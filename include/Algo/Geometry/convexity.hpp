@@ -45,9 +45,9 @@ bool isEdgeConvexe(typename PFP::MAP& map, Dart d, const VertexAttribute<typenam
 	const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(map, map.phi1(map.phi2(d)), position) ;
 
 	if((e * n) > 0)
-		return false;
-	else
 		return true;
+	else
+		return false;
 }
 
 } // namespace Geometry

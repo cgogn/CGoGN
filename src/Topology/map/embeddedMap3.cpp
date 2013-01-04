@@ -453,6 +453,15 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 		}
 
 		// embed the edge embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<EDGE2>())
+		{
+			setOrbitEmbeddingOnNewCell<EDGE2>(dit23) ;
+			copyCell<EDGE2>(dit23, dit) ;
+
+			copyDartEmbedding<EDGE2>(phi2(dit), dit);
+		}
+
+		// embed the edge embedded from the origin volume to the new darts
 		if(isOrbitEmbedded<EDGE>())
 		{
 			unsigned int eEmb = getEmbedding<EDGE>(dit) ;
