@@ -422,6 +422,65 @@ public:
 	void updateWithoutCollapse();
 } ;
 
+
+template <typename PFP>
+class EdgeSelector_CurvatureTensor : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "CurvatureTensorEdgeInfo" ; }
+	} CurvatureTensorEdgeInfo ;
+	typedef NoMathIOAttribute<CurvatureEdgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	EdgeAttribute<REAL> edgeangle ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, VEC3,EDGE>* m_positionApproximator ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
+
+public:
+	EdgeSelector_CurvatureTensor(MAP& m, VertexAttribute<VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_positionApproximator(NULL)
+	{
+		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
+		if(!edgeangle.isValid())
+		{
+			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
+			Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
+		}
+
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+	}
+	~EdgeSelector_CurvatureTensor()
+	{
+		this->m_map.removeAttribute(edgeangle) ; // TODO : pas malin s'il existait avant
+		this->m_map.removeAttribute(edgeInfo) ;
+	}
+	SelectorType getType() { return S_CurvatureTensor ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() {};
+} ;
+
+
 template <typename PFP>
 class EdgeSelector_MinDetail : public EdgeSelector<PFP>
 {

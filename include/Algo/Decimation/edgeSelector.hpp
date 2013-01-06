@@ -1221,6 +1221,215 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 }
 
 /************************************************************************************
+ *                            CURVATURE TENSOR                                      *
+ ************************************************************************************/
+
+template <typename PFP>
+bool CurvatureTensor<PFP>::init()
+{
+	MAP& m = this->m_map ;
+
+	bool ok = false ;
+	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
+		it != this->m_approximators.end() && !ok;
+		++it)
+	{
+		if((*it)->getApproximatedAttributeName() == "position")
+		{
+			assert((*it)->getType() == A_MidEdge || !"Only MidEdge Approximator is valid") ;
+			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
+			ok = true ;
+		}
+	}
+
+	if(!ok)
+		return false ;
+
+	edges.clear() ;
+
+//	TraversorE<MAP> travE(m);
+//	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+//	{
+//		computeEdgeMatrix(dit);
+//	}
+
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	{
+		initEdgeInfo(dit) ;	// init "edgeInfo" and "edges"
+	}
+
+	cur = edges.begin() ; // init the current edge to the first one
+
+	return true ;
+}
+
+template <typename PFP>
+bool CurvatureTensor<PFP>::nextEdge(Dart& d)
+{
+	if(cur == edges.end() || edges.empty())
+		return false ;
+	d = (*cur).second ;
+	return true ;
+}
+
+template <typename PFP>
+void CurvatureTensor<PFP>::updateBeforeCollapse(Dart d)
+{
+	MAP& m = this->m_map ;
+	assert(!m.isBoundaryEdge(d));
+
+	EdgeInfo* edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
+
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)					// remove all
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
+
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the concerned edges
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
+
+									// from the multimap
+	Dart dd = m.phi2(d) ;
+	edgeE = &(edgeInfo[m.phi1(dd)]) ;
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
+
+	edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
+}
+
+
+template <typename PFP>
+void CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	MAP& m = this->m_map ;
+
+	// TODO : here update edge angles : should look like :
+//	edgeangle[d] = computeAngleBetweenNormalsOnEdge<PFP>(map, d, this->m_position) ;
+
+
+	// update the edge matrices
+//	Traversor2VE<MAP> te (m,d2);
+//	for(Dart dit = te.begin() ; dit != te.end() ; dit = te.next())
+//	{
+//		computeEdgeMatrix(dit);
+//	}
+
+	// update the multimap
+
+	Traversor2VVaE<MAP> tv (m,d2);
+	CellMarker<EDGE> eMark (m);
+
+	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
+	{
+		Traversor2VE<MAP> te2 (m,dit);
+		for(Dart dit2 = te2.begin() ; dit2 != te2.end() ; dit2 = te2.next())
+		{
+			if (!eMark.isMarked(dit2))
+			{
+				updateEdgeInfo(dit2) ;
+				eMark.mark(dit2);
+			}
+		}
+	}
+
+	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void CurvatureTensor<PFP>::initEdgeInfo(Dart d)
+{
+	MAP& m = this->m_map ;
+	EdgeInfo einfo ;
+	if(m.edgeCanCollapse(d))
+		computeEdgeInfo(d, einfo) ;
+	else
+		einfo.valid = false ;
+	edgeInfo[d] = einfo ;
+}
+
+template <typename PFP>
+void CurvatureTensor<PFP>::updateEdgeInfo(Dart d)
+{
+	MAP& m = this->m_map ;
+	EdgeInfo& einfo = edgeInfo[d] ;
+
+	if(einfo.valid)
+		edges.erase(einfo.it) ;		// remove the edge from the multimap
+
+	if(m.edgeCanCollapse(d))
+		computeEdgeInfo(d, einfo) ;
+	else
+		einfo.valid = false ;
+}
+
+template <typename PFP>
+void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
+{
+
+	// TODO : code this function : everything complex is here
+
+	MAP& m = this->m_map ;
+	Dart dd = m.phi2(d);
+	Geom::Matrix33f M1; // init zero included
+	Geom::Matrix33f M2; // init zero included
+
+	assert(! m.isBoundaryEdge(d));
+
+	Traversor2VF<MAP> td (m,d);
+	Dart it = td.begin();
+	it = td.next();
+	Dart it2 = td.next();
+	while( it2 != td.end())
+	{
+		M1 += edgeMatrix[m.phi1(it)];
+		it = it2;
+		it2 = td.next();
+	}
+
+	Traversor2VF<MAP> tdd (m,dd);
+	it = tdd.begin();
+	it = tdd.next();
+	it2 = tdd.next();
+	while( it2 != tdd.end())
+	{
+		M2 += edgeMatrix[m.phi1(it)];
+		it = it2;
+		it2 = tdd.next();
+	}
+
+	m_positionApproximator->approximate(d) ;
+	const VEC3& a = m_positionApproximator->getApprox(d) ;
+
+	const VEC3 av1 = a - this->m_position[d] ;
+	const VEC3 av2 = a - this->m_position[dd] ;
+
+	REAL err = av1 * (M1 * av1) + av2 * (M2 * av2);
+
+	einfo.it = edges.insert(std::make_pair(err, d)) ;
+	einfo.valid = true ;
+}
+
+
+/************************************************************************************
  *                                  MIN DETAIL                                      *
  ************************************************************************************/
 
