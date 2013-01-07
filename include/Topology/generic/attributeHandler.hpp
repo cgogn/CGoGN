@@ -138,7 +138,7 @@ inline T& AttributeHandler<T, ORBIT>::operator[](Dart d)
 	unsigned int a = m_map->getEmbedding<ORBIT>(d) ;
 
 	if (a == EMBNULL)
-		a = m_map->embedNewCell<ORBIT>(d) ;
+		a = m_map->setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 
 	return m_attrib->operator[](a) ;
 }

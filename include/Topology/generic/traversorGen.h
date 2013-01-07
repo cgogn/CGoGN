@@ -26,6 +26,7 @@
 #define __TRAVERSORGEN_H__
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/functor.h"
 
 namespace CGoGN
 {
@@ -39,52 +40,18 @@ public:
 	virtual Dart end() = 0;
 	virtual Dart next() = 0;
 
-	/**
-	 * Factory of incident traversors creation
-	 * @param map the map in which we work
-	 * @param dart the initial dart of traversal
-	 * @param dim the dimension of traversal (2 or 3)
-	 * @param orbX incident from cell
-	 * @param orbY incident to cell
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor<MAP>* createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
-
-	/**
-	 * Factory of adjacent traversors creation
-	 * @param map the map in which we work
-	 * @param dart the initial dart of traversal
-	 * @param dim the dimension of traversal (2 or 3)
-	 * @param orbX incident from cell
-	 * @param orbY incident to cell
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor<MAP>* createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
-
-	/**
-	 * Factory of darts of orbit traversors creation
-	 * @param map the map in which we work
-	 * @param dart the initial dart of traversal
-	 * @param orb the orbit
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor<MAP>* createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb);
-
-	/**
-	 * Factory of incident traversors creation
-	 * @param map the map in which we work
-	 * @param good the selector (default value allDarts)
-	 * @param forceDartMarker (default value false)
-	 * @param thread (default value 0)
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor<MAP>* createCell(MAP& map, unsigned int orb, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0);
+	bool applyFunctor(FunctorType& f, const FunctorSelect& good = allDarts)
+	{
+		for (Dart d = begin(); d != end(); d = next())
+		{
+			if (good(d))
+				if (f(d))
+					return true;
+		}
+		return false;
+	}
 };
 
 } // namespace CGoGN
 
-
-//#include "Topology/generic/traversorGen.hpp"
-
 #endif
-

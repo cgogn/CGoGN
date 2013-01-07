@@ -330,6 +330,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 		{
 			if (d != Dart::nil())
 				m_selected = d;
+			std::cout << myMap.edgeCanCollapse(d) << std::endl;
 		}
 		if (button == Qt::RightButton)
 		{
@@ -650,10 +651,13 @@ void MyQT::importMesh(std::string& filename)
 	else
 	{
 		std::cerr << "could not import " << filename << std::endl ;
+		return ;
 	}
 
 	m_selected  = NIL;
 	m_selected2 = NIL;
+
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	setParamObject(bb.maxSize(), bb.center().data()) ;

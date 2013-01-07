@@ -1,7 +1,13 @@
 // PointSprite::fragmentShaderText
 
-uniform sampler2D SpriteTexture;
+uniform mat4 ProjectionMatrix;
+uniform vec3 lightPos;
+uniform vec3 ambiant;
 uniform float size;
+#ifdef WITH_PLANE
+	uniform vec3 eyePos;
+	VARYING_FRAG vec3 shiftedEye;
+#endif
 
 #ifdef WITH_COLOR_PER_VERTEX 
 	VARYING_FRAG vec3 colorsprite;
@@ -9,18 +15,42 @@ uniform float size;
 	uniform vec3 colorsprite;
 #endif
 
+VARYING_FRAG vec2 spriteCoord;
+VARYING_FRAG vec3 sphereCenter;
 
-VARYING_FRAG vec2 texCoord;
-VARYING_FRAG vec2 positionFragIn;
-VARYING_FRAG vec4 mvpFragIn;
 void main(void)
 {
-	float lum = texture2D(SpriteTexture, texCoord).s;
-	if (lum==0.0)
+#ifdef WITH_PLANE
+	vec3 billboard_frag_pos = vec3(spriteCoord, 0.0) * size;
+	vec3 ray_direction = normalize(billboard_frag_pos - shiftedEye);
+	float av = dot(shiftedEye,ray_direction);
+	float arg = av*av - dot(shiftedEye,shiftedEye) + size*size;
+	if (arg< 0.0)
 		discard;
-	vec2 v = texCoord-vec2(0.5,0.5);
-	float z = size * sqrt(1.0-dot(v,v));
-	vec2 zfrag = positionFragIn + vec2(z,0.0);
-	gl_FragDepth = 0.5 + 0.5 * dot(zfrag, mvpFragIn.xy) / dot(zfrag, mvpFragIn.zw);
-	gl_FragColor = vec4(colorsprite,0.0)*lum;
+	float t = -av - sqrt(arg);
+	vec3 frag_position_eye = ray_direction * t + eyePos	;
+#else
+	vec3 billboard_frag_pos = sphereCenter + vec3(spriteCoord, 0.0) * size;
+	vec3 ray_direction = normalize(billboard_frag_pos);
+	float TD = -dot(ray_direction,sphereCenter);
+	float c = dot(sphereCenter, sphereCenter) - size * size;
+	float arg = TD * TD - c;
+    
+	if (arg < 0.0)
+		discard;
+
+	float t = -c / (TD - sqrt(arg));
+	vec3 frag_position_eye = ray_direction * t ;
+#endif	
+
+
+	vec4 pos = ProjectionMatrix * vec4(frag_position_eye, 1.0);
+	gl_FragDepth = (pos.z / pos.w + 1.0) / 2.0;
+
+	vec3 N = normalize(frag_position_eye - sphereCenter);
+	vec3 L = normalize (lightPos - frag_position_eye);
+	float lambertTerm = dot(N,L);
+	
+	gl_FragColor = vec4(colorsprite*lambertTerm + ambiant ,1.0);
+
 }

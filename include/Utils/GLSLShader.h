@@ -31,8 +31,9 @@
 
 #include "Utils/gl_def.h"
 #include "Utils/os_spec.h"
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "Utils/gl_matrices.h"
+#include "Utils/cgognStream.h"
 
 #include "glm/glm.hpp"
 #include <GL/glew.h>
@@ -78,6 +79,9 @@ protected:
 	static std::string* DEFINES_GL;
 
 	static std::string defines_Geom(const std::string& primitivesIn, const std::string& primitivesOut, int maxVert);
+
+	int m_nbMaxVertices;
+
 
 	/**
 	 * handle of vertex shader
@@ -167,7 +171,7 @@ protected:
 	/**
 	 * create the shader (attach and link shaders into program)
 	 */
-	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES, int nb_max_vertices=16);
+	bool create(GLint inputGeometryPrimitive = GL_TRIANGLES, GLint outputGeometryPrimitive = GL_TRIANGLES, int nb_max_vertices = -1);
 
 	/**
 	 * get log after compiling
@@ -269,6 +273,8 @@ public:
 	bool reloadGeometryShaderFromMemory(const char* gs);
 
 	bool recompile();
+
+	bool changeNbMaxVertices(int nb_max_vertices);
 
 	/**
 	 * Link the shader do it just after binding the attributes

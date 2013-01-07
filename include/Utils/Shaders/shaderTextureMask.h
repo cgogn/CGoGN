@@ -25,7 +25,6 @@
 #ifndef __CGOGN_SHADERTEXTUREMASK_H_
 #define __CGOGN_SHADERTEXTUREMASK_H_
 
-
 #include "Geometry/vector_gen.h"
 #include "Utils/GLSLShader.h"
 #include "Utils/clippingShader.h"

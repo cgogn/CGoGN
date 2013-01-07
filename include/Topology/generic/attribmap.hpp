@@ -83,11 +83,6 @@ inline bool AttribMap::copyAttribute(AttributeHandler<T, ORBIT>& dst, AttributeH
 	return false ;
 }
 
-inline unsigned int AttribMap::getNbCells(unsigned int orbit)
-{
-	return this->m_attribs[orbit].size() ;
-}
-
 /****************************************
  *               UTILITIES              *
  ****************************************/
@@ -121,7 +116,7 @@ void AttribMap::bijectiveOrbitEmbedding()
 			{
 				if (counter[d] > 0)
 				{
-					unsigned int newEmb = embedNewCell<ORBIT>(d) ;
+					unsigned int newEmb = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 					copyCell<ORBIT>(newEmb, emb) ;
 				}
 				counter[d]++ ;

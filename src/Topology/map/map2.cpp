@@ -107,6 +107,22 @@ void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
  *  To generate or delete faces in a 2-map
  *************************************************************************/
 
+Dart Map2::newPolyLine(unsigned int nbEdges)
+{
+	Dart d = Map1::newCycle(2*nbEdges);
+	{
+		Dart it1 = d;
+		Dart it2 = phi_1(d);
+		for(unsigned int i = 0; i<nbEdges ; ++i)
+		{
+			phi2sew(it1, it2);
+			it1 = phi1(it1);
+			it2 = phi_1(it2);
+		}
+	}
+	return d;
+}
+
 Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 {
 	Dart d = Map1::newCycle(nbEdges);
@@ -384,8 +400,14 @@ void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
 	phi2sew(d, e) ; // sew the faces
 }
 
-void Map2::unsewFaces(Dart d)
+void Map2::unsewFaces(Dart d, bool withBoundary)
 {
+	if (!withBoundary)
+	{
+		phi2unsew(d) ;
+		return ;
+	}
+
 	assert(!Map2::isBoundaryEdge(d)) ;
 
 	Dart dd = phi2(d) ;
@@ -552,7 +574,7 @@ void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool second
 	//unsew the edge path
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
-		if(!Map2::isBoundaryEdge(*it))
+		//if(!Map2::isBoundaryEdge(*it))
 			unsewFaces(*it) ;
 	}
 
@@ -611,6 +633,18 @@ Dart Map2::findBoundaryEdgeOfVertex(Dart d)
 		if (isBoundaryMarked(it))
 			return it ;
 		it = phi2(phi_1(it)) ;
+	} while (it != d) ;
+	return NIL ;
+}
+
+Dart Map2::findBoundaryEdgeOfFace(Dart d)
+{
+	Dart it = d ;
+	do
+	{
+		if (isBoundaryMarked(phi2(it)))
+			return phi2(it) ;
+		it = phi1(it) ;
 	} while (it != d) ;
 	return NIL ;
 }
@@ -872,7 +906,7 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 	return countEdges ;
 }
 
-unsigned int Map2::closeMap()
+unsigned int Map2::closeMap(bool forboundary)
 {
 	// Search the map for topological holes (fix points of phi2)
 	unsigned int nb = 0 ;
@@ -881,7 +915,7 @@ unsigned int Map2::closeMap()
 		if (phi2(d) == d)
 		{
 			++nb ;
-			closeHole(d);
+			closeHole(d, forboundary);
 		}
 	}
 	return nb ;

@@ -26,6 +26,7 @@
 #define __COLLECTOR_H__
 
 #include "Container/fakeAttribute.h"
+#include "Geometry/basic.h"
 
 /*****************************************
  * Class hierarchy :

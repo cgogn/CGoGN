@@ -23,7 +23,6 @@
 *******************************************************************************/
 #ifdef WITH_QT
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderTextureMask.h"
 
 
@@ -74,19 +73,22 @@ ShaderTextureMask::ShaderTextureMask()
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
+	bind();
 	m_unif_unit = glGetUniformLocation(this->program_handler(), "textureUnit");
 	m_unif_unitMask = glGetUniformLocation(this->program_handler(), "textureUnitMask");
+	unbind();
 }
 
 void ShaderTextureMask::setTextureUnits(GLenum texture_unit, GLenum texture_unitMask)
 {
-	this->bind();
+	bind();
 	int unit = texture_unit - GL_TEXTURE0;
 	glUniform1iARB(*m_unif_unit,unit);
 	m_unit = unit;
 	unit = texture_unitMask - GL_TEXTURE0;
 	glUniform1iARB(*m_unif_unitMask,unit);
 	m_unitMask = unit;
+	unbind();
 }
 
 void ShaderTextureMask::setTextures(Utils::GTexture* tex, Utils::GTexture* texMask)
@@ -103,26 +105,32 @@ void ShaderTextureMask::activeTextures()
 	m_texMask_ptr->bind();
 }
 
-
-
 unsigned int ShaderTextureMask::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
 unsigned int ShaderTextureMask::setAttributeTexCoord(VBO* vbo)
 {
 	m_vboTexCoord = vbo;
-	return bindVA_VBO("VertexTexCoord", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexTexCoord", vbo);
+	unbind();
+	return id;
 }
 
 void ShaderTextureMask::restoreUniformsAttribs()
 {
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexTexCoord", m_vboTexCoord);
 	glUniform1iARB(*m_unif_unit,m_unit);
 	glUniform1iARB(*m_unif_unitMask,m_unitMask);
+	unbind();
 }
 
 } // namespace Utils

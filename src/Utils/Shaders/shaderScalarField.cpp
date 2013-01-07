@@ -22,9 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderScalarField.h"
-
 
 namespace CGoGN
 {
@@ -53,13 +51,19 @@ ShaderScalarField::ShaderScalarField()
 unsigned int ShaderScalarField::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
 unsigned int ShaderScalarField::setAttributeScalar(VBO* vbo)
 {
 	m_vboScal = vbo;
-	return bindVA_VBO("VertexScalar", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexScalar", vbo);
+	unbind();
+	return id;
 }
 
 void ShaderScalarField::restoreUniformsAttribs()

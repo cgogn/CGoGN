@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderSimpleColor.h"
 
 namespace CGoGN
@@ -84,12 +83,16 @@ void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
 	m_color = color;
 	bind();
 	glUniform4fv(*m_unif_color, 1, color.data());
+	unbind();
 }
 
 unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
 void ShaderSimpleColor::restoreUniformsAttribs()

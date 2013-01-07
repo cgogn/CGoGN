@@ -37,7 +37,7 @@ namespace Decimation
 template <typename PFP>
 bool Approximator_QEM<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
 	// Does not require to be valid (if it is not, altenatives will be used).
 
 	if(this->m_predictor)
@@ -55,14 +55,14 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 	// get some darts
 	Dart dd = m.phi2(d) ;
 
-	Quadric<REAL> q1, q2 ;
+	Utils::Quadric<REAL> q1, q2 ;
 	if(!m_quadric.isValid()) // if the selector is not QEM, compute local error quadrics
 	{
 		// compute the error quadric associated to v1
 		Dart it = d ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -71,7 +71,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		it = dd ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -82,7 +82,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		q2 = m_quadric[dd] ;
 	}
 
-	Quadric<REAL> quad ;
+	Utils::Quadric<REAL> quad ;
 	quad += q1 ;    // compute the sum of the
 	quad += q2 ;    // two vertices quadrics
 
@@ -112,7 +112,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 template <typename PFP>
 bool Approximator_QEMhalfEdge<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
 
 	if(this->m_predictor)
 	{
@@ -129,14 +129,14 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 	// get some darts
 	Dart dd = m.phi2(d) ;
 
-	Quadric<REAL> q1, q2 ;
+	Utils::Quadric<REAL> q1, q2 ;
 	if(!m_quadric.isValid()) // if the selector is not QEM, compute local error quadrics
 	{
 		// compute the error quadric associated to v1
 		Dart it = d ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -145,7 +145,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		it = dd ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -156,7 +156,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		q2 = m_quadric[dd] ;
 	}
 
-	Quadric<REAL> quad ;
+	Utils::Quadric<REAL> quad ;
 	quad += q1 ;	// compute the sum of the
 	quad += q2 ;	// two vertices quadrics
 
@@ -211,7 +211,7 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
+		unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 		this->m_attrV[0]->operator[](newV) = this->m_approx[0][d] ;
 
 		// compute the detail vector
@@ -220,8 +220,8 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.template embedOrbit<VERTEX>(d, m.template getEmbedding<VERTEX>(d)) ;
-		m.template embedOrbit<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
+		m.template setOrbitEmbedding<VERTEX>(d, m.template getEmbedding<VERTEX>(d)) ;
+		m.template setOrbitEmbedding<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
 	}
 }
 
@@ -260,7 +260,7 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
+		unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
 		{
 			this->m_attrV[i]->operator[](newV) = this->m_approx[i][d] ;
@@ -275,8 +275,8 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.template embedOrbit<VERTEX>(d, m.template getEmbedding<VERTEX>(d)) ;
-		m.template embedOrbit<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
+		m.template setOrbitEmbedding<VERTEX>(d, m.template getEmbedding<VERTEX>(d)) ;
+		m.template setOrbitEmbedding<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
 	}
 }
 

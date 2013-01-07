@@ -37,6 +37,7 @@
 
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
+#include "Utils/vbo.h"
 #include "Utils/cgognStream.h"
 #include "Utils/Qt/qtSimple.h"
 

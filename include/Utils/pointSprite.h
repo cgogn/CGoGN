@@ -61,6 +61,14 @@ protected:
 	CGoGNGLuint m_idTexture;
 
 	CGoGNGLuint m_uniform_texture;
+	
+	CGoGNGLuint m_uniform_EyePos;
+	
+//	CGoGNGLuint m_uniform_EyeY;
+
+	CGoGNGLuint m_uniform_ambiant;
+
+	CGoGNGLuint m_uniform_lightPos;
 
 public:
 	/**
@@ -69,7 +77,7 @@ public:
 	 * @param radius of sphere
 	 */
 
-	PointSprite(bool withColorPerVertex=false, float radius=1.0f);
+	PointSprite(bool withColorPerVertex=false, float radius=1.0f, bool with_plane=false);
 
 	/**
 	 * clean shaders, texture and variables
@@ -97,6 +105,12 @@ public:
 	 * @param radius
 	 */
 	void setSize(float radius);
+	
+	/**
+	* set the plane of rendering for VR rendering
+	*/
+	void setEyePosition(const Geom::Vec3f& ep);
+
 
 	/**
 	 * set position attribute
@@ -107,6 +121,12 @@ public:
 	 * set color attribute
 	 */
 	unsigned int setAttributeColor(VBO* vbo);
+
+
+	void setLightPosition(const Geom::Vec3f& pos);
+
+	void setAmbiantColor(const Geom::Vec3f& amb);
+
 };
 
 } // namespace Utils

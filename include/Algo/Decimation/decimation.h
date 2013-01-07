@@ -40,6 +40,20 @@ namespace Algo
 namespace Decimation
 {
 
+/**
+ * Decimate the mesh through edge contraction
+ * by using a selector and approximator scheme.
+ *
+ * \param map the map to decimate
+ * \param s the SelectorType
+ * \param a the ApproximatorType
+ * \param position the vertex position embeddings
+ * \param nbWantedVertices the aimed amount of vertices after decimation
+ * \param selected the selector stipulating which darts are eligible for contraction
+ * \param edgeErrors will (if not null) contain the edge errors computed by the approximator/selector (default NULL)
+ * \param callback_wrapper a callback function for progress monitoring (default NULL)
+ * \param callback_object the object to call the callback on (default NULL)
+ */
 template <typename PFP>
 void decimate(
 	typename PFP::MAP& map,
@@ -48,6 +62,7 @@ void decimate(
 	std::vector<VertexAttribute<typename PFP::VEC3> *>& position,
 	unsigned int nbWantedVertices,
 	const FunctorSelect& selected = allDarts,
+	EdgeAttribute<typename PFP::REAL> *edgeErrors = NULL,
 	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
 ) ;
 

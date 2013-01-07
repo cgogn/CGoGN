@@ -42,7 +42,7 @@ inline std::string GMap0::mapTypeName() const
 	return "GMap0";
 }
 
-inline unsigned int GMap0::dimension()
+inline unsigned int GMap0::dimension() const
 {
 	return 0;
 }
@@ -50,7 +50,8 @@ inline unsigned int GMap0::dimension()
 inline void GMap0::clear(bool removeAttrib)
 {
 	AttribMap::clear(removeAttrib) ;
-	init() ;
+	if (removeAttrib)
+		init() ;
 }
 
 inline void GMap0::update_topo_shortcuts()

@@ -35,7 +35,7 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
-
+#include "Utils/vbo.h"
 
 #include "Algo/Histogram/histogram.h"
 #include "Utils/Qt/qthistodraw.h"

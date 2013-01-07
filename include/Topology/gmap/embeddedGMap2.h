@@ -40,6 +40,11 @@ public:
 	typedef GMap2 TOPO_MAP;
 
 	/**
+	 *	create a new face with managed embeddings
+	 */
+	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
+
+	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
 	 * No attribute is attached to the new edge
 	 */

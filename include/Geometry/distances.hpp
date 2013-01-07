@@ -239,7 +239,7 @@ typename VEC3::DATA_TYPE squaredDistanceLine2Seg(const VEC3& A, const VEC3& AB, 
 }
 
 template <typename VEC3>
-float squaredDistanceSeg2Point(const VEC3& A, const VEC3& AB, typename VEC3::DATA_TYPE AB2, const VEC3& P)
+typename VEC3::DATA_TYPE squaredDistanceSeg2Point(const VEC3& A, const VEC3& AB, typename VEC3::DATA_TYPE AB2, const VEC3& P)
 {
 	typedef typename VEC3::DATA_TYPE T ;
 

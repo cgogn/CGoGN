@@ -30,12 +30,14 @@ namespace CGoGN
 
 namespace Utils
 {
+
 #include "shaderPhong.vert"
 #include "shaderPhong.frag"
 
 
-ShaderPhong::ShaderPhong(bool doubleSided):
+ShaderPhong::ShaderPhong(bool doubleSided, bool withEyePosition):
 	m_with_color(false),
+	m_with_eyepos(withEyePosition),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
@@ -45,7 +47,6 @@ ShaderPhong::ShaderPhong(bool doubleSided):
 	m_vboNormal(NULL),
 	m_vboColor(NULL)
 {
-
 	m_nameVS = "ShaderPhong_vs";
 	m_nameFS = "ShaderPhong_fs";
 	m_nameGS = "ShaderPhong_gs";
@@ -53,6 +54,8 @@ ShaderPhong::ShaderPhong(bool doubleSided):
 	// get choose GL defines (2 or 3)
 	// ans compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
+	if (m_with_eyepos)
+		glxvert.append("#define WITH_EYEPOSITION");
 	glxvert.append(vertexShaderText);
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	// Use double sided lighting if set
@@ -63,62 +66,85 @@ ShaderPhong::ShaderPhong(bool doubleSided):
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
 	// and get and fill uniforms
-	bind();
 	getLocations();
 	sendParams();
 }
 
 void ShaderPhong::getLocations()
 {
+	bind();
 	*m_unif_ambiant   = glGetUniformLocation(this->program_handler(), "materialAmbient");
 	*m_unif_diffuse   = glGetUniformLocation(this->program_handler(), "materialDiffuse");
 	*m_unif_specular  = glGetUniformLocation(this->program_handler(), "materialSpecular");
 	*m_unif_shininess = glGetUniformLocation(this->program_handler(), "shininess");
 	*m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
+	if (m_with_eyepos)
+		*m_unif_eyePos  = glGetUniformLocation(this->program_handler(), "eyePosition");
+	unbind();
 }
 
 void ShaderPhong::sendParams()
 {
+	bind();
 	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
 	glUniform4fv(*m_unif_diffuse,  1, m_diffuse.data());
 	glUniform4fv(*m_unif_specular, 1, m_specular.data());
 	glUniform1f(*m_unif_shininess,    m_shininess);
 	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
+	if (m_with_eyepos)
+		glUniform3fv(*m_unif_eyePos, 1, m_eyePos.data());
+	unbind();
 }
 
 void ShaderPhong::setAmbiant(const Geom::Vec4f& ambiant)
 {
-	this->bind();
+	bind();
 	glUniform4fv(*m_unif_ambiant,1, ambiant.data());
 	m_ambiant = ambiant;
+	unbind();
 }
 
 void ShaderPhong::setDiffuse(const Geom::Vec4f& diffuse)
 {
-	this->bind();
+	bind();
 	glUniform4fv(*m_unif_diffuse,1, diffuse.data());
 	m_diffuse = diffuse;
+	unbind();
 }
 
 void ShaderPhong::setSpecular(const Geom::Vec4f& specular)
 {
-	this->bind();
+	bind();
 	glUniform4fv(*m_unif_specular,1,specular.data());
 	m_specular = specular;
+	unbind();
 }
 
 void ShaderPhong::setShininess(float shininess)
 {
-	this->bind();
+	bind();
 	glUniform1f (*m_unif_shininess, shininess);
 	m_shininess = shininess;
+	unbind();
 }
 
-void ShaderPhong::setLightPosition( Geom::Vec3f lightPos)
+void ShaderPhong::setLightPosition(const Geom::Vec3f& lightPos)
 {
-	this->bind();
+	bind();
 	glUniform3fv(*m_unif_lightPos,1,lightPos.data());
 	m_lightPos = lightPos;
+	unbind();
+}
+
+void ShaderPhong::setEyePosition(const Geom::Vec3f& eyePos)
+{
+	if (m_with_eyepos)
+	{
+		bind();
+		glUniform3fv(*m_unif_eyePos,1,eyePos.data());
+		m_eyePos = eyePos;
+		unbind();
+	}
 }
 
 void ShaderPhong::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos)
@@ -128,7 +154,6 @@ void ShaderPhong::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffu
 	m_specular = specular;
 	m_shininess = shininess;
 	m_lightPos = lightPos;
-	bind();
 	sendParams();
 }
 
@@ -148,12 +173,14 @@ unsigned int ShaderPhong::setAttributeColor(VBO* vbo)
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
 
 		// and treat uniforms
-		bind();
 		getLocations();
 		sendParams();
 	}
 	// bind th VA with WBO
-	return bindVA_VBO("VertexColor", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexColor", vbo);
+	unbind();
+	return id;
 }
 
 void ShaderPhong::unsetAttributeColor()
@@ -161,9 +188,11 @@ void ShaderPhong::unsetAttributeColor()
 	m_vboColor = NULL;
 	if (m_with_color)
 	{
-		m_with_color=false;
+		m_with_color = false;
 		// unbind the VA
+		bind();
 		unbindVA("VertexColor");
+		unbind();
 		// recompile shader
 		std::string gl3vert(*GLSLShader::DEFINES_GL);
 		gl3vert.append(vertexShaderText);
@@ -171,7 +200,6 @@ void ShaderPhong::unsetAttributeColor()
 		gl3frag.append(fragmentShaderText);
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
 		// and treat uniforms
-		bind();
 		getLocations();
 		sendParams();
 	}
@@ -180,27 +208,33 @@ void ShaderPhong::unsetAttributeColor()
 void ShaderPhong::restoreUniformsAttribs()
 {
 	getLocations();
-
-	bind();
 	sendParams();
 
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexNormal", m_vboNormal);
 	if (m_vboColor)
 		bindVA_VBO("VertexColor", m_vboColor);
+
 	unbind();
 }
 
 unsigned int ShaderPhong::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
 unsigned int ShaderPhong::setAttributeNormal(VBO* vbo)
 {
 	m_vboNormal = vbo;
-	return bindVA_VBO("VertexNormal", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexNormal", vbo);
+	unbind();
+	return id;
 }
 
 } // namespace Utils

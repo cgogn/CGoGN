@@ -92,7 +92,7 @@ private:
 
 	// Assigne un nouveau plongement au sommet. Les anciens plongements sont libérés.
 	void newVertex(Dart d) {
-		embedNewCell<VERTEX>(d);
+		setOrbitEmbeddingOnNewCell<VERTEX>(d);
 	}
 
 public:
@@ -371,7 +371,7 @@ void MyQT::cb_initGL()
 	m_render = new Algo::Render::GL2::MapRender();
 	m_render_topo = new Algo::Render::GL2::TopoRender() ;
 
-	m_ds = new Utils::Drawer();
+	m_ds = new Utils::Drawer() ;
 
 	// create VBO for position
 	m_positionVBO = new Utils::VBO();
