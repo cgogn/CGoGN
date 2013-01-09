@@ -30,6 +30,37 @@
 namespace CGoGN
 {
 
+Dart EmbeddedMap2::newPolyLine(unsigned int nbEdges)
+{
+	Dart d = Map2::newPolyLine(nbEdges) ;
+
+	if (isOrbitEmbedded<VERTEX>())
+	{
+		Dart e = d ;
+		for (unsigned int i = 0 ; i <= nbEdges ; ++i)
+		{
+			initOrbitEmbeddingNewCell<VERTEX>(e) ;
+			e = this->phi1(e) ;
+		}
+	}
+
+	if (isOrbitEmbedded<EDGE>())
+	{
+		Dart e = d ;
+		for (unsigned int i = 0 ; i < nbEdges ; ++i)
+		{
+			initOrbitEmbeddingNewCell<EDGE>(e) ;
+			e = this->phi1(e) ;
+		}
+	}
+
+	if (isOrbitEmbedded<FACE>())
+	{
+		initOrbitEmbeddingNewCell<FACE>(d) ;
+	}
+	return d ;
+}
+
 Dart EmbeddedMap2::newFace(unsigned int nbEdges, bool withBoundary)
 {
 	Dart d = Map2::newFace(nbEdges, withBoundary);
@@ -308,6 +339,58 @@ void EmbeddedMap2::swapEdges(Dart d, Dart e)
 
 	if(isOrbitEmbedded<VOLUME>())
 		setOrbitEmbeddingOnNewCell<VOLUME>(d);
+}
+
+void EmbeddedMap2::insertEdgeInVertex(Dart d, Dart e)
+{
+	Map2::insertEdgeInVertex(d, e);
+
+	if (isOrbitEmbedded<VERTEX>())
+	{
+		copyDartEmbedding<VERTEX>(e, d) ;
+	}
+
+	if (isOrbitEmbedded<FACE>())
+	{
+		if(!sameFace(d,e))
+		{
+			setOrbitEmbeddingOnNewCell<FACE>(e);
+			copyCell<FACE>(e, d);
+		}
+		else
+		{
+			setOrbitEmbedding<FACE>(d, getEmbedding<FACE>(d)) ;
+		}
+	}
+}
+
+bool EmbeddedMap2::removeEdgeFromVertex(Dart d)
+{
+	Dart dPrev = alpha_1(d);
+
+	if (dPrev == d) return false ;
+
+	bool b = Map2::removeEdgeFromVertex(d);
+
+	if (isOrbitEmbedded<VERTEX>())
+	{
+		setOrbitEmbeddingOnNewCell<VERTEX>(d);
+		copyCell<VERTEX>(d, dPrev);
+	}
+
+	if (isOrbitEmbedded<FACE>())
+	{
+		if(!sameFace(d, dPrev))
+		{
+			setOrbitEmbeddingOnNewCell<FACE>(d);
+			copyCell<FACE>(d, dPrev);
+		}
+		else
+		{
+			setDartEmbedding<FACE>(d, getEmbedding<FACE>(d)) ;
+		}
+	}
+	return b ;
 }
 
 void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)

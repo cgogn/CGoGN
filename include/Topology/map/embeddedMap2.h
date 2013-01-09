@@ -40,7 +40,10 @@ public:
 	typedef Map2 TOPO_MAP;
 
 	/*
-	 *
+	 */
+	virtual Dart newPolyLine(unsigned int nbEdges) ;
+
+	/*
 	 */
 	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
 
@@ -92,6 +95,18 @@ public:
 	 *
 	 */
 	virtual void swapEdges(Dart d, Dart e);
+
+	/**
+	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
+	 * The attributes attached to the face of dart d are overwritten on the face of dart e
+	 */
+	virtual void insertEdgeInVertex(Dart d, Dart e);
+
+	/**
+	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
+	 * The attributes attached to the face of dart d are overwritten on the face of dart e
+	 */
+	virtual bool removeEdgeFromVertex(Dart d);
 
 	/**
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge

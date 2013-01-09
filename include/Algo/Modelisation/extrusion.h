@@ -173,9 +173,6 @@ Dart revolution(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>&
 * @param the_map the map in which include created surface
 * @param d a dart of the face to extrude
 * @param N the vector use to extrude face center (point) of axis revolution
-* @param axis direction of axis revolution
-* @param profile_closed profile is a closed polygon or not ?
-* @param nbSide number of steps around the revolution
 */
 template<typename PFP>
 Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
@@ -185,10 +182,7 @@ Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>
 * Face extrusion
 * @param the_map the map in which include created surface
 * @param d a dart of the face to extrude
-* @param N the vector use to extrude face center (point) of axis revolution
-* @param axis direction of axis revolution
-* @param profile_closed profile is a closed polygon or not ?
-* @param nbSide number of steps around the revolution
+* @param dist the height to extrude face
 */
 template<typename PFP>
 Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,

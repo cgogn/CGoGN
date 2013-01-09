@@ -40,55 +40,61 @@ bool isBetween(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 }
 
 template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e)
+void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e, int precision)
 {
-	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
-  // d1 traverses the vertex of d (following the alpha1 permutation)
-  // y is a temporay buffer to stop the loop
-  Dart d1=d;
-  // e1 traverses the vertex of e (following the alpha1 permutation)
-  Dart e1=e;
-  bool notempty = true;
-  do {
-	if (map.phi2_1(e1) == e1) notempty = false;
-	// detach z from its vertex
-	map.removeEdgeFromVertex(e1);
-	// Searchs the dart of the vertex of x where tz may be inserted
-	Dart nd1 = d1;
-	do {
-	  if (CGoGN::Algo::BooleanOperator::isBetween<PFP>(map,positions,e1,d1,map.phi2_1(d1))) break;
-	  d1 = map.phi2_1(d1);
-	} while (d1 != nd1);
-	map.insertEdgeInVertex(d1,e1);
-	d1 = e1;
-  } while (notempty);
+	assert(positions[d].isNear(positions[e], precision) && !map.sameVertex(d, e)) ;
 
-  // 0-embed z on the vertex of x without copy of the vertex
-//  positions[d] = ;
+	bool notempty = true ;
+	do // While vertex of e contains more than one dart
+	{
+		Dart e1 = map.alpha1(e) ;			// e1 stores next dart of vertex of e
+		if (e1 == e)
+			notempty = false ;				// last dart of vertex of e
+		else {
+			map.removeEdgeFromVertex(e) ;	// detach e from its vertex
+		}
+		// Searchs where e may be inserted in the vertex of d
+		Dart d1 = d ;
+		do
+		{
+			if (CGoGN::Algo::BooleanOperator::isBetween<PFP>(map, positions, e, d,
+			                                                 map.alpha1(d))) break ;
+			d = map.alpha1(d) ;
+		} while (d != d1) ;
+
+		// Inserted e in the correct place (after d)
+		map.insertEdgeInVertex(d, e) ;
+
+		// Go on with next darts
+		d = e ;
+		e = e1 ;
+	} while (notempty) ;
 }
 
-
-
 template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
+void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, int precision)
 {
 	// TODO optimiser en triant les sommets
-	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
+	//	map.template enableQuickTraversal<VERTEX>();
+	TraversorV<typename PFP::MAP> travV1(map) ;
+	CellMarker<VERTEX> vM(map);
+	for(Dart d1 = travV1.begin() ; d1 != travV1.end() ; d1 = travV1.next())
 	{
-		CellMarker<VERTEX> vM(map);
-		vM.mark(d);
-		std::cout << "." ; std::cout.flush() ;
-		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
+		vM.mark(d1);
+		TraversorV<typename PFP::MAP> travV2(map) ;
+		for(Dart d2 = travV2.begin() ; d2 != travV2.end() ; d2 = travV2.next())
 		{
-			if(!vM.isMarked(dd))
+			if(!vM.isMarked(d2))
 			{
-				if(Geom::arePointsEquals(positions[d],positions[dd]))
+				if(positions[d1].isNear(positions[d2], precision))
 				{
-					mergeVertex<PFP>(map,positions,d,dd);
+					if (map.sameVertex(d1,d2)) std::cout << "fusion: sameVertex" << std::endl ;
+					if (!map.sameVertex(d1,d2)) mergeVertex<PFP>(map,positions,d1,d2,precision);
 				}
 			}
 		}
 	}
+	//	map.template disableQuickTraversal<VERTEX>();
 }
 
 }
