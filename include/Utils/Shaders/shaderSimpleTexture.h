@@ -30,6 +30,7 @@
 #include "Utils/GLSLShader.h"
 #include "Utils/clippingShader.h"
 #include "Utils/textures.h"
+#include "Utils/gl_def.h"
 
 namespace CGoGN
 {
@@ -68,9 +69,14 @@ public:
 	void setTexture(Utils::GTexture* tex);
 
 	/**
-	 * activation of texture unit
+	 * activation of texture unit with set texture
 	 */
 	void activeTexture();
+	
+	/**
+	 * activation of texture unit with texture id
+	 */
+	void activeTexture(CGoGNGLuint texId);
 
 
 	unsigned int setAttributePosition(VBO* vbo);
