@@ -134,22 +134,55 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
 template <typename PFP>
 Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
 {
+	Dart dres = Dart::nil();
+	std::vector<Dart> m_tableVertDarts;
+	
+	
+	unsigned int nbt = 2*nbSides -1 ; // -1 for computation optimization
+	m_tableVertDarts.reserve(n);
+	
+	
+	// creation of triangles around circunference and storing vertices
+	for (unsigned int i = 0; i <= nbt; ++i)
+	{
+		Dart d = map.newFace(3, false);
+		m_tableVertDarts.push_back(d);
+	}
 
-// TODO A REFAIRE
+	// sewing the triangles
+	for (unsigned int i = 0; i < nbSides-1; ++i)
+	{
+		Dart d = m_tableVertDarts[i];
+		d = map.phi_1(d);
+		Dart e = m_tableVertDarts[i+1];
+		e = map.phi1(e);
+		map.sewFaces(d, e, false);
+	}
+	//sewing the last with the first
+	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[nbSides-1]), false);
 
-//	Dart res = Dart::nil();
-//
-//	Dart firstP = createPyramid<PFP>(map,nbSides);
-//	Dart secondP = createPyramid<PFP>(map,nbSides);
-//
-//	res = map.phi2(firstP);
-//
-//	map.sewVolumes(firstP, secondP);
-//	//map.mergeVolumes(firstP);
-//
-//	return res;
+	for (unsigned int i = nbSides; i <= nbt; ++i)
+	{
+		Dart d = m_tableVertDarts[i];
+		d = map.phi_1(d);
+		Dart e = m_tableVertDarts[i+1];
+		e = map.phi1(e);
+		map.sewFaces(d, e, false);
+	}
+	//sewing the last with the first
+	map.sewFaces(map.phi1(m_tableVertDarts[nbSides]), map.phi_1(m_tableVertDarts[nbt]), false);
+
+
+	//sewing the the two opened pyramids together
+	for(unsigned int i = 0; i < nbSides ; ++i)
+	{
+		map.sewFaces(m_tableVertDarts[i], m_tableVertDarts[nbt-i], false);
+		d1 = map.phi1(d1);
+	}
+
+	//return a dart from the base
+	return m_tableVertDarts[0];
 }
-
 
 
 /**
