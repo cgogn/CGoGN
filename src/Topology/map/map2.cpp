@@ -888,4 +888,136 @@ unsigned int Map2::closeMap()
 	return nb ;
 }
 
+/*! @name Compute dual
+ * These functions compute the dual mesh
+ *************************************************************************/
+
+void Map2::reverseOrientation()
+{
+	DartAttribute<unsigned int> emb0(this, getEmbeddingAttributeVector<VERTEX>()) ;
+	if(emb0.isValid())
+	{
+		DartAttribute<unsigned int> new_emb0 = addAttribute<unsigned int, DART>("new_EMB_0") ;
+		for(Dart d = begin(); d != end(); next(d))
+			new_emb0[d] = emb0[phi1(d)] ;
+
+		swapAttributes<unsigned int>(emb0, new_emb0) ;
+		removeAttribute(new_emb0) ;
+	}
+
+	DartAttribute<Dart> n_phi1 = getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart> n_phi_1 = getAttribute<Dart, DART>("phi_1") ;
+	swapAttributes<Dart>(n_phi1, n_phi_1) ;
+}
+
+void Map2::computeDual()
+{
+	DartAttribute<Dart> old_phi1 = getAttribute<Dart, DART>("phi1");
+	DartAttribute<Dart> old_phi_1 = getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart> new_phi1 = addAttribute<Dart, DART>("new_phi1") ;
+	DartAttribute<Dart> new_phi_1 = addAttribute<Dart, DART>("new_phi_1") ;
+
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		Dart dd = phi1(phi2(d));
+
+		new_phi1[d] = dd ;
+		new_phi_1[dd] = d ;
+	}
+
+	swapAttributes<Dart>(old_phi1, new_phi1) ;
+	swapAttributes<Dart>(old_phi_1, new_phi_1) ;
+
+	removeAttribute(new_phi1) ;
+	removeAttribute(new_phi_1) ;
+
+	swapEmbeddingContainers(VERTEX, FACE) ;
+
+	reverseOrientation() ;
+
+	//boundary management
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(isBoundaryMarked(d))
+		{
+			boundaryMarkOrbit<FACE>(deleteVertex(phi2(d)));
+		}
+	}
+}
+
+//TODO triangulation of the boundary face to compute correctly the dual(dual(T)) of mesh T
+void Map2::computeDualBorderConstraint()
+{
+	//unmarkBoundary
+	std::vector<Dart> oldb;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(isBoundaryMarked(d))
+		{
+			oldb.push_back(d);
+			boundaryUnmarkOrbit<FACE>(d);
+		}
+	}
+
+	//triangule old boundary faces
+	for(std::vector<Dart>::iterator it = oldb.begin() ; it != oldb.end() ; ++it)
+	{
+		Dart db = *it;
+		Dart d1 = phi1(db);
+		splitFace(db, d1) ;
+		cutEdge(phi_1(db)) ;
+		Dart x = phi2(phi_1(db)) ;
+		Dart dd = phi1(phi1(phi1(x)));
+		while(dd != x)
+		{
+			Dart next = phi1(dd) ;
+			splitFace(dd, phi1(x)) ;
+			dd = next ;
+		}
+	}
+
+	//after dual computation -> mark the new faces created with oldes vertices as a boundary facesc
+
+
+	//compute dual
+
+	DartAttribute<Dart> old_phi1 = getAttribute<Dart, DART>("phi1");
+	DartAttribute<Dart> old_phi_1 = getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart> new_phi1 = addAttribute<Dart, DART>("new_phi1") ;
+	DartAttribute<Dart> new_phi_1 = addAttribute<Dart, DART>("new_phi_1") ;
+
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		Dart dd = phi1(phi2(d));
+
+		new_phi1[d] = dd ;
+		new_phi_1[dd] = d ;
+	}
+
+	swapAttributes<Dart>(old_phi1, new_phi1) ;
+	swapAttributes<Dart>(old_phi_1, new_phi_1) ;
+
+	removeAttribute(new_phi1) ;
+	removeAttribute(new_phi_1) ;
+
+	swapEmbeddingContainers(VERTEX, FACE) ;
+
+	reverseOrientation() ;
+
+	//boundary management
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(isBoundaryMarked(d))
+		{
+			boundaryMarkOrbit<FACE>(deleteVertex(phi2(d)));
+		}
+	}
+
+
+	//	for(std::vector<Dart>::iterator it = oldb.begin() ; it != oldb.end() ; ++it)
+	//	{
+	//		boundaryMarkOrbit<FACE>(*it);
+	//	}
+}
+
 } // namespace CGoGN

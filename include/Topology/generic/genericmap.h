@@ -506,10 +506,10 @@ public:
 
 	AttributeMultiVector<unsigned int>* getMRLevelAttributeVector();
 
-//	/**
-//	 * swap two attribute containers
-//	 */
-//	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2) ;
+	/**
+	 * swap two attribute containers
+	 */
+	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2) ;
 
 	/**
 	 * static function for type registration

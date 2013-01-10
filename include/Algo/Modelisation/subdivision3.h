@@ -99,6 +99,12 @@ void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 template <typename PFP>
 void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts);
 
+///**
+// * Dual mesh computation
+// */
+//template <typename PFP>
+//void computeDual3(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
+
 } // namespace Modelisation
 
 } // namespace Algo

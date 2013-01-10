@@ -105,18 +105,21 @@ void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 template <typename PFP, typename EMBV, typename EMB>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
-/**
- * Reverse the orientation of the map
- */
-template <typename PFP>
-void reverseOrientation(typename PFP::MAP& map) ;
-
+///**
+// * Reverse the orientation of the map
+// */
+//template <typename PFP>
+//void reverseOrientation(typename PFP::MAP& map) ;
+//
 ///**
 // * Dual mesh computation
 // */
 //template <typename PFP>
 //void computeDual(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
-
+//
+//template <typename PFP>
+//void computeDualV2(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
+//
 ///**
 // * Sqrt(3) subdivision scheme
 // */

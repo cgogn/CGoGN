@@ -434,6 +434,22 @@ public:
 	 */
 	unsigned int closeMap();
 	//@}
+
+	/*! @name Compute dual
+	 * These functions compute the dual mesh
+	 *************************************************************************/
+
+	//@{
+	//! Reverse the orientation of the map
+	/*!
+	 */
+	void reverseOrientation();
+
+	//! Dual mesh computation
+	/*!
+	 */
+	void computeDual();
+	//@}
 };
 
 } // namespace CGoGN

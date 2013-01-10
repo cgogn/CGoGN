@@ -1184,4 +1184,83 @@ unsigned int Map3::closeMap()
 	return nb ;
 }
 
+/*! @name Compute dual
+ * These functions compute the dual mesh
+ *************************************************************************/
+
+void Map3::reverseOrientation()
+{
+
+}
+
+void Map3::computeDual()
+{
+
+	unsigned int count = 0;
+	CellMarkerNoUnmark<VERTEX> cv(*this);
+	std::vector<Dart> v;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!cv.isMarked(d) && isBoundaryMarked(d))
+		{
+			++count;
+			v.push_back(d);
+			cv.mark(d);
+		}
+	}
+
+	std::cout << "boundary vertices : " << count << std::endl;
+
+
+	DartAttribute<Dart> old_phi1 = getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart> old_phi_1 = getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart> new_phi1 = addAttribute<Dart, DART>("new_phi1") ;
+	DartAttribute<Dart> new_phi_1 = addAttribute<Dart, DART>("new_phi_1") ;
+
+	DartAttribute<Dart> old_phi2 = getAttribute<Dart, DART>("phi2") ;
+	DartAttribute<Dart> new_phi2 = addAttribute<Dart, DART>("new_phi2") ;
+
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		Dart dd = phi2(phi3(d)) ;
+		new_phi1[d] = dd ;
+		new_phi_1[dd] = d ;
+
+		Dart ddd = phi1(phi3(d));
+		new_phi2[d] = ddd;
+		new_phi2[ddd] = d;
+	}
+
+	swapAttributes<Dart>(old_phi1, new_phi1) ;
+	swapAttributes<Dart>(old_phi_1, new_phi_1) ;
+	swapAttributes<Dart>(old_phi2, new_phi2) ;
+
+	removeAttribute(new_phi1) ;
+	removeAttribute(new_phi_1) ;
+	removeAttribute(new_phi2) ;
+
+	swapEmbeddingContainers(VERTEX, VOLUME) ;
+
+//	//boundary management
+//	for(Dart d = begin(); d != end(); next(d))
+//	{
+//		if(isBoundaryMarked(d))
+//		{
+//			boundaryMarkOrbit<VOLUME>(d) ;//deleteVertex(d));
+//		}
+//	}
+
+	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
+	{
+		boundaryUnmarkOrbit<VOLUME>(*it);
+	}
+
+	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
+	{
+		deleteVolume(*it);
+	}
+
+	closeMap();
+}
+
 } // namespace CGoGN

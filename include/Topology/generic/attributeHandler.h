@@ -93,19 +93,6 @@ public:
 	 */
 	AttributeHandler() ;
 
-	template <unsigned int ORBIT2>
-	AttributeHandler(const AttributeHandler<T, ORBIT2>& h) : AttributeHandlerGen(h.m_map, h.valid)
-	{
-		m_attrib = h.m_attrib;
-		if(m_attrib->getOrbit() == ORBIT2)
-		{
-			if(valid)
-				registerInMap() ;
-		}
-		else
-			valid = false;
-	}
-
 	/**
 	 * Constructor
 	 * @param m the map which belong attribute
@@ -120,10 +107,25 @@ public:
 	AttributeHandler(const AttributeHandler<T, ORBIT>& ta) ;
 
 	/**
+	 * Transmute Constructor
+	 * Construct an attribute of Orbit from Orbit2
+	 * @param h the table attribute
+	 */
+	template <unsigned int ORBIT2>
+	AttributeHandler(const AttributeHandler<T, ORBIT2>& h) ;
+
+	/**
 	 * affectation operator
 	 * @param ta the table attribute to affect to this
 	 */
 	AttributeHandler<T, ORBIT>& operator=(const AttributeHandler<T, ORBIT>& ta) ;
+
+	/**
+	 * transmuted affectation operator
+	 * @param ta the table attribute to affect to this
+	 */
+	template <unsigned int ORBIT2>
+	AttributeHandler<T, ORBIT>& operator=(const AttributeHandler<T, ORBIT2>& ta) ;
 
 	/**
 	 * Destructor (empty & virtual)
@@ -233,6 +235,9 @@ public:
 	VertexAttribute(const AttributeHandler<T, VERTEX>& ah) : AttributeHandler<T, VERTEX>(ah) {}
 	VertexAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, VERTEX>(m,amv) {}
 	VertexAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ah) { this->AttributeHandler<T, VERTEX>::operator=(ah); return *this; }
+	VertexAttribute<T>& operator=(const AttributeHandler<T, EDGE>& ah) { this->AttributeHandler<T,VERTEX>::operator=(ah); return *this; }
+	VertexAttribute<T>& operator=(const AttributeHandler<T, FACE>& ah) { this->AttributeHandler<T,VERTEX>::operator=(ah); return *this; }
+	VertexAttribute<T>& operator=(const AttributeHandler<T, VOLUME>& ah) { this->AttributeHandler<T,VERTEX>::operator=(ah); return *this; }
 };
 
 /**
@@ -259,6 +264,7 @@ public:
 	FaceAttribute(const AttributeHandler<T, FACE>& ah) : AttributeHandler<T, FACE>(ah) {}
 	FaceAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, FACE>(m,amv) {}
 	FaceAttribute<T>& operator=(const AttributeHandler<T, FACE>& ah) { this->AttributeHandler<T, FACE>::operator=(ah); return *this; }
+	FaceAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ah) { this->AttributeHandler<T,FACE>::operator=(ah); return *this; }
 };
 
 /**
@@ -272,7 +278,19 @@ public:
 	VolumeAttribute(const AttributeHandler<T, VOLUME>& ah) : AttributeHandler<T, VOLUME>(ah) {}
 	VolumeAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, VOLUME>(m,amv) {}
 	VolumeAttribute<T>& operator=(const AttributeHandler<T, VOLUME>& ah) { this->AttributeHandler<T, VOLUME>::operator=(ah); return *this; }
+	VolumeAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ah) { this->AttributeHandler<T, VOLUME>::operator=(ah); return *this; }
 };
+
+
+// turn_to<b>(A*</b> obj) changes class of the object
+// that means it just replaces VTBL of the object by VTBL of another class.
+// NOTE: these two classes has to be ABI compatible!
+template <typename TO_T, typename FROM_T>
+  inline void turn_to(FROM_T* p)
+  {
+    assert( sizeof(FROM_T) == sizeof(TO_T));
+    ::new(p) TO_T(); // use of placement new
+  }
 
 } // namespace CGoGN
 

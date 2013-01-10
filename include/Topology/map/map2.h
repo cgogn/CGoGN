@@ -465,6 +465,34 @@ public:
 	 */
 	unsigned int closeMap();
 	//@}
+
+
+	/*! @name Compute dual
+	 * These functions compute the dual mesh
+	 *************************************************************************/
+
+	//@{
+	//! Reverse the orientation of the map
+	/*!
+	 */
+	void reverseOrientation();
+
+	//! Dual mesh computation (open or closed)
+	/*! Crop the infinite faces of open meshes
+	 */
+	void computeDual();
+
+	//! Dual mesh computation (open mesh)
+	/*! Fit the infinite faces vertices to the middle of the old boundary edges
+	 */
+	void computeDualBorderConstraint();
+
+	//! Dual mesh computation (open mesh)
+	/*! Fit the infinite faces vertices to the middle of the old boundary edges AND
+	 *  fit the middle of the new boundary edges to the old boundary vertices
+	 */
+	//void computeDualBorderConstraintWithOldVertices();
+	//@}
 };
 
 } // namespace CGoGN
