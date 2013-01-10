@@ -139,7 +139,7 @@ Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
 	
 	
 	unsigned int nbt = 2*nbSides -1 ; // -1 for computation optimization
-	m_tableVertDarts.reserve(n);
+	m_tableVertDarts.reserve(nbSides);
 	
 	
 	// creation of triangles around circunference and storing vertices
@@ -177,7 +177,6 @@ Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
 	for(unsigned int i = 0; i < nbSides ; ++i)
 	{
 		map.sewFaces(m_tableVertDarts[i], m_tableVertDarts[nbt-i], false);
-		d1 = map.phi1(d1);
 	}
 
 	//return a dart from the base
