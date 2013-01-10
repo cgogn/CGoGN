@@ -24,7 +24,7 @@
 
 
 #include <GL/glew.h>
-#include "Utils/Shaders/ShaderTextureDepth.h"
+#include "Utils/Shaders/shaderTextureDepth.h"
 
 
 namespace CGoGN
