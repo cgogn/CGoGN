@@ -918,6 +918,13 @@ bool GMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
 
+Dart GMap3::newBoundaryCycle(unsigned int nbE)
+{
+	Dart d = GMap1::newCycle(nbE);
+	boundaryMarkOrbit<FACE,3>(d);
+	return d;
+}
+
 unsigned int GMap3::closeHole(Dart d, bool forboundary)
 {
 	assert(beta3(d) == d);		// Nothing to close

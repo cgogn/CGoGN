@@ -448,6 +448,11 @@ public:
 	 *************************************************************************/
 
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of beta2). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of beta2 relation
 	 *  Add a face to the map that closes the hole.

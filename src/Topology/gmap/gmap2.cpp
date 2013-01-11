@@ -62,7 +62,7 @@ Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
 	Dart d = GMap1::newCycle(nbEdges);
 	if (withBoundary)
 	{
-		Dart e = GMap1::newBoundaryCycle(nbEdges);
+		Dart e = newBoundaryCycle(nbEdges);
 
 		Dart it = d;
 		do
@@ -378,7 +378,7 @@ void GMap2::unsewFaces(Dart d)
 
 	Dart dd = phi2(d);
 
-	Dart e = GMap1::newBoundaryCycle(2);
+	Dart e = newBoundaryCycle(2);
 	Dart ee = phi1(e) ;
 
 	Dart f = findBoundaryEdgeOfVertex(d) ;
@@ -882,6 +882,13 @@ bool GMap2::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thr
 /*! @name Close map after import or creation
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
+
+Dart GMap2::newBoundaryCycle(unsigned int nbE)
+{
+	Dart d = GMap1::newCycle(nbE);
+	boundaryMarkOrbit<FACE,2>(d);
+	return d;
+}
 
 unsigned int GMap2::closeHole(Dart d, bool forboundary)
 {

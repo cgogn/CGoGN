@@ -1074,6 +1074,13 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
 
+Dart Map3::newBoundaryCycle(unsigned int nbE)
+{
+	Dart d = Map1::newCycle(nbE);
+	boundaryMarkOrbit<FACE,3>(d);
+	return d;
+}
+
 unsigned int Map3::closeHole(Dart d, bool forboundary)
 {
 	assert(phi3(d) == d);		// Nothing to close

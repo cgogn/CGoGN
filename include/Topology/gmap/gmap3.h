@@ -57,7 +57,6 @@ public:
 	static const unsigned int EDGE_OF_PARENT2 = EDGE+5;
 
 	static const unsigned int DIMENSION = 3 ;
-//	enum {	DIMENSION = 3 } ;
 
 	GMap3();
 
@@ -359,6 +358,11 @@ public:
 	 *************************************************************************/
 
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of phi3). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of phi3 relation
 	 *  Add a volume to the map that closes the hole.

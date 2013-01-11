@@ -164,6 +164,9 @@ inline Dart Map1::cutEdge(Dart d)
 	if (isBoundaryMarked2(d))
 		boundaryMark2(e);
 
+	if (isBoundaryMarked3(d))
+		boundaryMark3(e);
+
 	return e ;
 }
 

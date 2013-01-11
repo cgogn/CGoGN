@@ -112,7 +112,7 @@ Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 	Dart d = Map1::newCycle(nbEdges);
 	if (withBoundary)
 	{
-		Dart e = Map1::newBoundaryCycle(nbEdges);
+		Dart e = newBoundaryCycle(nbEdges);
 
 		Dart it = d;
 		do
@@ -839,6 +839,13 @@ bool Map2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
 
+Dart Map2::newBoundaryCycle(unsigned int nbE)
+{
+	Dart d = Map1::newCycle(nbE);
+	boundaryMarkOrbit<FACE,2>(d);
+	return d;
+}
+
 unsigned int Map2::closeHole(Dart d, bool forboundary)
 {
 	assert(phi2(d) == d);		// Nothing to close
@@ -867,7 +874,7 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 		}
 	} while (dPhi1 != d);
 
-	if(forboundary)
+	if (forboundary)
 		boundaryMarkOrbit<FACE,2>(phi2(d));
 
 	return countEdges ;

@@ -169,6 +169,12 @@ inline Dart GMap1::cutEdge(Dart d)
 		boundaryMark2(f);
 	}
 
+	if (isBoundaryMarked3(d))
+	{
+		boundaryMark3(e);
+		boundaryMark3(f);
+	}
+
 	return f ;
 }
 

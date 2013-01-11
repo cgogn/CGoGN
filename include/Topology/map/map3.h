@@ -426,7 +426,13 @@ public:
 	 *  These functions must be used with care, generally only by import algorithms
 	 *************************************************************************/
 
+
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of phi3). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of phi3 relation
 	 *  Add a volume to the map that closes the hole.
