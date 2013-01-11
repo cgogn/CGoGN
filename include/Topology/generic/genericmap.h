@@ -168,7 +168,7 @@ public:
 
 	virtual unsigned int dimension() const = 0 ;
 
-	static const unsigned int DIMENSION = 0 ;
+//	static const unsigned int DIMENSION = 0 ;
 	/**
 	 * Clear the map
 	 * @param removeAttrib
@@ -741,6 +741,7 @@ public:
 
 	bool isBoundaryMarked2(Dart d) const ;
 	bool isBoundaryMarked3(Dart d) const ;
+	bool isBoundaryMarkedCurrent(Dart d) const ;
 
 protected:
 	/**

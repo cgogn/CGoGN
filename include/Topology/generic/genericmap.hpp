@@ -705,6 +705,12 @@ inline bool GenericMap::isBoundaryMarked(Dart d) const
 }
 
 
+inline bool GenericMap::isBoundaryMarkedCurrent(Dart d) const
+{
+	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarkers[this->dimension()-2]);
+}
+
+
 inline void GenericMap::boundaryMark2(Dart d)
 {
 	boundaryMark<2>(d);
