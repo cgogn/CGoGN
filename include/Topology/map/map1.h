@@ -51,6 +51,8 @@ protected:
 public:
 	Map1();
 
+	static const unsigned int DIMENSION = 1 ;
+
 	virtual std::string mapTypeName() const;
 
 	virtual unsigned int dimension() const;

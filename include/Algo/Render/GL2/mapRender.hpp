@@ -336,7 +336,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 		{
 			std::list<Dart> bound;
 
-			if (good(dd) && !map.isBoundaryMarkedCurrent(dd))
+			if (good(dd) && !map.template isBoundaryMarked<PFP::MAP::DIMENSION>(dd))
 			{
 				if(position == NULL)
 					addTri<PFP>(map, dd, tableIndices);
@@ -362,7 +362,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 					{
 						if (!m.isMarked(f))
 						{
-							if (good(f) && !map.isBoundaryMarkedCurrent(f))
+							if (good(f) && !map.template isBoundaryMarked<PFP::MAP::DIMENSION>(f))
 							{
 								if(position == NULL)
 									addTri<PFP>(map, f, tableIndices);

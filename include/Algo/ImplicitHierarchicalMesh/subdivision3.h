@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace IHM
 {
 
@@ -94,9 +97,8 @@ void splitVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 
 
 } //namespace IHM
-
+} // Volume
 } //namespace Algo
-
 } //namespace CGoGN
 
 #include "Algo/ImplicitHierarchicalMesh/subdivision3.hpp"

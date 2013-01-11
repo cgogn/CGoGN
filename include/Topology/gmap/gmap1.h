@@ -43,6 +43,10 @@ protected:
 public:
 	typedef GMap0 ParentMap;
 
+	static const unsigned int DIMENSION = 1 ;
+
+
+
 	GMap1();
 
 	virtual std::string mapTypeName() const;

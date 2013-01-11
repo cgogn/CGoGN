@@ -50,6 +50,8 @@ public:
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT = EDGE+5;
 
+	static const unsigned int DIMENSION = 2 ;
+
 	GMap2();
 
 	virtual std::string mapTypeName() const;

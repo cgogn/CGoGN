@@ -56,6 +56,9 @@ public:
 	static const unsigned int VERTEX_OF_PARENT2 = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT2 = EDGE+5;
 
+	static const unsigned int DIMENSION = 3 ;
+//	enum {	DIMENSION = 3 } ;
+
 	GMap3();
 
 	virtual std::string mapTypeName() const;

@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace IHM
 {
 
@@ -91,7 +94,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 //		//std::cout << "vLevel courant = " << map.volumeLevel(oldit) << std::endl;
 //
 //		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
-//				Algo::IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
+//				IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
 //	}
 
 	unsigned int degree = 0 ;
@@ -104,7 +107,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		p += position[it] ;
 
 		if(!map.edgeIsSubdivided(it))							// first cut the edges (if they are not already)
-			Algo::IHM::subdivideEdge<PFP>(map, it, position) ;	// and compute the degree of the face
+			IHM::subdivideEdge<PFP>(map, it, position) ;	// and compute the degree of the face
 	}
 	p /= typename PFP::REAL(degree) ;
 
@@ -113,7 +116,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 
 	Dart res;
 
-	if(degree == 3 && sType == Algo::IHM::S_TRI)	//subdiviser une face triangulaire
+	if(degree == 3 && sType == IHM::S_TRI)	//subdiviser une face triangulaire
 	{
 		Dart dd = map.phi1(old) ;
 		Dart e = map.phi1(map.phi1(dd)) ;
@@ -206,7 +209,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 	//	{
 	//		Dart oldit = map.volumeOldestDart(dit);
 	//		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
-	//			Algo::IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
+	//			IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
 	//	}
 
 	/*
@@ -277,7 +280,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
 		//if needed subdivide face
 		if(!map.faceIsSubdivided(d))
-			Algo::IHM::subdivideFace<PFP>(map, d, position, Algo::IHM::S_QUAD);
+			IHM::subdivideFace<PFP>(map, d, position, IHM::S_QUAD);
 
 		//save a dart from the subdivided face
 		unsigned int cur = map.getCurrentLevel() ;
@@ -471,7 +474,7 @@ void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 	do
 	{
 		if(map.edgeCanBeCoarsened(fit))
-			Algo::IHM::coarsenEdge<PFP>(map, fit, position) ;
+			IHM::coarsenEdge<PFP>(map, fit, position) ;
 		fit = map.phi1(fit) ;
 	} while(fit != d) ;
 }
@@ -499,7 +502,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
 	{
 		if(map.faceCanBeCoarsened(dit))
-			Algo::IHM::coarsenFace<PFP>(map, dit, position, Algo::IHM::S_QUAD);
+			IHM::coarsenFace<PFP>(map, dit, position, IHM::S_QUAD);
 	}
 }
 
@@ -550,7 +553,7 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<ty
 	{
 		//if needed subdivide face
 		if(!map.faceIsSubdivided(dit))
-			Algo::IHM::subdivideFace<PFP>(map, dit, position, Algo::IHM::S_QUAD);
+			IHM::subdivideFace<PFP>(map, dit, position, IHM::S_QUAD);
 
 		//save darts from the central vertex of each subdivided face
 		unsigned int cur = map.getCurrentLevel() ;
@@ -682,7 +685,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	{
 		//if needed subdivide face
 		if(!map.faceIsSubdivided(dit))
-			Algo::IHM::subdivideFace<PFP>(map, dit, position, Algo::IHM::S_TRI);
+			IHM::subdivideFace<PFP>(map, dit, position, IHM::S_TRI);
 
 		//save a dart from the subdivided face
 		unsigned int cur = map.getCurrentLevel() ;
@@ -928,7 +931,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename P
 
 		//if needed subdivide face
 		if(!map.faceIsSubdivided(d))
-			Algo::IHM::subdivideFace<PFP>(map, d, position);
+			IHM::subdivideFace<PFP>(map, d, position);
 
 
 		//save a dart from the subdivided face
@@ -1490,7 +1493,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typenam
 
 		//if needed subdivide face
 		if(!map.faceIsSubdivided(d))
-			Algo::IHM::subdivideFace<PFP>(map, d, position);
+			IHM::subdivideFace<PFP>(map, d, position);
 
 
 		//save a dart from the subdivided face
@@ -1885,7 +1888,7 @@ void splitVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 	do
 	{
 		if(!map.edgeIsSubdivided(map.phi1(map.phi2(t))))
-			Algo::IHM::subdivideEdge<PFP>(map, map.phi1(map.phi2(t)), position) ;
+			IHM::subdivideEdge<PFP>(map, map.phi1(map.phi2(t)), position) ;
 		t = map.phi1(t);
 	}
 	while(t != d);
@@ -1940,9 +1943,8 @@ void splitVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 }
 
 } //namespace IHM
-
+} //Volume
 } //namespace Algo
-
 } //namespace CGoGN
 
 

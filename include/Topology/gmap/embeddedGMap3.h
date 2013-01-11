@@ -39,6 +39,8 @@ class EmbeddedGMap3 : public GMap3
 public:
 	typedef GMap3 TOPO_MAP;
 
+	static const unsigned int DIMENSION = 3 ;
+
 	/*!
 	 *
 	 */

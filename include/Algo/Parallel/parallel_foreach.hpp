@@ -204,7 +204,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!cmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!cmark->isMarked(d)))
 				{
 					cmark->mark(d);
 					vd[nb%nbth].push_back(d);
@@ -220,7 +220,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!dmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
 					dmark->markOrbit<ORBIT>(d);
 					vd[nb%nbth].push_back(d);
@@ -292,7 +292,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!cmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!cmark->isMarked(d)))
 				{
 					cmark->mark(d);
 					tempo[nb%nbth].push_back(d);
@@ -315,7 +315,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!dmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
 					dmark->markOrbit<ORBIT>(d);
 					tempo[nb%nbth].push_back(d);
@@ -704,7 +704,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!cmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!cmark->isMarked(d)))
 				{
 					cmark->mark(d);
 					vd.push_back(d);
@@ -720,7 +720,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!dmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
 					dmark->markOrbit<ORBIT>(d);
 					vd.push_back(d);
@@ -778,7 +778,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!cmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!cmark->isMarked(d)))
 				{
 					cmark->mark(d);
 					tempo.push_back(d);
@@ -799,7 +799,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!map.isBoundaryMarkedCurrent(d)) && (!dmark->isMarked(d)))
+				if (good(d) && (!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
 					dmark->markOrbit<ORBIT>(d);
 					tempo.push_back(d);

@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace IHM
 {
 
@@ -662,7 +665,6 @@ const T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d) const
 }
 
 } //namespace IHM
-
+} // Volume
 } //namespace Algo
-
 } //namespace CGoGN

@@ -134,7 +134,6 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
 template <typename PFP>
 Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
 {
-	Dart dres = Dart::nil();
 	std::vector<Dart> m_tableVertDarts;
 	
 	
