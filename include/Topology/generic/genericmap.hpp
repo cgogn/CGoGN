@@ -760,7 +760,7 @@ void GenericMap::boundaryUnmarkAll()
 {
 	AttributeContainer& cont = getAttributeContainer<DART>() ;
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarkers[DIM-1]);
+		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarkers[DIM-2]);
 }
 
 
