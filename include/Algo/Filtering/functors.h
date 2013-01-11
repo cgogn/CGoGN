@@ -86,7 +86,7 @@ public:
 	bool operator()(Dart d)
 	{
 		typename PFP::REAL alpha = 0;
-		Algo::Geometry::intersectionSphereEdge<PFP>(this->m_map, center, radius, d, position, alpha);
+		Geometry::intersectionSphereEdge<PFP>(this->m_map, center, radius, d, position, alpha);
 		sum += (1 - alpha) * attr[d] + alpha * attr[this->m_map.phi1(d)] ;
 		++count ;
 		return false ;
