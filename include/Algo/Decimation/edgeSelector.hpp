@@ -1225,7 +1225,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
  ************************************************************************************/
 
 template <typename PFP>
-bool CurvatureTensor<PFP>::init()
+bool EdgeSelector_CurvatureTensor<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
@@ -1247,7 +1247,7 @@ bool CurvatureTensor<PFP>::init()
 
 	edges.clear() ;
 
-//	TraversorE<MAP> travE(m);
+	TraversorE<MAP> travE(m);
 //	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
 //	{
 //		computeEdgeMatrix(dit);
@@ -1264,7 +1264,7 @@ bool CurvatureTensor<PFP>::init()
 }
 
 template <typename PFP>
-bool CurvatureTensor<PFP>::nextEdge(Dart& d)
+bool EdgeSelector_CurvatureTensor<PFP>::nextEdge(Dart& d)
 {
 	if(cur == edges.end() || edges.empty())
 		return false ;
@@ -1273,7 +1273,7 @@ bool CurvatureTensor<PFP>::nextEdge(Dart& d)
 }
 
 template <typename PFP>
-void CurvatureTensor<PFP>::updateBeforeCollapse(Dart d)
+void EdgeSelector_CurvatureTensor<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 	assert(!m.isBoundaryEdge(d));
@@ -1318,25 +1318,31 @@ void CurvatureTensor<PFP>::updateBeforeCollapse(Dart d)
 
 
 template <typename PFP>
-void CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void EdgeSelector_CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	MAP& m = this->m_map ;
+	CellMarkerStore<EDGE> eMark (m);
 
-	// TODO : here update edge angles : should look like :
-//	edgeangle[d] = computeAngleBetweenNormalsOnEdge<PFP>(map, d, this->m_position) ;
+	// update edge angles
+	Traversor2VF<MAP> tf (m,d2);
+	for(Dart dit = tf.begin(); dit != tf.end(); dit = tf.next())
+	{
+		Traversor2FE<MAP> te (m,dit);
+		for(Dart dit2 = te.begin(); dit2 != te.end(); dit2=te.next())
+		{
+			if (!eMark.isMarked(dit2))
+			{
+				edgeangle[dit2] = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(m, dit2, this->m_position) ;
+				eMark.mark(dit2);
+			}
+		}
+	}
 
-
-	// update the edge matrices
-//	Traversor2VE<MAP> te (m,d2);
-//	for(Dart dit = te.begin() ; dit != te.end() ; dit = te.next())
-//	{
-//		computeEdgeMatrix(dit);
-//	}
 
 	// update the multimap
 
 	Traversor2VVaE<MAP> tv (m,d2);
-	CellMarker<EDGE> eMark (m);
+	eMark.unmarkAll();
 
 	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
 	{
@@ -1355,7 +1361,7 @@ void CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
-void CurvatureTensor<PFP>::initEdgeInfo(Dart d)
+void EdgeSelector_CurvatureTensor<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
 	EdgeInfo einfo ;
@@ -1367,7 +1373,7 @@ void CurvatureTensor<PFP>::initEdgeInfo(Dart d)
 }
 
 template <typename PFP>
-void CurvatureTensor<PFP>::updateEdgeInfo(Dart d)
+void EdgeSelector_CurvatureTensor<PFP>::updateEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
@@ -1384,46 +1390,44 @@ void CurvatureTensor<PFP>::updateEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-
-	// TODO : code this function : everything complex is here
-
 	MAP& m = this->m_map ;
-	Dart dd = m.phi2(d);
-	Geom::Matrix33f M1; // init zero included
-	Geom::Matrix33f M2; // init zero included
+	Dart dd = m.phi2(d) ;
 
-	assert(! m.isBoundaryEdge(d));
-
-	Traversor2VF<MAP> td (m,d);
-	Dart it = td.begin();
-	it = td.next();
-	Dart it2 = td.next();
-	while( it2 != td.end())
-	{
-		M1 += edgeMatrix[m.phi1(it)];
-		it = it2;
-		it2 = td.next();
-	}
-
-	Traversor2VF<MAP> tdd (m,dd);
-	it = tdd.begin();
-	it = tdd.next();
-	it2 = tdd.next();
-	while( it2 != tdd.end())
-	{
-		M2 += edgeMatrix[m.phi1(it)];
-		it = it2;
-		it2 = tdd.next();
-	}
+	unsigned int v1 = m.template getEmbedding<VERTEX>(d) ;
+	unsigned int v2 = m.template getEmbedding<VERTEX>(dd) ;
 
 	m_positionApproximator->approximate(d) ;
-	const VEC3& a = m_positionApproximator->getApprox(d) ;
 
-	const VEC3 av1 = a - this->m_position[d] ;
-	const VEC3 av2 = a - this->m_position[dd] ;
+	// compute tensor before collapse
+	typename PFP::MATRIX33 tens1;
+	Algo::Selection::Collector_OneRing_AroundEdge<PFP> col1 (m);
+	col1.collectAll(d);
+	col1.computeNormalCyclesTensor(this->m_position,edgeangle,tens1); // edgeangle is up to date
+	Algo::Geometry::normalCycles_SortTensor<PFP>(tens1);
 
-	REAL err = av1 * (M1 * av1) + av2 * (M2 * av2);
+	// temporary edge collapse
+	Dart d2 = m.phi2(m.phi_1(d)) ;
+	Dart dd2 = m.phi2(m.phi_1(dd)) ;
+	m.extractTrianglePair(d) ;
+	const unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
+	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
+	// compute tensor after collapse
+	typename PFP::MATRIX33 tens2;
+	Algo::Selection::Collector_OneRing<PFP> col2 (m);
+	col2.collectAll(d);
+	col2.computeNormalCyclesTensor(this->m_position,tens2); // edgeangle is not up to date
+	Algo::Geometry::normalCycles_SortTensor<PFP>(tens2);
+
+	// vertex split to reset the initial connectivity and embeddings
+	m.insertTrianglePair(d, d2, dd2) ;
+	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
+	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
+
+	// TODO : compute err from the tensors
+	REAL err = 0 ;
+
+	// update the priority queue and edgeinfo
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }

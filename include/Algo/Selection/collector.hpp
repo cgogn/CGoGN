@@ -168,6 +168,23 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 	tensor /= computeArea(pos) ;
 }
 
+template <typename PFP>
+void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33& tensor){
+	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
+
+	tensor.zero() ;
+
+	// collect edges inside the neighborhood
+	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) ;
+	}
+
+	tensor /= computeArea(pos) ;
+}
+
 /*********************************************************
  * Collector One Ring aroung edge
  *********************************************************/
@@ -256,6 +273,24 @@ void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexA
 
 	tensor /= computeArea(pos) ;
 }
+
+template <typename PFP>
+void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33& tensor){
+	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
+
+	tensor.zero() ;
+
+	// collect edges inside the neighborhood
+	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) ;
+	}
+
+	tensor /= computeArea(pos) ;
+}
+
 
 /*********************************************************
  * Collector Within Sphere
@@ -433,6 +468,33 @@ void Collector_WithinSphere<PFP>::computeNormalCyclesTensor (const VertexAttribu
 	tensor /= computeArea(pos) ;
 }
 
+
+template <typename PFP>
+void Collector_WithinSphere<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33& tensor){
+	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
+
+	VEC3 centerPosition = pos[this->centerDart];
+	tensor.zero() ;
+
+	// collect edges inside the neighborhood
+	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) ;
+	}
+	// collect edges crossing the neighborhood's border
+	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		REAL alpha ;
+		Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, radius, *it, pos, alpha) ;
+		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) * alpha ;
+	}
+
+	tensor /= computeArea(pos) ;
+}
 
 /*********************************************************
  * Collector Normal Angle (Vertices)

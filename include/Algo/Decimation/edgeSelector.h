@@ -31,6 +31,8 @@
 #include "Container/fakeAttribute.h"
 #include "Utils/qem.h"
 #include "Utils/quadricRGBfunctions.h"
+#include "Algo/Geometry/normal.h"
+#include "Algo/Selection/collector.h"
 #include "Algo/Geometry/curvature.h"
 #include "Algo/Geometry/area.h"
 
@@ -438,7 +440,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "CurvatureTensorEdgeInfo" ; }
 	} CurvatureTensorEdgeInfo ;
-	typedef NoMathIOAttribute<CurvatureEdgeInfo> EdgeInfo ;
+	typedef NoMathIOAttribute<CurvatureTensorEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	EdgeAttribute<REAL> edgeangle ;
@@ -449,7 +451,7 @@ private:
 	Approximator<PFP, VEC3,EDGE>* m_positionApproximator ;
 
 	void initEdgeInfo(Dart d) ;
-	void updateEdgeInfo(Dart d, bool recompute) ;
+	void updateEdgeInfo(Dart d) ; // TODO : usually has a 2nd arg (, bool recompute) : why ??
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
