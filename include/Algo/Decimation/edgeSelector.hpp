@@ -49,7 +49,7 @@ bool EdgeSelector_MapOrder<PFP>::init()
 template <typename PFP>
 bool EdgeSelector_MapOrder<PFP>::nextEdge(Dart& d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	if(cur == m.end())
 		return false ;
 	d = cur ;
@@ -59,7 +59,7 @@ bool EdgeSelector_MapOrder<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	cur = m.begin() ;
 	while(!this->m_select(cur) || !m.edgeCanCollapse(cur))
 	{
@@ -77,7 +77,7 @@ void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 template <typename PFP>
 bool EdgeSelector_Random<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	darts.reserve(m.getNbDarts()) ;
 	darts.clear() ;
@@ -114,7 +114,7 @@ bool EdgeSelector_Random<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	allSkipped = false ;
 	do
 	{
@@ -130,7 +130,7 @@ void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 template <typename PFP>
 void EdgeSelector_Random<PFP>::updateWithoutCollapse()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	allSkipped = false ;
 	do
 	{
@@ -150,7 +150,7 @@ void EdgeSelector_Random<PFP>::updateWithoutCollapse()
 template <typename PFP>
 bool EdgeSelector_Length<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	edges.clear() ;
 
@@ -181,7 +181,7 @@ bool EdgeSelector_Length<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_Length<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -211,7 +211,7 @@ void EdgeSelector_Length<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void EdgeSelector_Length<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	Dart vit = d2 ;
 	do
@@ -253,7 +253,7 @@ void EdgeSelector_Length<PFP>::updateWithoutCollapse()
 template <typename PFP>
 void EdgeSelector_Length<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -265,7 +265,7 @@ void EdgeSelector_Length<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_Length<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -309,7 +309,7 @@ void EdgeSelector_Length<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 bool EdgeSelector_QEM<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	bool ok = false ;
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
@@ -384,7 +384,7 @@ bool EdgeSelector_QEM<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_QEM<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -418,7 +418,7 @@ void EdgeSelector_QEM<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void EdgeSelector_QEM<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	quadric[d2] = tmpQ ;
 
@@ -462,7 +462,7 @@ void EdgeSelector_QEM<PFP>::updateWithoutCollapse()
 template <typename PFP>
 void EdgeSelector_QEM<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -474,7 +474,7 @@ void EdgeSelector_QEM<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_QEM<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -506,7 +506,7 @@ void EdgeSelector_QEM<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
 	Utils::Quadric<REAL> quad ;
@@ -528,7 +528,7 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 bool EdgeSelector_QEMml<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	bool ok = false ;
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
@@ -603,7 +603,7 @@ bool EdgeSelector_QEMml<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -664,7 +664,7 @@ void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomput
 template <typename PFP>
 void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	// for local vertex and neighbors
 	recomputeQuadric(d2, true) ;
@@ -707,7 +707,7 @@ void EdgeSelector_QEMml<PFP>::updateWithoutCollapse()
 template <typename PFP>
 void EdgeSelector_QEMml<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -719,7 +719,7 @@ void EdgeSelector_QEMml<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_QEMml<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -751,7 +751,7 @@ void EdgeSelector_QEMml<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_QEMml<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
 	Utils::Quadric<REAL> quad ;
@@ -772,7 +772,7 @@ void EdgeSelector_QEMml<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 bool EdgeSelector_NormalArea<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	bool ok = false ;
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
@@ -824,7 +824,7 @@ bool EdgeSelector_NormalArea<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	assert(!m.isBoundaryEdge(d));
 
 	EdgeInfo* edgeE = &(edgeInfo[d]) ;
@@ -869,7 +869,7 @@ void EdgeSelector_NormalArea<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	// update the edge matrices
 	Traversor2VE<MAP> te (m,d2);
@@ -902,7 +902,7 @@ void EdgeSelector_NormalArea<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -914,7 +914,7 @@ void EdgeSelector_NormalArea<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::updateEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 
 	if(einfo.valid)
@@ -929,7 +929,7 @@ void EdgeSelector_NormalArea<PFP>::updateEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi2(d);
 	Geom::Matrix33f M1; // init zero included
 	Geom::Matrix33f M2; // init zero included
@@ -986,7 +986,7 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::computeEdgeMatrix(Dart d)
 {
-	const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->m_map, d, this->m_position) ;
+	const typename PFP::VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->m_map, d, this->m_position) ;
 	edgeMatrix[d].identity();
 	edgeMatrix[d] *= e.norm2();
 	edgeMatrix[d] -= Geom::transposed_vectors_mult(e,e) ;
@@ -1002,7 +1002,7 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeMatrix(Dart d)
 template <typename PFP>
 bool EdgeSelector_Curvature<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	bool ok = false ;
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
@@ -1051,7 +1051,7 @@ bool EdgeSelector_Curvature<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_Curvature<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -1081,7 +1081,7 @@ void EdgeSelector_Curvature<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	normal[d2] = Algo::Geometry::vertexNormal<PFP>(m, d2, this->m_position) ;
 	Algo::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
@@ -1130,7 +1130,7 @@ void EdgeSelector_Curvature<PFP>::updateWithoutCollapse()
 template <typename PFP>
 void EdgeSelector_Curvature<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -1142,7 +1142,7 @@ void EdgeSelector_Curvature<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_Curvature<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -1174,7 +1174,7 @@ void EdgeSelector_Curvature<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
 	unsigned int v1 = m.template getEmbedding<VERTEX>(d) ;
@@ -1227,7 +1227,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 bool EdgeSelector_CurvatureTensor<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	bool ok = false ;
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
@@ -1275,7 +1275,7 @@ bool EdgeSelector_CurvatureTensor<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_CurvatureTensor<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	assert(!m.isBoundaryEdge(d));
 
 	EdgeInfo* edgeE = &(edgeInfo[d]) ;
@@ -1320,7 +1320,7 @@ void EdgeSelector_CurvatureTensor<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void EdgeSelector_CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	CellMarkerStore<EDGE> eMark (m);
 
 	// update edge angles
@@ -1363,7 +1363,7 @@ void EdgeSelector_CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 template <typename PFP>
 void EdgeSelector_CurvatureTensor<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -1375,7 +1375,7 @@ void EdgeSelector_CurvatureTensor<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_CurvatureTensor<PFP>::updateEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 
 	if(einfo.valid)
@@ -1390,7 +1390,12 @@ void EdgeSelector_CurvatureTensor<PFP>::updateEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+
+	typedef Geom::Matrix<3,3,REAL> MATRIX;
+//	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
+	typedef Eigen::Matrix<REAL,3,3,Eigen::RowMajor> E_MATRIX;
+
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
 	unsigned int v1 = m.template getEmbedding<VERTEX>(d) ;
@@ -1399,10 +1404,11 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	m_positionApproximator->approximate(d) ;
 
 	// compute tensor before collapse
-	typename PFP::MATRIX33 tens1;
+	MATRIX tens1;
 	Algo::Selection::Collector_OneRing_AroundEdge<PFP> col1 (m);
 	col1.collectAll(d);
-	col1.computeNormalCyclesTensor(this->m_position,edgeangle,tens1); // edgeangle is up to date
+	col1.computeNormalCyclesTensor(this->m_position,edgeangle,tens1); // edgeangle is up to date here
+	tens1 *= col1.computeArea(this->m_position); // mean tensor * area = integral of the tensor
 	Algo::Geometry::normalCycles_SortTensor<PFP>(tens1);
 
 	// temporary edge collapse
@@ -1413,10 +1419,11 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute tensor after collapse
-	typename PFP::MATRIX33 tens2;
+	MATRIX tens2;
 	Algo::Selection::Collector_OneRing<PFP> col2 (m);
 	col2.collectAll(d);
-	col2.computeNormalCyclesTensor(this->m_position,tens2); // edgeangle is not up to date
+	col2.computeNormalCyclesTensor(this->m_position,tens2); // edgeangle is not up to date here
+	tens2 *= col2.computeArea(this->m_position); // mean tensor * area = integral of the tensor
 	Algo::Geometry::normalCycles_SortTensor<PFP>(tens2);
 
 	// vertex split to reset the initial connectivity and embeddings
@@ -1424,8 +1431,15 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
 	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
 
-	// TODO : compute err from the tensors
-	REAL err = 0 ;
+	// compute err from the tensors
+	tens1 -= tens2;
+
+	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tens1),Eigen::EigenvaluesOnly);
+	const VEC3& e_val = Utils::convertRef<VEC3>(solver.eigenvalues());
+
+	REAL err = std::min(std::min(abs(e_val[0]), abs(e_val[1])) , abs(e_val[2])) ;
+
+//	if (v1 % 5000 == 0) CGoGNout << e_val << CGoGNendl << err << CGoGNendl ;
 
 	// update the priority queue and edgeinfo
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
@@ -1485,7 +1499,7 @@ bool EdgeSelector_MinDetail<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_MinDetail<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -1515,7 +1529,7 @@ void EdgeSelector_MinDetail<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void EdgeSelector_MinDetail<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	Dart vit = d2 ;
 	do
@@ -1557,7 +1571,7 @@ void EdgeSelector_MinDetail<PFP>::updateWithoutCollapse()
 template <typename PFP>
 void EdgeSelector_MinDetail<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -1569,7 +1583,7 @@ void EdgeSelector_MinDetail<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_MinDetail<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -1629,7 +1643,7 @@ void EdgeSelector_MinDetail<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 bool EdgeSelector_ColorNaive<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
@@ -1717,7 +1731,7 @@ bool EdgeSelector_ColorNaive<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_ColorNaive<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -1780,7 +1794,7 @@ void EdgeSelector_ColorNaive<PFP>::recomputeQuadric(const Dart d, const bool rec
 template <typename PFP>
 void EdgeSelector_ColorNaive<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	recomputeQuadric(d2, true) ;
 
@@ -1811,7 +1825,7 @@ void EdgeSelector_ColorNaive<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 template <typename PFP>
 void EdgeSelector_ColorNaive<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -1823,7 +1837,7 @@ void EdgeSelector_ColorNaive<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_ColorNaive<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -1855,7 +1869,7 @@ void EdgeSelector_ColorNaive<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_ColorNaive<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi1(d) ;
 
 	// New position
@@ -1896,7 +1910,7 @@ void EdgeSelector_ColorNaive<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 bool EdgeSelector_QEMextColor<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
@@ -1997,7 +2011,7 @@ bool EdgeSelector_QEMextColor<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_QEMextColor<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -2073,7 +2087,7 @@ void EdgeSelector_QEMextColor<PFP>::recomputeQuadric(const Dart d, const bool re
 template <typename PFP>
 void EdgeSelector_QEMextColor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	recomputeQuadric(d2, true) ;
 
@@ -2104,7 +2118,7 @@ void EdgeSelector_QEMextColor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 template <typename PFP>
 void EdgeSelector_QEMextColor<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -2116,7 +2130,7 @@ void EdgeSelector_QEMextColor<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_QEMextColor<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -2148,7 +2162,7 @@ void EdgeSelector_QEMextColor<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi1(d) ;
 
 	// New position
@@ -2195,7 +2209,7 @@ void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 bool EdgeSelector_Lightfield<PFP>::init()
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
@@ -2332,7 +2346,7 @@ bool EdgeSelector_Lightfield<PFP>::nextEdge(Dart& d)
 template <typename PFP>
 void EdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	EdgeInfo *edgeE = &(edgeInfo[d]) ;
 	if(edgeE->valid)
@@ -2395,7 +2409,7 @@ void EdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool rec
 template <typename PFP>
 void EdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 
 	recomputeQuadric(d2, true) ;
 
@@ -2426,7 +2440,7 @@ void EdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 template <typename PFP>
 void EdgeSelector_Lightfield<PFP>::initEdgeInfo(Dart d)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo einfo ;
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
@@ -2438,7 +2452,7 @@ void EdgeSelector_Lightfield<PFP>::initEdgeInfo(Dart d)
 template <typename PFP>
 void EdgeSelector_Lightfield<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
@@ -2470,7 +2484,7 @@ void EdgeSelector_Lightfield<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	MAP& m = this->m_map ;
+	typename PFP::MAP& m = this->m_map ;
 	Dart dd = m.phi1(d) ;
 
 	// New position

@@ -428,6 +428,7 @@ public:
 template <typename PFP>
 class EdgeSelector_CurvatureTensor : public EdgeSelector<PFP>
 {
+	// TODO : this selector still needs to be tested
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
