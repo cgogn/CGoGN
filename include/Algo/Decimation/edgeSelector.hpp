@@ -1437,7 +1437,7 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tens1),Eigen::EigenvaluesOnly);
 	const VEC3& e_val = Utils::convertRef<VEC3>(solver.eigenvalues());
 
-	REAL err = std::min(std::min(abs(e_val[0]), abs(e_val[1])) , abs(e_val[2])) ;
+	REAL err = std::max(std::max(abs(e_val[0]), abs(e_val[1])) , abs(e_val[2])) ;
 
 //	if (v1 % 5000 == 0) CGoGNout << e_val << CGoGNendl << err << CGoGNendl ;
 
