@@ -66,23 +66,28 @@ int main(int argc, char **argv)
 	// get a handler to the 3D vector attribute created by the import
 	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
 
-	FaceAttribute<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3, FACE>("position") ;
-	if(!positionF.isValid())
-		positionF = myMap.addAttribute<PFP::VEC3, FACE>("position") ;
 
-	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
+	//
+	// Dual
+	//
 
+//	FaceAttribute<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3, FACE>("position") ;
+//	if(!positionF.isValid())
+//		positionF = myMap.addAttribute<PFP::VEC3, FACE>("position") ;
+//
+//	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
+//	myMap.computeDual();
+//	position = positionF ;
+
+	EdgeAttribute<PFP::VEC3> positionE = myMap.getAttribute<PFP::VEC3, Edge>("position") ;
+	if(!positionE.isValid())
+		positionE = myMap.addAttribute<PFP::VEC3, EDGE>("position") ;
+
+	Algo::Surface::Geometry::computeCentroidEdges<PFP>(myMap, position, positionF) ;
 	myMap.computeDual();
-
 	position = positionF ;
 
 	myMap.check();
-
-	//turn_to<VertexAttribute<PFP::VEC3>, FaceAttribute<PFP::VEC3> >(&positionF);
-	//turn_to<FaceAttribute<PFP::VEC3>, VertexAttribute<PFP::VEC3> >(position);
-
-	//const std::type_info &t1 = typeid(&positionF);
-	//std::cout << "type name : " << t1.name() << std::endl;
 
 	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "result.off");
 	std::cout << "Exported" << std::endl;

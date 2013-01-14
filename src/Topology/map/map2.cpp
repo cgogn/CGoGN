@@ -955,14 +955,13 @@ void Map2::computeDual()
 //TODO triangulation of the boundary face to compute correctly the dual(dual(T)) of mesh T
 void Map2::computeDualBorderConstraint()
 {
-	//unmarkBoundary
 	std::vector<Dart> oldb;
 	for(Dart d = begin(); d != end(); next(d))
 	{
 		if(isBoundaryMarked2(d))
 		{
 			oldb.push_back(d);
-			boundaryUnmarkOrbit<FACE,2>(d);
+			fillHole(d);
 		}
 	}
 

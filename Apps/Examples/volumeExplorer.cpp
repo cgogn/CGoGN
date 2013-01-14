@@ -166,6 +166,17 @@ void MyQT::cb_Open()
 			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
 	}
 
+	if(extension == std::string(".ts"))
+	{
+		if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::TS))
+		{
+			std::cerr << "could not import " << filename << std::endl ;
+			return ;
+		}
+		else
+			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
+	}
+
 
 	if(extension == std::string(".off"))
 	{
@@ -408,6 +419,16 @@ int main(int argc, char **argv)
 				position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
 		}
 
+		if(extension == std::string(".ts"))
+		{
+			if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::TS))
+			{
+				std::cerr << "could not import " << filename << std::endl ;
+				return 1;
+			}
+			else
+				position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
+		}
 
 		if(extension == std::string(".off"))
 		{
