@@ -170,6 +170,7 @@ void FrameManipulator::draw()
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 		else
 			m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
+		m_shader->bind();
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 2*nb_segments+2);
 	}
 
@@ -179,6 +180,7 @@ void FrameManipulator::draw()
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 		else
 			m_shader->setColor(Geom::Vec4f(0.0f,1.0f,0.0f,0.0f));
+		m_shader->bind();
 		glDrawArrays(GL_TRIANGLE_STRIP, 2*nb_segments+2, 2*nb_segments+2);
 	}
 
@@ -188,6 +190,7 @@ void FrameManipulator::draw()
 			m_shader->setColor(Geom::Vec4f(1.0,1.0,0.0f,0.0f));
 		else
 			m_shader->setColor(Geom::Vec4f(0.0f,0.0f,1.0f,0.0f));
+		m_shader->bind();
 		glDrawArrays(GL_TRIANGLE_STRIP, 4*nb_segments+4, 2*nb_segments+2);
 	}
 
@@ -195,6 +198,7 @@ void FrameManipulator::draw()
 	{
 		glLineWidth(6.0f);
 		m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+		m_shader->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+6, 6);
 	}
 	else
@@ -211,6 +215,7 @@ void FrameManipulator::draw()
 			glLineWidth(3.0f);
 			m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
 		}
+		m_shader->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+6, 2);
 	}
 
@@ -226,6 +231,7 @@ void FrameManipulator::draw()
 			glLineWidth(3.0f);
 			m_shader->setColor(Geom::Vec4f(0.0f,0.7f,0.0f,0.0f));
 		}
+		m_shader->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+8, 2);
 	}
 
@@ -241,6 +247,7 @@ void FrameManipulator::draw()
 			glLineWidth(3.0f);
 			m_shader->setColor(Geom::Vec4f(0.0f,0.0f,0.7f,0.0f));
 		}
+		m_shader->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+10, 2);
 	}
 	}
@@ -259,6 +266,7 @@ void FrameManipulator::draw()
 			m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
 		}
 
+		m_shader->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+12, 2);
 		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+14, 6);
 	}
@@ -275,6 +283,7 @@ void FrameManipulator::draw()
 			glLineWidth(3.0f);
 			m_shader->setColor(Geom::Vec4f(0.0f,1.0f,0.0f,0.0f));
 		}
+		m_shader->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+20, 2);
 		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+22, 6);
 	}
@@ -291,6 +300,7 @@ void FrameManipulator::draw()
 			glLineWidth(3.0f);
 			m_shader->setColor(Geom::Vec4f(0.0f,0.0f,1.0f,0.0f));
 		}
+		m_shader->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+28, 2);
 		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+30, 6);
 	}
@@ -301,7 +311,7 @@ void FrameManipulator::draw()
 
  	Utils::GLSLShader::popTransfo();
 	Utils::GLSLShader::updateCurrentMatrices();
-
+	m_shader->unbind();
 }
 
 
