@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace PMesh
 {
 
@@ -98,9 +101,8 @@ public:
 } ;
 
 } //namespace PMesh
-
+} // Surface
 } //namespace Algo
-
 } //namespace CGoGN
 
 #endif
