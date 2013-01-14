@@ -42,11 +42,11 @@ public:
 
 	}
 
-	void vertexState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
+	virtual void vertexState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
 
-	void edgeState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
+	virtual void edgeState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
 
-	void faceState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
+	virtual void faceState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
 
 	void move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross) ;
 	std::vector<Dart> get_memo(const VEC3& goal);

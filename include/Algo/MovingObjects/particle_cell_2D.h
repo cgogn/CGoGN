@@ -70,14 +70,14 @@ public:
 
 	Geom::Orientation2D getOrientationFace(VEC3 sourcePoint, Dart d) ;
 
-	void vertexState(const VEC3& current) ;
+	virtual void vertexState(const VEC3& current) ;
 
-	void edgeState(const VEC3& current, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
+	virtual void edgeState(const VEC3& current, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
 
 	//just an orientation test : check which dart is aimed to leave the current face to reach an other position
 	Dart faceOrientationState(const VEC3& toward) ;
 
-	void faceState(const VEC3& current) ;
+	virtual void faceState(const VEC3& current) ;
 
 	void move(const VEC3& goal)
 	{
