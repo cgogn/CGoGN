@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace IHM
 {
 
@@ -821,9 +824,8 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersMoreThanOne(Dart d
 }
 
 } //namespace IHM
-
+} // Volume
 } //namespace Algo
-
 } //namespace CGoGN
 
 

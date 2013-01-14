@@ -41,6 +41,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Selection
 {
 
@@ -458,9 +461,8 @@ private :
 
 
 } // namespace Selection
-
+} // surface
 } // namespace Algo
-
 } // namespace CGoGN
 
 #include "Algo/Selection/collector.hpp"

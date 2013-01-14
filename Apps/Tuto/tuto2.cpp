@@ -110,7 +110,7 @@ void MyQT::createMap()
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
 		CGoGNout << "Dart "<< d;
-		if (myMap.isBoundaryMarked(d))
+		if (myMap.isBoundaryMarked<PFP::MAP::DIMENSION>(d))
 			CGoGNout << " is a boundary dart (implicitly added)"<< CGoGNendl;
 		else
 		{

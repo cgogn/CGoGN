@@ -43,6 +43,10 @@ protected:
 public:
 	typedef GMap0 ParentMap;
 
+	static const unsigned int DIMENSION = 1 ;
+
+
+
 	GMap1();
 
 	virtual std::string mapTypeName() const;
@@ -99,7 +103,7 @@ public:
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	Dart newBoundaryCycle(unsigned int nbEdges);
+//	Dart newBoundaryCycle(unsigned int nbEdges);
 
 	//! Delete a face erasing all its darts
 	/*! @param d a dart of the face

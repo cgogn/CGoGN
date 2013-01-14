@@ -46,18 +46,19 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
-	namespace ImportSurfacique
-	{
-		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
-	}
+	enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
 
-	namespace ImportVolumique
-	{
-		enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE};
-	}
+//	namespace ImportSurfacique
+//	{
+//
+//	}
+
 
 
 template <typename PFP>
@@ -82,7 +83,7 @@ protected:
 	*/
 	std::vector<unsigned int> m_emb;
 
-	static ImportSurfacique::ImportType getFileType(const std::string& filename);
+	static ImportType getFileType(const std::string& filename);
 
 #ifdef WITH_ASSIMP
 	void extractMeshRec(AttributeContainer& container, VertexAttribute<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
@@ -136,6 +137,16 @@ public:
 	}
 };
 
+}
+}
+
+
+namespace Volume
+{
+namespace Import
+{
+
+enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE};
 
 template <typename PFP>
 class MeshTablesVolume
@@ -159,7 +170,7 @@ protected:
 	*/
 	std::vector<unsigned int> m_emb;
 
-	static ImportVolumique::ImportType getFileType(const std::string& filename);
+	static ImportType getFileType(const std::string& filename);
 
 public:
 	typedef typename PFP::VEC3 VEC3 ;
@@ -193,7 +204,11 @@ public:
 	}
 };
 
+
 } // namespace Import
+
+}
+
 
 } // namespace Algo
 

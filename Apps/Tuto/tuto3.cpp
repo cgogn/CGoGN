@@ -154,7 +154,7 @@ void MyQT::createMap()
 
 	position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
-	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, position);
+	Algo::Surface::Modelisation::Polyhedron<PFP> prim1(myMap, position);
 	prim1.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
 	prim1.embedSphere(2.0f);
 
@@ -167,7 +167,7 @@ void MyQT::createMap()
 //	d2 = PHI<211>(d2);
 //	position[d2] = PFP::VEC3(0, 1, 2);
 
-	Algo::Modelisation::Polyhedron<PFP> prim2(myMap, position);
+	Algo::Surface::Modelisation::Polyhedron<PFP> prim2(myMap, position);
 	prim2.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
 	prim2.embedSphere(2.0f);
 

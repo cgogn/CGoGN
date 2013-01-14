@@ -32,7 +32,7 @@ SimpleMap3::SimpleMap3()
 {
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-	Algo::Modelisation::Primitive3D<PFP> primCat(myMap, position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap, position);
 	Dart d = primCat.hexaGrid_topo(2,1,1);
 	primCat.embedHexaGrid(1,1,1);
 

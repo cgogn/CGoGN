@@ -792,7 +792,7 @@ void Clipping::importMesh(std::string& filename)
 
 	if(extension == std::string(".tet"))
 	{
-		if(!Algo::Import::importTet<PFP>(myMap,filename.c_str(),attrNames))
+		if(!Algo::Volume::Import::importTet<PFP>(myMap,filename.c_str(),attrNames))
 		{
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
@@ -802,7 +802,7 @@ void Clipping::importMesh(std::string& filename)
 	}
 	else if(extension == std::string(".ts"))
 	{
-		if(!Algo::Import::importTs<PFP>(myMap,filename.c_str(),attrNames))
+		if(!Algo::Volume::Import::importTs<PFP>(myMap,filename.c_str(),attrNames))
 		{
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
@@ -1124,7 +1124,7 @@ int main(int argc, char** argv)
 	else
 	{
 		sqt.position = sqt.myMap.addAttribute<PFP::VEC3, VERTEX>("position");
-		Algo::Modelisation::Primitive3D<PFP> prim(sqt.myMap, sqt.position);
+		Algo::Volume::Modelisation::Primitive3D<PFP> prim(sqt.myMap, sqt.position);
 		prim.hexaGrid_topo(10,10,10);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);
 	}

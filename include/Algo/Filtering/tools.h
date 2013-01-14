@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Filtering
 {
 
@@ -130,6 +133,8 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
 }
 
 } //namespace Filtering
+
+}
 
 } //namespace Algo
 

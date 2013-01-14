@@ -64,6 +64,39 @@ public:
 	void skip(Dart d);
 } ;
 
+
+template <unsigned int ORBIT>
+class TraversorCell<GenericMap,ORBIT> : public Traversor<GenericMap>
+{
+private:
+	GenericMap& m ;
+
+	AttributeContainer* cont ;
+	unsigned int qCurrent ;
+
+	DartMarker* dmark ;
+	CellMarker<ORBIT>* cmark ;
+	AttributeMultiVector<Dart>* quickTraversal ;
+
+	Dart current ;
+	bool firstTraversal ;
+	const FunctorSelect& m_good ;
+
+public:
+	TraversorCell(GenericMap& map, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) ;
+
+	~TraversorCell() ;
+
+	Dart begin() ;
+
+	Dart end() ;
+
+	Dart next() ;
+
+	void skip(Dart d);
+} ;
+
+
 template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>
 {

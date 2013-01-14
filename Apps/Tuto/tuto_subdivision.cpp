@@ -64,15 +64,15 @@ int main(int argc, char **argv)
 	PFP::MAP myMap;
 
 	std::vector<std::string> attrNames ;
-	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
+	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
 	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
 
 	for(unsigned int i = 0; i < nbSteps; ++i)
-		Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
+		Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position);
 
-	Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
+	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "result.off");
 
     return 0;
 }

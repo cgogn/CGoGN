@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -64,7 +67,7 @@ public:
 		TraversorF<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
+			typename PFP::VEC3 p = Geometry::faceCentroid<PFP>(m_map, d, m_position);
 
 			m_map.incCurrentLevel() ;
 
@@ -93,6 +96,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

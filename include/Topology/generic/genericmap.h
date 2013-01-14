@@ -168,6 +168,7 @@ public:
 
 	virtual unsigned int dimension() const = 0 ;
 
+//	static const unsigned int DIMENSION = 0 ;
 	/**
 	 * Clear the map
 	 * @param removeAttrib
@@ -718,41 +719,55 @@ public:
 	unsigned int degree(Dart d);
 
 protected:
-	/// boundary marker
-	Mark m_boundaryMarker ;
+	/// boundary markers
+//	Mark m_boundaryMarker2 ;
+//	Mark m_boundaryMarker3 ;
+	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
 
 	/**
 	 * mark a dart as  belonging to boundary
 	 */
+	template <unsigned int D>
 	void boundaryMark(Dart d) ;
+	void boundaryMark2(Dart d) ;
+	void boundaryMark3(Dart d) ;
 
 	/**
 	 * unmark a dart from the boundary
 	 */
+	template <unsigned int D>
 	void boundaryUnmark(Dart d) ;
+	void boundaryUnmark2(Dart d) ;
+	void boundaryUnmark3(Dart d) ;
 
 public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
+	template <unsigned int D>
 	bool isBoundaryMarked(Dart d) const ;
+
+	bool isBoundaryMarked2(Dart d) const ;
+	bool isBoundaryMarked3(Dart d) const ;
+	bool isBoundaryMarkedCurrent(Dart d) const ;
 
 protected:
 	/**
 	 * mark an orbit of dart as belonging to boundary
 	 */
-	template <unsigned int ORBIT>
+	template <unsigned int ORBIT, unsigned int DIM>
 	void boundaryMarkOrbit(Dart d) ;
 
 	/**
 	 * unmark an orbit of dart from the boundary
 	 */
-	template <unsigned int ORBIT>
+	template <unsigned int ORBIT, unsigned int DIM>
 	void boundaryUnmarkOrbit(Dart d) ;
 
 	/**
 	 * clear all boundary markers
 	 */
+	template<unsigned int DIM>
 	void boundaryUnmarkAll() ;
 } ;
 

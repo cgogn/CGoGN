@@ -30,6 +30,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -793,6 +796,8 @@ void Map3MR<PFP>::subdivideVolumeTetOcta(Dart d)
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

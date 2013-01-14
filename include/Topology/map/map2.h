@@ -58,6 +58,7 @@ public:
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+5; }
 
 	static const unsigned int IN_PARENT = 5 ;
+	static const unsigned int DIMENSION = 2 ;
 
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT = EDGE+5;
@@ -449,6 +450,11 @@ public:
 	 *************************************************************************/
 
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of phi2). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of phi2 relation
 	 *  Add a face to the map that closes the hole.

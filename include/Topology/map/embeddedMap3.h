@@ -37,6 +37,10 @@ class EmbeddedMap3 : public Map3
 public:
 	typedef Map3 TOPO_MAP;
 
+	static const unsigned int DIMENSION = 3 ;
+
+
+
 	//!
 	/*!
 	 *

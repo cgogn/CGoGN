@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -69,6 +72,8 @@ bool isTriangleObtuse(typename PFP::MAP& map, Dart d, const VertexAttribute<type
 }
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

@@ -30,6 +30,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -564,6 +567,8 @@ unsigned int Map2MR<PFP>::subdivideFaceSqrt3(Dart d)
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

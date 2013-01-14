@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace DecimationVolumes
 {
 /************************************************************************************
@@ -321,5 +324,6 @@ void EdgeSelector_SG98<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 }
 
 } //end namespace DecimationVolumique
+}
 } //end namespace Algo
 } //end namespace CGoGN

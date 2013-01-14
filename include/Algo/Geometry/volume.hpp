@@ -62,12 +62,12 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	if(Modelisation::Tetrahedralization::isTetrahedron<PFP>(map,d,thread))
+	if (Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map,d,thread))
 		return tetrahedronVolume<PFP>(map,d,position) ;
 	else
 	{
 		typename PFP::REAL vol = 0 ;
-		VEC3 vCentroid = Algo::Geometry::volumeCentroid<PFP>(map, d, position, thread) ;
+		VEC3 vCentroid = Algo::Surface::Geometry::volumeCentroid<PFP>(map, d, position, thread) ;
 
 		DartMarkerStore mark(map,thread);		// Lock a marker
 
@@ -89,7 +89,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 			}
 			else
 			{
-				VEC3 fCentroid = Algo::Geometry::faceCentroid<PFP>(map, e, position) ;
+				VEC3 fCentroid = Algo::Surface::Geometry::faceCentroid<PFP>(map, e, position) ;
 				Dart f = e ;
 				do
 				{

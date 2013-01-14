@@ -36,6 +36,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -99,7 +102,7 @@ typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const VertexAttribute<typ
 {
 	typename PFP::VEC3 res(0);
 
-	if(Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, d))
+	if(Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, d))
 	{
 		Dart d1 = map.phi1(d) ;
 		Dart d2 = map.phi_1(d);
@@ -374,9 +377,9 @@ public:
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
+			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
 			{
-				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+				typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
 				m_map.incCurrentLevel() ;
 
@@ -432,6 +435,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

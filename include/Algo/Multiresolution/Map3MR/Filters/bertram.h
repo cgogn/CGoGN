@@ -37,6 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -72,7 +75,7 @@ public:
 		TraversorW<typename PFP::MAP> travW(m_map) ;
 		for (Dart d = travW.begin(); d != travW.end(); d = travW.next())
 		{
-			typename PFP::VEC3 vc = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+			typename PFP::VEC3 vc = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 			vc *= 8 * m_a * m_a * m_a;
 
 			unsigned int count = 0;
@@ -479,7 +482,7 @@ public:
 		TraversorW<typename PFP::MAP> travW(m_map) ;
 		for (Dart d = travW.begin(); d != travW.end(); d = travW.next())
 		{
-			typename PFP::VEC3 vc = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+			typename PFP::VEC3 vc = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 			vc *= 8 * m_a * m_a * m_a;
 
 			unsigned int count = 0;
@@ -789,6 +792,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

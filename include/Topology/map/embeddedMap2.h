@@ -39,6 +39,8 @@ class EmbeddedMap2 : public Map2
 public:
 	typedef Map2 TOPO_MAP;
 
+	static const unsigned int DIMENSION = 2 ;
+
 	/*
 	 *
 	 */

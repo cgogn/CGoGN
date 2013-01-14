@@ -27,11 +27,15 @@
 
 #include <math.h>
 #include <vector>
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace Modelisation
@@ -105,6 +109,12 @@ void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 template <typename PFP, typename EMBV, typename EMB>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
+/**
+ * Doo-Sabin subdivision scheme
+ */
+template <typename PFP>
+void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
 ///**
 // * Reverse the orientation of the map
 // */
@@ -127,7 +137,11 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 //void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
 
+
+
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

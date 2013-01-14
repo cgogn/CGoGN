@@ -133,9 +133,9 @@ void MCMesh::MC()
 {
 	myMap.clear(false);
 	// elargir l'image pour le calcul de la courbure
-	Algo::MC::Image<DATATYPE>* myImgFr = myImg->addFrame(1);
+	SAlgo::MC::Image<DATATYPE>* myImgFr = myImg->addFrame(1);
 
-	Algo::MC::WindowingGreater<DATATYPE> myWindFunc;
+	SAlgo::MC::WindowingGreater<DATATYPE> myWindFunc;
 	myWindFunc.setIsoValue(DATATYPE(127));
 
 	position = myMap.getAttribute<VEC3, VERTEX>("position");
@@ -143,7 +143,7 @@ void MCMesh::MC()
 		position = myMap.addAttribute<VEC3, VERTEX>("position");
 
 	// instanciation du mc
-	Algo::MC::MarchingCube<DATATYPE, Algo::MC::WindowingGreater,PFP> mc(myImgFr, &myMap, position, myWindFunc, false);
+	SAlgo::MC::MarchingCube<DATATYPE, SAlgo::MC::WindowingGreater,PFP> mc(myImgFr, &myMap, position, myWindFunc, false);
 	mc.simpleMeshing();
 
 	delete myImgFr;
@@ -168,7 +168,7 @@ void MCMesh::updateRender()
 
 void MCMesh::fromFile(char* fname)
 {
-	myImg = new Algo::MC::Image<DATATYPE>();
+	myImg = new SAlgo::MC::Image<DATATYPE>();
 	myImg->loadInrgz(fname);
 	CGoGNout << "Image chargee"<<CGoGNendl;
 	CGoGNout << myImg->getWidthX() <<"x"<< myImg->getWidthY() <<"x"<< myImg->getWidthZ() << "voxels"<<CGoGNendl;
@@ -193,7 +193,7 @@ void MCMesh::sphere()
 		}
 	}
 	
-	myImg = new Algo::MC::Image<DATATYPE>(img,128,128,128,1.0f,1.0f,1.0f,false);
+	myImg = new SAlgo::MC::Image<DATATYPE>(img,128,128,128,1.0f,1.0f,1.0f,false);
 }
 
 

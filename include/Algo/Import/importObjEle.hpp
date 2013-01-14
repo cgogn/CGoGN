@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Import
 {
 
@@ -145,7 +148,8 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		std::stringstream oss(line);
 		oss >> nbe;
 
-		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map,false);
+		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map);
+
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];
@@ -237,7 +241,6 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 }
 
 } // namespace Import
-
+}
 } // namespace Algo
-
 } // namespace CGoGN

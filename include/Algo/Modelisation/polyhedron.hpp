@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -137,19 +140,52 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n, bool withBoundary)
 template <typename PFP>
 Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary)
 {
-	Dart res = Dart::nil();
+	std::vector<Dart> m_tableVertDarts;
+	
+	
+	unsigned int nbt = 2*nbSides -1 ; // -1 for computation optimization
+	m_tableVertDarts.reserve(nbSides);
+	
+	
+	// creation of triangles around circunference and storing vertices
+	for (unsigned int i = 0; i <= nbt; ++i)
+	{
+		Dart d = map.newFace(3, false);
+		m_tableVertDarts.push_back(d);
+	}
 
-	Dart firstP = createPyramid<PFP>(map,nbSides, withBoundary);
-	Dart secondP = createPyramid<PFP>(map,nbSides, withBoundary);
+	// sewing the triangles
+	for (unsigned int i = 0; i < nbSides-1; ++i)
+	{
+		Dart d = m_tableVertDarts[i];
+		d = map.phi_1(d);
+		Dart e = m_tableVertDarts[i+1];
+		e = map.phi1(e);
+		map.sewFaces(d, e, false);
+	}
+	//sewing the last with the first
+	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[nbSides-1]), false);
 
-	res = map.phi2(firstP);
+	for (unsigned int i = nbSides; i <= nbt; ++i)
+	{
+		Dart d = m_tableVertDarts[i];
+		d = map.phi_1(d);
+		Dart e = m_tableVertDarts[i+1];
+		e = map.phi1(e);
+		map.sewFaces(d, e, false);
+	}
+	//sewing the last with the first
+	map.sewFaces(map.phi1(m_tableVertDarts[nbSides]), map.phi_1(m_tableVertDarts[nbt]), false);
 
-	map.sewVolumes(firstP, secondP);
-	map.mergeVolumes(firstP);
+	//sewing the the two opened pyramids together
+	for(unsigned int i = 0; i < nbSides ; ++i)
+	{
+		map.sewFaces(m_tableVertDarts[i], m_tableVertDarts[nbt-i], false);
+	}
 
-	return res;
+	//return a dart from the base
+	return m_tableVertDarts[0];
 }
-
 
 
 /**
@@ -550,7 +586,7 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
+				Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}
@@ -566,7 +602,7 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
+				Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}
@@ -1158,6 +1194,8 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 // }
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

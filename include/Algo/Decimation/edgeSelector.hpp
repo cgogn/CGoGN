@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -2090,6 +2093,8 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 }
 
 } // namespace Decimation
+
+}
 
 } // namespace Algo
 

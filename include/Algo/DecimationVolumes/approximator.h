@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace DecimationVolumes
 {
 
@@ -142,6 +145,8 @@ public:
 
 
 } // namespace DecimationVolumes
+
+}
 
 } // namespace Algo
 

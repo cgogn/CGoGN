@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace DecimationVolumes
 {
 
@@ -120,6 +123,8 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 }
 
 } //end namespace DecimationVolumes
+
+}
 
 } //end namespace Algo
 

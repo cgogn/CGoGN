@@ -665,19 +665,8 @@ unsigned int GenericMap::degree(Dart d)
 	return fcount.getNb() ;
 }
 
-template <unsigned int ORBIT>
-void GenericMap::boundaryMarkOrbit(Dart d)
-{
-	FunctorMark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
-	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
-}
 
-template <unsigned int ORBIT>
-void GenericMap::boundaryUnmarkOrbit(Dart d)
-{
-	FunctorUnmark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
-	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
-}
+
 
 /****************************************
  *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
@@ -707,19 +696,82 @@ inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& na
  *  BOUNDARY MANAGEMENT   *
  **************************/
 
+template <unsigned int D>
 inline void GenericMap::boundaryMark(Dart d)
 {
-	m_markTables[DART][0]->operator[](dartIndex(d)).setMark(m_boundaryMarker);
+	m_markTables[DART][0]->operator[](dartIndex(d)).setMark(m_boundaryMarkers[D-2]);
 }
 
+template <unsigned int D>
 inline void GenericMap::boundaryUnmark(Dart d)
 {
-	m_markTables[DART][0]->operator[](dartIndex(d)).unsetMark(m_boundaryMarker);
+	m_markTables[DART][0]->operator[](dartIndex(d)).unsetMark(m_boundaryMarkers[D-2]);
 }
 
+template <unsigned int D>
 inline bool GenericMap::isBoundaryMarked(Dart d) const
 {
-	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarker);
+	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarkers[D-2]);
 }
+
+
+inline bool GenericMap::isBoundaryMarkedCurrent(Dart d) const
+{
+	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarkers[this->dimension()-2]);
+}
+
+
+inline void GenericMap::boundaryMark2(Dart d)
+{
+	boundaryMark<2>(d);
+}
+
+inline void GenericMap::boundaryUnmark2(Dart d)
+{
+	boundaryUnmark<2>(d);
+}
+
+inline bool GenericMap::isBoundaryMarked2(Dart d) const
+{
+	return isBoundaryMarked<2>(d);
+}
+
+inline void GenericMap::boundaryMark3(Dart d)
+{
+	boundaryMark<3>(d);
+}
+
+inline void GenericMap::boundaryUnmark3(Dart d)
+{
+	boundaryUnmark<3>(d);
+}
+
+inline bool GenericMap::isBoundaryMarked3(Dart d) const
+{
+	return isBoundaryMarked<3>(d);
+}
+
+template <unsigned int ORBIT, unsigned int  DIM>
+void GenericMap::boundaryMarkOrbit(Dart d)
+{
+	FunctorMark<GenericMap> fm(*this, m_boundaryMarkers[DIM-2], m_markTables[DART][0]) ;
+	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
+}
+
+template <unsigned int ORBIT, unsigned int DIM>
+void GenericMap::boundaryUnmarkOrbit(Dart d)
+{
+	FunctorUnmark<GenericMap> fm(*this, m_boundaryMarkers[DIM-2], m_markTables[DART][0]) ;
+	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
+}
+
+template <unsigned int DIM>
+void GenericMap::boundaryUnmarkAll()
+{
+	AttributeContainer& cont = getAttributeContainer<DART>() ;
+	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarkers[DIM-2]);
+}
+
 
 } //namespace CGoGN

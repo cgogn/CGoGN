@@ -103,9 +103,9 @@ public:
 
 	Vector<DIM, T>& operator-=(const Vector<DIM, T>& v) ;
 
-	Vector<DIM, T> operator*=(T a) ;
+	Vector<DIM, T>& operator*=(T a) ;
 
-	Vector<DIM, T> operator/=(T a) ;
+	Vector<DIM, T>& operator/=(T a) ;
 
 	/**********************************************/
 	/*            ARITHMETIC OPERATORS            */

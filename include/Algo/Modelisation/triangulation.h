@@ -39,6 +39,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -107,6 +110,8 @@ public:
 };
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

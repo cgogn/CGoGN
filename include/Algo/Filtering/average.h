@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Filtering
 {
 
@@ -182,6 +185,8 @@ void filterAverageFaceAttribute_WithinSphere(
 }
 
 } // namespace Filtering
+
+}
 
 } // namespace Algo
 

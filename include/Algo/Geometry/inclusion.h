@@ -36,6 +36,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -124,6 +127,8 @@ template <typename PFP>
 bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, const typename PFP::VEC3 points[4], bool CCW);
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

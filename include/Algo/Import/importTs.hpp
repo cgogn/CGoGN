@@ -30,6 +30,8 @@ namespace CGoGN
 {
 namespace Algo
 {
+namespace Volume
+{
 namespace Import 
 {
 
@@ -121,7 +123,7 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		oss >> nbe; //number of vertices = 4
 		assert(nbe == 4);
 
-		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map,false);
+		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map);
 
 		Geom::Vec4ui pt;
 		oss >> pt[0];
@@ -213,7 +215,6 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 }
 
 } // namespace Import
-
+}
 } // namespace Algo
-
 } // namespace CGoGN

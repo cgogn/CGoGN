@@ -173,7 +173,7 @@ inline Vector<DIM, T>& Vector<DIM, T>::operator-=(const Vector<DIM, T>& v)
 }
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM, T> Vector<DIM, T>::operator*=(T a)
+inline Vector<DIM, T>& Vector<DIM, T>::operator*=(T a)
 {
 	for (unsigned int i = 0; i < DIM; ++i)
 		m_data[i] *= a ;
@@ -181,7 +181,7 @@ inline Vector<DIM, T> Vector<DIM, T>::operator*=(T a)
 }
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM, T> Vector<DIM, T>::operator/=(T a)
+inline Vector<DIM, T>& Vector<DIM, T>::operator/=(T a)
 {
 	for (unsigned int i = 0; i < DIM; ++i)
 		m_data[i] /= a ;
