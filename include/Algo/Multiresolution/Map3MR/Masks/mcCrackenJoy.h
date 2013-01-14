@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -109,7 +112,7 @@ public:
 			Traversor3VW<typename PFP::MAP> travVW(m_map, d);
 			for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
 			{
-				Cavg += Algo::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
+				Cavg += Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
 				++degree;
 			}
 			Cavg /= degree;
@@ -119,7 +122,7 @@ public:
 			Traversor3VF<typename PFP::MAP> travVF(m_map, d);
 			for(Dart dit = travVF.begin() ; dit != travVF.end() ; dit = travVF.next())
 			{
-				Aavg += Algo::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
+				Aavg += Algo::Surface::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
 				++degree;
 			}
 			Aavg /= degree;
@@ -203,7 +206,7 @@ public:
 			Traversor3EW<typename PFP::MAP> travEW(m_map, d2);
 			for(Dart dit = travEW.begin() ; dit != travEW.end() ; dit = travEW.next())
 			{
-				Cavg += Algo::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
+				Cavg += Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
 				++degree;
 			}
 			Cavg /= degree;
@@ -213,7 +216,7 @@ public:
 			Traversor3EF<typename PFP::MAP> travEF(m_map, d2);
 			for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
 			{
-				Aavg += Algo::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
+				Aavg += Algo::Surface::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
 				++degree;
 			}
 			Aavg /= degree;
@@ -273,10 +276,10 @@ public:
 			Dart df = m_map.phi1(m_map.phi1(d)) ;
 			//m_map.decCurrentLevel() ;
 			//face points
-			typename PFP::VEC3 C0 = Algo::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
-			typename PFP::VEC3 C1 = Algo::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(df), m_position);
+			typename PFP::VEC3 C0 = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
+			typename PFP::VEC3 C1 = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(df), m_position);
 
-			typename PFP::VEC3 A = Algo::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(df), m_position);
+			typename PFP::VEC3 A = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(df), m_position);
 
 			typename PFP::VEC3 fp = C0 + A * 2 + C1;
 			fp /= 4;
@@ -309,7 +312,7 @@ public:
 		m_map.decCurrentLevel() ;
 		//cell points : these points are the average of the
 		//vertices of the lattice that bound the cell
-		typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map,df,m_position);
+		typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map,df,m_position);
 		m_map.incCurrentLevel() ;
 
 		m_position[d] = p;
@@ -323,6 +326,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -148,7 +151,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 				m.markOrbit<FACE>(ditWF);
 		}
 
-		Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
+		Algo::Volume::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
 	}
 
 /*
@@ -161,7 +164,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 		if(m.isMarked(dit))
 		{
 			m.unmarkOrbit<FACE>(dit);
-			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
+			Algo::Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
 		}
 	}
 
@@ -180,7 +183,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 					m.markOrbit<EDGE>(ditWE);
 			}
 
-			Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(m_map, dit);
+			Algo::Volume::Modelisation::Tetrahedralization::flip1To3<PFP>(m_map, dit);
 		}
 	}
 
@@ -194,7 +197,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 		{
 			m.unmarkOrbit<EDGE>(dit);
 			Dart d = m_map.phi2(m_map.phi3(m_map.findBoundaryFaceOfEdge(dit)));
-			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(m_map, d);
+			Algo::Volume::Modelisation::Tetrahedralization::swapGen3To2<PFP>(m_map, d);
 
 		}
 	}
@@ -334,7 +337,7 @@ void Map3MR<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 			m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 			Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
 
-			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
+			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
 			{
 				DartMarkerStore me(m_map);
 
@@ -761,6 +764,8 @@ void Map3MR<PFP>::synthesis()
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

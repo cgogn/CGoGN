@@ -30,6 +30,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -44,14 +47,14 @@ Map2MR_PM<PFP>::~Map2MR_PM()
 {
 	if(m_selector)
 		delete m_selector ;
-	for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+	for(typename std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 		delete (*it) ;
-	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
+	for(typename std::vector<Algo::Surface::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
 		delete (*it) ;
 }
 
 template <typename PFP>
-void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select)
+void Map2MR_PM<PFP>::createPM(Algo::Surface::Decimation::SelectorType s, Algo::Surface::Decimation::ApproximatorType a, const FunctorSelect& select)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 
@@ -59,31 +62,31 @@ void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation
 	pos_v.push_back(&m_position) ;
 	switch(a)
 	{
-		case Algo::Decimation::A_QEM : {
-			m_approximators.push_back(new Algo::Decimation::Approximator_QEM<PFP>(m_map, pos_v)) ;
+		case Algo::Surface::Decimation::A_QEM : {
+			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_QEM<PFP>(m_map, pos_v)) ;
 			break ; }
-		case Algo::Decimation::A_MidEdge : {
-			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v)) ;
+		case Algo::Surface::Decimation::A_MidEdge : {
+			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v)) ;
 			break ; }
-		case Algo::Decimation::A_hHalfCollapse : {
-			Algo::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Decimation::Predictor_HalfCollapse<PFP>(m_map, m_position) ;
+		case Algo::Surface::Decimation::A_hHalfCollapse : {
+			Algo::Surface::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Surface::Decimation::Predictor_HalfCollapse<PFP>(m_map, m_position) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_HalfCollapse<PFP>(m_map, pos_v, pred)) ;
+			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP>(m_map, pos_v, pred)) ;
 			break ; }
-		case Algo::Decimation::A_CornerCutting : {
-			Algo::Decimation::Predictor_CornerCutting<PFP>* pred = new Algo::Decimation::Predictor_CornerCutting<PFP>(m_map, m_position) ;
+		case Algo::Surface::Decimation::A_CornerCutting : {
+			Algo::Surface::Decimation::Predictor_CornerCutting<PFP>* pred = new Algo::Surface::Decimation::Predictor_CornerCutting<PFP>(m_map, m_position) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_CornerCutting<PFP>(m_map, pos_v, pred)) ;
+			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_CornerCutting<PFP>(m_map, pos_v, pred)) ;
 			break ; }
-		case Algo::Decimation::A_TangentPredict1 : {
-			Algo::Decimation::Predictor_TangentPredict1<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict1<PFP>(m_map, m_position) ;
+		case Algo::Surface::Decimation::A_TangentPredict1 : {
+			Algo::Surface::Decimation::Predictor_TangentPredict1<PFP>* pred = new Algo::Surface::Decimation::Predictor_TangentPredict1<PFP>(m_map, m_position) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
+			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
 			break ; }
-		case Algo::Decimation::A_TangentPredict2 : {
-			Algo::Decimation::Predictor_TangentPredict2<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict2<PFP>(m_map, m_position) ;
+		case Algo::Surface::Decimation::A_TangentPredict2 : {
+			Algo::Surface::Decimation::Predictor_TangentPredict2<PFP>* pred = new Algo::Surface::Decimation::Predictor_TangentPredict2<PFP>(m_map, m_position) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
+			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
@@ -91,23 +94,23 @@ void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation
 	CGoGNout << "  creating selector.." << CGoGNflush ;
 	switch(s)
 	{
-	case Algo::Decimation::S_MapOrder : {
-		m_selector = new Algo::Decimation::EdgeSelector_MapOrder<PFP>(m_map, m_position, m_approximators, select) ;
+	case Algo::Surface::Decimation::S_MapOrder : {
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_MapOrder<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
-	case Algo::Decimation::S_Random : {
-		m_selector = new Algo::Decimation::EdgeSelector_Random<PFP>(m_map, m_position, m_approximators, select) ;
+	case Algo::Surface::Decimation::S_Random : {
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_Random<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
-	case Algo::Decimation::S_EdgeLength : {
-		m_selector = new Algo::Decimation::EdgeSelector_Length<PFP>(m_map, m_position, m_approximators, select) ;
+	case Algo::Surface::Decimation::S_EdgeLength : {
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_Length<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
-	case Algo::Decimation::S_QEM : {
-		m_selector = new Algo::Decimation::EdgeSelector_QEM<PFP>(m_map, m_position, m_approximators, select) ;
+	case Algo::Surface::Decimation::S_QEM : {
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_QEM<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
-	case Algo::Decimation::S_MinDetail : {
-		m_selector = new Algo::Decimation::EdgeSelector_MinDetail<PFP>(m_map, m_position, m_approximators, select) ;
+	case Algo::Surface::Decimation::S_MinDetail : {
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
-	case Algo::Decimation::S_Curvature : {
-		m_selector = new Algo::Decimation::EdgeSelector_Curvature<PFP>(m_map, m_position, m_approximators, select) ;
+	case Algo::Surface::Decimation::S_Curvature : {
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
@@ -115,17 +118,17 @@ void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation
 	m_initOk = true ;
 
 	CGoGNout << "  initializing approximators.." << CGoGNflush ;
-	for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+	for(typename std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 	{
 		if(! (*it)->init())
 			m_initOk = false ;
 		if((*it)->getApproximatedAttributeName() == "position")
-			m_positionApproximator = reinterpret_cast<Algo::Decimation::Approximator<PFP, VEC3>*>(*it) ;
+			m_positionApproximator = reinterpret_cast<Algo::Surface::Decimation::Approximator<PFP, VEC3>*>(*it) ;
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
 	CGoGNout << "  initializing predictors.." << CGoGNflush ;
-	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
+	for(typename std::vector<Algo::Surface::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
 		if(! (*it)->init())
 			m_initOk = false ;
 	CGoGNout << "..done" << CGoGNendl ;
@@ -311,6 +314,8 @@ Dart Map2MR_PM<PFP>::vertexOrigin(Dart d)
 
 
 } // namespace Multiresolution
+
+} // namespace Surface
 
 } // namespace Algo
 
