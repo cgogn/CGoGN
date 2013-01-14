@@ -93,20 +93,6 @@ public:
 	 */
 	AttributeHandler() ;
 
-	template <unsigned int ORBIT2>
-	AttributeHandler(const AttributeHandler<T, ORBIT2>& h):
-	AttributeHandlerGen(h.m_map, h.valid)
-	{
-		m_attrib = h.m_attrib;
-		if(m_attrib->getOrbit() == ORBIT2)
-		{
-			if(valid)
-				registerInMap() ;
-		}
-		else
-			valid = false;
-	}
-
 	/**
 	 * Constructor
 	 * @param m the map which belong attribute

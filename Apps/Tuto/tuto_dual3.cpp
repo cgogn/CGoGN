@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 	PFP::MAP myMap;
 
 	std::vector<std::string> attrNames ;
-	Algo::Import::importMeshV<PFP>(myMap, argv[1], attrNames, Algo::Import::ImportVolumique::NODE);
+	Algo::Volume::Import::importMeshV<PFP>(myMap, argv[1], attrNames, Algo::Volume::Import::NODE);
 
 	// get a handler to the 3D vector attribute created by the import
 	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
@@ -70,12 +70,12 @@ int main(int argc, char **argv)
 	if(!positionV.isValid())
 		positionV = myMap.addAttribute<PFP::VEC3, VOLUME>("position") ;
 
-	Algo::Geometry::computeCentroidVolumes<PFP>(myMap, position, positionV) ;
+	Algo::Volume::Geometry::computeCentroidVolumes<PFP>(myMap, position, positionV) ;
 
 	Dart dsave = NIL;
 	for(Dart d = myMap.begin() ; d != myMap.end() ; myMap.next(d))
 	{
-		if(myMap.isBoundaryMarked(d))
+		if(myMap.isBoundaryMarked3(d))
 		{
 			dsave = d;
 			break;

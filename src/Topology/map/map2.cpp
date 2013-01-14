@@ -945,9 +945,9 @@ void Map2::computeDual()
 	//boundary management
 	for(Dart d = begin(); d != end(); next(d))
 	{
-		if(isBoundaryMarked(d))
+		if(isBoundaryMarked2(d))
 		{
-			boundaryMarkOrbit<FACE>(deleteVertex(phi2(d)));
+			boundaryMarkOrbit<FACE,2>(deleteVertex(phi2(d)));
 		}
 	}
 }
@@ -959,10 +959,10 @@ void Map2::computeDualBorderConstraint()
 	std::vector<Dart> oldb;
 	for(Dart d = begin(); d != end(); next(d))
 	{
-		if(isBoundaryMarked(d))
+		if(isBoundaryMarked2(d))
 		{
 			oldb.push_back(d);
-			boundaryUnmarkOrbit<FACE>(d);
+			boundaryUnmarkOrbit<FACE,2>(d);
 		}
 	}
 
@@ -1014,9 +1014,9 @@ void Map2::computeDualBorderConstraint()
 	//boundary management
 	for(Dart d = begin(); d != end(); next(d))
 	{
-		if(isBoundaryMarked(d))
+		if(isBoundaryMarked2(d))
 		{
-			boundaryMarkOrbit<FACE>(deleteVertex(phi2(d)));
+			boundaryMarkOrbit<FACE,2>(deleteVertex(phi2(d)));
 		}
 	}
 

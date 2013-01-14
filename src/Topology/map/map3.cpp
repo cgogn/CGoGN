@@ -945,7 +945,7 @@ bool Map3::check()
         Dart d2 = phi2(d);
         if (phi2(d2) != d) // phi2 involution ?
 		{
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
         	std::cout << "Check: phi2 is not an involution" << std::endl;
@@ -955,7 +955,7 @@ bool Map3::check()
         Dart d1 = phi1(d);
         if (phi_1(d1) != d) // phi1 a une image correcte ?
 		{
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
             std::cout << "Check: unconsistent phi_1 link" << std::endl;
@@ -964,7 +964,7 @@ bool Map3::check()
 
         if (m.isMarked(d1)) // phi1 a un seul antécédent ?
 		{
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
             std::cout << "Check: dart with two phi1 predecessors" << std::endl;
@@ -974,7 +974,7 @@ bool Map3::check()
 
         if (d1 == d)
         {
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
             std::cout << "Check: (warning) face loop (one edge)" << std::endl;
@@ -982,7 +982,7 @@ bool Map3::check()
 
         if (phi1(d1) == d)
         {
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
             std::cout << "Check: (warning) face with only two edges" << std::endl;
@@ -990,7 +990,7 @@ bool Map3::check()
 
         if (phi2(d1) == d)
         {
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
         	std::cout << "Check: (warning) dandling edge (phi2)" << std::endl;
@@ -998,7 +998,7 @@ bool Map3::check()
 
         if (phi3(d1) == d)
         {
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
             std::cout << "Check: (warning) dandling edge (phi3)" << std::endl;
@@ -1009,7 +1009,7 @@ bool Map3::check()
     {
         if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
 		{
-        	if(isBoundaryMarked(d))
+        	if(isBoundaryMarked3(d))
         		std::cout << "Boundary case - ";
 
             std::cout << "Check: dart with no phi1 predecessor" << std::endl;
@@ -1208,7 +1208,7 @@ void Map3::computeDual()
 	std::vector<Dart> v;
 	for(Dart d = begin(); d != end(); next(d))
 	{
-		if(!cv.isMarked(d) && isBoundaryMarked(d))
+		if(!cv.isMarked(d) && isBoundaryMarked3(d))
 		{
 			++count;
 			v.push_back(d);
@@ -1259,7 +1259,7 @@ void Map3::computeDual()
 
 	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
 	{
-		boundaryUnmarkOrbit<VOLUME>(*it);
+		boundaryUnmarkOrbit<VOLUME,3>(*it);
 	}
 
 	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)

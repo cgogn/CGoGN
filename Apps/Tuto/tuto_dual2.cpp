@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 	PFP::MAP myMap;
 
 	std::vector<std::string> attrNames ;
-	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
+	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
 	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	if(!positionF.isValid())
 		positionF = myMap.addAttribute<PFP::VEC3, FACE>("position") ;
 
-	Algo::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
 
 	myMap.computeDual();
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 	//const std::type_info &t1 = typeid(&positionF);
 	//std::cout << "type name : " << t1.name() << std::endl;
 
-	Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
+	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "result.off");
 	std::cout << "Exported" << std::endl;
 
 	return 0;

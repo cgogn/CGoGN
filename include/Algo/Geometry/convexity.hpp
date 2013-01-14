@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -42,7 +45,7 @@ bool isEdgeConvexe(typename PFP::MAP& map, Dart d, const VertexAttribute<typenam
 	typedef typename PFP::VEC3 VEC3 ;
 
 	const VEC3 n = faceNormal<PFP>(map, d, position);
-	const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(map, map.phi1(map.phi2(d)), position) ;
+	const VEC3 e = vectorOutOfDart<PFP>(map, map.phi1(map.phi2(d)), position) ;
 
 	if((e * n) > 0)
 		return true;
@@ -51,6 +54,8 @@ bool isEdgeConvexe(typename PFP::MAP& map, Dart d, const VertexAttribute<typenam
 }
 
 } // namespace Geometry
+
+} // namespace Surface
 
 } // namespace Algo
 

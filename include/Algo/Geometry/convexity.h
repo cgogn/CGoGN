@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -41,6 +44,8 @@ template <typename PFP>
 bool isEdgeConvexe(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 } // namespace Geometry
+
+} // namespace Surface
 
 } // namespace Algo
 
