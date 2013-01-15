@@ -46,13 +46,16 @@ enum SelectorType
 	S_QEMml,
 	S_MinDetail,
 	S_Curvature,
+	S_NormalArea,
+	S_CurvatureTensor,
 	S_ColorNaive,
 	S_QEMextColor,
 	S_Lightfield,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	S_hQEMextColor,
 	S_hQEMml,
-	S_hLightfield
+	S_hLightfield,
+	S_hLightfieldExp
 } ;
 
 template <typename PFP> class ApproximatorGen ;

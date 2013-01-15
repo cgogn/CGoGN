@@ -42,16 +42,16 @@ namespace GL2
 
 
 
-inline ColorPerFaceRender::ColorPerFaceRender():
+inline DataPerFaceRender::DataPerFaceRender():
 m_nbTris(0)
 {
 }
 
-
-
-template<typename PFP, unsigned int ORBIT>
-void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
+template<typename PFP, unsigned int ORBIT, typename T>
+void
+DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<T,ORBIT>& dataPerXXX,
+		const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -59,8 +59,8 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
-	bufferColors.reserve(16384);
+	std::vector<T> bufferData;
+	bufferData.reserve(16384);
 
 	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
 
@@ -73,11 +73,11 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 		do
 		{
 			buffer.push_back(positions[d]);
-			bufferColors.push_back(colorPerXXX[d]);
+			bufferData.push_back(dataPerXXX[d]);
 			buffer.push_back(positions[b]);
-			bufferColors.push_back(colorPerXXX[b]);
+			bufferData.push_back(dataPerXXX[b]);
 			buffer.push_back(positions[c]);
-			bufferColors.push_back(colorPerXXX[c]);
+			bufferData.push_back(dataPerXXX[c]);
 			b = c;
 			c = map.phi1(b);
 		} while (c != d);
@@ -91,86 +91,20 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
 	vboPosition.releasePtr();
 
-	vboColor.setDataSize(3);
-	vboColor.allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboColor.lockPtr());
-	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
-	vboColor.releasePtr();
+	assert(sizeof(T) % sizeof(float) == 0 || !"DataPerFaceRender::updateVBO: VBO's only work with data types which are a multiple of 4 bytes") ;
+	vboData.setDataSize(sizeof(T) / sizeof(float)); // Warning : works only for data types of 4 bytes (as do the VBO's)
+	vboData.allocate(bufferData.size());
+	T* ptrData = reinterpret_cast<T*>(vboData.lockPtr());
+	memcpy(ptrData,&bufferData[0],bufferData.size()*sizeof(T));
+	vboData.releasePtr();
 }
 
-template<typename PFP, unsigned int ORBIT>
-void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals,
-			const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
-{
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
-	std::vector<VEC3> buffer;
-	buffer.reserve(16384);
-
-	std::vector<VEC3> bufferNormals;
-	bufferNormals.reserve(16384);
-
-	std::vector<VEC3> bufferColors;
-	bufferColors.reserve(16384);
-
-	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
-
-	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
-	{
-		Dart a = d;
-		Dart b = map.phi1(a);
-		Dart c = map.phi1(b);
-		// loop to cut a polygon in triangle on the fly (works only with convex faces)
-		do
-		{
-			buffer.push_back(positions[d]);
-			bufferNormals.push_back(normals[d]);
-			bufferColors.push_back(colorPerXXX[d]);
-			buffer.push_back(positions[b]);
-			bufferNormals.push_back(normals[b]);
-			bufferColors.push_back(colorPerXXX[b]);
-			buffer.push_back(positions[c]);
-			bufferNormals.push_back(normals[c]);
-			bufferColors.push_back(colorPerXXX[c]);
-			b = c;
-			c = map.phi1(b);
-		} while (c != d);
-	}
-
-	m_nbTris = buffer.size()/3;
-
-	vboPosition.setDataSize(3);
-	vboPosition.allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(vboPosition.lockPtr());
-	memcpy(ptrPos, &buffer[0], buffer.size()*sizeof(VEC3));
-	vboPosition.releasePtr();
-
-	vboNormal.setDataSize(3);
-	vboNormal.allocate(bufferColors.size());
-	VEC3* ptrNorm = reinterpret_cast<VEC3*>(vboNormal.lockPtr());
-	memcpy(ptrNorm, &bufferColors[0], bufferColors.size()*sizeof(VEC3));
-	vboNormal.releasePtr();
-
-	vboColor.setDataSize(3);
-	vboColor.allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboColor.lockPtr());
-	memcpy(ptrCol, &bufferColors[0], bufferColors.size()*sizeof(VEC3));
-	vboColor.releasePtr();
-}
-
-
-
-inline void ColorPerFaceRender::draw(Utils::GLSLShader* sh)
+inline void DataPerFaceRender::draw(Utils::GLSLShader* sh)
 {
 	sh->enableVertexAttribs();
 	glDrawArrays(GL_TRIANGLES , 0 , m_nbTris*3 );
 	sh->disableVertexAttribs();
 }
-
-
-
 
 }//end namespace VBO
 

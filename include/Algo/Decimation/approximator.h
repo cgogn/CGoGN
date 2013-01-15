@@ -46,6 +46,7 @@ enum ApproximatorType
 	A_CornerCutting,
 	A_TangentPredict1,
 	A_TangentPredict2,
+	A_NormalArea,
 	A_ColorNaive,
 	A_ColorQEMext,
 	A_Lightfield,
