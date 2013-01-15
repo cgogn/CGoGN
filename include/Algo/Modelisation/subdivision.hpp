@@ -453,36 +453,42 @@ void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 template <typename PFP, typename EMBV, typename EMB>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
-	EdgeAutoAttribute<Dart> tablePred(map);
 	CellMarker<EDGE> m0(map);
+	CellMarker<FACE> m1(map);
 
 	std::vector<Dart> dOrig;
-	std::vector<EMB> cOrig;
+
+	m0.unmarkAll();
+	m1.unmarkAll();
 
 	//first pass cut edge
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(selected(d))
 		{
-			if(!m0.isMarked(d)) {
-				dOrig.push_back(d);
+			if(!m0.isMarked(d))
+			{
+				if(!m1.isMarked(d))
+				{
+					m1.mark(d);
+					dOrig.push_back(d);
+				}
 
-				Dart dd = d;
-				do {
-					if(!m0.isMarked(dd)) {
-						EMB e1 = attributs[dd];
-						EMB e2 = attributs[map.phi1(dd)];
-						map.cutEdge(dd);
-						attributs[map.phi1(dd)] = e1*2.0f/3.0f+e2/3.0f;
-						map.cutEdge(map.phi1(dd));
-						attributs[map.phi1(map.phi1(dd))] = e2*2.0f/3.0f+e1/3.0f;
-						m0.mark(dd);
-						m0.mark(map.phi1(dd));
-						m0.mark(map.template phi<11>(dd));
-					}
-					dd = map.template phi<111>(dd);
-				} while(dd!=d);
+				if(selected(map.phi2(d)) && !m1.isMarked(map.phi2(d)))
+				{
+					m1.mark(map.phi2(d));
+					dOrig.push_back(map.phi2(d));
+				}
 
+				EMB e1 = attributs[d];
+				EMB e2 = attributs[map.phi1(d)];
+				map.cutEdge(d);
+				attributs[map.phi1(d)] = e1*2.0f/3.0f+e2/3.0f;
+				map.cutEdge(map.phi1(d));
+				attributs[map.phi1(map.phi1(d))] = e2*2.0f/3.0f+e1/3.0f;
+				m0.mark(d);
+				m0.mark(map.phi1(d));
+				m0.mark(map.template phi<11>(d));
 			}
 		}
 	}

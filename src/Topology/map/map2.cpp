@@ -107,6 +107,22 @@ void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
  *  To generate or delete faces in a 2-map
  *************************************************************************/
 
+Dart Map2::newPolyLine(unsigned int nbEdges)
+{
+	Dart d = Map1::newCycle(2*nbEdges);
+	{
+		Dart it1 = d;
+		Dart it2 = phi_1(d);
+		for(unsigned int i = 0; i<nbEdges ; ++i)
+		{
+			phi2sew(it1, it2);
+			it1 = phi1(it1);
+			it2 = phi_1(it2);
+		}
+	}
+	return d;
+}
+
 Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 {
 	Dart d = Map1::newCycle(nbEdges);
@@ -344,6 +360,23 @@ void Map2::swapEdges(Dart d, Dart e)
 
 	phi2sew(d, e);
 	phi2sew(d2, e2);
+}
+
+void Map2::insertEdgeInVertex(Dart d, Dart e)
+{
+	assert(!sameVertex(d,e));
+	assert(phi2(e) == phi_1(e));
+	phi1sew(phi_1(d), phi_1(e));
+}
+
+bool Map2::removeEdgeFromVertex(Dart d)
+{
+	if (!isBoundaryEdge(d))
+	{
+		phi1sew(phi_1(d), phi2(d)) ;
+		return true ;
+	}
+	return false ;
 }
 
 void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
@@ -886,7 +919,7 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 	return countEdges ;
 }
 
-unsigned int Map2::closeMap()
+unsigned int Map2::closeMap(bool forboundary)
 {
 	// Search the map for topological holes (fix points of phi2)
 	unsigned int nb = 0 ;
@@ -895,7 +928,7 @@ unsigned int Map2::closeMap()
 		if (phi2(d) == d)
 		{
 			++nb ;
-			closeHole(d);
+			closeHole(d, forboundary);
 		}
 	}
 	return nb ;

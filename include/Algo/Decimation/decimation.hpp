@@ -68,6 +68,9 @@ void decimate(
 		case A_TangentPredict2 :
 			approximators.push_back(new Approximator_MidEdge<PFP>(map, attribs)) ;
 			break ;
+		case A_NormalArea :
+			approximators.push_back(new Approximator_NormalArea<PFP>(map, attribs)) ;
+			break ;
 		case A_hHalfCollapse :
 			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, attribs)) ;
 			break ;
@@ -102,7 +105,7 @@ void decimate(
 
 			// pos
 			v_approx[0].push_back(attribs[0]) ;
-			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, v_approx[0])) ;
+			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, v_approx[0])) ;
 
 			// frame
 			assert(attribs.size() >= 4 || !"Decimate: A_hLightfieldHalf --> not enough attribs provided") ;
@@ -160,6 +163,12 @@ void decimate(
 		case S_Curvature :
 			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_NormalArea :
+			selector = new EdgeSelector_NormalArea<PFP>(map, position, approximators, selected) ;
+			break ;
+		case S_CurvatureTensor :
+			selector = new EdgeSelector_CurvatureTensor<PFP>(map, position, approximators, selected) ;
+			break ;
 		case S_MinDetail :
 			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators, selected) ;
 			break ;
@@ -180,6 +189,12 @@ void decimate(
 			break ;
 		case S_hLightfield :
 			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
+			break ;
+		case S_hLightfieldExp :
+			selector = new HalfEdgeSelector_LightfieldExp<PFP>(map, position, approximators, selected) ;
+			break ;
+		case S_hLightfieldKCL :
+			selector = new HalfEdgeSelector_LightfieldKCL<PFP>(map, position, approximators, selected) ;
 			break ;
 	}
 

@@ -302,7 +302,7 @@ bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<P
 		nbe = edgesBuffer.size();
 		if (nbe > 2)
 		{
-			Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe);
+			Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe,false);
 
 			//Embed the base faces
 			for (unsigned int j = 0; j < nbe; ++j)
@@ -414,7 +414,7 @@ bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurf
 
 			for(unsigned int k = 0 ; k < nbStage ; ++k)
 			{
-				Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe);
+				Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe,false);
 
 				//Embed the base faces
 				for (unsigned int j = 0; j < nbe; ++j)
