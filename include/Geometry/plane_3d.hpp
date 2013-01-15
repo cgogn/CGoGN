@@ -117,7 +117,7 @@ void Plane3D<T>::project(Vector<3,T>& p) const
 {
 #define PRECISION 1e-10
 	T d = -distance(p) ;
-	if(abs(d) > PRECISION)
+	if(std::abs(d) > PRECISION)
 	{
 		Vector<3,T> v = m_normal * d ;
 		p += v ;
