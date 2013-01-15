@@ -67,89 +67,15 @@ int main(int argc, char **argv)
 	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
 
 
-	//
-	// Dual
-	//
-	//	FaceAttribute<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3, FACE>("position") ;
-	//	if(!positionF.isValid())
-	//		positionF = myMap.addAttribute<PFP::VEC3, FACE>("position") ;
-	//
-	//	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
-	//	myMap.computeDual();
-	//	position = positionF ;
+	FaceAttribute<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3, FACE>("position") ;
+	if(!positionF.isValid())
+		positionF = myMap.addAttribute<PFP::VEC3, FACE>("position") ;
 
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
 
-//	AttributeHandler<PFP::VEC3, PFP::MAP::EDGE_OF_PARENT> positionE = myMap.getAttribute<PFP::VEC3, PFP::MAP::EDGE_OF_PARENT>("position") ;
-//	if(!positionE.isValid())
-//		positionE = myMap.addAttribute<PFP::VEC3, PFP::MAP::EDGE_OF_PARENT>("position") ;
-//
-//	SelectorDartBoundary<PFP::MAP> sdb(myMap);
-//	TraversorE<PFP::MAP> te(myMap, sdb);
-//	for(Dart dit = te.begin() ; dit != te.end() ; dit = te.next())
-//	{
-//		positionE[dit] = (position[dit] + position[myMap.phi1(dit)]) * PFP::REAL(0.5);
-//	}
-//
-//	std::cout << "boundary edges centroids : ok" << std::endl;
-//
-//	//triangule old boundary faces
-//	std::vector<Dart> oldb;
-//
-//	std::cout << "nb darts : " << myMap.getNbDarts() << std::endl;
-//
-//	CellMarker<FACE> cmf(myMap);
-//	for(Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-//	{
-//		if(!cmf.isMarked(d) && myMap.isBoundaryMarked2(d))
-//		{
-//			oldb.push_back(d);
-//			cmf.mark(d);
-//			std::cout << "d = " << d << std::endl;
-//		}
-//	}
-//
-//	for(std::vector<Dart>::iterator it = oldb.begin() ; it != oldb.end() ; ++it)
-//	{
-//		Dart db = *it;
-//		Dart d1 = myMap.phi1(db);
-//		myMap.splitFace(db, d1) ;
-//		myMap.cutEdge(myMap.phi_1(db)) ;
-//		Dart x = myMap.phi2(myMap.phi_1(db)) ;
-//		Dart dd = myMap.phi1(myMap.phi1(myMap.phi1(x)));
-//		while(dd != x)
-//		{
-//			Dart next = myMap.phi1(dd) ;
-//			myMap.splitFace(dd, myMap.phi1(x)) ;
-//			dd = next ;
-//		}
-//
-//	}
-//
-//	std::cout << "boundary face triangulation : ok" << std::endl;
-//
-//	myMap.swapEmbeddingContainers(FACE, PFP::MAP::EDGE_OF_PARENT) ;
-//
-//	std::cout << "swap containers : ok" << std::endl;
-//
-//	FaceAttribute<PFP::VEC3> positionF;
-//	positionF = positionE;
-//
-//	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
-//
-//	for(std::vector<Dart>::iterator it = oldb.begin() ; it != oldb.end() ; ++it)
-//	{
-//		myMap.fillHole(*it);
-//	}
-//
-//	std::cout << "fillHole : ok" << std::endl;
-//
-//	myMap.computeDual();
-//
-//	//myMap.closeMap();
-//
-//	position = positionF ;
-//
-//	myMap.check();
+	myMap.computeDual();
+	position = positionF ;
+
 
 	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "result.off");
 	std::cout << "Exported" << std::endl;

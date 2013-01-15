@@ -58,7 +58,7 @@ namespace Filters
 
 
 template <typename PFP>
-class LerpQuadOddSynthesisFilter : public Filter
+class LerpQuadOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -73,7 +73,7 @@ public:
 		TraversorW<typename PFP::MAP> travW(m_map) ;
 		for (Dart d = travW.begin(); d != travW.end(); d = travW.next())
 		{
-			typename PFP::VEC3 vc = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+			typename PFP::VEC3 vc = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
 			unsigned int count = 0;
 			typename PFP::VEC3 ec(0.0);
@@ -169,7 +169,7 @@ public:
 
 
 template <typename PFP>
-class LerpQuadOddAnalysisFilter : public Filter
+class LerpQuadOddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -222,7 +222,7 @@ public:
 		TraversorW<typename PFP::MAP> travW(m_map) ;
 		for (Dart d = travW.begin(); d != travW.end(); d = travW.next())
 		{
-			typename PFP::VEC3 vc = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+			typename PFP::VEC3 vc = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
 			unsigned int count = 0;
 			typename PFP::VEC3 ec(0.0);
@@ -275,7 +275,7 @@ public:
 
 
 template <typename PFP>
-class LerpEdgeSynthesisFilter : public Filter
+class LerpEdgeSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -303,7 +303,7 @@ public:
 } ;
 
 template <typename PFP>
-class LerpFaceSynthesisFilter : public Filter
+class LerpFaceSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -332,7 +332,7 @@ public:
 } ;
 
 template <typename PFP>
-class LerpTriQuadFaceSynthesisFilter : public Filter
+class LerpTriQuadFaceSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -349,7 +349,7 @@ public:
 		{
 			if(m_map.faceDegree(d) > 3)
 			{
-				typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
+				typename PFP::VEC3 p = Algo::Surface::Geometry::faceCentroid<PFP>(m_map, d, m_position);
 
 				m_map.incCurrentLevel() ;
 
@@ -364,7 +364,7 @@ public:
 
 
 template <typename PFP>
-class LerpVolumeSynthesisFilter : public Filter
+class LerpVolumeSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -379,9 +379,11 @@ public:
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d) && !Algo::Modelisation::isPrism<PFP>(m_map,d) && !Algo::Modelisation::isPyra<PFP>(m_map,d))
+			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d)
+					&& !Algo::Surface::Modelisation::isPrism<PFP>(m_map,d)
+					&& !Algo::Surface::Modelisation::isPyra<PFP>(m_map,d))
 			{
-				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+				typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
 				m_map.incCurrentLevel() ;
 
@@ -395,7 +397,7 @@ public:
 } ;
 
 template <typename PFP>
-class LerpSqrt3VolumeSynthesisFilter : public Filter
+class LerpSqrt3VolumeSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

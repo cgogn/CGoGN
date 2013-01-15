@@ -130,13 +130,19 @@ public:
 	/*! The phi3-links around the volume are removed
 	 *  @param d a dart of the volume
 	 */
-	virtual void deleteVolume(Dart d);
+	virtual void deleteVolume(Dart d, bool withBoundary = true);
 
 	//! Fill a hole with a volume
 	/*! \pre Dart d is boundary marked
 	 *  @param d a dart of the volume to fill
 	 */
 	virtual void fillHole(Dart d) ;
+
+	//! Open the mesh Transforming a face in a hole
+	/*! \pre Dart d is NOT boundary marked
+	 *  @param d a dart of the face filled
+	 */
+	virtual void createHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators

@@ -79,8 +79,45 @@ void Map3::compactTopoRelations(const std::vector<unsigned int>& oldnew)
  *  To generate or delete volumes in a 3-map
  *************************************************************************/
 
-void Map3::deleteVolume(Dart d)
+void Map3::deleteVolume(Dart d, bool withBoundary)
 {
+	if(withBoundary)
+	{
+		DartMarkerStore mark(*this);		// Lock a marker
+
+		std::vector<Dart> visitedFaces;		// Faces that are traversed
+		visitedFaces.reserve(512);
+		visitedFaces.push_back(d);			// Start with the face of d
+
+		mark.markOrbit<FACE2>(d) ;
+
+		for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+		{
+			Dart e = visitedFaces[i] ;
+
+			if(!isBoundaryFace(e))
+				unsewVolumes(e) ;
+
+			do	// add all face neighbours to the table
+			{
+				Dart ee = phi2(e) ;
+				if(!mark.isMarked(ee)) // not already marked
+				{
+					visitedFaces.push_back(ee) ;
+					mark.markOrbit<FACE2>(ee) ;
+				}
+				e = phi1(e) ;
+			} while(e != visitedFaces[i]) ;
+		}
+
+		Dart dd = phi3(d) ;
+		Map2::deleteCC(d) ; //deleting the volume
+		Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
+
+		return;
+	}
+
+	//else remove the CC and create fixed points
 	DartMarkerStore mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
@@ -89,13 +126,16 @@ void Map3::deleteVolume(Dart d)
 
 	mark.markOrbit<FACE2>(d) ;
 
-
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
 		Dart e = visitedFaces[i] ;
 
-		if(!isBoundaryFace(e))
-			unsewVolumes(e) ;
+		Dart it = e ;
+		do
+		{
+			phi3unsew(it);
+			it = phi1(it) ;
+		} while(it != e) ;
 
 		do	// add all face neighbours to the table
 		{
@@ -109,16 +149,7 @@ void Map3::deleteVolume(Dart d)
 		} while(e != visitedFaces[i]) ;
 	}
 
-//	Traversor3WF<Map3> tWF(*this,d);
-//	for(Dart dit = tWF.begin() ; dit != tWF.end() ; dit = tWF.next())
-//	{
-//		if(!isBoundaryFace(dit))
-//			unsewVolumes(dit) ;
-//	}
-
-	Dart dd = phi3(d) ;
 	Map2::deleteCC(d) ; //deleting the volume
-	Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
 }
 
 void Map3::fillHole(Dart d)
@@ -128,6 +159,12 @@ void Map3::fillHole(Dart d)
 	if(!isBoundaryMarked3(dd))
 		dd = phi3(dd) ;
 	boundaryUnmarkOrbit<VOLUME,3>(dd) ;
+}
+
+void Map3::createHole(Dart d)
+{
+	assert(!isBoundaryFace(d)) ;
+	boundaryMarkOrbit<VOLUME,3>(d) ;
 }
 
 /*! @name Topological Operators
@@ -1202,7 +1239,6 @@ void Map3::reverseOrientation()
 
 void Map3::computeDual()
 {
-
 	unsigned int count = 0;
 	CellMarkerNoUnmark<VERTEX> cv(*this);
 	std::vector<Dart> v;
@@ -1217,7 +1253,6 @@ void Map3::computeDual()
 	}
 
 	std::cout << "boundary vertices : " << count << std::endl;
-
 
 	DartAttribute<Dart> old_phi1 = getAttribute<Dart, DART>("phi1") ;
 	DartAttribute<Dart> old_phi_1 = getAttribute<Dart, DART>("phi_1") ;
@@ -1248,15 +1283,6 @@ void Map3::computeDual()
 
 	swapEmbeddingContainers(VERTEX, VOLUME) ;
 
-//	//boundary management
-//	for(Dart d = begin(); d != end(); next(d))
-//	{
-//		if(isBoundaryMarked(d))
-//		{
-//			boundaryMarkOrbit<VOLUME>(d) ;//deleteVertex(d));
-//		}
-//	}
-
 	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
 	{
 		boundaryUnmarkOrbit<VOLUME,3>(*it);
@@ -1268,6 +1294,18 @@ void Map3::computeDual()
 	}
 
 	closeMap();
+
+//	//boundary management
+//	for(Dart d = begin(); d != end(); next(d))
+//	{
+//		if(isBoundaryMarked3(d))
+//		{
+//			//boundaryMarkOrbit<VOLUME,3>(d) ;//deleteVertex(d));
+//			boundaryUnmarkOrbit<VOLUME,3>(d);
+//			deleteVolume(d);
+//		}
+//	}
+//	closeMap();
 }
 
 } // namespace CGoGN

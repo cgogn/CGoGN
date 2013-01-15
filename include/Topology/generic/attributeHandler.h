@@ -265,7 +265,6 @@ public:
 	FaceAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, FACE>(m,amv) {}
 	FaceAttribute<T>& operator=(const AttributeHandler<T, FACE>& ah) { this->AttributeHandler<T, FACE>::operator=(ah); return *this; }
 	FaceAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ah) { this->AttributeHandler<T,FACE>::operator=(ah); return *this; }
-	FaceAttribute<T>& operator=(const AttributeHandler<T, EDGE>& ah) { this->AttributeHandler<T,FACE>::operator=(ah); return *this; } //TODO dangerous
 };
 
 /**

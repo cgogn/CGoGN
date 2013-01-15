@@ -133,88 +133,88 @@ void Map3MR<PFP>::splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClos
 /************************************************************************
  * 							Level creation								*
  ************************************************************************/
+//template <typename PFP>
+//void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
+//{
+//	m_map.pushLevel();
+//
+//	m_map.addLevelBack();
+//	m_map.duplicateDarts(m_map.getMaxLevel());
+//	m_map.setCurrentLevel(m_map.getMaxLevel());
+//
+//	DartMarkerStore m(m_map);
+//
+//	//
+//	// 1-4 flip of all tetrahedra
+//	//
+//	TraversorW<typename PFP::MAP> tW(m_map);
+//	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
+//	{
+//		Traversor3WF<typename PFP::MAP> tWF(m_map, dit);
+//		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
+//		{
+//			if(!m_map.isBoundaryFace(ditWF))
+//				m.markOrbit<FACE>(ditWF);
+//		}
+//
+//		Algo::Volume::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
+//	}
+//
+///*
+//	//
+//	// 2-3 swap of all old interior faces
+//	//
+//	TraversorF<typename PFP::MAP> tF(m_map);
+//	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
+//	{
+//		if(m.isMarked(dit))
+//		{
+//			m.unmarkOrbit<FACE>(dit);
+//			Algo::Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
+//		}
+//	}
+//
+//	//
+//	// 1-3 flip of all boundary tetrahedra
+//	//
+//	TraversorW<typename PFP::MAP> tWb(m_map);
+//	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
+//	{
+//		if(m_map.isBoundaryVolume(dit))
+//		{
+//			Traversor3WE<typename PFP::MAP> tWE(m_map, dit);
+//			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
+//			{
+//				if(m_map.isBoundaryEdge(ditWE))
+//					m.markOrbit<EDGE>(ditWE);
+//			}
+//
+//			Algo::Volume::Modelisation::Tetrahedralization::flip1To3<PFP>(m_map, dit);
+//		}
+//	}
+//
+//	//
+//	// edge-removal on all old boundary edges
+//	//
+//	TraversorE<typename PFP::MAP> tE(m_map);
+//	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
+//	{
+//		if(m.isMarked(dit))
+//		{
+//			m.unmarkOrbit<EDGE>(dit);
+//			Dart d = m_map.phi2(m_map.phi3(m_map.findBoundaryFaceOfEdge(dit)));
+//			Algo::Volume::Modelisation::Tetrahedralization::swapGen3To2<PFP>(m_map, d);
+//
+//		}
+//	}
+//*/
+//
+//	m_map.setCurrentLevel(m_map.getMaxLevel());
+//	m_map.popLevel() ;
+//}
+
 template <typename PFP>
-void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
-{
-	m_map.pushLevel();
-
-	m_map.addLevelBack();
-	m_map.duplicateDarts(m_map.getMaxLevel());
-	m_map.setCurrentLevel(m_map.getMaxLevel());
-
-	DartMarkerStore m(m_map);
-
-	//
-	// 1-4 flip of all tetrahedra
-	//
-	TraversorW<typename PFP::MAP> tW(m_map);
-	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
-	{
-		Traversor3WF<typename PFP::MAP> tWF(m_map, dit);
-		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
-		{
-			if(!m_map.isBoundaryFace(ditWF))
-				m.markOrbit<FACE>(ditWF);
-		}
-
-		Algo::Volume::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
-	}
-
-/*
-	//
-	// 2-3 swap of all old interior faces
-	//
-	TraversorF<typename PFP::MAP> tF(m_map);
-	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
-	{
-		if(m.isMarked(dit))
-		{
-			m.unmarkOrbit<FACE>(dit);
-			Algo::Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
-		}
-	}
-
-	//
-	// 1-3 flip of all boundary tetrahedra
-	//
-	TraversorW<typename PFP::MAP> tWb(m_map);
-	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
-	{
-		if(m_map.isBoundaryVolume(dit))
-		{
-			Traversor3WE<typename PFP::MAP> tWE(m_map, dit);
-			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
-			{
-				if(m_map.isBoundaryEdge(ditWE))
-					m.markOrbit<EDGE>(ditWE);
-			}
-
-			Algo::Volume::Modelisation::Tetrahedralization::flip1To3<PFP>(m_map, dit);
-		}
-	}
-
-	//
-	// edge-removal on all old boundary edges
-	//
-	TraversorE<typename PFP::MAP> tE(m_map);
-	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
-	{
-		if(m.isMarked(dit))
-		{
-			m.unmarkOrbit<EDGE>(dit);
-			Dart d = m_map.phi2(m_map.phi3(m_map.findBoundaryFaceOfEdge(dit)));
-			Algo::Volume::Modelisation::Tetrahedralization::swapGen3To2<PFP>(m_map, d);
-
-		}
-	}
-*/
-
-	m_map.setCurrentLevel(m_map.getMaxLevel());
-	m_map.popLevel() ;
-}
-
-template <typename PFP>
-void Map3MR<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
+void Map3MR<PFP>::addNewLevelTetraOcta()
 {
 	m_map.pushLevel();
 
@@ -778,7 +778,7 @@ void Map3MR<PFP>::addNewLevel()
 				m_map.incCurrentLevel();
 				Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
 
-				if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
+				if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
 				{
 					DartMarkerStore me(m_map);
 

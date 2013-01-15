@@ -190,6 +190,12 @@ void Map2::fillHole(Dart d)
 	boundaryUnmarkOrbit<FACE,2>(dd) ;
 }
 
+void Map2::createHole(Dart d)
+{
+	assert(!isBoundaryEdge(d)) ;
+	boundaryMarkOrbit<FACE,2>(d) ;
+}
+
 /*! @name Topological Operators
  *  Topological operations on 2-maps
  *************************************************************************/
@@ -942,74 +948,6 @@ void Map2::computeDual()
 
 	reverseOrientation() ;
 
-//	//boundary management
-//	for(Dart d = begin(); d != end(); next(d))
-//	{
-//		if(isBoundaryMarked2(d))
-//		{
-//			boundaryMarkOrbit<FACE,2>(deleteVertex(phi2(d)));
-//		}
-//	}
-}
-
-//TODO triangulation of the boundary face to compute correctly the dual(dual(T)) of mesh T
-void Map2::computeDualBorderConstraint()
-{
-	std::vector<Dart> oldb;
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(isBoundaryMarked2(d))
-		{
-			oldb.push_back(d);
-			fillHole(d);
-		}
-	}
-
-	//triangule old boundary faces
-	for(std::vector<Dart>::iterator it = oldb.begin() ; it != oldb.end() ; ++it)
-	{
-		Dart db = *it;
-		Dart d1 = phi1(db);
-		splitFace(db, d1) ;
-		cutEdge(phi_1(db)) ;
-		Dart x = phi2(phi_1(db)) ;
-		Dart dd = phi1(phi1(phi1(x)));
-		while(dd != x)
-		{
-			Dart next = phi1(dd) ;
-			splitFace(dd, phi1(x)) ;
-			dd = next ;
-		}
-	}
-
-	//after dual computation -> mark the new faces created with oldes vertices as a boundary facesc
-
-
-	//compute dual
-
-	DartAttribute<Dart> old_phi1 = getAttribute<Dart, DART>("phi1");
-	DartAttribute<Dart> old_phi_1 = getAttribute<Dart, DART>("phi_1") ;
-	DartAttribute<Dart> new_phi1 = addAttribute<Dart, DART>("new_phi1") ;
-	DartAttribute<Dart> new_phi_1 = addAttribute<Dart, DART>("new_phi_1") ;
-
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		Dart dd = phi1(phi2(d));
-
-		new_phi1[d] = dd ;
-		new_phi_1[dd] = d ;
-	}
-
-	swapAttributes<Dart>(old_phi1, new_phi1) ;
-	swapAttributes<Dart>(old_phi_1, new_phi_1) ;
-
-	removeAttribute(new_phi1) ;
-	removeAttribute(new_phi_1) ;
-
-	swapEmbeddingContainers(VERTEX, FACE) ;
-
-	reverseOrientation() ;
-
 	//boundary management
 	for(Dart d = begin(); d != end(); next(d))
 	{
@@ -1018,12 +956,6 @@ void Map2::computeDualBorderConstraint()
 			boundaryMarkOrbit<FACE,2>(deleteVertex(phi2(d)));
 		}
 	}
-
-
-	//	for(std::vector<Dart>::iterator it = oldb.begin() ; it != oldb.end() ; ++it)
-	//	{
-	//		boundaryMarkOrbit<FACE>(*it);
-	//	}
 }
 
 } // namespace CGoGN
