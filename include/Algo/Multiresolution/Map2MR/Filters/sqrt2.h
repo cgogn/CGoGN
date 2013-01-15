@@ -52,7 +52,7 @@ namespace Filters
 
 
 template <typename PFP>
-class Sqrt2FaceSynthesisFilter : public Filter
+class Sqrt2FaceSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

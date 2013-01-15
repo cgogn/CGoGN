@@ -942,14 +942,14 @@ void Map2::computeDual()
 
 	reverseOrientation() ;
 
-	//boundary management
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(isBoundaryMarked2(d))
-		{
-			boundaryMarkOrbit<FACE,2>(deleteVertex(phi2(d)));
-		}
-	}
+//	//boundary management
+//	for(Dart d = begin(); d != end(); next(d))
+//	{
+//		if(isBoundaryMarked2(d))
+//		{
+//			boundaryMarkOrbit<FACE,2>(deleteVertex(phi2(d)));
+//		}
+//	}
 }
 
 //TODO triangulation of the boundary face to compute correctly the dual(dual(T)) of mesh T

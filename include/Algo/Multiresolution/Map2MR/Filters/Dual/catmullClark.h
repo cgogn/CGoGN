@@ -46,7 +46,7 @@ namespace Filters
 {
 
 template <typename PFP>
-class CCVertexSynthesisFilter : public Filter
+class CCVertexSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

@@ -54,7 +54,7 @@ namespace Filters
 
 //w-lift(a)
 template <typename PFP>
-class Ber02OddSynthesisFilter : public Filter
+class Ber02OddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -175,7 +175,7 @@ public:
 
 // s-lift(a)
 template <typename PFP>
-class Ber02EvenSynthesisFilter : public Filter
+class Ber02EvenSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -356,7 +356,7 @@ public:
 
 // s-scale(a)
 template <typename PFP>
-class Ber02ScaleSynthesisFilter : public Filter
+class Ber02ScaleSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -418,7 +418,7 @@ public:
 
 //w-lift(a)
 template <typename PFP>
-class Ber02OddAnalysisFilter : public Filter
+class Ber02OddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -480,7 +480,7 @@ public:
 
 // s-lift(a)
 template <typename PFP>
-class Ber02EvenAnalysisFilter : public Filter
+class Ber02EvenAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -571,7 +571,7 @@ public:
 
 // s-scale(a)
 template <typename PFP>
-class Ber02ScaleAnalysisFilter : public Filter
+class Ber02ScaleAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

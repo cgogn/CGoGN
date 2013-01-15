@@ -99,7 +99,7 @@ typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const VertexAttribute<
  *********************************************************************************/
 
 template <typename PFP>
-class LoopOddAnalysisFilter : public Filter
+class LoopOddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -132,7 +132,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopEvenAnalysisFilter : public Filter
+class LoopEvenAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -159,7 +159,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationAnalysisFilter : public Filter
+class LoopNormalisationAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -193,7 +193,7 @@ public:
  *********************************************************************************/
 
 template <typename PFP>
-class LoopOddSynthesisFilter : public Filter
+class LoopOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -226,7 +226,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopEvenSynthesisFilter : public Filter
+class LoopEvenSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -253,7 +253,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationSynthesisFilter : public Filter
+class LoopNormalisationSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

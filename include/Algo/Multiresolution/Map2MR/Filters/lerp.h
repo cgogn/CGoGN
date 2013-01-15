@@ -52,7 +52,7 @@ namespace Filters
 
 // Quad refinement
 template <typename PFP>
-class LerpQuadOddSynthesisFilter : public Filter
+class LerpQuadOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -106,7 +106,7 @@ public:
 
 // Tri/quad refinement
 template <typename PFP>
-class LerpTriQuadOddSynthesisFilter : public Filter
+class LerpTriQuadOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -167,7 +167,7 @@ public:
 
 // Quad refinement
 template <typename PFP>
-class LerpQuadOddAnalysisFilter : public Filter
+class LerpQuadOddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -221,7 +221,7 @@ public:
 
 // Tri/quad refinement
 template <typename PFP>
-class LerpTriQuadOddAnalysisFilter : public Filter
+class LerpTriQuadOddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
