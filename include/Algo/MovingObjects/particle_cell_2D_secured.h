@@ -17,6 +17,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MovingObjects
 {
 
@@ -50,13 +53,16 @@ public:
 	std::vector<Dart> move(const VEC3& goal) ;
 	std::vector<Dart> move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross) ;
 } ;
-
-#include "particle_cell_2D_secured.hpp"
-
 } //MovingObject
+
+} // Surface
 
 } //Algo
 
 } //CGoGN
+
+
+#include "particle_cell_2D_secured.hpp"
+
 
 #endif

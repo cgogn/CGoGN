@@ -1,3 +1,38 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace Surface
+{
+
+namespace MovingObjects
+{
+
 template <typename PFP>
 std::vector<Dart> ParticleCell2DSecured<PFP>::move(const VEC3& goal)
 {
@@ -48,7 +83,7 @@ void ParticleCell2DSecured<PFP>::vertexState(const VEC3& current, CellMarkerMemo
 		assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
 		this->crossCell = CROSS_OTHER ;
 
-		if (Algo::Geometry::isPointOnVertex < PFP > (this->m, this->d, this->positionAttribut, current))
+		if (Geometry::isPointOnVertex < PFP > (this->m, this->d, this->positionAttribut, current))
 		{
 			this->setState(VERTEX) ;
 			this->ParticleBase<PFP>::move(current) ;
@@ -75,7 +110,7 @@ void ParticleCell2DSecured<PFP>::vertexState(const VEC3& current, CellMarkerMemo
 					//orbit with 2 edges : point on one edge
 					if (this->m.phi2_1(this->m.phi2_1(this->d)) == this->d)
 					{
-						if (!Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
+						if (!Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
 							this->d = this->m.phi2_1(this->d) ;
 					}
 					else
@@ -83,8 +118,8 @@ void ParticleCell2DSecured<PFP>::vertexState(const VEC3& current, CellMarkerMemo
 						//checking : case with 3 orthogonal darts and point on an edge
 						do
 						{
-							if(Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
-									&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
+							if(Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
+									&& Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
 									&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
 							{
 
@@ -116,7 +151,7 @@ void ParticleCell2DSecured<PFP>::vertexState(const VEC3& current, CellMarkerMemo
 			//displacement step
 
 			if (this->getOrientationEdge(current, this->d) == Geom::ALIGNED
-					&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
+					&& Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
 				edgeState(current,memo_cross) ;
 			else
 			{
@@ -143,7 +178,7 @@ void ParticleCell2DSecured<PFP>::edgeState(const VEC3& current, CellMarkerMemo<F
 //	else
 	{
 			assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
-		// 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
+		// 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 			if (this->crossCell == NO_CROSS)
 			{
 				this->crossCell = CROSS_EDGE ;
@@ -169,14 +204,14 @@ void ParticleCell2DSecured<PFP>::edgeState(const VEC3& current, CellMarkerMemo<F
 					break ;
 			}
 
-			if (!Algo::Geometry::isPointOnHalfEdge < PFP
+			if (!Geometry::isPointOnHalfEdge < PFP
 				> (this->m, this->d, this->positionAttribut, current))
 			{
 				this->ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
 				vertexState(current,memo_cross) ;
 				return ;
 			}
-			else if (!Algo::Geometry::isPointOnHalfEdge < PFP
+			else if (!Geometry::isPointOnHalfEdge < PFP
 				> (this->m, this->m.phi2(this->d), this->positionAttribut, current))
 			{
 				this->d = this->m.phi2(this->d) ;
@@ -208,5 +243,9 @@ void ParticleCell2DSecured<PFP>::faceState(const VEC3& current, CellMarkerMemo<F
 		ParticleCell2DMemo<PFP>::faceState(current,memo_cross);
 	}
 
+}
 
+}
+}
+} //namespaces
 }
