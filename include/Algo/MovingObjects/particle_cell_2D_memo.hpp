@@ -1,4 +1,5 @@
 template <typename PFP>
+
 std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 {
 	this->crossCell = NO_CROSS ;
@@ -34,26 +35,7 @@ template <typename PFP>
 std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross)
 {
 	memo_cross.mark(this->d);
-
-	this->crossCell = NO_CROSS ;
-	if (!Geom::arePointsEquals(goal, this->getPosition()))
-	{
-		switch (this->getState())
-		{
-			case VERTEX :
-				vertexState(goal,memo_cross) ;
-				break ;
-			case EDGE :
-				edgeState(goal,memo_cross) ;
-				break ;
-			case FACE :
-				faceState(goal,memo_cross) ;
-				break ;
-		}
-	}
-	else
-		this->ParticleBase<PFP>::move(goal) ;
-
+	this->move(goal,memo_cross);
 	return memo_cross.get_markedCells();
 }
 
@@ -108,7 +90,6 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 						{
 
 							this->edgeState(current,memo_cross) ;
-
 							return;
 						}
 						this->d = this->m.phi2_1(this->d) ;

@@ -48,8 +48,8 @@ public:
 
 	virtual void faceState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
 
-	std::vector<Dart> move(const VEC3& goal) ;
 	std::vector<Dart> move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross) ;
+	std::vector<Dart> move(const VEC3& goal);
 } ;
 
 #include "particle_cell_2D_memo.hpp"
