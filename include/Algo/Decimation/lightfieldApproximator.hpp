@@ -239,16 +239,16 @@ void Approximator_FrameInterpolationHalfEdge<PFP>::approximate(Dart d)
 //	}
 //	else
 	{
-		// Create two segments : v0-v1 and v0-v
-		VEC3 v0v1 = this->m_position[dd] ;
-		v0v1 -= this->m_position[d] ;
-
-		VEC3 v0v = this->m_approxposition[d] ;
-		v0v -= this->m_position[d] ;
-
-		// Orthogonal projection of v0-v onto v0-v1 : get coefficient t
-		REAL t = this->m_position[d] == this->m_position[dd] ? 1. : (v0v1 * v0v) / v0v1.norm() ;
-		t = std::max (std::min (t , REAL(1)) , REAL(0) ) ; // clamp it to [0,1]
+//		// Create two segments : v0-v1 and v0-v
+//		VEC3 v0v1 = this->m_position[dd] ;
+//		v0v1 -= this->m_position[d] ;
+//
+//		VEC3 v0v = this->m_approxposition[d] ;
+//		v0v -= this->m_position[d] ;
+//
+//		// Orthogonal projection of v0-v onto v0-v1 : get coefficient t
+//		REAL t = this->m_position[d] == this->m_position[dd] ? 1. : (v0v1 * v0v) / v0v1.norm() ;
+//		t = std::max (std::min (t , REAL(1)) , REAL(0) ) ; // clamp it to [0,1]
 
 		VEC3& normal1 = this->m_attrV[2]->operator[](d) ;
 		VEC3& normal2 = this->m_attrV[2]->operator[](dd) ;

@@ -39,7 +39,7 @@ Quadric<REAL>::Quadric(int i)
 }
 
 template <typename REAL>
-Quadric<REAL>::Quadric(VEC3& p1, VEC3& p2, VEC3& p3)
+Quadric<REAL>::Quadric(const VEC3& p1, const VEC3& p2, const VEC3& p3)
 {
 	// compute the equation of the plane of the 3 points
 	Geom::Plane3D<REAL> plane(p1, p2, p3) ;
