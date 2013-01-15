@@ -1239,20 +1239,20 @@ void Map3::reverseOrientation()
 
 void Map3::computeDual()
 {
-	unsigned int count = 0;
-	CellMarkerNoUnmark<VERTEX> cv(*this);
-	std::vector<Dart> v;
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(!cv.isMarked(d) && isBoundaryMarked3(d))
-		{
-			++count;
-			v.push_back(d);
-			cv.mark(d);
-		}
-	}
-
-	std::cout << "boundary vertices : " << count << std::endl;
+//	unsigned int count = 0;
+//	CellMarkerNoUnmark<VERTEX> cv(*this);
+//	std::vector<Dart> v;
+//	for(Dart d = begin(); d != end(); next(d))
+//	{
+//		if(!cv.isMarked(d) && isBoundaryMarked3(d))
+//		{
+//			++count;
+//			v.push_back(d);
+//			cv.mark(d);
+//		}
+//	}
+//
+//	std::cout << "boundary vertices : " << count << std::endl;
 
 	DartAttribute<Dart> old_phi1 = getAttribute<Dart, DART>("phi1") ;
 	DartAttribute<Dart> old_phi_1 = getAttribute<Dart, DART>("phi_1") ;
@@ -1283,28 +1283,28 @@ void Map3::computeDual()
 
 	swapEmbeddingContainers(VERTEX, VOLUME) ;
 
-	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
-	{
-		boundaryUnmarkOrbit<VOLUME,3>(*it);
-	}
-
-	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
-	{
-		deleteVolume(*it);
-	}
-
-	closeMap();
-
-//	//boundary management
-//	for(Dart d = begin(); d != end(); next(d))
+//	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
 //	{
-//		if(isBoundaryMarked3(d))
-//		{
-//			//boundaryMarkOrbit<VOLUME,3>(d) ;//deleteVertex(d));
+//		boundaryUnmarkOrbit<VOLUME,3>(*it);
+//	}
+//
+//	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
+//	{
+//		deleteVolume(*it);
+//	}
+//
+//	closeMap();
+
+	//boundary management
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(isBoundaryMarked3(d))
+		{
+			boundaryMarkOrbit<VOLUME,3>(deleteVertex(phi1(d)));
 //			boundaryUnmarkOrbit<VOLUME,3>(d);
 //			deleteVolume(d);
-//		}
-//	}
+		}
+	}
 //	closeMap();
 }
 
