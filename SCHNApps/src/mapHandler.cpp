@@ -1,7 +1,5 @@
 #include "mapHandler.h"
 
-#include "system.h"
-
 namespace CGoGN
 {
 
@@ -36,6 +34,19 @@ Utils::VBO* MapHandlerGen::getVBO(const QString& name)
 		h_vbo.insert(name, vbo);
 		return vbo;
 	}
+}
+
+QList<Utils::VBO*> MapHandlerGen::getVBOList(const std::string& typeName)
+{
+	QList<Utils::VBO*> res;
+	VBOHash::const_iterator i = h_vbo.begin();
+	while (i != h_vbo.end())
+	{
+		if(i.value()->typeName() == typeName)
+			res.append(i.value());
+		++i;
+	}
+	return res;
 }
 
 void MapHandlerGen::deleteVBO(const QString& name)

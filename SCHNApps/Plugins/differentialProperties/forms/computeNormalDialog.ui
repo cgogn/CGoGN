@@ -71,7 +71,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="attributeName"/>
+         <widget class="QLineEdit" name="normalAttributeName"/>
         </item>
        </layout>
       </item>

@@ -3,6 +3,7 @@
 #include "mapHandler.h"
 
 #include "Algo/Geometry/normal.h"
+#include "Algo/Geometry/curvature.h"
 
 
 bool DifferentialPropertiesPlugin::enable()
@@ -51,10 +52,10 @@ void DifferentialPropertiesPlugin::cb_computeNormal()
 
 		std::string positionName = m_computeNormalDialog->combo_positionAttribute->currentText().toUtf8().constData();
 		std::string normalName;
-		if(m_computeNormalDialog->attributeName->text().isEmpty())
+		if(m_computeNormalDialog->normalAttributeName->text().isEmpty())
 			normalName = m_computeNormalDialog->combo_normalAttribute->currentText().toUtf8().constData();
 		else
-			normalName = m_computeNormalDialog->attributeName->text().toUtf8().constData();
+			normalName = m_computeNormalDialog->normalAttributeName->text().toUtf8().constData();
 		VertexAttribute<VEC3> position = map->getAttribute<VEC3, VERTEX>(positionName);
 		VertexAttribute<VEC3> normal = map->getAttribute<VEC3, VERTEX>(normalName);
 		if(!normal.isValid())
@@ -98,15 +99,6 @@ void DifferentialPropertiesPlugin::cb_computeCurvature()
 		if(!Kmax.isValid())
 			Kmax = map->addAttribute<VEC3, VERTEX>(KmaxName);
 
-		std::string KminName;
-		if(m_computeCurvatureDialog->KminAttributeName->text().isEmpty())
-			KminName = m_computeCurvatureDialog->combo_KminAttribute->currentText().toUtf8().constData();
-		else
-			KminName = m_computeCurvatureDialog->KminAttributeName->text().toUtf8().constData();
-		VertexAttribute<VEC3> Kmin = map->getAttribute<VEC3, VERTEX>(KminName);
-		if(!Kmin.isValid())
-			Kmin = map->addAttribute<VEC3, VERTEX>(KminName);
-
 		std::string kmaxName;
 		if(m_computeCurvatureDialog->kmaxAttributeName->text().isEmpty())
 			kmaxName = m_computeCurvatureDialog->combo_kmaxAttribute->currentText().toUtf8().constData();
@@ -115,6 +107,15 @@ void DifferentialPropertiesPlugin::cb_computeCurvature()
 		VertexAttribute<REAL> kmax = map->getAttribute<REAL, VERTEX>(kmaxName);
 		if(!kmax.isValid())
 			kmax = map->addAttribute<REAL, VERTEX>(kmaxName);
+
+		std::string KminName;
+		if(m_computeCurvatureDialog->KminAttributeName->text().isEmpty())
+			KminName = m_computeCurvatureDialog->combo_KminAttribute->currentText().toUtf8().constData();
+		else
+			KminName = m_computeCurvatureDialog->KminAttributeName->text().toUtf8().constData();
+		VertexAttribute<VEC3> Kmin = map->getAttribute<VEC3, VERTEX>(KminName);
+		if(!Kmin.isValid())
+			Kmin = map->addAttribute<VEC3, VERTEX>(KminName);
 
 		std::string kminName;
 		if(m_computeCurvatureDialog->kminAttributeName->text().isEmpty())
@@ -125,10 +126,36 @@ void DifferentialPropertiesPlugin::cb_computeCurvature()
 		if(!kmin.isValid())
 			kmin = map->addAttribute<REAL, VERTEX>(kminName);
 
-		Algo::Geometry::computeCurvatureVertices_NormalCycles<PFP>(*map, position, normal);
+		std::string KnormalName;
+		if(m_computeCurvatureDialog->KnormalAttributeName->text().isEmpty())
+			KnormalName = m_computeCurvatureDialog->combo_KnormalAttribute->currentText().toUtf8().constData();
+		else
+			KnormalName = m_computeCurvatureDialog->KnormalAttributeName->text().toUtf8().constData();
+		VertexAttribute<VEC3> Knormal = map->getAttribute<VEC3, VERTEX>(KnormalName);
+		if(!Knormal.isValid())
+			Knormal = map->addAttribute<VEC3, VERTEX>(KnormalName);
 
-		if(m_computeNormalDialog->check_createVBO->checkState() == Qt::Checked)
-			mh->createVBO(normal);
+		EdgeAttribute<REAL> edgeAngle = map->getAttribute<REAL, EDGE>("edgeAngle");
+		if(!edgeAngle.isValid())
+			edgeAngle = map->addAttribute<REAL, EDGE>("edgeAngle");
+		Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(*map, position, edgeAngle);
+
+		Algo::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP>(*map, 0.01f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
+
+		if(m_computeCurvatureDialog->check_KmaxCreateVBO->checkState() == Qt::Checked)
+			mh->createVBO(Kmax);
+
+		if(m_computeCurvatureDialog->check_kmaxCreateVBO->checkState() == Qt::Checked)
+			mh->createVBO(kmax);
+
+		if(m_computeCurvatureDialog->check_KminCreateVBO->checkState() == Qt::Checked)
+			mh->createVBO(Kmin);
+
+		if(m_computeCurvatureDialog->check_kminCreateVBO->checkState() == Qt::Checked)
+			mh->createVBO(kmin);
+
+		if(m_computeCurvatureDialog->check_KnormalCreateVBO->checkState() == Qt::Checked)
+			mh->createVBO(Knormal);
 
 		QList<View*> views = m_window->getViewsList();
 		foreach(View* view, views)

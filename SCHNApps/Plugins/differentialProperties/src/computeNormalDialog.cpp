@@ -21,7 +21,7 @@ void ComputeNormalDialog::init()
 	mapList->clear();
 	combo_positionAttribute->clear();
 	combo_normalAttribute->clear();
-	attributeName->setText("normal");
+	normalAttributeName->setText("normal");
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
 		mapList->addItem(map->getName());
