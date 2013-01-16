@@ -1234,25 +1234,40 @@ unsigned int Map3::closeMap()
 
 void Map3::reverseOrientation()
 {
+	DartAttribute<unsigned int> emb0(this, getEmbeddingAttributeVector<VERTEX>()) ;
+	if(emb0.isValid())
+	{
+		DartAttribute<unsigned int> new_emb0 = addAttribute<unsigned int, DART>("new_EMB_0") ;
+		for(Dart d = begin(); d != end(); next(d))
+			new_emb0[d] = emb0[phi1(d)] ;
 
+		swapAttributes<unsigned int>(emb0, new_emb0) ;
+		removeAttribute(new_emb0) ;
+	}
+
+	DartAttribute<Dart> n_phi1 = getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart> n_phi_1 = getAttribute<Dart, DART>("phi_1") ;
+	swapAttributes<Dart>(n_phi1, n_phi_1) ;
 }
 
 void Map3::computeDual()
 {
-//	unsigned int count = 0;
-//	CellMarkerNoUnmark<VERTEX> cv(*this);
-//	std::vector<Dart> v;
-//	for(Dart d = begin(); d != end(); next(d))
-//	{
-//		if(!cv.isMarked(d) && isBoundaryMarked3(d))
-//		{
-//			++count;
-//			v.push_back(d);
-//			cv.mark(d);
-//		}
-//	}
-//
-//	std::cout << "boundary vertices : " << count << std::endl;
+		unsigned int count = 0;
+		CellMarkerNoUnmark<VERTEX> cv(*this);
+		std::vector<Dart> v;
+		for(Dart d = begin(); d != end(); next(d))
+		{
+			if(!cv.isMarked(d) && isBoundaryMarked3(d))
+			{
+				++count;
+				v.push_back(d);
+				cv.mark(d);
+			}
+		}
+
+		cv.unmarkAll();
+
+		std::cout << "boundary vertices : " << count << std::endl;
 
 	DartAttribute<Dart> old_phi1 = getAttribute<Dart, DART>("phi1") ;
 	DartAttribute<Dart> old_phi_1 = getAttribute<Dart, DART>("phi_1") ;
@@ -1268,6 +1283,7 @@ void Map3::computeDual()
 		new_phi1[d] = dd ;
 		new_phi_1[dd] = d ;
 
+		//Dart ddd = phi3(phi_1(d));
 		Dart ddd = phi1(phi3(d));
 		new_phi2[d] = ddd;
 		new_phi2[ddd] = d;
@@ -1283,29 +1299,43 @@ void Map3::computeDual()
 
 	swapEmbeddingContainers(VERTEX, VOLUME) ;
 
-//	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
-//	{
-//		boundaryUnmarkOrbit<VOLUME,3>(*it);
-//	}
-//
-//	for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
-//	{
-//		deleteVolume(*it);
-//	}
-//
-//	closeMap();
+//	reverseOrientation();
 
-	//boundary management
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(isBoundaryMarked3(d))
+		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
 		{
-			boundaryMarkOrbit<VOLUME,3>(deleteVertex(phi1(d)));
-//			boundaryUnmarkOrbit<VOLUME,3>(d);
-//			deleteVolume(d);
+			boundaryUnmarkOrbit<VOLUME,3>(*it);
 		}
-	}
-//	closeMap();
+
+		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
+		{
+			deleteVolume(*it);
+		}
+
+//		std::cout << "boundary faces : " << closeMap() << std::endl;
+
+//	//boundary management
+//	for(Dart d = begin(); d != end(); next(d))
+//	{
+//		if(isBoundaryMarked3(d))
+//		{
+//			//Dart dit = deleteVertex(phi3(d));
+//			//deleteVolume(phi3(d));
+//			//if(dit == NIL)
+//			//{
+//			//	std::cout << "ploooooooooooooooooooop" << std::endl;
+//			//	return;
+//			//}
+//			//else
+//			//{
+//			//	std::cout << "gooooooooooooooooooooood" << std::endl;
+//			//	boundaryMarkOrbit<VOLUME,3>(dit);
+//			//	return;
+//			//}
+//			//boundaryUnmarkOrbit<VOLUME,3>(d);
+//			//deleteVolume(d);
+//		}
+//	}
+
 }
 
 } // namespace CGoGN
