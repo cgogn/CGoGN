@@ -165,6 +165,15 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
 	}
 
+	// collect edges on the border
+	// TODO : should be an option ?
+	// TODO : not boundary safe
+	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
+	}
+
 	tensor /= computeArea(pos) ;
 }
 
@@ -176,6 +185,16 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 
 	// collect edges inside the neighborhood
 	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) ;
+	}
+
+	// collect edges on the border
+	// TODO : should be an option ?
+	// TODO : not boundary safe
+	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
 		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
@@ -271,6 +290,15 @@ void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexA
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
 	}
 
+	// collect edges on the border
+	// TODO : should be an option ?
+	// TODO : not boundary safe
+	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
+	}
+
 	tensor /= computeArea(pos) ;
 }
 
@@ -282,6 +310,16 @@ void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexA
 
 	// collect edges inside the neighborhood
 	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
+		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) ;
+	}
+
+	// collect edges on the border
+	// TODO : should be an option ?
+	// TODO : not boundary safe
+	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
 		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		const REAL edgeangle = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
