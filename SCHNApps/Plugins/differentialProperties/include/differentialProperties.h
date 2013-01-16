@@ -3,7 +3,8 @@
 
 #include "plugin.h"
 
-#include "computeNormalsDialog.h"
+#include "computeNormalDialog.h"
+#include "computeCurvatureDialog.h"
 
 #include "Topology/generic/functor.h"
 #include "Topology/generic/parameters.h"
@@ -21,6 +22,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP;
+typedef PFP::REAL REAL;
 typedef PFP::VEC3 VEC3;
 
 
@@ -58,13 +60,17 @@ public:
 	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
 
 public slots:
-	void cb_openComputeNormalsDialog();
-	void cb_computeNormals();
+	void cb_openComputeNormalDialog();
+	void cb_openComputeCurvatureDialog();
+
+	void cb_computeNormal();
+	void cb_computeCurvature();
 
 private:
-	ComputeNormalsDialog* m_computeNormalsDialog;
+	ComputeNormalDialog* m_computeNormalDialog;
+	ComputeCurvatureDialog* m_computeCurvatureDialog;
 
-	QAction* computeNormalsAction;
+	QAction* computeNormalAction;
 	QAction* computeCurvatureAction;
 };
 

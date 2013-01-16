@@ -40,23 +40,23 @@ std::string nameOfType(const T& v)
 
 template <> inline std::string nameOfType(const char& v) { return "char"; }
 
-template <> inline std::string nameOfType(const short int& v) { return "short int"; }
+template <> inline std::string nameOfType(const short& v) { return "short"; }
 
 template <> inline std::string nameOfType(const int& v) { return "int"; }
 
-template <> inline std::string nameOfType(const long int& v) { return "long int"; }
+template <> inline std::string nameOfType(const long& v) { return "long"; }
 
 template <> inline std::string nameOfType(const long long& v) { return "long long"; }
 
-template <> inline std::string nameOfType(const unsigned long long& v) { return "long long"; }
-
 template <> inline std::string nameOfType(const unsigned char& v) { return "unsigned char"; }
 
-template <> inline std::string nameOfType(const unsigned short int& v) { return "unsigned short int"; }
+template <> inline std::string nameOfType(const unsigned short& v) { return "unsigned short"; }
 
 template <> inline std::string nameOfType(const unsigned int& v) { return "unsigned int"; }
 
-template <> inline std::string nameOfType(const unsigned long int& v) { return "unsigned long int"; }
+template <> inline std::string nameOfType(const unsigned long& v) { return "unsigned long"; }
+
+template <> inline std::string nameOfType(const unsigned long long& v) { return "unsigned long long"; }
 
 template <> inline std::string nameOfType(const float& v) { return "float"; }
 

@@ -198,51 +198,6 @@ public:
 };
 
 
-//
-//class SelectorDartMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const DartMarker& m_dm;
-//public:
-//	SelectorDartMarked(const DartMarker& dm): m_dm(dm)  {}
-//	bool operator()(Dart d) const { return m_dm.isMarked(d); }
-//};
-//
-//
-//class SelectorCellMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const CellMarker& m_cm;
-//public:
-//	SelectorCellMarked(const CellMarker& cm): m_cm(cm)  {}
-//	bool operator()(Dart d) const { return m_cm.isMarked(d); }
-//};
-//
-//class SelectorDartNotMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const DartMarker& m_dm;
-//public:
-//	SelectorDartNotMarked(const DartMarker& dm): m_dm(dm)  {}
-//	bool operator()(Dart d) const { return !m_dm.isMarked(d); }
-//};
-//
-//
-//template <typename MAP>
-//class SelectorCellNotMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const CellMarker& m_cm;
-//public:
-//	SelectorCellNotMarked(const CellMarker& cm): m_cm(cm)  {}
-//	bool operator()(Dart d) const { return !m_cm.isMarked(d); }
-//};
-
-
 // Counting Functors : increment its value every time it is applied
 /********************************************************/
 

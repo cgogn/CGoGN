@@ -1,4 +1,4 @@
-#include "computeNormalsDialog.h"
+#include "computeNormalDialog.h"
 
 #include "differentialProperties.h"
 #include "window.h"
@@ -10,28 +10,30 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-ComputeNormalsDialog::ComputeNormalsDialog(Window* w) : m_window(w)
+ComputeNormalDialog::ComputeNormalDialog(Window* w) : m_window(w)
 {
 	setupUi(this);
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
 }
 
-void ComputeNormalsDialog::init()
+void ComputeNormalDialog::init()
 {
 	mapList->clear();
 	combo_positionAttribute->clear();
+	combo_normalAttribute->clear();
 	attributeName->setText("normal");
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
 		mapList->addItem(map->getName());
 }
 
-void ComputeNormalsDialog::cb_selectedMapChanged()
+void ComputeNormalDialog::cb_selectedMapChanged()
 {
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 	if(!currentItems.empty())
 	{
 		combo_positionAttribute->clear();
+		combo_normalAttribute->clear();
 		const QString& mapname = currentItems[0]->text();
 		MapHandlerGen* mh = m_window->getMap(mapname);
 		GenericMap* map = mh->getGenericMap();
@@ -48,8 +50,13 @@ void ComputeNormalsDialog::cb_selectedMapChanged()
 			if(types[i] == vec3TypeName)
 			{
 				combo_positionAttribute->addItem(QString::fromStdString(names[i]));
-				if(names[i] == "position") // try to select an attribute named "position"
+				if(names[i] == "position") // try to select a position attribute named "position"
 					combo_positionAttribute->setCurrentIndex(j);
+
+				combo_normalAttribute->addItem(QString::fromStdString(names[i]));
+				if(names[i] == "normal") // try to select a normal attribute named "normal"
+					combo_normalAttribute->setCurrentIndex(j);
+
 				++j;
 			}
 		}

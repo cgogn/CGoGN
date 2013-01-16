@@ -1,7 +1,7 @@
-#ifndef _COMPUTENORMALS_DIALOG_H_
-#define _COMPUTENORMALS_DIALOG_H_
+#ifndef _COMPUTENORMAL_DIALOG_H_
+#define _COMPUTENORMAL_DIALOG_H_
 
-#include "ui_computeNormalsDialog.h"
+#include "ui_computeNormalDialog.h"
 
 namespace CGoGN
 {
@@ -11,12 +11,12 @@ namespace SCHNApps
 
 class Window;
 
-class ComputeNormalsDialog : public QDialog, public Ui::ComputeNormalsDialog
+class ComputeNormalDialog : public QDialog, public Ui::ComputeNormalDialog
 {
 	Q_OBJECT
 
 public:
-	ComputeNormalsDialog(Window* w);
+	ComputeNormalDialog(Window* w);
 	void init();
 
 public slots:

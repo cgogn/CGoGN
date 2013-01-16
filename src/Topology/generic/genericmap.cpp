@@ -46,15 +46,18 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		registerAttribute<Dart>("Dart");
 		registerAttribute<Mark>("Mark");
 
-		registerAttribute<long>("long");
-		registerAttribute<int>("int");
-		registerAttribute<short>("short");
 		registerAttribute<char>("char");
+		registerAttribute<short>("short");
+		registerAttribute<int>("int");
+		registerAttribute<long>("long");
 
-		registerAttribute<unsigned long>("unsigned long");
-		registerAttribute<unsigned int>("unsigned int");
-		registerAttribute<unsigned short>("unsigned short");
 		registerAttribute<unsigned char>("unsigned char");
+		registerAttribute<unsigned short>("unsigned short");
+		registerAttribute<unsigned int>("unsigned int");
+		registerAttribute<unsigned long>("unsigned long");
+
+		registerAttribute<float>("float");
+		registerAttribute<double>("double");
 
 		registerAttribute<Geom::Vec2f>(Geom::Vec2f::CGoGNnameOfType());
 		registerAttribute<Geom::Vec3f>(Geom::Vec3f::CGoGNnameOfType());
