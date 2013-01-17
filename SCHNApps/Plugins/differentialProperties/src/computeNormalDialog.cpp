@@ -43,7 +43,7 @@ void ComputeNormalDialog::cb_selectedMapChanged()
 		std::vector<std::string> types;
 		cont.getAttributesNames(names);
 		cont.getAttributesTypes(types);
-		std::string vec3TypeName = VEC3::CGoGNnameOfType();
+		std::string vec3TypeName = nameOfType(VEC3());
 		unsigned int j = 0;
 		for(unsigned int i = 0; i < names.size(); ++i)
 		{

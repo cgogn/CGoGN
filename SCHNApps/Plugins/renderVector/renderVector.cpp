@@ -215,7 +215,6 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 
 			PerMapParameterSet& p = params->perMap[map->getName()];
 
-//			QList<Utils::VBO*> vbos = map->getVBOList(nameOfType(VEC3()));
 			QList<Utils::VBO*> vbos = map->getVBOList();
 			for(int i = 0; i < vbos.count(); ++i)
 			{

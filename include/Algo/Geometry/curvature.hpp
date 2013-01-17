@@ -27,14 +27,6 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
-extern "C"
-{
-	#include "C_BLAS_LAPACK/INCLUDE/f2c.h"
-	#include "C_BLAS_LAPACK/INCLUDE/clapack.h"
-}
-#undef max
-#undef min
-
 namespace CGoGN
 {
 
@@ -291,7 +283,8 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select, unsigned int thread)
+	const FunctorSelect& select,
+	unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -310,7 +303,8 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread)
+	VertexAttribute<typename PFP::VEC3>& Knormal,
+	unsigned int thread)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -355,7 +349,8 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select, unsigned int thread)
+	const FunctorSelect& select,
+	unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -374,7 +369,8 @@ void computeCurvatureVertex_NormalCycles_Projected(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread)
+	VertexAttribute<typename PFP::VEC3>& Knormal,
+	unsigned int thread)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -412,7 +408,8 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select, unsigned int thread)
+	const FunctorSelect& select,
+	unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -431,7 +428,8 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread)
+	VertexAttribute<typename PFP::VEC3>& Knormal,
+	unsigned int thread)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -465,7 +463,8 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select, unsigned int thread)
+	const FunctorSelect& select,
+	unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -484,7 +483,8 @@ void computeCurvatureVertex_NormalCycles_Projected(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread)
+	VertexAttribute<typename PFP::VEC3>& Knormal,
+	unsigned int thread)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -519,7 +519,7 @@ void normalCycles_SortAndSetEigenComponents(
 	typename PFP::VEC3& Kmin,
 	typename PFP::VEC3& Knormal,
 	const typename PFP::VEC3& normal,
-	unsigned int thread=0)
+	unsigned int thread)
 {
 	// sort eigen components : ev[inormal] has minimal absolute value ; kmin = ev[imin] <= ev[imax] = kmax
 	int inormal=0, imin, imax ;
@@ -549,7 +549,7 @@ void normalCycles_SortAndSetEigenComponents(
 }
 
 template <typename PFP>
-void normalCycles_SortTensor( Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsigned int thread=0)
+void normalCycles_SortTensor(Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsigned int thread)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -582,7 +582,7 @@ void normalCycles_SortTensor( Geom::Matrix<3,3,typename PFP::REAL> & tensor, uns
 }
 
 template <typename PFP>
-void normalCycles_ProjectTensor( Geom::Matrix<3,3,typename PFP::REAL> & tensor, const typename PFP::VEC3& normal_vector, unsigned int thread=0)
+void normalCycles_ProjectTensor(Geom::Matrix<3,3,typename PFP::REAL> & tensor, const typename PFP::VEC3& normal_vector, unsigned int thread)
 {
 	Geom::Matrix<3,3,typename PFP::REAL> proj;
 	proj.identity();
@@ -647,7 +647,8 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select, unsigned int nbth)
+	const FunctorSelect& select,
+	unsigned int nbth)
 {
 	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
 	if (!map. template isOrbitEmbedded<VERTEX>())
@@ -714,7 +715,8 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	const FunctorSelect& select, unsigned int nbth)
+	const FunctorSelect& select,
+	unsigned int nbth)
 {
 	FunctorComputeCurvatureVertices_QuadraticFitting<PFP> funct(map, position, normal, kmax, kmin, Kmax, Kmin);
 	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select);
