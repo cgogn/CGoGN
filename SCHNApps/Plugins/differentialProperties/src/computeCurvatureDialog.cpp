@@ -52,8 +52,8 @@ void ComputeCurvatureDialog::cb_selectedMapChanged()
 		std::vector<std::string> types;
 		cont.getAttributesNames(names);
 		cont.getAttributesTypes(types);
-		std::string vec3TypeName = nameOfType(typename PFP2::VEC3());
-		std::string realTypeName = nameOfType(typename PFP2::REAL());
+		std::string vec3TypeName = nameOfType(PFP2::VEC3());
+		std::string realTypeName = nameOfType(PFP2::REAL());
 		unsigned int j = 0;
 		unsigned int k = 0;
 		for(unsigned int i = 0; i < names.size(); ++i)

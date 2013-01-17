@@ -30,7 +30,7 @@ void ImportSurfacePlugin::cb_import()
 		Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
 
 		// get vertex position attribute
-		VertexAttribute<PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
+		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
 
 		// create VBO for vertex position attribute
 		h->createVBO(position);
