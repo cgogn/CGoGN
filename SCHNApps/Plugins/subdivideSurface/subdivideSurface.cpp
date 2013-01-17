@@ -89,12 +89,9 @@ void SubdivideSurfacePlugin::cb_loopSubdivision()
 		mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
 		mh->updateVBO(position);
 
-		QList<View*> views = m_window->getViewsList();
+		QList<View*> views = mh->getLinkedViews();
 		foreach(View* view, views)
-		{
-			if(view->isLinkedToMap(mh))
-				view->updateGL();
-		}
+			view->updateGL();
 	}
 }
 
@@ -116,12 +113,9 @@ void SubdivideSurfacePlugin::cb_CCSubdivision()
 		mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
 		mh->updateVBO(position);
 
-		QList<View*> views = m_window->getViewsList();
+		QList<View*> views = mh->getLinkedViews();
 		foreach(View* view, views)
-		{
-			if(view->isLinkedToMap(mh))
-				view->updateGL();
-		}
+			view->updateGL();
 	}
 }
 
@@ -143,12 +137,9 @@ void SubdivideSurfacePlugin::cb_trianguleFaces()
 		mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
 		mh->updateVBO(position);
 
-		QList<View*> views = m_window->getViewsList();
+		QList<View*> views = mh->getLinkedViews();
 		foreach(View* view, views)
-		{
-			if(view->isLinkedToMap(mh))
-				view->updateGL();
-		}
+			view->updateGL();
 	}
 }
 

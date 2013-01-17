@@ -66,12 +66,9 @@ void DifferentialPropertiesPlugin::cb_computeNormal()
 		if(m_computeNormalDialog->check_createVBO->checkState() == Qt::Checked)
 			mh->createVBO(normal);
 
-		QList<View*> views = m_window->getViewsList();
+		QList<View*> views = mh->getLinkedViews();
 		foreach(View* view, views)
-		{
-			if(view->isLinkedToMap(mh))
-				view->updateGL();
-		}
+			view->updateGL();
 	}
 }
 
@@ -157,12 +154,9 @@ void DifferentialPropertiesPlugin::cb_computeCurvature()
 		if(m_computeCurvatureDialog->check_KnormalCreateVBO->checkState() == Qt::Checked)
 			mh->createVBO(Knormal);
 
-		QList<View*> views = m_window->getViewsList();
+		QList<View*> views = mh->getLinkedViews();
 		foreach(View* view, views)
-		{
-			if(view->isLinkedToMap(mh))
-				view->updateGL();
-		}
+			view->updateGL();
 	}
 }
 
