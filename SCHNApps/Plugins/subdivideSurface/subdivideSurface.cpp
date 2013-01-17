@@ -56,7 +56,7 @@ void SubdivideSurfacePlugin::cb_selectedMapChanged()
 		std::vector<std::string> types;
 		cont.getAttributesNames(names);
 		cont.getAttributesTypes(types);
-		std::string vec3TypeName = VEC3::CGoGNnameOfType();
+		std::string vec3TypeName = nameOfType(PFP2::VEC3());
 		unsigned int j = 0;
 		for(unsigned int i = 0; i < names.size(); ++i)
 		{
@@ -77,12 +77,12 @@ void SubdivideSurfacePlugin::cb_loopSubdivision()
 	if(!currentItems.empty())
 	{
 		const QString& mapname = currentItems[0]->text();
-		MapHandler<PFP>* mh = reinterpret_cast<MapHandler<PFP>*>(m_window->getMap(mapname));
-		MAP* map = mh->getMap();
+		MapHandler<PFP2>* mh = reinterpret_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
+		typename PFP2::MAP* map = mh->getMap();
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
-		VertexAttribute<VEC3> position = map->getAttribute<VEC3, VERTEX>(positionName);
+		VertexAttribute<typename PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, VERTEX>(positionName);
 
-		Algo::Surface::Modelisation::LoopSubdivision<PFP>(*map, position);
+		Algo::Surface::Modelisation::LoopSubdivision<PFP2>(*map, position);
 
 		mh->updatePrimitives(Algo::Render::GL2::POINTS);
 		mh->updatePrimitives(Algo::Render::GL2::LINES);
@@ -104,12 +104,12 @@ void SubdivideSurfacePlugin::cb_CCSubdivision()
 	if(!currentItems.empty())
 	{
 		const QString& mapname = currentItems[0]->text();
-		MapHandler<PFP>* mh = reinterpret_cast<MapHandler<PFP>*>(m_window->getMap(mapname));
-		MAP* map = mh->getMap();
+		MapHandler<PFP2>* mh = reinterpret_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
+		typename PFP2::MAP* map = mh->getMap();
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
-		VertexAttribute<VEC3> position = map->getAttribute<VEC3, VERTEX>(positionName);
+		VertexAttribute<typename PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, VERTEX>(positionName);
 
-		Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP>(*map, position);
+		Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP2>(*map, position);
 
 		mh->updatePrimitives(Algo::Render::GL2::POINTS);
 		mh->updatePrimitives(Algo::Render::GL2::LINES);
@@ -131,12 +131,12 @@ void SubdivideSurfacePlugin::cb_trianguleFaces()
 	if(!currentItems.empty())
 	{
 		const QString& mapname = currentItems[0]->text();
-		MapHandler<PFP>* mh = reinterpret_cast<MapHandler<PFP>*>(m_window->getMap(mapname));
-		MAP* map = mh->getMap();
+		MapHandler<PFP2>* mh = reinterpret_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
+		typename PFP2::MAP* map = mh->getMap();
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
-		VertexAttribute<VEC3> position = map->getAttribute<VEC3, VERTEX>(positionName);
+		VertexAttribute<typename PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, VERTEX>(positionName);
 
-		Algo::Surface::Modelisation::trianguleFaces<PFP>(*map, position);
+		Algo::Surface::Modelisation::trianguleFaces<PFP2>(*map, position);
 
 		mh->updatePrimitives(Algo::Render::GL2::POINTS);
 		mh->updatePrimitives(Algo::Render::GL2::LINES);

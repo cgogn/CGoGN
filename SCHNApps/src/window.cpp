@@ -507,6 +507,21 @@ Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
  * MANAGE MAPS
  *********************************************************/
 
+GenericMap* Window::createMap(unsigned int dim)
+{
+	GenericMap* map = NULL;
+	switch(dim)
+	{
+		case 2 :
+			map = new PFP2::MAP();
+			break;
+		case 3 :
+			map = new PFP3::MAP();
+			break;
+	}
+	return map;
+}
+
 bool Window::addMap(MapHandlerGen* map)
 {
 	if (h_maps.contains(map->getName()))

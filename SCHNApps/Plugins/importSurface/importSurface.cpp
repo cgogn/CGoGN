@@ -22,14 +22,16 @@ void ImportSurfacePlugin::cb_import()
 
 	if(fi.exists())
 	{
-		MAP* m = new MAP();
-		MapHandler<PFP>* h = new MapHandler<PFP>(fi.baseName(), m_window, m);
+//		typename PFP2::MAP* m = new typename PFP2::MAP();
+		GenericMap* m = m_window->createMap(2);
+		typename PFP2::MAP* map = static_cast<typename PFP2::MAP*>(m);
+		MapHandler<PFP2>* h = new MapHandler<PFP2>(fi.baseName(), m_window, map);
 
 		std::vector<std::string> attrNames ;
-		Algo::Surface::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
+		Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
 
 		// get vertex position attribute
-		VertexAttribute<VEC3> position = m->getAttribute<VEC3, CGoGN::VERTEX>(attrNames[0]);
+		VertexAttribute<typename PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
 
 		// create VBO for vertex position attribute
 		h->createVBO(position);

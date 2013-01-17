@@ -216,6 +216,7 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 			PerMapParameterSet& p = params->perMap[map->getName()];
 
 			QList<Utils::VBO*> vbos = map->getVBOList();
+			unsigned int j = 0;
 			for(int i = 0; i < vbos.count(); ++i)
 			{
 				combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
@@ -230,9 +231,13 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 				else if(vbos[i] == p.positionVBO)
 					combo_positionVBO->setCurrentIndex(i);
 
-				list_vectorVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(std::find(p.vectorVBO.begin(), p.vectorVBO.end(), vbos[i]) != p.vectorVBO.end())
-					list_vectorVBO->item(i)->setSelected(true);
+				if(vbos[i]->dataSize() == 3)
+				{
+					list_vectorVBO->addItem(QString::fromStdString(vbos[i]->name()));
+					if(std::find(p.vectorVBO.begin(), p.vectorVBO.end(), vbos[i]) != p.vectorVBO.end())
+						list_vectorVBO->item(j)->setSelected(true);
+					++j;
+				}
 			}
 
 			if(p.positionVBO == NULL && vbos.count() > 0)

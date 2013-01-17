@@ -6,24 +6,9 @@
 #include "computeNormalDialog.h"
 #include "computeCurvatureDialog.h"
 
-#include "Topology/generic/functor.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/attributeHandler.h"
-
 
 using namespace CGoGN;
 using namespace SCHNApps;
-
-
-struct PFP: public PFP_STANDARD
-{
-	typedef EmbeddedMap2 MAP;
-};
-
-typedef PFP::MAP MAP;
-typedef PFP::REAL REAL;
-typedef PFP::VEC3 VEC3;
 
 
 class DifferentialPropertiesPlugin : public Plugin
