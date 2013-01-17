@@ -379,14 +379,14 @@ public:
 		if(!normal.isValid())
 		{
 			normal = m.template addAttribute<VEC3, VERTEX>("normal") ;
-			Algo::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
 		}
 
 		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
 		if(!edgeangle.isValid())
 		{
 			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
-			Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
+			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
 		kmax = m.template getAttribute<REAL, VERTEX>("kmax") ;
@@ -403,7 +403,7 @@ public:
 			Kmax = m.template addAttribute<VEC3, VERTEX>("Kmax") ;
 			Kmin = m.template addAttribute<VEC3, VERTEX>("Kmin") ;
 			Knormal = m.template addAttribute<VEC3, VERTEX>("Knormal") ;
-			Algo::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+			Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 		}
 
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -467,7 +467,7 @@ public:
 		if(!edgeangle.isValid())
 		{
 			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
-			Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
+			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;

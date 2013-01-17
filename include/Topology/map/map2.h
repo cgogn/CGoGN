@@ -155,6 +155,12 @@ public:
 	 *  @param d a dart of the face to fill
 	 */
 	virtual void fillHole(Dart d) ;
+
+	//! Open the mesh Transforming a face in a hole
+	/*! \pre Dart d is NOT boundary marked
+	 *  @param d a dart of the face filled
+	 */
+	virtual void createHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators
@@ -505,17 +511,6 @@ public:
 	/*! Crop the infinite faces of open meshes
 	 */
 	void computeDual();
-
-	//! Dual mesh computation (open mesh)
-	/*! Fit the infinite faces vertices to the middle of the old boundary edges
-	 */
-	void computeDualBorderConstraint();
-
-	//! Dual mesh computation (open mesh)
-	/*! Fit the infinite faces vertices to the middle of the old boundary edges AND
-	 *  fit the middle of the new boundary edges to the old boundary vertices
-	 */
-	//void computeDualBorderConstraintWithOldVertices();
 	//@}
 };
 

@@ -156,7 +156,7 @@ typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const VertexAttribute<typ
  *********************************************************************************/
 
 template <typename PFP>
-class LoopEvenAnalysisFilter : public Filter
+class LoopEvenAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -182,7 +182,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationAnalysisFilter : public Filter
+class LoopNormalisationAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -212,7 +212,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopOddAnalysisFilter : public Filter
+class LoopOddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -263,7 +263,7 @@ public:
 /* Loop on Boundary Vertices and SHW04 on Insides Vertices
  *********************************************************************************/
 template <typename PFP>
-class LoopOddSynthesisFilter : public Filter
+class LoopOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -306,7 +306,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationSynthesisFilter : public Filter
+class LoopNormalisationSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -336,7 +336,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopEvenSynthesisFilter : public Filter
+class LoopEvenSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -362,7 +362,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopVolumeSynthesisFilter : public Filter
+class LoopVolumeSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -393,7 +393,7 @@ public:
 } ;
 
 template <typename PFP>
-class SHW04VolumeNormalisationSynthesisFilter : public Filter
+class SHW04VolumeNormalisationSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

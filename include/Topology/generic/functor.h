@@ -120,6 +120,29 @@ inline SelectorOr operator||(const FunctorSelect& fs1, const FunctorSelect& fs2)
 	return SelectorOr(fs1,fs2);
 }
 
+template <typename MAP>
+class SelectorVertexBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorVertexBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return m_map.isBoundaryVertex(d); }
+	FunctorSelect* copy() const { return new SelectorVertexBoundary(m_map);}
+};
+
+template <typename MAP>
+class SelectorVertexNoBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorVertexNoBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return !m_map.isBoundaryVertex(d); }
+	FunctorSelect* copy() const { return new SelectorVertexNoBoundary(m_map);}
+};
 
 template <typename MAP>
 class SelectorEdgeBoundary : public FunctorSelect

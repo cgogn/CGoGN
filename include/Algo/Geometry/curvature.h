@@ -181,7 +181,7 @@ void computeCurvatureVertex_NormalCycles_Projected(
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles(
 	typename PFP::MAP& map,
-	Algo::Selection::Collector<PFP> & neigh,
+	Algo::Surface::Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,
@@ -196,7 +196,7 @@ template <typename PFP>
 void computeCurvatureVertex_NormalCycles(
 	typename PFP::MAP& map,
 	Dart dart,
-	Algo::Selection::Collector<PFP> & neigh,
+	Algo::Surface::Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,
@@ -209,7 +209,7 @@ void computeCurvatureVertex_NormalCycles(
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles_Projected(
 	typename PFP::MAP& map,
-	Algo::Selection::Collector<PFP> & neigh,
+	Algo::Surface::Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,
@@ -224,7 +224,7 @@ template <typename PFP>
 void computeCurvatureVertex_NormalCycles_Projected(
 	typename PFP::MAP& map,
 	Dart dart,
-	Algo::Selection::Collector<PFP> & neigh,
+	Algo::Surface::Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,

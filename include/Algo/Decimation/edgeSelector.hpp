@@ -300,7 +300,7 @@ void EdgeSelector_Length<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_Length<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(this->m_map, d, this->m_position) ;
+	VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->m_map, d, this->m_position) ;
 	einfo.it = edges.insert(std::make_pair(vec.norm2(), d)) ;
 	einfo.valid = true ;
 }
@@ -989,7 +989,7 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::computeEdgeMatrix(Dart d)
 {
-	const typename PFP::VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->m_map, d, this->m_position) ;
+	const typename PFP::VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->m_map, d, this->m_position) ;
 	edgeMatrix[d].identity();
 	edgeMatrix[d] *= e.norm2();
 	edgeMatrix[d] -= Geom::transposed_vectors_mult(e,e) ;
@@ -1086,15 +1086,15 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	typename PFP::MAP& m = this->m_map ;
 
-	normal[d2] = Algo::Geometry::vertexNormal<PFP>(m, d2, this->m_position) ;
-	Algo::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+	normal[d2] = Algo::Surface::Geometry::vertexNormal<PFP>(m, d2, this->m_position) ;
+	Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 	Dart vit = d2 ;
 	do
 	{
 		Dart nVert = m.phi1(vit) ;
-		normal[nVert] = Algo::Geometry::vertexNormal<PFP>(m, nVert, this->m_position) ;
-		Algo::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, nVert, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+		normal[nVert] = Algo::Surface::Geometry::vertexNormal<PFP>(m, nVert, this->m_position) ;
+		Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, nVert, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 		updateEdgeInfo(m.phi1(vit), false) ;			// must recompute some edge infos in the
 		if(vit == d2 || vit == dd2)						// neighborhood of the collapsed edge
@@ -1193,8 +1193,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
-	normal[newV] = Algo::Geometry::vertexNormal<PFP>(m, d2, this->m_position) ;
-	Algo::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+	normal[newV] = Algo::Surface::Geometry::vertexNormal<PFP>(m, d2, this->m_position) ;
+	Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 //	VEC3 norm = normal[newV] ;
 	REAL mCurv = (kmax[newV] + kmin[newV]) / REAL(2) ;
@@ -1335,7 +1335,7 @@ void EdgeSelector_CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			if (!eMark.isMarked(dit2))
 			{
-				edgeangle[dit2] = Algo::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(m, dit2, this->m_position) ;
+				edgeangle[dit2] = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(m, dit2, this->m_position) ;
 				eMark.mark(dit2);
 			}
 		}
@@ -1408,11 +1408,11 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// compute tensor before collapse
 	MATRIX tens1;
-	Algo::Selection::Collector_OneRing_AroundEdge<PFP> col1 (m);
+	Algo::Surface::Selection::Collector_OneRing_AroundEdge<PFP> col1 (m);
 	col1.collectAll(d);
 	col1.computeNormalCyclesTensor(this->m_position,edgeangle,tens1); // edgeangle is up to date here
 	tens1 *= col1.computeArea(this->m_position); // mean tensor * area = integral of the tensor
-	Algo::Geometry::normalCycles_SortTensor<PFP>(tens1);
+	Algo::Surface::Geometry::normalCycles_SortTensor<PFP>(tens1);
 
 	// temporary edge collapse
 	Dart d2 = m.phi2(m.phi_1(d)) ;
@@ -1423,11 +1423,11 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// compute tensor after collapse
 	MATRIX tens2;
-	Algo::Selection::Collector_OneRing<PFP> col2 (m);
+	Algo::Surface::Selection::Collector_OneRing<PFP> col2 (m);
 	col2.collectAll(d);
 	col2.computeNormalCyclesTensor(this->m_position,tens2); // edgeangle is not up to date here
 	tens2 *= col2.computeArea(this->m_position); // mean tensor * area = integral of the tensor
-	Algo::Geometry::normalCycles_SortTensor<PFP>(tens2);
+	Algo::Surface::Geometry::normalCycles_SortTensor<PFP>(tens2);
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;

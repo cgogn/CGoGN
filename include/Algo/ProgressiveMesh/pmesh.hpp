@@ -284,7 +284,7 @@ void ProgressiveMesh<PFP>::refine()
 	typename PFP::MATRIX33 invLocalFrame ;
 	if(m_localFrameDetailVectors)
 	{
-		typename PFP::MATRIX33 localFrame = Algo::Surface::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
+		typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
 		localFrame.invert(invLocalFrame) ;
 	}
 
@@ -381,7 +381,7 @@ void ProgressiveMesh<PFP>::localizeDetailVectors()
 		{
 			Dart d = m_splits[m_cur-1]->getEdge() ;
 			Dart dd2 = m_splits[m_cur-1]->getRightEdge() ;
-			typename PFP::MATRIX33 localFrame = Algo::Surface::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
+			typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
 			VEC3 det = m_positionApproximator->getDetail(d) ;
 			det = localFrame * det ;
 			m_positionApproximator->setDetail(d, det) ;
@@ -412,7 +412,7 @@ void ProgressiveMesh<PFP>::globalizeDetailVectors()
 		{
 			Dart d = m_splits[m_cur-1]->getEdge() ;
 			Dart dd2 = m_splits[m_cur-1]->getRightEdge() ;
-			typename PFP::MATRIX33 localFrame = Algo::Surface::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
+			typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
 			typename PFP::MATRIX33 invLocalFrame ;
 			localFrame.invert(invLocalFrame) ;
 			VEC3 det = m_positionApproximator->getDetail(d) ;
@@ -436,7 +436,7 @@ void ProgressiveMesh<PFP>::initQuantization()
 		originalDetailVectors.resize(m_splits.size()) ;
 		for(unsigned int i = 0; i < m_splits.size(); ++i)
 			originalDetailVectors[i] = m_positionApproximator->getDetail(m_splits[i]->getEdge(),0) ;
-		q = new Quantization<VEC3>(originalDetailVectors) ;
+		q = new Algo::PMesh::Quantization<VEC3>(originalDetailVectors) ;
 		quantizationInitialized = true ;
 		CGoGNout << "  Differential Entropy -> " << q->getDifferentialEntropy() << CGoGNendl ;
 	}
@@ -575,8 +575,7 @@ void ProgressiveMesh<PFP>::calculCourbeDebitDistortion()
 }
 */
 
-} //namespace PMesh
-} // Surface
-} //namespace Algo
-}
-} //namespace CGoGN
+} // namespace PMesh
+} // namespace Surface
+} // namespace Algo
+} // namespace CGoGN

@@ -50,7 +50,7 @@ namespace Filters
 /* Catmull-clark on Boundary Vertices and MJ96 on Insides Vertices
  *********************************************************************************/
 template <typename PFP>
-class MJ96VertexSubdivision : public Filter
+class MJ96VertexSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -155,7 +155,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96EdgeSubdivision : public Filter
+class MJ96EdgeSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -245,7 +245,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96FaceSubdivision : public Filter
+class MJ96FaceSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -305,7 +305,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96VolumeSubdivision : public Filter
+class MJ96VolumeSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

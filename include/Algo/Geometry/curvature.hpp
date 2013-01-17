@@ -80,7 +80,7 @@ void computeCurvatureVertex_QuadraticFitting(
 
 	VEC3 n = normal[dart] ;
 
-	MATRIX33 localFrame = Geometry::vertexLocalFrame<PFP>(map, dart, position, n) ;
+	MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(map, dart, position, n) ;
 	MATRIX33 invLocalFrame ;
 	localFrame.invert(invLocalFrame) ;
 
