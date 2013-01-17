@@ -66,7 +66,7 @@ Dart Traversor2VE<MAP>::next()
 template <typename MAP>
 Traversor2VF<MAP>::Traversor2VF(MAP& map, Dart dart) : m(map), start(dart)
 {
-	if(m.isBoundaryMarked(start)) // jump over a boundary face
+	if(m.isBoundaryMarked2(start)) // jump over a boundary face
 		start = m.phi2(m.phi_1(start)) ;
 }
 
@@ -89,7 +89,7 @@ Dart Traversor2VF<MAP>::next()
 	if(current != NIL)
 	{
 		current = m.phi2(m.phi_1(current)) ;
-		if(m.isBoundaryMarked(current)) // jump over a boundary face
+		if(m.isBoundaryMarked2(current)) // jump over a boundary face
 			current = m.phi2(m.phi_1(current)) ;
 		if(current == start)
 			current = NIL ;
@@ -135,7 +135,7 @@ Dart Traversor2VVaE<MAP>::next()
 template <typename MAP>
 Traversor2VVaF<MAP>::Traversor2VVaF(MAP& map, Dart dart) : m(map)
 {
-	if(m.isBoundaryMarked(dart))
+	if(m.isBoundaryMarked2(dart))
 		dart = m.phi2(m.phi_1(dart)) ;
 	start = m.phi1(m.phi1(dart)) ;
 	if(start == dart)
@@ -165,7 +165,7 @@ Dart Traversor2VVaF<MAP>::next()
 		if(current == stop)
 		{
 			Dart d = m.phi2(m.phi_1(current)) ;
-			if(m.isBoundaryMarked(d)) // jump over a boundary face
+			if(m.isBoundaryMarked2(d)) // jump over a boundary face
 			{
 				d = m.phi2(m.phi_1(d)) ;
 				current = m.phi1(d);
@@ -222,7 +222,7 @@ Dart Traversor2EV<MAP>::next()
 template <typename MAP>
 Traversor2EF<MAP>::Traversor2EF(MAP& map, Dart dart) : m(map), start(dart)
 {
-	if(m.isBoundaryMarked(start))
+	if(m.isBoundaryMarked2(start))
 		start = m.phi2(current) ;
 }
 
@@ -245,7 +245,7 @@ Dart Traversor2EF<MAP>::next()
 	if(current != NIL)
 	{
 		current = m.phi2(current) ;
-		if(current == start || m.isBoundaryMarked(current)) // do not consider a boundary face
+		if(current == start || m.isBoundaryMarked2(current)) // do not consider a boundary face
 			current = NIL ;
 	}
 	return current ;
@@ -373,7 +373,7 @@ Traversor2FFaV<MAP>::Traversor2FFaV(MAP& map, Dart dart) : m(map)
 		start = next() ;
 	}
 	stop = dart ;
-	if(m.isBoundaryMarked(start))
+	if(m.isBoundaryMarked2(start))
 		start = next() ;
 }
 
@@ -406,7 +406,7 @@ Dart Traversor2FFaV<MAP>::next()
 				return next() ;
 			}
 			stop = d ;
-			if(m.isBoundaryMarked(current))
+			if(m.isBoundaryMarked2(current))
 				return next() ;
 		}
 		if(current == start)
@@ -421,7 +421,7 @@ template <typename MAP>
 Traversor2FFaE<MAP>::Traversor2FFaE(MAP& map, Dart dart) : m(map)
 {
 	start = m.phi2(dart) ;
-	while(start != NIL && m.isBoundaryMarked(start))
+	while(start != NIL && m.isBoundaryMarked2(start))
 	{
 		start = m.phi2(m.phi1(m.phi2(start))) ;
 		if(start == m.phi2(dart))
@@ -450,7 +450,7 @@ Dart Traversor2FFaE<MAP>::next()
 		do
 		{
 			current = m.phi2(m.phi1(m.phi2(current))) ;
-		} while(m.isBoundaryMarked(current)) ;
+		} while(m.isBoundaryMarked2(current)) ;
 		if(current == start)
 			current = NIL ;
 	}

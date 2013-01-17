@@ -58,7 +58,7 @@ void drawerAddEdgeShrink(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, cons
 template<typename PFP>
 void drawerAddFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, float k)
 {
-	typename PFP::VEC3 C = Algo::Geometry::faceCentroid<PFP>(map,d,positions);
+	typename PFP::VEC3 C = Algo::Surface::Geometry::faceCentroid<PFP>(map,d,positions);
 
 	Traversor2FE<typename PFP::MAP> trav(map,d);
 	for (Dart e=trav.begin(); e!=trav.end(); e=trav.next())
@@ -70,7 +70,7 @@ void drawerAddFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Vert
 template<typename PFP>
 void drawerAddVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
-	typename PFP::VEC3 C = Algo::Geometry::volumeCentroid<PFP>(map,d,positions);
+	typename PFP::VEC3 C = Algo::Surface::Geometry::volumeCentroid<PFP>(map,d,positions);
 
 	Traversor3WE<typename PFP::MAP> trav(map,d);
 	for (Dart e=trav.begin(); e!=trav.end(); e=trav.next())

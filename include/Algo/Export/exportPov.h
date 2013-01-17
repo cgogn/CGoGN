@@ -11,6 +11,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace ExportPov
 {
 
@@ -276,6 +279,8 @@ bool exportScenePovSmooth(typename PFP::MAP& map, VertexAttribute<typename PFP::
 }
 
 } // namespace ExportPov
+
+}
 
 } // namespace Algo
 

@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -46,70 +49,240 @@ namespace Filters
 /*********************************************************************************
  *                           SYNTHESIS FILTERS
  *********************************************************************************/
+
+// Quad refinement
 template <typename PFP>
-class LerpEdgeSynthesisFilter : public Filter
+class LerpQuadOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpEdgeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	LerpQuadOddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
-		TraversorE<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		TraversorF<typename PFP::MAP> travF(m_map) ;
+		for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 		{
-			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
+			typename PFP::VEC3 vf(0.0);
+			typename PFP::VEC3 ef(0.0);
+
+			unsigned int count = 0;
+			Traversor2FE<typename PFP::MAP> travFE(m_map, d);
+			for (Dart dit = travFE.begin(); dit != travFE.end(); dit = travFE.next())
+			{
+				vf += m_position[dit];
+				m_map.incCurrentLevel();
+				ef += m_position[m_map.phi1(dit)];
+				m_map.decCurrentLevel();
+				++count;
+			}
+			ef /= count;
+			ef *= 2.0;
+
+			vf /= count;
 
 			m_map.incCurrentLevel() ;
+			Dart midF = m_map.phi1(m_map.phi1(d));
+			m_position[midF] += vf + ef ;
+			m_map.decCurrentLevel() ;
+		}
 
+		TraversorE<typename PFP::MAP> travE(m_map) ;
+		for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
+		{
+			typename PFP::VEC3 ve = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
+
+			m_map.incCurrentLevel() ;
 			Dart midV = m_map.phi1(d) ;
-			m_position[midV] = p ;
-
+			m_position[midV] += ve ;
 			m_map.decCurrentLevel() ;
 		}
 	}
-} ;
+};
 
+// Tri/quad refinement
 template <typename PFP>
-class LerpFaceSynthesisFilter : public Filter
+class LerpTriQuadOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpFaceSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	LerpTriQuadOddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
-		TraversorF<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		TraversorF<typename PFP::MAP> travF(m_map) ;
+		for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 		{
-			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
-
-			m_map.incCurrentLevel() ;
 			if(m_map.faceDegree(d) != 3)
 			{
-				Dart midF = m_map.phi1(m_map.phi1(d));
-				m_position[midF] = p ;
-			}
-			m_map.decCurrentLevel() ;
+				typename PFP::VEC3 vf(0.0);
+				typename PFP::VEC3 ef(0.0);
 
+				unsigned int count = 0;
+				Traversor2FE<typename PFP::MAP> travFE(m_map, d);
+				for (Dart dit = travFE.begin(); dit != travFE.end(); dit = travFE.next())
+				{
+					vf += m_position[dit];
+					m_map.incCurrentLevel();
+					ef += m_position[m_map.phi1(dit)];
+					m_map.decCurrentLevel();
+					++count;
+				}
+				ef /= count;
+				ef *= 2.0;
+
+				vf /= count;
+
+				m_map.incCurrentLevel() ;
+				Dart midF = m_map.phi1(m_map.phi1(d));
+				m_position[midF] += vf + ef ;
+				m_map.decCurrentLevel() ;
+			}
+		}
+
+		TraversorE<typename PFP::MAP> travE(m_map) ;
+		for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
+		{
+			typename PFP::VEC3 ve = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
+
+			m_map.incCurrentLevel() ;
+			Dart midV = m_map.phi1(d) ;
+			m_position[midV] += ve ;
+			m_map.decCurrentLevel() ;
 		}
 	}
-} ;
+};
 
+/*********************************************************************************
+ *                           ANALYSIS FILTERS
+ *********************************************************************************/
+
+// Quad refinement
+template <typename PFP>
+class LerpQuadOddAnalysisFilter : public Algo::MR::Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpQuadOddAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorE<typename PFP::MAP> travE(m_map) ;
+		for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
+		{
+			typename PFP::VEC3 ve = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
+
+			m_map.incCurrentLevel() ;
+			Dart midV = m_map.phi1(d) ;
+			m_position[midV] -= ve ;
+			m_map.decCurrentLevel() ;
+		}
+
+		TraversorF<typename PFP::MAP> travF(m_map) ;
+		for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
+		{
+			typename PFP::VEC3 vf(0.0);
+			typename PFP::VEC3 ef(0.0);
+
+			unsigned int count = 0;
+			Traversor2FE<typename PFP::MAP> travFE(m_map, d);
+			for (Dart dit = travFE.begin(); dit != travFE.end(); dit = travFE.next())
+			{
+				vf += m_position[dit];
+				m_map.incCurrentLevel();
+				ef += m_position[m_map.phi1(dit)];
+				m_map.decCurrentLevel();
+				++count;
+			}
+			ef /= count;
+			ef *= 2.0;
+
+			vf /= count;
+
+			m_map.incCurrentLevel() ;
+			Dart midF = m_map.phi1(m_map.phi1(d));
+			m_position[midF] -= vf + ef ;
+			m_map.decCurrentLevel() ;
+		}
+	}
+};
+
+// Tri/quad refinement
+template <typename PFP>
+class LerpTriQuadOddAnalysisFilter : public Algo::MR::Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpTriQuadOddAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorE<typename PFP::MAP> travE(m_map) ;
+		for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
+		{
+			typename PFP::VEC3 ve = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
+
+			m_map.incCurrentLevel() ;
+			Dart midV = m_map.phi1(d) ;
+			m_position[midV] -= ve ;
+			m_map.decCurrentLevel() ;
+		}
+
+		TraversorF<typename PFP::MAP> travF(m_map) ;
+		for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
+		{
+			if(m_map.faceDegree(d) != 3)
+			{
+				typename PFP::VEC3 vf(0.0);
+				typename PFP::VEC3 ef(0.0);
+
+				unsigned int count = 0;
+				Traversor2FE<typename PFP::MAP> travFE(m_map, d);
+				for (Dart dit = travFE.begin(); dit != travFE.end(); dit = travFE.next())
+				{
+					vf += m_position[dit];
+					m_map.incCurrentLevel();
+					ef += m_position[m_map.phi1(dit)];
+					m_map.decCurrentLevel();
+					++count;
+				}
+				ef /= count;
+				ef *= 2.0;
+
+				vf /= count;
+
+				m_map.incCurrentLevel() ;
+				Dart midF = m_map.phi1(m_map.phi1(d));
+				m_position[midF] -= vf + ef ;
+				m_map.decCurrentLevel() ;
+			}
+		}
+	}
+};
 
 } // namespace Filters
 
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

@@ -1,3 +1,27 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
 //#define DEBUG
 
 #include "Geometry/frame.h"
@@ -6,6 +30,9 @@ namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace MovingObjects
@@ -47,7 +74,7 @@ Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationEdge(const VEC3& p
 	const VEC3& endPoint = m_positions[m.phi1(d)];
 	const VEC3& vertexPoint = m_positions[d];
 
-	const VEC3& n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
+	const VEC3& n1 = Geometry::faceNormal<PFP>(m, d, m_positions);
 
 	//orientation relative to the plane orthogonal to the face going through the edge
 	return Geom::testOrientation3D(point, vertexPoint, endPoint, vertexPoint+n1);
@@ -60,12 +87,12 @@ typename PFP::VEC3 ParticleCell2DAndHalf<PFP>::intersectLineEdge(const VEC3& pA,
 	const VEC3& q2 = m_positions[m.phi1(d)];
 	VEC3 Inter;
 
-	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
+	VEC3 n1 = Geometry::faceNormal<PFP>(m, d, m_positions);
 	VEC3 n = (q2 - q1) ^ n1 ;
 
 	Geom::intersectionLinePlane(pA, pB - pA, q1, n, Inter) ;
 
-	Geom::Plane3D<float> pl = Algo::Geometry::facePlane<PFP>(m, d, m_positions);
+	Geom::Plane3D<float> pl = Geometry::facePlane<PFP>(m, d, m_positions);
 	pl.project(Inter);
 
 	return Inter;
@@ -76,7 +103,7 @@ Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationFace(VEC3 point, V
 {
 	const VEC3& dPoint = m_positions[d];
 
-	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
+	VEC3 n1 = Geometry::faceNormal<PFP>(m, d, m_positions);
 
 	return Geom::testOrientation3D(point, sourcePoint, dPoint+n1, dPoint);
 }
@@ -91,7 +118,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 
 	crossCell = CROSS_OTHER;
 
-	if(Algo::Geometry::isPointOnVertex<PFP>(m,d,m_positions,goal))
+	if(Geometry::isPointOnVertex<PFP>(m,d,m_positions,goal))
 	{
 		state = VERTEX;
 		m_position = goal;
@@ -117,7 +144,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 				//orbit with 2 edges : point on one edge
 				if(m.phi2_1(m.phi2_1(d)) == d)
 				{
-					if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current))
+					if(!Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current))
 						d = m.phi2_1(d);
 				}
 				else
@@ -140,7 +167,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 		}
 
 		//displacement step
-		if(getOrientationEdge(goal, d) == Geom::ON && Algo::Geometry::isPointOnHalfEdge<PFP>(m, d, m_positions, goal))
+		if(getOrientationEdge(goal, d) == Geom::ON && Geometry::isPointOnHalfEdge<PFP>(m, d, m_positions, goal))
 			edgeState(goal);
 		else
 		{
@@ -158,7 +185,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 	#endif
 
 	assert(goal.isfinite()) ;
-// 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
+// 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if(crossCell == NO_CROSS)
 	{
@@ -185,8 +212,8 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 			//transform the displacement into the new entered face
 			VEC3 displ = goal - m_position;
 
-			VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
-			VEC3 n2 = Algo::Geometry::faceNormal<PFP>(m, m.phi2(d), m_positions);
+			VEC3 n1 = Geometry::faceNormal<PFP>(m, d, m_positions);
+			VEC3 n2 = Geometry::faceNormal<PFP>(m, m.phi2(d), m_positions);
 			VEC3 axis = n1 ^ n2 ;
 
 			float angle = Geom::angle(n1, n2) ;
@@ -203,13 +230,13 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 			state = EDGE;
 	}
 
-	if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m, d, m_positions, goal))
+	if(!Geometry::isPointOnHalfEdge<PFP>(m, d, m_positions, goal))
 	{
 		m_position = m_positions[d];
 		vertexState(goal);
 		return;
 	}
-	else if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m, m.phi2(d), m_positions, goal))
+	else if(!Geometry::isPointOnHalfEdge<PFP>(m, m.phi2(d), m_positions, goal))
 	{
 		d = m.phi2(d);
 		m_position = m_positions[d];
@@ -229,10 +256,10 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 
 	assert(goal.isfinite()) ;
 	assert(this->getPosition().isFinite()) ;
-// 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
+// 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	//project goal within face plane
-	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
+	VEC3 n1 = Geometry::faceNormal<PFP>(m,d,m_positions);
 	VEC3 n2 = current - m_position;
 //	n1.normalize();
 	VEC3 n3 = n1 ^ n2;
@@ -280,7 +307,7 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 			m_position = goal;
 			state = FACE;
 
-// 			m_position = Algo::Geometry::faceCentroid<PFP>(m,d,m_positions);
+// 			m_position = Geometry::faceCentroid<PFP>(m,d,m_positions);
 // 			d = m.phi1(d);
 // 			m_position = pointInFace(d);
 // 			faceState(goal);
@@ -364,6 +391,8 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 }
 
 } // namespace MovingObjects
+
+} // namespace Surface
 
 } // namespace Algo
 

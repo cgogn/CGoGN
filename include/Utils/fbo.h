@@ -25,7 +25,9 @@
 #ifndef __CGoGN_GLSL_FBO__
 #define __CGoGN_GLSL_FBO__
 
+#include <GL/glew.h>
 #include "Utils/gl_def.h"
+#include "Utils/cgognStream.h"
 
 #include <iostream>
 #include <vector>
@@ -36,64 +38,196 @@ namespace CGoGN
 namespace Utils
 {
 
+// forward declaration
+class GLSLShader;
+
+/**
+ * Simple Fbo class to do offscreen rendering in OpenGL.
+ */
 class FBO
 {
+
 public:
-	/// default constructor
-    FBO();
 
-    /**
-     * constructor with size of frame buffer
-     * @param width width in pixel
-     * @param height heigt in pixel
-     */
-    FBO(unsigned int width, unsigned int height);
+	/**
+	 * Constructor.
+	 * \param  width   Width of the Fbo in pixels
+	 * \param  heigth  Height of the Fbo in pixels
+	 */
+	FBO(unsigned int width, unsigned int height);
 
-    /// destructor
-    ~FBO();
+	/**
+	 * Destructor.
+	 */
+	~FBO();
 
-    /**
-     *
-     */
-    void attachRender(GLenum internalformat);
+	/**
+	 * Attach a render buffer to the Fbo.\n
+	 * If another render buffer is already attached, it will be deleted and replaced with the new one.\n
+	 * When calling this function, no Fbo should be bound.\n
+	 * \param  internalFormat  Internal format of the render buffer : GL_DEPTH_COMPONENT, GL_STENCIL_INDEX, or GL_DEPTH_STENCIL
+	 */
+//	void attachRenderbuffer(GLenum internalFormat);
+	
+	/**
+	 * Attach a color texture to the Fbo.\n
+	 * This function fails if the maximum number of attached color textures is already reached.\n
+	 * When calling this function, no Fbo should be bound.\n
+	 * @param  internalFormat  Internal format of the texture : GL_RGBA, GL_RGB, GL_RGBA32F, or GL_RGB32F
+	 * @param  filter          Filter used to minify or magnify the texture (default value is GL_LINEAR)
+	 * @return id of attachement
+	 */
+	int createAttachColorTexture(GLenum internalFormat, GLint filter = GL_LINEAR);
 
-    /**
-     *
-     */
-    void attachTexture(GLenum internalformat, GLint filter = GL_LINEAR);
+	/**
+	 * Attach a color texture to the Fbo.\n
+	 * This function fails if the maximum number of attached color textures is already reached.\n
+	 * When calling this function, no Fbo should be bound.\n
+	 * @param textureId id of texture to attach  (default is 0: texture us creatated with internal format)
+	 * @return id of attachement
+	 */
+	int attachColorTexture(CGoGNGLuint textureId);
 
-    void bindTexInput();
-    void bindTexInput(int num);
+	/**
+	 * Create and attach a depth texture to the Fbo.\n
+	 * This function fails if a depth texture was already attached to the Fbo.\n
+	 * When calling this function, no Fbo should be bound.\n
+	 * @param  filter  Filter used to minify or magnify the texture (default value is GL_LINEAR)
+	 * @return true if creation & attachment success
+	 */
+	bool createAttachDepthTexture(GLint filter = GL_LINEAR);
 
-    void bindTexOutput();
-    void bindTexOutput(int num);
+	/**
+	 * Attach a depth texture to the Fbo.\n
+	 * This function fails if a depth texture was already attached to the Fbo.\n
+	 * When calling this function, no Fbo should be bound.\n
+	 * @param textureId depth texture from another FBO, with getDepthTexId
+	 * @return true if attachment success
+	 */
+	bool attachDepthTexture(CGoGNGLuint textureId);
 
-    void unbind();
 
-    void setSize(unsigned int width, unsigned int height)
-    {
-        m_width = width;
-        m_height = height;
-    }
+	/**
+	 * Enable every color attachments of the Fbo.\n
+	 * Useless for Fbos containing only one color attachment.\n
+	 * When calling this function, this Fbo must be bound.\n
+	 */
+	void enableAllColorAttachments();
 
-    void checkFBO();
+	/**
+	 * Enable a specific color attachment of the Fbo.\n
+	 * Useless for Fbos containing only one color attachment.\n
+	 * When calling this function, this Fbo must be bound.\n
+	 * \param  num  Number of the color attachment that should be enabled
+	 */
+	void enableColorAttachment(int num);
+	
+	/**
+	 * Get an attached color texture id.
+	 * \param  att  Number of the color texture (the number is equivalent to the color attachment)
+	 * \returns  Color texture id
+	 */
+	CGoGNGLuint getColorTexId(int att);
+	
+	/**
+	 * Get the attached depth texture id.
+	 * \returns  Depth texture id
+	 */
+	CGoGNGLuint getDepthTexId();
+
+	/**
+	 * draw full screen attached texture
+	 * @param attach id of attachment
+	 */
+	void draw(int attach=0);
+
+	/**
+	 * draw full screen attached texture
+	 * @param attach id of attachment
+	 */
+	void drawWithDepth(int attach=0);
+
+	/**
+	 * draw full screen attached texture
+	 * @param attach id of attachment
+	 */
+	void drawWithDepth(int attach, CGoGNGLuint depthTexId);
+
+	/**
+	 *
+	 */
+	static void draw(Utils::GLSLShader* shader);
+
+	/**
+	 * Bind this Fbo.\n
+	 * When calling this function, no Fbo should be bound.\n
+	 */
+	void bind();
+	
+	/**
+	 * Unbind this Fbo.\n
+	 */
+	void unbind();
+
+	/**
+	 * Call glFlush(), unbind this Fbo, call glDrawBuffer(GL_BACK).\n
+	 */
+	void safeUnbind();
+
+	/**
+	 * Check the completeness of this Fbo.\n
+	 * When calling this function, no Fbo should be bound.\n
+	 */
+	void checkFBO();
+
+	/**
+	 * \returns  Width of the Fbo in pixels.
+	 */
+	unsigned int getWidth() const;
+
+	/**
+	 * \returns  Height of the Fbo in pixels.
+	 */
+	unsigned int getHeight() const;
 
 protected:
-    unsigned int m_width;
-    unsigned int m_height;
 
-    int m_maxColorAttachments;
+	/// Width (in pixels) of the Fbo.
+	unsigned int m_width;
+	
+	/// Height (in pixels) of the Fbo.
+	unsigned int m_height;
 
-    CGoGNGLuint m_fboID;
-    CGoGNGLuint m_renderID;
-    std::vector<CGoGNGLuint> m_texID;
+	/// Maximum number of color attachments.
+	int m_maxColorAttachments;
 
+	/// Fbo id.
+	CGoGNGLuint m_fboId;
+	
+	/// Render buffer id.
+	CGoGNGLuint m_renderBufferId;
+	
+	/// Color textures ids (up to m_maxColorAttachments color textures).
+	std::vector<CGoGNGLuint> m_colorTexId;
+	
+	/// Depth textures ids (only one depth texture actually).
+	std::vector<CGoGNGLuint> m_depthTexId;
 
-    CGoGNGLenumTable m_attachmentPoints;
-
+	/// Color attachments of the Fbo.
+	CGoGNGLenumTable m_colorAttachmentPoints;
+	
+	/// Original viewport (x, y, width, height), saved when binding the Fbo, restored when unbinding it.
+	GLint m_oldViewport[4];
+	
+	/// Indicates wether the Fbo is bound or not.
+	bool m_bound;
+	
+	/// Indicates wether any Fbo is bound or not.
+	static bool sm_anyFboBound;
 };
 
-}
-}
+} // namespace Utils
+
+} // namespace CGoGN
 
 #endif	/* FRAMEBUFFER_HPP */

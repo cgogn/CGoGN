@@ -52,6 +52,7 @@
 
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Geometry/normal.h"
+#include "Algo/Geometry/convexity.h"
 
 using namespace CGoGN ;
 

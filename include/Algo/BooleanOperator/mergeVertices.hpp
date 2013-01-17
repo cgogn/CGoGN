@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace BooleanOperator
 {
 
@@ -95,6 +98,8 @@ void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& 
 		}
 	}
 	//	map.template disableQuickTraversal<VERTEX>();
+}
+
 }
 
 }

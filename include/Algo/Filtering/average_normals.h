@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Filtering
 {
 
@@ -461,6 +464,8 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 }
 
 } //namespace Filtering
+
+}
 
 } //namespace Algo
 

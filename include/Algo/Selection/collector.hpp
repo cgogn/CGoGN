@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Selection
 {
 
@@ -457,7 +460,7 @@ typename PFP::REAL Collector_WithinSphere<PFP>::computeArea(const VertexAttribut
 	REAL area = 0;
 
 	for (std::vector<Dart>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
-		area += Algo::Geometry::triangleArea<PFP>(this->map, *it, pos);
+		area += Geometry::triangleArea<PFP>(this->map, *it, pos);
 
 	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
@@ -466,15 +469,15 @@ typename PFP::REAL Collector_WithinSphere<PFP>::computeArea(const VertexAttribut
 		if (Geom::isPointInSphere(pos[g], centerPosition, this->radius))
 		{ // only f is outside
 			typename PFP::REAL alpha, beta;
-			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, pos, alpha);
-			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(f), pos, beta);
+			Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, pos, alpha);
+			Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(f), pos, beta);
 			area += (alpha+beta - alpha*beta) * Algo::Geometry::triangleArea<PFP>(this->map, *it, pos);
 		}
 		else
 		{ // f and g are outside
 			typename PFP::REAL alpha, beta;
-			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, pos, alpha);
-			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(g), pos, beta);
+			Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, pos, alpha);
+			Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(g), pos, beta);
 			area += alpha * beta * Algo::Geometry::triangleArea<PFP>(this->map, *it, pos);
 		}
 	}
@@ -1394,12 +1397,14 @@ void Collector_Dijkstra<PFP>::collectBorder(Dart dinit)
 template <typename PFP>
 inline float Collector_Dijkstra<PFP>::edgeLength (Dart d)
 {
-	typename PFP::VEC3 v = Algo::Geometry::vectorOutOfDart<PFP>(this->map, d, this->position);
+	typename PFP::VEC3 v = Geometry::vectorOutOfDart<PFP>(this->map, d, this->position);
 	return v.norm();
 }
 
 
 } // namespace Selection
+
+} // Surface
 
 } // namespace Algo
 

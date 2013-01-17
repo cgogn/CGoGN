@@ -95,7 +95,7 @@ public:
 	 * \param p2 second point
 	 * \param p3 third point
 	 */
-	Quadric(VEC3& p1, VEC3& p2, VEC3& p3) ;
+	Quadric(const VEC3& p1, const VEC3& p2, const VEC3& p3) ;
 
 
 	/*!

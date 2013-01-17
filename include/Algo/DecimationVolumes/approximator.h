@@ -34,13 +34,17 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace DecimationVolumes
 {
 
 enum ApproximatorType
 {
 	A_QEM,
-	A_MidEdge
+	A_MidEdge,
+	A_hHalfCollapse
 };
 
 template <typename PFP>
@@ -141,6 +145,8 @@ public:
 
 
 } // namespace DecimationVolumes
+
+}
 
 } // namespace Algo
 

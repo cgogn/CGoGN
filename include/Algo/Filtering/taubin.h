@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Filtering
 {
 
@@ -154,6 +157,8 @@ void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP:
 }
 
 } // namespace Filtering
+
+}
 
 } // namespace Algo
 

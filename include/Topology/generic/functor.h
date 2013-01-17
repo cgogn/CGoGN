@@ -146,6 +146,9 @@ public:
 	FunctorSelect* copy() const { return new SelectorEdgeNoBoundary(m_map);}
 };
 
+/**
+ * Selector for darts of boundary (of current dimension)
+ */
 template <typename MAP>
 class SelectorDartBoundary : public FunctorSelect
 {
@@ -154,10 +157,13 @@ protected:
 	MAP& m_map;
 public:
 	SelectorDartBoundary(MAP& m): m_map(m) {}
-	bool operator()(Dart d) const { return m_map.isBoundaryMarked(d); }
+	bool operator()(Dart d) const { return m_map.template isBoundaryMarked<MAP::DIMENSION>(d); }
 	FunctorSelect* copy() const { return new SelectorDartBoundary(m_map);}
 };
 
+/**
+ * Selector for darts not of boundary (of current dimension)
+ */
 
 template <typename MAP>
 class SelectorDartNoBoundary : public FunctorSelect
@@ -167,7 +173,7 @@ protected:
 	MAP& m_map;
 public:
 	SelectorDartNoBoundary(MAP& m): m_map(m) {}
-	bool operator()(Dart d) const { return !m_map.isBoundaryMarked(d); }
+	bool operator()(Dart d) const { return !m_map.template isBoundaryMarked<MAP::DIMENSION>(d); }
 	FunctorSelect* copy() const { return new SelectorDartNoBoundary(m_map);}
 };
 
@@ -327,7 +333,7 @@ public:
 	FunctorStoreNotBoundary(MAP& map, std::vector<Dart>& vec) : FunctorMap<MAP>(map), m_vec(vec) {}
 	bool operator()(Dart d)
 	{
-		if (!this->m_map.isBoundaryMarked(d))
+		if (!this->m_map.template isBoundaryMarked<MAP::DIMENSION>(d))
 			m_vec.push_back(d);
 		return false;
 	}

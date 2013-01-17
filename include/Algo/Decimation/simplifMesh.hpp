@@ -32,6 +32,10 @@ namespace CGoGN
 namespace Algo
 {
 
+
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -272,6 +276,8 @@ void SimplifTrian<PFP>::computeVerticesValences(bool gc)
 }
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

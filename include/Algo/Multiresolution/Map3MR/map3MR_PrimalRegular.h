@@ -38,6 +38,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -77,31 +80,33 @@ private:
 	 *
 	 *************************************************************************/
 	//@{
-	void swapEdges(Dart d, Dart e);
+
 
 	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
 	//@}
 
 public:
+
+	void swapEdges(Dart d, Dart e);
+
 	/*! @name Level creation
 	 *
 	 *************************************************************************/
 	//@{
 	//!
 	/*
-	 *
 	 */
-	void addNewLevelSqrt3(bool embedNewVertices);
+	void addNewLevelTetraOcta();
 
 	//!
 	/*
 	 */
-	void addNewLevelTetraOcta(bool embedNewVertices);
+	void addNewLevelHexa();
 
 	//!
 	/*
 	 */
-	void addNewLevelHexa(bool embedNewVertices);
+	void addNewLevel();
 
 	//!
 	/*
@@ -132,6 +137,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

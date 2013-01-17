@@ -344,9 +344,12 @@ public:
 	{
 		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
-
 		for (std::vector<Dart>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
-			this->m_markVector->operator[](this->m_map.template getEmbedding<CELL>(*it)).unsetMark(this->m_mark) ;
+		{
+			this->unmark(*it) ;
+		}
+		m_markedDarts.clear();
+
 	}
 	std::vector<Dart> get_markedCells()
 	{

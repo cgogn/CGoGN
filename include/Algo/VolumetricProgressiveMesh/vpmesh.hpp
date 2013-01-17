@@ -30,6 +30,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace VPMesh
 {
 
@@ -357,6 +360,8 @@ void VolumetricProgressiveMesh<PFP>::gotoLevel(unsigned int l)
 
 
 } //namespace VPMesh
+
+}
 
 } //namespace Algo
 

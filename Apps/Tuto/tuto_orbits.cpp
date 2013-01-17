@@ -202,7 +202,7 @@ void MyQT::initMap()
 	std::cout << "INIT MAP"<< std::endl;
 
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
-	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	int nb=2;
 	prim.hexaGrid_topo(nb,nb,nb);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);

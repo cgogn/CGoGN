@@ -1,3 +1,39 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace Surface
+{
+
+namespace MovingObjects
+{
+
+
 template <typename PFP>
 std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 {
@@ -34,26 +70,7 @@ template <typename PFP>
 std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross)
 {
 	memo_cross.mark(this->d);
-
-	this->crossCell = NO_CROSS ;
-	if (!Geom::arePointsEquals(goal, this->getPosition()))
-	{
-		switch (this->getState())
-		{
-			case VERTEX :
-				vertexState(goal,memo_cross) ;
-				break ;
-			case EDGE :
-				edgeState(goal,memo_cross) ;
-				break ;
-			case FACE :
-				faceState(goal,memo_cross) ;
-				break ;
-		}
-	}
-	else
-		this->ParticleBase<PFP>::move(goal) ;
-
+	this->move(goal,memo_cross);
 	return memo_cross.get_markedCells();
 }
 
@@ -67,7 +84,7 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 	memo_cross.mark(this->d);
 	this->crossCell = CROSS_OTHER ;
 
-	if (Algo::Geometry::isPointOnVertex < PFP > (this->m, this->d, this->positionAttribut, current))
+	if (Geometry::isPointOnVertex < PFP > (this->m, this->d, this->positionAttribut, current))
 	{
 		this->setState(VERTEX) ;
 		this->ParticleBase<PFP>::move(current) ;
@@ -94,7 +111,7 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 				//orbit with 2 edges : point on one edge
 				if (this->m.phi2_1(this->m.phi2_1(this->d)) == this->d)
 				{
-					if (!Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
+					if (!Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
 						this->d = this->m.phi2_1(this->d) ;
 				}
 				else
@@ -102,13 +119,12 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 					//checking : case with 3 orthogonal darts and point on an edge
 					do
 					{
-						if(Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
-								&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
+						if(Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
+								&& Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
 								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
 						{
 
 							this->edgeState(current,memo_cross) ;
-
 							return;
 						}
 						this->d = this->m.phi2_1(this->d) ;
@@ -135,7 +151,7 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 		//displacement step
 
 		if (this->getOrientationEdge(current, this->d) == Geom::ALIGNED
-				&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
+				&& Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
 			edgeState(current,memo_cross) ;
 		else
 		{
@@ -153,7 +169,7 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, CellMarkerMemo<FACE
 #endif
 
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
-// 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
+// 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 	memo_cross.mark(this->d);
 	if (this->crossCell == NO_CROSS)
 	{
@@ -180,14 +196,14 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, CellMarkerMemo<FACE
 			break ;
 	}
 
-	if (!Algo::Geometry::isPointOnHalfEdge < PFP
+	if (!Geometry::isPointOnHalfEdge < PFP
 	    > (this->m, this->d, this->positionAttribut, current))
 	{
 		this->ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
 		vertexState(current,memo_cross) ;
 		return ;
 	}
-	else if (!Algo::Geometry::isPointOnHalfEdge < PFP
+	else if (!Geometry::isPointOnHalfEdge < PFP
 	    > (this->m, this->m.phi2(this->d), this->positionAttribut, current))
 	{
 		this->d = this->m.phi2(this->d) ;
@@ -210,7 +226,7 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current, CellMarkerMemo<FACE
 	    std::isfinite(this->getPosition()[0]) && std::isfinite(this->getPosition()[1])
 	        && std::isfinite(this->getPosition()[2])) ;
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
-// 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
+// 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 	memo_cross.mark(this->d);
 	Dart dd = this->d ;
 	float wsoe = this->getOrientationFace(current, this->m.phi1(this->d)) ;
@@ -253,7 +269,7 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current, CellMarkerMemo<FACE
 			this->ParticleBase<PFP>::move(current);
 			this->setState(FACE) ;
 
-// 			m_position = Algo::Geometry::faceCentroid<PFP>(m,d,m_positions);
+// 			m_position = Geometry::faceCentroid<PFP>(m,d,m_positions);
 // 			d = m.phi1(d);
 // 			m_position = pointInFace(d);
 // 			faceState(current);
@@ -339,4 +355,9 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current, CellMarkerMemo<FACE
 			}
 	}
 
+}
+
+}
+}
+} //namespaces
 }

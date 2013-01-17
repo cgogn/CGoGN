@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -155,7 +158,7 @@ template<typename PFP>
 void EarTriangulation<PFP>::trianguleFace(Dart d)
 {
 	// compute normal to polygon
-	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(m_map, d, m_position);
+	typename PFP::VEC3 normalPoly = Algo::Surface::Geometry::newellNormal<PFP>(m_map, d, m_position);
 
 	// first pass create polygon in chained list witht angle computation
 	unsigned int nbv = 0;
@@ -241,6 +244,8 @@ void EarTriangulation<PFP>::triangule( const FunctorSelect& good, unsigned int t
 }
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -52,7 +55,8 @@ enum SelectorType
 	S_hQEMextColor,
 	S_hQEMml,
 	S_hLightfield,
-	S_hLightfieldExp
+	S_hLightfieldExp,
+	S_hLightfieldKCL
 } ;
 
 template <typename PFP> class ApproximatorGen ;
@@ -92,6 +96,8 @@ public:
 } ;
 
 } // namespace Decimation
+
+}
 
 } // namespace Algo
 

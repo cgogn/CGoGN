@@ -41,6 +41,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -77,7 +80,7 @@ void computeCurvatureVertex_QuadraticFitting(
 
 	VEC3 n = normal[dart] ;
 
-	MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(map, dart, position, n) ;
+	MATRIX33 localFrame = Geometry::vertexLocalFrame<PFP>(map, dart, position, n) ;
 	MATRIX33 invLocalFrame ;
 	localFrame.invert(invLocalFrame) ;
 
@@ -188,7 +191,7 @@ template <typename PFP>
 void vertexCubicFitting(Dart dart, gmtl::Vec3f& normal, float& a, float& b, float& c, float& d, float& e, float& f, float& g, float& h, float& i)
 {
 	gmtl::Matrix33f localFrame, invLocalFrame ;
-	Algo::Geometry::vertexLocalFrame<PFP>(m_map,dart,normal,localFrame) ;
+	Geometry::vertexLocalFrame<PFP>(m_map,dart,normal,localFrame) ;
 	gmtl::invertFull(invLocalFrame, localFrame) ;
 	gmtl::Vec3f p = m_map.getVertexEmb(dart)->getPosition() ;
 	solverC->reset(false) ;
@@ -316,7 +319,7 @@ void computeCurvatureVertex_NormalCycles(
 	typedef Eigen::Matrix<REAL,3,3,Eigen::RowMajor> E_MATRIX;
 
 	// collect the normal cycle tensor
-	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
+	Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
 	neigh.collectAll(dart) ;
 
 	MATRIX tensor(0) ;
@@ -380,7 +383,7 @@ void computeCurvatureVertex_NormalCycles_Projected(
 	typedef Eigen::Matrix<REAL,3,3,Eigen::RowMajor> E_MATRIX;
 
 	// collect the normal cycle tensor
-	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
+	Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
 	neigh.collectAll(dart) ;
 
 	MATRIX tensor(0) ;
@@ -400,7 +403,7 @@ void computeCurvatureVertex_NormalCycles_Projected(
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles(
 	typename PFP::MAP& map,
-	Algo::Selection::Collector<PFP> & neigh,
+	Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,
@@ -420,7 +423,7 @@ template <typename PFP>
 void computeCurvatureVertex_NormalCycles(
 	typename PFP::MAP& map,
 	Dart dart,
-	Algo::Selection::Collector<PFP> & neigh,
+	Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,
@@ -453,7 +456,7 @@ void computeCurvatureVertex_NormalCycles(
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles_Projected(
 	typename PFP::MAP& map,
-	Algo::Selection::Collector<PFP> & neigh,
+	Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,
@@ -473,7 +476,7 @@ template <typename PFP>
 void computeCurvatureVertex_NormalCycles_Projected(
 	typename PFP::MAP& map,
 	Dart dart,
-	Algo::Selection::Collector<PFP> & neigh,
+	Selection::Collector<PFP> & neigh,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& normal,
 	const EdgeAttribute<typename PFP::REAL>& edgeangle,
@@ -721,6 +724,8 @@ void computeCurvatureVertices_QuadraticFitting(
 
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

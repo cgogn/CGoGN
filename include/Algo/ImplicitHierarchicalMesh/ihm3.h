@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace IHM
 {
 
@@ -66,6 +69,7 @@ public:
 
 	~ImplicitHierarchicalMap3() ;
 
+	static const unsigned int DIMENSION = 3 ;
 
 	//!
 	/*!
@@ -410,16 +414,16 @@ public:
 } ;
 
 template <typename T>
-class VertexAttribute_IHM : public Algo::IHM::AttributeHandler_IHM<T, VERTEX>
+class VertexAttribute_IHM : public IHM::AttributeHandler_IHM<T, VERTEX>
 {
 public:
-	VertexAttribute_IHM() : Algo::IHM::AttributeHandler_IHM<T, VERTEX>() {}
-	VertexAttribute_IHM(const Algo::IHM::AttributeHandler_IHM<T, VERTEX>& ah) : Algo::IHM::AttributeHandler_IHM<T, VERTEX>(ah) {}
-	VertexAttribute_IHM<T>& operator=(const Algo::IHM::AttributeHandler_IHM<T, VERTEX>& ah) { this->Algo::IHM::AttributeHandler_IHM<T, VERTEX>::operator=(ah); return *this; }
+	VertexAttribute_IHM() : IHM::AttributeHandler_IHM<T, VERTEX>() {}
+	VertexAttribute_IHM(const IHM::AttributeHandler_IHM<T, VERTEX>& ah) : IHM::AttributeHandler_IHM<T, VERTEX>(ah) {}
+	VertexAttribute_IHM<T>& operator=(const IHM::AttributeHandler_IHM<T, VERTEX>& ah) { this->IHM::AttributeHandler_IHM<T, VERTEX>::operator=(ah); return *this; }
 };
 
 } //namespace IHM
-
+} // Volume
 } //namespace Algo
 
 } //namespace CGoGN

@@ -173,7 +173,7 @@ inline bool GMap3::sameFace(Dart d, Dart e)
 
 inline bool GMap3::isBoundaryFace(Dart d)
 {
-	return isBoundaryMarked(d) || isBoundaryMarked(beta3(d));
+	return isBoundaryMarked3(d) || isBoundaryMarked3(beta3(d));
 }
 
 /*! @name Cell Functors

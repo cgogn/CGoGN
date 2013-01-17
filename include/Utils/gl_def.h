@@ -32,6 +32,8 @@
 
 #include <GL/glew.h>
 
+#include "Utils/cgognStream.h"
+
 namespace CGoGN
 {
 
@@ -64,6 +66,21 @@ typedef FalsePtr<GLenum> CGoGNGLenum;
 typedef FalsePtr<GLenum*> CGoGNGLenumTable;
 
 #endif
+
+inline void glCheckErrors()
+{
+	GLenum glError = glGetError();
+	if (glError != GL_NO_ERROR)
+		CGoGNerr<<"GL error: " << gluErrorString(glError) << CGoGNendl;
+}
+
+inline void glCheckErrors(const std::string& message)
+{
+	GLenum glError = glGetError();
+	if (glError != GL_NO_ERROR)
+		CGoGNerr<< message <<" : " << gluErrorString(glError) << CGoGNendl;
+}
+
 
 }
 

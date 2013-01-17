@@ -56,6 +56,8 @@ public:
 	static const unsigned int VERTEX_OF_PARENT2 = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT2 = EDGE+5;
 
+	static const unsigned int DIMENSION = 3 ;
+
 	GMap3();
 
 	virtual std::string mapTypeName() const;
@@ -180,6 +182,9 @@ public:
 	/*! @param d a dart of common face
 	 */
 	virtual bool mergeVolumes(Dart d);
+
+	virtual bool mergeVolumes(Dart d, Dart e) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
+
 
 	//! Split a volume into two volumes along a edge path
 	/*! @param vd a vector of darts
@@ -353,6 +358,11 @@ public:
 	 *************************************************************************/
 
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of phi3). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of phi3 relation
 	 *  Add a volume to the map that closes the hole.

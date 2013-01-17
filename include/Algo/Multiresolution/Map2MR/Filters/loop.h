@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -96,7 +99,7 @@ typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const VertexAttribute<
  *********************************************************************************/
 
 template <typename PFP>
-class LoopOddAnalysisFilter : public Filter
+class LoopOddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -121,10 +124,15 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class LoopEvenAnalysisFilter : public Filter
+class LoopEvenAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -143,10 +151,15 @@ public:
 			m_position[d] -= p ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class LoopNormalisationAnalysisFilter : public Filter
+class LoopNormalisationAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -168,6 +181,11 @@ public:
 			m_position[d] /= n ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 /*********************************************************************************
@@ -175,7 +193,7 @@ public:
  *********************************************************************************/
 
 template <typename PFP>
-class LoopOddSynthesisFilter : public Filter
+class LoopOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -200,10 +218,15 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class LoopEvenSynthesisFilter : public Filter
+class LoopEvenSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -222,10 +245,15 @@ public:
 			m_position[d] += p ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class LoopNormalisationSynthesisFilter : public Filter
+class LoopNormalisationSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -247,6 +275,11 @@ public:
 			m_position[d] *= n ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 } // namespace Filters
@@ -254,6 +287,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -452,6 +455,8 @@ void Approximator_NormalArea<PFP>::approximate(Dart d)
 
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

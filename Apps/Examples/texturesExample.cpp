@@ -232,7 +232,7 @@ int main(int argc, char**argv)
 
 #define NB 96
 
-	Algo::Modelisation::Polyhedron<PFP> prim(m, position);
+	Algo::Surface::Modelisation::Polyhedron<PFP> prim(m, position);
 	prim.tore_topo(NB, NB);
 	prim.embedTore(40.0f,20.0f);
 

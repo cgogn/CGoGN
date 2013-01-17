@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -82,6 +85,8 @@ template <typename PFP>
 bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::REAL& alpha) ;
 
 } // namespace Geometry
+
+} // surface
 
 } // namespace Algo
 

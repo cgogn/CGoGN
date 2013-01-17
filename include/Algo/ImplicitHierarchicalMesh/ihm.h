@@ -32,7 +32,8 @@ namespace CGoGN
 
 namespace Algo
 {
-
+namespace Surface
+{
 namespace IHM
 {
 
@@ -56,6 +57,8 @@ public:
 	ImplicitHierarchicalMap() ;
 
 	~ImplicitHierarchicalMap() ;
+
+	static const unsigned int DIMENSION = 2 ;
 
 	void init() ;
 
@@ -239,7 +242,7 @@ public:
 } ;
 
 } //namespace IHM
-
+} // Surface
 } //namespace Algo
 
 } //namespace CGoGN

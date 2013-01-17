@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -102,7 +105,7 @@ void decimate(
 
 			// pos
 			v_approx[0].push_back(attribs[0]) ;
-			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, v_approx[0])) ;
+			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, v_approx[0])) ;
 
 			// frame
 			assert(attribs.size() >= 4 || !"Decimate: A_hLightfieldHalf --> not enough attribs provided") ;
@@ -190,6 +193,9 @@ void decimate(
 		case S_hLightfieldExp :
 			selector = new HalfEdgeSelector_LightfieldExp<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_hLightfieldKCL :
+			selector = new HalfEdgeSelector_LightfieldKCL<PFP>(map, position, approximators, selected) ;
+			break ;
 	}
 
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
@@ -260,6 +266,8 @@ void decimate(
 }
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

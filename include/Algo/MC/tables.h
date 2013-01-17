@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -85,6 +88,8 @@ static const char m_NeighTable[256][16];
 } // end namespace
 } // end namespace
 } // end namespace
+}
+
 
 #endif
 

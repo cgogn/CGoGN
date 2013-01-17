@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
@@ -273,6 +276,9 @@ void readCoordAndStyle(xmlNode* cur_path,
 template <typename PFP>
 bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3>& position, CellMarker<EDGE>& obstacleMark, CellMarker<FACE>& buildingMark)
 {
+	//TODO : remove auto-intersecting faces
+	//TODO : handling polygons with holes
+
 	typedef typename PFP::VEC3 VEC3;
 	typedef std::vector<VEC3> POLYGON;
 
@@ -437,7 +443,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		if(!buildingMark.isMarked(d))
 		{
 			bool canSimplify = true ;
-			while ( canSimplify && ((position[map.phi1(d)] - position[d]).norm() < edgeWidth[d]) )
+			while ( canSimplify && (Geometry::edgeLength<PFP>(map,d,position) < edgeWidth[d]) )
 			{
 				if (map.vertexDegree(map.phi1(d)) == 2)
 				{
@@ -548,6 +554,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 		map.template initAllOrbitsEmbedding<FACE>(true);
 
+
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
 			if (!map.isBoundaryMarked(d) && brokenL.isMarked(d))
@@ -570,6 +577,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

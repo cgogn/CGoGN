@@ -45,6 +45,7 @@ protected:
 
 public:
 	GMap0();
+	static const unsigned int DIMENSION = 0 ;
 
 	virtual std::string mapTypeName() const;
 

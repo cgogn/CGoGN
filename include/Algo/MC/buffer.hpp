@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -419,6 +422,7 @@ void Buffer<DART>::setExternalNeighbour(char _cEdge, int _lX, int _lY, DART _lNe
 	}
 }
 
+}
 } // end namespace
 } // end namespace
 } // end namespace

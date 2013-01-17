@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 const unsigned char accelMCTable::m_EdgeCode[12]={ 20,18,24,17,36,34,40,33,5,6,10,9 };
@@ -1112,6 +1115,7 @@ const char accelMCTable::m_NeighTable[256][16] =
 //	{-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 }
 };
 
+}
 } //namespace 
 } //namespace 
 } //namespace 

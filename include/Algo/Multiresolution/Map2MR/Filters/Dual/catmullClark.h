@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -43,7 +46,7 @@ namespace Filters
 {
 
 template <typename PFP>
-class CCVertexSynthesisFilter : public Filter
+class CCVertexSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -128,6 +131,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

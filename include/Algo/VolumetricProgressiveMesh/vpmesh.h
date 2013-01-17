@@ -25,6 +25,7 @@
 #ifndef __VPMESH__
 #define __VPMESH__
 
+//TODO add this file with git !!!
 #include "Algo/VolumetricProgressiveMesh/vsplit.h"
 
 #include "Algo/Decimation/selector.h"
@@ -38,6 +39,9 @@ namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Volume
 {
 
 namespace VPMesh
@@ -99,6 +103,8 @@ public:
 } ;
 
 } //namespace PMesh
+
+}
 
 } //namespace Algo
 

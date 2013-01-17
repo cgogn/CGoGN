@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Filtering
 {
 
@@ -150,6 +153,8 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttri
 }
 
 } //namespace Filtering
+
+}
 
 } //namespace Algo
 

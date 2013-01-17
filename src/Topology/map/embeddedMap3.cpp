@@ -29,6 +29,7 @@
 namespace CGoGN
 {
 
+//TODO
 Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 {
 	Dart d = vd.front();
@@ -59,6 +60,7 @@ Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 	return dres;
 }
 
+//TODO
 Dart EmbeddedMap3::deleteVertex(Dart d)
 {
 	Dart v = Map3::deleteVertex(d) ;
@@ -76,10 +78,10 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 {
 	Dart nd = Map3::cutEdge(d);
 
-	if(isOrbitEmbedded<VERTEX>())
-	{
-		initOrbitEmbeddingNewCell<VERTEX>(nd) ;
-	}
+//	if(isOrbitEmbedded<VERTEX>())
+//	{
+//		initOrbitEmbeddingNewCell<VERTEX>(nd) ;
+//	}
 
 	if(isOrbitEmbedded<EDGE>())
 	{
@@ -234,10 +236,10 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(phi_1(dd), vEmb2);
 	}
 
-	if(isOrbitEmbedded<EDGE>())
-	{
-		initOrbitEmbeddingNewCell<EDGE>(phi_1(d)) ;
-	}
+//	if(isOrbitEmbedded<EDGE>())
+//	{
+//		initOrbitEmbeddingNewCell<EDGE>(phi_1(d)) ;
+//	}
 
 	if(isOrbitEmbedded<FACE2>())
 	{
@@ -448,6 +450,15 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 		{
 			copyDartEmbedding<VERTEX>(dit23, dit);
 			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
+		}
+
+		// embed the edge embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<EDGE2>())
+		{
+			setOrbitEmbeddingOnNewCell<EDGE2>(dit23) ;
+			copyCell<EDGE2>(dit23, dit) ;
+
+			copyDartEmbedding<EDGE2>(phi2(dit), dit);
 		}
 
 		// embed the edge embedded from the origin volume to the new darts

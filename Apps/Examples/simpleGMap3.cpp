@@ -36,7 +36,7 @@ SimpleGMap3::SimpleGMap3()
 
 	CellMarker<EDGE> mE(myMap);
 
-	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap,position);
 	Dart d = primCat.hexaGrid_topo(3,1,1);
 	primCat.embedHexaGrid(2,1,1);
 	myMap.check();
@@ -56,14 +56,14 @@ SimpleGMap3::SimpleGMap3()
 
 //	Geom::Plane3D<PFP::REAL> pl(VEC3(0.5,0.14,0.5),VEC3(1.5,0.45,0.5),VEC3(0.5,0.15,1.5));
 	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
-	Algo::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
+	Algo::Volume::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
 
 	myMap.check();
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(2,0,0);
 
-	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	d = prim.hexaGrid_topo(2,2,1);
 	prim.embedHexaGrid(1,1,1);
 
@@ -88,7 +88,7 @@ SimpleGMap3::SimpleGMap3()
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(0,2,0);
 
-	Algo::Modelisation::Primitive3D<PFP> prim2(myMap,position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> prim2(myMap,position);
 	d = prim2.hexaGrid_topo(2,1,1);
 	prim2.embedHexaGrid(1,1,1);
 

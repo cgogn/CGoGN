@@ -38,6 +38,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -189,6 +192,8 @@ Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>
 	Dart d,	float dist);
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

@@ -29,14 +29,15 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
 template <typename PFP>
 bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& tabV, std::vector<unsigned int>& tabE)
 {
-
-	std::cout << "immport choupiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" << std::endl;
 	typedef typename PFP::VEC3 VEC3;
 
 	//open file
@@ -124,6 +125,8 @@ bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& 
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

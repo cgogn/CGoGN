@@ -68,7 +68,7 @@ void MyQT::createMap(const std::string& filename)
 	std::string extension = filename.substr(pos);
 
 	std::vector<std::string> attrNames ;
-	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+	if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
 	{
 		CGoGNerr << "could not import " << filename << CGoGNendl ;
 		return;
@@ -82,7 +82,7 @@ void MyQT::createMap(const std::string& filename)
 	VertexAttribute<VEC3> colorF = myMap.addAttribute<PFP::VEC3, VERTEX>("colorF");
 
 	// compute the area attribute
-	Algo::Geometry::computeOneRingAreaVertices<PFP>(myMap,position,area);
+	Algo::Surface::Geometry::computeOneRingAreaVertices<PFP>(myMap,position,area);
 
 	// just some tricks to obtain relatives value
 	float amax=0;

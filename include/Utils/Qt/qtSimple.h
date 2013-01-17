@@ -279,9 +279,15 @@ public:
 	bool Alt() const  { return m_glWidget->Alt(); }
 
 	/**
-	 * height of OpenGL widget (for classic yy = H-y
+	 * height of OpenGL widget (for classic yy = H-y)
 	 */
 	int getHeight() const { return m_glWidget->getHeight(); }
+
+	/**
+	 * width of OpenGL widget
+	 */
+	int getWidth() const { return m_glWidget->getWidth(); }
+
 
 	/**
 	 * console QTextEdit ptr

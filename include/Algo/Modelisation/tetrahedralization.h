@@ -32,9 +32,13 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Modelisation
 {
 
+//TODO change namespace
 namespace Tetrahedralization
 {
 
@@ -168,6 +172,8 @@ template <typename PFP>
 Dart edgeBisection(typename PFP::MAP& map, Dart d);
 
 } // namespace Tetrahedralization
+
+}
 
 } // namespace Modelisation
 

@@ -37,6 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -56,8 +59,8 @@ protected:
 	MAP& m_map;
 	bool shareVertexEmbeddings ;
 
-	std::vector<Filter*> synthesisFilters ;
-	std::vector<Filter*> analysisFilters ;
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
 	Map2MR(MAP& map);
@@ -67,8 +70,8 @@ public:
 	//if true : tri and quad else quad
 	void addNewLevel(bool embedNewVertices = true) ;
 
-	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
@@ -82,6 +85,8 @@ public:
 } // namespace Dual
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 
