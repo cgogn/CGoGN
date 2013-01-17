@@ -77,10 +77,10 @@ void SubdivideSurfacePlugin::cb_loopSubdivision()
 	if(!currentItems.empty())
 	{
 		const QString& mapname = currentItems[0]->text();
-		MapHandler<PFP2>* mh = reinterpret_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
-		typename PFP2::MAP* map = mh->getMap();
+		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
+		PFP2::MAP* map = mh->getMap();
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
-		VertexAttribute<typename PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, VERTEX>(positionName);
+		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(positionName);
 
 		Algo::Surface::Modelisation::LoopSubdivision<PFP2>(*map, position);
 
@@ -104,10 +104,10 @@ void SubdivideSurfacePlugin::cb_CCSubdivision()
 	if(!currentItems.empty())
 	{
 		const QString& mapname = currentItems[0]->text();
-		MapHandler<PFP2>* mh = reinterpret_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
-		typename PFP2::MAP* map = mh->getMap();
+		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
+		PFP2::MAP* map = mh->getMap();
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
-		VertexAttribute<typename PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, VERTEX>(positionName);
+		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(positionName);
 
 		Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP2>(*map, position);
 
@@ -131,10 +131,10 @@ void SubdivideSurfacePlugin::cb_trianguleFaces()
 	if(!currentItems.empty())
 	{
 		const QString& mapname = currentItems[0]->text();
-		MapHandler<PFP2>* mh = reinterpret_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
-		typename PFP2::MAP* map = mh->getMap();
+		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
+		PFP2::MAP* map = mh->getMap();
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
-		VertexAttribute<typename PFP2::VEC3> position = map->getAttribute<typename PFP2::VEC3, VERTEX>(positionName);
+		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(positionName);
 
 		Algo::Surface::Modelisation::trianguleFaces<PFP2>(*map, position);
 
