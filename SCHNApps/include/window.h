@@ -3,7 +3,7 @@
 
 #include "ui_window.h"
 
-#include "system.h"
+#include "types.h"
 
 class QVBoxLayout;
 class QSplitter;

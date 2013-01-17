@@ -156,6 +156,12 @@ inline const std::string& AttributeHandler<T, ORBIT>::name() const
 	return m_attrib->getName() ;
 }
 
+//template <typename T, unsigned int ORBIT>
+//inline const std::string& AttributeHandler<T, ORBIT>::typeName() const
+//{
+//	return nameOfType(T()) ;
+//}
+
 
 template <typename T, unsigned int ORBIT>
 inline unsigned int AttributeHandler<T, ORBIT>::nbElements() const

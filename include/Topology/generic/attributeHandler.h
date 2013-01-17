@@ -59,6 +59,7 @@ public:
 	}
 
 	virtual const std::string& name() const = 0;
+//	virtual const std::string& typeName() const = 0;
 
 protected:
 	void setInvalid()
@@ -151,6 +152,11 @@ public:
 	 * get attribute name
 	 */
 	virtual const std::string& name() const ;
+
+//	/**
+//	 * get attribute type name
+//	 */
+//	virtual const std::string& typeName() const ;
 
 	/**
 	 * give the number of elements of the attribute container

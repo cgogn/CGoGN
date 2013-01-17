@@ -1,4 +1,4 @@
-#include "system.h"
+#include <QSplashScreen>
 #include "window.h"
 
 int main(int argc, char* argv[])

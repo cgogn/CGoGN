@@ -7,7 +7,6 @@
 
 PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
 	positionVBO(NULL),
-	vectorVBO(NULL),
 	vectorsScaleFactor(1.0f)
 {
 	QList<Utils::VBO*> vbos = map->getVBOList();
@@ -19,8 +18,6 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
 
 	if(positionVBO == NULL && vbos.count() > 0)
 		positionVBO = vbos[0];
-	if(vectorVBO == NULL && vbos.count() > 0)
-		vectorVBO = vbos[0];
 }
 
 
@@ -36,7 +33,7 @@ bool RenderVectorPlugin::enable()
 
 	connect(m_dockTab->mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
 	connect(m_dockTab->combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_positionVBOChanged(int)));
-	connect(m_dockTab->combo_vectorVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_vectorVBOChanged(int)));
+	connect(m_dockTab->list_vectorVBO, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedVectorVBOChanged()));
 	connect(m_dockTab->button_refreshVBOs, SIGNAL(clicked()), this, SLOT(cb_refreshVBOs()));
 	connect(m_dockTab->slider_vectorsScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_vectorsScaleFactorChanged(int)));
 
@@ -56,13 +53,16 @@ void RenderVectorPlugin::redraw(View* view)
 	foreach(MapHandlerGen* m, maps)
 	{
 		const PerMapParameterSet& p = params->perMap[m->getName()];
-		if(p.positionVBO != NULL && p.vectorVBO != NULL)
+		m_vectorShader->setScale(m->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
+		if(p.positionVBO != NULL)
 		{
-			m_vectorShader->setScale(m->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
 			m_vectorShader->setAttributePosition(p.positionVBO) ;
-			m_vectorShader->setAttributeVector(p.vectorVBO) ;
-			glLineWidth(1.0f) ;
-			m->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
+			for(std::vector<Utils::VBO*>::const_iterator it = p.vectorVBO.begin(); it != p.vectorVBO.end(); ++it)
+			{
+				m_vectorShader->setAttributeVector(*it) ;
+				glLineWidth(1.0f) ;
+				m->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
+			}
 		}
 	}
 }
@@ -155,14 +155,20 @@ void RenderVectorPlugin::cb_positionVBOChanged(int index)
 	}
 }
 
-void RenderVectorPlugin::cb_vectorVBOChanged(int index)
+void RenderVectorPlugin::cb_selectedVectorVBOChanged()
 {
 	if(!b_refreshingUI)
 	{
 		View* current = m_window->getCurrentView();
 		ParameterSet* params = h_viewParams[current];
 		MapHandlerGen* map = params->selectedMap;
-		params->perMap[map->getName()].vectorVBO = map->getVBO(m_dockTab->combo_vectorVBO->currentText());
+		PerMapParameterSet& mapParam = params->perMap[map->getName()];
+
+		mapParam.vectorVBO.clear();
+		QList<QListWidgetItem*> currentItems = m_dockTab->list_vectorVBO->selectedItems();
+		foreach(QListWidgetItem* item, currentItems)
+			mapParam.vectorVBO.push_back(map->getVBO(item->text()));
+
 		current->updateGL();
 	}
 }
@@ -194,7 +200,7 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 
 	mapList->clear();
 	combo_positionVBO->clear();
-	combo_vectorVBO->clear();
+	list_vectorVBO->clear();
 
 	MapHandlerGen* map = params->selectedMap;
 
@@ -209,6 +215,7 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 
 			PerMapParameterSet& p = params->perMap[map->getName()];
 
+//			QList<Utils::VBO*> vbos = map->getVBOList(nameOfType(VEC3()));
 			QList<Utils::VBO*> vbos = map->getVBOList();
 			for(int i = 0; i < vbos.count(); ++i)
 			{
@@ -224,20 +231,15 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 				else if(vbos[i] == p.positionVBO)
 					combo_positionVBO->setCurrentIndex(i);
 
-				combo_vectorVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(vbos[i] == p.vectorVBO)
-					combo_vectorVBO->setCurrentIndex(i);
+				list_vectorVBO->addItem(QString::fromStdString(vbos[i]->name()));
+				if(std::find(p.vectorVBO.begin(), p.vectorVBO.end(), vbos[i]) != p.vectorVBO.end())
+					list_vectorVBO->item(i)->setSelected(true);
 			}
 
 			if(p.positionVBO == NULL && vbos.count() > 0)
 			{
 				p.positionVBO = vbos[0];
 				combo_positionVBO->setCurrentIndex(0);
-			}
-			if(p.vectorVBO == NULL && vbos.count() > 0)
-			{
-				p.vectorVBO = vbos[0];
-				combo_vectorVBO->setCurrentIndex(0);
 			}
 
 			slider_vectorsScaleFactor->setSliderPosition(p.vectorsScaleFactor * 50.0);

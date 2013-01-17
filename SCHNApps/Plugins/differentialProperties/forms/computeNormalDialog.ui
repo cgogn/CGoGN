@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ComputeNormalsDialog</class>
- <widget class="QDialog" name="ComputeNormalsDialog">
+ <class>ComputeNormalDialog</class>
+ <widget class="QDialog" name="ComputeNormalDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>287</width>
-    <height>228</height>
+    <width>447</width>
+    <height>311</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Compute Normals</string>
+   <string>Compute Normal</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QListWidget" name="mapList"/>
    </item>
@@ -29,7 +29,7 @@
      <item>
       <widget class="QComboBox" name="combo_positionAttribute">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -39,27 +39,53 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Normal attribute name :</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="attributeName"/>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="check_createVBO">
-     <property name="text">
-      <string>create VBO</string>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Normal attribute</string>
      </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Existing attribute :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_normalAttribute">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>New attribute :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="normalAttributeName"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_createVBO">
+        <property name="text">
+         <string>create VBO</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -94,7 +120,7 @@
   <connection>
    <sender>button_ok</sender>
    <signal>clicked()</signal>
-   <receiver>ComputeNormalsDialog</receiver>
+   <receiver>ComputeNormalDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -110,7 +136,7 @@
   <connection>
    <sender>button_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>ComputeNormalsDialog</receiver>
+   <receiver>ComputeNormalDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

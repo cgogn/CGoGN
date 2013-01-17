@@ -84,7 +84,7 @@ Window::Window(const QString& appPath, QWidget *parent) :
 
 Window::~Window()
 {
-//	System::StateHandler::saveState(this, &h_plugins, &h_scenes, m_splitArea);
+//	System::StateHandler::saveState(this, h_plugins);
 }
 
 /*********************************************************
@@ -142,10 +142,7 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 {
 	// if menu path = empty string: set error + failure
 	if (menuPath.isEmpty())
-	{
-		System::Error::code = System::Error::BAD_ACTION_MENU_PATH_f(menuPath);
 		return false;
-	}
 
 	if (!action)
 		return false;
@@ -158,10 +155,7 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 	// if only one substring: error + failure
 	// No action directly in the menu bar
 	if (nbStep < 1)
-	{
-		System::Error::code = System::Error::BAD_ACTION_MENU_PATH_f(menuPath);
 		return false;
-	}
 
 	unsigned int i = 0;
 	QMenu* lastMenu = NULL;
@@ -264,10 +258,7 @@ void Window::removeToolbarAction(QAction* action)
 Camera* Window::addCamera(const QString& name)
 {
 	if (h_cameras.contains(name))
-	{
-		System::Error::code = System::Error::CAMERA_EXISTS;
 		return NULL;
-	}
 
 	Camera* camera = new Camera(name, this);
 	h_cameras.insert(name, camera);
@@ -300,10 +291,7 @@ Camera* Window::getCamera(const QString& name) const
 	if (h_cameras.contains(name))
 		return h_cameras[name];
 	else
-	{
-		System::Error::code = System::Error::CAMERA_DOES_NOT_EXIST;
 		return NULL;
-	}
 }
 
 /*********************************************************
@@ -313,10 +301,7 @@ Camera* Window::getCamera(const QString& name) const
 View* Window::addView(const QString& name)
 {
 	if (h_views.contains(name))
-	{
-		System::Error::code = System::Error::VIEW_EXISTS;
 		return NULL;
-	}
 
 	View* view = NULL;
 	if(m_firstView == NULL)
@@ -372,10 +357,7 @@ View* Window::getView(const QString& name) const
 	if (h_views.contains(name))
 		return h_views[name];
 	else
-	{
-		System::Error::code = System::Error::VIEW_DOES_NOT_EXIST;
 		return NULL;
-	}
 }
 
 void Window::setCurrentView(View* view)
@@ -438,11 +420,7 @@ Plugin* Window::loadPlugin(const QString& pluginFilePath)
 	QString pluginName = QFileInfo(pluginFilePath).baseName().remove(0, 3);
 
 	if (h_plugins.contains(pluginName))
-	{
-		// set message error + function fails
-		System::Error::code = System::Error::PLUGIN_EXISTS;
 		return NULL;
-	}
 
 	QPluginLoader loader(pluginFilePath);
 
@@ -476,11 +454,7 @@ Plugin* Window::loadPlugin(const QString& pluginFilePath)
 	}
 	// if loading fails
 	else
-	{
-		// set error message + method failure
-		System::Error::code = System::Error::ERROR_PLUGIN_LOAD_f(pluginName);
 		return NULL;
-	}
 }
 
 void Window::unloadPlugin(const QString& pluginName)
@@ -509,10 +483,7 @@ Plugin* Window::getPlugin(const QString& name) const
 	if (h_plugins.contains(name))
 		return h_plugins[name];
 	else
-	{
-		System::Error::code = System::Error::PLUGIN_DOES_NOT_EXIST;
 		return NULL;
-	}
 }
 /*
 Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
@@ -528,10 +499,7 @@ Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
 	}
 	//if not found: set error message + failure
 	else
-	{
-		System::Error::code = System::Error::UNSATSIFIED_PLUGIN_DEPENDENCIE_f(name, dependantPlugin->getName());
 		return NULL;
-	}
 }
 */
 
@@ -542,10 +510,7 @@ Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
 bool Window::addMap(MapHandlerGen* map)
 {
 	if (h_maps.contains(map->getName()))
-	{
-		System::Error::code = System::Error::MAP_EXISTS;
 		return false;
-	}
 
 	h_maps.insert(map->getName(), map);
 
@@ -572,10 +537,7 @@ MapHandlerGen* Window::getMap(const QString& name) const
 	if (h_maps.contains(name))
 		return h_maps[name];
 	else
-	{
-		System::Error::code = System::Error::MAP_DOES_NOT_EXIST;
 		return NULL;
-	}
 }
 
 /*********************************************************

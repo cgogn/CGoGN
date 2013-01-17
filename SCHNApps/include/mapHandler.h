@@ -61,6 +61,7 @@ public:
 
 	Utils::VBO* getVBO(const QString& name);
 	QList<Utils::VBO*> getVBOList() const { return h_vbo.values(); }
+	QList<Utils::VBO*> getVBOList(const std::string& typeName);
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
