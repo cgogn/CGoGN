@@ -61,7 +61,7 @@ void DifferentialPropertiesPlugin::cb_computeNormal()
 		if(!normal.isValid())
 			normal = map->addAttribute<VEC3, VERTEX>(normalName);
 
-		Algo::Geometry::computeNormalVertices<PFP>(*map, position, normal);
+		Algo::Surface::Geometry::computeNormalVertices<PFP>(*map, position, normal);
 
 		if(m_computeNormalDialog->check_createVBO->checkState() == Qt::Checked)
 			mh->createVBO(normal);
