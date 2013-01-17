@@ -17,7 +17,7 @@ bool ImportSurfacePlugin::enable()
 
 void ImportSurfacePlugin::cb_import()
 {
-	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off)");
+	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off *.trian)");
 	QFileInfo fi(fileName);
 
 	if(fi.exists())

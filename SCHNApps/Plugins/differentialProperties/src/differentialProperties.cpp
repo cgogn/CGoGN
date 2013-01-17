@@ -138,9 +138,9 @@ void DifferentialPropertiesPlugin::cb_computeCurvature()
 		EdgeAttribute<REAL> edgeAngle = map->getAttribute<REAL, EDGE>("edgeAngle");
 		if(!edgeAngle.isValid())
 			edgeAngle = map->addAttribute<REAL, EDGE>("edgeAngle");
-		Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(*map, position, edgeAngle);
+		Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(*map, position, edgeAngle);
 
-		Algo::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP>(*map, 0.01f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
+		Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP>(*map, 0.01f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
 
 		if(m_computeCurvatureDialog->check_KmaxCreateVBO->checkState() == Qt::Checked)
 			mh->createVBO(Kmax);
