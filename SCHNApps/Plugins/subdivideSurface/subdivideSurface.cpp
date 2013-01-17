@@ -82,7 +82,7 @@ void SubdivideSurfacePlugin::cb_loopSubdivision()
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
 		VertexAttribute<VEC3> position = map->getAttribute<VEC3, VERTEX>(positionName);
 
-		Algo::Modelisation::LoopSubdivision<PFP>(*map, position);
+		Algo::Surface::Modelisation::LoopSubdivision<PFP>(*map, position);
 
 		mh->updatePrimitives(Algo::Render::GL2::POINTS);
 		mh->updatePrimitives(Algo::Render::GL2::LINES);
@@ -109,7 +109,7 @@ void SubdivideSurfacePlugin::cb_CCSubdivision()
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
 		VertexAttribute<VEC3> position = map->getAttribute<VEC3, VERTEX>(positionName);
 
-		Algo::Modelisation::CatmullClarkSubdivision<PFP>(*map, position);
+		Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP>(*map, position);
 
 		mh->updatePrimitives(Algo::Render::GL2::POINTS);
 		mh->updatePrimitives(Algo::Render::GL2::LINES);
@@ -136,7 +136,7 @@ void SubdivideSurfacePlugin::cb_trianguleFaces()
 		std::string positionName = m_dockTab->combo_positionAttribute->currentText().toUtf8().constData();
 		VertexAttribute<VEC3> position = map->getAttribute<VEC3, VERTEX>(positionName);
 
-		Algo::Modelisation::trianguleFaces<PFP>(*map, position);
+		Algo::Surface::Modelisation::trianguleFaces<PFP>(*map, position);
 
 		mh->updatePrimitives(Algo::Render::GL2::POINTS);
 		mh->updatePrimitives(Algo::Render::GL2::LINES);

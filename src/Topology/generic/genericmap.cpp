@@ -290,10 +290,10 @@ void GenericMap::removeLevelFront()
 	if(maxL > 0) //must have at min 2 levels (0 and 1) to remove the front one
 	{
 		AttributeMultiVector<unsigned int>* minMR = m_mrDarts[0] ;
-		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
+//		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
 		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 		{
-			unsigned int idx = (*minMR)[i] ;
+//			unsigned int idx = (*minMR)[i] ;
 			if((*m_mrLevels)[i] != 0)	// if the MRdart was introduced after the level we're removing
 			{
 				--(*m_mrLevels)[i]; //decrement his level of insertion

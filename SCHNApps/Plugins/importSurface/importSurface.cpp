@@ -26,7 +26,7 @@ void ImportSurfacePlugin::cb_import()
 		MapHandler<PFP>* h = new MapHandler<PFP>(fi.baseName(), m_window, m);
 
 		std::vector<std::string> attrNames ;
-		Algo::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
+		Algo::Surface::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
 
 		// get vertex position attribute
 		VertexAttribute<VEC3> position = m->getAttribute<VEC3, CGoGN::VERTEX>(attrNames[0]);
