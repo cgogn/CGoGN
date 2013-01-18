@@ -26,9 +26,9 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-Window::Window(const QString& appPath, QWidget *parent) :
-	QMainWindow(parent),
-	m_appPath(appPath),
+Window::Window() :
+	QMainWindow(),
+	m_appPath("/home/kraemer/Dev/CGoGN/SCHNApps"),
 	m_firstView(NULL),
 	m_currentView(NULL)
 {
@@ -80,6 +80,11 @@ Window::Window(const QString& appPath, QWidget *parent) :
 
 	// program in its initialization phase
 	m_initialization = false;
+}
+
+Window::Window(const Window& w)
+{
+	std::cout << "hiohoihoih" << std::endl;
 }
 
 Window::~Window()
@@ -448,13 +453,23 @@ Plugin* Window::loadPlugin(const QString& pluginFilePath)
 		}
 		else
 		{
+			std::cout << "plugin enable failed" << std::endl;
 			delete plugin;
 			return NULL;
 		}
 	}
 	// if loading fails
 	else
+	{
+		std::cout << "loader.instance failed" << std::endl << loader.errorString().toUtf8().constData() << std::endl;
 		return NULL;
+	}
+}
+
+void Window::loadPlugin_py(std::string path)
+{
+	QString p(QString::fromStdString(path));
+	loadPlugin(p);
 }
 
 void Window::unloadPlugin(const QString& pluginName)

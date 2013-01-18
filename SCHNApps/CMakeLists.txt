@@ -23,15 +23,12 @@ find_package(QGLViewer REQUIRED)
 
 #======SCHNApps=======#
 SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
-SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin)
-SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/Plugins)
+SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib)
 
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Release Release)
 IF (NOT WIN32)
 	ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Debug Debug)
 ENDIF (NOT WIN32)
-
-configure_file(${CMAKE_SOURCE_DIR}/settings/state_save.xml ${EXECUTABLE_OUTPUT_PATH}/state_save.xml @ONLY)
 
 
 #======Documentation=======#

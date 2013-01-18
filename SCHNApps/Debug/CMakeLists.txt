@@ -21,7 +21,6 @@ file(
 	GLOB
 	SCHNApps_SRC_FILES
 	${SCHNApps_ROOT_DIR}/src/camera.cpp
-	${SCHNApps_ROOT_DIR}/src/main.cpp
 	${SCHNApps_ROOT_DIR}/src/mapHandler.cpp
 	${SCHNApps_ROOT_DIR}/src/plugin.cpp
 	${SCHNApps_ROOT_DIR}/src/view.cpp
@@ -69,7 +68,7 @@ QT4_ADD_RESOURCES( RCC_FILES
 	${SCHNApps_ROOT_DIR}/resources/resources.qrc
 )
 
-ADD_EXECUTABLE( SCHNAppsD
+ADD_LIBRARY( SCHNAppsD SHARED
 	${SCHNApps_SRC_FILES}
 	${UI_H_FILES}
 	${MOC_FILES}

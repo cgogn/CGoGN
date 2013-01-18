@@ -36,14 +36,14 @@ PluginsDialog::PluginsDialog(Window* window) :
 	connect(removeButton, SIGNAL(pressed()), this, SLOT(cb_removePlugins()));
 	connect(directoryButton, SIGNAL(pressed()), this, SLOT(cb_addPluginsDirectory()));
 
-	connect(treeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(cb_togglePlugin(QTreeWidgetItem *, int)));
+	connect(treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(cb_togglePlugin(QTreeWidgetItem*, int)));
 //	connect(treeWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenu(const QPoint &)));
 
 //	connect(this, SIGNAL(accepted()), this, SLOT(cb_acceptDialog()));
 
 //	restoreState();
 
-	addPluginsDirectory(m_window->getAppPath() + QString("/../Plugins/"));
+	addPluginsDirectory(m_window->getAppPath() + QString("/lib/"));
 
 	init = false;
 }
@@ -231,7 +231,7 @@ void PluginsDialog::cb_addPluginsDirectory()
 	QString dir = QFileDialog::getExistingDirectory(
 		this,
 		tr("Select a directory"),
-		m_window->getAppPath() + QString("/../Plugins/"),
+		m_window->getAppPath() + QString("/lib/"),
 		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
 	);
 
@@ -312,7 +312,7 @@ void PluginsDialog::cb_removePlugins()
 	}
 }
 
-void PluginsDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
+void PluginsDialog::cb_togglePlugin(QTreeWidgetItem* item, int column)
 {
 	if (!init && column == 0)
 	{

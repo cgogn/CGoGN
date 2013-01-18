@@ -275,7 +275,7 @@ public:
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked);
-		CGoGN_ASSERT(this->isAllUnmarked())
+//		CGoGN_ASSERT(this->isAllUnmarked())
 	}
 
 protected:
@@ -323,7 +323,7 @@ public:
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked);
-		CGoGN_ASSERT(this->isAllUnmarked())
+//		CGoGN_ASSERT(this->isAllUnmarked())
 	}
 
 protected:
@@ -371,7 +371,7 @@ public:
 	virtual ~CellMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked()) ;
-		CGoGN_ASSERT(this->isAllUnmarked())
+//		CGoGN_ASSERT(this->isAllUnmarked())
 	}
 
 protected:

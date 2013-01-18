@@ -270,7 +270,7 @@ public:
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked) ;
-		CGoGN_ASSERT(isAllUnmarked())
+//		CGoGN_ASSERT(isAllUnmarked())
 	}
 
 protected:
@@ -339,7 +339,7 @@ public:
 	~DartMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked) ;
-		CGoGN_ASSERT(isAllUnmarked())
+//		CGoGN_ASSERT(isAllUnmarked())
 	}
 
 protected:

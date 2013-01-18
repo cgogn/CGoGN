@@ -1,8 +1,8 @@
 #ifndef _PLUGIN_H_
 #define _PLUGIN_H_
 
-#include <QtPlugin>
-#include <QAction>
+#include <QtCore/QtPlugin>
+#include <QtGui/QAction>
 
 #include "types.h"
 

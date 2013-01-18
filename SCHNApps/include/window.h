@@ -26,18 +26,23 @@ class Window : public QMainWindow, Ui::Window
 
 public:
 	/**
-	 * \fn Window(QWidget* parent = NULL)
-	 * \brief Default (and unique) constructor
-	 *
-	 * \param parent the parent of the window
+	 * \fn Window()
+	 * \brief Constructor
 	 */
-	Window(const QString& appPath, QWidget* parent = NULL);
+	Window();
+
+	Window(const Window& w);
 
 	/**
 	 * \fn ~Window()
-	 * \brief the class destructor
+	 * \brief Destructor
 	 */
 	~Window();
+
+	void launch()
+	{
+		this->QMainWindow::show();
+	}
 
 	const QString& getAppPath() { return m_appPath; }
 
@@ -202,6 +207,7 @@ public:
 	 * \see Plugin::enable()
 	 */
 	Plugin* loadPlugin(const QString& pluginFilePath);
+	void loadPlugin_py(std::string path);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
