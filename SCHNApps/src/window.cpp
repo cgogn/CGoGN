@@ -446,6 +446,8 @@ Plugin* Window::loadPlugin(const QString& pluginFilePath)
 			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
 			emit(pluginAdded(plugin));
 
+			m_pythonContext.addObject(pluginName, plugin);
+
 			// method success
 			return plugin;
 		}
