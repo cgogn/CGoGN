@@ -43,7 +43,7 @@ PluginsDialog::PluginsDialog(Window* window) :
 
 //	restoreState();
 
-	addPluginsDirectory(m_window->getAppPath() + QString("/lib/"));
+	addPluginsDirectory(m_window->getAppPath() + QString("../lib/"));
 
 	init = false;
 }
@@ -231,7 +231,7 @@ void PluginsDialog::cb_addPluginsDirectory()
 	QString dir = QFileDialog::getExistingDirectory(
 		this,
 		tr("Select a directory"),
-		m_window->getAppPath() + QString("/lib/"),
+		m_window->getAppPath() + QString("../lib/"),
 		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
 	);
 

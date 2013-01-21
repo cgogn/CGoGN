@@ -1,9 +1,9 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
-#include <QtCore/QHash>
-#include <QtCore/QMap>
-#include <QtCore/QString>
+#include <QHash>
+#include <QMap>
+#include <QString>
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"

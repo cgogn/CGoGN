@@ -3,6 +3,7 @@
 
 #include "ui_window.h"
 
+#include "PythonQt/PythonQt.h"
 #include "types.h"
 
 class QVBoxLayout;
@@ -29,20 +30,13 @@ public:
 	 * \fn Window()
 	 * \brief Constructor
 	 */
-	Window();
-
-	Window(const Window& w);
+	Window(const QString& appPath, PythonQtObjectPtr& pythonContext);
 
 	/**
 	 * \fn ~Window()
 	 * \brief Destructor
 	 */
 	~Window();
-
-	void launch()
-	{
-		this->QMainWindow::show();
-	}
 
 	const QString& getAppPath() { return m_appPath; }
 
@@ -206,8 +200,7 @@ public:
 	 * \see getPlugins()
 	 * \see Plugin::enable()
 	 */
-	Plugin* loadPlugin(const QString& pluginFilePath);
-	void loadPlugin_py(std::string path);
+//	Plugin* loadPlugin(const QString& pluginFilePath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -274,6 +267,7 @@ public:
 
 protected:
 	QString m_appPath;
+	PythonQtObjectPtr& m_pythonContext;
 
 	bool m_initialization;
 
@@ -299,6 +293,9 @@ protected:
 	MapsDialog* m_mapsDialog;
 
 public slots:
+
+	Plugin* loadPlugin(const QString& pluginFilePath);
+
 	/**
 	 * \fn void cb_about_SCHNApps();
 	 * \brief function that is called when the "about SCHNApps" menu action is triggered

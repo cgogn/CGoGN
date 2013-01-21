@@ -21,8 +21,14 @@ find_package(Qt4 REQUIRED)
 find_package(QGLViewer REQUIRED)
 
 
+#=======Python=========#
+find_package(PythonLibs REQUIRED)
+
+
+
 #======SCHNApps=======#
 SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
+SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib)
 
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Release Release)
