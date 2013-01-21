@@ -1,28 +1,25 @@
-#ifndef _DIFFERENTIALPROPERTIES_PLUGIN_H_
-#define _DIFFERENTIALPROPERTIES_PLUGIN_H_
+#ifndef _IMPORTSURFACE_PLUGIN_H_
+#define _IMPORTSURFACE_PLUGIN_H_
 
 #include "plugin.h"
-
-#include "computeNormalDialog.h"
-#include "computeCurvatureDialog.h"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
 
 
-class DifferentialPropertiesPlugin : public Plugin
+class ImportVolumePlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	DifferentialPropertiesPlugin()
+	ImportVolumePlugin()
 	{
 		setProvidesRendering(false);
 	}
 
-	~DifferentialPropertiesPlugin()
+	~ImportVolumePlugin()
 	{}
 
 	virtual bool enable();
@@ -45,18 +42,10 @@ public:
 	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
 
 public slots:
-	void cb_openComputeNormalDialog();
-	void cb_openComputeCurvatureDialog();
-
-	void cb_computeNormal();
-	void cb_computeCurvature();
+	void cb_import();
 
 private:
-	ComputeNormalDialog* m_computeNormalDialog;
-	ComputeCurvatureDialog* m_computeCurvatureDialog;
-
-	QAction* computeNormalAction;
-	QAction* computeCurvatureAction;
+	QAction* importAction;
 };
 
 #endif

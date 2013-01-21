@@ -1,4 +1,4 @@
-#include "importSurface.h"
+#include "importVolume.h"
 
 #include "mapHandler.h"
 
@@ -7,27 +7,27 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
-bool ImportSurfacePlugin::enable()
+bool ImportVolumePlugin::enable()
 {
 	importAction = new QAction("import", this);
-	addMenuAction("Surface;Import", importAction);
+	addMenuAction("Volume;Import", importAction);
 	connect(importAction, SIGNAL(triggered()), this, SLOT(cb_import()));
 	return true;
 }
 
-void ImportSurfacePlugin::cb_import()
+void ImportVolumePlugin::cb_import()
 {
-	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off *.trian)");
+	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.node *.ts *.off *.tet)");
 	QFileInfo fi(fileName);
 
 	if(fi.exists())
 	{
-		GenericMap* m = m_window->createMap(2);
-		PFP2::MAP* map = static_cast<PFP2::MAP*>(m);
-		MapHandler<PFP2>* h = new MapHandler<PFP2>(fi.baseName(), m_window, map);
+		GenericMap* m = m_window->createMap(3);
+		PFP3::MAP* map = static_cast<PFP3::MAP*>(m);
+		MapHandler<PFP3>* h = new MapHandler<PFP3>(fi.baseName(), m_window, map);
 
 		std::vector<std::string> attrNames ;
-		Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
+		Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toUtf8().constData(), attrNames);
 
 		// get vertex position attribute
 		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
@@ -48,7 +48,7 @@ void ImportSurfacePlugin::cb_import()
 }
 
 #ifndef DEBUG
-Q_EXPORT_PLUGIN2(ImportSurfacePlugin, ImportSurfacePlugin)
+Q_EXPORT_PLUGIN2(ImportVolumePlugin, ImportVolumePlugin)
 #else
-Q_EXPORT_PLUGIN2(ImportSurfacePluginD, ImportSurfacePlugin)
+Q_EXPORT_PLUGIN2(ImportVolumePluginD, ImportVolumePlugin)
 #endif
