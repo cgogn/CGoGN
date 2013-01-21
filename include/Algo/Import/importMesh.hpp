@@ -507,7 +507,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
 
 template <typename PFP>
-bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
 {
 	ImportType kind = Volume::Import::UNKNOWNVOLUME;
 
