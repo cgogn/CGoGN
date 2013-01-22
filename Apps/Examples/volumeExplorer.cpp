@@ -469,6 +469,12 @@ int main(int argc, char **argv)
 		prim.hexaGrid_topo(nb,nb,nb);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
+		for (unsigned int i=position.begin(); i != position.end(); position.next(i))
+		{
+			PFP::VEC3 pert(float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0));
+			position[i]+= pert;
+		}
+
 		color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
 		TraversorW<PFP::MAP> tra(myMap);
 		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
