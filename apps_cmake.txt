@@ -46,6 +46,7 @@ add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 # define includes of external libs 
 SET(COMMON_INCLUDES 
 	${CGoGN_ROOT_DIR}/ThirdParty/glm
+	${CGoGN_ROOT_DIR}/ThirdParty/PythonQt/src
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}

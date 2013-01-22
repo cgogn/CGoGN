@@ -3,7 +3,7 @@
 
 #include "ui_window.h"
 
-#include "PythonQt/PythonQt.h"
+#include "PythonQt.h"
 #include "types.h"
 
 class QVBoxLayout;
