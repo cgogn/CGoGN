@@ -57,7 +57,7 @@ public:
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
-	bool linkView(View* view);
+	void linkView(View* view);
 	void unlinkView(View* view);
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }

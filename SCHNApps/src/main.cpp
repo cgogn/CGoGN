@@ -14,19 +14,25 @@ int main(int argc, char* argv[])
 	// init PythonQt and Python itself
 	PythonQt::init();
 
+	QStringList classNames;
+	classNames.append("Plugin");
+	classNames.append("View");
+	classNames.append("MapHandlerGen");
+	classNames.append("Camera");
+	PythonQt::self()->registerQObjectClassNames(classNames);
+
 	// get a smart pointer to the __main__ module of the Python interpreter
 	PythonQtObjectPtr pythonContext = PythonQt::self()->getMainModule();
-
-	CGoGN::SCHNApps::Window window(app.applicationDirPath(), pythonContext);
-	window.show();
-
-	pythonContext.addObject("window", &window);
-
-	splash->finish(&window);
-	delete splash;
-
 	PythonQtScriptingConsole pythonConsole(NULL, pythonContext);
-	pythonConsole.show();
+
+	CGoGN::SCHNApps::Window schnapps(app.applicationDirPath(), pythonContext, pythonConsole);
+	schnapps.show();
+
+	pythonContext.addObject("schnapps", &schnapps);
+	pythonContext.evalFile(app.applicationDirPath() + QString("/init.py"));
+
+	splash->finish(&schnapps);
+	delete splash;
 
 	return app.exec();
 }

@@ -118,6 +118,10 @@ protected:
 	MapsViewDialog* m_mapsViewDialog;
 
 public slots:
+	CameraViewDialog* getCameraViewDialog() { return m_cameraViewDialog; }
+	PluginsViewDialog* getPluginsViewDialog() { return m_pluginsViewDialog; }
+	MapsViewDialog* getMapsViewDialog() { return m_mapsViewDialog; }
+
 	void cb_cameraView(int x, int y, int globalX, int globalY);
 	void cb_pluginsView(int x, int y, int globalX, int globalY);
 	void cb_mapsView(int x, int y, int globalX, int globalY);

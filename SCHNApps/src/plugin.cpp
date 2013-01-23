@@ -40,16 +40,13 @@ Plugin::~Plugin()
  * MANAGE LINKED VIEWS
  *********************************************************/
 
-bool Plugin::linkView(View* view)
+void Plugin::linkView(View* view)
 {
 	if(view && !l_views.contains(view))
 	{
 		l_views.push_back(view);
 		viewLinked(view);
-		return true;
 	}
-	else
-		return false;
 }
 
 void Plugin::unlinkView(View* view)

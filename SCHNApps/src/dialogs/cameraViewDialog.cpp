@@ -57,9 +57,7 @@ void CameraViewDialog::cb_selectedCameraChanged()
 	{
 		const QString& cname = currentItems[0]->text();
 		Camera* c = m_window->getCamera(cname);
-		m_view->getCurrentCamera()->unlinkView(m_view);
-		m_view->setCurrentCamera(c);
-		c->linkView(m_view);
+		m_window->linkViewAndCamera(m_view, c);
 	}
 }
 

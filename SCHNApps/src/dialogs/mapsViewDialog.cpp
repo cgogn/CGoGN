@@ -44,14 +44,12 @@ void MapsViewDialog::cb_selectedMapsChanged()
 		if(mapList->item(i)->isSelected() && !m_view->isLinkedToMap(map))
 		{
 			assert(!map->isLinkedToView(m_view));
-			m_view->linkMap(map);
-			map->linkView(m_view);
+			m_window->linkViewAndMap(m_view, map);
 		}
 		else if(!mapList->item(i)->isSelected() && m_view->isLinkedToMap(map))
 		{
 			assert(map->isLinkedToView(m_view));
-			m_view->unlinkMap(map);
-			map->unlinkView(m_view);
+			m_window->unlinkViewAndMap(m_view, map);
 		}
 	}
 	m_view->updateGL();

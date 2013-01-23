@@ -11,14 +11,14 @@ bool DifferentialPropertiesPlugin::enable()
 	m_computeNormalDialog = new ComputeNormalDialog(m_window);
 	m_computeCurvatureDialog = new ComputeCurvatureDialog(m_window);
 
-	computeNormalAction = new QAction("Compute Normal", this);
-	computeCurvatureAction = new QAction("Compute Curvature", this);
+	m_computeNormalAction = new QAction("Compute Normal", this);
+	m_computeCurvatureAction = new QAction("Compute Curvature", this);
 
-	addMenuAction("Surface;Differential Properties;Compute Normal", computeNormalAction);
-	addMenuAction("Surface;Differential Properties;Compute Curvature", computeCurvatureAction);
+	addMenuAction("Surface;Differential Properties;Compute Normal", m_computeNormalAction);
+	addMenuAction("Surface;Differential Properties;Compute Curvature", m_computeCurvatureAction);
 
-	connect(computeNormalAction, SIGNAL(triggered()), this, SLOT(cb_openComputeNormalDialog()));
-	connect(computeCurvatureAction, SIGNAL(triggered()), this, SLOT(cb_openComputeCurvatureDialog()));
+	connect(m_computeNormalAction, SIGNAL(triggered()), this, SLOT(cb_openComputeNormalDialog()));
+	connect(m_computeCurvatureAction, SIGNAL(triggered()), this, SLOT(cb_openComputeCurvatureDialog()));
 
 	connect(m_computeNormalDialog, SIGNAL(accepted()), this, SLOT(cb_computeNormal()));
 	connect(m_computeNormalDialog->button_apply, SIGNAL(clicked()), this, SLOT(cb_computeNormal()));
@@ -56,6 +56,7 @@ void DifferentialPropertiesPlugin::cb_computeNormal()
 			normalName = m_computeNormalDialog->combo_normalAttribute->currentText().toUtf8().constData();
 		else
 			normalName = m_computeNormalDialog->normalAttributeName->text().toUtf8().constData();
+
 		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(positionName);
 		VertexAttribute<PFP2::VEC3> normal = map->getAttribute<PFP2::VEC3, VERTEX>(normalName);
 		if(!normal.isValid())

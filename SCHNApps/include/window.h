@@ -3,8 +3,9 @@
 
 #include "ui_window.h"
 
-#include "PythonQt.h"
 #include "types.h"
+#include "PythonQt.h"
+#include "gui/PythonQtScriptingConsole.h"
 
 class QVBoxLayout;
 class QSplitter;
@@ -30,7 +31,7 @@ public:
 	 * \fn Window()
 	 * \brief Constructor
 	 */
-	Window(const QString& appPath, PythonQtObjectPtr& pythonContext);
+	Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQtScriptingConsole& pythonConsole);
 
 	/**
 	 * \fn ~Window()
@@ -44,22 +45,15 @@ public:
 	 * MANAGE DOCK
 	 *********************************************************/
 
-	/**
-	 * \fn QTabWidget* getDockTabWidget()
-	 * \brief Accessor to the QTabWidget of this interface
-	 *
-	 * \return a pointer to the TabWidget, NULL if not allocated yet
-	 */
 	QTabWidget* getDockTabWidget() const { return m_dockTabWidget; }
 
 	/**
-	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText)
+	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText, bool enable)
 	 * \brief Adds the widget as a new tab in the interface's dock
 	 *
 	 * \param tabWidget the created and allocated pointer to the QWidget to add in the dock
 	 * \param tabText The text that will appears in the tab label
-	 *
-	 * \see removeTabInDock()
+	 * \param enable is the new tab enabled ?
 	 */
 	void addTabInDock(QWidget* tabWidget, const QString& tabText, bool enable);
 
@@ -70,8 +64,6 @@ public:
 	 * \param tabWidget the reference to the widget you want to remove
 	 *
 	 * If the widget does belong to the tab, it will be destroyed.
-	 *
-	 * \see addWidgetInDockTab()
 	 */
 	void removeTabInDock(QWidget* tabWidget);
 
@@ -159,7 +151,11 @@ public:
 	View* addView(const QString& name);
 	View* addView();
 	void removeView(const QString& name);
+
+public slots:
 	View* getView(const QString& name) const;
+
+public:
 	QList<View*> getViewsList() const { return h_views.values(); }
 	const ViewHash& getViewsHash() const { return h_views; }
 
@@ -172,6 +168,7 @@ public:
 	 * MANAGE PLUGINS
 	 *********************************************************/
 
+public slots:
 	/**
 	 * \fn bool loadPlugin(QString pluginPath)
 	 * \brief Loads and references a Plugin
@@ -189,18 +186,9 @@ public:
 	 * This method calls the Plugin::enable() method of the concerned Plugin. That is why
 	 * when Plugin are written, this method is overriden and used as an initialization method.
 	 *
-	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
-	 *
 	 * \return a boolean whether the loading succeeded or not.
-	 *
-	 * If the function failed, the error code ( Error::code ) is affected with a value
-	 * depending on the error. This error can be shown with Error::showError
-	 *
-	 * \see unloadPlugin()
-	 * \see getPlugins()
-	 * \see Plugin::enable()
 	 */
-//	Plugin* loadPlugin(const QString& pluginFilePath);
+	Plugin* loadPlugin(const QString& pluginFilePath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -213,36 +201,10 @@ public:
 	 *
 	 * This method calls the Plugin::disable() method of the concerned Plugin. That is why,
 	 * when Plugin are written, this method is overriden and used as a destruction method.
-	 *
-	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
-	 *
-	 * \see loadPlugin()
-	 * \see getPlugins()
-	 * \see Plugin::disable()
 	 */
 	void unloadPlugin(const QString& pluginName);
 
-	/**
-	 * \fn Plugin* checkPluginDependencie(QString name, Plugin* dependantPlugin)
-	 * \brief checks for a dependencie Plugin, and set the dependencie link for the found Plugin
-	 *
-	 * \param name the name of the Plugin you have to check the existence in order to make a dependencie
-	 * \param dependantPlugin a reference to the Plugin that asks for the dependencie that will be set as a
-	 *          dependant Plugin for the found Plugin
-	 *
-	 * \warning In the program this method is called under specific and controlled circumstances
-	 *          by the Plugins you should probably not call it.
-	 *
-	 * \return a pointer to the found dependencie Plugin, NULL if this Plugin wasn't referenced
-	 *
-	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
-	 *
-	 * \see loadPlugin()
-	 * \see VisualPlugin::addDependencie()
-	 */
-//	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
-
+public:
 	Plugin* getPlugin(const QString& name) const;
 	QList<Plugin*> getPluginsList() const { return h_plugins.values(); }
 	const PluginHash& getPluginsHash() const { return h_plugins; }
@@ -259,15 +221,30 @@ public:
 	const MapHash& getMapsHash() const { return h_maps; }
 
 	/*********************************************************
+	 * MANAGE LINKS
+	 *********************************************************/
+
+public slots:
+	void linkViewAndPlugin(View* v, Plugin* p);
+	void unlinkViewAndPlugin(View* v, Plugin* p);
+
+	void linkViewAndMap(View* v, MapHandlerGen* m);
+	void unlinkViewAndMap(View* v, MapHandlerGen* m);
+
+	void linkViewAndCamera(View* v, Camera* c);
+
+	/*********************************************************
 	 * MANAGE TEXTURES
 	 *********************************************************/
 
+public:
 	Texture* getTexture(const QString& image);
 	void releaseTexture(const QString& image);
 
 protected:
 	QString m_appPath;
 	PythonQtObjectPtr& m_pythonContext;
+	PythonQtScriptingConsole& m_pythonConsole;
 
 	bool m_initialization;
 
@@ -281,6 +258,8 @@ protected:
 	QDockWidget* m_dock;
 	QTabWidget* m_dockTabWidget;
 
+	QDockWidget* m_pythonDock;
+
 	PluginHash h_plugins;
 	ViewHash h_views;
 	CameraHash h_cameras;
@@ -293,9 +272,6 @@ protected:
 	MapsDialog* m_mapsDialog;
 
 public slots:
-
-	Plugin* loadPlugin(const QString& pluginFilePath);
-
 	/**
 	 * \fn void cb_about_SCHNApps();
 	 * \brief function that is called when the "about SCHNApps" menu action is triggered
@@ -309,6 +285,8 @@ public slots:
 	void cb_aboutCGoGN();
 	
 	void cb_showHideDock();
+
+	void cb_showHidePythonDock();
 
 	/**
 	 * \fn void cb_manageCameras()

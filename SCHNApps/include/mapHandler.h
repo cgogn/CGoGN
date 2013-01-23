@@ -5,9 +5,11 @@
 
 #include "types.h"
 #include "view.h"
+#include "plugin.h"
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/functor.h"
+#include "Topology/generic/attributeHandler.h"
 #include "Utils/vbo.h"
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Geometry/boundingbox.h"

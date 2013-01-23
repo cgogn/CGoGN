@@ -14,17 +14,6 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 INCLUDE(${CGoGN_ROOT_DIR}/apps_cmake.txt)
 
-find_package(Qt4 REQUIRED)
-
-
-#=======QGLViewer=========#
-find_package(QGLViewer REQUIRED)
-
-
-#=======Python=========#
-find_package(PythonLibs REQUIRED)
-
-
 
 #======SCHNApps=======#
 SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
@@ -38,12 +27,12 @@ ENDIF (NOT WIN32)
 
 
 #======Documentation=======#
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-add_custom_target(doc
-	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Doc
-	COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
-endif(DOXYGEN_FOUND)
+#find_package(Doxygen)
+#if(DOXYGEN_FOUND)
+#configure_file(${CMAKE_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+#add_custom_target(doc
+#	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+#	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Doc
+#	COMMENT "Generating API documentation with Doxygen" VERBATIM
+#)
+#endif(DOXYGEN_FOUND)

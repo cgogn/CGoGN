@@ -2,18 +2,12 @@
 #define _SUBDIVIDESURFACE_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_subdivideSurface.h"
+
+#include "subdivideSurfaceDialog.h"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
-
-
-class SubdivideSurfaceDockTab : public QWidget, public Ui::SubdivideSurfaceWidget
-{
-public:
-	SubdivideSurfaceDockTab() { setupUi(this); }
-};
 
 
 class SubdivideSurfacePlugin : public Plugin
@@ -49,17 +43,18 @@ public:
 	virtual void mapLinked(View* view, MapHandlerGen* m) {}
 	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
 
-protected:
-	SubdivideSurfaceDockTab* m_dockTab;
-
 public slots:
-	void cb_addMapToList(MapHandlerGen* m);
-	void cb_removeMapFromList(MapHandlerGen* m);
-	void cb_selectedMapChanged();
+	void cb_openSubdivideSurfaceDialog();
+	void cb_subdivideSurface();
 
-	void cb_loopSubdivision();
-	void cb_CCSubdivision();
-	void cb_trianguleFaces();
+	void loopSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
+	void CCSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
+	void trianguleFaces(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
+
+private:
+	SubdivideSurfaceDialog* m_subdivideSurfaceDialog;
+
+	QAction* m_subdivideSurfaceAction;
 };
 
 #endif

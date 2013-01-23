@@ -26,10 +26,11 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext) :
+Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQtScriptingConsole& pythonConsole) :
 	QMainWindow(),
 	m_appPath(appPath),
 	m_pythonContext(pythonContext),
+	m_pythonConsole(pythonConsole),
 	m_firstView(NULL),
 	m_currentView(NULL)
 {
@@ -42,9 +43,9 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext) :
 
 	this->setupUi(this);
 
-	m_dock = new QDockWidget(tr("Control"), this);
-	m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	m_dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+	m_dock = new QDockWidget(tr("Plugins' Tabs"), this);
+	m_dock->setAllowedAreas(Qt::RightDockWidgetArea);
+	m_dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
 	addDockWidget(Qt::RightDockWidgetArea, m_dock);
 	m_dock->setVisible(false);
 
@@ -55,6 +56,15 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext) :
 	m_dock->setWidget(m_dockTabWidget);
 
 	connect(actionShowHideDock, SIGNAL(triggered()), this, SLOT(cb_showHideDock()));
+
+	m_pythonDock = new QDockWidget(tr("Python"), this);
+	m_pythonDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+	m_dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+	addDockWidget(Qt::BottomDockWidgetArea, m_pythonDock);
+	m_pythonDock->setVisible(false);
+	m_pythonDock->setWidget(&m_pythonConsole);
+
+	connect(actionShowHidePythonDock, SIGNAL(triggered()), this, SLOT(cb_showHidePythonDock()));
 
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
@@ -77,17 +87,12 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext) :
 	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
 	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
 
-//	System::StateHandler::loadState(this, &h_plugin, &h_scene, m_splitArea);
-
 	// program in its initialization phase
 	m_initialization = false;
-
-	m_pythonContext.addObject("dock", m_dock);
 }
 
 Window::~Window()
 {
-//	System::StateHandler::saveState(this, h_plugins);
 }
 
 /*********************************************************
@@ -387,24 +392,17 @@ void Window::splitView(const QString& name, Qt::Orientation orientation)
 {
 	View* newView = addView();
 
-//	std::cout << "splitView" << std::endl;
-
 	View* view = h_views[name];
 	QSplitter* parent = (QSplitter*)(view->parentWidget());
 	if(parent == m_rootSplitter && !b_rootSplitterInitialized)
 	{
-//		std::cout << "init root splitter" << std::endl;
 		m_rootSplitter->setOrientation(orientation);
 		b_rootSplitterInitialized = true;
 	}
 	if(parent->orientation() == orientation)
-	{
-//		std::cout << "same orientation" << std::endl;
 		parent->insertWidget(parent->indexOf(view)+1, newView);
-	}
 	else
 	{
-//		std::cout << "new orientation" << std::endl;
 		int idx = parent->indexOf(view);
 		view->setParent(NULL);
 		QSplitter* spl = new QSplitter(orientation);
@@ -565,6 +563,41 @@ MapHandlerGen* Window::getMap(const QString& name) const
 }
 
 /*********************************************************
+ * MANAGE LINKS
+ *********************************************************/
+
+void Window::linkViewAndPlugin(View* v, Plugin* p)
+{
+	v->linkPlugin(p);
+	p->linkView(v);
+}
+
+void Window::unlinkViewAndPlugin(View* v, Plugin* p)
+{
+	v->unlinkPlugin(p);
+	p->unlinkView(v);
+}
+
+void Window::linkViewAndMap(View* v, MapHandlerGen* m)
+{
+	v->linkMap(m);
+	m->linkView(v);
+}
+
+void Window::unlinkViewAndMap(View* v, MapHandlerGen* m)
+{
+	v->unlinkMap(m);
+	m->unlinkView(v);
+}
+
+void Window::linkViewAndCamera(View* v, Camera* c)
+{
+	v->getCurrentCamera()->unlinkView(v);
+	v->setCurrentCamera(c);
+	c->linkView(v);
+}
+
+/*********************************************************
  * MANAGE TEXTURES
  *********************************************************/
 
@@ -627,6 +660,11 @@ void Window::cb_aboutCGoGN()
 void Window::cb_showHideDock()
 {
 	m_dock->setVisible(m_dock->isHidden());
+}
+
+void Window::cb_showHidePythonDock()
+{
+	m_pythonDock->setVisible(m_pythonDock->isHidden());
 }
 
 void Window::cb_manageCameras()

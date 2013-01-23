@@ -11,15 +11,13 @@ bool ImportSurfacePlugin::enable()
 {
 	importAction = new QAction("import", this);
 	addMenuAction("Surface;Import", importAction);
-	connect(importAction, SIGNAL(triggered()), this, SLOT(cb_import()));
+	connect(importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
 	return true;
 }
 
-void ImportSurfacePlugin::cb_import()
+void ImportSurfacePlugin::importFromFile(const QString& fileName)
 {
-	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off *.trian)");
 	QFileInfo fi(fileName);
-
 	if(fi.exists())
 	{
 		GenericMap* m = m_window->createMap(2);
@@ -45,6 +43,12 @@ void ImportSurfacePlugin::cb_import()
 
 		m_window->addMap(h);
 	}
+}
+
+void ImportSurfacePlugin::importFromFileDialog()
+{
+	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off *.trian)");
+	importFromFile(fileName);
 }
 
 #ifndef DEBUG

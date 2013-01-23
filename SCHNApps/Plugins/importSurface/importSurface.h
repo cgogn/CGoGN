@@ -42,7 +42,8 @@ public:
 	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
 
 public slots:
-	void cb_import();
+	void importFromFile(const QString& fileName);
+	void importFromFileDialog();
 
 private:
 	QAction* importAction;
