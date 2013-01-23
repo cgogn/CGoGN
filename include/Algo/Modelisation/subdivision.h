@@ -116,11 +116,13 @@ template <typename PFP>
 void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 ///**
-// * Reverse the orientation of the map
+// * Sqrt(3) subdivision scheme
 // */
 //template <typename PFP>
-//void reverseOrientation(typename PFP::MAP& map) ;
-//
+//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+
+
+
 ///**
 // * Dual mesh computation
 // */
@@ -130,11 +132,7 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 //template <typename PFP>
 //void computeDualV2(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
 //
-///**
-// * Sqrt(3) subdivision scheme
-// */
-//template <typename PFP>
-//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+
 
 
 

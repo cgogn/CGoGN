@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -52,6 +55,8 @@ bool isTetrahedronWellOriented(typename PFP::MAP& map, Dart d, const VertexAttri
 }
 
 } // namespace Geometry
+
+} // namespace Surface
 
 } // namespace Algo
 
