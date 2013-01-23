@@ -57,17 +57,19 @@ protected:
 
 	Utils::ShaderExplodeSmoothVolumes* m_shaderS;
 
-	bool m_smooth;
-
 	bool m_cpf;
 
 	bool m_ef;
+
+	bool m_smooth;
 
 	Utils::ShaderExplodeVolumesLines* m_shaderL;
 
 	Utils::VBO* m_vboPos;
 
 	Utils::VBO* m_vboColors;
+
+	Utils::VBO* m_vboNormals;
 
 	Utils::VBO* m_vboPosLine;
 
@@ -79,6 +81,13 @@ protected:
 	GLuint m_nbLines;
 
 	Geom::Vec3f m_globalColor;
+
+	template<typename PFP>
+	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
+
+	template<typename PFP>
+	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
+
 
 public:
 	/**
@@ -109,8 +118,8 @@ public:
 	* @param positions  attribute of position vertices
 	* @param good selector
 	*/
-//	template<typename PFP>
-//	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
+	template<typename PFP>
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
 
 	/**
 	* update all drawing buffers
@@ -122,9 +131,6 @@ public:
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
 
-
-	template<typename PFP>
-	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
 
 	/**
 	 * draw edges
