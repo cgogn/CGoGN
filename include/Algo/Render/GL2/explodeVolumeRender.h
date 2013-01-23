@@ -93,7 +93,8 @@ public:
 	/**
 	* Constructor
 	* @param withColorPerFace affect a color per face
-	* @param withExplodeFace shrinj each face
+	* @param withExplodeFace shrink each face
+	* @param withSmoothFaces use a smooth gouraud interpolation between triangles of a faces
 	*/
 	ExplodeVolumeRender(bool withColorPerFace = false, bool withExplodeFace = false, bool withSmoothFaces = false) ;
 
