@@ -137,11 +137,11 @@ bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool CCW)
 			AC[0], AC[1], AC[2],
 			AD[0], AD[1], AD[2];
 
-	A = A.inverse();
+	Eigen::Matrix3f AInv = A.inverse();
 
 	VEC3 v1(point-points[0]);
 	Eigen::Vector3f& v = Utils::convertRef<Eigen::Vector3f>(v1);
-	Eigen::Vector3f beta = A* v;
+	Eigen::Vector3f beta = AInv* v;
 	return (beta[0] >= 0.0f && beta[1] >= 0.0f && beta[2] >= 0.0f && beta[0]+beta[1]+beta[2]<=1.0f);
 }
 
