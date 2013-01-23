@@ -22,6 +22,9 @@
  *                                                                              *
  *******************************************************************************/
 
+#include <Eigen/Dense>
+#include "Utils/convertType.h"
+
 namespace CGoGN
 {
 
@@ -128,23 +131,18 @@ bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool CCW)
 	VEC3 AB = points[1] - points[0] ;
 	VEC3 AC = points[2] - points[0] ;
 	VEC3 AD = points[3] - points[0] ;
-	VEC3 BD = points[3] - points[1] ;
-	VEC3 BC = points[2] - points[1] ;
 
-	VEC3 nABC = AB ^ AC ;
-	VEC3 nACD = AC ^ AD ;
-	VEC3 nADB = AD ^ AB ;
-	VEC3 nBDC = BD ^ BC ;
+	Eigen::Matrix3f A;
+	A << AB[0], AB[1], AB[2],
+			AC[0], AC[1], AC[2],
+			AD[0], AD[1], AD[2];
 
-	T d0 = nABC * (point - points[0]) ;
-	T d1 = nACD * (point - points[0]) ;
-	T d2 = nADB * (point - points[0]) ;
-	T d3 = nBDC * (point - points[1]) ;
+	Eigen::Matrix3f AInv = A.inverse();
 
-	if(CCW)
-		return (d0 < 0 && d1 < 0 && d2 < 0 && d3 < 0) ;
-	else
-		return (d0 > 0 && d1 > 0 && d2 > 0 && d3 > 0) ;
+	VEC3 v1(point-points[0]);
+	Eigen::Vector3f& v = Utils::convertRef<Eigen::Vector3f>(v1);
+	Eigen::Vector3f beta = AInv* v;
+	return (beta[0] >= 0.0f && beta[1] >= 0.0f && beta[2] >= 0.0f && beta[0]+beta[1]+beta[2]<=1.0f);
 }
 
 template <typename VEC3>
