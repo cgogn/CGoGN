@@ -514,8 +514,11 @@ Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
  * MANAGE MAPS
  *********************************************************/
 
-GenericMap* Window::createMap(unsigned int dim)
+MapHandlerGen* Window::addMap(const QString& name, unsigned int dim)
 {
+	if (h_maps.contains(name))
+		return NULL;
+
 	GenericMap* map = NULL;
 	switch(dim)
 	{
@@ -526,19 +529,13 @@ GenericMap* Window::createMap(unsigned int dim)
 			map = new PFP3::MAP();
 			break;
 	}
-	return map;
-}
 
-bool Window::addMap(MapHandlerGen* map)
-{
-	if (h_maps.contains(map->getName()))
-		return false;
+	MapHandlerGen* mh = new MapHandlerGen(name, this, map);
+	h_maps.insert(name, mh);
 
-	h_maps.insert(map->getName(), map);
+	emit(mapAdded(mh));
 
-	emit(mapAdded(map));
-
-	return true;
+	return mh;
 }
 
 void Window::removeMap(const QString& name)

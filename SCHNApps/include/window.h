@@ -213,8 +213,7 @@ public:
 	 * MANAGE MAPS
 	 *********************************************************/
 
-	GenericMap* createMap(unsigned int dim);
-	bool addMap(MapHandlerGen* map);
+	MapHandlerGen* addMap(const QString& name, unsigned int dim);
 	void removeMap(const QString& name);
 	MapHandlerGen* getMap(const QString& name) const;
 	QList<MapHandlerGen*> getMapsList() const { return h_maps.values(); }

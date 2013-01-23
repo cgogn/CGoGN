@@ -20,28 +20,29 @@ void ImportSurfacePlugin::importFromFile(const QString& fileName)
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
-		GenericMap* m = m_window->createMap(2);
-		PFP2::MAP* map = static_cast<PFP2::MAP*>(m);
-		MapHandler<PFP2>* h = new MapHandler<PFP2>(fi.baseName(), m_window, map);
+		MapHandlerGen* mhg = m_window->addMap(fi.baseName(), 2);
+		if(mhg)
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
+			PFP2::MAP* map = mh->getMap();
 
-		std::vector<std::string> attrNames ;
-		Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
+			std::vector<std::string> attrNames ;
+			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
 
-		// get vertex position attribute
-		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
+			// get vertex position attribute
+			VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
 
-		// create VBO for vertex position attribute
-		h->createVBO(position);
+			// create VBO for vertex position attribute
+			mh->createVBO(position);
 
-		// compute map bounding box
-		h->updateBB(position);
+			// compute map bounding box
+			mh->updateBB(position);
 
-		// compute primitive connectivity VBOs
-		h->updatePrimitives(Algo::Render::GL2::POINTS);
-		h->updatePrimitives(Algo::Render::GL2::LINES);
-		h->updatePrimitives(Algo::Render::GL2::TRIANGLES);
-
-		m_window->addMap(h);
+			// compute primitive connectivity VBOs
+			mh->updatePrimitives(Algo::Render::GL2::POINTS);
+			mh->updatePrimitives(Algo::Render::GL2::LINES);
+			mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
+		}
 	}
 }
 
