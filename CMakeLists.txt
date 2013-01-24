@@ -74,7 +74,9 @@ SET(CGoGN_EXT_INCLUDES
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
 	${LIBXML2_INCLUDE_DIR}
-	${Boost_INCLUDE_DIRS} )
+	${Boost_INCLUDE_DIRS}
+	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
+	${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig )
 
 # define libs for external libs
 SET (CGoGN_EXT_LIBS 

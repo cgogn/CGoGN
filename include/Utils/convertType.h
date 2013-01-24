@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <vector>
+#include <list>
 
 namespace CGoGN {
 
