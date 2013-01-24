@@ -293,7 +293,6 @@ bool HalfEdgeSelector_QEMextColor<PFP>::init()
 	{
 		assert(this->m_approximators[approxindex]->getType() == A_hQEM
 				|| this->m_approximators[approxindex]->getType() == A_hHalfCollapse
-				|| this->m_approximators[approxindex]->getType() != A_Lightfield
 				|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
 		bool saved = false ;
@@ -1670,9 +1669,9 @@ void HalfEdgeSelector_LightfieldKCL<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 	// New position
 	const VEC3& newPos = (this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos))[d] ; // get newPos
 
-	const REAL geomErr = quadGeom(newPos) ;
-	const REAL visualI = m_visualImportance[dd] ;
-	const REAL lferr = computeLightfieldError(d) ;
+	const REAL& geomErr = quadGeom(newPos) ;
+	const REAL& visualI = m_visualImportance[dd] ;
+	const REAL& lferr = computeLightfieldError(d) ;
 
 	//std::cout << lferr/geomErr << std::endl ;
 	const REAL& err =
@@ -1699,8 +1698,19 @@ typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeLightfieldError(D
 {
 	Dart v1 = this->m_map.phi1(v0) ;
 
-	//return computeSquaredLightfieldDifference(v0,v1) ;
 	REAL err = 0 ;
+	/*Traversor2VVaE<MAP> tv0(this->m_map,v0) ; // all vertices surrounding vertex v0
+	for (Dart vi = tv0.begin() ; vi != tv0.end() ; vi = tv0.next())
+	{
+		if (vi != v1)
+		{
+			err += computeSquaredLightfieldDifference(v1,vi) ;
+		}
+	}
+	return err ;
+*/
+
+	// return computeSquaredLightfieldDifference(v0,v1) ;
 	Traversor2VVaE<MAP> tv(this->m_map,v1) ; // all vertices surrounding vertex v0
 	for (Dart vi = tv.begin() ; vi != tv.end() ; vi = tv.next())
 	{
