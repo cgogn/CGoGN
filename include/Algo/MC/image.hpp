@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -919,4 +922,4 @@ bool Image<DataType>::checkSaddlecomputeNormal(const Geom::Vec3f& P, const Geom:
 } // end namespace
 } // end namespace
 } // end namespace
-
+}

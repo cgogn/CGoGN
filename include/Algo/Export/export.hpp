@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Export
 {
 
@@ -1014,6 +1017,8 @@ bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::V
 }
 
 } // namespace Export
+
+}
 
 } // namespace Algo
 

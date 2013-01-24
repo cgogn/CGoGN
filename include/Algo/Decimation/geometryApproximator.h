@@ -26,12 +26,16 @@
 #define __GEOMETRY_APPROXIMATOR_H__
 
 #include "Algo/Decimation/approximator.h"
+#include "Utils/convertType.h"
 #include <Eigen/Dense>
 
 namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace Decimation
@@ -172,6 +176,8 @@ public:
 
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

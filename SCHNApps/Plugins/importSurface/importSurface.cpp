@@ -17,19 +17,20 @@ bool ImportSurfacePlugin::enable()
 
 void ImportSurfacePlugin::cb_import()
 {
-	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off)");
+	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off *.trian)");
 	QFileInfo fi(fileName);
 
 	if(fi.exists())
 	{
-		MAP* m = new MAP();
-		MapHandler<PFP>* h = new MapHandler<PFP>(fi.baseName(), m_window, m);
+		GenericMap* m = m_window->createMap(2);
+		PFP2::MAP* map = static_cast<PFP2::MAP*>(m);
+		MapHandler<PFP2>* h = new MapHandler<PFP2>(fi.baseName(), m_window, map);
 
 		std::vector<std::string> attrNames ;
-		Algo::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
+		Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
 
 		// get vertex position attribute
-		VertexAttribute<VEC3> position = m->getAttribute<VEC3, CGoGN::VERTEX>(attrNames[0]);
+		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
 
 		// create VBO for vertex position attribute
 		h->createVBO(position);

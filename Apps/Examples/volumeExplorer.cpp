@@ -144,32 +144,9 @@ void MyQT::cb_Open()
 	size_t pos = filename.rfind(".");    // position of "." in filename
 	std::string extension = filename.substr(pos);
 
-	if(extension == std::string(".tet"))
-	{
-		if(!Algo::Import::importTet<PFP>(myMap,filename,attrNames))
-		{
-			CGoGNerr << "could not import " << filename << CGoGNendl ;
-			return;
-		}
-		else
-			position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
-	}
-
-	if(extension == std::string(".node"))
-	{
-		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::NODE))
-		{
-			std::cerr << "could not import " << filename << std::endl ;
-			return ;
-		}
-		else
-			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
-	}
-
-
 	if(extension == std::string(".off"))
 	{
-		if(!Algo::Import::importMeshToExtrude<PFP>(myMap, filename, attrNames))
+		if(!Algo::Volume::Import::importMeshToExtrude<PFP>(myMap, filename, attrNames))
 		{
 			std::cerr << "could not import " << filename << std::endl ;
 			return ;
@@ -179,6 +156,16 @@ void MyQT::cb_Open()
 			position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 			myMap.closeMap();
 		}
+	}
+	else
+	{
+		if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
+		{
+			std::cerr << "could not import " << filename << std::endl ;
+			return ;
+		}
+		else
+			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
 	}
 
 	color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
@@ -386,34 +373,11 @@ int main(int argc, char **argv)
 		size_t pos = filename.rfind(".");    // position of "." in filename
 		std::string extension = filename.substr(pos);
 
-		if(extension == std::string(".tet"))
-		{
-			if(!Algo::Import::importTet<PFP>(myMap,argv[1],attrNames))
-			{
-				CGoGNerr << "could not import " << argv[1] << CGoGNendl ;
-				return 1;
-			}
-			else
-				position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
-		}
-
-		if(extension == std::string(".node"))
-		{
-			if(!Algo::Import::importMeshV<PFP>(myMap, argv[1], attrNames, Algo::Import::ImportVolumique::NODE))
-			{
-				std::cerr << "could not import " << argv[1] << std::endl ;
-				return 1;
-			}
-			else
-				position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
-		}
-
-
 		if(extension == std::string(".off"))
 		{
-			if(!Algo::Import::importMeshToExtrude<PFP>(myMap, argv[1], attrNames))
+			if(!Algo::Volume::Import::importMeshToExtrude<PFP>(myMap, filename, attrNames))
 			{
-				std::cerr << "could not import "  << std::endl ;
+				std::cerr << "could not import " << filename << std::endl ;
 				return 1;
 			}
 			else
@@ -421,6 +385,16 @@ int main(int argc, char **argv)
 				position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 				myMap.closeMap();
 			}
+		}
+		else
+		{
+			if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
+			{
+				std::cerr << "could not import " << filename << std::endl ;
+				return 1;
+			}
+			else
+				position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
 		}
 
 		color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
@@ -443,10 +417,16 @@ int main(int argc, char **argv)
 	else
 	{
 		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
-		Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
+		Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
 		int nb = 8;
 		prim.hexaGrid_topo(nb,nb,nb);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);
+
+		for (unsigned int i=position.begin(); i != position.end(); position.next(i))
+		{
+			PFP::VEC3 pert(float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0));
+			position[i]+= pert;
+		}
 
 		color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
 		TraversorW<PFP::MAP> tra(myMap);

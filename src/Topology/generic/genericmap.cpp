@@ -46,15 +46,18 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		registerAttribute<Dart>("Dart");
 		registerAttribute<Mark>("Mark");
 
-		registerAttribute<long>("long");
-		registerAttribute<int>("int");
-		registerAttribute<short>("short");
 		registerAttribute<char>("char");
+		registerAttribute<short>("short");
+		registerAttribute<int>("int");
+		registerAttribute<long>("long");
 
-		registerAttribute<unsigned long>("unsigned long");
-		registerAttribute<unsigned int>("unsigned int");
-		registerAttribute<unsigned short>("unsigned short");
 		registerAttribute<unsigned char>("unsigned char");
+		registerAttribute<unsigned short>("unsigned short");
+		registerAttribute<unsigned int>("unsigned int");
+		registerAttribute<unsigned long>("unsigned long");
+
+		registerAttribute<float>("float");
+		registerAttribute<double>("double");
 
 		registerAttribute<Geom::Vec2f>(Geom::Vec2f::CGoGNnameOfType());
 		registerAttribute<Geom::Vec3f>(Geom::Vec3f::CGoGNnameOfType());
@@ -93,7 +96,8 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	}
 
 	// get & lock marker for boundary
-	m_boundaryMarker =  m_marksets[DART][0].getNewMark();
+	m_boundaryMarkers[0] =  m_marksets[DART][0].getNewMark();
+	m_boundaryMarkers[1] =  m_marksets[DART][0].getNewMark();
 
 	if (m_isMultiRes)
 		initMR() ;
@@ -102,7 +106,8 @@ GenericMap::GenericMap() : m_nbThreads(1)
 GenericMap::~GenericMap()
 {
 	// release marker for boundary
-	m_marksets[DART][0].releaseMark(m_boundaryMarker);
+	m_marksets[DART][0].releaseMark(m_boundaryMarkers[0]);
+	m_marksets[DART][0].releaseMark(m_boundaryMarkers[1]);
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
@@ -288,10 +293,10 @@ void GenericMap::removeLevelFront()
 	if(maxL > 0) //must have at min 2 levels (0 and 1) to remove the front one
 	{
 		AttributeMultiVector<unsigned int>* minMR = m_mrDarts[0] ;
-		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
+//		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
 		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 		{
-			unsigned int idx = (*minMR)[i] ;
+//			unsigned int idx = (*minMR)[i] ;
 			if((*m_mrLevels)[i] != 0)	// if the MRdart was introduced after the level we're removing
 			{
 				--(*m_mrLevels)[i]; //decrement his level of insertion
@@ -337,36 +342,39 @@ void GenericMap::duplicateDarts(unsigned int level)
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
-//void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
-//{
-//	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
-//	assert((orbit1 != DART && orbit2 != DART) || !"Cannot swap the darts container") ;
-//
-//	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
-//	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
-//	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
-//
-//	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
-//
-//	for(unsigned int t = 0; t < m_nbThreads; ++t)
-//	{
-//		AttributeMultiVector<Mark>* m = m_markTables[orbit1][t] ;
-//		m_markTables[orbit1][t] = m_markTables[orbit2][t] ;
-//		m_markTables[orbit2][t] = m ;
-//
-//		MarkSet ms = m_marksets[orbit1][t] ;
-//		m_marksets[orbit1][t] = m_marksets[orbit2][t] ;
-//		m_marksets[orbit2][t] = ms ;
-//	}
-//
-//	for(std::vector<CellMarkerGen*>::iterator it = cellMarkers.begin(); it != cellMarkers.end(); ++it)
-//	{
-//		if((*it)->m_cell == orbit1)
-//			(*it)->m_cell = orbit2 ;
-//		else if((*it)->m_cell == orbit2)
-//			(*it)->m_cell = orbit1 ;
-//	}
-//}
+void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
+{
+	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
+	assert((orbit1 != DART && orbit2 != DART) || !"Cannot swap the darts container") ;
+
+	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
+	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
+	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
+
+	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
+
+	for(unsigned int t = 0; t < m_nbThreads; ++t)
+	{
+		AttributeMultiVector<Mark>* m = m_markTables[orbit1][t] ;
+		m_markTables[orbit1][t] = m_markTables[orbit2][t] ;
+		m_markTables[orbit2][t] = m ;
+
+		MarkSet ms = m_marksets[orbit1][t] ;
+		m_marksets[orbit1][t] = m_marksets[orbit2][t] ;
+		m_marksets[orbit2][t] = ms ;
+	}
+
+	for (unsigned int i=0; i<NB_THREAD; ++i)
+	{
+		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
+		{
+			if((*it)->m_cell == orbit1)
+				(*it)->m_cell = orbit2 ;
+			else if((*it)->m_cell == orbit2)
+				(*it)->m_cell = orbit1 ;
+		}
+	}
+}
 
 void GenericMap::viewAttributesTables()
 {
@@ -592,12 +600,24 @@ bool GenericMap::loadMapBin(const std::string& filename)
 		fs.read(reinterpret_cast<char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
 	}
 
-
 	// retrieve m_embeddings (from m_attribs)
 	update_m_emb_afterLoad();
 
 	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
 	update_topo_shortcuts();
+
+	// restore nbThreads
+	std::vector<std::string> typeMark;
+	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
+	m_nbThreads = 0;
+	for (unsigned int i = 0; i < nbatt0; ++i)
+	{
+		if (typeMark[i] == "Mark")
+			++m_nbThreads;
+	}
+
+
+
 
 	return true;
 }
@@ -683,7 +703,9 @@ void GenericMap::update_topo_shortcuts()
 
 				if ((orbit == DART) && (thread == 0))	// for Marker of dart of thread O keep the boundary marker
 				{
-					Mark m(m_boundaryMarker);
+			// TODO Verifier ce qu fait exactement ce unsetMark sur m.invert ??
+//					Mark m(m_boundaryMarker);
+					Mark m(m_boundaryMarkers[0]+m_boundaryMarkers[1]);
 					m.invert();
 					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 						amvMark->operator[](i).unsetMark(m);
@@ -867,13 +889,6 @@ bool GenericMap::foreach_dart(FunctorType& f, const FunctorSelect& good)
 				return true;
 	}
 	return false;
-}
-
-void GenericMap::boundaryUnmarkAll()
-{
-	AttributeContainer& cont = getAttributeContainer<DART>() ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarker);
 }
 
 } // namespace CGoGN

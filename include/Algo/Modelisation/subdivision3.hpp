@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Modelisation
 {
 
@@ -110,7 +113,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 			else
 			{
 				typename PFP::VEC3 interP;
-				typename PFP::VEC3 vec(Algo::Geometry::vectorOutOfDart<PFP>(map,dd,position));
+				typename PFP::VEC3 vec(Surface::Geometry::vectorOutOfDart<PFP>(map,dd,position));
 				Geom::Intersection inter = Geom::intersectionLinePlane<typename PFP::VEC3, typename Geom::Plane3D<typename PFP::REAL > >(position[dd],vec,pl,interP);
 
 				if(inter==Geom::FACE_INTERSECTION)
@@ -437,7 +440,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 	//pre-computation : compute the centroid of all volume
 	VolumeAutoAttribute<EMB> attBary(map);
-	Algo::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary, selected);
+	Volume::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary, selected);
 
 	//subdivision
 	//1. cut edges
@@ -468,7 +471,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	TraversorF<typename PFP::MAP> travF(map) ;
 	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 	{
-		EMB center = Algo::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map,d,attributs);
+		EMB center = Surface::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map,d,attributs);
 
 		Dart dd = map.phi1(d) ;
 		Dart next = map.phi1(map.phi1(dd)) ;
@@ -654,7 +657,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		volCenter += position[map.phi_1(map.phi2(dit))];
 		volCenter /= 4;
 
-		Dart dres = Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit);
+		Dart dres = Volume::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit);
 		position[dres] = volCenter;
 	}
 
@@ -667,7 +670,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		if(m.isMarked(dit))
 		{
 			m.unmarkOrbit<FACE>(dit);
-			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit);
+			Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit);
 		}
 	}
 
@@ -692,7 +695,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 			faceCenter += position[map.phi_1(dit)];
 			faceCenter /= 3;
 
-			Dart dres = Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit);
+			Dart dres = Volume::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit);
 			position[dres] = faceCenter;
 		}
 	}
@@ -707,14 +710,98 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		{
 			m.unmarkOrbit<EDGE>(dit);
 			Dart d = map.phi2(map.phi3(map.findBoundaryFaceOfEdge(dit)));
-			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
+			Volume::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
 
 		}
 	}
 }
 
+//template <typename PFP>
+//void reverseOrientation3(typename PFP::MAP& map)
+//{
+//	DartAttribute<unsigned int> emb0(&map, map.template getEmbeddingAttributeVector<VERTEX>()) ;
+//	if(emb0.isValid())
+//	{
+//		DartAttribute<unsigned int> new_emb0 = map.template addAttribute<unsigned int, DART>("new_EMB_0") ;
+//		for(Dart d = map.begin(); d != map.end(); map.next(d))
+//			new_emb0[d] = emb0[map.phi1(d)] ;
+//		map.template swapAttributes<unsigned int>(emb0, new_emb0) ;
+//		map.removeAttribute(new_emb0) ;
+//	}
+//
+//	DartAttribute<Dart> phi2 = map.template getAttribute<Dart, DART>("phi2") ;
+//	DartAttribute<Dart> phi3 = map.template getAttribute<Dart, DART>("phi3") ;
+//	map.template swapAttributes<Dart>(phi2, phi3) ;
+//}
+//
+//template <typename PFP>
+//void computeDual3(typename PFP::MAP& map, const FunctorSelect& selected)
+//{
+//	DartAttribute<Dart> phi1 = map.template getAttribute<Dart, DART>("phi1") ;
+//	DartAttribute<Dart> phi_1 = map.template getAttribute<Dart, DART>("phi_1") ;
+//	DartAttribute<Dart> new_phi1 = map.template addAttribute<Dart, DART>("new_phi1") ;
+//	DartAttribute<Dart> new_phi_1 = map.template addAttribute<Dart, DART>("new_phi_1") ;
+//
+//	DartAttribute<Dart> phi2 = map.template getAttribute<Dart, DART>("phi2") ;
+//	DartAttribute<Dart> new_phi2 = map.template addAttribute<Dart, DART>("new_phi2") ;
+//
+//	for(Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		Dart dd = map.phi2(map.phi3(d)) ;
+//		new_phi1[d] = dd ;
+//		new_phi_1[dd] = d ;
+//
+//		Dart ddd = map.phi1(map.phi3(d));
+//		new_phi2[d] = ddd;
+//		new_phi2[ddd] = d;
+//	}
+//
+//	map.template swapAttributes<Dart>(phi1, new_phi1) ;
+//	map.template swapAttributes<Dart>(phi_1, new_phi_1) ;
+//	map.template swapAttributes<Dart>(phi2, new_phi2) ;
+//
+//	map.removeAttribute(new_phi1) ;
+//	map.removeAttribute(new_phi_1) ;
+//	map.removeAttribute(new_phi2) ;
+//
+//	map.swapEmbeddingContainers(VERTEX, VOLUME) ;
+//
+//	for(Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if(map.isBoundaryMarked(d))
+//		{
+//			map.deleteVolume(d);
+////			Traversor3VW<typename PFP::MAP> tWV(map, d);
+////			std::vector<Dart> v;
+////			for(Dart ditW = tWV.begin() ; ditW != tWV.end() ; ditW = tWV.next())
+////			{
+////				v.push_back(ditW);
+////			}
+////
+////			for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
+////			{
+////				map.deleteVolume(*it);
+////			}
+//
+//		}
+//	}
+//
+////	reverseOrientation3<PFP>(map) ;
+//
+//	//boundary management
+////	for(Dart d = map.begin(); d != map.end(); map.next(d))
+////	{
+////		if(map.isBoundaryMarked(d))
+////		{
+////			map.deleteVolume(d); //map.template boundaryMarkOrbit<VOLUME>(
+////		}
+////	}
+//}
+
 
 } //namespace Modelisation
+
+} // volume
 
 } //namespace Algo
 

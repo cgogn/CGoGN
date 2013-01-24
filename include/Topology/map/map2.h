@@ -58,6 +58,7 @@ public:
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+5; }
 
 	static const unsigned int IN_PARENT = 5 ;
+	static const unsigned int DIMENSION = 2 ;
 
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT = EDGE+5;
@@ -125,16 +126,22 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Create an new polyline of nbEdges, i.e 2*nbEdges darts pairwise sewn by phi2
+	/*! @param nbEdges the number of edges
+	 *  @return return a dart of the face
+	 */
+	virtual Dart newPolyLine(unsigned int nbEdges) ;
+
 	//! Create an new face of nbEdges
 	/*! @param nbEdges the number of edges
-	 *  @param withBoudary create the face and its boundary (default true)
+	 *  @param withBoundary create the face and its boundary (default true)
 	 *  @return return a dart of the face
 	 */
 	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
 
 	//! Delete the face of d
 	/*! @param d a dart of the face
-	 *  @param withBoudary create or extend boundary face instead of fixed points (default true)
+	 *  @param withBoundary create or extend boundary face instead of fixed points (default true)
 	 */
 	virtual void deleteFace(Dart d, bool withBoundary = true) ;
 
@@ -148,6 +155,12 @@ public:
 	 *  @param d a dart of the face to fill
 	 */
 	virtual void fillHole(Dart d) ;
+
+	//! Open the mesh Transforming a face in a hole
+	/*! \pre Dart d is NOT boundary marked
+	 *  @param d a dart of the face filled
+	 */
+	virtual void createHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators
@@ -215,6 +228,18 @@ public:
 	 *
 	 */
 	void swapEdges(Dart d, Dart e);
+
+	 //	 *  @param d dart of the vertex
+	 //	 *  @param e dart of the edge
+	 //	 */
+	virtual void insertEdgeInVertex(Dart d, Dart e);
+	 //
+	 //	//! Remove an edge from a vertex orbit
+	 //	/*! \pre Dart d must be phi2 sewed
+	 //	 *  @param d the dart of the edge to remove from the vertex
+	 //	 * @return true if the removal has been executed, false otherwise
+	 //	 */
+	virtual bool removeEdgeFromVertex(Dart d);
 
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Edges of darts d & e MUST be boundary edges
@@ -449,6 +474,11 @@ public:
 	 *************************************************************************/
 
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of phi2). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of phi2 relation
 	 *  Add a face to the map that closes the hole.
@@ -463,7 +493,24 @@ public:
 	 *  These faces are marked as boundary.
 	 *  @return the number of closed holes
 	 */
-	unsigned int closeMap();
+	unsigned int closeMap(bool forboundary = true);
+	//@}
+
+
+	/*! @name Compute dual
+	 * These functions compute the dual mesh
+	 *************************************************************************/
+
+	//@{
+	//! Reverse the orientation of the map
+	/*!
+	 */
+	void reverseOrientation();
+
+	//! Dual mesh computation (open or closed)
+	/*! Crop the infinite faces of open meshes
+	 */
+	void computeDual();
 	//@}
 };
 

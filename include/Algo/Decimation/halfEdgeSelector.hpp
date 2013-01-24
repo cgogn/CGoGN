@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -1791,6 +1794,8 @@ typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeSquaredLightfield
 
 
 } // namespace Decimation
+
+}
 
 } // namespace Algo
 

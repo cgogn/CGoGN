@@ -183,7 +183,7 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 	const VertexAttribute<typename PFP::VEC3>& position = *pos ;
 
 	// compute normal to polygon
-	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(map, d, position);
+	typename PFP::VEC3 normalPoly = Algo::Surface::Geometry::newellNormal<PFP>(map, d, position);
 
 	// first pass create polygon in chained list with angle computation
 	VertexPoly* vpp = NULL;
@@ -336,7 +336,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 		{
 			std::list<Dart> bound;
 
-			if (good(dd) && !map.isBoundaryMarked(dd))
+			if (good(dd) && !map.template isBoundaryMarked<PFP::MAP::DIMENSION>(dd))
 			{
 				if(position == NULL)
 					addTri<PFP>(map, dd, tableIndices);
@@ -362,7 +362,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 					{
 						if (!m.isMarked(f))
 						{
-							if (good(f) && !map.isBoundaryMarked(f))
+							if (good(f) && !map.template isBoundaryMarked<PFP::MAP::DIMENSION>(f))
 							{
 								if(position == NULL)
 									addTri<PFP>(map, f, tableIndices);

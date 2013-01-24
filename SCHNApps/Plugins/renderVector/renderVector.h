@@ -15,14 +15,13 @@ struct PerMapParameterSet
 {
 	PerMapParameterSet() :
 		positionVBO(NULL),
-		vectorVBO(NULL),
 		vectorsScaleFactor(1.0f)
 	{}
 
 	PerMapParameterSet(MapHandlerGen* map);
 
 	Utils::VBO* positionVBO;
-	Utils::VBO* vectorVBO;
+	std::vector<Utils::VBO*> vectorVBO;
 	float vectorsScaleFactor;
 };
 
@@ -99,7 +98,7 @@ protected:
 public slots:
 	void cb_selectedMapChanged();
 	void cb_positionVBOChanged(int index);
-	void cb_vectorVBOChanged(int index);
+	void cb_selectedVectorVBOChanged();
 	void cb_refreshVBOs();
 	void cb_vectorsScaleFactorChanged(int i);
 };

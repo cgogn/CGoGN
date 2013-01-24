@@ -58,6 +58,17 @@ inline AttributeHandler<T ,ORBIT> AttribMap::getAttribute(const std::string& nam
 }
 
 template <typename T, unsigned int ORBIT>
+inline AttributeHandler<T ,ORBIT> AttribMap::checkAttribute(const std::string& nameAttr)
+{
+	AttributeHandler<T,ORBIT> att = this->getAttribute<T,ORBIT>(nameAttr);
+	if (!att.isValid())
+		att = this->addAttribute<T,ORBIT>("position");
+	return att;
+}
+
+
+
+template <typename T, unsigned int ORBIT>
 inline bool AttribMap::swapAttributes(AttributeHandler<T, ORBIT>& attr1, AttributeHandler<T, ORBIT>& attr2)
 {
 	assert((attr1.isValid() && attr2.isValid()) || !"Invalid attribute handler") ;

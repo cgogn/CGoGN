@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -163,6 +166,9 @@ void decimate(
 		case S_NormalArea :
 			selector = new EdgeSelector_NormalArea<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_CurvatureTensor :
+			selector = new EdgeSelector_CurvatureTensor<PFP>(map, position, approximators, selected) ;
+			break ;
 		case S_MinDetail :
 			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators, selected) ;
 			break ;
@@ -260,6 +266,8 @@ void decimate(
 }
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

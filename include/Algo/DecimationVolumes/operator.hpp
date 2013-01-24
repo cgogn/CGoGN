@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace DecimationVolumes
 {
 
@@ -159,6 +162,8 @@ void OperatorList<PFP>::refine(VertexAttribute<typename PFP::VEC3>& position)
 
 
 } //end namespace DecimationVolumes
+
+}
 
 } //end namespace Algo
 

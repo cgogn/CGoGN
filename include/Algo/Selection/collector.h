@@ -41,6 +41,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Selection
 {
 
@@ -60,6 +63,8 @@ protected:
 
 	Dart centerDart;
 
+	bool isInsideCollected;
+
 	std::vector<Dart> insideVertices;
 	std::vector<Dart> insideEdges;
 	std::vector<Dart> insideFaces;
@@ -71,6 +76,7 @@ public:
 	inline void init(Dart d)
 	{
 		centerDart = d;
+		isInsideCollected = false;
 		insideVertices.clear();
 		insideEdges.clear();
 		insideFaces.clear();
@@ -97,18 +103,26 @@ public:
 
 	inline Dart getCenterDart() const { return centerDart; }
 
-	inline const std::vector<Dart>& getInsideVertices() const { return insideVertices; }
-	inline const std::vector<Dart>& getInsideEdges() const { return insideEdges; }
-	inline const std::vector<Dart>& getInsideFaces() const { return insideFaces; }
+	inline const std::vector<Dart>& getInsideVertices() const { assert(isInsideCollected || !"getInsideVertices: inside cells have not been collected.") ; return insideVertices; }
+	inline const std::vector<Dart>& getInsideEdges() const { assert(isInsideCollected || !"getInsideEdges: inside cells have not been collected.") ; return insideEdges; }
+	inline const std::vector<Dart>& getInsideFaces() const { assert(isInsideCollected || !"getInsideFaces: inside cells have not been collected.") ; return insideFaces; }
 	inline const std::vector<Dart>& getBorder() const { return border; }
 
-	inline unsigned int getNbInsideVertices() const { return insideVertices.size(); }
-	inline unsigned int getNbInsideEdges() const { return insideEdges.size(); }
-	inline unsigned int getNbInsideFaces() const { return insideFaces.size(); }
+	inline unsigned int getNbInsideVertices() const { assert(isInsideCollected || !"getNbInsideVertices: inside cells have not been collected.") ; return insideVertices.size(); }
+	inline unsigned int getNbInsideEdges() const { assert(isInsideCollected || !"getNbInsideEdges: inside cells have not been collected.") ; return insideEdges.size(); }
+	inline unsigned int getNbInsideFaces() const { assert(isInsideCollected || !"getNbInsideFaces: inside cells have not been collected.") ; return insideFaces.size(); }
 	inline unsigned int getNbBorder() const { return border.size(); }
 
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
+
+	virtual REAL computeArea (const VertexAttribute<VEC3>& pos) {
+		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
+		return 0.0;
+	}
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+
 };
 
 /*********************************************************
@@ -125,12 +139,52 @@ public:
 template <typename PFP>
 class Collector_OneRing : public Collector<PFP>
 {
+protected:
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 public:
 	Collector_OneRing(typename PFP::MAP& m, unsigned int thread=0):
 		Collector<PFP>(m, thread) {}
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
+
+	REAL computeArea(const VertexAttribute<VEC3>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>&edgeangle, typename PFP::MATRIX33&);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&);
 };
+
+/*********************************************************
+ * Collector One Ring around edge
+ *********************************************************/
+
+/*
+ * insideVertices = 2 ends of center edge (centerDart)
+ * insideEdges = center egde + edges adjacent by a vertex
+ *             = union of stars of 1-rings of the 2 ends
+ * insideFaces = triangles incident to the 2 ends
+ * border = vertices of 1-ring -> link (set of adjacent vertices)
+ *        = edges of 1-ring
+ */
+
+template <typename PFP>
+class Collector_OneRing_AroundEdge : public Collector<PFP>
+{
+protected:
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+public:
+	Collector_OneRing_AroundEdge(typename PFP::MAP& m, unsigned int thread=0):
+		Collector<PFP>(m, thread) {}
+	void collectAll(Dart d);
+	void collectBorder(Dart d);
+
+	REAL computeArea(const VertexAttribute<VEC3>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>&edgeangle, typename PFP::MATRIX33&);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&);
+};
+
 
 /*********************************************************
  * Collector Within Sphere
@@ -146,26 +200,28 @@ template <typename PFP>
 class Collector_WithinSphere : public Collector<PFP>
 {
 protected:
-	const VertexAttribute<typename PFP::VEC3>& position;
-	typename PFP::REAL radius;
-	typename PFP::REAL area;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	const VertexAttribute<VEC3>& position;
+	REAL radius;
 
 public:
-	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL r = 0, unsigned int thread=0) :
+	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<VEC3>& p, REAL r = 0, unsigned int thread=0) :
 		Collector<PFP>(m, thread),
 		position(p),
-		radius(r),
-		area(0)
+		radius(r)
 	{}
-	inline void setRadius(typename PFP::REAL r) { radius = r; }
-	inline typename PFP::REAL getRadius() const { return radius; }
-	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position; }
+	inline void setRadius(REAL r) { radius = r; }
+	inline REAL getRadius() const { return radius; }
+	inline const VertexAttribute<VEC3>& getPosition() const { return position; }
 
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	void computeArea();
-	inline typename PFP::REAL getArea() const { return area; }
+	REAL computeArea(const VertexAttribute<VEC3>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&);
 };
 
 /*********************************************************
@@ -208,6 +264,7 @@ class CollectorCriterion
 {
 public :
 	CollectorCriterion() {};
+	virtual ~CollectorCriterion() {} ;
 	virtual void init(Dart center) = 0;
 	virtual bool isInside(Dart d) = 0;
 
@@ -458,9 +515,8 @@ private :
 
 
 } // namespace Selection
-
+} // surface
 } // namespace Algo
-
 } // namespace CGoGN
 
 #include "Algo/Selection/collector.hpp"

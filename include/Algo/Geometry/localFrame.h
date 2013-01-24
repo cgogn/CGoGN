@@ -44,8 +44,8 @@ namespace Geometry
 template <typename PFP>
 void vertexLocalFrame(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
-	Z = vertexNormal<PFP>(map, d, position) ;
-	X = vectorOutOfDart<PFP>(map, d, position) ;
+	Z = Algo::Surface::Geometry::vertexNormal<PFP>(map, d, position) ;
+	X = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, d, position) ;
 	Y = Z ^ X ;
 	Y.normalize() ;
 	X = Y ^ Z ;
@@ -70,7 +70,7 @@ template <typename PFP>
 void vertexLocalFrame(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::VEC3& normal, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
 	Z = normal ;
-	X = vectorOutOfDart<PFP>(map, d, position) ;
+	X = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, d, position) ;
 	Y = Z ^ X ;
 	Y.normalize() ;
 	X = Y ^ Z ;

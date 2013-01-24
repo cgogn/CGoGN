@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
@@ -1180,7 +1183,7 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(VertexAttribu
 	DartMarker mf(*m_map);
 	for (Dart d = m_map->begin(); d != m_map->end();)	// next done inside loop because of deleteFace
 	{
-		if (!mf.isMarked(d) && !m_map->isBoundaryMarked(d))
+		if (!mf.isMarked(d) && !m_map->isBoundaryMarked2(d))
 		{
 			Dart dd = d;
 			Dart e = m_map->phi1(d);
@@ -1205,7 +1208,7 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(VertexAttribu
 //	vecF.reserve(8192);
 //	for (Dart d = m_map->begin(); d != m_map->end();m_map->next(d))	// next done inside loop because of deleteFace
 //	{
-//		if ((!mf.isMarked(d)) && (!m_map->isBoundaryMarked(d)) )
+//		if ((!mf.isMarked(d)) && (!m_map->isBoundaryMarked2(d)) )
 //		{
 //			Dart dd = d;
 //			Dart e = m_map->phi1(d);
@@ -1248,6 +1251,8 @@ void MarchingCube<DataType, Windowing, PFP>::setZSliceAttrib(EdgeAttribute<unsig
 
 
 } // namespace MC
+
+}
 
 } // namespace Algo
 

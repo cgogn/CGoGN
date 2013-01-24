@@ -87,7 +87,7 @@ void MyQT::cb_initGL()
 	m_lines->setScale(2.0f);
 	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
 
-	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+	Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
@@ -298,7 +298,7 @@ int main(int argc, char **argv)
 	if (argc==2)
 		nbt = atoi(argv[1]);
  		// create a sphere
- 	Algo::Modelisation::Polyhedron<PFP> prim(myMap, position);
+ 	Algo::Surface::Modelisation::Polyhedron<PFP> prim(myMap, position);
  	prim.cylinder_topo(nbt,nbt, true, true);
  	prim.embedSphere(20.0f);
 

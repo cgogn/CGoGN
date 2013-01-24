@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace IHM
 {
 
@@ -47,9 +50,8 @@ template <typename PFP>
 void coarsenFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position) ;
 
 } //namespace IHM
-
+} // Surface
 } //namespace Algo
-
 } //namespace CGoGN
 
 #include "Algo/ImplicitHierarchicalMesh/subdivision.hpp"

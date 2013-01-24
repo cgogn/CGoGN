@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -496,5 +499,5 @@ DATATYPE BufferGen<DART,DATATYPE>::getData2(int _lX, int _lY)
 } // end namespace
 } // end namespace
 } // end namespace
-
+}
 

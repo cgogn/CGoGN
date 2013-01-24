@@ -8,16 +8,19 @@ INCLUDE_DIRECTORIES(
 
 SET( PLUGIN_SRC
     ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/src/differentialProperties.cpp
-    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/src/computeNormalsDialog.cpp
+    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/src/computeNormalDialog.cpp
+    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/src/computeCurvatureDialog.cpp
 )
 
 SET( PLUGIN_H
     ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/include/differentialProperties.h
-    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/include/computeNormalsDialog.h
+    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/include/computeNormalDialog.h
+    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/include/computeCurvatureDialog.h
 )
 
 SET( PLUGIN_FORM
-	${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/forms/computeNormalsDialog.ui
+	${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/forms/computeNormalDialog.ui
+	${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/forms/computeCurvatureDialog.ui
 )
 
 IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )

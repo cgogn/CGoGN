@@ -61,6 +61,7 @@ public:
 
 	Utils::VBO* getVBO(const QString& name);
 	QList<Utils::VBO*> getVBOList() const { return h_vbo.values(); }
+	QList<Utils::VBO*> getVBOList(const std::string& typeName);
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
@@ -102,11 +103,11 @@ public:
 			delete m_map;
 	}
 
-	typename PFP::MAP* getMap() { return reinterpret_cast<typename PFP::MAP*>(m_map); }
+	typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
 
 	void updateBB(const VertexAttribute<typename PFP::VEC3>& position)
 	{
-		CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), position);
+		CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), position);
 		m_bbMin = qglviewer::Vec(bb.min()[0], bb.min()[1], bb.min()[2]);
 		m_bbMax = qglviewer::Vec(bb.max()[0], bb.max()[1], bb.max()[2]);
 		m_bbDiagSize = (m_bbMax - m_bbMin).norm();
@@ -114,7 +115,7 @@ public:
 
 	void updatePrimitives(int primitive, const FunctorSelect& good = allDarts)
 	{
-		m_render->initPrimitives<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
+		m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
 	}
 };
 

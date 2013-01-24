@@ -4,23 +4,9 @@
 #include "plugin.h"
 #include "ui_subdivideSurface.h"
 
-#include "Topology/generic/functor.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/attributeHandler.h"
-
 
 using namespace CGoGN;
 using namespace SCHNApps;
-
-
-struct PFP: public PFP_STANDARD
-{
-	typedef EmbeddedMap2 MAP;
-};
-
-typedef PFP::MAP MAP;
-typedef PFP::VEC3 VEC3;
 
 
 class SubdivideSurfaceDockTab : public QWidget, public Ui::SubdivideSurfaceWidget

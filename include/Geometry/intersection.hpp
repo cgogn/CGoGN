@@ -347,7 +347,7 @@ template <typename VEC3>
 Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter)
 {
 	typedef typename VEC3::DATA_TYPE T ;
-	const T precision = std::numeric_limits<T>::min();
+	const T precision = 0.0001;//std::numeric_limits<T>::min();
 
 	VEC3 u = Tb - Ta ;
 	VEC3 v = Tc - Ta ;
@@ -381,9 +381,18 @@ Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const V
 
     // get and test parametric coords
 	T s = ((uv * wv) - (vv * wu)) / D ;
+
+	if(s <= precision)
+		s = 0.0f;
+
 	if(s < T(0) || s > T(1))
 		return NO_INTERSECTION ;
+
 	T t = ((uv * wu) - (uu * wv)) / D ;
+
+	if(t <= precision)
+		t = 0.0f;
+
 	if(t < T(0) || (s + t) > T(1))
         return NO_INTERSECTION ;
 

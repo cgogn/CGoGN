@@ -51,6 +51,8 @@ protected:
 public:
 	Map1();
 
+	static const unsigned int DIMENSION = 1 ;
+
 	virtual std::string mapTypeName() const;
 
 	virtual unsigned int dimension() const;
@@ -113,7 +115,7 @@ public:
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	Dart newBoundaryCycle(unsigned int nbEdges);
+//	Dart newBoundaryCycle(unsigned int nbEdges);
 
 	//! Delete an oriented face erasing all its darts
 	/*! @param d a dart of the face

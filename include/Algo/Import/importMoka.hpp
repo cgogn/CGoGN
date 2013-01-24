@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Import
 {
 
@@ -127,6 +130,8 @@ bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vecto
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

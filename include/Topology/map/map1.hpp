@@ -161,8 +161,11 @@ inline Dart Map1::cutEdge(Dart d)
 	Dart e = newDart() ;	// Create a new dart
 	phi1sew(d, e) ;			// Insert dart e between d and phi1(d)
 
-	if (isBoundaryMarked(d))
-		boundaryMark(e);
+	if (isBoundaryMarked2(d))
+		boundaryMark2(e);
+
+	if (isBoundaryMarked3(d))
+		boundaryMark3(e);
 
 	return e ;
 }

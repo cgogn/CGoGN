@@ -46,6 +46,8 @@
 
 using namespace CGoGN ;
 
+namespace SAlgo = ::CGoGN::Algo::Surface;
+
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
@@ -83,7 +85,7 @@ public:
 	Utils::ShaderSimpleColor* m_simpleColorShader ;
 
 	DATATYPE valLabel;
-	Algo::MC::Image<DATATYPE>* myImg;
+	SAlgo::MC::Image<DATATYPE>* myImg;
 
 	MCMesh() ;
 

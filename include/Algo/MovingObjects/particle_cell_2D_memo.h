@@ -17,6 +17,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MovingObjects
 {
 
@@ -42,22 +45,21 @@ public:
 
 	}
 
-	void vertexState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
+	virtual void vertexState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
 
-	void edgeState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
+	virtual void edgeState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
 
-	void faceState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
+	virtual void faceState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
 
-	std::vector<Dart> move(const VEC3& goal) ;
 	std::vector<Dart> move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross) ;
+	std::vector<Dart> move(const VEC3& goal);
 } ;
 
+}
+}
+}
+}
+
 #include "particle_cell_2D_memo.hpp"
-
-}
-
-}
-
-}
 
 #endif

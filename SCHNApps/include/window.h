@@ -3,7 +3,7 @@
 
 #include "ui_window.h"
 
-#include "system.h"
+#include "types.h"
 
 class QVBoxLayout;
 class QSplitter;
@@ -252,6 +252,7 @@ public:
 	 * MANAGE MAPS
 	 *********************************************************/
 
+	GenericMap* createMap(unsigned int dim);
 	bool addMap(MapHandlerGen* map);
 	void removeMap(const QString& name);
 	MapHandlerGen* getMap(const QString& name) const;

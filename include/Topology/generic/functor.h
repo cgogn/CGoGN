@@ -120,6 +120,29 @@ inline SelectorOr operator||(const FunctorSelect& fs1, const FunctorSelect& fs2)
 	return SelectorOr(fs1,fs2);
 }
 
+template <typename MAP>
+class SelectorVertexBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorVertexBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return m_map.isBoundaryVertex(d); }
+	FunctorSelect* copy() const { return new SelectorVertexBoundary(m_map);}
+};
+
+template <typename MAP>
+class SelectorVertexNoBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorVertexNoBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return !m_map.isBoundaryVertex(d); }
+	FunctorSelect* copy() const { return new SelectorVertexNoBoundary(m_map);}
+};
 
 template <typename MAP>
 class SelectorEdgeBoundary : public FunctorSelect
@@ -146,6 +169,9 @@ public:
 	FunctorSelect* copy() const { return new SelectorEdgeNoBoundary(m_map);}
 };
 
+/**
+ * Selector for darts of boundary (of current dimension)
+ */
 template <typename MAP>
 class SelectorDartBoundary : public FunctorSelect
 {
@@ -154,10 +180,13 @@ protected:
 	MAP& m_map;
 public:
 	SelectorDartBoundary(MAP& m): m_map(m) {}
-	bool operator()(Dart d) const { return m_map.isBoundaryMarked(d); }
+	bool operator()(Dart d) const { return m_map.template isBoundaryMarked<MAP::DIMENSION>(d); }
 	FunctorSelect* copy() const { return new SelectorDartBoundary(m_map);}
 };
 
+/**
+ * Selector for darts not of boundary (of current dimension)
+ */
 
 template <typename MAP>
 class SelectorDartNoBoundary : public FunctorSelect
@@ -167,7 +196,7 @@ protected:
 	MAP& m_map;
 public:
 	SelectorDartNoBoundary(MAP& m): m_map(m) {}
-	bool operator()(Dart d) const { return !m_map.isBoundaryMarked(d); }
+	bool operator()(Dart d) const { return !m_map.template isBoundaryMarked<MAP::DIMENSION>(d); }
 	FunctorSelect* copy() const { return new SelectorDartNoBoundary(m_map);}
 };
 
@@ -196,51 +225,6 @@ public:
 	bool operator()(Dart d) const { return (m_map.getDartLevel(d) == m_level) && (m_map.getDartLevel(m_map.phi2(d)) == m_level); }
 	FunctorSelect* copy() const { return new SelectorEdgeLevel(m_map, m_level);}
 };
-
-
-//
-//class SelectorDartMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const DartMarker& m_dm;
-//public:
-//	SelectorDartMarked(const DartMarker& dm): m_dm(dm)  {}
-//	bool operator()(Dart d) const { return m_dm.isMarked(d); }
-//};
-//
-//
-//class SelectorCellMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const CellMarker& m_cm;
-//public:
-//	SelectorCellMarked(const CellMarker& cm): m_cm(cm)  {}
-//	bool operator()(Dart d) const { return m_cm.isMarked(d); }
-//};
-//
-//class SelectorDartNotMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const DartMarker& m_dm;
-//public:
-//	SelectorDartNotMarked(const DartMarker& dm): m_dm(dm)  {}
-//	bool operator()(Dart d) const { return !m_dm.isMarked(d); }
-//};
-//
-//
-//template <typename MAP>
-//class SelectorCellNotMarked : public FunctorSelect
-//{
-//public:
-//protected:
-//	const CellMarker& m_cm;
-//public:
-//	SelectorCellNotMarked(const CellMarker& cm): m_cm(cm)  {}
-//	bool operator()(Dart d) const { return !m_cm.isMarked(d); }
-//};
 
 
 // Counting Functors : increment its value every time it is applied
@@ -372,7 +356,7 @@ public:
 	FunctorStoreNotBoundary(MAP& map, std::vector<Dart>& vec) : FunctorMap<MAP>(map), m_vec(vec) {}
 	bool operator()(Dart d)
 	{
-		if (!this->m_map.isBoundaryMarked(d))
+		if (!this->m_map.template isBoundaryMarked<MAP::DIMENSION>(d))
 			m_vec.push_back(d);
 		return false;
 	}

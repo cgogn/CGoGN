@@ -31,6 +31,8 @@
 #include "Container/fakeAttribute.h"
 #include "Utils/qem.h"
 #include "Utils/quadricRGBfunctions.h"
+#include "Algo/Geometry/normal.h"
+#include "Algo/Selection/collector.h"
 #include "Algo/Geometry/curvature.h"
 #include "Algo/Geometry/area.h"
 
@@ -38,6 +40,9 @@ namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace Decimation
@@ -374,14 +379,14 @@ public:
 		if(!normal.isValid())
 		{
 			normal = m.template addAttribute<VEC3, VERTEX>("normal") ;
-			Algo::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
 		}
 
 		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
 		if(!edgeangle.isValid())
 		{
 			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
-			Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
+			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
 		kmax = m.template getAttribute<REAL, VERTEX>("kmax") ;
@@ -398,7 +403,7 @@ public:
 			Kmax = m.template addAttribute<VEC3, VERTEX>("Kmax") ;
 			Kmin = m.template addAttribute<VEC3, VERTEX>("Kmin") ;
 			Knormal = m.template addAttribute<VEC3, VERTEX>("Knormal") ;
-			Algo::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+			Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 		}
 
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -421,6 +426,66 @@ public:
 
 	void updateWithoutCollapse();
 } ;
+
+
+template <typename PFP>
+class EdgeSelector_CurvatureTensor : public EdgeSelector<PFP>
+{
+	// TODO : this selector still needs to be tested
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "CurvatureTensorEdgeInfo" ; }
+	} CurvatureTensorEdgeInfo ;
+	typedef NoMathIOAttribute<CurvatureTensorEdgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	EdgeAttribute<REAL> edgeangle ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, VEC3,EDGE>* m_positionApproximator ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d) ; // TODO : usually has a 2nd arg (, bool recompute) : why ??
+	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
+
+public:
+	EdgeSelector_CurvatureTensor(MAP& m, VertexAttribute<VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_positionApproximator(NULL)
+	{
+		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
+		if(!edgeangle.isValid())
+		{
+			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
+			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
+		}
+
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+	}
+	~EdgeSelector_CurvatureTensor()
+	{
+		this->m_map.removeAttribute(edgeangle) ; // TODO : pas malin s'il existait avant
+		this->m_map.removeAttribute(edgeInfo) ;
+	}
+	SelectorType getType() { return S_CurvatureTensor ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() {};
+} ;
+
 
 template <typename PFP>
 class EdgeSelector_MinDetail : public EdgeSelector<PFP>
@@ -703,6 +768,8 @@ public:
 } ;
 
 } // namespace Decimation
+
+}
 
 } // namespace Algo
 

@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Remeshing
 {
 
@@ -38,6 +41,8 @@ template <typename PFP>
 void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal) ;
 
 } // namespace Remeshing
+
+}
 
 } // namespace Algo
 

@@ -21,11 +21,9 @@ file(
 	GLOB
 	SCHNApps_SRC_FILES
 	${SCHNApps_ROOT_DIR}/src/camera.cpp
-	${SCHNApps_ROOT_DIR}/src/context.cpp
 	${SCHNApps_ROOT_DIR}/src/main.cpp
 	${SCHNApps_ROOT_DIR}/src/mapHandler.cpp
 	${SCHNApps_ROOT_DIR}/src/plugin.cpp
-	${SCHNApps_ROOT_DIR}/src/system.cpp
 	${SCHNApps_ROOT_DIR}/src/view.cpp
 	${SCHNApps_ROOT_DIR}/src/window.cpp
 	${SCHNApps_ROOT_DIR}/src/viewButtonArea.cpp

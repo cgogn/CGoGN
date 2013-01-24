@@ -13,7 +13,6 @@
 //#include <QRegExp>
 //#include <QTextBrowser>
 
-#include "system.h"
 #include "window.h"
 #include "plugin.h"
 
@@ -45,9 +44,6 @@ PluginsDialog::PluginsDialog(Window* window) :
 //	restoreState();
 
 	addPluginsDirectory(m_window->getAppPath() + QString("/../Plugins/"));
-
-	if (System::Error::code != System::Error::SUCCESS)
-		System::Error::showError(this);
 
 	init = false;
 }
@@ -163,7 +159,7 @@ void PluginsDialog::addPluginsDirectory(const QString& dir)
 	QDir directory(dir);
 
 	if (!directory.exists())
-		System::Error::code = System::Error::BAD_PLUGIN_PATH_IN_FILE_f(directory.absolutePath());
+		return;
 
 	QTreeWidgetItem *dirItem = new QTreeWidgetItem(treeWidget, DIR);
 	dirItem->setText(1, directory.path());
@@ -195,9 +191,6 @@ void PluginsDialog::addPluginsDirectory(const QString& dir)
 
 		m_listedPlugins[item] = pinfo;
 	}
-
-	if (dirFiles.isEmpty())
-		System::Error::code = System::Error::NO_PLUGIN_IN_DIR_f(directory.absolutePath());
 }
 
 void PluginsDialog::cb_addPlugins()
@@ -228,9 +221,6 @@ void PluginsDialog::cb_addPlugins()
 		}
 	}
 
-	if (System::Error::code != System::Error::SUCCESS)
-		System::Error::showError(this);
-
 	init = false;
 }
 
@@ -247,9 +237,6 @@ void PluginsDialog::cb_addPluginsDirectory()
 
 	if (!dir.isEmpty())
 		addPluginsDirectory(dir);
-
-	if (System::Error::code != System::Error::SUCCESS)
-		System::Error::showError(this);
 
 	init = false;
 }
@@ -323,9 +310,6 @@ void PluginsDialog::cb_removePlugins()
 			}
 		}
 	}
-
-	if (System::Error::code != System::Error::SUCCESS)
-		System::Error::showError(this);
 }
 
 void PluginsDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
@@ -343,8 +327,6 @@ void PluginsDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 
 			if (activePlugins.contains(pluginName))
 			{
-				System::Error::code = System::Error::PLUGIN_EXISTS_f(pluginName);
-				System::Error::showError(this);
 				init = true;
 				item->setCheckState(0, Qt::Unchecked);
 				init = false;
@@ -415,9 +397,6 @@ void PluginsDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 //			paths.push_back(path);
 //		}
 //	}
-//
-//	if (!System::StateHandler::savePluginsInfo(m_window, activePlugins, paths))
-//		System::Error::showError();
 //}
 
 //void PluginsDialog::showPluginInfo()

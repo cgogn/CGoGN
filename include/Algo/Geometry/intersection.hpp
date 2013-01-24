@@ -37,6 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -248,6 +251,8 @@ bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, 
 }
 
 } // namespace Geometry
+
+} // Surface
 
 } // namespace Algo
 

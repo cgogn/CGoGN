@@ -39,6 +39,8 @@ class EmbeddedGMap2 : public GMap2
 public:
 	typedef GMap2 TOPO_MAP;
 
+	static const unsigned int DIMENSION = 2 ;
+
 	/**
 	 *	create a new face with managed embeddings
 	 */

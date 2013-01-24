@@ -43,6 +43,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -285,6 +288,7 @@ public:
 } // end namespace
 } // end namespace
 } // end namespace
+}
 
 #include "bufferGen.hpp"
 

@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -65,6 +68,8 @@ template <typename PFP>
 void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select = allDarts) ;
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -390,10 +393,15 @@ bool Approximator_NormalArea<PFP>::init()
 template <typename PFP>
 void Approximator_NormalArea<PFP>::approximate(Dart d)
 {
+	typedef typename PFP::REAL REAL;
+	typedef Geom::Matrix<3,3,REAL> MATRIX;
+	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
+	typedef Eigen::Matrix<REAL,3,3> E_MATRIX;
+
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d);
-	Geom::Matrix33f M1; // init zero included
-	Geom::Matrix33f M2; // init zero included
+	MATRIX M1; // init zero included
+	MATRIX M2; // init zero included
 
 	assert(! m.isBoundaryEdge(d));
 
@@ -422,21 +430,33 @@ void Approximator_NormalArea<PFP>::approximate(Dart d)
 	const VEC3 & v1 = (*this->m_attrV[0])[d] ;
 	const VEC3 & v2 = (*this->m_attrV[0])[dd] ;
 
-
-	Eigen::Matrix3f A ;
+	/* version plus sûre : sans cast avec recopie
+	E_MATRIX A ;
 	A << M1(0,0)+M2(0,0) , M1(0,1)+M2(0,1) , M1(0,2)+M2(0,2) , M1(1,0)+M2(1,0) , M1(1,1)+M2(1,1) , M1(1,2)+M2(1,2) , M1(2,0)+M2(2,0) , M1(2,1)+M2(2,1) , M1(2,2)+M2(2,2) ;
 
 	VEC3 mb = M1*v1 + M2*v2 ;
-	Eigen::Vector3f b (mb[0],mb[1],mb[2]);
+	E_VEC3 b (mb[0],mb[1],mb[2]);
 
-	Eigen::LDLT<Eigen::Matrix3f> decompo (A);
-	Eigen::Vector3f x = decompo.solve(b);
+	Eigen::LDLT<E_MATRIX> decompo (A);
+	E_VEC3 x = decompo.solve(b);
 
 	this->m_approx[0][d] = VEC3 (x(0),x(1),x(2)) ;
+	 */
+
+	/* version legerement moins gourmande et plus risquee : avec cast sans recopie */
+	VEC3 mb = M1*v1 + M2*v2 ;
+	M1 += M2;
+
+	Eigen::LDLT<E_MATRIX> decompo (Utils::convertRef<E_MATRIX>(M1));
+	E_VEC3 x = decompo.solve(Utils::convertRef<E_VEC3>(mb));
+
+	this->m_approx[0][d] = Utils::convertRef<VEC3>(x) ;
 }
 
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

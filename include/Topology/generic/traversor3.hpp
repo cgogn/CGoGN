@@ -159,9 +159,9 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
 		}
 	}
 
-	if(ORBY == VOLUME)
+	if ((ORBY == VOLUME) && (m_current != NIL))
 	{
-		if(m_map.isBoundaryMarked(m_current))
+		if(m_map.isBoundaryMarked3(m_current))
 			m_current = next();
 	}
 
@@ -185,7 +185,7 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 			m_current = m_tradoo.next();
 			if(ORBY == VOLUME)
 			{
-				if(m_map.isBoundaryMarked(m_current))
+				if(m_map.isBoundaryMarked3(m_current))
 					m_cmark->mark(m_current);
 			}
 			while ((m_current != NIL) && m_cmark->isMarked(m_current))
@@ -206,7 +206,7 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 			m_current = m_tradoo.next();
 			if(ORBY == VOLUME)
 			{
-				if(m_map.isBoundaryMarked(m_current))
+				if(m_map.isBoundaryMarked3(m_current))
 				{
 					if (ORBX == VOLUME)
 					{

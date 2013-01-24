@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace IHM
 {
 
@@ -77,7 +80,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 		++degree ;
 		p += position[it] ;
 		if(!map.edgeIsSubdivided(it))							// first cut the edges (if they are not already)
-			Algo::IHM::subdivideEdge<PFP>(map, it, position) ;	// and compute the degree of the face
+			IHM::subdivideEdge<PFP>(map, it, position) ;	// and compute the degree of the face
 		it = map.phi1(it) ;
 	} while(it != old) ;
 	p /= typename PFP::REAL(degree) ;
@@ -204,7 +207,6 @@ void coarsenFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::V
 }
 
 } //namespace IHM
-
+} // Surface
 } //namespace Algo
-
 } //namespace CGoGN

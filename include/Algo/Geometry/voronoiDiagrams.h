@@ -14,6 +14,10 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
+
 namespace Geometry
 {
 
@@ -111,6 +115,7 @@ protected :
 
 
 }// end namespace Geometry
+}// end namespace Surface
 }// end namespace Algo
 }// end namespace CGoGN
 

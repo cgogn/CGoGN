@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace IHM
 {
 
@@ -395,7 +398,7 @@ const T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d) const
 }
 
 } //namespace IHM
-
+} // Surface
 } //namespace Algo
 
 } //namespace CGoGN

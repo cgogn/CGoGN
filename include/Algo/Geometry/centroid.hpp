@@ -36,6 +36,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -86,13 +89,6 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
 	return center ;
 }
 
-template <typename PFP>
-void computeCentroidVolumes(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid, const FunctorSelect& select, unsigned int thread)
-{
-	TraversorW<typename PFP::MAP> t(map, select,thread) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		vol_centroid[d] = volumeCentroid<PFP>(map, d, position,thread) ;
-}
 
 template <typename PFP>
 void computeCentroidFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid, const FunctorSelect& select, unsigned int thread)
@@ -114,32 +110,6 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const VertexAtt
 
 namespace Parallel
 {
-template <typename PFP>
-class FunctorComputeCentroidVolumes: public FunctorMapThreaded<typename PFP::MAP >
-{
-	 const VertexAttribute<typename PFP::VEC3>& m_position;
-	 VolumeAttribute<typename PFP::VEC3>& m_vol_centroid;
-public:
-	 FunctorComputeCentroidVolumes<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol_centroid(vol_centroid)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
-	{
-		m_vol_centroid[d] = volumeCentroid<PFP>(this->m_map, d, m_position,threadID) ;
-	}
-};
-
-
-template <typename PFP>
-void computeCentroidVolumes(typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		const FunctorSelect& select, unsigned int nbth)
-{
-	FunctorComputeCentroidVolumes<PFP> funct(map,position,vol_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true, select);
-}
-
 
 template <typename PFP>
 class FunctorComputeCentroidFaces: public FunctorMapThreaded<typename PFP::MAP >
@@ -194,20 +164,99 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 } // namespace Geometry
+} // namespace Surface
+
+namespace Volume
+{
+namespace Geometry
+{
+
+template <typename PFP, typename EMBV, typename EMB>
+EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
+{
+	EMB center = AttribOps::zero<EMB,PFP>();
+	unsigned int count = 0 ;
+	Traversor3VVaE<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
+	{
+		center += attributs[it];
+		++count ;
+	}
+	center /= count ;
+	return center ;
+}
+
+template <typename PFP>
+void computeCentroidVolumes(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid, const FunctorSelect& select, unsigned int thread)
+{
+	TraversorW<typename PFP::MAP> t(map, select,thread) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		vol_centroid[d] = Surface::Geometry::volumeCentroid<PFP>(map, d, position,thread) ;
+}
+
+namespace Parallel
+{
+template <typename PFP>
+class FunctorComputeCentroidVolumes: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 VolumeAttribute<typename PFP::VEC3>& m_vol_centroid;
+public:
+	 FunctorComputeCentroidVolumes<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol_centroid(vol_centroid)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_vol_centroid[d] = Surface::Geometry::volumeCentroid<PFP>(this->m_map, d, m_position,threadID) ;
+	}
+};
+
+template <typename PFP>
+void computeCentroidVolumes(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
+		const FunctorSelect& select, unsigned int nbth)
+{
+	FunctorComputeCentroidVolumes<PFP> funct(map,position,vol_centroid);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true, select);
+}
+
+
+template <typename PFP>
+class FunctorComputeNeighborhoodCentroidVertices: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 VertexAttribute<typename PFP::VEC3>& m_vcentroid;
+public:
+	 FunctorComputeNeighborhoodCentroidVertices<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vcentroid):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vcentroid(vcentroid)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_vcentroid[d] = vertexNeighborhoodCentroid<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
+		const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorComputeNeighborhoodCentroidVertices<PFP> funct(map,position,vertex_centroid);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+}
+
+
+} // namespace Parallel
+} // namespace Geometry
+
+} // namespace Volume
+
+
+
+
 
 } // namespace Algo
 
