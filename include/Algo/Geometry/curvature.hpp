@@ -115,7 +115,7 @@ void vertexQuadraticFitting(
 {
 	typename PFP::VEC3 p = position[dart] ;
 
-	LinearSolver<CPUSolverTraits> solver(5) ;
+	LinearSolver<typename PFP::REAL> solver(5) ;
 	solver.set_least_squares(true) ;
 	solver.begin_system() ;
 	Traversor2VVaE<typename PFP::MAP> tav(map, dart) ;
@@ -137,7 +137,7 @@ void vertexQuadraticFitting(
 }
 
 template <typename PFP>
-void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<CPUSolverTraits>& solver)
+void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver)
 {
 	typename PFP::VEC3 vec = v - p ;
 	vec = localFrame * vec ;
@@ -154,7 +154,7 @@ void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, 
 }
 
 template <typename PFP>
-void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<CPUSolverTraits>& solver)
+void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver)
 {
 	typename PFP::VEC3 vec = v - p ;
 	vec = localFrame * vec ;

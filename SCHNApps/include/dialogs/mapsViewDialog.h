@@ -26,9 +26,9 @@ private:
 	View* m_view;
 
 public slots:
-	void cb_selectedMapsChanged();
-	void cb_addMapToList(MapHandlerGen* m);
-	void cb_removeMapFromList(MapHandlerGen* m);
+	void selectedMapsChanged();
+	void addMapToList(MapHandlerGen* m);
+	void removeMapFromList(MapHandlerGen* m);
 };
 
 } // namespace SCHNApps

@@ -36,16 +36,9 @@ public:
 	virtual void mouseMove(View* view, int buttons, int x, int y) {}
 	virtual void wheelEvent(View* view, int delta, int x, int y) {}
 
-	virtual void viewLinked(View* view) {}
-	virtual void viewUnlinked(View* view) {}
-	virtual void currentViewChanged(View* view) {}
-
-	virtual void mapLinked(View* view, MapHandlerGen* m) {}
-	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
-
 public slots:
-	void cb_openSubdivideSurfaceDialog();
-	void cb_subdivideSurface();
+	void openSubdivideSurfaceDialog();
+	void subdivideSurface();
 
 	void loopSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
 	void CCSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);

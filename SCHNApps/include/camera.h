@@ -62,8 +62,6 @@ public:
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-	void fitParamWith(View* view);
-
 	/*********************************************************
 	 * SNAPSHOTS
 	 *********************************************************/

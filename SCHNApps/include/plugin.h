@@ -46,12 +46,12 @@ public:
 	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
 	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
 
-	virtual void viewLinked(View* view) = 0;
-	virtual void viewUnlinked(View* view) = 0;
-	virtual void currentViewChanged(View* view) = 0;
+//	virtual void viewLinked(View* view) = 0;
+//	virtual void viewUnlinked(View* view) = 0;
+//	virtual void currentViewChanged(View* view) = 0;
 
-	virtual void mapLinked(View* view, MapHandlerGen* m) = 0;
-	virtual void mapUnlinked(View* view, MapHandlerGen* m) = 0;
+//	virtual void mapLinked(View* view, MapHandlerGen* m) = 0;
+//	virtual void mapUnlinked(View* view, MapHandlerGen* m) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
@@ -105,73 +105,6 @@ protected:
 	QList<QAction*> l_toolbarActions;
 
 	QList<Utils::GLSLShader*> l_shaders;
-
-//	QList<Plugin*> l_dependencies;
-//	QList<Plugin*> l_dependantPlugins;
-
-/*
-	void addDependantPlugin(Plugin* p) { l_dependantPlugins.push_back(p); }
-	void removeDependantPlugin(Plugin* p) { l_dependantPlugins.removeAll(p); }
-	void removeAllDependantPlugins() { l_dependantPlugins.clear(); }
-	bool hasDependantPlugins() { return !l_dependantPlugins.isEmpty(); }
-	QStringList getDependantPluginNames()
-	{
-		QStringList l;
-		for(QList<Plugin*>::iterator it = l_dependantPlugins.begin(); it != l_dependantPlugins.end(); ++it)
-			l.push_back((*it)->getName());
-		return l;
-	}
-
-	Plugin* addDependency(QString dependency)
-	{
-		Plugin* plugin;
-		if((plugin = m_window->checkPluginDependency(dependency, this)))
-		{
-			l_dependencies.push_back(plugin);
-			return plugin;
-		}
-		else
-			return NULL;
-	}
-
-	template<typename T>
-	T* getDependency(QString dependency)
-	{
-		return (T*)(this->addDependency(dependency));
-	}
-
-	virtual void removeDependencyLink(Plugin* p)
-	{
-		p->removeDependantPlugin(this);
-		l_dependencies.removeAll(p);
-	}
-	virtual void removeAllDependencyLinks()
-	{
-		foreach(Plugin* p, l_dependencies)
-			p->removeDependantPlugin(this);
-		l_dependencies.clear();
-	}
-	void removeDependantLink(Plugin* p)
-	{
-		int i = l_dependantPlugins.indexOf(p);
-		if(i >= 0)
-			p->removeDependencyLink(this);
-	}
-	void removeAllDependantLinks()
-	{
-		foreach(Plugin* p, l_dependantPlugins)
-			p->removeDependencyLink(this);
-	}
-
-	virtual void unloadDependantPlugins()
-	{
-		while(!l_dependantPlugins.empty())
-		{
-			if(l_dependantPlugins.back())
-				m_window->unloadPlugin(l_dependantPlugins.back()->getName());
-		}
-	}
-*/
 };
 
 } // namespace SCHNApps

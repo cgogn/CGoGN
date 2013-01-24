@@ -10,6 +10,7 @@ namespace SCHNApps
 {
 
 class Window;
+class MapHandlerGen;
 
 class SubdivideSurfaceDialog : public QDialog, public Ui::SubdivideSurfaceDialog
 {
@@ -17,13 +18,14 @@ class SubdivideSurfaceDialog : public QDialog, public Ui::SubdivideSurfaceDialog
 
 public:
 	SubdivideSurfaceDialog(Window* w);
-	void init();
-
-public slots:
-	void cb_selectedMapChanged();
 
 private:
 	Window* m_window;
+
+public slots:
+	void selectedMapChanged();
+	void addMapToList(MapHandlerGen* m);
+	void removeMapFromList(MapHandlerGen* m);
 };
 
 } // namespace SCHNApps

@@ -4,8 +4,8 @@
 #include "ui_window.h"
 
 #include "types.h"
-#include "PythonQt.h"
-#include "gui/PythonQtScriptingConsole.h"
+#include "PythonQt/PythonQt.h"
+#include "PythonQt/gui/PythonQtScriptingConsole.h"
 
 class QVBoxLayout;
 class QSplitter;
@@ -67,6 +67,7 @@ public:
 	 */
 	void removeTabInDock(QWidget* tabWidget);
 
+public slots:
 	void enablePluginTabWidgets(Plugin* plugin);
 	void disablePluginTabWidgets(Plugin* plugin);
 
@@ -74,6 +75,7 @@ public:
 	 * MANAGE MENU ACTIONS
 	 *********************************************************/
 
+public:
 	/**
 	 * \fn bool addMenuAction(const QString& menuPath, QAction* action)
 	 * \brief adds an action in the program menu bar
@@ -169,6 +171,8 @@ public:
 	 *********************************************************/
 
 public slots:
+	void registerPluginsDirectory(const QString& path);
+
 	/**
 	 * \fn bool loadPlugin(QString pluginPath)
 	 * \brief Loads and references a Plugin
@@ -209,6 +213,8 @@ public:
 	QList<Plugin*> getPluginsList() const { return h_plugins.values(); }
 	const PluginHash& getPluginsHash() const { return h_plugins; }
 
+	const QMap<QString, QString>& getAvailablePlugins() const { return m_availablePlugins; }
+
 	/*********************************************************
 	 * MANAGE MAPS
 	 *********************************************************/
@@ -245,8 +251,6 @@ protected:
 	PythonQtObjectPtr& m_pythonContext;
 	PythonQtScriptingConsole& m_pythonConsole;
 
-	bool m_initialization;
-
 	QVBoxLayout* m_centralLayout;
 	QSplitter* m_rootSplitter;
 	bool b_rootSplitterInitialized;
@@ -258,6 +262,8 @@ protected:
 	QTabWidget* m_dockTabWidget;
 
 	QDockWidget* m_pythonDock;
+
+	QMap<QString, QString> m_availablePlugins;
 
 	PluginHash h_plugins;
 	ViewHash h_views;
@@ -271,36 +277,14 @@ protected:
 	MapsDialog* m_mapsDialog;
 
 public slots:
-	/**
-	 * \fn void cb_about_SCHNApps();
-	 * \brief function that is called when the "about SCHNApps" menu action is triggered
-	 */
 	void cb_aboutSCHNApps();
-
-	/**
-	 * \fn void cb_about_CGoGN();
-	 * \brief function that is called when the "about CGOGN" menu action is triggered
-	 */
 	void cb_aboutCGoGN();
 	
 	void cb_showHideDock();
-
 	void cb_showHidePythonDock();
 
-	/**
-	 * \fn void cb_manageCameras()
-	 * \brief method called when the "Cameras" action is triggered.
-	 * Show the cameras management dialog:
-	 */
 	void cb_manageCameras();
-
-	/**
-	 * \fn void cb_managePlugins()
-	 * \brief method called when the "Plugins" action is triggered.
-	 * Show the plugins management dialog
-	 */
 	void cb_managePlugins();
-
 	void cb_manageMaps();
 
 signals:
@@ -309,12 +293,13 @@ signals:
 
 	void viewAdded(View* view);
 	void viewRemoved(View* view);
+	void currentViewChanged(View* view);
 
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
 
-	void pluginAdded(Plugin* plugin);
-	void pluginRemoved(Plugin* plugin);
+	void pluginLoaded(Plugin* plugin);
+	void pluginUnloaded(Plugin* plugin);
 };
 
 } // namespace SCHNApps

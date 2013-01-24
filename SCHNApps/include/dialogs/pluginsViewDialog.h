@@ -26,9 +26,9 @@ private:
 	View* m_view;
 
 public slots:
-	void cb_selectedPluginsChanged();
-	void cb_addPluginToList(Plugin* p);
-	void cb_removePluginFromList(Plugin* p);
+	void selectedPluginsChanged();
+	void addPluginToList(Plugin* p);
+	void removePluginFromList(Plugin* p);
 };
 
 } // namespace SCHNApps

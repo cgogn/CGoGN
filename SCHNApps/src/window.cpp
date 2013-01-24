@@ -5,7 +5,9 @@
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QPluginLoader>
+#include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
@@ -34,9 +36,6 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQ
 	m_firstView(NULL),
 	m_currentView(NULL)
 {
-	// program in its initialization phase
-	m_initialization = true;
-
 	m_camerasDialog = new CamerasDialog(this);
 	m_pluginsDialog = new PluginsDialog(this);
 	m_mapsDialog = new MapsDialog(this);
@@ -74,7 +73,7 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQ
 
 	// add first view
 	m_firstView = addView();
-	m_currentView = m_firstView;
+	setCurrentView(m_firstView);
 	m_rootSplitter->addWidget(m_firstView);
 
 	glewInit();
@@ -87,8 +86,7 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQ
 	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
 	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
 
-	// program in its initialization phase
-	m_initialization = false;
+	registerPluginsDirectory(m_appPath + QString("/../lib"));
 }
 
 Window::~Window()
@@ -370,21 +368,28 @@ View* Window::getView(const QString& name) const
 
 void Window::setCurrentView(View* view)
 {
-	const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
-	foreach(Plugin* p, oldPlugins)
-		disablePluginTabWidgets(p);
+	if(m_currentView)
+	{
+		const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
+		foreach(Plugin* p, oldPlugins)
+			disablePluginTabWidgets(p);
+
+		disconnect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+	}
 
 	View* oldCurrent = m_currentView;
 	m_currentView = view;
 
 	const QList<Plugin*>& newPlugins = m_currentView->getLinkedPlugins();
 	foreach(Plugin* p, newPlugins)
-	{
 		enablePluginTabWidgets(p);
-		p->currentViewChanged(m_currentView);
-	}
 
-	oldCurrent->updateGL();
+	connect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+
+	emit(currentViewChanged(m_currentView));
+
+	if(oldCurrent)
+		oldCurrent->updateGL();
 	m_currentView->updateGL();
 }
 
@@ -416,50 +421,82 @@ void Window::splitView(const QString& name, Qt::Orientation orientation)
  * MANAGE PLUGINS
  *********************************************************/
 
-Plugin* Window::loadPlugin(const QString& pluginFilePath)
+void Window::registerPluginsDirectory(const QString& path)
 {
-	QString pluginName = QFileInfo(pluginFilePath).baseName().remove(0, 3);
+	QDir directory(path);
+	if(directory.exists())
+	{
+		QStringList filters;
+		filters << "lib*.so";
+		filters << "lib*.dylib";
+		filters << "*.dll";
 
+		QStringList pluginFiles = directory.entryList(filters, QDir::Files);
+
+		foreach(QString pluginFile, pluginFiles)
+		{
+			QFileInfo pfi(pluginFile);
+			QString pluginName = pfi.baseName().remove(0, 3);
+			QString pluginFilePath = directory.absoluteFilePath(pluginFile);
+
+			m_availablePlugins[pluginName] = pluginFilePath;
+		}
+
+		m_pluginsDialog->refreshPluginsList();
+	}
+}
+
+Plugin* Window::loadPlugin(const QString& pluginName)
+{
 	if (h_plugins.contains(pluginName))
 		return NULL;
 
-	QPluginLoader loader(pluginFilePath);
-
-	// if the loader loads a plugin instance
-	if (QObject* pluginObject = loader.instance())
+	if (m_availablePlugins.contains(pluginName))
 	{
-		Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
+		QString pluginFilePath = m_availablePlugins[pluginName];
 
-		// we set the plugin with correct parameters (name, filepath, window)
-		plugin->setName(pluginName);
-		plugin->setFilePath(pluginFilePath);
-		plugin->setWindow(this);
+		QPluginLoader loader(pluginFilePath);
 
-		// then we call its enable() methods
-		if (plugin->enable())
+		// if the loader loads a plugin instance
+		if (QObject* pluginObject = loader.instance())
 		{
-			// if it succeeded we reference this plugin
-			h_plugins.insert(pluginName, plugin);
+			Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
 
-			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
-			emit(pluginAdded(plugin));
+			// set the plugin with correct parameters (name, filepath, window)
+			plugin->setName(pluginName);
+			plugin->setFilePath(pluginFilePath);
+			plugin->setWindow(this);
 
-			m_pythonContext.addObject(pluginName, plugin);
+			// then we call its enable() methods
+			if (plugin->enable())
+			{
+				// if it succeeded we reference this plugin
+				h_plugins.insert(pluginName, plugin);
 
-			// method success
-			return plugin;
+				statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
+				emit(pluginLoaded(plugin));
+
+				m_pythonContext.addObject(pluginName, plugin);
+
+				// method success
+				return plugin;
+			}
+			else
+			{
+				delete plugin;
+				return NULL;
+			}
 		}
+		// if loading fails
 		else
 		{
-			std::cout << "plugin enable failed" << std::endl;
-			delete plugin;
+			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toUtf8().constData() << std::endl;
 			return NULL;
 		}
 	}
-	// if loading fails
 	else
 	{
-		std::cout << "loader.instance failed" << std::endl << loader.errorString().toUtf8().constData() << std::endl;
+		std::cout << "loadPlugin: plugin not found (" << pluginName.toUtf8().constData() << ")" << std::endl;
 		return NULL;
 	}
 }
@@ -478,7 +515,7 @@ void Window::unloadPlugin(const QString& pluginName)
 		loader.unload();
 
 		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
-		emit(pluginRemoved(plugin));
+		emit(pluginUnloaded(plugin));
 
 		// delete plugin
 		delete plugin;
@@ -492,23 +529,6 @@ Plugin* Window::getPlugin(const QString& name) const
 	else
 		return NULL;
 }
-/*
-Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
-{
-	// if the plugin is referenced and found
-	PluginHash::iterator it;
-
-	if ((it = h_plugin.find(name)) != h_plugin.end())
-	{
-		// the plugin calling for the depencie is added to the found plugin's list of dependant plugins
-		(*it)->addDependantPlugin(dependantPlugin);
-		return (*it);
-	}
-	//if not found: set error message + failure
-	else
-		return NULL;
-}
-*/
 
 /*********************************************************
  * MANAGE MAPS

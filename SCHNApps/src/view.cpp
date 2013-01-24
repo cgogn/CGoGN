@@ -223,6 +223,7 @@ void View::setCurrentCamera(Camera* c)
 	{
 		m_currentCamera = c;
 		this->setCamera(m_currentCamera);
+		emit(currentCameraChanged(c));
 		updateGL();
 	}
 }
@@ -236,16 +237,14 @@ void View::linkPlugin(Plugin* plugin)
 	if(plugin && !l_plugins.contains(plugin))
 	{
 		l_plugins.push_back(plugin);
-		if(isCurrentView())
-			m_window->enablePluginTabWidgets(plugin);
+		emit(pluginLinked(plugin));
 	}
 }
 
 void View::unlinkPlugin(Plugin* plugin)
 {
-	l_plugins.removeOne(plugin);
-	if(isCurrentView())
-		m_window->disablePluginTabWidgets(plugin);
+	if(l_plugins.removeOne(plugin))
+		emit(pluginUnlinked(plugin));
 }
 
 /*********************************************************
@@ -257,18 +256,18 @@ void View::linkMap(MapHandlerGen* map)
 	if(map && !l_maps.contains(map))
 	{
 		l_maps.push_back(map);
-		foreach(Plugin* plugin, l_plugins)
-			plugin->mapLinked(this, map);
+		emit(mapLinked(map));
 		updateViewBB();
 	}
 }
 
 void View::unlinkMap(MapHandlerGen* map)
 {
-	l_maps.removeOne(map);
-	foreach(Plugin* plugin, l_plugins)
-		plugin->mapUnlinked(this, map);
-	updateViewBB();
+	if(l_maps.removeOne(map))
+	{
+		emit(mapUnlinked(map));
+		updateViewBB();
+	}
 }
 
 void View::updateViewBB()
@@ -339,28 +338,6 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 	}
 	return mvpm;
 }
-
-//void View::setCurrentModelViewMatrix(const glm::mat4& mvm)
-//{
-//	GLdouble gl_mvm[16];
-//	for(unsigned int i = 0; i < 4; ++i)
-//	{
-//		for(unsigned int j = 0; j < 4; ++j)
-//			gl_mvm[i*4+j] = mvm[i][j];
-//	}
-//	camera()->setFromModelViewMatrix(gl_mvm);
-//}
-//
-//void View::setCurrentProjectionMatrix(const glm::mat4& pm)
-//{
-//	float gl_pm[12];
-//	for(unsigned int i = 0; i < 3; ++i)
-//	{
-//		for(unsigned int j = 0; j < 4; ++j)
-//			gl_pm[i*3+j] = pm[i][j];
-//	}
-//	camera()->setFromProjectionMatrix(gl_pm);
-//}
 
 void View::cb_cameraView(int x, int y, int globalX, int globalY)
 {

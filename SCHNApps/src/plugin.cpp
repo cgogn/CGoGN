@@ -31,9 +31,6 @@ Plugin::~Plugin()
 
 	foreach(QAction* action, l_toolbarActions)
 		removeToolbarAction(action);
-
-//	unloadDependantPlugins();
-//	removeAllDependencyLinks();
 }
 
 /*********************************************************
@@ -43,16 +40,12 @@ Plugin::~Plugin()
 void Plugin::linkView(View* view)
 {
 	if(view && !l_views.contains(view))
-	{
 		l_views.push_back(view);
-		viewLinked(view);
-	}
 }
 
 void Plugin::unlinkView(View* view)
 {
-	if(l_views.removeOne(view))
-		viewUnlinked(view);
+	l_views.removeOne(view);
 }
 
 /*********************************************************

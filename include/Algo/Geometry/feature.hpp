@@ -52,7 +52,7 @@ void featureEdgeDetection(
 	FaceAttribute<VEC3> fNormal = map.template getAttribute<VEC3, FACE>("normal") ;
 	if(!fNormal.isValid())
 		fNormal = map.template addAttribute<VEC3, FACE>("normal") ;
-	Algo::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
 	TraversorE<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -357,8 +357,8 @@ void ridgeLines(
 
 	if(p1set && p2set)
 	{
-		VEC3 n = Algo::Geometry::faceNormal<PFP>(map, d, position) ;
-		REAL a = Algo::Geometry::convexFaceArea<PFP>(map, d, position) ;
+		VEC3 n = Algo::Surface::Geometry::faceNormal<PFP>(map, d, position) ;
+		REAL a = Algo::Surface::Geometry::convexFaceArea<PFP>(map, d, position) ;
 
 		VEC3 p1 = position[v1] ;
 		VEC3 p2 = position[v2] ;

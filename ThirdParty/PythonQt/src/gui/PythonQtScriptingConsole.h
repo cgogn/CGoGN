@@ -42,7 +42,7 @@
 */
 //----------------------------------------------------------------------------------
 
-#include "PythonQt.h"
+#include "../PythonQt.h"
 #include <QVariant>
 #include <QTextEdit>
 

@@ -34,13 +34,6 @@ public:
 	virtual void mouseMove(View* view, int buttons, int x, int y) {}
 	virtual void wheelEvent(View* view, int delta, int x, int y) {}
 
-	virtual void viewLinked(View* view) {}
-	virtual void viewUnlinked(View* view) {}
-	virtual void currentViewChanged(View* view) {}
-
-	virtual void mapLinked(View* view, MapHandlerGen* m) {}
-	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
-
 public slots:
 	void importFromFile(const QString& fileName);
 	void importFromFileDialog();

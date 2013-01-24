@@ -13,19 +13,18 @@ namespace SCHNApps
 SubdivideSurfaceDialog::SubdivideSurfaceDialog(Window* w) : m_window(w)
 {
 	setupUi(this);
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
-}
 
-void SubdivideSurfaceDialog::init()
-{
-	mapList->clear();
-	combo_positionAttribute->clear();
+	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
+
+	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
+
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
 		mapList->addItem(map->getName());
 }
 
-void SubdivideSurfaceDialog::cb_selectedMapChanged()
+void SubdivideSurfaceDialog::selectedMapChanged()
 {
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 	if(!currentItems.empty())
@@ -52,6 +51,23 @@ void SubdivideSurfaceDialog::cb_selectedMapChanged()
 
 				++j;
 			}
+		}
+	}
+}
+
+void SubdivideSurfaceDialog::addMapToList(MapHandlerGen* m)
+{
+	mapList->addItem(m->getName());
+}
+
+void SubdivideSurfaceDialog::removeMapFromList(MapHandlerGen* m)
+{
+	for(int i = 0; i < mapList->count(); ++i)
+	{
+		if(mapList->item(i)->text() == m->getName())
+		{
+			delete mapList->item(i);
+			return;
 		}
 	}
 }

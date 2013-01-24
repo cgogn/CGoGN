@@ -42,7 +42,6 @@ IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	TARGET_LINK_LIBRARIES( SubdivideSurfacePluginD
 		${CGoGN_LIBS_D}
 		${COMMON_LIBS}
-		${QGLVIEWER_LIBRARIES}
 	)
 
 	ADD_DEPENDENCIES( SubdivideSurfacePluginD SCHNAppsD )
@@ -69,7 +68,6 @@ ELSE ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	TARGET_LINK_LIBRARIES( SubdivideSurfacePlugin
 		${CGoGN_LIBS_R}
 		${COMMON_LIBS}
-		${QGLVIEWER_LIBRARIES}
 	)
 
 	ADD_DEPENDENCIES( SubdivideSurfacePlugin SCHNApps )

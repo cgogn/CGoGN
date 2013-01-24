@@ -33,11 +33,12 @@
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
-
 #include "Utils/gzstream.h"
+
 #ifdef WITH_ASSIMP
-#include "assimp.h"
-#include "aiScene.h"
+#include "Assimp/assimp.h"
+#include "Assimp/aiPostProcess.h"
+#include "Assimp/aiScene.h"
 #endif
 
 namespace CGoGN

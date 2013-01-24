@@ -226,8 +226,8 @@ target_link_libraries(PythonQt
 #-----------------------------------------------------------------------------
 # Install library (on windows, put the dll in 'bin' and the archive in 'lib')
 
-install(TARGETS PythonQt
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
-install(FILES ${headers} DESTINATION include/PythonQt)
+#install(TARGETS PythonQt
+#        RUNTIME DESTINATION bin
+#        LIBRARY DESTINATION lib
+#        ARCHIVE DESTINATION lib)
+#install(FILES ${headers} DESTINATION include/PythonQt)

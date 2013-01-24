@@ -21,10 +21,10 @@ CameraViewDialog::CameraViewDialog(Window* window, View* view) :
 	this->setupUi(this);
 	this->setWindowTitle(m_view->getName() + QString(" : camera"));
 
-	connect(cameraList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedCameraChanged()));
+	connect(cameraList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedCameraChanged()));
 
-	connect(m_window, SIGNAL(cameraAdded(Camera*)), this, SLOT(cb_addCameraToList(Camera*)));
-	connect(m_window, SIGNAL(cameraRemoved(Camera*)), this, SLOT(cb_removeCameraFromList(Camera*)));
+	connect(m_window, SIGNAL(cameraAdded(Camera*)), this, SLOT(addCameraToList(Camera*)));
+	connect(m_window, SIGNAL(cameraRemoved(Camera*)), this, SLOT(removeCameraFromList(Camera*)));
 
 	QList<Camera*> cameras = m_window->getCamerasList();
 	foreach(Camera* c, cameras)
@@ -48,7 +48,7 @@ void CameraViewDialog::selectCurrentCamera()
 	}
 }
 
-void CameraViewDialog::cb_selectedCameraChanged()
+void CameraViewDialog::selectedCameraChanged()
 {
 	QList<QListWidgetItem*> currentItems = cameraList->selectedItems();
 	if(currentItems.empty())
@@ -61,12 +61,12 @@ void CameraViewDialog::cb_selectedCameraChanged()
 	}
 }
 
-void CameraViewDialog::cb_addCameraToList(Camera* c)
+void CameraViewDialog::addCameraToList(Camera* c)
 {
 	cameraList->addItem(c->getName());
 }
 
-void CameraViewDialog::cb_removeCameraFromList(Camera* c)
+void CameraViewDialog::removeCameraFromList(Camera* c)
 {
 	for(int i = 0; i < cameraList->count(); ++i)
 	{

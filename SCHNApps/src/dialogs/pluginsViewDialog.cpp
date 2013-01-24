@@ -21,10 +21,10 @@ PluginsViewDialog::PluginsViewDialog(Window* window, View* view) :
 	this->setupUi(this);
 	this->setWindowTitle(m_view->getName() + QString(" : plugins"));
 
-	connect(pluginList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedPluginsChanged()));
+	connect(pluginList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedPluginsChanged()));
 
-	connect(m_window, SIGNAL(pluginAdded(Plugin*)), this, SLOT(cb_addPluginToList(Plugin*)));
-	connect(m_window, SIGNAL(pluginRemoved(Plugin*)), this, SLOT(cb_removePluginFromList(Plugin*)));
+	connect(m_window, SIGNAL(pluginLoaded(Plugin*)), this, SLOT(addPluginToList(Plugin*)));
+	connect(m_window, SIGNAL(pluginUnloaded(Plugin*)), this, SLOT(removePluginFromList(Plugin*)));
 
 	QList<Plugin*> plugins = m_window->getPluginsList();
 	foreach(Plugin* p, plugins)
@@ -37,33 +37,28 @@ PluginsViewDialog::PluginsViewDialog(Window* window, View* view) :
 PluginsViewDialog::~PluginsViewDialog()
 {}
 
-void PluginsViewDialog::cb_selectedPluginsChanged()
+void PluginsViewDialog::selectedPluginsChanged()
 {
 	for(int i = 0; i < pluginList->count(); ++i)
 	{
 		QString pluginName = pluginList->item(i)->text();
 		Plugin* plugin = m_window->getPlugin(pluginName);
 		if(pluginList->item(i)->isSelected() && !m_view->isLinkedToPlugin(plugin))
-		{
-			assert(!plugin->isLinkedToView(m_view));
 			m_window->linkViewAndPlugin(m_view, plugin);
-		}
+
 		else if(!pluginList->item(i)->isSelected() && m_view->isLinkedToPlugin(plugin))
-		{
-			assert(plugin->isLinkedToView(m_view));
 			m_window->unlinkViewAndPlugin(m_view, plugin);
-		}
 	}
 	m_view->updateGL();
 }
 
-void PluginsViewDialog::cb_addPluginToList(Plugin* p)
+void PluginsViewDialog::addPluginToList(Plugin* p)
 {
 	if(p->getProvidesRendering())
 		pluginList->addItem(p->getName());
 }
 
-void PluginsViewDialog::cb_removePluginFromList(Plugin* p)
+void PluginsViewDialog::removePluginFromList(Plugin* p)
 {
 	if(p->getProvidesRendering())
 	{

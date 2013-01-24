@@ -12,21 +12,20 @@ bool SubdivideSurfacePlugin::enable()
 
 	addMenuAction("Surface;Subdivide", m_subdivideSurfaceAction);
 
-	connect(m_subdivideSurfaceAction, SIGNAL(triggered()), this, SLOT(cb_openSubdivideSurfaceDialog()));
+	connect(m_subdivideSurfaceAction, SIGNAL(triggered()), this, SLOT(openSubdivideSurfaceDialog()));
 
-	connect(m_subdivideSurfaceDialog, SIGNAL(accepted()), this, SLOT(cb_subdivideSurface()));
-	connect(m_subdivideSurfaceDialog->button_apply, SIGNAL(clicked()), this, SLOT(cb_subdivideSurface()));
+	connect(m_subdivideSurfaceDialog, SIGNAL(accepted()), this, SLOT(subdivideSurface()));
+	connect(m_subdivideSurfaceDialog->button_apply, SIGNAL(clicked()), this, SLOT(subdivideSurface()));
 
 	return true;
 }
 
-void SubdivideSurfacePlugin::cb_openSubdivideSurfaceDialog()
+void SubdivideSurfacePlugin::openSubdivideSurfaceDialog()
 {
-	m_subdivideSurfaceDialog->init();
 	m_subdivideSurfaceDialog->show();
 }
 
-void SubdivideSurfacePlugin::cb_subdivideSurface()
+void SubdivideSurfacePlugin::subdivideSurface()
 {
 	QList<QListWidgetItem*> currentItems = m_subdivideSurfaceDialog->mapList->selectedItems();
 	if(!currentItems.empty())
