@@ -56,16 +56,16 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="2" alignment="Qt::AlignRight">
+     <item row="2" column="2">
       <widget class="QPushButton" name="button_refreshVBOs">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
+        <enum>Qt::RightToLeft</enum>
        </property>
        <property name="text">
         <string>Refresh</string>
@@ -75,11 +75,7 @@
     </layout>
    </item>
    <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
+    <widget class="Line" name="line"/>
    </item>
    <item>
     <widget class="QCheckBox" name="check_renderVertices">
