@@ -27,6 +27,15 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
+extern "C"
+{
+#include "C_BLAS_LAPACK/INCLUDE/f2c.h"
+#include "C_BLAS_LAPACK/INCLUDE/clapack.h"
+}
+#undef max
+#undef min
+
+
 namespace CGoGN
 {
 

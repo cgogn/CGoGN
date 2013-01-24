@@ -49,7 +49,7 @@ void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 	TraversorE<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		sumLengths += Algo::Geometry::edgeLength<PFP>(map, d, position) ;
+		sumLengths += Algo::Surface::Geometry::edgeLength<PFP>(map, d, position) ;
 		sumAngles += Geom::angle(normal[d], normal[map.phi1(d)]) ;
 		++nbEdges ;
 	}
@@ -80,7 +80,7 @@ void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 			Traversor2VE<typename PFP::MAP> te(map, d) ;
 			for(Dart it = te.begin(); it != te.end(); it = te.next())
 			{
-				VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
+				VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
 				float h = normal_d * vec ;
 				float t = vec.norm() ;
 				float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) ) ;
@@ -125,7 +125,7 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttri
 				float angle = Geom::angle(normal_d, neighborNormal) ;
 				if( angle <= SUSANthreshold )
 				{
-					VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
+					VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
 					float h = normal_d * vec ;
 					float t = vec.norm() ;
 					float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) );
