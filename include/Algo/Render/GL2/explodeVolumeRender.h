@@ -32,6 +32,7 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
 #include "Utils/vbo_base.h"
+#include "Utils/Shaders/shaderExplodeSmoothVolumes.h"
 #include "Utils/Shaders/shaderExplodeVolumes.h"
 #include "Utils/Shaders/shaderExplodeVolumesLines.h"
 
@@ -54,15 +55,21 @@ protected:
 
 	Utils::ShaderExplodeVolumes* m_shader;
 
+	Utils::ShaderExplodeSmoothVolumes* m_shaderS;
+
 	bool m_cpf;
 
 	bool m_ef;
+
+	bool m_smooth;
 
 	Utils::ShaderExplodeVolumesLines* m_shaderL;
 
 	Utils::VBO* m_vboPos;
 
 	Utils::VBO* m_vboColors;
+
+	Utils::VBO* m_vboNormals;
 
 	Utils::VBO* m_vboPosLine;
 
@@ -75,13 +82,20 @@ protected:
 
 	Geom::Vec3f m_globalColor;
 
+	template<typename PFP>
+	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
+
+	template<typename PFP>
+	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
+
+
 public:
 	/**
 	* Constructor
 	* @param withColorPerFace affect a color per face
 	* @param withExplodeFace shrinj each face
 	*/
-	ExplodeVolumeRender(bool withColorPerFace = false, bool withExplodeFace = false) ;
+	ExplodeVolumeRender(bool withColorPerFace = false, bool withExplodeFace = false, bool withSmoothFaces = false) ;
 
 	/**
 	* Destructor
@@ -116,6 +130,7 @@ public:
 	*/
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
+
 
 	/**
 	 * draw edges
