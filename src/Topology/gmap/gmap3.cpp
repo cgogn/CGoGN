@@ -996,4 +996,24 @@ unsigned int GMap3::closeMap()
 	return nb ;
 }
 
+/*! @name Compute dual
+ * These functions compute the dual mesh
+ *************************************************************************/
+
+void GMap3::computeDual()
+{
+//	DartAttribute<Dart> old_beta0 = getAttribute<Dart, DART>("beta0");
+//	DartAttribute<Dart> old_beta1 = getAttribute<Dart, DART>("beta1");
+//	DartAttribute<Dart> old_beta2 = getAttribute<Dart, DART>("beta2");
+//	DartAttribute<Dart> old_beta3 = getAttribute<Dart, DART>("beta3") ;
+//
+//	swapAttributes<Dart>(old_beta0, old_beta3) ;
+//	swapAttributes<Dart>(old_beta1, old_beta2) ;
+//
+//	swapEmbeddingContainers(VERTEX, FACE) ;
+//
+//	//boundary management ?
+}
+
+
 } // namespace CGoGN

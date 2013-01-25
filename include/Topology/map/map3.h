@@ -432,7 +432,6 @@ public:
 	 *  These functions must be used with care, generally only by import algorithms
 	 *************************************************************************/
 
-
 	//@{
 	/**
 	 * create a face of map1 marked as boundary

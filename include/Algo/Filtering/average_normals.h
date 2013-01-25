@@ -87,9 +87,9 @@ void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
@@ -131,9 +131,9 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typ
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
@@ -216,9 +216,9 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
@@ -335,9 +335,9 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
 	VertexAutoAttribute<REAL> vertexArea(map, "vertexArea") ;
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
@@ -369,7 +369,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 			float angle = Geom::angle(normV, neighborNormal) ;
 			if( angle <= SUSANthreshold )
 			{
-				REAL umbArea = Algo::Geometry::vertexOneRingArea<PFP>(map, it, position) ;
+				REAL umbArea = Algo::Surface::Geometry::vertexOneRingArea<PFP>(map, it, position) ;
 				vertexArea[it] = umbArea ;
 
 				sumArea += umbArea ;

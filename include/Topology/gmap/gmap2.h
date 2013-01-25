@@ -439,8 +439,6 @@ public:
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge1(Dart d, FunctorType& fonct, unsigned int thread = 0);
-
-
 	//@}
 
 	/*! @name Close map after import or creation
@@ -468,6 +466,17 @@ public:
 	 *  @return the number of closed holes
 	 */
 	unsigned int closeMap();
+	//@}
+
+	/*! @name Compute dual
+	 * These functions compute the dual mesh
+	 *************************************************************************/
+
+	//@{
+	//! Dual mesh computation
+	/*!
+	 */
+	void computeDual();
 	//@}
 };
 
