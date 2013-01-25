@@ -20,8 +20,10 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class MapHandlerGen
+class MapHandlerGen : public QObject
 {
+	Q_OBJECT
+
 public:
 	MapHandlerGen(const QString& name, Window* window, GenericMap* map);
 	virtual ~MapHandlerGen();
@@ -49,8 +51,15 @@ public:
 	template <typename ATTR_HANDLER>
 	Utils::VBO* createVBO(const ATTR_HANDLER& attr)
 	{
-		Utils::VBO* vbo = getVBO(QString::fromStdString(attr.name()));
+		QString name = QString::fromStdString(attr.name());
+		Utils::VBO* vbo = getVBO(name);
+		if(!vbo)
+		{
+			vbo = new Utils::VBO();
+			h_vbo.insert(name, vbo);
+		}
 		vbo->updateData(attr);
+		emit(vboAdded(vbo));
 		return vbo;
 	}
 
@@ -58,7 +67,8 @@ public:
 	void updateVBO(const ATTR_HANDLER& attr)
 	{
 		Utils::VBO* vbo = getVBO(QString::fromStdString(attr.name()));
-		vbo->updateData(attr);
+		if(vbo)
+			vbo->updateData(attr);
 	}
 
 	Utils::VBO* getVBO(const QString& name);
@@ -89,6 +99,10 @@ protected:
 	QList<View*> l_views;
 
 	VBOHash h_vbo;
+
+signals:
+	void vboAdded(Utils::VBO* vbo);
+	void vboRemoved(Utils::VBO* vbo);
 };
 
 template <typename PFP>

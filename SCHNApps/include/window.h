@@ -230,13 +230,13 @@ public:
 	 *********************************************************/
 
 public slots:
-	void linkViewAndPlugin(View* v, Plugin* p);
-	void unlinkViewAndPlugin(View* v, Plugin* p);
+	void linkViewAndCamera(View* v, Camera* c);
 
 	void linkViewAndMap(View* v, MapHandlerGen* m);
 	void unlinkViewAndMap(View* v, MapHandlerGen* m);
 
-	void linkViewAndCamera(View* v, Camera* c);
+	void linkViewAndPlugin(View* v, Plugin* p);
+	void unlinkViewAndPlugin(View* v, Plugin* p);
 
 	/*********************************************************
 	 * MANAGE TEXTURES
@@ -300,6 +300,15 @@ signals:
 
 	void pluginLoaded(Plugin* plugin);
 	void pluginUnloaded(Plugin* plugin);
+
+	void viewAndCameraLinked(View* view, Camera* camera);
+	void viewAndCameraUnlinked(View* view, Camera* camera);
+
+	void viewAndMapLinked(View* view, MapHandlerGen* map);
+	void viewAndMapUnlinked(View* view, MapHandlerGen* map);
+
+	void viewAndPluginLinked(View* view, Plugin* plugin);
+	void viewAndPluginUnlinked(View* view, Plugin* plugin);
 };
 
 } // namespace SCHNApps

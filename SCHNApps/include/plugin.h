@@ -46,12 +46,9 @@ public:
 	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
 	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
 
-//	virtual void viewLinked(View* view) = 0;
-//	virtual void viewUnlinked(View* view) = 0;
-//	virtual void currentViewChanged(View* view) = 0;
-
-//	virtual void mapLinked(View* view, MapHandlerGen* m) = 0;
-//	virtual void mapUnlinked(View* view, MapHandlerGen* m) = 0;
+	virtual void viewLinked(View* view) = 0;
+	virtual void viewUnlinked(View* view) = 0;
+	virtual void currentViewChanged(View* view) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS

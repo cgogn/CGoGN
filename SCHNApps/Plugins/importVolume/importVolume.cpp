@@ -11,40 +11,45 @@ bool ImportVolumePlugin::enable()
 {
 	importAction = new QAction("import", this);
 	addMenuAction("Volume;Import", importAction);
-	connect(importAction, SIGNAL(triggered()), this, SLOT(cb_import()));
+	connect(importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
 	return true;
 }
 
-void ImportVolumePlugin::cb_import()
+void ImportVolumePlugin::importFromFile(const QString& fileName)
 {
-	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.node *.ts *.off *.tet)");
 	QFileInfo fi(fileName);
-
 	if(fi.exists())
 	{
-		GenericMap* m = m_window->createMap(3);
-		PFP3::MAP* map = static_cast<PFP3::MAP*>(m);
-		MapHandler<PFP3>* h = new MapHandler<PFP3>(fi.baseName(), m_window, map);
+		MapHandlerGen* mhg = m_window->addMap(fi.baseName(), 3);
+		if(mhg)
+		{
+			MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(mhg);
+			PFP3::MAP* map = mh->getMap();
 
-		std::vector<std::string> attrNames ;
-		Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toUtf8().constData(), attrNames);
+			std::vector<std::string> attrNames ;
+			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toUtf8().constData(), attrNames);
 
-		// get vertex position attribute
-		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
+			// get vertex position attribute
+			VertexAttribute<PFP3::VEC3> position = map->getAttribute<PFP3::VEC3, CGoGN::VERTEX>(attrNames[0]);
 
-		// create VBO for vertex position attribute
-		h->createVBO(position);
+			// create VBO for vertex position attribute
+			mh->createVBO(position);
 
-		// compute map bounding box
-		h->updateBB(position);
+			// compute map bounding box
+			mh->updateBB(position);
 
-		// compute primitive connectivity VBOs
-		h->updatePrimitives(Algo::Render::GL2::POINTS);
-		h->updatePrimitives(Algo::Render::GL2::LINES);
-		h->updatePrimitives(Algo::Render::GL2::TRIANGLES);
-
-		m_window->addMap(h);
+			// compute primitive connectivity VBOs
+			mh->updatePrimitives(Algo::Render::GL2::POINTS);
+			mh->updatePrimitives(Algo::Render::GL2::LINES);
+			mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
+		}
 	}
+}
+
+void ImportVolumePlugin::importFromFileDialog()
+{
+	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.node *.ts *.off *.tet)");
+	importFromFile(fileName);
 }
 
 #ifndef DEBUG

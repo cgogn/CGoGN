@@ -29,11 +29,7 @@ Utils::VBO* MapHandlerGen::getVBO(const QString& name)
 	if (h_vbo.contains(name))
 		return h_vbo[name];
 	else
-	{
-		Utils::VBO* vbo = new Utils::VBO();
-		h_vbo.insert(name, vbo);
-		return vbo;
-	}
+		return NULL;
 }
 
 QList<Utils::VBO*> MapHandlerGen::getVBOList(const std::string& typeName)
@@ -55,6 +51,7 @@ void MapHandlerGen::deleteVBO(const QString& name)
 	{
 		Utils::VBO* vbo = h_vbo[name];
 		h_vbo.remove(name);
+		emit(vboRemoved(vbo));
 		delete vbo;
 	}
 }

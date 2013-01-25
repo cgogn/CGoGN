@@ -36,6 +36,10 @@ public:
 	virtual void mouseMove(View* view, int buttons, int x, int y) {}
 	virtual void wheelEvent(View* view, int delta, int x, int y) {}
 
+	virtual void viewLinked(View* view) {}
+	virtual void viewUnlinked(View* view) {}
+	virtual void currentViewChanged(View* view) {}
+
 public slots:
 	void openSubdivideSurfaceDialog();
 	void subdivideSurface();

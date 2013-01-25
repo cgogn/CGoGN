@@ -82,9 +82,6 @@ public:
 	virtual void viewUnlinked(View* view);
 	virtual void currentViewChanged(View* view);
 
-	virtual void mapLinked(View* view, MapHandlerGen* m);
-	virtual void mapUnlinked(View* view, MapHandlerGen* m);
-
 	void setRefreshingUI(bool b) { b_refreshingUI = b; }
 
 protected:
@@ -96,10 +93,19 @@ protected:
 	bool b_refreshingUI;
 
 public slots:
+	void mapLinked(MapHandlerGen* m);
+	void mapUnlinked(MapHandlerGen* m);
+	void vboAdded(Utils::VBO* vbo);
+	void vboRemoved(Utils::VBO* vbo);
+
+	void changeSelectedMap(View* view, MapHandlerGen* map);
+	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
+	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos);
+	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i);
+
 	void cb_selectedMapChanged();
 	void cb_positionVBOChanged(int index);
-	void cb_selectedVectorVBOChanged();
-	void cb_refreshVBOs();
+	void cb_selectedVectorsVBOChanged();
 	void cb_vectorsScaleFactorChanged(int i);
 };
 

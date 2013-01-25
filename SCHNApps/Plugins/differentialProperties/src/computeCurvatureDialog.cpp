@@ -37,6 +37,11 @@ void ComputeCurvatureDialog::selectedMapChanged()
 	{
 		combo_positionAttribute->clear();
 		combo_normalAttribute->clear();
+		combo_KmaxAttribute->clear();
+		combo_KminAttribute->clear();
+		combo_KnormalAttribute->clear();
+		combo_kmaxAttribute->clear();
+		combo_kminAttribute->clear();
 		const QString& mapname = currentItems[0]->text();
 		MapHandlerGen* mh = m_window->getMap(mapname);
 		GenericMap* map = mh->getGenericMap();

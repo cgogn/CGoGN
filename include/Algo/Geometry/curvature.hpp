@@ -27,14 +27,6 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
-extern "C"
-{
-#include "C_BLAS_LAPACK/INCLUDE/f2c.h"
-#include "C_BLAS_LAPACK/INCLUDE/clapack.h"
-}
-#undef max
-#undef min
-
 
 namespace CGoGN
 {
@@ -93,7 +85,7 @@ void computeCurvatureVertex_QuadraticFitting(
 //	/*int res = */slaev2_(&a, &b, &c, &kmax_v, &kmin_v, &Kmax_x, &Kmax_y) ;
 
 	Eigen::Matrix<REAL,2,2> m;
-	m << a, b, b, c;
+	m << 2*a, b, b, 2*c;
 
 	// solve eigen problem
 	Eigen::SelfAdjointEigenSolver<Eigen::Matrix<REAL,2,2> > solver(m);
@@ -180,23 +172,23 @@ void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& 
 	typename PFP::VEC3 vec = v - p ;
 	vec = localFrame * vec ;
 	typename PFP::VEC3 norm = localFrame * n ;
-	solver.begin_row() ;
 
-	solver.add_coefficient(0, 2.0f * vec[0]) ;
-	solver.add_coefficient(1, vec[1]) ;
+	solver.begin_row() ;
+	solver.add_coefficient(0, 2.0f * vec[0] * norm[2]) ;
+	solver.add_coefficient(1, vec[1] * norm[2]) ;
 	solver.add_coefficient(2, 0) ;
-	solver.add_coefficient(3, 1.0f) ;
+	solver.add_coefficient(3, 1.0f * norm[2]) ;
 	solver.add_coefficient(4, 0) ;
-	solver.set_right_hand_side(-1.0f * norm[0] / norm[2]) ;
+	solver.set_right_hand_side(-1.0f * norm[0]) ;
 	solver.end_row() ;
 
 	solver.begin_row() ;
 	solver.add_coefficient(0, 0) ;
-	solver.add_coefficient(1, vec[0]) ;
-	solver.add_coefficient(2, 2.0f * vec[1]) ;
+	solver.add_coefficient(1, vec[0] * norm[2]) ;
+	solver.add_coefficient(2, 2.0f * vec[1] * norm[2]) ;
 	solver.add_coefficient(3, 0) ;
-	solver.add_coefficient(4, 1.0f) ;
-	solver.set_right_hand_side(-1.0f * norm[1] / norm[2]) ;
+	solver.add_coefficient(4, 1.0f * norm[2]) ;
+	solver.set_right_hand_side(-1.0f * norm[1]) ;
 	solver.end_row() ;
 }
 /*
@@ -221,6 +213,7 @@ void vertexCubicFitting(Dart dart, gmtl::Vec3f& normal, float& a, float& b, floa
 	}
 	solverC->end_system() ;
 	solverC->solve() ;
+
 	a = solverC->variable(0).value() ;
 	b = solverC->variable(1).value() ;
 	c = solverC->variable(2).value() ;
@@ -263,8 +256,8 @@ void cubicFittingAddVertexNormal(gmtl::Vec3f& v, gmtl::Vec3f& n, gmtl::Vec3f& p,
 	gmtl::Vec3f vec = v - p ;
 	vec = localFrame * vec ;
 	gmtl::Vec3f norm = localFrame * n ;
-	solverC->begin_row() ;
 
+	solverC->begin_row() ;
 	solverC->add_coefficient(0, 3.0f*vec[0]*vec[0]) ;
 	solverC->add_coefficient(1, 2.0f*vec[0]*vec[1]) ;
 	solverC->add_coefficient(2, vec[1]*vec[1]) ;

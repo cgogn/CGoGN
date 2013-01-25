@@ -36,6 +36,7 @@ file(
 
 SET(SCHNApps_H_OBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/mapHandler.h
 	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
 	${SCHNApps_ROOT_DIR}/include/dialogs/camerasDialog.h
