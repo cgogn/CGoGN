@@ -4,6 +4,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -543,5 +546,6 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 }
 */
 }// end namespace Geometry
+} // Surface
 }// end namespace Algo
 }// end namespace CGoGN

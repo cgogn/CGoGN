@@ -612,47 +612,20 @@ void MyQT::importMesh(std::string& filename)
 
 	size_t pos = filename.rfind(".");    // position of "." in filename
 	std::string extension = filename.substr(pos);
+	std::vector<std::string> attrNames ;
 
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
 		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
-	else if (extension == std::string(".node"))
-	{
-		std::vector<std::string> attrNames ;
-		if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::NODE))
-		{
-			std::cerr << "could not import " << filename << std::endl ;
-			return ;
-		}
-		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
-	}
-	else if(extension == std::string(".tet"))
-	{
-		std::vector<std::string> attrNames ;
-		if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::TET))
-		{
-			std::cerr << "could not import " << filename << std::endl ;
-			return ;
-		}
-		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
-	}
-	else if(extension == std::string(".off"))
-	{
-		std::vector<std::string> attrNames ;
-		if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::OFF))
-		{
-			std::cerr << "could not import " << filename << std::endl ;
-			return ;
-		}
-		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
-	}
-	else
+	else if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
 	{
 		std::cerr << "could not import " << filename << std::endl ;
 		return ;
 	}
+	else
+		position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
 
 	m_selected  = NIL;
 	m_selected2 = NIL;

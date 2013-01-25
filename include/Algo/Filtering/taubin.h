@@ -42,7 +42,7 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& p
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	Algo::Selection::Collector_OneRing<PFP> c(map) ;
+	Algo::Surface::Selection::Collector_OneRing<PFP> c(map) ;
 
 	const float lambda = 0.6307 ;
 	const float mu = -0.6732 ;
@@ -109,7 +109,7 @@ void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP:
 	CellMarkerNoUnmark<VERTEX> mv(map) ;
 
 	FunctorAverageOnSphereBorder<PFP, VEC3> fa1(map, position, position) ;
-	Algo::Selection::Collector_WithinSphere<PFP> c1(map, position, radius) ;
+	Algo::Surface::Selection::Collector_WithinSphere<PFP> c1(map, position, radius) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))
@@ -133,7 +133,7 @@ void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP:
 
 	// unshrinking step
 	FunctorAverageOnSphereBorder<PFP, VEC3> fa2(map, position2, position2) ;
-	Algo::Selection::Collector_WithinSphere<PFP> c2(map, position2, radius) ;
+	Algo::Surface::Selection::Collector_WithinSphere<PFP> c2(map, position2, radius) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && mv.isMarked(d))

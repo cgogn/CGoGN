@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 	PFP::MAP myMap;
 
 	std::vector<std::string> attrNames ;
-	Algo::Volume::Import::importMeshV<PFP>(myMap, argv[1], attrNames, Algo::Volume::Import::NODE);
+	Algo::Volume::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
 	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
