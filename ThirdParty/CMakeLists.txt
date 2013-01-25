@@ -8,10 +8,10 @@ IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
 ENDIF(WIN32)
 
-SET(CMAKE_BUILD_TYPE Release)
-
 IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
 	SET(CMAKE_BUILD_TYPE Debug)
+ELSE (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
+	SET(CMAKE_BUILD_TYPE Release)
 ENDIF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
 
 IF(WIN32)
@@ -24,10 +24,9 @@ ENDIF(WIN32)
 
 # for shared or not shared
 SET (BUILD_SHARED_LIBS OFF CACHE BOOL 
-	"if used all library are build as shared type (.so /dylib/dll).")
+	"if used all library are build as shared type (.so/.dylib/.dll)")
 
 SET (WITH_ASSIMP ON CACHE BOOL "build with Assimp")
-SET (WITH_NUMERICAL ON CACHE BOOL "build with numerical libs")
 SET (WITH_ZINRI ON CACHE BOOL "build with Zinri libs")
 
 IF (APPLE)
@@ -38,17 +37,18 @@ ENDIF(APPLE)
 
 add_subdirectory(Tools Tools/build)
 
+add_subdirectory(PythonQt PythonQt/build)
+INSTALL (DIRECTORY PythonQt/src/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/PythonQt FILES_MATCHING PATTERN "*.h")
+
 IF (WITH_ZINRI)
 	add_subdirectory(Zinri Zinri/build)
+	INSTALL (DIRECTORY Zinri/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/Zinri FILES_MATCHING PATTERN "*.h")
 ENDIF(WITH_ZINRI)
 
 IF (WITH_ASSIMP)
 	add_subdirectory(Assimp Assimp/build)
+	INSTALL (DIRECTORY Assimp/include/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp)
 ENDIF (WITH_ASSIMP)
-
-IF (WITH_NUMERICAL)
-	add_subdirectory(Numerical Numerical/build)
-ENDIF (WITH_NUMERICAL)
 
 
 IF(WIN32)

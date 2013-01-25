@@ -91,9 +91,6 @@ public:
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
-//	void setCurrentModelViewMatrix(const glm::mat4& mvm);
-//	void setCurrentProjectionMatrix(const glm::mat4& pm);
-
 protected:
 	QString m_name;
 	Window* m_window;
@@ -118,12 +115,25 @@ protected:
 	MapsViewDialog* m_mapsViewDialog;
 
 public slots:
+	CameraViewDialog* getCameraViewDialog() { return m_cameraViewDialog; }
+	PluginsViewDialog* getPluginsViewDialog() { return m_pluginsViewDialog; }
+	MapsViewDialog* getMapsViewDialog() { return m_mapsViewDialog; }
+
 	void cb_cameraView(int x, int y, int globalX, int globalY);
 	void cb_pluginsView(int x, int y, int globalX, int globalY);
 	void cb_mapsView(int x, int y, int globalX, int globalY);
 	void cb_closeView(int x, int y, int globalX, int globalY);
 	void cb_VsplitView(int x, int y, int globalX, int globalY);
 	void cb_HsplitView(int x, int y, int globalX, int globalY);
+
+signals:
+	void currentCameraChanged(Camera*);
+
+	void mapLinked(MapHandlerGen*);
+	void mapUnlinked(MapHandlerGen*);
+
+	void pluginLinked(Plugin*);
+	void pluginUnlinked(Plugin*);
 };
 
 } // namespace SCHNApps

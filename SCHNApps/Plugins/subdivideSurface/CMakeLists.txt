@@ -2,20 +2,22 @@ cmake_minimum_required(VERSION 2.8)
 
 INCLUDE_DIRECTORIES(
 	${SCHNApps_ROOT_DIR}/include
-	${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface
+	${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
 SET( PLUGIN_SRC
-    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/subdivideSurface.cpp
+    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/src/subdivideSurface.cpp
+    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/src/subdivideSurfaceDialog.cpp
 )
 
 SET( PLUGIN_H
-    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/subdivideSurface.h
+    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/include/subdivideSurface.h
+    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/include/subdivideSurfaceDialog.h
 )
 
 SET( PLUGIN_FORM
-	${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/subdivideSurface.ui
+	${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/forms/subdivideSurfaceDialog.ui
 )
 
 IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
@@ -40,7 +42,6 @@ IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	TARGET_LINK_LIBRARIES( SubdivideSurfacePluginD
 		${CGoGN_LIBS_D}
 		${COMMON_LIBS}
-		${QGLVIEWER_LIBRARIES}
 	)
 
 	ADD_DEPENDENCIES( SubdivideSurfacePluginD SCHNAppsD )
@@ -67,7 +68,6 @@ ELSE ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	TARGET_LINK_LIBRARIES( SubdivideSurfacePlugin
 		${CGoGN_LIBS_R}
 		${COMMON_LIBS}
-		${QGLVIEWER_LIBRARIES}
 	)
 
 	ADD_DEPENDENCIES( SubdivideSurfacePlugin SCHNApps )

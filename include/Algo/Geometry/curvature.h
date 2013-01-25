@@ -32,8 +32,6 @@
 #include "Utils/convertType.h"
 
 #include "OpenNL/linear_solver.h"
-#include "OpenNL/sparse_matrix.h"
-#include "OpenNL/full_vector.h"
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
@@ -50,7 +48,7 @@ namespace Surface
 namespace Geometry
 {
 
-typedef CPULinearSolverTraits< SparseMatrix<double>, FullVector<double> > CPUSolverTraits ;
+//typedef CPULinearSolverTraits< SparseMatrix<double>, FullVector<double> > CPUSolverTraits ;
 
 template <typename PFP>
 void computeCurvatureVertices_QuadraticFitting(
@@ -84,10 +82,10 @@ void vertexQuadraticFitting(
 	float& a, float& b, float& c, float& d, float& e) ;
 
 template <typename PFP>
-void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<CPUSolverTraits>& solver) ;
+void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver) ;
 
 template <typename PFP>
-void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<CPUSolverTraits>& solver) ;
+void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver) ;
 /*
 template <typename PFP>
 void vertexCubicFitting(Dart dart, typename PFP::VEC3& normal, float& a, float& b, float& c, float& d, float& e, float& f, float& g, float& h, float& i) ;

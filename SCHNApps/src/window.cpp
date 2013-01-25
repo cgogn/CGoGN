@@ -5,7 +5,9 @@
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QPluginLoader>
+#include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
@@ -26,24 +28,23 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-Window::Window(const QString& appPath, QWidget *parent) :
-	QMainWindow(parent),
+Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQtScriptingConsole& pythonConsole) :
+	QMainWindow(),
 	m_appPath(appPath),
+	m_pythonContext(pythonContext),
+	m_pythonConsole(pythonConsole),
 	m_firstView(NULL),
 	m_currentView(NULL)
 {
-	// program in its initialization phase
-	m_initialization = true;
-
 	m_camerasDialog = new CamerasDialog(this);
 	m_pluginsDialog = new PluginsDialog(this);
 	m_mapsDialog = new MapsDialog(this);
 
 	this->setupUi(this);
 
-	m_dock = new QDockWidget(tr("Control"), this);
-	m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	m_dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+	m_dock = new QDockWidget(tr("Plugins' Tabs"), this);
+	m_dock->setAllowedAreas(Qt::RightDockWidgetArea);
+	m_dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
 	addDockWidget(Qt::RightDockWidgetArea, m_dock);
 	m_dock->setVisible(false);
 
@@ -55,6 +56,15 @@ Window::Window(const QString& appPath, QWidget *parent) :
 
 	connect(actionShowHideDock, SIGNAL(triggered()), this, SLOT(cb_showHideDock()));
 
+	m_pythonDock = new QDockWidget(tr("Python"), this);
+	m_pythonDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+	m_dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+	addDockWidget(Qt::BottomDockWidgetArea, m_pythonDock);
+	m_pythonDock->setVisible(false);
+	m_pythonDock->setWidget(&m_pythonConsole);
+
+	connect(actionShowHidePythonDock, SIGNAL(triggered()), this, SLOT(cb_showHidePythonDock()));
+
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
 	m_rootSplitter = new QSplitter(centralwidget);
@@ -63,7 +73,7 @@ Window::Window(const QString& appPath, QWidget *parent) :
 
 	// add first view
 	m_firstView = addView();
-	m_currentView = m_firstView;
+	setCurrentView(m_firstView);
 	m_rootSplitter->addWidget(m_firstView);
 
 	glewInit();
@@ -76,15 +86,11 @@ Window::Window(const QString& appPath, QWidget *parent) :
 	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
 	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
 
-//	System::StateHandler::loadState(this, &h_plugin, &h_scene, m_splitArea);
-
-	// program in its initialization phase
-	m_initialization = false;
+	registerPluginsDirectory(m_appPath + QString("/../lib"));
 }
 
 Window::~Window()
 {
-//	System::StateHandler::saveState(this, h_plugins);
 }
 
 /*********************************************************
@@ -362,9 +368,14 @@ View* Window::getView(const QString& name) const
 
 void Window::setCurrentView(View* view)
 {
-	const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
-	foreach(Plugin* p, oldPlugins)
-		disablePluginTabWidgets(p);
+	if(m_currentView)
+	{
+		const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
+		foreach(Plugin* p, oldPlugins)
+			disablePluginTabWidgets(p);
+
+		disconnect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+	}
 
 	View* oldCurrent = m_currentView;
 	m_currentView = view;
@@ -376,7 +387,12 @@ void Window::setCurrentView(View* view)
 		p->currentViewChanged(m_currentView);
 	}
 
-	oldCurrent->updateGL();
+	connect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+
+	emit(currentViewChanged(m_currentView));
+
+	if(oldCurrent)
+		oldCurrent->updateGL();
 	m_currentView->updateGL();
 }
 
@@ -384,24 +400,17 @@ void Window::splitView(const QString& name, Qt::Orientation orientation)
 {
 	View* newView = addView();
 
-//	std::cout << "splitView" << std::endl;
-
 	View* view = h_views[name];
 	QSplitter* parent = (QSplitter*)(view->parentWidget());
 	if(parent == m_rootSplitter && !b_rootSplitterInitialized)
 	{
-//		std::cout << "init root splitter" << std::endl;
 		m_rootSplitter->setOrientation(orientation);
 		b_rootSplitterInitialized = true;
 	}
 	if(parent->orientation() == orientation)
-	{
-//		std::cout << "same orientation" << std::endl;
 		parent->insertWidget(parent->indexOf(view)+1, newView);
-	}
 	else
 	{
-//		std::cout << "new orientation" << std::endl;
 		int idx = parent->indexOf(view);
 		view->setParent(NULL);
 		QSplitter* spl = new QSplitter(orientation);
@@ -415,46 +424,84 @@ void Window::splitView(const QString& name, Qt::Orientation orientation)
  * MANAGE PLUGINS
  *********************************************************/
 
-Plugin* Window::loadPlugin(const QString& pluginFilePath)
+void Window::registerPluginsDirectory(const QString& path)
 {
-	QString pluginName = QFileInfo(pluginFilePath).baseName().remove(0, 3);
+	QDir directory(path);
+	if(directory.exists())
+	{
+		QStringList filters;
+		filters << "lib*.so";
+		filters << "lib*.dylib";
+		filters << "*.dll";
 
+		QStringList pluginFiles = directory.entryList(filters, QDir::Files);
+
+		foreach(QString pluginFile, pluginFiles)
+		{
+			QFileInfo pfi(pluginFile);
+			QString pluginName = pfi.baseName().remove(0, 3);
+			QString pluginFilePath = directory.absoluteFilePath(pluginFile);
+
+			m_availablePlugins[pluginName] = pluginFilePath;
+		}
+
+		m_pluginsDialog->refreshPluginsList();
+	}
+}
+
+Plugin* Window::loadPlugin(const QString& pluginName)
+{
 	if (h_plugins.contains(pluginName))
 		return NULL;
 
-	QPluginLoader loader(pluginFilePath);
-
-	// if the loader loads a plugin instance
-	if (QObject* pluginObject = loader.instance())
+	if (m_availablePlugins.contains(pluginName))
 	{
-		Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
+		QString pluginFilePath = m_availablePlugins[pluginName];
 
-		// we set the plugin with correct parameters (name, filepath, window)
-		plugin->setName(pluginName);
-		plugin->setFilePath(pluginFilePath);
-		plugin->setWindow(this);
+		QPluginLoader loader(pluginFilePath);
 
-		// then we call its enable() methods
-		if (plugin->enable())
+		// if the loader loads a plugin instance
+		if (QObject* pluginObject = loader.instance())
 		{
-			// if it succeeded we reference this plugin
-			h_plugins.insert(pluginName, plugin);
+			Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
 
-			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
-			emit(pluginAdded(plugin));
+			// set the plugin with correct parameters (name, filepath, window)
+			plugin->setName(pluginName);
+			plugin->setFilePath(pluginFilePath);
+			plugin->setWindow(this);
 
-			// method success
-			return plugin;
+			// then we call its enable() methods
+			if (plugin->enable())
+			{
+				// if it succeeded we reference this plugin
+				h_plugins.insert(pluginName, plugin);
+
+				statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
+				emit(pluginLoaded(plugin));
+
+				m_pythonContext.addObject(pluginName, plugin);
+
+				// method success
+				return plugin;
+			}
+			else
+			{
+				delete plugin;
+				return NULL;
+			}
 		}
+		// if loading fails
 		else
 		{
-			delete plugin;
+			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toUtf8().constData() << std::endl;
 			return NULL;
 		}
 	}
-	// if loading fails
 	else
+	{
+		std::cout << "loadPlugin: plugin not found (" << pluginName.toUtf8().constData() << ")" << std::endl;
 		return NULL;
+	}
 }
 
 void Window::unloadPlugin(const QString& pluginName)
@@ -471,7 +518,7 @@ void Window::unloadPlugin(const QString& pluginName)
 		loader.unload();
 
 		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
-		emit(pluginRemoved(plugin));
+		emit(pluginUnloaded(plugin));
 
 		// delete plugin
 		delete plugin;
@@ -485,30 +532,16 @@ Plugin* Window::getPlugin(const QString& name) const
 	else
 		return NULL;
 }
-/*
-Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
-{
-	// if the plugin is referenced and found
-	PluginHash::iterator it;
-
-	if ((it = h_plugin.find(name)) != h_plugin.end())
-	{
-		// the plugin calling for the depencie is added to the found plugin's list of dependant plugins
-		(*it)->addDependantPlugin(dependantPlugin);
-		return (*it);
-	}
-	//if not found: set error message + failure
-	else
-		return NULL;
-}
-*/
 
 /*********************************************************
  * MANAGE MAPS
  *********************************************************/
 
-GenericMap* Window::createMap(unsigned int dim)
+MapHandlerGen* Window::addMap(const QString& name, unsigned int dim)
 {
+	if (h_maps.contains(name))
+		return NULL;
+
 	GenericMap* map = NULL;
 	switch(dim)
 	{
@@ -519,19 +552,13 @@ GenericMap* Window::createMap(unsigned int dim)
 			map = new PFP3::MAP();
 			break;
 	}
-	return map;
-}
 
-bool Window::addMap(MapHandlerGen* map)
-{
-	if (h_maps.contains(map->getName()))
-		return false;
+	MapHandlerGen* mh = new MapHandlerGen(name, this, map);
+	h_maps.insert(name, mh);
 
-	h_maps.insert(map->getName(), map);
+	emit(mapAdded(mh));
 
-	emit(mapAdded(map));
-
-	return true;
+	return mh;
 }
 
 void Window::removeMap(const QString& name)
@@ -553,6 +580,56 @@ MapHandlerGen* Window::getMap(const QString& name) const
 		return h_maps[name];
 	else
 		return NULL;
+}
+
+/*********************************************************
+ * MANAGE LINKS
+ *********************************************************/
+
+void Window::linkViewAndPlugin(View* v, Plugin* p)
+{
+	v->linkPlugin(p);
+	p->linkView(v);
+
+	emit(viewAndPluginLinked(v, p));
+
+	p->viewLinked(v);
+}
+
+void Window::unlinkViewAndPlugin(View* v, Plugin* p)
+{
+	v->unlinkPlugin(p);
+	p->unlinkView(v);
+
+	emit(viewAndPluginUnlinked(v, p));
+
+	p->viewUnlinked(v);
+}
+
+void Window::linkViewAndMap(View* v, MapHandlerGen* m)
+{
+	v->linkMap(m);
+	m->linkView(v);
+
+	emit(viewAndMapLinked(v, m));
+}
+
+void Window::unlinkViewAndMap(View* v, MapHandlerGen* m)
+{
+	v->unlinkMap(m);
+	m->unlinkView(v);
+
+	emit(viewAndMapUnlinked(v, m));
+}
+
+void Window::linkViewAndCamera(View* v, Camera* c)
+{
+	Camera* current = v->getCurrentCamera();
+	current->unlinkView(v);
+	emit(viewAndCameraUnlinked(v, current));
+	v->setCurrentCamera(c);
+	c->linkView(v);
+	emit(viewAndCameraLinked(v, c));
 }
 
 /*********************************************************
@@ -618,6 +695,11 @@ void Window::cb_aboutCGoGN()
 void Window::cb_showHideDock()
 {
 	m_dock->setVisible(m_dock->isHidden());
+}
+
+void Window::cb_showHidePythonDock()
+{
+	m_pythonDock->setVisible(m_pythonDock->isHidden());
 }
 
 void Window::cb_manageCameras()

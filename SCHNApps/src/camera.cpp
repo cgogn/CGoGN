@@ -52,11 +52,6 @@ void Camera::unlinkView(View* view)
 	l_views.removeOne(view);
 }
 
-void Camera::fitParamWith(View* view)
-{
-	setScreenWidthAndHeight(view->width(), view->height());
-}
-
 void Camera::saveSnapshot(QString snapPathName)
 {
 	foreach(View* view, l_views)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>352</height>
+    <width>301</width>
+    <height>434</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,64 +15,17 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QToolButton" name="addButton">
-       <property name="text">
-        <string>Add plugin file</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="directoryButton">
-       <property name="text">
-        <string>Add plugin directory</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="removeButton">
-       <property name="text">
-        <string>Remove</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QTreeWidget" name="treeWidget">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+    <widget class="QToolButton" name="button_registerDirectory">
+     <property name="text">
+      <string>Register plugin directory</string>
      </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
-     </property>
-     <property name="allColumnsShowFocus">
-      <bool>false</bool>
-     </property>
-     <property name="columnCount">
-      <number>2</number>
-     </property>
-     <attribute name="headerDefaultSectionSize">
-      <number>80</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string notr="true">1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">2</string>
-      </property>
-     </column>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="OKButton">
+    <widget class="QListWidget" name="list_plugins"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="button_OK">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -95,7 +48,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>OKButton</sender>
+   <sender>button_OK</sender>
    <signal>pressed()</signal>
    <receiver>PluginsDialog</receiver>
    <slot>accept()</slot>

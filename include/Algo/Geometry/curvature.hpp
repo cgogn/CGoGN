@@ -27,14 +27,6 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
-extern "C"
-{
-#include "C_BLAS_LAPACK/INCLUDE/f2c.h"
-#include "C_BLAS_LAPACK/INCLUDE/clapack.h"
-}
-#undef max
-#undef min
-
 
 namespace CGoGN
 {
@@ -90,12 +82,24 @@ void computeCurvatureVertex_QuadraticFitting(
 	vertexQuadraticFitting<PFP>(map, dart, localFrame, position, normal, a, b, c, d, e) ;
 
 	REAL kmax_v, kmin_v, Kmax_x, Kmax_y ;
-	//int res = slaev2_(&e, &f, &g, &maxC, &minC, &dirX, &dirY) ;
-	/*int res = */slaev2_(&a, &b, &c, &kmax_v, &kmin_v, &Kmax_x, &Kmax_y) ;
+//	/*int res = */slaev2_(&a, &b, &c, &kmax_v, &kmin_v, &Kmax_x, &Kmax_y) ;
 
-	VEC3 Kmax_v(Kmax_x, Kmax_y, 0.0f) ;
+	Eigen::Matrix<REAL,2,2> m;
+	m << 2*a, b, b, 2*c;
+
+	// solve eigen problem
+	Eigen::SelfAdjointEigenSolver<Eigen::Matrix<REAL,2,2> > solver(m);
+
+	const Eigen::Matrix<REAL,2,1>& ev = solver.eigenvalues();
+	kmax_v = ev[0];
+	kmin_v = ev[1];
+
+	const Eigen::Matrix<REAL,2,2>& evec = solver.eigenvectors();
+	VEC3 Kmax_v(evec(0,0), evec(1,0), 0.0f) ;
 	Kmax_v = invLocalFrame * Kmax_v ;
-	VEC3 Kmin_v = n ^ Kmax_v ;
+	VEC3 Kmin_v(evec(0,1), evec(1,1), 0.0f) ;
+	Kmin_v = invLocalFrame * Kmin_v ;
+//	VEC3 Kmin_v = n ^ Kmax_v ;
 
 	if (kmax_v < kmin_v)
 	{
@@ -124,7 +128,7 @@ void vertexQuadraticFitting(
 {
 	typename PFP::VEC3 p = position[dart] ;
 
-	LinearSolver<CPUSolverTraits> solver(5) ;
+	LinearSolver<typename PFP::REAL> solver(5) ;
 	solver.set_least_squares(true) ;
 	solver.begin_system() ;
 	Traversor2VVaE<typename PFP::MAP> tav(map, dart) ;
@@ -146,7 +150,7 @@ void vertexQuadraticFitting(
 }
 
 template <typename PFP>
-void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<CPUSolverTraits>& solver)
+void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver)
 {
 	typename PFP::VEC3 vec = v - p ;
 	vec = localFrame * vec ;
@@ -163,28 +167,28 @@ void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, 
 }
 
 template <typename PFP>
-void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<CPUSolverTraits>& solver)
+void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver)
 {
 	typename PFP::VEC3 vec = v - p ;
 	vec = localFrame * vec ;
 	typename PFP::VEC3 norm = localFrame * n ;
-	solver.begin_row() ;
 
-	solver.add_coefficient(0, 2.0f * vec[0]) ;
-	solver.add_coefficient(1, vec[1]) ;
+	solver.begin_row() ;
+	solver.add_coefficient(0, 2.0f * vec[0] * norm[2]) ;
+	solver.add_coefficient(1, vec[1] * norm[2]) ;
 	solver.add_coefficient(2, 0) ;
-	solver.add_coefficient(3, 1.0f) ;
+	solver.add_coefficient(3, 1.0f * norm[2]) ;
 	solver.add_coefficient(4, 0) ;
-	solver.set_right_hand_side(-1.0f * norm[0] / norm[2]) ;
+	solver.set_right_hand_side(-1.0f * norm[0]) ;
 	solver.end_row() ;
 
 	solver.begin_row() ;
 	solver.add_coefficient(0, 0) ;
-	solver.add_coefficient(1, vec[0]) ;
-	solver.add_coefficient(2, 2.0f * vec[1]) ;
+	solver.add_coefficient(1, vec[0] * norm[2]) ;
+	solver.add_coefficient(2, 2.0f * vec[1] * norm[2]) ;
 	solver.add_coefficient(3, 0) ;
-	solver.add_coefficient(4, 1.0f) ;
-	solver.set_right_hand_side(-1.0f * norm[1] / norm[2]) ;
+	solver.add_coefficient(4, 1.0f * norm[2]) ;
+	solver.set_right_hand_side(-1.0f * norm[1]) ;
 	solver.end_row() ;
 }
 /*
@@ -209,6 +213,7 @@ void vertexCubicFitting(Dart dart, gmtl::Vec3f& normal, float& a, float& b, floa
 	}
 	solverC->end_system() ;
 	solverC->solve() ;
+
 	a = solverC->variable(0).value() ;
 	b = solverC->variable(1).value() ;
 	c = solverC->variable(2).value() ;
@@ -251,8 +256,8 @@ void cubicFittingAddVertexNormal(gmtl::Vec3f& v, gmtl::Vec3f& n, gmtl::Vec3f& p,
 	gmtl::Vec3f vec = v - p ;
 	vec = localFrame * vec ;
 	gmtl::Vec3f norm = localFrame * n ;
-	solverC->begin_row() ;
 
+	solverC->begin_row() ;
 	solverC->add_coefficient(0, 3.0f*vec[0]*vec[0]) ;
 	solverC->add_coefficient(1, 2.0f*vec[0]*vec[1]) ;
 	solverC->add_coefficient(2, vec[1]*vec[1]) ;

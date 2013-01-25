@@ -10,18 +10,17 @@ ENDIF (WIN32)
 
 INCLUDE_DIRECTORIES(
 	${CGoGN_ROOT_DIR}/include
-	${COMMON_INCLUDES}
+	${SCHNApps_ROOT_DIR}/include
+	${EXT_INCLUDES}
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
-	${QGLVIEWER_INCLUDE_DIR}
-	${SCHNApps_ROOT_DIR}/include
 )
 
 file(
 	GLOB
 	SCHNApps_SRC_FILES
-	${SCHNApps_ROOT_DIR}/src/camera.cpp
 	${SCHNApps_ROOT_DIR}/src/main.cpp
+	${SCHNApps_ROOT_DIR}/src/camera.cpp
 	${SCHNApps_ROOT_DIR}/src/mapHandler.cpp
 	${SCHNApps_ROOT_DIR}/src/plugin.cpp
 	${SCHNApps_ROOT_DIR}/src/view.cpp
@@ -38,6 +37,7 @@ file(
 SET(SCHNApps_H_OBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/view.h
 	${SCHNApps_ROOT_DIR}/include/window.h
+	${SCHNApps_ROOT_DIR}/include/mapHandler.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
 	${SCHNApps_ROOT_DIR}/include/dialogs/camerasDialog.h
 	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsDialog.h
@@ -78,8 +78,7 @@ ADD_EXECUTABLE( SCHNAppsD
 
 TARGET_LINK_LIBRARIES( SCHNAppsD
 	${CGoGN_LIBS_D}
-	${COMMON_LIBS}
-	${QGLVIEWER_LIBRARIES}
+	${EXT_LIBS}
 )
 
 

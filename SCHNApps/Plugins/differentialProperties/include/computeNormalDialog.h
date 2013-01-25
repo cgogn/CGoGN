@@ -10,6 +10,7 @@ namespace SCHNApps
 {
 
 class Window;
+class MapHandlerGen;
 
 class ComputeNormalDialog : public QDialog, public Ui::ComputeNormalDialog
 {
@@ -17,13 +18,14 @@ class ComputeNormalDialog : public QDialog, public Ui::ComputeNormalDialog
 
 public:
 	ComputeNormalDialog(Window* w);
-	void init();
-
-public slots:
-	void cb_selectedMapChanged();
 
 private:
 	Window* m_window;
+
+public slots:
+	void selectedMapChanged();
+	void addMapToList(MapHandlerGen* m);
+	void removeMapFromList(MapHandlerGen* m);
 };
 
 } // namespace SCHNApps

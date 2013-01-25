@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -148,6 +151,8 @@ void computeCotanWeightEdges(
 }
 
 } // namespace Geometry
+
+} // namespace Surface
 
 } // namespace Algo
 

@@ -1,5 +1,5 @@
-#ifndef _IMPORTSURFACE_PLUGIN_H_
-#define _IMPORTSURFACE_PLUGIN_H_
+#ifndef _IMPORTVOLUME_PLUGIN_H_
+#define _IMPORTVOLUME_PLUGIN_H_
 
 #include "plugin.h"
 
@@ -38,11 +38,9 @@ public:
 	virtual void viewUnlinked(View* view) {}
 	virtual void currentViewChanged(View* view) {}
 
-	virtual void mapLinked(View* view, MapHandlerGen* m) {}
-	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
-
 public slots:
-	void cb_import();
+	void importFromFile(const QString& fileName);
+	void importFromFileDialog();
 
 private:
 	QAction* importAction;

@@ -5,5 +5,3 @@ project(Tools)
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../bin/)
 
 add_executable( shader_to_h ${CMAKE_CURRENT_SOURCE_DIR}/shader_to_h.cpp )
-
-

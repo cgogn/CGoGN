@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -79,7 +82,9 @@ void computeCotanWeightEdges(
 	EdgeAttribute<typename PFP::REAL>& edgeWeight,
 	const FunctorSelect& select = allDarts) ;
 
-} // namespace Geoemtry
+} // namespace Geometry
+
+} // namespace Surface
 
 } // namespace Algo
 

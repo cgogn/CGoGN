@@ -60,7 +60,6 @@ bool RenderPlugin::enable()
 	connect(m_dockTab->mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
 	connect(m_dockTab->combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_positionVBOChanged(int)));
 	connect(m_dockTab->combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_normalVBOChanged(int)));
-	connect(m_dockTab->button_refreshVBOs, SIGNAL(clicked()), this, SLOT(cb_refreshVBOs()));
 	connect(m_dockTab->check_renderVertices, SIGNAL(toggled(bool)), this, SLOT(cb_renderVerticesChanged(bool)));
 	connect(m_dockTab->slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_verticesScaleFactorChanged(int)));
 	connect(m_dockTab->check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(cb_renderEdgesChanged(bool)));
@@ -140,18 +139,21 @@ void RenderPlugin::viewLinked(View* view)
 		params->perMap.insert(map->getName(), p);
 	}
 	if (!maps.empty())
-		params->selectedMap = maps[0];
+		changeSelectedMap(view, maps[0]);
 
-	m_dockTab->refreshUI(params);
+	connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
+	connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
+
+	if(view->isCurrentView())
+		m_dockTab->refreshUI(params);
 }
 
 void RenderPlugin::viewUnlinked(View* view)
 {
 	h_viewParams.remove(view);
 
-	View* current = m_window->getCurrentView();
-	if(isLinkedToView(current))
-		m_dockTab->refreshUI(h_viewParams[current]);
+	disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
+	disconnect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
 }
 
 void RenderPlugin::currentViewChanged(View* view)
@@ -160,31 +162,156 @@ void RenderPlugin::currentViewChanged(View* view)
 	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
-void RenderPlugin::mapLinked(View* view, MapHandlerGen* m)
+void RenderPlugin::mapLinked(MapHandlerGen* m)
 {
+	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet p(m);
 	params->perMap.insert(m->getName(), p);
-	if(params->perMap.count() == 1)
-		params->selectedMap = m;
-
-	m_dockTab->refreshUI(params);
+	if(params->selectedMap == NULL || params->perMap.count() == 1)
+		changeSelectedMap(view, m);
+	else
+		m_dockTab->refreshUI(params);
 }
 
-void RenderPlugin::mapUnlinked(View* view, MapHandlerGen* m)
+void RenderPlugin::mapUnlinked(MapHandlerGen* m)
 {
+	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+
 	ParameterSet* params = h_viewParams[view];
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)
 	{
 		if(!params->perMap.empty())
-			params->selectedMap = m_window->getMap(params->perMap.begin().key());
+			changeSelectedMap(view, m_window->getMap(params->perMap.begin().key()));
 		else
-			params->selectedMap = NULL;
+			changeSelectedMap(view, NULL);
+	}
+	else
 		m_dockTab->refreshUI(params);
+}
+
+void RenderPlugin::vboAdded(Utils::VBO* vbo)
+{
+	m_dockTab->refreshUI(h_viewParams[m_window->getCurrentView()]);
+}
+
+void RenderPlugin::vboRemoved(Utils::VBO* vbo)
+{
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+
+	View* view = m_window->getCurrentView();
+	ParameterSet* params = h_viewParams[view];
+	if(params->perMap[map->getName()].positionVBO == vbo)
+		changePositionVBO(view, map, NULL);
+	if(params->perMap[map->getName()].normalVBO == vbo)
+		changeNormalVBO(view, map, NULL);
+}
+
+void RenderPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
+{
+	ParameterSet* params = h_viewParams[view];
+
+	MapHandlerGen* prev = params->selectedMap;
+	params->selectedMap = map;
+
+	if(view->isCurrentView())
+	{
+		if(prev)
+			disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+		if(map)
+			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].positionVBO = vbo;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderPlugin::changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].normalVBO = vbo;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderPlugin::changeRenderVertices(View* view, MapHandlerGen* map, bool b)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].renderVertices = b;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderPlugin::changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].verticesScaleFactor = i / 50.0;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderPlugin::changeRenderEdges(View* view, MapHandlerGen* map, bool b)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].renderEdges = b;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool b)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].renderFaces = b;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderPlugin::changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].faceStyle = style;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
 	}
 }
 
@@ -192,16 +319,9 @@ void RenderPlugin::cb_selectedMapChanged()
 {
 	if(!b_refreshingUI)
 	{
-		View* view = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[view];
 		QList<QListWidgetItem*> currentItems = m_dockTab->mapList->selectedItems();
 		if(!currentItems.empty())
-		{
-			const QString& mapname = currentItems[0]->text();
-			params->selectedMap = m_window->getMap(mapname);
-			m_dockTab->refreshUI(params);
-			view->updateGL();
-		}
+			changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
 	}
 }
 
@@ -209,11 +329,9 @@ void RenderPlugin::cb_positionVBOChanged(int index)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* map = params->selectedMap;
-		params->perMap[map->getName()].positionVBO = map->getVBO(m_dockTab->combo_positionVBO->currentText());
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changePositionVBO(view, map, map->getVBO(m_dockTab->combo_positionVBO->currentText()));
 	}
 }
 
@@ -221,30 +339,19 @@ void RenderPlugin::cb_normalVBOChanged(int index)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* map = params->selectedMap;
-		params->perMap[map->getName()].normalVBO = map->getVBO(m_dockTab->combo_normalVBO->currentText());
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changeNormalVBO(view, map, map->getVBO(m_dockTab->combo_normalVBO->currentText()));
 	}
-}
-
-void RenderPlugin::cb_refreshVBOs()
-{
-	View* current = m_window->getCurrentView();
-	if(isLinkedToView(current))
-		m_dockTab->refreshUI(h_viewParams[current]);
 }
 
 void RenderPlugin::cb_renderVerticesChanged(bool b)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* m = params->selectedMap;
-		params->perMap[m->getName()].renderVertices = b;
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changeRenderVertices(view, map, b);
 	}
 }
 
@@ -252,11 +359,9 @@ void RenderPlugin::cb_verticesScaleFactorChanged(int i)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* m = params->selectedMap;
-		params->perMap[m->getName()].verticesScaleFactor = i / 50.0;
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changeVerticesScaleFactor(view, map, i);
 	}
 }
 
@@ -264,11 +369,9 @@ void RenderPlugin::cb_renderEdgesChanged(bool b)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* m = params->selectedMap;
-		params->perMap[m->getName()].renderEdges = b;
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changeRenderEdges(view, map, b);
 	}
 }
 
@@ -276,11 +379,9 @@ void RenderPlugin::cb_renderFacesChanged(bool b)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* m = params->selectedMap;
-		params->perMap[m->getName()].renderFaces = b;
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changeRenderFaces(view, map, b);
 	}
 }
 
@@ -288,14 +389,12 @@ void RenderPlugin::cb_faceStyleChanged(QAbstractButton* b)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* m = params->selectedMap;
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
 		if(m_dockTab->radio_flatShading->isChecked())
-			params->perMap[m->getName()].faceStyle = FLAT;
+			changeFacesStyle(view, map, FLAT);
 		else if(m_dockTab->radio_phongShading->isChecked())
-			params->perMap[m->getName()].faceStyle = PHONG;
-		current->updateGL();
+			changeFacesStyle(view, map, PHONG);
 	}
 }
 
@@ -323,42 +422,68 @@ void RenderDockTab::refreshUI(ParameterSet* params)
 			PerMapParameterSet& p = params->perMap[map->getName()];
 
 			QList<Utils::VBO*> vbos = map->getVBOList();
+			unsigned int j = 0;
 			for(int i = 0; i < vbos.count(); ++i)
 			{
-				combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(p.positionVBO == NULL)
-				{										// if nothing is specified in the parameter set
-					if(vbos[i]->name() == "position")	// try to select a VBO named "position"
-					{
-						p.positionVBO = vbos[i];
-						combo_positionVBO->setCurrentIndex(i);
+				if(vbos[i]->dataSize() == 3)
+				{
+					combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
+					if(p.positionVBO == NULL)
+					{										// if nothing is specified in the parameter set
+						if(vbos[i]->name() == "position")	// try to select a VBO named "position"
+						{
+							p.positionVBO = vbos[i];
+							combo_positionVBO->setCurrentIndex(j);
+						}
 					}
-				}
-				else if(vbos[i] == p.positionVBO)
-					combo_positionVBO->setCurrentIndex(i);
+					else if(vbos[i] == p.positionVBO)
+						combo_positionVBO->setCurrentIndex(j);
 
-				combo_normalVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(p.normalVBO == NULL)
-				{									// if nothing is specified in the parameter set
-					if(vbos[i]->name() == "normal")	// try to select a VBO named "normal"
-					{
-						p.normalVBO = vbos[i];
-						combo_normalVBO->setCurrentIndex(i);
+					combo_normalVBO->addItem(QString::fromStdString(vbos[i]->name()));
+					if(p.normalVBO == NULL)
+					{									// if nothing is specified in the parameter set
+						if(vbos[i]->name() == "normal")	// try to select a VBO named "normal"
+						{
+							p.normalVBO = vbos[i];
+							combo_normalVBO->setCurrentIndex(j);
+						}
 					}
+					else if(vbos[i] == p.normalVBO)
+						combo_normalVBO->setCurrentIndex(j);
+
+					++j;
 				}
-				else if(vbos[i] == p.normalVBO)
-					combo_normalVBO->setCurrentIndex(i);
 			}
 
 			if(p.positionVBO == NULL && vbos.count() > 0)
 			{
-				p.positionVBO = vbos[0];
-				combo_positionVBO->setCurrentIndex(0);
+				int i = 0;
+				bool found = false;
+				while(i < vbos.count() && !found)
+				{
+					if(vbos[i]->dataSize() == 3)
+					{
+						p.positionVBO = vbos[i];
+						combo_positionVBO->setCurrentIndex(i);
+						found = true;
+					}
+					++i;
+				}
 			}
 			if(p.normalVBO == NULL && vbos.count() > 0)
 			{
-				p.normalVBO = vbos[0];
-				combo_normalVBO->setCurrentIndex(0);
+				int i = 0;
+				bool found = false;
+				while(i < vbos.count() && !found)
+				{
+					if(vbos[i]->dataSize() == 3)
+					{
+						p.normalVBO = vbos[i];
+						combo_normalVBO->setCurrentIndex(i);
+						found = true;
+					}
+					++i;
+				}
 			}
 
 			check_renderVertices->setChecked(p.renderVertices);

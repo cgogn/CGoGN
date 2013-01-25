@@ -22,10 +22,10 @@ MapsViewDialog::MapsViewDialog(Window* window, View* view) :
 	this->setupUi(this);
 	this->setWindowTitle(m_view->getName() + QString(" : maps"));
 
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapsChanged()));
+	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapsChanged()));
 
-	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(cb_addMapToList(MapHandlerGen*)));
-	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(cb_removeMapFromList(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
 
 	QList<MapHandlerGen*> maps = m_window->getMapsList();
 	foreach(MapHandlerGen* m, maps)
@@ -35,34 +35,28 @@ MapsViewDialog::MapsViewDialog(Window* window, View* view) :
 MapsViewDialog::~MapsViewDialog()
 {}
 
-void MapsViewDialog::cb_selectedMapsChanged()
+void MapsViewDialog::selectedMapsChanged()
 {
 	for(int i = 0; i < mapList->count(); ++i)
 	{
 		QString mapName = mapList->item(i)->text();
 		MapHandlerGen* map = m_window->getMap(mapName);
+
 		if(mapList->item(i)->isSelected() && !m_view->isLinkedToMap(map))
-		{
-			assert(!map->isLinkedToView(m_view));
-			m_view->linkMap(map);
-			map->linkView(m_view);
-		}
+			m_window->linkViewAndMap(m_view, map);
+
 		else if(!mapList->item(i)->isSelected() && m_view->isLinkedToMap(map))
-		{
-			assert(map->isLinkedToView(m_view));
-			m_view->unlinkMap(map);
-			map->unlinkView(m_view);
-		}
+			m_window->unlinkViewAndMap(m_view, map);
 	}
 	m_view->updateGL();
 }
 
-void MapsViewDialog::cb_addMapToList(MapHandlerGen* m)
+void MapsViewDialog::addMapToList(MapHandlerGen* m)
 {
 	mapList->addItem(m->getName());
 }
 
-void MapsViewDialog::cb_removeMapFromList(MapHandlerGen* m)
+void MapsViewDialog::removeMapFromList(MapHandlerGen* m)
 {
 	for(int i = 0; i < mapList->count(); ++i)
 	{

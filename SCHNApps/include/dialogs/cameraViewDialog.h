@@ -28,9 +28,9 @@ private:
 	void selectCurrentCamera();
 
 public slots:
-	void cb_selectedCameraChanged();
-	void cb_addCameraToList(Camera* c);
-	void cb_removeCameraFromList(Camera* c);
+	void selectedCameraChanged();
+	void addCameraToList(Camera* c);
+	void removeCameraFromList(Camera* c);
 };
 
 } // namespace SCHNApps

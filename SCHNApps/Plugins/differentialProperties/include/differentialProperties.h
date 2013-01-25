@@ -41,22 +41,19 @@ public:
 	virtual void viewUnlinked(View* view) {}
 	virtual void currentViewChanged(View* view) {}
 
-	virtual void mapLinked(View* view, MapHandlerGen* m) {}
-	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
-
 public slots:
-	void cb_openComputeNormalDialog();
-	void cb_openComputeCurvatureDialog();
+	void openComputeNormalDialog();
+	void openComputeCurvatureDialog();
 
-	void cb_computeNormal();
-	void cb_computeCurvature();
+	void computeNormal();
+	void computeCurvature();
 
 private:
 	ComputeNormalDialog* m_computeNormalDialog;
 	ComputeCurvatureDialog* m_computeCurvatureDialog;
 
-	QAction* computeNormalAction;
-	QAction* computeCurvatureAction;
+	QAction* m_computeNormalAction;
+	QAction* m_computeCurvatureAction;
 };
 
 #endif

@@ -28,12 +28,6 @@
 
 #include "Algo/Import/AHEM.h"
 
-#ifdef WITH_ASSIMP
-#include "assimp.h"
-#include "aiPostProcess.h"
-#include "aiScene.h"
-#endif
-
 namespace CGoGN
 {
 

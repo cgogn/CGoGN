@@ -33,8 +33,7 @@ bool RenderVectorPlugin::enable()
 
 	connect(m_dockTab->mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
 	connect(m_dockTab->combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_positionVBOChanged(int)));
-	connect(m_dockTab->list_vectorVBO, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedVectorVBOChanged()));
-	connect(m_dockTab->button_refreshVBOs, SIGNAL(clicked()), this, SLOT(cb_refreshVBOs()));
+	connect(m_dockTab->list_vectorVBO, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedVectorsVBOChanged()));
 	connect(m_dockTab->slider_vectorsScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_vectorsScaleFactorChanged(int)));
 
 	return true;
@@ -78,18 +77,21 @@ void RenderVectorPlugin::viewLinked(View* view)
 		params->perMap.insert(map->getName(), p);
 	}
 	if (!maps.empty())
-		params->selectedMap = maps[0];
+		changeSelectedMap(view, maps[0]);
 
-	m_dockTab->refreshUI(params);
+	connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
+	connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
+
+	if(view->isCurrentView())
+		m_dockTab->refreshUI(params);
 }
 
 void RenderVectorPlugin::viewUnlinked(View* view)
 {
 	h_viewParams.remove(view);
 
-	View* current = m_window->getCurrentView();
-	if(isLinkedToView(current))
-		m_dockTab->refreshUI(h_viewParams[current]);
+	disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
+	disconnect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
 }
 
 void RenderVectorPlugin::currentViewChanged(View* view)
@@ -98,31 +100,106 @@ void RenderVectorPlugin::currentViewChanged(View* view)
 	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
-void RenderVectorPlugin::mapLinked(View* view, MapHandlerGen* m)
+void RenderVectorPlugin::mapLinked(MapHandlerGen* m)
 {
+	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet p(m);
 	params->perMap.insert(m->getName(), p);
-	if(params->perMap.count() == 1)
-		params->selectedMap = m;
-
-	m_dockTab->refreshUI(params);
+	if(params->selectedMap == NULL || params->perMap.count() == 1)
+		changeSelectedMap(view, m);
+	else
+		m_dockTab->refreshUI(params);
 }
 
-void RenderVectorPlugin::mapUnlinked(View* view, MapHandlerGen* m)
+void RenderVectorPlugin::mapUnlinked(MapHandlerGen* m)
 {
+	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+
 	ParameterSet* params = h_viewParams[view];
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)
 	{
 		if(!params->perMap.empty())
-			params->selectedMap = m_window->getMap(params->perMap.begin().key());
+			changeSelectedMap(view, m_window->getMap(params->perMap.begin().key()));
 		else
-			params->selectedMap = NULL;
+			changeSelectedMap(view, NULL);
+	}
+	else
 		m_dockTab->refreshUI(params);
+}
+
+void RenderVectorPlugin::vboAdded(Utils::VBO* vbo)
+{
+	m_dockTab->refreshUI(h_viewParams[m_window->getCurrentView()]);
+}
+
+void RenderVectorPlugin::vboRemoved(Utils::VBO* vbo)
+{
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+
+	View* view = m_window->getCurrentView();
+	ParameterSet* params = h_viewParams[view];
+	if(params->perMap[map->getName()].positionVBO == vbo)
+		changePositionVBO(view, map, NULL);
+}
+
+void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
+{
+	ParameterSet* params = h_viewParams[view];
+
+	MapHandlerGen* prev = params->selectedMap;
+	params->selectedMap = map;
+
+	if(view->isCurrentView())
+	{
+		if(prev)
+			disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+		if(map)
+			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderVectorPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].positionVBO = vbo;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderVectorPlugin::changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].vectorVBO = vbos;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderVectorPlugin::changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()].vectorsScaleFactor = i / 50.0;
+
+	if(view->isCurrentView())
+	{
+		m_dockTab->refreshUI(params);
+		view->updateGL();
 	}
 }
 
@@ -130,16 +207,9 @@ void RenderVectorPlugin::cb_selectedMapChanged()
 {
 	if(!b_refreshingUI)
 	{
-		View* view = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[view];
 		QList<QListWidgetItem*> currentItems = m_dockTab->mapList->selectedItems();
 		if(!currentItems.empty())
-		{
-			const QString& mapname = currentItems[0]->text();
-			params->selectedMap = m_window->getMap(mapname);
-			m_dockTab->refreshUI(params);
-			view->updateGL();
-		}
+			changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
 	}
 }
 
@@ -147,48 +217,33 @@ void RenderVectorPlugin::cb_positionVBOChanged(int index)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* map = params->selectedMap;
-		params->perMap[map->getName()].positionVBO = map->getVBO(m_dockTab->combo_positionVBO->currentText());
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changePositionVBO(view, map, map->getVBO(m_dockTab->combo_positionVBO->currentText()));
 	}
 }
 
-void RenderVectorPlugin::cb_selectedVectorVBOChanged()
+void RenderVectorPlugin::cb_selectedVectorsVBOChanged()
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* map = params->selectedMap;
-		PerMapParameterSet& mapParam = params->perMap[map->getName()];
-
-		mapParam.vectorVBO.clear();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
 		QList<QListWidgetItem*> currentItems = m_dockTab->list_vectorVBO->selectedItems();
+		std::vector<Utils::VBO*> vbos;
 		foreach(QListWidgetItem* item, currentItems)
-			mapParam.vectorVBO.push_back(map->getVBO(item->text()));
-
-		current->updateGL();
+			vbos.push_back(map->getVBO(item->text()));
+		changeSelectedVectorsVBO(view, map, vbos);
 	}
-}
-
-void RenderVectorPlugin::cb_refreshVBOs()
-{
-	View* current = m_window->getCurrentView();
-	if(isLinkedToView(current))
-		m_dockTab->refreshUI(h_viewParams[current]);
 }
 
 void RenderVectorPlugin::cb_vectorsScaleFactorChanged(int i)
 {
 	if(!b_refreshingUI)
 	{
-		View* current = m_window->getCurrentView();
-		ParameterSet* params = h_viewParams[current];
-		MapHandlerGen* m = params->selectedMap;
-		params->perMap[m->getName()].vectorsScaleFactor = i / 50.0;
-		current->updateGL();
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = h_viewParams[view]->selectedMap;
+		changeVectorsScaleFactor(view, map, i);
 	}
 }
 
@@ -219,23 +274,24 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 			unsigned int j = 0;
 			for(int i = 0; i < vbos.count(); ++i)
 			{
-				combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(p.positionVBO == NULL)
-				{										// if nothing is specified in the parameter set
-					if(vbos[i]->name() == "position")	// try to select a VBO named "position"
-					{
-						p.positionVBO = vbos[i];
-						combo_positionVBO->setCurrentIndex(i);
-					}
-				}
-				else if(vbos[i] == p.positionVBO)
-					combo_positionVBO->setCurrentIndex(i);
-
 				if(vbos[i]->dataSize() == 3)
 				{
+					combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
+					if(p.positionVBO == NULL)
+					{										// if nothing is specified in the parameter set
+						if(vbos[i]->name() == "position")	// try to select a VBO named "position"
+						{
+							p.positionVBO = vbos[i];
+							combo_positionVBO->setCurrentIndex(j);
+						}
+					}
+					else if(vbos[i] == p.positionVBO)
+						combo_positionVBO->setCurrentIndex(j);
+
 					list_vectorVBO->addItem(QString::fromStdString(vbos[i]->name()));
 					if(std::find(p.vectorVBO.begin(), p.vectorVBO.end(), vbos[i]) != p.vectorVBO.end())
 						list_vectorVBO->item(j)->setSelected(true);
+
 					++j;
 				}
 			}

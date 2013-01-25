@@ -13,36 +13,35 @@ namespace SCHNApps
 ComputeCurvatureDialog::ComputeCurvatureDialog(Window* w) : m_window(w)
 {
 	setupUi(this);
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
-}
 
-void ComputeCurvatureDialog::init()
-{
-	mapList->clear();
-	combo_positionAttribute->clear();
-	combo_normalAttribute->clear();
-	combo_KmaxAttribute->clear();
-	combo_kmaxAttribute->clear();
-	combo_KminAttribute->clear();
-	combo_kminAttribute->clear();
-	combo_KnormalAttribute->clear();
 	KmaxAttributeName->setText("Kmax");
 	kmaxAttributeName->setText("kmax");
 	KminAttributeName->setText("Kmin");
 	kminAttributeName->setText("kmin");
 	KnormalAttributeName->setText("Knormal");
+
+	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
+
+	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
+
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
 		mapList->addItem(map->getName());
 }
 
-void ComputeCurvatureDialog::cb_selectedMapChanged()
+void ComputeCurvatureDialog::selectedMapChanged()
 {
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 	if(!currentItems.empty())
 	{
 		combo_positionAttribute->clear();
 		combo_normalAttribute->clear();
+		combo_KmaxAttribute->clear();
+		combo_KminAttribute->clear();
+		combo_KnormalAttribute->clear();
+		combo_kmaxAttribute->clear();
+		combo_kminAttribute->clear();
 		const QString& mapname = currentItems[0]->text();
 		MapHandlerGen* mh = m_window->getMap(mapname);
 		GenericMap* map = mh->getGenericMap();
@@ -94,6 +93,23 @@ void ComputeCurvatureDialog::cb_selectedMapChanged()
 
 				++k;
 			}
+		}
+	}
+}
+
+void ComputeCurvatureDialog::addMapToList(MapHandlerGen* m)
+{
+	mapList->addItem(m->getName());
+}
+
+void ComputeCurvatureDialog::removeMapFromList(MapHandlerGen* m)
+{
+	for(int i = 0; i < mapList->count(); ++i)
+	{
+		if(mapList->item(i)->text() == m->getName())
+		{
+			delete mapList->item(i);
+			return;
 		}
 	}
 }

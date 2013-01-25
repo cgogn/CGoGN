@@ -4,6 +4,8 @@
 #include "ui_window.h"
 
 #include "types.h"
+#include "PythonQt/PythonQt.h"
+#include "PythonQt/gui/PythonQtScriptingConsole.h"
 
 class QVBoxLayout;
 class QSplitter;
@@ -26,16 +28,14 @@ class Window : public QMainWindow, Ui::Window
 
 public:
 	/**
-	 * \fn Window(QWidget* parent = NULL)
-	 * \brief Default (and unique) constructor
-	 *
-	 * \param parent the parent of the window
+	 * \fn Window()
+	 * \brief Constructor
 	 */
-	Window(const QString& appPath, QWidget* parent = NULL);
+	Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQtScriptingConsole& pythonConsole);
 
 	/**
 	 * \fn ~Window()
-	 * \brief the class destructor
+	 * \brief Destructor
 	 */
 	~Window();
 
@@ -45,22 +45,15 @@ public:
 	 * MANAGE DOCK
 	 *********************************************************/
 
-	/**
-	 * \fn QTabWidget* getDockTabWidget()
-	 * \brief Accessor to the QTabWidget of this interface
-	 *
-	 * \return a pointer to the TabWidget, NULL if not allocated yet
-	 */
 	QTabWidget* getDockTabWidget() const { return m_dockTabWidget; }
 
 	/**
-	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText)
+	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText, bool enable)
 	 * \brief Adds the widget as a new tab in the interface's dock
 	 *
 	 * \param tabWidget the created and allocated pointer to the QWidget to add in the dock
 	 * \param tabText The text that will appears in the tab label
-	 *
-	 * \see removeTabInDock()
+	 * \param enable is the new tab enabled ?
 	 */
 	void addTabInDock(QWidget* tabWidget, const QString& tabText, bool enable);
 
@@ -71,11 +64,10 @@ public:
 	 * \param tabWidget the reference to the widget you want to remove
 	 *
 	 * If the widget does belong to the tab, it will be destroyed.
-	 *
-	 * \see addWidgetInDockTab()
 	 */
 	void removeTabInDock(QWidget* tabWidget);
 
+public slots:
 	void enablePluginTabWidgets(Plugin* plugin);
 	void disablePluginTabWidgets(Plugin* plugin);
 
@@ -83,6 +75,7 @@ public:
 	 * MANAGE MENU ACTIONS
 	 *********************************************************/
 
+public:
 	/**
 	 * \fn bool addMenuAction(const QString& menuPath, QAction* action)
 	 * \brief adds an action in the program menu bar
@@ -160,7 +153,11 @@ public:
 	View* addView(const QString& name);
 	View* addView();
 	void removeView(const QString& name);
+
+public slots:
 	View* getView(const QString& name) const;
+
+public:
 	QList<View*> getViewsList() const { return h_views.values(); }
 	const ViewHash& getViewsHash() const { return h_views; }
 
@@ -172,6 +169,9 @@ public:
 	/*********************************************************
 	 * MANAGE PLUGINS
 	 *********************************************************/
+
+public slots:
+	void registerPluginsDirectory(const QString& path);
 
 	/**
 	 * \fn bool loadPlugin(QString pluginPath)
@@ -190,16 +190,7 @@ public:
 	 * This method calls the Plugin::enable() method of the concerned Plugin. That is why
 	 * when Plugin are written, this method is overriden and used as an initialization method.
 	 *
-	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
-	 *
 	 * \return a boolean whether the loading succeeded or not.
-	 *
-	 * If the function failed, the error code ( Error::code ) is affected with a value
-	 * depending on the error. This error can be shown with Error::showError
-	 *
-	 * \see unloadPlugin()
-	 * \see getPlugins()
-	 * \see Plugin::enable()
 	 */
 	Plugin* loadPlugin(const QString& pluginFilePath);
 
@@ -214,62 +205,51 @@ public:
 	 *
 	 * This method calls the Plugin::disable() method of the concerned Plugin. That is why,
 	 * when Plugin are written, this method is overriden and used as a destruction method.
-	 *
-	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
-	 *
-	 * \see loadPlugin()
-	 * \see getPlugins()
-	 * \see Plugin::disable()
 	 */
 	void unloadPlugin(const QString& pluginName);
 
-	/**
-	 * \fn Plugin* checkPluginDependencie(QString name, Plugin* dependantPlugin)
-	 * \brief checks for a dependencie Plugin, and set the dependencie link for the found Plugin
-	 *
-	 * \param name the name of the Plugin you have to check the existence in order to make a dependencie
-	 * \param dependantPlugin a reference to the Plugin that asks for the dependencie that will be set as a
-	 *          dependant Plugin for the found Plugin
-	 *
-	 * \warning In the program this method is called under specific and controlled circumstances
-	 *          by the Plugins you should probably not call it.
-	 *
-	 * \return a pointer to the found dependencie Plugin, NULL if this Plugin wasn't referenced
-	 *
-	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
-	 *
-	 * \see loadPlugin()
-	 * \see VisualPlugin::addDependencie()
-	 */
-//	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
-
+public:
 	Plugin* getPlugin(const QString& name) const;
 	QList<Plugin*> getPluginsList() const { return h_plugins.values(); }
 	const PluginHash& getPluginsHash() const { return h_plugins; }
+
+	const QMap<QString, QString>& getAvailablePlugins() const { return m_availablePlugins; }
 
 	/*********************************************************
 	 * MANAGE MAPS
 	 *********************************************************/
 
-	GenericMap* createMap(unsigned int dim);
-	bool addMap(MapHandlerGen* map);
+	MapHandlerGen* addMap(const QString& name, unsigned int dim);
 	void removeMap(const QString& name);
 	MapHandlerGen* getMap(const QString& name) const;
 	QList<MapHandlerGen*> getMapsList() const { return h_maps.values(); }
 	const MapHash& getMapsHash() const { return h_maps; }
 
 	/*********************************************************
+	 * MANAGE LINKS
+	 *********************************************************/
+
+public slots:
+	void linkViewAndCamera(View* v, Camera* c);
+
+	void linkViewAndMap(View* v, MapHandlerGen* m);
+	void unlinkViewAndMap(View* v, MapHandlerGen* m);
+
+	void linkViewAndPlugin(View* v, Plugin* p);
+	void unlinkViewAndPlugin(View* v, Plugin* p);
+
+	/*********************************************************
 	 * MANAGE TEXTURES
 	 *********************************************************/
 
+public:
 	Texture* getTexture(const QString& image);
 	void releaseTexture(const QString& image);
 
 protected:
 	QString m_appPath;
-
-	bool m_initialization;
+	PythonQtObjectPtr& m_pythonContext;
+	PythonQtScriptingConsole& m_pythonConsole;
 
 	QVBoxLayout* m_centralLayout;
 	QSplitter* m_rootSplitter;
@@ -280,6 +260,10 @@ protected:
 
 	QDockWidget* m_dock;
 	QTabWidget* m_dockTabWidget;
+
+	QDockWidget* m_pythonDock;
+
+	QMap<QString, QString> m_availablePlugins;
 
 	PluginHash h_plugins;
 	ViewHash h_views;
@@ -293,34 +277,14 @@ protected:
 	MapsDialog* m_mapsDialog;
 
 public slots:
-	/**
-	 * \fn void cb_about_SCHNApps();
-	 * \brief function that is called when the "about SCHNApps" menu action is triggered
-	 */
 	void cb_aboutSCHNApps();
-
-	/**
-	 * \fn void cb_about_CGoGN();
-	 * \brief function that is called when the "about CGOGN" menu action is triggered
-	 */
 	void cb_aboutCGoGN();
 	
 	void cb_showHideDock();
+	void cb_showHidePythonDock();
 
-	/**
-	 * \fn void cb_manageCameras()
-	 * \brief method called when the "Cameras" action is triggered.
-	 * Show the cameras management dialog:
-	 */
 	void cb_manageCameras();
-
-	/**
-	 * \fn void cb_managePlugins()
-	 * \brief method called when the "Plugins" action is triggered.
-	 * Show the plugins management dialog
-	 */
 	void cb_managePlugins();
-
 	void cb_manageMaps();
 
 signals:
@@ -329,12 +293,22 @@ signals:
 
 	void viewAdded(View* view);
 	void viewRemoved(View* view);
+	void currentViewChanged(View* view);
 
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
 
-	void pluginAdded(Plugin* plugin);
-	void pluginRemoved(Plugin* plugin);
+	void pluginLoaded(Plugin* plugin);
+	void pluginUnloaded(Plugin* plugin);
+
+	void viewAndCameraLinked(View* view, Camera* camera);
+	void viewAndCameraUnlinked(View* view, Camera* camera);
+
+	void viewAndMapLinked(View* view, MapHandlerGen* map);
+	void viewAndMapUnlinked(View* view, MapHandlerGen* map);
+
+	void viewAndPluginLinked(View* view, Plugin* plugin);
+	void viewAndPluginUnlinked(View* view, Plugin* plugin);
 };
 
 } // namespace SCHNApps
