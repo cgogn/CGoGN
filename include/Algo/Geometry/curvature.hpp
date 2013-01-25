@@ -81,12 +81,24 @@ void computeCurvatureVertex_QuadraticFitting(
 	vertexQuadraticFitting<PFP>(map, dart, localFrame, position, normal, a, b, c, d, e) ;
 
 	REAL kmax_v, kmin_v, Kmax_x, Kmax_y ;
-	//int res = slaev2_(&e, &f, &g, &maxC, &minC, &dirX, &dirY) ;
-	/*int res = */slaev2_(&a, &b, &c, &kmax_v, &kmin_v, &Kmax_x, &Kmax_y) ;
+//	/*int res = */slaev2_(&a, &b, &c, &kmax_v, &kmin_v, &Kmax_x, &Kmax_y) ;
 
-	VEC3 Kmax_v(Kmax_x, Kmax_y, 0.0f) ;
+	Eigen::Matrix<REAL,2,2> m;
+	m << a, b, b, c;
+
+	// solve eigen problem
+	Eigen::SelfAdjointEigenSolver<Eigen::Matrix<REAL,2,2> > solver(m);
+
+	const Eigen::Matrix<REAL,2,1>& ev = solver.eigenvalues();
+	kmax_v = ev[0];
+	kmin_v = ev[1];
+
+	const Eigen::Matrix<REAL,2,2>& evec = solver.eigenvectors();
+	VEC3 Kmax_v(evec(0,0), evec(1,0), 0.0f) ;
 	Kmax_v = invLocalFrame * Kmax_v ;
-	VEC3 Kmin_v = n ^ Kmax_v ;
+	VEC3 Kmin_v(evec(0,1), evec(1,1), 0.0f) ;
+	Kmin_v = invLocalFrame * Kmin_v ;
+//	VEC3 Kmin_v = n ^ Kmax_v ;
 
 	if (kmax_v < kmin_v)
 	{
