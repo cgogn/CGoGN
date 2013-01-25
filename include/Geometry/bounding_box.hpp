@@ -222,7 +222,7 @@ bool BoundingBox<VEC>::contains(const VEC& a, const VEC& b)
 #define MIDDLE 'm'
 
 	//Algorithm from Graphic Gems
-	//modified : do not compute intersection point
+	//modified to test segment
 	VEC dir(b-a);		/*ray */
 
 	bool inside = true;
@@ -287,10 +287,12 @@ bool BoundingBox<VEC>::contains(const VEC& a, const VEC& b)
 			coord[i] = a[i] + maxT[whichPlane] *dir[i];
 			if (coord[i] < m_pMin[i] || coord[i] > m_pMax[i])
 				return false;
+			else
+				coord[i] = candidatePlane[i];
 		}
 	}
 
-	return true;				/* ray hits box */
+	return VEC(coord-b)*VEC(a-b); /* intersection in segment ?*/
 }
 
 template <typename VEC>
