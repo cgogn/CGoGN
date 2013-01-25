@@ -140,7 +140,6 @@ void RenderPlugin::viewLinked(View* view)
 	}
 	if (!maps.empty())
 		changeSelectedMap(view, maps[0]);
-//		params->selectedMap = maps[0];
 
 	connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
 	connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
