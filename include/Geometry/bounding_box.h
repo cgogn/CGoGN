@@ -89,8 +89,11 @@ class BoundingBox
 		// fusion with the given bounding box
 		void fusion(const BoundingBox<VEC>& bb) ;
 
-		// return true if the vector belongs strictly to a bounding box
+		// return true if the point belongs strictly to a bounding box
 		bool contains(const VEC& p);
+
+		// return true if the segment belongs strictly to a bounding box
+		bool contains(const VEC& a, const VEC& b);
 
 		// return true if the bounding box belongs strictly to a bounding box
 		bool contains(const BoundingBox<VEC> & bb);

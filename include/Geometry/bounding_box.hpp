@@ -213,6 +213,87 @@ bool BoundingBox<VEC>::contains(const VEC& p)
 }
 
 template <typename VEC>
+bool BoundingBox<VEC>::contains(const VEC& a, const VEC& b)
+{
+	assert(m_initialized || !"Bounding box not initialized");
+
+#define LEFT 'l'
+#define RIGHT 'r'
+#define MIDDLE 'm'
+
+	//Algorithm from Graphic Gems
+	//modified : do not compute intersection point
+	VEC dir(b-a);		/*ray */
+
+	bool inside = true;
+	char quadrant[m_pMin.dimension()];
+
+	VEC candidatePlane;
+
+	/* Find candidate planes; this loop can be avoided if
+	rays cast all from the eye(assume perpsective view) */
+	for (unsigned int i=0; i< m_pMin.dimension(); i++)
+	{
+		if(a[i] < m_pMin[i])
+		{
+			quadrant[i] = LEFT;
+			candidatePlane[i] = m_pMin[i];
+			inside = false;
+		}
+		else if (a[i] > m_pMax[i])
+		{
+			quadrant[i] = RIGHT;
+			candidatePlane[i] = m_pMax[i];
+			inside = false;
+		}
+		else
+		{
+			quadrant[i] = MIDDLE;
+		}
+	}
+
+	/* Ray origin inside bounding box */
+	if(inside)
+		return true;
+
+	VEC maxT;
+	VEC coord;			/* hit point */
+	/* Calculate T distances to candidate planes */
+	for(unsigned int i = 0; i < m_pMin.dimension(); i++)
+	{
+		if (quadrant[i] != MIDDLE && dir[i] !=0)
+			maxT[i] = (candidatePlane[i]-a[i]) / dir[i];
+		else
+			maxT[i] = -1.;
+	}
+
+#undef LEFT
+#undef RIGHT
+#undef MIDDLE
+
+	/* Get largest of the maxT's for final choice of intersection */
+	unsigned int whichPlane = 0;
+	for(unsigned int i = 1; i < m_pMin.dimension(); i++)
+		if (maxT[whichPlane] < maxT[i])
+			whichPlane = i;
+
+	/* Check final candidate actually inside box */
+	if (maxT[whichPlane] < 0.)
+		return false;
+	for (unsigned int i = 0; i < m_pMin.dimension(); i++)
+	{
+		if (whichPlane != i)
+		{
+			coord[i] = a[i] + maxT[whichPlane] *dir[i];
+			if (coord[i] < m_pMin[i] || coord[i] > m_pMax[i])
+				return false;
+		}
+	}
+
+	return true;				/* ray hits box */
+}
+
+template <typename VEC>
 bool BoundingBox<VEC>::contains(const BoundingBox<VEC>& bb)
 {
 	assert(m_initialized || !"Bounding box not initialized");
