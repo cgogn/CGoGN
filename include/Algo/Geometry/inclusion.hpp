@@ -307,7 +307,7 @@ bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Dart d, con
 
 } // namespace Geometry
 
-}
+} // namespace Surface
 
 } // namspace Algo
 

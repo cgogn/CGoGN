@@ -140,10 +140,8 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n, bool withBoundary)
 template <typename PFP>
 Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary)
 {
-	std::vector<Dart> m_tableVertDarts;
-	
-	
 	unsigned int nbt = 2*nbSides -1 ; // -1 for computation optimization
+	std::vector<Dart> m_tableVertDarts;
 	m_tableVertDarts.reserve(nbSides);
 	
 	
@@ -166,7 +164,7 @@ Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBounda
 	//sewing the last with the first
 	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[nbSides-1]), false);
 
-	for (unsigned int i = nbSides; i <= nbt; ++i)
+	for (unsigned int i = nbSides; i < nbt; ++i)
 	{
 		Dart d = m_tableVertDarts[i];
 		d = map.phi_1(d);
@@ -182,6 +180,9 @@ Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBounda
 	{
 		map.sewFaces(m_tableVertDarts[i], m_tableVertDarts[nbt-i], false);
 	}
+
+	if(map.dimension() == 3 && withBoundary)
+		map.closeMap();
 
 	//return a dart from the base
 	return m_tableVertDarts[0];

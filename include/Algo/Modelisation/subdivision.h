@@ -115,19 +115,10 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 template <typename PFP>
 void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
-///**
-// * Reverse the orientation of the map
-// * NOW  IN THE MAP
-// */
-//template <typename PFP>
-//void reverseOrientation(typename PFP::MAP& map) ;
-//
-///**
-// * Sqrt(3) subdivision scheme
+//**
 // */
 //template <typename PFP>
 //void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
-
 
 
 

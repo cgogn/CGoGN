@@ -92,7 +92,7 @@ void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttr
 
 } // namespace Geometry
 
-}
+} // namespace Surface
 
 } // namespace Algo
 

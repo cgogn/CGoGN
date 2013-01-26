@@ -629,7 +629,6 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 }
 
 
-
 inline double sqrt3_K(unsigned int n)
 {
 	switch(n)
@@ -698,6 +697,7 @@ inline double sqrt3_K(unsigned int n)
 //		}
 //	}
 //}
+
 
 } // namespace Modelisation
 

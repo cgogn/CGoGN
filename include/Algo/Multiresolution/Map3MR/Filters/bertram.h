@@ -181,7 +181,6 @@ public:
 //				Dart dit = db;
 //				do
 //				{
-//					std::cout << "dit = " << dit << std::endl;
 //					m_map.incCurrentLevel() ;
 //
 //					Dart midEdgeV = m_map.phi1(dit);
@@ -196,7 +195,7 @@ public:
 //				}while(dit != db);
 
 				//TODO Replace do--while with a Traversor2 on Boundary
-				ClosedMap::Traversor2VF<typename PFP::MAP> travVF(m_map,db);
+				Traversor2VF<typename PFP::MAP> travVF(m_map,db);
 				for(Dart dit = travVF.begin(); dit != travVF.end() ; dit = travVF.next())
 				{
 					m_map.incCurrentLevel() ;
@@ -275,6 +274,7 @@ public:
 				Dart db = m_map.findBoundaryFaceOfEdge(d);
 				typename PFP::VEC3 fe(0.0);
 
+//				unsigned int count = 2;
 //				m_map.incCurrentLevel() ;
 //				Dart midV = m_map.phi1(m_map.phi1(db));
 //				fe += m_position[midV];
@@ -284,7 +284,7 @@ public:
 
 				//TODO Replace do--while with a Traversor2 on Boundary
 				unsigned int count = 0;
-				ClosedMap::Traversor2EF<typename PFP::MAP> travEF(m_map, db);
+				Traversor2EF<typename PFP::MAP> travEF(m_map, db);
 				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
 				{
 					m_map.incCurrentLevel() ;
@@ -569,6 +569,7 @@ public:
 				Dart db = m_map.findBoundaryFaceOfEdge(d);
 				typename PFP::VEC3 fe(0.0);
 
+//				unsigned int count = 2;
 //				m_map.incCurrentLevel() ;
 //				Dart midV = m_map.phi1(m_map.phi1(db));
 //				fe += m_position[midV];
@@ -578,7 +579,7 @@ public:
 
 				//TODO Replace do--while with a Traversor2 on Boundary
 				unsigned int count = 0;
-				ClosedMap::Traversor2EF<typename PFP::MAP> travEF(m_map, db);
+				Traversor2EF<typename PFP::MAP> travEF(m_map, db);
 				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
 				{
 					m_map.incCurrentLevel() ;
@@ -648,7 +649,6 @@ public:
 //				Dart dit = db;
 //				do
 //				{
-//					std::cout << "dit = " << dit << std::endl;
 //					m_map.incCurrentLevel() ;
 //
 //					Dart midEdgeV = m_map.phi1(dit);
@@ -662,7 +662,7 @@ public:
 //
 //				}while(dit != db);
 
-				ClosedMap::Traversor2VF<typename PFP::MAP> travVF(m_map,db);
+				Traversor2VF<typename PFP::MAP> travVF(m_map,db);
 				for(Dart dit = travVF.begin(); dit != travVF.end() ; dit = travVF.next())
 				{
 					std::cout << "dit = " << dit << std::endl;

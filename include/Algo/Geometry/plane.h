@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -60,6 +63,8 @@ Geom::Plane3D<typename PFP::REAL> vertexTangentPlane(typename PFP::MAP& map, Dar
 }
 
 } // namespace Geometry
+
+} // namespace Surface
 
 } // namespace Algo
 

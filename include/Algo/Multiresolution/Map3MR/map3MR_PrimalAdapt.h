@@ -28,6 +28,7 @@
 #include "Topology/map/embeddedMap3.h"
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor3.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 #include <limits>
 
 namespace CGoGN

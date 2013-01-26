@@ -470,6 +470,8 @@ public:
 	/*!
 	 */
 	void computeDual();
+
+	void computeDualTest();
 	//@}
 };
 
