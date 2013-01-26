@@ -1300,26 +1300,28 @@ void Map3::computeDual()
 
 	std::vector<Dart> vbound;
 
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(isBoundaryMarked3(d) && !isBoundaryMarked3(phi3(d)))
-		{
-			vbound.push_back(d);
-		}
-	}
-
-	std::cout << "vbound size = " << vbound.size() << std::endl;
-
-	for(std::vector<Dart>::iterator it = vbound.begin() ; it != vbound.end() ; ++it)
-	{
-		Dart d = *it;
-		//Dart d3 = phi3(d);
-		phi3unsew(d);
-		//phi3unsew(d3);
-	}
-
 	//std::cout << "nb faces : " << closeMap() << std::endl;
 
+//	for(Dart d = begin(); d != end(); next(d))
+//	{
+//		if(isBoundaryMarked3(d) && !isBoundaryMarked3(phi3(d)))
+//		{
+//			vbound.push_back(d);
+//		}
+//	}
+//
+//	std::cout << "vbound size = " << vbound.size() << std::endl;
+//
+//	for(std::vector<Dart>::iterator it = vbound.begin() ; it != vbound.end() ; ++it)
+//	{
+//		Dart d = *it;
+//		//Dart d3 = phi3(d);
+//		phi3unsew(d);
+//		//phi3unsew(d3);
+//	}
+//
+//	//std::cout << "nb faces : " << closeMap() << std::endl;
+//
 //			if(d == 14208)
 //			{
 //				std::cout << "yeahhhhhhhh" << std::endl;
@@ -1468,7 +1470,6 @@ void Map3::computeDualTest()
 		new_phi1[d] = dd ;
 		new_phi_1[dd] = d ;
 
-		//Dart ddd = phi3(phi_1(d));
 		Dart ddd = phi1(phi3(d));
 		new_phi2[d] = ddd;
 		new_phi2[ddd] = d;

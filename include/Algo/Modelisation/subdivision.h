@@ -130,13 +130,20 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 //template <typename PFP>
 //void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
+template <typename PFP>
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
+template <typename PFP>
+void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
+template <typename PFP>
+void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 
 
 } // namespace Modelisation
 
-}
+} // namespace Surface
 
 } // namespace Algo
 

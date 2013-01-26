@@ -716,87 +716,21 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	}
 }
 
-//template <typename PFP>
-//void reverseOrientation3(typename PFP::MAP& map)
-//{
-//	DartAttribute<unsigned int> emb0(&map, map.template getEmbeddingAttributeVector<VERTEX>()) ;
-//	if(emb0.isValid())
-//	{
-//		DartAttribute<unsigned int> new_emb0 = map.template addAttribute<unsigned int, DART>("new_EMB_0") ;
-//		for(Dart d = map.begin(); d != map.end(); map.next(d))
-//			new_emb0[d] = emb0[map.phi1(d)] ;
-//		map.template swapAttributes<unsigned int>(emb0, new_emb0) ;
-//		map.removeAttribute(new_emb0) ;
-//	}
-//
-//	DartAttribute<Dart> phi2 = map.template getAttribute<Dart, DART>("phi2") ;
-//	DartAttribute<Dart> phi3 = map.template getAttribute<Dart, DART>("phi3") ;
-//	map.template swapAttributes<Dart>(phi2, phi3) ;
-//}
-//
-//template <typename PFP>
-//void computeDual3(typename PFP::MAP& map, const FunctorSelect& selected)
-//{
-//	DartAttribute<Dart> phi1 = map.template getAttribute<Dart, DART>("phi1") ;
-//	DartAttribute<Dart> phi_1 = map.template getAttribute<Dart, DART>("phi_1") ;
-//	DartAttribute<Dart> new_phi1 = map.template addAttribute<Dart, DART>("new_phi1") ;
-//	DartAttribute<Dart> new_phi_1 = map.template addAttribute<Dart, DART>("new_phi_1") ;
-//
-//	DartAttribute<Dart> phi2 = map.template getAttribute<Dart, DART>("phi2") ;
-//	DartAttribute<Dart> new_phi2 = map.template addAttribute<Dart, DART>("new_phi2") ;
-//
-//	for(Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		Dart dd = map.phi2(map.phi3(d)) ;
-//		new_phi1[d] = dd ;
-//		new_phi_1[dd] = d ;
-//
-//		Dart ddd = map.phi1(map.phi3(d));
-//		new_phi2[d] = ddd;
-//		new_phi2[ddd] = d;
-//	}
-//
-//	map.template swapAttributes<Dart>(phi1, new_phi1) ;
-//	map.template swapAttributes<Dart>(phi_1, new_phi_1) ;
-//	map.template swapAttributes<Dart>(phi2, new_phi2) ;
-//
-//	map.removeAttribute(new_phi1) ;
-//	map.removeAttribute(new_phi_1) ;
-//	map.removeAttribute(new_phi2) ;
-//
-//	map.swapEmbeddingContainers(VERTEX, VOLUME) ;
-//
-//	for(Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		if(map.isBoundaryMarked(d))
-//		{
-//			map.deleteVolume(d);
-////			Traversor3VW<typename PFP::MAP> tWV(map, d);
-////			std::vector<Dart> v;
-////			for(Dart ditW = tWV.begin() ; ditW != tWV.end() ; ditW = tWV.next())
-////			{
-////				v.push_back(ditW);
-////			}
-////
-////			for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
-////			{
-////				map.deleteVolume(*it);
-////			}
-//
-//		}
-//	}
-//
-////	reverseOrientation3<PFP>(map) ;
-//
-//	//boundary management
-////	for(Dart d = map.begin(); d != map.end(); map.next(d))
-////	{
-////		if(map.isBoundaryMarked(d))
-////		{
-////			map.deleteVolume(d); //map.template boundaryMarkOrbit<VOLUME>(
-////		}
-////	}
-//}
+template <typename PFP>
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+{
+	// VolumeAttribute -> after dual new VertexAttribute
+	VolumeAttribute<typename PFP::VEC3> positionV  = map.template getAttribute<typename PFP::VEC3, VOLUME>("position") ;
+	if(!positionV.isValid())
+		positionV = map.template addAttribute<typename PFP::VEC3, VOLUME>("position") ;
+
+	// Compute Centroid for the volumes
+	Algo::Volume::Geometry::computeCentroidVolumes<PFP>(map, position, positionV) ;
+
+	// Compute the Dual mesh
+	map.computeDual();
+	position = positionV ;
+}
 
 
 } //namespace Modelisation

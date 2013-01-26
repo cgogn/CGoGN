@@ -697,10 +697,175 @@ inline double sqrt3_K(unsigned int n)
 //	}
 //}
 
+template <typename PFP>
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+{
+	// Face Attribute -> after dual new Vertex Attribute
+	FaceAttribute<typename PFP::VEC3> positionF  = map.template getAttribute<typename PFP::VEC3, FACE>("position") ;
+	if(!positionF.isValid())
+		positionF = map.template addAttribute<typename PFP::VEC3, FACE>("position") ;
+
+	// Compute Centroid for the faces
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
+
+	// Compute the Dual mesh
+	map.computeDual();
+	position = positionF ;
+}
+
+
+template <typename PFP>
+void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+{
+	// Face Attribute -> after dual new Vertex Attribute
+	FaceAttribute<typename PFP::VEC3> positionF  = map.template getAttribute<typename PFP::VEC3, FACE>("position") ;
+	if(!positionF.isValid())
+		positionF = map.template addAttribute<typename PFP::VEC3, FACE>("position") ;
+
+	//Triangule boundary faces & compute for each new face the centroid
+	std::vector<Dart> boundsDart;
+	DartMarkerStore mf(map);
+	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
+	{
+		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		{
+			boundsDart.push_back(dit);
+			Dart db = dit;
+			Dart d1 = map.phi1(db);
+			Dart dprev = map.phi_1(db);
+			map.splitFace(db, d1) ;
+			map.cutEdge(map.phi_1(db)) ;
+
+			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * typename PFP::REAL(0.5);
+			mf.markOrbit<FACE>(dit);
+
+			Dart x = map.phi2(map.phi_1(db)) ;
+			Dart dd = map.phi1(map.phi1(map.phi1(x)));
+			while(dd != x)
+			{
+				Dart next = map.phi1(dd) ;
+				Dart prev = map.phi_1(dd);
+				map.splitFace(dd, map.phi1(x)) ;
+				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * typename PFP::REAL(0.5);
+				mf.markOrbit<FACE>(prev);
+				dd = next ;
+			}
+
+			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * typename PFP::REAL(0.5);
+			mf.markOrbit<FACE>(dprev);
+		}
+	}
+
+	// Compute Centroid for the other faces
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
+
+	// Fill the holes
+	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
+	{
+		if(mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		{
+			map.fillHole(dit);
+			mf.unmarkOrbit<FACE>(dit);
+		}
+	}
+
+	// Compute the Dual mesh
+	map.computeDual();
+	position = positionF ;
+
+	// Create the new border with the old boundary edges
+	for(std::vector<Dart>::iterator it = boundsDart.begin() ; it != boundsDart.end() ; ++it)
+	{
+		map.createHole(map.phi2(map.phi1(*it)));
+	}
+}
+
+template <typename PFP>
+void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+{
+	// Face Attribute -> after dual new Vertex Attribute
+	FaceAttribute<typename PFP::VEC3> positionF  = map.template getAttribute<typename PFP::VEC3, FACE>("position") ;
+	if(!positionF.isValid())
+		positionF = map.template 	addAttribute<typename PFP::VEC3, FACE>("position") ;
+
+	//Triangule boundary faces & compute for each new face the centroid
+	std::vector<Dart> boundsDart;
+	DartMarkerStore mf(map);
+	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
+	{
+		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		{
+			boundsDart.push_back(dit);
+			Dart db = dit;
+			Dart d1 = map.phi1(db);
+			Dart dprev = map.phi_1(db);
+			map.splitFace(db, d1) ;
+			map.cutEdge(map.phi_1(db)) ;
+
+			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * typename PFP::REAL(0.5);
+			mf.markOrbit<FACE>(dit);
+
+			Dart x = map.phi2(map.phi_1(db)) ;
+			Dart dd = map.phi1(map.phi1(map.phi1(x)));
+			while(dd != x)
+			{
+				Dart next = map.phi1(dd) ;
+				Dart prev = map.phi_1(dd);
+				map.splitFace(dd, map.phi1(x)) ;
+				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * typename PFP::REAL(0.5);
+				mf.markOrbit<FACE>(prev);
+				dd = next ;
+			}
+
+			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * typename PFP::REAL(0.5);
+			mf.markOrbit<FACE>(dprev);
+		}
+	}
+
+	// Compute Centroid for the other faces
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
+
+	// Fill the holes
+	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
+	{
+		if(mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		{
+			map.fillHole(dit);
+			mf.unmarkOrbit<FACE>(dit);
+		}
+	}
+
+	// Compute the Dual mesh
+	map.computeDual();
+
+	//Saving old position VertexAttribute to a FaceAttribute
+	FaceAttribute<typename PFP::VEC3> temp;
+	temp = position;
+	position = positionF ;
+	positionF = temp;
+
+	// Create the new border with the old boundary edges
+	for(std::vector<Dart>::iterator it = boundsDart.begin() ; it != boundsDart.end() ; ++it)
+	{
+		map.createHole(map.phi2(map.phi1(*it)));
+	}
+
+	// Manage old vertices with new FaceAttribute
+	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
+	{
+		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		{
+			Dart nd = map.cutEdge(dit);
+			position[nd] = positionF[map.phi2(dit)];
+			mf.markOrbit<EDGE>(dit);
+			mf.markOrbit<EDGE>(nd);
+		}
+	}
+}
 
 } // namespace Modelisation
 
-}
+} // namespace Surface
 
 } // namespace Algo
 
