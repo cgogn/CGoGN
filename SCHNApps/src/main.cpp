@@ -1,4 +1,5 @@
 #include <QSplashScreen>
+#include <QFileInfo>
 #include "PythonQt/PythonQt.h"
 #include "PythonQt/gui/PythonQtScriptingConsole.h"
 #include "window.h"
@@ -29,7 +30,9 @@ int main(int argc, char* argv[])
 	schnapps.show();
 
 	pythonContext.addObject("schnapps", &schnapps);
-	pythonContext.evalFile(app.applicationDirPath() + QString("/init.py"));
+	QFileInfo fi(app.applicationDirPath() + QString("/init.py"));
+	if(fi.exists())
+		pythonContext.evalFile(fi.filePath());
 
 	splash->finish(&schnapps);
 	delete splash;

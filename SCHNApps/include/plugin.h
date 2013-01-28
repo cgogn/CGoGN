@@ -16,12 +16,16 @@ class Window;
 
 class Plugin : public QObject
 {
+	Q_OBJECT
+
 public:
 	Plugin();
 	virtual ~Plugin();
 
+	const QString& getName() const { return m_name; }
+
 public slots:
-	const QString& getName() { return m_name; }
+	QString getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
 	const QString& getFilePath() { return m_filePath; }
