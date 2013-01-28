@@ -32,6 +32,9 @@ public:
 	~View();
 
 	const QString& getName() const { return m_name; }
+
+public slots:
+	QString getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
 	Window* getWindow() const { return m_window; }
@@ -39,6 +42,7 @@ public:
 
 	bool isCurrentView() const { return m_window->getCurrentView() == this; }
 
+public:
 	virtual void init();
 	virtual void preDraw();
 	virtual void draw();

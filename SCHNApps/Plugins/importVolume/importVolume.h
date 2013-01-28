@@ -35,7 +35,7 @@ public:
 	virtual void wheelEvent(View* view, int delta, int x, int y) {}
 
 public slots:
-	void importFromFile(const QString& fileName);
+	MapHandlerGen* importFromFile(const QString& fileName);
 	void importFromFileDialog();
 
 private:

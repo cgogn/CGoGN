@@ -476,8 +476,6 @@ Plugin* Window::loadPlugin(const QString& pluginName)
 				statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
 				emit(pluginLoaded(plugin));
 
-				m_pythonContext.addObject(pluginName, plugin);
-
 				// method success
 				return plugin;
 			}
@@ -583,20 +581,24 @@ MapHandlerGen* Window::getMap(const QString& name) const
  * MANAGE LINKS
  *********************************************************/
 
-void Window::linkViewAndPlugin(View* v, Plugin* p)
+void Window::linkViewAndCamera(View* v, Camera* c)
 {
-	v->linkPlugin(p);
-	p->linkView(v);
+	Camera* current = v->getCurrentCamera();
+	current->unlinkView(v);
+	emit(viewAndCameraUnlinked(v, current));
 
-	emit(viewAndPluginLinked(v, p));
+	v->setCurrentCamera(c);
+
+	c->linkView(v);
+	emit(viewAndCameraLinked(v, c));
 }
 
-void Window::unlinkViewAndPlugin(View* v, Plugin* p)
+void Window::linkViewAndCamera(const QString& viewName, const QString& cameraName)
 {
-	v->unlinkPlugin(p);
-	p->unlinkView(v);
-
-	emit(viewAndPluginUnlinked(v, p));
+	View* view = getView(viewName);
+	Camera* camera = getCamera(cameraName);
+	if(view && camera)
+		linkViewAndCamera(view, camera);
 }
 
 void Window::linkViewAndMap(View* v, MapHandlerGen* m)
@@ -607,6 +609,14 @@ void Window::linkViewAndMap(View* v, MapHandlerGen* m)
 	emit(viewAndMapLinked(v, m));
 }
 
+void Window::linkViewAndMap(const QString& viewName, const QString& mapName)
+{
+	View* view = getView(viewName);
+	MapHandlerGen* map = getMap(mapName);
+	if(view && map)
+		linkViewAndMap(view, map);
+}
+
 void Window::unlinkViewAndMap(View* v, MapHandlerGen* m)
 {
 	v->unlinkMap(m);
@@ -615,15 +625,44 @@ void Window::unlinkViewAndMap(View* v, MapHandlerGen* m)
 	emit(viewAndMapUnlinked(v, m));
 }
 
-void Window::linkViewAndCamera(View* v, Camera* c)
+void Window::unlinkViewAndMap(const QString& viewName, const QString& mapName)
 {
-	Camera* current = v->getCurrentCamera();
-	current->unlinkView(v);
-	emit(viewAndCameraUnlinked(v, current));
-	v->setCurrentCamera(c);
-	c->linkView(v);
+	View* view = getView(viewName);
+	MapHandlerGen* map = getMap(mapName);
+	if(view && map)
+		unlinkViewAndMap(view, map);
+}
 
-	emit(viewAndCameraLinked(v, c));
+void Window::linkViewAndPlugin(View* v, Plugin* p)
+{
+	v->linkPlugin(p);
+	p->linkView(v);
+
+	emit(viewAndPluginLinked(v, p));
+}
+
+void Window::linkViewAndPlugin(const QString& viewName, const QString& pluginName)
+{
+	View* view = getView(viewName);
+	Plugin* plugin = getPlugin(pluginName);
+	if(view && plugin)
+		linkViewAndPlugin(view, plugin);
+}
+
+void Window::unlinkViewAndPlugin(View* v, Plugin* p)
+{
+	v->unlinkPlugin(p);
+	p->unlinkView(v);
+
+	emit(viewAndPluginUnlinked(v, p));
+}
+
+void Window::unlinkViewAndPlugin(const QString& viewName, const QString& pluginName)
+{
+	View* view = getView(viewName);
+	Plugin* plugin = getPlugin(pluginName);
+	if(view && plugin)
+		unlinkViewAndPlugin(view, plugin);
 }
 
 /*********************************************************

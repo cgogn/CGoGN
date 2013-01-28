@@ -24,9 +24,12 @@ public:
 private:
 	Window* m_window;
 	View* m_view;
+	bool b_refreshingUI;
 
 public slots:
 	void selectedMapsChanged();
+	void selectMap(View* view, MapHandlerGen* map);
+	void deselectMap(View* view, MapHandlerGen* map);
 	void addMapToList(MapHandlerGen* m);
 	void removeMapFromList(MapHandlerGen* m);
 };

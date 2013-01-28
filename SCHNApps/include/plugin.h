@@ -16,11 +16,16 @@ class Window;
 
 class Plugin : public QObject
 {
+	Q_OBJECT
+
 public:
 	Plugin();
 	virtual ~Plugin();
 
-	const QString& getName() { return m_name; }
+	const QString& getName() const { return m_name; }
+
+public slots:
+	QString getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
 	const QString& getFilePath() { return m_filePath; }
@@ -34,6 +39,7 @@ public:
 	bool getProvidesRendering() { return b_providesRendering; }
 	void setProvidesRendering(bool b) {	b_providesRendering = b; }
 
+public:
 	virtual bool enable() = 0;
 	virtual void disable() = 0;
 
@@ -45,10 +51,6 @@ public:
 	virtual void mouseRelease(View* view, int button, int x, int y) = 0;
 	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
 	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
-
-//	virtual void viewLinked(View* view) = 0;
-//	virtual void viewUnlinked(View* view) = 0;
-//	virtual void currentViewChanged(View* view) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
