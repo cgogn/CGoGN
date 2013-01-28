@@ -466,9 +466,9 @@ public:
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
 			Dart dd = this->m_map.phi2(d) ;
-			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
+			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first > (*errors)[d])
 			{
-				(*errors)[d] = halfEdgeInfo[dd].it->first ;
+				(*errors)[dd] = halfEdgeInfo[dd].it->first ;
 			}
 			//m_avgColor[d] = VEC3(m_visualImportance[d]/6.,m_visualImportance[d]/6.,m_visualImportance[d]/6.) ;
 		}
