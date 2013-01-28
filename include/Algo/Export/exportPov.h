@@ -51,7 +51,7 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, VertexAttribute
 			unsigned int nb = map.faceDegree(d);
 
 			if(nb == 3)
-				Algo::ExportPov::exportTrianglePlain<PFP>(out,position[d],position[map.phi1(d)],position[map.phi1(map.phi1(d))]);
+				exportTrianglePlain<PFP>(out,position[d],position[map.phi1(d)],position[map.phi1(map.phi1(d))]);
 			else
 			{
 					out << "polygon{ " << nb+1 << std::endl;
@@ -115,7 +115,7 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, VertexAt
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;
-					VEC3 norm = Algo::Geometry::vertexBorderNormal<PFP>(map,dd,position);
+					VEC3 norm = Geometry::vertexBorderNormal<PFP>(map,dd,position);
 
 					vIndex[vNum] = vCpt++ ;
 					vertices.push_back(vNum) ;
@@ -222,7 +222,7 @@ bool exportScenePov(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>&
 	out << "count 100 nearest_count 10 error_bound 0.15 recursion_limit 1 low_error_factor 0.2 gray_threshold 0.0 minimum_reuse 0.015 brightness 1 adc_bailout 0.01/2 normal off media off}" << std::endl;
 	out << "max_trace_level 255}" << std::endl;
 
-	Algo::ExportPov::exportMeshPlain<PFP>(out,map,position,"myMesh",good);
+	exportMeshPlain<PFP>(out,map,position,"myMesh",good);
 
 	out << "object {myMesh" << std::endl;
  	out << "translate <" << translate[0] << "," << translate[1] << "," << translate[2] << ">" << std::endl;
@@ -266,7 +266,7 @@ bool exportScenePovSmooth(typename PFP::MAP& map, VertexAttribute<typename PFP::
 //	out << "count 300 nearest_count 10 error_bound 0.15 recursion_limit 1 low_error_factor 0.2 gray_threshold 0.0 minimum_reuse 0.015 brightness 1 adc_bailout 0.01/2 normal off media off}" << std::endl;
 	out << "max_trace_level 60}" << std::endl;
 
-	Algo::ExportPov::export3MeshPlainSmooth<PFP>(out,map,position,"myMesh",good);
+	export3MeshPlainSmooth<PFP>(out,map,position,"myMesh",good);
 
 	out << "object {myMesh" << std::endl;
  	out << "translate <" << translate[0] << "," << translate[1] << "," << translate[2] << ">" << std::endl;
