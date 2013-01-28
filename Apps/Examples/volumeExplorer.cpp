@@ -200,7 +200,7 @@ void MyQT::cb_initGL()
 
 	// create the renders
     m_topo_render = new Algo::Render::GL2::Topo3Render();
-    m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,true);
+    m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,false);
 
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f, nb);

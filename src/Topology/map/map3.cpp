@@ -1296,11 +1296,11 @@ void Map3::computeDual()
 
 	swapEmbeddingContainers(VERTEX, VOLUME) ;
 
-	unsigned int count = 0;
+//	unsigned int count = 0;
 
-	std::vector<Dart> vbound;
+//	std::vector<Dart> vbound;
 
-	//std::cout << "nb faces : " << closeMap() << std::endl;
+//	//std::cout << "nb faces : " << closeMap() << std::endl;
 
 //	for(Dart d = begin(); d != end(); next(d))
 //	{
@@ -1435,6 +1435,118 @@ void Map3::computeDual()
 
 
 	//std::cout << "Map closed (" << closeMap() <<" boundary faces)" << std::endl;
+}
+
+Dart Map3::explodBorderTopo(Dart d)
+{
+	std::vector<std::pair<Dart,Dart> > ve;
+	ve.reserve(1024);
+
+	//stocke un brin par face du bord
+	DartMarker me(*this);
+	for(Dart dit = begin() ; dit != end() ; next(dit))
+	{
+		if(isBoundaryMarked3(dit) && !me.isMarked(dit))
+		{
+			ve.push_back(std::make_pair(dit,phi2(dit)));
+			me.markOrbit<EDGE>(dit);
+		}
+	}
+
+	//decoud chaque face
+	for(std::vector<std::pair<Dart,Dart> >::iterator it = ve.begin() ; it != ve.end() ; ++it)
+	{
+		Map2::unsewFaces((*it).first,false);
+	}
+
+	//triangule chaque face
+	DartMarker mf(*this);
+	for(std::vector<std::pair<Dart,Dart> >::iterator it = ve.begin() ; it != ve.end() ; ++it)
+	{
+		Dart first = (*it).first;
+		Dart second = (*it).second;
+
+		if(!mf.isMarked(first))
+		{
+			mf.markOrbit<FACE>(first);
+			unsigned int degf = Map2::faceDegree(first);
+
+			Dart dnf = Map2::newFace(degf,false);
+            Dart dnftemp = dnf;
+            Dart dit = first;
+            do
+            {
+            	Map2::sewFaces(dit,dnftemp,false);
+            	dit = phi1(dit);
+            	dnftemp = phi_1(dnftemp);
+            }while(dnftemp != dnf);
+
+
+			Dart db = dnf;
+			Dart d1 = phi1(db);
+			Dart dprev = phi_1(db);
+			Map2::splitFace(db, d1) ;
+			Map2::cutEdge(phi_1(db)) ;
+
+			Dart x = phi2(phi_1(db)) ;
+			Dart dd = phi1(phi1(phi1(x)));
+			while(dd != x)
+			{
+				Dart next = phi1(dd) ;
+				Dart prev = phi_1(dd);
+				Map2::splitFace(dd, phi1(x)) ;
+				dd = next ;
+			}
+		}
+
+		if(!mf.isMarked(second))
+		{
+			mf.markOrbit<FACE>(second);
+			unsigned int degf = Map2::faceDegree(second);
+
+			Dart dnf = Map2::newFace(degf,false);
+            Dart dnftemp = dnf;
+            Dart dit = second;
+            do
+            {
+            	Map2::sewFaces(dit,dnftemp,false);
+            	dit = phi1(dit);
+            	dnftemp = phi_1(dnftemp);
+            }while(dnftemp != dnf);
+
+
+			Dart db = dnf;
+			Dart d1 = phi1(db);
+			Dart dprev = phi_1(db);
+			Map2::splitFace(db, d1) ;
+			Map2::cutEdge(phi_1(db)) ;
+
+			Dart x = phi2(phi_1(db)) ;
+			Dart dd = phi1(phi1(phi1(x)));
+			while(dd != x)
+			{
+				Dart next = phi1(dd) ;
+				Dart prev = phi_1(dd);
+				Map2::splitFace(dd, phi1(x)) ;
+				dd = next ;
+			}
+		}
+
+	}
+
+//	//close de chaque nouveau volume
+//	for(std::vector<std::pair<Dart, Dart> >::iterator it = ve.begin() ; it != ve.end() ; ++it)
+//	{
+//		closeHole(phi2((*it).first));
+//	}
+
+	//close de chaque nouveau volume
+	for(std::vector<std::pair<Dart,Dart> >::iterator it = ve.begin() ; it != ve.end() ; ++it)
+	{
+		sewVolumes(phi2((*it).first), phi2((*it).second),false);
+	}
+
+	return phi_1(phi2(ve.front().first));
 }
 
 void Map3::computeDualTest()
