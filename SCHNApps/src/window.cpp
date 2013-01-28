@@ -382,10 +382,7 @@ void Window::setCurrentView(View* view)
 
 	const QList<Plugin*>& newPlugins = m_currentView->getLinkedPlugins();
 	foreach(Plugin* p, newPlugins)
-	{
 		enablePluginTabWidgets(p);
-		p->currentViewChanged(m_currentView);
-	}
 
 	connect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
 
@@ -592,8 +589,6 @@ void Window::linkViewAndPlugin(View* v, Plugin* p)
 	p->linkView(v);
 
 	emit(viewAndPluginLinked(v, p));
-
-	p->viewLinked(v);
 }
 
 void Window::unlinkViewAndPlugin(View* v, Plugin* p)
@@ -602,8 +597,6 @@ void Window::unlinkViewAndPlugin(View* v, Plugin* p)
 	p->unlinkView(v);
 
 	emit(viewAndPluginUnlinked(v, p));
-
-	p->viewUnlinked(v);
 }
 
 void Window::linkViewAndMap(View* v, MapHandlerGen* m)
@@ -629,6 +622,7 @@ void Window::linkViewAndCamera(View* v, Camera* c)
 	emit(viewAndCameraUnlinked(v, current));
 	v->setCurrentCamera(c);
 	c->linkView(v);
+
 	emit(viewAndCameraLinked(v, c));
 }
 

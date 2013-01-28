@@ -96,10 +96,6 @@ public:
 	virtual void mouseMove(View* view, int buttons, int x, int y) {}
 	virtual void wheelEvent(View* view, int delta, int x, int y) {}
 
-	virtual void viewLinked(View* view);
-	virtual void viewUnlinked(View* view);
-	virtual void currentViewChanged(View* view);
-
 	void setRefreshingUI(bool b) { b_refreshingUI = b; }
 
 protected:
@@ -114,8 +110,13 @@ protected:
 	bool b_refreshingUI;
 
 public slots:
+	void viewLinked(View* view, Plugin* plugin);
+	void viewUnlinked(View* view, Plugin* plugin);
+	void currentViewChanged(View* view);
+
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
+
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
