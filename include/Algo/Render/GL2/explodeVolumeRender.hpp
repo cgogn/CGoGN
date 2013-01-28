@@ -131,7 +131,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 			N.normalize();
 			normals.push_back(N);
 			a = e;
-			centerFace += positions[d];
+			centerFace += positions[a];
 			nbs++;
 		} while (a != d);
 
@@ -243,7 +243,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 			N.normalize();
 			normals.push_back(N);
 			a = e;
-			centerFace += positions[d];
+			centerFace += positions[a];
 			nbs++;
 		} while (a != d);
 

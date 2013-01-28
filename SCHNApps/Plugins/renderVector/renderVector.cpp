@@ -36,6 +36,10 @@ bool RenderVectorPlugin::enable()
 	connect(m_dockTab->list_vectorVBO, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedVectorsVBOChanged()));
 	connect(m_dockTab->slider_vectorsScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_vectorsScaleFactorChanged(int)));
 
+	connect(m_window, SIGNAL(viewAndPluginLinked(View*, Plugin*)), this, SLOT(viewLinked(View*, Plugin*)));
+	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
+	connect(m_window, SIGNAL(currentViewChanged(View*)), this, SLOT(currentViewChanged(View*)));
+
 	return true;
 }
 
@@ -66,38 +70,44 @@ void RenderVectorPlugin::redraw(View* view)
 	}
 }
 
-void RenderVectorPlugin::viewLinked(View* view)
+void RenderVectorPlugin::viewLinked(View* view, Plugin* plugin)
 {
-	ParameterSet* params = new ParameterSet();
-	h_viewParams.insert(view, params);
-	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
-	foreach(MapHandlerGen* map, maps)
+	if(plugin == this)
 	{
-		PerMapParameterSet p(map);
-		params->perMap.insert(map->getName(), p);
+		ParameterSet* params = new ParameterSet();
+		h_viewParams.insert(view, params);
+		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+		foreach(MapHandlerGen* map, maps)
+		{
+			PerMapParameterSet p(map);
+			params->perMap.insert(map->getName(), p);
+		}
+		if (!maps.empty())
+			changeSelectedMap(view, maps[0]);
+
+		connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
+		connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
+
+		if(view->isCurrentView())
+			m_dockTab->refreshUI(params);
 	}
-	if (!maps.empty())
-		changeSelectedMap(view, maps[0]);
-
-	connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
-	connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
-
-	if(view->isCurrentView())
-		m_dockTab->refreshUI(params);
 }
 
-void RenderVectorPlugin::viewUnlinked(View* view)
+void RenderVectorPlugin::viewUnlinked(View* view, Plugin* plugin)
 {
-	h_viewParams.remove(view);
+	if(plugin == this)
+	{
+		h_viewParams.remove(view);
 
-	disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
-	disconnect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
+		disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
+		disconnect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
+	}
 }
 
 void RenderVectorPlugin::currentViewChanged(View* view)
 {
-	assert(isLinkedToView(view));
-	m_dockTab->refreshUI(h_viewParams[view]);
+	if(isLinkedToView(view))
+		m_dockTab->refreshUI(h_viewParams[view]);
 }
 
 void RenderVectorPlugin::mapLinked(MapHandlerGen* m)

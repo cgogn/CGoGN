@@ -29,6 +29,9 @@ public:
 	virtual ~MapHandlerGen();
 
 	const QString& getName() const { return m_name; }
+
+public slots:
+	QString getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
 	Window* getWindow() const { return m_window; }
@@ -42,6 +45,7 @@ public:
 
 	bool isUsed() const { return !l_views.empty(); }
 
+public:
 	void draw(Utils::GLSLShader* shader, int primitive) { m_render->draw(shader, primitive); }
 
 	/*********************************************************

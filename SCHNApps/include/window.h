@@ -231,12 +231,17 @@ public:
 
 public slots:
 	void linkViewAndCamera(View* v, Camera* c);
+	void linkViewAndCamera(const QString& viewName, const QString& cameraName);
 
 	void linkViewAndMap(View* v, MapHandlerGen* m);
+	void linkViewAndMap(const QString& viewName, const QString& mapName);
 	void unlinkViewAndMap(View* v, MapHandlerGen* m);
+	void unlinkViewAndMap(const QString& viewName, const QString& mapName);
 
 	void linkViewAndPlugin(View* v, Plugin* p);
+	void linkViewAndPlugin(const QString& viewName, const QString& pluginName);
 	void unlinkViewAndPlugin(View* v, Plugin* p);
+	void unlinkViewAndPlugin(const QString& viewName, const QString& pluginName);
 
 	/*********************************************************
 	 * MANAGE TEXTURES

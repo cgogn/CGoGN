@@ -15,7 +15,7 @@ bool ImportVolumePlugin::enable()
 	return true;
 }
 
-void ImportVolumePlugin::importFromFile(const QString& fileName)
+MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 {
 	QFileInfo fi(fileName);
 	if(fi.exists())
@@ -43,6 +43,7 @@ void ImportVolumePlugin::importFromFile(const QString& fileName)
 			mh->updatePrimitives(Algo::Render::GL2::LINES);
 			mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
 		}
+		return mhg;
 	}
 }
 
