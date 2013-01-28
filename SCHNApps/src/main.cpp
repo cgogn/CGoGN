@@ -15,10 +15,10 @@ int main(int argc, char* argv[])
 	PythonQt::init();
 
 	QStringList classNames;
-	classNames.append("Plugin");
 	classNames.append("View");
-	classNames.append("MapHandlerGen");
 	classNames.append("Camera");
+	classNames.append("Plugin");
+	classNames.append("MapHandlerGen");
 	PythonQt::self()->registerQObjectClassNames(classNames);
 
 	// get a smart pointer to the __main__ module of the Python interpreter

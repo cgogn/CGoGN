@@ -20,6 +20,7 @@ public:
 	Plugin();
 	virtual ~Plugin();
 
+public slots:
 	const QString& getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
@@ -34,6 +35,7 @@ public:
 	bool getProvidesRendering() { return b_providesRendering; }
 	void setProvidesRendering(bool b) {	b_providesRendering = b; }
 
+public:
 	virtual bool enable() = 0;
 	virtual void disable() = 0;
 
@@ -45,10 +47,6 @@ public:
 	virtual void mouseRelease(View* view, int button, int x, int y) = 0;
 	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
 	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
-
-//	virtual void viewLinked(View* view) = 0;
-//	virtual void viewUnlinked(View* view) = 0;
-//	virtual void currentViewChanged(View* view) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS

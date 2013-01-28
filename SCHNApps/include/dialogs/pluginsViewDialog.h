@@ -24,9 +24,12 @@ public:
 private:
 	Window* m_window;
 	View* m_view;
+	bool b_refreshingUI;
 
 public slots:
 	void selectedPluginsChanged();
+	void selectPlugin(View* view, Plugin* plugin);
+	void deselectPlugin(View* view, Plugin* plugin);
 	void addPluginToList(Plugin* p);
 	void removePluginFromList(Plugin* p);
 };
