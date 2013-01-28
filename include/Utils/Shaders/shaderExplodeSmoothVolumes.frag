@@ -3,8 +3,8 @@
 uniform vec4 ambient;
 uniform vec4 backColor;
 
-VARYING_FRAG vec4 normalFS;
-VARYING_FRAG vec4 lightFS;
+VARYING_FRAG vec3 normalFS;
+VARYING_FRAG vec3 lightFS;
 VARYING_FRAG vec3 colorVert;
 
 
