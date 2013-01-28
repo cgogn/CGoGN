@@ -432,7 +432,6 @@ public:
 	 *  These functions must be used with care, generally only by import algorithms
 	 *************************************************************************/
 
-
 	//@{
 	/**
 	 * create a face of map1 marked as boundary
@@ -470,6 +469,17 @@ public:
 	/*!
 	 */
 	void computeDual();
+
+	//TODO crade a virer (espece d'extrud)
+	// Prend un brin d'une 2-carte
+	// - stocke 1 brin par face
+	// - decoud chaque face
+	// - triangule chaque face
+	// - ferme par phi3 chaque volume
+	// - recoud le tout
+	Dart explodBorderTopo(Dart d);
+
+	void computeDualTest();
 	//@}
 };
 

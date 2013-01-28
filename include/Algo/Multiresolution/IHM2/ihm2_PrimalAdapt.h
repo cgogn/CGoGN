@@ -22,61 +22,100 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
+#ifndef __MAP2MR_PRIMAL_ADAPT__
+#define __MAP2MR_PRIMAL_ADAPT__
 
-#include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
 
-#include "Geometry/vector_gen.h"
+#include <cmath>
 
-#include "Algo/Import/import.h"
-#include "Algo/Export/export.h"
-
-#include "Algo/Modelisation/subdivision.h"
-
-using namespace CGoGN ;
-
-/**
- * Struct that contains some informations about the types of the manipulated objects
- * Mainly here to be used by the algorithms that are parameterized by it
- */
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP;
-};
 
-int main(int argc, char **argv)
+namespace Algo
 {
-	if(argc != 2)
-	{
-		CGoGNout << "Usage : " << argv[0] << " filename" << CGoGNendl;
-		return 0;
-	}
 
-	std::string filename(argv[1]);
+namespace MR
+{
 
-	// declaration of the map
-	PFP::MAP myMap;
+namespace Primal
+{
 
-	std::vector<std::string> attrNames ;
-	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
+namespace Adaptive
+{
 
-	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
+template <typename PFP>
+class IHM2
+{
 
-	FaceAttribute<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3, FACE>("position") ;
-	if(!positionF.isValid())
-		positionF = myMap.addAttribute<PFP::VEC3, FACE>("position") ;
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
-	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
+protected:
+	MAP& m_map;
+	bool shareVertexEmbeddings ;
 
-	myMap.computeDual();
-	position = positionF ;
+	FunctorType* vertexVertexFunctor ;
+	FunctorType* edgeVertexFunctor ;
+	FunctorType* faceVertexFunctor ;
+
+public:
+	IHM2(MAP& map) ;
 
 
-	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "result.off");
-	std::cout << "Exported" << std::endl;
+protected:
+	/***************************************************
+	 *               SUBDIVISION                       *
+	 ***************************************************/
 
-	return 0;
-}
+	/**
+	 * subdivide the edge of d to the next level
+	 */
+	void subdivideEdge(Dart d) ;
+
+	/**
+	 * coarsen the edge of d from the next level
+	 */
+	void coarsenEdge(Dart d) ;
+
+public:
+	/**
+	 * subdivide the face of d to the next level
+	 */
+	unsigned int subdivideFace(Dart d, bool triQuad = true, bool OneLevelDifference = true);
+
+	/**
+	 *
+	 */
+	unsigned int subdivideFaceSqrt3(Dart d);
+
+	/**
+	 * coarsen the face of d from the next level
+	 */
+	void coarsenFace(Dart d) ;
+
+	/**
+	 * vertices attributes management
+	 */
+	void setVertexVertexFunctor(FunctorType* f) { vertexVertexFunctor = f ; }
+	void setEdgeVertexFunctor(FunctorType* f) { edgeVertexFunctor = f ; }
+	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
+} ;
+
+} // namespace Adaptive
+
+} // namespace Primal
+
+} // namespace MR
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "Algo/Multiresolution/IHM2/ihm2_PrimalAdapt.hpp"
+
+#endif

@@ -46,26 +46,27 @@ namespace Primal
 namespace Masks
 {
 
-/* MJ96 basic functions : polyhedral meshes
- *********************************************************************************/
+
 template <typename PFP>
 class MJ96VertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96VertexVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
+	MJ96VertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
 	{
 		if(m_map.isBoundaryVertex(d))
 		{
-			Dart db = m_map.findBoundaryFaceOfVertex(d);
+			std::cout << "boundary" << std::endl;
 
 			m_map.decCurrentLevel() ;
+
+			Dart db = m_map.findBoundaryFaceOfVertex(d);
 
 			typename PFP::VEC3 np1(0) ;
 			typename PFP::VEC3 np2(0) ;
@@ -103,62 +104,157 @@ public:
 		}
 		else
 		{
+			m_map.decCurrentLevel() ;
+
 			typename PFP::VEC3 P = m_position[d];
 
-			m_map.decCurrentLevel() ;
 			//vertex points
 			typename PFP::VEC3 Cavg = typename PFP::VEC3(0);
-			unsigned int degree = 0;
-			Traversor3VW<typename PFP::MAP> travVW(m_map, d);
-			for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
-			{
-				Cavg += Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
-				++degree;
-			}
+			unsigned int degree = m_map.template degree<typename PFP::MAP, VERTEX, VOLUME>(d);
+			Cavg = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 			Cavg /= degree;
 
+			//P /= degree;
+
 			typename PFP::VEC3 Aavg = typename PFP::VEC3(0);
-			degree = 0;
-			Traversor3VF<typename PFP::MAP> travVF(m_map, d);
-			for(Dart dit = travVF.begin() ; dit != travVF.end() ; dit = travVF.next())
-			{
-				Aavg += Algo::Surface::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
-				++degree;
-			}
+			degree = m_map.template degree<typename PFP::MAP, VERTEX, FACE>(d);
+			Aavg = Algo::Surface::Geometry::faceCentroid<PFP>(m_map, d, m_position);
 			Aavg /= degree;
 
 			typename PFP::VEC3 Mavg = typename PFP::VEC3(0);
-			degree = 0;
-			Traversor3VE<typename PFP::MAP> travVE(m_map, d);
-			for(Dart dit = travVE.begin() ; dit != travVE.end() ; dit = travVE.next())
-			{
-				Dart d2 = m_map.phi2(dit);
-				Aavg += (m_position[dit] + m_position[d2]) * typename PFP::REAL(0.5);
-				++degree;
-			}
-			Aavg /= degree;
+			degree = m_map.template degree<typename PFP::MAP, VERTEX, EDGE>(d);
+			Dart d2 = m_map.phi2(d);
+			Mavg = (m_position[d] + m_position[d2]) * typename PFP::REAL(0.5);
+			Mavg /= degree;
 
 			typename PFP::VEC3 vp = Cavg + Aavg * 3 + Mavg * 3 + P;
 			vp /= 8;
 
 			m_map.incCurrentLevel() ;
 
-			m_position[d] = vp;
+			m_position[d] = P; // += vp; //P;
 		}
 
 		return false;
 	}
 };
 
+
+
+///* MJ96 basic functions : polyhedral meshes
+// *********************************************************************************/
+//template <typename PFP>
+//class MJ96VertexVertexFunctor : public FunctorType
+//{
+//protected:
+//	typename PFP::MAP& m_map ;
+//	VertexAttribute<typename PFP::VEC3>& m_position ;
+//
+//public:
+//	MJ96VertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+//	{}
+//
+//	bool operator() (Dart d)
+//	{
+//		if(m_map.isBoundaryVertex(d))
+//		{
+//			m_map.decCurrentLevel() ;
+//
+//			Dart db = m_map.findBoundaryFaceOfVertex(d);
+//
+//			typename PFP::VEC3 np1(0) ;
+//			typename PFP::VEC3 np2(0) ;
+//			unsigned int degree1 = 0 ;
+//			unsigned int degree2 = 0 ;
+//			Dart it = db ;
+//			do
+//			{
+//				++degree1 ;
+//				Dart dd = m_map.phi1(it) ;
+//				np1 += m_position[dd] ;
+//				Dart end = m_map.phi_1(it) ;
+//				dd = m_map.phi1(dd) ;
+//				do
+//				{
+//					++degree2 ;
+//					np2 += m_position[dd] ;
+//					dd = m_map.phi1(dd) ;
+//				} while(dd != end) ;
+//				it = m_map.phi2(m_map.phi_1(it)) ;
+//			} while(it != db) ;
+//
+//			float beta = 3.0 / (2.0 * degree1) ;
+//			float gamma = 1.0 / (4.0 * degree2) ;
+//			np1 *= beta / degree1 ;
+//			np2 *= gamma / degree2 ;
+//
+//			typename PFP::VEC3 vp = m_position[db] ;
+//			vp *= 1.0 - beta - gamma ;
+//
+//			m_map.incCurrentLevel() ;
+//
+//			m_position[d] = np1 + np2 + vp ;
+//
+//		}
+//		else
+//		{
+//			m_map.decCurrentLevel() ;
+//
+//			typename PFP::VEC3 P = m_position[d];
+//
+//			//vertex points
+//			typename PFP::VEC3 Cavg = typename PFP::VEC3(0);
+//			unsigned int degree = 0;
+//			Traversor3VW<typename PFP::MAP> travVW(m_map, d);
+//			for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
+//			{
+//				Cavg += Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
+//				++degree;
+//			}
+//			Cavg /= degree;
+//
+//			typename PFP::VEC3 Aavg = typename PFP::VEC3(0);
+//			degree = 0;
+//			Traversor3VF<typename PFP::MAP> travVF(m_map, d);
+//			for(Dart dit = travVF.begin() ; dit != travVF.end() ; dit = travVF.next())
+//			{
+//				Aavg += Algo::Surface::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
+//				++degree;
+//			}
+//			Aavg /= degree;
+//
+//			typename PFP::VEC3 Mavg = typename PFP::VEC3(0);
+//			degree = 0;
+//			Traversor3VE<typename PFP::MAP> travVE(m_map, d);
+//			for(Dart dit = travVE.begin() ; dit != travVE.end() ; dit = travVE.next())
+//			{
+//				Dart d2 = m_map.phi2(dit);
+//				Mavg += (m_position[dit] + m_position[d2]) * typename PFP::REAL(0.5);
+//				++degree;
+//			}
+//			Mavg /= degree;
+//
+//			typename PFP::VEC3 vp = Cavg + Aavg * 3 + Mavg * 3 + P;
+//			vp /= 8;
+//
+//			m_map.incCurrentLevel() ;
+//
+//			m_position[d] = vp;
+//		}
+//
+//		return false;
+//	}
+//};
+
 template <typename PFP>
 class MJ96EdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96EdgeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
+	MJ96EdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -169,7 +265,7 @@ public:
 
 			Dart d1 = m_map.phi2(db) ;
 
-			//m_map.decCurrentLevel() ;
+			m_map.decCurrentLevel() ;
 
 			Dart d2 = m_map.phi2(d1) ;
 			Dart d3 = m_map.phi_1(d1) ;
@@ -191,7 +287,7 @@ public:
 			p5 *= 1.0 / 16.0 ;
 			p6 *= 1.0 / 16.0 ;
 
-			//m_map.incCurrentLevel() ;
+			m_map.incCurrentLevel() ;
 
 			m_position[d] = p1 + p2 + p3 + p4 + p5 + p6 ;
 		}
@@ -199,7 +295,8 @@ public:
 		{
 			Dart d2 = m_map.phi2(d);
 
-			//m_map.decCurrentLevel() ;
+			m_map.decCurrentLevel() ;
+
 			//edge points
 			typename PFP::VEC3 Cavg = typename PFP::VEC3(0);
 			unsigned int degree = 0;
@@ -227,7 +324,7 @@ public:
 			typename PFP::VEC3 ep = Cavg + Aavg * 2 + M * (degree - 3);
 			ep /= degree;
 
-			//m_map.incCurrentLevel() ;
+			m_map.incCurrentLevel() ;
 
 			m_position[d] = ep;
 		}
@@ -241,25 +338,23 @@ class MJ96FaceVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96FaceVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
+	MJ96FaceVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
 	{
-		if(m_map.isBoundaryVertex(d))
+		if(m_map.isBoundaryFace(d))
 		{
-			Dart db = m_map.findBoundaryFaceOfVertex(d);
+			Dart db = m_map.phi_1(m_map.phi3(d));
 
-			Dart df = m_map.phi1(m_map.phi1(db)) ;
-
-			//m_map.decCurrentLevel() ;
+			m_map.decCurrentLevel() ;
 
 			typename PFP::VEC3 p(0) ;
 			unsigned int degree = 0 ;
-			Traversor2FV<typename PFP::MAP> trav(m_map, df) ;
+			Traversor2FV<typename PFP::MAP> trav(m_map, db) ;
 			for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
 			{
 				++degree ;
@@ -267,24 +362,26 @@ public:
 			}
 			p /= degree ;
 
-			//m_map.incCurrentLevel() ;
+			m_map.incCurrentLevel() ;
 
 			m_position[d] = p ;
 		}
 		else
 		{
-			Dart df = m_map.phi1(m_map.phi1(d)) ;
-			//m_map.decCurrentLevel() ;
+			Dart df = m_map.phi_1(m_map.phi_1(d)) ;
+
+			m_map.decCurrentLevel() ;
+
 			//face points
 			typename PFP::VEC3 C0 = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
 			typename PFP::VEC3 C1 = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(df), m_position);
 
-			typename PFP::VEC3 A = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(df), m_position);
+			typename PFP::VEC3 A = Algo::Surface::Geometry::faceCentroid<PFP>(m_map, m_map.phi3(df), m_position);
 
 			typename PFP::VEC3 fp = C0 + A * 2 + C1;
 			fp /= 4;
 
-			//m_map.incCurrentLevel() ;
+			m_map.incCurrentLevel() ;
 
 			m_position[d] = fp;
 		}
@@ -299,10 +396,10 @@ class MJ96VolumeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96VolumeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
+	MJ96VolumeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -310,9 +407,11 @@ public:
 		Dart df = m_map.phi_1(m_map.phi2(m_map.phi1(d))) ;
 
 		m_map.decCurrentLevel() ;
+
 		//cell points : these points are the average of the
 		//vertices of the lattice that bound the cell
 		typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map,df,m_position);
+
 		m_map.incCurrentLevel() ;
 
 		m_position[d] = p;

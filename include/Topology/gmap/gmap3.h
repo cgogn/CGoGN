@@ -378,6 +378,19 @@ public:
 	 *  @return the number of closed holes
 	 */
 	unsigned int closeMap();
+	//@}
+
+	/*! @name Compute dual
+	 * These functions compute the dual mesh
+	 *************************************************************************/
+
+	//@{
+	//! Dual mesh computation
+	/*!
+	 */
+	void computeDual();
+	//@}
+
 };
 
 } // namespace CGoGN

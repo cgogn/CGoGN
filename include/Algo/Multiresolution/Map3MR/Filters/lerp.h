@@ -290,7 +290,7 @@ public:
 		TraversorE<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi2(d)]) * typename PFP::REAL(0.5);
+			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
 
 			m_map.incCurrentLevel() ;
 
@@ -322,7 +322,7 @@ public:
 
 			m_map.incCurrentLevel() ;
 
-			Dart midF = m_map.phi2(m_map.phi1(d));
+			Dart midF = m_map.phi1(m_map.phi1(d));
 			m_position[midF] = p ;
 
 			m_map.decCurrentLevel() ;
@@ -353,7 +353,7 @@ public:
 
 				m_map.incCurrentLevel() ;
 
-				Dart midF = m_map.phi2(m_map.phi1(d));
+				Dart midF = m_map.phi1(m_map.phi1(d));
 				m_position[midF] = p ;
 
 				m_map.decCurrentLevel() ;
@@ -361,7 +361,6 @@ public:
 		}
 	}
 } ;
-
 
 template <typename PFP>
 class LerpVolumeSynthesisFilter : public Algo::MR::Filter
@@ -372,6 +371,35 @@ protected:
 
 public:
 	LerpVolumeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorW<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+
+			m_map.incCurrentLevel() ;
+
+			Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
+			m_position[midV] = p ;
+
+			m_map.decCurrentLevel() ;
+
+		}
+	}
+} ;
+
+template <typename PFP>
+class LerpTriQuadVolumeSynthesisFilter : public Algo::MR::Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpTriQuadVolumeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
