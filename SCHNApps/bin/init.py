@@ -1,6 +1,6 @@
-importPlugin = schnapps.loadPlugin("ImportSurfacePlugin");
-differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialPropertiesPlugin");
-renderPlugin = schnapps.loadPlugin("RenderPlugin");
+importPlugin = schnapps.loadPlugin("ImportSurface");
+differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
+renderPlugin = schnapps.loadPlugin("Render");
 
 hand = importPlugin.importFromFile("/home/kraemer/Media/Data/surface/midRes/handman_12k.off");
 

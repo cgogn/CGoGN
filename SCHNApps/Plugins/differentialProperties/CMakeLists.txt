@@ -36,20 +36,20 @@ IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	QT4_WRAP_UI( PLUGIN_UI ${PLUGIN_FORM} )
 	QT4_WRAP_CPP( PLUGIN_MOC ${PLUGIN_H} )
 	
-	ADD_LIBRARY( DifferentialPropertiesPluginD SHARED
+	ADD_LIBRARY( DifferentialPropertiesD SHARED
 		${PLUGIN_SRC}
 		${PLUGIN_UI}
 		${PLUGIN_MOC}
 	)
 
-	TARGET_LINK_LIBRARIES( DifferentialPropertiesPluginD
+	TARGET_LINK_LIBRARIES( DifferentialPropertiesD
 		${CGoGN_LIBS_D}
 		${COMMON_LIBS}
 	)
 
-	ADD_DEPENDENCIES( DifferentialPropertiesPluginD SCHNAppsD )
+	ADD_DEPENDENCIES( DifferentialPropertiesD SCHNAppsD )
 
-	SET_TARGET_PROPERTIES( DifferentialPropertiesPluginD PROPERTIES COMPILE_DEFINITIONS "DEBUG" )
+	SET_TARGET_PROPERTIES( DifferentialPropertiesD PROPERTIES COMPILE_DEFINITIONS "DEBUG" )
 		
 ELSE ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	
@@ -62,17 +62,17 @@ ELSE ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	QT4_WRAP_UI( PLUGIN_UI ${PLUGIN_FORM} )
 	QT4_WRAP_CPP( PLUGIN_MOC ${PLUGIN_H} )
 
-	ADD_LIBRARY( DifferentialPropertiesPlugin SHARED
+	ADD_LIBRARY( DifferentialProperties SHARED
 		${PLUGIN_SRC}
 		${PLUGIN_UI}
 		${PLUGIN_MOC}
 	)
 
-	TARGET_LINK_LIBRARIES( DifferentialPropertiesPlugin
+	TARGET_LINK_LIBRARIES( DifferentialProperties
 		${CGoGN_LIBS_R}
 		${COMMON_LIBS}
 	)
 
-	ADD_DEPENDENCIES( DifferentialPropertiesPlugin SCHNApps )
+	ADD_DEPENDENCIES( DifferentialProperties SCHNApps )
 	
 ENDIF ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
