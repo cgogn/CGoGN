@@ -45,20 +45,20 @@ void DifferentialPropertiesPlugin::computeNormal()
 	{
 		const QString& mapname = currentItems[0]->text();
 		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
-		PFP2::MAP* map = mh->getMap();
 
-		std::string positionName = m_computeNormalDialog->combo_positionAttribute->currentText().toUtf8().constData();
-		std::string normalName;
+		QString positionName = m_computeNormalDialog->combo_positionAttribute->currentText();
+		QString normalName;
 		if(m_computeNormalDialog->normalAttributeName->text().isEmpty())
-			normalName = m_computeNormalDialog->combo_normalAttribute->currentText().toUtf8().constData();
+			normalName = m_computeNormalDialog->combo_normalAttribute->currentText();
 		else
-			normalName = m_computeNormalDialog->normalAttributeName->text().toUtf8().constData();
+			normalName = m_computeNormalDialog->normalAttributeName->text();
 
-		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(positionName);
-		VertexAttribute<PFP2::VEC3> normal = map->getAttribute<PFP2::VEC3, VERTEX>(normalName);
+		VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionName);
+		VertexAttribute<PFP2::VEC3> normal = mh->getAttribute<PFP2::VEC3, VERTEX>(normalName);
 		if(!normal.isValid())
-			normal = map->addAttribute<PFP2::VEC3, VERTEX>(normalName);
+			normal = mh->addAttribute<PFP2::VEC3, VERTEX>(normalName);
 
+		PFP2::MAP* map = mh->getMap();
 		Algo::Surface::Geometry::computeNormalVertices<PFP2>(*map, position, normal);
 
 		if(m_computeNormalDialog->check_createVBO->checkState() == Qt::Checked)
@@ -77,64 +77,64 @@ void DifferentialPropertiesPlugin::computeCurvature()
 	{
 		const QString& mapname = currentItems[0]->text();
 		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
-		PFP2::MAP* map = mh->getMap();
 
-		std::string positionName = m_computeCurvatureDialog->combo_positionAttribute->currentText().toUtf8().constData();
-		std::string normalName = m_computeCurvatureDialog->combo_normalAttribute->currentText().toUtf8().constData();
+		QString positionName = m_computeCurvatureDialog->combo_positionAttribute->currentText();
+		QString normalName = m_computeCurvatureDialog->combo_normalAttribute->currentText();
 
-		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(positionName);
-		VertexAttribute<PFP2::VEC3> normal = map->getAttribute<PFP2::VEC3, VERTEX>(normalName);
+		VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionName);
+		VertexAttribute<PFP2::VEC3> normal = mh->getAttribute<PFP2::VEC3, VERTEX>(normalName);
 
-		std::string KmaxName;
+		QString KmaxName;
 		if(m_computeCurvatureDialog->KmaxAttributeName->text().isEmpty())
-			KmaxName = m_computeCurvatureDialog->combo_KmaxAttribute->currentText().toUtf8().constData();
+			KmaxName = m_computeCurvatureDialog->combo_KmaxAttribute->currentText();
 		else
-			KmaxName = m_computeCurvatureDialog->KmaxAttributeName->text().toUtf8().constData();
-		VertexAttribute<PFP2::VEC3> Kmax = map->getAttribute<PFP2::VEC3, VERTEX>(KmaxName);
+			KmaxName = m_computeCurvatureDialog->KmaxAttributeName->text();
+		VertexAttribute<PFP2::VEC3> Kmax = mh->getAttribute<PFP2::VEC3, VERTEX>(KmaxName);
 		if(!Kmax.isValid())
-			Kmax = map->addAttribute<PFP2::VEC3, VERTEX>(KmaxName);
+			Kmax = mh->addAttribute<PFP2::VEC3, VERTEX>(KmaxName);
 
-		std::string kmaxName;
+		QString kmaxName;
 		if(m_computeCurvatureDialog->kmaxAttributeName->text().isEmpty())
-			kmaxName = m_computeCurvatureDialog->combo_kmaxAttribute->currentText().toUtf8().constData();
+			kmaxName = m_computeCurvatureDialog->combo_kmaxAttribute->currentText();
 		else
-			kmaxName = m_computeCurvatureDialog->kmaxAttributeName->text().toUtf8().constData();
-		VertexAttribute<PFP2::REAL> kmax = map->getAttribute<PFP2::REAL, VERTEX>(kmaxName);
+			kmaxName = m_computeCurvatureDialog->kmaxAttributeName->text();
+		VertexAttribute<PFP2::REAL> kmax = mh->getAttribute<PFP2::REAL, VERTEX>(kmaxName);
 		if(!kmax.isValid())
-			kmax = map->addAttribute<PFP2::REAL, VERTEX>(kmaxName);
+			kmax = mh->addAttribute<PFP2::REAL, VERTEX>(kmaxName);
 
-		std::string KminName;
+		QString KminName;
 		if(m_computeCurvatureDialog->KminAttributeName->text().isEmpty())
-			KminName = m_computeCurvatureDialog->combo_KminAttribute->currentText().toUtf8().constData();
+			KminName = m_computeCurvatureDialog->combo_KminAttribute->currentText();
 		else
-			KminName = m_computeCurvatureDialog->KminAttributeName->text().toUtf8().constData();
-		VertexAttribute<PFP2::VEC3> Kmin = map->getAttribute<PFP2::VEC3, VERTEX>(KminName);
+			KminName = m_computeCurvatureDialog->KminAttributeName->text();
+		VertexAttribute<PFP2::VEC3> Kmin = mh->getAttribute<PFP2::VEC3, VERTEX>(KminName);
 		if(!Kmin.isValid())
-			Kmin = map->addAttribute<PFP2::VEC3, VERTEX>(KminName);
+			Kmin = mh->addAttribute<PFP2::VEC3, VERTEX>(KminName);
 
-		std::string kminName;
+		QString kminName;
 		if(m_computeCurvatureDialog->kminAttributeName->text().isEmpty())
-			kminName = m_computeCurvatureDialog->combo_kminAttribute->currentText().toUtf8().constData();
+			kminName = m_computeCurvatureDialog->combo_kminAttribute->currentText();
 		else
-			kminName = m_computeCurvatureDialog->kminAttributeName->text().toUtf8().constData();
-		VertexAttribute<PFP2::REAL> kmin = map->getAttribute<PFP2::REAL, VERTEX>(kminName);
+			kminName = m_computeCurvatureDialog->kminAttributeName->text();
+		VertexAttribute<PFP2::REAL> kmin = mh->getAttribute<PFP2::REAL, VERTEX>(kminName);
 		if(!kmin.isValid())
-			kmin = map->addAttribute<PFP2::REAL, VERTEX>(kminName);
+			kmin = mh->addAttribute<PFP2::REAL, VERTEX>(kminName);
 
-		std::string KnormalName;
+		QString KnormalName;
 		if(m_computeCurvatureDialog->KnormalAttributeName->text().isEmpty())
-			KnormalName = m_computeCurvatureDialog->combo_KnormalAttribute->currentText().toUtf8().constData();
+			KnormalName = m_computeCurvatureDialog->combo_KnormalAttribute->currentText();
 		else
-			KnormalName = m_computeCurvatureDialog->KnormalAttributeName->text().toUtf8().constData();
-		VertexAttribute<PFP2::VEC3> Knormal = map->getAttribute<PFP2::VEC3, VERTEX>(KnormalName);
+			KnormalName = m_computeCurvatureDialog->KnormalAttributeName->text();
+		VertexAttribute<PFP2::VEC3> Knormal = mh->getAttribute<PFP2::VEC3, VERTEX>(KnormalName);
 		if(!Knormal.isValid())
-			Knormal = map->addAttribute<PFP2::VEC3, VERTEX>(KnormalName);
+			Knormal = mh->addAttribute<PFP2::VEC3, VERTEX>(KnormalName);
 
-		EdgeAttribute<PFP2::REAL> edgeAngle = map->getAttribute<PFP2::REAL, EDGE>("edgeAngle");
+		EdgeAttribute<PFP2::REAL> edgeAngle = mh->getAttribute<PFP2::REAL, EDGE>("edgeAngle");
 		if(!edgeAngle.isValid())
-			edgeAngle = map->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
-		Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, position, edgeAngle);
+			edgeAngle = mh->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
 
+		PFP2::MAP* map = mh->getMap();
+		Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, position, edgeAngle);
 		Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP2>(*map, 0.01f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
 
 		if(m_computeCurvatureDialog->check_KmaxCreateVBO->checkState() == Qt::Checked)

@@ -607,6 +607,8 @@ void Window::linkViewAndMap(View* v, MapHandlerGen* m)
 	m->linkView(v);
 
 	emit(viewAndMapLinked(v, m));
+
+	v->updateGL();
 }
 
 void Window::linkViewAndMap(const QString& viewName, const QString& mapName)
@@ -623,6 +625,8 @@ void Window::unlinkViewAndMap(View* v, MapHandlerGen* m)
 	m->unlinkView(v);
 
 	emit(viewAndMapUnlinked(v, m));
+
+	v->updateGL();
 }
 
 void Window::unlinkViewAndMap(const QString& viewName, const QString& mapName)
@@ -639,6 +643,8 @@ void Window::linkViewAndPlugin(View* v, Plugin* p)
 	p->linkView(v);
 
 	emit(viewAndPluginLinked(v, p));
+
+	v->updateGL();
 }
 
 void Window::linkViewAndPlugin(const QString& viewName, const QString& pluginName)
@@ -655,6 +661,8 @@ void Window::unlinkViewAndPlugin(View* v, Plugin* p)
 	p->unlinkView(v);
 
 	emit(viewAndPluginUnlinked(v, p));
+
+	v->updateGL();
 }
 
 void Window::unlinkViewAndPlugin(const QString& viewName, const QString& pluginName)

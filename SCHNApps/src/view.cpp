@@ -292,8 +292,8 @@ void View::updateViewBB()
 			}
 		}
 	}
-	setSceneBoundingBox(bbMin, bbMax);
-	showEntireScene();
+	camera()->setSceneBoundingBox(bbMin, bbMax);
+	camera()->showEntireScene();
 }
 
 /*********************************************************
