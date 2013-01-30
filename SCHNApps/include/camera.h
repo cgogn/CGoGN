@@ -14,6 +14,8 @@ class Window;
 
 class Camera : public qglviewer::Camera
 {
+	Q_OBJECT
+
 public:
 	static unsigned int cameraCount;
 
@@ -42,13 +44,11 @@ public slots:
 	bool getDrawPath() const { return m_drawPath; }
 	void setDrawPath(bool b);
 
-public:
-//	virtual void draw();
-
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
+public:
 	void linkView(View* view);
 	void unlinkView(View* view);
 	const QList<View*>& getLinkedViews() const { return l_views; }
@@ -58,6 +58,7 @@ public:
 	 * SNAPSHOTS
 	 *********************************************************/
 
+public slots:
 	void resetSnapCount() { m_snapCount = 0; }
 	void saveSnapshot(QString snapPathName);
 

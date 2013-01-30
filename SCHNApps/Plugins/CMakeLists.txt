@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-ADD_SUBDIRECTORY(cameraControl)
 ADD_SUBDIRECTORY(importSurface)
 ADD_SUBDIRECTORY(importVolume)
 ADD_SUBDIRECTORY(differentialProperties)

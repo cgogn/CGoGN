@@ -72,7 +72,11 @@ public:
 	Camera* addCamera(const QString& name);
 	Camera* addCamera();
 	void removeCamera(const QString& name);
+
+public slots:
 	Camera* getCamera(const QString& name) const;
+
+public:
 	QList<Camera*> getCamerasList() const { return h_cameras.values(); }
 	const CameraHash& getCamerasHash() const { return h_cameras; }
 

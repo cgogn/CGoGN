@@ -64,7 +64,10 @@ public:
 	 * MANAGE LINKED CAMERA
 	 *********************************************************/
 
+public slots:
 	Camera* getCurrentCamera() const { return m_currentCamera; }
+
+public:
 	void setCurrentCamera(Camera* c);
 
 	/*********************************************************
