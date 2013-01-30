@@ -118,6 +118,16 @@ void View::preDraw()
 
 void View::draw()
 {
+	QList<Camera*> cameras = m_window->getCamerasList();
+	foreach(Camera* camera, cameras)
+	{
+		if(camera != m_currentCamera)
+		{
+			if(camera->getDraw()) camera->draw();
+			if(camera->getDrawPath()) camera->drawAllPaths();
+		}
+	}
+
 	foreach(Plugin* plugin, l_plugins)
 		plugin->redraw(this);
 }
@@ -204,6 +214,13 @@ void View::mouseMoveEvent(QMouseEvent* event)
 	foreach(Plugin* plugin, l_plugins)
 		plugin->mouseMove(this, event->button(), event->pos().x(), event->pos().y());
 	QGLViewer::mouseMoveEvent(event);
+
+	QList<View*> views = m_window->getViewsList();
+	foreach(View* view, views)
+	{
+		if(view != this)
+			view->updateGL();
+	}
 }
 
 void View::wheelEvent(QWheelEvent* event)
@@ -211,6 +228,13 @@ void View::wheelEvent(QWheelEvent* event)
 	foreach(Plugin* plugin, l_plugins)
 		plugin->wheelEvent(this, event->delta(), event->pos().x(), event->pos().y());
 	QGLViewer::wheelEvent(event);
+
+	QList<View*> views = m_window->getViewsList();
+	foreach(View* view, views)
+	{
+		if(view != this)
+			view->updateGL();
+	}
 }
 
 /*********************************************************
