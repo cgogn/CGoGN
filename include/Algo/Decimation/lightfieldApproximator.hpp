@@ -148,8 +148,8 @@ void Approximator_HemiFuncCoefs<PFP>::approximate(Dart d)
 	const VEC3& N1 = m_frameN[d] ;
 	const VEC3& N2 = m_frameN[dd] ;
 
-	//assert(abs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
-	//assert(abs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
+	//assert(fabs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
+	//assert(fabs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
 
 	// Compute D1' and D2'
 	VEC3 B1prime = N1 ^ T ;
@@ -327,8 +327,8 @@ void Approximator_HemiFuncCoefsHalfEdge<PFP>::approximate(Dart d)
 	const VEC3& N1 = m_frameN[d] ;
 	const VEC3& N2 = m_frameN[dd] ;
 
-	//assert(abs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
-	//assert(abs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
+	//assert(fabs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
+	//assert(fabs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
 
 	// Compute D1' and D2'
 	VEC3 B1prime = N1 ^ T ;

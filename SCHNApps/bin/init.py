@@ -11,5 +11,5 @@ schnapps.linkViewAndPlugin(v.getName(), renderPlugin.getName());
 schnapps.linkViewAndPlugin(v.getName(), renderVectorPlugin.getName());
 schnapps.linkViewAndMap(v.getName(), obj.getName());
 
-#differentialPropertiesPlugin.computeNormal(obj.getName());
-#differentialPropertiesPlugin.computeCurvature(obj.getName());
+differentialPropertiesPlugin.computeNormal(obj.getName());
+differentialPropertiesPlugin.computeCurvature(obj.getName());
