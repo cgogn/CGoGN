@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "dialogs/camerasDialog.h"
 
 namespace CGoGN
 {
@@ -11,12 +12,8 @@ unsigned int Camera::cameraCount = 0;
 Camera::Camera(const QString& name, Window* window) :
 	m_name(name),
 	m_window(window),
-	m_draw(true),
-	m_drawFarPlane(true),
-	m_drawScale(0.1),
+	m_draw(false),
 	m_drawPath(false),
-	m_drawPathAxis(false),
-	m_drawPathScale(1.0),
 	m_snapCount(0)
 {
 	++cameraCount;
@@ -25,20 +22,31 @@ Camera::Camera(const QString& name, Window* window) :
 Camera::~Camera()
 {}
 
-void Camera::draw()
+void Camera::changeType(qglviewer::Camera::Type type)
 {
-	if(m_draw)
-	{
-		qglviewer::Camera::draw(m_drawFarPlane, m_drawScale);
-		if(m_drawPath)
-		{
-			int mask = 1;
-			if(m_drawPathAxis)
-				mask = mask | 4;
-			if(this->keyFrameInterpolator(0))
-				this->keyFrameInterpolator(0)->drawPath(mask, 6, m_drawPathScale);
-		}
-	}
+	setType(type);
+	foreach(View* view, m_window->getViewsList())
+		view->updateGL();
+
+	m_window->getCamerasDialog()->setCameraType(m_name, type);
+}
+
+void Camera::setDraw(bool b)
+{
+	m_draw = b;
+	foreach(View* view, m_window->getViewsList())
+		view->updateGL();
+
+	m_window->getCamerasDialog()->setDrawCamera(m_name, b);
+}
+
+void Camera::setDrawPath(bool b)
+{
+	m_drawPath = b;
+	foreach(View* view, m_window->getViewsList())
+		view->updateGL();
+
+	m_window->getCamerasDialog()->setDrawCameraPath(m_name, b);
 }
 
 void Camera::linkView(View* view)

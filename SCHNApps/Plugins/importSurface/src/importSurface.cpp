@@ -45,6 +45,8 @@ MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
 		}
 		return mhg;
 	}
+	else
+		return NULL;
 }
 
 void ImportSurfacePlugin::importFromFileDialog()

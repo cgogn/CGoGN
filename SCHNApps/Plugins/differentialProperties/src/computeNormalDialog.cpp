@@ -10,7 +10,9 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-ComputeNormalDialog::ComputeNormalDialog(Window* w) : m_window(w)
+ComputeNormalDialog::ComputeNormalDialog(Window* w) :
+	m_window(w),
+	m_selectedMap(NULL)
 {
 	setupUi(this);
 
@@ -19,15 +21,18 @@ ComputeNormalDialog::ComputeNormalDialog(Window* w) : m_window(w)
 	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
 	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
 
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
+	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(refreshUI()));
 
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
 		mapList->addItem(map->getName());
 }
 
-void ComputeNormalDialog::selectedMapChanged()
+void ComputeNormalDialog::refreshUI()
 {
+	if(m_selectedMap)
+		disconnect(m_selectedMap, SIGNAL(attributeAdded()), this, SLOT(refreshUI()));
+
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 	if(!currentItems.empty())
 	{
@@ -59,7 +64,12 @@ void ComputeNormalDialog::selectedMapChanged()
 				++j;
 			}
 		}
+
+		m_selectedMap = mh;
+		connect(m_selectedMap, SIGNAL(attributeAdded()), this, SLOT(refreshUI()));
 	}
+	else
+		m_selectedMap = NULL;
 }
 
 void ComputeNormalDialog::addMapToList(MapHandlerGen* m)
@@ -69,13 +79,14 @@ void ComputeNormalDialog::addMapToList(MapHandlerGen* m)
 
 void ComputeNormalDialog::removeMapFromList(MapHandlerGen* m)
 {
-	for(int i = 0; i < mapList->count(); ++i)
+	QList<QListWidgetItem*> items = mapList->findItems(m->getName(), Qt::MatchExactly);
+	if(!items.empty())
+		delete items[0];
+
+	if(m_selectedMap == m)
 	{
-		if(mapList->item(i)->text() == m->getName())
-		{
-			delete mapList->item(i);
-			return;
-		}
+		disconnect(m_selectedMap, SIGNAL(attributeAdded()), this, SLOT(refreshUI()));
+		m_selectedMap = NULL;
 	}
 }
 

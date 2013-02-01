@@ -54,7 +54,6 @@ void MapsViewDialog::selectedMapsChanged()
 			else if(!mapList->item(i)->isSelected() && m_view->isLinkedToMap(map))
 				m_window->unlinkViewAndMap(m_view, map);
 		}
-		m_view->updateGL();
 	}
 }
 
@@ -67,7 +66,6 @@ void MapsViewDialog::selectMap(View* view, MapHandlerGen* plugin)
 		{
 			b_refreshingUI = true;
 			items[0]->setSelected(true);
-			m_view->updateGL();
 			b_refreshingUI = false;
 		}
 	}
@@ -82,7 +80,6 @@ void MapsViewDialog::deselectMap(View* view, MapHandlerGen* plugin)
 		{
 			b_refreshingUI = true;
 			items[0]->setSelected(false);
-			m_view->updateGL();
 			b_refreshingUI = false;
 		}
 	}
@@ -95,14 +92,9 @@ void MapsViewDialog::addMapToList(MapHandlerGen* m)
 
 void MapsViewDialog::removeMapFromList(MapHandlerGen* m)
 {
-	for(int i = 0; i < mapList->count(); ++i)
-	{
-		if(mapList->item(i)->text() == m->getName())
-		{
-			delete mapList->item(i);
-			return;
-		}
-	}
+	QList<QListWidgetItem*> items = mapList->findItems(m->getName(), Qt::MatchExactly);
+	if(!items.empty())
+		delete items[0];
 }
 
 } // namespace SCHNApps

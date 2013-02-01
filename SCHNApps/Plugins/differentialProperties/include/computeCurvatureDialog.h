@@ -21,9 +21,10 @@ public:
 
 private:
 	Window* m_window;
+	MapHandlerGen* m_selectedMap;
 
 public slots:
-	void selectedMapChanged();
+	void refreshUI();
 	void addMapToList(MapHandlerGen* m);
 	void removeMapFromList(MapHandlerGen* m);
 };

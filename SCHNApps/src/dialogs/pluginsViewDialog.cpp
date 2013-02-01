@@ -55,7 +55,6 @@ void PluginsViewDialog::selectedPluginsChanged()
 			else if(!pluginList->item(i)->isSelected() && m_view->isLinkedToPlugin(plugin))
 				m_window->unlinkViewAndPlugin(m_view, plugin);
 		}
-		m_view->updateGL();
 	}
 }
 
@@ -68,7 +67,6 @@ void PluginsViewDialog::selectPlugin(View* view, Plugin* plugin)
 		{
 			b_refreshingUI = true;
 			items[0]->setSelected(true);
-			m_view->updateGL();
 			b_refreshingUI = false;
 		}
 	}
@@ -83,7 +81,6 @@ void PluginsViewDialog::deselectPlugin(View* view, Plugin* plugin)
 		{
 			b_refreshingUI = true;
 			items[0]->setSelected(false);
-			m_view->updateGL();
 			b_refreshingUI = false;
 		}
 	}
@@ -99,14 +96,9 @@ void PluginsViewDialog::removePluginFromList(Plugin* p)
 {
 	if(p->getProvidesRendering())
 	{
-		for(int i = 0; i < pluginList->count(); ++i)
-		{
-			if(pluginList->item(i)->text() == p->getName())
-			{
-				delete pluginList->item(i);
-				return;
-			}
-		}
+		QList<QListWidgetItem*> items = pluginList->findItems(p->getName(), Qt::MatchExactly);
+		if(!items.empty())
+			delete items[0];
 	}
 }
 

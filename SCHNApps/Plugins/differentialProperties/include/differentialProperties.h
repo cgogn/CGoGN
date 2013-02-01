@@ -41,8 +41,30 @@ public slots:
 	void openComputeNormalDialog();
 	void openComputeCurvatureDialog();
 
-	void computeNormal();
-	void computeCurvature();
+	void computeNormalFromDialog();
+	void computeCurvatureFromDialog();
+
+	void computeNormal(
+		const QString& mapName,
+		const QString& positionAttributeName = "position",
+		const QString& normalAttributeName = "normal",
+		bool createNormalVBO = true
+	);
+	void computeCurvature(
+		const QString& mapName,
+		const QString& positionAttributeName = "position",
+		const QString& normalAttributeName = "normal",
+		const QString& KmaxAttributeName = "Kmax",
+		const QString& kmaxAttributeName = "kmax",
+		const QString& KminAttributeName = "Kmin",
+		const QString& kminAttributeName = "kmin",
+		const QString& KnormalAttributeName = "Knormal",
+		bool createKmaxVBO = true,
+		bool createkmaxVBO = true,
+		bool createKminVBO = true,
+		bool createkminVBO = true,
+		bool createKnormalVBO = true
+	);
 
 private:
 	ComputeNormalDialog* m_computeNormalDialog;
