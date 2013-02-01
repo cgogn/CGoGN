@@ -102,6 +102,37 @@ SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
 SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib)
 
+
+file(
+	GLOB_RECURSE
+	SCHNApps_FILES
+	${SCHNApps_ROOT_DIR}/src/*.cpp
+	${SCHNApps_ROOT_DIR}/include/*.h
+)
+
+file(
+	GLOB_RECURSE
+	SCHNApps_UI_FILES
+	${SCHNApps_ROOT_DIR}/forms/*.ui
+)
+
+SET(SCHNApps_QOBJECT_FILES
+	${SCHNApps_ROOT_DIR}/include/camera.h
+	${SCHNApps_ROOT_DIR}/include/mapHandler.h
+	${SCHNApps_ROOT_DIR}/include/plugin.h
+	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/window.h
+	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/camerasDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/mapsDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/mapsViewDialog.h
+)
+
+
+
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Release Release)
 IF (NOT WIN32)
 	ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Debug Debug)
