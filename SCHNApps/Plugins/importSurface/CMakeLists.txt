@@ -14,6 +14,7 @@ file(
 	PLUGIN_FILES
 	${PLUGIN_ROOT_DIR}/src/*.cpp
 	${PLUGIN_ROOT_DIR}/include/*.h
+	${PLUGIN_ROOT_DIR}/include/*.hpp
 )
 
 file(
