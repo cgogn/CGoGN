@@ -45,12 +45,12 @@ public:
 
 	virtual void redraw(View* view) = 0;
 
-	virtual void keyPress(View* view, int key) = 0;
-	virtual void keyRelease(View* view, int key) = 0;
-	virtual void mousePress(View* view, int button, int x, int y) = 0;
-	virtual void mouseRelease(View* view, int button, int x, int y) = 0;
-	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
-	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
+	virtual void keyPress(View* view, QKeyEvent* event) = 0;
+	virtual void keyRelease(View* view, QKeyEvent* event) = 0;
+	virtual void mousePress(View* view, QMouseEvent* event) = 0;
+	virtual void mouseRelease(View* view, QMouseEvent* event) = 0;
+	virtual void mouseMove(View* view, QMouseEvent* event) = 0;
+	virtual void wheelEvent(View* view, QWheelEvent* event) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
