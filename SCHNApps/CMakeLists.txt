@@ -16,7 +16,7 @@ find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(Qt4 REQUIRED)
 find_package(QGLViewer REQUIRED)
-find_package(PythonLibs REQUIRED)
+find_package(PythonLibs 2.7 REQUIRED)
 
 SET( QT_USE_QTOPENGL TRUE )
 SET( QT_USE_QTXML TRUE )
