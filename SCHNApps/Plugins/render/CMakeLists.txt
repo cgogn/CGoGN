@@ -1,73 +1,30 @@
 cmake_minimum_required(VERSION 2.8)
 
+SET( PLUGIN_NAME Render )
+
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/render )
+
 INCLUDE_DIRECTORIES(
-	${SCHNApps_ROOT_DIR}/include
-	${SCHNApps_ROOT_DIR}/Plugins/render
+	${PLUGIN_ROOT_DIR}/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
-SET( PLUGIN_SRC
-    ${SCHNApps_ROOT_DIR}/Plugins/render/render.cpp
+file(
+	GLOB_RECURSE
+	PLUGIN_FILES
+	${PLUGIN_ROOT_DIR}/src/*.cpp
+	${PLUGIN_ROOT_DIR}/include/*.h
 )
 
-SET( PLUGIN_H
-    ${SCHNApps_ROOT_DIR}/Plugins/render/render.h
+file(
+	GLOB_RECURSE
+	PLUGIN_UI_FILES
+	${PLUGIN_ROOT_DIR}/forms/*.ui
 )
 
-SET( PLUGIN_FORM
-	${SCHNApps_ROOT_DIR}/Plugins/render/render.ui
+SET(
+	PLUGIN_QOBJECT_FILES
+	${PLUGIN_ROOT_DIR}/include/render.h
 )
 
-IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
-
-	ADD_DEFINITIONS(-DDEBUG)
-
-	IF(WIN32)
-		link_directories( ${CGoGN_ROOT_DIR}/lib/Release )
-	ELSE (WIN32)
-		link_directories( ${CGoGN_ROOT_DIR}/lib/Debug ${CGoGN_ROOT_DIR}/lib/Release )
-	ENDIF (WIN32)
-
-	QT4_WRAP_UI( PLUGIN_UI ${PLUGIN_FORM} )
-	QT4_WRAP_CPP( PLUGIN_MOC ${PLUGIN_H} )
-
-	ADD_LIBRARY( RenderD SHARED
-		${PLUGIN_SRC}
-		${PLUGIN_UI}
-		${PLUGIN_MOC}
-	)
-
-	TARGET_LINK_LIBRARIES( RenderD
-		${CGoGN_LIBS_D}
-		${COMMON_LIBS}
-	)
-
-	ADD_DEPENDENCIES( RenderD SCHNAppsD )
-
-	SET_TARGET_PROPERTIES( RenderD PROPERTIES COMPILE_DEFINITIONS "DEBUG" )
-		
-ELSE ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
-	
-	IF(WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/Release )
-	ELSE (WIN32)
-		link_directories( ${CGoGN_ROOT_DIR}/lib/Release )
-	ENDIF (WIN32)
-
-	QT4_WRAP_UI( PLUGIN_UI ${PLUGIN_FORM} )
-	QT4_WRAP_CPP( PLUGIN_MOC ${PLUGIN_H} )
-
-	ADD_LIBRARY( Render SHARED
-		${PLUGIN_SRC}
-		${PLUGIN_UI}
-		${PLUGIN_MOC}
-	)
-
-	TARGET_LINK_LIBRARIES( Render
-		${CGoGN_LIBS_R}
-		${COMMON_LIBS}
-	)
-
-	ADD_DEPENDENCIES( Render SCHNApps )
-	
-ENDIF ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
+include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

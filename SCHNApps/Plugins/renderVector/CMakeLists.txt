@@ -24,7 +24,7 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-    ${SCHNApps_ROOT_DIR}/Plugins/renderVector/renderVector.h
+	${PLUGIN_ROOT_DIR}/include/renderVector.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )
