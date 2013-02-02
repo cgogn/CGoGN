@@ -35,6 +35,7 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -70,7 +71,6 @@ FrameManipulator::FrameManipulator():
 	points.reserve(6*nb_segments+30);
 	points.resize(6*nb_segments+6);
 
-
 	unsigned int second = 2*(nb_segments+1);
 	unsigned int third = 4*(nb_segments+1);
 
@@ -89,7 +89,6 @@ FrameManipulator::FrameManipulator():
 		points[third + 2*i] = Geom::Vec3f(x,y,0.0f);
 		points[third + 2*i+1] = Geom::Vec3f(xx,yy,0.0f);
 	}
-
 
 	points.push_back(Geom::Vec3f(0.0f,0.0f,0.0f));
 	points.push_back(Geom::Vec3f(0.23f,0.0f,0.0f));
@@ -118,7 +117,6 @@ FrameManipulator::FrameManipulator():
 	points.push_back(Geom::Vec3f(-0.03f,0.7f, 0.0f));
 	points.push_back(Geom::Vec3f(0.0f,  0.7f, 0.03f));
 
-
 	points.push_back(Geom::Vec3f(0.0f,0.0f,  0.27f));
 	points.push_back(Geom::Vec3f(0.0f,0.0f,  0.75f));
 	points.push_back(Geom::Vec3f(0.0f,0.0f,  0.9f));
@@ -127,7 +125,6 @@ FrameManipulator::FrameManipulator():
 	points.push_back(Geom::Vec3f(-0.03f,0.0f,0.7f));
 	points.push_back(Geom::Vec3f(0.0f,-0.03f,0.7f));
 	points.push_back(Geom::Vec3f(0.03f,0.0f, 0.7f));
-
 
 	m_vboPos->bind();
 	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Geom::Vec3f), &(points[0]), GL_STREAM_DRAW);
@@ -153,7 +150,6 @@ float FrameManipulator::getSize()
 	return m_scaleRendering;
 }
 
-
 void FrameManipulator::draw()
 {
 	Utils::GLSLShader::pushTransfo();
@@ -162,7 +158,6 @@ void FrameManipulator::draw()
 
  	glPushAttrib(GL_LINE_BIT);
 	m_shader->enableVertexAttribs();
-
 
 	if (!m_locked_axis[Xr])
 	{
@@ -203,53 +198,53 @@ void FrameManipulator::draw()
 	}
 	else
 	{
-	if (!m_locked_axis[Xs])
-	{
-		if (m_highlighted == Xs)
+		if (!m_locked_axis[Xs])
 		{
-			glLineWidth(6.0f);
-			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			if (m_highlighted == Xs)
+			{
+				glLineWidth(6.0f);
+				m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			}
+			else
+			{
+				glLineWidth(3.0f);
+				m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
+			}
+			m_shader->bind();
+			glDrawArrays(GL_LINES, 6*nb_segments+6, 2);
 		}
-		else
-		{
-			glLineWidth(3.0f);
-			m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
-		}
-		m_shader->bind();
-		glDrawArrays(GL_LINES, 6*nb_segments+6, 2);
-	}
 
-	if (!m_locked_axis[Ys])
-	{
-		if (m_highlighted == Ys)
+		if (!m_locked_axis[Ys])
 		{
-			glLineWidth(6.0f);
-			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			if (m_highlighted == Ys)
+			{
+				glLineWidth(6.0f);
+				m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			}
+			else
+			{
+				glLineWidth(3.0f);
+				m_shader->setColor(Geom::Vec4f(0.0f,0.7f,0.0f,0.0f));
+			}
+			m_shader->bind();
+			glDrawArrays(GL_LINES, 6*nb_segments+8, 2);
 		}
-		else
-		{
-			glLineWidth(3.0f);
-			m_shader->setColor(Geom::Vec4f(0.0f,0.7f,0.0f,0.0f));
-		}
-		m_shader->bind();
-		glDrawArrays(GL_LINES, 6*nb_segments+8, 2);
-	}
 
-	if (!m_locked_axis[Zs])
-	{
-		if (m_highlighted == Zs)
+		if (!m_locked_axis[Zs])
 		{
-			glLineWidth(6.0f);
-			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			if (m_highlighted == Zs)
+			{
+				glLineWidth(6.0f);
+				m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			}
+			else
+			{
+				glLineWidth(3.0f);
+				m_shader->setColor(Geom::Vec4f(0.0f,0.0f,0.7f,0.0f));
+			}
+			m_shader->bind();
+			glDrawArrays(GL_LINES, 6*nb_segments+10, 2);
 		}
-		else
-		{
-			glLineWidth(3.0f);
-			m_shader->setColor(Geom::Vec4f(0.0f,0.0f,0.7f,0.0f));
-		}
-		m_shader->bind();
-		glDrawArrays(GL_LINES, 6*nb_segments+10, 2);
-	}
 	}
 
 
@@ -305,7 +300,6 @@ void FrameManipulator::draw()
 		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+30, 6);
 	}
 
-
  	m_shader->disableVertexAttribs();
  	glPopAttrib();
 
@@ -314,8 +308,6 @@ void FrameManipulator::draw()
 	m_shader->unbind();
 }
 
-
-
 void FrameManipulator::highlight(unsigned int axis)
 {
 	if (m_highlighted == axis)
@@ -323,8 +315,6 @@ void FrameManipulator::highlight(unsigned int axis)
 	else
 		m_highlighted = axis;
 }
-
-
 
 unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV, float epsilon)
 {
@@ -429,7 +419,6 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 		}
 	}
 
-
 	if (axisPickable(Yt) || axisPickable(Ys))
 	{
 		Geom::Vec3f PY(0.0f,3.6f*m_lengthAxes[1],0.0f);
@@ -447,7 +436,6 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 			}
 		}
 	}
-
 
 	if (axisPickable(Zt) || axisPickable(Zs))
 	{
@@ -489,7 +477,6 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 	return NONE;
 }
 
-
 void FrameManipulator::rotate(unsigned int axis, float angle)
 {
 	// create axis
@@ -498,15 +485,12 @@ void FrameManipulator::rotate(unsigned int axis, float angle)
 
 	glm::mat4 tr = glm::rotate(glm::mat4(1.0f),angle,ax);
 	m_rotations = m_rotations*tr;
-
 }
-
 
 void FrameManipulator::translate(unsigned int axis, float x)
 {
 	m_trans += x*m_scaleRendering * glm::vec3(m_rotations[axis-Xt][0],m_rotations[axis-Xt][1],m_rotations[axis-Xt][2]);
 }
-
 
 void FrameManipulator::setLengthAxes()
 {
@@ -518,7 +502,6 @@ void FrameManipulator::setLengthAxes()
 	float sc0 = m_scale[0]/avgScale;
 	float sc1 = m_scale[1]/avgScale;
 	float sc2 = m_scale[2]/avgScale;
-
 
 	positions[ind] = 0.23f*sc0;
 	ind+=7;
@@ -591,9 +574,7 @@ void FrameManipulator::setLengthAxes()
 	m_vboPos->releasePtr();
 
 	m_lengthAxes = Geom::Vec3f(0.25f*sc0, 0.25f*sc1, 0.25f*sc2);
-
 }
-
 
 void FrameManipulator::scale(unsigned int axis, float sc)
 {
@@ -607,9 +588,7 @@ void FrameManipulator::scale(unsigned int axis, float sc)
 		m_scale[axis-Xs] *= sc;
 
 	setLengthAxes();
-
 }
-
 
 glm::mat4 FrameManipulator::transfoRenderFrame()
 {
@@ -628,15 +607,12 @@ glm::mat4 FrameManipulator::transfo()
 	return glm::scale(tr,glm::vec3(m_scale[0],m_scale[1],m_scale[2]));
 }
 
-
 void FrameManipulator::setTranslation(const Geom::Vec3f& P)
 {
 	m_trans[0] = P[0];
 	m_trans[1] = P[1];
 	m_trans[2] = P[2];
 }
-
-
 
 void FrameManipulator::setScale(const Geom::Vec3f& S)
 {
@@ -646,7 +622,6 @@ void FrameManipulator::setScale(const Geom::Vec3f& S)
 
 	setLengthAxes();
 }
-
 
 bool FrameManipulator::setOrientation(const Geom::Vec3f& X, const Geom::Vec3f& Y)
 {
@@ -670,10 +645,8 @@ bool FrameManipulator::setOrientation(const Geom::Vec3f& X, const Geom::Vec3f& Y
 	return true;
 }
 
-
 void FrameManipulator::setTransformation( const glm::mat4& transfo)
 {
-
 	setTranslation(Geom::Vec3f(transfo[3][0],transfo[3][1],transfo[3][2]));
 
 	Geom::Vec3f Rx(	transfo[0][0], transfo[0][1], transfo[0][2]);
@@ -720,8 +693,6 @@ void FrameManipulator::lock(unsigned int axis)
 	setLengthAxes();
 }
 
-
-
 void FrameManipulator::unlock(unsigned int axis)
 {
 	assert(axis <=Scales);
@@ -748,7 +719,6 @@ void FrameManipulator::unlock(unsigned int axis)
 	}
 	setLengthAxes();
 }
-
 
 bool FrameManipulator::locked(unsigned int axis)
 {
@@ -783,8 +753,6 @@ void FrameManipulator::lockPicking(unsigned int axis)
 	setLengthAxes();
 }
 
-
-
 void FrameManipulator::unlockPicking(unsigned int axis)
 {
 	assert(axis <=Scales);
@@ -812,8 +780,6 @@ void FrameManipulator::unlockPicking(unsigned int axis)
 	setLengthAxes();
 }
 
-
-
 bool FrameManipulator::lockedPicking(unsigned int axis)
 {
 	return m_lockedPicking_axis[axis];
@@ -826,7 +792,6 @@ Geom::Vec3f  FrameManipulator::getAxis(unsigned int ax)
 
 	return Geom::Vec3f(m_rotations[i][0],m_rotations[i][1],m_rotations[i][2]);
 }
-
 
 void FrameManipulator::storeProjection(unsigned int ax)
 {
@@ -844,9 +809,7 @@ void FrameManipulator::storeProjection(unsigned int ax)
 		glm::vec3 winA = glm::project(glm::vec3(A[0],A[1],A[2]), GLSLShader::currentModelView(), GLSLShader::currentProjection(), viewport);
 		m_projectedSelectedAxis = Geom::Vec3f(winA[0]-winO[0], winA[1]-winO[1],winA[2]-winO[2]);
 	}
-
 }
-
 
 float FrameManipulator::angleFromMouse(int x, int y, int dx, int dy)
 {
@@ -874,7 +837,6 @@ float FrameManipulator::distanceFromMouse(int dx, int dy)
 
 float FrameManipulator::scaleFromMouse(int dx, int dy)
 {
-
 	if (abs(dx) > abs(dy))
 	{
 		if (dx>0)
@@ -902,7 +864,6 @@ void FrameManipulator::translateInScreen(int dx, int dy)
 	m_trans[1] = P[1];
 	m_trans[2] = P[2];
 	storeProjection(NONE);
-
 }
 
 void FrameManipulator::rotateInScreen(int dx, int dy)
@@ -919,10 +880,8 @@ void FrameManipulator::rotateInScreen(int dx, int dy)
 
 	glm::mat4 tr = glm::rotate(glm::mat4(1.0f),sqrtf(float(dx*dx+dy*dy))/2.0f,glm::vec3(axisRotation[0],axisRotation[1],axisRotation[2]));
 	m_rotations = tr*m_rotations;
-
 }
 
+} // namespace Utils
 
-
-}
-}
+} // namespace CGoGN

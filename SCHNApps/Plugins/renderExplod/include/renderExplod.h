@@ -77,19 +77,12 @@ public:
 
 	virtual void redraw(View *view);
 
-	virtual void keyPress(View* view, int key) {}
-	virtual void keyRelease(View* view, int key) {}
-	virtual void mousePress(View* view, int button, int x, int y) {}
-	virtual void mouseRelease(View* view, int button, int x, int y) {}
-	virtual void mouseMove(View* view, int buttons, int x, int y) {}
-	virtual void wheelEvent(View* view, int delta, int x, int y) {}
-
-	virtual void viewLinked(View* view);
-	virtual void viewUnlinked(View* view);
-	virtual void currentViewChanged(View* view);
-
-	virtual void mapLinked(View* view, MapHandlerGen* m);
-	virtual void mapUnlinked(View* view, MapHandlerGen* m);
+	virtual void keyPress(View* view, QKeyEvent* event) {}
+	virtual void keyRelease(View* view, QKeyEvent* event) {}
+	virtual void mousePress(View* view, QMouseEvent* event) {}
+	virtual void mouseRelease(View* view, QMouseEvent* event) {}
+	virtual void mouseMove(View* view, QMouseEvent* event) {}
+	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
 	void setRefreshingUI(bool b) { b_refreshingUI = b; }
 
@@ -100,10 +93,27 @@ protected:
 	bool b_refreshingUI;
 
 public slots:
+	void viewLinked(View* view, Plugin* plugin);
+	void viewUnlinked(View* view, Plugin* plugin);
+	void currentViewChanged(View* view);
+
+	void mapLinked(MapHandlerGen* m);
+	void mapUnlinked(MapHandlerGen* m);
+
+	void vboAdded(Utils::VBO* vbo);
+	void vboRemoved(Utils::VBO* vbo);
+
+	void changeSelectedMap(View* view, MapHandlerGen* map);
+	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
+	void changeColorVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
+	void changeRenderEdges(View* view, MapHandlerGen* map, bool b);
+	void changeRenderFaces(View* view, MapHandlerGen* map, bool b);
+	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i);
+	void changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i);
+
 	void cb_selectedMapChanged();
 	void cb_positionVBOChanged(int index);
 	void cb_colorVBOChanged(int index);
-	void cb_refreshVBOs();
 	void cb_renderEdgesChanged(bool b);
 	void cb_renderFacesChanged(bool b);
 	void cb_facesScaleFactorChanged(int i);

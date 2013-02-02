@@ -1207,16 +1207,16 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	REAL err = 0 ;
 
-//	REAL norm_deviation_1 = REAL(1) / abs(norm * normal[v1]) ;
-//	REAL norm_deviation_2 = REAL(1) / abs(norm * normal[v2]) ;
+//	REAL norm_deviation_1 = REAL(1) / fabs(norm * normal[v1]) ;
+//	REAL norm_deviation_2 = REAL(1) / fabs(norm * normal[v2]) ;
 //	err += norm_deviation_1 + norm_deviation_2 ;
 
-	REAL mCurv_deviation_1 = abs(mCurv - (kmax[v1] + kmin[v1] / REAL(2))) ;
-	REAL mCurv_deviation_2 = abs(mCurv - (kmax[v2] + kmin[v2] / REAL(2))) ;
+	REAL mCurv_deviation_1 = fabs(mCurv - (kmax[v1] + kmin[v1] / REAL(2))) ;
+	REAL mCurv_deviation_2 = fabs(mCurv - (kmax[v2] + kmin[v2] / REAL(2))) ;
 	err += mCurv_deviation_1 + mCurv_deviation_2 ;
 
-//	REAL cDir1_deviation_1 = REAL(1) / abs(cDir1 * Kmax[v1]) ;
-//	REAL cDir1_deviation_2 = REAL(1) / abs(cDir1 * Kmax[v2]) ;
+//	REAL cDir1_deviation_1 = REAL(1) / fabs(cDir1 * Kmax[v1]) ;
+//	REAL cDir1_deviation_2 = REAL(1) / fabs(cDir1 * Kmax[v2]) ;
 //	err += cDir1_deviation_1 + cDir1_deviation_2 ;
 
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
@@ -1440,7 +1440,7 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tens1),Eigen::EigenvaluesOnly);
 	const VEC3& e_val = Utils::convertRef<VEC3>(solver.eigenvalues());
 
-	REAL err = std::max(std::max(abs(e_val[0]), abs(e_val[1])) , abs(e_val[2])) ;
+	REAL err = std::max(std::max(fabs(e_val[0]), fabs(e_val[1])) , fabs(e_val[2])) ;
 
 //	if (v1 % 5000 == 0) CGoGNout << e_val << CGoGNendl << err << CGoGNendl ;
 

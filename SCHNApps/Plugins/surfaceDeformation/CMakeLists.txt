@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME SubdivideSurface )
+SET( PLUGIN_NAME SurfaceDeformation )
 
-SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface )
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surfaceDeformation )
 
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
@@ -25,8 +25,7 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/subdivideSurface.h
-	${PLUGIN_ROOT_DIR}/include/subdivideSurfaceDialog.h
+	${PLUGIN_ROOT_DIR}/include/surfaceDeformation.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

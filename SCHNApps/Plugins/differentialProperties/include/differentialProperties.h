@@ -30,19 +30,41 @@ public:
 
 	virtual void redraw(View *view) {}
 
-	virtual void keyPress(View* view, int key) {}
-	virtual void keyRelease(View* view, int key) {}
-	virtual void mousePress(View* view, int button, int x, int y) {}
-	virtual void mouseRelease(View* view, int button, int x, int y) {}
-	virtual void mouseMove(View* view, int buttons, int x, int y) {}
-	virtual void wheelEvent(View* view, int delta, int x, int y) {}
+	virtual void keyPress(View* view, QKeyEvent* event) {}
+	virtual void keyRelease(View* view, QKeyEvent* event) {}
+	virtual void mousePress(View* view, QMouseEvent* event) {}
+	virtual void mouseRelease(View* view, QMouseEvent* event) {}
+	virtual void mouseMove(View* view, QMouseEvent* event) {}
+	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
 public slots:
 	void openComputeNormalDialog();
 	void openComputeCurvatureDialog();
 
-	void computeNormal();
-	void computeCurvature();
+	void computeNormalFromDialog();
+	void computeCurvatureFromDialog();
+
+	void computeNormal(
+		const QString& mapName,
+		const QString& positionAttributeName = "position",
+		const QString& normalAttributeName = "normal",
+		bool createNormalVBO = true
+	);
+	void computeCurvature(
+		const QString& mapName,
+		const QString& positionAttributeName = "position",
+		const QString& normalAttributeName = "normal",
+		const QString& KmaxAttributeName = "Kmax",
+		const QString& kmaxAttributeName = "kmax",
+		const QString& KminAttributeName = "Kmin",
+		const QString& kminAttributeName = "kmin",
+		const QString& KnormalAttributeName = "Knormal",
+		bool createKmaxVBO = true,
+		bool createkmaxVBO = true,
+		bool createKminVBO = true,
+		bool createkminVBO = true,
+		bool createKnormalVBO = true
+	);
 
 private:
 	ComputeNormalDialog* m_computeNormalDialog;

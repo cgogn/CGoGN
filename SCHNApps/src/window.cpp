@@ -42,23 +42,25 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQ
 
 	this->setupUi(this);
 
-	m_dock = new QDockWidget(tr("Plugins' Tabs"), this);
+	m_dock = new QDockWidget(tr("Plugins"), this);
 	m_dock->setAllowedAreas(Qt::RightDockWidgetArea);
 	m_dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
-	addDockWidget(Qt::RightDockWidgetArea, m_dock);
-	m_dock->setVisible(false);
 
 	m_dockTabWidget = new QTabWidget(m_dock);
 	m_dockTabWidget->setObjectName("DockTabWidget");
 	m_dockTabWidget->setLayoutDirection(Qt::LeftToRight);
 	m_dockTabWidget->setTabPosition(QTabWidget::East);
+
+	addDockWidget(Qt::RightDockWidgetArea, m_dock);
+	m_dock->setVisible(false);
 	m_dock->setWidget(m_dockTabWidget);
 
 	connect(actionShowHideDock, SIGNAL(triggered()), this, SLOT(cb_showHideDock()));
 
 	m_pythonDock = new QDockWidget(tr("Python"), this);
 	m_pythonDock->setAllowedAreas(Qt::BottomDockWidgetArea);
-	m_dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+	m_pythonDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+
 	addDockWidget(Qt::BottomDockWidgetArea, m_pythonDock);
 	m_pythonDock->setVisible(false);
 	m_pythonDock->setWidget(&m_pythonConsole);
@@ -82,9 +84,9 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQ
 	connect(actionAboutSCHNApps, SIGNAL(triggered()), this, SLOT(cb_aboutSCHNApps()));
 	connect(actionAboutCGoGN, SIGNAL(triggered()), this, SLOT(cb_aboutCGoGN()));
 
-	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
-	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
-	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
+	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_showCamerasDialog()));
+	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_showPluginsDialog()));
+	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_showMapsDialog()));
 
 	registerPluginsDirectory(m_appPath + QString("/../lib"));
 }
@@ -607,6 +609,8 @@ void Window::linkViewAndMap(View* v, MapHandlerGen* m)
 	m->linkView(v);
 
 	emit(viewAndMapLinked(v, m));
+
+	v->updateGL();
 }
 
 void Window::linkViewAndMap(const QString& viewName, const QString& mapName)
@@ -623,6 +627,8 @@ void Window::unlinkViewAndMap(View* v, MapHandlerGen* m)
 	m->unlinkView(v);
 
 	emit(viewAndMapUnlinked(v, m));
+
+	v->updateGL();
 }
 
 void Window::unlinkViewAndMap(const QString& viewName, const QString& mapName)
@@ -639,6 +645,8 @@ void Window::linkViewAndPlugin(View* v, Plugin* p)
 	p->linkView(v);
 
 	emit(viewAndPluginLinked(v, p));
+
+	v->updateGL();
 }
 
 void Window::linkViewAndPlugin(const QString& viewName, const QString& pluginName)
@@ -655,6 +663,8 @@ void Window::unlinkViewAndPlugin(View* v, Plugin* p)
 	p->unlinkView(v);
 
 	emit(viewAndPluginUnlinked(v, p));
+
+	v->updateGL();
 }
 
 void Window::unlinkViewAndPlugin(const QString& viewName, const QString& pluginName)
@@ -735,17 +745,17 @@ void Window::cb_showHidePythonDock()
 	m_pythonDock->setVisible(m_pythonDock->isHidden());
 }
 
-void Window::cb_manageCameras()
+void Window::cb_showCamerasDialog()
 {
 	m_camerasDialog->show();
 }
 
-void Window::cb_managePlugins()
+void Window::cb_showPluginsDialog()
 {
 	m_pluginsDialog->show();
 }
 
-void Window::cb_manageMaps()
+void Window::cb_showMapsDialog()
 {
 	m_mapsDialog->show();
 }

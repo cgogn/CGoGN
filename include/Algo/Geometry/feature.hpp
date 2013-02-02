@@ -321,14 +321,14 @@ void ridgeLines(
 
 	if( (e1 < 0 && e2 > 0) || (e1 > 0 && e2 < 0) )
 	{
-		REAL alpha = abs(e1) / ( abs(e1) + abs(e2) ) ;
+		REAL alpha = fabs(e1) / ( fabs(e1) + fabs(e2) ) ;
 		ridge_segments[d].p1.d = v1 ;
 		ridge_segments[d].p1.w = alpha ;
 		p1set = true ;
 	}
 	if( (e2 < 0 && e3 > 0) || (e2 > 0 && e3 < 0) )
 	{
-		REAL alpha = abs(e2) / ( abs(e2) + abs(e3) ) ;
+		REAL alpha = fabs(e2) / ( fabs(e2) + fabs(e3) ) ;
 		if(!p1set)
 		{
 			ridge_segments[d].p1.d = v2 ;
@@ -345,7 +345,7 @@ void ridgeLines(
 	}
 	if( (e3 < 0 && e1 > 0) || (e3 > 0 && e1 < 0) )
 	{
-		REAL alpha = abs(e3) / ( abs(e1) + abs(e3) ) ;
+		REAL alpha = fabs(e3) / ( fabs(e1) + fabs(e3) ) ;
 		if(p1set && !p2set)
 		{
 			ridge_segments[d].p2.d = v3 ;
