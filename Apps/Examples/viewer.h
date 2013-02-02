@@ -98,13 +98,11 @@ public:
 	bool m_drawTopo ;
 
 	VertexAttribute<VEC3> position ;
-	VertexAttribute<VEC3> normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
 	Algo::Render::GL2::TopoRender* m_topoRender ;
 
 	Utils::VBO* m_positionVBO ;
-	Utils::VBO* m_normalVBO ;
 
 	Utils::ShaderPhong* m_phongShader ;
 	Utils::ShaderFlat* m_flatShader ;
