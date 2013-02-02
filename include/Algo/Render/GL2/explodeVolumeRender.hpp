@@ -159,6 +159,41 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 			b = c;
 			c = map.phi1(b);
 		} while (c != d);
+
+//		a = d;
+//		Dart b = map.phi1(a);
+//		// loop to cut a polygon in triangle on the fly (works only with convex faces)
+//		do
+//		{
+//			buffer.push_back(centerVolumes[d]);
+//			bufferColors.push_back(centerFace);
+//			bufferNormals.push_back(centerFace); // unsused just for fill
+//			buffer.push_back(positions[a]);
+//			bufferColors.push_back(colorPerXXX[a]);
+//
+//			VEC3 N1 = positions[a]^positions[b];
+//			N1.normalize();
+//			bufferNormals.push_back(N1);
+//
+//			buffer.push_back(positions[b]);
+//			bufferColors.push_back(colorPerXXX[b]);
+//
+//			VEC3 N2 = positions[b]^centerFace;
+//			N2.normalize();
+//			bufferNormals.push_back(N2);
+//
+//			buffer.push_back(centerFace);
+//			bufferColors.push_back(colorPerXXX[a]);
+//
+//			VEC3 N3 = centerFace^positions[a];
+//			N3.normalize();
+//			bufferNormals.push_back(N3);
+//
+//			a = b;
+//			b = map.phi1(a);
+//		} while (a != d);
+
+
 	}
 
 
@@ -370,6 +405,26 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 			b = c;
 			c = map.phi1(b);
 		} while (c != d);
+
+//		Dart a = d;
+//		Dart b = map.phi1(a);
+//		// loop to cut a polygon in triangle on the fly (works only with convex faces)
+//		do
+//		{
+//			buffer.push_back(centerVolumes[a]);
+//			bufferColors.push_back(centerFace);
+//			buffer.push_back(positions[a]);
+//			bufferColors.push_back(colorPerXXX[a]);
+//
+//			buffer.push_back(positions[b]);
+//			bufferColors.push_back(colorPerXXX[b]);
+//
+//			buffer.push_back(centerFace);
+//			bufferColors.push_back(colorPerXXX[a]);
+//
+//			a = b;
+//			b = map.phi1(a);
+//		} while (a != d);
 	}
 
 	m_nbTris = buffer.size()/4;
