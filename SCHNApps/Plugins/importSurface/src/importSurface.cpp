@@ -26,7 +26,7 @@ MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 			PFP2::MAP* map = mh->getMap();
 
-			std::vector<std::string> attrNames ;
+			std::vector<std::string> attrNames;
 			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
 
 			// get vertex position attribute
@@ -37,11 +37,6 @@ MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
 
 			// compute map bounding box
 			mh->updateBB(position);
-
-			// compute primitive connectivity VBOs
-			mh->updatePrimitives(Algo::Render::GL2::POINTS);
-			mh->updatePrimitives(Algo::Render::GL2::LINES);
-			mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
 		}
 		return mhg;
 	}

@@ -58,22 +58,12 @@ namespace GL2
 
 enum drawingType
 {
-	TRIANGLES = 1,
-	LINES = 2,
-	POINTS = 4,
-	EXPLODED = 8,
-	FLAT_TRIANGLES = 16,
-	BOUNDARY = 32,
-	ERR = 64
-} ;
-
-enum bufferIndex
-{
-	POINT_INDICES = 0,
-	LINE_INDICES = 1,
-	TRIANGLE_INDICES = 2,
-	FLAT_BUFFER = 3,
-	BOUNDARY_INDICES = 4,
+	POINTS = 0,
+	LINES = 1,
+	TRIANGLES = 2,
+	FLAT_TRIANGLES = 3,
+	BOUNDARY = 4,
+	EXPLODED = 5,
 	SIZE_BUFFER
 } ;
 
@@ -84,6 +74,7 @@ protected:
 	 * vbo buffers
 	 */
 	GLuint m_indexBuffers[SIZE_BUFFER] ;
+	bool m_indexBufferUpToDate[SIZE_BUFFER];
 
 	/**
 	 * nb indices
@@ -208,6 +199,7 @@ public:
 	 */
 	template <typename PFP>
 	void initBoundaries(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
+
 	/**
 	 * initialization of the VBO indices primitives
 	 * computed by a traversal of the map
@@ -225,6 +217,20 @@ public:
 	 * @param prim primitive to draw: POINTS, LINES, TRIANGLES
 	 */
 	void initPrimitives(int prim, std::vector<GLuint>& tableIndices) ;
+
+	/**
+	 * initialization of the VBO indices primitives
+	 * using the given table
+	 * @param prim primitive to draw: POINT_INDICES, LINE_INDICES, TRIANGLE_INDICES
+	 */
+	bool isPrimitiveUpToDate(int prim) { return m_indexBufferUpToDate[prim]; }
+
+	/**
+	 * initialization of the VBO indices primitives
+	 * using the given table
+	 * @param prim primitive to draw: POINT_INDICES, LINE_INDICES, TRIANGLE_INDICES
+	 */
+	void setPrimitiveDirty(int prim) { m_indexBufferUpToDate[prim] = false; }
 
 	/**
 	 * draw the VBO (function to call in the drawing callback)

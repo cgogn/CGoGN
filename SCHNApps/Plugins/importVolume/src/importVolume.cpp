@@ -37,11 +37,6 @@ MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 
 			// compute map bounding box
 			mh->updateBB(position);
-
-			// compute primitive connectivity VBOs
-			mh->updatePrimitives(Algo::Render::GL2::POINTS);
-			mh->updatePrimitives(Algo::Render::GL2::LINES);
-			mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
 		}
 		return mhg;
 	}

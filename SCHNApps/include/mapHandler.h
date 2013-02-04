@@ -47,7 +47,9 @@ public slots:
 	bool isUsed() const { return !l_views.empty(); }
 
 public:
-	void draw(Utils::GLSLShader* shader, int primitive) { m_render->draw(shader, primitive); }
+	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
+
+	void setPrimitiveDirty(int primitive) { m_render->setPrimitiveDirty(primitive); }
 
 	/*********************************************************
 	 * MANAGE ATTRIBUTES
@@ -141,6 +143,13 @@ public:
 	{
 		if (m_map)
 			delete m_map;
+	}
+
+	virtual void draw(Utils::GLSLShader* shader, int primitive)
+	{
+		if(!m_render->isPrimitiveUpToDate(primitive))
+			updatePrimitives(primitive);
+		m_render->draw(shader, primitive);
 	}
 
 	typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }

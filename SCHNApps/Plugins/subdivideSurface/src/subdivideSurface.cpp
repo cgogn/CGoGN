@@ -44,9 +44,10 @@ void SubdivideSurfacePlugin::subdivideSurface()
 		else if(m_subdivideSurfaceDialog->radio_trianguleFaces->isChecked())
 			trianguleFaces(map, position);
 
-		mh->updatePrimitives(Algo::Render::GL2::POINTS);
-		mh->updatePrimitives(Algo::Render::GL2::LINES);
-		mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
+		mh->setPrimitiveDirty(Algo::Render::GL2::POINTS);
+		mh->setPrimitiveDirty(Algo::Render::GL2::LINES);
+		mh->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+
 		mh->updateVBO(position);
 
 		QList<View*> views = mh->getLinkedViews();

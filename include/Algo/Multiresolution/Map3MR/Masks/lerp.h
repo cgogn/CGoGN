@@ -138,10 +138,20 @@ public:
 		Dart df = m_map.phi_1(m_map.phi2(m_map.phi1(d))) ;
 
 		m_map.decCurrentLevel() ;
-		typename PFP::VEC3 p =  Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
-		m_map.incCurrentLevel() ;
 
-		m_position[d] = p ;
+		if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,df)
+				&& !Algo::Surface::Modelisation::isPrism<PFP>(m_map,df)
+				&& !Algo::Surface::Modelisation::isPyra<PFP>(m_map,df))
+		{
+
+			typename PFP::VEC3 p =  Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
+
+			m_map.incCurrentLevel() ;
+
+			m_position[d] = p ;
+		}
+		else
+			m_map.incCurrentLevel() ;
 
 		return false ;
 	}

@@ -622,7 +622,7 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 				Dart dd = m_map.phi1(m_map.phi1(old));
 
 				m_map.splitFace(old,dd) ;
-				centralDart = old;
+				//centralDart = old;
 			}
 			else
 			{
@@ -712,7 +712,7 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 		}
 
 		//replonger l'orbit de ditV.
-		//m_map.template setOrbitEmbedding<VERTEX>(x, m_map.template getEmbedding<VERTEX>(d));
+		m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
 
 		(*volumeVertexFunctor)(centralDart) ;
 
@@ -747,6 +747,7 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 
 		//replonger l'orbit de ditV.
 		m_map.template setOrbitEmbedding<VERTEX>(x, m_map.template getEmbedding<VERTEX>(x));
+		(*volumeVertexFunctor)(x) ;
 
 		m_map.decCurrentLevel() ;
 	}
@@ -786,8 +787,8 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 
 			}
 
-			m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
-			(*volumeVertexFunctor)(centralDart) ;
+			m_map.template setOrbitEmbedding<VERTEX>(x, m_map.template getEmbedding<VERTEX>(x));
+			(*volumeVertexFunctor)(x) ;
 
 			m_map.decCurrentLevel() ;
 		}
@@ -836,8 +837,8 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 		m_map.decCurrentLevel() ;
 	}
 
-
 	m_map.incCurrentLevel();
+
 	m_map.popLevel() ;
 
 	return vLevel;
