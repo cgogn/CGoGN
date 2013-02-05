@@ -443,7 +443,7 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
 		Dart dit = *it;
-		Dart dit23 = alpha2(dit);
+		Dart dit23 = phi3(phi2(dit));
 
 		// embed the vertex embedded from the origin volume to the new darts
 		if(isOrbitEmbedded<VERTEX>())
@@ -479,7 +479,7 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 	if(isOrbitEmbedded<VOLUME>())
 	{
 		Dart v = vd.front() ;
-		Dart v23 = alpha2(v) ;
+		Dart v23 = phi3(phi2(v));
 		setOrbitEmbeddingOnNewCell<VOLUME>(v23) ;
 		copyCell<VOLUME>(v23, v) ;
 	}
