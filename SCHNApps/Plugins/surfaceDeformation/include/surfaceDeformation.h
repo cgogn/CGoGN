@@ -2,27 +2,34 @@
 #define _SURFACEDEFORMATION_PLUGIN_H_
 
 #include "plugin.h"
+#include "mapHandler.h"
+
+#include "ui_surfaceDeformation.h"
+
+#include "Utils/drawer.h"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
 
 
+enum SelectionMode
+{
+	LOCKED,
+	HANDLE
+};
+
+
 struct PerMapParameterSet
 {
 	PerMapParameterSet() {}
-
 	PerMapParameterSet(MapHandlerGen* mh);
+	~PerMapParameterSet();
 
 	VertexAttribute<PFP2::VEC3> positionAttribute;
-	CellMarker<VERTEX> lockingMarker;
-	bool setLockedVertices;
-	bool selecting;
-	PFP2::VEC3 selectionCenter;
-	PFP2::REAL selectionRadius;
-	bool dragging;
-	PFP2::REAL dragZ;
-	qglviewer::Vec dragPrevious;
+	CellMarker<VERTEX>* lockingMarker;
+	CellMarker<VERTEX>* handleMarker;
+	SelectionMode verticesSelectionMode;
 	std::vector<unsigned int> locked_vertices;
 	std::vector<unsigned int> handle_vertices;
 };
@@ -32,12 +39,12 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	PerMapParameterSet& getCurrentMapParameterSet()
+	PerMapParameterSet* getCurrentMapParameterSet()
 	{
 		return perMap[selectedMap->getName()];
 	}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
 };
 
@@ -65,7 +72,10 @@ class SurfaceDeformationPlugin : public Plugin
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	SurfaceDeformationPlugin() : b_refreshingUI(false)
+	SurfaceDeformationPlugin() :
+		b_refreshingUI(false),
+		selecting(false),
+		dragging(false)
 	{
 		setProvidesRendering(true);
 	}
@@ -74,7 +84,7 @@ public:
 	{}
 
 	virtual bool enable();
-	virtual void disable() {}
+	virtual void disable();
 
 	virtual void redraw(View *view);
 
@@ -95,17 +105,31 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
+	void attributeAdded();
+
 	void changeSelectedMap(View* view, MapHandlerGen* map);
 	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute);
+	void changeVerticesSelectionMode(View* view, MapHandlerGen* map, SelectionMode m);
 
 	void cb_selectedMapChanged();
 	void cb_positionAttributeChanged(int index);
+	void cb_selectLockedVertices(bool b);
+	void cb_selectHandleVertices(bool b);
 
 private:
-	RenderVectorDockTab* m_dockTab;
+	SurfaceDeformationDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
+	Utils::Drawer* m_drawer;
+
 	bool b_refreshingUI;
+
+	bool selecting;
+	PFP2::VEC3 selectionCenter;
+	PFP2::REAL selectionRadius;
+	bool dragging;
+	PFP2::REAL dragZ;
+	qglviewer::Vec dragPrevious;
 };
 
 #endif
