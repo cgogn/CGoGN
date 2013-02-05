@@ -28,9 +28,9 @@
 #include <vector>
 #include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
 
 namespace CGoGN { namespace Utils { class VBO; } }
-namespace CGoGN { namespace Utils { class ShaderColorPerVertex; } }
 namespace CGoGN { namespace Utils { namespace SVG { class SVGOut ; } } }
 
 namespace CGoGN
@@ -80,6 +80,8 @@ public:
 	 * release buffers and shader
 	 */
 	~Drawer();
+
+	Utils::ShaderColorPerVertex* getShader();
 
 	/**
 	 * init the data structure

@@ -64,6 +64,11 @@ Drawer::~Drawer()
 	delete m_shader;
 }
 
+Utils::ShaderColorPerVertex* Drawer::getShader()
+{
+	return m_shader;
+}
+
 void Drawer::lineWidth(float lw)
 {
 	m_currentWidth = lw;
