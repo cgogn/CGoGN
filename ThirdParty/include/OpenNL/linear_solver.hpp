@@ -33,8 +33,8 @@ LinearSolver<CoeffType>::LinearSolver(unsigned int nb_variables) {
 	A_ = NULL ;
 	x_ = NULL ;
 	b_ = NULL ;
-	symmetric_solver_ = NULL;
-	nonsymmetric_solver_ = NULL;
+//	symmetric_solver_ = NULL;
+//	nonsymmetric_solver_ = NULL;
 	direct_solver_ = NULL;
 }
 
@@ -172,7 +172,10 @@ void LinearSolver<CoeffType>::end_row() {
 template <typename CoeffType>
 void LinearSolver<CoeffType>::end_system() {
 	if(least_squares_ && direct_ && !direct_solver_)
-		direct_solver_ = new Eigen::SimplicialLLT<Eigen::SparseMatrix<CoeffType> >(*A_);
+		direct_solver_ = new Eigen::LDLT<Eigen::SparseMatrix<CoeffType> >(*A_);
+
+//	if(least_squares_ && direct_ && !direct_solver_->factorized())
+//		direct_solver_->factorize(*A_);
 
     transition(IN_SYSTEM, CONSTRUCTED) ;
 }
@@ -185,12 +188,12 @@ void LinearSolver<CoeffType>::solve() {
 		if(direct_) {
 			*x_ = direct_solver_->solve(*b_) ;
 		} else {
-			symmetric_solver_ = new Eigen::ConjugateGradient<Eigen::SparseMatrix<CoeffType> >(*A_) ;
-			*x_ = symmetric_solver_->solve(*b_) ;
+			Eigen::ConjugateGradient<Eigen::SparseMatrix<CoeffType> > solver(*A_) ;
+			*x_ = solver->solve(*b_) ;
 		}
 	} else {
-		nonsymmetric_solver_ = new Eigen::BiCGSTAB<Eigen::SparseMatrix<CoeffType> >(*A_) ;
-		*x_ = nonsymmetric_solver_->solve(*b_) ;
+		Eigen::BiCGSTAB<Eigen::SparseMatrix<CoeffType> > solver(*A_) ;
+		*x_ = solver->solve(*b_) ;
 	}
 	vector_to_variables() ;
 	transition(CONSTRUCTED, SOLVED) ;
@@ -206,9 +209,10 @@ void LinearSolver<CoeffType>::reset(bool keep_matrix) {
     	delete A_ ; A_ = NULL ;
     	delete x_ ; x_ = NULL ;
     	delete b_ ; b_ = NULL ;
-		if(symmetric_solver_) delete symmetric_solver_ ; symmetric_solver_ = NULL ;
-		if(nonsymmetric_solver_) delete nonsymmetric_solver_ ; nonsymmetric_solver_ = NULL ;
+//		if(symmetric_solver_) delete symmetric_solver_ ; symmetric_solver_ = NULL ;
+//		if(nonsymmetric_solver_) delete nonsymmetric_solver_ ; nonsymmetric_solver_ = NULL ;
 		if(direct_solver_) delete direct_solver_ ; direct_solver_ = NULL ;
+//		direct_solver_->reset();
     	matrix_already_set_ = false ;
     	for(unsigned int i = 0; i < nb_variables_; ++i) {
     		variable_[i].unlock() ;

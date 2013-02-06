@@ -6,6 +6,8 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
 
+#include "Utils/drawer.h"
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 

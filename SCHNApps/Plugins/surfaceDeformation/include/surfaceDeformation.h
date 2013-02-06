@@ -7,13 +7,15 @@
 #include "ui_surfaceDeformation.h"
 
 #include "Container/fakeAttribute.h"
-#include "Utils/drawer.h"
+
 #include "OpenNL/linear_solver.h"
 #include "Algo/LinearSolving/basic.h"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
+
+namespace CGoGN { namespace Utils { class Drawer; } }
 
 
 enum SelectionMode

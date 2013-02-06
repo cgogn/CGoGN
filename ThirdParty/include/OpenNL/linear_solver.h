@@ -36,6 +36,9 @@
 #include <cassert>
 #include <cstdlib>
 
+//#include "cholesky_solver.h"
+
+#include <Eigen/Cholesky>
 #include <Eigen/Sparse>
 
 
@@ -188,9 +191,13 @@ private:
 	Eigen::Matrix<CoeffType, Eigen::Dynamic, 1>* x_ ;
 	Eigen::Matrix<CoeffType, Eigen::Dynamic, 1>* b_ ;
 
-	Eigen::ConjugateGradient<Eigen::SparseMatrix<CoeffType> >* symmetric_solver_;
-	Eigen::BiCGSTAB<Eigen::SparseMatrix<CoeffType> >* nonsymmetric_solver_;
-	Eigen::SimplicialLLT<Eigen::SparseMatrix<CoeffType> >* direct_solver_;
+//	Solver_CHOLESKY<CoeffType>* direct_solver_;
+
+	Eigen::LDLT<Eigen::SparseMatrix<CoeffType> >* direct_solver_;
+
+//	Eigen::ConjugateGradient<Eigen::SparseMatrix<CoeffType> >* symmetric_solver_;
+//	Eigen::BiCGSTAB<Eigen::SparseMatrix<CoeffType> >* nonsymmetric_solver_;
+//	Eigen::SimplicialLDLT<Eigen::SparseMatrix<CoeffType> >* direct_solver_;
 } ;
 
 #include "OpenNL/linear_solver.hpp"

@@ -32,17 +32,12 @@
 #define __CHOLESKY_SOLVER__
 
 #include <cassert>
-#include "OpenNL/sparse_matrix.h"
-#include "CHOLMOD/cholmod.h"
+#include "cholmod.h"
 
-template< class MATRIX, class VECTOR >
+template <typename CoeffType>
 class Solver_CHOLESKY
 {
 public:
-    typedef MATRIX Matrix ;
-    typedef VECTOR Vector ;
-    typedef typename Vector::CoeffType CoeffType ;
-
     Solver_CHOLESKY() {
     	N = 0 ;
     	factorized_ = false ;
@@ -58,43 +53,45 @@ public:
 
     bool factorized() { return factorized_ ; }
 
-    void factorize(const MATRIX &A_in) {
-    	assert(A_in.n() == A_in.m()) ;
-		assert(A_in.has_symmetric_storage()) ;
+	void factorize(const Eigen::SparseMatrix<CoeffType>& A_in) {
+		assert(A_in.rows() == A_in.cols()) ;
+//		assert(A_in.has_symmetric_storage()) ;
 
-		N = A_in.n() ;
-		int NNZ = A_in.nnz() ;
+		N = A_in.rows() ;
+//		int NNZ = A_in.nonZeros() ;
 
 		// Translate sparse matrix into cholmod format
-		cholmod_sparse* A = cholmod_allocate_sparse(N, N, NNZ, false, true, -1, CHOLMOD_REAL, &c);
+//		cholmod_sparse* A = cholmod_allocate_sparse(N, N, NNZ, false, true, -1, CHOLMOD_REAL, &c);
 
-		int* colptr = static_cast<int*>(A->p) ;
-		int* rowind = static_cast<int*>(A->i) ;
-		double* a = static_cast<double*>(A->x) ;
+//		int* colptr = static_cast<int*>(A->p) ;
+//		int* rowind = static_cast<int*>(A->i) ;
+//		double* a = static_cast<double*>(A->x) ;
 
 		// Convert local Matrix into CHOLMOD Matrix
-		int count = 0 ;
-		for(int j = 0; j < N; j++) {
-			const typename SparseMatrix<CoeffType>::Column& Cj = A_in.column(j) ;
-			colptr[j] = count ;
-			for(unsigned int ii = 0; ii < Cj.nb_coeffs(); ii++) {
-				a[count] = Cj.coeff(ii).a ;
-				rowind[count] = Cj.coeff(ii).index ;
-				count++ ;
-			}
-		}
-		colptr[N] = NNZ ;
+//		int count = 0 ;
+//		for(int j = 0; j < N; j++) {
+//			const typename SparseMatrix<CoeffType>::Column& Cj = A_in.column(j) ;
+//			colptr[j] = count ;
+//			for(unsigned int ii = 0; ii < Cj.nb_coeffs(); ii++) {
+//				a[count] = Cj.coeff(ii).a ;
+//				rowind[count] = Cj.coeff(ii).index ;
+//				count++ ;
+//			}
+//		}
+//		colptr[N] = NNZ ;
+
+		cholmod_sparse A = Eigen::viewAsCholmod(A_in);
 
 		// Factorize
-		L = cholmod_analyze(A, &c) ;
-		cholmod_factorize(A, L, &c) ;
+		L = cholmod_analyze(&A, &c) ;
+		cholmod_factorize(&A, L, &c) ;
 		factorized_ = true ;
 
 		// Cleanup
-		cholmod_free_sparse(&A, &c) ;
+//		cholmod_free_sparse(&A, &c) ;
     }
 
-    void solve(const VECTOR& b_in, VECTOR& x_out) {
+	void solve(const VECTOR& b_in, VECTOR& x_out) {
     	assert(factorized_) ;
         assert(L->n == b_in.dimension()) ;
         assert(L->n == x_out.dimension()) ;
