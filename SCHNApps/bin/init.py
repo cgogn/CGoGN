@@ -5,7 +5,7 @@ differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
 subdivisionPlugin = schnapps.loadPlugin("SubdivideSurface");
 surfaceDeformationPlugin = schnapps.loadPlugin("SurfaceDeformation");
 
-obj = importPlugin.importFromFile("/home/kraemer/Media/Data/surface/midRes/camel_10k.off");
+obj = importPlugin.importFromFile("/home/kraemer/Media/Data/surface/lowRes/iphi_good_9k.off");
 
 v = schnapps.getView("view_0");
 
