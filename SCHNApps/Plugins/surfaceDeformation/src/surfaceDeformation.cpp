@@ -3,6 +3,9 @@
 #include "Algo/Selection/raySelector.h"
 #include "Algo/Selection/collector.h"
 
+#include "Algo/Geometry/normal.h"
+#include "Algo/Geometry/laplacian.h"
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 
@@ -10,10 +13,7 @@
 PerMapParameterSet::PerMapParameterSet(MapHandlerGen* mh) :
 	verticesSelectionMode(LOCKED)
 {
-	GenericMap* map = mh->getGenericMap();
-
-	lockingMarker = new CellMarker<VERTEX>(*map);
-	handleMarker = new CellMarker<VERTEX>(*map);
+	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 
 	AttributeContainer& cont = map->getAttributeContainer<VERTEX>();
 
@@ -42,6 +42,34 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* mh) :
 			}
 		}
 	}
+
+	lockingMarker = new CellMarker<VERTEX>(*map);
+	handleMarker = new CellMarker<VERTEX>(*map);
+
+	positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit") ;
+	map->copyAttribute(positionInit, positionAttribute) ;
+
+	vertexNormal = mh->addAttribute<PFP2::VEC3, VERTEX>("vertexNormal");
+	edgeAngle = mh->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
+	edgeWeight = mh->addAttribute<PFP2::REAL, EDGE>("edgeWeight");
+	vertexArea = mh->addAttribute<PFP2::REAL, VERTEX>("vertexArea");
+	diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord");
+	vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix") ;
+	rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord") ;
+
+	Algo::Surface::Geometry::computeNormalVertices<PFP2>(*map, positionAttribute, vertexNormal) ;
+	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, positionAttribute, edgeAngle) ;
+	Algo::Surface::Geometry::computeCotanWeightEdges<PFP2>(*map, positionAttribute, edgeWeight) ;
+	Algo::Surface::Geometry::computeVoronoiAreaVertices<PFP2>(*map, positionAttribute, vertexArea) ;
+	Algo::Surface::Geometry::computeLaplacianCotanVertices<PFP2>(*map, edgeWeight, vertexArea, positionAttribute, diffCoord) ;
+
+	for(unsigned int i = vertexRotationMatrix.begin(); i != vertexRotationMatrix.end() ; vertexRotationMatrix.next(i))
+		vertexRotationMatrix[i] = Eigen::Matrix3f::Identity();
+
+	vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex");
+	nb_vertices = static_cast<AttribMap*>(map)->computeIndexCells<VERTEX>(vIndex);
+
+	solver = new LinearSolver<PFP2::REAL>(nb_vertices);
 }
 
 PerMapParameterSet::~PerMapParameterSet()
@@ -176,35 +204,26 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 			neigh.collectAll(d) ;
 			const std::vector<Dart>& insideV = neigh.getInsideVertices() ;
 
-			if(perMap->verticesSelectionMode == LOCKED)
+			for(unsigned int i = 0; i < insideV.size(); ++i)
 			{
-				for(unsigned int i = 0; i < insideV.size(); ++i)
+				unsigned int v = map->getEmbedding<VERTEX>(insideV[i]) ;
+				if (!perMap->lockingMarker->isMarked(v))
 				{
-					unsigned int v = map->getEmbedding<VERTEX>(insideV[i]) ;
-					if (!perMap->lockingMarker->isMarked(v))
-					{
-						perMap->locked_vertices.push_back(v) ;
-						perMap->lockingMarker->mark(v);
-					}
+					perMap->locked_vertices.push_back(v) ;
+					perMap->lockingMarker->mark(v);
 				}
-			}
-			else
-			{
-				for(unsigned int i = 0; i < insideV.size(); ++i)
+				if(perMap->verticesSelectionMode == HANDLE)
 				{
-					unsigned int v = map->getEmbedding<VERTEX>(insideV[i]) ;
 					if(!perMap->handleMarker->isMarked(v))
 					{
 						perMap->handle_vertices.push_back(v) ;
 						perMap->handleMarker->mark(v);
 					}
-					if(!perMap->lockingMarker->isMarked(v))
-					{
-						perMap->locked_vertices.push_back(v) ;
-						perMap->lockingMarker->mark(v) ;
-					}
 				}
 			}
+
+			LinearSolving::resetSolver(perMap->solver, false) ;
+
 			view->updateGL() ;
 		}
 	}
@@ -243,7 +262,8 @@ void SurfaceDeformationPlugin::mouseRelease(View* view, QMouseEvent* event)
 void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
 {
 	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet* perMap = params->getCurrentMapParameterSet();
+	MapHandlerGen* map = params->selectedMap;
+	PerMapParameterSet* perMap = params->perMap[map->getName()];
 
 	if(dragging)
 	{
@@ -257,9 +277,9 @@ void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
 
 		dragPrevious = q ;
 
-//		matchDiffCoord() ;
+//		matchDiffCoord(view, map);
 //		for(unsigned int i = 0; i < 2; ++i)
-//			asRigidAsPossible();
+			asRigidAsPossible(view, map);
 
 		params->selectedMap->updateVBO(perMap->positionAttribute);
 
@@ -467,6 +487,150 @@ void SurfaceDeformationPlugin::cb_selectHandleVertices(bool b)
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = h_viewParams[view]->selectedMap;
 		changeVerticesSelectionMode(view, map, HANDLE);
+	}
+}
+
+void SurfaceDeformationPlugin::matchDiffCoord(View* view, MapHandlerGen* mh)
+{
+	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
+	PerMapParameterSet* perMap = h_viewParams[view]->perMap[mh->getName()];
+
+	LinearSolving::initSolver(perMap->solver, perMap->nb_vertices, true, true) ;
+	for(int coord = 0; coord < 3; ++coord)
+	{
+		LinearSolving::setupVariables<PFP2>(*map, perMap->solver, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
+		LinearSolving::startMatrix(perMap->solver) ;
+		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->diffCoord, coord) ;
+//		LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->diffCoord, coord);
+		LinearSolving::endMatrix(perMap->solver) ;
+		LinearSolving::solve(perMap->solver) ;
+		LinearSolving::getResult<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->positionAttribute, coord) ;
+		LinearSolving::resetSolver(perMap->solver, true) ;
+	}
+}
+
+void SurfaceDeformationPlugin::asRigidAsPossible(View* view, MapHandlerGen* mh)
+{
+	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
+	PerMapParameterSet* perMap = h_viewParams[view]->perMap[mh->getName()];
+
+	CellMarkerNoUnmark<VERTEX> m(*map) ;
+
+	for(Dart d = map->begin(); d != map->end(); map->next(d))
+	{
+		if(!m.isMarked(d))
+		{
+			m.mark(d) ;
+
+			Eigen::Matrix3f cov = Eigen::Matrix3f::Zero() ;
+			PFP2::VEC3 p = perMap->positionAttribute[d] ;
+			PFP2::VEC3 pInit = perMap->positionInit[d] ;
+			PFP2::REAL area = perMap->vertexArea[d] ;
+			Dart it = d ;
+			do
+			{
+				Dart neigh = map->phi1(it) ;
+				PFP2::VEC3 v = perMap->positionAttribute[neigh] - p ;
+				PFP2::VEC3 vv = perMap->positionInit[neigh] - pInit ;
+				for(unsigned int i = 0; i < 3; ++i)
+					for(unsigned int j = 0; j < 3; ++j)
+						cov(i,j) += v[i] * vv[j] * perMap->edgeWeight[it] / area ;
+				Dart dboundary = map->phi_1(it) ;
+				if(map->phi2(dboundary) == dboundary)
+				{
+					v = perMap->positionAttribute[dboundary] - p ;
+					vv = perMap->positionInit[dboundary] - p ;
+					for(unsigned int i = 0; i < 3; ++i)
+						for(unsigned int j = 0; j < 3; ++j)
+							cov(i,j) += v[i] * vv[j] * perMap->edgeWeight[dboundary] / area ;
+				}
+				it = map->alpha1(it) ;
+			} while(it != d) ;
+
+			Eigen::JacobiSVD<Eigen::Matrix3f> svd(cov, Eigen::ComputeFullU | Eigen::ComputeFullV) ;
+			Eigen::Matrix3f R = svd.matrixU() * svd.matrixV().transpose() ;
+
+			if(R.determinant() < 0)
+			{
+				Eigen::Matrix3f U = svd.matrixU() ;
+				for(unsigned int i = 0; i < 3; ++i)
+					U(i,2) *= -1 ;
+				R = U * svd.matrixV().transpose() ;
+			}
+
+			perMap->vertexRotationMatrix[d] = R ;
+		}
+	}
+
+	for(Dart d = map->begin(); d != map->end(); map->next(d))
+	{
+		if(m.isMarked(d))
+		{
+			m.unmark(d) ;
+
+			unsigned int degree = 0 ;
+			Eigen::Matrix3f r = Eigen::Matrix3f::Zero() ;
+			Dart it = d ;
+			do
+			{
+				r += perMap->vertexRotationMatrix[map->phi1(it)] ;
+				++degree ;
+				Dart dboundary = map->phi_1(it) ;
+				if(map->phi2(dboundary) == dboundary)
+				{
+					r += perMap->vertexRotationMatrix[dboundary] ;
+					++degree ;
+				}
+				it = map->alpha1(it) ;
+			} while(it != d) ;
+			r += perMap->vertexRotationMatrix[d] ;
+			r /= degree + 1 ;
+			PFP2::VEC3& dc = perMap->diffCoord[d] ;
+			Eigen::Vector3f rdc(dc[0], dc[1], dc[2]) ;
+			rdc = r * rdc ;
+			perMap->rotatedDiffCoord[d] = PFP2::VEC3(rdc[0], rdc[1], rdc[2]) ;
+
+//			Eigen::Vector3f rdc = Eigen::Vector3f::Zero() ;
+//			Dart it = d ;
+//			PFP::REAL vArea = perMap->vertexArea[d] ;
+//			Eigen::Matrix3f& rotM = perMap->vertexRotationMatrix[d] ;
+//			PFP::REAL val = 0 ;
+//			do
+//			{
+//				Dart ddn = map->phi1(it) ;
+//				PFP::REAL w = perMap->edgeWeight[it] / vArea ;
+//				PFP::VEC3 vv = (perMap->positionInit[ddn] - perMap->positionInit[it]) * w ;
+//				val += w ;
+//				Eigen::Matrix3f r = 0.5f * (perMap->vertexRotationMatrix[ddn] + rotM) ;
+//				Eigen::Vector3f vvr = r * Eigen::Vector3f(vv[0], vv[1], vv[2]) ;
+//				rdc += vvr ;
+//				Dart dboundary = map->phi_1(it) ;
+//				if(map->phi2(dboundary) == dboundary)
+//				{
+//					w = perMap->edgeWeight[dboundary] / vArea ;
+//					vv = (perMap->positionInit[dboundary] - perMap->positionInit[it]) * w ;
+//					val += w ;
+//					r = 0.5f * (perMap->vertexRotationMatrix[dboundary] + rotM) ;
+//					vvr = r * Eigen::Vector3f(vv[0], vv[1], vv[2]) ;
+//					rdc += vvr ;
+//				}
+//				it = map->alpha1(it) ;
+//			} while(it != d) ;
+//			rdc /= val ;
+//			perMap->rotatedDiffCoord[d] = PFP::VEC3(rdc[0], rdc[1], rdc[2]) ;
+		}
+	}
+
+	LinearSolving::initSolver(perMap->solver, perMap->nb_vertices, true, true) ;
+	for(int coord = 0; coord < 3; ++coord)
+	{
+		LinearSolving::setupVariables<PFP2>(*map, perMap->solver, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
+		LinearSolving::startMatrix(perMap->solver) ;
+		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->rotatedDiffCoord, coord) ;
+		LinearSolving::endMatrix(perMap->solver) ;
+		LinearSolving::solve(perMap->solver) ;
+		LinearSolving::getResult<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->positionAttribute, coord) ;
+		LinearSolving::resetSolver(perMap->solver, true) ;
 	}
 }
 

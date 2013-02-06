@@ -190,7 +190,7 @@ private:
 
 	Eigen::ConjugateGradient<Eigen::SparseMatrix<CoeffType> >* symmetric_solver_;
 	Eigen::BiCGSTAB<Eigen::SparseMatrix<CoeffType> >* nonsymmetric_solver_;
-	Eigen::SimplicialLDLT<Eigen::SparseMatrix<CoeffType> >* direct_solver_;
+	Eigen::SimplicialLLT<Eigen::SparseMatrix<CoeffType> >* direct_solver_;
 } ;
 
 #include "OpenNL/linear_solver.hpp"

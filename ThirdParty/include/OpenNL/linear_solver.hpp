@@ -172,7 +172,7 @@ void LinearSolver<CoeffType>::end_row() {
 template <typename CoeffType>
 void LinearSolver<CoeffType>::end_system() {
 	if(least_squares_ && direct_ && !direct_solver_)
-		direct_solver_ = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<CoeffType> >(*A_);
+		direct_solver_ = new Eigen::SimplicialLLT<Eigen::SparseMatrix<CoeffType> >(*A_);
 
     transition(IN_SYSTEM, CONSTRUCTED) ;
 }
