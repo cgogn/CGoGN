@@ -3,6 +3,8 @@
 #include "Algo/Selection/raySelector.h"
 #include "Algo/Selection/collector.h"
 
+#include "Utils/drawer.h"
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 

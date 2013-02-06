@@ -6,11 +6,13 @@
 
 #include "ui_surfaceDeformation.h"
 
-#include "Utils/drawer.h"
+//#include "Utils/drawer.h"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
+
+namespace CGoGN { namespace Utils { class Drawer; } }
 
 
 enum SelectionMode
