@@ -189,11 +189,11 @@ void LinearSolver<CoeffType>::solve() {
 			*x_ = direct_solver_->solve(*b_) ;
 		} else {
 			Eigen::ConjugateGradient<Eigen::SparseMatrix<CoeffType> > solver(*A_) ;
-			*x_ = solver->solve(*b_) ;
+			*x_ = solver.solve(*b_) ;
 		}
 	} else {
 		Eigen::BiCGSTAB<Eigen::SparseMatrix<CoeffType> > solver(*A_) ;
-		*x_ = solver->solve(*b_) ;
+		*x_ = solver.solve(*b_) ;
 	}
 	vector_to_variables() ;
 	transition(CONSTRUCTED, SOLVED) ;
