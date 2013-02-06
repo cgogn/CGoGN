@@ -15,7 +15,7 @@
 using namespace CGoGN;
 using namespace SCHNApps;
 
-namespace CGoGN { namespace Utils { class Drawer; } }
+// namespace CGoGN { namespace Utils { class Drawer; } }
 
 
 enum SelectionMode
@@ -143,7 +143,7 @@ private:
 	SurfaceDeformationDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
-	Utils::Drawer* m_drawer;
+//	Utils::Drawer* m_drawer;
 
 	bool b_refreshingUI;
 

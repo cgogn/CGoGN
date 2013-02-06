@@ -6,7 +6,7 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
 
-#include "Utils/drawer.h"
+//#include "Utils/drawer.h"
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -95,25 +95,22 @@ bool SurfaceDeformationPlugin::enable()
 	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(currentViewChanged(View*)), this, SLOT(currentViewChanged(View*)));
 
-	Utils::ShaderColorPerVertex* s = new Utils::ShaderColorPerVertex();
-	registerShader(s);
-
-	m_drawer = new Utils::Drawer();
-	registerShader(m_drawer->getShader());
+//	m_drawer = new Utils::Drawer();
+//	registerShader(m_drawer->getShader());
 
 	return true;
 }
 
 void SurfaceDeformationPlugin::disable()
 {
-	delete m_drawer;
+//	delete m_drawer;
 }
 
 void SurfaceDeformationPlugin::redraw(View* view)
 {
 	if(selecting)
 	{
-		glDisable(GL_LIGHTING) ;
+/*		glDisable(GL_LIGHTING) ;
 		m_drawer->newList(GL_COMPILE_AND_EXECUTE) ;
 		m_drawer->lineWidth(2.0f) ;
 		m_drawer->begin(GL_LINES) ;
@@ -132,7 +129,7 @@ void SurfaceDeformationPlugin::redraw(View* view)
 		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(0,0,-1)) ;
 		m_drawer->end() ;
 		m_drawer->endList() ;
-	}
+*/	}
 
 	ParameterSet* params = h_viewParams[view];
 	MapHandlerGen* mh = params->selectedMap;
@@ -142,7 +139,7 @@ void SurfaceDeformationPlugin::redraw(View* view)
 
 		if(!perMap->locked_vertices.empty() || !perMap->handle_vertices.empty())
 		{
-			glDisable(GL_LIGHTING) ;
+/*			glDisable(GL_LIGHTING) ;
 			m_drawer->newList(GL_COMPILE_AND_EXECUTE) ;
 			m_drawer->pointSize(4.0f) ;
 			m_drawer->begin(GL_POINTS) ;
@@ -157,7 +154,7 @@ void SurfaceDeformationPlugin::redraw(View* view)
 				m_drawer->vertex(perMap->positionAttribute[perMap->handle_vertices[i]]) ;
 			m_drawer->end() ;
 			m_drawer->endList() ;
-		}
+*/		}
 	}
 }
 
