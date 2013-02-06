@@ -128,15 +128,77 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 			Dart e = map.phi1(a);
 			VEC3 v2 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,e,positions);
 			VEC3 N = v1^v2;
-			N.normalize();
-			normals.push_back(N);
-			a = e;
+			double l = N.norm();
+			if (l>0.000001)
+			{
+				N /= l;
+				normals.push_back(N);
+			}
+			else
+			{
+				normals.push_back(VEC3(9,9,9));
+			}
+			
 			centerFace += positions[a];
+			a = e;
 			nbs++;
 		} while (a != d);
 
 		centerFace /= float(nbs);
+		
+		
+		typename std::vector<VEC3>::iterator in  = normals.begin();
+		typename std::vector<VEC3>::iterator inb = normals.begin();
+		typename std::vector<VEC3>::iterator inc = normals.begin();
+		a = map.phi1(d);
+		while ((*in)[0]>1.0)
+		{
+			a = map.phi1(a);
+			++in;
+		}
+		inb = in;
+		++inb;
+		Dart b = map.phi1(a);
+		while ((*inb)[0]>1.0)
+		{
+			b = map.phi1(b);
+			++inb;
+		}
+		inc = inb;
+		++inc;
+		Dart c = map.phi1(b);
+		while ((*inc)[0]>1.0)
+		{
+			c = map.phi1(c);
+			++inc;
+		}
+		// loop to cut a polygon in triangle on the fly (works only with convex faces)
+		do
+		{
+			buffer.push_back(centerVolumes[a]);
+			bufferColors.push_back(centerFace);
+			bufferNormals.push_back(centerFace); // unsused just for fill
+			buffer.push_back(positions[a]);
+			bufferColors.push_back(colorPerXXX[a]);
+			bufferNormals.push_back(*in);
+			buffer.push_back(positions[b]);
+			bufferColors.push_back(colorPerXXX[b]);
+			bufferNormals.push_back(*inb);
+			buffer.push_back(positions[c]);
+			bufferColors.push_back(colorPerXXX[c]);
+			bufferNormals.push_back(*inc);
+			b = c;
+			inb = inc;
+			inc++;
+			c = map.phi1(b);
+			while ((*inc)[0]>1.0)
+			{
+				c = map.phi1(c);
+				++inc;
+			}
+		} while (c != a);
 
+/*
 		typename std::vector<VEC3>::iterator in = normals.begin();
 		a = d;
 		Dart b = map.phi1(a);
@@ -144,11 +206,11 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 		// loop to cut a polygon in triangle on the fly (works only with convex faces)
 		do
 		{
-			buffer.push_back(centerVolumes[d]);
+			buffer.push_back(centerVolumes[a]);
 			bufferColors.push_back(centerFace);
 			bufferNormals.push_back(centerFace); // unsused just for fill
-			buffer.push_back(positions[d]);
-			bufferColors.push_back(colorPerXXX[d]);
+			buffer.push_back(positions[a]);
+			bufferColors.push_back(colorPerXXX[a]);
 			bufferNormals.push_back(normals.back());
 			buffer.push_back(positions[b]);
 			bufferColors.push_back(colorPerXXX[b]);
@@ -158,7 +220,8 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 			bufferNormals.push_back(*in);
 			b = c;
 			c = map.phi1(b);
-		} while (c != d);
+		} while (c != a);
+		*/
 	}
 
 
@@ -248,7 +311,61 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 		} while (a != d);
 
 		centerFace /= float(nbs);
+		
+		
+		typename std::vector<VEC3>::iterator in  = normals.begin();
+		typename std::vector<VEC3>::iterator inb = normals.begin();
+		typename std::vector<VEC3>::iterator inc = normals.begin();
+		a = map.phi1(d);
+		while ((*in)[0]>1.0)
+		{
+			a = map.phi1(a);
+			++in;
+		}
+		inb = in;
+		++inb;
+		Dart b = map.phi1(a);
+		while ((*inb)[0]>1.0)
+		{
+			b = map.phi1(b);
+			++inb;
+		}
+		inc = inb;
+		++inc;
+		Dart c = map.phi1(b);
+		while ((*inc)[0]>1.0)
+		{
+			c = map.phi1(c);
+			++inc;
+		}
+		// loop to cut a polygon in triangle on the fly (works only with convex faces)
+		do
+		{
+			buffer.push_back(centerVolumes[a]);
+			bufferColors.push_back(centerFace);
+			bufferNormals.push_back(centerFace); // unsused just for fill
+			buffer.push_back(positions[a]);
+			bufferColors.push_back(m_globalColor);
+			bufferNormals.push_back(*in);
+			buffer.push_back(positions[b]);
+			bufferColors.push_back(m_globalColor);
+			bufferNormals.push_back(*inb);
+			buffer.push_back(positions[c]);
+			bufferColors.push_back(m_globalColor);
+			bufferNormals.push_back(*inc);
+			b = c;
+			inb = inc;
+			inc++;
+			c = map.phi1(b);
+			while (*inc[0]>1.0)
+			{
+				c = map.phi1(c);
+				++inc;
+			}
+		} while (c != a);
 
+		
+/*
 		typename std::vector<VEC3>::iterator in = normals.begin();
 		a = d;
 		Dart b = map.phi1(a);
@@ -271,9 +388,10 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 			b = c;
 			c = map.phi1(b);
 		} while (c != d);
+
+*/
 	}
-
-
+	
 	m_nbTris = buffer.size()/4;
 
 	m_vboPos->allocate(buffer.size());
