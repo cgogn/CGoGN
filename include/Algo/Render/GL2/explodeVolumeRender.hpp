@@ -145,59 +145,11 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 				if (N*centerNormalFace < 0.707)
 					N = centerNormalFace;
 			}
-			
 			normals.push_back(N);
 			vertices.push_back(positions[e]);
-			
-// 			VEC3 v1 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,a,positions);
-// 			Dart e = map.phi1(a);
-// 			VEC3 v2 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,e,positions);
-// 			v1.normalize();
-// 			v2.normalize();
-// 			VEC3 N = v1^v2;
-//  			double l = N.norm();
-// 			double ll = fabs(N*centerNormalFace());
-// 			if ((l<0.2) && l<0
-			
-// 			if (l<0.3)
-//  			{
-// 				N = centerNormalFace;
-// 			}
-// 			else
-// 			{
-// 				if (N*centerNormalFace < 0.0)
-// 					N /= -l;
-// 				else
-// 					N /= l;
-// 			}
-// 			if ((l < 0.5) || (N*centerNormalFace < 0.0))
-// 			{
-// 				N = centerNormalFace;
-// 			}
-			
-
-			
-			
-			
-// 				if (N*centerNormalFace < 0.0)
-// 				{
-// 					std::cout << "INVERTED" <<std::endl;
-// 					N =-N;
-// 				}
-// 				N.normalize();
-// 				normals.push_back(N);
-// 			}
-// 			normals.push_back(N);
-// 			vertices.push_back(positions[e]);
-
-		//centerFace += positions[e];
-			
 			a = e;
 		} while (a != d);
 
-//		centerFace /= float(vertices.size());
-//		centerNormalFace.normalize();
-		
 		VEC3 volCol = colorPerXXX[d];
 
 		unsigned int nbs = vertices.size();
@@ -321,30 +273,33 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 		// compute normals
 		normals.clear();
 		vertices.clear();
-		VEC3 centerFace(0);
-		VEC3 centerNormalFace(0);
+		VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
+		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
 
 		Dart a = d;
 		do
 		{
-			VEC3 v1 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,a,positions);
+			VEC3 v1 = positions[a] - centerFace;
+			v1.normalize();
 			Dart e = map.phi1(a);
-			VEC3 v2 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,e,positions);
+			VEC3 v2 = positions[map.phi1(e)] - centerFace;
+			v2.normalize();
 			VEC3 N = v1^v2;
+			
 			double l = N.norm();
-			if (l>0.000001)
+			if (l<0.01)
+				N = centerNormalFace;
+			else
 			{
 				N /= l;
-				normals.push_back(N);
-				centerNormalFace += N;
-				vertices.push_back(positions[e]);
-				centerFace += positions[e];
+				if (N*centerNormalFace < 0.707)
+					N = centerNormalFace;
 			}
+			normals.push_back(N);
+			vertices.push_back(positions[e]);
 			a = e;
 		} while (a != d);
 
-		centerFace /= float(vertices.size());
-		centerNormalFace.normalize();
 
 		unsigned int nbs = vertices.size();
 		// just to have more easy algo further
@@ -552,12 +507,6 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 template<typename PFP>
 void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good)
 {
-	if (m_cpf)
-	{
-		CGoGNerr<< "ExplodeVolumeRender: problem wrong update fonction use the other (without VolumeAttribute parameter)" << CGoGNendl;
-		return;
-	}
-
 	if (m_smooth)
 	{
 		updateSmooth<PFP>(map,positions,good);
