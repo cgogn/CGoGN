@@ -114,6 +114,8 @@ public:
 	Vector<DIM, T> operator+(const Vector<DIM, T>& v) const ;
 
 	Vector<DIM, T> operator-(const Vector<DIM, T>& v) const ;
+	
+	Vector<DIM, T> operator-() const ;
 
 	Vector<DIM, T> operator*(T a) const ;
 
