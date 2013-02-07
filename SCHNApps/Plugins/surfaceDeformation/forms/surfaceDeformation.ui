@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RenderVectorWidget</class>
- <widget class="QWidget" name="RenderVectorWidget">
+ <class>SurfaceDeformationWidget</class>
+ <widget class="QWidget" name="SurfaceDeformationWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>174</width>
+    <width>189</width>
     <height>545</height>
    </rect>
   </property>
@@ -39,34 +39,30 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Vectors :</string>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Select Vertices</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QListWidget" name="list_vectorVBO">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Vectors Size :</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QSlider" name="slider_vectorsScaleFactor">
-     <property name="value">
-      <number>50</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QRadioButton" name="radio_locked">
+          <property name="text">
+           <string>locked</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radio_handle">
+          <property name="text">
+           <string>handle</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -84,11 +80,8 @@
    </item>
   </layout>
   <zorder>mapList</zorder>
-  <zorder>label_3</zorder>
-  <zorder>list_vectorVBO</zorder>
-  <zorder>label</zorder>
-  <zorder>slider_vectorsScaleFactor</zorder>
   <zorder>label_2</zorder>
+  <zorder>groupBox</zorder>
  </widget>
  <resources/>
  <connections/>
