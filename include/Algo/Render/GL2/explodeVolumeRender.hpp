@@ -28,7 +28,7 @@
 #include "Topology/generic/cellmarker.h"
 #include "Algo/Geometry/centroid.h"
 #include "Topology/generic/autoAttributeHandler.h"
-
+#include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/basic.h"
 
 namespace CGoGN
@@ -99,7 +99,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -108,120 +108,145 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	bufferColors.reserve(16384);
 	std::vector<VEC3> bufferNormals;
 	bufferNormals.reserve(16384);
+	
 	std::vector<VEC3> normals;
 	bufferNormals.reserve(20);
+	std::vector<VEC3> vertices;
+	bufferNormals.reserve(20);
 
+	
 	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
 
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-
 		// compute normals
 		normals.clear();
-		VEC3 centerFace(0);
-		unsigned int nbs=0;
+		vertices.clear();
+		VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
+		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
+
 		Dart a = d;
 		do
 		{
-			VEC3 v1 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,a,positions);
+			VEC3 v1 = positions[a] - centerFace;
+			v1.normalize();
 			Dart e = map.phi1(a);
-			VEC3 v2 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,e,positions);
+			VEC3 v2 = positions[map.phi1(e)] - centerFace;
+			v2.normalize();
 			VEC3 N = v1^v2;
+			
 			double l = N.norm();
-			if (l>0.000001)
-			{
-				N /= l;
-				normals.push_back(N);
-			}
+			if (l<0.01)
+				N = centerNormalFace;
 			else
 			{
-				normals.push_back(VEC3(9,9,9));
+				N /= l;
+				if (N*centerNormalFace < 0.707)
+					N = centerNormalFace;
 			}
 			
-			centerFace += positions[a];
+			normals.push_back(N);
+			vertices.push_back(positions[e]);
+			
+// 			VEC3 v1 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,a,positions);
+// 			Dart e = map.phi1(a);
+// 			VEC3 v2 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,e,positions);
+// 			v1.normalize();
+// 			v2.normalize();
+// 			VEC3 N = v1^v2;
+//  			double l = N.norm();
+// 			double ll = fabs(N*centerNormalFace());
+// 			if ((l<0.2) && l<0
+			
+// 			if (l<0.3)
+//  			{
+// 				N = centerNormalFace;
+// 			}
+// 			else
+// 			{
+// 				if (N*centerNormalFace < 0.0)
+// 					N /= -l;
+// 				else
+// 					N /= l;
+// 			}
+// 			if ((l < 0.5) || (N*centerNormalFace < 0.0))
+// 			{
+// 				N = centerNormalFace;
+// 			}
+			
+
+			
+			
+			
+// 				if (N*centerNormalFace < 0.0)
+// 				{
+// 					std::cout << "INVERTED" <<std::endl;
+// 					N =-N;
+// 				}
+// 				N.normalize();
+// 				normals.push_back(N);
+// 			}
+// 			normals.push_back(N);
+// 			vertices.push_back(positions[e]);
+
+		//centerFace += positions[e];
+			
 			a = e;
-			nbs++;
 		} while (a != d);
 
-		centerFace /= float(nbs);
+//		centerFace /= float(vertices.size());
+//		centerNormalFace.normalize();
 		
-		
-		typename std::vector<VEC3>::iterator in  = normals.begin();
-		typename std::vector<VEC3>::iterator inb = normals.begin();
-		typename std::vector<VEC3>::iterator inc = normals.begin();
-		a = map.phi1(d);
-		while ((*in)[0]>1.0)
-		{
-			a = map.phi1(a);
-			++in;
-		}
-		inb = in;
-		++inb;
-		Dart b = map.phi1(a);
-		while ((*inb)[0]>1.0)
-		{
-			b = map.phi1(b);
-			++inb;
-		}
-		inc = inb;
-		++inc;
-		Dart c = map.phi1(b);
-		while ((*inc)[0]>1.0)
-		{
-			c = map.phi1(c);
-			++inc;
-		}
-		// loop to cut a polygon in triangle on the fly (works only with convex faces)
-		do
-		{
-			buffer.push_back(centerVolumes[a]);
-			bufferColors.push_back(centerFace);
-			bufferNormals.push_back(centerFace); // unsused just for fill
-			buffer.push_back(positions[a]);
-			bufferColors.push_back(colorPerXXX[a]);
-			bufferNormals.push_back(*in);
-			buffer.push_back(positions[b]);
-			bufferColors.push_back(colorPerXXX[b]);
-			bufferNormals.push_back(*inb);
-			buffer.push_back(positions[c]);
-			bufferColors.push_back(colorPerXXX[c]);
-			bufferNormals.push_back(*inc);
-			b = c;
-			inb = inc;
-			inc++;
-			c = map.phi1(b);
-			while ((*inc)[0]>1.0)
-			{
-				c = map.phi1(c);
-				++inc;
-			}
-		} while (c != a);
+		VEC3 volCol = colorPerXXX[d];
 
-/*
-		typename std::vector<VEC3>::iterator in = normals.begin();
-		a = d;
-		Dart b = map.phi1(a);
-		Dart c = map.phi1(b);
-		// loop to cut a polygon in triangle on the fly (works only with convex faces)
-		do
+		unsigned int nbs = vertices.size();
+		// just to have more easy algo further
+		vertices.push_back(vertices.front());
+		normals.push_back(normals.front());
+		
+		typename std::vector<VEC3>::iterator iv  = vertices.begin();
+		typename std::vector<VEC3>::iterator in  = normals.begin();
+		
+		if (nbs == 3)
 		{
-			buffer.push_back(centerVolumes[a]);
+			buffer.push_back(centerVolumes[d]);
 			bufferColors.push_back(centerFace);
-			bufferNormals.push_back(centerFace); // unsused just for fill
-			buffer.push_back(positions[a]);
-			bufferColors.push_back(colorPerXXX[a]);
-			bufferNormals.push_back(normals.back());
-			buffer.push_back(positions[b]);
-			bufferColors.push_back(colorPerXXX[b]);
+			bufferNormals.push_back(centerNormalFace); // unsused just for fill
+			
+			buffer.push_back(*iv++);
 			bufferNormals.push_back(*in++);
-			buffer.push_back(positions[c]);
-			bufferColors.push_back(colorPerXXX[c]);
-			bufferNormals.push_back(*in);
-			b = c;
-			c = map.phi1(b);
-		} while (c != a);
-		*/
+			bufferColors.push_back(volCol);
+			
+			buffer.push_back(*iv++);
+			bufferNormals.push_back(*in++);
+			bufferColors.push_back(volCol);
+
+			buffer.push_back(*iv++);
+			bufferNormals.push_back(*in++);
+			bufferColors.push_back(volCol);
+		}
+		else
+		{
+			for (unsigned int i=0; i<nbs; ++i)
+			{
+				buffer.push_back(centerVolumes[d]);
+				bufferColors.push_back(centerFace);
+				bufferNormals.push_back(centerNormalFace); // unsused just for fill
+
+				buffer.push_back(centerFace);
+				bufferColors.push_back(volCol);
+				bufferNormals.push_back(centerNormalFace);
+				
+				buffer.push_back(*iv++);
+				bufferNormals.push_back(*in++);
+				bufferColors.push_back(volCol);
+				
+				buffer.push_back(*iv);
+				bufferNormals.push_back(*in);
+				bufferColors.push_back(volCol);
+			}
+		}
 	}
 
 
@@ -274,7 +299,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -283,19 +308,22 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	bufferColors.reserve(16384);
 	std::vector<VEC3> bufferNormals;
 	bufferNormals.reserve(16384);
+	
 	std::vector<VEC3> normals;
+	bufferNormals.reserve(20);
+	std::vector<VEC3> vertices;
 	bufferNormals.reserve(20);
 
 	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-
 		// compute normals
-
 		normals.clear();
+		vertices.clear();
 		VEC3 centerFace(0);
-		unsigned int nbs=0;
+		VEC3 centerNormalFace(0);
+
 		Dart a = d;
 		do
 		{
@@ -303,93 +331,68 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 			Dart e = map.phi1(a);
 			VEC3 v2 = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,e,positions);
 			VEC3 N = v1^v2;
-			N.normalize();
-			normals.push_back(N);
+			double l = N.norm();
+			if (l>0.000001)
+			{
+				N /= l;
+				normals.push_back(N);
+				centerNormalFace += N;
+				vertices.push_back(positions[e]);
+				centerFace += positions[e];
+			}
 			a = e;
-			centerFace += positions[a];
-			nbs++;
 		} while (a != d);
 
-		centerFace /= float(nbs);
-		
-		
-		typename std::vector<VEC3>::iterator in  = normals.begin();
-		typename std::vector<VEC3>::iterator inb = normals.begin();
-		typename std::vector<VEC3>::iterator inc = normals.begin();
-		a = map.phi1(d);
-		while ((*in)[0]>1.0)
-		{
-			a = map.phi1(a);
-			++in;
-		}
-		inb = in;
-		++inb;
-		Dart b = map.phi1(a);
-		while ((*inb)[0]>1.0)
-		{
-			b = map.phi1(b);
-			++inb;
-		}
-		inc = inb;
-		++inc;
-		Dart c = map.phi1(b);
-		while ((*inc)[0]>1.0)
-		{
-			c = map.phi1(c);
-			++inc;
-		}
-		// loop to cut a polygon in triangle on the fly (works only with convex faces)
-		do
-		{
-			buffer.push_back(centerVolumes[a]);
-			bufferColors.push_back(centerFace);
-			bufferNormals.push_back(centerFace); // unsused just for fill
-			buffer.push_back(positions[a]);
-			bufferColors.push_back(m_globalColor);
-			bufferNormals.push_back(*in);
-			buffer.push_back(positions[b]);
-			bufferColors.push_back(m_globalColor);
-			bufferNormals.push_back(*inb);
-			buffer.push_back(positions[c]);
-			bufferColors.push_back(m_globalColor);
-			bufferNormals.push_back(*inc);
-			b = c;
-			inb = inc;
-			inc++;
-			c = map.phi1(b);
-			while (*inc[0]>1.0)
-			{
-				c = map.phi1(c);
-				++inc;
-			}
-		} while (c != a);
+		centerFace /= float(vertices.size());
+		centerNormalFace.normalize();
 
+		unsigned int nbs = vertices.size();
+		// just to have more easy algo further
+		vertices.push_back(vertices.front());
+		normals.push_back(normals.front());
 		
-/*
-		typename std::vector<VEC3>::iterator in = normals.begin();
-		a = d;
-		Dart b = map.phi1(a);
-		Dart c = map.phi1(b);
-		// loop to cut a polygon in triangle on the fly (works only with convex faces)
-		do
+		typename std::vector<VEC3>::iterator iv  = vertices.begin();
+		typename std::vector<VEC3>::iterator in  = normals.begin();
+		
+		if (nbs == 3)
 		{
 			buffer.push_back(centerVolumes[d]);
 			bufferColors.push_back(centerFace);
-			bufferNormals.push_back(centerFace); // unsused just for fill
-			buffer.push_back(positions[d]);
-			bufferColors.push_back(m_globalColor);
-			bufferNormals.push_back(normals.back());
-			buffer.push_back(positions[b]);
-			bufferColors.push_back(m_globalColor);
-			bufferNormals.push_back(*in++);
-			buffer.push_back(positions[c]);
-			bufferColors.push_back(m_globalColor);
-			bufferNormals.push_back(*in);
-			b = c;
-			c = map.phi1(b);
-		} while (c != d);
+			bufferNormals.push_back(centerNormalFace); // unsused just for fill
 
-*/
+			buffer.push_back(*iv++);
+			bufferNormals.push_back(*in++);
+			bufferColors.push_back(m_globalColor);
+			
+			buffer.push_back(*iv++);
+			bufferNormals.push_back(*in++);
+			bufferColors.push_back(m_globalColor);
+
+			buffer.push_back(*iv++);
+			bufferNormals.push_back(*in++);
+			bufferColors.push_back(m_globalColor);
+		}
+		else
+		{
+			for (unsigned int i=0; i<nbs; ++i)
+			{
+				buffer.push_back(centerVolumes[d]);
+				bufferColors.push_back(centerFace);
+				bufferNormals.push_back(centerNormalFace); // unsused just for fill
+
+				buffer.push_back(centerFace);
+				bufferColors.push_back(m_globalColor);
+				bufferNormals.push_back(centerNormalFace);
+				
+				buffer.push_back(*iv++);
+				bufferNormals.push_back(*in++);
+				bufferColors.push_back(m_globalColor);
+				
+				buffer.push_back(*iv);
+				bufferNormals.push_back(*in);
+				bufferColors.push_back(m_globalColor);
+			}
+		}
 	}
 	
 	m_nbTris = buffer.size()/4;
@@ -456,7 +459,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -469,25 +472,46 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
-
-		Dart a = d;
-		Dart b = map.phi1(a);
+		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
+		VEC3 volColor = colorPerXXX[d];
+		
+		Dart b = d;
 		Dart c = map.phi1(b);
-		// loop to cut a polygon in triangle on the fly (works only with convex faces)
-		do
+		Dart a = map.phi1(c);
+		
+		if (map.phi1(a) == d)
 		{
 			buffer.push_back(centerVolumes[d]);
 			bufferColors.push_back(centerFace);
-			buffer.push_back(positions[d]);
-			bufferColors.push_back(colorPerXXX[d]);
+			
 			buffer.push_back(positions[b]);
-			bufferColors.push_back(colorPerXXX[b]);
+			bufferColors.push_back(volColor);
 			buffer.push_back(positions[c]);
-			bufferColors.push_back(colorPerXXX[c]);
-			b = c;
-			c = map.phi1(b);
-		} while (c != d);
+			bufferColors.push_back(volColor);
+			c = map.phi1(c);
+			buffer.push_back(positions[c]);
+			bufferColors.push_back(volColor);	
+		}
+		else
+		{
+	
+			// loop to cut a polygon in triangle on the fly (ceter point method)
+			do
+			{
+				buffer.push_back(centerVolumes[d]);
+				bufferColors.push_back(centerFace);
+				
+				buffer.push_back(centerFace);
+				bufferColors.push_back(volColor);
+				
+				buffer.push_back(positions[b]);
+				bufferColors.push_back(volColor);
+				buffer.push_back(positions[c]);
+				bufferColors.push_back(volColor);
+				b = c;
+				c = map.phi1(b);
+			} while (b != d);
+		}
 	}
 
 	m_nbTris = buffer.size()/4;
@@ -545,7 +569,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -558,26 +582,47 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
+		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
 
-		Dart a = d;
-		Dart b = map.phi1(a);
+		Dart b = d;
 		Dart c = map.phi1(b);
-		// loop to cut a polygon in triangle on the fly (works only with convex faces)
-		do
+		Dart a = map.phi1(c);
+		
+		if (map.phi1(a) == d)
 		{
 			buffer.push_back(centerVolumes[d]);
 			bufferColors.push_back(centerFace);
-			buffer.push_back(positions[d]);
-			bufferColors.push_back(m_globalColor);
+			
 			buffer.push_back(positions[b]);
 			bufferColors.push_back(m_globalColor);
 			buffer.push_back(positions[c]);
 			bufferColors.push_back(m_globalColor);
-			b = c;
-			c = map.phi1(b);
-		} while (c != d);
+			c = map.phi1(c);
+			buffer.push_back(positions[c]);
+			bufferColors.push_back(m_globalColor);	
+		}
+		else
+		{
+	
+			// loop to cut a polygon in triangle on the fly (ceter point method)
+			do
+			{
+				buffer.push_back(centerVolumes[d]);
+				bufferColors.push_back(centerFace);
+				
+				buffer.push_back(centerFace);
+				bufferColors.push_back(m_globalColor);
+				
+				buffer.push_back(positions[b]);
+				bufferColors.push_back(m_globalColor);
+				buffer.push_back(positions[c]);
+				bufferColors.push_back(m_globalColor);
+				b = c;
+				c = map.phi1(b);
+			} while (b != d);
+		}
 	}
+
 
 	m_nbTris = buffer.size()/4;
 
@@ -686,9 +731,7 @@ inline void ExplodeVolumeRender::setAmbiant(const Geom::Vec4f& ambiant)
 
 inline void ExplodeVolumeRender::setBackColor(const Geom::Vec4f& color)
 {
-	if (m_smooth)
-		m_shaderS->setBackColor(color);
-	else
+	if (!m_smooth)
 		m_shader->setBackColor(color);
 }
 

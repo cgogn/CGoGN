@@ -44,7 +44,6 @@ protected:
 
     // uniform locations
 	CGoGNGLuint m_unif_ambiant;
-	CGoGNGLuint m_unif_backColor;
 	CGoGNGLuint m_unif_lightPos;
 	CGoGNGLuint m_unif_explodeV;
 	CGoGNGLuint m_unif_explodeF;
@@ -54,7 +53,6 @@ protected:
 	float m_explodeV;
 	float m_explodeF;
 	Geom::Vec4f m_ambiant;
-	Geom::Vec4f m_backColor;
 	Geom::Vec3f m_light_pos;
 	Geom::Vec4f m_plane;
 
@@ -79,13 +77,11 @@ public:
 
 	void setAmbiant(const Geom::Vec4f& ambiant);
 
-	void setBackColor(const Geom::Vec4f& backColor);
-
 	void setLightPosition(const Geom::Vec3f& lp);
 
 	void setClippingPlane(const Geom::Vec4f& plane);
 
-	void setParams(float explodeV, float explodeF, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane);
+	void setParams(float explodeV, float explodeF, const Geom::Vec4f& ambiant, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane);
 
 	unsigned int setAttributePosition(VBO* vbo);
 
