@@ -211,6 +211,16 @@ inline Vector<DIM, T> Vector<DIM, T>::operator-(const Vector<DIM, T>& v) const
 }
 
 template <unsigned int DIM, typename T>
+inline Vector<DIM, T> Vector<DIM, T>::operator-() const
+{
+	Vector<DIM, T> res ;
+	for (unsigned int i = 0; i < DIM; ++i)
+		res[i] = - m_data[i] ;
+	return res ;
+}
+
+
+template <unsigned int DIM, typename T>
 inline Vector<DIM, T> Vector<DIM, T>::operator*(T a) const
 {
 	Vector<DIM, T> res ;

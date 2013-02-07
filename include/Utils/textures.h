@@ -28,10 +28,11 @@
 #include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
 #include <string>
-#include <QImage>
 
-#ifndef WITH_QT
-#error "Texture class need Qt for loading images, please recompile CGoGN with Qt support"
+#ifdef WITH_QT
+#include <QImage>
+//#else
+//#error "Texture class need Qt for loading images, please recompile CGoGN with Qt support if necessary"
 #endif
 
 // TODO externaliser le chargement d'image pour enlever la dependance Qt ??

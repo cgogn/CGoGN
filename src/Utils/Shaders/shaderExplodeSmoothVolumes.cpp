@@ -67,11 +67,10 @@ ShaderExplodeSmoothVolumes::ShaderExplodeSmoothVolumes(bool withColorPerFace, bo
 	m_explodeV = 0.9f;
 	m_explodeF = 0.9f;
 	m_ambiant = Geom::Vec4f(0.05f, 0.05f, 0.1f, 0.0f);
-	m_backColor = Geom::Vec4f(1.0f, 0.1f, 0.1f, 0.0f);
 	m_light_pos = Geom::Vec3f(10.0f, 10.0f, 1000.0f);
 	m_plane   = Geom::Vec4f(0.0f, 0.0f, 1000.f, 1000000000000000000000000000.0f);
 
-	setParams(m_explodeV, m_explodeF, m_ambiant, m_backColor, m_light_pos, m_plane);
+	setParams(m_explodeV, m_explodeF, m_ambiant, m_light_pos, m_plane);
 }
 
 void ShaderExplodeSmoothVolumes::getLocations()
@@ -80,7 +79,6 @@ void ShaderExplodeSmoothVolumes::getLocations()
 	*m_unif_explodeV  = glGetUniformLocation(program_handler(),"explodeV");
 	*m_unif_explodeF  = glGetUniformLocation(program_handler(),"explodeF");
 	*m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
-	*m_unif_backColor  = glGetUniformLocation(program_handler(),"backColor");
 	*m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
 	*m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 	unbind();
@@ -114,7 +112,7 @@ unsigned int ShaderExplodeSmoothVolumes::setAttributeNormal(VBO* vbo)
 }
 
 
-void ShaderExplodeSmoothVolumes::setParams(float explV, float explF, const Geom::Vec4f& ambiant, const Geom::Vec4f& backColor, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane)
+void ShaderExplodeSmoothVolumes::setParams(float explV, float explF, const Geom::Vec4f& ambiant, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane)
 {
 	bind();
 	m_explodeV = explV;
@@ -123,9 +121,6 @@ void ShaderExplodeSmoothVolumes::setParams(float explV, float explF, const Geom:
 	glUniform1f(*m_unif_explodeF, explF);
 	m_ambiant = ambiant;
 	glUniform4fv(*m_unif_ambiant, 1, ambiant.data());
-	m_backColor = backColor;
-	glUniform4fv(*m_unif_backColor, 1, backColor.data());
-
 	m_light_pos = lightPos;
 	glUniform3fv(*m_unif_lightPos, 1, lightPos.data());
 
@@ -159,13 +154,7 @@ void ShaderExplodeSmoothVolumes::setAmbiant(const Geom::Vec4f& ambiant)
 	unbind();
 }
 
-void ShaderExplodeSmoothVolumes::setBackColor(const Geom::Vec4f& backColor)
-{
-	m_backColor = backColor;
-	bind();
-	glUniform4fv(*m_unif_backColor, 1, backColor.data());
-	unbind();
-}
+
 
 void ShaderExplodeSmoothVolumes::setLightPosition(const Geom::Vec3f& lp)
 {
@@ -195,9 +184,6 @@ void ShaderExplodeSmoothVolumes::restoreUniformsAttribs()
 
 	*m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
 	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
-
-	*m_unif_backColor = glGetUniformLocation(program_handler(),"backColor");
-	glUniform4fv(*m_unif_backColor, 1, m_backColor.data());
 
 	*m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
 	glUniform3fv(*m_unif_lightPos, 1, m_light_pos.data());
