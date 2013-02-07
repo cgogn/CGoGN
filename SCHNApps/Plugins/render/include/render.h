@@ -89,12 +89,12 @@ public:
 
 	virtual void redraw(View *view);
 
-	virtual void keyPress(View* view, int key) {}
-	virtual void keyRelease(View* view, int key) {}
-	virtual void mousePress(View* view, int button, int x, int y) {}
-	virtual void mouseRelease(View* view, int button, int x, int y) {}
-	virtual void mouseMove(View* view, int buttons, int x, int y) {}
-	virtual void wheelEvent(View* view, int delta, int x, int y) {}
+	virtual void keyPress(View* view, QKeyEvent* event) {}
+	virtual void keyRelease(View* view, QKeyEvent* event) {}
+	virtual void mousePress(View* view, QMouseEvent* event) {}
+	virtual void mouseRelease(View* view, QMouseEvent* event) {}
+	virtual void mouseMove(View* view, QMouseEvent* event) {}
+	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
 	void setRefreshingUI(bool b) { b_refreshingUI = b; }
 

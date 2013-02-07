@@ -19,7 +19,7 @@ SubdivideSurfaceDialog::SubdivideSurfaceDialog(Window* w) :
 	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
 	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
 
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
+	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(refreshUI()));
 
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)

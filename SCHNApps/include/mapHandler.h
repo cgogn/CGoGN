@@ -56,8 +56,7 @@ public:
 	template <typename T, unsigned int ORBIT>
 	AttributeHandler<T, ORBIT> getAttribute(const QString& nameAttr)
 	{
-		AttributeHandler<T,ORBIT> ah = static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
-		return ah;
+		return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
 	}
 
 	template <typename T, unsigned int ORBIT>
