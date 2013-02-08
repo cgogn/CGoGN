@@ -31,6 +31,8 @@
 #include "Topology/gmap/embeddedGMap2.h"
 
 #include "Geometry/distances.h"
+#include "Algo/Geometry/centroid.h"
+
 
 namespace CGoGN
 {
@@ -117,29 +119,20 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 		Dart d = *id;
 		if (!mf.isMarked(d))
 		{
-
 			vecPos.clear();
-			// store the face & center
-			VEC3 center(0.0f,0.0f,0.0f);
+			VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+			
+			float k = 1.0f - kf;
 			Dart dd = d;
 			do
 			{
-				const VEC3& P = positions[d];
-				vecPos.push_back(P);
-				center += P;
-				Dart e = map.phi1(d);
-				d = e;
-			} while (d != dd);
-			center /= REAL(vecPos.size());
+				vecPos.push_back(center*k + positions[dd]*kf);
+				dd = map.phi1(dd);
+			} while (dd != d);
 
-			//shrink the face
 			unsigned int nb = vecPos.size();
-			float k = 1.0f - kf;
-			for (unsigned int i = 0; i < nb; ++i)
-			{
-				vecPos[i] = center*k + vecPos[i]*kf;
-			}
 			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
+
 
 			k = 1.0f - ke;
 			for (unsigned int i = 0; i < nb; ++i)
@@ -266,25 +259,17 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 		if (!mf.isMarked(d))
 		{
 			vecPos.clear();
-			// store the face & center
-			VEC3 center(0.0f,0.0f,0.0f);
+			VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+			
+			float k = 1.0f - kf;
 			Dart dd = d;
 			do
 			{
-				const VEC3& P = positions[d];
-				vecPos.push_back(P);
-				center += P;
-				d = map.phi1(d);
-			} while (d != dd);
-			center /= REAL(vecPos.size());
+				vecPos.push_back(center*k + positions[dd]*kf);
+				dd = map.phi1(dd);
+			} while (dd != d);
 
-			//shrink the face
 			unsigned int nb = vecPos.size();
-			float k = 1.0f - kf;
-			for (unsigned int i = 0; i < nb; ++i)
-			{
-				vecPos[i] = center*k + vecPos[i]*kf;
-			}
 			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 
 			k = 1.0f - ke;
