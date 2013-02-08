@@ -91,6 +91,44 @@ inline ExplodeVolumeRender::~ExplodeVolumeRender()
 }
 
 
+template<typename PFP>
+void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
+									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace, 
+									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	normals.clear();
+	vertices.clear();
+	Dart a = d;
+	do
+	{
+		VEC3 v1 = positions[a] - centerFace;
+		v1.normalize();
+		Dart e = map.phi1(a);
+		VEC3 v2 = positions[e] - centerFace;
+		v2.normalize();
+		VEC3 N = v1^v2;
+		normals.push_back(N);
+		vertices.push_back(positions[a]);
+		a = e;
+	} while (a != d);
+	
+	unsigned int nb = normals.size();
+	VEC3 Ntemp = normals[0];
+	normals[0] += normals[nb-1];
+	normals[0].normalize();
+	for (unsigned int i=1; i!=nb ; ++i)
+	{
+		VEC3 Ntemp2 = normals[i];
+		normals[i] += Ntemp;
+		normals[i].normalize();
+		Ntemp = Ntemp2;
+	}
+}
+
+
 
 template<typename PFP>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX, const FunctorSelect& good)
@@ -110,46 +148,21 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	bufferNormals.reserve(16384);
 	
 	std::vector<VEC3> normals;
-	bufferNormals.reserve(20);
+	normals.reserve(20);
 	std::vector<VEC3> vertices;
-	bufferNormals.reserve(20);
+	vertices.reserve(20);
 
 	
 	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
 
-
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		// compute normals
-		normals.clear();
-		vertices.clear();
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
+		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
 		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
-
-		Dart a = d;
-		do
-		{
-			VEC3 v1 = positions[a] - centerFace;
-			v1.normalize();
-			Dart e = map.phi1(a);
-			VEC3 v2 = positions[map.phi1(e)] - centerFace;
-			v2.normalize();
-			VEC3 N = v1^v2;
-			
-			double l = N.norm();
-			if (l<0.01)
-				N = centerNormalFace;
-			else
-			{
-				N /= l;
-				if (N*centerNormalFace < 0.707)
-					N = centerNormalFace;
-			}
-			normals.push_back(N);
-			vertices.push_back(positions[e]);
-			a = e;
-		} while (a != d);
-
+		
+		computeFace<PFP>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
+		
 		VEC3 volCol = colorPerXXX[d];
 
 		unsigned int nbs = vertices.size();
@@ -271,36 +284,11 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		// compute normals
-		normals.clear();
-		vertices.clear();
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
+		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
 		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
 
-		Dart a = d;
-		do
-		{
-			VEC3 v1 = positions[a] - centerFace;
-			v1.normalize();
-			Dart e = map.phi1(a);
-			VEC3 v2 = positions[map.phi1(e)] - centerFace;
-			v2.normalize();
-			VEC3 N = v1^v2;
-			
-			double l = N.norm();
-			if (l<0.01)
-				N = centerNormalFace;
-			else
-			{
-				N /= l;
-				if (N*centerNormalFace < 0.707)
-					N = centerNormalFace;
-			}
-			normals.push_back(N);
-			vertices.push_back(positions[e]);
-			a = e;
-		} while (a != d);
-
-
+		computeFace<PFP>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
+		
 		unsigned int nbs = vertices.size();
 		// just to have more easy algo further
 		vertices.push_back(vertices.front());

@@ -81,6 +81,12 @@ protected:
 	GLuint m_nbLines;
 
 	Geom::Vec3f m_globalColor;
+	
+	template<typename PFP>
+	void computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
+									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace, 
+									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
+
 
 	template<typename PFP>
 	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
