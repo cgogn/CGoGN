@@ -8,6 +8,7 @@
 #include "plugin.h"
 
 #include "Topology/generic/genericmap.h"
+#include "Topology/generic/attribmap.h"
 #include "Topology/generic/functor.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Utils/vbo.h"
@@ -47,6 +48,24 @@ public slots:
 
 public:
 	void draw(Utils::GLSLShader* shader, int primitive) { m_render->draw(shader, primitive); }
+
+	/*********************************************************
+	 * MANAGE ATTRIBUTES
+	 *********************************************************/
+
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT> getAttribute(const QString& nameAttr)
+	{
+		return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
+	}
+
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT> addAttribute(const QString& nameAttr)
+	{
+		AttributeHandler<T,ORBIT> ah = static_cast<AttribMap*>(m_map)->addAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
+		emit(attributeAdded());
+		return ah;
+	}
 
 	/*********************************************************
 	 * MANAGE VBOs
@@ -105,6 +124,7 @@ protected:
 	VBOHash h_vbo;
 
 signals:
+	void attributeAdded();
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 };

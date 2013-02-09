@@ -537,8 +537,8 @@ void normalCycles_SortAndSetEigenComponents(
 {
 	// sort eigen components : ev[inormal] has minimal absolute value ; kmin = ev[imin] <= ev[imax] = kmax
 	int inormal=0, imin, imax ;
-	if (abs(e_val[1]) < abs(e_val[inormal])) inormal = 1;
-	if (abs(e_val[2]) < abs(e_val[inormal])) inormal = 2;
+	if (fabs(e_val[1]) < fabs(e_val[inormal])) inormal = 1;
+	if (fabs(e_val[2]) < fabs(e_val[inormal])) inormal = 2;
 	imin = (inormal + 1) % 3;
 	imax = (inormal + 2) % 3;
 	if (e_val[imax] < e_val[imin]) { int tmp = imin ; imin = imax ; imax = tmp ; }
@@ -578,8 +578,8 @@ void normalCycles_SortTensor(Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsi
 
 	// switch kmin and kmax w.r.t. Kmin and Kmax
 	int inormal=0, imin, imax ;
-	if (abs(e_val[1]) < abs(e_val[inormal])) inormal = 1;
-	if (abs(e_val[2]) < abs(e_val[inormal])) inormal = 2;
+	if (fabs(e_val[1]) < fabs(e_val[inormal])) inormal = 1;
+	if (fabs(e_val[2]) < fabs(e_val[inormal])) inormal = 2;
 	imin = (inormal + 1) % 3;
 	imax = (inormal + 2) % 3;
 	if (e_val[imax] < e_val[imin]) { int tmp = imin ; imin = imax ; imax = tmp ; }

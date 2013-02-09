@@ -54,7 +54,7 @@ void CameraViewDialog::selectCurrentCamera()
 
 void CameraViewDialog::selectedCameraChanged()
 {
-	if(b_refreshingUI)
+	if(!b_refreshingUI)
 	{
 		QList<QListWidgetItem*> currentItems = cameraList->selectedItems();
 		if(currentItems.empty())
@@ -77,7 +77,6 @@ void CameraViewDialog::selectCamera(View* view, Camera* camera)
 		{
 			b_refreshingUI = true;
 			items[0]->setSelected(true);
-			m_view->updateGL();
 			b_refreshingUI = false;
 		}
 	}
@@ -92,7 +91,6 @@ void CameraViewDialog::deselectCamera(View* view, Camera* camera)
 		{
 			b_refreshingUI = true;
 			items[0]->setSelected(false);
-			m_view->updateGL();
 			b_refreshingUI = false;
 		}
 	}
@@ -105,14 +103,9 @@ void CameraViewDialog::addCameraToList(Camera* c)
 
 void CameraViewDialog::removeCameraFromList(Camera* c)
 {
-	for(int i = 0; i < cameraList->count(); ++i)
-	{
-		if(cameraList->item(i)->text() == c->getName())
-		{
-			delete cameraList->item(i);
-			return;
-		}
-	}
+	QList<QListWidgetItem*> items = cameraList->findItems(c->getName(), Qt::MatchExactly);
+	if(!items.empty())
+		delete items[0];
 }
 
 } // namespace SCHNApps

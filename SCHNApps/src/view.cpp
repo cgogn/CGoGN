@@ -118,6 +118,16 @@ void View::preDraw()
 
 void View::draw()
 {
+	QList<Camera*> cameras = m_window->getCamerasList();
+	foreach(Camera* camera, cameras)
+	{
+		if(camera != m_currentCamera)
+		{
+			if(camera->getDraw()) camera->draw();
+			if(camera->getDrawPath()) camera->drawAllPaths();
+		}
+	}
+
 	foreach(Plugin* plugin, l_plugins)
 		plugin->redraw(this);
 }
@@ -166,14 +176,14 @@ void View::drawFrame()
 void View::keyPressEvent(QKeyEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->keyPress(this, event->key());
+		plugin->keyPress(this, event);
 	QGLViewer::keyPressEvent(event);
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->keyRelease(this, event->key());
+		plugin->keyRelease(this, event);
 	QGLViewer::keyReleaseEvent(event);
 }
 
@@ -187,7 +197,7 @@ void View::mousePressEvent(QMouseEvent* event)
 	else
 	{
 		foreach(Plugin* plugin, l_plugins)
-			plugin->mousePress(this, event->button(), event->pos().x(), event->pos().y());
+			plugin->mousePress(this, event);
 		QGLViewer::mousePressEvent(event);
 	}
 }
@@ -195,22 +205,36 @@ void View::mousePressEvent(QMouseEvent* event)
 void View::mouseReleaseEvent(QMouseEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->mouseRelease(this, event->button(), event->pos().x(), event->pos().y());
+		plugin->mouseRelease(this, event);
 	QGLViewer::mouseReleaseEvent(event);
 }
 
 void View::mouseMoveEvent(QMouseEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->mouseMove(this, event->button(), event->pos().x(), event->pos().y());
+		plugin->mouseMove(this, event);
 	QGLViewer::mouseMoveEvent(event);
+
+	QList<View*> views = m_window->getViewsList();
+	foreach(View* view, views)
+	{
+		if(view != this)
+			view->updateGL();
+	}
 }
 
 void View::wheelEvent(QWheelEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->wheelEvent(this, event->delta(), event->pos().x(), event->pos().y());
+		plugin->wheelEvent(this, event);
 	QGLViewer::wheelEvent(event);
+
+	QList<View*> views = m_window->getViewsList();
+	foreach(View* view, views)
+	{
+		if(view != this)
+			view->updateGL();
+	}
 }
 
 /*********************************************************
@@ -292,8 +316,8 @@ void View::updateViewBB()
 			}
 		}
 	}
-	setSceneBoundingBox(bbMin, bbMax);
-	showEntireScene();
+	camera()->setSceneBoundingBox(bbMin, bbMax);
+	camera()->showEntireScene();
 }
 
 /*********************************************************

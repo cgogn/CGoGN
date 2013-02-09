@@ -146,14 +146,9 @@ void MapsDialog::cb_addMapToList(MapHandlerGen* m)
 
 void MapsDialog::cb_removeMapFromList(MapHandlerGen* m)
 {
-	for(int i = 0; i < mapList->count(); ++i)
-	{
-		if(mapList->item(i)->text() == m->getName())
-		{
-			delete mapList->item(i);
-			return;
-		}
-	}
+	QList<QListWidgetItem*> items = mapList->findItems(m->getName(), Qt::MatchExactly);
+	if(!items.empty())
+		delete items[0];
 }
 
 } // namespace SCHNApps
