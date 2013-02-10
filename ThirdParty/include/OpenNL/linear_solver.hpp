@@ -33,9 +33,7 @@ LinearSolver<CoeffType>::LinearSolver(unsigned int nb_variables) {
 	A_ = NULL ;
 	x_ = NULL ;
 	b_ = NULL ;
-	symmetric_solver_ = NULL;
-	nonsymmetric_solver_ = NULL;
-	direct_solver_ = NULL;
+	direct_solver_ = new Solver_CHOLESKY<CoeffType>() ;
 }
 
 template <typename CoeffType>
@@ -138,7 +136,7 @@ void LinearSolver<CoeffType>::end_row() {
 		if(!matrix_already_set_) {
 			for(unsigned int i = 0; i < nf; i++) {
 				for(unsigned int j = 0; j < nf; j++) {
-					A_->coeffRef(if_[i], if_[j]) += af_[i] * af_[j];
+					A_->coeffRef(if_[i], if_[j]) += af_[i] * af_[j] ;
 				}
 			}
 		}
@@ -156,11 +154,11 @@ void LinearSolver<CoeffType>::end_row() {
 		// Construct the matrix coefficients of the current row
 		if(!matrix_already_set_) {
 			for(unsigned int i = 0; i < nf; i++) {
-				A_->coeffRef(current_row_, if_[i]) += af_[i];
+				A_->coeffRef(current_row_, if_[i]) += af_[i] ;
 			}
 		}
 		// Construct the right-hand side of the current row
-		(*b_)[current_row_] = bk_ ;
+		(*b_)[current_row_] = -bk_ ;
 		for(unsigned int i = 0; i < nl; i++) {
 			(*b_)[current_row_] -= al_[i] * xl_[i] ;
 		}
@@ -171,10 +169,10 @@ void LinearSolver<CoeffType>::end_row() {
 
 template <typename CoeffType>
 void LinearSolver<CoeffType>::end_system() {
-	if(least_squares_ && direct_ && !direct_solver_)
-		direct_solver_ = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<CoeffType> >(*A_);
+	if(least_squares_ && direct_ && !direct_solver_->factorized())
+		direct_solver_->factorize(*A_) ;
 
-    transition(IN_SYSTEM, CONSTRUCTED) ;
+	transition(IN_SYSTEM, CONSTRUCTED) ;
 }
 
 template <typename CoeffType>
@@ -183,44 +181,48 @@ void LinearSolver<CoeffType>::solve() {
 	if(least_squares_)
 	{
 		if(direct_) {
-			*x_ = direct_solver_->solve(*b_) ;
+			direct_solver_->solve(*b_, *x_) ;
 		} else {
-			symmetric_solver_ = new Eigen::ConjugateGradient<Eigen::SparseMatrix<CoeffType> >(*A_) ;
-			*x_ = symmetric_solver_->solve(*b_) ;
+			Eigen::ConjugateGradient<Eigen::MatrixXf > solver(*A_) ;
+//			int n = x_->rows() ;
+//			Eigen::Matrix<CoeffType, Eigen::Dynamic, 1> guess(n) ;
+//			for(int i = 0; i < n; ++i)
+//				guess[i] = (*x_)[i] ;
+//			*x_ = solver.solveWithGuess(*b_, guess) ;
+			*x_ = solver.solve(*b_) ;
 		}
 	} else {
-		nonsymmetric_solver_ = new Eigen::BiCGSTAB<Eigen::SparseMatrix<CoeffType> >(*A_) ;
-		*x_ = nonsymmetric_solver_->solve(*b_) ;
+		Eigen::BiCGSTAB<Eigen::MatrixXf > solver(*A_) ;
+		*x_ = solver.solve(*b_) ;
 	}
+
 	vector_to_variables() ;
 	transition(CONSTRUCTED, SOLVED) ;
 }
 
 template <typename CoeffType>
 void LinearSolver<CoeffType>::reset(bool keep_matrix) {
-    if(keep_matrix) {
-    	x_->setZero();
-    	b_->setZero();
-    	matrix_already_set_ = true ;
-    } else {
-    	delete A_ ; A_ = NULL ;
-    	delete x_ ; x_ = NULL ;
-    	delete b_ ; b_ = NULL ;
-		if(symmetric_solver_) delete symmetric_solver_ ; symmetric_solver_ = NULL ;
-		if(nonsymmetric_solver_) delete nonsymmetric_solver_ ; nonsymmetric_solver_ = NULL ;
-		if(direct_solver_) delete direct_solver_ ; direct_solver_ = NULL ;
-    	matrix_already_set_ = false ;
-    	for(unsigned int i = 0; i < nb_variables_; ++i) {
-    		variable_[i].unlock() ;
-    	}
-    }
+	if(keep_matrix) {
+		x_->setZero() ;
+		b_->setZero() ;
+		matrix_already_set_ = true ;
+	} else {
+		delete A_ ; A_ = NULL ;
+		delete x_ ; x_ = NULL ;
+		delete b_ ; b_ = NULL ;
+		direct_solver_->reset();
+		matrix_already_set_ = false ;
+		for(unsigned int i = 0; i < nb_variables_; ++i) {
+			variable_[i].unlock() ;
+		}
+	}
 	state_ = INITIAL ;
 }
 
 template <typename CoeffType>
 void LinearSolver<CoeffType>::vector_to_variables() {
 	for(unsigned int i=0; i < nb_variables(); i++) {
-	Variable<CoeffType>& v = variable(i) ;
+		Variable<CoeffType>& v = variable(i) ;
 		if(!v.is_locked()) {
 			v.set_value((*x_)[v.index()]) ;
 		}
@@ -230,7 +232,7 @@ void LinearSolver<CoeffType>::vector_to_variables() {
 template <typename CoeffType>
 void LinearSolver<CoeffType>::variables_to_vector() {
 	for(unsigned int i=0; i < nb_variables(); i++) {
-	Variable<CoeffType>& v = variable(i) ;
+		Variable<CoeffType>& v = variable(i) ;
 		if(!v.is_locked()) {
 			(*x_)[v.index()] = v.value() ;
 		}

@@ -6,11 +6,16 @@
 
 #include "ui_surfaceDeformation.h"
 
-#include "Utils/drawer.h"
+#include "Container/fakeAttribute.h"
+
+#include "OpenNL/linear_solver.h"
+#include "Algo/LinearSolving/basic.h"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
+
+// namespace CGoGN { namespace Utils { class Drawer; } }
 
 
 enum SelectionMode
@@ -19,6 +24,8 @@ enum SelectionMode
 	HANDLE
 };
 
+
+typedef NoNameIOAttribute<Eigen::Matrix3f> Eigen_Matrix3f ;
 
 struct PerMapParameterSet
 {
@@ -32,6 +39,19 @@ struct PerMapParameterSet
 	SelectionMode verticesSelectionMode;
 	std::vector<unsigned int> locked_vertices;
 	std::vector<unsigned int> handle_vertices;
+
+	VertexAttribute<PFP2::VEC3> positionInit;
+	VertexAttribute<PFP2::VEC3> vertexNormal;
+	EdgeAttribute<PFP2::REAL> edgeAngle;
+	EdgeAttribute<PFP2::REAL> edgeWeight;
+	VertexAttribute<PFP2::REAL> vertexArea;
+	VertexAttribute<PFP2::VEC3> diffCoord;
+	VertexAttribute<Eigen_Matrix3f> vertexRotationMatrix;
+	VertexAttribute<PFP2::VEC3> rotatedDiffCoord;
+
+	VertexAttribute<unsigned int> vIndex;
+	unsigned int nb_vertices;
+	LinearSolver<PFP2::REAL>* solver;
 };
 
 struct ParameterSet
@@ -116,11 +136,14 @@ public slots:
 	void cb_selectLockedVertices(bool b);
 	void cb_selectHandleVertices(bool b);
 
+	void matchDiffCoord(View* view, MapHandlerGen* map);
+	void asRigidAsPossible(View* view, MapHandlerGen* map);
+
 private:
 	SurfaceDeformationDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
-	Utils::Drawer* m_drawer;
+//	Utils::Drawer* m_drawer;
 
 	bool b_refreshingUI;
 
