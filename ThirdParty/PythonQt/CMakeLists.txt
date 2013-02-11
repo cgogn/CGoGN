@@ -33,7 +33,7 @@ project(PythonQt)
 #-----------------------------------------------------------------------------
 # Python libraries
 
-find_package(PythonLibs REQUIRED)
+find_package(PythonLibs 2.7 REQUIRED)
 include_directories("${PYTHON_INCLUDE_DIR}")
 add_definitions(-DPYTHONQT_USE_RELEASE_PYTHON_FALLBACK)
 
