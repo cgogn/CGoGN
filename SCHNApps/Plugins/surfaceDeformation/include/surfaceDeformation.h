@@ -1,6 +1,8 @@
 #ifndef _SURFACEDEFORMATION_PLUGIN_H_
 #define _SURFACEDEFORMATION_PLUGIN_H_
 
+#include "Utils/drawer.h"
+
 #include "plugin.h"
 #include "mapHandler.h"
 
