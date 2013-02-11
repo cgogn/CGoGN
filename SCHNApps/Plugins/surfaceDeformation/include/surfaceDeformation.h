@@ -8,14 +8,15 @@
 
 #include "Container/fakeAttribute.h"
 
-#include "OpenNL/linear_solver.h"
+#include "NL/nl.h"
 #include "Algo/LinearSolving/basic.h"
+#include "Eigen/Dense"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
 
-// namespace CGoGN { namespace Utils { class Drawer; } }
+namespace CGoGN { namespace Utils { class Drawer; } }
 
 
 enum SelectionMode
@@ -51,7 +52,8 @@ struct PerMapParameterSet
 
 	VertexAttribute<unsigned int> vIndex;
 	unsigned int nb_vertices;
-	LinearSolver<PFP2::REAL>* solver;
+//	LinearSolver<PFP2::REAL>* solver;
+	NLContext nlContext;
 };
 
 struct ParameterSet
@@ -143,7 +145,7 @@ private:
 	SurfaceDeformationDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
-//	Utils::Drawer* m_drawer;
+	Utils::Drawer* m_drawer;
 
 	bool b_refreshingUI;
 

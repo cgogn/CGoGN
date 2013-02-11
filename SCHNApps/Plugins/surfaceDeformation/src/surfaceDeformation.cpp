@@ -6,7 +6,7 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
 
-//#include "Utils/drawer.h"
+#include "Utils/drawer.h"
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -48,16 +48,38 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* mh) :
 	lockingMarker = new CellMarker<VERTEX>(*map);
 	handleMarker = new CellMarker<VERTEX>(*map);
 
-	positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit") ;
+	positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit") ;
+	if(!positionInit.isValid())
+		positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit") ;
 	map->copyAttribute(positionInit, positionAttribute) ;
 
-	vertexNormal = mh->addAttribute<PFP2::VEC3, VERTEX>("vertexNormal");
-	edgeAngle = mh->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
-	edgeWeight = mh->addAttribute<PFP2::REAL, EDGE>("edgeWeight");
-	vertexArea = mh->addAttribute<PFP2::REAL, VERTEX>("vertexArea");
-	diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord");
-	vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix") ;
-	rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord") ;
+	vertexNormal = mh->getAttribute<PFP2::VEC3, VERTEX>("vertexNormal");
+	if(!vertexNormal.isValid())
+		vertexNormal = mh->addAttribute<PFP2::VEC3, VERTEX>("vertexNormal");
+
+	edgeAngle = mh->getAttribute<PFP2::REAL, EDGE>("edgeAngle");
+	if(!edgeAngle.isValid())
+		edgeAngle = mh->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
+
+	edgeWeight = mh->getAttribute<PFP2::REAL, EDGE>("edgeWeight");
+	if(!edgeWeight.isValid())
+		edgeWeight = mh->addAttribute<PFP2::REAL, EDGE>("edgeWeight");
+
+	vertexArea = mh->getAttribute<PFP2::REAL, VERTEX>("vertexArea");
+	if(!vertexArea.isValid())
+		vertexArea = mh->addAttribute<PFP2::REAL, VERTEX>("vertexArea");
+
+	diffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("diffCoord");
+	if(!diffCoord.isValid())
+		diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord");
+
+	vertexRotationMatrix = mh->getAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix") ;
+	if(!vertexRotationMatrix.isValid())
+		vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix");
+
+	rotatedDiffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord") ;
+	if(!rotatedDiffCoord.isValid())
+		rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord");
 
 	Algo::Surface::Geometry::computeNormalVertices<PFP2>(*map, positionAttribute, vertexNormal) ;
 	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, positionAttribute, edgeAngle) ;
@@ -68,16 +90,23 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* mh) :
 	for(unsigned int i = vertexRotationMatrix.begin(); i != vertexRotationMatrix.end() ; vertexRotationMatrix.next(i))
 		vertexRotationMatrix[i] = Eigen::Matrix3f::Identity();
 
-	vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex");
+	vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex");
+	if(!vIndex.isValid())
+		vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex");
 	nb_vertices = static_cast<AttribMap*>(map)->computeIndexCells<VERTEX>(vIndex);
 
-	solver = new LinearSolver<PFP2::REAL>(nb_vertices);
+	nlContext = nlNewContext();
+	nlMakeCurrent(nlContext) ;
+	nlSolverParameteri(NL_NB_VARIABLES, nb_vertices) ;
+	nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE) ;
+	nlSolverParameteri(NL_SOLVER, NL_CHOLMOD_EXT) ;
 }
 
 PerMapParameterSet::~PerMapParameterSet()
 {
 	delete lockingMarker;
 	delete handleMarker;
+	nlDeleteContext(nlContext);
 }
 
 
@@ -95,22 +124,22 @@ bool SurfaceDeformationPlugin::enable()
 	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(currentViewChanged(View*)), this, SLOT(currentViewChanged(View*)));
 
-//	m_drawer = new Utils::Drawer();
-//	registerShader(m_drawer->getShader());
+	m_drawer = new Utils::Drawer();
+	registerShader(m_drawer->getShader());
 
 	return true;
 }
 
 void SurfaceDeformationPlugin::disable()
 {
-//	delete m_drawer;
+	delete m_drawer;
 }
 
 void SurfaceDeformationPlugin::redraw(View* view)
 {
 	if(selecting)
 	{
-/*		glDisable(GL_LIGHTING) ;
+		glDisable(GL_LIGHTING) ;
 		m_drawer->newList(GL_COMPILE_AND_EXECUTE) ;
 		m_drawer->lineWidth(2.0f) ;
 		m_drawer->begin(GL_LINES) ;
@@ -129,7 +158,7 @@ void SurfaceDeformationPlugin::redraw(View* view)
 		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(0,0,-1)) ;
 		m_drawer->end() ;
 		m_drawer->endList() ;
-*/	}
+	}
 
 	ParameterSet* params = h_viewParams[view];
 	MapHandlerGen* mh = params->selectedMap;
@@ -139,7 +168,7 @@ void SurfaceDeformationPlugin::redraw(View* view)
 
 		if(!perMap->locked_vertices.empty() || !perMap->handle_vertices.empty())
 		{
-/*			glDisable(GL_LIGHTING) ;
+			glDisable(GL_LIGHTING) ;
 			m_drawer->newList(GL_COMPILE_AND_EXECUTE) ;
 			m_drawer->pointSize(4.0f) ;
 			m_drawer->begin(GL_POINTS) ;
@@ -154,7 +183,7 @@ void SurfaceDeformationPlugin::redraw(View* view)
 				m_drawer->vertex(perMap->positionAttribute[perMap->handle_vertices[i]]) ;
 			m_drawer->end() ;
 			m_drawer->endList() ;
-*/		}
+		}
 	}
 }
 
@@ -165,6 +194,12 @@ void SurfaceDeformationPlugin::keyPress(View* view, QKeyEvent* event)
 		view->setMouseTracking(true);
 		selecting = true;
 		view->updateGL();
+	}
+	else if(event->key() == Qt::Key_M)
+	{
+		ParameterSet* params = h_viewParams[view];
+		MapHandlerGen* map = params->selectedMap;
+		matchDiffCoord(view, map);
 	}
 }
 
@@ -221,7 +256,8 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 				}
 			}
 
-			LinearSolving::resetSolver(perMap->solver, false) ;
+			nlMakeCurrent(perMap->nlContext) ;
+			nlReset(NL_FALSE) ;
 
 			view->updateGL() ;
 		}
@@ -277,7 +313,7 @@ void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
 		dragPrevious = q ;
 
 //		matchDiffCoord(view, map);
-//		for(unsigned int i = 0; i < 2; ++i)
+		for(unsigned int i = 0; i < 2; ++i)
 			asRigidAsPossible(view, map);
 
 		params->selectedMap->updateVBO(perMap->positionAttribute);
@@ -414,11 +450,12 @@ void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 	if(view->isCurrentView())
 	{
 		if(prev)
-			disconnect(map, SIGNAL(attributeAdded()), this, SLOT(attributeAdded()));
+			disconnect(prev, SIGNAL(attributeAdded()), this, SLOT(attributeAdded()));
 		if(map)
+		{
 			connect(map, SIGNAL(attributeAdded()), this, SLOT(attributeAdded()));
-
-		selectionRadius = map->getBBdiagSize() / 50.0;
+			selectionRadius = map->getBBdiagSize() / 50.0;
+		}
 
 		m_dockTab->refreshUI(params);
 		view->updateGL();
@@ -431,10 +468,7 @@ void SurfaceDeformationPlugin::changePositionAttribute(View* view, MapHandlerGen
 	params->perMap[map->getName()]->positionAttribute = attribute;
 
 	if(view->isCurrentView())
-	{
 		m_dockTab->refreshUI(params);
-//		view->updateGL();
-	}
 }
 
 void SurfaceDeformationPlugin::changeVerticesSelectionMode(View* view, MapHandlerGen* map, SelectionMode m)
@@ -443,10 +477,7 @@ void SurfaceDeformationPlugin::changeVerticesSelectionMode(View* view, MapHandle
 	params->perMap[map->getName()]->verticesSelectionMode = m;
 
 	if(view->isCurrentView())
-	{
 		m_dockTab->refreshUI(params);
-//		view->updateGL();
-	}
 }
 
 void SurfaceDeformationPlugin::cb_selectedMapChanged()
@@ -494,17 +525,19 @@ void SurfaceDeformationPlugin::matchDiffCoord(View* view, MapHandlerGen* mh)
 	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 	PerMapParameterSet* perMap = h_viewParams[view]->perMap[mh->getName()];
 
-	LinearSolving::initSolver(perMap->solver, perMap->nb_vertices, true, true) ;
+	nlMakeCurrent(perMap->nlContext);
+	if(nlGetCurrentState() == NL_STATE_INITIAL)
+		nlBegin(NL_SYSTEM) ;
 	for(int coord = 0; coord < 3; ++coord)
 	{
-		LinearSolving::setupVariables<PFP2>(*map, perMap->solver, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
-		LinearSolving::startMatrix(perMap->solver) ;
-		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->diffCoord, coord) ;
-//		LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->diffCoord, coord);
-		LinearSolving::endMatrix(perMap->solver) ;
-		LinearSolving::solve(perMap->solver) ;
-		LinearSolving::getResult<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->positionAttribute, coord) ;
-		LinearSolving::resetSolver(perMap->solver, true) ;
+		LinearSolving::setupVariables<PFP2>(*map, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
+		nlBegin(NL_MATRIX) ;
+		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->diffCoord, coord) ;
+		nlEnd(NL_MATRIX) ;
+		nlEnd(NL_SYSTEM) ;
+		nlSolve() ;
+		LinearSolving::getResult<PFP2>(*map, perMap->vIndex, perMap->positionAttribute, coord) ;
+		nlReset(NL_TRUE) ;
 	}
 }
 
@@ -620,16 +653,19 @@ void SurfaceDeformationPlugin::asRigidAsPossible(View* view, MapHandlerGen* mh)
 		}
 	}
 
-	LinearSolving::initSolver(perMap->solver, perMap->nb_vertices, true, true) ;
+	nlMakeCurrent(perMap->nlContext);
+	if(nlGetCurrentState() == NL_STATE_INITIAL)
+		nlBegin(NL_SYSTEM) ;
 	for(int coord = 0; coord < 3; ++coord)
 	{
-		LinearSolving::setupVariables<PFP2>(*map, perMap->solver, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
-		LinearSolving::startMatrix(perMap->solver) ;
-		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->rotatedDiffCoord, coord) ;
-		LinearSolving::endMatrix(perMap->solver) ;
-		LinearSolving::solve(perMap->solver) ;
-		LinearSolving::getResult<PFP2>(*map, perMap->solver, perMap->vIndex, perMap->positionAttribute, coord) ;
-		LinearSolving::resetSolver(perMap->solver, true) ;
+		LinearSolving::setupVariables<PFP2>(*map, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
+		nlBegin(NL_MATRIX) ;
+		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->rotatedDiffCoord, coord) ;
+		nlEnd(NL_MATRIX) ;
+		nlEnd(NL_SYSTEM) ;
+		nlSolve() ;
+		LinearSolving::getResult<PFP2>(*map, perMap->vIndex, perMap->positionAttribute, coord) ;
+		nlReset(NL_TRUE) ;
 	}
 }
 

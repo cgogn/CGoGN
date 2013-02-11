@@ -73,6 +73,7 @@ SET (EXT_INCLUDES
 # define libs for external libs
 SET (EXT_LIBS 
 	PythonQt
+	nl
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
