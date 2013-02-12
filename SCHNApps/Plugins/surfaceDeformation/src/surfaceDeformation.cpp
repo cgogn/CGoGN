@@ -85,7 +85,8 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* mh) :
 	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, positionAttribute, edgeAngle) ;
 	Algo::Surface::Geometry::computeCotanWeightEdges<PFP2>(*map, positionAttribute, edgeWeight) ;
 	Algo::Surface::Geometry::computeVoronoiAreaVertices<PFP2>(*map, positionAttribute, vertexArea) ;
-	Algo::Surface::Geometry::computeLaplacianCotanVertices<PFP2>(*map, edgeWeight, vertexArea, positionAttribute, diffCoord) ;
+//	Algo::Surface::Geometry::computeLaplacianCotanVertices<PFP2>(*map, edgeWeight, vertexArea, positionAttribute, diffCoord) ;
+	Algo::Surface::Geometry::computeLaplacianTopoVertices<PFP2>(*map, positionAttribute, diffCoord) ;
 
 	for(unsigned int i = vertexRotationMatrix.begin(); i != vertexRotationMatrix.end() ; vertexRotationMatrix.next(i))
 		vertexRotationMatrix[i] = Eigen::Matrix3f::Identity();
@@ -557,7 +558,7 @@ void SurfaceDeformationPlugin::asRigidAsPossible(View* view, MapHandlerGen* mh)
 			Eigen::Matrix3f cov = Eigen::Matrix3f::Zero() ;
 			PFP2::VEC3 p = perMap->positionAttribute[d] ;
 			PFP2::VEC3 pInit = perMap->positionInit[d] ;
-			PFP2::REAL area = perMap->vertexArea[d] ;
+//			PFP2::REAL area = perMap->vertexArea[d] ;
 			Dart it = d ;
 			do
 			{
@@ -566,7 +567,7 @@ void SurfaceDeformationPlugin::asRigidAsPossible(View* view, MapHandlerGen* mh)
 				PFP2::VEC3 vv = perMap->positionInit[neigh] - pInit ;
 				for(unsigned int i = 0; i < 3; ++i)
 					for(unsigned int j = 0; j < 3; ++j)
-						cov(i,j) += v[i] * vv[j] * perMap->edgeWeight[it] / area ;
+						cov(i,j) += v[i] * vv[j];// * perMap->edgeWeight[it] / area ;
 				Dart dboundary = map->phi_1(it) ;
 				if(map->phi2(dboundary) == dboundary)
 				{
@@ -574,7 +575,7 @@ void SurfaceDeformationPlugin::asRigidAsPossible(View* view, MapHandlerGen* mh)
 					vv = perMap->positionInit[dboundary] - p ;
 					for(unsigned int i = 0; i < 3; ++i)
 						for(unsigned int j = 0; j < 3; ++j)
-							cov(i,j) += v[i] * vv[j] * perMap->edgeWeight[dboundary] / area ;
+							cov(i,j) += v[i] * vv[j];// * perMap->edgeWeight[dboundary] / area ;
 				}
 				it = map->alpha1(it) ;
 			} while(it != d) ;
@@ -660,7 +661,8 @@ void SurfaceDeformationPlugin::asRigidAsPossible(View* view, MapHandlerGen* mh)
 	{
 		LinearSolving::setupVariables<PFP2>(*map, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
 		nlBegin(NL_MATRIX) ;
-		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->rotatedDiffCoord, coord) ;
+//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->rotatedDiffCoord, coord) ;
+		LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, perMap->vIndex, perMap->rotatedDiffCoord, coord) ;
 		nlEnd(NL_MATRIX) ;
 		nlEnd(NL_SYSTEM) ;
 		nlSolve() ;
