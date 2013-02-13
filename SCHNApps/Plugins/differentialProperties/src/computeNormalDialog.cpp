@@ -25,7 +25,11 @@ ComputeNormalDialog::ComputeNormalDialog(Window* w) :
 
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
-		mapList->addItem(map->getName());
+	{
+		QListWidgetItem* item = new QListWidgetItem(map->getName(), mapList);
+		item->setCheckState(Qt::Unchecked);
+		connect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+	}
 }
 
 void ComputeNormalDialog::selectedMapChanged()
@@ -71,7 +75,8 @@ void ComputeNormalDialog::selectedMapChanged()
 
 void ComputeNormalDialog::addMapToList(MapHandlerGen* m)
 {
-	mapList->addItem(m->getName());
+	QListWidgetItem* item = new QListWidgetItem(m->getName(), mapList);
+	item->setCheckState(Qt::Unchecked);
 }
 
 void ComputeNormalDialog::removeMapFromList(MapHandlerGen* m)
@@ -98,6 +103,15 @@ void ComputeNormalDialog::addAttributeToList(unsigned int orbit, const QString& 
 		combo_positionAttribute->addItem(nameAttr);
 		combo_normalAttribute->addItem(nameAttr);
 	}
+}
+
+void ComputeNormalDialog::attributeModified(unsigned int orbit, QString nameAttr)
+{
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+//	if(orbit == VERTEX && nameAttr == )
+//	{
+
+//	}
 }
 
 } // namespace SCHNApps

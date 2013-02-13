@@ -32,19 +32,6 @@ Utils::VBO* MapHandlerGen::getVBO(const QString& name) const
 		return NULL;
 }
 
-QList<Utils::VBO*> MapHandlerGen::getVBOList(const std::string& typeName) const
-{
-	QList<Utils::VBO*> res;
-	VBOHash::const_iterator i = h_vbo.begin();
-	while (i != h_vbo.end())
-	{
-		if(i.value()->typeName() == typeName)
-			res.append(i.value());
-		++i;
-	}
-	return res;
-}
-
 void MapHandlerGen::deleteVBO(const QString& name)
 {
 	if (h_vbo.contains(name))

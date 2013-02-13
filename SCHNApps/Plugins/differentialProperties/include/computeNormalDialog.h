@@ -28,6 +28,8 @@ public slots:
 	void addMapToList(MapHandlerGen* m);
 	void removeMapFromList(MapHandlerGen* m);
 	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
+
+	void attributeModified(unsigned int orbit, QString nameAttr);
 };
 
 } // namespace SCHNApps

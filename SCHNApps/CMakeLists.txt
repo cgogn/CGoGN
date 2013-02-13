@@ -112,6 +112,7 @@ file(
 	SCHNApps_FILES
 	${SCHNApps_ROOT_DIR}/src/*.cpp
 	${SCHNApps_ROOT_DIR}/include/*.h
+	${SCHNApps_ROOT_DIR}/include/*.hpp
 )
 
 file(

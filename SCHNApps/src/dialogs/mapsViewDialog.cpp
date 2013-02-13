@@ -20,8 +20,8 @@ MapsViewDialog::MapsViewDialog(Window* window, View* view) :
 	m_view(view),
 	b_refreshingUI(false)
 {
-	this->setupUi(this);
-	this->setWindowTitle(m_view->getName() + QString(" : maps"));
+	setupUi(this);
+	setWindowTitle(m_view->getName() + QString(" : maps"));
 
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapsChanged()));
 
