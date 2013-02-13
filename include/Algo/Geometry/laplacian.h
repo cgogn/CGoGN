@@ -57,8 +57,7 @@ template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianTopoVertices(
 	typename PFP::MAP& map,
 	const VertexAttribute<ATTR_TYPE>& attr,
-	VertexAttribute<ATTR_TYPE>& laplacian,
-	const FunctorSelect& select = allDarts) ;
+	VertexAttribute<ATTR_TYPE>& laplacian) ;
 
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianCotanVertices(
@@ -66,8 +65,7 @@ void computeLaplacianCotanVertices(
 	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
 	const VertexAttribute<typename PFP::REAL>& vertexArea,
 	const VertexAttribute<ATTR_TYPE>& attr,
-	VertexAttribute<ATTR_TYPE>& laplacian,
-	const FunctorSelect& select = allDarts) ;
+	VertexAttribute<ATTR_TYPE>& laplacian) ;
 
 template <typename PFP>
 typename PFP::REAL computeCotanWeightEdge(
@@ -79,8 +77,7 @@ template <typename PFP>
 void computeCotanWeightEdges(
 	typename PFP::MAP& map,
 	const VertexAttribute<typename PFP::VEC3>& position,
-	EdgeAttribute<typename PFP::REAL>& edgeWeight,
-	const FunctorSelect& select = allDarts) ;
+	EdgeAttribute<typename PFP::REAL>& edgeWeight) ;
 
 } // namespace Geometry
 

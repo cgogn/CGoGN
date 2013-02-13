@@ -51,7 +51,7 @@ m_nbEdges(0)
 
 template<typename PFP, typename ATTRIB>
 void ColorPerEdgeRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX, const FunctorSelect& good)
+		const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -62,7 +62,7 @@ void ColorPerEdgeRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 	std::vector<VEC3> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, EDGE> traEdge(map, good);
+	TraversorCell<typename PFP::MAP, EDGE> traEdge(map);
 
 	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
 	{

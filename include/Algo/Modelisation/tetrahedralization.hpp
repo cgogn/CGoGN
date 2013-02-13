@@ -258,9 +258,9 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread)
 }
 
 template <typename PFP>
-bool isTetrahedralization(typename PFP::MAP& map, const FunctorSelect& selected)
+bool isTetrahedralization(typename PFP::MAP& map)
 {
-	TraversorW<typename PFP::MAP> travW(map, selected);
+	TraversorW<typename PFP::MAP> travW(map);
 	for(Dart dit = travW.begin() ; dit != travW.end() ; dit = travW.next())
 	{
 		if(!isTetrahedron<PFP>(map, dit))

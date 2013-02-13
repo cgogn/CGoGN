@@ -454,14 +454,14 @@ inline void GenericMap::enableQuickTraversal()
 }
 
 template <unsigned int ORBIT>
-inline void GenericMap::updateQuickTraversal(const FunctorSelect& good)
+inline void GenericMap::updateQuickTraversal()
 {
 	assert(m_quickTraversal[ORBIT] != NULL || !"updateQuickTraversal on a disabled orbit") ;
 
 	CellMarker<ORBIT> cm(*this) ;
 	for(Dart d = begin(); d != end(); next(d))
 	{
-		if(good(d) && !cm.isMarked(d))
+		if(!cm.isMarked(d))
 		{
 			cm.mark(d) ;
 			(*m_quickTraversal[ORBIT])[getEmbedding<ORBIT>(d)] = d ;
@@ -575,7 +575,7 @@ void GenericMap::addEmbedding()
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-inline Dart GenericMap::begin() const
+inline Dart GenericMap::realBegin() const
 {
 	if (m_isMultiRes)
 	{
@@ -591,10 +591,58 @@ inline Dart GenericMap::begin() const
 	return Dart::create(m_attribs[DART].begin()) ;
 }
 
+inline Dart GenericMap::realEnd() const
+{
+	if (m_isMultiRes)
+		return Dart::create(m_mrattribs.end()) ;
+
+	return Dart::create(m_attribs[DART].end()) ;
+}
+
+inline void GenericMap::realNext(Dart& d) const
+{
+	if (m_isMultiRes)
+	{
+		do
+		{
+			m_mrattribs.next(d.index) ;
+		} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
+	}
+	else
+	{
+
+		m_attribs[DART].next(d.index) ;
+	}
+}
+
+
+inline Dart GenericMap::begin() const
+{
+	if (m_isMultiRes)
+	{
+		unsigned int d = m_mrattribs.begin() ;
+		if(d != m_mrattribs.end())
+		{
+			while (getDartLevel(d) > m_mrCurrentLevel)
+				m_mrattribs.next(d) ;
+		}
+		return Dart::create(d) ;
+	}
+
+
+	if (m_currentBrowser != NULL)
+		return m_currentBrowser->begin();
+
+	return Dart::create(m_attribs[DART].begin()) ;
+}
+
 inline Dart GenericMap::end() const
 {
 	if (m_isMultiRes)
 		return Dart::create(m_mrattribs.end()) ;
+
+	if (m_currentBrowser != NULL)
+		return m_currentBrowser->end();
 
 	return Dart::create(m_attribs[DART].end()) ;
 }
@@ -609,7 +657,12 @@ inline void GenericMap::next(Dart& d) const
 		} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
 	}
 	else
-		m_attribs[DART].next(d.index) ;
+	{
+		if (m_currentBrowser != NULL)
+			return m_currentBrowser->next(d);
+		else
+			m_attribs[DART].next(d.index) ;
+	}
 }
 
 template <unsigned int ORBIT>
@@ -633,9 +686,9 @@ bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thre
 }
 
 template <unsigned int ORBIT>
-bool GenericMap::foreach_orbit(FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
+bool GenericMap::foreach_orbit(FunctorType& fonct, unsigned int thread)
 {
-	TraversorCell<GenericMap, ORBIT> trav(*this, good, true, thread);
+	TraversorCell<GenericMap, ORBIT> trav(*this, true, thread);
 	bool found = false;
 
 	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
@@ -647,10 +700,10 @@ bool GenericMap::foreach_orbit(FunctorType& fonct, const FunctorSelect& good, un
 }
 
 template <unsigned int ORBIT>
-unsigned int GenericMap::getNbOrbits(const FunctorSelect& good)
+unsigned int GenericMap::getNbOrbits()
 {
 	FunctorCount fcount;
-	foreach_orbit<ORBIT>(fcount, good);
+	foreach_orbit<ORBIT>(fcount);
 	return fcount.getNb();
 }
 

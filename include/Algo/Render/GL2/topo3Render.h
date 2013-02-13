@@ -147,9 +147,6 @@ public:
 
 	/**
 	* Constructor
-	* @param map the map to draw
-	* @param good functor that return true for darts of part to draw
-	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/
 	Topo3Render();
 
@@ -237,25 +234,23 @@ public:
 	 */
 	void overdrawDart(Dart d, float width, float r, float g, float b);
 
-	/*
+	/**
 	 * store darts in color for picking
-	 * @param map the map (must be the same than during updating data)
-	 * @param good the selector (must be the same than during updating data)
 	 */
 	template<typename PFP>
-	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
+	void setDartsIdColor(typename PFP::MAP& map);
 
 	/**
 	 * pick dart with color set bey setDartsIdColor
 	 * Do not forget to apply same transformation to scene before picking than before drawing !
 	 * @param map the map
-	 * @param good a dart selector
+
 	 * @param x position of mouse (x)
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
 	template<typename PFP>
-	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
+	Dart picking(typename PFP::MAP& map, int x, int y);
 
 
 	/**
@@ -272,32 +267,29 @@ public:
 	/**
 	* update all drawing buffers to render a dual map
 	* @param map the map
-	* @param good selector
 	* @param positions  attribute of position vertices
 	* @param ke exploding coef for edge
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
 
 	/**
 	* update color buffer with color attribute handler
 	* @param map the map
-	* @param good selector
 	* @param colors  attribute of dart's colors
 	*/
 	template<typename PFP>
-	void updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors, const FunctorSelect& good = allDarts);
+	void updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors);
 
 	/**
 	 * Get back middle position of drawn darts
 	 * @param map the map
 	 * @param posExpl the output positions
-	 * @param good the selector
 	 */
 	template<typename PFP>
-	void computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3>& posExpl, const FunctorSelect& good = allDarts);
+	void computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3>& posExpl);
 
 	/**
 	 * render to svg struct
@@ -311,10 +303,10 @@ public:
 
 
 	template<typename PFP>
-	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good=allDarts);
+	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
 
 	template<typename PFP>
-	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax, const FunctorSelect& good=allDarts);
+	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
 protected:
 	/**
@@ -324,10 +316,9 @@ protected:
 	* @param ke exploding coef for edge
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
-	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good);
+	void updateDataMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
 
 	/**
 	* update all drawing buffers to render a gmap
@@ -336,10 +327,9 @@ protected:
 	* @param ke exploding coef for edge
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
-	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataGMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good);
+	void updateDataGMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
 };
 
 

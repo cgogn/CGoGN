@@ -1673,7 +1673,7 @@ void HalfEdgeSelector_LightfieldKCL<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 	const VEC3& newPos = (this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos))[d] ; // get newPos
 
 	const REAL& geomErr = quadGeom(newPos) ;
-	const REAL& visualI = m_visualImportance[dd] ;
+//	const REAL& visualI = m_visualImportance[dd] ;
 	const REAL& lferr = computeLightfieldError(d) ;
 
 	//std::cout << lferr/geomErr << std::endl ;

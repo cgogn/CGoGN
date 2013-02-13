@@ -55,8 +55,9 @@ void MyQT::topo_onoff(bool x)
 	render_topo = !render_topo;
 	if (render_topo)
 	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor, nb);
+//		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+		//TODO MapBrowser
+		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor);
 	}
 
 	updateGL();
@@ -123,8 +124,9 @@ void MyQT::slider_released()
 	render_topo = render_topoTemp;
 	if (render_topo)
 	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor, nb);
+//		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+		//TODO MapBrowser
+		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor );
 	}
 	updateGL();
 }
@@ -185,8 +187,8 @@ void MyQT::cb_Open()
 		color[i][2] = 1.0f - color[i][0];
 	}
 
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f, nb);
+//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f);
 	m_explode_render->updateData<PFP>(myMap, position, color);
 
 	updateGL() ;
@@ -202,8 +204,8 @@ void MyQT::cb_initGL()
     m_topo_render = new Algo::Render::GL2::Topo3Render();
     m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,false);
 
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f, nb);
+//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f);
 	m_explode_render->updateData<PFP>(myMap, position, color);
 	m_explode_render->setExplodeVolumes(0.8f);
 	m_explode_render->setExplodeFaces(0.9f);

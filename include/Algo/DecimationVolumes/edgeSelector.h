@@ -33,8 +33,8 @@ private:
 	Dart cur ;
 
 public:
-	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		Selector<PFP>(m, pos, approx, select)
+	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		Selector<PFP>(m, pos, approx)
 	{}
 	~EdgeSelector_MapOrder()
 	{}
@@ -66,8 +66,8 @@ private:
 	bool allSkipped ;
 
 public:
-	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		Selector<PFP>(m, pos, approx, select),
+	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		Selector<PFP>(m, pos, approx),
 		cur(0),
 		allSkipped(false)
 	{}
@@ -113,8 +113,8 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Length(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		Selector<PFP>(m, pos, approx, select)
+	EdgeSelector_Length(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		Selector<PFP>(m, pos, approx)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 	}
@@ -165,8 +165,8 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_SG98(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		Selector<PFP>(m, pos, approx, select), m_positionApproximator(NULL)
+	EdgeSelector_SG98(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		Selector<PFP>(m, pos, approx), m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 	}

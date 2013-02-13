@@ -58,8 +58,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL>& kmax,
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
-	VertexAttribute<typename PFP::VEC3>& Kmin,
-	const FunctorSelect& select = allDarts) ;
+	VertexAttribute<typename PFP::VEC3>& Kmin) ;
 
 template <typename PFP>
 void computeCurvatureVertex_QuadraticFitting(
@@ -110,7 +109,6 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -158,7 +156,6 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -192,7 +189,6 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -222,7 +218,6 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -255,7 +250,6 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select = allDarts,
 	unsigned int nbth = 0) ;
 
 template <typename PFP>
@@ -267,7 +261,6 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	const FunctorSelect& select = allDarts,
 	unsigned int nbth = 0);
 
 } // namespace Parallel

@@ -218,13 +218,13 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 }
 
 template<typename PFP>
-void EarTriangulation<PFP>::triangule( const FunctorSelect& good, unsigned int thread)
+void EarTriangulation<PFP>::triangule(unsigned int thread)
 {
 //	DartMarker m(m_map, thread);
 //
 //	for(Dart d = m_map.begin(); d != m_map.end(); m_map.next(d))
 //	{
-//		if(!m.isMarked(d) && good(d))
+//		if(!m.isMarked(d))
 //		{
 //			Dart e = m_map.template phi<111>(d);
 //			if (e!=d)
@@ -233,7 +233,7 @@ void EarTriangulation<PFP>::triangule( const FunctorSelect& good, unsigned int t
 //	}
 //	m.unmarkAll();
 
-	TraversorF<typename PFP::MAP> trav(m_map,good,thread);
+	TraversorF<typename PFP::MAP> trav(m_map,thread);
 
 	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{

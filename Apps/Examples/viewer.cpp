@@ -229,9 +229,9 @@ void Viewer::importMesh(std::string& filename)
 
 	myMap.enableQuickTraversal<VERTEX>() ;
 
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
 	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f) ;
 
@@ -258,7 +258,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 	std::string extension = filename.substr(pos) ;
 
 	if (extension == std::string(".off"))
-		Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+		Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str()) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 	{
 		int ascii = 0 ;
@@ -267,7 +267,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 
 		std::vector<VertexAttribute<VEC3>*> attributes ;
 		attributes.push_back(&position) ;
-		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
+		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii) ;
 	}
 	else if (extension == std::string(".map"))
 		myMap.saveMapBin(filename) ;

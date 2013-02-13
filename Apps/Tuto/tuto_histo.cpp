@@ -160,7 +160,7 @@ void MyQT::createMap(const std::string& filename)
 	l_histo->histoColorizeVBO(*m_colorVBO2);
 
 	// construct rendering primities
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
 
 
 }

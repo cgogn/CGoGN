@@ -41,10 +41,10 @@ namespace Geometry
 {
 
 template <typename PFP>
-Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts)
+Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	Geom::BoundingBox<typename PFP::VEC3> bb ;
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		bb.addPoint(position[d]) ;
 	return bb ;

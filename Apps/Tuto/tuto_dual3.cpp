@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 	if(dsave != NIL)
 		positionV[dsave] = PFP::VEC3(0.0);
 
-	//Algo::Modelisation::computeDual3<PFP>(myMap,allDarts) ;
+	//Algo::Modelisation::computeDual3<PFP>(myMap) ;
 	myMap.computeDual();
 
 	position = positionV ;

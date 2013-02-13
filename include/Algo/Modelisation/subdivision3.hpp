@@ -433,14 +433,14 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
 }
 
 template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 {
 	//std::vector<Dart> l_centers;
 	std::vector<Dart> l_vertices;
 
 	//pre-computation : compute the centroid of all volume
 	VolumeAutoAttribute<EMB> attBary(map);
-	Volume::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary, selected);
+	Volume::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary);
 
 	//subdivision
 	//1. cut edges
@@ -449,7 +449,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
 		//memorize each vertices per volumes
-		if(selected(d) && !mv.isMarked(d))
+		if( !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
 			mv.markOrbit<PFP::MAP::VERTEX_OF_PARENT>(d);
@@ -633,14 +633,14 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 
 template <typename PFP>
-void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
+void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
 	DartMarkerStore m(map);
 
 	//
 	// 1-4 flip of all tetrahedra
 	//
-	TraversorW<typename PFP::MAP> tW(map,selected);
+	TraversorW<typename PFP::MAP> tW(map);
 	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
 	{
 		Traversor3WF<typename PFP::MAP> tWF(map, dit);
@@ -664,7 +664,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//
 	// 2-3 swap of all old interior faces
 	//
-	TraversorF<typename PFP::MAP> tF(map,selected);
+	TraversorF<typename PFP::MAP> tF(map);
 	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
 	{
 		if(m.isMarked(dit))
@@ -677,7 +677,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//
 	// 1-3 flip of all boundary tetrahedra
 	//
-	TraversorW<typename PFP::MAP> tWb(map,selected);
+	TraversorW<typename PFP::MAP> tWb(map);
 	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
 	{
 		if(map.isBoundaryVolume(dit))
@@ -703,7 +703,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//
 	// edge-removal on all old boundary edges
 	//
-	TraversorE<typename PFP::MAP> tE(map,selected);
+	TraversorE<typename PFP::MAP> tE(map);
 	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
 	{
 		if(m.isMarked(dit))

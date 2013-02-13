@@ -85,14 +85,14 @@ void setNbCore(unsigned int nb);
 //	T* getFunctor(unsigned int i);
 //
 //	template <unsigned int ORBIT>
-//	void traverseCell(bool needMarkers = false, const FunctorSelect& good = allDarts, unsigned int currentThread = 0);
+//	void traverseCell(bool needMarkers = false, unsigned int currentThread = 0);
 //
 //	template <unsigned int ORBIT>
-//	void traverseEachCell(bool needMarkers = false, const FunctorSelect& good = allDarts, unsigned int currentThread = 0);
+//	void traverseEachCell(bool needMarkers = false, unsigned int currentThread = 0);
 //
-//	void traverseDart(bool needMarkers = false, const FunctorSelect& good = allDarts, unsigned int currentThread = 0);
+//	void traverseDart(bool needMarkers = false, unsigned int currentThread = 0);
 //
-//	void traverseEachDart(bool needMarkers = false, const FunctorSelect& good = allDarts, unsigned int currentThread = 0);
+//	void traverseEachDart(bool needMarkers = false, unsigned int currentThread = 0);
 //};
 
 
@@ -103,10 +103,9 @@ void setNbCore(unsigned int nb);
  * @param map the map
  * @param funcs the functors to apply (size of vector determine number of threads, and all functors must be of the same type)
  * @param needMarkers set to yes if you want that each thread use different markers. Warning if set to false (default) do not use algo with thread id or markers !!
- * @param good a selector
  */
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false, const FunctorSelect& good = allDarts);
+void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false);
 
 /**
  * Traverse cells of a map in parallel. Use quick traversal, cell markers or dart markers if available !
@@ -115,10 +114,9 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
  * @param func the functor to apply
  * @param nbth number of threads 0 for let the system choose
  * @param needMarkers set to yes if you want that each thread use different markers. Warning if set to false (default) do not use algo with thread id or markers !!
- * @param good a selector
  */
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false, const FunctorSelect& good = allDarts);
+void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false);
 
 
 /**
@@ -128,10 +126,9 @@ void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0
  * @param funcs the functors to apply ( each functors can (should!) be here of different type)
  * @param nbth number of threads
  * @param needMarkers set to yes if you want that each thread use different markers. Warning if set to false (default) do not use algo with thread id or markers !!
- * @param good a selector
  */
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false, const FunctorSelect& good = allDarts);
+void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false);
 
 
 /**
@@ -140,10 +137,9 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
  * @param map the map
  * @param funcs the functors to apply (size of vector determine number of threads, and all functors must be of the same type)
  * @param needMarkers set to yes if you want that each thread use different markers.Warning if set to false (default) do not use algo with thread id or markers !!
- * @param good a selector
  */
 template <typename MAP>
-void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs,  unsigned int nbth, bool needMarkers = false, const FunctorSelect& good = allDarts);
+void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs,  unsigned int nbth, bool needMarkers = false);
 
 
 /**
@@ -152,10 +148,9 @@ void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs,  unsig
  * @param funcs the functor
  * @param nbth number of thread to use, 0 for let the system choose
  * @param needMarkers set to yes if you want that each thread use different markers. Warning if set to false (default) do not use algo with thread id or markers !!
- * @param good a selector
  */
 template <typename MAP>
-void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false, const FunctorSelect& good = allDarts);
+void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false);
 
 
 /**
@@ -181,10 +176,9 @@ void foreach_attrib(AttributeContainer& attr_cont, FunctorAttribThreaded& func, 
  * @param funcsFrontnBack nbth front pass functors followed by nbth back pass functors
  * @param nbLoops number of loops to execute
  * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
- * @param good a selector
  */
 template <typename MAP, unsigned int CELL>
-void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFrontnBack, unsigned int nbLoops, bool needMarkers = false, const FunctorSelect& good = allDarts);
+void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFrontnBack, unsigned int nbLoops, bool needMarkers = false);
 
 /**
  * Optimized version for // foreach with to pass (2 functors), with several loops
@@ -195,10 +189,9 @@ void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFro
  * @param nbLoops number of loops to execute
  * @param nbth number of threads to use
  * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
- * @param good a selector
  */
 template <typename MAP, unsigned int CELL>
-void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapThreaded<MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, bool needMarkers = false, const FunctorSelect& good = allDarts);
+void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapThreaded<MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, bool needMarkers = false);
 
 
 } // namespace Parallel

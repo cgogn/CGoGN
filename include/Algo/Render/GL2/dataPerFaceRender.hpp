@@ -50,8 +50,7 @@ m_nbTris(0)
 template<typename PFP, unsigned int ORBIT, typename T>
 void
 DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<T,ORBIT>& dataPerXXX,
-		const FunctorSelect& good)
+		const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<T,ORBIT>& dataPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -62,7 +61,7 @@ DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typen
 	std::vector<T> bufferData;
 	bufferData.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
+	TraversorCell<typename PFP::MAP, FACE> traFace(map);
 
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{

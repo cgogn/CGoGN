@@ -83,7 +83,7 @@ void TexView::cb_initGL()
 
 	glEnable(GL_TEXTURE_2D);
 
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
 }
 
 void TexView::cb_redraw()

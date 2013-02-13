@@ -67,11 +67,10 @@ public:
 	* @param map the map
 	* @param positions attribute of position vertices
 	* @param dataPerXXX attribute of data (per face, per vertex per face, per what you want)
-	* @param good selector
 	*/
 	template<typename PFP, unsigned int ORBIT, typename T>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<T,ORBIT>& dataPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<T,ORBIT>& dataPerXXX) ;
 
 	/**
 	 * draw

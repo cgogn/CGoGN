@@ -138,7 +138,7 @@ void renderTopoMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 }
 
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, const FunctorSelect& good)
+void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -164,45 +164,42 @@ void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& 
 	DartMarker mark(map);					// marker for darts
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(good(d))
-		{
-			CellMarkerStore<VERTEX> markVert(map);		//marker for vertices
-			VEC3 center(0, 0, 0);
-			unsigned int nbv = 0;
-			unsigned int nbf = 0;
-			std::list<Dart> visitedFaces;	// Faces that are traversed
-			visitedFaces.push_back(d);		// Start with the face of d
+		CellMarkerStore<VERTEX> markVert(map);		//marker for vertices
+		VEC3 center(0, 0, 0);
+		unsigned int nbv = 0;
+		unsigned int nbf = 0;
+		std::list<Dart> visitedFaces;	// Faces that are traversed
+		visitedFaces.push_back(d);		// Start with the face of d
 
-			// For every face added to the list
-			for (std::list<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+		// For every face added to the list
+		for (std::list<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+		{
+			if (!mark.isMarked(*face))		// Face has not been visited yet
 			{
-				if (!mark.isMarked(*face))		// Face has not been visited yet
+				// store a dart of face
+				vecDartFaces.push_back(*face);
+				nbf++;
+				Dart dNext = *face ;
+				do
 				{
-					// store a dart of face
-					vecDartFaces.push_back(*face);
-					nbf++;
-					Dart dNext = *face ;
-					do
+					if (!markVert.isMarked(dNext))
 					{
-						if (!markVert.isMarked(dNext))
-						{
-							markVert.mark(dNext);
-							center += positions[dNext];
-							nbv++;
-						}
-						mark.mark(dNext);					// Mark
-						m_nbDarts++;
-						Dart adj = map.phi2(dNext);				// Get adjacent face
-						if (adj != dNext && !mark.isMarked(adj))
-							visitedFaces.push_back(adj);	// Add it
-						dNext = map.phi1(dNext);
-					} while(dNext != *face);
-				}
+						markVert.mark(dNext);
+						center += positions[dNext];
+						nbv++;
+					}
+					mark.mark(dNext);					// Mark
+					m_nbDarts++;
+					Dart adj = map.phi2(dNext);				// Get adjacent face
+					if (adj != dNext && !mark.isMarked(adj))
+						visitedFaces.push_back(adj);	// Add it
+					dNext = map.phi1(dNext);
+				} while(dNext != *face);
 			}
-			center /= typename PFP::REAL(nbv);
-			vecCenters.push_back(center);
-			vecNbFaces.push_back(nbf);
 		}
+		center /= typename PFP::REAL(nbv);
+		vecCenters.push_back(center);
+		vecNbFaces.push_back(nbf);
 	}
 
  	glLineWidth(1.0f);

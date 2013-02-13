@@ -51,7 +51,7 @@ m_nbTris(0)
 
 template<typename PFP, unsigned int ORBIT>
 void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
+			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -62,7 +62,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 	std::vector<VEC3> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
+	TraversorCell<typename PFP::MAP, FACE> traFace(map);
 
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
@@ -101,7 +101,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 template<typename PFP, unsigned int ORBIT>
 void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
 			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals,
-			const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
+			const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -115,7 +115,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 	std::vector<VEC3> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
+	TraversorCell<typename PFP::MAP, FACE> traFace(map);
 
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
