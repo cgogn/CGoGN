@@ -38,36 +38,67 @@ public slots:
 	Window* getWindow() const { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	GenericMap* getGenericMap() { return m_map; }
+	GenericMap* getGenericMap() const { return m_map; }
 
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
 	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
-	float getBBdiagSize() { return m_bbDiagSize; }
+	float getBBdiagSize() const { return m_bbDiagSize; }
 
 	bool isUsed() const { return !l_views.empty(); }
 
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
 
-	void setPrimitiveDirty(int primitive) { m_render->setPrimitiveDirty(primitive); }
+	void setPrimitiveDirty(int primitive)
+	{
+		m_render->setPrimitiveDirty(primitive);
+	}
 
 	/*********************************************************
 	 * MANAGE ATTRIBUTES
 	 *********************************************************/
 
 	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT> getAttribute(const QString& nameAttr)
+	AttributeHandler<T, ORBIT> getAttribute(const QString& nameAttr, bool onlyRegistered = true) const
 	{
-		return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
+		if(onlyRegistered)
+		{
+			if(h_attribs[ORBIT].contains(nameAttr))
+				return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toStdString());
+			else
+				return AttributeHandler<T, ORBIT>();
+		}
+		else
+			return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toStdString());
 	}
 
 	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT> addAttribute(const QString& nameAttr)
+	AttributeHandler<T, ORBIT> addAttribute(const QString& nameAttr, bool registerAttr = true)
 	{
-		AttributeHandler<T,ORBIT> ah = static_cast<AttribMap*>(m_map)->addAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
-		emit(attributeAdded());
+		AttributeHandler<T,ORBIT> ah = static_cast<AttribMap*>(m_map)->addAttribute<T,ORBIT>(nameAttr.toStdString());
+		if(ah.isValid() && registerAttr)
+		{
+			registerAttribute(ah);
+			emit(attributeAdded(ORBIT, nameAttr));
+		}
 		return ah;
 	}
+
+	template <typename T, unsigned int ORBIT>
+	void registerAttribute(const AttributeHandler<T, ORBIT>& ah)
+	{
+		h_attribs[ORBIT].insert(QString::fromStdString(ah.name()), QString::fromStdString(nameOfType(T())));
+	}
+
+	QString getAttributeTypeName(unsigned int orbit, const QString& nameAttr) const
+	{
+		if(h_attribs[orbit].contains(nameAttr))
+			return h_attribs[orbit][nameAttr];
+		else
+			return "";
+	}
+
+	const AttributeHash& getAttributesList(unsigned int orbit) const { return h_attribs[orbit];	}
 
 	/*********************************************************
 	 * MANAGE VBOs
@@ -96,9 +127,9 @@ public:
 			vbo->updateData(attr);
 	}
 
-	Utils::VBO* getVBO(const QString& name);
+	Utils::VBO* getVBO(const QString& name) const;
 	QList<Utils::VBO*> getVBOList() const { return h_vbo.values(); }
-	QList<Utils::VBO*> getVBOList(const std::string& typeName);
+	QList<Utils::VBO*> getVBOList(const std::string& typeName) const;
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
@@ -124,9 +155,10 @@ protected:
 	QList<View*> l_views;
 
 	VBOHash h_vbo;
+	AttributeHash h_attribs[NB_ORBITS];
 
 signals:
-	void attributeAdded();
+	void attributeAdded(unsigned int orbit, const QString& name);
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 };
@@ -148,7 +180,7 @@ public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive)
 	{
 		if(!m_render->isPrimitiveUpToDate(primitive))
-			updatePrimitives(primitive);
+			m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), allDarts, primitive) ;
 		m_render->draw(shader, primitive);
 	}
 
@@ -160,11 +192,6 @@ public:
 		m_bbMin = qglviewer::Vec(bb.min()[0], bb.min()[1], bb.min()[2]);
 		m_bbMax = qglviewer::Vec(bb.max()[0], bb.max()[1], bb.max()[2]);
 		m_bbDiagSize = (m_bbMax - m_bbMin).norm();
-	}
-
-	void updatePrimitives(int primitive, const FunctorSelect& good = allDarts)
-	{
-		m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
 	}
 };
 

@@ -4,6 +4,12 @@
 
 #include "Algo/Modelisation/subdivision.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 bool SubdivideSurfacePlugin::enable()
 {
 	m_subdivideSurfaceDialog = new SubdivideSurfaceDialog(m_window);
@@ -34,7 +40,7 @@ void SubdivideSurfacePlugin::subdivideSurface()
 		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapname));
 		PFP2::MAP* map = mh->getMap();
 
-		std::string positionName = m_subdivideSurfaceDialog->combo_positionAttribute->currentText().toUtf8().constData();
+		std::string positionName = m_subdivideSurfaceDialog->combo_positionAttribute->currentText().toStdString();
 		VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(positionName);
 
 		if(m_subdivideSurfaceDialog->radio_Loop->isChecked())
@@ -76,3 +82,7 @@ Q_EXPORT_PLUGIN2(SubdivideSurfacePlugin, SubdivideSurfacePlugin)
 #else
 Q_EXPORT_PLUGIN2(SubdivideSurfacePluginD, SubdivideSurfacePlugin)
 #endif
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

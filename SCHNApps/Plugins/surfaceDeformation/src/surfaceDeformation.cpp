@@ -9,96 +9,92 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
-
-PerMapParameterSet::PerMapParameterSet(MapHandlerGen* mh) :
-	verticesSelectionMode(LOCKED)
+namespace CGoGN
 {
+
+namespace SCHNApps
+{
+
+PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
+	mh(m),
+	verticesSelectionMode(LOCKED),
+	nlContext(NULL)
+{
+	QString positionName;
+
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+
+	const AttributeHash& attribs = mh->getAttributesList(VERTEX);
+	for(AttributeHash::const_iterator i = attribs.constBegin(); i != attribs.constEnd(); ++i)
+	{
+		if(i.value() == vec3TypeName)
+		{
+			if(positionName != "position")	// try to select an attribute named "position"
+				positionName = i.key();		// or anything else if not found
+		}
+	}
+	positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(positionName);
+
 	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
-
-	AttributeContainer& cont = map->getAttributeContainer<VERTEX>();
-
-	std::vector<std::string> names;
-	std::vector<std::string> types;
-	cont.getAttributesNames(names);
-	cont.getAttributesTypes(types);
-	std::string vec3TypeName = nameOfType(PFP2::VEC3());
-	for(unsigned int i = 0; i < names.size(); ++i)
-	{
-		if(types[i] == vec3TypeName)
-		{
-			if(names[i] == "position") // try to select a position attribute named "position"
-				positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(QString::fromStdString(names[i]));
-		}
-	}
-
-	if(!positionAttribute.isValid())
-	{
-		for(unsigned int i = 0; i < names.size(); ++i)
-		{
-			if(types[i] == vec3TypeName)
-			{
-				positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(QString::fromStdString(names[i]));
-				break;
-			}
-		}
-	}
-
 	lockingMarker = new CellMarker<VERTEX>(*map);
 	handleMarker = new CellMarker<VERTEX>(*map);
 
-	positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit") ;
+	positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit", false) ;
 	if(!positionInit.isValid())
-		positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit") ;
-	map->copyAttribute(positionInit, positionAttribute) ;
+		positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit", false) ;
 
-	vertexNormal = mh->getAttribute<PFP2::VEC3, VERTEX>("vertexNormal");
-	if(!vertexNormal.isValid())
-		vertexNormal = mh->addAttribute<PFP2::VEC3, VERTEX>("vertexNormal");
-
-	edgeAngle = mh->getAttribute<PFP2::REAL, EDGE>("edgeAngle");
-	if(!edgeAngle.isValid())
-		edgeAngle = mh->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
-
-	edgeWeight = mh->getAttribute<PFP2::REAL, EDGE>("edgeWeight");
-	if(!edgeWeight.isValid())
-		edgeWeight = mh->addAttribute<PFP2::REAL, EDGE>("edgeWeight");
-
-	vertexArea = mh->getAttribute<PFP2::REAL, VERTEX>("vertexArea");
-	if(!vertexArea.isValid())
-		vertexArea = mh->addAttribute<PFP2::REAL, VERTEX>("vertexArea");
-
-	diffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("diffCoord");
-	if(!diffCoord.isValid())
-		diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord");
-
-	vertexRotationMatrix = mh->getAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix") ;
-	if(!vertexRotationMatrix.isValid())
-		vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix");
-
-	rotatedDiffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord") ;
-	if(!rotatedDiffCoord.isValid())
-		rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord");
-
-	Algo::Surface::Geometry::computeNormalVertices<PFP2>(*map, positionAttribute, vertexNormal) ;
-	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, positionAttribute, edgeAngle) ;
-	Algo::Surface::Geometry::computeCotanWeightEdges<PFP2>(*map, positionAttribute, edgeWeight) ;
-	Algo::Surface::Geometry::computeVoronoiAreaVertices<PFP2>(*map, positionAttribute, vertexArea) ;
-//	Algo::Surface::Geometry::computeLaplacianCotanVertices<PFP2>(*map, edgeWeight, vertexArea, positionAttribute, diffCoord) ;
-	Algo::Surface::Geometry::computeLaplacianTopoVertices<PFP2>(*map, positionAttribute, diffCoord) ;
-
-	for(unsigned int i = vertexRotationMatrix.begin(); i != vertexRotationMatrix.end() ; vertexRotationMatrix.next(i))
-		vertexRotationMatrix[i] = Eigen::Matrix3f::Identity();
-
-	vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex");
+	vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex", false);
 	if(!vIndex.isValid())
-		vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex");
-	nb_vertices = static_cast<AttribMap*>(map)->computeIndexCells<VERTEX>(vIndex);
+		vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex", false);
 
-	nlContext = nlNewContext();
-	nlMakeCurrent(nlContext) ;
-	nlSolverParameteri(NL_NB_VARIABLES, nb_vertices) ;
-	nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE) ;
-	nlSolverParameteri(NL_SOLVER, NL_CHOLMOD_EXT) ;
+//	edgeWeight = mh->getAttribute<PFP2::REAL, EDGE>("edgeWeight", false);
+//	if(!edgeWeight.isValid())
+//		edgeWeight = mh->addAttribute<PFP2::REAL, EDGE>("edgeWeight", false);
+
+//	vertexArea = mh->getAttribute<PFP2::REAL, VERTEX>("vertexArea", false);
+//	if(!vertexArea.isValid())
+//		vertexArea = mh->addAttribute<PFP2::REAL, VERTEX>("vertexArea", false);
+
+	diffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("diffCoord", false);
+	if(!diffCoord.isValid())
+		diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord", false);
+
+	vertexRotationMatrix = mh->getAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix", false) ;
+	if(!vertexRotationMatrix.isValid())
+		vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix", false);
+
+	rotatedDiffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord", false) ;
+	if(!rotatedDiffCoord.isValid())
+		rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord", false);
+
+	initParameters();
+}
+
+void PerMapParameterSet::initParameters()
+{
+	if(positionAttribute.isValid())
+	{
+		PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
+
+		map->copyAttribute(positionInit, positionAttribute) ;
+
+		nb_vertices = static_cast<AttribMap*>(map)->computeIndexCells<VERTEX>(vIndex);
+
+//		Algo::Surface::Geometry::computeCotanWeightEdges<PFP2>(*map, positionAttribute, edgeWeight) ;
+//		Algo::Surface::Geometry::computeVoronoiAreaVertices<PFP2>(*map, positionAttribute, vertexArea) ;
+//		Algo::Surface::Geometry::computeLaplacianCotanVertices<PFP2>(*map, edgeWeight, vertexArea, positionAttribute, diffCoord) ;
+		Algo::Surface::Geometry::computeLaplacianTopoVertices<PFP2>(*map, positionAttribute, diffCoord) ;
+
+		for(unsigned int i = vertexRotationMatrix.begin(); i != vertexRotationMatrix.end() ; vertexRotationMatrix.next(i))
+			vertexRotationMatrix[i] = Eigen::Matrix3f::Identity();
+
+		if(nlContext)
+			nlDeleteContext(nlContext);
+		nlContext = nlNewContext();
+		nlSolverParameteri(NL_NB_VARIABLES, nb_vertices);
+		nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
+		nlSolverParameteri(NL_SOLVER, NL_CHOLMOD_EXT);
+	}
 }
 
 PerMapParameterSet::~PerMapParameterSet()
@@ -111,20 +107,15 @@ PerMapParameterSet::~PerMapParameterSet()
 
 bool SurfaceDeformationPlugin::enable()
 {
-	m_dockTab = new SurfaceDeformationDockTab(this);
+	m_dockTab = new SurfaceDeformationDockTab(m_window, this);
 	addTabInDock(m_dockTab, "Surface Deformation");
 
-	connect(m_dockTab->mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
-	connect(m_dockTab->combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_positionAttributeChanged(int)));
-	connect(m_dockTab->radio_locked, SIGNAL(toggled(bool)), this, SLOT(cb_selectLockedVertices(bool)));
-	connect(m_dockTab->radio_handle, SIGNAL(toggled(bool)), this, SLOT(cb_selectHandleVertices(bool)));
+	m_drawer = new Utils::Drawer();
+	registerShader(m_drawer->getShader());
 
 	connect(m_window, SIGNAL(viewAndPluginLinked(View*, Plugin*)), this, SLOT(viewLinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(currentViewChanged(View*)), this, SLOT(currentViewChanged(View*)));
-
-	m_drawer = new Utils::Drawer();
-	registerShader(m_drawer->getShader());
 
 	return true;
 }
@@ -194,11 +185,16 @@ void SurfaceDeformationPlugin::keyPress(View* view, QKeyEvent* event)
 		selecting = true;
 		view->updateGL();
 	}
-	else if(event->key() == Qt::Key_M)
+	else if(event->key() == Qt::Key_R)
 	{
 		ParameterSet* params = h_viewParams[view];
 		MapHandlerGen* map = params->selectedMap;
-		matchDiffCoord(view, map);
+		if(map)
+		{
+			asRigidAsPossible(view, map);
+			params->selectedMap->updateVBO(params->getCurrentMapParameterSet()->positionAttribute);
+			view->updateGL();
+		}
 	}
 }
 
@@ -219,46 +215,49 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 		ParameterSet* params = h_viewParams[view];
 		PerMapParameterSet* perMap = params->getCurrentMapParameterSet();
 
-		QPoint pixel(event->x(), event->y());
-		qglviewer::Vec orig;
-		qglviewer::Vec dir;
-		view->camera()->convertClickToLine(pixel, orig, dir);
-
-		PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
-		PFP2::VEC3 AB(dir.x, dir.y, dir.z);
-
-		Dart d ;
-		PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(params->selectedMap)->getMap();
-		Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d) ;
-
-		if(d != NIL)
+		if(perMap)
 		{
-			Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, perMap->positionAttribute, selectionRadius) ;
-			neigh.collectAll(d) ;
-			const std::vector<Dart>& insideV = neigh.getInsideVertices() ;
+			QPoint pixel(event->x(), event->y());
+			qglviewer::Vec orig;
+			qglviewer::Vec dir;
+			view->camera()->convertClickToLine(pixel, orig, dir);
 
-			for(unsigned int i = 0; i < insideV.size(); ++i)
+			PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
+			PFP2::VEC3 AB(dir.x, dir.y, dir.z);
+
+			Dart d ;
+			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(params->selectedMap)->getMap();
+			Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d) ;
+
+			if(d != NIL)
 			{
-				unsigned int v = map->getEmbedding<VERTEX>(insideV[i]) ;
-				if (!perMap->lockingMarker->isMarked(v))
+				Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, perMap->positionAttribute, selectionRadius) ;
+				neigh.collectAll(d) ;
+				const std::vector<Dart>& insideV = neigh.getInsideVertices() ;
+
+				for(unsigned int i = 0; i < insideV.size(); ++i)
 				{
-					perMap->locked_vertices.push_back(v) ;
-					perMap->lockingMarker->mark(v);
-				}
-				if(perMap->verticesSelectionMode == HANDLE)
-				{
-					if(!perMap->handleMarker->isMarked(v))
+					unsigned int v = map->getEmbedding<VERTEX>(insideV[i]) ;
+					if (!perMap->lockingMarker->isMarked(v))
 					{
-						perMap->handle_vertices.push_back(v) ;
-						perMap->handleMarker->mark(v);
+						perMap->locked_vertices.push_back(v) ;
+						perMap->lockingMarker->mark(v);
+					}
+					if(perMap->verticesSelectionMode == HANDLE)
+					{
+						if(!perMap->handleMarker->isMarked(v))
+						{
+							perMap->handle_vertices.push_back(v) ;
+							perMap->handleMarker->mark(v);
+						}
 					}
 				}
+
+				nlMakeCurrent(perMap->nlContext) ;
+				nlReset(NL_FALSE) ;
+
+				view->updateGL() ;
 			}
-
-			nlMakeCurrent(perMap->nlContext) ;
-			nlReset(NL_FALSE) ;
-
-			view->updateGL() ;
 		}
 	}
 	else if(event->button() == Qt::RightButton && event->modifiers() & Qt::ShiftModifier)
@@ -268,20 +267,23 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 		ParameterSet* params = h_viewParams[view];
 		PerMapParameterSet* perMap = params->getCurrentMapParameterSet();
 
-		selecting = false ;
-		dragging = true ;
-
-		dragZ = 0;
-		for(unsigned int i = 0; i < perMap->handle_vertices.size(); ++i)
+		if(perMap)
 		{
-			const PFP2::VEC3& p = perMap->positionAttribute[perMap->handle_vertices[i]] ;
-			qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(p[0],p[1],p[2]));
-			dragZ += q.z ;
-		}
-		dragZ /= perMap->handle_vertices.size() ;
+			selecting = false ;
+			dragging = true ;
 
-		qglviewer::Vec p(event->x(), event->y(), dragZ);
-		dragPrevious = view->camera()->unprojectedCoordinatesOf(p);
+			dragZ = 0;
+			for(unsigned int i = 0; i < perMap->handle_vertices.size(); ++i)
+			{
+				const PFP2::VEC3& p = perMap->positionAttribute[perMap->handle_vertices[i]] ;
+				qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(p[0],p[1],p[2]));
+				dragZ += q.z ;
+			}
+			dragZ /= perMap->handle_vertices.size() ;
+
+			qglviewer::Vec p(event->x(), event->y(), dragZ);
+			dragPrevious = view->camera()->unprojectedCoordinatesOf(p);
+		}
 	}
 }
 
@@ -296,46 +298,47 @@ void SurfaceDeformationPlugin::mouseRelease(View* view, QMouseEvent* event)
 void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
 {
 	ParameterSet* params = h_viewParams[view];
-	MapHandlerGen* map = params->selectedMap;
-	PerMapParameterSet* perMap = params->perMap[map->getName()];
+	PerMapParameterSet* perMap = params->getCurrentMapParameterSet();
 
-	if(dragging)
+	if(perMap)
 	{
-		qglviewer::Vec p(event->x(), event->y(), dragZ);
-		qglviewer::Vec q = view->camera()->unprojectedCoordinatesOf(p);
-
-		qglviewer::Vec vec = q - dragPrevious;
-		PFP2::VEC3 t(vec.x, vec.y, vec.z);
-		for(unsigned int i = 0; i < perMap->handle_vertices.size(); ++i)
-			perMap->positionAttribute[perMap->handle_vertices[i]] += t ;
-
-		dragPrevious = q ;
-
-//		matchDiffCoord(view, map);
-		for(unsigned int i = 0; i < 2; ++i)
-			asRigidAsPossible(view, map);
-
-		params->selectedMap->updateVBO(perMap->positionAttribute);
-
-		view->updateGL();
-	}
-	else if(selecting)
-	{
-		QPoint pixel(event->x(), event->y());
-		qglviewer::Vec orig;
-		qglviewer::Vec dir;
-		view->camera()->convertClickToLine(pixel, orig, dir);
-
-		PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
-		PFP2::VEC3 AB(dir.x, dir.y, dir.z);
-
-		Dart d ;
-		PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(params->selectedMap)->getMap();
-		Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d) ;
-		if(d != NIL)
+		if(dragging)
 		{
-			selectionCenter = perMap->positionAttribute[d] ;
-			view->updateGL() ;
+			qglviewer::Vec p(event->x(), event->y(), dragZ);
+			qglviewer::Vec q = view->camera()->unprojectedCoordinatesOf(p);
+
+			qglviewer::Vec vec = q - dragPrevious;
+			PFP2::VEC3 t(vec.x, vec.y, vec.z);
+			for(unsigned int i = 0; i < perMap->handle_vertices.size(); ++i)
+				perMap->positionAttribute[perMap->handle_vertices[i]] += t ;
+
+			dragPrevious = q ;
+
+//			matchDiffCoord(view, map);
+			asRigidAsPossible(view, params->selectedMap);
+
+			params->selectedMap->updateVBO(perMap->positionAttribute);
+
+			view->updateGL();
+		}
+		else if(selecting)
+		{
+			QPoint pixel(event->x(), event->y());
+			qglviewer::Vec orig;
+			qglviewer::Vec dir;
+			view->camera()->convertClickToLine(pixel, orig, dir);
+
+			PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
+			PFP2::VEC3 AB(dir.x, dir.y, dir.z);
+
+			Dart d ;
+			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(params->selectedMap)->getMap();
+			Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d) ;
+			if(d != NIL)
+			{
+				selectionCenter = perMap->positionAttribute[d] ;
+				view->updateGL() ;
+			}
 		}
 	}
 }
@@ -396,7 +399,11 @@ void SurfaceDeformationPlugin::viewUnlinked(View* view, Plugin* plugin)
 void SurfaceDeformationPlugin::currentViewChanged(View* view)
 {
 	if(isLinkedToView(view))
-		m_dockTab->refreshUI(h_viewParams[view]);
+	{
+		ParameterSet* params = h_viewParams[view];
+		changeSelectedMap(view, params->selectedMap);
+		m_dockTab->refreshUI(params);
+	}
 }
 
 void SurfaceDeformationPlugin::mapLinked(MapHandlerGen* m)
@@ -433,12 +440,6 @@ void SurfaceDeformationPlugin::mapUnlinked(MapHandlerGen* m)
 		m_dockTab->refreshUI(params);
 }
 
-void SurfaceDeformationPlugin::attributeAdded()
-{
-	ParameterSet* params = h_viewParams[m_window->getCurrentView()];
-	m_dockTab->refreshUI(params);
-}
-
 void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 {
 	ParameterSet* params = h_viewParams[view];
@@ -449,10 +450,10 @@ void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 	if(view->isCurrentView())
 	{
 		if(prev)
-			disconnect(prev, SIGNAL(attributeAdded()), this, SLOT(attributeAdded()));
+			disconnect(prev, SIGNAL(attributeAdded(unsigned int, const QString&)), m_dockTab, SLOT(addAttributeToList(unsigned int, const QString&)));
 		if(map)
 		{
-			connect(map, SIGNAL(attributeAdded()), this, SLOT(attributeAdded()));
+			connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), m_dockTab, SLOT(addAttributeToList(unsigned int, const QString&)));
 			selectionRadius = map->getBBdiagSize() / 50.0;
 		}
 
@@ -464,7 +465,9 @@ void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 void SurfaceDeformationPlugin::changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()]->positionAttribute = attribute;
+	PerMapParameterSet* perMap = params->perMap[map->getName()];
+	perMap->positionAttribute = attribute;
+	perMap->initParameters();
 
 	if(view->isCurrentView())
 		m_dockTab->refreshUI(params);
@@ -479,46 +482,6 @@ void SurfaceDeformationPlugin::changeVerticesSelectionMode(View* view, MapHandle
 		m_dockTab->refreshUI(params);
 }
 
-void SurfaceDeformationPlugin::cb_selectedMapChanged()
-{
-	if(!b_refreshingUI)
-	{
-		QList<QListWidgetItem*> currentItems = m_dockTab->mapList->selectedItems();
-		if(!currentItems.empty())
-			changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
-	}
-}
-
-void SurfaceDeformationPlugin::cb_positionAttributeChanged(int index)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(m_dockTab->combo_positionAttribute->currentText()));
-	}
-}
-
-void SurfaceDeformationPlugin::cb_selectLockedVertices(bool b)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changeVerticesSelectionMode(view, map, LOCKED);
-	}
-}
-
-void SurfaceDeformationPlugin::cb_selectHandleVertices(bool b)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changeVerticesSelectionMode(view, map, HANDLE);
-	}
-}
-
 void SurfaceDeformationPlugin::matchDiffCoord(View* view, MapHandlerGen* mh)
 {
 	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
@@ -531,7 +494,8 @@ void SurfaceDeformationPlugin::matchDiffCoord(View* view, MapHandlerGen* mh)
 	{
 		LinearSolving::setupVariables<PFP2>(*map, perMap->vIndex, *perMap->lockingMarker, perMap->positionAttribute, coord) ;
 		nlBegin(NL_MATRIX) ;
-		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->diffCoord, coord) ;
+		LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, perMap->vIndex, perMap->diffCoord, coord) ;
+//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->diffCoord, coord) ;
 		nlEnd(NL_MATRIX) ;
 		nlEnd(NL_SYSTEM) ;
 		nlSolve() ;
@@ -669,83 +633,12 @@ void SurfaceDeformationPlugin::asRigidAsPossible(View* view, MapHandlerGen* mh)
 	}
 }
 
-
-
-void SurfaceDeformationDockTab::refreshUI(ParameterSet* params)
-{
-	plugin->setRefreshingUI(true);
-
-	mapList->clear();
-	combo_positionAttribute->clear();
-
-	MapHandlerGen* mh = params->selectedMap;
-
-	QHash<QString, PerMapParameterSet*>::const_iterator i = params->perMap.constBegin();
-	while (i != params->perMap.constEnd())
-	{
-		mapList->addItem(i.key());
-		if(mh != NULL && i.key() == mh->getName())
-		{
-			QList<QListWidgetItem*> item = mapList->findItems(mh->getName(), Qt::MatchExactly);
-			item[0]->setSelected(true);
-
-			PerMapParameterSet* p = params->perMap[mh->getName()];
-
-			GenericMap* map = mh->getGenericMap();
-
-			AttributeContainer& cont = map->getAttributeContainer<VERTEX>();
-
-			std::vector<std::string> names;
-			std::vector<std::string> types;
-			cont.getAttributesNames(names);
-			cont.getAttributesTypes(types);
-			std::string vec3TypeName = nameOfType(PFP2::VEC3());
-			unsigned int j = 0;
-			for(unsigned int i = 0; i < names.size(); ++i)
-			{
-				if(types[i] == vec3TypeName)
-				{
-					combo_positionAttribute->addItem(QString::fromStdString(names[i]));
-					if(!p->positionAttribute.isValid())
-					{								// if nothing is specified in the parameter set
-						if(names[i] == "position")	// try to select a position attribute named "position"
-						{
-							p->positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(QString::fromStdString(names[i]));
-							combo_positionAttribute->setCurrentIndex(j);
-						}
-					}
-					++j;
-				}
-			}
-
-			j = 0;
-			if(!p->positionAttribute.isValid())
-			{
-				for(unsigned int i = 0; i < names.size(); ++i)
-				{
-					if(types[i] == vec3TypeName)
-					{
-						p->positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(QString::fromStdString(names[i]));
-						combo_positionAttribute->setCurrentIndex(j);
-						++j;
-						break;
-					}
-				}
-			}
-
-			radio_locked->setChecked(p->verticesSelectionMode == LOCKED);
-			radio_handle->setChecked(p->verticesSelectionMode == HANDLE);
-		}
-		++i;
-	}
-
-	plugin->setRefreshingUI(false);
-}
-
-
-
 #ifndef DEBUG
 Q_EXPORT_PLUGIN2(SurfaceDeformationPlugin, SurfaceDeformationPlugin)
 #else
 Q_EXPORT_PLUGIN2(SurfaceDeformationPluginD, SurfaceDeformationPlugin)
 #endif
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

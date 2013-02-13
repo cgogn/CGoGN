@@ -47,6 +47,8 @@
 
 #include <NL/nl_private.h>
 
-NLboolean nlSolve_SUPERLU()  ;
+NLboolean nlFactorize_SUPERLU() ;
+NLboolean nlSolve_SUPERLU() ;
+void nlClear_SUPERLU() ;
 
 #endif

@@ -27,10 +27,11 @@ MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
 			PFP2::MAP* map = mh->getMap();
 
 			std::vector<std::string> attrNames;
-			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toUtf8().constData(), attrNames);
+			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toStdString(), attrNames);
 
 			// get vertex position attribute
 			VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
+			mh->registerAttribute<PFP2::VEC3, VERTEX>(position);
 
 			// create VBO for vertex position attribute
 			mh->createVBO(position);

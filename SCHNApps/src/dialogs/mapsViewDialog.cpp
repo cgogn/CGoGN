@@ -57,11 +57,11 @@ void MapsViewDialog::selectedMapsChanged()
 	}
 }
 
-void MapsViewDialog::selectMap(View* view, MapHandlerGen* plugin)
+void MapsViewDialog::selectMap(View* view, MapHandlerGen* m)
 {
 	if(view == m_view)
 	{
-		QList<QListWidgetItem*> items = mapList->findItems(plugin->getName(), Qt::MatchExactly);
+		QList<QListWidgetItem*> items = mapList->findItems(m->getName(), Qt::MatchExactly);
 		if(!items.empty())
 		{
 			b_refreshingUI = true;
@@ -71,11 +71,11 @@ void MapsViewDialog::selectMap(View* view, MapHandlerGen* plugin)
 	}
 }
 
-void MapsViewDialog::deselectMap(View* view, MapHandlerGen* plugin)
+void MapsViewDialog::deselectMap(View* view, MapHandlerGen* m)
 {
 	if(view == m_view)
 	{
-		QList<QListWidgetItem*> items = mapList->findItems(plugin->getName(), Qt::MatchExactly);
+		QList<QListWidgetItem*> items = mapList->findItems(m->getName(), Qt::MatchExactly);
 		if(!items.empty())
 		{
 			b_refreshingUI = true;

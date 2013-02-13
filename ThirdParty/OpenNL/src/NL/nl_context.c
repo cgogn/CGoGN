@@ -66,6 +66,14 @@ NLContext nlNewContext() {
 	result->row_scaling           = 1.0 ;
 	result->right_hand_side       = 0.0 ;
 	result->inner_iterations      = 5 ;
+	result->normalize_rows        = NL_FALSE ;
+	result->alloc_M               = NL_FALSE ;
+	result->alloc_af              = NL_FALSE ;
+	result->alloc_al              = NL_FALSE ;
+	result->alloc_xl              = NL_FALSE ;
+	result->alloc_variable        = NL_FALSE ;
+	result->alloc_x               = NL_FALSE ;
+	result->alloc_b               = NL_FALSE ;
 	result->matrix_already_set    = NL_FALSE ;
 	result->matrix_vector_prod    = nlMatrixVectorProd_default ;
 	result->solver_func           = nlDefaultSolver ;
