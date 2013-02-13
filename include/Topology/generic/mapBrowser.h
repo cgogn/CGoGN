@@ -99,6 +99,11 @@ public:
 		m_map(m), autoAttribute(false), m_links(links), m_first(NIL), m_end(NIL)
 	{
 	}
+	
+	MapBrowserLinked(MAP& m, DartAttribute<Dart>& links, Dart first, Dart end) :
+		m_map(m), autoAttribute(false), m_links(links), m_first(first), m_end(end)
+	{
+	}
 
 	~MapBrowserLinked()
 	{
@@ -106,6 +111,11 @@ public:
 			m_map.removeAttribute(m_links) ;
 	}
 
+	DartAttribute<Dart>& getLinkAttr()
+	{
+		return m_links;
+	}
+	
 	void clear()
 	{
 		m_first = NIL ;

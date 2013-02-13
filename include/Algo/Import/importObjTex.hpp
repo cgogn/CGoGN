@@ -22,8 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/mapBrowser.h"
-#include "Topology/generic/cellmarker.h"
+#include "Topology/generic/attributeHandler.h"
+#include "Container/fakeAttribute.h"
+#include <fstream>
 
 
 namespace CGoGN
@@ -35,9 +36,173 @@ namespace Surface
 namespace Import 
 {
 
-
-short readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices)
+template <typename PFP>
+OBJModel<PFP>::OBJModel(typename PFP::MAP& map):
+	m_map(map),m_specialVertices(map),m_dirtyEdges(map)
 {
+}
+
+template <typename PFP>
+inline typename PFP::VEC3 OBJModel<PFP>::getPosition(Dart d)
+{
+	return m_positions[d];
+}
+
+
+template <typename PFP>
+inline typename PFP::VEC3 OBJModel<PFP>::getNormal(Dart d)
+{
+	if (m_specialVertices.isMarked(d))
+		return m_normalsF[d];
+	return m_normals[d];
+}
+
+
+template <typename PFP>
+inline Geom::Vec2f OBJModel<PFP>::getTexCoord(Dart d)
+{
+	if (m_specialVertices.isMarked(d))
+		return m_texCoordsF[d];
+	return m_texCoords[d];
+}
+
+
+template <typename PFP>
+std::vector<std::string>& OBJModel<PFP>::getMaterialNames()
+{
+	return m_materialNames;
+}
+
+
+
+template <typename PFP>
+void OBJModel<PFP>::readMaterials(const std::string& filename)
+{
+	m_materials.resize(m_materialNames.size());
+		
+	// open file
+	std::ifstream fp(filename.c_str());
+	if (!fp.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		return false;
+	}
+	
+	std::vector<MaterialOBJ>::iterator mit;
+	std::string ligne;
+	std::string tag;
+	fp >> tag;
+	do
+	{
+		std::getline (fp, ligne);
+		if (tag == "newmtl")
+		{
+			std::vector<std::string>::iterator it = std::find(m_materialNames.begin(), m_materialNames.end(), ligne);
+			if (it ==  m_materialNames.end())
+			{
+				CGoGNerr << "Skipping material "<< ligne << CGoGNendl;
+				do
+				{
+					fp >> tag;
+					
+				}while (!fp.eof() && (tag == "new mtl")); 
+			}
+			else
+			{
+				CGoGNerr << "Reading material "<< ligne << CGoGNendl;
+				mit =  m_materials.begin() + (it - m_materialNames.begin());
+			}
+		}
+		else
+		{
+			std::stringstream oss(ligne);
+			if (tag == "Ka")
+			{
+				oss >> mit->ambiantColor[0];
+				oss >> mit->ambiantColor[1];
+				oss >> mit->ambiantColor[2];
+			}
+			if (tag == "Kd")
+			{
+				oss >> mit->diffuseColor[0];
+				oss >> mit->diffuseColor[1];
+				oss >> mit->diffuseColor[2];
+				
+			}
+			if (tag == "Ks")
+			{
+				oss >> mit->specularColor[0];
+				oss >> mit->specularColor[1];
+				oss >> mit->specularColor[2];
+			}
+			if (tag == "Ns")
+			{
+				oss >> mit->shininess;
+			}
+			
+			if (tag == "map_Ka") // ambiant texture
+			{
+				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
+			}
+			if (tag == "map_Kd") // diffuse texture
+			{
+				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
+			}
+			if (tag == "map_d") // opacity texture
+			{
+				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
+			}
+			if ((tag == "map_bump") || (tag == "bump"))
+			{
+				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
+			}
+			
+			fp >> tag;
+
+		}
+	}while (!fp.eof());
+}
+
+
+
+
+
+template <typename PFP>
+bool OBJModel<PFP>::generateBrowsers(std::vector<MapBrowser*>& browsers)
+{
+	browsers.clear();
+	
+	if (m_groupNames.empty())
+		return false;
+	
+	MapBrowserLinked<typename PFP::MAP>* MBLptr = new MapBrowserLinked<typename PFP::MAP>(m_map);
+	DartAttribute<Dart>& links = MBLptr->getLinkAttr();
+	browsers.push_back(MBLptr);
+	
+	for (unsigned int i = 1; i<m_groupNames.size(); ++i)
+	{
+		MapBrowser* MBptr = new MapBrowserLinked<typename PFP::MAP>(m_map,links);
+		browsers.push_back(MBptr);
+	}
+	
+	for (Dart d=m_map.begin(); d!=m_map.end(); m_map.next(d))
+	{
+		unsigned int g = m_groups[d] -1 ; // groups are name from 1
+		MapBrowserLinked<typename PFP::MAP>* mb = static_cast<MapBrowserLinked<typename PFP::MAP>*>(browsers[g]);
+		mb->push_back(d);
+	}
+	return true;
+}
+
+
+
+
+	
+template <typename PFP>
+short OBJModel<PFP>::readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices)
+{
+	indices.clear();
+	
 	unsigned int nb=0;
 	while (!oss.eof())  // lecture de tous les indices
 	{
@@ -82,18 +247,20 @@ short readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices)
 }
 
 
+// template <typename PFP>
+// bool importObjTex(typename PFP::MAP& map, const std::string& filename,
+// 				  std::vector<std::string>& attrNames,/* std::vector<MapBrowserLinked*>& browsers,*/
+// 				  CellMarker<VERTEX>& specialVertices, DartMarker& dirtyEdges)
+
 template <typename PFP>
-bool importObjTex(typename PFP::MAP& map, const std::string& filename,
-				  std::vector<std::string>& attrNames, std::vector<MapBrowserLinked*>& browsers, CellMarker<VERTEX>& markV )
+bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string>& attrNames)
 {
 	typedef  typename PFP::VEC3 VEC3;
 	typedef Geom::Vec2f VEC2;
 
 	attrNames.clear();
-	browsers.clear();
-// parse file
 	// open file
-	std::ifstream fp(filename.c_str(), std::ios::binary);
+	std::ifstream fp(filename.c_str()/*, std::ios::binary*/);
 	if (!fp.good())
 	{
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
@@ -132,37 +299,44 @@ bool importObjTex(typename PFP::MAP& map, const std::string& filename,
 	std::cout << "Faces:"<< tagF<< std::endl;
 
 
-	VertexAttribute<VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
-	if (!positions.isValid())
-		positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;
-	attrNames.push_back(positions.name()) ;
-
-	if (tagVN != 0)
-	{
-		VertexAttribute<VEC3> normals =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("normal") ;
-		if (!normals.isValid())
-			normals = m_map.template addAttribute<VEC3, VERTEX>("normal") ;
-		attrNames.push_back(normals.name()) ;
-
-		AttributeHandler<VEC3,VERTEX1> normalsF =  m_map.template getAttribute<VEC3, VERTEX1>("normalF") ;
-		if (!normalsF.isValid())
-			normalsF = m_map.template addAttribute<VEC3, VERTEX1>("normalF") ;
-	}
+	m_positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+	if (!m_positions.isValid())
+		m_positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;
+	attrNames.push_back(m_positions.name()) ;
 
 	if (tagVT != 0)
 	{
-		VertexAttribute<Geom::Vec2f> texCoords =  m_map.template getAttribute<VEC2, VERTEX>("texCoord") ;
-		if (!texCoords.isValid())
-			texCoords = m_map.template addAttribute<VEC2, VERTEX>("texCoord") ;
-		attrNames.push_back(texCoords.name()) ;
+		m_texCoords =  m_map.template getAttribute<VEC2, VERTEX>("texCoord") ;
+		if (!m_texCoords.isValid())
+			m_texCoords = m_map.template addAttribute<VEC2, VERTEX>("texCoord") ;
+		attrNames.push_back(m_texCoords.name()) ;
 
-		AttributeHandler<Geom::Vec2f,VERTEX1> texCoordsF =  m_map.template getAttribute<VEC2, VERTEX1>("texCoordF") ;
-		if (!texCoordsF.isValid())
-			texCoordsF = m_map.template addAttribute<VEC2, VERTEX1>("texCoordF") ;
+		m_texCoordsF =  m_map.template getAttribute<VEC2, VERTEX1>("texCoordF") ;
+		if (!m_texCoordsF.isValid())
+			m_texCoordsF = m_map.template addAttribute<VEC2, VERTEX1>("texCoordF") ;
 	}
 
+	if (tagVN != 0)
+	{
+		m_normals =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("normal") ;
+		if (!m_normals.isValid())
+			m_normals = m_map.template addAttribute<VEC3, VERTEX>("normal") ;
+		attrNames.push_back(m_normals.name()) ;
+
+		m_normalsF =  m_map.template getAttribute<VEC3, VERTEX1>("normalF") ;
+		if (!m_normalsF.isValid())
+			m_normalsF = m_map.template addAttribute<VEC3, VERTEX1>("normalF") ;
+	}
+
+	
 	if (tagG != 0)
-		browsers.reserve(tagG);
+	{
+		m_groups =  m_map.template getAttribute<unsigned int, FACE>("groups") ;
+		if (!m_groups.isValid())
+			m_groups = m_map.template addAttribute<unsigned int, FACE>("groups") ;
+// ??	attrNames.push_back(m_groups.name()) ;
+	}
+	
 
 	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
 
@@ -171,26 +345,32 @@ bool importObjTex(typename PFP::MAP& map, const std::string& filename,
 	fp.open(filename.c_str());
 
 	std::vector<VEC3> normalsBuffer;
-	std::vector<VEC2> texCoordsBuffer;
-	std::vector<unsigned int> verticesID;
-	std::vector<unsigned int> noramlsID;
-	std::vector<unsigned int> texCoordsID;
-
 	normalsBuffer.reserve(tagVN);
+	
+	std::vector<VEC2> texCoordsBuffer;
 	texCoordsBuffer.reserve(tagVT);
-	verticesID.reserve(tagV); // approx
-	noramlsID.reserve(tagV);
+	
+	std::vector<unsigned int> verticesID;
+	verticesID.reserve(tagV);
+	
+	std::vector<unsigned int> normalsID;
+	normalsID.reserve(tagV);
+	std::vector<unsigned int> texCoordsID;
 	texCoordsID.reserve(tagV);
+	
+	
 
 	std::vector<unsigned int> localIndices;
 	localIndices.reserve(64*3);
-	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(map);
+	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(m_map);
 
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<unsigned int> > > vecNormIndPerVertex(map, "incidentsN");
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<unsigned int> > > vecTCIndPerVertex(map, "incidentsTC");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(m_map, "incidents");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<unsigned int> > > vecNormIndPerVertex(m_map, "incidentsN");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<unsigned int> > > vecTCIndPerVertex(m_map, "incidentsTC");
 
+	unsigned int currentGroup = 0;
 
+	DartMarkerNoUnmark mk(m_map) ;
 	unsigned int i = 0;
 	fp >> tag;
 	std::getline(fp, ligne);
@@ -208,7 +388,7 @@ bool importObjTex(typename PFP::MAP& map, const std::string& filename,
 			VEC3 pos(x,y,z);
 
 			unsigned int id = container.insertLine();
-			positions[id] = pos;
+			m_positions[id] = pos;
 
 			verticesID.push_back(id);
 			i++;
@@ -231,13 +411,21 @@ bool importObjTex(typename PFP::MAP& map, const std::string& filename,
 			VEC2 tc;
 			oss >> tc[0];
 			oss >> tc[1];
-			texcoordsBuffer.push_back(tc);
+			texCoordsBuffer.push_back(tc);
 		}
 
 		if (tag == std::string("g"))
 		{
-			currentBrowser = new MapBrowserLinked(map);
-			browsers.push_back();
+			m_groupNames.push_back(ligne);
+			std::string buf;
+			fp >> buf;
+			if (buf != "usemtl")
+			{
+				CGoGNerr << "problem reading OBJ, waiting for usemtl get "<< buf << CGoGNendl;
+			}
+			fp >> buf;
+			m_materialNames.push_back(buf);
+			currentGroup++;
 		}
 
 		if (tag == std::string("f"))
@@ -246,56 +434,61 @@ bool importObjTex(typename PFP::MAP& map, const std::string& filename,
 
 			short nbe = readObjLine(oss,localIndices);
 
-			Dart d = map.newFace(nbe, false);
+			Dart d = m_map.newFace(nbe, false);
+			m_groups[d] = currentGroup;
+			
 			for (short j = 0; j < nbe; ++j)
 			{
 				unsigned int em = localIndices[3*j]-1;		// get embedding
 				fsetemb.changeEmb(em) ;
-				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-				m.mark(d) ;								// mark on the fly to unmark on second loop
+				m_map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+				mk.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
 				vecTCIndPerVertex[em].push_back(localIndices[3*j+1]-1);
 				vecNormIndPerVertex[em].push_back(localIndices[3*j+2]-1);
-				d = map.phi1(d);
+				d = m_map.phi1(d);
 			}
 		}
 		fp >> tag;
 		std::getline(fp, ligne);
 	} while (!fp.eof());
-
-
+	fp.close ();
 
 	// reconstruct neighbourhood
 	unsigned int nbBoundaryEdges = 0;
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	for (Dart d = m_map.begin(); d != m_map.end(); m_map.next(d))
 	{
-		if (m.isMarked(d))
+		if (mk.isMarked(d))
 		{
 			// darts incident to end vertex of edge
-			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+			std::vector<Dart>& vec = vecDartsPerVertex[m_map.phi1(d)];
 
-			unsigned int embd = map.template getEmbedding<VERTEX>(d);
+			unsigned int embd = m_map.template getEmbedding<VERTEX>(d);
 			Dart good_dart = NIL;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if (map.template getEmbedding<VERTEX>(map.phi1(*it)) == embd)
+				if (m_map.template getEmbedding<VERTEX>(m_map.phi1(*it)) == embd)
 					good_dart = *it;
 			}
 
 			if (good_dart != NIL)
 			{
-				map.sewFaces(d, good_dart, false);
-				m.unmarkOrbit<EDGE>(d);
+				if (good_dart == m_map.phi2(good_dart) && (d == m_map.phi2(d)))
+					m_map.sewFaces(d, good_dart, false);
+				else
+					m_dirtyEdges.mark(d);
+				mk.unmarkOrbit<EDGE>(d);
 			}
 			else
 			{
-				m.unmark(d);
+				mk.unmark(d);
+				m_dirtyEdges.mark(d);
 				++nbBoundaryEdges;
 			}
 		}
 	}
 
-	TraversorV tra(map);
+	TraversorV<typename PFP::MAP> tra(m_map);
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
 		std::vector<Dart>& vec			= vecDartsPerVertex[d];
@@ -316,360 +509,25 @@ bool importObjTex(typename PFP::MAP& map, const std::string& filename,
 		{
 			for (unsigned int j=0; j<nb; ++j)
 			{
-				Dart e = vec[i];
-				texCoordsF[e] = vecTCIndPerVertex[e][j];
-				normalsF[e] = vecNormIndPerVertex[e][j];
+				Dart e = vec[j];
+				m_texCoordsF[e] = texCoordsBuffer[ vecTCIndPerVertex[e][j] ];
+				m_normalsF[e] = normalsBuffer[ vecNormIndPerVertex[e][j] ];
 			}
-			markV.mark(d);
+			m_specialVertices.mark(d);
 		}
 		else
 		{
-			texCoords[d] = vecTCIndPerVertex[d][0];
-			normals[d] = vecNormIndPerVertex[d][0];
-			markV.unmark(d);
+			m_texCoords[d] = texCoordsBuffer[ vecTCIndPerVertex[d][0] ];
+			m_normals[d] = normalsBuffer[ vecNormIndPerVertex[d][0] ];
+			m_specialVertices.unmark(d);
 		}
 	}
 
-
-
-
-
-
-
-////	std::string ligne;
-////	std::string tag;
-
-////	do
-////	{
-////		fp >> tag;
-////		std::getline (fp, ligne);
-////	}while (tag != std::string("v"));
-
-//	// lecture des sommets
-//	std::vector<unsigned int> verticesID;
-//	verticesID.reserve(102400); // on tape large (400Ko wahouuuuu !!)
-
-//	m_texcoordsBuffer.reserve(102400);
-
-//	m_normalsBuffer.reserve(102400);
-
-//	unsigned int i = 0;
-//	do
-//	{
-//		if (tag == std::string("v"))
-//		{
-//			std::stringstream oss(ligne);
-
-//			float x,y,z;
-//			oss >> x;
-//			oss >> y;
-//			oss >> z;
-
-//			VEC3 pos(x,y,z);
-
-//			unsigned int id = container.insertLine();
-//			positions[id] = pos;
-
-//			verticesID.push_back(id);
-//			i++;
-//		}
-
-//		if (tag == std::string("vn"))
-//		{
-//			std::stringstream oss(ligne);
-
-//			VEC3 norm;
-//			oss >> norm[0];
-//			oss >> norm[1];
-//			oss >> norm[2];
-//			m_normalsBuffer.push_back(norm);
-//		}
-
-//		if (tag == std::string("vt"))
-//		{
-//			std::stringstream oss(ligne);
-//			VEC2 tc;
-//			oss >> tc[0];
-//			oss >> tc[1];
-//			m_texcoordsBuffer.push_back(tc);
-//		}
-
-//		fp >> tag;
-//		std::getline(fp, ligne);
-//	} while (!fp.eof());
-
-//	m_nbVertices = verticesID.size();
-
-//	// close/clear/open only way to go back to beginning of file
-//	fp.close();
-//	fp.clear();
-//	fp.open(filename.c_str());
-
-//	do
-//	{
-//		fp >> tag;
-//		std::getline (fp, ligne);
-//	} while (tag != std::string("f"));
-
-//	m_nbEdges.reserve(verticesID.size()*2);
-//	m_emb.reserve(verticesID.size()*8);
-
-//	std::vector<int> table;
-//	table.reserve(64); // NBV cotes pour une face devrait suffire
-//	m_nbFaces = 0;
-//	do
-//	{
-//		if (tag == std::string("f")) // lecture d'une face
-//		{
-//			std::stringstream oss(ligne);
-//			table.clear();
-//			while (!oss.eof())  // lecture de tous les indices
-//			{
-//				std::string str;
-//				oss >> str;
-
-//				unsigned int ind = 0;
-
-//// TODO A MODIFIER POUR LIRE P/T/N ou P//N ou P/T ...
-
-//				while ((ind<str.length()) && (str[ind]!='/'))
-//					ind++;
-
-//				if (ind > 0)
-//				{
-//					long index;
-//					std::stringstream iss(str.substr(0, ind));
-//					iss >> index;
-//					table.push_back(index);
-//				}
-//			}
-
-//			unsigned int n = table.size();
-//			m_nbEdges.push_back(short(n));
-//			for (unsigned int j = 0; j < n; ++j)
-//			{
-//				int index = table[j] - 1; // les index commencent a 1 (boufonnerie d'obj ;)
-//				m_emb.push_back(verticesID[index]);
-//			}
-//			m_nbFaces++;
-//		}
-//		fp >> tag;
-//		std::getline(fp, ligne);
-//	 } while (!fp.eof());
-
-//	fp.close ();
-//	return true;
-}
-
-
-
-
-
-
-
-
-
-
-
-template<typename PFP>
-bool importObjWithTex(typename PFP::MAP& map, const std::string& filename)
-{
-	typedef typename PFP::EMB VertexEmb;
-	
-
-	// open file
-	std::ifstream fp(filename.c_str(), std::ios::binary);
-	if (!fp.good())
-	{
-		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
-		return false;
-	}
-
-    std::string ligne;
-    std::string tag;
-
-    do
-    {
-    	fp >> tag;
-    	std::getline (fp, ligne);
-    }while (tag != std::string("v"));
-
-    // lecture des sommets
-
-	std::vector<VertexEmb*> vertices;
-	vertices.reserve(102400); 
-
-	std::vector<Emb::TexCoord2*> texcoords;
-	texcoords.reserve(102400);
-
-
-	// coordonnees de texture "fake" pour le cas des faces ne soit pas texturée
-	Emb::TexCoord2* tc = Emb::TexCoord2::create(gmtl::Vec2f(0.0f,0.0f));
-	tc->setLabel(0);
-	texcoords.push_back(tc);
-
-	int i=0;
-	int j=1;
-    do
-    {
-		if (tag == std::string("v"))
-		{
-			std::stringstream oss(ligne);
-		
-			float x,y,z;
-			oss >> x;
-			oss >> y;
-			oss >> z;
-
-			VertexEmb* em = VertexEmb::create(gmtl::Vec3f(x,y,z));
-			em->setLabel(i);
-			vertices.push_back(em);
-			i++;
-		}
-		else if (tag == std::string("vt"))
-		{
-			std::stringstream oss(ligne);
-		
-			float u,v;
-			oss >> u;
-			oss >> v;
-
-			Emb::TexCoord2* tc = Emb::TexCoord2::create(gmtl::Vec2f(u,v)); 
-			tc->setLabel(j);
-			texcoords.push_back(tc);
-// 			CGoGNout << "vt :"<<tc->getTexCoord()<<CGoGNendl;
-			j++;
-		}
-
-		fp >> tag;
-    	std::getline (fp, ligne);
-
-    }while (!fp.eof());
-
-
-	// pour la reconstruction du phi2
-	std::vector< std::vector<Dart> > dartsOfVertex;
-	dartsOfVertex.resize(vertices.size());
-	for (int i=0; i<dartsOfVertex.size(); ++i)
-	{
-		dartsOfVertex[i].reserve(16);
-	}
-
-
-	// close/clear/open only way to go back to beginning of file
-	fp.close();
-	fp.clear();
-	fp.open(filename.c_str());
-
-
-	// saute tout jusqu'à la premiere face
-	do
-    {
-    	fp >> tag;
-    	std::getline (fp, ligne);
-    }while (tag != std::string("f"));
-
-
-	std::vector<int> table;
-	table.reserve(64); // 64 cotes pour une face ca devrait suffire
-	std::vector<int> tableTex;
-	tableTex.reserve(64); // 64 cotes pour une face ca devrait suffire
-
-	do
-	{
-		if  (tag == std::string("f")) // lecture d'une face
-		{
-			std::stringstream oss(ligne);
-     		table.clear();
-			tableTex.clear();
-
-    		while (!oss.eof())  // lecture de tous les indices
-    		{
-    			std::string str;
-    			oss >> str;
-
-				//position du premier /
-    			unsigned ind=0;
-    			while ( (str[ind]!='/')&& (ind<str.length()) )
-    			{
-    				ind++;
-    			}
-				// position du deuxieme /
-  				unsigned ind2=ind;
-     			while ( (str[ind]!='/')&& (ind2<str.length()) )
-     			{
-     				ind2++;
-     			}
-				ind2;
-
-				if (ind>0)
-				{
-    				int index;
-					std::stringstream iss(str.substr(0,ind));
-					iss >> index;
-		   			table.push_back(index);
-				}
-
-				if (ind2<str.length())
-				{
-    				int index;
-					std::stringstream iss(str.substr(ind2+1,str.length()));
-					iss >> index;
-
-//					CGoGNout << "Tex: "<< index<<CGoGNendl;
-					tableTex.push_back(index);
-				}
-    		}
-
-// 			CGoGNout << "Face: ";
-			int n = table.size();	
-			Dart d = map.newFace(n);
-			for (int j=0;j<n; ++j)
-    		{
-				int k = table[j]-1;
-				map.setVertexEmb(d, vertices[k]); // pas direct sur le brin pour les GCartes
-				dartsOfVertex[k].push_back(d);
-				if (!tableTex.empty())
-				{
-					map.setFaceVertexEmb(d,texcoords[tableTex[j]]); // pas -1 car on a utilisé
-// 					CGoGNout <<texcoords[tableTex[j]]->getTexCoord()<< " / ";
-				}
-				else 
-					map.setFaceVertexEmb(d,texcoords[0]);
-				d = map.phi1(d);
-    		}
-// 			CGoGNout << CGoGNendl;;
-    	}
-		fp >> tag;
-    	std::getline (fp, ligne);
-     }while (!fp.eof());
-
-
-	for (Dart d = map.begin(); d != map.end(); ++d)
-	{
-		if (map.phi2(d) == d)
-		{
-			Emb::Embedding* em0 = map.getVertexEmb(d);
-			Emb::Embedding* em1 = NULL;
-
-			int k = map.getVertexEmb(map.phi1(d))->getLabel();
-			typename std::vector<Dart>::iterator it = dartsOfVertex[k].begin();
-
-			do
-			{
-				em1 = map.getVertexEmb( map.phi1(*it) );
-				if (em1 == em0)
-				{
-					map.sewFaces(d,*it);
-				}
-				it++;
-			} while ((em1 != em0) && (it!= dartsOfVertex[k].end()));
-		}
-	}
-
-	fp.close ();
 	return true;
+
 }
+
+
 
 }
 }
