@@ -175,21 +175,21 @@ bool OBJModel<PFP>::generateBrowsers(std::vector<MapBrowser*>& browsers)
 	if (m_groupNames.empty())
 		return false;
 	
-	MapBrowserLinked<typename PFP::MAP>* MBLptr = new MapBrowserLinked<typename PFP::MAP>(m_map);
+	MapBrowserLinked* MBLptr = new MapBrowserLinked(m_map);
 	DartAttribute<Dart>& links = MBLptr->getLinkAttr();
 	browsers.push_back(MBLptr);
 	
 	for (unsigned int i = 1; i<m_groupNames.size(); ++i)
 	{
-		MapBrowser* MBptr = new MapBrowserLinked<typename PFP::MAP>(m_map,links);
+		MapBrowser* MBptr = new MapBrowserLinked(m_map,links);
 		browsers.push_back(MBptr);
 	}
 	
 	for (Dart d=m_map.begin(); d!=m_map.end(); m_map.next(d))
 	{
 		unsigned int g = m_groups[d] -1 ; // groups are name from 1
-		MapBrowserLinked<typename PFP::MAP>* mb = static_cast<MapBrowserLinked<typename PFP::MAP>*>(browsers[g]);
-		mb->push_back(d);
+		MapBrowserLinked* mb = static_cast<MapBrowserLinked*>(browsers[g]);
+		mb->pushBack(d);
 	}
 	return true;
 }

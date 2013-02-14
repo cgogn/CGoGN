@@ -610,7 +610,6 @@ inline void GenericMap::realNext(Dart& d) const
 	}
 	else
 	{
-
 		m_attribs[DART].next(d.index) ;
 	}
 }
@@ -618,52 +617,74 @@ inline void GenericMap::realNext(Dart& d) const
 
 inline Dart GenericMap::begin() const
 {
-	if (m_isMultiRes)
-	{
-		unsigned int d = m_mrattribs.begin() ;
-		if(d != m_mrattribs.end())
-		{
-			while (getDartLevel(d) > m_mrCurrentLevel)
-				m_mrattribs.next(d) ;
-		}
-		return Dart::create(d) ;
-	}
-
-
 	if (m_currentBrowser != NULL)
 		return m_currentBrowser->begin();
-
-	return Dart::create(m_attribs[DART].begin()) ;
+	return GenericMap::realBegin();
 }
 
 inline Dart GenericMap::end() const
 {
-	if (m_isMultiRes)
-		return Dart::create(m_mrattribs.end()) ;
-
 	if (m_currentBrowser != NULL)
 		return m_currentBrowser->end();
-
-	return Dart::create(m_attribs[DART].end()) ;
+	return GenericMap::realEnd();
 }
 
 inline void GenericMap::next(Dart& d) const
 {
-	if (m_isMultiRes)
-	{
-		do
-		{
-			m_mrattribs.next(d.index) ;
-		} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
-	}
+	if (m_currentBrowser != NULL)
+		m_currentBrowser->next(d);
 	else
-	{
-		if (m_currentBrowser != NULL)
-			return m_currentBrowser->next(d);
-		else
-			m_attribs[DART].next(d.index) ;
-	}
+		realNext(d);
 }
+
+//inline Dart GenericMap::begin() const
+//{
+//	if (m_isMultiRes)
+//	{
+//		unsigned int d = m_mrattribs.begin() ;
+//		if(d != m_mrattribs.end())
+//		{
+//			while (getDartLevel(d) > m_mrCurrentLevel)
+//				m_mrattribs.next(d) ;
+//		}
+//		return Dart::create(d) ;
+//	}
+
+
+//	if (m_currentBrowser != NULL)
+//		return m_currentBrowser->begin();
+
+//	return Dart::create(m_attribs[DART].begin()) ;
+//}
+
+//inline Dart GenericMap::end() const
+//{
+//	if (m_isMultiRes)
+//		return Dart::create(m_mrattribs.end()) ;
+
+//	if (m_currentBrowser != NULL)
+//		return m_currentBrowser->end();
+
+//	return Dart::create(m_attribs[DART].end()) ;
+//}
+
+//inline void GenericMap::next(Dart& d) const
+//{
+//	if (m_isMultiRes)
+//	{
+//		do
+//		{
+//			m_mrattribs.next(d.index) ;
+//		} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
+//	}
+//	else
+//	{
+//		if (m_currentBrowser != NULL)
+//			return m_currentBrowser->next(d);
+//		else
+//			m_attribs[DART].next(d.index) ;
+//	}
+//}
 
 template <unsigned int ORBIT>
 bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread)

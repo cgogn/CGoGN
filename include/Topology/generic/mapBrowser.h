@@ -42,29 +42,15 @@ class MapBrowserSelector : public MapBrowser
 protected:
 	AttribMap& m_map ;
 	const FunctorSelect& m_selector ;
+
 public:
-	MapBrowserSelector(AttribMap& m, const FunctorSelect& fs) :
-		m_map(m), m_selector(fs)
-	{}
+	MapBrowserSelector(AttribMap& m, const FunctorSelect& fs);
 
-	inline Dart begin() const
-	{
-		return m_map.realBegin() ;
-	}
+	Dart begin() const;
 
-	inline Dart end() const
-	{
-		return m_map.realEnd() ;
-	}
+	Dart end() const;
 
-	inline void next(Dart& d) const
-	{
-		do
-		{
-			m_map.realNext(d) ;
-		}
-		while ( (d != m_map.realEnd()) && !m_selector(d) ) ;
-	}
+	void next(Dart& d) const;
 } ;
 
 /**
@@ -88,109 +74,40 @@ protected:
 	Dart m_end ;
 
 public:
-	MapBrowserLinked(AttribMap& m) :
-		m_map(m), autoAttribute(true), m_first(NIL), m_end(NIL)
-	{
-		m_links = m.addAttribute<Dart, DART>("") ;
-	}
+	MapBrowserLinked(AttribMap& m);
 
-	MapBrowserLinked(AttribMap& m, DartAttribute<Dart>& links) :
-		m_map(m), autoAttribute(false), m_links(links), m_first(NIL), m_end(NIL)
-	{
-	}
+	MapBrowserLinked(AttribMap& m, DartAttribute<Dart>& links);
 	
-	MapBrowserLinked(AttribMap& m, DartAttribute<Dart>& links, Dart first, Dart end) :
-		m_map(m), autoAttribute(false), m_links(links), m_first(first), m_end(end)
-	{
-	}
+	MapBrowserLinked(AttribMap& m, DartAttribute<Dart>& links, Dart first, Dart end);
 
-	~MapBrowserLinked()
-	{
-		if (autoAttribute)
-			m_map.removeAttribute(m_links) ;
-	}
-
-	inline DartAttribute<Dart>& getLinkAttr()
-	{
-		return m_links;
-	}
+	~MapBrowserLinked();
+	DartAttribute<Dart>& getLinkAttr();
 	
-	inline void clear()
-	{
-		m_first = NIL ;
-		m_end = NIL ;
-	}
+	void clear();
 
-	inline Dart begin() const
-	{
-		return m_first ;
-	}
+	Dart begin() const;
 
-	inline Dart end() const
-	{
-		return NIL ;
-	}
+	Dart end() const;
 
-	inline void next(Dart& d) const
-	{
-		assert(d != NIL) ;
-		d = m_links[d] ;
-	}
+	void next(Dart& d) const;
 
-	void pushFront(Dart d)
-	{
-		assert(d != NIL) ;
-		m_links[d] = m_first ;
-		m_first = d ;
-		if (m_end == NIL)		// empty list
-			m_end = d ;
-	}
+	void pushFront(Dart d);
 
-	void pushBack(Dart d)
-	{
-		assert(d != NIL) ;
-		m_links[d] = NIL ;
-		if (m_first == NIL)		// empty list
-		{
-			m_first = d ;
-			m_end = d ;
-		}
-		else
-		{
-			m_links[m_end] = d ;
-			m_end = d ;
-		}
-	}
+	void pushBack(Dart d);
 
-	void popFront()
-	{
-		if (m_first == m_end)	// one element or empty list
-		{
-			m_first = NIL ;
-			m_end = NIL ;
-		}
-		else m_first = m_links[m_first] ;
-	}
+	void popFront();
 
 
-	void addSelected(const FunctorSelect& fs)
-	{
-		for (Dart d = m_map.begin() ; d != m_map.end() ; m_map.next(d))
-		{
-			if (fs(d))
-//			pushFront(d) ;
-				pushBack(d); // better tot use push_back for memory access
-		}
-	}
+	void addSelected(const FunctorSelect& fs);
 
 	// operator() for use of foreach_cell
-	bool operator()(Dart d)
-	{
-		pushFront(d) ;
-		return false ;
-	}
+	bool operator()(Dart d);
+
+	void append(MapBrowserLinked& mbl);
 } ;
 
 } // namespace CGoGN
+
+#include "mapBrowser.hpp"
 
 #endif /* MAPBROWSER_H_ */
