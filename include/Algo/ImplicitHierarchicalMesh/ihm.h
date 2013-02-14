@@ -173,6 +173,12 @@ public:
 	 */
 	Dart faceOldestDart(Dart d) ;
 
+	//! Test if dart d and e belong to the same face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameFace(Dart d, Dart e) ;
+
 	/**
 	 * Return true if the edge of d in the current level map
 	 * has already been subdivided to the next level

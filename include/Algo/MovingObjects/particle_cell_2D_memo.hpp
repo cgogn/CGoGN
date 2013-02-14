@@ -6,7 +6,7 @@ std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 	if (!Geom::arePointsEquals(goal, this->getPosition()))
 	{
 		CellMarkerMemo<FACE> memo_cross(this->m);
-		memo_cross.mark(this->d);
+
 
 		switch (this->getState())
 		{
