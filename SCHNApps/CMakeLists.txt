@@ -73,6 +73,7 @@ SET (EXT_INCLUDES
 # define libs for external libs
 SET (EXT_LIBS 
 	PythonQt
+	nl
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
@@ -111,6 +112,7 @@ file(
 	SCHNApps_FILES
 	${SCHNApps_ROOT_DIR}/src/*.cpp
 	${SCHNApps_ROOT_DIR}/include/*.h
+	${SCHNApps_ROOT_DIR}/include/*.hpp
 )
 
 file(

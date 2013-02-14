@@ -85,7 +85,7 @@ public:
 
 	/**
 	 * init the data structure
-	 * @param com say if compile only, or compile and execute (GL_COMPILE/ GL_COMPILE_AND_EXECUTE)
+	 * @param comp say if compile only, or compile and execute (GL_COMPILE / GL_COMPILE_AND_EXECUTE)
 	 */
 	void newList(GLenum comp = GL_COMPILE);
 
@@ -163,7 +163,7 @@ public:
 	/**
 	 * update position of VBO of drawer
 	 * @param first index of vertex to update
-	 * @param nb number of vertex tp update
+	 * @param nb number of vertices to update
 	 * @param P ptr to table of vertices
 	 */
 	void updatePositions(unsigned int first, unsigned int nb, const Geom::Vec3f* P);
@@ -171,7 +171,7 @@ public:
 	/**
 	 * update position of VBO of drawer
 	 * @param first index of vertex to update
-	 * @param nb number of vertex tp update
+	 * @param nb number of vertices to update
 	 * @param P ptr to table of vertices
 	 */
 	void updatePositions(unsigned int first, unsigned int nb, const float* P);

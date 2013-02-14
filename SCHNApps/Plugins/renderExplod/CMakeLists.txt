@@ -26,6 +26,7 @@ file(
 SET(
 	PLUGIN_QOBJECT_FILES
 	${PLUGIN_ROOT_DIR}/include/renderExplod.h
+	${PLUGIN_ROOT_DIR}/include/renderExplodDockTab.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

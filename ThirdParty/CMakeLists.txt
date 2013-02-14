@@ -15,7 +15,7 @@ ELSE (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
 ENDIF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
 
 IF(WIN32)
-	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib)#release added by visual
+	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib) #release added by visual
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/)
 ELSE(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
@@ -39,6 +39,9 @@ add_subdirectory(Tools Tools/build)
 
 add_subdirectory(PythonQt PythonQt/build)
 INSTALL (DIRECTORY PythonQt/src/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/PythonQt FILES_MATCHING PATTERN "*.h")
+
+add_subdirectory(OpenNL OpenNL/build)
+INSTALL (DIRECTORY OpenNL/src/NL/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/NL FILES_MATCHING PATTERN "*.h")
 
 IF (WITH_ZINRI)
 	add_subdirectory(Zinri Zinri/build)

@@ -2,17 +2,18 @@
 #define _RENDER_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_render.h"
+#include "renderDockTab.h"
 
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderPhong.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/pointSprite.h"
 
+namespace CGoGN
+{
 
-using namespace CGoGN;
-using namespace SCHNApps;
-
+namespace SCHNApps
+{
 
 enum FaceShadingStyle
 {
@@ -53,30 +54,13 @@ struct ParameterSet
 };
 
 
-class RenderPlugin;
-
-class RenderDockTab : public QWidget, public Ui::RenderWidget
-{
-public:
-	RenderDockTab(RenderPlugin* p) : plugin(p)
-	{
-		setupUi(this);
-	}
-
-	void refreshUI(ParameterSet* params);
-
-private:
-	RenderPlugin* plugin;
-};
-
-
 class RenderPlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderPlugin() : b_refreshingUI(false)
+	RenderPlugin()
 	{
 		setProvidesRendering(true);
 	}
@@ -96,8 +80,6 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-	void setRefreshingUI(bool b) { b_refreshingUI = b; }
-
 protected:
 	RenderDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
@@ -106,8 +88,6 @@ protected:
 	CGoGN::Utils::ShaderPhong* m_phongShader;
 	CGoGN::Utils::ShaderSimpleColor* m_simpleColorShader;
 	CGoGN::Utils::PointSprite* m_pointSprite;
-
-	bool b_refreshingUI;
 
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
@@ -128,15 +108,10 @@ public slots:
 	void changeRenderEdges(View* view, MapHandlerGen* map, bool b);
 	void changeRenderFaces(View* view, MapHandlerGen* map, bool b);
 	void changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style);
-
-	void cb_selectedMapChanged();
-	void cb_positionVBOChanged(int index);
-	void cb_normalVBOChanged(int index);
-	void cb_renderVerticesChanged(bool b);
-	void cb_verticesScaleFactorChanged(int i);
-	void cb_renderEdgesChanged(bool b);
-	void cb_renderFacesChanged(bool b);
-	void cb_faceStyleChanged(QAbstractButton* b);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

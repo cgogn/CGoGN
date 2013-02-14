@@ -2,13 +2,13 @@
 #define _SUBDIVIDESURFACE_PLUGIN_H_
 
 #include "plugin.h"
-
 #include "subdivideSurfaceDialog.h"
 
+namespace CGoGN
+{
 
-using namespace CGoGN;
-using namespace SCHNApps;
-
+namespace SCHNApps
+{
 
 class SubdivideSurfacePlugin : public Plugin
 {
@@ -49,5 +49,9 @@ private:
 
 	QAction* m_subdivideSurfaceAction;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif
