@@ -11,7 +11,7 @@ namespace SCHNApps
 
 class Window;
 class RenderPlugin;
-class ParameterSet;
+struct ParameterSet;
 
 class RenderDockTab : public QWidget, public Ui::RenderDockWidget
 {

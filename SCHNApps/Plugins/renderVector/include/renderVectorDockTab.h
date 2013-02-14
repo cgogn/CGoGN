@@ -11,7 +11,7 @@ namespace SCHNApps
 
 class Window;
 class RenderVectorPlugin;
-class ParameterSet;
+struct ParameterSet;
 
 class RenderVectorDockTab : public QWidget, public Ui::RenderVectorDockWidget
 {
