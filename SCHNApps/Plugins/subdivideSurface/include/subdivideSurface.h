@@ -38,11 +38,24 @@ public:
 
 public slots:
 	void openSubdivideSurfaceDialog();
-	void subdivideSurface();
+	void subdivideSurfaceFromDialog();
 
-	void loopSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
-	void CCSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
-	void trianguleFaces(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
+	void loopSubdivision(
+		const QString& mapName,
+		const QString& positionAttributeName = "position"
+	);
+	void CCSubdivision(
+		const QString& mapName,
+		const QString& positionAttributeName = "position"
+	);
+	void trianguleFaces(
+		const QString& mapName,
+		const QString& positionAttributeName = "position"
+	);
+
+//	void loopSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
+//	void CCSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
+//	void trianguleFaces(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
 
 private:
 	SubdivideSurfaceDialog* m_subdivideSurfaceDialog;

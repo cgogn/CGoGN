@@ -38,18 +38,22 @@ public:
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
 public slots:
+	void mapAdded(MapHandlerGen* map);
+	void mapRemoved(MapHandlerGen* map);
+	void attributeModified(unsigned int orbit, QString nameAttr);
+
 	void openComputeNormalDialog();
 	void openComputeCurvatureDialog();
 
 	void computeNormalFromDialog();
 	void computeCurvatureFromDialog();
 
-	void computeNormal(
-		const QString& mapName,
+	void computeNormal(const QString& mapName,
 		const QString& positionAttributeName = "position",
 		const QString& normalAttributeName = "normal",
-		bool createNormalVBO = true
-	);
+		bool createNormalVBO = true,
+		bool autoUpdateNormal = true);
+
 	void computeCurvature(
 		const QString& mapName,
 		const QString& positionAttributeName = "position",
@@ -63,7 +67,12 @@ public slots:
 		bool createkmaxVBO = true,
 		bool createKminVBO = true,
 		bool createkminVBO = true,
-		bool createKnormalVBO = true
+		bool createKnormalVBO = true,
+		bool autoUpdateKmax = true,
+		bool autoUpdatekmax = true,
+		bool autoUpdateKmin = true,
+		bool autoUpdatekmin = true,
+		bool autoUpdateKnormal = true
 	);
 
 private:
@@ -76,9 +85,13 @@ private:
 	struct ComputeNormalParameters
 	{
 		ComputeNormalParameters() {}
-		ComputeNormalParameters(QString p, QString n) : positionName(p), normalName(n) {}
+		ComputeNormalParameters(QString p, QString n, bool vbo, bool update) :
+			positionName(p), normalName(n), createVBO(vbo), autoUpdate(update)
+		{}
 		QString positionName;
 		QString normalName;
+		bool createVBO;
+		bool autoUpdate;
 	};
 	QHash<QString, ComputeNormalParameters> computeNormalLastParameters;
 };

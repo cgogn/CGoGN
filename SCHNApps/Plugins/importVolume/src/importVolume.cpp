@@ -7,6 +7,12 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 bool ImportVolumePlugin::enable()
 {
 	importAction = new QAction("import", this);
@@ -30,11 +36,14 @@ MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toStdString(), attrNames);
 
 			// get vertex position attribute
-			VertexAttribute<PFP3::VEC3> position = map->getAttribute<PFP3::VEC3, CGoGN::VERTEX>(attrNames[0]);
-			mh->registerAttribute<PFP2::VEC3, VERTEX>(position);
+			VertexAttribute<PFP3::VEC3> position = map->getAttribute<PFP3::VEC3, VERTEX>(attrNames[0]);
+			mh->registerAttribute(position);
 
 			// create VBO for vertex position attribute
 			mh->createVBO(position);
+
+			// update corresponding VBO & emit attribute update signal
+			mh->notifyAttributeModification(position);
 
 			// compute map bounding box
 			mh->updateBB(position);
@@ -56,3 +65,7 @@ Q_EXPORT_PLUGIN2(ImportVolumePlugin, ImportVolumePlugin)
 #else
 Q_EXPORT_PLUGIN2(ImportVolumePluginD, ImportVolumePlugin)
 #endif
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

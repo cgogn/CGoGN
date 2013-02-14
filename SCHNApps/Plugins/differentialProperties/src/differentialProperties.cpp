@@ -25,7 +25,34 @@ bool DifferentialPropertiesPlugin::enable()
 	connect(m_computeCurvatureDialog, SIGNAL(accepted()), this, SLOT(computeCurvatureFromDialog()));
 	connect(m_computeCurvatureDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeCurvatureFromDialog()));
 
+	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+
 	return true;
+}
+
+void DifferentialPropertiesPlugin::mapAdded(MapHandlerGen *map)
+{
+	connect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+}
+
+void DifferentialPropertiesPlugin::mapRemoved(MapHandlerGen *map)
+{
+	disconnect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+}
+
+void DifferentialPropertiesPlugin::attributeModified(unsigned int orbit, QString nameAttr)
+{
+	if(orbit == VERTEX)
+	{
+		MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+		if(computeNormalLastParameters.contains(map->getName()))
+		{
+			ComputeNormalParameters& params = computeNormalLastParameters[map->getName()];
+			if(params.positionName == nameAttr && params.autoUpdate)
+				computeNormal(map->getName(), params.positionName, params.normalName, params.createVBO);
+		}
+	}
 }
 
 void DifferentialPropertiesPlugin::openComputeNormalDialog()
@@ -46,6 +73,7 @@ void DifferentialPropertiesPlugin::computeNormalFromDialog()
 		const QString& mapName = currentItems[0]->text();
 
 		QString positionName = m_computeNormalDialog->combo_positionAttribute->currentText();
+
 		QString normalName;
 		if(m_computeNormalDialog->normalAttributeName->text().isEmpty())
 			normalName = m_computeNormalDialog->combo_normalAttribute->currentText();
@@ -54,7 +82,9 @@ void DifferentialPropertiesPlugin::computeNormalFromDialog()
 
 		bool createVBO = (m_computeNormalDialog->check_createVBO->checkState() == Qt::Checked);
 
-		computeNormal(mapName, positionName, normalName, createVBO);
+		bool autoUpdate = (currentItems[0]->checkState() == Qt::Checked);
+
+		computeNormal(mapName, positionName, normalName, createVBO, autoUpdate);
 	}
 }
 
@@ -73,39 +103,34 @@ void DifferentialPropertiesPlugin::computeCurvatureFromDialog()
 			KmaxName = m_computeCurvatureDialog->combo_KmaxAttribute->currentText();
 		else
 			KmaxName = m_computeCurvatureDialog->KmaxAttributeName->text();
+		bool KmaxVBO = (m_computeCurvatureDialog->check_KmaxCreateVBO->checkState() == Qt::Checked);
 
 		QString kmaxName;
 		if(m_computeCurvatureDialog->kmaxAttributeName->text().isEmpty())
 			kmaxName = m_computeCurvatureDialog->combo_kmaxAttribute->currentText();
 		else
 			kmaxName = m_computeCurvatureDialog->kmaxAttributeName->text();
+		bool kmaxVBO = (m_computeCurvatureDialog->check_kmaxCreateVBO->checkState() == Qt::Checked);
 
 		QString KminName;
 		if(m_computeCurvatureDialog->KminAttributeName->text().isEmpty())
 			KminName = m_computeCurvatureDialog->combo_KminAttribute->currentText();
 		else
 			KminName = m_computeCurvatureDialog->KminAttributeName->text();
+		bool KminVBO = (m_computeCurvatureDialog->check_KminCreateVBO->checkState() == Qt::Checked);
 
 		QString kminName;
 		if(m_computeCurvatureDialog->kminAttributeName->text().isEmpty())
 			kminName = m_computeCurvatureDialog->combo_kminAttribute->currentText();
 		else
 			kminName = m_computeCurvatureDialog->kminAttributeName->text();
+		bool kminVBO = (m_computeCurvatureDialog->check_kminCreateVBO->checkState() == Qt::Checked);
 
 		QString KnormalName;
 		if(m_computeCurvatureDialog->KnormalAttributeName->text().isEmpty())
 			KnormalName = m_computeCurvatureDialog->combo_KnormalAttribute->currentText();
 		else
 			KnormalName = m_computeCurvatureDialog->KnormalAttributeName->text();
-
-		bool KmaxVBO = (m_computeCurvatureDialog->check_KmaxCreateVBO->checkState() == Qt::Checked);
-
-		bool kmaxVBO = (m_computeCurvatureDialog->check_kmaxCreateVBO->checkState() == Qt::Checked);
-
-		bool KminVBO = (m_computeCurvatureDialog->check_KminCreateVBO->checkState() == Qt::Checked);
-
-		bool kminVBO = (m_computeCurvatureDialog->check_kminCreateVBO->checkState() == Qt::Checked);
-
 		bool KnormalVBO = (m_computeCurvatureDialog->check_KnormalCreateVBO->checkState() == Qt::Checked);
 
 		computeCurvature(
@@ -119,7 +144,8 @@ void DifferentialPropertiesPlugin::computeNormal(
 	const QString& mapName,
 	const QString& positionAttributeName,
 	const QString& normalAttributeName,
-	bool createNormalVBO)
+	bool createNormalVBO,
+	bool autoUpdateNormal)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
 	if(mh == NULL)
@@ -140,7 +166,9 @@ void DifferentialPropertiesPlugin::computeNormal(
 		mh->createVBO(normal);
 
 	computeNormalLastParameters[mapName] =
-		ComputeNormalParameters(positionAttributeName, normalAttributeName) ;
+		ComputeNormalParameters(positionAttributeName, normalAttributeName, createNormalVBO, autoUpdateNormal) ;
+
+	mh->notifyAttributeModification(normal);
 
 	QList<View*> views = mh->getLinkedViews();
 	foreach(View* view, views)
@@ -160,7 +188,12 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	bool createkmaxVBO,
 	bool createKminVBO,
 	bool createkminVBO,
-	bool createKnormalVBO)
+	bool createKnormalVBO,
+	bool autoUpdateKmax,
+	bool autoUpdatekmax,
+	bool autoUpdateKmin,
+	bool autoUpdatekmin,
+	bool autoUpdateKnormal)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
 	if(mh == NULL)
