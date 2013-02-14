@@ -31,7 +31,7 @@ SimpleGMap2::SimpleGMap2()
 {
 	 position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-     Dart d = Algo::Modelisation::createTetrahedron<PFP>(myMap);
+     Dart d = Algo::Surface::Modelisation::createTetrahedron<PFP>(myMap);
      position[d] = VEC3(0,0,0);
      position[myMap.phi1(d)] = VEC3(10,0,15);
      position[myMap.phi_1(d)] = VEC3(10,20,15);
@@ -41,7 +41,7 @@ SimpleGMap2::SimpleGMap2()
      myMap.cutEdge(d);
      position[myMap.phi1(d)] = mid;
 
-     Algo::Modelisation::Polyhedron<PFP> poly(myMap, position);
+     Algo::Surface::Modelisation::Polyhedron<PFP> poly(myMap, position);
 
      d = poly.cylinder_topo(5, 1, false, false);
 

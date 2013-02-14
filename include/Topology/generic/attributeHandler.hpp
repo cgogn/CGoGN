@@ -80,6 +80,23 @@ AttributeHandler<T, ORBIT>::AttributeHandler(const AttributeHandler<T, ORBIT>& t
 		registerInMap() ;
 }
 
+//template <typename T, unsigned int ORBIT>
+//template <unsigned int ORBIT2>
+template <typename T, unsigned int ORBIT>
+template <unsigned int ORBIT2>
+AttributeHandler<T, ORBIT>::AttributeHandler(const AttributeHandler<T, ORBIT2>& h) :
+	AttributeHandlerGen(h.m_map, h.valid)
+{
+	m_attrib = h.m_attrib;
+	if(m_attrib->getOrbit() == ORBIT2)
+	{
+		if(valid)
+			registerInMap() ;
+	}
+	else
+		valid = false;
+}
+
 template <typename T, unsigned int ORBIT>
 inline AttributeHandler<T, ORBIT>& AttributeHandler<T, ORBIT>::operator=(const AttributeHandler<T, ORBIT>& ta)
 {
@@ -92,6 +109,21 @@ inline AttributeHandler<T, ORBIT>& AttributeHandler<T, ORBIT>::operator=(const A
 		registerInMap() ;
 	return *this ;
 }
+
+template <typename T, unsigned int ORBIT>
+template <unsigned int ORBIT2>
+inline AttributeHandler<T, ORBIT>& AttributeHandler<T, ORBIT>::operator=(const AttributeHandler<T, ORBIT2>& ta)
+{
+	if(valid)
+		unregisterFromMap() ;
+	m_map = ta.map() ;
+	m_attrib = ta.getDataVector() ;
+	valid = ta.isValid() ;
+	if(valid)
+		registerInMap() ;
+	return *this ;
+}
+
 
 template <typename T, unsigned int ORBIT>
 AttributeHandler<T, ORBIT>::~AttributeHandler()
@@ -123,6 +155,12 @@ inline const std::string& AttributeHandler<T, ORBIT>::name() const
 {
 	return m_attrib->getName() ;
 }
+
+//template <typename T, unsigned int ORBIT>
+//inline const std::string& AttributeHandler<T, ORBIT>::typeName() const
+//{
+//	return nameOfType(T()) ;
+//}
 
 
 template <typename T, unsigned int ORBIT>

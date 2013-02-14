@@ -37,6 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import 
 {
 
@@ -51,6 +54,27 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
+
+/**
+ * import a Choupi file
+ * @param map
+ * @param filename
+ * @return
+ */
+template <typename PFP>
+bool importChoupi(const std::string& filename, const std::vector<typename PFP::VEC3>& tabV, const std::vector<unsigned int>& tabE);
+
+
+} // namespace Import
+
+} // Surface
+
+
+namespace Volume
+{
+namespace Import
+{
+
 /**
  * import a volumetric mesh
  * @param map the map in which the function imports the mesh
@@ -60,7 +84,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
  * @return a boolean indicating if import was successful
  */
 template <typename PFP>
-bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
 /**
  * import a mesh and extrude it
@@ -75,24 +99,6 @@ bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, st
 
 template <typename PFP>
 bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
-
-/*
- * import a MOKA file
- * @param gmap the gmap in which the function imports the mesh
- * @param filename
- * @param attrNames attribute names
- */
-template <typename PFP>
-bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vector<std::string>& attrNames);
-
-/**
- * import a Choupi file
- * @param map
- * @param filename
- * @return
- */
-template <typename PFP>
-bool importChoupi(const std::string& filename, const std::vector<typename PFP::VEC3>& tabV, const std::vector<unsigned int>& tabE);
 
 /*
  * TODO a transformer en utilisant un MeshTableVolume.
@@ -112,7 +118,10 @@ bool importMoka(typename PFP::MAP& the_gmap, const std::string& filename, std::v
 template <typename PFP>
 bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
-} // namespace Import
+} // Import
+
+} // Volume
+
 
 } // namespace Algo
 

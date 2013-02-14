@@ -63,6 +63,9 @@ protected:
 	// name of the last attribute used to fill the VBO
 	std::string m_name;
 
+	// type name of the last attribute used to fill the VBO
+	std::string m_typeName;
+
 public:
 	/**
 	 * constructor: allocate the OGL VBO
@@ -93,6 +96,11 @@ public:
 	 * get name
 	 */
 	const std::string& name() const { return m_name; }
+
+	/**
+	 * get name
+	 */
+	const std::string& typeName() const { return m_typeName; }
 
 	/**
 	 * set the data size (in number of float)

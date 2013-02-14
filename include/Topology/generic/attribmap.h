@@ -73,6 +73,14 @@ public:
 	AttributeHandler<T, ORBIT> getAttribute(const std::string& nameAttr) ;
 
 	/**
+	* check if an attribute exist ( get, test if valid and add if necessary)
+	* @param nameAttr attribute name
+	* @return an AttributeHandler
+	*/
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT> checkAttribute(const std::string& nameAttr) ;
+
+	/**
 	 * swap the content of two attributes (efficient, only swap pointers)
 	 */
 	template <typename T, unsigned int ORBIT>

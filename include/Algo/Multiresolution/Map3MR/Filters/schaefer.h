@@ -36,6 +36,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -99,7 +102,7 @@ typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const VertexAttribute<typ
 {
 	typename PFP::VEC3 res(0);
 
-	if(Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, d))
+	if(Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, d))
 	{
 		Dart d1 = map.phi1(d) ;
 		Dart d2 = map.phi_1(d);
@@ -153,7 +156,7 @@ typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const VertexAttribute<typ
  *********************************************************************************/
 
 template <typename PFP>
-class LoopEvenAnalysisFilter : public Filter
+class LoopEvenAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -179,7 +182,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationAnalysisFilter : public Filter
+class LoopNormalisationAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -209,7 +212,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopOddAnalysisFilter : public Filter
+class LoopOddAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -260,7 +263,7 @@ public:
 /* Loop on Boundary Vertices and SHW04 on Insides Vertices
  *********************************************************************************/
 template <typename PFP>
-class LoopOddSynthesisFilter : public Filter
+class LoopOddSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -303,7 +306,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationSynthesisFilter : public Filter
+class LoopNormalisationSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -333,7 +336,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopEvenSynthesisFilter : public Filter
+class LoopEvenSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -359,7 +362,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopVolumeSynthesisFilter : public Filter
+class LoopVolumeSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -374,9 +377,9 @@ public:
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
+			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
 			{
-				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+				typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
 				m_map.incCurrentLevel() ;
 
@@ -390,7 +393,7 @@ public:
 } ;
 
 template <typename PFP>
-class SHW04VolumeNormalisationSynthesisFilter : public Filter
+class SHW04VolumeNormalisationSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -432,6 +435,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

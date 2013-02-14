@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -35,7 +38,7 @@ namespace Modelisation
  * create a n-sided pyramid
  */
 template <typename PFP>
-Dart createPyramid(typename PFP::MAP& map, unsigned int n)
+Dart createPyramid(typename PFP::MAP& map, unsigned int n, bool withBoundary)
 {
 	Dart dres = Dart::nil();
 	std::vector<Dart> m_tableVertDarts;
@@ -61,13 +64,16 @@ Dart createPyramid(typename PFP::MAP& map, unsigned int n)
 	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[n-1]), false);
 
 	//sewing the bottom face
-	Dart d1 = map.newFace(n, false);
-	dres = d1;
+	Dart base = map.newFace(n, false);
+	dres = base;
 	for(unsigned int i = 0; i < n ; ++i)
 	{
-		map.sewFaces(m_tableVertDarts[i], d1, false);
-		d1 = map.phi1(d1);
+		map.sewFaces(m_tableVertDarts[i], base, false);
+		base = map.phi1(base);
 	}
+
+	if(map.dimension() == 3 && withBoundary)
+		map.closeMap();
 
 	//return a dart from the base
 	return dres;
@@ -77,7 +83,7 @@ Dart createPyramid(typename PFP::MAP& map, unsigned int n)
  * create a n-sided prism
  */
 template <typename PFP>
-Dart createPrism(typename PFP::MAP& map, unsigned int n)
+Dart createPrism(typename PFP::MAP& map, unsigned int n, bool withBoundary)
 {
 	Dart dres = Dart::nil();
 	unsigned int nb = n*2;
@@ -110,16 +116,19 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
 	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[n-1]), false);
 
 	//sewing the top & bottom faces
-	Dart d1 = map.newFace(n, false);
-	Dart d2 = map.newFace(n, false);
-	dres = d1;
+	Dart top = map.newFace(n, false);
+	Dart bottom = map.newFace(n, false);
+	dres = top;
 	for(unsigned int i = 0; i < n ; ++i)
 	{
-		map.sewFaces(m_tableVertDarts[i], d1, false);
-		map.sewFaces(m_tableVertDarts[n+i], d2, false);
-		d1 = map.phi1(d1);
-		d2 = map.phi_1(d2);
+		map.sewFaces(m_tableVertDarts[i], top, false);
+		map.sewFaces(m_tableVertDarts[n+i], bottom, false);
+		top = map.phi1(top);
+		bottom = map.phi_1(bottom);
 	}
+
+	if(map.dimension() == 3 && withBoundary)
+		map.closeMap();
 
 	//return a dart from the base
 	return dres;
@@ -129,67 +138,157 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
  * create a n-sided diamond
  */
 template <typename PFP>
-Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
+Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary)
 {
-	Dart res = Dart::nil();
+	unsigned int nbt = 2*nbSides -1 ; // -1 for computation optimization
+	std::vector<Dart> m_tableVertDarts;
+	m_tableVertDarts.reserve(nbSides);
+	
+	
+	// creation of triangles around circunference and storing vertices
+	for (unsigned int i = 0; i <= nbt; ++i)
+	{
+		Dart d = map.newFace(3, false);
+		m_tableVertDarts.push_back(d);
+	}
 
-	Dart firstP = createPyramid<PFP>(map,nbSides);
-	Dart secondP = createPyramid<PFP>(map,nbSides);
+	// sewing the triangles
+	for (unsigned int i = 0; i < nbSides-1; ++i)
+	{
+		Dart d = m_tableVertDarts[i];
+		d = map.phi_1(d);
+		Dart e = m_tableVertDarts[i+1];
+		e = map.phi1(e);
+		map.sewFaces(d, e, false);
+	}
+	//sewing the last with the first
+	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[nbSides-1]), false);
 
-	res = map.phi2(firstP);
+	for (unsigned int i = nbSides; i < nbt; ++i)
+	{
+		Dart d = m_tableVertDarts[i];
+		d = map.phi_1(d);
+		Dart e = m_tableVertDarts[i+1];
+		e = map.phi1(e);
+		map.sewFaces(d, e, false);
+	}
+	//sewing the last with the first
+	map.sewFaces(map.phi1(m_tableVertDarts[nbSides]), map.phi_1(m_tableVertDarts[nbt]), false);
 
-	map.sewVolumes(firstP, secondP);
-	//map.mergeVolumes(firstP);
+	//sewing the the two opened pyramids together
+	for(unsigned int i = 0; i < nbSides ; ++i)
+	{
+		map.sewFaces(m_tableVertDarts[i], m_tableVertDarts[nbt-i], false);
+	}
 
-	return res;
+	if(map.dimension() == 3 && withBoundary)
+		map.closeMap();
+
+	//return a dart from the base
+	return m_tableVertDarts[0];
 }
-
 
 
 /**
  * create a 3-sided prism
  */
 template <typename PFP>
-Dart createTriangularPrism(typename PFP::MAP& map)
+Dart createTriangularPrism(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPrism<PFP>(map, 3);
+	return createPrism<PFP>(map, 3, withBoundary);
 }
 
 /**
  * create a hexahedron
  */
 template <typename PFP>
-Dart createHexahedron(typename PFP::MAP& map)
+Dart createHexahedron(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPrism<PFP>(map, 4);
+	return createPrism<PFP>(map, 4, withBoundary);
 }
 
 /**
  * create a tetrahedron
  */
 template <typename PFP>
-Dart createTetrahedron(typename PFP::MAP& map)
+Dart createTetrahedron(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPyramid<PFP>(map, 3);
+	return createPyramid<PFP>(map, 3, withBoundary);
 }
 
 /**
  * create a 4-sided pyramid
  */
 template <typename PFP>
-Dart createQuadrangularPyramid(typename PFP::MAP& map)
+Dart createQuadrangularPyramid(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPyramid<PFP>(map, 4);
+	return createPyramid<PFP>(map, 4, withBoundary);
 }
 
 /**
  * create an octahedron (i.e. 4-sided diamond)
  */
 template <typename PFP>
-Dart createOctahedron(typename PFP::MAP& map)
+Dart createOctahedron(typename PFP::MAP& map, bool withBoundary)
 {
-	return createDiamond<PFP>(map,4);
+	return createDiamond<PFP>(map,4, withBoundary);
 }
+
+
+
+
+
+
+template <typename PFP>
+bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread)
+{
+	unsigned int nbFacesT = 0;
+	unsigned int nbFacesQ = 0;
+
+	//Test the number of faces end its valency
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
+	{
+		//increase the number of faces
+		if(map.faceDegree(dit) == 3)
+			nbFacesT++;
+		else if(map.faceDegree(dit) == 4)
+			nbFacesQ++;
+		else
+			return false;
+	}
+
+	if((nbFacesT != 4) || (nbFacesQ != 1))	//too much faces
+		return false;
+
+	return true;
+}
+
+template <typename PFP>
+bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread)
+{
+	unsigned int nbFacesT = 0;
+	unsigned int nbFacesQ = 0;
+
+	//Test the number of faces end its valency
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
+	{
+		//increase the number of faces
+		if(map.faceDegree(dit) == 3)
+			nbFacesT++;
+		else if(map.faceDegree(dit) == 4)
+			nbFacesQ++;
+		else
+			return false;
+	}
+
+	if((nbFacesT != 2) || (nbFacesQ != 3))	//too much faces
+		return false;
+
+	return true;
+}
+
 
 
 
@@ -488,7 +587,7 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
+				Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}
@@ -504,7 +603,7 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
+				Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}
@@ -867,6 +966,70 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 }
 
 template <typename PFP>
+void Polyhedron<PFP>::embedCube(VEC3 origin, float sx, float sy, float sz)
+{
+	typedef typename PFP::VEC3 VEC3 ;
+
+	if (m_kind != CUBE)
+	{
+		CGoGNerr << "Warning try to embedCube something that is not a cube"<<CGoGNendl;
+		return;
+	}
+
+	float dz = sz/float(m_nz);
+	float dy = sy/float(m_ny);
+	float dx = sx/float(m_nx);
+
+	// first embedding the sides
+	int index = 0;
+	for (unsigned int k = 0; k <= m_nz; ++k)
+	{
+		float z = float(k)*dz - sz/2.0f;
+		for (unsigned int i = 0; i < m_nx; ++i)
+		{
+			float x = float(i)*dx - sx/2.0f;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(x, -sy/2.0f, z);
+		}
+		for (unsigned int i = 0; i < m_ny; ++i)
+		{
+			float y = float(i)*dy - sy/2.0f;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(sx/2.0f, y, z);
+		}
+		for (unsigned int i = 0; i < m_nx; ++i)
+		{
+			float x = sx/2.0f-float(i)*dx;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(x, sy/2.0f, z);
+		}
+		for (unsigned int i = 0; i < m_ny ;++i)
+		{
+			float y = sy/2.0f - float(i)*dy;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(-sx/2.0f, y, z);
+		}
+	}
+
+	// the top
+	for(unsigned int i = 1; i  <m_ny; ++i)
+	{
+		for(unsigned int j = 1; j < m_nx; ++j)
+		{
+			VEC3 pos(-sx/2.0f+float(j)*dx, -sy/2.0f+float(i)*dy, sz/2.0f);
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + pos;
+		}
+	}
+
+	// the bottom
+	for(unsigned int i = 1; i < m_ny; ++i)
+	{
+		for(unsigned int j = 1; j < m_nx; ++j)
+		{
+			VEC3 pos(-sx/2.0f+float(j)*dx, sy/2.0f-float(i)*dy, -sz/2.0f);
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + pos;
+		}
+	}
+}
+
+
+template <typename PFP>
 void Polyhedron<PFP>::computeCenter()
 {
 	typename PFP::VEC3 center(0);
@@ -1032,6 +1195,8 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 // }
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

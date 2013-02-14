@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -47,7 +50,7 @@ namespace Filters
 /* Catmull-clark on Boundary Vertices and MJ96 on Insides Vertices
  *********************************************************************************/
 template <typename PFP>
-class MJ96VertexSubdivision : public Filter
+class MJ96VertexSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -112,7 +115,7 @@ public:
 				Traversor3VW<typename PFP::MAP> travVW(m_map, d);
 				for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
 				{
-					Cavg += Algo::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
+					Cavg += Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
 					++degree;
 				}
 				Cavg /= degree;
@@ -122,7 +125,7 @@ public:
 				Traversor3VF<typename PFP::MAP> travVF(m_map, d);
 				for(Dart dit = travVF.begin() ; dit != travVF.end() ; dit = travVF.next())
 				{
-					Aavg += Algo::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
+					Aavg += Algo::Surface::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
 					++degree;
 				}
 				Aavg /= degree;
@@ -152,7 +155,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96EdgeSubdivision : public Filter
+class MJ96EdgeSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -208,7 +211,7 @@ public:
 				Traversor3EW<typename PFP::MAP> travEW(m_map, d);
 				for(Dart dit = travEW.begin() ; dit != travEW.end() ; dit = travEW.next())
 				{
-					Cavg += Algo::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
+					Cavg += Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, dit, m_position);
 					++degree;
 				}
 				Cavg /= degree;
@@ -218,7 +221,7 @@ public:
 				Traversor3EF<typename PFP::MAP> travEF(m_map, d);
 				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
 				{
-					Aavg += Algo::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
+					Aavg += Algo::Surface::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
 					++degree;
 				}
 				Aavg /= degree;
@@ -242,7 +245,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96FaceSubdivision : public Filter
+class MJ96FaceSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -282,10 +285,10 @@ public:
 			else
 			{
 				//face points
-				typename PFP::VEC3 C0 = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
-				typename PFP::VEC3 C1 = Algo::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(d), m_position);
+				typename PFP::VEC3 C0 = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+				typename PFP::VEC3 C1 = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(d), m_position);
 
-				typename PFP::VEC3 A = Algo::Geometry::faceCentroid<PFP>(m_map, m_map.phi3(d), m_position);
+				typename PFP::VEC3 A = Algo::Surface::Geometry::faceCentroid<PFP>(m_map, m_map.phi3(d), m_position);
 
 				typename PFP::VEC3 fp = C0 + A * 2 + C1;
 				fp /= 4;
@@ -302,7 +305,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96VolumeSubdivision : public Filter
+class MJ96VolumeSubdivision : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -319,16 +322,11 @@ public:
 		{
 			//cell points : these points are the average of the
 			//vertices of the lattice that bound the cell
-			typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+			typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
 			m_map.incCurrentLevel() ;
-
-			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
-			{
-				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-				m_position[midV] = p ;
-			}
-
+			Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
+			m_position[midV] = p ;
 			m_map.decCurrentLevel() ;
 
 		}
@@ -340,6 +338,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

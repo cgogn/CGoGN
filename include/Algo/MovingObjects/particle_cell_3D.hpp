@@ -1,4 +1,40 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
 // #define DEBUG
+namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace Volume
+{
+
+namespace MovingObjects
+{
+
 
 #define DELTA 0.00001
 //static const float DELTA=0.00001;
@@ -12,7 +48,7 @@ void ParticleCell3D<PFP>::display()
 template <typename PFP>
 typename PFP::VEC3 ParticleCell3D<PFP>::pointInFace(Dart d)
 {
-	return Algo::Geometry::faceCentroid<PFP>(m,d,position);
+	return Algo::Surface::Geometry::faceCentroid<PFP>(m,d,position);
 //	const VEC3& p1(m_positions[d]);
 //	Dart dd=m.phi1(d);
 //	const VEC3& p2(m_positions[dd]);
@@ -53,7 +89,7 @@ bool ParticleCell3D<PFP>::isRightVertex(VEC3 c, Dart d, VEC3 base)
 template <typename PFP>
 Geom::Orientation3D ParticleCell3D<PFP>::whichSideOfFace(VEC3 c, Dart d)
 {
-	Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
+	Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
 	return pl.orient(c);
 }
 
@@ -207,8 +243,8 @@ Dart ParticleCell3D<PFP>::nextNonPlanar(Dart d)
 		beg++;
 
 		// apply functor
-		Geom::Plane3D<typename PFP::REAL> pl1 = Algo::Geometry::facePlane<PFP>(m,d,position);
-		Geom::Plane3D<typename PFP::REAL> pl2 = Algo::Geometry::facePlane<PFP>(m,d1,position);
+		Geom::Plane3D<typename PFP::REAL> pl1 = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
+		Geom::Plane3D<typename PFP::REAL> pl2 = Algo::Surface::Geometry::facePlane<PFP>(m,d1,position);
 		if ((pl1.normal()-pl2.normal()).norm2()>0.000001)
 			beg = darts_list.end();
 		// remove the head of the list
@@ -291,7 +327,7 @@ Geom::Orientation3D ParticleCell3D<PFP>::whichSideOfEdge(VEC3 c, Dart d)
 	VEC3 p1 = position[m.phi1(d)];
 	VEC3 p2 = position[d];
 
-	Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
+	Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
 	VEC3 norm = pl.normal();
 	VEC3 n2 = norm ^ VEC3(p2-p1);
 
@@ -340,7 +376,7 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 	CellMarkerStore<FACE> mark(m);
 
 	do {
-		VEC3 dualsp = (som+ Algo::Geometry::vertexNormal<PFP>(m,d,position));
+		VEC3 dualsp = (som+ Algo::Surface::Geometry::vertexNormal<PFP>(m,d,position));
 		Dart ddd=d;
 
 		mark.mark(d);
@@ -540,7 +576,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 		return;
 	}
 
-	VEC3 norm = Algo::Geometry::faceNormal<PFP>(m,d,position);
+	VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(m,d,position);
 
 	Dart dd=d;
 	if(isLeftL1DFace(current,d,m_positionFace,norm)!=Geom::UNDER) {
@@ -558,7 +594,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 					state = EDGE;
 					return;
 				default :
-					Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
+					Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
 					VEC3 p3 = pl.normal()+m_position;
 					Geom::Plane3D<typename PFP::REAL> plOrtho(m_position,current,p3);
 					VEC3 e(position[m.phi1(d)]-position[d]);
@@ -591,7 +627,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 					state = EDGE;
 					return;
 				default :
-					 Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
+					 Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
 					 VEC3 p3 = pl.normal()+m_position;
 					 Geom::Plane3D<typename PFP::REAL> plOrtho(m_position,current,p3);
 					 VEC3 e(position[m.phi1(d)]-position[d]);
@@ -620,7 +656,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 		 state = EDGE;
 		 break;
 	default :
-		 Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
+		 Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
 		 VEC3 p3 = pl.normal()+m_position;
 		 Geom::Plane3D<typename PFP::REAL> plOrtho(m_position,current,p3);
 		 VEC3 e(position[m.phi1(d)]-position[d]);
@@ -737,12 +773,12 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 	else {
 		if(isAbove(current,d,m_position)==Geom::UNDER) {
 //			m_position = m.intersectDartPlaneLine(d,m_position,current);
-			Algo::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
 			faceState(current,wsof);
 		}
 		else {
 //			m_position = m.intersectDartPlaneLineEdge(d,m_position,current);
-			Algo::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
 			edgeState(current);
 		}
 	}
@@ -781,13 +817,13 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 				if(isAbove(current,d,m_position)==Geom::UNDER)
 				{
 //					m_position = m.intersectDartPlaneLine(d,m_position,current);
-					Algo::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+					Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
 					faceState(current,Geom::OVER);
 				}
 				else
 				{
 //					m_position = m.intersectDartPlaneLineEdge(d,m_position,current);
-					Algo::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+					Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
 					edgeState(current);
 				}
 
@@ -802,7 +838,7 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 				return;
 			}
 
-			Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,*face,position);
+			Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,*face,position);
 			if(pl.normal()*VEC3(current-m_position)>0)
 			{
 				dist_list.push_back(-pl.distance(current));
@@ -855,13 +891,19 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 		if(isAbove(current,d,m_position)==Geom::UNDER)
 		{
 //			m_position = m.intersectDartPlaneLine(d,m_position,current);
-			Algo::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
 			faceState(current,wsof);
 		}
 		else {
 //			m_position = m.intersectDartPlaneLineEdge(d,m_position,current);
-			Algo::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
 			edgeState(current);
 		}
 	}
 }
+
+}
+}
+}
+}
+

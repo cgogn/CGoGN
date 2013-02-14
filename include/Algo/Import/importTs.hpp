@@ -30,6 +30,8 @@ namespace CGoGN
 {
 namespace Algo
 {
+namespace Volume
+{
 namespace Import 
 {
 
@@ -118,10 +120,8 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		} while(ligne.size() == 0);
 
 		std::stringstream oss(ligne);
-		oss >> nbe; //number of vertices = 4
-		assert(nbe == 4);
 
-		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map);
+		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
 
 		Geom::Vec4ui pt;
 		oss >> pt[0];
@@ -168,6 +168,8 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		//end of tetra
 	}
 
+	fp.close();
+
 	//Association des phi3
 	unsigned int nbBoundaryFaces = 0 ;
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -208,12 +210,10 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces)" << CGoGNendl;
 	}
 
-	fp.close();
 	return true;
 }
 
 } // namespace Import
-
+}
 } // namespace Algo
-
 } // namespace CGoGN

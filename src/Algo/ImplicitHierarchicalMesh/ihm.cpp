@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace IHM
 {
 
@@ -309,7 +312,6 @@ bool ImplicitHierarchicalMap::faceIsSubdividedOnce(Dart d)
 }
 
 } //namespace IHM
-
+} // Surface
 } //namespace Algo
-
 } //namespace CGoGN

@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -145,8 +148,8 @@ void Approximator_HemiFuncCoefs<PFP>::approximate(Dart d)
 	const VEC3& N1 = m_frameN[d] ;
 	const VEC3& N2 = m_frameN[dd] ;
 
-	//assert(abs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
-	//assert(abs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
+	//assert(fabs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
+	//assert(fabs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
 
 	// Compute D1' and D2'
 	VEC3 B1prime = N1 ^ T ;
@@ -236,16 +239,16 @@ void Approximator_FrameInterpolationHalfEdge<PFP>::approximate(Dart d)
 //	}
 //	else
 	{
-		// Create two segments : v0-v1 and v0-v
-		VEC3 v0v1 = this->m_position[dd] ;
-		v0v1 -= this->m_position[d] ;
-
-		VEC3 v0v = this->m_approxposition[d] ;
-		v0v -= this->m_position[d] ;
-
-		// Orthogonal projection of v0-v onto v0-v1 : get coefficient t
-		REAL t = this->m_position[d] == this->m_position[dd] ? 1. : (v0v1 * v0v) / v0v1.norm() ;
-		t = std::max (std::min (t , REAL(1)) , REAL(0) ) ; // clamp it to [0,1]
+//		// Create two segments : v0-v1 and v0-v
+//		VEC3 v0v1 = this->m_position[dd] ;
+//		v0v1 -= this->m_position[d] ;
+//
+//		VEC3 v0v = this->m_approxposition[d] ;
+//		v0v -= this->m_position[d] ;
+//
+//		// Orthogonal projection of v0-v onto v0-v1 : get coefficient t
+//		REAL t = this->m_position[d] == this->m_position[dd] ? 1. : (v0v1 * v0v) / v0v1.norm() ;
+//		t = std::max (std::min (t , REAL(1)) , REAL(0) ) ; // clamp it to [0,1]
 
 		VEC3& normal1 = this->m_attrV[2]->operator[](d) ;
 		VEC3& normal2 = this->m_attrV[2]->operator[](dd) ;
@@ -324,8 +327,8 @@ void Approximator_HemiFuncCoefsHalfEdge<PFP>::approximate(Dart d)
 	const VEC3& N1 = m_frameN[d] ;
 	const VEC3& N2 = m_frameN[dd] ;
 
-	//assert(abs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
-	//assert(abs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
+	//assert(fabs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
+	//assert(fabs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
 
 	// Compute D1' and D2'
 	VEC3 B1prime = N1 ^ T ;
@@ -397,6 +400,8 @@ void Approximator_HemiFuncCoefsHalfEdge<PFP>::approximate(Dart d)
 }
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

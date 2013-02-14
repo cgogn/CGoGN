@@ -18,6 +18,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MovingObjects
 {
 
@@ -28,7 +31,7 @@ enum {
 };
 
 template <typename PFP>
-class ParticleCell3D : public ParticleBase
+class ParticleCell3D : public MovingObjects::ParticleBase
 {
 public :
 	typedef typename PFP::MAP Map;
@@ -118,12 +121,12 @@ public :
 	}
 };
 
+}
+}
+}
+}
+
 #include "particle_cell_3D.hpp"
 
-}
-
-}
-
-}
 
 #endif

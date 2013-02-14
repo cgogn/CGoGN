@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -726,7 +729,7 @@ float Image<DataType>::computeCurvatureCount3(const DataType *ptrVox, const std:
 //	return (valY + valZ)/2.0f;
 
 	unsigned short m1,m2;
-	if ((abs(vals[0]) < abs(vals[1])) && (abs(vals[0]) < abs(vals[2])))
+	if ((fabs(vals[0]) < fabs(vals[1])) && (fabs(vals[0]) < fabs(vals[2])))
 	{
 		m1 =1;
 		m2 =2;
@@ -734,7 +737,7 @@ float Image<DataType>::computeCurvatureCount3(const DataType *ptrVox, const std:
 	else
 	{
 		m1=0;
-		if (abs(vals[1]) < abs(vals[2]))
+		if (fabs(vals[1]) < fabs(vals[2]))
 			m2 = 2;
 		else
 			m2 = 1;
@@ -750,7 +753,7 @@ float Image<DataType>::computeCurvatureCount3(const DataType *ptrVox, const std:
 			if ((vals[m2] - vals[m1])>0.8f)
 			return 1.0f;
 
-	return std::max(std::max(abs(vals[0]),abs(vals[1])),abs(vals[2]));
+	return std::max(std::max(fabs(vals[0]),fabs(vals[1])),fabs(vals[2]));
 
 }
 
@@ -919,4 +922,4 @@ bool Image<DataType>::checkSaddlecomputeNormal(const Geom::Vec3f& P, const Geom:
 } // end namespace
 } // end namespace
 } // end namespace
-
+}

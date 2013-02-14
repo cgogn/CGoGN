@@ -270,7 +270,7 @@ public:
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked) ;
-		CGoGN_ASSERT(isAllUnmarked())
+//		CGoGN_ASSERT(isAllUnmarked())
 	}
 
 protected:
@@ -312,8 +312,7 @@ public:
 	void unmarkAll()
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
-		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin();
-		    it != m_markedDarts.end(); ++it)
+		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
 			m_markVector->operator[](*it).unsetMark(m_mark) ;
 	}
 } ;
@@ -339,7 +338,7 @@ public:
 	~DartMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked) ;
-		CGoGN_ASSERT(isAllUnmarked())
+//		CGoGN_ASSERT(isAllUnmarked())
 	}
 
 protected:

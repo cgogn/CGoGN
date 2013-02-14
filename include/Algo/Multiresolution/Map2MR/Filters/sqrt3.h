@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -100,7 +103,7 @@ inline double omega0(unsigned int n)
  *********************************************************************************/
 
 template <typename PFP>
-class Sqrt3FaceSynthesisFilter : public Filter
+class Sqrt3FaceSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -141,10 +144,15 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class Sqrt3VertexSynthesisFilter : public Filter
+class Sqrt3VertexSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -225,10 +233,15 @@ public:
 			}
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class Sqrt3VertexAnalysisFilter : public Filter
+class Sqrt3VertexAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -275,10 +288,15 @@ public:
 
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class Sqrt3FaceAnalysisFilter : public Filter
+class Sqrt3FaceAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -312,6 +330,11 @@ public:
 
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 /*********************************************************************************
@@ -328,6 +351,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

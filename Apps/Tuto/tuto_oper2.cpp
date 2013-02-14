@@ -73,8 +73,8 @@ void MyQT::operation(int x)
 		{
 			dm.markAll();
 			myMap.splitVertex(m_selected,m_selected2);
-			PFP::VEC3 c1 = Algo::Geometry::faceCentroid<PFP>(myMap, m_selected, position);
-			PFP::VEC3 c2 = Algo::Geometry::faceCentroid<PFP>(myMap, m_selected2, position);
+			PFP::VEC3 c1 = Algo::Surface::Geometry::faceCentroid<PFP>(myMap, m_selected, position);
+			PFP::VEC3 c2 = Algo::Surface::Geometry::faceCentroid<PFP>(myMap, m_selected2, position);
 			position[m_selected] = position[m_selected] * 0.7f + c1*0.3f;
 			position[m_selected2] = position[m_selected2] * 0.7f + c2*0.3f;
 			updateMap();
@@ -175,7 +175,7 @@ void MyQT::createMap(int n)
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
 	colorDarts = myMap.addAttribute<VEC3, DART>("color");
 
-	Algo::Modelisation::Polyhedron<PFP> grid(myMap,position);
+	Algo::Surface::Modelisation::Polyhedron<PFP> grid(myMap,position);
 	grid.grid_topo(n,n);
 	grid.embedGrid(1.,1.,0.);
 
@@ -197,7 +197,7 @@ void MyQT::createMap(int n)
 
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
 		{
 			int n = rand();
 			float r = float(n&0x7f)/255.0f + 0.25f;
@@ -214,7 +214,7 @@ void MyQT::updateMap()
 	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
 		{
 			const Geom::Vec3f& C = colorDarts[d];
 			if (C*C != 0.0f)
@@ -273,7 +273,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'c':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked(d))
+			if (!myMap.isBoundaryMarked2(d))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
@@ -287,7 +287,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'g':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked(d))
+			if (!myMap.isBoundaryMarked2(d))
 			{
 				colorDarts[d] =  Geom::Vec3f(0.5f,0.5f,0.5f);
 				m_render_topo->setDartColor(d,0.5f,0.5f,0.5f);
@@ -298,7 +298,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'b':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked(d))
+			if (!myMap.isBoundaryMarked2(d))
 			{
 				colorDarts[d] =  Geom::Vec3f(0.0f,0.0f,0.0f);
 				m_render_topo->setDartColor(d,0.0f,0.0f,0.0f);
@@ -356,7 +356,7 @@ void MyQT::cb_Open()
 void MyQT::cb_Save()
 {
 	std::string filename = selectFileSave("Export SVG file ",".","(*.off)");
-	Algo::Export::exportOFF<PFP>(myMap,position,filename.c_str());
+	Algo::Surface::Export::exportOFF<PFP>(myMap,position,filename.c_str());
 }
 
 void MyQT::importMesh(std::string& filename)
@@ -374,7 +374,7 @@ void MyQT::importMesh(std::string& filename)
 	else
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+		if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
 		{
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
@@ -388,7 +388,7 @@ void MyQT::importMesh(std::string& filename)
 		colorDarts = myMap.addAttribute<VEC3, DART>("color");
 		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 		{
-			if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
+			if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;

@@ -23,7 +23,7 @@ void main(void)
 		vec3 v1 = POSITION_IN(2).xyz - POSITION_IN(1).xyz;
 		vec3 v2 = POSITION_IN(3).xyz - POSITION_IN(1).xyz;
 		vec3 N  = cross(v1,v2);
-		N  =  normalize (vec3(NormalMatrix*vec4(N,0.0))); 
+		N = normalize (vec3(NormalMatrix*vec4(N,0.0))); 
 		
 	// compute face center & lighting informations
 		vec4 newPos =  ModelViewMatrix * vec4(colorVertex[0],1.0);

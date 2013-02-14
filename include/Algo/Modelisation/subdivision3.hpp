@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Modelisation
 {
 
@@ -110,7 +113,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 			else
 			{
 				typename PFP::VEC3 interP;
-				typename PFP::VEC3 vec(Algo::Geometry::vectorOutOfDart<PFP>(map,dd,position));
+				typename PFP::VEC3 vec(Surface::Geometry::vectorOutOfDart<PFP>(map,dd,position));
 				Geom::Intersection inter = Geom::intersectionLinePlane<typename PFP::VEC3, typename Geom::Plane3D<typename PFP::REAL > >(position[dd],vec,pl,interP);
 
 				if(inter==Geom::FACE_INTERSECTION)
@@ -437,7 +440,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 	//pre-computation : compute the centroid of all volume
 	VolumeAutoAttribute<EMB> attBary(map);
-	Algo::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary, selected);
+	Volume::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary, selected);
 
 	//subdivision
 	//1. cut edges
@@ -468,7 +471,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	TraversorF<typename PFP::MAP> travF(map) ;
 	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 	{
-		EMB center = Algo::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map,d,attributs);
+		EMB center = Surface::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map,d,attributs);
 
 		Dart dd = map.phi1(d) ;
 		Dart next = map.phi1(map.phi1(dd)) ;
@@ -654,7 +657,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		volCenter += position[map.phi_1(map.phi2(dit))];
 		volCenter /= 4;
 
-		Dart dres = Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit);
+		Dart dres = Volume::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit);
 		position[dres] = volCenter;
 	}
 
@@ -667,7 +670,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		if(m.isMarked(dit))
 		{
 			m.unmarkOrbit<FACE>(dit);
-			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit);
+			Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit);
 		}
 	}
 
@@ -692,7 +695,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 			faceCenter += position[map.phi_1(dit)];
 			faceCenter /= 3;
 
-			Dart dres = Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit);
+			Dart dres = Volume::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit);
 			position[dres] = faceCenter;
 		}
 	}
@@ -707,14 +710,32 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		{
 			m.unmarkOrbit<EDGE>(dit);
 			Dart d = map.phi2(map.phi3(map.findBoundaryFaceOfEdge(dit)));
-			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
+			Volume::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
 
 		}
 	}
 }
 
+template <typename PFP>
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+{
+	// VolumeAttribute -> after dual new VertexAttribute
+	VolumeAttribute<typename PFP::VEC3> positionV  = map.template getAttribute<typename PFP::VEC3, VOLUME>("position") ;
+	if(!positionV.isValid())
+		positionV = map.template addAttribute<typename PFP::VEC3, VOLUME>("position") ;
+
+	// Compute Centroid for the volumes
+	Algo::Volume::Geometry::computeCentroidVolumes<PFP>(map, position, positionV) ;
+
+	// Compute the Dual mesh
+	map.computeDual();
+	position = positionV ;
+}
+
 
 } //namespace Modelisation
+
+} // volume
 
 } //namespace Algo
 

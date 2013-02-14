@@ -16,15 +16,19 @@ namespace SCHNApps
 PluginsViewDialog::PluginsViewDialog(Window* window, View* view) :
 	QDialog(view),
 	m_window(window),
-	m_view(view)
+	m_view(view),
+	b_refreshingUI(false)
 {
 	this->setupUi(this);
 	this->setWindowTitle(m_view->getName() + QString(" : plugins"));
 
-	connect(pluginList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedPluginsChanged()));
+	connect(pluginList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedPluginsChanged()));
 
-	connect(m_window, SIGNAL(pluginAdded(Plugin*)), this, SLOT(cb_addPluginToList(Plugin*)));
-	connect(m_window, SIGNAL(pluginRemoved(Plugin*)), this, SLOT(cb_removePluginFromList(Plugin*)));
+	connect(m_window, SIGNAL(pluginLoaded(Plugin*)), this, SLOT(addPluginToList(Plugin*)));
+	connect(m_window, SIGNAL(pluginUnloaded(Plugin*)), this, SLOT(removePluginFromList(Plugin*)));
+
+	connect(m_window, SIGNAL(viewAndPluginLinked(View*, Plugin*)), this, SLOT(selectPlugin(View*, Plugin*)));
+	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(deselectPlugin(View*, Plugin*)));
 
 	QList<Plugin*> plugins = m_window->getPluginsList();
 	foreach(Plugin* p, plugins)
@@ -37,46 +41,64 @@ PluginsViewDialog::PluginsViewDialog(Window* window, View* view) :
 PluginsViewDialog::~PluginsViewDialog()
 {}
 
-void PluginsViewDialog::cb_selectedPluginsChanged()
+void PluginsViewDialog::selectedPluginsChanged()
 {
-	for(int i = 0; i < pluginList->count(); ++i)
+	if(!b_refreshingUI)
 	{
-		QString pluginName = pluginList->item(i)->text();
-		Plugin* plugin = m_window->getPlugin(pluginName);
-		if(pluginList->item(i)->isSelected() && !m_view->isLinkedToPlugin(plugin))
+		for(int i = 0; i < pluginList->count(); ++i)
 		{
-			assert(!plugin->isLinkedToView(m_view));
-			m_view->linkPlugin(plugin);
-			plugin->linkView(m_view);
-		}
-		else if(!pluginList->item(i)->isSelected() && m_view->isLinkedToPlugin(plugin))
-		{
-			assert(plugin->isLinkedToView(m_view));
-			m_view->unlinkPlugin(plugin);
-			plugin->unlinkView(m_view);
+			QString pluginName = pluginList->item(i)->text();
+			Plugin* plugin = m_window->getPlugin(pluginName);
+			if(pluginList->item(i)->isSelected() && !m_view->isLinkedToPlugin(plugin))
+				m_window->linkViewAndPlugin(m_view, plugin);
+
+			else if(!pluginList->item(i)->isSelected() && m_view->isLinkedToPlugin(plugin))
+				m_window->unlinkViewAndPlugin(m_view, plugin);
 		}
 	}
-	m_view->updateGL();
 }
 
-void PluginsViewDialog::cb_addPluginToList(Plugin* p)
+void PluginsViewDialog::selectPlugin(View* view, Plugin* plugin)
+{
+	if(view == m_view)
+	{
+		QList<QListWidgetItem*> items = pluginList->findItems(plugin->getName(), Qt::MatchExactly);
+		if(!items.empty())
+		{
+			b_refreshingUI = true;
+			items[0]->setSelected(true);
+			b_refreshingUI = false;
+		}
+	}
+}
+
+void PluginsViewDialog::deselectPlugin(View* view, Plugin* plugin)
+{
+	if(view == m_view)
+	{
+		QList<QListWidgetItem*> items = pluginList->findItems(plugin->getName(), Qt::MatchExactly);
+		if(!items.empty())
+		{
+			b_refreshingUI = true;
+			items[0]->setSelected(false);
+			b_refreshingUI = false;
+		}
+	}
+}
+
+void PluginsViewDialog::addPluginToList(Plugin* p)
 {
 	if(p->getProvidesRendering())
 		pluginList->addItem(p->getName());
 }
 
-void PluginsViewDialog::cb_removePluginFromList(Plugin* p)
+void PluginsViewDialog::removePluginFromList(Plugin* p)
 {
 	if(p->getProvidesRendering())
 	{
-		for(int i = 0; i < pluginList->count(); ++i)
-		{
-			if(pluginList->item(i)->text() == p->getName())
-			{
-				delete pluginList->item(i);
-				return;
-			}
-		}
+		QList<QListWidgetItem*> items = pluginList->findItems(p->getName(), Qt::MatchExactly);
+		if(!items.empty())
+			delete items[0];
 	}
 }
 

@@ -32,6 +32,9 @@ public:
 	~View();
 
 	const QString& getName() const { return m_name; }
+
+public slots:
+	QString getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
 	Window* getWindow() const { return m_window; }
@@ -39,6 +42,7 @@ public:
 
 	bool isCurrentView() const { return m_window->getCurrentView() == this; }
 
+public:
 	virtual void init();
 	virtual void preDraw();
 	virtual void draw();
@@ -60,7 +64,10 @@ public:
 	 * MANAGE LINKED CAMERA
 	 *********************************************************/
 
+public slots:
 	Camera* getCurrentCamera() const { return m_currentCamera; }
+
+public:
 	void setCurrentCamera(Camera* c);
 
 	/*********************************************************
@@ -91,9 +98,6 @@ public:
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
-//	void setCurrentModelViewMatrix(const glm::mat4& mvm);
-//	void setCurrentProjectionMatrix(const glm::mat4& pm);
-
 protected:
 	QString m_name;
 	Window* m_window;
@@ -118,12 +122,25 @@ protected:
 	MapsViewDialog* m_mapsViewDialog;
 
 public slots:
+	CameraViewDialog* getCameraViewDialog() { return m_cameraViewDialog; }
+	PluginsViewDialog* getPluginsViewDialog() { return m_pluginsViewDialog; }
+	MapsViewDialog* getMapsViewDialog() { return m_mapsViewDialog; }
+
 	void cb_cameraView(int x, int y, int globalX, int globalY);
 	void cb_pluginsView(int x, int y, int globalX, int globalY);
 	void cb_mapsView(int x, int y, int globalX, int globalY);
 	void cb_closeView(int x, int y, int globalX, int globalY);
 	void cb_VsplitView(int x, int y, int globalX, int globalY);
 	void cb_HsplitView(int x, int y, int globalX, int globalY);
+
+signals:
+	void currentCameraChanged(Camera*);
+
+	void mapLinked(MapHandlerGen*);
+	void mapUnlinked(MapHandlerGen*);
+
+	void pluginLinked(Plugin*);
+	void pluginUnlinked(Plugin*);
 };
 
 } // namespace SCHNApps

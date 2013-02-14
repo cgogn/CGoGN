@@ -163,7 +163,7 @@ inline bool Map3::sameFace(Dart d, Dart e)
 
 inline bool Map3::isBoundaryFace(Dart d)
 {
-	return isBoundaryMarked(d) || isBoundaryMarked(phi3(d));
+	return isBoundaryMarked3(d) || isBoundaryMarked3(phi3(d));
 }
 
 /*! @name Cell Functors

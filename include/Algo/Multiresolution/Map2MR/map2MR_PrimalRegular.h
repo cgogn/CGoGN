@@ -37,6 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -45,6 +48,14 @@ namespace Primal
 
 namespace Regular
 {
+
+enum FilterType
+{
+	F_HighPass = 0,
+	F_LowPass,
+	F_BandPass,
+	F_None,
+} ;
 
 template <typename PFP>
 class Map2MR
@@ -56,8 +67,12 @@ protected:
 	MAP& m_map;
 	bool shareVertexEmbeddings ;
 
-	std::vector<Filter*> synthesisFilters ;
-	std::vector<Filter*> analysisFilters ;
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
+
+	FilterType filter;
+	unsigned int thresholdLow;
+	unsigned int thresholdHigh;
 
 public:
 	Map2MR(MAP& map);
@@ -65,14 +80,14 @@ public:
 	~Map2MR();
 
 	//if true : tri and quad else quad
-	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
+	void addNewLevel(bool triQuad = true) ;
 
-	void addNewLevelSqrt3(bool embedNewVertices = true);
+	void addNewLevelSqrt3();
 
-	void addNewLevelSqrt2(bool embedNewVertices = true);
+	void addNewLevelSqrt2();
 
-	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
@@ -80,9 +95,11 @@ public:
 	void analysis() ;
 	void synthesis() ;
 
-	//threshold
+	void lowPassFiltering(unsigned int cutoff) { thresholdHigh = cutoff; filter = F_LowPass; }
+	void highPassFiltering(unsigned int cutoff) { thresholdLow = cutoff; filter = F_HighPass; }
+	void bandPassFiltering(unsigned int cutoffLow, unsigned int cutoffHigh) { thresholdLow = cutoffLow; thresholdHigh = cutoffHigh; filter = F_BandPass; }
+	void resetFiltering() { thresholdLow = 0; thresholdHigh = 0; filter = F_None; }
 
-	void filtering();
 } ;
 
 } // namespace Regular
@@ -90,6 +107,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

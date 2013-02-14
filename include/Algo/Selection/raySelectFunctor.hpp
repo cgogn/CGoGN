@@ -200,7 +200,7 @@ public:
 
 	bool operator()(Dart d)
 	{
-		typename PFP::VEC3 center = Geometry::faceCentroid<PFP>(this->m_map, d, m_positions) ;
+		typename PFP::VEC3 center = Surface::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions) ;
 		bool notfound = true ;
 		Dart face = d ;
 		do
@@ -360,23 +360,7 @@ public:
 };
 
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 } //namespace Selection
 

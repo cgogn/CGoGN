@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Filtering
 {
 
@@ -46,7 +49,7 @@ void filterAverageAttribute_OneRing(
 	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T, VERTEX> fa(attIn) ;
-	Algo::Selection::Collector_OneRing<PFP> col(map) ;
+	Algo::Surface::Selection::Collector_OneRing<PFP> col(map) ;
 
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -95,7 +98,7 @@ void filterAverageVertexAttribute_WithinSphere(
 {
 	FunctorAverage<T, VERTEX> faInside(attIn) ;
 	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
-	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
+	Algo::Surface::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -136,7 +139,7 @@ void filterAverageEdgeAttribute_WithinSphere(
 	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T, EDGE> fa(attIn) ;
-	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
+	Algo::Surface::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	TraversorE<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -164,7 +167,7 @@ void filterAverageFaceAttribute_WithinSphere(
 	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T, FACE> fa(attIn) ;
-	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
+	Algo::Surface::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	TraversorF<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -182,6 +185,8 @@ void filterAverageFaceAttribute_WithinSphere(
 }
 
 } // namespace Filtering
+
+}
 
 } // namespace Algo
 

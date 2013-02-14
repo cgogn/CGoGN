@@ -26,11 +26,16 @@
 #define __GEOMETRY_APPROXIMATOR_H__
 
 #include "Algo/Decimation/approximator.h"
+#include "Utils/convertType.h"
+#include <Eigen/Dense>
 
 namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace Decimation
@@ -144,7 +149,35 @@ public:
 	void approximate(Dart d) ;
 } ;
 
+template <typename PFP>
+class Approximator_NormalArea : public Approximator<PFP, typename PFP::VEC3, EDGE>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+protected:
+//	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
+	EdgeAttribute<Geom::Matrix<3,3,REAL> > edgeMatrix ;
+
+public:
+	Approximator_NormalArea(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
+	{
+		assert(pos.size() > 0 || !"Approximator_NormalArea: attribute vector is empty") ;
+	}
+	~Approximator_NormalArea()
+	{}
+	ApproximatorType getType() const { return A_NormalArea ; }
+	bool init() ;
+	void approximate(Dart d) ;
+} ;
+
+
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

@@ -17,6 +17,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MovingObjects
 {
 
@@ -49,13 +52,13 @@ class ParticleCell2DAndHalfMemo : public ParticleCell2DAndHalf<PFP>
 	void move(const VEC3& newCurrent);
 };
 
-#include "particle_cell_2DandHalf_memo.hpp"
 //namespace
 
 }
-
+}
+}
 }
 
-}
+#include "particle_cell_2DandHalf_memo.hpp"
 
 #endif

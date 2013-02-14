@@ -80,6 +80,14 @@ target_link_libraries( show_traversors
 add_executable( tuto_subdivision tuto_subdivision.cpp)
 target_link_libraries( tuto_subdivision
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
+	
+add_executable( tuto_dual2 tuto_dual2.cpp)
+target_link_libraries( tuto_dual2
+	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
+	
+add_executable( tuto_dual3 tuto_dual3.cpp)
+target_link_libraries( tuto_dual3
+	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
 
 #QT4_WRAP_CPP(tp_master_moc tp_master.h)
 #add_executable( tp_master tp_master.cpp ${tp_master_moc})

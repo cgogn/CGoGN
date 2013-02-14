@@ -32,7 +32,7 @@ SimpleMap3::SimpleMap3()
 {
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-	Algo::Modelisation::Primitive3D<PFP> primCat(myMap, position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap, position);
 	Dart d = primCat.hexaGrid_topo(2,1,1);
 	primCat.embedHexaGrid(1,1,1);
 
@@ -91,7 +91,7 @@ void SimpleMap3::cb_redraw()
 {
 	glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
-	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
+	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f,allDarts);
 }
 
 /**********************************************************************************************

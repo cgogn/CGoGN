@@ -39,6 +39,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -81,49 +84,63 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename P
  * create a n-sided pyramid
  */
 template <typename PFP>
-Dart createPyramid(typename PFP::MAP& map, unsigned int nbSides);
+Dart createPyramid(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary = true);
 
 /**
  * create a n-sided prism
  */
 template <typename PFP>
-Dart createPrism(typename PFP::MAP& map, unsigned int nbSides);
+Dart createPrism(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary = true);
 
 /**
  * create a n-sided diamond
  */
 template <typename PFP>
-Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides);
+Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary = true);
 
 /**
  * create a tetrahedron
  */
 template <typename PFP>
-Dart createTetrahedron(typename PFP::MAP& map);
+Dart createTetrahedron(typename PFP::MAP& map, bool withBoundary = true);
 
 /**
  * create a hexahedron
  */
 template <typename PFP>
-Dart createHexahedron(typename PFP::MAP& map);
+Dart createHexahedron(typename PFP::MAP& map, bool withBoundary = true);
 
 /**
  * create a 3-sided prism
  */
 template <typename PFP>
-Dart createTriangularPrism(typename PFP::MAP& map);
+Dart createTriangularPrism(typename PFP::MAP& map, bool withBoundary = true);
 
 /**
  * create a 4-sided pyramid
  */
 template <typename PFP>
-Dart createQuadrangularPyramid(typename PFP::MAP& map);
+Dart createQuadrangularPyramid(typename PFP::MAP& map, bool withBoundary = true);
 
 /**
  * create 4-sided diamond (i.e. an octahedron)
  */
 template <typename PFP>
-Dart createOctahedron(typename PFP::MAP& map);
+Dart createOctahedron(typename PFP::MAP& map, bool withBoundary = true);
+
+//TODO optimize
+template <typename PFP>
+bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+
+//TODO optimize
+template <typename PFP>
+bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+
+
+
+
+
+
 
 
 
@@ -336,6 +353,8 @@ public:
 	*/
 	void embedCube(float sx, float sy, float sz);
 
+	void embedCube(VEC3 origin, float sx, float sy, float sz);
+
 	/**
 	* embed the a grid into a twister open ribbon
 	* with turns=PI it is a Moebius strip, needs only to be closed (if model allow it)
@@ -380,6 +399,8 @@ public:
 };
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

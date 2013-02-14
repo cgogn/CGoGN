@@ -38,6 +38,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -286,6 +289,8 @@ void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttr
 }
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

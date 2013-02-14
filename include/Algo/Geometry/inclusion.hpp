@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -84,7 +87,7 @@ bool isPointInVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typen
 	{
 		Dart e = visitedFaces[iface];
 		VEC3 inter;
-		bool interRes = Algo::Geometry::intersectionLineConvexFace<PFP>(map, e, position, point, dir, inter);
+		bool interRes = intersectionLineConvexFace<PFP>(map, e, position, point, dir, inter);
 		if (interRes)
 		{
 			// check if already intersect on same point (a vertex certainly)
@@ -141,7 +144,7 @@ bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const VertexAttribute
 	{
 		if (!mark.isMarked(*face))
 		{
-			Geom::Plane3D<REAL> p = Geometry::facePlane<PFP>(map, *face, position);
+			Geom::Plane3D<REAL> p = facePlane<PFP>(map, *face, position);
 			Geom::Orientation3D o3d = p.orient(point);
 			if(CCW)
 			{
@@ -234,7 +237,7 @@ bool isPointOnEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typenam
 // 	typedef typename PFP::REAL REAL;
 // 	typedef typename PFP::VEC3 VEC3 ;
 // 
-// 	VEC3 v1 = Algo::Geometry::vectorOutOfDart<PFP>(map, d, positions);
+// 	VEC3 v1 = vectorOutOfDart<PFP>(map, d, positions);
 // 	VEC3 v2(point - positions[d]);
 // 
 // 	v1.normalize();
@@ -243,9 +246,9 @@ bool isPointOnEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typenam
 // 	return fabs(REAL(1) - (v1*v2)) < std::numeric_limits<REAL>::min();
 
 	if(
-		( Algo::Geometry::isPointOnHalfEdge<PFP>(map,d,position,point) && Algo::Geometry::isPointOnHalfEdge<PFP>(map,map.phi2(d),position,point) ) ||
-		Algo::Geometry::isPointOnVertex<PFP>(map,d,position,point) ||
-		Algo::Geometry::isPointOnVertex<PFP>(map,map.phi1(d),position,point)
+		( isPointOnHalfEdge<PFP>(map,d,position,point) && isPointOnHalfEdge<PFP>(map,map.phi2(d),position,point) ) ||
+		isPointOnVertex<PFP>(map,d,position,point) ||
+		isPointOnVertex<PFP>(map,map.phi1(d),position,point)
 	)
 		return true;
 	else
@@ -262,7 +265,7 @@ bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 	typedef typename PFP::REAL REAL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VEC3 v1 = Algo::Geometry::vectorOutOfDart<PFP>(map, d, position);
+	VEC3 v1 = vectorOutOfDart<PFP>(map, d, position);
 	VEC3 v2(point - position[d]);
 
 	v1.normalize();
@@ -303,6 +306,8 @@ bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Dart d, con
 }
 
 } // namespace Geometry
+
+} // namespace Surface
 
 } // namspace Algo
 

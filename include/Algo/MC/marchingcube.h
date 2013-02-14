@@ -37,6 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -274,6 +277,8 @@ public:
 };
 
 } // namespace MC
+
+}
 
 } // namespace Algo
 

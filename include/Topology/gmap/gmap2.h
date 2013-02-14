@@ -50,6 +50,8 @@ public:
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT = EDGE+5;
 
+	static const unsigned int DIMENSION = 2 ;
+
 	GMap2();
 
 	virtual std::string mapTypeName() const;
@@ -437,8 +439,6 @@ public:
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge1(Dart d, FunctorType& fonct, unsigned int thread = 0);
-
-
 	//@}
 
 	/*! @name Close map after import or creation
@@ -446,6 +446,11 @@ public:
 	 *************************************************************************/
 
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of beta2). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of beta2 relation
 	 *  Add a face to the map that closes the hole.
@@ -461,6 +466,17 @@ public:
 	 *  @return the number of closed holes
 	 */
 	unsigned int closeMap();
+	//@}
+
+	/*! @name Compute dual
+	 * These functions compute the dual mesh
+	 *************************************************************************/
+
+	//@{
+	//! Dual mesh computation
+	/*!
+	 */
+	void computeDual();
 	//@}
 };
 

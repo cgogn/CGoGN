@@ -24,13 +24,16 @@ public:
 private:
 	Window* m_window;
 	View* m_view;
+	bool b_refreshingUI;
 
 	void selectCurrentCamera();
 
 public slots:
-	void cb_selectedCameraChanged();
-	void cb_addCameraToList(Camera* c);
-	void cb_removeCameraFromList(Camera* c);
+	void selectedCameraChanged();
+	void selectCamera(View* view, Camera* camera);
+	void deselectCamera(View* view, Camera* camera);
+	void addCameraToList(Camera* c);
+	void removeCameraFromList(Camera* c);
 };
 
 } // namespace SCHNApps

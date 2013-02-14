@@ -24,11 +24,14 @@ public:
 private:
 	Window* m_window;
 	View* m_view;
+	bool b_refreshingUI;
 
 public slots:
-	void cb_selectedMapsChanged();
-	void cb_addMapToList(MapHandlerGen* m);
-	void cb_removeMapFromList(MapHandlerGen* m);
+	void selectedMapsChanged();
+	void selectMap(View* view, MapHandlerGen* map);
+	void deselectMap(View* view, MapHandlerGen* map);
+	void addMapToList(MapHandlerGen* m);
+	void removeMapFromList(MapHandlerGen* m);
 };
 
 } // namespace SCHNApps

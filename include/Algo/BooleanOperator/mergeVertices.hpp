@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace BooleanOperator
 {
 
@@ -50,15 +53,16 @@ void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& po
 		Dart e1 = map.alpha1(e) ;			// e1 stores next dart of vertex of e
 		if (e1 == e)
 			notempty = false ;				// last dart of vertex of e
-		else {
+		else
+		{
 			map.removeEdgeFromVertex(e) ;	// detach e from its vertex
 		}
 		// Searchs where e may be inserted in the vertex of d
 		Dart d1 = d ;
 		do
 		{
-			if (CGoGN::Algo::BooleanOperator::isBetween<PFP>(map, positions, e, d,
-			                                                 map.alpha1(d))) break ;
+			if (isBetween<PFP>(map, positions, e, d, map.alpha1(d)))
+				break ;
 			d = map.alpha1(d) ;
 		} while (d != d1) ;
 
@@ -88,13 +92,17 @@ void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& 
 			{
 				if(positions[d1].isNear(positions[d2], precision))
 				{
-					if (map.sameVertex(d1,d2)) std::cout << "fusion: sameVertex" << std::endl ;
-					if (!map.sameVertex(d1,d2)) mergeVertex<PFP>(map,positions,d1,d2,precision);
+					if (map.sameVertex(d1,d2))
+						std::cout << "fusion: sameVertex" << std::endl ;
+					if (!map.sameVertex(d1,d2))
+						mergeVertex<PFP>(map,positions,d1,d2,precision);
 				}
 			}
 		}
 	}
 	//	map.template disableQuickTraversal<VERTEX>();
+}
+
 }
 
 }

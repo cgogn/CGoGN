@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -163,18 +166,22 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
+			(*errors)[d] = -1 ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			else
-				(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
+			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
+			{
+				(*errors)[d] = halfEdgeInfo[dd].it->first ;
+			}
 		}
 	}
 } ;
 
 /*****************************************************************************************************************
- *                                 HALF-EDGE QEMextColor METRIC                                                  *
+ *                                 HALF-EDGE LIGHTFIELD METRIC                                                   *
  *****************************************************************************************************************/
 template <typename PFP>
 class HalfEdgeSelector_Lightfield : public EdgeSelector<PFP>
@@ -190,9 +197,9 @@ private:
 	{
 		typename std::multimap<float,Dart>::iterator it ;
 		bool valid ;
-		static std::string CGoGNnameOfType() { return "QEMextColorHalfEdgeInfo" ; }
-	} QEMextColorHalfEdgeInfo ;
-	typedef NoMathIOAttribute<QEMextColorHalfEdgeInfo> HalfEdgeInfo ;
+		static std::string CGoGNnameOfType() { return "LightfieldHalfEdgeInfo" ; }
+	} LightfieldHalfEdgeInfo ;
+	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
 
 	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
 
@@ -258,7 +265,7 @@ public:
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
 			Dart dd = this->m_map.phi2(d) ;
-			if (halfEdgeInfo[dd].valid && halfEdgeInfo[d].it->first < (*errors)[d])
+			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
 				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
@@ -266,7 +273,212 @@ public:
 	}
 } ;
 
+/*****************************************************************************************************************
+ *                                 HALF-EDGE LIGHTFIELD METRIC experimental                                      *
+ *****************************************************************************************************************/
+template <typename PFP>
+class HalfEdgeSelector_LightfieldExp : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<6,REAL> VEC6 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "LightfieldHalfEdgeInfo" ; }
+	} LightfieldHalfEdgeInfo ;
+	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
+
+	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
+
+	VertexAttribute<Utils::Quadric<REAL> > m_quadricGeom ;
+	DartAttribute<Utils::QuadricHF<REAL> > m_quadricHF ;
+
+	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN, m_avgColor ;
+	std::vector<VertexAttribute<VEC3> > m_HF ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_FN, m_attrindex_FN ;
+	std::vector<unsigned int> m_approxindex_HF, m_attrindex_HF ;
+	unsigned int m_K ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3, DART>* > m_approx ;
+
+	std::multimap<float,Dart> halfEdges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initHalfEdgeInfo(Dart d) ;
+	void updateHalfEdgeInfo(Dart d, bool recompute) ;
+	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	HalfEdgeSelector_LightfieldExp(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_FN(-1),
+		m_attrindex_FN(-1),
+		m_K(0)
+	{
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
+		m_quadricGeom = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		m_quadricHF = m.template getAttribute<Utils::QuadricHF<REAL>, DART>("HFquadric") ;
+		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+		assert(m_avgColor.isValid()) ;
+	}
+	~HalfEdgeSelector_LightfieldExp()
+	{
+		this->m_map.removeAttribute(m_quadricGeom) ;
+		this->m_map.removeAttribute(halfEdgeInfo) ;
+	}
+	SelectorType getType() { return S_hLightfieldExp ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
+		if (!errors->isValid())
+			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
+		assert(halfEdgeInfo.isValid()) ;
+
+		TraversorE<typename PFP::MAP> travE(this->m_map) ;
+		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
+		{
+			(*errors)[d] = -1 ;
+			if (halfEdgeInfo[d].valid)
+			{
+				(*errors)[d] = halfEdgeInfo[d].it->first ;
+			}
+			Dart dd = this->m_map.phi2(d) ;
+			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
+			{
+				(*errors)[d] = halfEdgeInfo[dd].it->first ;
+			}
+		}
+	}
+} ;
+
+/*****************************************************************************************************************
+ *                                 HALF-EDGE LIGHTFIELD METRIC KCL08-like                                        *
+ *****************************************************************************************************************/
+template <typename PFP>
+class HalfEdgeSelector_LightfieldKCL : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "LightfieldHalfEdgeInfo" ; }
+	} LightfieldHalfEdgeInfo ;
+	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
+
+	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
+
+	VertexAttribute<Utils::Quadric<REAL> > m_quadricGeom ;
+
+	VertexAttribute<REAL> m_visualImportance ;
+	VertexAttribute<VEC3> m_avgColor ;
+
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_FT, m_attrindex_FT ;
+	int m_approxindex_FB, m_attrindex_FB ;
+	int m_approxindex_FN, m_attrindex_FN ;
+	std::vector<unsigned int> m_approxindex_HF, m_attrindex_HF ;
+	unsigned int m_K ;
+
+	REAL tmpVisualImportance ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3,DART>* > m_approx ;
+
+	std::multimap<float,Dart> halfEdges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initHalfEdgeInfo(Dart d) ;
+	void updateHalfEdgeInfo(Dart d, bool recompute) ;
+	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+	REAL computeLightfieldError(Dart v0) ;
+	REAL computeSquaredLightfieldDifference(Dart d1, Dart d2) ;
+
+public:
+	HalfEdgeSelector_LightfieldKCL(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_FT(-1),
+		m_attrindex_FT(-1),
+		m_approxindex_FB(-1),
+		m_attrindex_FB(-1),
+		m_approxindex_FN(-1),
+		m_attrindex_FN(-1),
+		m_K(0)
+	{
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
+		m_quadricGeom = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		m_visualImportance = m.template addAttribute<typename PFP::REAL, VERTEX>("VisualImportance") ;
+		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+				assert(m_avgColor.isValid()) ;
+	}
+	~HalfEdgeSelector_LightfieldKCL()
+	{
+		this->m_map.removeAttribute(m_quadricGeom) ;
+		this->m_map.removeAttribute(halfEdgeInfo) ;
+		this->m_map.removeAttribute(m_visualImportance) ;
+	}
+	SelectorType getType() { return S_hLightfieldKCL ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
+		if (!errors->isValid())
+			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
+		assert(halfEdgeInfo.isValid()) ;
+
+		TraversorE<typename PFP::MAP> travE(this->m_map) ;
+		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
+		{
+			(*errors)[d] = -1 ;
+			if (halfEdgeInfo[d].valid)
+			{
+				(*errors)[d] = halfEdgeInfo[d].it->first ;
+			}
+			Dart dd = this->m_map.phi2(d) ;
+			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first > (*errors)[d])
+			{
+				(*errors)[dd] = halfEdgeInfo[dd].it->first ;
+			}
+			//m_avgColor[d] = VEC3(m_visualImportance[d]/6.,m_visualImportance[d]/6.,m_visualImportance[d]/6.) ;
+		}
+	}
+} ;
+
+
 } // namespace Decimation
+
+}
 
 } // namespace Algo
 

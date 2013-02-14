@@ -31,13 +31,16 @@
 #include "Utils/img3D_IO.h"
 
 #ifdef WITH_ZINRI
-#include "Zinrimage.h"
+#include "Zinri/Zinrimage.h"
 #endif
 
 namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace MC
@@ -363,6 +366,7 @@ public:
 } // end namespace
 } // end namespace
 } // end namespace
+}
 
 #include "Algo/MC/image.hpp"
 

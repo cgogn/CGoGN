@@ -70,6 +70,10 @@ public:
 	static const unsigned int VERTEX_OF_PARENT2 = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT2 = EDGE+5;
 
+	static const unsigned int DIMENSION = 3 ;
+
+
+
 	Map3();
 
 	virtual std::string mapTypeName() const;
@@ -126,13 +130,19 @@ public:
 	/*! The phi3-links around the volume are removed
 	 *  @param d a dart of the volume
 	 */
-	virtual void deleteVolume(Dart d);
+	virtual void deleteVolume(Dart d, bool withBoundary = true);
 
 	//! Fill a hole with a volume
 	/*! \pre Dart d is boundary marked
 	 *  @param d a dart of the volume to fill
 	 */
 	virtual void fillHole(Dart d) ;
+
+	//! Open the mesh Transforming a face in a hole
+	/*! \pre Dart d is NOT boundary marked
+	 *  @param d a dart of the face filled
+	 */
+	virtual void createHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators
@@ -147,6 +157,8 @@ public:
 	 *  @param vd a vector of darts
 	 */
 	virtual Dart splitVertex(std::vector<Dart>& vd);
+
+	virtual void splitVertex(Dart d, Dart e) { assert("use splitVertex(d,e) only in dimension 2");}
 
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume
@@ -256,6 +268,9 @@ public:
 	/*! @param d a dart of common face
 	 */
 	virtual bool mergeVolumes(Dart d);
+
+	virtual bool mergeVolumes(Dart d, Dart e) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
+
 
 	//! Split a volume into two volumes along a edge path
 	/*! @param vd a vector of darts
@@ -418,6 +433,11 @@ public:
 	 *************************************************************************/
 
 	//@{
+	/**
+	 * create a face of map1 marked as boundary
+	 */
+	Dart newBoundaryCycle(unsigned int nbE);
+
 	//! Close a topological hole (a sequence of connected fixed point of phi3). DO NOT USE, only for import/creation algorithm
 	/*! \pre dart d MUST be fixed point of phi3 relation
 	 *  Add a volume to the map that closes the hole.
@@ -433,6 +453,33 @@ public:
 	 *  @return the number of closed holes
 	 */
 	unsigned int closeMap();
+	//@}
+
+	/*! @name Compute dual
+	 * These functions compute the dual mesh
+	 *************************************************************************/
+
+	//@{
+	//! Reverse the orientation of the map
+	/*!
+	 */
+	void reverseOrientation();
+
+	//! Dual mesh computation
+	/*!
+	 */
+	void computeDual();
+
+	//TODO crade a virer (espece d'extrud)
+	// Prend un brin d'une 2-carte
+	// - stocke 1 brin par face
+	// - decoud chaque face
+	// - triangule chaque face
+	// - ferme par phi3 chaque volume
+	// - recoud le tout
+	Dart explodBorderTopo(Dart d);
+
+	void computeDualTest();
 	//@}
 };
 

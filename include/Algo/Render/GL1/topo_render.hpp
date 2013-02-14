@@ -138,7 +138,7 @@ void renderTopoMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 }
 
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv)
+void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -164,6 +164,8 @@ void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& 
 	DartMarker mark(map);					// marker for darts
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
+		if(good(d))
+		{
 			CellMarkerStore<VERTEX> markVert(map);		//marker for vertices
 			VEC3 center(0, 0, 0);
 			unsigned int nbv = 0;
@@ -200,6 +202,7 @@ void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& 
 			center /= typename PFP::REAL(nbv);
 			vecCenters.push_back(center);
 			vecNbFaces.push_back(nbf);
+		}
 	}
 
  	glLineWidth(1.0f);
@@ -275,11 +278,14 @@ void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& 
 		}
 
 		e = map.phi3(d);
+		if(fv2[d] != VEC3(0.0f) && fv2[e] != VEC3(0.0f))
+		{
 		if ((d<e) && drawPhi3)
 		{
 			glColor3f(1.0,1.0,0.0);
 			glVertex3fv(fv2[d].data());
 			glVertex3fv(fv2[e].data());
+		}
 		}
 		if (drawPhi1)
 		{

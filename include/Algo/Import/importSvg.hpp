@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
@@ -347,7 +350,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	// Merge near vertices
-	Algo::BooleanOperator::mergeVertices<PFP>(map,position,1);
+	BooleanOperator::mergeVertices<PFP>(map,position,1);
 	std::cout << "importSVG : Merging of vertices." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -518,7 +521,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	{
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
-			if(map.isBoundaryMarked(d))
+			if(map.isBoundaryMarked2(d))
 			{
 				map.fillHole(d);
 			}
@@ -551,9 +554,10 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 		map.template initAllOrbitsEmbedding<FACE>(true);
 
+
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
-			if (!map.isBoundaryMarked(d) && brokenL.isMarked(d))
+			if (!map.isBoundaryMarked2(d) && brokenL.isMarked(d))
 			{
 				map.deleteFace(d,false);
 			}
@@ -563,7 +567,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
-			if (map.isBoundaryMarked(d))
+			if (map.isBoundaryMarked2(d))
 				buildingMark.mark(d);
 		}
 
@@ -573,6 +577,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

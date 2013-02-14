@@ -1,3 +1,39 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace Surface
+{
+
+namespace MovingObjects
+{
+
+
 template <typename PFP>
 void ParticleCell2D<PFP>::display()
 {
@@ -65,10 +101,10 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 
 	crossCell = CROSS_OTHER ;
 
-	if (Algo::Geometry::isPointOnVertex < PFP > (m, d, positionAttribut, goal))
+	if (Geometry::isPointOnVertex < PFP > (m, d, positionAttribut, goal))
 	{
 		this->setState(VERTEX) ;
-		this->ParticleBase < PFP > ::move(goal) ;
+		this->Algo::MovingObjects::ParticleBase < PFP > ::move(goal) ;
 		return ;
 	}
 	else
@@ -91,7 +127,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 				//orbit with 2 edges : point on one edge
 				if(m.phi2_1(m.phi2_1(d)) == d)
 				{
-					if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,positionAttribut,goal))
+					if(!Geometry::isPointOnHalfEdge<PFP>(m,d,positionAttribut,goal))
 						d = m.phi2_1(d);
 				}
 				else
@@ -99,8 +135,8 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 					//checking : case with 3 orthogonal darts and point on an edge
 					do
 					{
-						if(Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,positionAttribut,goal)
-								&& Algo::Geometry::isPointOnHalfEdge<PFP>(m,this->m.phi2(d),positionAttribut,goal)
+						if(Geometry::isPointOnHalfEdge<PFP>(m,d,positionAttribut,goal)
+								&& Geometry::isPointOnHalfEdge<PFP>(m,this->m.phi2(d),positionAttribut,goal)
 								&& this->getOrientationEdge(goal, this->d) == Geom::ALIGNED)
 						{
 							edgeState(goal) ;
@@ -111,7 +147,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 
 
 					this->setState(VERTEX) ;
-					this->ParticleBase < PFP > ::move(goal) ;
+					this->Algo::MovingObjects::ParticleBase < PFP > ::move(goal) ;
 					return ;
 				}
 			}
@@ -129,7 +165,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 
 		//displacement step
 		if (getOrientationEdge(goal, d) == Geom::ALIGNED
-		    && Algo::Geometry::isPointOnHalfEdge < PFP > (m, d, positionAttribut, goal))
+		    && Geometry::isPointOnHalfEdge < PFP > (m, d, positionAttribut, goal))
 			edgeState(goal) ;
 		else
 		{
@@ -147,7 +183,7 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 #endif
 
 	assert(goal.isFinite()) ;
-// 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
+// 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if (crossCell == NO_CROSS)
 	{
@@ -174,21 +210,21 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 			break ;
 	}
 
-	if (!Algo::Geometry::isPointOnHalfEdge < PFP > (m, d, positionAttribut, goal))
+	if (!Geometry::isPointOnHalfEdge < PFP > (m, d, positionAttribut, goal))
 	{
-		this->ParticleBase < PFP > ::move(positionAttribut[d]) ;
+		this->Algo::MovingObjects::ParticleBase < PFP > ::move(positionAttribut[d]) ;
 		vertexState(goal) ;
 		return ;
 	}
-	else if (!Algo::Geometry::isPointOnHalfEdge < PFP > (m, m.phi2(d), positionAttribut, goal))
+	else if (!Geometry::isPointOnHalfEdge < PFP > (m, m.phi2(d), positionAttribut, goal))
 	{
 		d = m.phi2(d) ;
-		this->ParticleBase < PFP > ::move(positionAttribut[d]) ;
+		this->Algo::MovingObjects::ParticleBase < PFP > ::move(positionAttribut[d]) ;
 		vertexState(goal) ;
 		return ;
 	}
 
-	this->ParticleBase < PFP > ::move(goal) ;
+	this->Algo::MovingObjects::ParticleBase < PFP > ::move(goal) ;
 }
 
 template <typename PFP>
@@ -278,7 +314,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 
 	assert(this->getPosition().isFinite());
 	assert(goal.isFinite()) ;
-// 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
+// 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	Dart dd = d ;
 	float wsoe = getOrientationFace(goal, m.phi1(d)) ;
@@ -305,19 +341,19 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 						d = m.phi1(d) ;
 						break ;
 					case Geom::ALIGNED :
-						this->ParticleBase<PFP>::move(goal) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 						edgeState(goal) ;
 						return ;
 					case Geom::RIGHT :
-						this->ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
 						edgeState(goal, Geom::RIGHT) ;
 						return ;
 				}
 			} while (d != dd) ;
-			this->ParticleBase<PFP>::move(goal) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 			this->setState(FACE) ;
 
-// 			m_position = Algo::Geometry::faceCentroid<PFP>(m,d,m_positions);
+// 			m_position = Geometry::faceCentroid<PFP>(m,d,m_positions);
 // 			d = m.phi1(d);
 // 			m_position = pointInFace(d);
 // 			faceState(current);
@@ -351,19 +387,19 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 						break ;
 					case Geom::ALIGNED :
 // 					CGoGNout << "pic" << CGoGNendl;
-						this->ParticleBase<PFP>::move(goal) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 						edgeState(goal) ;
 						return ;
 					case Geom::RIGHT :
 //					CGoGNout << "smthg went bad(2) " << m_position << CGoGNendl;
-						this->ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
 // 					CGoGNout << " " << m_position << CGoGNendl;
 						edgeState(goal, Geom::RIGHT) ;
 						return ;
 				}
 			} while (d != dd) ;
 
-			this->ParticleBase<PFP>::move(goal) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 			this->setState(FACE) ;
 			return ;
 		}
@@ -373,7 +409,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 	switch (getOrientationEdge(goal, d))
 	{
 		case Geom::LEFT :
-			this->ParticleBase<PFP>::move(goal) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 			this->setState(FACE) ;
 			;
 			break ;
@@ -392,14 +428,19 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 			if (wsoe == Geom::ALIGNED)
 			{
 				d = m.phi1(d) ; //to check
-				this->ParticleBase<PFP>::move(positionAttribut[d]) ;
+				this->Algo::MovingObjects::ParticleBase<PFP>::move(positionAttribut[d]) ;
 				vertexState(goal) ;
 			}
 			else
 			{
-				this->ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
+				this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
 				edgeState(goal, Geom::RIGHT) ;
 			}
 			break ;
 	}
+}
+
+}
+}
+} //namespaces
 }

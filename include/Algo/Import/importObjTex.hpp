@@ -28,6 +28,8 @@ namespace CGoGN
 {
 namespace Algo
 {
+namespace Surface
+{
 namespace Import 
 {
 
@@ -231,7 +233,7 @@ bool importObjWithTex(typename PFP::MAP& map, const std::string& filename)
 	return true;
 }
 
-
+}
 }
 } // end namespaces
 }

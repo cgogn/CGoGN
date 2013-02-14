@@ -3,25 +3,12 @@
 
 #include "plugin.h"
 
-#include "computeNormalsDialog.h"
-
-#include "Topology/generic/functor.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/attributeHandler.h"
+#include "computeNormalDialog.h"
+#include "computeCurvatureDialog.h"
 
 
 using namespace CGoGN;
 using namespace SCHNApps;
-
-
-struct PFP: public PFP_STANDARD
-{
-	typedef EmbeddedMap2 MAP;
-};
-
-typedef PFP::MAP MAP;
-typedef PFP::VEC3 VEC3;
 
 
 class DifferentialPropertiesPlugin : public Plugin
@@ -43,29 +30,48 @@ public:
 
 	virtual void redraw(View *view) {}
 
-	virtual void keyPress(View* view, int key) {}
-	virtual void keyRelease(View* view, int key) {}
-	virtual void mousePress(View* view, int button, int x, int y) {}
-	virtual void mouseRelease(View* view, int button, int x, int y) {}
-	virtual void mouseMove(View* view, int buttons, int x, int y) {}
-	virtual void wheelEvent(View* view, int delta, int x, int y) {}
-
-	virtual void viewLinked(View* view) {}
-	virtual void viewUnlinked(View* view) {}
-	virtual void currentViewChanged(View* view) {}
-
-	virtual void mapLinked(View* view, MapHandlerGen* m) {}
-	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
+	virtual void keyPress(View* view, QKeyEvent* event) {}
+	virtual void keyRelease(View* view, QKeyEvent* event) {}
+	virtual void mousePress(View* view, QMouseEvent* event) {}
+	virtual void mouseRelease(View* view, QMouseEvent* event) {}
+	virtual void mouseMove(View* view, QMouseEvent* event) {}
+	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
 public slots:
-	void cb_openComputeNormalsDialog();
-	void cb_computeNormals();
+	void openComputeNormalDialog();
+	void openComputeCurvatureDialog();
+
+	void computeNormalFromDialog();
+	void computeCurvatureFromDialog();
+
+	void computeNormal(
+		const QString& mapName,
+		const QString& positionAttributeName = "position",
+		const QString& normalAttributeName = "normal",
+		bool createNormalVBO = true
+	);
+	void computeCurvature(
+		const QString& mapName,
+		const QString& positionAttributeName = "position",
+		const QString& normalAttributeName = "normal",
+		const QString& KmaxAttributeName = "Kmax",
+		const QString& kmaxAttributeName = "kmax",
+		const QString& KminAttributeName = "Kmin",
+		const QString& kminAttributeName = "kmin",
+		const QString& KnormalAttributeName = "Knormal",
+		bool createKmaxVBO = true,
+		bool createkmaxVBO = true,
+		bool createKminVBO = true,
+		bool createkminVBO = true,
+		bool createKnormalVBO = true
+	);
 
 private:
-	ComputeNormalsDialog* m_computeNormalsDialog;
+	ComputeNormalDialog* m_computeNormalDialog;
+	ComputeCurvatureDialog* m_computeCurvatureDialog;
 
-	QAction* computeNormalsAction;
-	QAction* computeCurvatureAction;
+	QAction* m_computeNormalAction;
+	QAction* m_computeCurvatureAction;
 };
 
 #endif

@@ -38,6 +38,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib)
 	}
 
 	m_name = attrib.name();
+	m_typeName = nameOfType(typename ATTR_HANDLER::DATA_TYPE());
 
 	m_data_size = sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
 	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
@@ -70,6 +71,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 	}
 
 	m_name = attrib.name();
+	m_typeName = nameOfType(typename ATTR_HANDLER::DATA_TYPE());
 
 	m_data_size = conv->sizeElt();
 	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;

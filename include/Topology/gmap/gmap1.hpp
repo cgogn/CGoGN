@@ -163,10 +163,16 @@ inline Dart GMap1::cutEdge(Dart d)
 	beta0sew(e, d) ;
 	beta0sew(f, dd) ;
 
-	if (isBoundaryMarked(d))
+	if (isBoundaryMarked2(d))
 	{
-		boundaryMark(e);
-		boundaryMark(f);
+		boundaryMark2(e);
+		boundaryMark2(f);
+	}
+
+	if (isBoundaryMarked3(d))
+	{
+		boundaryMark3(e);
+		boundaryMark3(f);
 	}
 
 	return f ;

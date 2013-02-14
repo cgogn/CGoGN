@@ -24,11 +24,14 @@ public:
 private:
 	Window* m_window;
 	View* m_view;
+	bool b_refreshingUI;
 
 public slots:
-	void cb_selectedPluginsChanged();
-	void cb_addPluginToList(Plugin* p);
-	void cb_removePluginFromList(Plugin* p);
+	void selectedPluginsChanged();
+	void selectPlugin(View* view, Plugin* plugin);
+	void deselectPlugin(View* view, Plugin* plugin);
+	void addPluginToList(Plugin* p);
+	void removePluginFromList(Plugin* p);
 };
 
 } // namespace SCHNApps

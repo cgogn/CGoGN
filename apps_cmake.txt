@@ -3,11 +3,9 @@
 
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 
-
 SET ( WITH_ASSIMP ON CACHE BOOL "need Assimp")
-SET ( WITH_NUMERICAL ON CACHE BOOL "need numerical libs")
-SET ( WITH_ZINRI ON CACHE BOOL "need Zinri lib  ")
-SET ( WITH_QT ON CACHE BOOL "need Qt lib  ")
+SET ( WITH_ZINRI ON CACHE BOOL "need Zinri lib")
+SET ( WITH_QT ON CACHE BOOL "need Qt lib")
 
 # for CGoGN MR
 file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_mr.h FORCE_MR)
@@ -45,12 +43,13 @@ add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 
 # define includes of external libs 
 SET(COMMON_INCLUDES 
-	${CGoGN_ROOT_DIR}/ThirdParty/glm
+	${CGoGN_ROOT_DIR}/ThirdParty/include
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
 	${LIBXML2_INCLUDE_DIR}
-	${Boost_INCLUDE_DIRS} )
+	${Boost_INCLUDE_DIRS}
+)
 
 # define libs for external libs
 SET (COMMON_LIBS 
@@ -60,23 +59,22 @@ SET (COMMON_LIBS
 	${LIBXML2_LIBRARIES}
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
-	${Boost_THREAD_LIBRARY} )
+	${Boost_THREAD_LIBRARY}
+)
 
 #optionnal libs
 IF (WITH_ASSIMP)
 	add_definitions(-DWITH_ASSIMP)	
-	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include)
 	SET (COMMON_LIBS ${COMMON_LIBS} assimp)
 ENDIF (WITH_ASSIMP)
 
 IF (WITH_ZINRI)
 	add_definitions(-DWITH_ZINRI)
-	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${CGoGN_ROOT_DIR}/ThirdParty/Zinri)
 	SET (COMMON_LIBS ${COMMON_LIBS} Zinri)
 ENDIF (WITH_ZINRI)
 
 IF (WITH_QT)
-	find_package(Qt4 REQUIRED)
+	find_package(Qt4 REQUIRED)	
 	add_definitions(-DWITH_QT)
 	SET(QT_USE_QTOPENGL TRUE)
 	INCLUDE(${QT_USE_FILE})
@@ -84,12 +82,6 @@ IF (WITH_QT)
 	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${QT_INCLUDE_DIR})
 	SET (COMMON_LIBS ${COMMON_LIBS} ${QT_LIBRARIES})
 ENDIF (WITH_QT)
-
-IF (WITH_NUMERICAL)
-	add_definitions(-DWITH_NUMERICAL)
-	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
-	SET (COMMON_LIBS ${COMMON_LIBS} numerical lapack blas f2c)
-ENDIF (WITH_NUMERICAL)
 
 # qq definition specifiques pour mac
 IF(APPLE)

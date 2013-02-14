@@ -5,7 +5,9 @@
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QPluginLoader>
+#include <QFile>
 #include <QFileInfo>
+#include <QDir>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
@@ -26,34 +28,44 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-Window::Window(const QString& appPath, QWidget *parent) :
-	QMainWindow(parent),
+Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQtScriptingConsole& pythonConsole) :
+	QMainWindow(),
 	m_appPath(appPath),
+	m_pythonContext(pythonContext),
+	m_pythonConsole(pythonConsole),
 	m_firstView(NULL),
 	m_currentView(NULL)
 {
-	// program in its initialization phase
-	m_initialization = true;
-
 	m_camerasDialog = new CamerasDialog(this);
 	m_pluginsDialog = new PluginsDialog(this);
 	m_mapsDialog = new MapsDialog(this);
 
 	this->setupUi(this);
 
-	m_dock = new QDockWidget(tr("Control"), this);
-	m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-	m_dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
-	addDockWidget(Qt::RightDockWidgetArea, m_dock);
-	m_dock->setVisible(false);
+	m_dock = new QDockWidget(tr("Plugins"), this);
+	m_dock->setAllowedAreas(Qt::RightDockWidgetArea);
+	m_dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
 
 	m_dockTabWidget = new QTabWidget(m_dock);
 	m_dockTabWidget->setObjectName("DockTabWidget");
 	m_dockTabWidget->setLayoutDirection(Qt::LeftToRight);
 	m_dockTabWidget->setTabPosition(QTabWidget::East);
+
+	addDockWidget(Qt::RightDockWidgetArea, m_dock);
+	m_dock->setVisible(false);
 	m_dock->setWidget(m_dockTabWidget);
 
 	connect(actionShowHideDock, SIGNAL(triggered()), this, SLOT(cb_showHideDock()));
+
+	m_pythonDock = new QDockWidget(tr("Python"), this);
+	m_pythonDock->setAllowedAreas(Qt::BottomDockWidgetArea);
+	m_pythonDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+
+	addDockWidget(Qt::BottomDockWidgetArea, m_pythonDock);
+	m_pythonDock->setVisible(false);
+	m_pythonDock->setWidget(&m_pythonConsole);
+
+	connect(actionShowHidePythonDock, SIGNAL(triggered()), this, SLOT(cb_showHidePythonDock()));
 
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
@@ -63,7 +75,7 @@ Window::Window(const QString& appPath, QWidget *parent) :
 
 	// add first view
 	m_firstView = addView();
-	m_currentView = m_firstView;
+	setCurrentView(m_firstView);
 	m_rootSplitter->addWidget(m_firstView);
 
 	glewInit();
@@ -72,19 +84,15 @@ Window::Window(const QString& appPath, QWidget *parent) :
 	connect(actionAboutSCHNApps, SIGNAL(triggered()), this, SLOT(cb_aboutSCHNApps()));
 	connect(actionAboutCGoGN, SIGNAL(triggered()), this, SLOT(cb_aboutCGoGN()));
 
-	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
-	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
-	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
+	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_showCamerasDialog()));
+	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_showPluginsDialog()));
+	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_showMapsDialog()));
 
-//	System::StateHandler::loadState(this, &h_plugin, &h_scene, m_splitArea);
-
-	// program in its initialization phase
-	m_initialization = false;
+	registerPluginsDirectory(m_appPath + QString("/../lib"));
 }
 
 Window::~Window()
 {
-//	System::StateHandler::saveState(this, &h_plugins, &h_scenes, m_splitArea);
 }
 
 /*********************************************************
@@ -142,10 +150,7 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 {
 	// if menu path = empty string: set error + failure
 	if (menuPath.isEmpty())
-	{
-		System::Error::code = System::Error::BAD_ACTION_MENU_PATH_f(menuPath);
 		return false;
-	}
 
 	if (!action)
 		return false;
@@ -158,10 +163,7 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 	// if only one substring: error + failure
 	// No action directly in the menu bar
 	if (nbStep < 1)
-	{
-		System::Error::code = System::Error::BAD_ACTION_MENU_PATH_f(menuPath);
 		return false;
-	}
 
 	unsigned int i = 0;
 	QMenu* lastMenu = NULL;
@@ -264,10 +266,7 @@ void Window::removeToolbarAction(QAction* action)
 Camera* Window::addCamera(const QString& name)
 {
 	if (h_cameras.contains(name))
-	{
-		System::Error::code = System::Error::CAMERA_EXISTS;
 		return NULL;
-	}
 
 	Camera* camera = new Camera(name, this);
 	h_cameras.insert(name, camera);
@@ -300,10 +299,7 @@ Camera* Window::getCamera(const QString& name) const
 	if (h_cameras.contains(name))
 		return h_cameras[name];
 	else
-	{
-		System::Error::code = System::Error::CAMERA_DOES_NOT_EXIST;
 		return NULL;
-	}
 }
 
 /*********************************************************
@@ -313,10 +309,7 @@ Camera* Window::getCamera(const QString& name) const
 View* Window::addView(const QString& name)
 {
 	if (h_views.contains(name))
-	{
-		System::Error::code = System::Error::VIEW_EXISTS;
 		return NULL;
-	}
 
 	View* view = NULL;
 	if(m_firstView == NULL)
@@ -372,29 +365,33 @@ View* Window::getView(const QString& name) const
 	if (h_views.contains(name))
 		return h_views[name];
 	else
-	{
-		System::Error::code = System::Error::VIEW_DOES_NOT_EXIST;
 		return NULL;
-	}
 }
 
 void Window::setCurrentView(View* view)
 {
-	const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
-	foreach(Plugin* p, oldPlugins)
-		disablePluginTabWidgets(p);
+	if(m_currentView)
+	{
+		const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
+		foreach(Plugin* p, oldPlugins)
+			disablePluginTabWidgets(p);
+
+		disconnect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+	}
 
 	View* oldCurrent = m_currentView;
 	m_currentView = view;
 
 	const QList<Plugin*>& newPlugins = m_currentView->getLinkedPlugins();
 	foreach(Plugin* p, newPlugins)
-	{
 		enablePluginTabWidgets(p);
-		p->currentViewChanged(m_currentView);
-	}
 
-	oldCurrent->updateGL();
+	connect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+
+	emit(currentViewChanged(m_currentView));
+
+	if(oldCurrent)
+		oldCurrent->updateGL();
 	m_currentView->updateGL();
 }
 
@@ -402,24 +399,17 @@ void Window::splitView(const QString& name, Qt::Orientation orientation)
 {
 	View* newView = addView();
 
-//	std::cout << "splitView" << std::endl;
-
 	View* view = h_views[name];
 	QSplitter* parent = (QSplitter*)(view->parentWidget());
 	if(parent == m_rootSplitter && !b_rootSplitterInitialized)
 	{
-//		std::cout << "init root splitter" << std::endl;
 		m_rootSplitter->setOrientation(orientation);
 		b_rootSplitterInitialized = true;
 	}
 	if(parent->orientation() == orientation)
-	{
-//		std::cout << "same orientation" << std::endl;
 		parent->insertWidget(parent->indexOf(view)+1, newView);
-	}
 	else
 	{
-//		std::cout << "new orientation" << std::endl;
 		int idx = parent->indexOf(view);
 		view->setParent(NULL);
 		QSplitter* spl = new QSplitter(orientation);
@@ -433,52 +423,80 @@ void Window::splitView(const QString& name, Qt::Orientation orientation)
  * MANAGE PLUGINS
  *********************************************************/
 
-Plugin* Window::loadPlugin(const QString& pluginFilePath)
+void Window::registerPluginsDirectory(const QString& path)
 {
-	QString pluginName = QFileInfo(pluginFilePath).baseName().remove(0, 3);
-
-	if (h_plugins.contains(pluginName))
+	QDir directory(path);
+	if(directory.exists())
 	{
-		// set message error + function fails
-		System::Error::code = System::Error::PLUGIN_EXISTS;
-		return NULL;
-	}
+		QStringList filters;
+		filters << "lib*.so";
+		filters << "lib*.dylib";
+		filters << "*.dll";
 
-	QPluginLoader loader(pluginFilePath);
+		QStringList pluginFiles = directory.entryList(filters, QDir::Files);
 
-	// if the loader loads a plugin instance
-	if (QObject* pluginObject = loader.instance())
-	{
-		Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
-
-		// we set the plugin with correct parameters (name, filepath, window)
-		plugin->setName(pluginName);
-		plugin->setFilePath(pluginFilePath);
-		plugin->setWindow(this);
-
-		// then we call its enable() methods
-		if (plugin->enable())
+		foreach(QString pluginFile, pluginFiles)
 		{
-			// if it succeeded we reference this plugin
-			h_plugins.insert(pluginName, plugin);
+			QFileInfo pfi(pluginFile);
+			QString pluginName = pfi.baseName().remove(0, 3);
+			QString pluginFilePath = directory.absoluteFilePath(pluginFile);
 
-			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
-			emit(pluginAdded(plugin));
-
-			// method success
-			return plugin;
+			m_availablePlugins[pluginName] = pluginFilePath;
 		}
+
+		m_pluginsDialog->refreshPluginsList();
+	}
+}
+
+Plugin* Window::loadPlugin(const QString& pluginName)
+{
+	if (h_plugins.contains(pluginName))
+		return NULL;
+
+	if (m_availablePlugins.contains(pluginName))
+	{
+		QString pluginFilePath = m_availablePlugins[pluginName];
+
+		QPluginLoader loader(pluginFilePath);
+
+		// if the loader loads a plugin instance
+		if (QObject* pluginObject = loader.instance())
+		{
+			Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
+
+			// set the plugin with correct parameters (name, filepath, window)
+			plugin->setName(pluginName);
+			plugin->setFilePath(pluginFilePath);
+			plugin->setWindow(this);
+
+			// then we call its enable() methods
+			if (plugin->enable())
+			{
+				// if it succeeded we reference this plugin
+				h_plugins.insert(pluginName, plugin);
+
+				statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
+				emit(pluginLoaded(plugin));
+
+				// method success
+				return plugin;
+			}
+			else
+			{
+				delete plugin;
+				return NULL;
+			}
+		}
+		// if loading fails
 		else
 		{
-			delete plugin;
+			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toUtf8().constData() << std::endl;
 			return NULL;
 		}
 	}
-	// if loading fails
 	else
 	{
-		// set error message + method failure
-		System::Error::code = System::Error::ERROR_PLUGIN_LOAD_f(pluginName);
+		std::cout << "loadPlugin: plugin not found (" << pluginName.toUtf8().constData() << ")" << std::endl;
 		return NULL;
 	}
 }
@@ -497,7 +515,7 @@ void Window::unloadPlugin(const QString& pluginName)
 		loader.unload();
 
 		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
-		emit(pluginRemoved(plugin));
+		emit(pluginUnloaded(plugin));
 
 		// delete plugin
 		delete plugin;
@@ -509,49 +527,35 @@ Plugin* Window::getPlugin(const QString& name) const
 	if (h_plugins.contains(name))
 		return h_plugins[name];
 	else
-	{
-		System::Error::code = System::Error::PLUGIN_DOES_NOT_EXIST;
 		return NULL;
-	}
 }
-/*
-Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
-{
-	// if the plugin is referenced and found
-	PluginHash::iterator it;
-
-	if ((it = h_plugin.find(name)) != h_plugin.end())
-	{
-		// the plugin calling for the depencie is added to the found plugin's list of dependant plugins
-		(*it)->addDependantPlugin(dependantPlugin);
-		return (*it);
-	}
-	//if not found: set error message + failure
-	else
-	{
-		System::Error::code = System::Error::UNSATSIFIED_PLUGIN_DEPENDENCIE_f(name, dependantPlugin->getName());
-		return NULL;
-	}
-}
-*/
 
 /*********************************************************
  * MANAGE MAPS
  *********************************************************/
 
-bool Window::addMap(MapHandlerGen* map)
+MapHandlerGen* Window::addMap(const QString& name, unsigned int dim)
 {
-	if (h_maps.contains(map->getName()))
+	if (h_maps.contains(name))
+		return NULL;
+
+	GenericMap* map = NULL;
+	switch(dim)
 	{
-		System::Error::code = System::Error::MAP_EXISTS;
-		return false;
+		case 2 :
+			map = new PFP2::MAP();
+			break;
+		case 3 :
+			map = new PFP3::MAP();
+			break;
 	}
 
-	h_maps.insert(map->getName(), map);
+	MapHandlerGen* mh = new MapHandlerGen(name, this, map);
+	h_maps.insert(name, mh);
 
-	emit(mapAdded(map));
+	emit(mapAdded(mh));
 
-	return true;
+	return mh;
 }
 
 void Window::removeMap(const QString& name)
@@ -572,10 +576,103 @@ MapHandlerGen* Window::getMap(const QString& name) const
 	if (h_maps.contains(name))
 		return h_maps[name];
 	else
-	{
-		System::Error::code = System::Error::MAP_DOES_NOT_EXIST;
 		return NULL;
-	}
+}
+
+/*********************************************************
+ * MANAGE LINKS
+ *********************************************************/
+
+void Window::linkViewAndCamera(View* v, Camera* c)
+{
+	Camera* current = v->getCurrentCamera();
+	current->unlinkView(v);
+	emit(viewAndCameraUnlinked(v, current));
+
+	v->setCurrentCamera(c);
+
+	c->linkView(v);
+	emit(viewAndCameraLinked(v, c));
+}
+
+void Window::linkViewAndCamera(const QString& viewName, const QString& cameraName)
+{
+	View* view = getView(viewName);
+	Camera* camera = getCamera(cameraName);
+	if(view && camera)
+		linkViewAndCamera(view, camera);
+}
+
+void Window::linkViewAndMap(View* v, MapHandlerGen* m)
+{
+	v->linkMap(m);
+	m->linkView(v);
+
+	emit(viewAndMapLinked(v, m));
+
+	v->updateGL();
+}
+
+void Window::linkViewAndMap(const QString& viewName, const QString& mapName)
+{
+	View* view = getView(viewName);
+	MapHandlerGen* map = getMap(mapName);
+	if(view && map)
+		linkViewAndMap(view, map);
+}
+
+void Window::unlinkViewAndMap(View* v, MapHandlerGen* m)
+{
+	v->unlinkMap(m);
+	m->unlinkView(v);
+
+	emit(viewAndMapUnlinked(v, m));
+
+	v->updateGL();
+}
+
+void Window::unlinkViewAndMap(const QString& viewName, const QString& mapName)
+{
+	View* view = getView(viewName);
+	MapHandlerGen* map = getMap(mapName);
+	if(view && map)
+		unlinkViewAndMap(view, map);
+}
+
+void Window::linkViewAndPlugin(View* v, Plugin* p)
+{
+	v->linkPlugin(p);
+	p->linkView(v);
+
+	emit(viewAndPluginLinked(v, p));
+
+	v->updateGL();
+}
+
+void Window::linkViewAndPlugin(const QString& viewName, const QString& pluginName)
+{
+	View* view = getView(viewName);
+	Plugin* plugin = getPlugin(pluginName);
+	if(view && plugin)
+		linkViewAndPlugin(view, plugin);
+}
+
+void Window::unlinkViewAndPlugin(View* v, Plugin* p)
+{
+	v->unlinkPlugin(p);
+	p->unlinkView(v);
+
+	emit(viewAndPluginUnlinked(v, p));
+
+	v->updateGL();
+}
+
+void Window::unlinkViewAndPlugin(const QString& viewName, const QString& pluginName)
+{
+	View* view = getView(viewName);
+	Plugin* plugin = getPlugin(pluginName);
+	if(view && plugin)
+		unlinkViewAndPlugin(view, plugin);
 }
 
 /*********************************************************
@@ -643,17 +740,22 @@ void Window::cb_showHideDock()
 	m_dock->setVisible(m_dock->isHidden());
 }
 
-void Window::cb_manageCameras()
+void Window::cb_showHidePythonDock()
+{
+	m_pythonDock->setVisible(m_pythonDock->isHidden());
+}
+
+void Window::cb_showCamerasDialog()
 {
 	m_camerasDialog->show();
 }
 
-void Window::cb_managePlugins()
+void Window::cb_showPluginsDialog()
 {
 	m_pluginsDialog->show();
 }
 
-void Window::cb_manageMaps()
+void Window::cb_showMapsDialog()
 {
 	m_mapsDialog->show();
 }

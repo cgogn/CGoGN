@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 
 ADD_SUBDIRECTORY(importSurface)
+ADD_SUBDIRECTORY(importVolume)
 ADD_SUBDIRECTORY(differentialProperties)
 ADD_SUBDIRECTORY(render)
 ADD_SUBDIRECTORY(renderVector)
+ADD_SUBDIRECTORY(renderExplod)
 ADD_SUBDIRECTORY(subdivideSurface)
+#ADD_SUBDIRECTORY(surfaceDeformation)

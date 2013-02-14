@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Remeshing
 {
 
@@ -49,7 +52,7 @@ void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 		if(!m1.isMarked(d))
 		{
 			m1.markOrbit<EDGE>(d) ;
-			meanEdgeLength += Algo::Geometry::edgeLength<PFP>(map, d, position) ;
+			meanEdgeLength += Geometry::edgeLength<PFP>(map, d, position) ;
 			++nbEdges ;
 		}
 	}
@@ -66,7 +69,7 @@ void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 		if(!m2.isMarked(d))
 		{
 			m2.markOrbit<EDGE>(d) ;
-			REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
+			REAL length = Geometry::edgeLength<PFP>(map, d, position) ;
 			if(length > edgeLengthSup)
 			{
 				Dart dd = map.phi2(d) ;
@@ -82,7 +85,7 @@ void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 
 	// compute feature edges
 	CellMarker<EDGE> featureEdge(map) ;
-	Algo::Geometry::featureEdgeDetection<PFP>(map, position, featureEdge) ;
+	Geometry::featureEdgeDetection<PFP>(map, position, featureEdge) ;
 
 	// compute feature vertices
 	CellMarker<VERTEX> featureVertex(map) ;
@@ -121,7 +124,7 @@ void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 			if(!cornerVertex.isMarked(d) && !cornerVertex.isMarked(d1) &&
 				( (featureVertex.isMarked(d) && featureVertex.isMarked(d1)) || (!featureVertex.isMarked(d) && !featureVertex.isMarked(d1)) ))
 			{
-				REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
+				REAL length = Geometry::edgeLength<PFP>(map, d, position) ;
 				if(length < edgeLengthInf && map.edgeCanCollapse(d))
 				{
 					bool collapse = true ;
@@ -179,7 +182,7 @@ void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 
 	// tangential relaxation
 	VertexAttribute<VEC3> centroid = map.template addAttribute<VEC3, VERTEX>("centroid") ;
-	Algo::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
+	Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
 
 	CellMarker<VERTEX> vm(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -201,6 +204,8 @@ void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 }
 
 } // namespace Remeshing
+
+}
 
 } // namespace Algo
 

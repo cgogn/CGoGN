@@ -14,12 +14,15 @@ class Window;
 
 class Camera : public qglviewer::Camera
 {
+	Q_OBJECT
+
 public:
 	static unsigned int cameraCount;
 
 	Camera(const QString& name, Window* window);
 	~Camera();
 
+public slots:
 	const QString& getName() const { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
@@ -29,45 +32,33 @@ public:
 	bool isUsed() const { return !l_views.empty(); }
 	bool isShared()	const { return l_views.size() > 1; }
 
+	void changeType(qglviewer::Camera::Type type);
+
 	/*********************************************************
 	 * CAMERA DRAWING
 	 *********************************************************/
 
-	virtual void draw();
-
 	bool getDraw() const { return m_draw; }
-	void setDraw(bool b = true) { m_draw = b; }
-
-	bool getDrawFarPlane() const { return m_drawFarPlane; }
-	void setDrawFarPlane(bool b) { m_drawFarPlane = b; }
-
-	double getDrawScale() const { return m_drawScale; }
-	void setDrawScale(double s) { m_drawScale = s; }
+	void setDraw(bool b);
 
 	bool getDrawPath() const { return m_drawPath; }
-	void setDrawPath(bool b) { m_drawPath = b; }
-
-	bool getDrawPathAxis() const { return m_drawPathAxis; }
-	void setDrawPathAxis(bool b) { m_drawPathAxis = b; }
-
-	double getDrawPathScale() const { return m_drawPathScale; }
-	void setDrawPathScale(double s) { m_drawPathScale = s;}
+	void setDrawPath(bool b);
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
+public:
 	void linkView(View* view);
 	void unlinkView(View* view);
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-	void fitParamWith(View* view);
-
 	/*********************************************************
 	 * SNAPSHOTS
 	 *********************************************************/
 
+public slots:
 	void resetSnapCount() { m_snapCount = 0; }
 	void saveSnapshot(QString snapPathName);
 
@@ -78,12 +69,7 @@ protected:
 	QList<View*> l_views;
 
 	bool m_draw;
-	bool m_drawFarPlane;
-	double m_drawScale;
-
 	bool m_drawPath;
-	bool m_drawPathAxis;
-	double m_drawPathScale;
 
 	int m_snapCount;
 };

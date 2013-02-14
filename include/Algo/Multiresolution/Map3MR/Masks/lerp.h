@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace MR
 {
 
@@ -110,7 +113,7 @@ public:
 		Dart df = m_map.phi1(m_map.phi1(d)) ;
 
 		m_map.decCurrentLevel() ;
-		typename PFP::VEC3 p =  Algo::Geometry::faceCentroid<PFP>(m_map, df, m_position);
+		typename PFP::VEC3 p =  Algo::Surface::Geometry::faceCentroid<PFP>(m_map, df, m_position);
 		m_map.incCurrentLevel() ;
 
 		m_position[d] = p ;
@@ -135,7 +138,7 @@ public:
 		Dart df = m_map.phi_1(m_map.phi2(m_map.phi1(d))) ;
 
 		m_map.decCurrentLevel() ;
-		typename PFP::VEC3 p =  Algo::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
+		typename PFP::VEC3 p =  Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
 		m_map.incCurrentLevel() ;
 
 		m_position[d] = p ;
@@ -150,6 +153,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Volume
 
 } // namespace Algo
 

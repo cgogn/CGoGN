@@ -5,9 +5,12 @@
 
 #include "types.h"
 #include "view.h"
+#include "plugin.h"
 
 #include "Topology/generic/genericmap.h"
+#include "Topology/generic/attribmap.h"
 #include "Topology/generic/functor.h"
+#include "Topology/generic/attributeHandler.h"
 #include "Utils/vbo.h"
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -18,13 +21,18 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class MapHandlerGen
+class MapHandlerGen : public QObject
 {
+	Q_OBJECT
+
 public:
 	MapHandlerGen(const QString& name, Window* window, GenericMap* map);
 	virtual ~MapHandlerGen();
 
 	const QString& getName() const { return m_name; }
+
+public slots:
+	QString getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
 	Window* getWindow() const { return m_window; }
@@ -38,7 +46,26 @@ public:
 
 	bool isUsed() const { return !l_views.empty(); }
 
+public:
 	void draw(Utils::GLSLShader* shader, int primitive) { m_render->draw(shader, primitive); }
+
+	/*********************************************************
+	 * MANAGE ATTRIBUTES
+	 *********************************************************/
+
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT> getAttribute(const QString& nameAttr)
+	{
+		return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
+	}
+
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT> addAttribute(const QString& nameAttr)
+	{
+		AttributeHandler<T,ORBIT> ah = static_cast<AttribMap*>(m_map)->addAttribute<T,ORBIT>(nameAttr.toUtf8().constData());
+		emit(attributeAdded());
+		return ah;
+	}
 
 	/*********************************************************
 	 * MANAGE VBOs
@@ -47,8 +74,15 @@ public:
 	template <typename ATTR_HANDLER>
 	Utils::VBO* createVBO(const ATTR_HANDLER& attr)
 	{
-		Utils::VBO* vbo = getVBO(QString::fromStdString(attr.name()));
+		QString name = QString::fromStdString(attr.name());
+		Utils::VBO* vbo = getVBO(name);
+		if(!vbo)
+		{
+			vbo = new Utils::VBO();
+			h_vbo.insert(name, vbo);
+		}
 		vbo->updateData(attr);
+		emit(vboAdded(vbo));
 		return vbo;
 	}
 
@@ -56,11 +90,13 @@ public:
 	void updateVBO(const ATTR_HANDLER& attr)
 	{
 		Utils::VBO* vbo = getVBO(QString::fromStdString(attr.name()));
-		vbo->updateData(attr);
+		if(vbo)
+			vbo->updateData(attr);
 	}
 
 	Utils::VBO* getVBO(const QString& name);
 	QList<Utils::VBO*> getVBOList() const { return h_vbo.values(); }
+	QList<Utils::VBO*> getVBOList(const std::string& typeName);
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
@@ -86,6 +122,11 @@ protected:
 	QList<View*> l_views;
 
 	VBOHash h_vbo;
+
+signals:
+	void attributeAdded();
+	void vboAdded(Utils::VBO* vbo);
+	void vboRemoved(Utils::VBO* vbo);
 };
 
 template <typename PFP>
@@ -102,11 +143,11 @@ public:
 			delete m_map;
 	}
 
-	typename PFP::MAP* getMap() { return reinterpret_cast<typename PFP::MAP*>(m_map); }
+	typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
 
 	void updateBB(const VertexAttribute<typename PFP::VEC3>& position)
 	{
-		CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), position);
+		CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), position);
 		m_bbMin = qglviewer::Vec(bb.min()[0], bb.min()[1], bb.min()[2]);
 		m_bbMax = qglviewer::Vec(bb.max()[0], bb.max()[1], bb.max()[2]);
 		m_bbDiagSize = (m_bbMax - m_bbMin).norm();
@@ -114,7 +155,7 @@ public:
 
 	void updatePrimitives(int primitive, const FunctorSelect& good = allDarts)
 	{
-		m_render->initPrimitives<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
+		m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
 	}
 };
 

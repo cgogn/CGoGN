@@ -5,6 +5,10 @@
 #include <QMap>
 #include <QString>
 
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+
 namespace CGoGN
 {
 
@@ -13,6 +17,16 @@ namespace Utils
 class VBO;
 class GLSLShader;
 }
+
+struct PFP2: public PFP_STANDARD
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+struct PFP3: public PFP_STANDARD
+{
+	typedef EmbeddedMap3 MAP;
+};
 
 namespace SCHNApps
 {

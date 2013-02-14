@@ -213,7 +213,7 @@ void MyQT::cb_keyPress(int code)
 	case 't':
 		{
 
-			Algo::Modelisation::EarTriangulation<PFP> triangulation(myMap);
+			Algo::Surface::Modelisation::EarTriangulation<PFP> triangulation(myMap);
 			triangulation.triangule();
 
 			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);

@@ -6,42 +6,55 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>198</width>
-    <height>318</height>
+    <width>287</width>
+    <height>332</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>CamerasDialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="addCameraButton">
-         <property name="text">
-          <string>Add</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="removeCamerasButton">
-         <property name="text">
-          <string>Remove</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QPushButton" name="addCameraButton">
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="cameraList">
-       <property name="selectionMode">
-        <enum>QAbstractItemView::ExtendedSelection</enum>
+      <widget class="QPushButton" name="removeCamerasButton">
+       <property name="text">
+        <string>Remove</string>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QTreeWidget" name="cameraList">
+     <column>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Ortho</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Draw</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Draw path</string>
+      </property>
+     </column>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="OKButton">

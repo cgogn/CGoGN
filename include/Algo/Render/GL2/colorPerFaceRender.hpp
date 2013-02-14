@@ -49,9 +49,9 @@ m_nbTris(0)
 
 
 
-template<typename PFP, typename ATTRIB>
+template<typename PFP, unsigned int ORBIT>
 void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX, const FunctorSelect& good)
+			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -98,11 +98,10 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 	vboColor.releasePtr();
 }
 
-
-template<typename PFP, typename ATTRIB>
+template<typename PFP, unsigned int ORBIT>
 void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals,
-		const ATTRIB& colorPerXXX, const FunctorSelect& good)
+			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals,
+			const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;

@@ -17,6 +17,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MovingObjects
 {
 
@@ -26,7 +29,7 @@ enum
 } ;
 
 template <typename PFP>
-class ParticleCell2D : public ParticleBase<PFP>
+class ParticleCell2D : public Algo::MovingObjects::ParticleBase<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -43,7 +46,7 @@ public:
 	unsigned int crossCell ;
 
 	ParticleCell2D(MAP& map, Dart belonging_cell, const VEC3& pos, const TAB_POS& tabPos) :
-		ParticleBase<PFP>(pos),
+		Algo::MovingObjects::ParticleBase<PFP>(pos),
 		m(map),
 		positionAttribut(tabPos),
 		d(belonging_cell),
@@ -102,17 +105,16 @@ public:
 		else
 		{
 			// TODO Des petits pas répétés peuvent faire sortir de la cellule actuelle
-			this->ParticleBase<PFP>::move(goal) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 		}
 	}
 } ;
 
+}
+}
+}
+}
+
 #include "particle_cell_2D.hpp"
-
-}
-
-}
-
-}
 
 #endif

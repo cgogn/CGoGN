@@ -62,7 +62,7 @@ Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
 	Dart d = GMap1::newCycle(nbEdges);
 	if (withBoundary)
 	{
-		Dart e = GMap1::newBoundaryCycle(nbEdges);
+		Dart e = newBoundaryCycle(nbEdges);
 
 		Dart it = d;
 		do
@@ -78,7 +78,7 @@ Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
 
 void GMap2::deleteFace(Dart d)
 {
-	assert(!isBoundaryMarked(d)) ;
+	assert(!isBoundaryMarked2(d)) ;
 	Dart it = d ;
 	do
 	{
@@ -130,9 +130,9 @@ void GMap2::fillHole(Dart d)
 {
 	assert(isBoundaryEdge(d)) ;
 	Dart dd = d ;
-	if(!isBoundaryMarked(dd))
+	if(!isBoundaryMarked2(dd))
 		dd = phi2(dd) ;
-	boundaryUnmarkOrbit<FACE>(dd) ;
+	boundaryUnmarkOrbit<FACE,2>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -378,7 +378,7 @@ void GMap2::unsewFaces(Dart d)
 
 	Dart dd = phi2(d);
 
-	Dart e = GMap1::newBoundaryCycle(2);
+	Dart e = newBoundaryCycle(2);
 	Dart ee = phi1(e) ;
 
 	Dart f = findBoundaryEdgeOfVertex(d) ;
@@ -536,7 +536,7 @@ void GMap2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 
 bool GMap2::mergeVolumes(Dart d, Dart e)
 {
-	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
+	assert(!isBoundaryMarked2(d) && !isBoundaryMarked2(e)) ;
 
 	if (GMap2::isBoundaryFace(d) || GMap2::isBoundaryFace(e))
 		return false;
@@ -639,7 +639,7 @@ bool GMap2::isBoundaryVertex(Dart d)
 	Dart it = d ;
 	do
 	{
-		if (isBoundaryMarked(it))
+		if (isBoundaryMarked2(it))
 			return true ;
 		it = alpha1(it) ;
 	} while (it != d) ;
@@ -651,7 +651,7 @@ Dart GMap2::findBoundaryEdgeOfVertex(Dart d)
 	Dart it = d ;
 	do
 	{
-		if (isBoundaryMarked(it))
+		if (isBoundaryMarked2(it))
 			return it ;
 		it = alpha1(it) ;
 	} while (it != d) ;
@@ -663,7 +663,7 @@ bool GMap2::isBoundaryFace(Dart d)
 	Dart it = d ;
 	do
 	{
-		if (isBoundaryMarked(beta2(it)))
+		if (isBoundaryMarked2(beta2(it)))
 			return true ;
 		it = phi1(it) ;
 	} while (it != d) ;
@@ -681,7 +681,7 @@ bool GMap2::sameOrientedVolume(Dart d, Dart e)
 	// For every face added to the list
 	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
-		if (!isBoundaryMarked(*face) && !mark.isMarked(*face))		// Face has not been visited yet
+		if (!isBoundaryMarked2(*face) && !mark.isMarked(*face))		// Face has not been visited yet
 		{
 			Dart it = *face ;
 			do
@@ -691,7 +691,7 @@ bool GMap2::sameOrientedVolume(Dart d, Dart e)
 
 				mark.mark(it);						// Mark
 				Dart adj = phi2(it);				// Get adjacent face
-				if (!isBoundaryMarked(adj) && !mark.isMarked(adj))
+				if (!isBoundaryMarked2(adj) && !mark.isMarked(adj))
 					visitedFaces.push_back(adj);	// Add it
 				it = phi1(it);
 			} while(it != *face);
@@ -714,7 +714,7 @@ unsigned int GMap2::volumeDegree(Dart d)
 	for (unsigned int i = 0; i != visitedFaces.size(); ++i)
 	{
 		Dart df = visitedFaces[i];
-		if (!isBoundaryMarked(df) && !mark.isMarked(df))		// Face has not been visited yet
+		if (!isBoundaryMarked2(df) && !mark.isMarked(df))		// Face has not been visited yet
 		{
 			++count;
 			Dart it = df ;
@@ -722,7 +722,7 @@ unsigned int GMap2::volumeDegree(Dart d)
 			{
 				mark.mark(it);					// Mark
 				Dart adj = phi2(it);			// Get adjacent face
-				if ( !isBoundaryMarked(adj) && !mark.isMarked(adj) )
+				if ( !isBoundaryMarked2(adj) && !mark.isMarked(adj) )
 					visitedFaces.push_back(adj);// Add it
 				it = phi1(it);
 			} while(it != df);
@@ -883,6 +883,13 @@ bool GMap2::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thr
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
 
+Dart GMap2::newBoundaryCycle(unsigned int nbE)
+{
+	Dart d = GMap1::newCycle(nbE);
+	boundaryMarkOrbit<FACE,2>(d);
+	return d;
+}
+
 unsigned int GMap2::closeHole(Dart d, bool forboundary)
 {
 	assert(beta2(d) == d);		// Nothing to close
@@ -920,7 +927,7 @@ unsigned int GMap2::closeHole(Dart d, bool forboundary)
 	beta1sew(prev, beta0(first)) ;
 
 	if(forboundary)
-		boundaryMarkOrbit<FACE>(phi2(d));
+		boundaryMarkOrbit<FACE,2>(phi2(d));
 
 	return countEdges ;
 }
@@ -938,6 +945,22 @@ unsigned int GMap2::closeMap()
 		}
 	}
 	return nb ;
+}
+
+/*! @name Compute dual
+ * These functions compute the dual mesh
+ *************************************************************************/
+
+void GMap2::computeDual()
+{
+//	DartAttribute<Dart> old_beta0 = this->getAttribute<Dart, DART>("beta0");
+//	DartAttribute<Dart> old_beta2 = this->getAttribute<Dart, DART>("beta2") ;
+//
+//	swapAttributes<Dart>(old_beta0, old_beta2) ;
+//
+//	swapEmbeddingContainers(VERTEX, FACE) ;
+//
+//	//boundary management ?
 }
 
 } // namespace CGoGN

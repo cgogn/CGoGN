@@ -17,6 +17,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MovingObjects
 {
 
@@ -52,12 +55,11 @@ public:
 	std::vector<Dart> move(const VEC3& goal);
 } ;
 
+}
+}
+}
+}
+
 #include "particle_cell_2D_memo.hpp"
-
-}
-
-}
-
-}
 
 #endif

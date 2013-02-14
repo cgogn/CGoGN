@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MR
 {
 
@@ -65,7 +68,7 @@ namespace Filters
  *                      	     Lazy Wavelet
  *********************************************************************************/
 template <typename PFP>
-class CCInitEdgeSynthesisFilter : public Filter
+class CCInitEdgeSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -90,10 +93,15 @@ public:
 			first = false;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCInitFaceSynthesisFilter : public Filter
+class CCInitFaceSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -118,10 +126,15 @@ public:
 			first = false;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCEdgeSynthesisFilter : public Filter
+class CCEdgeSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -144,10 +157,15 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCFaceSynthesisFilter : public Filter
+class CCFaceSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -192,10 +210,15 @@ public:
 		}
 
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCVertexSynthesisFilter : public Filter
+class CCVertexSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -244,10 +267,15 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCScalingSynthesisFilter : public Filter
+class CCScalingSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -277,10 +305,15 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCScalingAnalysisFilter : public Filter
+class CCScalingAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -310,10 +343,15 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCVertexAnalysisFilter : public Filter
+class CCVertexAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -364,10 +402,15 @@ public:
 
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
-class CCFaceAnalysisFilter : public Filter
+class CCFaceAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -411,12 +454,16 @@ public:
 			m_position[m_map.phi2(m_map.phi1(d))] = m_position[m_map.phi2(m_map.phi1(d))] - v - e ;
 			m_map.decCurrentLevel() ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
 
 	}
 } ;
 
 template <typename PFP>
-class CCEdgeAnalysisFilter : public Filter
+class CCEdgeAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -439,6 +486,11 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 } // namespace Filters
@@ -446,6 +498,8 @@ public:
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

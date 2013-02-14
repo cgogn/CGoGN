@@ -27,11 +27,15 @@
 
 #include <math.h>
 #include <vector>
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace Modelisation
@@ -106,16 +110,19 @@ template <typename PFP, typename EMBV, typename EMB>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 /**
- * Reverse the orientation of the map
+ * Doo-Sabin subdivision scheme
  */
 template <typename PFP>
-void reverseOrientation(typename PFP::MAP& map) ;
+void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 ///**
-// * Dual mesh computation
+// * Reverse the orientation of the map
+// * NOW  IN THE MAP
 // */
 //template <typename PFP>
-//void computeDual(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
+//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+
+
 
 ///**
 // * Sqrt(3) subdivision scheme
@@ -123,8 +130,20 @@ void reverseOrientation(typename PFP::MAP& map) ;
 //template <typename PFP>
 //void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
+template <typename PFP>
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
+template <typename PFP>
+void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
+template <typename PFP>
+void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
+
 
 } // namespace Modelisation
+
+} // namespace Surface
 
 } // namespace Algo
 

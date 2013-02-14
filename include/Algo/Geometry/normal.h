@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -81,13 +84,15 @@ void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename P
 
 
 template <typename PFP>
-typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position) ;
+typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 
 } // namespace Geometry
+
+} // namespace Surface
 
 } // namespace Algo
 
