@@ -82,6 +82,23 @@ void RenderVectorDockTab::selectedMapChanged()
 	}
 }
 
+void RenderVectorDockTab::addVBOToList(QString name)
+{
+	combo_positionVBO->addItem(name);
+	list_vectorVBO->addItem(name);
+}
+
+void RenderVectorDockTab::removeVBOFromList(QString name)
+{
+	int itemIdx = combo_positionVBO->findText(name, Qt::MatchExactly);
+	if(itemIdx != -1)
+		combo_positionVBO->removeItem(itemIdx);
+
+	QList<QListWidgetItem*> items = list_vectorVBO->findItems(name, Qt::MatchExactly);
+	if(!items.empty())
+		delete items[0];
+}
+
 void RenderVectorDockTab::positionVBOChanged(int index)
 {
 	if(!b_refreshingUI)

@@ -30,6 +30,8 @@ public slots:
 	void refreshUI(ParameterSet* params);
 
 	void selectedMapChanged();
+	void addVBOToList(QString name);
+	void removeVBOFromList(QString name);
 	void positionVBOChanged(int index);
 	void selectedVectorsVBOChanged();
 	void vectorsScaleFactorChanged(int i);

@@ -149,7 +149,9 @@ void RenderVectorPlugin::mapUnlinked(MapHandlerGen* m)
 
 void RenderVectorPlugin::vboAdded(Utils::VBO* vbo)
 {
-	m_dockTab->refreshUI(h_viewParams[m_window->getCurrentView()]);
+	assert(h_viewParams[m_window->getCurrentView()]->selectedMap == static_cast<MapHandlerGen*>(QObject::sender()));
+	if(vbo->dataSize() == 3)
+		m_dockTab->addVBOToList(QString::fromStdString(vbo->name()));
 }
 
 void RenderVectorPlugin::vboRemoved(Utils::VBO* vbo)

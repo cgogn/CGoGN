@@ -215,8 +215,7 @@ void RenderPlugin::mapUnlinked(MapHandlerGen* m)
 
 void RenderPlugin::vboAdded(Utils::VBO* vbo)
 {
-	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-	assert(h_viewParams[m_window->getCurrentView()]->selectedMap == map);
+	assert(h_viewParams[m_window->getCurrentView()]->selectedMap == static_cast<MapHandlerGen*>(QObject::sender()));
 	if(vbo->dataSize() == 3)
 		m_dockTab->addVBOToList(QString::fromStdString(vbo->name()));
 }
