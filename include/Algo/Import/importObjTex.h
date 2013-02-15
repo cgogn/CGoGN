@@ -70,6 +70,12 @@ protected:
 	/// read face line with different indices v  v/t v//n v/t/n
 	short readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices);
 
+	unsigned int m_tagV ;
+	unsigned int m_tagVT ;
+	unsigned int m_tagVN ;
+	unsigned int m_tagG ;
+	unsigned int m_tagF ;
+
 public:
 
 	/// marker for special vertices (with several normals & tex coords)
@@ -96,6 +102,31 @@ public:
 	 * @param map
 	 */
 	OBJModel(typename PFP::MAP& map);
+
+	/**
+	 * @brief set position attribute
+	 * @param position attribute
+	 */
+	void setPositionAttribute(VertexAttribute<Geom::Vec3f> position);
+
+	/**
+	 * @brief set position attribute
+	 * @param position attribute
+	 */
+	void setNormalAttribute(VertexAttribute<Geom::Vec3f> normal);
+
+	/**
+	 * @brief set texture coordinate attribute
+	 * @param texcoord attribute
+	 */
+	void setTexCoordAttribute(VertexAttribute<Geom::Vec2f>texcoord);
+
+
+	bool hasTexCoords() const { return m_tagVT!=0; }
+
+	bool hasNormals() const { return m_tagVN!=0; }
+
+	bool hasGroups() const { return m_tagG!=0; }
 
 	/**
 	 * @brief import

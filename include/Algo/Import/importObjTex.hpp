@@ -38,7 +38,9 @@ namespace Import
 
 template <typename PFP>
 OBJModel<PFP>::OBJModel(typename PFP::MAP& map):
-	m_map(map),m_specialVertices(map),m_dirtyEdges(map)
+	m_map(map),
+	m_tagV(0),m_tagVT(0),m_tagVN(0),m_tagG(0),m_tagF(0),
+	m_specialVertices(map),m_dirtyEdges(map)
 {
 }
 
@@ -72,6 +74,25 @@ std::vector<std::string>& OBJModel<PFP>::getMaterialNames()
 {
 	return m_materialNames;
 }
+
+template <typename PFP>
+void OBJModel<PFP>::setPositionAttribute(VertexAttribute<Geom::Vec3f> position)
+{
+	m_positions = position;
+}
+
+template <typename PFP>
+void OBJModel<PFP>::setNormalAttribute(VertexAttribute<Geom::Vec3f> normal)
+{
+	m_normals = normal;
+}
+
+template <typename PFP>
+void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f>texcoord)
+{
+	m_texCoords = texcoord;
+}
+
 
 
 
@@ -337,10 +358,22 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PT(Utils::VBO* positionVBO, Utils::V
 template <typename PFP>
 unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO )
 {
+	if (!m_normals.isValid())
+	{
+		CGoGNerr << "no normal attribute "<< CGoGNendl;
+		return 0;
+	}
+	if (!m_texCoords.isValid())
+	{
+		CGoGNerr << "no tex coords attribute "<< CGoGNendl;
+		return 0;
+	}
+
+
 	TraversorF<typename PFP::MAP> traf(m_map);
 	std::vector<Geom::Vec3f> posBuff;
 	std::vector<Geom::Vec2f> TCBuff;
-	std::vector<Geom::Vec2f> normalBuff;
+	std::vector<Geom::Vec3f> normalBuff;
 	posBuff.reserve(16384);
 	TCBuff.reserve(16384);
 	normalBuff.reserve(16384);
@@ -355,8 +388,14 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 			posBuff.push_back(m_positions[d]);
 			if (m_specialVertices.isMarked(d))
 			{
-				TCBuff.push_back(m_texCoordsF[d]);
-				normalBuff.push_back(m_normalsF[d]);
+				if (hasTexCoords())
+					TCBuff.push_back(m_texCoordsF[d]);
+				else
+					TCBuff.push_back(m_texCoords[d]);
+				if (hasNormals())
+					normalBuff.push_back(m_normalsF[d]);
+				else
+					normalBuff.push_back(m_normals[d]);
 			}
 			else
 			{
@@ -367,8 +406,14 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 			posBuff.push_back(m_positions[e]);
 			if (m_specialVertices.isMarked(e))
 			{
-				TCBuff.push_back(m_texCoordsF[e]);
-				normalBuff.push_back(m_normalsF[e]);
+				if (hasTexCoords())
+					TCBuff.push_back(m_texCoordsF[e]);
+				else
+					TCBuff.push_back(m_texCoords[e]);
+				if (hasNormals())
+					normalBuff.push_back(m_normalsF[e]);
+				else
+					normalBuff.push_back(m_normals[e]);
 			}
 			else
 			{
@@ -379,8 +424,14 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 			posBuff.push_back(m_positions[f]);
 			if (m_specialVertices.isMarked(f))
 			{
-				TCBuff.push_back(m_texCoordsF[f]);
-				normalBuff.push_back(m_normalsF[f]);
+				if (hasTexCoords())
+					TCBuff.push_back(m_texCoordsF[f]);
+				else
+					TCBuff.push_back(m_texCoords[f]);
+				if (hasNormals())
+					normalBuff.push_back(m_normalsF[f]);
+				else
+					normalBuff.push_back(m_normals[f]);
 			}
 			else
 			{
@@ -504,12 +555,6 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		return false;
 	}
 
-	unsigned int tagV = 0;
-	unsigned int tagVT = 0;
-	unsigned int tagVN = 0;
-	unsigned int tagG = 0;
-	unsigned int tagF = 0;
-
 	std::string ligne;
 	std::string tag;
 	do
@@ -517,23 +562,23 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		fp >> tag;
 		std::getline (fp, ligne);
 		if (tag == "v")
-			tagV++;
+			m_tagV++;
 		if (tag == "vn")
-			tagVN++;
+			m_tagVN++;
 		if (tag == "vt")
-			tagVT++;
+			m_tagVT++;
 		if (tag == "g")
-			tagG++;
+			m_tagG++;
 		if (tag == "f")
-			tagF++;
+			m_tagF++;
 	}while (!fp.eof());
 
-	std::cout << "Parsing OBJ"<< tagV<< std::endl;
-	std::cout << "Vertices:"<< tagV<< std::endl;
-	std::cout << "Normals:"<< tagVN<< std::endl;
-	std::cout << "TexCoords:"<< tagVT<< std::endl;
-	std::cout << "Groups:"<< tagG<< std::endl;
-	std::cout << "Faces:"<< tagF<< std::endl;
+	std::cout << "Parsing OBJ"<< m_tagV<< std::endl;
+	std::cout << "Vertices:"<< m_tagV<< std::endl;
+	std::cout << "Normals:"<< m_tagVN<< std::endl;
+	std::cout << "TexCoords:"<< m_tagVT<< std::endl;
+	std::cout << "Groups:"<< m_tagG<< std::endl;
+	std::cout << "Faces:"<< m_tagF<< std::endl;
 
 
 	m_positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
@@ -541,7 +586,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		m_positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(m_positions.name()) ;
 
-	if (tagVT != 0)
+	if (m_tagVT != 0)
 	{
 		m_texCoords =  m_map.template getAttribute<VEC2, VERTEX>("texCoord") ;
 		if (!m_texCoords.isValid())
@@ -553,7 +598,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			m_texCoordsF = m_map.template addAttribute<VEC2, VERTEX1>("texCoordF") ;
 	}
 
-	if (tagVN != 0)
+	if (m_tagVN != 0)
 	{
 		m_normals =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("normal") ;
 		if (!m_normals.isValid())
@@ -566,7 +611,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	}
 
 	
-	if (tagG != 0)
+	if (m_tagG != 0)
 	{
 		m_groups =  m_map.template getAttribute<unsigned int, FACE>("groups") ;
 		if (!m_groups.isValid())
@@ -582,18 +627,18 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	fp.open(filename.c_str());
 
 	std::vector<VEC3> normalsBuffer;
-	normalsBuffer.reserve(tagVN);
+	normalsBuffer.reserve(m_tagVN);
 	
 	std::vector<VEC2> texCoordsBuffer;
-	texCoordsBuffer.reserve(tagVT);
+	texCoordsBuffer.reserve(m_tagVT);
 	
 	std::vector<unsigned int> verticesID;
-	verticesID.reserve(tagV);
+	verticesID.reserve(m_tagV);
 	
 	std::vector<unsigned int> normalsID;
-	normalsID.reserve(tagV);
+	normalsID.reserve(m_tagV);
 	std::vector<unsigned int> texCoordsID;
-	texCoordsID.reserve(tagV);
+	texCoordsID.reserve(m_tagV);
 	
 	
 
@@ -672,7 +717,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			short nbe = readObjLine(oss,localIndices);
 
 			Dart d = m_map.newFace(nbe, false);
-			if (tagG!=0)
+			if (m_tagG!=0)
 				m_groups[d] = currentGroup;
 			
 			for (short j = 0; j < nbe; ++j)
@@ -748,9 +793,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			for (unsigned int j=0; j<nb; ++j)
 			{
 				Dart e = vec[j];
-				if (tagVT)
+				if (m_tagVT)
 					m_texCoordsF[e] = texCoordsBuffer[ vecTCIndPerVertex[e][j] ];
-				if (tagVN)
+				if (m_tagVN)
 					m_normalsF[e] = normalsBuffer[ vecNormIndPerVertex[e][j] ];
 			}
 			m_specialVertices.mark(d);
