@@ -672,7 +672,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		Traversor3WF<typename PFP::MAP> tWF(map, dit);
 		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
 		{
-			if(!map.isBoundaryFace(ditWF))
+			if(!map.isBoundaryFace(ditWF) && !m.isMarked(ditWF))
 				m.markOrbit<FACE>(ditWF);
 		}
 
@@ -711,7 +711,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 			Traversor3WE<typename PFP::MAP> tWE(map, dit);
 			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
 			{
-				if(map.isBoundaryEdge(ditWE))
+				if(map.isBoundaryEdge(ditWE) && !m.isMarked(ditWE))
 					m.markOrbit<EDGE>(ditWE);
 			}
 
@@ -725,6 +725,32 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 			position[dres] = faceCenter;
 
 			newBoundaryV.markOrbit<VERTEX>(dres);
+		}
+	}
+
+	TraversorV<typename PFP::MAP> tVg(map,selected);
+	for(Dart dit = tVg.begin() ; dit != tVg.end() ; dit = tVg.next())
+	{
+		if(map.isBoundaryVertex(dit) && !newBoundaryV.isMarked(dit))
+		{
+			Dart db = map.findBoundaryFaceOfVertex(dit);
+
+			typename PFP::VEC3 P = position[db] ;
+			typename PFP::VEC3 newP(0) ;
+			unsigned int val = 0 ;
+			Dart vit = db ;
+			do
+			{
+				newP += position[map.phi_1(map.phi2(map.phi1(vit)))] ;
+				++val ;
+				vit = map.phi2(map.phi_1(vit)) ;
+			} while(vit != db) ;
+			typename PFP::REAL K = sqrt3_K(val) ;
+			newP *= typename PFP::REAL(3) ;
+			newP -= typename PFP::REAL(val) * P ;
+			newP *= K / typename PFP::REAL(2 * val) ;
+			newP += (typename PFP::REAL(1) - K) * P ;
+			position[db] = newP ;
 		}
 	}
 
@@ -743,29 +769,31 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		}
 	}
 
-	TraversorV<typename PFP::MAP> tVg(map,selected);
-	for(Dart dit = tVg.begin() ; dit != tVg.end() ; dit = tVg.next())
-	{
-		if(map.isBoundaryVertex(dit) && !newBoundaryV.isMarked(dit))
-		{
-			typename PFP::VEC3 P = position[dit] ;
-			typename PFP::VEC3 newP(0) ;
-			unsigned int val = 0 ;
-			Dart vit = dit ;
-			do
-			{
-				newP += position[map.phi_1(map.phi2(map.phi1(vit)))] ;
-				++val ;
-				vit = map.phi2(map.phi_1(vit)) ;
-			} while(vit != dit) ;
-			typename PFP::REAL K = sqrt3_K(val) ;
-			newP *= typename PFP::REAL(3) ;
-			newP -= typename PFP::REAL(val) * P ;
-			newP *= K / typename PFP::REAL(2 * val) ;
-			newP += (typename PFP::REAL(1) - K) * P ;
-			position[dit] = newP ;
-		}
-	}
+//	TraversorV<typename PFP::MAP> tVg(map,selected);
+//	for(Dart dit = tVg.begin() ; dit != tVg.end() ; dit = tVg.next())
+//	{
+//		if(map.isBoundaryVertex(dit) && !newBoundaryV.isMarked(dit))
+//		{
+//			Dart db = map.findBoundaryFaceOfVertex(dit);
+//
+//			typename PFP::VEC3 P = position[db] ;
+//			typename PFP::VEC3 newP(0) ;
+//			unsigned int val = 0 ;
+//			Dart vit = db ;
+//			do
+//			{
+//				newP += position[map.phi_1(map.phi2(map.phi1(vit)))] ;
+//				++val ;
+//				vit = map.phi2(map.phi_1(vit)) ;
+//			} while(vit != db) ;
+//			typename PFP::REAL K = sqrt3_K(val) ;
+//			newP *= typename PFP::REAL(3) ;
+//			newP -= typename PFP::REAL(val) * P ;
+//			newP *= K / typename PFP::REAL(2 * val) ;
+//			newP += (typename PFP::REAL(1) - K) * P ;
+//			position[db] = newP ;
+//		}
+//	}
 
 	//AutoVertexAttribute laplacian qui est une copie de position
 
@@ -781,108 +809,48 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//echange lapaclian et position
 
 
-	VertexAutoAttribute<typename PFP::VEC3> diffCoord(map, "diffCoord");
-	Algo::Volume::Geometry::computeLaplacianTopoVertices<PFP>(map, position, diffCoord) ;
-
-	VertexAutoAttribute<unsigned int> vIndex(map, "vIndex");
-
-	unsigned int nb_vertices = map.template computeIndexCells<VERTEX>(vIndex);
-
-
-	CellMarker<VERTEX> lockingMarker(map);
-
-	TraversorV<typename PFP::MAP> tv(map);
-	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
-	{
-		if(!lockingMarker.isMarked(dit) && map.isBoundaryVertex(dit))
-			lockingMarker.mark(dit);
-	}
-
-
-	NLContext nlContext = nlNewContext();
-	nlSolverParameteri(NL_NB_VARIABLES, nb_vertices);
-	nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
-	nlSolverParameteri(NL_SOLVER, NL_CHOLMOD_EXT);
-
-
-	nlMakeCurrent(nlContext);
-	if(nlGetCurrentState() == NL_STATE_INITIAL)
-		nlBegin(NL_SYSTEM) ;
-
-	for(int coord = 0; coord < 3; ++coord)
-	{
-		LinearSolving::setupVariables<PFP>(map, vIndex, lockingMarker, position, coord) ;
-		nlBegin(NL_MATRIX) ;
-		LinearSolving::addRowsRHS_Laplacian_Topo<PFP>(map, vIndex, diffCoord, coord) ;
-//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->diffCoord, coord) ;
-		nlEnd(NL_MATRIX) ;
-		nlEnd(NL_SYSTEM) ;
-		nlSolve() ;
-		LinearSolving::getResult<PFP>(map, vIndex, position, coord) ;
-		nlReset(NL_TRUE) ;
-	}
-
-	nlDeleteContext(nlContext);
-
-
+//	VertexAutoAttribute<typename PFP::VEC3> diffCoord(map, "diffCoord");
+//	Algo::Volume::Geometry::computeLaplacianTopoVertices<PFP>(map, position, diffCoord) ;
 //
-//	float weight = 1.0;
-
-//	LinearSolving::LinearSolver<PFP::REAL> ls(nbV);
-//	ls.set_least_squares(true);
-
-//	for(unsigned int coord = 0 ; coord < 3 ; ++coord)
+//	VertexAutoAttribute<unsigned int> vIndex(map, "vIndex");
+//
+//	unsigned int nb_vertices = map.template computeIndexCells<VERTEX>(vIndex);
+//
+//
+//	CellMarker<VERTEX> lockingMarker(map);
+//
+//	TraversorV<typename PFP::MAP> tv(map);
+//	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
 //	{
-//		std::cout << "coord " << coord << std::flush;
-
-//		TraversorV<PFP::MAP> tv(map);
-//		for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
-//		{
-//			ls.variable(indexV[dit]).set_value(position[dit][coord]);
-
-//			if(map.isBoundaryVertex(dit))
-//				ls.variable(indexV[dit]).lock();
-//		}
-//		std::cout << "... variables set... " << std::flush;
-
-//		ls.begin_system();
-
-//		TraversorV<PFP::MAP> tv2(map);
-//		for(Dart dit = tv2.begin() ; dit != tv2.end() ; dit = tv2.next())
-//		{
-//			if(!map.isBoundaryVertex(dit))
-//			{
-//				ls.begin_row();
-
-//				float sum = 0;
-//				Traversor3VVaE<PFP::MAP> tvvae(map, dit);
-//				for(Dart ditvvae = tvvae.begin() ; ditvvae != tvvae.end() ; ditvvae = tvvae.next())
-//				{
-//					ls.add_coefficient(indexV[ditvvae],weight);
-//					sum += weight;
-//				}
-
-//				ls.add_coefficient(indexV[dit],-sum);
-//				ls.normalize_row();
-
-//				ls.end_row();
-//			}
-//		}
-
-//		ls.end_system();
-//		std::cout << "... system built... " << std::flush;
-//		ls.solve();
-//		std::cout << "... system solved... " << std::flush;
-
-//		TraversorV<PFP::MAP> tv3(map);
-//		for(Dart dit = tv3.begin() ; dit != tv3.end() ; dit = tv3.next())
-//		{
-//			position[dit][coord] = ls.variable(indexV[dit]).value();
-//		}
-
-//		ls.reset(false);
-//		std::cout << "... done" << std::endl;
+//		if(map.isBoundaryVertex(dit))
+//			lockingMarker.mark(dit);
 //	}
+//
+//
+//	NLContext nlContext = nlNewContext();
+//	nlSolverParameteri(NL_NB_VARIABLES, nb_vertices);
+//	nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
+//	nlSolverParameteri(NL_SOLVER, NL_CHOLMOD_EXT);
+//
+//
+//	nlMakeCurrent(nlContext);
+//	if(nlGetCurrentState() == NL_STATE_INITIAL)
+//		nlBegin(NL_SYSTEM) ;
+//
+//	for(int coord = 0; coord < 3; ++coord)
+//	{
+//		LinearSolving::setupVariables<PFP>(map, vIndex, lockingMarker, position, coord) ;
+//		nlBegin(NL_MATRIX) ;
+//		LinearSolving::addRowsRHS_Laplacian_Topo<PFP>(map, vIndex, diffCoord, coord) ;
+////		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP>(*map, perMap->vIndex, perMap->edgeWeight, perMap->vertexArea, perMap->diffCoord, coord) ;
+//		nlEnd(NL_MATRIX) ;
+//		nlEnd(NL_SYSTEM) ;
+//		nlSolve() ;
+//		LinearSolving::getResult<PFP>(map, vIndex, position, coord) ;
+//		nlReset(NL_TRUE) ;
+//	}
+//
+//	nlDeleteContext(nlContext);
 }
 
 template <typename PFP>
