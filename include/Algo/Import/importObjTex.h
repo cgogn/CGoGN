@@ -57,6 +57,21 @@ class OBJModel
 protected:
 	typename PFP::MAP& m_map;
 
+
+	/// vector of group name
+	std::vector<std::string> m_groupNames;
+
+	/// vector of material names
+	std::vector<std::string> m_materialNames;
+
+	/// vector of material struct
+	std::vector<MaterialOBJ> m_materials;
+
+	/// read face line with different indices v  v/t v//n v/t/n
+	short readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices);
+
+public:
+
 	/// marker for special vertices (with several normals & tex coords)
 	CellMarker<VERTEX> m_specialVertices;
 
@@ -75,19 +90,6 @@ protected:
 	AttributeHandler<VEC3,VERTEX1> m_normalsF;
 	AttributeHandler<Geom::Vec2f,VERTEX1> m_texCoordsF;
 
-	/// vector of group name
-	std::vector<std::string> m_groupNames;
-
-	/// vector of material names
-	std::vector<std::string> m_materialNames;
-
-	/// vector of material struct
-	std::vector<MaterialOBJ> m_materials;
-
-	/// read face line with different indices v  v/t v//n v/t/n
-	short readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices);
-
-public:
 
 	/**
 	 * @brief Constructeur
@@ -144,6 +146,39 @@ public:
 	 * @param filename name of file
 	 */
 	void readMaterials(const std::string& filename);
+
+	/**
+	 * @brief create simple VBO for separated triangles
+	 * @param positionVBO
+	 * @param texcoordVBO
+	 * @param normalVBO
+	 * @return number of indices to draw
+	 */
+	unsigned int createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO);
+
+	/**
+	 * @brief create simple VBO for separated triangles
+	 * @param positionVBO
+	 * @param texcoordVBO
+	 * @return number of indices to draw
+	 */
+	unsigned int createSimpleVBO_PT(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO);
+
+	/**
+	 * @brief create simple VBO for separated triangles
+	 * @param positionVBO
+	 * @param normalVBO
+	 * @return number of indices to draw
+	 */
+	unsigned int createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO);
+
+	/**
+	 * @brief create simple VBO for separated triangles
+	 * @param positionVBO
+	 * @param normalVBO
+	 * @return number of indices to draw
+	 */
+	unsigned int createSimpleVBO_P(Utils::VBO* positionVBO);
 
 };
 

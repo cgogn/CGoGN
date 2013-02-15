@@ -31,11 +31,10 @@ namespace CGoGN
 namespace LinearSolving
 {
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template <typename PFP, typename ATTR_TYPE>
 class FunctorMeshToSolver_Scalar : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	CellMarker<VERTEX>& lockingMarker ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
@@ -43,31 +42,30 @@ protected:
 
 public:
 	FunctorMeshToSolver_Scalar(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		CellMarker<VERTEX>& lm,
 		const VertexAttribute<ATTR_TYPE>& attr
-	) :	solver(s), indexTable(index), lockingMarker(lm), attrTable(attr), lockedVertices(false)
+	) :	indexTable(index), lockingMarker(lm), attrTable(attr), lockedVertices(false)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->variable(indexTable[d]).set_value(attrTable[d]) ;
+		nlSetVariable(indexTable[d], attrTable[d]);
 		if(lockingMarker.isMarked(d))
 		{
-			solver->variable(indexTable[d]).lock() ;
+			nlLockVariable(indexTable[d]);
 			lockedVertices = true ;
 		}
 		return false ;
 	}
+
 	bool hasLockedVertices() { return lockedVertices ; }
 } ;
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template <typename PFP, typename ATTR_TYPE>
 class FunctorMeshToSolver_Vector : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	CellMarker<VERTEX>& lockingMarker ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
@@ -76,71 +74,67 @@ protected:
 
 public:
 	FunctorMeshToSolver_Vector(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		CellMarker<VERTEX>& lm,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		unsigned int c
-	) :	solver(s), indexTable(index), lockingMarker(lm), attrTable(attr), coord(c), lockedVertices(false)
+	) :	indexTable(index), lockingMarker(lm), attrTable(attr), coord(c), lockedVertices(false)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->variable(indexTable[d]).set_value((attrTable[d])[coord]) ;
+		nlSetVariable(indexTable[d], (attrTable[d])[coord]);
 		if(lockingMarker.isMarked(d))
 		{
-			solver->variable(indexTable[d]).lock() ;
+			nlLockVariable(indexTable[d]);
 			lockedVertices = true ;
 		}
 		return false ;
 	}
+
 	bool hasLockedVertices() { return lockedVertices ; }
 } ;
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template <typename PFP, typename ATTR_TYPE>
 class FunctorSolverToMesh_Scalar : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	VertexAttribute<ATTR_TYPE>& attrTable ;
 
 public:
 	FunctorSolverToMesh_Scalar(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		VertexAttribute<ATTR_TYPE>& attr
-	) :	solver(s), indexTable(index), attrTable(attr)
+	) :	indexTable(index), attrTable(attr)
 	{}
 
 	bool operator()(Dart d)
 	{
-		attrTable[d] = solver->variable(indexTable[d]).value() ;
+		attrTable[d] = nlGetVariable(indexTable[d]) ;
 		return false ;
 	}
 } ;
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template <typename PFP, typename ATTR_TYPE>
 class FunctorSolverToMesh_Vector : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	VertexAttribute<ATTR_TYPE>& attrTable ;
 	unsigned int coord ;
 
 public:
 	FunctorSolverToMesh_Vector(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		VertexAttribute<ATTR_TYPE>& attr,
 		unsigned int c
-	) :	solver(s), indexTable(index), attrTable(attr), coord(c)
+	) :	indexTable(index), attrTable(attr), coord(c)
 	{}
 
 	bool operator()(Dart d)
 	{
-		(attrTable[d])[coord] = solver->variable(indexTable[d]).value() ;
+		(attrTable[d])[coord] = nlGetVariable(indexTable[d]) ;
 		return false ;
 	}
 } ;

@@ -72,6 +72,15 @@ private:
 
 	QAction* m_computeNormalAction;
 	QAction* m_computeCurvatureAction;
+
+	struct ComputeNormalParameters
+	{
+		ComputeNormalParameters() {}
+		ComputeNormalParameters(QString p, QString n) : positionName(p), normalName(n) {}
+		QString positionName;
+		QString normalName;
+	};
+	QHash<QString, ComputeNormalParameters> computeNormalLastParameters;
 };
 
 #endif

@@ -16,8 +16,8 @@ CamerasDialog::CamerasDialog(Window* window) :
 	QDialog(window),
 	m_window(window)
 {
-	this->setupUi(this);
-	this->setModal(false);
+	setupUi(this);
+	setModal(false);
 
 	connect(addCameraButton, SIGNAL(clicked()), this, SLOT(cb_addCamera()));
 	connect(removeCamerasButton, SIGNAL(clicked()), this, SLOT(cb_removeCameras()));

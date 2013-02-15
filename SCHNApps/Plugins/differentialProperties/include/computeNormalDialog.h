@@ -24,9 +24,12 @@ private:
 	MapHandlerGen* m_selectedMap;
 
 public slots:
-	void refreshUI();
+	void selectedMapChanged();
 	void addMapToList(MapHandlerGen* m);
 	void removeMapFromList(MapHandlerGen* m);
+	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
+
+	void attributeModified(unsigned int orbit, QString nameAttr);
 };
 
 } // namespace SCHNApps

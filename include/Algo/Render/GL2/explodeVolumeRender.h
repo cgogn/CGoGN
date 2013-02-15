@@ -136,7 +136,6 @@ public:
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
 
-
 	/**
 	 * draw edges
 	 */

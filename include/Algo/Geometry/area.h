@@ -69,7 +69,7 @@ void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<ty
 
 } // namespace Geometry
 
-}
+} // namespace Surface
 
 } // namespace Algo
 

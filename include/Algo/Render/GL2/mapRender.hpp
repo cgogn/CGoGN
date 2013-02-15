@@ -493,49 +493,104 @@ void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAtt
 {
 	std::vector<GLuint> tableIndices;
 
-	// indice du VBO a utiliser
-	int vbo_ind = 0;
-
 	switch(prim)
 	{
 		case POINTS:
+
 			initPoints<PFP>(map, tableIndices, thread);
-			m_nbIndices[POINT_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[POINT_INDICES];
 			break;
 		case LINES:
 			if(optimized)
 				initLinesOptimized<PFP>(map, tableIndices, thread);
 			else
 				initLines<PFP>(map, tableIndices, thread) ;
-			m_nbIndices[LINE_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[LINE_INDICES];
 			break;
 		case TRIANGLES:
 			if(optimized)
 				initTrianglesOptimized<PFP>(map, tableIndices, position, thread);
 			else
 				initTriangles<PFP>(map, tableIndices, position, thread) ;
-			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
 			break;
 		case FLAT_TRIANGLES:
 			break;
 		case BOUNDARY:
 			initBoundaries<PFP>(map, tableIndices, thread) ;
-			m_nbIndices[BOUNDARY_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[BOUNDARY_INDICES];
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
 			break;
 	}
-	unsigned int size = tableIndices.size();
+
+	m_nbIndices[prim] = tableIndices.size();
+	m_indexBufferUpToDate[prim] = true;
 
 	// setup du buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
+
+
+template <typename PFP>
+void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3>* position, bool optimized, unsigned int thread)
+{
+	std::vector<GLuint> tableIndices;
+
+	switch(prim)
+	{
+		case POINTS:
+
+			initPoints<PFP>(map, tableIndices, thread);
+			break;
+		case LINES:
+			if(optimized)
+				initLinesOptimized<PFP>(map, tableIndices, thread);
+			else
+				initLines<PFP>(map, tableIndices, thread) ;
+			break;
+		case TRIANGLES:
+			if(optimized)
+				initTrianglesOptimized<PFP>(map, tableIndices, position, thread);
+			else
+				initTriangles<PFP>(map, tableIndices, position, thread) ;
+			break;
+		case FLAT_TRIANGLES:
+			break;
+		case BOUNDARY:
+			initBoundaries<PFP>(map, tableIndices, thread) ;
+			break;
+		default:
+			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
+			break;
+	}
+
+	m_indexBufferUpToDate[prim] = true;
+
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	GLint sz=0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &sz);
+	GLuint* oldIndices =  reinterpret_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE));
+
+	// allocate new buffer
+	GLuint newBuffer;
+	glGenBuffers(1,&newBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sz + tableIndices.size() * sizeof(GLuint),NULL, GL_STREAM_DRAW);
+
+	//copy old indices
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sz, oldIndices);
+	//and new ones
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sz, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]) );
+
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+
+	glDeleteBuffers(1,&(m_indexBuffers[prim]));
+	m_indexBuffers[prim] = newBuffer;
+
+	m_nbIndices[prim] += tableIndices.size();
+
+}
+
 
 } // namespace GL2
 

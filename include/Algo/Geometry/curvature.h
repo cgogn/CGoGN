@@ -31,7 +31,7 @@
 
 #include "Utils/convertType.h"
 
-#include "OpenNL/linear_solver.h"
+#include "NL/nl.h"
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
@@ -81,10 +81,10 @@ void vertexQuadraticFitting(
 	float& a, float& b, float& c, float& d, float& e) ;
 
 template <typename PFP>
-void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver) ;
+void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame) ;
 
 template <typename PFP>
-void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver) ;
+void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame) ;
 /*
 template <typename PFP>
 void vertexCubicFitting(Dart dart, typename PFP::VEC3& normal, float& a, float& b, float& c, float& d, float& e, float& f, float& g, float& h, float& i) ;

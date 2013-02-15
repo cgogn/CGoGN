@@ -549,12 +549,6 @@ unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
 
 bool EmbeddedMap3::check()
 {
-	bool topo = Map3::check() ;
-	if (!topo)
-		return false ;
-
-	std::cout << "Check: embedding begin" << std::endl ;
-
     std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
@@ -567,6 +561,12 @@ bool EmbeddedMap3::check()
     std::cout << "nb volume orbits : " << getNbOrbits<VOLUME>() << std::endl ;
     std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
 
+
+	bool topo = Map3::check() ;
+	if (!topo)
+		return false ;
+
+	std::cout << "Check: embedding begin" << std::endl ;
 
 	for(Dart d = begin(); d != end(); next(d))
 	{

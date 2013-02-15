@@ -247,6 +247,243 @@ short OBJModel<PFP>::readObjLine(std::stringstream& oss, std::vector<unsigned in
 }
 
 
+template <typename PFP>
+unsigned int OBJModel<PFP>::createSimpleVBO_P(Utils::VBO* positionVBO)
+{
+	TraversorF<typename PFP::MAP> traf(m_map);
+	std::vector<Geom::Vec3f> posBuff;
+	posBuff.reserve(16384);
+
+	unsigned int nbtris = 0;
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		Dart e = m_map.phi1(d);
+		Dart f = m_map.phi1(e);
+		do
+		{
+			posBuff.push_back(m_positions[d]);
+			posBuff.push_back(m_positions[e]);
+			posBuff.push_back(m_positions[f]);
+			e=f;
+			f = m_map.phi1(e);
+			nbtris++;
+		}while (f!=d);
+	}
+
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	return 3*nbtris;
+}
+
+
+template <typename PFP>
+unsigned int OBJModel<PFP>::createSimpleVBO_PT(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO)
+{
+	TraversorF<typename PFP::MAP> traf(m_map);
+	std::vector<Geom::Vec3f> posBuff;
+	std::vector<Geom::Vec2f> TCBuff;
+	posBuff.reserve(16384);
+	TCBuff.reserve(16384);
+
+	unsigned int nbtris = 0;
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		Dart e = m_map.phi1(d);
+		Dart f = m_map.phi1(e);
+		do
+		{
+			posBuff.push_back(m_positions[d]);
+			if (m_specialVertices.isMarked(d))
+				TCBuff.push_back(m_texCoordsF[d]);
+			else
+				TCBuff.push_back(m_texCoords[d]);
+
+			posBuff.push_back(m_positions[e]);
+			if (m_specialVertices.isMarked(e))
+				TCBuff.push_back(m_texCoordsF[e]);
+			else
+				TCBuff.push_back(m_texCoords[e]);
+
+			posBuff.push_back(m_positions[f]);
+			if (m_specialVertices.isMarked(f))
+				TCBuff.push_back(m_texCoordsF[f]);
+			else
+				TCBuff.push_back(m_texCoords[f]);
+			e=f;
+			f = m_map.phi1(e);
+			nbtris++;
+		}while (f!=d);
+	}
+
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	texcoordVBO->setDataSize(2);
+	texcoordVBO->allocate(TCBuff.size());
+	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
+	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
+	texcoordVBO->releasePtr();
+
+	return 3*nbtris;
+}
+
+template <typename PFP>
+unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO )
+{
+	TraversorF<typename PFP::MAP> traf(m_map);
+	std::vector<Geom::Vec3f> posBuff;
+	std::vector<Geom::Vec2f> TCBuff;
+	std::vector<Geom::Vec2f> normalBuff;
+	posBuff.reserve(16384);
+	TCBuff.reserve(16384);
+	normalBuff.reserve(16384);
+
+	unsigned int nbtris = 0;
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		Dart e = m_map.phi1(d);
+		Dart f = m_map.phi1(e);
+		do
+		{
+			posBuff.push_back(m_positions[d]);
+			if (m_specialVertices.isMarked(d))
+			{
+				TCBuff.push_back(m_texCoordsF[d]);
+				normalBuff.push_back(m_normalsF[d]);
+			}
+			else
+			{
+				TCBuff.push_back(m_texCoords[d]);
+				normalBuff.push_back(m_normals[d]);
+			}
+
+			posBuff.push_back(m_positions[e]);
+			if (m_specialVertices.isMarked(e))
+			{
+				TCBuff.push_back(m_texCoordsF[e]);
+				normalBuff.push_back(m_normalsF[e]);
+			}
+			else
+			{
+				TCBuff.push_back(m_texCoords[e]);
+				normalBuff.push_back(m_normals[e]);
+			}
+
+			posBuff.push_back(m_positions[f]);
+			if (m_specialVertices.isMarked(f))
+			{
+				TCBuff.push_back(m_texCoordsF[f]);
+				normalBuff.push_back(m_normalsF[f]);
+			}
+			else
+			{
+				TCBuff.push_back(m_texCoords[f]);
+				normalBuff.push_back(m_normals[f]);
+			}
+			e=f;
+			f = m_map.phi1(e);
+			nbtris++;
+		}while (f!=d);
+	}
+
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	texcoordVBO->setDataSize(2);
+	texcoordVBO->allocate(TCBuff.size());
+	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
+	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
+	texcoordVBO->releasePtr();
+
+	normalVBO->setDataSize(3);
+	normalVBO->allocate(normalBuff.size());
+	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
+	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
+	normalVBO->releasePtr();
+
+
+	return 3*nbtris;
+}
+
+
+template <typename PFP>
+unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO )
+{
+	TraversorF<typename PFP::MAP> traf(m_map);
+	std::vector<Geom::Vec3f> posBuff;
+	std::vector<Geom::Vec2f> normalBuff;
+	posBuff.reserve(16384);
+	normalBuff.reserve(16384);
+
+	unsigned int nbtris = 0;
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		Dart e = m_map.phi1(d);
+		Dart f = m_map.phi1(e);
+		do
+		{
+			posBuff.push_back(m_positions[d]);
+			if (m_specialVertices.isMarked(d))
+			{
+				normalBuff.push_back(m_normalsF[d]);
+			}
+			else
+			{
+				normalBuff.push_back(m_normals[d]);
+			}
+
+			posBuff.push_back(m_positions[e]);
+			if (m_specialVertices.isMarked(e))
+			{
+				normalBuff.push_back(m_normalsF[e]);
+			}
+			else
+			{
+				normalBuff.push_back(m_normals[e]);
+			}
+
+			posBuff.push_back(m_positions[f]);
+			if (m_specialVertices.isMarked(f))
+			{
+				normalBuff.push_back(m_normalsF[f]);
+			}
+			else
+			{
+				normalBuff.push_back(m_normals[f]);
+			}
+			e=f;
+			f = m_map.phi1(e);
+			nbtris++;
+		}while (f!=d);
+	}
+
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	normalVBO->setDataSize(3);
+	normalVBO->allocate(normalBuff.size());
+	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
+	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
+	normalVBO->releasePtr();
+
+
+	return 3*nbtris;
+}
+
+
 // template <typename PFP>
 // bool importObjTex(typename PFP::MAP& map, const std::string& filename,
 // 				  std::vector<std::string>& attrNames,/* std::vector<MapBrowserLinked*>& browsers,*/
@@ -334,7 +571,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		m_groups =  m_map.template getAttribute<unsigned int, FACE>("groups") ;
 		if (!m_groups.isValid())
 			m_groups = m_map.template addAttribute<unsigned int, FACE>("groups") ;
-// ??	attrNames.push_back(m_groups.name()) ;
+		attrNames.push_back(m_groups.name()) ;
 	}
 	
 
@@ -435,7 +672,8 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			short nbe = readObjLine(oss,localIndices);
 
 			Dart d = m_map.newFace(nbe, false);
-			m_groups[d] = currentGroup;
+			if (tagG!=0)
+				m_groups[d] = currentGroup;
 			
 			for (short j = 0; j < nbe; ++j)
 			{
@@ -505,22 +743,26 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		}
 
 		// if not all faces the same embedding
-		if (!same)
-		{
+//		if (!same)
+//		{
 			for (unsigned int j=0; j<nb; ++j)
 			{
 				Dart e = vec[j];
-				m_texCoordsF[e] = texCoordsBuffer[ vecTCIndPerVertex[e][j] ];
-				m_normalsF[e] = normalsBuffer[ vecNormIndPerVertex[e][j] ];
+				if (tagVT)
+					m_texCoordsF[e] = texCoordsBuffer[ vecTCIndPerVertex[e][j] ];
+				if (tagVN)
+					m_normalsF[e] = normalsBuffer[ vecNormIndPerVertex[e][j] ];
 			}
 			m_specialVertices.mark(d);
-		}
-		else
-		{
-			m_texCoords[d] = texCoordsBuffer[ vecTCIndPerVertex[d][0] ];
-			m_normals[d] = normalsBuffer[ vecNormIndPerVertex[d][0] ];
-			m_specialVertices.unmark(d);
-		}
+//		}
+//		else
+//		{
+//			if (tagVT)
+//				m_texCoords[d] = texCoordsBuffer[ vecTCIndPerVertex[d][0] ];
+//			if (tagVN)
+//				m_normals[d] = normalsBuffer[ vecNormIndPerVertex[d][0] ];
+//			m_specialVertices.unmark(d);
+//		}
 	}
 
 	return true;

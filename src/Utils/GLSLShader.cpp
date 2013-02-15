@@ -1061,14 +1061,10 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 		glUniformMatrix4fv(*m_uniMat_Model,	1, false, &modelview[0][0]);
 
 	if (*m_uniMat_ModelProj >= 0)
-	{
 		glUniformMatrix4fv(*m_uniMat_ModelProj,	1 , false, &PMV[0][0]);
-	}
 
 	if (*m_uniMat_Normal >= 0)
-	{
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
-	}
 
 	this->unbind();
 }

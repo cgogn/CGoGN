@@ -2,14 +2,15 @@
 #define _RENDERVECTOR_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_renderVector.h"
+#include "renderVectorDockTab.h"
 
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 
+namespace CGoGN
+{
 
-using namespace CGoGN;
-using namespace SCHNApps;
-
+namespace SCHNApps
+{
 
 struct PerMapParameterSet
 {
@@ -35,30 +36,13 @@ struct ParameterSet
 };
 
 
-class RenderVectorPlugin;
-
-class RenderVectorDockTab : public QWidget, public Ui::RenderVectorWidget
-{
-public:
-	RenderVectorDockTab(RenderVectorPlugin* p) : plugin(p)
-	{
-		setupUi(this);
-	}
-
-	void refreshUI(ParameterSet* params);
-
-private:
-	RenderVectorPlugin* plugin;
-};
-
-
 class RenderVectorPlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderVectorPlugin() : b_refreshingUI(false)
+	RenderVectorPlugin()
 	{
 		setProvidesRendering(true);
 	}
@@ -78,15 +62,11 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-	void setRefreshingUI(bool b) { b_refreshingUI = b; }
-
 protected:
 	RenderVectorDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
 	CGoGN::Utils::ShaderVectorPerVertex* m_vectorShader;
-
-	bool b_refreshingUI;
 
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
@@ -103,11 +83,10 @@ public slots:
 	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
 	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos);
 	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i);
-
-	void cb_selectedMapChanged();
-	void cb_positionVBOChanged(int index);
-	void cb_selectedVectorsVBOChanged();
-	void cb_vectorsScaleFactorChanged(int i);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

@@ -72,6 +72,7 @@ SET (CGoGN_EXT_INCLUDES
 	${ZLIB_INCLUDE_DIRS}
 	${LIBXML2_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
+
 )
 
 # define libs for external libs

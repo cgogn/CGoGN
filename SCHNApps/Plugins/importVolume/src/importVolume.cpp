@@ -27,21 +27,17 @@ MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 			PFP3::MAP* map = mh->getMap();
 
 			std::vector<std::string> attrNames ;
-			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toUtf8().constData(), attrNames);
+			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toStdString(), attrNames);
 
 			// get vertex position attribute
 			VertexAttribute<PFP3::VEC3> position = map->getAttribute<PFP3::VEC3, CGoGN::VERTEX>(attrNames[0]);
+			mh->registerAttribute<PFP2::VEC3, VERTEX>(position);
 
 			// create VBO for vertex position attribute
 			mh->createVBO(position);
 
 			// compute map bounding box
 			mh->updateBB(position);
-
-			// compute primitive connectivity VBOs
-			mh->updatePrimitives(Algo::Render::GL2::POINTS);
-			mh->updatePrimitives(Algo::Render::GL2::LINES);
-			mh->updatePrimitives(Algo::Render::GL2::TRIANGLES);
 		}
 		return mhg;
 	}

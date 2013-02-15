@@ -21,9 +21,10 @@ public:
 
 	Camera(const QString& name, Window* window);
 	~Camera();
+	const QString& getName() const { return m_name; }
 
 public slots:
-	const QString& getName() const { return m_name; }
+	QString getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
 	Window* getWindow() const { return m_window; }
