@@ -517,8 +517,8 @@ private:
 
 
 public:
-	HalfEdgeSelector_ColorExperimental(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
-		EdgeSelector<PFP>(m, pos, approx, select),
+	HalfEdgeSelector_ColorExperimental(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		EdgeSelector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),
@@ -612,8 +612,8 @@ private:
 	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) ;
 
 public:
-	HalfEdgeSelector_LFexperimental(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
-		EdgeSelector<PFP>(m, pos, approx, select),
+	HalfEdgeSelector_LFexperimental(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		EdgeSelector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_FT(-1),

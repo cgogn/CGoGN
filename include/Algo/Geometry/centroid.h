@@ -303,7 +303,6 @@ void computeCentroidELWVolumes(typename PFP::MAP& map,
  * @param map the map
  * @param position vertex attribute of position
  * @param vertex_centroid vertex attribute to store the centroids
- * @param select the selector
  */
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,

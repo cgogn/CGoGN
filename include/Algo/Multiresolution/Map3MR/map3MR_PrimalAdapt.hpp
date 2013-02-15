@@ -299,8 +299,8 @@ void Map3MR<PFP>::swapEdges(Dart d, Dart e)
 
 		}
 
-		if(m_map.template isOrbitEmbedded<VOLUME>())
-			m_map.template setOrbitEmbeddingOnNewCell<VOLUME>(d);
+//		if(m_map.template isOrbitEmbedded<VOLUME>())
+//			m_map.template setOrbitEmbeddingOnNewCell<VOLUME>(d);
 
 
 		m_map.duplicateDart(d);
@@ -342,6 +342,14 @@ void Map3MR<PFP>::splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClos
 			m_map.template copyDartEmbedding<VERTEX>(m_map.phi2(dit2), m_map.phi1(dit2));
 		}
 	}
+
+//	if(m_map.template isOrbitEmbedded<VOLUME>())
+//	{
+//		Dart v = vd.front() ;
+//		Dart v23 = m_map.alpha2(v) ;
+//		m_map.template setOrbitEmbeddingOnNewCell<VOLUME>(v23) ;
+//		m_map.template copyCell<VOLUME>(v23, v) ;
+//	}
 
 }
 
@@ -622,11 +630,14 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 				Dart dd = m_map.phi1(m_map.phi1(old));
 
 				m_map.splitFace(old,dd) ;
-				//centralDart = old;
+				centralDart = old;
 			}
 			else
 			{
-				isocta = true;
+				if(ispyra)
+					isocta = false;
+				else
+					isocta = true;
 
 				Dart old = m_map.phi2(m_map.phi1(ditWV));
 				Dart dd = m_map.phi1(old) ;
@@ -713,7 +724,6 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 
 		//replonger l'orbit de ditV.
 		m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
-
 		(*volumeVertexFunctor)(centralDart) ;
 
 		m_map.decCurrentLevel() ;
@@ -734,6 +744,7 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 
 		m_map.incCurrentLevel();
 		Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditV)));
+		std::vector<Dart> embVol;
 
 		Dart f = x;
 		do
@@ -741,13 +752,28 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 			Dart f3 = m_map.phi3(f);
 			Dart tmp =  m_map.phi_1(m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi_1(f3))))); //future voisin par phi2
 			swapEdges(f3, tmp);
+			embVol.push_back(tmp);
 
 			f = m_map.phi2(m_map.phi_1(f));
 		}while(f != x);
 
+
+		for(std::vector<Dart>::iterator it = embVol.begin() ; it != embVol.end() ; ++it)
+		{
+			Dart dit = *it;
+
+			m_map.template setOrbitEmbeddingOnNewCell<VOLUME>(dit);
+			m_map.template copyCell<VOLUME>(dit, ditV);
+		}
+
+		//embed the volumes around swapEdges
+
+
+
 		//replonger l'orbit de ditV.
-		m_map.template setOrbitEmbedding<VERTEX>(x, m_map.template getEmbedding<VERTEX>(x));
-		(*volumeVertexFunctor)(x) ;
+		m_map.template setOrbitEmbedding<VERTEX>(m_map.phi2(m_map.phi3(x)), m_map.template getEmbedding<VERTEX>(m_map.phi2(m_map.phi3(x))));
+		//m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
+		//(*volumeVertexFunctor)(x) ;
 
 		m_map.decCurrentLevel() ;
 	}
@@ -760,6 +786,7 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 		{
 			m_map.incCurrentLevel();
 			Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
+			std::vector<Dart> embVol;
 
 			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
 			{
@@ -780,12 +807,23 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 
 						me.markOrbit<EDGE>(f3);
 						me.markOrbit<EDGE>(f32);
+
+						embVol.push_back(tmp);
 					}
 
 					f = m_map.phi2(m_map.phi_1(f));
 				}while(f != x);
 
 			}
+
+			for(std::vector<Dart>::iterator it = embVol.begin() ; it != embVol.end() ; ++it)
+			{
+				Dart dit = *it;
+
+				m_map.template setOrbitEmbeddingOnNewCell<VOLUME>(dit);
+				m_map.template copyCell<VOLUME>(dit, d);
+			}
+
 
 			m_map.template setOrbitEmbedding<VERTEX>(x, m_map.template getEmbedding<VERTEX>(x));
 			(*volumeVertexFunctor)(x) ;
@@ -838,7 +876,6 @@ unsigned int Map3MR<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDif
 	}
 
 	m_map.incCurrentLevel();
-
 	m_map.popLevel() ;
 
 	return vLevel;

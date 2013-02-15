@@ -83,6 +83,26 @@ void computeCotanWeightEdges(
 
 } // namespace Surface
 
+namespace Volume
+{
+
+namespace Geometry
+{
+
+template <typename PFP, typename ATTR_TYPE>
+ATTR_TYPE computeLaplacianTopoVertex( typename PFP::MAP& map, Dart d, const VertexAttribute<ATTR_TYPE>& attr) ;
+
+template <typename PFP, typename ATTR_TYPE>
+void computeLaplacianTopoVertices(typename PFP::MAP& map, const VertexAttribute<ATTR_TYPE>& attr,
+									VertexAttribute<ATTR_TYPE>& laplacian) ;
+
+
+
+} // namespace Geometry
+
+} // namespace Volume
+
+
 } // namespace Algo
 
 } // namespace CGoGN

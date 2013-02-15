@@ -134,7 +134,7 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
 
 } //namespace Filtering
 
-}
+} //namespace Surface
 
 } //namespace Algo
 
