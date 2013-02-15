@@ -25,6 +25,8 @@
 #ifndef __PLANE_3D__
 #define __PLANE_3D__
 
+#include "Geometry/vector_gen.h"
+
 namespace CGoGN
 {
 

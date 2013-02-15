@@ -196,6 +196,12 @@ void decimate(
 		case S_hLightfieldKCL :
 			selector = new HalfEdgeSelector_LightfieldKCL<PFP>(map, position, approximators) ;
 			break ;
+		case S_hColorExperimental:
+			selector = new HalfEdgeSelector_ColorExperimental<PFP>(map, position, approximators, selected) ;
+			break ;
+		case S_hLFexperimental:
+			selector = new HalfEdgeSelector_LFexperimental<PFP>(map, position, approximators, selected) ;
+			break ;
 	}
 
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
@@ -212,9 +218,6 @@ void decimate(
 
 		return ;
 	}
-
-	if (edgeErrors != NULL)
-		selector->getEdgeErrors(edgeErrors) ;
 
 	unsigned int nbVertices = map.template getNbOrbits<VERTEX>() ;
 	bool finished = false ;
@@ -256,6 +259,9 @@ void decimate(
 		if (callback_wrapper != NULL && callback_object != NULL)
 			callback_wrapper(callback_object, &nbVertices) ;
 	}
+
+	if (edgeErrors != NULL)
+		selector->getEdgeErrors(edgeErrors) ;
 
 	delete selector ;
 
