@@ -743,7 +743,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		}
 	}
 
-	TraversorV<typename PFP::MAP> tVg(map,selected);
+	TraversorV<typename PFP::MAP> tVg(map);
 	for(Dart dit = tVg.begin() ; dit != tVg.end() ; dit = tVg.next())
 	{
 		if(map.isBoundaryVertex(dit) && !newBoundaryV.isMarked(dit))
