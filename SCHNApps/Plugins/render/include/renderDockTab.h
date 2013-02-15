@@ -11,7 +11,7 @@ namespace SCHNApps
 
 class Window;
 class RenderPlugin;
-class ParameterSet;
+struct ParameterSet;
 
 class RenderDockTab : public QWidget, public Ui::RenderDockWidget
 {
@@ -30,6 +30,8 @@ public slots:
 	void refreshUI(ParameterSet* params);
 
 	void selectedMapChanged();
+	void addVBOToList(QString name);
+	void removeVBOFromList(QString name);
 	void positionVBOChanged(int index);
 	void normalVBOChanged(int index);
 	void renderVerticesChanged(bool b);

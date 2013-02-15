@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>447</width>
-    <height>311</height>
+    <width>472</width>
+    <height>276</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,16 +74,6 @@
          <widget class="QLineEdit" name="normalAttributeName"/>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="check_createVBO">
-        <property name="text">
-         <string>create VBO</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>

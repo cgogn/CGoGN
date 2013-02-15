@@ -7,6 +7,12 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 bool ImportSurfacePlugin::enable()
 {
 	importAction = new QAction("import", this);
@@ -30,11 +36,14 @@ MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
 			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toStdString(), attrNames);
 
 			// get vertex position attribute
-			VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, CGoGN::VERTEX>(attrNames[0]);
-			mh->registerAttribute<PFP2::VEC3, VERTEX>(position);
+			VertexAttribute<PFP2::VEC3> position = map->getAttribute<PFP2::VEC3, VERTEX>(attrNames[0]);
+			mh->registerAttribute(position);
 
-			// create VBO for vertex position attribute
+			// create position VBO
 			mh->createVBO(position);
+
+			// update corresponding VBO & emit attribute update signal
+			mh->notifyAttributeModification(position);
 
 			// compute map bounding box
 			mh->updateBB(position);
@@ -56,3 +65,7 @@ Q_EXPORT_PLUGIN2(ImportSurfacePlugin, ImportSurfacePlugin)
 #else
 Q_EXPORT_PLUGIN2(ImportSurfacePluginD, ImportSurfacePlugin)
 #endif
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

@@ -11,7 +11,7 @@ namespace SCHNApps
 
 class Window;
 class RenderExplodPlugin;
-class ParameterSet;
+struct ParameterSet;
 
 class RenderExplodDockTab : public QWidget, public Ui::RenderExplodDockWidget
 {

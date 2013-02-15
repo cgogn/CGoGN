@@ -79,10 +79,10 @@ public slots:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos);
-	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i);
+	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI = false);
+	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 };
 
 } // namespace SCHNApps

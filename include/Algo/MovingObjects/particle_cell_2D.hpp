@@ -104,7 +104,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 	if (Geometry::isPointOnVertex < PFP > (m, d, positionAttribut, goal))
 	{
 		this->setState(VERTEX) ;
-		this->ParticleBase < PFP > ::move(goal) ;
+		this->Algo::MovingObjects::ParticleBase < PFP > ::move(goal) ;
 		return ;
 	}
 	else
@@ -147,7 +147,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 
 
 					this->setState(VERTEX) ;
-					this->ParticleBase < PFP > ::move(goal) ;
+					this->Algo::MovingObjects::ParticleBase < PFP > ::move(goal) ;
 					return ;
 				}
 			}
@@ -212,19 +212,19 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 
 	if (!Geometry::isPointOnHalfEdge < PFP > (m, d, positionAttribut, goal))
 	{
-		this->ParticleBase < PFP > ::move(positionAttribut[d]) ;
+		this->Algo::MovingObjects::ParticleBase < PFP > ::move(positionAttribut[d]) ;
 		vertexState(goal) ;
 		return ;
 	}
 	else if (!Geometry::isPointOnHalfEdge < PFP > (m, m.phi2(d), positionAttribut, goal))
 	{
 		d = m.phi2(d) ;
-		this->ParticleBase < PFP > ::move(positionAttribut[d]) ;
+		this->Algo::MovingObjects::ParticleBase < PFP > ::move(positionAttribut[d]) ;
 		vertexState(goal) ;
 		return ;
 	}
 
-	this->ParticleBase < PFP > ::move(goal) ;
+	this->Algo::MovingObjects::ParticleBase < PFP > ::move(goal) ;
 }
 
 template <typename PFP>
@@ -341,16 +341,16 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 						d = m.phi1(d) ;
 						break ;
 					case Geom::ALIGNED :
-						this->ParticleBase<PFP>::move(goal) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 						edgeState(goal) ;
 						return ;
 					case Geom::RIGHT :
-						this->ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
 						edgeState(goal, Geom::RIGHT) ;
 						return ;
 				}
 			} while (d != dd) ;
-			this->ParticleBase<PFP>::move(goal) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 			this->setState(FACE) ;
 
 // 			m_position = Geometry::faceCentroid<PFP>(m,d,m_positions);
@@ -387,19 +387,19 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 						break ;
 					case Geom::ALIGNED :
 // 					CGoGNout << "pic" << CGoGNendl;
-						this->ParticleBase<PFP>::move(goal) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 						edgeState(goal) ;
 						return ;
 					case Geom::RIGHT :
 //					CGoGNout << "smthg went bad(2) " << m_position << CGoGNendl;
-						this->ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
 // 					CGoGNout << " " << m_position << CGoGNendl;
 						edgeState(goal, Geom::RIGHT) ;
 						return ;
 				}
 			} while (d != dd) ;
 
-			this->ParticleBase<PFP>::move(goal) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 			this->setState(FACE) ;
 			return ;
 		}
@@ -409,7 +409,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 	switch (getOrientationEdge(goal, d))
 	{
 		case Geom::LEFT :
-			this->ParticleBase<PFP>::move(goal) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 			this->setState(FACE) ;
 			;
 			break ;
@@ -428,12 +428,12 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 			if (wsoe == Geom::ALIGNED)
 			{
 				d = m.phi1(d) ; //to check
-				this->ParticleBase<PFP>::move(positionAttribut[d]) ;
+				this->Algo::MovingObjects::ParticleBase<PFP>::move(positionAttribut[d]) ;
 				vertexState(goal) ;
 			}
 			else
 			{
-				this->ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
+				this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
 				edgeState(goal, Geom::RIGHT) ;
 			}
 			break ;
