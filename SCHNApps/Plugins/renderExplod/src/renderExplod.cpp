@@ -195,7 +195,7 @@ void RenderExplodPlugin::vboRemoved(Utils::VBO* vbo)
 	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
-void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
+void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 
@@ -209,79 +209,86 @@ void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 		if(map)
 			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderExplodPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo)
+void RenderExplodPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].positionVBO = vbo;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderExplodPlugin::changeColorVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo)
+void RenderExplodPlugin::changeColorVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].colorVBO = vbo;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderExplodPlugin::changeRenderEdges(View* view, MapHandlerGen* map, bool b)
+void RenderExplodPlugin::changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].renderEdges = b;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderExplodPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool b)
+void RenderExplodPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].renderFaces = b;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderExplodPlugin::changeFacesScaleFactor(View* view, MapHandlerGen* map, int i)
+void RenderExplodPlugin::changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].facesScaleFactor = i / 50.0;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderExplodPlugin::changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i)
+void RenderExplodPlugin::changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].volumesScaleFactor = i / 50.0;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }

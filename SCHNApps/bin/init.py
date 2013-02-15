@@ -1,5 +1,5 @@
 importPlugin = schnapps.loadPlugin("ImportSurface");
-renderPlugin = schnapps.loadPlugin("Render");
+renderPlugin = schnapps.loadPlugin("RenderD");
 renderVectorPlugin = schnapps.loadPlugin("RenderVectorD");
 differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
 subdivisionPlugin = schnapps.loadPlugin("SubdivideSurface");

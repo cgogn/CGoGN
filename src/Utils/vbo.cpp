@@ -33,7 +33,7 @@ namespace CGoGN
 namespace Utils
 {
 
-VBO::VBO() : m_nbElts(0), m_lock(false)
+VBO::VBO(const std::string& name) : m_nbElts(0), m_lock(false), m_name(name)
 {
 	glGenBuffers(1, &(*m_id));
 	m_refs.reserve(4);

@@ -84,7 +84,7 @@ void RenderExplodDockTab::selectedMapChanged()
 	{
 		QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 		if(!currentItems.empty())
-			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
+			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()), true);
 	}
 }
 
@@ -94,7 +94,7 @@ void RenderExplodDockTab::positionVBOChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()));
+		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
 	}
 }
 
@@ -104,7 +104,7 @@ void RenderExplodDockTab::colorVBOChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeColorVBO(view, map, map->getVBO(combo_colorVBO->currentText()));
+		m_plugin->changeColorVBO(view, map, map->getVBO(combo_colorVBO->currentText()), true);
 	}
 }
 
@@ -114,7 +114,7 @@ void RenderExplodDockTab::renderEdgesChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeRenderEdges(view, map, b);
+		m_plugin->changeRenderEdges(view, map, b, true);
 	}
 }
 
@@ -124,7 +124,7 @@ void RenderExplodDockTab::renderFacesChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeRenderFaces(view, map, b);
+		m_plugin->changeRenderFaces(view, map, b, true);
 	}
 }
 
@@ -134,7 +134,7 @@ void RenderExplodDockTab::facesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeFacesScaleFactor(view, map, i);
+		m_plugin->changeFacesScaleFactor(view, map, i, true);
 	}
 }
 
@@ -144,7 +144,7 @@ void RenderExplodDockTab::volumesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVolumesScaleFactor(view, map, i);
+		m_plugin->changeVolumesScaleFactor(view, map, i, true);
 	}
 }
 

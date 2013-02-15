@@ -67,41 +67,6 @@
       <string>Computed attributes</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <italic>true</italic>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>Kmax :</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Existing attribute :</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="combo_KmaxAttribute">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="0" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
@@ -115,16 +80,6 @@
          <widget class="QLineEdit" name="KmaxAttributeName"/>
         </item>
        </layout>
-      </item>
-      <item row="0" column="3">
-       <widget class="QCheckBox" name="check_KmaxCreateVBO">
-        <property name="text">
-         <string>create VBO</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_10">
@@ -175,16 +130,6 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="3">
-       <widget class="QCheckBox" name="check_kmaxCreateVBO">
-        <property name="text">
-         <string>create VBO</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_7">
         <property name="font">
@@ -233,16 +178,6 @@
          <widget class="QLineEdit" name="KminAttributeName"/>
         </item>
        </layout>
-      </item>
-      <item row="2" column="3">
-       <widget class="QCheckBox" name="check_KminCreateVBO">
-        <property name="text">
-         <string>create VBO</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_13">
@@ -293,16 +228,6 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="3">
-       <widget class="QCheckBox" name="check_kminCreateVBO">
-        <property name="text">
-         <string>create VBO</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="0">
        <widget class="QLabel" name="label_15">
         <property name="font">
@@ -352,15 +277,40 @@
         </item>
        </layout>
       </item>
-      <item row="4" column="3">
-       <widget class="QCheckBox" name="check_KnormalCreateVBO">
-        <property name="text">
-         <string>create VBO</string>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <italic>true</italic>
+          <bold>true</bold>
+         </font>
         </property>
-        <property name="checked">
-         <bool>true</bool>
+        <property name="text">
+         <string>Kmax :</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Existing attribute :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="combo_KmaxAttribute">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

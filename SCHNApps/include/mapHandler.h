@@ -76,6 +76,9 @@ public:
 			h_vbo[nameAttr]->updateData(attr);
 
 		emit(attributeModified(ORBIT, nameAttr));
+
+		foreach(View* view, l_views)
+			view->updateGL();
 	}
 
 	inline void notifyConnectivityModification()
@@ -85,6 +88,9 @@ public:
 		m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
 
 		emit(connectivityModified());
+
+		foreach(View* view, l_views)
+			view->updateGL();
 	}
 
 	/*********************************************************

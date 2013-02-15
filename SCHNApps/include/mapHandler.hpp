@@ -52,7 +52,8 @@ Utils::VBO* MapHandlerGen::createVBO(const ATTR_HANDLER& attr)
 	Utils::VBO* vbo = getVBO(name);
 	if(!vbo)
 	{
-		vbo = new Utils::VBO();
+		vbo = new Utils::VBO(attr.name());
+		vbo->updateData(attr);
 		h_vbo.insert(name, vbo);
 		emit(vboAdded(vbo));
 	}

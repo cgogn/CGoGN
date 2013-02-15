@@ -39,7 +39,7 @@ MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 			VertexAttribute<PFP3::VEC3> position = map->getAttribute<PFP3::VEC3, VERTEX>(attrNames[0]);
 			mh->registerAttribute(position);
 
-			// create VBO for vertex position attribute
+			// create position VBO
 			mh->createVBO(position);
 
 			// update corresponding VBO & emit attribute update signal

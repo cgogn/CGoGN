@@ -51,8 +51,7 @@ public slots:
 	void computeNormal(const QString& mapName,
 		const QString& positionAttributeName = "position",
 		const QString& normalAttributeName = "normal",
-		bool createNormalVBO = true,
-		bool autoUpdateNormal = true);
+		bool autoUpdate = true);
 
 	void computeCurvature(
 		const QString& mapName,
@@ -63,16 +62,7 @@ public slots:
 		const QString& KminAttributeName = "Kmin",
 		const QString& kminAttributeName = "kmin",
 		const QString& KnormalAttributeName = "Knormal",
-		bool createKmaxVBO = true,
-		bool createkmaxVBO = true,
-		bool createKminVBO = true,
-		bool createkminVBO = true,
-		bool createKnormalVBO = true,
-		bool autoUpdateKmax = true,
-		bool autoUpdatekmax = true,
-		bool autoUpdateKmin = true,
-		bool autoUpdatekmin = true,
-		bool autoUpdateKnormal = true
+		bool autoUpdate = true
 	);
 
 private:
@@ -85,15 +75,36 @@ private:
 	struct ComputeNormalParameters
 	{
 		ComputeNormalParameters() {}
-		ComputeNormalParameters(QString p, QString n, bool vbo, bool update) :
-			positionName(p), normalName(n), createVBO(vbo), autoUpdate(update)
+		ComputeNormalParameters(const QString& p, const QString& n, bool update) :
+			positionName(p), normalName(n), autoUpdate(update)
 		{}
 		QString positionName;
 		QString normalName;
-		bool createVBO;
 		bool autoUpdate;
 	};
 	QHash<QString, ComputeNormalParameters> computeNormalLastParameters;
+
+	struct ComputeCurvatureParameters
+	{
+		ComputeCurvatureParameters() {}
+		ComputeCurvatureParameters(
+			const QString& p, const QString& n,
+			const QString& Kmax, const QString& kmax, const QString& Kmin, const QString& kmin, const QString& Knormal,
+			bool update) :
+			positionName(p), normalName(n),
+			KmaxName(Kmax), kmaxName(kmax), KminName(Kmin), kminName(kmin), KnormalName(Knormal),
+			autoUpdate(update)
+		{}
+		QString positionName;
+		QString normalName;
+		QString KmaxName;
+		QString kmaxName;
+		QString KminName;
+		QString kminName;
+		QString KnormalName;
+		bool autoUpdate;
+	};
+	QHash<QString, ComputeCurvatureParameters> computeCurvatureLastParameters;
 };
 
 #endif

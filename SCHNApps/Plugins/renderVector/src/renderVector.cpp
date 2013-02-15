@@ -164,7 +164,7 @@ void RenderVectorPlugin::vboRemoved(Utils::VBO* vbo)
 	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
-void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
+void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 
@@ -178,43 +178,47 @@ void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 		if(map)
 			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderVectorPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo)
+void RenderVectorPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].positionVBO = vbo;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderVectorPlugin::changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos)
+void RenderVectorPlugin::changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].vectorVBO = vbos;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderVectorPlugin::changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i)
+void RenderVectorPlugin::changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()].vectorsScaleFactor = i / 50.0;
 
 	if(view->isCurrentView())
 	{
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }

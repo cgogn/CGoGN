@@ -50,7 +50,7 @@ void DifferentialPropertiesPlugin::attributeModified(unsigned int orbit, QString
 		{
 			ComputeNormalParameters& params = computeNormalLastParameters[map->getName()];
 			if(params.positionName == nameAttr && params.autoUpdate)
-				computeNormal(map->getName(), params.positionName, params.normalName, params.createVBO);
+				computeNormal(map->getName(), params.positionName, params.normalName);
 		}
 	}
 }
@@ -80,11 +80,9 @@ void DifferentialPropertiesPlugin::computeNormalFromDialog()
 		else
 			normalName = m_computeNormalDialog->normalAttributeName->text();
 
-		bool createVBO = (m_computeNormalDialog->check_createVBO->checkState() == Qt::Checked);
-
 		bool autoUpdate = (currentItems[0]->checkState() == Qt::Checked);
 
-		computeNormal(mapName, positionName, normalName, createVBO, autoUpdate);
+		computeNormal(mapName, positionName, normalName, autoUpdate);
 	}
 }
 
@@ -103,39 +101,38 @@ void DifferentialPropertiesPlugin::computeCurvatureFromDialog()
 			KmaxName = m_computeCurvatureDialog->combo_KmaxAttribute->currentText();
 		else
 			KmaxName = m_computeCurvatureDialog->KmaxAttributeName->text();
-		bool KmaxVBO = (m_computeCurvatureDialog->check_KmaxCreateVBO->checkState() == Qt::Checked);
 
 		QString kmaxName;
 		if(m_computeCurvatureDialog->kmaxAttributeName->text().isEmpty())
 			kmaxName = m_computeCurvatureDialog->combo_kmaxAttribute->currentText();
 		else
 			kmaxName = m_computeCurvatureDialog->kmaxAttributeName->text();
-		bool kmaxVBO = (m_computeCurvatureDialog->check_kmaxCreateVBO->checkState() == Qt::Checked);
 
 		QString KminName;
 		if(m_computeCurvatureDialog->KminAttributeName->text().isEmpty())
 			KminName = m_computeCurvatureDialog->combo_KminAttribute->currentText();
 		else
 			KminName = m_computeCurvatureDialog->KminAttributeName->text();
-		bool KminVBO = (m_computeCurvatureDialog->check_KminCreateVBO->checkState() == Qt::Checked);
 
 		QString kminName;
 		if(m_computeCurvatureDialog->kminAttributeName->text().isEmpty())
 			kminName = m_computeCurvatureDialog->combo_kminAttribute->currentText();
 		else
 			kminName = m_computeCurvatureDialog->kminAttributeName->text();
-		bool kminVBO = (m_computeCurvatureDialog->check_kminCreateVBO->checkState() == Qt::Checked);
 
 		QString KnormalName;
 		if(m_computeCurvatureDialog->KnormalAttributeName->text().isEmpty())
 			KnormalName = m_computeCurvatureDialog->combo_KnormalAttribute->currentText();
 		else
 			KnormalName = m_computeCurvatureDialog->KnormalAttributeName->text();
-		bool KnormalVBO = (m_computeCurvatureDialog->check_KnormalCreateVBO->checkState() == Qt::Checked);
+
+		bool autoUpdate = (currentItems[0]->checkState() == Qt::Checked);
 
 		computeCurvature(
-			mapName, positionName, normalName, KmaxName, kmaxName, KminName, kminName, KnormalName,
-			KmaxVBO, kmaxVBO, KminVBO, kminVBO, KnormalVBO
+			mapName,
+			positionName, normalName,
+			KmaxName, kmaxName, KminName, kminName, KnormalName,
+			autoUpdate
 		);
 	}
 }
@@ -144,8 +141,7 @@ void DifferentialPropertiesPlugin::computeNormal(
 	const QString& mapName,
 	const QString& positionAttributeName,
 	const QString& normalAttributeName,
-	bool createNormalVBO,
-	bool autoUpdateNormal)
+	bool autoUpdate)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
 	if(mh == NULL)
@@ -162,17 +158,12 @@ void DifferentialPropertiesPlugin::computeNormal(
 	PFP2::MAP* map = mh->getMap();
 	Algo::Surface::Geometry::computeNormalVertices<PFP2>(*map, position, normal);
 
-	if(createNormalVBO)
-		mh->createVBO(normal);
-
 	computeNormalLastParameters[mapName] =
-		ComputeNormalParameters(positionAttributeName, normalAttributeName, createNormalVBO, autoUpdateNormal) ;
+		ComputeNormalParameters(positionAttributeName, normalAttributeName, autoUpdate);
+
+	mh->createVBO(normal);
 
 	mh->notifyAttributeModification(normal);
-
-	QList<View*> views = mh->getLinkedViews();
-	foreach(View* view, views)
-		view->updateGL();
 }
 
 void DifferentialPropertiesPlugin::computeCurvature(
@@ -184,16 +175,7 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	const QString& KminAttributeName,
 	const QString& kminAttributeName,
 	const QString& KnormalAttributeName,
-	bool createKmaxVBO,
-	bool createkmaxVBO,
-	bool createKminVBO,
-	bool createkminVBO,
-	bool createKnormalVBO,
-	bool autoUpdateKmax,
-	bool autoUpdatekmax,
-	bool autoUpdateKmin,
-	bool autoUpdatekmin,
-	bool autoUpdateKnormal)
+	bool autoUpdate)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
 	if(mh == NULL)
@@ -235,15 +217,23 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, position, edgeAngle);
 	Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP2>(*map, 0.02f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
 
-	if(createKmaxVBO) mh->createVBO(Kmax);
-	if(createkmaxVBO) mh->createVBO(kmax);
-	if(createKminVBO) mh->createVBO(Kmin);
-	if(createkminVBO) mh->createVBO(kmin);
-	if(createKnormalVBO) mh->createVBO(Knormal);
+	computeCurvatureLastParameters[mapName] =
+		ComputeCurvatureParameters(
+			positionAttributeName, normalAttributeName,
+			KmaxAttributeName, kmaxAttributeName, KminAttributeName, kminAttributeName, KnormalAttributeName,
+			autoUpdate);
 
-	QList<View*> views = mh->getLinkedViews();
-	foreach(View* view, views)
-		view->updateGL();
+	mh->createVBO(Kmax);
+	mh->createVBO(kmax);
+	mh->createVBO(Kmin);
+	mh->createVBO(kmin);
+	mh->createVBO(Knormal);
+
+	mh->notifyAttributeModification(Kmax);
+	mh->notifyAttributeModification(kmax);
+	mh->notifyAttributeModification(Kmin);
+	mh->notifyAttributeModification(kmin);
+	mh->notifyAttributeModification(Knormal);
 }
 
 #ifndef DEBUG
