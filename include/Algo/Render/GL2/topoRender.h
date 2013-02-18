@@ -94,6 +94,9 @@ protected:
 	 */
 	float m_topo_relation_width;
 
+	/// shifting along normals for 3-map boundary drawing
+	float m_normalShift;
+
 	/**
 	 * initial darts color (set in update)
 	 */
@@ -130,7 +133,7 @@ protected:
 	 * affect a color to each dart
 	 */
 	template<typename PFP>
-	void setDartsIdColor(typename PFP::MAP& map);
+	void setDartsIdColor(typename PFP::MAP& map, bool withBoundary);
 
 	/**
 	 * save colors before picking
@@ -146,7 +149,6 @@ public:
 	/**
 	* Constructor
 	*/	
-
 	TopoRender();
 
 	/**
@@ -225,7 +227,7 @@ public:
 	 * @return the dart or NIL
 	 */
 	template<typename PFP>
-	Dart picking(typename PFP::MAP& map, int x, int y);
+	Dart picking(typename PFP::MAP& map, int x, int y, bool withBoundary=false);
 
 
 	template<typename PFP>
@@ -246,6 +248,13 @@ public:
 	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
 
 	/**
+	 * Special update function used to draw boundary of map3
+	 */
+	template<typename PFP>
+	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns);
+
+
+	/**
 	 * render to svg struct
 	 */
 	void toSVG(Utils::SVG::SVGOut& svg);
@@ -254,6 +263,12 @@ public:
 	 * render svg into svg file
 	 */
 	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+
+	/**
+	 * @brief set normal shift for boundary of dim 3 drawing
+	 * @param ns distance shift along normals (use BB.diagSize()/100 is good approximation)
+	 */
+	void setNormalShift(float ns);
 };
 
 // just for compatibility with old code
