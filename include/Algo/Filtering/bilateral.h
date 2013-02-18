@@ -38,7 +38,7 @@ namespace Filtering
 {
 
 template <typename PFP>
-void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, float& sigmaC, float& sigmaS, const FunctorSelect& select)
+void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, float& sigmaC, float& sigmaS)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -46,7 +46,7 @@ void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 	float sumAngles = 0.0f ;
 	long nbEdges = 0 ;
 
-	TraversorE<typename PFP::MAP> t(map, select) ;
+	TraversorE<typename PFP::MAP> t(map);
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		sumLengths += Algo::Surface::Geometry::edgeLength<PFP>(map, d, position) ;
@@ -60,14 +60,14 @@ void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 }
 
 template <typename PFP>
-void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts)
+void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
 	float sigmaC, sigmaS ;
-	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS, select) ;
+	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS) ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if(!map.isBoundaryVertex(d))
@@ -96,17 +96,17 @@ void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 }
 
 template <typename PFP>
-void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts)
+void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
 	float sigmaC, sigmaS ;
-	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS, select) ;
+	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS) ;
 
 	long nbTot = 0 ;
 	long nbSusan = 0 ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if(!map.isBoundaryVertex(d))

@@ -264,12 +264,12 @@ void MyQT::createMap(int n)
 
 	m_render_topo->setDartWidth(3.0f);
 	m_render_topo->setInitialDartsColor(0.0f,0.0f,0.0f);
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 }
 
 void MyQT::updateMap()
 {
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 }
 
 // initialization GL callback
@@ -325,7 +325,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y/*,nb*/);
 		if (button == Qt::LeftButton)
 		{
 			if (d != Dart::nil())
@@ -365,7 +365,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 
 	if (Control())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y/*, nb*/);
 		if (button == Qt::LeftButton)
 		{
 			if (d != Dart::nil())
@@ -507,13 +507,13 @@ void MyQT::cb_keyPress(int keycode)
 	case 'w':
 		m_ex1 = 0.99f;
 		m_ex2 = 0.99f;
-		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 		updateGL();
 		break;
 	case 'W':
 		m_ex1 = 0.9f;
 		m_ex2 = 0.9f;
-		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 		updateGL();
 		break;
 
@@ -632,7 +632,7 @@ void MyQT::importMesh(std::string& filename)
 	m_selected  = NIL;
 	m_selected2 = NIL;
 
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	setParamObject(bb.maxSize(), bb.center().data()) ;
@@ -647,6 +647,6 @@ void MyQT::importMesh(std::string& filename)
 void MyQT::width(int w)
 {
 	m_ex3 = 0.9f - 0.025f*w;
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 	updateGL();
 }

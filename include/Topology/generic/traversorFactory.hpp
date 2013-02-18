@@ -192,39 +192,39 @@ Traversor<MAP>* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsig
 }
 
 template<typename MAP>
-Traversor<MAP>* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, const FunctorSelect& good, bool forceDartMarker, unsigned int thread)
+Traversor<MAP>* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, bool forceDartMarker, unsigned int thread)
 {
 	switch(orb)
 	{
 		case VERTEX:
-			return new TraversorCell<MAP,VERTEX>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,VERTEX>(map,forceDartMarker,thread);
 			break;
 		case EDGE:
-			return new TraversorCell<MAP,EDGE>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,EDGE>(map,forceDartMarker,thread);
 			break;
 		case FACE:
-			return new TraversorCell<MAP,FACE>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,FACE>(map,forceDartMarker,thread);
 			break;
 		case VOLUME:
-			return new TraversorCell<MAP,VOLUME>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,VOLUME>(map,forceDartMarker,thread);
 			break;
 		case CC:
-			return new TraversorCell<MAP,CC>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,CC>(map,forceDartMarker,thread);
 			break;
 		case VERTEX1:
-			return new TraversorCell<MAP,VERTEX1>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,VERTEX1>(map,forceDartMarker,thread);
 			break;
 		case EDGE1:
-			return new TraversorCell<MAP,EDGE1>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,EDGE1>(map,forceDartMarker,thread);
 			break;
 		case VERTEX2:
-			return new TraversorCell<MAP,VERTEX2>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,VERTEX2>(map,forceDartMarker,thread);
 			break;
 		case EDGE2:
-			return new TraversorCell<MAP,EDGE2>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,EDGE2>(map,forceDartMarker,thread);
 			break;
 		case FACE2:
-			return new TraversorCell<MAP,FACE2>(map,good,forceDartMarker,thread);
+			return new TraversorCell<MAP,FACE2>(map,forceDartMarker,thread);
 			break;
 		default:
 			return NULL;

@@ -86,7 +86,7 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
  *
  */
 template <typename PFP>
-bool isTetrahedralization(typename PFP::MAP& map, const FunctorSelect& selected = allDarts);
+bool isTetrahedralization(typename PFP::MAP& map);
 
 
 /************************************************************************************************

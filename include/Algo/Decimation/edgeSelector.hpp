@@ -64,7 +64,7 @@ void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	typename PFP::MAP& m = this->m_map ;
 	cur = m.begin() ;
-	while(!this->m_select(cur) || !m.edgeCanCollapse(cur))
+	while( !m.edgeCanCollapse(cur))
 	{
 		m.next(cur) ;
 		if(cur == m.end())
@@ -127,7 +127,7 @@ void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 			cur = 0 ;
 			allSkipped = true ;
 		}
-	} while(!this->m_select(cur) || !m.edgeCanCollapse(darts[cur])) ;
+	} while( !m.edgeCanCollapse(darts[cur])) ;
 }
 
 template <typename PFP>
@@ -143,7 +143,7 @@ void EdgeSelector_Random<PFP>::updateWithoutCollapse()
 			cur = 0 ;
 			allSkipped = true ;
 		}
-	} while(!this->m_select(cur) || !m.edgeCanCollapse(darts[cur])) ;
+	} while( !m.edgeCanCollapse(darts[cur])) ;
 }
 
 /************************************************************************************

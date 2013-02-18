@@ -67,11 +67,10 @@ public:
 	* @param map the map
 	* @param positions attribute of position vertices
 	* @param colorPerXXX attribute of color (per edge or per vertex per edge)
-	* @param good selector
 	*/
 	template<typename PFP, typename ATTRIB>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX) ;
 
 	/**
 	 * draw

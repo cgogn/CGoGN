@@ -131,13 +131,13 @@ void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const Vert
 
 
 template<typename PFP>
-void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX, const FunctorSelect& good)
+void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -153,7 +153,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	vertices.reserve(20);
 
 	
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -212,7 +212,6 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 				bufferColors.push_back(volCol);
 			}
 		}
-
 	}
 
 
@@ -238,7 +237,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
 			buffer.push_back(centerVolumes[d]);
@@ -259,13 +258,13 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 
 
 template<typename PFP>
-void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good)
+void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -280,7 +279,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	std::vector<VEC3> vertices;
 	bufferNormals.reserve(20);
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -361,7 +360,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
 			buffer.push_back(centerVolumes[d]);
@@ -383,7 +382,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 
 
 template<typename PFP>
-void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX, const FunctorSelect& good)
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX)
 {
 	if (!m_cpf)
 	{
@@ -394,7 +393,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	if (m_smooth)
 	{
 
-		updateSmooth<PFP>(map,positions,colorPerXXX,good);
+		updateSmooth<PFP>(map,positions,colorPerXXX);
 		return;
 	}
 
@@ -403,7 +402,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -412,7 +411,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -474,7 +473,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
 			buffer.push_back(centerVolumes[d]);
@@ -494,11 +493,11 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 }
 
 template<typename PFP>
-void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good)
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	if (m_smooth)
 	{
-		updateSmooth<PFP>(map,positions,good);
+		updateSmooth<PFP>(map,positions);
 		return;
 	}
 
@@ -507,7 +506,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -516,7 +515,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -578,7 +577,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
 			buffer.push_back(centerVolumes[d]);

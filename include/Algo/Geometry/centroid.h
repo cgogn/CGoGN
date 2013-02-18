@@ -179,26 +179,24 @@ typename PFP::VEC3 vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, co
  * @param map the map
  * @param position position vertex attribute
  * @param face_centroid centroid face attribute
- * @param select the selector
  * @param thread the thread id (default 0)
  */
 template <typename PFP>
 void computeCentroidFaces(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid,
-		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+		unsigned int thread = 0) ;
 
 /**
  * Compute centroid of all faces (Edge Length Weighted)
  * @param map the map
  * @param position position vertex attribute
  * @param face_centroid centroid face attribute
- * @param select the selector
  * @param thread the thread id (default 0)
  */
 template <typename PFP>
 void computeCentroidELWFaces(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid,
-		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+		unsigned int thread = 0) ;
 		
 		
 /**
@@ -206,13 +204,12 @@ void computeCentroidELWFaces(typename PFP::MAP& map,
  * @param map the map
  * @param position position vertex attribute
  * @param vertex_centroid centroid vertex attribute
- * @param select the selector
  * @param thread the thread id (default 0)
  */
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
-		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+		unsigned int thread = 0) ;
 
 
 namespace Parallel
@@ -222,39 +219,36 @@ namespace Parallel
  * @param map the map
  * @param position position vertex attribute
  * @param face_centroid centroid face attribute
- * @param select the selector
  * @param nbth the number of threads
  */
 template <typename PFP>
 void computeCentroidFaces(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
+		unsigned int nbth = 0) ;
 
 /**
  * Compute centroid of all faces (Edge Length Weighted)
  * @param map the map
  * @param position position vertex attribute
  * @param face_centroid centroid face attribute
- * @param select the selector
  * @param nbth the number of threads
  */
 template <typename PFP>
 void computeCentroidELWFaces(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
+		unsigned int nbth = 0) ;
 
 /**
  * Compute neighborhood centroid of all vertices (in parallel)
  * @param map the map
  * @param position position vertex attribute
  * @param vertex_centroid centroid vertex attribute
- * @param select the selector
  * @param nbth the number of threads
  */
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
+		unsigned int nbth = 0) ;
 }
 } // namespace Geometry
 }
@@ -293,29 +287,27 @@ typename PFP::VEC3 vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, co
  * @param map the map
  * @param position vertex attribute of position
  * @param vol_centroid volume attribute where to store the centroids
- * @param select the selector
  */
 template <typename PFP>
 void computeCentroidVolumes(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+		unsigned int thread = 0) ;
 
 template <typename PFP>
 void computeCentroidELWVolumes(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+		unsigned int thread = 0) ;
 
 /**
  * compute centroid of all vertices
  * @param map the map
  * @param position vertex attribute of position
  * @param vertex_centroid vertex attribute to store the centroids
- * @param select the selector
  */
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
-		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+		unsigned int thread = 0) ;
 
 
 
@@ -324,18 +316,18 @@ namespace Parallel
 template <typename PFP>
 void computeCentroidVolumes(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
+		unsigned int nbth = 0) ;
 
 template <typename PFP>
 void computeCentroidELWVolumes(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
+		unsigned int nbth = 0) ;
 
 		
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
+		unsigned int nbth = 0) ;
 }
 } // namespace Geometry
 } // namespace Volume

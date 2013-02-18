@@ -153,17 +153,17 @@ typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const Vert
 }
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_normal, const FunctorSelect& select, unsigned int thread)
+void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_normal, unsigned int thread)
 {
-	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	TraversorF<typename PFP::MAP> trav(map, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		face_normal[d] = faceNormal<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int thread)
+void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> trav(map, select, thread);
+	TraversorV<typename PFP::MAP> trav(map, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		normal[d] = vertexNormal<PFP>(map, d, position) ;
 }
@@ -190,10 +190,10 @@ public:
 };
 
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth)
+void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, unsigned int nbth)
 {
 	FunctorComputeNormalVertices<PFP> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false);
 }
 
 
@@ -214,10 +214,10 @@ public:
 };
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth)
+void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& normal, unsigned int nbth)
 {
 	FunctorComputeNormalFaces<PFP> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false);
 }
 
 
@@ -239,10 +239,10 @@ public:
 
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select, unsigned int nbth)
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, unsigned int nbth)
 {
 	FunctorComputeAngleBetweenNormalsOnEdge<PFP> funct(map,position,angles);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, funct, nbth, false, select);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, funct, nbth, false);
 }
 
 } // endnamespace Parallel
@@ -281,9 +281,9 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 }
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select, unsigned int thread)
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, unsigned int thread)
 {
-	TraversorE<typename PFP::MAP> trav(map, select, thread);
+	TraversorE<typename PFP::MAP> trav(map, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(map, d, position) ;
 }

@@ -69,8 +69,8 @@ void MyQT::traverseMap()
 	m1.markOrbit<VOLUME>(xd1);
 
 	// render the topo of the map without boundary darts
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, nb);
+//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
 
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
@@ -201,8 +201,8 @@ void MyQT::createMap()
 	show();
 
 	// render the topo of the map without boundary darts
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
+//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
 }
 
 // initialization GL callback

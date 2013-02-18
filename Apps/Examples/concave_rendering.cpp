@@ -216,8 +216,8 @@ void MyQT::cb_keyPress(int code)
 			Algo::Surface::Modelisation::EarTriangulation<PFP> triangulation(myMap);
 			triangulation.triangule();
 
-			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
 			updateGL();
 		}
 		break;
@@ -431,9 +431,9 @@ int main(int argc, char **argv)
 	sqt.m_positionVBO->updateData(position);
 
 	// update des primitives du renderer
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES, &position);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES, &position);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS, &position);
+	sqt.m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES, &position);
+	sqt.m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES, &position);
+	sqt.m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS, &position);
 
 //	 show final pour premier redraw
 	sqt.show();

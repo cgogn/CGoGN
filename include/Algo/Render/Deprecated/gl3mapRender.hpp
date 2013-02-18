@@ -199,14 +199,14 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 
 
 template<typename PFP>
-void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	DartMarker m(map,thread);
 	tableIndices.reserve(4*map.getNbDarts()/3);
 
 	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
-		if(!m.isMarked(dd) && good(dd))
+		if(!m.isMarked(dd))
 		{
 			addTri<PFP>(map, dd, tableIndices);
 			m.markOrbit<FACE>(dd);
@@ -215,7 +215,7 @@ void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good,
 }
 
 template<typename PFP>
-void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initTrianglesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
 	DartMarker m(map,thread);
@@ -230,8 +230,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 		{
 			std::list<Dart> bound;
 
-			if(good(dd))
-				addTri<PFP>(map,dd,tableIndices);
+			addTri<PFP>(map,dd,tableIndices);
 			m.markOrbit<FACE>(dd);
 			bound.push_back(dd);
 			int nb = 1;
@@ -246,8 +245,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 					{
 						if (!m.isMarked(f))
 						{
-							if(good(f))
-								addTri<PFP>(map, f, tableIndices);
+							addTri<PFP>(map, f, tableIndices);
 							m.markOrbit<FACE>(f);
 							bound.push_back(map.phi1(f));
 							++nb;
@@ -271,14 +269,14 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 }
 
 template<typename PFP>
-void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	DartMarker m(map,thread);
 	tableIndices.reserve(map.getNbDarts());
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!m.isMarked(d) && good(d))
+		if(!m.isMarked(d))
 		{
 			tableIndices.push_back(map.getEmbedding(d, VERTEX));
 			tableIndices.push_back(map.getEmbedding(map.phi2(d), VERTEX));
@@ -288,7 +286,7 @@ void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std
 }
 
 template<typename PFP>
-void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLinesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
 
@@ -313,10 +311,8 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 					Dart f = map.phi2(ee);
 					if (!m.isMarked(ee))
 					{
-						if(good(ee))
-							tableIndices.push_back(map.getEmbedding(ee, VERTEX));
-						if(good(f))
-							tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX));
+						tableIndices.push_back(map.getEmbedding(ee, VERTEX));
+						tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX));
 						m.markOrbit<EDGE>(f);
 
 						bound.push_back(f);
@@ -338,14 +334,14 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 }
 
 template<typename PFP>
-void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initPoints(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	CellMarker m(map, VERTEX,thread) ;
 	tableIndices.reserve(map.getNbDarts()/5);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!m.isMarked(d) && good(d))
+		if(!m.isMarked(d))
 		{
 			tableIndices.push_back(map.getEmbedding(d, VERTEX));
 			m.mark(d) ;
@@ -354,7 +350,7 @@ void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, st
 }
 
 template<typename PFP>
-void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
+void MapRender::initPrimitives(typename PFP::MAP& map, int prim, bool optimized, unsigned int thread)
 {
 	std::vector<GLuint> tableIndices;
 
@@ -368,22 +364,22 @@ void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good
 			break;
 		case TRIANGLES:
 			if(optimized)
-				initTrianglesOptimized<PFP>(map,good,tableIndices,thread);
+				initTrianglesOptimized<PFP>(map,tableIndices,thread);
 			else
-				initTriangles<PFP>(map,good,tableIndices,thread) ;
+				initTriangles<PFP>(map,tableIndices,thread) ;
 			m_nbIndicesTri = tableIndices.size();
 			vbo_ind = m_VBOBuffers[TRIANGLE_INDICES];
 			break;
 		case LINES:
 			if(optimized)
-				initLinesOptimized<PFP>(map,good,tableIndices,thread);
+				initLinesOptimized<PFP>(map,tableIndices,thread);
 			else
-				initLines<PFP>(map,good,tableIndices,thread) ;
+				initLines<PFP>(map,tableIndices,thread) ;
 			m_nbIndicesLines = tableIndices.size();
 			vbo_ind = m_VBOBuffers[LINE_INDICES];
 			break;
 		case POINTS:
-			initPoints<PFP>(map,good,tableIndices,thread);
+			initPoints<PFP>(map,tableIndices,thread);
 			m_nbIndicesPoints = tableIndices.size();
 			vbo_ind = m_VBOBuffers[POINT_INDICES];
 			break;
@@ -402,7 +398,7 @@ void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good
 
 
 template<typename PFP>
-void MapRender::initFlatTriangles( typename PFP::MAP& map, unsigned int vertex_attrib_position, const FunctorSelect& good, unsigned int thread)
+void MapRender::initFlatTriangles( typename PFP::MAP& map, unsigned int vertex_attrib_position, unsigned int thread)
 {
 	std::vector<Geom::Vec3f> tableFlat;
 	tableFlat.reserve(3*map.getNbDarts()); // 3 in case of polygonal faces (less chance of realloc, but bigger allocation)
@@ -416,7 +412,7 @@ void MapRender::initFlatTriangles( typename PFP::MAP& map, unsigned int vertex_a
 	DartMarker m(map,thread);
 	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
-		if(!m.isMarked(dd) && good(dd))
+		if(!m.isMarked(dd))
 		{
 			Dart a = dd;
 			Dart b = map.phi1(a);

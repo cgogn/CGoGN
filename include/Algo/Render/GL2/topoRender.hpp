@@ -47,24 +47,24 @@ namespace GL2
 {
 
 template<typename PFP>
-void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
 	Map2* ptrMap2 = dynamic_cast<Map2*>(&map);
 	if (ptrMap2 != NULL)
 	{
-		updateDataMap<PFP>(map, positions, ke, kf, good);
+		updateDataMap<PFP>(map, positions, ke, kf, withBoundary);
 		return;
 	}
 	GMap2* ptrGMap2 = dynamic_cast<GMap2*>(&map);
 	if (ptrGMap2 != NULL)
 	{
-		updateDataGMap<PFP>(map, positions, ke, kf, good);
+		updateDataGMap<PFP>(map, positions, ke, kf, withBoundary);
 		return;
 	}
 }
 
 template<typename PFP>
-void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
 	Map2& map = reinterpret_cast<Map2&>(mapx);
 
@@ -81,7 +81,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
-		if (good(d))
+		if (withBoundary || !map.isBoundaryMarked2(d))
 			vecDarts.push_back(d);
 	}
 	m_nbDarts = vecDarts.size();
@@ -184,7 +184,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 		Dart e = map.phi2(d);
 
 //		if (good(e) && (e.index > d.index))
-		if (good(e) && (d < e ))
+		if ( (withBoundary || !map.isBoundaryMarked2(e)) && (d < e ))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
@@ -205,7 +205,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 }
 
 template<typename PFP>
-void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
 	GMap2& map = dynamic_cast<GMap2&>(mapx);
 
@@ -224,7 +224,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
-		if (good(d))
+		if (withBoundary || !map.isBoundaryMarked2(d))
 			vecDarts.push_back(d);
 	}
 	m_nbDarts = vecDarts.size();
@@ -333,7 +333,8 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 	{
 		Dart d = *id;
 		Dart e = map.beta2(d);
-		if (good(e) && (d < e ))
+//		if (d < e )
+		if ( (withBoundary || !map.isBoundaryMarked2(e)) && (d < e ))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
@@ -354,7 +355,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 }
 
 template<typename PFP>
-void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
+void TopoRender::setDartsIdColor(typename PFP::MAP& map)
 {
 	m_vbo3->bind();
 	float* colorBuffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -369,36 +370,33 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (good(d))
+		if (nb < m_nbDarts)
+			{
+			float r,g,b;
+			dartToCol(d, r,g,b);
+			float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
+			*local++ = r;
+			*local++ = g;
+			*local++ = b;
+			*local++ = r;
+			*local++ = g;
+			*local++ = b;
+			nb++;
+		}
+		else
 		{
-			if (nb < m_nbDarts)
-			{
-				float r,g,b;
-				dartToCol(d, r,g,b);
-				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
-				*local++ = r;
-				*local++ = g;
-				*local++ = b;
-				*local++ = r;
-				*local++ = g;
-				*local++ = b;
-				nb++;
-			}
-			else
-			{
-				CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
-				break;
-			}
+			CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
+			break;
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 template<typename PFP>
-Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelect& good)
+Dart TopoRender::picking(typename PFP::MAP& map,int x, int y)
 {
 	pushColors();
-	setDartsIdColor<PFP>(map,good);
+	setDartsIdColor<PFP>(map);
 	Dart d = pickColor(x,y);
 	popColors();
 	return d;
@@ -408,7 +406,7 @@ Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelec
 
 
 template<typename PFP>
-Dart TopoRender::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good)
+Dart TopoRender::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;
@@ -438,7 +436,7 @@ Dart TopoRender::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, 
 }
 
 template<typename PFP>
-Dart TopoRender::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax, const FunctorSelect& good)
+Dart TopoRender::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;

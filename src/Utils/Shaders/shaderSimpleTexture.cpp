@@ -22,8 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifdef WITH_QT
-
 #include <GL/glew.h>
 #include "Utils/Shaders/shaderSimpleTexture.h"
 
@@ -125,6 +123,3 @@ void ShaderSimpleTexture::restoreUniformsAttribs()
 } // namespace Utils
 
 } // namespace CGoGN
-#else
-#pragma message(__FILE__ " not compiled because of mising Qt")
-#endif

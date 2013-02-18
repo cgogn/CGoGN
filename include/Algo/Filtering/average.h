@@ -45,13 +45,12 @@ void filterAverageAttribute_OneRing(
 	typename PFP::MAP& map,
 	const VertexAttribute<T>& attIn,
 	VertexAttribute<T>& attOut,
-	int neigh,
-	const FunctorSelect& select = allDarts)
+	int neigh)
 {
 	FunctorAverage<T, VERTEX> fa(attIn) ;
 	Algo::Surface::Selection::Collector_OneRing<PFP> col(map) ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if(!map.isBoundaryVertex(d))
@@ -93,14 +92,13 @@ void filterAverageVertexAttribute_WithinSphere(
 	VertexAttribute<T>& attOut,
 	int neigh,
 	VertexAttribute<typename PFP::VEC3>& position,
-	typename PFP::REAL radius,
-	const FunctorSelect& select = allDarts)
+	typename PFP::REAL radius)
 {
 	FunctorAverage<T, VERTEX> faInside(attIn) ;
 	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
 	Algo::Surface::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if(!map.isBoundaryVertex(d))
@@ -135,13 +133,12 @@ void filterAverageEdgeAttribute_WithinSphere(
 	EdgeAttribute<T>& attOut,
 	int neigh,
 	VertexAttribute<typename PFP::VEC3>& position,
-	typename PFP::REAL radius,
-	const FunctorSelect& select = allDarts)
+	typename PFP::REAL radius)
 {
 	FunctorAverage<T, EDGE> fa(attIn) ;
 	Algo::Surface::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorE<typename PFP::MAP> t(map, select) ;
+	TraversorE<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if (neigh & INSIDE)
@@ -163,13 +160,12 @@ void filterAverageFaceAttribute_WithinSphere(
 	FaceAttribute<T>& attOut,
 	int neigh,
 	VertexAttribute<typename PFP::VEC3>& position,
-	typename PFP::REAL radius,
-	const FunctorSelect& select = allDarts)
+	typename PFP::REAL radius)
 {
 	FunctorAverage<T, FACE> fa(attIn) ;
 	Algo::Surface::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorF<typename PFP::MAP> t(map, select) ;
+	TraversorF<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if (neigh & INSIDE)

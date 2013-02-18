@@ -297,11 +297,11 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 }
 
 template<typename PFP>
-void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3>* position, unsigned int thread)
+void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3>* position, unsigned int thread)
 {
 	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
-	TraversorF<typename PFP::MAP> trav(map, good, thread);
+	TraversorF<typename PFP::MAP> trav(map, thread);
 
 	if(position == NULL)
 	{
@@ -321,7 +321,7 @@ void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good,
 }
 
 template<typename PFP>
-void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3>* position, unsigned int thread)
+void MapRender::initTrianglesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3>* position, unsigned int thread)
 {
 #define LIST_SIZE 20
 	DartMarker m(map, thread);
@@ -336,7 +336,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 		{
 			std::list<Dart> bound;
 
-			if (good(dd) && !map.template isBoundaryMarked<PFP::MAP::DIMENSION>(dd))
+			if (!map.template isBoundaryMarked<PFP::MAP::DIMENSION>(dd))
 			{
 				if(position == NULL)
 					addTri<PFP>(map, dd, tableIndices);
@@ -362,7 +362,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 					{
 						if (!m.isMarked(f))
 						{
-							if (good(f) && !map.template isBoundaryMarked<PFP::MAP::DIMENSION>(f))
+							if ( !map.template isBoundaryMarked<PFP::MAP::DIMENSION>(f))
 							{
 								if(position == NULL)
 									addTri<PFP>(map, f, tableIndices);
@@ -397,11 +397,11 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 }
 
 template<typename PFP>
-void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	tableIndices.reserve(map.getNbDarts());
 
-	TraversorE<typename PFP::MAP> trav(map, good, thread);
+	TraversorE<typename PFP::MAP> trav(map, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(d));
@@ -410,11 +410,11 @@ void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std
 }
 
 template<typename PFP>
-void MapRender::initBoundaries(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	tableIndices.reserve(map.getNbDarts()); //TODO optimisation ?
 
-	TraversorE<typename PFP::MAP> trav(map, good, thread);
+	TraversorE<typename PFP::MAP> trav(map, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
 		if (map.isBoundaryEdge(d))
@@ -426,7 +426,7 @@ void MapRender::initBoundaries(typename PFP::MAP& map, const FunctorSelect& good
 }
 
 template<typename PFP>
-void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLinesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
 	DartMarker m(map, thread);
@@ -450,10 +450,8 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 					Dart f = map.phi2(ee);
 					if (!m.isMarked(ee))
 					{
-						if(good(ee))
-							tableIndices.push_back(map.template getEmbedding<VERTEX>(ee));
-						if(good(f))
-							tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(ee)));
+						tableIndices.push_back(map.template getEmbedding<VERTEX>(ee));
+						tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(ee)));
 						m.markOrbit<EDGE>(f);
 
 						bound.push_back(f);
@@ -475,47 +473,48 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 }
 
 template<typename PFP>
-void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initPoints(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	tableIndices.reserve(map.getNbDarts() / 5);
 
-	TraversorV<typename PFP::MAP> trav(map, good, thread);
+	TraversorV<typename PFP::MAP> trav(map, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(d));
 }
 
 template<typename PFP>
-void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
+void MapRender::initPrimitives(typename PFP::MAP& map, int prim, bool optimized, unsigned int thread)
 {
-	initPrimitives<PFP>(map, good, prim, NULL, optimized, thread) ;
+	initPrimitives<PFP>(map, prim, NULL, optimized, thread) ;
 }
 
 template <typename PFP>
-void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, const VertexAttribute<typename PFP::VEC3>* position, bool optimized, unsigned int thread)
+void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3>* position, bool optimized, unsigned int thread)
 {
 	std::vector<GLuint> tableIndices;
 
 	switch(prim)
 	{
 		case POINTS:
-			initPoints<PFP>(map, good, tableIndices, thread);
+
+			initPoints<PFP>(map, tableIndices, thread);
 			break;
 		case LINES:
 			if(optimized)
-				initLinesOptimized<PFP>(map, good, tableIndices, thread);
+				initLinesOptimized<PFP>(map, tableIndices, thread);
 			else
-				initLines<PFP>(map, good, tableIndices, thread) ;
+				initLines<PFP>(map, tableIndices, thread) ;
 			break;
 		case TRIANGLES:
 			if(optimized)
-				initTrianglesOptimized<PFP>(map, good, tableIndices, position, thread);
+				initTrianglesOptimized<PFP>(map, tableIndices, position, thread);
 			else
-				initTriangles<PFP>(map, good, tableIndices, position, thread) ;
+				initTriangles<PFP>(map, tableIndices, position, thread) ;
 			break;
 		case FLAT_TRIANGLES:
 			break;
 		case BOUNDARY:
-			initBoundaries<PFP>(map, good, tableIndices, thread) ;
+			initBoundaries<PFP>(map, tableIndices, thread) ;
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
@@ -529,6 +528,69 @@ void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
 	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
+
+
+template <typename PFP>
+void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3>* position, bool optimized, unsigned int thread)
+{
+	std::vector<GLuint> tableIndices;
+
+	switch(prim)
+	{
+		case POINTS:
+
+			initPoints<PFP>(map, tableIndices, thread);
+			break;
+		case LINES:
+			if(optimized)
+				initLinesOptimized<PFP>(map, tableIndices, thread);
+			else
+				initLines<PFP>(map, tableIndices, thread) ;
+			break;
+		case TRIANGLES:
+			if(optimized)
+				initTrianglesOptimized<PFP>(map, tableIndices, position, thread);
+			else
+				initTriangles<PFP>(map, tableIndices, position, thread) ;
+			break;
+		case FLAT_TRIANGLES:
+			break;
+		case BOUNDARY:
+			initBoundaries<PFP>(map, tableIndices, thread) ;
+			break;
+		default:
+			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
+			break;
+	}
+
+	m_indexBufferUpToDate[prim] = true;
+
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	GLint sz=0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &sz);
+	GLuint* oldIndices =  reinterpret_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE));
+
+	// allocate new buffer
+	GLuint newBuffer;
+	glGenBuffers(1,&newBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sz + tableIndices.size() * sizeof(GLuint),NULL, GL_STREAM_DRAW);
+
+	//copy old indices
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sz, oldIndices);
+	//and new ones
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sz, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]) );
+
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+
+	glDeleteBuffers(1,&(m_indexBuffers[prim]));
+	m_indexBuffers[prim] = newBuffer;
+
+	m_nbIndices[prim] += tableIndices.size();
+
+}
+
 
 } // namespace GL2
 

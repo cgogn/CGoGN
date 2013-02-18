@@ -101,9 +101,9 @@ void MyQT::createMap()
 	m_colorVBO2->updateData(colorE);
 
 	// construct rendering primities
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);	// special primitive for boundary edges
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);	// special primitive for boundary edges
 
 	// traverse of all dart of the map:
 	// and write informations

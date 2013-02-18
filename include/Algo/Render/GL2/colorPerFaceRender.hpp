@@ -51,7 +51,7 @@ m_nbTris(0)
 
 template<typename PFP, unsigned int ORBIT>
 void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
+			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -62,7 +62,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 	std::vector<VEC3> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
+	TraversorCell<typename PFP::MAP, FACE> traFace(map);
 
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
@@ -101,7 +101,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 template<typename PFP, unsigned int ORBIT>
 void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
 			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals,
-			const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good)
+			const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -115,7 +115,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 	std::vector<VEC3> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
+	TraversorCell<typename PFP::MAP, FACE> traFace(map);
 
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
@@ -160,6 +160,91 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 	vboColor.releasePtr();
 }
 
+
+
+/*
+
+template<typename PFP, unsigned int ORBIT>
+void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, Utils::VBO& vboTexCoord,
+								   typename PFP::MAP& map,
+								   const VertexAttribute<typename PFP::VEC3>& positions,
+								   const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX,
+								   CellMarker<VERTEX>& specialVertices,
+								   const VertexAttribute<typename PFP::VEC3>& texCoordPerVertex,
+								   const AttributeHandler<typename PFP::VEC3,VERTEX1>& texCoordPerDart)
+
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	std::vector<VEC3> buffer;
+	buffer.reserve(16384);
+
+	std::vector<VEC3> bufferColors;
+	bufferColors.reserve(16384);
+
+
+	std::vector<VEC3> bufferTC;
+	bufferColors.reserve(16384);
+
+	TraversorCell<typename PFP::MAP, FACE> traFace(map);
+
+	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	{
+		Dart a = d;
+		Dart b = map.phi1(a);
+		Dart c = map.phi1(b);
+		// loop to cut a polygon in triangle on the fly (works only with convex faces)
+		do
+		{
+			buffer.push_back(positions[d]);
+			bufferColors.push_back(colorPerXXX[d]);
+			if (specialVertices.isMarked(d))
+				bufferTC.push_back(texCoordPerDart[d]);
+			else
+				bufferTC.push_back(texCoordPerVertex[d]);
+
+			buffer.push_back(positions[b]);
+			bufferColors.push_back(colorPerXXX[b]);
+			if (specialVertices.isMarked(c))
+				bufferTC.push_back(texCoordPerDart[b]);
+			else
+				bufferTC.push_back(texCoordPerVertex[b]);
+
+			buffer.push_back(positions[c]);
+			bufferColors.push_back(colorPerXXX[c]);
+			if (specialVertices.isMarked(c))
+				bufferTC.push_back(texCoordPerDart[c]);
+			else
+				bufferTC.push_back(texCoordPerVertex[c]);
+
+			b = c;
+			c = map.phi1(b);
+		} while (c != d);
+	}
+
+	m_nbTris = buffer.size()/3;
+
+	vboPosition.setDataSize(3);
+	vboPosition.allocate(buffer.size());
+	VEC3* ptrPos = reinterpret_cast<VEC3*>(vboPosition.lockPtr());
+	memcpy(ptrPos, &buffer[0], buffer.size()*sizeof(VEC3));
+	vboPosition.releasePtr();
+
+	vboTexCoord.setDataSize(2);
+	vboTexCoord.allocate(bufferTC.size());
+	VEC3* ptrTC = reinterpret_cast<VEC3*>(vboTexCoord.lockPtr());
+	memcpy(ptrTC, &bufferTC[0], bufferTC.size()*sizeof(VEC2));
+	vboTexCoord.releasePtr();
+
+	vboColor.setDataSize(3);
+	vboColor.allocate(bufferColors.size());
+	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboColor.lockPtr());
+	memcpy(ptrCol, &bufferColors[0], bufferColors.size()*sizeof(VEC3));
+	vboColor.releasePtr();
+}
+
+*/
 
 
 inline void ColorPerFaceRender::draw(Utils::GLSLShader* sh)

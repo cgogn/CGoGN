@@ -89,10 +89,10 @@ protected:
 
 
 	template<typename PFP>
-	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
+	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
 
 	template<typename PFP>
-	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
+	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
 
 
 public:
@@ -123,20 +123,18 @@ public:
 	* update all drawing buffers
 	* @param map the map
 	* @param positions  attribute of position vertices
-	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
 
 	/**
 	* update all drawing buffers
 	* @param map the map
 	* @param positions attribute of position vertices
 	* @param colorPerFace attribute of color (per face)
-	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
 
 	/**
 	 * draw edges
