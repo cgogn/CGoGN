@@ -297,13 +297,37 @@ void RenderExplodPlugin::changeVolumesScaleFactor(View* view, MapHandlerGen* map
 
 void RenderExplodPlugin::attributeModified(unsigned int orbit, QString nameAttr)
 {
+	MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(QObject::sender());
+
+	//On cherche la carte et on la met a jour puis updateGL();
+
+	//pour toutes les vues
+	 	 	 //on va mettre a jour la carte QObject::senter() si elle est enregistree dans le parameterSet de cette vue
+
+
+
 //	if(orbit == VERTEX)
 //	{
-//
 //		MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(QObject::sender());
 //		if(mh == NULL)
 //			return;
 //
+//		foreach(ParameterSet* params, h_viewParams)
+//		{
+//			QHash<QString, PerMapParameterSet*>::const_iterator i = params->perMap.constBegin();
+//			while (i != params->perMap.constEnd())
+//			{
+//				PerMapParameterSet* p = params->perMap[mh->getName()];
+//
+//				p->updateRender();
+//
+//				++i;
+//			}
+//
+//		}
+
+
+
 //		VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP3::VEC3, VERTEX>(nameAttr);
 //		if(!position.isValid())
 //			return;
@@ -311,18 +335,24 @@ void RenderExplodPlugin::attributeModified(unsigned int orbit, QString nameAttr)
 //		PFP3::MAP* map = mh->getMap();
 //
 //		m_renderExplod->updateData<PFP3>(*map,position);
-//
-////		if(computeNormalLastParameters.contains(map->getName()))
-////		{
-////			ComputeNormalParameters& params = computeNormalLastParameters[map->getName()];
-////			if(params.positionName == nameAttr && params.autoUpdate)
-////				computeNormal(map->getName(), params.positionName, params.normalName);
-////		}
-//	}
+
+//		if(computeNormalLastParameters.contains(map->getName()))
+//		{
+//			ComputeNormalParameters& params = computeNormalLastParameters[map->getName()];
+//			if(params.positionName == nameAttr && params.autoUpdate)
+//				computeNormal(map->getName(), params.positionName, params.normalName);
+//		}
+	}
 }
 
 void RenderExplodPlugin::connectivityModified()
 {
+	//On cherche la carte et on la met a jour puis updateGL();
+
+	//pour toutes les vues
+	 	 	 //on va mettre a jour la carte QObject::senter() si elle est enregistree dans le parameterSet de cette vue
+
+
 //	MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(QObject::sender());
 //	if(mh == NULL)
 //		return;
