@@ -38,13 +38,15 @@ namespace Render
 namespace GL2
 {
 
-TopoRender::TopoRender():
+TopoRender::TopoRender(float bs):
 	m_nbDarts(0),
 	m_nbRel2(0),
 	m_topo_dart_width(2.0f),
 	m_topo_relation_width(3.0f),
 	m_normalShift(0.0f),
+	m_boundShift(bs),
 	m_dartsColor(1.0f,1.0f,1.0f),
+	m_dartsBoundaryColor(0.7f,1.0f,0.7f),
 	m_bufferDartPosition(NULL)
 {
 	m_vbo0 = new Utils::VBO();
@@ -128,6 +130,12 @@ void TopoRender::setAllDartsColor(float r, float g, float b)
 void TopoRender::setInitialDartsColor(float r, float g, float b)
 {
 	m_dartsColor = Geom::Vec3f(r,g,b);
+}
+
+
+void TopoRender::setInitialBoundaryDartsColor(float r, float g, float b)
+{
+	m_dartsBoundaryColor = Geom::Vec3f(r,g,b);
 }
 
 void TopoRender::drawDarts()

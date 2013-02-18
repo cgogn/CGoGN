@@ -97,10 +97,17 @@ protected:
 	/// shifting along normals for 3-map boundary drawing
 	float m_normalShift;
 
+	float m_boundShift;
+
 	/**
 	 * initial darts color (set in update)
 	 */
 	Geom::Vec3f m_dartsColor;
+
+	/**
+	 * initial darts color (set in update)
+	 */
+	Geom::Vec3f m_dartsBoundaryColor;
 
 	float *m_color_save;
 
@@ -149,7 +156,7 @@ public:
 	/**
 	* Constructor
 	*/	
-	TopoRender();
+	TopoRender(float bs = 0.01f);
 
 	/**
 	* Destructor
@@ -187,6 +194,7 @@ public:
 	 * draw all topo
 	 */
 	void drawTopo();
+
 	/**
 	 * change dart drawing color
 	 * @param d the dart
@@ -206,6 +214,8 @@ public:
 	void setAllDartsColor(float r, float g, float b);
 
 	void setInitialDartsColor(float r, float g, float b);
+
+	void setInitialBoundaryDartsColor(float r, float g, float b);
 
 	/**
 	 * redraw one dart with specific width and color (not efficient use only for debug with small amount of call)
