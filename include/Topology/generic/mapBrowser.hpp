@@ -32,7 +32,11 @@ inline MapBrowserSelector::MapBrowserSelector(AttribMap& m, const FunctorSelect&
 
 inline Dart MapBrowserSelector::begin() const
 {
-	return m_map.realBegin() ;
+	Dart d = m_map.realBegin() ;
+	while ( (d != m_map.realEnd()) && !m_selector(d) )
+		m_map.realNext(d);
+
+	return d;
 }
 
 inline Dart MapBrowserSelector::end() const
