@@ -75,6 +75,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
 	{
+		if (!mapx.isBoundaryMarked3(d)) // in the following code Traversor do not traverse boundary
 			m_nbDarts++;
 	}
 
@@ -237,25 +238,27 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map)
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (nb < m_nbDarts)
+		if ( !map.isBoundaryMarked3(d)) // topo3 Render do not traverse boundary
 		{
-			float r,g,b;
-			dartToCol(d, r,g,b);
+			if (nb < m_nbDarts)
+			{
+				float r,g,b;
+				dartToCol(d, r,g,b);
 
-			float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
-			*local++ = r;
-			*local++ = g;
-			*local++ = b;
-			*local++ = r;
-			*local++ = g;
-			*local++ = b;
-
-			nb++;
-		}
-		else
-		{
-			CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
-			break;
+				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
+				nb++;
+			}
+			else
+			{
+				CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
+				break;
+			}
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -270,15 +273,18 @@ void Topo3Render::updateColors(typename PFP::MAP& map, const VertexAttribute<typ
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (nb < m_nbDarts)
+		if ( !map.isBoundaryMarked3(d)) // topo3 Render do not traverse boundary
 		{
-			colorBuffer[m_attIndex[d]] = colors[d];
-			nb++;
-		}
-		else
-		{
-			CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
-			break;
+			if (nb < m_nbDarts)
+			{
+				colorBuffer[m_attIndex[d]] = colors[d];
+				nb++;
+			}
+			else
+			{
+				CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
+				break;
+			}
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -313,6 +319,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
 	{
+		if (!map.isBoundaryMarked3(d)) // in the following code Traversor do not traverse boundary
 			m_nbDarts++;
 	}
 
