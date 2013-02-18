@@ -118,7 +118,6 @@ void MyQT::cb_initGL()
 
     m_render_topo = new Algo::Render::GL2::Topo3Render();
 
-//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f);
 	m_dm_topo = new DartMarker(myMap);
 }
@@ -145,7 +144,6 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-//		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 		Dart d = m_render_topo->picking<PFP>(myMap, x, y);
 		if (d != Dart::nil())
 		{
@@ -199,7 +197,6 @@ void MyQT::traverse2()
 		return;
 	m_last=2;
 //	int code = (m_ajd_or_inci2)*100+m_first2*10+m_second2;
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 
 	m_drawer.newList(GL_COMPILE);
 	m_drawer.lineWidth(7.0f);
@@ -265,8 +262,6 @@ void MyQT::traverse3()
 		return;
 
 	m_last=3;
-
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 
 
 	m_affDarts.clear();

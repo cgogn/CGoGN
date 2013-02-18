@@ -30,9 +30,12 @@
 #include "Topology/map/embeddedMap2.h"
 #include "Topology/gmap/embeddedGMap2.h"
 
+#include "Algo/Geometry/basic.h"
 #include "Geometry/distances.h"
 #include "Algo/Geometry/centroid.h"
+#include "Algo/Geometry/normal.h"
 
+#include "Topology/generic/mapBrowser.h"
 
 namespace CGoGN
 {
@@ -45,6 +48,22 @@ namespace Render
 
 namespace GL2
 {
+
+
+template<typename PFP>
+void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns)
+{
+	m_normalShift = ns;
+	SelectorDartBoundary<typename PFP::MAP> sdb(map);
+	MapBrowserSelector mbs(map,sdb);
+	map.setBrowser(&mbs);
+
+	updateData<PFP>(map,positions, ke, kf,true);
+
+	map.setBrowser(NULL);
+	m_normalShift = 0.0f;
+}
+
 
 template<typename PFP>
 void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
@@ -83,6 +102,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 	{
 		if (withBoundary || !map.isBoundaryMarked2(d))
 			vecDarts.push_back(d);
+
 	}
 	m_nbDarts = vecDarts.size();
 
@@ -120,41 +140,96 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 		if (!mf.isMarked(d))
 		{
 			vecPos.clear();
-			VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
-			
-			float k = 1.0f - kf;
-			Dart dd = d;
-			do
+			if (!map.isBoundaryMarked2(d))
 			{
-				vecPos.push_back(center*k + positions[dd]*kf);
-				dd = map.phi1(dd);
-			} while (dd != d);
+				VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+				float k = 1.0f - kf;
+				Dart dd = d;
+				do
+				{
+					vecPos.push_back(center*k + positions[dd]*kf);
+					dd = map.phi1(dd);
+				} while (dd != d);
 
-			unsigned int nb = vecPos.size();
-			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 
+				if (m_normalShift > 0.0f)
+				{
+					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,d,positions);
+					for (typename std::vector<VEC3>::iterator pit = vecPos.begin(); pit != vecPos.end(); ++pit)
+					{
+						*pit -= normal*m_normalShift;
+					}
+				}
 
-			k = 1.0f - ke;
-			for (unsigned int i = 0; i < nb; ++i)
-			{
-				VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
-				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
+				unsigned int nb = vecPos.size();
+				vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 
-				m_attIndex[d] = indexDC;
-				indexDC+=2;
-				*positionDartBuf++ = P;
-				*positionDartBuf++ = Q;
-				*colorDartBuf++ = m_dartsColor;
-				*colorDartBuf++ = m_dartsColor;
-				VEC3 f = P*0.5f + Q*0.5f;
-				fv2[d] = f;
-				f = P*0.1f + Q*0.9f;
-				fv1[d] = f;
-				f = P*0.9f + Q*0.1f;
-				fv11[d] = f;
-				d = map.phi1(d);
+				k = 1.0f - ke;
+				for (unsigned int i = 0; i < nb; ++i)
+				{
+
+					VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
+					VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
+
+					m_attIndex[d] = indexDC;
+					indexDC+=2;
+					*positionDartBuf++ = P;
+					*positionDartBuf++ = Q;
+					*colorDartBuf++ = m_dartsColor;
+					*colorDartBuf++ = m_dartsColor;
+					VEC3 f = P*0.5f + Q*0.5f;
+					fv2[d] = f;
+					f = P*0.1f + Q*0.9f;
+					fv1[d] = f;
+					f = P*0.9f + Q*0.1f;
+					fv11[d] = f;
+					d = map.phi1(d);
+				}
+				mf.markOrbit<FACE>(d);
 			}
-			mf.markOrbit<FACE>(d);
+			else if (withBoundary)
+			{
+
+				Dart dd = d;
+				do
+				{
+					Dart ee = mapx.phi2(dd);
+					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,ee,positions);
+					VEC3 vd = Algo::Surface::Geometry::vectorOutOfDart<PFP>(mapx,ee,positions);
+					VEC3 v = vd ^ normal;
+					v.normalize();
+					VEC3 P = positions[map.phi1(ee)] + v* m_boundShift;
+					vecPos.push_back(P);
+					dd = map.phi1(dd);
+					ee = mapx.phi2(dd);
+					P = positions[map.phi1(ee)] + v* m_boundShift;
+					vecPos.push_back(P);
+				} while (dd != d);
+
+				unsigned int nb = vecPos.size()/2;
+				float k = 1.0f - ke;
+				for (unsigned int i = 0; i < nb; ++i)
+				{
+
+					VEC3 P = vecPos[2*i]*ke + vecPos[2*i+1]*k;
+					VEC3 Q = vecPos[2*i+1]*ke + vecPos[2*i]*k;
+
+					m_attIndex[d] = indexDC;
+					indexDC+=2;
+					*positionDartBuf++ = P;
+					*positionDartBuf++ = Q;
+					*colorDartBuf++ = m_dartsBoundaryColor;
+					*colorDartBuf++ = m_dartsBoundaryColor;
+					VEC3 f = P*0.5f + Q*0.5f;
+					fv2[d] = f;
+					f = P*0.1f + Q*0.9f;
+					fv1[d] = f;
+					f = P*0.9f + Q*0.1f;
+					fv11[d] = f;
+					d = map.phi1(d);
+				}
+				mf.markOrbit<FACE>(d);
+			}
 		}
 	}
 
@@ -184,7 +259,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 		Dart e = map.phi2(d);
 
 //		if (good(e) && (e.index > d.index))
-		if ( (withBoundary || !map.isBoundaryMarked2(e)) && (d < e ))
+		if ( (withBoundary || !map.isBoundaryMarked2(e)) && (e.index > d.index))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
@@ -269,8 +344,18 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 				dd = map.phi1(dd);
 			} while (dd != d);
 
+
+			if (m_normalShift > 0.0f)
+			{
+				VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,d,positions);
+				for (typename std::vector<VEC3>::iterator pit = vecPos.begin(); pit != vecPos.end(); ++pit)
+				{
+					*pit -= normal*m_normalShift;
+				}
+			}
 			unsigned int nb = vecPos.size();
 			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
+
 
 			k = 1.0f - ke;
 			for (unsigned int i = 0; i < nb; ++i)
@@ -355,7 +440,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 }
 
 template<typename PFP>
-void TopoRender::setDartsIdColor(typename PFP::MAP& map)
+void TopoRender::setDartsIdColor(typename PFP::MAP& map, bool withBoundary)
 {
 	m_vbo3->bind();
 	float* colorBuffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -370,33 +455,38 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map)
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (nb < m_nbDarts)
-			{
-			float r,g,b;
-			dartToCol(d, r,g,b);
-			float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
-			*local++ = r;
-			*local++ = g;
-			*local++ = b;
-			*local++ = r;
-			*local++ = g;
-			*local++ = b;
-			nb++;
-		}
-		else
+		if (withBoundary || !map.isBoundaryMarked2(d))
 		{
-			CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
-			break;
+
+			if (nb < m_nbDarts)
+			{
+				float r,g,b;
+				dartToCol(d, r,g,b);
+				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
+				nb++;
+			}
+			else
+			{
+				CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
+				CGoGNerr << "NB = " << nb << "   NBDARTs = "<< m_nbDarts<<CGoGNendl;
+				break;
+			}
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 template<typename PFP>
-Dart TopoRender::picking(typename PFP::MAP& map,int x, int y)
+Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, bool withBoundary)
 {
 	pushColors();
-	setDartsIdColor<PFP>(map);
+	setDartsIdColor<PFP>(map,withBoundary);
 	Dart d = pickColor(x,y);
 	popColors();
 	return d;

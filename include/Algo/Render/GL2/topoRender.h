@@ -94,10 +94,20 @@ protected:
 	 */
 	float m_topo_relation_width;
 
+	/// shifting along normals for 3-map boundary drawing
+	float m_normalShift;
+
+	float m_boundShift;
+
 	/**
 	 * initial darts color (set in update)
 	 */
 	Geom::Vec3f m_dartsColor;
+
+	/**
+	 * initial darts color (set in update)
+	 */
+	Geom::Vec3f m_dartsBoundaryColor;
 
 	float *m_color_save;
 
@@ -130,7 +140,7 @@ protected:
 	 * affect a color to each dart
 	 */
 	template<typename PFP>
-	void setDartsIdColor(typename PFP::MAP& map);
+	void setDartsIdColor(typename PFP::MAP& map, bool withBoundary);
 
 	/**
 	 * save colors before picking
@@ -146,8 +156,7 @@ public:
 	/**
 	* Constructor
 	*/	
-
-	TopoRender();
+	TopoRender(float bs = 0.01f);
 
 	/**
 	* Destructor
@@ -185,6 +194,7 @@ public:
 	 * draw all topo
 	 */
 	void drawTopo();
+
 	/**
 	 * change dart drawing color
 	 * @param d the dart
@@ -204,6 +214,8 @@ public:
 	void setAllDartsColor(float r, float g, float b);
 
 	void setInitialDartsColor(float r, float g, float b);
+
+	void setInitialBoundaryDartsColor(float r, float g, float b);
 
 	/**
 	 * redraw one dart with specific width and color (not efficient use only for debug with small amount of call)
@@ -225,7 +237,7 @@ public:
 	 * @return the dart or NIL
 	 */
 	template<typename PFP>
-	Dart picking(typename PFP::MAP& map, int x, int y);
+	Dart picking(typename PFP::MAP& map, int x, int y, bool withBoundary=false);
 
 
 	template<typename PFP>
@@ -246,6 +258,13 @@ public:
 	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
 
 	/**
+	 * Special update function used to draw boundary of map3
+	 */
+	template<typename PFP>
+	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns);
+
+
+	/**
 	 * render to svg struct
 	 */
 	void toSVG(Utils::SVG::SVGOut& svg);
@@ -254,6 +273,18 @@ public:
 	 * render svg into svg file
 	 */
 	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+
+	/**
+	 * @brief set normal shift for boundary of dim 3 drawing
+	 * @param ns distance shift along normals (use BB.diagSize()/100 is good approximation)
+	 */
+	void setNormalShift(float ns);
+
+	/**
+	 * @brief set boundary shift for boundary of dim 2 drawing
+	 * @param ns distance shift
+	 */
+	void setBoundaryShift(float bs);
 };
 
 // just for compatibility with old code

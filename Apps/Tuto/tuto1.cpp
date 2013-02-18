@@ -77,7 +77,8 @@ void MyQT::createMap()
 	show();
 
 	// render the topo of the map without boundary darts
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true	);
+	m_render_topo->setInitialBoundaryDartsColor(0,1,0);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true);
 }
 
 // initialization GL callback
