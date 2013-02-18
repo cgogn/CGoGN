@@ -345,6 +345,17 @@ void TopoRender::toSVG(Utils::SVG::SVGOut& svg)
 }
 
 
+void TopoRender::setNormalShift(float ns)
+{
+	m_normalShift = ns;
+}
+
+void TopoRender::setBoundaryShift(float bs)
+{
+	m_boundShift = bs;
+}
+
+
 
 }//end namespace GL2
 

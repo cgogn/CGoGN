@@ -279,6 +279,12 @@ public:
 	 * @param ns distance shift along normals (use BB.diagSize()/100 is good approximation)
 	 */
 	void setNormalShift(float ns);
+
+	/**
+	 * @brief set boundary shift for boundary of dim 2 drawing
+	 * @param ns distance shift
+	 */
+	void setBoundaryShift(float bs);
 };
 
 // just for compatibility with old code
