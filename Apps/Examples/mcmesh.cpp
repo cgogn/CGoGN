@@ -154,7 +154,7 @@ void MCMesh::MC()
 
 void MCMesh::updateRender()
 {
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	//TODO	add Browser for no border
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);

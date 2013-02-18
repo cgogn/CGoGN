@@ -69,7 +69,7 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
-	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f) {}
+	MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f) {}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -86,8 +86,6 @@ protected:
 
 	VertexAttribute<VEC3> position;
 	DartAttribute<VEC3> colorDarts;
-
-	SelectorDartNoBoundary<PFP::MAP> nb;
 
 	// render (for the topo)
 	Algo::Render::GL2::TopoRender* m_render_topo;
