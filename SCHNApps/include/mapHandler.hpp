@@ -74,7 +74,7 @@ template <typename PFP>
 void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 {
 	if(!m_render->isPrimitiveUpToDate(primitive))
-		m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), allDarts, primitive) ;
+		m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), primitive) ;
 	m_render->draw(shader, primitive);
 }
 

@@ -8,72 +8,74 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
-	positionVBO(NULL),
-	colorVBO(NULL),
+PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
+	mh(m),
 	facesScaleFactor(1.0f),
 	volumesScaleFactor(1.0f),
 	renderEdges(false),
-	renderFaces(true)
+	renderFaces(true),
+	faceStyle(FLAT)
 {
-	bool positionFound = false;
-	bool colorFound = false;
 
-	QList<Utils::VBO*> vbos = map->getVBOList();
-	for(int i = 0; i < vbos.count(); ++i)
+	m_renderExplod = new Algo::Render::GL2::ExplodeVolumeRender(false, false, false);
+
+	m_renderExplod->setNoClippingPlane();
+	m_renderExplod->setExplodeVolumes(1.0f);
+	m_renderExplod->setExplodeFaces(1.0f);
+
+	QString positionName;
+
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP3::VEC3()));
+
+	const AttributeHash& attribs = mh->getAttributesList(VERTEX);
+	for(AttributeHash::const_iterator i = attribs.constBegin(); i != attribs.constEnd(); ++i)
 	{
-		if(vbos[i]->dataSize() == 3)
+		if(i.value() == vec3TypeName)
 		{
-			if(!positionFound) positionVBO = vbos[i];
-			if(vbos[i]->name() == "position") // try to select a VBO named "position"
-			{
-				positionVBO = vbos[i];
-				positionFound = true;
-			}
-
-			if(!colorFound) colorVBO = vbos[i];
-			if(vbos[i]->name() == "color")	// try to select a VBO named "color"
-			{
-				colorVBO = vbos[i];
-				colorFound = true;
-			}
+			if(positionName != "position")	// try to select an attribute named "position"
+				positionName = i.key();		// or anything else if not found
 		}
 	}
+	positionAttribute = mh->getAttribute<PFP3::VEC3, VERTEX>(positionName);
+
+	colorAttribute = mh->getAttribute<PFP3::VEC3, VOLUME>("color");
+
+	updateRender();
 }
 
+PerMapParameterSet::~PerMapParameterSet()
+{
+	delete m_renderExplod;
+}
+
+void PerMapParameterSet::updateRender()
+{
+	MapHandler<PFP3>* mh3 = static_cast<MapHandler<PFP3>*>(mh);
+	if(mh3 == NULL)
+		return;
+
+	PFP3::MAP* m = mh3->getMap();
+
+	//if(!color.isValid())
+	m_renderExplod->updateData<PFP3>(*m,positionAttribute);
+}
 
 bool RenderExplodPlugin::enable()
 {
 	m_dockTab = new RenderExplodDockTab(m_window, this);
 	addTabInDock(m_dockTab, "RenderExplod");
 
-//	m_renderExplod = new Algo::Render::GL2::ExplodeVolumeRender(true);
-//
-//	m_renderExplod->setNoClippingPlane();
-//	m_renderExplod->setExplodeVolumes(0.9f);
-//	m_renderExplod->setExplodeFaces(1.0f);
-//
-//	//m_renderExplod->setAmbiant(Geom::Vec4f(0.1f,0.1f,0.1f,0.0f));
-//	//m_renderExplod->setBackColor(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f));
-//	//m_renderExplod->setColorLine(Geom::Vec4f(0.1f,0.1f,0.1f,0.0f));
-//	//m_renderExplod->setAmbiant(Geom::Vec4f(0.9f, 0.5f, 0.0f, 0.0f));
-//	m_renderExplod->setBackColor(Geom::Vec4f(0.9f, 0.5f, 0.0f, 0.0f));
-//	//m_renderExplod->setColorLine(Geom::Vec4f(0.9f, 0.5f, 0.0f, 0.0f));
-//	m_renderExplod->setColorLine(Geom::Vec4f(0.0f, 0.0f, 0.0f, 0.0f));
-//
-//	registerShader(m_renderExplod->shaderFaces());
-//	registerShader(m_renderExplod->shaderLines());
-
 	connect(m_window, SIGNAL(viewAndPluginLinked(View*, Plugin*)), this, SLOT(viewLinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(currentViewChanged(View*)), this, SLOT(currentViewChanged(View*)));
+
 
 	return true;
 }
 
 void RenderExplodPlugin::disable()
 {
-
+	//delete m_renderExplod;
 }
 
 void RenderExplodPlugin::redraw(View* view)
@@ -83,22 +85,23 @@ void RenderExplodPlugin::redraw(View* view)
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* m, maps)
 	{
-		const PerMapParameterSet& p = params->perMap[m->getName()];
-		if(p.positionVBO != NULL)
+		PerMapParameterSet* p = params->perMap[m->getName()];
+
+		p->m_renderExplod->setExplodeFaces(p->facesScaleFactor);
+		p->m_renderExplod->setExplodeVolumes(p->volumesScaleFactor);
+
+		if(p->renderEdges)
 		{
-			if(p.renderEdges)
-			{
-//				m_renderExplod->drawEdges();
-			}
-			if(p.renderFaces)
-			{
-//				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//				glEnable(GL_LIGHTING);
-//				glEnable(GL_POLYGON_OFFSET_FILL);
-//			    glPolygonOffset(1.0f, 1.0f) ;
-//			    m_renderExplod->drawFaces();
-//				glDisable(GL_POLYGON_OFFSET_FILL);
-			}
+			p->m_renderExplod->drawEdges();
+		}
+		if(p->renderFaces)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glEnable(GL_LIGHTING);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0f, 1.0f) ;
+			p->m_renderExplod->drawFaces();
+			glDisable(GL_POLYGON_OFFSET_FILL);
 		}
 	}
 }
@@ -110,10 +113,12 @@ void RenderExplodPlugin::viewLinked(View* view, Plugin* plugin)
 		ParameterSet* params = new ParameterSet();
 		h_viewParams.insert(view, params);
 		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
-		foreach(MapHandlerGen* map, maps)
+		foreach(MapHandlerGen* mh, maps)
 		{
-			PerMapParameterSet p(map);
-			params->perMap.insert(map->getName(), p);
+			PerMapParameterSet* p = new PerMapParameterSet(mh);
+			registerShader(p->m_renderExplod->shaderFaces());
+			registerShader(p->m_renderExplod->shaderLines());
+			params->perMap.insert(mh->getName(), p);
 		}
 		if (!maps.empty())
 			changeSelectedMap(view, maps[0]);
@@ -140,7 +145,11 @@ void RenderExplodPlugin::viewUnlinked(View* view, Plugin* plugin)
 void RenderExplodPlugin::currentViewChanged(View* view)
 {
 	if(isLinkedToView(view))
+	{
+		ParameterSet* params = h_viewParams[view];
+		changeSelectedMap(view, params->selectedMap);
 		m_dockTab->refreshUI(h_viewParams[view]);
+	}
 }
 
 void RenderExplodPlugin::mapLinked(MapHandlerGen* m)
@@ -148,9 +157,17 @@ void RenderExplodPlugin::mapLinked(MapHandlerGen* m)
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
 
+	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+
 	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet p(m);
+
+	PerMapParameterSet* p = new PerMapParameterSet(m);
+	registerShader(p->m_renderExplod->shaderFaces());
+	registerShader(p->m_renderExplod->shaderLines());
 	params->perMap.insert(m->getName(), p);
+
 	if(params->selectedMap == NULL || params->perMap.count() == 1)
 		changeSelectedMap(view, m);
 	else
@@ -161,6 +178,10 @@ void RenderExplodPlugin::mapUnlinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+
+	disconnect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
 
 	ParameterSet* params = h_viewParams[view];
 	params->perMap.remove(m->getName());
@@ -176,24 +197,6 @@ void RenderExplodPlugin::mapUnlinked(MapHandlerGen* m)
 		m_dockTab->refreshUI(params);
 }
 
-void RenderExplodPlugin::vboAdded(Utils::VBO* vbo)
-{
-	m_dockTab->refreshUI(h_viewParams[m_window->getCurrentView()]);
-}
-
-void RenderExplodPlugin::vboRemoved(Utils::VBO* vbo)
-{
-	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-
-	View* view = m_window->getCurrentView();
-	ParameterSet* params = h_viewParams[view];
-	if(params->perMap[map->getName()].positionVBO == vbo)
-		changePositionVBO(view, map, NULL);
-	if(params->perMap[map->getName()].colorVBO == vbo)
-		changeColorVBO(view, map, NULL);
-
-	m_dockTab->refreshUI(h_viewParams[view]);
-}
 
 void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
 {
@@ -204,21 +207,18 @@ void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool 
 
 	if(view->isCurrentView())
 	{
-		if(prev)
-			disconnect(prev, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
-		if(map)
-			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
-
 		if(!fromUI)
 			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
 }
 
-void RenderExplodPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
+void RenderExplodPlugin::changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].positionVBO = vbo;
+	PerMapParameterSet* perMap = params->perMap[map->getName()];
+	perMap->positionAttribute = attribute;
+	perMap->updateRender();
 
 	if(view->isCurrentView())
 	{
@@ -228,10 +228,11 @@ void RenderExplodPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils
 	}
 }
 
-void RenderExplodPlugin::changeColorVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
+void RenderExplodPlugin::changeColorAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].colorVBO = vbo;
+//	params->perMap[map->getName()].colorAttribute = attribute;
+	//perMap->colorAttribute = attribute;
 
 	if(view->isCurrentView())
 	{
@@ -244,7 +245,7 @@ void RenderExplodPlugin::changeColorVBO(View* view, MapHandlerGen* map, Utils::V
 void RenderExplodPlugin::changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].renderEdges = b;
+	params->perMap[map->getName()]->renderEdges = b;
 
 	if(view->isCurrentView())
 	{
@@ -257,7 +258,7 @@ void RenderExplodPlugin::changeRenderEdges(View* view, MapHandlerGen* map, bool 
 void RenderExplodPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].renderFaces = b;
+	params->perMap[map->getName()]->renderFaces = b;
 
 	if(view->isCurrentView())
 	{
@@ -270,7 +271,7 @@ void RenderExplodPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool 
 void RenderExplodPlugin::changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].facesScaleFactor = i / 50.0;
+	params->perMap[map->getName()]->facesScaleFactor = i / 50.0;
 
 	if(view->isCurrentView())
 	{
@@ -283,7 +284,7 @@ void RenderExplodPlugin::changeFacesScaleFactor(View* view, MapHandlerGen* map, 
 void RenderExplodPlugin::changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].volumesScaleFactor = i / 50.0;
+	params->perMap[map->getName()]->volumesScaleFactor = i / 50.0;
 
 	if(view->isCurrentView())
 	{
@@ -291,6 +292,49 @@ void RenderExplodPlugin::changeVolumesScaleFactor(View* view, MapHandlerGen* map
 			m_dockTab->refreshUI(params);
 		view->updateGL();
 	}
+}
+
+
+void RenderExplodPlugin::attributeModified(unsigned int orbit, QString nameAttr)
+{
+//	if(orbit == VERTEX)
+//	{
+//
+//		MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(QObject::sender());
+//		if(mh == NULL)
+//			return;
+//
+//		VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP3::VEC3, VERTEX>(nameAttr);
+//		if(!position.isValid())
+//			return;
+//
+//		PFP3::MAP* map = mh->getMap();
+//
+//		m_renderExplod->updateData<PFP3>(*map,position);
+//
+////		if(computeNormalLastParameters.contains(map->getName()))
+////		{
+////			ComputeNormalParameters& params = computeNormalLastParameters[map->getName()];
+////			if(params.positionName == nameAttr && params.autoUpdate)
+////				computeNormal(map->getName(), params.positionName, params.normalName);
+////		}
+//	}
+}
+
+void RenderExplodPlugin::connectivityModified()
+{
+//	MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(QObject::sender());
+//	if(mh == NULL)
+//		return;
+//
+//	VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP3::VEC3, VERTEX>("position");
+//	if(!position.isValid())
+//		return;
+//
+//	PFP3::MAP* map = mh->getMap();
+//
+//	m_renderExplod->updateData<PFP3>(*map,position);
+
 }
 
 #ifndef DEBUG

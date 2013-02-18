@@ -1,5 +1,5 @@
-#ifndef _RENDEREXPLOD_DOCK_TAB_H_
-#define _RENDEREXPLOD_DOCK_TAB_H_
+#ifndef _RENDER_EXPLOD_DOCK_TAB_H_
+#define _RENDER_EXPLOD_DOCK_TAB_H_
 
 #include "ui_renderExplod.h"
 
@@ -30,12 +30,14 @@ public slots:
 	void refreshUI(ParameterSet* params);
 
 	void selectedMapChanged();
-	void positionVBOChanged(int index);
-	void colorVBOChanged(int index);
+	void positionAttributeChanged(int index);
+	void colorAttributeChanged(int index);
 	void renderEdgesChanged(bool b);
 	void renderFacesChanged(bool b);
 	void facesScaleFactorChanged(int i);
 	void volumesScaleFactorChanged(int i);
+
+	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
 };
 
 } // namespace SCHNApps

@@ -18,10 +18,13 @@ RenderExplodDockTab::RenderExplodDockTab(Window* w, RenderExplodPlugin* p) :
 	setupUi(this);
 
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
-	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
-	connect(combo_colorVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(colorVBOChanged(int)));
+
+	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
+	connect(combo_colorAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(colorAttributeChanged(int)));
+
 	connect(check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(renderEdgesChanged(bool)));
 	connect(check_renderFaces, SIGNAL(toggled(bool)), this, SLOT(renderFacesChanged(bool)));
+
 	connect(slider_facesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(facesScaleFactorChanged(int)));
 	connect(slider_volumesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(volumesScaleFactorChanged(int)));
 }
@@ -33,44 +36,46 @@ void RenderExplodDockTab::refreshUI(ParameterSet* params)
 	b_refreshingUI = true;
 
 	mapList->clear();
-	combo_positionVBO->clear();
-	combo_colorVBO->clear();
+	combo_positionAttribute->clear();
+	combo_colorAttribute->clear();
 
-	MapHandlerGen* map = params->selectedMap;
+	MapHandlerGen* mh = params->selectedMap;
 
-	QHash<QString, PerMapParameterSet>::const_iterator i = params->perMap.constBegin();
+	QHash<QString, PerMapParameterSet*>::const_iterator i = params->perMap.constBegin();
 	while (i != params->perMap.constEnd())
 	{
 		mapList->addItem(i.key());
-		if(map != NULL && i.key() == map->getName())
+		if(mh != NULL && i.key() == mh->getName())
 		{
-			QList<QListWidgetItem*> item = mapList->findItems(map->getName(), Qt::MatchExactly);
+			QList<QListWidgetItem*> item = mapList->findItems(mh->getName(), Qt::MatchExactly);
 			item[0]->setSelected(true);
 
-			PerMapParameterSet& p = params->perMap[map->getName()];
+			PerMapParameterSet* p = params->perMap[mh->getName()];
 
-			QList<Utils::VBO*> vbos = map->getVBOList();
+			QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+
 			unsigned int j = 0;
-			for(int i = 0; i < vbos.count(); ++i)
+			const AttributeHash& attribs = mh->getAttributesList(VERTEX);
+			for(AttributeHash::const_iterator i = attribs.constBegin(); i != attribs.constEnd(); ++i)
 			{
-				if(vbos[i]->dataSize() == 3)
+				if(i.value() == vec3TypeName)
 				{
-					combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
-					if(vbos[i] == p.positionVBO)
-						combo_positionVBO->setCurrentIndex(j);
+					combo_positionAttribute->addItem(i.key());
+					if(i.key() == QString::fromStdString(p->positionAttribute.name()))
+						combo_positionAttribute->setCurrentIndex(j);
 
-					combo_colorVBO->addItem(QString::fromStdString(vbos[i]->name()));
-					if(vbos[i] == p.colorVBO)
-						combo_colorVBO->setCurrentIndex(j);
+//					combo_colorAttribute->addItem(i.key());
+//					if(i.key() == QString::fromStdString(p.colorAttribute.name()))
+//						combo_colorAttribute->setCurrentIndex(j);
 
 					++j;
 				}
 			}
 
-			check_renderEdges->setChecked(p.renderEdges);
-			check_renderFaces->setChecked(p.renderFaces);
-			slider_facesScaleFactor->setSliderPosition(p.facesScaleFactor * 50.0);
-			slider_volumesScaleFactor->setSliderPosition(p.volumesScaleFactor * 50.0);
+			check_renderEdges->setChecked(p->renderEdges);
+			check_renderFaces->setChecked(p->renderFaces);
+			slider_facesScaleFactor->setSliderPosition(p->facesScaleFactor * 50.0);
+			slider_volumesScaleFactor->setSliderPosition(p->volumesScaleFactor * 50.0);
 		}
 		++i;
 	}
@@ -88,23 +93,23 @@ void RenderExplodDockTab::selectedMapChanged()
 	}
 }
 
-void RenderExplodDockTab::positionVBOChanged(int index)
+void RenderExplodDockTab::positionAttributeChanged(int index)
 {
 	if(!b_refreshingUI)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
+		m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
 	}
 }
 
-void RenderExplodDockTab::colorVBOChanged(int index)
+void RenderExplodDockTab::colorAttributeChanged(int index)
 {
 	if(!b_refreshingUI)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeColorVBO(view, map, map->getVBO(combo_colorVBO->currentText()), true);
+		m_plugin->changeColorAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_colorAttribute->currentText()), true);
 	}
 }
 

@@ -728,24 +728,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		}
 	}
 
-
-	//
-	// edge-removal on all old boundary edges
-	//
-	TraversorE<typename PFP::MAP> tE(map);
-	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
-	{
-		if(m.isMarked(dit))
-		{
-			m.unmarkOrbit<EDGE>(dit);
-			Dart d = map.phi2(map.phi3(map.findBoundaryFaceOfEdge(dit)));
-			Volume::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
-
-		}
-	}
-
 	TraversorV<typename PFP::MAP> tVg(map);
->>>>>>> 498aabac71c2d803003f86eb62a8466f894c2271
 	for(Dart dit = tVg.begin() ; dit != tVg.end() ; dit = tVg.next())
 	{
 		if(map.isBoundaryVertex(dit) && !newBoundaryV.isMarked(dit))
@@ -774,7 +757,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//
 	// edge-removal on all old boundary edges
 	//
-	TraversorE<typename PFP::MAP> tE(map,selected);
+	TraversorE<typename PFP::MAP> tE(map);
 	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
 	{
 		if(m.isMarked(dit))
