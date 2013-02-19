@@ -151,7 +151,6 @@ bool isEdgeInOrIntersectingTetrahedron(VEC3 points[4], VEC3& point1, VEC3& point
 	if(isPointInTetrahedron(points,point1,CCW) || isPointInTetrahedron(points,point1,CCW))
 		return true ;
 
-	VEC3 dir = point2 - point1 ;
 	VEC3 inter;
 	if(intersectionSegmentTriangle(point1, point2, points[0], points[1], points[2], inter)
 	|| intersectionSegmentTriangle(point1, point2, points[0], points[1], points[3], inter)

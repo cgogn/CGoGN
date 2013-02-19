@@ -58,11 +58,12 @@ public: // types
 	 */
 	enum ColourEncoding
 	{
-		C_RGB = 0,
-		C_XYZ = 1,
-		C_Luv = 2,
-		C_Lab = 3,
-		C_HSV = 4
+		C_RGB = 0, /*!< R,G,B in [0,1] */
+		C_XYZ = 1, /*!< X,Y,Z in [0,1] */
+		C_Luv = 2, /*!< L in [0,100], u in [-83,175], v in [-134,108] */
+		C_Lab = 3, /*!< L in [0,100], u in [-86,98], v in [-108,95] */
+		C_HSV = 4,  /*!< H,S,V in [0,1] */
+		C_HSL = 5  /*!< H,S,L in [0,1] */
 	} ;
 
 	typedef Geom::Vector<3,REAL> VEC3 ; /*!< Triplet for color encoding */
@@ -111,6 +112,11 @@ public: // methods
 	VEC3 getHSV() ;
 	/**
 	 * getR
+	 * @return HSL value of provided colour
+	 */
+	VEC3 getHSL() ;
+	/**
+	 * getR
 	 * @return XYZ value of provided colour
 	 */
 	VEC3 getXYZ() ;
@@ -124,6 +130,7 @@ private: // private members
 	VEC3 *Lab ;
 	VEC3 *HSV ;
 	VEC3 *XYZ ;
+	VEC3 *HSL ;
 
 	bool convert(enum ColourEncoding from, enum ColourEncoding to) ;
 	void convertRGBtoXYZ() ;
@@ -135,8 +142,29 @@ private: // private members
 	void convertXYZtoLab() ;
 	void convertLabToXYZ() ;
 
+	/**
+	 * Converts RGB to HSV. All is normalized between 0 and 1.
+	 * Conversion formula adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	 */
 	void convertRGBtoHSV() ;
+	/**
+	 * Converts HSV to RGB. All is normalized between 0 and 1.
+	 * Conversion formula adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	 */
 	void convertHSVtoRGB() ;
+
+	/**
+	 * Converts RGB to HSL. All is normalized between 0 and 1.
+	 * Conversion formula adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	 */
+	void convertRGBtoHSL() ;
+	/**
+	 * Converts HSL to RGB. All is normalized between 0 and 1.
+	 * Conversion formula adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+	 */
+	void convertHSLtoRGB() ;
+
+	static REAL hue2rgb(const REAL& p, const REAL& q, REAL t) ;
 
 private: // private constants
 	// D65 reference white

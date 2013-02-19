@@ -48,8 +48,7 @@ void decimate(
 	SelectorType s,
 	ApproximatorType a,
 	VertexAttribute<typename PFP::VEC3>& position,
-	unsigned int percentWantedVertices,
-	const FunctorSelect& selected = allDarts
+	unsigned int percentWantedVertices
 );
 
 } //namespace DecimationVolumes

@@ -114,8 +114,14 @@ public:
 	Vector<DIM, T> operator+(const Vector<DIM, T>& v) const ;
 
 	Vector<DIM, T> operator-(const Vector<DIM, T>& v) const ;
+	
+	Vector<DIM, T> operator-() const ;
 
-	Vector<DIM, T> operator*(T a) const ;
+ 	Vector<DIM, T> operator*(T a) const ;
+	
+// 	template <typename T2>
+// 	Vector<DIM, T> operator*(T2 a) const ;
+	
 
 	Vector<DIM, T> operator/(T a) const ;
 
@@ -206,8 +212,8 @@ bool isNull(T x, int precision = 0) ;
 template <typename T>
 bool isNull2(T x, int precision = 0) ;
 
-template <unsigned int DIM, typename T>
-Vector<DIM, T> operator*(T a, const Vector<DIM, T>& v) ;
+// template <unsigned int DIM, typename T>
+// Vector<DIM, T> operator*(T a, const Vector<DIM, T>& v) ;
 
 template <unsigned int DIM, typename T>
 Vector<DIM, T> operator/(T a, const Vector<DIM, T>& v) ;
@@ -219,6 +225,9 @@ T tripleProduct(const Vector<DIM, T>& v1, const Vector<DIM, T>& v2, const Vector
 // returns a spherical interpolation of two vectors considering parameter t ((0 <= t <= 1) => result between v1 and v2)
 template <unsigned int DIM, typename T>
 Vector<DIM, T> slerp(const Vector<DIM, T> &v1, const Vector<DIM, T> &v2, const T &t) ;
+
+template <unsigned int DIM, typename T, typename T2>
+Vector<DIM, T> operator*(T2 b, const Vector<DIM, T>& v);
 
 
 /**********************************************/

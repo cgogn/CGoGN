@@ -17,7 +17,8 @@ PluginsDialog::PluginsDialog(Window* window) :
 	m_window(window),
 	b_refreshingUI(false)
 {
-	this->setupUi(this);
+	setupUi(this);
+	setModal(false);
 
 	connect(button_registerDirectory, SIGNAL(pressed()), this, SLOT(registerPluginsDirectory()));
 	connect(list_plugins, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(togglePlugin(QListWidgetItem*)));

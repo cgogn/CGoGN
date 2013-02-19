@@ -1,6 +1,6 @@
 Dépendences Linux:
 installer les paquets suivants:
-cmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev
+cmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 Pour compiler CGoGN:
 - aller dans ThirdParty, cd build, taper "cmake .", puis make ( avec -j x si vous avez x core sur votre machine) suivi de make install
@@ -41,7 +41,7 @@ https://iggservis.u-strasbg.fr/Data/data.zip
 
 Linux dependencies:
 install the following packages:
-ccmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev
+ccmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 To compile CGoGN:
 - Go ThirdParty, cd build, type "cmake .." and then make (with -j x if you have x core on your machine) followed by make install

@@ -42,17 +42,17 @@ namespace GL1
 {
 
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& good)
+void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal)
 {
 	// RenderType => lighted & smooth ??
 	bool lighted = (rt != NO_LIGHT) && (rt!= LINE);
 	bool smooth = (rt==SMOOTH);
 
 	// first pass render the triangles
-	FunctorGLFace<PFP> fgl_tri(the_map, lighted, smooth, 3, explode, true, position, normal, good);
+	FunctorGLFace<PFP> fgl_tri(the_map, lighted, smooth, 3, explode, true, position, normal);
 
 	glBegin(GL_TRIANGLES);
-	the_map.template foreach_orbit<FACE>(fgl_tri, good);
+	the_map.template foreach_orbit<FACE>(fgl_tri);
 	glEnd();
 
 	// get untreated quads & polygons
@@ -61,7 +61,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 	if (rt==LINE)
 	{
-		FunctorGLFace<PFP> fgl_quads(the_map, lighted, smooth, POLYGONS, explode, true, position, normal, good);
+		FunctorGLFace<PFP> fgl_quads(the_map, lighted, smooth, POLYGONS, explode, true, position, normal);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
 			glBegin(GL_POLYGON);
@@ -72,7 +72,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 	}
 	else
 	{
-		FunctorGLFace<PFP> fgl_quads(the_map, lighted, smooth, 4, explode, true, position, normal, good);
+		FunctorGLFace<PFP> fgl_quads(the_map, lighted, smooth, 4, explode, true, position, normal);
 		glBegin(GL_TRIANGLES);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
@@ -84,7 +84,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 	if (rt==LINE)
 	{
-		FunctorGLFace<PFP> fgl_polygStar(the_map, lighted, smooth, POLYGONS, explode, true, position, normal, good);
+		FunctorGLFace<PFP> fgl_polygStar(the_map, lighted, smooth, POLYGONS, explode, true, position, normal);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
 			glBegin(GL_POLYGON);
@@ -94,7 +94,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 	}
 	else
 	{
-		FunctorGLFace<PFP> fgl_polygStar(the_map, lighted, smooth, TRIFAN, explode, true, position, normal, good);
+		FunctorGLFace<PFP> fgl_polygStar(the_map, lighted, smooth, TRIFAN, explode, true, position, normal);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
 			glBegin(GL_TRIANGLE_FAN);
@@ -107,18 +107,18 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good)
+void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const VertexAttribute<typename PFP::VEC3>& color)
 {
 	// RenderType => lighted & smooth ??
 	bool lighted = (rt != NO_LIGHT) && (rt!= LINE);
 	bool smooth = (rt==SMOOTH);
 
 	// first pass render the triangles
-	FunctorGLFaceColor<PFP> fgl_tri(the_map, lighted, smooth, 3, explode, true, position, normal, color, good);
+	FunctorGLFaceColor<PFP> fgl_tri(the_map, lighted, smooth, 3, explode, true, position, normal, color);
 
 
 	glBegin(GL_TRIANGLES);
-	the_map.template foreach_orbit<FACE>(fgl_tri, good);
+	the_map.template foreach_orbit<FACE>(fgl_tri);
 	glEnd();
 
 	// get untreated quads & polygons
@@ -127,7 +127,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 	if (rt==LINE)
 	{
-		FunctorGLFaceColor<PFP> fgl_quads(the_map, lighted, smooth, POLYGONS, explode, true, position, normal, color, good);
+		FunctorGLFaceColor<PFP> fgl_quads(the_map, lighted, smooth, POLYGONS, explode, true, position, normal, color);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
 			glBegin(GL_POLYGON);
@@ -138,7 +138,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 	}
 	else
 	{
-		FunctorGLFaceColor<PFP> fgl_quads(the_map, lighted, smooth, 4, explode, true, position, normal, color, good);
+		FunctorGLFaceColor<PFP> fgl_quads(the_map, lighted, smooth, 4, explode, true, position, normal, color);
 		glBegin(GL_TRIANGLES);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
@@ -150,7 +150,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 	if (rt==LINE)
 	{
-		FunctorGLFaceColor<PFP> fgl_polygStar(the_map, lighted, smooth, POLYGONS, explode, true, position, normal, color, good);
+		FunctorGLFaceColor<PFP> fgl_polygStar(the_map, lighted, smooth, POLYGONS, explode, true, position, normal, color);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
 			glBegin(GL_POLYGON);
@@ -160,7 +160,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 	}
 	else
 	{
-		FunctorGLFaceColor<PFP> fgl_polygStar(the_map, lighted, smooth, TRIFAN, explode, true, position, normal, color, good);
+		FunctorGLFaceColor<PFP> fgl_polygStar(the_map, lighted, smooth, TRIFAN, explode, true, position, normal, color);
 		for(typename std::vector<Dart>::iterator d = polygons.begin(); d != polygons.end(); ++d)
 		{
 			glBegin(GL_TRIANGLE_FAN);
@@ -172,22 +172,22 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 template <typename PFP>
-void renderNormalVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, float scale, const FunctorSelect& good)
+void renderNormalVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, float scale)
 {
-	FunctorGLNormal<PFP> fgl_norm(the_map, good, position, normal, scale);
+	FunctorGLNormal<PFP> fgl_norm(the_map, position, normal, scale);
 
 	glBegin(GL_LINES);
-	the_map.template foreach_orbit<VERTEX>(fgl_norm, good);
+	the_map.template foreach_orbit<VERTEX>(fgl_norm);
 	glEnd();
 }
 
 template <typename PFP>
-void renderFrameVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], float scale, const FunctorSelect& good)
+void renderFrameVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], float scale)
 {
-	FunctorGLFrame<PFP> fgl_frame(the_map, good, position, frame, scale) ;
+	FunctorGLFrame<PFP> fgl_frame(the_map, position, frame, scale) ;
 
 	glBegin(GL_LINES) ;
-	the_map.template foreach_orbit<VERTEX>(fgl_frame, good) ;
+	the_map.template foreach_orbit<VERTEX>(fgl_frame) ;
 	glEnd();
 }
 

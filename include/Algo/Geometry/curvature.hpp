@@ -48,10 +48,9 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL>& kmax,
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
-	VertexAttribute<typename PFP::VEC3>& Kmin,
-	const FunctorSelect& select)
+	VertexAttribute<typename PFP::VEC3>& Kmin)
 {
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		computeCurvatureVertex_QuadraticFitting<PFP>(map, d, position, normal, kmax, kmin, Kmax, Kmin) ;
 }
@@ -128,68 +127,73 @@ void vertexQuadraticFitting(
 {
 	typename PFP::VEC3 p = position[dart] ;
 
-	LinearSolver<typename PFP::REAL> solver(5) ;
-	solver.set_least_squares(true) ;
-	solver.begin_system() ;
+	NLContext nlContext = nlNewContext() ;
+	nlMakeCurrent(nlContext) ;
+	nlSolverParameteri(NL_NB_VARIABLES, 5) ;
+	nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE) ;
+	nlBegin(NL_SYSTEM) ;
+	nlBegin(NL_MATRIX) ;
 	Traversor2VVaE<typename PFP::MAP> tav(map, dart) ;
 	for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 	{
 		typename PFP::VEC3 v = position[it] ;
-		quadraticFittingAddVertexPos<PFP>(v, p, localFrame, solver) ;
+		quadraticFittingAddVertexPos<PFP>(v, p, localFrame) ;
 		typename PFP::VEC3 n = normal[it] ;
-		quadraticFittingAddVertexNormal<PFP>(v, n, p, localFrame, solver) ;
+		quadraticFittingAddVertexNormal<PFP>(v, n, p, localFrame) ;
 	}
-	solver.end_system() ;
-	solver.solve() ;
+	nlEnd(NL_MATRIX) ;
+	nlEnd(NL_SYSTEM) ;
+	nlSolve() ;
 
-	a = solver.variable(0).value() ;
-	b = solver.variable(1).value() ;
-	c = solver.variable(2).value() ;
-	d = solver.variable(3).value() ;
-	e = solver.variable(4).value() ;
+	a = nlGetVariable(0) ;
+	b = nlGetVariable(1) ;
+	c = nlGetVariable(2) ;
+	d = nlGetVariable(3) ;
+	e = nlGetVariable(4) ;
+
+	nlDeleteContext(nlContext) ;
 }
 
 template <typename PFP>
-void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver)
+void quadraticFittingAddVertexPos(typename PFP::VEC3& v, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame)
 {
 	typename PFP::VEC3 vec = v - p ;
 	vec = localFrame * vec ;
-	solver.begin_row() ;
 
-	solver.add_coefficient(0, vec[0]*vec[0]) ;
-	solver.add_coefficient(1, vec[0]*vec[1]) ;
-	solver.add_coefficient(2, vec[1]*vec[1]) ;
-	solver.add_coefficient(3, vec[0]) ;
-	solver.add_coefficient(4, vec[1]) ;
-
-	solver.set_right_hand_side(vec[2]) ;
-	solver.end_row() ;
+	nlRowParameterd(NL_RIGHT_HAND_SIDE, vec[2]) ;
+	nlBegin(NL_ROW) ;
+	nlCoefficient(0, vec[0]*vec[0]) ;
+	nlCoefficient(1, vec[0]*vec[1]) ;
+	nlCoefficient(2, vec[1]*vec[1]) ;
+	nlCoefficient(3, vec[0]) ;
+	nlCoefficient(4, vec[1]) ;
+	nlEnd(NL_ROW) ;
 }
 
 template <typename PFP>
-void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame, LinearSolver<typename PFP::REAL>& solver)
+void quadraticFittingAddVertexNormal(typename PFP::VEC3& v, typename PFP::VEC3& n, typename PFP::VEC3& p, typename PFP::MATRIX33& localFrame)
 {
 	typename PFP::VEC3 vec = v - p ;
 	vec = localFrame * vec ;
 	typename PFP::VEC3 norm = localFrame * n ;
 
-	solver.begin_row() ;
-	solver.add_coefficient(0, 2.0f * vec[0] * norm[2]) ;
-	solver.add_coefficient(1, vec[1] * norm[2]) ;
-	solver.add_coefficient(2, 0) ;
-	solver.add_coefficient(3, 1.0f * norm[2]) ;
-	solver.add_coefficient(4, 0) ;
-	solver.set_right_hand_side(-1.0f * norm[0]) ;
-	solver.end_row() ;
+	nlRowParameterd(NL_RIGHT_HAND_SIDE, -1.0f * norm[0]) ;
+	nlBegin(NL_ROW);
+	nlCoefficient(0, 2.0f * vec[0] * norm[2]) ;
+	nlCoefficient(1, vec[1] * norm[2]) ;
+	nlCoefficient(2, 0) ;
+	nlCoefficient(3, 1.0f * norm[2]) ;
+	nlCoefficient(4, 0) ;
+	nlEnd(NL_ROW) ;
 
-	solver.begin_row() ;
-	solver.add_coefficient(0, 0) ;
-	solver.add_coefficient(1, vec[0] * norm[2]) ;
-	solver.add_coefficient(2, 2.0f * vec[1] * norm[2]) ;
-	solver.add_coefficient(3, 0) ;
-	solver.add_coefficient(4, 1.0f * norm[2]) ;
-	solver.set_right_hand_side(-1.0f * norm[1]) ;
-	solver.end_row() ;
+	nlRowParameterd(NL_RIGHT_HAND_SIDE, -1.0f * norm[1]) ;
+	nlBegin(NL_ROW);
+	nlCoefficient(0, 0) ;
+	nlCoefficient(1, vec[0] * norm[2]) ;
+	nlCoefficient(2, 2.0f * vec[1] * norm[2]) ;
+	nlCoefficient(3, 0) ;
+	nlCoefficient(4, 1.0f * norm[2]) ;
+	nlEnd(NL_ROW) ;
 }
 /*
 template <typename PFP>
@@ -297,10 +301,9 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select,
 	unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
 }
@@ -363,10 +366,9 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select,
 	unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
 }
@@ -422,10 +424,9 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select,
 	unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		computeCurvatureVertex_NormalCycles<PFP>(map, d, neigh, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
 }
@@ -477,10 +478,9 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select,
 	unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, d, neigh, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
 }
@@ -661,7 +661,6 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select,
 	unsigned int nbth)
 {
 	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
@@ -682,7 +681,7 @@ void computeCurvatureVertices_NormalCycles(
 	}
 
 	FunctorComputeCurvatureVertices_NormalCycles<PFP> funct(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true);
 }
 
 
@@ -729,11 +728,10 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	const FunctorSelect& select,
 	unsigned int nbth)
 {
 	FunctorComputeCurvatureVertices_QuadraticFitting<PFP> funct(map, position, normal, kmax, kmin, Kmax, Kmin);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true);
 }
 
 } // namespace Parallel

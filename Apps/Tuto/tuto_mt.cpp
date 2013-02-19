@@ -89,8 +89,8 @@ void MyQT::cb_initGL()
 
 	Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
 	registerShader(m_shader);
 	registerShader(m_lines);

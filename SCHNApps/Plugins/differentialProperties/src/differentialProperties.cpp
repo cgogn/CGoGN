@@ -139,6 +139,9 @@ void DifferentialPropertiesPlugin::computeNormal(
 	if(createNormalVBO)
 		mh->createVBO(normal);
 
+	computeNormalLastParameters[mapName] =
+		ComputeNormalParameters(positionAttributeName, normalAttributeName) ;
+
 	QList<View*> views = mh->getLinkedViews();
 	foreach(View* view, views)
 		view->updateGL();

@@ -29,7 +29,7 @@ enum
 } ;
 
 template <typename PFP>
-class ParticleCell2D : public Algo::MovingObjects::ParticleBase<PFP>
+class ParticleCell2D : public ParticleBase<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;

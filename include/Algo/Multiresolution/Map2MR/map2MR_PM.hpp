@@ -54,7 +54,7 @@ Map2MR_PM<PFP>::~Map2MR_PM()
 }
 
 template <typename PFP>
-void Map2MR_PM<PFP>::createPM(Algo::Surface::Decimation::SelectorType s, Algo::Surface::Decimation::ApproximatorType a, const FunctorSelect& select)
+void Map2MR_PM<PFP>::createPM(Algo::Surface::Decimation::SelectorType s, Algo::Surface::Decimation::ApproximatorType a)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 
@@ -95,22 +95,22 @@ void Map2MR_PM<PFP>::createPM(Algo::Surface::Decimation::SelectorType s, Algo::S
 	switch(s)
 	{
 	case Algo::Surface::Decimation::S_MapOrder : {
-		m_selector = new Algo::Surface::Decimation::EdgeSelector_MapOrder<PFP>(m_map, m_position, m_approximators, select) ;
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_MapOrder<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
 	case Algo::Surface::Decimation::S_Random : {
-		m_selector = new Algo::Surface::Decimation::EdgeSelector_Random<PFP>(m_map, m_position, m_approximators, select) ;
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_Random<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
 	case Algo::Surface::Decimation::S_EdgeLength : {
-		m_selector = new Algo::Surface::Decimation::EdgeSelector_Length<PFP>(m_map, m_position, m_approximators, select) ;
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_Length<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
 	case Algo::Surface::Decimation::S_QEM : {
-		m_selector = new Algo::Surface::Decimation::EdgeSelector_QEM<PFP>(m_map, m_position, m_approximators, select) ;
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_QEM<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
 	case Algo::Surface::Decimation::S_MinDetail : {
-		m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, m_position, m_approximators, select) ;
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
 	case Algo::Surface::Decimation::S_Curvature : {
-		m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, m_position, m_approximators, select) ;
+		m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;

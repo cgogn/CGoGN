@@ -191,9 +191,10 @@ void MyQT::createMap(int n)
 
 	dm.markAll();
 
-	m_render_topo->setDartWidth(5.0f);
+	m_render_topo->setDartWidth(4.0f);
 	m_render_topo->setInitialDartsColor(0.0f,0.0f,0.0f);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
+	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true); // nb
 
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
@@ -211,7 +212,8 @@ void MyQT::createMap(int n)
 
 void MyQT::updateMap()
 {
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
+	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true); // nb
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
 		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
@@ -227,7 +229,7 @@ void MyQT::updateMap()
 void MyQT::cb_initGL()
 {
 	glClearColor(1.0f,1.0f,1.0f,1.0f);
-	m_render_topo = new Algo::Render::GL2::TopoRender() ;
+	m_render_topo = new Algo::Render::GL2::TopoRender(0.01f) ;
 }
 
 // redraw GL callback (clear and swap already done)
@@ -251,7 +253,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y); // nb
 		if (button == Qt::LeftButton)
 		{
 			if (d != Dart::nil())

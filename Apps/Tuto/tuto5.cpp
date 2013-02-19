@@ -156,14 +156,13 @@ void MyQT::cb_initGL()
 	registerShader(m_sprite);
 	registerShader(m_lines);
 
-	SelectorTrue allDarts;
 
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
+//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f); // nb
 
 	// timer example for animation
 	m_timer = new QTimer( this );
@@ -217,8 +216,8 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);	
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+//		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y); // nb
 		if (d != Dart::nil())
 		{
 			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
@@ -262,11 +261,11 @@ void MyQT::cb_keyPress(int code)
 		Algo::Volume::Modelisation::catmullClarkVol<PFP>(myMap, position);
 
 		m_positionVBO->updateData(position);
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
-		m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, 0.9f, allDarts);
+		m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, 0.9f);
 	}
 }
 

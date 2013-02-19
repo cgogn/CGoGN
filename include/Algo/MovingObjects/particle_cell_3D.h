@@ -31,7 +31,7 @@ enum {
 };
 
 template <typename PFP>
-class ParticleCell3D : public MovingObjects::ParticleBase
+class ParticleCell3D : public Algo::MovingObjects::ParticleBase
 {
 public :
 	typedef typename PFP::MAP Map;
@@ -55,7 +55,7 @@ public :
 	{}
 
 	ParticleCell3D(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		ParticleBase(pos), m(map), position(tabPos), d(belonging_cell), state(3)
+		Algo::MovingObjects::ParticleBase(pos), m(map), position(tabPos), d(belonging_cell), state(3)
 	{
 		m_positionFace = pointInFace(d);
 	}

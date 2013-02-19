@@ -138,21 +138,21 @@ void Clipping::slot_drawFaces(bool b)
 void Clipping::slot_explodTopoPhi1(double c)
 {
 	m_coeffTopoExplod[0] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
 void Clipping::slot_explodTopoPhi2(double c)
 {
 	m_coeffTopoExplod[1] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
 void Clipping::slot_explodTopoPhi3(double c)
 {
 	m_coeffTopoExplod[2] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
@@ -823,7 +823,7 @@ void Clipping::importMesh(std::string& filename)
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 
 	m_bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	gPosObj = m_bb.center() ;
@@ -883,13 +883,13 @@ void Clipping::cb_initGL()
 void Clipping::updateVBOprimitives(int upType)
 {
 	if(upType & Algo::Render::GL2::TRIANGLES)
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
 	if(upType & Algo::Render::GL2::LINES)
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES,false) ;
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES,false) ;
 
 	if(upType & Algo::Render::GL2::POINTS)
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 }
 
 void Clipping::cb_redraw()

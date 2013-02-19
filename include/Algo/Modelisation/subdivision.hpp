@@ -64,9 +64,9 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d)
 }
 
 template <typename PFP, typename EMBV, typename EMB>
-void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+void trianguleFaces(typename PFP::MAP& map, EMBV& attributs)
 {
-	TraversorF<typename PFP::MAP> t(map, selected) ;
+	TraversorF<typename PFP::MAP> t(map) ;
 	for (Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		EMB center = Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
@@ -82,18 +82,17 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 }
 
 template <typename PFP>
-void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
+void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
-	trianguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
+	trianguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
 }
 
 template <typename PFP>
 void trianguleFaces(
 		typename PFP::MAP& map,
-		VertexAttribute<typename PFP::VEC3>& position, const FaceAttribute<typename PFP::VEC3>& positionF,
-		const FunctorSelect& selected)
+		VertexAttribute<typename PFP::VEC3>& position, const FaceAttribute<typename PFP::VEC3>& positionF)
 {
-	TraversorF<typename PFP::MAP> t(map, selected) ;
+	TraversorF<typename PFP::MAP> t(map) ;
 	for (Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		Dart cd = trianguleFace<PFP>(map, d);	// triangule the face
@@ -126,7 +125,7 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d)
 }
 
 template <typename PFP, typename EMBV, typename EMB>
-void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 {
 	DartMarker me(map) ;
 	DartMarker mf(map) ;
@@ -134,7 +133,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 	// first pass: cut the edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked2(d) && !me.isMarked(d))
+		if ( !map.isBoundaryMarked2(d) && !me.isMarked(d))
 		{
 			Dart f = map.phi1(d);
 			Dart e = map.cutEdge(d);
@@ -154,7 +153,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 	// second pass: quandrangule faces
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked2(d) && !mf.isMarked(d))
+		if ( !map.isBoundaryMarked2(d) && !mf.isMarked(d))
 		{
 			EMB center = Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
@@ -170,13 +169,13 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 }
 
 template <typename PFP>
-void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
+void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
-	quadranguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
+	quadranguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
 }
 
 template <typename PFP, typename EMBV, typename EMB>
-void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
@@ -188,7 +187,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 	// first pass: cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked2(d) && !me.isMarked(d))
+		if ( !map.isBoundaryMarked2(d) && !me.isMarked(d))
 		{
 			if (!m0.isMarked(d))
 			{
@@ -222,7 +221,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 	// second pass: quandrangule faces
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked2(d) && mf.isMarked(d)) // for each face not subdivided
+		if ( !map.isBoundaryMarked2(d) && mf.isMarked(d)) // for each face not subdivided
 		{
 			// compute center skip darts of new vertices non embedded
 			EMB center = AttribOps::zero<EMB,PFP>();
@@ -298,9 +297,9 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 }
 
 template <typename PFP>
-void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
+void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
-	CatmullClarkSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
+	CatmullClarkSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
 }
 
 inline double betaF(unsigned int n)
@@ -328,7 +327,7 @@ inline double betaF(unsigned int n)
 }
 
 template <typename PFP, typename EMBV, typename EMB>
-void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
@@ -340,7 +339,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	// first pass cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked2(d) && !me.isMarked(d))
+		if ( !map.isBoundaryMarked2(d) && !me.isMarked(d))
 		{
 			if (!m0.isMarked(d))
 			{
@@ -445,13 +444,13 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 }
 
 template <typename PFP>
-void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
+void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
-	LoopSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
+	LoopSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
 }
 
 template <typename PFP, typename EMBV, typename EMB>
-void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
 	CellMarker<EDGE> m0(map);
 	CellMarker<FACE> m1(map);
@@ -464,32 +463,30 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 	//first pass cut edge
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(selected(d))
+		if(!m0.isMarked(d))
 		{
-			if(!m0.isMarked(d))
+			if(!m1.isMarked(d))
 			{
-				if(!m1.isMarked(d))
-				{
-					m1.mark(d);
-					dOrig.push_back(d);
-				}
-
-				if(selected(map.phi2(d)) && !m1.isMarked(map.phi2(d)))
-				{
-					m1.mark(map.phi2(d));
-					dOrig.push_back(map.phi2(d));
-				}
-
-				EMB e1 = attributs[d];
-				EMB e2 = attributs[map.phi1(d)];
-				map.cutEdge(d);
-				attributs[map.phi1(d)] = e1*2.0f/3.0f+e2/3.0f;
-				map.cutEdge(map.phi1(d));
-				attributs[map.phi1(map.phi1(d))] = e2*2.0f/3.0f+e1/3.0f;
-				m0.mark(d);
-				m0.mark(map.phi1(d));
-				m0.mark(map.template phi<11>(d));
+				m1.mark(d);
+				dOrig.push_back(d);
 			}
+
+//			if(selected(map.phi2(d)) && !m1.isMarked(map.phi2(d)))   TODO CHECK THIS ALGO
+			if (!m1.isMarked(map.phi2(d)))
+			{
+				m1.mark(map.phi2(d));
+				dOrig.push_back(map.phi2(d));
+			}
+
+			EMB e1 = attributs[d];
+			EMB e2 = attributs[map.phi1(d)];
+			map.cutEdge(d);
+			attributs[map.phi1(d)] = e1*2.0f/3.0f+e2/3.0f;
+			map.cutEdge(map.phi1(d));
+			attributs[map.phi1(map.phi1(d))] = e2*2.0f/3.0f+e1/3.0f;
+			m0.mark(d);
+			m0.mark(map.phi1(d));
+			m0.mark(map.template phi<11>(d));
 		}
 	}
 
@@ -651,7 +648,7 @@ inline double sqrt3_K(unsigned int n)
 }
 
 //template <typename PFP>
-//void Sqrt3Subdivision(typename PFP::MAP& map, VertexAttribute<VEC3>& position, const FunctorSelect& selected)
+//void Sqrt3Subdivision(typename PFP::MAP& map, VertexAttribute<VEC3>& position)
 //{
 //	typedef typename PFP::VEC3 VEC3 ;
 //	typedef typename PFP::REAL REAL ;
@@ -661,7 +658,7 @@ inline double sqrt3_K(unsigned int n)
 //		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 //	Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
 //
-//	computeDual<PFP>(map, selected);
+//	computeDual<PFP>(map);
 //
 //	VertexAttribute<VEC3> tmp = position ;
 //	position = positionF ;
@@ -670,7 +667,7 @@ inline double sqrt3_K(unsigned int n)
 //	CellMarker m(map, VERTEX) ;
 //	m.markAll() ;
 //
-//	trianguleFaces<PFP>(map, position, positionF, selected);
+//	trianguleFaces<PFP>(map, position, positionF);
 //
 //	for(Dart d = map.begin(); d != map.end(); map.next(d))
 //	{

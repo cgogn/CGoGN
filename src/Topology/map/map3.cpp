@@ -1468,23 +1468,22 @@ Dart Map3::explodBorderTopo(Dart d)
 
 		if(!mf.isMarked(first))
 		{
-			mf.markOrbit<FACE>(first);
 			unsigned int degf = Map2::faceDegree(first);
 
 			Dart dnf = Map2::newFace(degf,false);
-            Dart dnftemp = dnf;
             Dart dit = first;
             do
             {
-            	Map2::sewFaces(dit,dnftemp,false);
+            	Map2::sewFaces(dit,dnf,false);
+            	copyDartEmbedding<VERTEX>(dnf, phi1(dit)) ;
             	dit = phi1(dit);
-            	dnftemp = phi_1(dnftemp);
-            }while(dnftemp != dnf);
+            	dnf = phi_1(dnf);
+            }while(dit != first);
 
+			mf.markOrbit<FACE>(first);
 
 			Dart db = dnf;
 			Dart d1 = phi1(db);
-			Dart dprev = phi_1(db);
 			Map2::splitFace(db, d1) ;
 			Map2::cutEdge(phi_1(db)) ;
 
@@ -1493,10 +1492,17 @@ Dart Map3::explodBorderTopo(Dart d)
 			while(dd != x)
 			{
 				Dart next = phi1(dd) ;
-				Dart prev = phi_1(dd);
 				Map2::splitFace(dd, phi1(x)) ;
 				dd = next ;
 			}
+
+			Dart cd = phi_1(db);
+			do
+			{
+				setDartEmbedding<VERTEX>(phi2(cd), getEmbedding<VERTEX>(phi1(cd))) ;
+				cd = phi2(phi_1(cd));
+			}while(cd != phi_1(db));
+
 		}
 
 		if(!mf.isMarked(second))
@@ -1505,19 +1511,19 @@ Dart Map3::explodBorderTopo(Dart d)
 			unsigned int degf = Map2::faceDegree(second);
 
 			Dart dnf = Map2::newFace(degf,false);
-            Dart dnftemp = dnf;
             Dart dit = second;
             do
             {
-            	Map2::sewFaces(dit,dnftemp,false);
+            	Map2::sewFaces(dit,dnf,false);
+            	copyDartEmbedding<VERTEX>(dnf, phi1(dit)) ;
             	dit = phi1(dit);
-            	dnftemp = phi_1(dnftemp);
-            }while(dnftemp != dnf);
+            	dnf = phi_1(dnf);
+            }while(dit != second);
 
+			mf.markOrbit<FACE>(second);
 
 			Dart db = dnf;
 			Dart d1 = phi1(db);
-			Dart dprev = phi_1(db);
 			Map2::splitFace(db, d1) ;
 			Map2::cutEdge(phi_1(db)) ;
 
@@ -1526,25 +1532,29 @@ Dart Map3::explodBorderTopo(Dart d)
 			while(dd != x)
 			{
 				Dart next = phi1(dd) ;
-				Dart prev = phi_1(dd);
 				Map2::splitFace(dd, phi1(x)) ;
 				dd = next ;
 			}
+
+			Dart cd = phi_1(db);
+			do
+			{
+				setDartEmbedding<VERTEX>(phi2(cd), getEmbedding<VERTEX>(phi1(cd))) ;
+				cd = phi2(phi_1(cd));
+			}while(cd != phi_1(db));
 		}
 
 	}
 
-//	//close de chaque nouveau volume
-//	for(std::vector<std::pair<Dart, Dart> >::iterator it = ve.begin() ; it != ve.end() ; ++it)
-//	{
-//		closeHole(phi2((*it).first));
-//	}
-
 	//close de chaque nouveau volume
 	for(std::vector<std::pair<Dart,Dart> >::iterator it = ve.begin() ; it != ve.end() ; ++it)
 	{
-		sewVolumes(phi2((*it).first), phi2((*it).second),false);
+		Dart dit1 = phi2((*it).first);
+		Dart dit2 = phi2((*it).second);
+		Map3::sewVolumes(dit1, dit2, false);
 	}
+
+	setOrbitEmbeddingOnNewCell<VERTEX>(phi_1(phi2(ve.front().first)));
 
 	return phi_1(phi2(ve.front().first));
 }

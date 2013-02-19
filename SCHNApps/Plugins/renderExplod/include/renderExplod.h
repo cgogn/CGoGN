@@ -2,13 +2,15 @@
 #define _RENDER_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_renderExplod.h"
+#include "renderExplodDockTab.h"
 
 #include "Algo/Render/GL2/explodeVolumeRender.h"
 
-using namespace CGoGN;
-using namespace SCHNApps;
+namespace CGoGN
+{
 
+namespace SCHNApps
+{
 
 struct PerMapParameterSet
 {
@@ -41,30 +43,13 @@ struct ParameterSet
 };
 
 
-class RenderExplodPlugin;
-
-class RenderExplodDockTab : public QWidget, public Ui::RenderExplodWidget
-{
-public:
-	RenderExplodDockTab(RenderExplodPlugin* p) : plugin(p)
-	{
-		setupUi(this);
-	}
-
-	void refreshUI(ParameterSet* params);
-
-private:
-	RenderExplodPlugin* plugin;
-};
-
-
 class RenderExplodPlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderExplodPlugin() : b_refreshingUI(false)
+	RenderExplodPlugin()
 	{
 		setProvidesRendering(true);
 	}
@@ -84,13 +69,9 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-	void setRefreshingUI(bool b) { b_refreshingUI = b; }
-
 protected:
 	RenderExplodDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
-
-	bool b_refreshingUI;
 
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
@@ -110,14 +91,10 @@ public slots:
 	void changeRenderFaces(View* view, MapHandlerGen* map, bool b);
 	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i);
 	void changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i);
-
-	void cb_selectedMapChanged();
-	void cb_positionVBOChanged(int index);
-	void cb_colorVBOChanged(int index);
-	void cb_renderEdgesChanged(bool b);
-	void cb_renderFacesChanged(bool b);
-	void cb_facesScaleFactorChanged(int i);
-	void cb_volumesScaleFactorChanged(int i);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

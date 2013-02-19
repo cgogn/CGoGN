@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RenderWidget</class>
- <widget class="QWidget" name="RenderWidget">
+ <class>RenderDockWidget</class>
+ <widget class="QWidget" name="RenderDockWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>174</width>
-    <height>547</height>
+    <height>545</height>
    </rect>
   </property>
   <property name="windowTitle">

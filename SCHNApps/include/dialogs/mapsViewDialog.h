@@ -28,8 +28,8 @@ private:
 
 public slots:
 	void selectedMapsChanged();
-	void selectMap(View* view, MapHandlerGen* map);
-	void deselectMap(View* view, MapHandlerGen* map);
+	void selectMap(View* view, MapHandlerGen* m);
+	void deselectMap(View* view, MapHandlerGen* m);
 	void addMapToList(MapHandlerGen* m);
 	void removeMapFromList(MapHandlerGen* m);
 };

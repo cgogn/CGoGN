@@ -46,13 +46,13 @@ template <typename PFP>
 typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread=0) ;
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread = 0) ;
 
 
 namespace Parallel
 {
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int nbth = 0) ;
 
 }
 

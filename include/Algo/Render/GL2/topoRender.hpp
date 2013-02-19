@@ -30,7 +30,12 @@
 #include "Topology/map/embeddedMap2.h"
 #include "Topology/gmap/embeddedGMap2.h"
 
+#include "Algo/Geometry/basic.h"
 #include "Geometry/distances.h"
+#include "Algo/Geometry/centroid.h"
+#include "Algo/Geometry/normal.h"
+
+#include "Topology/generic/mapBrowser.h"
 
 namespace CGoGN
 {
@@ -44,25 +49,42 @@ namespace Render
 namespace GL2
 {
 
+
 template<typename PFP>
-void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns)
+{
+	m_normalShift = ns;
+//	SelectorDartBoundary<typename PFP::MAP> sdb(map);
+//	MapBrowserSelector mbs(map,sdb);
+	MapBrowserSelector mbs(map,SelectorDartBoundary<typename PFP::MAP>(map));
+	map.setBrowser(&mbs);
+
+	updateData<PFP>(map,positions, ke, kf,true);
+
+	map.setBrowser(NULL);
+	m_normalShift = 0.0f;
+}
+
+
+template<typename PFP>
+void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
 	Map2* ptrMap2 = dynamic_cast<Map2*>(&map);
 	if (ptrMap2 != NULL)
 	{
-		updateDataMap<PFP>(map, positions, ke, kf, good);
+		updateDataMap<PFP>(map, positions, ke, kf, withBoundary);
 		return;
 	}
 	GMap2* ptrGMap2 = dynamic_cast<GMap2*>(&map);
 	if (ptrGMap2 != NULL)
 	{
-		updateDataGMap<PFP>(map, positions, ke, kf, good);
+		updateDataGMap<PFP>(map, positions, ke, kf, withBoundary);
 		return;
 	}
 }
 
 template<typename PFP>
-void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
 	Map2& map = reinterpret_cast<Map2&>(mapx);
 
@@ -79,8 +101,9 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
-		if (good(d))
+		if (withBoundary || !map.isBoundaryMarked2(d))
 			vecDarts.push_back(d);
+
 	}
 	m_nbDarts = vecDarts.size();
 
@@ -117,51 +140,97 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 		Dart d = *id;
 		if (!mf.isMarked(d))
 		{
-
 			vecPos.clear();
-			// store the face & center
-			VEC3 center(0.0f,0.0f,0.0f);
-			Dart dd = d;
-			do
+			if (!map.isBoundaryMarked2(d))
 			{
-				const VEC3& P = positions[d];
-				vecPos.push_back(P);
-				center += P;
-				Dart e = map.phi1(d);
-				d = e;
-			} while (d != dd);
-			center /= REAL(vecPos.size());
+				VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+				float k = 1.0f - kf;
+				Dart dd = d;
+				do
+				{
+					vecPos.push_back(center*k + positions[dd]*kf);
+					dd = map.phi1(dd);
+				} while (dd != d);
 
-			//shrink the face
-			unsigned int nb = vecPos.size();
-			float k = 1.0f - kf;
-			for (unsigned int i = 0; i < nb; ++i)
-			{
-				vecPos[i] = center*k + vecPos[i]*kf;
+
+				if (m_normalShift > 0.0f)
+				{
+					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,d,positions);
+					for (typename std::vector<VEC3>::iterator pit = vecPos.begin(); pit != vecPos.end(); ++pit)
+					{
+						*pit -= normal*m_normalShift;
+					}
+				}
+
+				unsigned int nb = vecPos.size();
+				vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
+
+				k = 1.0f - ke;
+				for (unsigned int i = 0; i < nb; ++i)
+				{
+
+					VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
+					VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
+
+					m_attIndex[d] = indexDC;
+					indexDC+=2;
+					*positionDartBuf++ = P;
+					*positionDartBuf++ = Q;
+					*colorDartBuf++ = m_dartsColor;
+					*colorDartBuf++ = m_dartsColor;
+					VEC3 f = P*0.5f + Q*0.5f;
+					fv2[d] = f;
+					f = P*0.1f + Q*0.9f;
+					fv1[d] = f;
+					f = P*0.9f + Q*0.1f;
+					fv11[d] = f;
+					d = map.phi1(d);
+				}
+				mf.markOrbit<FACE>(d);
 			}
-			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
-
-			k = 1.0f - ke;
-			for (unsigned int i = 0; i < nb; ++i)
+			else if (withBoundary)
 			{
-				VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
-				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
 
-				m_attIndex[d] = indexDC;
-				indexDC+=2;
-				*positionDartBuf++ = P;
-				*positionDartBuf++ = Q;
-				*colorDartBuf++ = m_dartsColor;
-				*colorDartBuf++ = m_dartsColor;
-				VEC3 f = P*0.5f + Q*0.5f;
-				fv2[d] = f;
-				f = P*0.1f + Q*0.9f;
-				fv1[d] = f;
-				f = P*0.9f + Q*0.1f;
-				fv11[d] = f;
-				d = map.phi1(d);
+				Dart dd = d;
+				do
+				{
+					Dart ee = mapx.phi2(dd);
+					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,ee,positions);
+					VEC3 vd = Algo::Surface::Geometry::vectorOutOfDart<PFP>(mapx,ee,positions);
+					VEC3 v = vd ^ normal;
+					v.normalize();
+					VEC3 P = positions[map.phi1(ee)] + v* m_boundShift;
+					vecPos.push_back(P);
+					dd = map.phi1(dd);
+					ee = mapx.phi2(dd);
+					P = positions[map.phi1(ee)] + v* m_boundShift;
+					vecPos.push_back(P);
+				} while (dd != d);
+
+				unsigned int nb = vecPos.size()/2;
+				float k = 1.0f - ke;
+				for (unsigned int i = 0; i < nb; ++i)
+				{
+
+					VEC3 P = vecPos[2*i]*ke + vecPos[2*i+1]*k;
+					VEC3 Q = vecPos[2*i+1]*ke + vecPos[2*i]*k;
+
+					m_attIndex[d] = indexDC;
+					indexDC+=2;
+					*positionDartBuf++ = P;
+					*positionDartBuf++ = Q;
+					*colorDartBuf++ = m_dartsBoundaryColor;
+					*colorDartBuf++ = m_dartsBoundaryColor;
+					VEC3 f = P*0.5f + Q*0.5f;
+					fv2[d] = f;
+					f = P*0.1f + Q*0.9f;
+					fv1[d] = f;
+					f = P*0.9f + Q*0.1f;
+					fv11[d] = f;
+					d = map.phi1(d);
+				}
+				mf.markOrbit<FACE>(d);
 			}
-			mf.markOrbit<FACE>(d);
 		}
 	}
 
@@ -191,7 +260,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 		Dart e = map.phi2(d);
 
 //		if (good(e) && (e.index > d.index))
-		if (good(e) && (d < e ))
+		if ( (withBoundary || !map.isBoundaryMarked2(e)) && (e.index > d.index))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
@@ -212,7 +281,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 }
 
 template<typename PFP>
-void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
 	GMap2& map = dynamic_cast<GMap2&>(mapx);
 
@@ -231,7 +300,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
-		if (good(d))
+		if (withBoundary || !map.isBoundaryMarked2(d))
 			vecDarts.push_back(d);
 	}
 	m_nbDarts = vecDarts.size();
@@ -266,26 +335,28 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 		if (!mf.isMarked(d))
 		{
 			vecPos.clear();
-			// store the face & center
-			VEC3 center(0.0f,0.0f,0.0f);
+			VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+			
+			float k = 1.0f - kf;
 			Dart dd = d;
 			do
 			{
-				const VEC3& P = positions[d];
-				vecPos.push_back(P);
-				center += P;
-				d = map.phi1(d);
-			} while (d != dd);
-			center /= REAL(vecPos.size());
+				vecPos.push_back(center*k + positions[dd]*kf);
+				dd = map.phi1(dd);
+			} while (dd != d);
 
-			//shrink the face
-			unsigned int nb = vecPos.size();
-			float k = 1.0f - kf;
-			for (unsigned int i = 0; i < nb; ++i)
+
+			if (m_normalShift > 0.0f)
 			{
-				vecPos[i] = center*k + vecPos[i]*kf;
+				VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,d,positions);
+				for (typename std::vector<VEC3>::iterator pit = vecPos.begin(); pit != vecPos.end(); ++pit)
+				{
+					*pit -= normal*m_normalShift;
+				}
 			}
+			unsigned int nb = vecPos.size();
 			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
+
 
 			k = 1.0f - ke;
 			for (unsigned int i = 0; i < nb; ++i)
@@ -348,7 +419,8 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 	{
 		Dart d = *id;
 		Dart e = map.beta2(d);
-		if (good(e) && (d < e ))
+//		if (d < e )
+		if ( (withBoundary || !map.isBoundaryMarked2(e)) && (d < e ))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
@@ -369,7 +441,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 }
 
 template<typename PFP>
-void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
+void TopoRender::setDartsIdColor(typename PFP::MAP& map, bool withBoundary)
 {
 	m_vbo3->bind();
 	float* colorBuffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -384,8 +456,9 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (good(d))
+		if (withBoundary || !map.isBoundaryMarked2(d))
 		{
+
 			if (nb < m_nbDarts)
 			{
 				float r,g,b;
@@ -402,6 +475,7 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 			else
 			{
 				CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
+				CGoGNerr << "NB = " << nb << "   NBDARTs = "<< m_nbDarts<<CGoGNendl;
 				break;
 			}
 		}
@@ -410,10 +484,10 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 }
 
 template<typename PFP>
-Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelect& good)
+Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, bool withBoundary)
 {
 	pushColors();
-	setDartsIdColor<PFP>(map,good);
+	setDartsIdColor<PFP>(map,withBoundary);
 	Dart d = pickColor(x,y);
 	popColors();
 	return d;
@@ -423,7 +497,7 @@ Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelec
 
 
 template<typename PFP>
-Dart TopoRender::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good)
+Dart TopoRender::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;
@@ -453,7 +527,7 @@ Dart TopoRender::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, 
 }
 
 template<typename PFP>
-Dart TopoRender::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax, const FunctorSelect& good)
+Dart TopoRender::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;

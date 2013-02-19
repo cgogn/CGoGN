@@ -28,9 +28,9 @@
 #include <vector>
 #include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
 
 namespace CGoGN { namespace Utils { class VBO; } }
-namespace CGoGN { namespace Utils { class ShaderColorPerVertex; } }
 namespace CGoGN { namespace Utils { namespace SVG { class SVGOut ; } } }
 
 namespace CGoGN
@@ -81,9 +81,11 @@ public:
 	 */
 	~Drawer();
 
+	Utils::ShaderColorPerVertex* getShader();
+
 	/**
 	 * init the data structure
-	 * @param com say if compile only, or compile and execute (GL_COMPILE/ GL_COMPILE_AND_EXECUTE)
+	 * @param comp say if compile only, or compile and execute (GL_COMPILE / GL_COMPILE_AND_EXECUTE)
 	 */
 	void newList(GLenum comp = GL_COMPILE);
 
@@ -161,7 +163,7 @@ public:
 	/**
 	 * update position of VBO of drawer
 	 * @param first index of vertex to update
-	 * @param nb number of vertex tp update
+	 * @param nb number of vertices to update
 	 * @param P ptr to table of vertices
 	 */
 	void updatePositions(unsigned int first, unsigned int nb, const Geom::Vec3f* P);
@@ -169,7 +171,7 @@ public:
 	/**
 	 * update position of VBO of drawer
 	 * @param first index of vertex to update
-	 * @param nb number of vertex tp update
+	 * @param nb number of vertices to update
 	 * @param P ptr to table of vertices
 	 */
 	void updatePositions(unsigned int first, unsigned int nb, const float* P);

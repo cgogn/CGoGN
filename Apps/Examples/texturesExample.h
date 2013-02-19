@@ -30,16 +30,16 @@
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/textures.h"
 #include "Utils/Shaders/shaderSimpleTexture.h"
-#include "Utils/Shaders/shaderTextureMask.h"
+#include "Utils/Shaders/shaderPhongTexture.h"
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
 #include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Import/importObjTex.h"
 
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
 namespace CGoGN { namespace Utils { class VBO; } }
-
 
 using namespace CGoGN ;
 
@@ -59,35 +59,37 @@ class TexView: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 protected:
-	void createMask(unsigned int nb);
 	void computeImage();
+	void computeTore();
 public:
 
 	MAP myMap ;
-
-	// render
-	Algo::Render::GL2::MapRender* m_render;
+	Algo::Surface::Import::OBJModel<PFP> m_obj;
 
 	// VBO
 	Utils::VBO* m_positionVBO;
 	Utils::VBO* m_texcoordVBO;
+	Utils::VBO* m_normalVBO;
+	unsigned int m_nbIndices;
 
 	Utils::Texture<2,Geom::Vec3uc>* m_texture;
-	Utils::Texture<2,float>* m_mask;
 
-	//2 shaders
+	// shader simple texture
 	Utils::ShaderSimpleTexture* m_shader;
-	Utils::ShaderTextureMask* m_shader2;
+	Utils::ShaderPhongTexture* m_shader2;
 
-	//with mask or not
-	bool m_modeMask;
+	bool m_phong;
 
-	/// filename of last loaded texture
-	std::string m_fileName;
+	/// filename of loaded mesh
+	std::string m_fileNameMesh;
+	/// filename of loaded texture
+	std::string m_fileNameTex;
 
 	TexView();
 
 	~TexView();
+
+	void init(char* fnm, char* fnt);
 
 	// callbacks of simpleQT to overdefine:
 	void cb_redraw();
@@ -96,7 +98,6 @@ public:
 
 	void cb_keyPress(int code);
 
-	void cb_Open();
 };
 
 #endif

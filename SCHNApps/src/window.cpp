@@ -377,6 +377,7 @@ void Window::setCurrentView(View* view)
 			disablePluginTabWidgets(p);
 
 		disconnect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+		disconnect(m_currentView, SIGNAL(pluginUnlinked(Plugin*)), this, SLOT(disablePluginTabWidgets(Plugin*)));
 	}
 
 	View* oldCurrent = m_currentView;
@@ -387,6 +388,7 @@ void Window::setCurrentView(View* view)
 		enablePluginTabWidgets(p);
 
 	connect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+	connect(m_currentView, SIGNAL(pluginUnlinked(Plugin*)), this, SLOT(disablePluginTabWidgets(Plugin*)));
 
 	emit(currentViewChanged(m_currentView));
 
@@ -490,13 +492,13 @@ Plugin* Window::loadPlugin(const QString& pluginName)
 		// if loading fails
 		else
 		{
-			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toUtf8().constData() << std::endl;
+			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toStdString() << std::endl;
 			return NULL;
 		}
 	}
 	else
 	{
-		std::cout << "loadPlugin: plugin not found (" << pluginName.toUtf8().constData() << ")" << std::endl;
+		std::cout << "loadPlugin: plugin not found (" << pluginName.toStdString() << ")" << std::endl;
 		return NULL;
 	}
 }
@@ -539,18 +541,21 @@ MapHandlerGen* Window::addMap(const QString& name, unsigned int dim)
 	if (h_maps.contains(name))
 		return NULL;
 
-	GenericMap* map = NULL;
+	MapHandlerGen* mh = NULL;
 	switch(dim)
 	{
-		case 2 :
-			map = new PFP2::MAP();
+		case 2 : {
+			PFP2::MAP* map = new PFP2::MAP();
+			mh = new MapHandler<PFP2>(name, this, map);
 			break;
-		case 3 :
-			map = new PFP3::MAP();
+		}
+		case 3 : {
+			PFP3::MAP* map = new PFP3::MAP();
+			mh = new MapHandler<PFP3>(name, this, map);
 			break;
+		}
 	}
 
-	MapHandlerGen* mh = new MapHandlerGen(name, this, map);
 	h_maps.insert(name, mh);
 
 	emit(mapAdded(mh));

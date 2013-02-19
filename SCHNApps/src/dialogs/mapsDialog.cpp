@@ -16,8 +16,8 @@ MapsDialog::MapsDialog(Window* window) :
 	QDialog(window),
 	m_window(window)
 {
-	this->setupUi(this);
-	this->setModal(false);
+	setupUi(this);
+	setModal(false);
 
 	connect(button_removeMap, SIGNAL(clicked()), this, SLOT(cb_removeMap()));
 	connect(button_refreshMapInfo, SIGNAL(clicked()), this, SLOT(cb_selectedMapChanged()));
