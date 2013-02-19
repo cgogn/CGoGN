@@ -202,6 +202,12 @@ void decimate(
 		case S_hLFexperimental:
 			selector = new HalfEdgeSelector_LFexperimental<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_hColorPerFace:
+			selector = new HalfEdgeSelector_ColorPerFace<PFP>(map, position, approximators, selected) ;
+			break ;
+		case S_hLFperFace:
+			selector = new HalfEdgeSelector_LFperFace<PFP>(map, position, approximators, selected) ;
+			break ;
 	}
 
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
