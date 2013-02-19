@@ -621,7 +621,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	// restore quick traversals pointers if necessary (containers  already ok)
 	for (unsigned int orb=0; orb<NB_ORBITS; ++orb)
 	{
-		m_quickTraversal[ORBIT] = m_attribs[ORBIT].getDataVector<Dart>("quick_traversal") ;
+		m_quickTraversal[orb] = m_attribs[orb].getDataVector<Dart>("quick_traversal") ;
 	}
 
 	return true;
