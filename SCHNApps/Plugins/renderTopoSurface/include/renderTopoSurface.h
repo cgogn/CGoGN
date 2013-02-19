@@ -1,10 +1,10 @@
-#ifndef _RENDERVECTOR_PLUGIN_H_
-#define _RENDERVECTOR_PLUGIN_H_
+#ifndef _RENDERTOPO_SURFACE_PLUGIN_H_
+#define _RENDERTOPO_SURFACE_PLUGIN_H_
 
 #include "plugin.h"
-#include "renderVectorDockTab.h"
+#include "renderTopoSurfaceDockTab.h"
 
-#include "Utils/Shaders/shaderVectorPerVertex.h"
+#include "Algo/Render/GL2/topoRender.h"
 
 namespace CGoGN
 {
@@ -14,16 +14,17 @@ namespace SCHNApps
 
 struct PerMapParameterSet
 {
-	PerMapParameterSet() :
-		positionVBO(NULL),
-		vectorsScaleFactor(1.0f)
-	{}
+	PerMapParameterSet(MapHandlerGen* mh);
+	~PerMapParameterSet();
 
-	PerMapParameterSet(MapHandlerGen* map);
+	void updateRender();
 
-	Utils::VBO* positionVBO;
-	std::vector<Utils::VBO*> vectorVBO;
-	float vectorsScaleFactor;
+	Algo::Render::GL2::TopoRender* m_renderTopo;
+	MapHandlerGen* mh;
+	VertexAttribute<PFP2::VEC3> positionAttribute;
+
+	float edgesScaleFactor;
+	float facesScaleFactor;
 };
 
 struct ParameterSet
@@ -31,23 +32,23 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
 };
 
 
-class RenderVectorPlugin : public Plugin
+class RenderTopoSurfacePlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderVectorPlugin()
+	RenderTopoSurfacePlugin()
 	{
 		setProvidesRendering(true);
 	}
 
-	~RenderVectorPlugin()
+	~RenderTopoSurfacePlugin()
 	{}
 
 	virtual bool enable();
@@ -62,11 +63,10 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-protected:
-	RenderVectorDockTab* m_dockTab;
-	QHash<View*, ParameterSet*> h_viewParams;
 
-	CGoGN::Utils::ShaderVectorPerVertex* m_vectorShader;
+protected:
+	RenderTopoSurfaceDockTab* m_dockTab;
+	QHash<View*, ParameterSet*> h_viewParams;
 
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
@@ -76,13 +76,15 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void vboAdded(Utils::VBO* vbo);
-	void vboRemoved(Utils::VBO* vbo);
-
 	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
-	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
-	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI = false);
-	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+
+	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI = false);
+
+	void changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+
+	void attributeModified(unsigned int orbit, QString nameAttr);
+	void connectivityModified();
 };
 
 } // namespace SCHNApps

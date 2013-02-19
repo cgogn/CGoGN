@@ -12,25 +12,28 @@ namespace CGoGN
 namespace SCHNApps
 {
 
+enum FaceShadingStyle
+{
+	FLAT = 0,
+	SMOOTH = 1
+};
+
 struct PerMapParameterSet
 {
-	PerMapParameterSet() :
-		positionVBO(NULL),
-		colorVBO(NULL),
-		facesScaleFactor(1.0f),
-		volumesScaleFactor(1.0f),
-		renderEdges(false),
-		renderFaces(true)
-	{}
+	PerMapParameterSet(MapHandlerGen* mh);
+	~PerMapParameterSet();
 
-	PerMapParameterSet(MapHandlerGen* map);
+	void updateRender();
 
-	Utils::VBO* positionVBO;
-	Utils::VBO* colorVBO;
+	Algo::Render::GL2::ExplodeVolumeRender* m_renderExplod;
+	MapHandlerGen* mh;
+	VertexAttribute<PFP3::VEC3> positionAttribute;
+	VolumeAttribute<PFP3::VEC3> colorAttribute;
 	float facesScaleFactor;
 	float volumesScaleFactor;
 	bool renderEdges;
 	bool renderFaces;
+	FaceShadingStyle faceStyle;
 };
 
 struct ParameterSet
@@ -38,7 +41,7 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
 };
 
@@ -81,16 +84,20 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void vboAdded(Utils::VBO* vbo);
-	void vboRemoved(Utils::VBO* vbo);
+	//void addAttributeToList(unsigned int orbit, const QString& nameAttr);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeColorVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeRenderEdges(View* view, MapHandlerGen* map, bool b);
-	void changeRenderFaces(View* view, MapHandlerGen* map, bool b);
-	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i);
-	void changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i);
+	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+
+	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI = false);
+	void changeColorAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI = false);
+
+	void changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+	void changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+
+	void attributeModified(unsigned int orbit, QString nameAttr);
+	void connectivityModified();
 };
 
 } // namespace SCHNApps

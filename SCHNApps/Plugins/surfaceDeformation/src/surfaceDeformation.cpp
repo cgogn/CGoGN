@@ -193,7 +193,6 @@ void SurfaceDeformationPlugin::keyPress(View* view, QKeyEvent* event)
 		{
 			asRigidAsPossible(view, map);
 			PerMapParameterSet* perMap = params->perMap[map->getName()];
-			params->selectedMap->updateVBO(perMap->positionAttribute);
 			params->selectedMap->notifyAttributeModification(perMap->positionAttribute);
 			view->updateGL();
 		}
@@ -319,7 +318,6 @@ void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
 //			matchDiffCoord(view, map);
 			asRigidAsPossible(view, params->selectedMap);
 
-			params->selectedMap->updateVBO(perMap->positionAttribute);
 			params->selectedMap->notifyAttributeModification(perMap->positionAttribute);
 
 			view->updateGL();

@@ -358,7 +358,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 			TYPE* ptrOut = this->m_data_ptr;
 			for(int i=img.height()-1; i>0; --i)
 			{
-				memcpy(ptrOut, img.constScanLine(i), 3*img.width());
+				memcpy(ptrOut, img.scanLine(i), 3*img.width());
 				ptrOut += img.width(); // not *3 because type is size of 3
 			}
 		}
@@ -370,7 +370,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 			TYPE* ptrOut = this->m_data_ptr;
 			for(int i=img.height()-1; i>0; --i)
 			{
-				memcpy(ptrOut, img.constScanLine(i), img.width());
+				memcpy(ptrOut, img.scanLine(i), img.width());
 				ptrOut += img.width();
 			}
 		}
@@ -382,7 +382,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 		//copy per line for alignment
 		for(int i=ptr->height()-1; i>0; --i)
 		{
-			memcpy(ptrOut, ptr->constScanLine(i), ptr->width()*bpp);
+			memcpy(ptrOut, ptr->scanLine(i), ptr->width()*bpp);
 			ptrOut += ptr->width();
 		}
 	}

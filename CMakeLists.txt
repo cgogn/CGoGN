@@ -33,6 +33,7 @@ find_package(Boost COMPONENTS regex thread system REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(SuiteSparse REQUIRED)
 
 IF (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
@@ -77,6 +78,7 @@ SET (CGoGN_EXT_INCLUDES
 
 # define libs for external libs
 SET (CGoGN_EXT_LIBS
+    nl
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
@@ -84,6 +86,7 @@ SET (CGoGN_EXT_LIBS
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
 	${Boost_THREAD_LIBRARY}
+	${SUITESPARSE_LIBRARIES}
 )
 
 #optionnal libs

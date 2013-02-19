@@ -78,8 +78,25 @@ void RenderVectorDockTab::selectedMapChanged()
 	{
 		QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 		if(!currentItems.empty())
-			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
+			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()), true);
 	}
+}
+
+void RenderVectorDockTab::addVBOToList(QString name)
+{
+	combo_positionVBO->addItem(name);
+	list_vectorVBO->addItem(name);
+}
+
+void RenderVectorDockTab::removeVBOFromList(QString name)
+{
+	int itemIdx = combo_positionVBO->findText(name, Qt::MatchExactly);
+	if(itemIdx != -1)
+		combo_positionVBO->removeItem(itemIdx);
+
+	QList<QListWidgetItem*> items = list_vectorVBO->findItems(name, Qt::MatchExactly);
+	if(!items.empty())
+		delete items[0];
 }
 
 void RenderVectorDockTab::positionVBOChanged(int index)
@@ -88,7 +105,7 @@ void RenderVectorDockTab::positionVBOChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()));
+		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
 	}
 }
 
@@ -102,7 +119,7 @@ void RenderVectorDockTab::selectedVectorsVBOChanged()
 		std::vector<Utils::VBO*> vbos;
 		foreach(QListWidgetItem* item, currentItems)
 			vbos.push_back(map->getVBO(item->text()));
-		m_plugin->changeSelectedVectorsVBO(view, map, vbos);
+		m_plugin->changeSelectedVectorsVBO(view, map, vbos, true);
 	}
 }
 
@@ -112,7 +129,7 @@ void RenderVectorDockTab::vectorsScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVectorsScaleFactor(view, map, i);
+		m_plugin->changeVectorsScaleFactor(view, map, i, true);
 	}
 }
 

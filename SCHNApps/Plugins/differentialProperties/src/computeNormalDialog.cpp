@@ -105,15 +105,6 @@ void ComputeNormalDialog::addAttributeToList(unsigned int orbit, const QString& 
 	}
 }
 
-void ComputeNormalDialog::attributeModified(unsigned int orbit, QString nameAttr)
-{
-	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-//	if(orbit == VERTEX && nameAttr == )
-//	{
-
-//	}
-}
-
 } // namespace SCHNApps
 
 } // namespace CGoGN

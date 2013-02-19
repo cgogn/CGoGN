@@ -71,12 +71,26 @@ public:
 	template <typename T, unsigned int ORBIT>
 	inline void notifyAttributeModification(const AttributeHandler<T, ORBIT>& attr)
 	{
-		emit(attributeModified(ORBIT, QString::fromStdString(attr.name())));
+		QString nameAttr = QString::fromStdString(attr.name());
+		if(h_vbo.contains(nameAttr))
+			h_vbo[nameAttr]->updateData(attr);
+
+		emit(attributeModified(ORBIT, nameAttr));
+
+		foreach(View* view, l_views)
+			view->updateGL();
 	}
 
 	inline void notifyConnectivityModification()
 	{
+		m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+
 		emit(connectivityModified());
+
+		foreach(View* view, l_views)
+			view->updateGL();
 	}
 
 	/*********************************************************
