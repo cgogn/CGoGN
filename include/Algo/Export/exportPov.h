@@ -49,7 +49,7 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, VertexAttribute
 		unsigned int nb = map.faceDegree(d);
 
 		if(nb == 3)
-			Algo::ExportPov::exportTrianglePlain<PFP>(out,position[d],position[map.phi1(d)],position[map.phi1(map.phi1(d))]);
+			exportTrianglePlain<PFP>(out,position[d],position[map.phi1(d)],position[map.phi1(map.phi1(d))]);
 		else
 		{
 			out << "polygon{ " << nb+1 << std::endl;
@@ -219,7 +219,7 @@ bool exportScenePov(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>&
 	out << "count 100 nearest_count 10 error_bound 0.15 recursion_limit 1 low_error_factor 0.2 gray_threshold 0.0 minimum_reuse 0.015 brightness 1 adc_bailout 0.01/2 normal off media off}" << std::endl;
 	out << "max_trace_level 255}" << std::endl;
 
-	exportMeshPlain<PFP>(out,map,position,"myMesh",good);
+	exportMeshPlain<PFP>(out,map,position,"myMesh");
 
 	out << "object {myMesh" << std::endl;
  	out << "translate <" << translate[0] << "," << translate[1] << "," << translate[2] << ">" << std::endl;
@@ -263,11 +263,7 @@ bool exportScenePovSmooth(typename PFP::MAP& map, VertexAttribute<typename PFP::
 //	out << "count 300 nearest_count 10 error_bound 0.15 recursion_limit 1 low_error_factor 0.2 gray_threshold 0.0 minimum_reuse 0.015 brightness 1 adc_bailout 0.01/2 normal off media off}" << std::endl;
 	out << "max_trace_level 60}" << std::endl;
 
-<<<<<<< HEAD
-	Algo::ExportPov::export3MeshPlainSmooth<PFP>(out,map,position,"myMesh");
-=======
-	export3MeshPlainSmooth<PFP>(out,map,position,"myMesh",good);
->>>>>>> 9da4717808f9c38da5f9d54d821f4b1e3050bbc1
+	export3MeshPlainSmooth<PFP>(out,map,position,"myMesh");
 
 	out << "object {myMesh" << std::endl;
  	out << "translate <" << translate[0] << "," << translate[1] << "," << translate[2] << ">" << std::endl;

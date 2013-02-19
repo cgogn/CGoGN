@@ -54,8 +54,9 @@ template<typename PFP>
 void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns)
 {
 	m_normalShift = ns;
-	SelectorDartBoundary<typename PFP::MAP> sdb(map);
-	MapBrowserSelector mbs(map,sdb);
+//	SelectorDartBoundary<typename PFP::MAP> sdb(map);
+//	MapBrowserSelector mbs(map,sdb);
+	MapBrowserSelector mbs(map,SelectorDartBoundary<typename PFP::MAP>(map));
 	map.setBrowser(&mbs);
 
 	updateData<PFP>(map,positions, ke, kf,true);
