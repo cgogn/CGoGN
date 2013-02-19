@@ -41,10 +41,12 @@ class MapBrowserSelector : public MapBrowser
 {
 protected:
 	AttribMap& m_map ;
-	const FunctorSelect& m_selector ;
+	const FunctorSelect* m_selector ;
 
 public:
 	MapBrowserSelector(AttribMap& m, const FunctorSelect& fs);
+
+	~MapBrowserSelector();
 
 	Dart begin() const;
 

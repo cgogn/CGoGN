@@ -37,6 +37,7 @@
 #endif
 
 #include "Algo/Render/GL2/topo3Render.h"
+#include "Algo/Render/GL2/topoRender.h"
 #include "Algo/Geometry/boundingbox.h"
 
 #include "ui_tuto_oper3.h"
@@ -70,7 +71,7 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
-	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f), clip_volume(true) , hide_clipping(false) {}
+	MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f), clip_volume(true) , hide_clipping(false) {}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -89,12 +90,13 @@ protected:
 
 	VertexAttribute<VEC3> position;
 
-	SelectorDartNoBoundary<PFP::MAP> nb;
+//	SelectorDartNoBoundary<PFP::MAP> nb;
 
 	Geom::BoundingBox<PFP::VEC3> bb;
 
 	// render (for the topo)
 	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
 	Dart m_selected;
 	Dart m_selected2;
 	std::vector<Dart> m_selecteds;
@@ -121,6 +123,10 @@ protected:
 	inline Dart PHI3(Dart d)	{return myMap.phi3(d);}
 	template<int X>
 	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+
+	Utils::ClippingShader* m_sh1;
+	Utils::ClippingShader* m_sh2;
+
 
 public:
 	// example of simple map creation
