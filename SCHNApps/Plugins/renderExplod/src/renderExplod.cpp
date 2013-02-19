@@ -342,7 +342,7 @@ void RenderExplodPlugin::attributeModified(unsigned int orbit, QString nameAttr)
 //			if(params.positionName == nameAttr && params.autoUpdate)
 //				computeNormal(map->getName(), params.positionName, params.normalName);
 //		}
-	}
+//	}
 }
 
 void RenderExplodPlugin::connectivityModified()

@@ -1,33 +1,30 @@
-#ifndef _RENDER_PLUGIN_H_
-#define _RENDER_PLUGIN_H_
+#ifndef _RENDERTOPO_SURFACE_PLUGIN_H_
+#define _RENDERTOPO_SURFACE_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_renderTopoSurface.h"
+#include "renderTopoSurfaceDockTab.h"
 
 #include "Algo/Render/GL2/topoRender.h"
 
-using namespace CGoGN;
-using namespace SCHNApps;
+namespace CGoGN
+{
 
+namespace SCHNApps
+{
 
 struct PerMapParameterSet
 {
-	PerMapParameterSet() :
-		edgesScaleFactor(1.0f),
-		facesScaleFactor(1.0f)
-	{
-		m_renderTopo = new Algo::Render::GL2::TopoRender();
-	}
+	PerMapParameterSet(MapHandlerGen* mh);
+	~PerMapParameterSet();
 
-	~PerMapParameterSet()
-	{
-		delete m_renderTopo;
-	}
+	void updateRender();
+
+	Algo::Render::GL2::TopoRender* m_renderTopo;
+	MapHandlerGen* mh;
+	VertexAttribute<PFP2::VEC3> positionAttribute;
 
 	float edgesScaleFactor;
 	float facesScaleFactor;
-
-	Algo::Render::GL2::TopoRender* m_renderTopo;
 };
 
 struct ParameterSet
@@ -35,25 +32,8 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
-};
-
-
-class RenderTopoSurfacePlugin;
-
-class RenderTopoSurfaceDockTab : public QWidget, public Ui::RenderWidget
-{
-public:
-	RenderTopoSurfaceDockTab(RenderTopoSurfacePlugin* p) : plugin(p)
-	{
-		setupUi(this);
-	}
-
-	void refreshUI(ParameterSet* params);
-
-private:
-	RenderTopoSurfacePlugin* plugin;
 };
 
 
@@ -63,7 +43,7 @@ class RenderTopoSurfacePlugin : public Plugin
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderTopoSurfacePlugin() : b_refreshingUI(false)
+	RenderTopoSurfacePlugin()
 	{
 		setProvidesRendering(true);
 	}
@@ -83,13 +63,10 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-	void setRefreshingUI(bool b) { b_refreshingUI = b; }
 
 protected:
-	RenderDockTab* m_dockTab;
+	RenderTopoSurfaceDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
-
-	bool b_refreshingUI;
 
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
@@ -99,13 +76,19 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i);
-	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i);
+	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
 
-	void cb_selectedMapChanged();
-	void cb_edgesScaleFactorChanged(int i);
-	void cb_facesScaleFactorChanged(int i);
+	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI = false);
+
+	void changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+
+	void attributeModified(unsigned int orbit, QString nameAttr);
+	void connectivityModified();
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif
