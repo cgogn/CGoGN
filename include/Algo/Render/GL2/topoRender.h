@@ -155,6 +155,7 @@ protected:
 public:
 	/**
 	* Constructor
+	* @param bs shift for boundary drawing
 	*/	
 	TopoRender(float bs = 0.01f);
 
