@@ -98,6 +98,11 @@ class MyQT: public Utils::QT::SimpleQT
 	int clip_id1;
 	int clip_id2;
 
+	// shader of toporender3
+	Utils::ClippingShader* m_sh1;
+	Utils::ClippingShader* m_sh2;
+
+
 public:
 	float m_WidthObj;
 	Geom::Vec3f m_PosObj;

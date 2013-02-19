@@ -74,16 +74,16 @@ void MyQT::clipping_onoff(bool x)
 		Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
 		float d = -(pos*normal);
 		m_explode_render->setClippingPlane(Geom::Vec4f(normal[0],normal[1],normal[2],d));
-		m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
-		m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
+		m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
+		m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
 	}
 	else
 	{
 		m_explode_render->setNoClippingPlane();
-		m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-		m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-		m_topo_render->shader1()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-		m_topo_render->shader2()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
+		m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
+		m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
+		m_sh1->setClipColorAttenuationFactorRelative(0.0f,0.0f);
+		m_sh2->setClipColorAttenuationFactorRelative(0.0f,0.0f);
 	}
 	updateGL();
 }
@@ -213,6 +213,9 @@ void MyQT::cb_initGL()
 	m_explode_render->setBackColor(Geom::Vec4f(0.9f,0.9f,0.9f,1.0f));
 	m_explode_render->setColorLine(Geom::Vec4f(0.8f,0.2f,0.2f,1.0f));
 
+	m_sh1 = static_cast<Utils::ClippingShader*>(m_topo_render->shader1());
+	m_sh2 = static_cast<Utils::ClippingShader*>(m_topo_render->shader2());
+
 	registerShader(m_explode_render->shaderFaces());
 	registerShader(m_explode_render->shaderLines());
 
@@ -221,14 +224,14 @@ void MyQT::cb_initGL()
 	m_frame->setSize(m_WidthObj/2.0f);
 
 
-	m_topo_render->shader1()->insertClippingCode();
-	m_topo_render->shader2()->insertClippingCode();
+	m_sh1->insertClippingCode();
+	m_sh2->insertClippingCode();
 
-	clip_id1 = m_topo_render->shader1()->addClipPlane();
-	clip_id2 = m_topo_render->shader2()->addClipPlane();
+	clip_id1 = m_sh1->addClipPlane();
+	clip_id2 = m_sh2->addClipPlane();
 
-	m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), m_PosObj);
-	m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), m_PosObj);
+	m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), m_PosObj);
+	m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), m_PosObj);
 	m_explode_render->setClippingPlane(Geom::Vec4f(0,0,1,m_PosObj*Geom::Vec3f(0,0,-1)));
 
 }
@@ -356,8 +359,8 @@ void  MyQT::cb_mouseMove(int buttons, int x, int y)
 	float d = -(pos*normal);
 	m_explode_render->setClippingPlane(Geom::Vec4f(normal[0],normal[1],normal[2],d));
 
-	m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
-	m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
+	m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
+	m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
 
 	m_begX = x;
 	m_begY = y;
