@@ -193,7 +193,8 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 	else
 		crossCell = CROSS_OTHER ;
 
-	if (sideOfEdge == Geom::ALIGNED) sideOfEdge = getOrientationEdge(goal, d) ;
+	if (sideOfEdge == Geom::ALIGNED)
+		sideOfEdge = getOrientationEdge(goal, d) ;
 
 	switch (sideOfEdge)
 	{
