@@ -1,6 +1,6 @@
 importPlugin = schnapps.loadPlugin("ImportSurface");
-renderPlugin = schnapps.loadPlugin("Render");
-renderVectorPlugin = schnapps.loadPlugin("RenderVector");
+renderPlugin = schnapps.loadPlugin("RenderD");
+renderVectorPlugin = schnapps.loadPlugin("RenderVectorD");
 differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
 subdivisionPlugin = schnapps.loadPlugin("SubdivideSurface");
 surfaceDeformationPlugin = schnapps.loadPlugin("SurfaceDeformation");
@@ -15,5 +15,5 @@ schnapps.linkViewAndPlugin(v.getName(), surfaceDeformationPlugin.getName());
 
 schnapps.linkViewAndMap(v.getName(), obj.getName());
 
-#differentialPropertiesPlugin.computeNormal(obj.getName());
-#differentialPropertiesPlugin.computeCurvature(obj.getName());
+differentialPropertiesPlugin.computeNormal(obj.getName());
+differentialPropertiesPlugin.computeCurvature(obj.getName());

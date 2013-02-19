@@ -1,5 +1,5 @@
-#ifndef _RENDEREXPLOD_DOCK_TAB_H_
-#define _RENDEREXPLOD_DOCK_TAB_H_
+#ifndef _RENDER_EXPLOD_DOCK_TAB_H_
+#define _RENDER_EXPLOD_DOCK_TAB_H_
 
 #include "ui_renderExplod.h"
 
@@ -11,7 +11,7 @@ namespace SCHNApps
 
 class Window;
 class RenderExplodPlugin;
-class ParameterSet;
+struct ParameterSet;
 
 class RenderExplodDockTab : public QWidget, public Ui::RenderExplodDockWidget
 {
@@ -30,8 +30,8 @@ public slots:
 	void refreshUI(ParameterSet* params);
 
 	void selectedMapChanged();
-	void positionVBOChanged(int index);
-	void colorVBOChanged(int index);
+	void positionAttributeChanged(int index);
+	void colorAttributeChanged(int index);
 	void renderEdgesChanged(bool b);
 	void renderFacesChanged(bool b);
 	void facesScaleFactorChanged(int i);

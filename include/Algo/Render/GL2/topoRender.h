@@ -36,9 +36,9 @@
 #include "Utils/vbo_base.h"
 #include "Utils/svg.h"
 
-// forward
-namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
-namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 
 namespace CGoGN
 {
@@ -286,6 +286,9 @@ public:
 	 * @param ns distance shift
 	 */
 	void setBoundaryShift(float bs);
+
+	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
+	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
 };
 
 // just for compatibility with old code

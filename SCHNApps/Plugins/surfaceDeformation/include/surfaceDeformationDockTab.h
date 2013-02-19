@@ -11,7 +11,7 @@ namespace SCHNApps
 
 class Window;
 class SurfaceDeformationPlugin;
-class ParameterSet;
+struct ParameterSet;
 
 class SurfaceDeformationDockTab : public QWidget, public Ui::SurfaceDeformationWidget
 {

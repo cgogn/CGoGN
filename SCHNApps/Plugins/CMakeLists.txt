@@ -6,6 +6,7 @@ ADD_SUBDIRECTORY(differentialProperties)
 ADD_SUBDIRECTORY(render)
 ADD_SUBDIRECTORY(renderVector)
 ADD_SUBDIRECTORY(renderExplod)
+ADD_SUBDIRECTORY(renderTopoSurface)
 ADD_SUBDIRECTORY(subdivideSurface)
 ADD_SUBDIRECTORY(surfaceDeformation)
-#ADD_SUBDIRECTORY(renderTopoSurface)
+

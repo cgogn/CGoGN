@@ -37,7 +37,7 @@
       </widget>
      </item>
      <item row="1" column="1" colspan="2">
-      <widget class="QComboBox" name="combo_colorVBO">
+      <widget class="QComboBox" name="combo_colorAttribute">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -47,7 +47,7 @@
       </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QComboBox" name="combo_positionVBO">
+      <widget class="QComboBox" name="combo_positionAttribute">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>

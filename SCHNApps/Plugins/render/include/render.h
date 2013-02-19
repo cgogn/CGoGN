@@ -100,14 +100,14 @@ public slots:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeRenderVertices(View* view, MapHandlerGen* map, bool b);
-	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i);
-	void changeRenderEdges(View* view, MapHandlerGen* map, bool b);
-	void changeRenderFaces(View* view, MapHandlerGen* map, bool b);
-	void changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style);
+	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeRenderVertices(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+	void changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style, bool fromUI = false);
 };
 
 } // namespace SCHNApps
