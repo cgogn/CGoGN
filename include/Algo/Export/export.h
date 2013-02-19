@@ -49,7 +49,7 @@ namespace Export
 * @return true
 */
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const bool binary, const FunctorSelect& good = allDarts) ;
+bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const bool binary) ;
 
 /**
 * export the map into a PLY file
@@ -60,7 +60,7 @@ bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * @return true
 */
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3>* >& attributeHandlers, const char* filename, const bool binary, const FunctorSelect& good = allDarts) ;
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3>* >& attributeHandlers, const char* filename, const bool binary) ;
 
 /**
 * export the map into a OFF file
@@ -69,7 +69,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 * @return true
 */
 template <typename PFP>
-bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good = allDarts) ;
+bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
 /**
 * export the map into a OBJ file
@@ -78,7 +78,7 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * @return true
 */
 template <typename PFP>
-bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename) ;
 
 /**
 * export the map into a Trian file
@@ -87,7 +87,7 @@ bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 * @return true
 */
 template <typename PFP>
-bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, char* filename, const FunctorSelect& good = allDarts) ;
+bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, char* filename) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format).
@@ -102,7 +102,7 @@ bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC
 * @return true
 */
 //template <typename PFP>
-//bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good = allDarts) ;
+//bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format).
@@ -117,7 +117,7 @@ bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC
 * @return true
 */
 //template <typename PFP>
-//bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good = allDarts) ;
+//bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
 /**
 * export the map into a PLYSLF file (K. Vanhoey generic format).
@@ -132,7 +132,7 @@ bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC
 * @return true
 */
 /*template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good = allDarts) ;
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 */
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format)
@@ -145,7 +145,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 */
 /*
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good = allDarts) ;
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6]) ;
 */
 /**
  * export meshes used at the workbench
@@ -155,7 +155,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
  * @return
  */
 template <typename PFP>
-bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good = allDarts) ;
+bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename) ;
 
 } // namespace Export
 

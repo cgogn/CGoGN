@@ -2,8 +2,11 @@
 
 #include "mapHandler.h"
 
-#include "Algo/Import/import.h"
+namespace CGoGN
+{
 
+namespace SCHNApps
+{
 
 PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
 	positionVBO(NULL),
@@ -14,25 +17,35 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
 	renderFaces(true),
 	faceStyle(FLAT)
 {
+	bool positionFound = false;
+	bool normalFound = false;
+
 	QList<Utils::VBO*> vbos = map->getVBOList();
 	for(int i = 0; i < vbos.count(); ++i)
 	{
-		if(vbos[i]->name() == "position") // try to select a VBO named "position"
-			positionVBO = vbos[i];
-		if(vbos[i]->name() == "normal")	// try to select a VBO named "normal"
-			normalVBO = vbos[i];
-	}
+		if(vbos[i]->dataSize() == 3)
+		{
+			if(!positionFound) positionVBO = vbos[i];
+			if(vbos[i]->name() == "position") // try to select a VBO named "position"
+			{
+				positionVBO = vbos[i];
+				positionFound = true;
+			}
 
-	if(positionVBO == NULL && vbos.count() > 0)
-		positionVBO = vbos[0];
-	if(normalVBO == NULL && vbos.count() > 0)
-		normalVBO = vbos[0];
+			if(!normalFound) normalVBO = vbos[i];
+			if(vbos[i]->name() == "normal")	// try to select a VBO named "normal"
+			{
+				normalVBO = vbos[i];
+				normalFound = true;
+			}
+		}
+	}
 }
 
 
 bool RenderPlugin::enable()
 {
-	m_dockTab = new RenderDockTab(this);
+	m_dockTab = new RenderDockTab(m_window, this);
 	addTabInDock(m_dockTab, "Render");
 
 	m_flatShader = new CGoGN::Utils::ShaderFlat();
@@ -56,15 +69,6 @@ bool RenderPlugin::enable()
 	registerShader(m_phongShader);
 	registerShader(m_simpleColorShader);
 	registerShader(m_pointSprite);
-
-	connect(m_dockTab->mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
-	connect(m_dockTab->combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_positionVBOChanged(int)));
-	connect(m_dockTab->combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_normalVBOChanged(int)));
-	connect(m_dockTab->check_renderVertices, SIGNAL(toggled(bool)), this, SLOT(cb_renderVerticesChanged(bool)));
-	connect(m_dockTab->slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_verticesScaleFactorChanged(int)));
-	connect(m_dockTab->check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(cb_renderEdgesChanged(bool)));
-	connect(m_dockTab->check_renderFaces, SIGNAL(toggled(bool)), this, SLOT(cb_renderFacesChanged(bool)));
-	connect(m_dockTab->group_faceShading, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(cb_faceStyleChanged(QAbstractButton*)));
 
 	connect(m_window, SIGNAL(viewAndPluginLinked(View*, Plugin*)), this, SLOT(viewLinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
@@ -169,7 +173,11 @@ void RenderPlugin::viewUnlinked(View* view, Plugin* plugin)
 void RenderPlugin::currentViewChanged(View* view)
 {
 	if(isLinkedToView(view))
+	{
+		ParameterSet* params = h_viewParams[view];
+		changeSelectedMap(view, params->selectedMap);
 		m_dockTab->refreshUI(h_viewParams[view]);
+	}
 }
 
 void RenderPlugin::mapLinked(MapHandlerGen* m)
@@ -234,7 +242,7 @@ void RenderPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 	if(view->isCurrentView())
 	{
 		if(prev)
-			disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+			disconnect(prev, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 		if(map)
 			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 
@@ -327,194 +335,12 @@ void RenderPlugin::changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingS
 	}
 }
 
-void RenderPlugin::cb_selectedMapChanged()
-{
-	if(!b_refreshingUI)
-	{
-		QList<QListWidgetItem*> currentItems = m_dockTab->mapList->selectedItems();
-		if(!currentItems.empty())
-			changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
-	}
-}
-
-void RenderPlugin::cb_positionVBOChanged(int index)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changePositionVBO(view, map, map->getVBO(m_dockTab->combo_positionVBO->currentText()));
-	}
-}
-
-void RenderPlugin::cb_normalVBOChanged(int index)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changeNormalVBO(view, map, map->getVBO(m_dockTab->combo_normalVBO->currentText()));
-	}
-}
-
-void RenderPlugin::cb_renderVerticesChanged(bool b)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changeRenderVertices(view, map, b);
-	}
-}
-
-void RenderPlugin::cb_verticesScaleFactorChanged(int i)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changeVerticesScaleFactor(view, map, i);
-	}
-}
-
-void RenderPlugin::cb_renderEdgesChanged(bool b)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changeRenderEdges(view, map, b);
-	}
-}
-
-void RenderPlugin::cb_renderFacesChanged(bool b)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		changeRenderFaces(view, map, b);
-	}
-}
-
-void RenderPlugin::cb_faceStyleChanged(QAbstractButton* b)
-{
-	if(!b_refreshingUI)
-	{
-		View* view = m_window->getCurrentView();
-		MapHandlerGen* map = h_viewParams[view]->selectedMap;
-		if(m_dockTab->radio_flatShading->isChecked())
-			changeFacesStyle(view, map, FLAT);
-		else if(m_dockTab->radio_phongShading->isChecked())
-			changeFacesStyle(view, map, PHONG);
-	}
-}
-
-
-
-void RenderDockTab::refreshUI(ParameterSet* params)
-{
-	plugin->setRefreshingUI(true);
-
-	mapList->clear();
-	combo_positionVBO->clear();
-	combo_normalVBO->clear();
-
-	MapHandlerGen* map = params->selectedMap;
-
-	QHash<QString, PerMapParameterSet>::const_iterator i = params->perMap.constBegin();
-	while (i != params->perMap.constEnd())
-	{
-		mapList->addItem(i.key());
-		if(map != NULL && i.key() == map->getName())
-		{
-			QList<QListWidgetItem*> item = mapList->findItems(map->getName(), Qt::MatchExactly);
-			item[0]->setSelected(true);
-
-			PerMapParameterSet& p = params->perMap[map->getName()];
-
-			QList<Utils::VBO*> vbos = map->getVBOList();
-			unsigned int j = 0;
-			for(int i = 0; i < vbos.count(); ++i)
-			{
-				if(vbos[i]->dataSize() == 3)
-				{
-					combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
-					if(p.positionVBO == NULL)
-					{										// if nothing is specified in the parameter set
-						if(vbos[i]->name() == "position")	// try to select a VBO named "position"
-						{
-							p.positionVBO = vbos[i];
-							combo_positionVBO->setCurrentIndex(j);
-						}
-					}
-					else if(vbos[i] == p.positionVBO)
-						combo_positionVBO->setCurrentIndex(j);
-
-					combo_normalVBO->addItem(QString::fromStdString(vbos[i]->name()));
-					if(p.normalVBO == NULL)
-					{									// if nothing is specified in the parameter set
-						if(vbos[i]->name() == "normal")	// try to select a VBO named "normal"
-						{
-							p.normalVBO = vbos[i];
-							combo_normalVBO->setCurrentIndex(j);
-						}
-					}
-					else if(vbos[i] == p.normalVBO)
-						combo_normalVBO->setCurrentIndex(j);
-
-					++j;
-				}
-			}
-
-			if(p.positionVBO == NULL && vbos.count() > 0)
-			{
-				int i = 0;
-				bool found = false;
-				while(i < vbos.count() && !found)
-				{
-					if(vbos[i]->dataSize() == 3)
-					{
-						p.positionVBO = vbos[i];
-						combo_positionVBO->setCurrentIndex(i);
-						found = true;
-					}
-					++i;
-				}
-			}
-			if(p.normalVBO == NULL && vbos.count() > 0)
-			{
-				int i = 0;
-				bool found = false;
-				while(i < vbos.count() && !found)
-				{
-					if(vbos[i]->dataSize() == 3)
-					{
-						p.normalVBO = vbos[i];
-						combo_normalVBO->setCurrentIndex(i);
-						found = true;
-					}
-					++i;
-				}
-			}
-
-			check_renderVertices->setChecked(p.renderVertices);
-			slider_verticesScaleFactor->setSliderPosition(p.verticesScaleFactor * 50.0);
-			check_renderEdges->setChecked(p.renderEdges);
-			check_renderFaces->setChecked(p.renderFaces);
-			radio_flatShading->setChecked(p.faceStyle == FLAT);
-			radio_phongShading->setChecked(p.faceStyle == PHONG);
-		}
-		++i;
-	}
-
-	plugin->setRefreshingUI(false);
-}
-
-
-
 #ifndef DEBUG
 Q_EXPORT_PLUGIN2(RenderPlugin, RenderPlugin)
 #else
 Q_EXPORT_PLUGIN2(RenderPluginD, RenderPlugin)
 #endif
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

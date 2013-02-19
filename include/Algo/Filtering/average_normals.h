@@ -49,13 +49,12 @@ void computeNewPositionsFromFaceNormals(
 	const FaceAttribute<typename PFP::REAL>& faceArea,
 	const FaceAttribute<typename PFP::VEC3>& faceCentroid,
 	const FaceAttribute<typename PFP::VEC3>& faceNormal,
-	const FaceAttribute<typename PFP::VEC3>& faceNewNormal,
-	const FunctorSelect& select)
+	const FaceAttribute<typename PFP::VEC3>& faceNewNormal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		const VEC3& pos_d = position[d] ;
@@ -78,7 +77,7 @@ void computeNewPositionsFromFaceNormals(
 }
 
 template <typename PFP>
-void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
+void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -87,14 +86,14 @@ void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
-	TraversorF<typename PFP::MAP> tf(map, select) ;
+	TraversorF<typename PFP::MAP> tf(map) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
 		REAL sumArea = 0 ;
@@ -117,12 +116,11 @@ void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename
 
 	// Compute new vertices position
 	computeNewPositionsFromFaceNormals<PFP>(
-		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal, select
-	) ;
+		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal) ;
 }
 
 template <typename PFP>
-void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
+void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -131,14 +129,14 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typ
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
-	TraversorF<typename PFP::MAP> tf(map, select) ;
+	TraversorF<typename PFP::MAP> tf(map) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
 		// traversal of neighbour vertices
@@ -202,12 +200,11 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typ
 
 	// Compute new vertices position
 	computeNewPositionsFromFaceNormals<PFP>(
-		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal, select
-	) ;
+		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal) ;
 }
 
 template <typename PFP>
-void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
+void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -216,9 +213,9 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
@@ -227,7 +224,7 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	TraversorF<typename PFP::MAP> tf(map, select) ;
+	TraversorF<typename PFP::MAP> tf(map) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
 		const VEC3& normF = faceNormal[d] ;
@@ -318,15 +315,14 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 
 	// Compute new vertices position
 	computeNewPositionsFromFaceNormals<PFP>(
-		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal, select
-	) ;
+		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal) ;
 
 //	CGoGNout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<CGoGNendl;
 //	CGoGNout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<CGoGNendl;
 }
 
 template <typename PFP>
-void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts)
+void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -335,9 +331,9 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
 	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
-	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
-	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
-	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
+	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
+	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
+	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
 	VertexAutoAttribute<REAL> vertexArea(map, "vertexArea") ;
 	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
@@ -347,7 +343,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	TraversorV<typename PFP::MAP> tv(map, select) ;
+	TraversorV<typename PFP::MAP> tv(map) ;
 	for(Dart d = tv.begin(); d != tv.end(); d = tv.next())
 	{
 		const VEC3& normV = normal[d] ;
@@ -436,7 +432,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	}
 
 	// Compute face normals from vertex normals
-	TraversorF<typename PFP::MAP> tf(map, select) ;
+	TraversorF<typename PFP::MAP> tf(map) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
 		VEC3 newNormal(0) ;
@@ -456,8 +452,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 
 	// Compute new vertices position
 	computeNewPositionsFromFaceNormals<PFP>(
-		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal, select
-	) ;
+		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal	) ;
 
 //	CGoGNout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<CGoGNendl;
 //	CGoGNout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<CGoGNendl;

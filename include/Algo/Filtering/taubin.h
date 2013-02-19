@@ -38,7 +38,7 @@ namespace Filtering
 {
 
 template <typename PFP>
-void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
+void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -52,7 +52,7 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& p
 	FunctorAverage<VEC3, VERTEX> fa1(position) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(select(d) && !mv.isMarked(d))
+		if( !mv.isMarked(d))
 		{
 			mv.mark(d);
 
@@ -75,7 +75,7 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& p
 	FunctorAverage<VEC3, VERTEX> fa2(position2) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(select(d) && mv.isMarked(d))
+		if( mv.isMarked(d))
 		{
 			mv.unmark(d);
 
@@ -99,7 +99,7 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& p
  * Taubin filter modified as proposed by [Lav09]
  */
 template <typename PFP>
-void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, typename PFP::REAL radius, const FunctorSelect& select = allDarts)
+void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, typename PFP::REAL radius)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -112,7 +112,7 @@ void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP:
 	Algo::Surface::Selection::Collector_WithinSphere<PFP> c1(map, position, radius) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(select(d) && !mv.isMarked(d))
+		if( !mv.isMarked(d))
 		{
 			mv.mark(d);
 
@@ -136,7 +136,7 @@ void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP:
 	Algo::Surface::Selection::Collector_WithinSphere<PFP> c2(map, position2, radius) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(select(d) && mv.isMarked(d))
+		if( mv.isMarked(d))
 		{
 			mv.unmark(d);
 

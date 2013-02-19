@@ -40,11 +40,10 @@ public:
 	virtual Dart end() = 0;
 	virtual Dart next() = 0;
 
-	bool applyFunctor(FunctorType& f, const FunctorSelect& good = allDarts)
+	bool applyFunctor(FunctorType& f)
 	{
 		for (Dart d = begin(); d != end(); d = next())
 		{
-			if (good(d))
 				if (f(d))
 					return true;
 		}

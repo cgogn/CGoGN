@@ -63,7 +63,6 @@ void computeFaceGradient(
 	const VertexAttribute<typename PFP::REAL>& scalar,
 	const FaceAttribute<typename PFP::REAL>& face_area,
 	FaceAttribute<typename PFP::VEC3>& face_gradient,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -81,7 +80,6 @@ void computeVertexGradient(
 	const FaceAttribute<typename PFP::VEC3>& face_gradient,
 	const FaceAttribute<typename PFP::REAL>& face_area,
 	VertexAttribute<typename PFP::VEC3>& vertex_gradient,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -104,7 +102,6 @@ void computeTriangleType(
 	typename PFP::MAP& map,
 	const VertexAttribute<typename PFP::VEC3>& K,
 	CellMarker<FACE>& regularMarker,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -114,7 +111,6 @@ template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
 	FaceAttribute<ridgeSegment>& ridge_segments,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -127,7 +123,6 @@ void computeRidgeLines(
 	const VertexAttribute<typename PFP::REAL>& k,
 	const VertexAttribute<typename PFP::REAL>& k2,
 	FaceAttribute<ridgeSegment>& ridge_segments,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
@@ -147,7 +142,6 @@ void computeSingularTriangle(
 	typename PFP::MAP& map,
 	CellMarker<FACE>& regularMarker,
 	FaceAttribute<ridgeSegment>& ridge_segments,
-	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>

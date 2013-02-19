@@ -41,14 +41,14 @@ namespace Filtering
 {
 
 template <typename PFP>
-float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& originalPosition, const VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
+float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& originalPosition, const VertexAttribute<typename PFP::VEC3>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
 	float dist_o = 0.0f ;
 	float dist_f = 0.0f ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		const VEC3& posO = originalPosition[d] ;
@@ -88,7 +88,7 @@ float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PF
 }
 
 template <typename PFP>
-void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts)
+void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -96,7 +96,7 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
 	srand(time(NULL)) ;
 
 	// apply noise on each vertex
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		const VEC3& pos = position[d] ;
@@ -134,7 +134,7 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
 
 } //namespace Filtering
 
-}
+} //namespace Surface
 
 } //namespace Algo
 

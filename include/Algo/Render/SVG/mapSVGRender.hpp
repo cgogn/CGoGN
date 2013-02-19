@@ -35,9 +35,9 @@ namespace SVG
 {
 
 template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, unsigned int thread)
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> trac(map, good);
+	TraversorV<typename PFP::MAP> trac(map);
 	svg.beginPoints();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
 		svg.addPoint(position[d]);
@@ -45,9 +45,9 @@ void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const Verte
 }
 
 template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good, unsigned int thread)
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> trac(map, good);
+	TraversorV<typename PFP::MAP> trac(map);
 	svg.beginPoints();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
 		svg.addPoint(position[d], color[d]);
@@ -55,9 +55,9 @@ void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const Verte
 }
 
 template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, unsigned int thread)
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread)
 {
-	TraversorE<typename PFP::MAP> trac(map, good);
+	TraversorE<typename PFP::MAP> trac(map);
 	svg.beginLines();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
 		svg.addLine(position[d], position[map.phi1(d)]);
@@ -65,9 +65,9 @@ void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAt
 }
 
 template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good, unsigned int thread)
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, unsigned int thread)
 {
-	TraversorE<typename PFP::MAP> trac(map, good);
+	TraversorE<typename PFP::MAP> trac(map);
 	svg.beginLines();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
 		svg.addLine(position[d], position[map.phi1(d)], color[d]);

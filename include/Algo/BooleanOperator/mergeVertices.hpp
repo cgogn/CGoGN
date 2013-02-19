@@ -60,7 +60,7 @@ void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& po
 		Dart d1 = d ;
 		do
 		{
-			if (CGoGN::Algo::BooleanOperator::isBetween<PFP>(map, positions, e, d,
+			if (BooleanOperator::isBetween<PFP>(map, positions, e, d,
 			                                                 map.alpha1(d))) break ;
 			d = map.alpha1(d) ;
 		} while (d != d1) ;

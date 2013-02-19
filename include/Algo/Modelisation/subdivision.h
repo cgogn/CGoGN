@@ -53,10 +53,10 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d);
  * Triangule all the faces of the mesh
  */
 template <typename PFP, typename EMBV, typename EMB>
-void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
+void trianguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
 template <typename PFP>
-void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts) ;
+void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 /**
  * Triangule all the faces of the mesh
@@ -65,8 +65,7 @@ void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>&
 template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3>& position, const FaceAttribute<typename PFP::VEC3>& positionF,
-	const FunctorSelect& selected = allDarts) ;
+	VertexAttribute<typename PFP::VEC3>& position, const FaceAttribute<typename PFP::VEC3>& positionF) ;
 
 /**
 * Quadrangule a face with central vertex
@@ -82,32 +81,32 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d);
  * Quadrangule all the faces of the mesh
  */
 template <typename PFP, typename EMBV, typename EMB>
-void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
+void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
 template <typename PFP>
-void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts) ;
+void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 /**
  * Catmull-Clark subdivision scheme
  */
 template <typename PFP, typename EMBV, typename EMB>
-void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
+void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
 template <typename PFP>
-void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts) ;
+void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 /**
  * Loop subdivision scheme
  */
 template <typename PFP, typename EMBV, typename EMB>
-void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
+void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
 template <typename PFP>
-void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts) ;
+void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 
 template <typename PFP, typename EMBV, typename EMB>
-void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
+void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
 /**
  * Doo-Sabin subdivision scheme
@@ -120,7 +119,7 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 // * NOW  IN THE MAP
 // */
 //template <typename PFP>
-//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position) ;
 
 
 
@@ -128,7 +127,7 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 // * Sqrt(3) subdivision scheme
 // */
 //template <typename PFP>
-//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position) ;
 
 template <typename PFP>
 void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);

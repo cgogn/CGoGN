@@ -106,7 +106,7 @@ public:
 //	void trianguleFace(Dart d, DartMarker& mark);
 	void trianguleFace(Dart d);
 
-	void triangule(const FunctorSelect& good = allDarts, unsigned int thread = 0);
+	void triangule(unsigned int thread = 0);
 };
 
 } // namespace Modelisation

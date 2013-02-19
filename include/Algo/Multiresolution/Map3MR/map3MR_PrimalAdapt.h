@@ -167,6 +167,8 @@ public:
 	 */
 	unsigned int subdivideVolume(Dart d, bool triQuad = true, bool OneLevelDifference = true);
 
+	unsigned int subdivideHexa(Dart d, bool OneLevelDifference = true);
+
 	//! Subdivide the volume of d to hexahedral cells
 	/*! @param d Dart from the volume
 	 */

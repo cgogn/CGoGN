@@ -37,7 +37,7 @@ namespace Decimation
 template <typename PFP>
 void decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	std::vector<VertexAttribute<typename PFP::VEC3>* >& attribs, unsigned int nbWantedVertices, const FunctorSelect& selected,
+	std::vector<VertexAttribute<typename PFP::VEC3>* >& attribs, unsigned int nbWantedVertices,
 	EdgeAttribute<typename PFP::REAL> *edgeErrors,
 	void (*callback_wrapper)(void*, const void*), void* callback_object
 )
@@ -146,55 +146,55 @@ void decimate(
 	switch(s)
 	{
 		case S_MapOrder :
-			selector = new EdgeSelector_MapOrder<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_MapOrder<PFP>(map, position, approximators) ;
 			break ;
 		case S_Random :
-			selector = new EdgeSelector_Random<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_Random<PFP>(map, position, approximators) ;
 			break ;
 		case S_EdgeLength :
-			selector = new EdgeSelector_Length<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_Length<PFP>(map, position, approximators) ;
 			break ;
 		case S_QEMml :
-			selector = new EdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_QEMml<PFP>(map, position, approximators) ;
 			break ;
 		case S_QEM :
-			selector = new EdgeSelector_QEM<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_QEM<PFP>(map, position, approximators) ;
 			break ;
 		case S_Curvature :
-			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators) ;
 			break ;
 		case S_NormalArea :
-			selector = new EdgeSelector_NormalArea<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_NormalArea<PFP>(map, position, approximators) ;
 			break ;
 		case S_CurvatureTensor :
-			selector = new EdgeSelector_CurvatureTensor<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_CurvatureTensor<PFP>(map, position, approximators) ;
 			break ;
 		case S_MinDetail :
-			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators) ;
 			break ;
 		case S_ColorNaive :
-			selector = new EdgeSelector_ColorNaive<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_ColorNaive<PFP>(map, position, approximators) ;
 			break ;
 		case S_QEMextColor :
-			selector = new EdgeSelector_QEMextColor<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_QEMextColor<PFP>(map, position, approximators) ;
 			break ;
 		case S_hQEMextColor :
-			selector = new HalfEdgeSelector_QEMextColor<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_QEMextColor<PFP>(map, position, approximators) ;
 			break ;
 		case S_hQEMml :
-			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
 			break ;
 		case S_Lightfield :
-			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators) ;
 			break ;
 		case S_hLightfield :
-			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
 			break ;
 		case S_hLightfieldExp :
-			selector = new HalfEdgeSelector_LightfieldExp<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_LightfieldExp<PFP>(map, position, approximators) ;
 			break ;
 		case S_hLightfieldKCL :
-			selector = new HalfEdgeSelector_LightfieldKCL<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_LightfieldKCL<PFP>(map, position, approximators) ;
 			break ;
 		case S_hColorExperimental:
 			selector = new HalfEdgeSelector_ColorExperimental<PFP>(map, position, approximators, selected) ;

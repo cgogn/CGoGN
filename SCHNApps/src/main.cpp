@@ -1,10 +1,8 @@
-
 #include <QSplashScreen>
 #include "window.h"
 #include <QFileInfo>
 #include "PythonQt/PythonQt.h"
 #include "PythonQt/gui/PythonQtScriptingConsole.h"
-
 
 int main(int argc, char* argv[])
 {

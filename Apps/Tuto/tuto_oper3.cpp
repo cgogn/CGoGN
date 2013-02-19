@@ -31,6 +31,7 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
+#include "Topology/generic/mapBrowser.h"
 
 using namespace CGoGN ;
 
@@ -73,15 +74,15 @@ void MyQT::clipping_onoff(bool x)
 		Geom::Vec3f pos = m_PlanePick->getPosition();
 		float pipo;
 		Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
-		m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
-		m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
+		m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
+		m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
 	}
 	else
 	{
-		m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-		m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-		m_render_topo->shader1()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-		m_render_topo->shader2()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
+		m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
+		m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
+		m_sh1->setClipColorAttenuationFactorRelative(0.0f,0.0f);
+		m_sh2->setClipColorAttenuationFactorRelative(0.0f,0.0f);
 	}
 	updateMap();
 	updateGL();
@@ -252,6 +253,8 @@ void MyQT::createMap(int n)
 	prim.hexaGrid_topo(n,n,n);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
+	myMap.check();
+
     //  bounding box of scene
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	setParamObject(bb.maxSize(), bb.center().data()) ;
@@ -264,12 +267,22 @@ void MyQT::createMap(int n)
 
 	m_render_topo->setDartWidth(3.0f);
 	m_render_topo->setInitialDartsColor(0.0f,0.0f,0.0f);
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
+
+//	SelectorDartBoundary<PFP::MAP> sdb(myMap);
+//	MapBrowserSelector mbs(myMap,sdb);
+//	myMap.setBrowser(&mbs);
+//	m_render_topo_boundary->updateData<PFP>(myMap,position,m_ex1,m_ex2);
+//	myMap.setBrowser(NULL);
+	m_render_topo_boundary->updateDataBoundary<PFP>(myMap,position,m_ex1,m_ex2,m_shift);
 }
 
 void MyQT::updateMap()
 {
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	std::cout << "updateMap"<< std::endl;
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
+	m_render_topo_boundary->updateDataBoundary<PFP>(myMap,position,m_ex1,m_ex2,m_shift);
+
 }
 
 // initialization GL callback
@@ -278,18 +291,24 @@ void MyQT::cb_initGL()
 	glClearColor(1.0f,1.0f,1.0f,1.0f);
 	m_render_topo = new Algo::Render::GL2::Topo3Render() ;
 
+	m_render_topo_boundary = new Algo::Render::GL2::TopoRender();
+	m_render_topo_boundary->setInitialDartsColor(0.0f,0.9f,0.0f);
+
     m_PlanePick = new Utils::Pickable(Utils::Pickable::GRID,1);
 	m_frame = new Utils::FrameManipulator();
 	m_frame->setSize(bb.maxSize());
 
-	m_render_topo->shader1()->insertClippingCode();
-	m_render_topo->shader2()->insertClippingCode();
+	m_sh1 = static_cast<Utils::ClippingShader*>(m_render_topo->shader1());
+	m_sh2 = static_cast<Utils::ClippingShader*>(m_render_topo->shader2());
 
-	clip_id1 = m_render_topo->shader1()->addClipPlane();
-	clip_id2 = m_render_topo->shader2()->addClipPlane();
+	m_sh1->insertClippingCode();
+	m_sh2->insertClippingCode();
 
-	m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), bb.center());
-	m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), bb.center());
+	clip_id1 = m_sh1->addClipPlane();
+	clip_id2 = m_sh2->addClipPlane();
+
+	m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), bb.center());
+	m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), bb.center());
 
 }
 
@@ -300,6 +319,8 @@ void MyQT::cb_redraw()
 	glPolygonOffset( 1.0f, 1.0f );
 
 	m_render_topo->drawTopo();
+
+	m_render_topo_boundary->drawTopo();
 
 	glDisable( GL_POLYGON_OFFSET_FILL );
 
@@ -325,12 +346,11 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y/*,nb*/);
 		if (button == Qt::LeftButton)
 		{
 			if (d != Dart::nil())
 				m_selected = d;
-			std::cout << myMap.edgeCanCollapse(d) << std::endl;
 		}
 		if (button == Qt::RightButton)
 		{
@@ -365,13 +385,37 @@ void MyQT::cb_mousePress(int button, int x, int y)
 
 	if (Control())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+//		Dart d = m_render_topo->picking<PFP>(myMap, x,y/*, nb*/);
+//		if (button == Qt::LeftButton)
+//		{
+//			if (d != Dart::nil())
+//				m_selecteds.push_back(d);
+//		}
+//		updateGL();
+
+
 		if (button == Qt::LeftButton)
 		{
+			Dart d = m_render_topo_boundary->picking<PFP>(myMap, x,y,true);
 			if (d != Dart::nil())
-				m_selecteds.push_back(d);
+			{
+				Dart e = myMap.phi2(d);
+				std::cout << "Dart "<< d.index << " / phi2:" << e.index << std::endl;
+			}
 		}
+		if (button == Qt::RightButton)
+		{
+			Dart d = m_render_topo->picking<PFP>(myMap, x,y/*, nb*/);
+			if (d != Dart::nil())
+			{
+				Dart e = myMap.phi2(d);
+				std::cout << "Dart "<< d.index << " / phi2:" << e.index << std::endl;
+			}
+		}
+
+
 		updateGL();
+
 	}
 }
 
@@ -433,8 +477,8 @@ void  MyQT::cb_mouseMove(int buttons, int x, int y)
 	float pipo;
 	Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
 
-	m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
-	m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
+	m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
+	m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
 
 	m_begX = x;
 	m_begY = y;
@@ -507,13 +551,13 @@ void MyQT::cb_keyPress(int keycode)
 	case 'w':
 		m_ex1 = 0.99f;
 		m_ex2 = 0.99f;
-		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 		updateGL();
 		break;
 	case 'W':
 		m_ex1 = 0.9f;
 		m_ex2 = 0.9f;
-		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 		updateGL();
 		break;
 
@@ -602,8 +646,10 @@ void MyQT::cb_Open()
 
 void MyQT::cb_Save()
 {
-	std::string filename = selectFileSave("Export SVG file ",".","(*.off)");
-	Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str()); // ???
+	std::string filename = selectFileSave("Export MAP file ",".","(*.map)");
+	//Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str()); // ???
+	if(!myMap.saveMapBin(filename))
+		std::cout << "could not save file : " << filename << std::endl;
 }
 
 void MyQT::importMesh(std::string& filename)
@@ -630,7 +676,14 @@ void MyQT::importMesh(std::string& filename)
 	m_selected  = NIL;
 	m_selected2 = NIL;
 
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
+
+//	SelectorDartBoundary<PFP::MAP> sdb(myMap);
+//	MapBrowserSelector mbs(myMap,sdb);
+//	myMap.setBrowser(&mbs);
+//	m_render_topo_boundary->updateData<PFP>(myMap,position,m_ex1,m_ex2);
+//	myMap.setBrowser(NULL);
+	m_render_topo_boundary->updateDataBoundary<PFP>(myMap,position,m_ex1,m_ex2,m_shift);
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	setParamObject(bb.maxSize(), bb.center().data()) ;
@@ -645,6 +698,6 @@ void MyQT::importMesh(std::string& filename)
 void MyQT::width(int w)
 {
 	m_ex3 = 0.9f - 0.025f*w;
-	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
+	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 	updateGL();
 }

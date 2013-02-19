@@ -49,12 +49,12 @@ namespace Primal
 namespace Regular
 {
 
-enum FilterType
+enum FilteringType
 {
 	F_HighPass = 0,
 	F_LowPass,
 	F_BandPass,
-	F_None,
+	F_None
 } ;
 
 template <typename PFP>
@@ -70,7 +70,7 @@ protected:
 	std::vector<Algo::MR::Filter*> synthesisFilters ;
 	std::vector<Algo::MR::Filter*> analysisFilters ;
 
-	FilterType filter;
+	FilteringType filter;
 	unsigned int thresholdLow;
 	unsigned int thresholdHigh;
 

@@ -26,8 +26,8 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT>
-TraversorCell<MAP, ORBIT>::TraversorCell(MAP& map, const FunctorSelect& good, bool forceDartMarker, unsigned int thread) :
-	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true), m_good(good)
+TraversorCell<MAP, ORBIT>::TraversorCell(MAP& map, bool forceDartMarker, unsigned int thread) :
+	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true)
 {
 	if(forceDartMarker)
 		dmark = new DartMarker(map, thread) ;
@@ -76,7 +76,7 @@ Dart TraversorCell<MAP, ORBIT>::begin()
 		}
 
 		current = m.begin() ;
-		while(current != m.end() && (m.template isBoundaryMarked<MAP::DIMENSION>(current) || !m_good(current)))
+		while(current != m.end() && (m.template isBoundaryMarked<MAP::DIMENSION>(current) ))
 			m.next(current) ;
 
 		if(current == m.end())
@@ -116,7 +116,7 @@ Dart TraversorCell<MAP, ORBIT>::next()
 			if(dmark)
 			{
 				bool ismarked = dmark->isMarked(current) ;
-				while(current != NIL && (ismarked || m.template isBoundaryMarked<MAP::DIMENSION>(current) || !m_good(current)))
+				while(current != NIL && (ismarked || m.template isBoundaryMarked<MAP::DIMENSION>(current)))
 				{
 					m.next(current) ;
 					if(current == m.end())
@@ -130,7 +130,7 @@ Dart TraversorCell<MAP, ORBIT>::next()
 			else
 			{
 				bool ismarked = cmark->isMarked(current) ;
-				while(current != NIL && (ismarked || m.template isBoundaryMarked<MAP::DIMENSION>(current) || !m_good(current)))
+				while(current != NIL && (ismarked || m.template isBoundaryMarked<MAP::DIMENSION>(current) ))
 				{
 					m.next(current) ;
 					if(current == m.end())
@@ -159,8 +159,8 @@ void TraversorCell<MAP, ORBIT>::skip(Dart d)
 
 //special version (partial specialization) for Genric Map
 template <unsigned int ORBIT>
-TraversorCell<GenericMap, ORBIT>::TraversorCell(GenericMap& map, const FunctorSelect& good, bool forceDartMarker, unsigned int thread) :
-	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true), m_good(good)
+TraversorCell<GenericMap, ORBIT>::TraversorCell(GenericMap& map, bool forceDartMarker, unsigned int thread) :
+	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true)
 {
 	if(forceDartMarker)
 		dmark = new DartMarker(map, thread) ;
@@ -209,7 +209,7 @@ Dart TraversorCell<GenericMap, ORBIT>::begin()
 		}
 
 		current = m.begin() ;
-		while(current != m.end() && (m.isBoundaryMarkedCurrent(current) || !m_good(current)))
+		while(current != m.end() && (m.isBoundaryMarkedCurrent(current) ))
 			m.next(current) ;
 
 		if(current == m.end())
@@ -249,7 +249,7 @@ Dart TraversorCell<GenericMap, ORBIT>::next()
 			if(dmark)
 			{
 				bool ismarked = dmark->isMarked(current) ;
-				while(current != NIL && (ismarked || m.isBoundaryMarkedCurrent(current) || !m_good(current)))
+				while(current != NIL && (ismarked || m.isBoundaryMarkedCurrent(current) ))
 				{
 					m.next(current) ;
 					if(current == m.end())
@@ -263,7 +263,7 @@ Dart TraversorCell<GenericMap, ORBIT>::next()
 			else
 			{
 				bool ismarked = cmark->isMarked(current) ;
-				while(current != NIL && (ismarked || m.isBoundaryMarkedCurrent(current) || !m_good(current)))
+				while(current != NIL && (ismarked || m.isBoundaryMarkedCurrent(current) ))
 				{
 					m.next(current) ;
 					if(current == m.end())

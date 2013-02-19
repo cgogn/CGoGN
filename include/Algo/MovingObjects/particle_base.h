@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MovingObjects
 {
 
@@ -73,9 +76,13 @@ public:
 	}
 } ;
 
+
+
 } // namespace MovingObjects
 
 } // namespace Algo
+
+}
 
 } // namespace CGoGN
 
