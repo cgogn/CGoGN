@@ -33,13 +33,16 @@
 #include "Topology/generic/functor.h"
 #include "Geometry/vector_gen.h"
 
+#include "Utils/GLSLShader.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
+
+
+
 #include "Utils/vbo_base.h"
 #include "Utils/svg.h"
 
-// forward
-namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
-namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
-namespace CGoGN { namespace Utils {  class ClippingShader; } }
 
 namespace CGoGN
 {
@@ -156,8 +159,8 @@ public:
 	~Topo3Render();
 
 
-	Utils::ClippingShader* shader1() { return reinterpret_cast<Utils::ClippingShader*>(m_shader1);}
-	Utils::ClippingShader* shader2() { return reinterpret_cast<Utils::ClippingShader*>(m_shader2);}
+	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1);}
+	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2);}
 
 	/**
 	 * set the with of line use to draw darts (default val is 2)

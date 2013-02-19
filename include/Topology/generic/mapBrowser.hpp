@@ -27,13 +27,20 @@ namespace CGoGN
 
 
 inline MapBrowserSelector::MapBrowserSelector(AttribMap& m, const FunctorSelect& fs) :
-	m_map(m), m_selector(fs)
-{}
+	m_map(m)
+{
+	m_selector = fs.copy();
+}
+
+inline MapBrowserSelector::~MapBrowserSelector()
+{
+	delete m_selector;
+}
 
 inline Dart MapBrowserSelector::begin() const
 {
 	Dart d = m_map.realBegin() ;
-	while ( (d != m_map.realEnd()) && !m_selector(d) )
+	while ( (d != m_map.realEnd()) && !m_selector->operator()(d) )
 		m_map.realNext(d);
 
 	return d;
@@ -50,7 +57,7 @@ inline void MapBrowserSelector::next(Dart& d) const
 	{
 		m_map.realNext(d) ;
 	}
-	while ( (d != m_map.realEnd()) && !m_selector(d) ) ;
+	while ( (d != m_map.realEnd()) && !m_selector->operator()(d) ) ;
 }
 
 
