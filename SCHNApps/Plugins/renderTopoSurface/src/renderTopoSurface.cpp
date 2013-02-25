@@ -215,7 +215,8 @@ void RenderTopoSurfacePlugin::changeEdgesScaleFactor(View* view, MapHandlerGen* 
 {
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet* perMap = params->perMap[map->getName()];
-	perMap->edgesScaleFactor = i / 50.0;
+	perMap->edgesScaleFactor = i / 100.0;
+	std::cout << "i = " << perMap->edgesScaleFactor << std::endl;
 	perMap->updateRender();
 
 	if(view->isCurrentView())
@@ -230,7 +231,7 @@ void RenderTopoSurfacePlugin::changeFacesScaleFactor(View* view, MapHandlerGen* 
 {
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet* perMap = params->perMap[map->getName()];
-	perMap->facesScaleFactor = i / 50.0;
+	perMap->facesScaleFactor = i / 100.0;
 	perMap->updateRender();
 
 	if(view->isCurrentView())
@@ -243,7 +244,21 @@ void RenderTopoSurfacePlugin::changeFacesScaleFactor(View* view, MapHandlerGen* 
 
 void RenderTopoSurfacePlugin::attributeModified(unsigned int orbit, QString nameAttr)
 {
-
+//	if(orbit == VERTEX)
+//	{
+//		MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+//		if(h_viewParams.contains(map->getName()))
+//		{
+//			ParameterSet* params = h_viewParams[view];
+//
+//			if(params->perMap.contains(map->getName()))
+//				PerMapParameterSet* perMap = params->perMap[map->getName()];
+//				perMap->updateRender();
+//
+//			//if(params.positionName == nameAttr && params.autoUpdate)
+//			//	computeNormal(map->getName(), params.positionName, params.normalName);
+//		}
+//	}
 }
 
 void RenderTopoSurfacePlugin::connectivityModified()

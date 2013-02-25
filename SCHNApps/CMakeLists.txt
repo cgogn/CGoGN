@@ -134,6 +134,7 @@ SET(SCHNApps_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
 	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsViewDialog.h
 	${SCHNApps_ROOT_DIR}/include/dialogs/mapsViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
 )
 
 

@@ -63,8 +63,8 @@ void RenderTopoSurfaceDockTab::refreshUI(ParameterSet* params)
 				}
 			}
 
-			slider_edgesScaleFactor->setSliderPosition(p->edgesScaleFactor * 50.0);
-			slider_facesScaleFactor->setSliderPosition(p->facesScaleFactor * 50.0);
+			slider_edgesScaleFactor->setSliderPosition(p->edgesScaleFactor * 100.0);
+			slider_facesScaleFactor->setSliderPosition(p->facesScaleFactor * 100.0);
 		}
 		++i;
 	}

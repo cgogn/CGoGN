@@ -362,60 +362,233 @@ void SvgStrings::fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const
 //
 //}
 
+//void SvgLayers::save(std::ofstream& out) const
+//{
+//	saveOne(out,0,0);
+//}
+//
+//void SvgLayers::saveOne(std::ofstream& out, unsigned int i, unsigned int bbl) const
+//{
+//	if(m_end)
+//	{
+//		out << "</g>" << std::endl;
+//	}
+//	else
+//	{
+//		out << "<g inkscape:groupemode=\"layer\"" << std::endl;
+//		out << "   id=\"" << m_layer << "\"" << std::endl;
+//		out << "   inkscape:label=\"" << m_layer <<"\">" << std::endl;
+//	}
+//}
 
 
+
+SvgGroup::SvgGroup(const std::string& name, const glm::mat4& model, const glm::mat4& proj):
+		m_name(name), m_model(model),m_proj(proj),global_color(Geom::Vec3f(0.0f,0.0f,0.0f)), global_width(2.0f), m_isLayer(false)
+{
+	m_objs.reserve(1000);
+	glGetIntegerv(GL_VIEWPORT, &(m_viewport[0]));
+}
+
+
+//SvgGroup::SvgGroup(const glm::mat4& model, const glm::mat4& proj):
+//		m_groupName(""), m_model(model),m_proj(proj),global_color(Geom::Vec3f(0.0f,0.0f,0.0f)), global_width(2.0f), m_isLayer(false)
+//{
+//	m_objs.reserve(1000);
+//	glGetIntegerv(GL_VIEWPORT, &(m_viewport[0]));
+//}
+
+
+SvgGroup::~SvgGroup()
+{
+	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
+		delete (*it);
+}
+
+void SvgGroup::setColor(const Geom::Vec3f& col)
+{
+	global_color = col;
+}
+
+void SvgGroup::setWidth(float w)
+{
+	global_width = w;
+}
+
+void SvgGroup::beginPoints()
+{
+	m_current = new SvgPoints();
+	m_current->setColor(global_color);
+	m_current->setWidth(global_width);
+}
+
+void SvgGroup::endPoints()
+{
+	m_objs.push_back(m_current);
+	m_current = NULL;
+}
+
+void SvgGroup::addPoint(const Geom::Vec3f& P)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
+}
+
+void SvgGroup::addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
+}
+
+
+void SvgGroup::beginLines()
+{
+	m_current = new SvgLines();
+	m_current->setColor(global_color);
+	m_current->setWidth(global_width);
+}
+
+
+void SvgGroup::endLines()
+{
+	m_objs.push_back(m_current);
+	m_current = NULL;
+}
+
+void SvgGroup::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
+//	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
+	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])));
+}
+
+void SvgGroup::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
+//	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
+	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])),C);
+}
+
+void SvgGroup::beginStrings(float scalefactor)
+{
+	m_current = new SvgStrings(scalefactor);
+	m_current->setColor(global_color);
+	m_current->setWidth(global_width);
+}
+
+void SvgGroup::endStrings()
+{
+	m_objs.push_back(m_current);
+	m_current = NULL;
+}
+
+void SvgGroup::addString(const Geom::Vec3f& P, const std::string& str)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+	m_current->addString(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])), str);
+}
+
+
+void SvgGroup::addString(const Geom::Vec3f& P, const std::string& str, const Geom::Vec3f& C)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+	m_current->addString(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])), str, C);
+}
+
+void SvgGroup::sortSimpleDepth(std::vector<DepthSort>& vds)
+{
+	unsigned int nb=0;
+	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
+		nb += (*it)->nbPrimtives();
+
+	vds.reserve(nb);
+
+	for (unsigned int i=0; i< m_objs.size(); ++i)
+	{
+		m_objs[i]->fillDS(vds,i);
+	}
+	std::sort(vds.begin(),vds.end());
+}
 
 
 SVGOut::SVGOut(const std::string& filename, const glm::mat4& model, const glm::mat4& proj):
-		m_model(model),m_proj(proj),global_color(Geom::Vec3f(0.0f,0.0f,0.0f)), global_width(2.0f)
+		m_model(model),m_proj(proj)
 {
-	m_objs.reserve(1000);
+	m_groups.reserve(1000);
 
 	m_out = new std::ofstream(filename.c_str()) ;
 	if (!m_out->good())
 	{
 		CGoGNerr << "Unable to open file " << CGoGNendl ;
-		// ????
 	}
 
 	glGetIntegerv(GL_VIEWPORT, &(m_viewport[0]));
 }
 
-
 SVGOut::SVGOut(const glm::mat4& model, const glm::mat4& proj):
-		m_model(model),m_proj(proj),global_color(Geom::Vec3f(0.0f,0.0f,0.0f)), global_width(2.0f)
+		m_model(model),m_proj(proj)
 {
-	m_objs.reserve(1000);
+	m_groups.reserve(1000);
 
 	m_out = NULL;
 
 	glGetIntegerv(GL_VIEWPORT, &(m_viewport[0]));
 }
 
-
 SVGOut::~SVGOut()
 {
-	if (m_out && (m_out->good()))
-	{
-		closeFile();
-	}
 	delete m_out;
 
-	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
+	for (std::vector<SvgGroup*>::iterator it = m_groups.begin(); it != m_groups.end(); ++it)
 		delete (*it);
 }
 
-void SVGOut::setColor(const Geom::Vec3f& col)
+void SVGOut::computeBB(unsigned int& a, unsigned int& b, unsigned int& c, unsigned& d)
 {
-	global_color = col;
+	for (std::vector<SvgGroup*>::iterator it = m_groups.begin(); it != m_groups.end(); ++it)
+	{
+		const std::vector<SvgObj*>& objs = (*it)->m_objs;
+
+		for (std::vector<SvgObj*>::const_iterator ito = objs.begin(); ito != objs.end(); ++ito)
+		{
+			const std::vector<Geom::Vec3f>& vert = (*ito)->vertices();
+			for (std::vector<Geom::Vec3f>::const_iterator j = vert.begin(); j != vert.end(); ++j)
+			{
+				const Geom::Vec3f& P = *j;
+				if (P[0]<a)
+					a = (unsigned int)(P[0]);
+				if (P[1]<b)
+					b = (unsigned int)(P[1]);
+				if (P[0]>c)
+					c = (unsigned int)(P[0]);
+				if (P[1]>d)
+					d = (unsigned int)(P[1]);
+			}
+
+			if (a>10)
+				a-=10;
+			if (b>10)
+				b-=10;
+			c+=10;
+			d+=10;
+		}
+	}
 }
 
-void SVGOut::setWidth(float w)
-{
-	global_width = w;
-}
 
-void SVGOut::closeFile()
+void SVGOut::write()
 {
 	m_bbX0 = 100000;
 	m_bbY0 = 100000;
@@ -434,167 +607,39 @@ void SVGOut::closeFile()
 	*m_out << "</desc>"<< std::endl;
 	*m_out << "<defs>"<< std::endl;
 	*m_out << "</defs>"<< std::endl;
-	*m_out << "<g shape-rendering=\"crispEdges\">" << std::endl;
+	//*m_out << "<g shape-rendering=\"crispEdges\">" << std::endl;
 
-	std::vector<DepthSort> vds;
-	sortSimpleDepth(vds);
-
-
-	for (std::vector<DepthSort>::iterator it = vds.begin(); it != vds.end(); ++it)
+	for(std::vector<SvgGroup*>::iterator it = m_groups.begin() ; it != m_groups.end() ; ++it)
 	{
-		m_objs[it->obj]->saveOne(*m_out,it->id, m_bbX1-m_bbX0);
+		if((*it)->m_isLayer)
+		{
+			*m_out << "<g inkscape:groupmode=\"layer\"" << std::endl;
+			*m_out << "id =\"" << (*it)->m_name << "\"" << std::endl;
+			*m_out << "inkscape:label=\"" << (*it)->m_name << "\">" << std::endl;
+
+		}
+		else
+		{
+			*m_out << "<g " << std::endl;
+			*m_out << "id =\"" << (*it)->m_name << "\">" << std::endl;
+		}
+
+		std::vector<DepthSort> vds;
+		(*it)->sortSimpleDepth(vds);
+
+
+		for (std::vector<DepthSort>::iterator itd = vds.begin(); itd != vds.end(); ++itd)
+		{
+			(*it)->m_objs[itd->obj]->saveOne(*m_out,itd->id, m_bbX1-m_bbX0);
+		}
+
+		*m_out << "</g>" << std::endl;
 	}
 
-
-	*m_out << "</g>" << std::endl;
+	//*m_out << "</g>" << std::endl;
 	*m_out << "</svg>" << std::endl;
 	m_out->close();
 }
-
-
-void SVGOut::computeBB(unsigned int& a, unsigned int& b, unsigned int& c, unsigned& d)
-{
-
-	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
-	{
-		const std::vector<Geom::Vec3f>& vert = (*it)->vertices();
-		for (std::vector<Geom::Vec3f>::const_iterator j = vert.begin(); j != vert.end(); ++j)
-		{
-			const Geom::Vec3f& P = *j;
-			if (P[0]<a)
-				a = (unsigned int)(P[0]);
-			if (P[1]<b)
-				b = (unsigned int)(P[1]);
-			if (P[0]>c)
-				c = (unsigned int)(P[0]);
-			if (P[1]>d)
-				d = (unsigned int)(P[1]);
-		}
-
-		if (a>10)
-			a-=10;
-		if (b>10)
-			b-=10;
-		c+=10;
-		d+=10;
-	}
-}
-
-
-
-void SVGOut::beginPoints()
-{
-	m_current = new SvgPoints();
-	m_current->setColor(global_color);
-	m_current->setWidth(global_width);
-}
-
-void SVGOut::endPoints()
-{
-	m_objs.push_back(m_current);
-	m_current = NULL;
-}
-
-void SVGOut::addPoint(const Geom::Vec3f& P)
-{
-	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
-}
-
-void SVGOut::addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C)
-{
-	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
-}
-
-
-void SVGOut::beginLines()
-{
-	m_current = new SvgLines();
-	m_current->setColor(global_color);
-	m_current->setWidth(global_width);
-}
-
-
-void SVGOut::endLines()
-{
-	m_objs.push_back(m_current);
-	m_current = NULL;
-}
-
-void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2)
-{
-	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-
-	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
-//	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
-
-	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
-	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])));
-}
-
-
-
-void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C)
-{
-	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-
-	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
-//	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
-
-	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
-	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])),C);
-}
-
-
-void SVGOut::beginStrings(float scalefactor)
-{
-	m_current = new SvgStrings(scalefactor);
-	m_current->setColor(global_color);
-	m_current->setWidth(global_width);
-}
-
-void SVGOut::endStrings()
-{
-	m_objs.push_back(m_current);
-	m_current = NULL;
-}
-
-void SVGOut::addString(const Geom::Vec3f& P, const std::string& str)
-{
-	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-	m_current->addString(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])), str);
-}
-
-
-void SVGOut::addString(const Geom::Vec3f& P, const std::string& str, const Geom::Vec3f& C)
-{
-	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-	m_current->addString(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])), str, C);
-}
-
-
-void SVGOut::sortSimpleDepth(std::vector<DepthSort>& vds)
-{
-	unsigned int nb=0;
-	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
-		nb += (*it)->nbPrimtives();
-
-	vds.reserve(nb);
-
-	for (unsigned int i=0; i< m_objs.size(); ++i)
-	{
-		m_objs[i]->fillDS(vds,i);
-	}
-	std::sort(vds.begin(),vds.end());
-}
-
-
-
 
 
 
@@ -605,63 +650,63 @@ void AnimatedSVGOut::add(SVGOut* svg)
 
 void AnimatedSVGOut::write(const std::string& filename, float timeStep)
 {
-	std::ofstream outfile(filename.c_str()) ;
-
-	unsigned int bbX0=1000000;
-	unsigned int bbY0=1000000;
-	unsigned int bbX1=0;
-	unsigned int bbY1=0;
-
-	for (unsigned int i=0; i< m_svgs.size(); ++i)
-		m_svgs[i]->computeBB(bbX0, bbY0, bbX1, bbY1);
-
-	outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"<< std::endl;
-	outfile << "<svg xmlns=\"http://www.w3.org/2000/svg\""<< std::endl;
-	outfile << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""<< std::endl;
-	outfile << "viewBox=\""<< bbX0 <<" "<< bbY0 <<" "<< bbX1-bbX0 << " " << bbY1-bbY0 <<"\">"<< std::endl;
-	outfile << "<title>Animated SVG</title>"<< std::endl;
-	outfile << "<desc>"<< std::endl;
-	outfile << "Rendered from CGoGN"<< std::endl;
-	outfile << "</desc>"<< std::endl;
-
-	outfile << "<defs>"<< std::endl;
-
-
-	for (unsigned int i=0; i< m_svgs.size(); ++i)
-	{
-		std::vector<DepthSort> vds;
-		m_svgs[i]->sortSimpleDepth(vds);
-
-		outfile << "<g id=\"slice"<<i<< "\">" << std::endl;
-		for (std::vector<DepthSort>::iterator it = vds.begin(); it != vds.end(); ++it)
-			m_svgs[i]->m_objs[it->obj]->saveOne(outfile,it->id, bbX1-bbX0);
-		outfile << "</g>" << std::endl;
-	}
-
-	outfile << "</defs>"<< std::endl;
-
-
-	for (unsigned int i=0; i< m_svgs.size(); ++i)
-	{
-		unsigned int nbo = m_svgs[i]->m_opacities_animations.size();
-
-		outfile << "<use xlink:href=\"#slice"<<i<<"\" >" << std::endl;
-		outfile << "<animate attributeName=\"opacity\" dur=\""<<timeStep*nbo<<"s\" fill=\"freeze\" values=\"";
-
-
-		for (unsigned int j = 0; j < nbo; ++j)
-		{
-			outfile << m_svgs[i]->m_opacities_animations[j];
-			if ( j != (nbo-1))
-				outfile<< ";";
-		}
-
-		outfile << "\" calcMode=\"discrete\" repeatCount=\"indefinite\" />" << std::endl;
-		outfile << "</use>" << std::endl;
-	}
-
-	outfile << "</svg>" << std::endl;
-	outfile.close();
+//	std::ofstream outfile(filename.c_str()) ;
+//
+//	unsigned int bbX0=1000000;
+//	unsigned int bbY0=1000000;
+//	unsigned int bbX1=0;
+//	unsigned int bbY1=0;
+//
+//	for (unsigned int i=0; i< m_svgs.size(); ++i)
+//		m_svgs[i]->computeBB(bbX0, bbY0, bbX1, bbY1);
+//
+//	outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"<< std::endl;
+//	outfile << "<svg xmlns=\"http://www.w3.org/2000/svg\""<< std::endl;
+//	outfile << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""<< std::endl;
+//	outfile << "viewBox=\""<< bbX0 <<" "<< bbY0 <<" "<< bbX1-bbX0 << " " << bbY1-bbY0 <<"\">"<< std::endl;
+//	outfile << "<title>Animated SVG</title>"<< std::endl;
+//	outfile << "<desc>"<< std::endl;
+//	outfile << "Rendered from CGoGN"<< std::endl;
+//	outfile << "</desc>"<< std::endl;
+//
+//	outfile << "<defs>"<< std::endl;
+//
+//
+//	for (unsigned int i=0; i< m_svgs.size(); ++i)
+//	{
+//		std::vector<DepthSort> vds;
+//		m_svgs[i]->sortSimpleDepth(vds);
+//
+//		outfile << "<g id=\"slice"<<i<< "\">" << std::endl;
+//		for (std::vector<DepthSort>::iterator it = vds.begin(); it != vds.end(); ++it)
+//			m_svgs[i]->m_objs[it->obj]->saveOne(outfile,it->id, bbX1-bbX0);
+//		outfile << "</g>" << std::endl;
+//	}
+//
+//	outfile << "</defs>"<< std::endl;
+//
+//
+//	for (unsigned int i=0; i< m_svgs.size(); ++i)
+//	{
+//		unsigned int nbo = m_svgs[i]->m_opacities_animations.size();
+//
+//		outfile << "<use xlink:href=\"#slice"<<i<<"\" >" << std::endl;
+//		outfile << "<animate attributeName=\"opacity\" dur=\""<<timeStep*nbo<<"s\" fill=\"freeze\" values=\"";
+//
+//
+//		for (unsigned int j = 0; j < nbo; ++j)
+//		{
+//			outfile << m_svgs[i]->m_opacities_animations[j];
+//			if ( j != (nbo-1))
+//				outfile<< ";";
+//		}
+//
+//		outfile << "\" calcMode=\"discrete\" repeatCount=\"indefinite\" />" << std::endl;
+//		outfile << "</use>" << std::endl;
+//	}
+//
+//	outfile << "</svg>" << std::endl;
+//	outfile.close();
 }
 
 

@@ -344,11 +344,14 @@ void Strings3D::updateString(unsigned int idSt, const std::string& str)
 
 void Strings3D::toSVG(Utils::SVG::SVGOut& svg)
 {
-	svg.beginStrings(m_scale);
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("strings3D", svg.m_model, svg.m_proj);
+	svg1->beginStrings(m_scale);
 	unsigned int nb = m_strings.size();
 	for(unsigned int i=0; i<nb; ++i)
-		svg.addString(m_strTranslate[i],m_strings[i]);
-	svg.endStrings();
+		svg1->addString(m_strTranslate[i],m_strings[i]);
+	svg1->endStrings();
+
+	svg.addGroup(svg1);
 }
 
 } // namespace Utils

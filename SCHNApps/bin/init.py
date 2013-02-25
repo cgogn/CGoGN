@@ -4,6 +4,7 @@ renderVectorPlugin = schnapps.loadPlugin("RenderVectorD");
 differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
 subdivisionPlugin = schnapps.loadPlugin("SubdivideSurface");
 surfaceDeformationPlugin = schnapps.loadPlugin("SurfaceDeformation");
+renderTopoSurface = schnapps.loadPlugin("RenderTopoSurface");
 
 obj = importPlugin.importFromFile("/home/kraemer/Media/Data/surface/lowRes/iphi_good_9k.off");
 
@@ -12,6 +13,7 @@ v = schnapps.getView("view_0");
 schnapps.linkViewAndPlugin(v.getName(), renderPlugin.getName());
 schnapps.linkViewAndPlugin(v.getName(), renderVectorPlugin.getName());
 schnapps.linkViewAndPlugin(v.getName(), surfaceDeformationPlugin.getName());
+schnapps.linkViewAndPlugin(v.getName(), renderTopoSurface.getName());
 
 schnapps.linkViewAndMap(v.getName(), obj.getName());
 
