@@ -380,6 +380,7 @@ void Topo3Render::svgout2D(const std::string& filename, const glm::mat4& model, 
 {
 	Utils::SVG::SVGOut svg(filename,model,proj);
 	toSVG(svg);
+	svg.write();
 }
 
 void Topo3Render::toSVG(Utils::SVG::SVGOut& svg)

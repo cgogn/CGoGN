@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __3MR_BERTRAM_FILTER__
-#define __3MR_BERTRAM_FILTER__
+#ifndef __2MR_BERTRAM_FILTER__
+#define __2MR_BERTRAM_FILTER__
 
 #include <cmath>
 #include "Algo/Geometry/centroid.h"
@@ -66,11 +66,6 @@ public:
 	{}
 
 	void operator() ()
-	{
-
-	}
-
-	void operator() (bool filtering)
 	{
 		TraversorE<typename PFP::MAP> travE(m_map) ;
 		for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
@@ -129,11 +124,6 @@ public:
 
 	void operator() ()
 	{
-
-	}
-
-	void operator() (bool filtering)
-	{
 		TraversorE<typename PFP::MAP> travE(m_map);
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
@@ -171,9 +161,11 @@ public:
 			{
 				Dart db = m_map.findBoundaryEdgeOfVertex(d);
 				m_map.incCurrentLevel() ;
-				ev = (m_position[m_map.phi1(db)] + m_position[m_map.phi_1(db)]);
+				ev += (m_position[m_map.phi1(db)] + m_position[m_map.phi_1(db)]) * typename PFP::REAL(0.5);
+				//ev = (m_position[m_map.phi1(db)] + m_position[m_map.phi_1(db)]);
 				m_map.decCurrentLevel() ;
-				ev *= m_a;
+				ev *= 2 * m_a;
+				//ev *= m_a;
 
 				m_position[d] -= ev;
 			}
@@ -220,20 +212,6 @@ public:
 
 	void operator() ()
 	{
-
-	}
-
-	void operator() (bool filtering)
-	{
-		TraversorV<typename PFP::MAP> travV(m_map) ;
-		for (Dart d = travV.begin(); d != travV.end(); d = travV.next())
-		{
-			if(m_map.isBoundaryVertex(d))
-				m_position[d] /= m_a;
-			else
-				m_position[d] /= m_a * m_a;
-		}
-
 		TraversorE<typename PFP::MAP> travE(m_map) ;
 		for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 		{
@@ -242,6 +220,15 @@ public:
 			if(!m_map.isBoundaryVertex(midE))
 				m_position[midE] /= m_a ;
 			m_map.decCurrentLevel() ;
+		}
+
+		TraversorV<typename PFP::MAP> travV(m_map) ;
+		for (Dart d = travV.begin(); d != travV.end(); d = travV.next())
+		{
+			if(m_map.isBoundaryVertex(d))
+				m_position[d] /= m_a;
+			else
+				m_position[d] /= m_a * m_a;
 		}
 	}
 };
@@ -268,11 +255,6 @@ public:
 
 	void operator() ()
 	{
-
-	}
-
-	void operator() (bool filtering)
-	{
 		TraversorF<typename PFP::MAP> travF(m_map) ;
 		for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 		{
@@ -297,14 +279,7 @@ public:
 
 			m_map.incCurrentLevel() ;
 			Dart midF = m_map.phi1(m_map.phi1(d));
-			if(filtering)
-			{
-				m_position[midF] = vf + ef ;
-			}
-			else
-			{
-				m_position[midF] += vf + ef ;
-			}
+			m_position[midF] += vf + ef ;
 			m_map.decCurrentLevel() ;
 
 		}
@@ -316,15 +291,8 @@ public:
 			ve *= 2.0 * m_a;
 
 			m_map.incCurrentLevel() ;
-			Dart midV = m_map.phi1(d) ;
-			if(filtering)
-			{
-				m_position[midV] = ve;
-			}
-			else
-			{
-				m_position[midV] += ve;
-			}
+			Dart midE = m_map.phi1(d) ;
+			m_position[midE] += ve;
 			m_map.decCurrentLevel() ;
 		}
 	}
@@ -345,11 +313,6 @@ public:
 
 	void operator() ()
 	{
-
-	}
-
-	void operator() (bool filtering)
-	{
 		TraversorV<typename PFP::MAP> travV(m_map);
 		for(Dart d = travV.begin() ; d != travV.end() ; d = travV.next())
 		{
@@ -363,14 +326,7 @@ public:
 				m_map.decCurrentLevel() ;
 				ev *= 2 * m_a;
 
-				if(filtering)
-				{
-					m_position[db] = ev;
-				}
-				else
-				{
-					m_position[db] += ev;
-				}
+				m_position[db] += ev;
 			}
 			else
 			{
@@ -392,14 +348,7 @@ public:
 
 				ev /= count;
 				ev *= 4 * m_a;
-				if(filtering)
-				{
-					m_position[d] = fv + ev;
-				}
-				else
-				{
-					m_position[d] += fv + ev;
-				}
+				m_position[d] += fv + ev;
 			}
 		}
 
@@ -426,17 +375,11 @@ public:
 
 				m_map.incCurrentLevel() ;
 				Dart midF = m_map.phi1(d);
-				if(filtering)
-				{
-					m_position[midF] = fe;
-				}
-				else
-				{
-					m_position[midF] += fe;
-				}
+				m_position[midF] += fe;
 				m_map.decCurrentLevel() ;
 			}
 		}
+
 	}
 } ;
 
@@ -454,11 +397,6 @@ public:
 	{}
 
 	void operator() ()
-	{
-
-	}
-
-	void operator() (bool filtering)
 	{
 		TraversorV<typename PFP::MAP> travV(m_map) ;
 		for (Dart d = travV.begin(); d != travV.end(); d = travV.next())
@@ -496,4 +434,4 @@ public:
 } // namespace CGoGN
 
 
-#endif /* __3MR_FILTERS_PRIMAL__ */
+#endif /* __2MR_FILTERS_PRIMAL__ */
