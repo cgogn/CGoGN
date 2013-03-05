@@ -58,7 +58,7 @@ std::vector<Dart> ParticleCell2DSecured<PFP>::move(const VEC3& goal)
 		return memo_cross.get_markedCells();
 	}
 	else
-		this->ParticleBase<PFP>::move(goal) ;
+		this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 
 	std::vector<Dart> res;
 	res.push_back(this->d);
@@ -86,7 +86,7 @@ void ParticleCell2DSecured<PFP>::vertexState(const VEC3& current, CellMarkerMemo
 		if (Geometry::isPointOnVertex < PFP > (this->m, this->d, this->positionAttribut, current))
 		{
 			this->setState(VERTEX) ;
-			this->ParticleBase<PFP>::move(current) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(current) ;
 			return ;
 		}
 		else
@@ -130,7 +130,7 @@ void ParticleCell2DSecured<PFP>::vertexState(const VEC3& current, CellMarkerMemo
 							this->d = this->m.phi2_1(this->d) ;
 						} while (this->getOrientationEdge(current, this->m.phi2_1(this->d)) != Geom::RIGHT && dd_vert != this->d) ;
 
-						this->ParticleBase<PFP>::move(current) ;
+						this->Algo::MovingObjects::ParticleBase<PFP>::move(current) ;
 						this->setState(VERTEX) ;
 						return ;
 					}
@@ -207,7 +207,7 @@ void ParticleCell2DSecured<PFP>::edgeState(const VEC3& current, CellMarkerMemo<F
 			if (!Geometry::isPointOnHalfEdge < PFP
 				> (this->m, this->d, this->positionAttribut, current))
 			{
-				this->ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
+				this->Algo::MovingObjects::ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
 				vertexState(current,memo_cross) ;
 				return ;
 			}
@@ -215,12 +215,12 @@ void ParticleCell2DSecured<PFP>::edgeState(const VEC3& current, CellMarkerMemo<F
 				> (this->m, this->m.phi2(this->d), this->positionAttribut, current))
 			{
 				this->d = this->m.phi2(this->d) ;
-				this->ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
+				this->Algo::MovingObjects::ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
 				vertexState(current,memo_cross) ;
 				return ;
 			}
 
-			this->ParticleBase<PFP>::move(current) ;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(current) ;
 	}
 
 }
