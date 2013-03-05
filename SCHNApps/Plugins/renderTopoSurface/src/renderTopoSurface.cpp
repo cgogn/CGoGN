@@ -10,12 +10,13 @@ namespace SCHNApps
 
 PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
 	mh(m),
+	drawDarts(true),
+	drawPhi1(true),
+	drawPhi2(true),
 	edgesScaleFactor(1.0f),
 	facesScaleFactor(1.0f)
 {
 	m_renderTopo = new Algo::Render::GL2::TopoRender();
-
-	std::cout << "plop" << std::endl;
 
 	QString positionName;
 
@@ -35,7 +36,6 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
 	updateRender();
 }
 
-
 PerMapParameterSet::~PerMapParameterSet()
 {
 	delete m_renderTopo;
@@ -43,16 +43,10 @@ PerMapParameterSet::~PerMapParameterSet()
 
 void PerMapParameterSet::updateRender()
 {
-	MapHandler<PFP2>* mh2 = static_cast<MapHandler<PFP2>*>(mh);
-	if(mh2 == NULL)
-		return;
-
-	PFP2::MAP* m = mh2->getMap();
-
-	m_renderTopo->updateData<PFP2>(*m,positionAttribute,edgesScaleFactor,facesScaleFactor);
-
-	std::cout << "update render " << std::endl;
+	PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(mh)->getMap();
+	m_renderTopo->updateData<PFP2>(*m, positionAttribute, edgesScaleFactor, facesScaleFactor);
 }
+
 
 bool RenderTopoSurfacePlugin::enable()
 {
@@ -80,12 +74,12 @@ void RenderTopoSurfacePlugin::redraw(View* view)
 	{
 		PerMapParameterSet* p = params->perMap[m->getName()];
 
-		if(p != NULL)
-			p->m_renderTopo->drawTopo();
-
-//		if (p->m_selectedDart != NIL)
-//			p->m_renderTopo->overdrawDart(m_selectedDart, 4.0f, 1.0f, 0.0f, 0.0f) ;
-
+		if(p->drawDarts)
+			p->m_renderTopo->drawDarts();
+		if(p->drawPhi1)
+			p->m_renderTopo->drawRelation1();
+		if(p->drawPhi2)
+			p->m_renderTopo->drawRelation2();
 	}
 }
 
@@ -103,7 +97,7 @@ void RenderTopoSurfacePlugin::viewLinked(View* view, Plugin* plugin)
 			registerShader(p->m_renderTopo->shader2());
 			params->perMap.insert(mh->getName(), p);
 		}
-		if (!maps.empty())
+		if(!maps.empty())
 			changeSelectedMap(view, maps[0]);
 
 		connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
@@ -118,6 +112,15 @@ void RenderTopoSurfacePlugin::viewUnlinked(View* view, Plugin* plugin)
 {
 	if(plugin == this)
 	{
+		ParameterSet* params = h_viewParams[view];
+		QHash<QString, PerMapParameterSet*>::const_iterator i = params->perMap.constBegin();
+		while (i != params->perMap.constEnd())
+		{
+			unregisterShader(i.value()->m_renderTopo->shader1());
+			unregisterShader(i.value()->m_renderTopo->shader2());
+			delete i.value();
+			++i;
+		}
 		h_viewParams.remove(view);
 
 		disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
@@ -128,11 +131,7 @@ void RenderTopoSurfacePlugin::viewUnlinked(View* view, Plugin* plugin)
 void RenderTopoSurfacePlugin::currentViewChanged(View* view)
 {
 	if(isLinkedToView(view))
-	{
-//		ParameterSet* params = h_viewParams[view];
-//		changeSelectedMap(view, params->selectedMap);
 		m_dockTab->refreshUI(h_viewParams[view]);
-	}
 }
 
 void RenderTopoSurfacePlugin::mapLinked(MapHandlerGen* m)
@@ -144,14 +143,10 @@ void RenderTopoSurfacePlugin::mapLinked(MapHandlerGen* m)
 	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 
 	ParameterSet* params = h_viewParams[view];
-
 	PerMapParameterSet* p = new PerMapParameterSet(m);
-
 	registerShader(p->m_renderTopo->shader1());
 	registerShader(p->m_renderTopo->shader2());
-
 	params->perMap.insert(m->getName(), p);
-
 	if(params->selectedMap == NULL || params->perMap.count() == 1)
 		changeSelectedMap(view, m);
 	else
@@ -167,6 +162,7 @@ void RenderTopoSurfacePlugin::mapUnlinked(MapHandlerGen* m)
 	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 
 	ParameterSet* params = h_viewParams[view];
+	delete params->perMap[m->getName()];
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)
@@ -189,9 +185,13 @@ void RenderTopoSurfacePlugin::changeSelectedMap(View* view, MapHandlerGen* map, 
 
 	if(view->isCurrentView())
 	{
+		if(prev)
+			disconnect(prev, SIGNAL(attributeAdded(unsigned int, const QString&)), m_dockTab, SLOT(addAttributeToList(unsigned int, const QString&)));
+		if(map)
+			connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), m_dockTab, SLOT(addAttributeToList(unsigned int, const QString&)));
+
 		if(!fromUI)
 			m_dockTab->refreshUI(params);
-		view->updateGL();
 	}
 }
 
@@ -210,6 +210,44 @@ void RenderTopoSurfacePlugin::changePositionAttribute(View* view, MapHandlerGen*
 	}
 }
 
+void RenderTopoSurfacePlugin::changeDrawDarts(View* view, MapHandlerGen* map, bool b, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()]->drawDarts = b;
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderTopoSurfacePlugin::changeDrawPhi1(View* view, MapHandlerGen* map, bool b, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()]->drawPhi1 = b;
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderTopoSurfacePlugin::changeDrawPhi2(View* view, MapHandlerGen* map, bool b, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()]->drawPhi2 = b;
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
 
 void RenderTopoSurfacePlugin::changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
@@ -243,7 +281,20 @@ void RenderTopoSurfacePlugin::changeFacesScaleFactor(View* view, MapHandlerGen* 
 
 void RenderTopoSurfacePlugin::attributeModified(unsigned int orbit, QString nameAttr)
 {
-
+	if(orbit == VERTEX)
+	{
+		MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+		foreach(View* view, l_views)
+		{
+			ParameterSet* params = h_viewParams[view];
+			if(params->perMap.contains(map->getName()))
+			{
+				PerMapParameterSet* perMap = params->perMap[map->getName()];
+				if(nameAttr == QString::fromStdString(perMap->positionAttribute.name()))
+					perMap->updateRender();
+			}
+		}
+	}
 }
 
 void RenderTopoSurfacePlugin::connectivityModified()

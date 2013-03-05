@@ -70,6 +70,13 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
 	initParameters();
 }
 
+PerMapParameterSet::~PerMapParameterSet()
+{
+	delete lockingMarker;
+	delete handleMarker;
+	nlDeleteContext(nlContext);
+}
+
 void PerMapParameterSet::initParameters()
 {
 	if(positionAttribute.isValid())
@@ -95,13 +102,6 @@ void PerMapParameterSet::initParameters()
 		nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
 		nlSolverParameteri(NL_SOLVER, NL_CHOLMOD_EXT);
 	}
-}
-
-PerMapParameterSet::~PerMapParameterSet()
-{
-	delete lockingMarker;
-	delete handleMarker;
-	nlDeleteContext(nlContext);
 }
 
 
@@ -459,7 +459,6 @@ void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 		}
 
 		m_dockTab->refreshUI(params);
-		view->updateGL();
 	}
 }
 

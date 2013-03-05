@@ -11,16 +11,17 @@ namespace SCHNApps
 {
 
 RenderTopoSurfaceDockTab::RenderTopoSurfaceDockTab(Window* w, RenderTopoSurfacePlugin* p) :
-		m_window(w),
-		m_plugin(p),
-		b_refreshingUI(false)
+	m_window(w),
+	m_plugin(p),
+	b_refreshingUI(false)
 {
 	setupUi(this);
 
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
-
 	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
-
+	connect(check_drawDarts, SIGNAL(toggled(bool)), this, SLOT(drawDartsChanged(bool)));
+	connect(check_drawPhi1, SIGNAL(toggled(bool)), this, SLOT(drawPhi1Changed(bool)));
+	connect(check_drawPhi2, SIGNAL(toggled(bool)), this, SLOT(drawPhi2Changed(bool)));
 	connect(slider_edgesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(edgesScaleFactorChanged(int)));
 	connect(slider_facesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(facesScaleFactorChanged(int)));
 }
@@ -63,6 +64,9 @@ void RenderTopoSurfaceDockTab::refreshUI(ParameterSet* params)
 				}
 			}
 
+			check_drawDarts->setChecked(p->drawDarts);
+			check_drawPhi1->setChecked(p->drawPhi1);
+			check_drawPhi2->setChecked(p->drawPhi2);
 			slider_edgesScaleFactor->setSliderPosition(p->edgesScaleFactor * 50.0);
 			slider_facesScaleFactor->setSliderPosition(p->facesScaleFactor * 50.0);
 		}
@@ -92,6 +96,36 @@ void RenderTopoSurfaceDockTab::positionAttributeChanged(int index)
 	}
 }
 
+void RenderTopoSurfaceDockTab::drawDartsChanged(bool b)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changeDrawDarts(view, map, b, true);
+	}
+}
+
+void RenderTopoSurfaceDockTab::drawPhi1Changed(bool b)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changeDrawPhi1(view, map, b, true);
+	}
+}
+
+void RenderTopoSurfaceDockTab::drawPhi2Changed(bool b)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changeDrawPhi2(view, map, b, true);
+	}
+}
+
 void RenderTopoSurfaceDockTab::facesScaleFactorChanged(int i)
 {
 	if(!b_refreshingUI)
@@ -109,6 +143,18 @@ void RenderTopoSurfaceDockTab::edgesScaleFactorChanged(int i)
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
 		m_plugin->changeFacesScaleFactor(view, map, i, true);
+	}
+}
+
+void RenderTopoSurfaceDockTab::addAttributeToList(unsigned int orbit, const QString& nameAttr)
+{
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+
+	const QString& typeAttr = m_currentParams->selectedMap->getAttributeTypeName(orbit, nameAttr);
+
+	if(typeAttr == vec3TypeName)
+	{
+		combo_positionAttribute->addItem(nameAttr);
 	}
 }
 

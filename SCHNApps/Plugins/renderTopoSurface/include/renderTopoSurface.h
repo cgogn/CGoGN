@@ -19,10 +19,13 @@ struct PerMapParameterSet
 
 	void updateRender();
 
-	Algo::Render::GL2::TopoRender* m_renderTopo;
 	MapHandlerGen* mh;
+	Algo::Render::GL2::TopoRender* m_renderTopo;
 	VertexAttribute<PFP2::VEC3> positionAttribute;
 
+	bool drawDarts;
+	bool drawPhi1;
+	bool drawPhi2;
 	float edgesScaleFactor;
 	float facesScaleFactor;
 };
@@ -63,7 +66,6 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-
 protected:
 	RenderTopoSurfaceDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
@@ -77,9 +79,10 @@ public slots:
 	void mapUnlinked(MapHandlerGen* m);
 
 	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
-
 	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI = false);
-
+	void changeDrawDarts(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeDrawPhi1(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeDrawPhi2(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
 	void changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 

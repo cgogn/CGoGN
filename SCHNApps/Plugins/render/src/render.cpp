@@ -250,7 +250,6 @@ void RenderPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI
 
 		if(!fromUI)
 			m_dockTab->refreshUI(params);
-		view->updateGL();
 	}
 }
 

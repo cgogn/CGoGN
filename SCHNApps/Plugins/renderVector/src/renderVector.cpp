@@ -86,7 +86,7 @@ void RenderVectorPlugin::viewLinked(View* view, Plugin* plugin)
 			PerMapParameterSet p(map);
 			params->perMap.insert(map->getName(), p);
 		}
-		if (!maps.empty())
+		if(!maps.empty())
 			changeSelectedMap(view, maps[0]);
 
 		connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
@@ -182,7 +182,6 @@ void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool 
 
 		if(!fromUI)
 			m_dockTab->refreshUI(params);
-		view->updateGL();
 	}
 }
 

@@ -1,5 +1,5 @@
-#ifndef _RENDER_TOPO_DOCK_TAB_H_
-#define _RENDER_TOPO_DOCK_TAB_H_
+#ifndef _RENDER_TOPO_SURFACE_DOCK_TAB_H_
+#define _RENDER_TOPO_SURFACE_DOCK_TAB_H_
 
 #include "ui_renderTopoSurface.h"
 
@@ -31,8 +31,12 @@ public slots:
 
 	void selectedMapChanged();
 	void positionAttributeChanged(int index);
+	void drawDartsChanged(bool b);
+	void drawPhi1Changed(bool b);
+	void drawPhi2Changed(bool b);
 	void edgesScaleFactorChanged(int i);
 	void facesScaleFactorChanged(int i);
+	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
 };
 
 } // namespace SCHNApps
