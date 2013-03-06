@@ -1,7 +1,7 @@
 importPlugin = schnapps.loadPlugin("ImportSurface");
 renderPlugin = schnapps.loadPlugin("Render");
 renderVectorPlugin = schnapps.loadPlugin("RenderVector");
-renderTopoSurfacePlugin = schnapps.loadPlugin("RenderTopoSurfaceD");
+renderTopoSurfacePlugin = schnapps.loadPlugin("RenderTopoSurface");
 differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
 subdivisionPlugin = schnapps.loadPlugin("SubdivideSurface");
 surfaceDeformationPlugin = schnapps.loadPlugin("SurfaceDeformation");

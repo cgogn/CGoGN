@@ -24,8 +24,11 @@ struct PerMapParameterSet
 	VertexAttribute<PFP2::VEC3> positionAttribute;
 
 	bool drawDarts;
+	QColor dartsColor;
 	bool drawPhi1;
+	QColor phi1Color;
 	bool drawPhi2;
+	QColor phi2Color;
 	float edgesScaleFactor;
 	float facesScaleFactor;
 };
@@ -81,8 +84,11 @@ public slots:
 	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
 	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI = false);
 	void changeDrawDarts(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeDartsColor(View* view, MapHandlerGen* map, QColor c, bool fromUI = false);
 	void changeDrawPhi1(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changePhi1Color(View* view, MapHandlerGen* map, QColor c, bool fromUI = false);
 	void changeDrawPhi2(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changePhi2Color(View* view, MapHandlerGen* map, QColor c, bool fromUI = false);
 	void changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 

@@ -20,8 +20,11 @@ RenderTopoSurfaceDockTab::RenderTopoSurfaceDockTab(Window* w, RenderTopoSurfaceP
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
 	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
 	connect(check_drawDarts, SIGNAL(toggled(bool)), this, SLOT(drawDartsChanged(bool)));
+	connect(combo_dartsColor, SIGNAL(currentIndexChanged(int)), this, SLOT(dartsColorChanged(int)));
 	connect(check_drawPhi1, SIGNAL(toggled(bool)), this, SLOT(drawPhi1Changed(bool)));
+	connect(combo_phi1Color, SIGNAL(currentIndexChanged(int)), this, SLOT(phi1ColorChanged(int)));
 	connect(check_drawPhi2, SIGNAL(toggled(bool)), this, SLOT(drawPhi2Changed(bool)));
+	connect(combo_phi2Color, SIGNAL(currentIndexChanged(int)), this, SLOT(phi2ColorChanged(int)));
 	connect(slider_edgesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(edgesScaleFactorChanged(int)));
 	connect(slider_facesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(facesScaleFactorChanged(int)));
 }
@@ -65,10 +68,13 @@ void RenderTopoSurfaceDockTab::refreshUI(ParameterSet* params)
 			}
 
 			check_drawDarts->setChecked(p->drawDarts);
+			combo_dartsColor->setColor(p->dartsColor);
 			check_drawPhi1->setChecked(p->drawPhi1);
+			combo_phi1Color->setColor(p->phi1Color);
 			check_drawPhi2->setChecked(p->drawPhi2);
-			slider_edgesScaleFactor->setSliderPosition(p->edgesScaleFactor * 50.0);
-			slider_facesScaleFactor->setSliderPosition(p->facesScaleFactor * 50.0);
+			combo_phi2Color->setColor(p->phi2Color);
+			slider_edgesScaleFactor->setSliderPosition(p->edgesScaleFactor * 100.0);
+			slider_facesScaleFactor->setSliderPosition(p->facesScaleFactor * 100.0);
 		}
 		++i;
 	}
@@ -106,6 +112,16 @@ void RenderTopoSurfaceDockTab::drawDartsChanged(bool b)
 	}
 }
 
+void RenderTopoSurfaceDockTab::dartsColorChanged(int i)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changeDartsColor(view, map, combo_dartsColor->color(), true);
+	}
+}
+
 void RenderTopoSurfaceDockTab::drawPhi1Changed(bool b)
 {
 	if(!b_refreshingUI)
@@ -116,6 +132,16 @@ void RenderTopoSurfaceDockTab::drawPhi1Changed(bool b)
 	}
 }
 
+void RenderTopoSurfaceDockTab::phi1ColorChanged(int i)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changePhi1Color(view, map, combo_phi1Color->color(), true);
+	}
+}
+
 void RenderTopoSurfaceDockTab::drawPhi2Changed(bool b)
 {
 	if(!b_refreshingUI)
@@ -123,6 +149,16 @@ void RenderTopoSurfaceDockTab::drawPhi2Changed(bool b)
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
 		m_plugin->changeDrawPhi2(view, map, b, true);
+	}
+}
+
+void RenderTopoSurfaceDockTab::phi2ColorChanged(int i)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changePhi2Color(view, map, combo_phi2Color->color(), true);
 	}
 }
 

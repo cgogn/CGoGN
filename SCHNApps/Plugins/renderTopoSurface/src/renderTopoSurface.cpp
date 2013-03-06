@@ -11,8 +11,11 @@ namespace SCHNApps
 PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
 	mh(m),
 	drawDarts(true),
+	dartsColor("white"),
 	drawPhi1(true),
+	phi1Color("cyan"),
 	drawPhi2(true),
+	phi2Color("red"),
 	edgesScaleFactor(1.0f),
 	facesScaleFactor(1.0f)
 {
@@ -223,10 +226,39 @@ void RenderTopoSurfacePlugin::changeDrawDarts(View* view, MapHandlerGen* map, bo
 	}
 }
 
+void RenderTopoSurfacePlugin::changeDartsColor(View* view, MapHandlerGen* map, QColor c, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	PerMapParameterSet* perMap = params->perMap[map->getName()];
+	perMap->dartsColor = c;
+	perMap->m_renderTopo->setInitialDartsColor(c.redF(), c.greenF(), c.blueF());
+	perMap->m_renderTopo->setAllDartsColor(c.redF(), c.greenF(), c.blueF());
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
 void RenderTopoSurfacePlugin::changeDrawPhi1(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()]->drawPhi1 = b;
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderTopoSurfacePlugin::changePhi1Color(View* view, MapHandlerGen* map, QColor c, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()]->phi1Color = c;
 
 	if(view->isCurrentView())
 	{
@@ -249,11 +281,24 @@ void RenderTopoSurfacePlugin::changeDrawPhi2(View* view, MapHandlerGen* map, boo
 	}
 }
 
+void RenderTopoSurfacePlugin::changePhi2Color(View* view, MapHandlerGen* map, QColor c, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()]->phi2Color = c;
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
 void RenderTopoSurfacePlugin::changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet* perMap = params->perMap[map->getName()];
-	perMap->edgesScaleFactor = i / 50.0;
+	perMap->edgesScaleFactor = i / 100.0;
 	perMap->updateRender();
 
 	if(view->isCurrentView())
@@ -268,7 +313,7 @@ void RenderTopoSurfacePlugin::changeFacesScaleFactor(View* view, MapHandlerGen* 
 {
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet* perMap = params->perMap[map->getName()];
-	perMap->facesScaleFactor = i / 50.0;
+	perMap->facesScaleFactor = i / 100.0;
 	perMap->updateRender();
 
 	if(view->isCurrentView())

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MR_SQRT2_FILTER__
-#define __MR_SQRT2_FILTER__
+#ifndef __2MR_SQRT2_FILTER__
+#define __2MR_SQRT2_FILTER__
 
 #include <cmath>
 #include "Algo/Multiresolution/filter.h"
@@ -82,11 +82,6 @@ public:
 			m_map.decCurrentLevel() ;
 
 		}
-	}
-
-	void operator() (bool filtering)
-	{
-
 	}
 } ;
 

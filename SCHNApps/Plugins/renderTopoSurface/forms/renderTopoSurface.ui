@@ -6,45 +6,35 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>204</width>
+    <width>190</width>
     <height>547</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="4">
     <widget class="QListWidget" name="mapList"/>
    </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Position :</string>
      </property>
-     <item row="0" column="2">
-      <widget class="QComboBox" name="combo_positionAttribute">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" colspan="2">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Position :</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    </widget>
    </item>
-   <item>
-    <widget class="Line" name="line"/>
+   <item row="1" column="1" colspan="3">
+    <widget class="QComboBox" name="combo_positionAttribute">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
-   <item>
+   <item row="2" column="0" colspan="3">
     <widget class="QCheckBox" name="check_drawDarts">
      <property name="text">
       <string>draw darts</string>
@@ -54,7 +44,10 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="2" column="3">
+    <widget class="ColorComboBox" name="combo_dartsColor"/>
+   </item>
+   <item row="3" column="0" colspan="3">
     <widget class="QCheckBox" name="check_drawPhi1">
      <property name="text">
       <string>draw phi1</string>
@@ -64,7 +57,10 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="3" column="3">
+    <widget class="ColorComboBox" name="combo_phi1Color"/>
+   </item>
+   <item row="4" column="0" colspan="3">
     <widget class="QCheckBox" name="check_drawPhi2">
      <property name="text">
       <string>draw phi2</string>
@@ -74,45 +70,44 @@
      </property>
     </widget>
    </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>explod edges</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QSlider" name="slider_edgesScaleFactor">
-       <property name="value">
-        <number>50</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>explod faces</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSlider" name="slider_facesScaleFactor">
-       <property name="value">
-        <number>50</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="4" column="3">
+    <widget class="ColorComboBox" name="combo_phi2Color"/>
    </item>
-   <item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>explod edges</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2" colspan="2">
+    <widget class="QSlider" name="slider_edgesScaleFactor">
+     <property name="value">
+      <number>50</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>explod faces</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2" colspan="2">
+    <widget class="QSlider" name="slider_facesScaleFactor">
+     <property name="value">
+      <number>50</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="4">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -127,6 +122,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ColorComboBox</class>
+   <extends>QComboBox</extends>
+   <header>colorComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -380,75 +380,87 @@ void Topo3Render::svgout2D(const std::string& filename, const glm::mat4& model, 
 {
 	Utils::SVG::SVGOut svg(filename,model,proj);
 	toSVG(svg);
+	svg.write();
 }
 
 void Topo3Render::toSVG(Utils::SVG::SVGOut& svg)
 {
-	svg.setWidth(m_topo_relation_width);
 
 	// PHI3 / beta3
-
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("phi3", svg.m_model, svg.m_proj);
 	const Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo3->lockPtr());
-
-	svg.beginLines();
+	svg1->setWidth(m_topo_relation_width);
+	svg1->beginLines();
 	for (unsigned int i=0; i<m_nbRel3; ++i)
 	{
 		Geom::Vec3f P = (ptr[4*i]+ ptr[4*i+3])/2.0f;
 		Geom::Vec3f Q = (ptr[4*i+1]+ ptr[4*i+2])/2.0f;
-		svg.addLine(P, Q,Geom::Vec3f(0.8f,0.8f,0.0f));
+		svg1->addLine(P, Q,Geom::Vec3f(0.8f,0.8f,0.0f));
 	}
-	svg.endLines();
+	svg1->endLines();
 	m_vbo3->releasePtr();
 
+	svg.addGroup(svg1);
 
 	// PHI2 / beta2
-
+	Utils::SVG::SvgGroup* svg2 = new Utils::SVG::SvgGroup("phi2", svg.m_model, svg.m_proj);
 	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo2->lockPtr());
-
-	svg.beginLines();
+	svg2->setWidth(m_topo_relation_width);
+	svg2->beginLines();
 	for (unsigned int i=0; i<m_nbRel2; ++i)
 	{
 		Geom::Vec3f P = (ptr[4*i]+ ptr[4*i+3])/2.0f;
 		Geom::Vec3f Q = (ptr[4*i+1]+ ptr[4*i+2])/2.0f;
-		svg.addLine(P, Q,Geom::Vec3f(0.8f,0.0f,0.0f));
+		svg2->addLine(P, Q,Geom::Vec3f(0.8f,0.0f,0.0f));
 	}
-	svg.endLines();
+	svg2->endLines();
 	m_vbo2->releasePtr();
 
-	//PHI1 /beta1
-	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
+	svg.addGroup(svg2);
 
-	svg.beginLines();
+	//PHI1 /beta1
+	Utils::SVG::SvgGroup* svg3 = new Utils::SVG::SvgGroup("phi1", svg.m_model, svg.m_proj);
+	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
+	svg3->setWidth(m_topo_relation_width);
+	svg3->beginLines();
 	for (unsigned int i=0; i<m_nbRel1; ++i)
-		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
-	svg.endLines();
+		svg3->addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
+	svg3->endLines();
 	m_vbo1->releasePtr();
 
+	svg.addGroup(svg3);
 
 	const Geom::Vec3f* colorsPtr = reinterpret_cast<const Geom::Vec3f*>(m_vbo4->lockPtr());
 	ptr= reinterpret_cast<Geom::Vec3f*>(m_vbo0->lockPtr());
 
-	svg.setWidth(m_topo_dart_width);
+	Utils::SVG::SvgGroup* svg4 = new Utils::SVG::SvgGroup("darts", svg.m_model, svg.m_proj);
+	svg4->setWidth(m_topo_dart_width);
 
-	svg.beginLines();
+	svg4->beginLines();
 	for (unsigned int i=0; i<m_nbDarts; ++i)
 	{
 		Geom::Vec3f col = colorsPtr[2*i];
 		if (col.norm2()>2.9f)
 			col = Geom::Vec3f(1.0f,1.0f,1.0f) - col;
-		svg.addLine(ptr[2*i], ptr[2*i+1], col);
+		svg4->addLine(ptr[2*i], ptr[2*i+1], col);
 	}
-	svg.endLines();
+	svg4->endLines();
 
-	svg.beginPoints();
+	svg.addGroup(svg4);
+
+	Utils::SVG::SvgGroup* svg5 = new Utils::SVG::SvgGroup("dartEmb", svg.m_model, svg.m_proj);
+	svg5->setWidth(m_topo_dart_width);
+	svg5->beginPoints();
 	for (unsigned int i=0; i<m_nbDarts; ++i)
 	{
 		Geom::Vec3f col = colorsPtr[2*i];
 		if (col.norm2()>2.9f)
 			col = Geom::Vec3f(1.0f,1.0f,1.0f) - col;
-		svg.addPoint(ptr[2*i], col);
+		svg5->addPoint(ptr[2*i], col);
 	}
-	svg.endPoints();
+	svg5->endPoints();
+
+	svg.addGroup(svg5);
 
 	m_vbo0->releasePtr();
 	m_vbo4->releasePtr();
