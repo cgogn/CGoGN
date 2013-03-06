@@ -99,6 +99,17 @@ IF(WITH_QT)
 	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})
 ENDIF (WITH_QT)
 
+file(	GLOB_RECURSE
+		files_geometry
+		${CGoGN_ROOT_DIR}/include/Geometry/*.h
+		${CGoGN_ROOT_DIR}/include/Geometry/*.hpp
+)
+
+file(	GLOB_RECURSE
+		files_thirdParty
+		${CGoGN_ROOT_DIR}/ThirdParty/include/*.h
+		${CGoGN_ROOT_DIR}/ThirdParty/include/*.hpp
+)
 
 IF (ONELIB)
 	IF(WITH_QT)
@@ -116,5 +127,7 @@ ELSE (ONELIB)
 	ELSE(WITH_QT)
 		add_library( utils ${files_utils} )
 	ENDIF (WITH_QT)
-	add_dependencies(utils shader_target )
+	add_custom_target( Geometry 	SOURCES ${files_geometry} )
+	add_custom_target( ThirdParty 	SOURCES ${files_thirdParty} )
+	add_dependencies( utils shader_target )
 ENDIF (ONELIB)
