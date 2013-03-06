@@ -75,7 +75,7 @@ void SurfaceDeformationDockTab::selectedMapChanged()
 	{
 		QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 		if(!currentItems.empty())
-			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
+			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()), true);
 	}
 }
 
@@ -85,7 +85,7 @@ void SurfaceDeformationDockTab::positionAttributeChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()));
+		m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
 	}
 }
 
@@ -95,7 +95,7 @@ void SurfaceDeformationDockTab::selectLockedVertices(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVerticesSelectionMode(view, map, LOCKED);
+		m_plugin->changeVerticesSelectionMode(view, map, LOCKED, true);
 	}
 }
 
@@ -105,7 +105,7 @@ void SurfaceDeformationDockTab::selectHandleVertices(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVerticesSelectionMode(view, map, HANDLE);
+		m_plugin->changeVerticesSelectionMode(view, map, HANDLE, true);
 	}
 }
 

@@ -441,7 +441,7 @@ void SurfaceDeformationPlugin::mapUnlinked(MapHandlerGen* m)
 		m_dockTab->refreshUI(params);
 }
 
-void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
+void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 
@@ -458,11 +458,12 @@ void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 			selectionRadius = map->getBBdiagSize() / 50.0;
 		}
 
-		m_dockTab->refreshUI(params);
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
 	}
 }
 
-void SurfaceDeformationPlugin::changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute)
+void SurfaceDeformationPlugin::changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet* perMap = params->perMap[map->getName()];
@@ -470,16 +471,22 @@ void SurfaceDeformationPlugin::changePositionAttribute(View* view, MapHandlerGen
 	perMap->initParameters();
 
 	if(view->isCurrentView())
-		m_dockTab->refreshUI(params);
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+	}
 }
 
-void SurfaceDeformationPlugin::changeVerticesSelectionMode(View* view, MapHandlerGen* map, SelectionMode m)
+void SurfaceDeformationPlugin::changeVerticesSelectionMode(View* view, MapHandlerGen* map, SelectionMode m, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
 	params->perMap[map->getName()]->verticesSelectionMode = m;
 
 	if(view->isCurrentView())
-		m_dockTab->refreshUI(params);
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+	}
 }
 
 void SurfaceDeformationPlugin::matchDiffCoord(View* view, MapHandlerGen* mh)
