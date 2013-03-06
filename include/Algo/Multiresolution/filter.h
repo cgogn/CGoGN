@@ -51,16 +51,26 @@ unsigned int vertexLevel(typename PFP::MAP& map, Dart d)
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"edgeLevel : called with a dart inserted after current level") ;
 
 	unsigned int level = map.getMaxLevel();
-	Dart dit = d;
-	do
+
+	TraversorDartsOfOrbit<typename PFP::MAP,VERTEX> tv(map,d);
+
+	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
 	{
 		unsigned int ldit = map.getDartLevel(dit) ;
 		if(ldit < level)
 			level = ldit;
-
-		dit = map.phi2(map.phi_1(dit));
 	}
-	while(dit != d);
+
+//	Dart dit = d;
+//	do
+//	{
+//		unsigned int ldit = map.getDartLevel(dit) ;
+//		if(ldit < level)
+//			level = ldit;
+//
+//		dit = map.phi2(map.phi_1(dit));
+//	}
+//	while(dit != d);
 
 	return level;
 }
@@ -133,7 +143,7 @@ void frequencyDeformation(typename PFP::MAP& map, VertexAttribute<T>& attIn, uns
 	for (Dart d = tv.begin(); d != tv.end(); d = tv.next())
 	{
 		if(vertexLevel<PFP>(map,d) == cutoffLevel)
-			attIn[d] *= 2.0;//T(0.0,6.0,0.0);
+			attIn[d] += T(0.0,0.0,0.2);
 	}
 
 	map.setCurrentLevel(cur);
