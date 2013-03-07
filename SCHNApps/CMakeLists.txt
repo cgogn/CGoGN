@@ -18,7 +18,7 @@ find_package(Qt4 REQUIRED)
 find_package(QGLViewer REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
 find_package(SuiteSparse REQUIRED)
-find_package(SuperLU REQUIRED)
+#find_package(SuperLU REQUIRED)
 
 
 SET( QT_USE_QTOPENGL TRUE )
@@ -70,7 +70,7 @@ SET (EXT_INCLUDES
 	${QGLVIEWER_INCLUDE_DIR}
 	${PYTHON_INCLUDE_DIRS}
 	${SUITESPARSE_INCLUDE_DIRS}
-	${SUPERLU_INCLUDE_DIRS}
+#	${SUPERLU_INCLUDE_DIRS}
 )
 
 # define libs for external libs
@@ -88,7 +88,7 @@ SET (EXT_LIBS
 	${QGLVIEWER_LIBRARIES}
 	${PYTHON_LIBRARIES}
 	${SUITESPARSE_LIBRARIES}
-	${SUPERLU_LIBRARIES}
+#	${SUPERLU_LIBRARIES}
 )
 
 
