@@ -108,7 +108,10 @@ void nlDeleteContext(NLContext context_in) {
     if(context->alloc_b) {
         NL_DELETE_ARRAY(context->b) ;
     }
-	if(context->solver == NL_CHOLMOD_EXT) { // or any other direct solver
+	if( context->solver == NL_CHOLMOD_EXT || // or any other direct solver
+		context->solver == NL_SUPERLU_EXT ||
+		context->solver == NL_PERM_SUPERLU_EXT ||
+		context->solver == NL_SYMMETRIC_SUPERLU_EXT) {
 		context->clear_factor_func() ;
 	}
 
@@ -268,10 +271,12 @@ NLboolean nlDefaultFactorize() {
 	case NL_CNC_FLOAT_ELL:
 	case NL_CNC_DOUBLE_ELL:
 	case NL_CNC_FLOAT_HYB:
-	case NL_CNC_DOUBLE_HYB:
+	case NL_CNC_DOUBLE_HYB: break ;
 	case NL_SUPERLU_EXT:
 	case NL_PERM_SUPERLU_EXT:
-	case NL_SYMMETRIC_SUPERLU_EXT: break ;
+	case NL_SYMMETRIC_SUPERLU_EXT: {
+			result = nlFactorize_SUPERLU() ;
+	} break ;
 	case NL_CHOLMOD_EXT: {
 		result = nlFactorize_CHOLMOD() ;
 	} break ;
@@ -293,10 +298,12 @@ void nlDefaultClearFactor() {
 	case NL_CNC_FLOAT_ELL:
 	case NL_CNC_DOUBLE_ELL:
 	case NL_CNC_FLOAT_HYB:
-	case NL_CNC_DOUBLE_HYB:
+	case NL_CNC_DOUBLE_HYB: break ;
 	case NL_SUPERLU_EXT:
 	case NL_PERM_SUPERLU_EXT:
-	case NL_SYMMETRIC_SUPERLU_EXT: break ;
+	case NL_SYMMETRIC_SUPERLU_EXT: {
+		nlClear_SUPERLU() ;
+	} break ;
 	case NL_CHOLMOD_EXT: {
 		nlClear_CHOLMOD() ;
 	} break ;

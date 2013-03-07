@@ -121,9 +121,6 @@ typedef void* NLContext ;
 #define NL_ELAPSED_TIME     0x10a
 #define NL_PRECONDITIONER   0x10b
 
-//#define NL_DIRECT           0x10c
-//#define NL_FACTORIZED       0x10d
-
 /* Solvers */
 
 #define NL_CG                    0x200
@@ -133,7 +130,6 @@ typedef void* NLContext ;
 #define NL_PERM_SUPERLU_EXT      0x211
 #define NL_SYMMETRIC_SUPERLU_EXT 0x212
 #define NL_SOLVER_USER           0x213
-
 #define NL_CHOLMOD_EXT           0x214
 
 #define NL_CNC_FLOAT_CRS         0x220

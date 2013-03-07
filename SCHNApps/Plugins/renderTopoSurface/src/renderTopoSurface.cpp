@@ -95,6 +95,8 @@ void RenderTopoSurfacePlugin::viewLinked(View* view, Plugin* plugin)
 		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 		foreach(MapHandlerGen* mh, maps)
 		{
+			connect(mh, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+			connect(mh, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 			PerMapParameterSet* p = new PerMapParameterSet(mh);
 			registerShader(p->m_renderTopo->shader1());
 			registerShader(p->m_renderTopo->shader2());
@@ -119,6 +121,8 @@ void RenderTopoSurfacePlugin::viewUnlinked(View* view, Plugin* plugin)
 		QHash<QString, PerMapParameterSet*>::const_iterator i = params->perMap.constBegin();
 		while (i != params->perMap.constEnd())
 		{
+			disconnect(i.value()->mh, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+			disconnect(i.value()->mh, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 			unregisterShader(i.value()->m_renderTopo->shader1());
 			unregisterShader(i.value()->m_renderTopo->shader2());
 			delete i.value();
@@ -146,10 +150,10 @@ void RenderTopoSurfacePlugin::mapLinked(MapHandlerGen* m)
 	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 
 	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet* p = new PerMapParameterSet(m);
-	registerShader(p->m_renderTopo->shader1());
-	registerShader(p->m_renderTopo->shader2());
-	params->perMap.insert(m->getName(), p);
+	PerMapParameterSet* perMap = new PerMapParameterSet(m);
+	registerShader(perMap->m_renderTopo->shader1());
+	registerShader(perMap->m_renderTopo->shader2());
+	params->perMap.insert(m->getName(), perMap);
 	if(params->selectedMap == NULL || params->perMap.count() == 1)
 		changeSelectedMap(view, m);
 	else
@@ -165,7 +169,10 @@ void RenderTopoSurfacePlugin::mapUnlinked(MapHandlerGen* m)
 	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 
 	ParameterSet* params = h_viewParams[view];
-	delete params->perMap[m->getName()];
+	PerMapParameterSet* perMap = params->perMap[m->getName()];
+	unregisterShader(perMap->m_renderTopo->shader1());
+	unregisterShader(perMap->m_renderTopo->shader2());
+	delete perMap;
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)

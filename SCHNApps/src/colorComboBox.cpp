@@ -23,18 +23,15 @@ void ColorComboBox::populateList()
 	//QStringList colorNames = QColor::colorNames();
 	QStringList colorNames;
 	colorNames <<
-		"darkGreen" <<
-		"green" <<
-		"gray" <<
 		"red" <<
-		"white" <<
+		"green" <<
 		"blue" <<
 		"cyan "<<
-		"darkMagenta" <<
+		"magenta" <<
 		"yellow" <<
-		"darkRed" <<
-		"black" <<
-		"magenta";
+		"gray" <<
+		"white" <<
+		"black";
 
 	for (int i = 0; i < colorNames.size(); ++i) {
 		QColor color(colorNames[i]);
