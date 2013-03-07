@@ -268,17 +268,16 @@ void nlClear_SUPERLU() {
 
 NLboolean nlFactorize_SUPERLU() {
 	nl_assert_not_reached ;
-	return 0;
+	return NL_FALSE;
 }
 
 NLboolean nlSolve_SUPERLU() {
     nl_assert_not_reached ;
-    return 0;
+    return NL_FALSE;
 }
 
 void nlCLear_SUPERLU() {
 	nl_assert_not_reached ;
-	return 0;
 }
 
 #endif

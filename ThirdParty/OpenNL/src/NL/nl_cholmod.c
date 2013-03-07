@@ -206,9 +206,8 @@ NLboolean nlSolve_CHOLMOD() {
 	return NL_FALSE ;
 }
 
-NLboolean nlClear_CHOLMOD() {
+void nlClear_CHOLMOD() {
 	nl_assert_not_reached ;
-	return NL_FALSE ;
 }
 
 #endif
