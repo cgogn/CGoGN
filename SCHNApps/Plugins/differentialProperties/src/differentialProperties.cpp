@@ -49,8 +49,19 @@ void DifferentialPropertiesPlugin::attributeModified(unsigned int orbit, QString
 		if(computeNormalLastParameters.contains(map->getName()))
 		{
 			ComputeNormalParameters& params = computeNormalLastParameters[map->getName()];
-			if(params.positionName == nameAttr && params.autoUpdate)
-				computeNormal(map->getName(), params.positionName, params.normalName);
+			if(params.autoUpdate && params.positionName == nameAttr)
+				computeNormal(map->getName(), params.positionName, params.normalName, true);
+		}
+		if(computeCurvatureLastParameters.contains(map->getName()))
+		{
+			ComputeCurvatureParameters& params = computeCurvatureLastParameters[map->getName()];
+			if(params.autoUpdate && (params.positionName == nameAttr || params.normalName == nameAttr))
+				computeCurvature(
+					map->getName(),
+					params.positionName, params.normalName,
+					params.KmaxName, params.kmaxName, params.KminName, params.kminName, params.KnormalName,
+					true
+				);
 		}
 	}
 }

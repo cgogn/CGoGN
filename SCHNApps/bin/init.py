@@ -2,8 +2,8 @@ importPlugin = schnapps.loadPlugin("ImportSurface");
 renderPlugin = schnapps.loadPlugin("Render");
 renderVectorPlugin = schnapps.loadPlugin("RenderVector");
 renderTopoSurfacePlugin = schnapps.loadPlugin("RenderTopoSurface");
-#differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
-#subdivisionPlugin = schnapps.loadPlugin("SubdivideSurface");
+differentialPropertiesPlugin = schnapps.loadPlugin("DifferentialProperties");
+subdivisionPlugin = schnapps.loadPlugin("SubdivideSurface");
 surfaceDeformationPlugin = schnapps.loadPlugin("SurfaceDeformation");
 
 obj = importPlugin.importFromFile("/home/kraemer/Media/Data/surface/midRes/cow_3k.off");
