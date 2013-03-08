@@ -56,8 +56,12 @@ MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
 
 void ImportSurfacePlugin::importFromFileDialog()
 {
-	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off *.trian)");
-	importFromFile(fileName);
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_window, "Import surfaces", m_window->getAppPath(), "Surface mesh Files (*.ply *.off *.trian)");
+	QStringList::Iterator it = fileNames.begin();
+	while(it != fileNames.end()) {
+		importFromFile(*it);
+		++it;
+	}
 }
 
 #ifndef DEBUG
