@@ -39,6 +39,7 @@ public slots:
 	void phi2ColorChanged(int);
 	void edgesScaleFactorChanged(int i);
 	void facesScaleFactorChanged(int i);
+
 	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
 };
 

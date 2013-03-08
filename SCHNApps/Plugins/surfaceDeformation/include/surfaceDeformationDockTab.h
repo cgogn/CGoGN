@@ -30,9 +30,11 @@ public slots:
 	void refreshUI(ParameterSet* params);
 
 	void selectedMapChanged();
+
 	void positionAttributeChanged(int index);
 	void selectLockedVertices(bool b);
 	void selectHandleVertices(bool b);
+
 	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
 };
 

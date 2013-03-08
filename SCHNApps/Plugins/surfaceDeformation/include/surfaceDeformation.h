@@ -128,10 +128,17 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
+
+public slots:
+	void changeSelectedMap(View* view, MapHandlerGen* map);
+
 	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI = false);
 	void changeVerticesSelectionMode(View* view, MapHandlerGen* map, SelectionMode m, bool fromUI = false);
 
+protected:
 	void matchDiffCoord(View* view, MapHandlerGen* map);
 	void asRigidAsPossible(View* view, MapHandlerGen* map);
 };

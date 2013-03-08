@@ -36,6 +36,8 @@ public slots:
 	void renderFacesChanged(bool b);
 	void facesScaleFactorChanged(int i);
 	void volumesScaleFactorChanged(int i);
+
+	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
 };
 
 } // namespace SCHNApps

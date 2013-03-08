@@ -362,14 +362,10 @@ void SurfaceDeformationPlugin::viewLinked(View* view, Plugin* plugin)
 	{
 		ParameterSet* params = new ParameterSet();
 		h_viewParams.insert(view, params);
+
 		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
-		foreach(MapHandlerGen* map, maps)
-		{
-			PerMapParameterSet* p = new PerMapParameterSet(map);
-			params->perMap.insert(map->getName(), p);
-		}
-		if (!maps.empty())
-			changeSelectedMap(view, maps[0]);
+		foreach(MapHandlerGen* mh, maps)
+			addManagedMap(view, mh);
 
 		connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
 		connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
@@ -383,13 +379,12 @@ void SurfaceDeformationPlugin::viewUnlinked(View* view, Plugin* plugin)
 {
 	if(plugin == this)
 	{
+		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+		foreach(MapHandlerGen* mh, maps)
+			removeManagedMap(view, mh);
+
 		ParameterSet* params = h_viewParams[view];
-		QHash<QString, PerMapParameterSet*>::const_iterator i = params->perMap.constBegin();
-		while (i != params->perMap.constEnd())
-		{
-			delete i.value();
-			++i;
-		}
+		delete params;
 		h_viewParams.remove(view);
 
 		disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
@@ -411,37 +406,55 @@ void SurfaceDeformationPlugin::mapLinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
-
-	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet* p = new PerMapParameterSet(m);
-	params->perMap.insert(m->getName(), p);
-	if(params->selectedMap == NULL || params->perMap.count() == 1)
-		changeSelectedMap(view, m);
-	else
-		m_dockTab->refreshUI(params);
+	addManagedMap(view, m);
 }
 
 void SurfaceDeformationPlugin::mapUnlinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+	removeManagedMap(view, m);
+}
 
-	ParameterSet* params = h_viewParams[view];
-	delete params->perMap[m->getName()];
+void SurfaceDeformationPlugin::addManagedMap(View* v, MapHandlerGen *m)
+{
+//	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+//	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = new PerMapParameterSet(m);
+
+	params->perMap.insert(m->getName(), perMap);
+
+	if(params->selectedMap == NULL || params->perMap.count() == 1)
+		changeSelectedMap(v, m);
+	else
+		m_dockTab->refreshUI(params);
+}
+
+void SurfaceDeformationPlugin::removeManagedMap(View *v, MapHandlerGen *m)
+{
+//	disconnect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+//	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = params->perMap[m->getName()];
+
+	delete perMap;
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)
 	{
 		if(!params->perMap.empty())
-			changeSelectedMap(view, m_window->getMap(params->perMap.begin().key()));
+			changeSelectedMap(v, m_window->getMap(params->perMap.begin().key()));
 		else
-			changeSelectedMap(view, NULL);
+			changeSelectedMap(v, NULL);
 	}
 	else
 		m_dockTab->refreshUI(params);
 }
 
-void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
+void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 {
 	ParameterSet* params = h_viewParams[view];
 
@@ -458,8 +471,7 @@ void SurfaceDeformationPlugin::changeSelectedMap(View* view, MapHandlerGen* map,
 			selectionRadius = map->getBBdiagSize() / 50.0;
 		}
 
-		if(!fromUI)
-			m_dockTab->refreshUI(params);
+		m_dockTab->refreshUI(params);
 	}
 }
 

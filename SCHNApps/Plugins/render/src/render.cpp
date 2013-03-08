@@ -92,40 +92,40 @@ void RenderPlugin::redraw(View* view)
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* m, maps)
 	{
-		const PerMapParameterSet& p = params->perMap[m->getName()];
-		if(p.positionVBO != NULL)
+		PerMapParameterSet* p = params->perMap[m->getName()];
+		if(p->positionVBO != NULL)
 		{
-			if(p.renderVertices)
+			if(p->renderVertices)
 			{
-				m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
-				m_pointSprite->setAttributePosition(p.positionVBO);
+				m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * p->verticesScaleFactor);
+				m_pointSprite->setAttributePosition(p->positionVBO);
 				m_pointSprite->predraw(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
 				m->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
 				m_pointSprite->postdraw();
 			}
-			if(p.renderEdges)
+			if(p->renderEdges)
 			{
 				glLineWidth(1.0f);
-				m_simpleColorShader->setAttributePosition(p.positionVBO);
+				m_simpleColorShader->setAttributePosition(p->positionVBO);
 				m->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
 			}
-			if(p.renderFaces)
+			if(p->renderFaces)
 			{
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				glEnable(GL_LIGHTING);
 				glEnable(GL_POLYGON_OFFSET_FILL);
 				glPolygonOffset(1.0f, 1.0f);
-				switch(p.faceStyle)
+				switch(p->faceStyle)
 				{
 					case FLAT :
-						m_flatShader->setAttributePosition(p.positionVBO);
+						m_flatShader->setAttributePosition(p->positionVBO);
 						m->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
 						break ;
 					case PHONG :
-						if(p.normalVBO != NULL)
+						if(p->normalVBO != NULL)
 						{
-							m_phongShader->setAttributePosition(p.positionVBO) ;
-							m_phongShader->setAttributeNormal(p.normalVBO) ;
+							m_phongShader->setAttributePosition(p->positionVBO) ;
+							m_phongShader->setAttributeNormal(p->normalVBO) ;
 							m->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
 						}
 						break ;
@@ -142,14 +142,10 @@ void RenderPlugin::viewLinked(View* view, Plugin* plugin)
 	{
 		ParameterSet* params = new ParameterSet();
 		h_viewParams.insert(view, params);
+
 		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
-		foreach(MapHandlerGen* map, maps)
-		{
-			PerMapParameterSet p(map);
-			params->perMap.insert(map->getName(), p);
-		}
-		if (!maps.empty())
-			changeSelectedMap(view, maps[0]);
+		foreach(MapHandlerGen* mh, maps)
+			addManagedMap(view, mh);
 
 		connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
 		connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
@@ -163,6 +159,12 @@ void RenderPlugin::viewUnlinked(View* view, Plugin* plugin)
 {
 	if(plugin == this)
 	{
+		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+		foreach(MapHandlerGen* mh, maps)
+			removeManagedMap(view, mh);
+
+		ParameterSet* params = h_viewParams[view];
+		delete params;
 		h_viewParams.remove(view);
 
 		disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
@@ -173,68 +175,62 @@ void RenderPlugin::viewUnlinked(View* view, Plugin* plugin)
 void RenderPlugin::currentViewChanged(View* view)
 {
 	if(isLinkedToView(view))
-	{
-		ParameterSet* params = h_viewParams[view];
-		changeSelectedMap(view, params->selectedMap);
 		m_dockTab->refreshUI(h_viewParams[view]);
-	}
 }
 
 void RenderPlugin::mapLinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
-
-	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet p(m);
-	params->perMap.insert(m->getName(), p);
-	if(params->selectedMap == NULL || params->perMap.count() == 1)
-		changeSelectedMap(view, m);
-	else
-		m_dockTab->refreshUI(params);
+	addManagedMap(view, m);
 }
 
 void RenderPlugin::mapUnlinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+	removeManagedMap(view, m);
+}
 
-	ParameterSet* params = h_viewParams[view];
+void RenderPlugin::addManagedMap(View* v, MapHandlerGen *m)
+{
+//	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+//	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = new PerMapParameterSet(m);
+
+	params->perMap.insert(m->getName(), perMap);
+
+	if(params->selectedMap == NULL || params->perMap.count() == 1)
+		changeSelectedMap(v, m);
+	else
+		m_dockTab->refreshUI(params);
+}
+
+void RenderPlugin::removeManagedMap(View *v, MapHandlerGen *m)
+{
+//	disconnect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+//	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = params->perMap[m->getName()];
+
+	delete perMap;
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)
 	{
 		if(!params->perMap.empty())
-			changeSelectedMap(view, m_window->getMap(params->perMap.begin().key()));
+			changeSelectedMap(v, m_window->getMap(params->perMap.begin().key()));
 		else
-			changeSelectedMap(view, NULL);
+			changeSelectedMap(v, NULL);
 	}
 	else
 		m_dockTab->refreshUI(params);
 }
 
-void RenderPlugin::vboAdded(Utils::VBO* vbo)
-{
-	assert(h_viewParams[m_window->getCurrentView()]->selectedMap == static_cast<MapHandlerGen*>(QObject::sender()));
-	if(vbo->dataSize() == 3)
-		m_dockTab->addVBOToList(QString::fromStdString(vbo->name()));
-}
-
-void RenderPlugin::vboRemoved(Utils::VBO* vbo)
-{
-	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-
-	View* view = m_window->getCurrentView();
-	ParameterSet* params = h_viewParams[view];
-	if(params->perMap[map->getName()].positionVBO == vbo)
-		changePositionVBO(view, map, NULL);
-	if(params->perMap[map->getName()].normalVBO == vbo)
-		changeNormalVBO(view, map, NULL);
-
-	m_dockTab->refreshUI(h_viewParams[view]);
-}
-
-void RenderPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
+void RenderPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 {
 	ParameterSet* params = h_viewParams[view];
 
@@ -244,19 +240,18 @@ void RenderPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI
 	if(view->isCurrentView())
 	{
 		if(prev)
-			disconnect(prev, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+			disconnect(prev, SIGNAL(vboAdded(Utils::VBO*)), m_dockTab, SLOT(addVBOToList(Utils::VBO*)));
 		if(map)
-			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+			connect(map, SIGNAL(vboAdded(Utils::VBO*)), m_dockTab, SLOT(addVBOToList(Utils::VBO*)));
 
-		if(!fromUI)
-			m_dockTab->refreshUI(params);
+		m_dockTab->refreshUI(params);
 	}
 }
 
 void RenderPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].positionVBO = vbo;
+	params->perMap[map->getName()]->positionVBO = vbo;
 
 	if(view->isCurrentView())
 	{
@@ -269,7 +264,7 @@ void RenderPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO*
 void RenderPlugin::changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].normalVBO = vbo;
+	params->perMap[map->getName()]->normalVBO = vbo;
 
 	if(view->isCurrentView())
 	{
@@ -282,7 +277,7 @@ void RenderPlugin::changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* v
 void RenderPlugin::changeRenderVertices(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].renderVertices = b;
+	params->perMap[map->getName()]->renderVertices = b;
 
 	if(view->isCurrentView())
 	{
@@ -295,7 +290,7 @@ void RenderPlugin::changeRenderVertices(View* view, MapHandlerGen* map, bool b, 
 void RenderPlugin::changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].verticesScaleFactor = i / 50.0;
+	params->perMap[map->getName()]->verticesScaleFactor = i / 50.0;
 
 	if(view->isCurrentView())
 	{
@@ -308,7 +303,7 @@ void RenderPlugin::changeVerticesScaleFactor(View* view, MapHandlerGen* map, int
 void RenderPlugin::changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].renderEdges = b;
+	params->perMap[map->getName()]->renderEdges = b;
 
 	if(view->isCurrentView())
 	{
@@ -321,7 +316,7 @@ void RenderPlugin::changeRenderEdges(View* view, MapHandlerGen* map, bool b, boo
 void RenderPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].renderFaces = b;
+	params->perMap[map->getName()]->renderFaces = b;
 
 	if(view->isCurrentView())
 	{
@@ -334,7 +329,7 @@ void RenderPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool b, boo
 void RenderPlugin::changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].faceStyle = style;
+	params->perMap[map->getName()]->faceStyle = style;
 
 	if(view->isCurrentView())
 	{
