@@ -90,7 +90,9 @@ IF(WITH_QT)
 		utils_qt_headers
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtgl.h
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtSimple.h
-		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtpopup.h 
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtQGLV_glw.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtQGLV.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtpopup.h
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/qthistodraw.h 
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtcolorschooser.h
 	)	
