@@ -9,7 +9,9 @@ namespace SCHNApps
 {
 
 PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
-	positionVBO(NULL)
+	positionVBO(NULL),
+	scalarVBO(NULL),
+	expansion(0)
 {
 	bool positionFound = false;
 
@@ -58,14 +60,14 @@ void RenderScalarPlugin::redraw(View* view)
 	foreach(MapHandlerGen* m, maps)
 	{
 		PerMapParameterSet* p = params->perMap[m->getName()];
-		if(p->positionVBO != NULL)
+		if(p->positionVBO != NULL && p->scalarVBO != NULL)
 		{
-			m_scalarShader->setAttributePosition(p->positionVBO) ;
-			for(std::vector<Utils::VBO*>::const_iterator it = p->scalarVBO.begin(); it != p->scalarVBO.end(); ++it)
-			{
-				m_scalarShader->setAttributeScalar(*it) ;
-				m->draw(m_scalarShader, Algo::Render::GL2::TRIANGLES) ;
-			}
+			m_scalarShader->setAttributePosition(p->positionVBO);
+			m_scalarShader->setAttributeScalar(p->scalarVBO);
+			m_scalarShader->setMinValue(p->scalarMin);
+			m_scalarShader->setMaxValue(p->scalarMax);
+			m_scalarShader->setExpansion(p->expansion);
+			m->draw(m_scalarShader, Algo::Render::GL2::TRIANGLES);
 		}
 	}
 }
@@ -195,10 +197,37 @@ void RenderScalarPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils
 	}
 }
 
-void RenderScalarPlugin::changeSelectedScalarsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI)
+void RenderScalarPlugin::changeScalarVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()]->scalarVBO = vbos;
+	PerMapParameterSet* perMap = params->perMap[map->getName()];
+
+	perMap->scalarVBO = vbo;
+
+	if(vbo != NULL)
+	{
+		const VertexAttribute<PFP2::REAL>& attr = map->getAttribute<PFP2::REAL, VERTEX>(QString::fromStdString(vbo->name()));
+		perMap->scalarMin = 1e20;
+		perMap->scalarMax= -1e20;
+		for(unsigned int i = attr.begin(); i != attr.end(); attr.next(i))
+		{
+			perMap->scalarMin = attr[i] < perMap->scalarMin ? attr[i] : perMap->scalarMin;
+			perMap->scalarMax = attr[i] > perMap->scalarMax ? attr[i] : perMap->scalarMax;
+		}
+	}
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderScalarPlugin::changeExpansion(View* view, MapHandlerGen* map, int i, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()]->expansion = i;
 
 	if(view->isCurrentView())
 	{

@@ -111,7 +111,7 @@ public slots:
 	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeRenderVertices(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
-	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, float f, bool fromUI = false);
 	void changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
 	void changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
 	void changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style, bool fromUI = false);

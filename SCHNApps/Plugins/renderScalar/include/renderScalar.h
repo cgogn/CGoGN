@@ -21,7 +21,9 @@ struct PerMapParameterSet
 	PerMapParameterSet(MapHandlerGen* map);
 
 	Utils::VBO* positionVBO;
-	std::vector<Utils::VBO*> scalarVBO;
+	Utils::VBO* scalarVBO;
+	float scalarMin, scalarMax;
+	int expansion;
 };
 
 struct ParameterSet
@@ -82,7 +84,8 @@ public slots:
 	void changeSelectedMap(View* view, MapHandlerGen* map);
 
 	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
-	void changeSelectedScalarsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI = false);
+	void changeScalarVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeExpansion(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 };
 
 } // namespace SCHNApps

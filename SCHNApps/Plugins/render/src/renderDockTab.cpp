@@ -127,7 +127,7 @@ void RenderDockTab::verticesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVerticesScaleFactor(view, map, i, true);
+		m_plugin->changeVerticesScaleFactor(view, map, i / 50.0, true);
 	}
 }
 

@@ -33,7 +33,8 @@ public slots:
 	void selectedMapChanged();
 
 	void positionVBOChanged(int index);
-	void selectedScalarsVBOChanged();
+	void selectedScalarVBOChanged();
+	void expansionChanged(int i);
 
 	void addVBOToList(Utils::VBO* vbo);
 };

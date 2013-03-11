@@ -19,7 +19,8 @@ RenderScalarDockTab::RenderScalarDockTab(Window* w, RenderScalarPlugin* p) :
 
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
-	connect(list_scalarVBO, SIGNAL(itemSelectionChanged()), this, SLOT(selectedScalarsVBOChanged()));
+	connect(list_scalarVBO, SIGNAL(itemSelectionChanged()), this, SLOT(selectedScalarVBOChanged()));
+	connect(slider_expansion, SIGNAL(valueChanged(int)), this, SLOT(expansionChanged(int)));
 }
 
 void RenderScalarDockTab::refreshUI(ParameterSet* params)
@@ -47,6 +48,7 @@ void RenderScalarDockTab::refreshUI(ParameterSet* params)
 
 			QList<Utils::VBO*> vbos = map->getVBOList();
 			unsigned int j = 0;
+			unsigned int k = 0;
 			for(int i = 0; i < vbos.count(); ++i)
 			{
 				unsigned int dataSize = vbos[i]->dataSize();
@@ -60,10 +62,13 @@ void RenderScalarDockTab::refreshUI(ParameterSet* params)
 				else if(dataSize == 1)
 				{
 					list_scalarVBO->addItem(QString::fromStdString(vbos[i]->name()));
-					if(std::find(p->scalarVBO.begin(), p->scalarVBO.end(), vbos[i]) != p->scalarVBO.end())
-						list_scalarVBO->item(j)->setSelected(true);
+					if(vbos[i] == p->scalarVBO)
+						list_scalarVBO->item(k)->setSelected(true);
+					++k;
 				}
 			}
+
+			slider_expansion->setSliderPosition(p->expansion);
 		}
 		++i;
 	}
@@ -91,17 +96,34 @@ void RenderScalarDockTab::positionVBOChanged(int index)
 	}
 }
 
-void RenderScalarDockTab::selectedScalarsVBOChanged()
+void RenderScalarDockTab::selectedScalarVBOChanged()
 {
 	if(!b_refreshingUI)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		QList<QListWidgetItem*> currentItems = list_scalarVBO->selectedItems();
-		std::vector<Utils::VBO*> vbos;
-		foreach(QListWidgetItem* item, currentItems)
-			vbos.push_back(map->getVBO(item->text()));
-		m_plugin->changeSelectedScalarsVBO(view, map, vbos, true);
+		QList<QListWidgetItem*> selectedItems = list_scalarVBO->selectedItems();
+		if(!selectedItems.empty())
+		{
+			foreach(QListWidgetItem* item, selectedItems)
+			{
+				if(item != list_scalarVBO->currentItem())
+					item->setSelected(false);
+			}
+			m_plugin->changeScalarVBO(view, map, map->getVBO(list_scalarVBO->currentItem()->text()), true);
+		}
+		else
+			m_plugin->changeScalarVBO(view, map, NULL, true);
+	}
+}
+
+void RenderScalarDockTab::expansionChanged(int i)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changeExpansion(view, map, i, true);
 	}
 }
 

@@ -98,7 +98,7 @@ public:
 	const std::string& name() const { return m_name; }
 
 	/**
-	 * get name
+	 * get type name
 	 */
 	const std::string& typeName() const { return m_typeName; }
 

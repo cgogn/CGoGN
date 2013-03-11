@@ -287,10 +287,10 @@ void RenderPlugin::changeRenderVertices(View* view, MapHandlerGen* map, bool b, 
 	}
 }
 
-void RenderPlugin::changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
+void RenderPlugin::changeVerticesScaleFactor(View* view, MapHandlerGen* map, float f, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()]->verticesScaleFactor = i / 50.0;
+	params->perMap[map->getName()]->verticesScaleFactor = f;
 
 	if(view->isCurrentView())
 	{
