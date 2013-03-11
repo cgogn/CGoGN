@@ -65,6 +65,7 @@ public:
 	QGLView(SimpleQGLV* ptr, QWidget *parent = 0);
 	~QGLView();
 
+	void setObjectBB(float* bbmin, float* bbmax);
 	void setParamObject(float width, float* pos);
 	void glMousePosition(int& x, int& y);
 

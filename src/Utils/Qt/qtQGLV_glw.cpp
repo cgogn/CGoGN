@@ -57,8 +57,14 @@ void QGLView::setParamObject(float width, float* pos)
 	qglviewer::Vec bbMax(pos[0]+width/2.0f, pos[1]+width/2.0f, pos[2]+width/2.0f);
 	camera()->setSceneBoundingBox(bbMin, bbMax);
 	camera()->showEntireScene();
+}
 
-	std::cout << "w p  = "<< width << " / "<< pos[0]<< " , "<< pos[1]<< " , "<< pos[2]<< std::endl;
+void QGLView::setObjectBB(float* bbmin, float* bbmax)
+{
+	qglviewer::Vec bbMin(bbmin[0], bbmin[1], bbmin[2]);
+	qglviewer::Vec bbMax(bbmax[0], bbmax[1], bbmax[2]);
+	camera()->setSceneBoundingBox(bbMin, bbMax);
+	camera()->showEntireScene();
 }
 
 QSize QGLView::minimumSizeHint() const
@@ -76,11 +82,6 @@ void QGLView::init()
 	glewInit();
 	if (m_sqgl)
 		m_sqgl->cb_initGL();
-
-	qglviewer::Vec bbMin(0.0,0.0,0.0);
-	qglviewer::Vec bbMax(2.0,2.0,2.0);
-	camera()->setSceneBoundingBox(bbMin, bbMax);
-	camera()->showEntireScene();
 }
 
 void QGLView::preDraw()

@@ -196,12 +196,15 @@ public:
 	void setParamObject(float width, float* pos) { m_qglWidget->setParamObject(width, pos); }
 
 	/**
+	 * set BB min & max corner of object to draw
+	 */
+	void setObjectBB(float* bbmin, float* bbmax) { m_qglWidget->setObjectBB(bbmin, bbmax); }
+
+	/**
 	 * @brief get pointer on QGLViewer widget for direct access
 	 * @return
 	 */
 	QGLViewer* getQGLWidget() { return static_cast<QGLViewer*>(m_qglWidget); }
-
-//	void resetCenterOfRotation(float width, float* pos) { m_qglWidget->resetCenterOfRotation(width, pos); }
 
 	/**
 	 * make the contex of glWidget current
