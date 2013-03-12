@@ -33,6 +33,7 @@
     </property>
     <addaction name="actionShowHideDock"/>
     <addaction name="actionShowHidePythonDock"/>
+    <addaction name="actionLoadPythonScript"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -114,6 +115,14 @@
   <action name="actionShowHidePythonDock">
    <property name="text">
     <string>Show/Hide Python Dock</string>
+   </property>
+  </action>
+  <action name="actionLoadPythonScript">
+   <property name="text">
+    <string>Load Python Script</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>
