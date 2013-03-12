@@ -106,7 +106,7 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 	if (!fp.good())
 	{
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
-		return false;
+		return ;
 	}
 	
 	std::vector<MaterialOBJ>::iterator mit;

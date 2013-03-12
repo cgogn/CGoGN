@@ -33,6 +33,7 @@
 
 //forward definitions
 namespace CGoGN { namespace Utils { namespace QT { class SimpleQT; } } }
+namespace CGoGN { namespace Utils { namespace QT { class SimpleQGLV; } } }
 class QTextEdit;
 
 namespace CGoGN
@@ -56,11 +57,13 @@ void allToFile(const std::string& filename);
  * set all outputs to status bar of Qt interface
  */
 void allToStatusBar(Utils::QT::SimpleQT* sqt);
+void allToStatusBar(Utils::QT::SimpleQGLV* sqglv);
 
 /**
  * set all outputs to console of Qt interface
  */
 void allToConsole(Utils::QT::SimpleQT* sqt);
+void allToConsole(Utils::QT::SimpleQGLV* sqglv);
 
 #endif
 
@@ -92,8 +95,11 @@ protected:
 	
 #ifdef WITH_QT
 	Utils::QT::SimpleQT* m_sqt_bar;
-
 	Utils::QT::SimpleQT* m_sqt_console;
+
+	Utils::QT::SimpleQGLV* m_sqglv_bar;
+	Utils::QT::SimpleQGLV* m_sqglv_console;
+
 
 	QTextEdit* m_qte;
 #endif
@@ -126,15 +132,37 @@ public:
 	void toFile(const std::string& filename);
 
 #ifdef WITH_QT
+
+	/**
+	 * remove output to status bars
+	 */
+	void noStatusBar();
+
+	/**
+	 * remove output to consoles
+	 */
+	void noConsole();
+
 	/**
 	 * set output to status bar of Qt interface
 	 */
-	void toStatusBar(Utils::QT::SimpleQT* sqt);
+	void toStatusBar(Utils::QT::SimpleQT* sqt = NULL);
 
 	/**
 	 * set output to console of Qt interface
 	 */
-	void toConsole(Utils::QT::SimpleQT* sqt);
+	void toConsole(Utils::QT::SimpleQT* sqt = NULL);
+
+	/**
+	 * set output to status bar of Qt interface
+	 */
+	void toStatusBar(Utils::QT::SimpleQGLV* sqglv = NULL);
+
+	/**
+	 * set output to console of Qt interface
+	 */
+	void toConsole(Utils::QT::SimpleQGLV* sqglv = NULL);
+
 #endif
 
 	/**

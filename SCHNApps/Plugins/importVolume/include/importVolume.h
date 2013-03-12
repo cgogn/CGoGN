@@ -4,9 +4,11 @@
 #include "plugin.h"
 
 
-using namespace CGoGN;
-using namespace SCHNApps;
+namespace CGoGN
+{
 
+namespace SCHNApps
+{
 
 class ImportVolumePlugin : public Plugin
 {
@@ -41,5 +43,9 @@ public slots:
 private:
 	QAction* importAction;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

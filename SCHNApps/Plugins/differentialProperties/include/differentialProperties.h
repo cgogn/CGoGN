@@ -38,18 +38,21 @@ public:
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
 public slots:
+	void mapAdded(MapHandlerGen* map);
+	void mapRemoved(MapHandlerGen* map);
+	void attributeModified(unsigned int orbit, QString nameAttr);
+
 	void openComputeNormalDialog();
 	void openComputeCurvatureDialog();
 
 	void computeNormalFromDialog();
 	void computeCurvatureFromDialog();
 
-	void computeNormal(
-		const QString& mapName,
+	void computeNormal(const QString& mapName,
 		const QString& positionAttributeName = "position",
 		const QString& normalAttributeName = "normal",
-		bool createNormalVBO = true
-	);
+		bool autoUpdate = true);
+
 	void computeCurvature(
 		const QString& mapName,
 		const QString& positionAttributeName = "position",
@@ -59,11 +62,7 @@ public slots:
 		const QString& KminAttributeName = "Kmin",
 		const QString& kminAttributeName = "kmin",
 		const QString& KnormalAttributeName = "Knormal",
-		bool createKmaxVBO = true,
-		bool createkmaxVBO = true,
-		bool createKminVBO = true,
-		bool createkminVBO = true,
-		bool createKnormalVBO = true
+		bool autoUpdate = true
 	);
 
 private:
@@ -76,11 +75,36 @@ private:
 	struct ComputeNormalParameters
 	{
 		ComputeNormalParameters() {}
-		ComputeNormalParameters(QString p, QString n) : positionName(p), normalName(n) {}
+		ComputeNormalParameters(const QString& p, const QString& n, bool update) :
+			positionName(p), normalName(n), autoUpdate(update)
+		{}
 		QString positionName;
 		QString normalName;
+		bool autoUpdate;
 	};
 	QHash<QString, ComputeNormalParameters> computeNormalLastParameters;
+
+	struct ComputeCurvatureParameters
+	{
+		ComputeCurvatureParameters() {}
+		ComputeCurvatureParameters(
+			const QString& p, const QString& n,
+			const QString& Kmax, const QString& kmax, const QString& Kmin, const QString& kmin, const QString& Knormal,
+			bool update) :
+			positionName(p), normalName(n),
+			KmaxName(Kmax), kmaxName(kmax), KminName(Kmin), kminName(kmin), KnormalName(Knormal),
+			autoUpdate(update)
+		{}
+		QString positionName;
+		QString normalName;
+		QString KmaxName;
+		QString kmaxName;
+		QString KminName;
+		QString kminName;
+		QString KnormalName;
+		bool autoUpdate;
+	};
+	QHash<QString, ComputeCurvatureParameters> computeCurvatureLastParameters;
 };
 
 #endif

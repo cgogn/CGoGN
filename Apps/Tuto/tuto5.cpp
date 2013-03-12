@@ -301,7 +301,7 @@ int main(int argc, char **argv)
 
 	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 
-	CGoGNout.toStatusBar(NULL);
+//	CGoGNout.toStatusBar(NULL);
 
 	//  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

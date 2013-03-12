@@ -27,7 +27,8 @@
 
 //#define USE_GMAP
 
-#include "Utils/Qt/qtSimple.h"
+//#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtQGLV.h"
 #include "Utils/cgognStream.h"
 
 #include "Topology/generic/parameters.h"
@@ -59,7 +60,7 @@ struct PFP: public PFP_STANDARD
 typedef PFP::MAP MAP;
 typedef PFP::VEC3 VEC3;
 
-class MyQT : public Utils::QT::SimpleQT
+class MyQT : public Utils::QT::SimpleQGLV
 {
 	Q_OBJECT
 public:
@@ -67,6 +68,7 @@ public:
 
 	void cb_redraw();
 	void cb_initGL();
+	void cb_keyPress(int keycode);
 
 protected:
 	// declaration of the map

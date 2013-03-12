@@ -110,10 +110,10 @@ public:
 	}
 } ;
 
-}
-}
-}
-}
+} //MovingObjects
+} //Surface
+} //Algo
+} //CGoGN
 
 #include "particle_cell_2D.hpp"
 

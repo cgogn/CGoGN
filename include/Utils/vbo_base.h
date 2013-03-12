@@ -70,7 +70,7 @@ public:
 	/**
 	 * constructor: allocate the OGL VBO
 	 */
-	VBO();
+	VBO(const std::string& name = "");
 
 	/**
 	 * copy constructor, new VBO copy content
