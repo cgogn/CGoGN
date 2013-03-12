@@ -86,6 +86,8 @@ public slots:
 	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeScalarVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeExpansion(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+
+	void attributeModified(unsigned int orbit, QString nameAttr);
 };
 
 } // namespace SCHNApps

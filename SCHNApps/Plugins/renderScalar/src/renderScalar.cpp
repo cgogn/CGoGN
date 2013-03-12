@@ -60,7 +60,7 @@ void RenderScalarPlugin::redraw(View* view)
 	foreach(MapHandlerGen* m, maps)
 	{
 		PerMapParameterSet* p = params->perMap[m->getName()];
-		if(p->positionVBO != NULL && p->scalarVBO != NULL)
+		if(p->positionVBO && p->scalarVBO)
 		{
 			m_scalarShader->setAttributePosition(p->positionVBO);
 			m_scalarShader->setAttributeScalar(p->scalarVBO);
@@ -130,7 +130,7 @@ void RenderScalarPlugin::mapUnlinked(MapHandlerGen* m)
 
 void RenderScalarPlugin::addManagedMap(View* v, MapHandlerGen *m)
 {
-//	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
 //	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 
 	ParameterSet* params = h_viewParams[v];
@@ -146,7 +146,7 @@ void RenderScalarPlugin::addManagedMap(View* v, MapHandlerGen *m)
 
 void RenderScalarPlugin::removeManagedMap(View *v, MapHandlerGen *m)
 {
-//	disconnect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+	disconnect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
 //	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 
 	ParameterSet* params = h_viewParams[v];
@@ -208,7 +208,7 @@ void RenderScalarPlugin::changeScalarVBO(View* view, MapHandlerGen* map, Utils::
 	{
 		const VertexAttribute<PFP2::REAL>& attr = map->getAttribute<PFP2::REAL, VERTEX>(QString::fromStdString(vbo->name()));
 		perMap->scalarMin = 1e20;
-		perMap->scalarMax= -1e20;
+		perMap->scalarMax = -1e20;
 		for(unsigned int i = attr.begin(); i != attr.end(); attr.next(i))
 		{
 			perMap->scalarMin = attr[i] < perMap->scalarMin ? attr[i] : perMap->scalarMin;
@@ -234,6 +234,33 @@ void RenderScalarPlugin::changeExpansion(View* view, MapHandlerGen* map, int i, 
 		if(!fromUI)
 			m_dockTab->refreshUI(params);
 		view->updateGL();
+	}
+}
+
+void RenderScalarPlugin::attributeModified(unsigned int orbit, QString nameAttr)
+{
+	if(orbit == VERTEX)
+	{
+		MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+		foreach(View* view, l_views)
+		{
+			ParameterSet* params = h_viewParams[view];
+			if(params->perMap.contains(map->getName()))
+			{
+				PerMapParameterSet* perMap = params->perMap[map->getName()];
+				if(perMap->scalarVBO && nameAttr == QString::fromStdString(perMap->scalarVBO->name()))
+				{
+					const VertexAttribute<PFP2::REAL>& attr = map->getAttribute<PFP2::REAL, VERTEX>(nameAttr);
+					perMap->scalarMin = 1e20;
+					perMap->scalarMax = -1e20;
+					for(unsigned int i = attr.begin(); i != attr.end(); attr.next(i))
+					{
+						perMap->scalarMin = attr[i] < perMap->scalarMin ? attr[i] : perMap->scalarMin;
+						perMap->scalarMax = attr[i] > perMap->scalarMax ? attr[i] : perMap->scalarMax;
+					}
+				}
+			}
+		}
 	}
 }
 
