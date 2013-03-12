@@ -186,6 +186,8 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	const QString& KminAttributeName,
 	const QString& kminAttributeName,
 	const QString& KnormalAttributeName,
+	bool compute_kmean,
+	bool compute_kgaussian,
 	bool autoUpdate)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
@@ -232,7 +234,7 @@ void DifferentialPropertiesPlugin::computeCurvature(
 		ComputeCurvatureParameters(
 			positionAttributeName, normalAttributeName,
 			KmaxAttributeName, kmaxAttributeName, KminAttributeName, kminAttributeName, KnormalAttributeName,
-			autoUpdate);
+			compute_kmean, compute_kgaussian, autoUpdate);
 
 	mh->createVBO(Kmax);
 	mh->createVBO(kmax);
@@ -245,6 +247,32 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	mh->notifyAttributeModification(Kmin);
 	mh->notifyAttributeModification(kmin);
 	mh->notifyAttributeModification(Knormal);
+
+	if(compute_kmean)
+	{
+		VertexAttribute<PFP2::REAL> kmean = mh->getAttribute<PFP2::REAL, VERTEX>("kmean");
+		if(!kmean.isValid())
+			kmean = mh->addAttribute<PFP2::REAL, VERTEX>("kmean");
+
+		for(unsigned int i = kmin.begin(); i != kmin.end(); kmin.next(i))
+			kmean[i] = (kmin[i] + kmax[i]) / 2.0;
+
+		mh->createVBO(kmean);
+		mh->notifyAttributeModification(kmean);
+	}
+
+	if(compute_kgaussian)
+	{
+		VertexAttribute<PFP2::REAL> kgaussian = mh->getAttribute<PFP2::REAL, VERTEX>("kgaussian");
+		if(!kgaussian.isValid())
+			kgaussian = mh->addAttribute<PFP2::REAL, VERTEX>("kgaussian");
+
+		for(unsigned int i = kmin.begin(); i != kmin.end(); kmin.next(i))
+			kgaussian[i] = kmin[i] * kmax[i];
+
+		mh->createVBO(kgaussian);
+		mh->notifyAttributeModification(kgaussian);
+	}
 }
 
 #ifndef DEBUG

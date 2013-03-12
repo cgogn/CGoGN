@@ -67,7 +67,12 @@ void RenderScalarPlugin::redraw(View* view)
 			m_scalarShader->setMinValue(p->scalarMin);
 			m_scalarShader->setMaxValue(p->scalarMax);
 			m_scalarShader->setExpansion(p->expansion);
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0f, 1.0f);
 			m->draw(m_scalarShader, Algo::Render::GL2::TRIANGLES);
+			glDisable(GL_POLYGON_OFFSET_FILL);
 		}
 	}
 }
@@ -251,8 +256,8 @@ void RenderScalarPlugin::attributeModified(unsigned int orbit, QString nameAttr)
 				if(perMap->scalarVBO && nameAttr == QString::fromStdString(perMap->scalarVBO->name()))
 				{
 					const VertexAttribute<PFP2::REAL>& attr = map->getAttribute<PFP2::REAL, VERTEX>(nameAttr);
-					perMap->scalarMin = 1e20;
-					perMap->scalarMax = -1e20;
+					perMap->scalarMin = std::numeric_limits<float>::max();
+					perMap->scalarMax = std::numeric_limits<float>::min();
 					for(unsigned int i = attr.begin(); i != attr.end(); attr.next(i))
 					{
 						perMap->scalarMin = attr[i] < perMap->scalarMin ? attr[i] : perMap->scalarMin;
