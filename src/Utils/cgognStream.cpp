@@ -162,17 +162,21 @@ void Out::toFile(const std::string& filename )
 }
 
 #ifdef WITH_QT
-void Out::toStatusBar(void* ptr)
+void Out::noStatusBar()
 {
-	if (ptr == NULL)
-		m_out_mode &= ~QTSTATUSBAR;
+	m_out_mode &= ~QTSTATUSBAR;
+	m_sqt_bar = NULL;
+	m_sqglv_bar = NULL;
 }
 
-void Out::toConsole(void* ptr)
+
+void Out::noConsole()
 {
-	if (ptr == NULL)
-		m_out_mode &= ~QTCONSOLE;
+	m_out_mode &= ~QTCONSOLE;
+	m_sqt_console = NULL;
+	m_sqglv_console = NULL;
 }
+
 
 void Out::toStatusBar(Utils::QT::SimpleQT* sqt)
 {

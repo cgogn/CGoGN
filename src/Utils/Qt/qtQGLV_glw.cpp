@@ -130,19 +130,13 @@ void QGLView::resizeGL(int w, int h)
 
 void QGLView::keyPressEvent(QKeyEvent* event)
 {
-	if (event->key() == Qt::Key_Escape)
-	{
-		close();
-		m_sqgl->close();
-		return;
-	}
-
-	m_state_modifier = event->modifiers();
 	QGLViewer::keyPressEvent(event);
+
 	if (m_sqgl)
 	{
+		m_state_modifier = event->modifiers();
 		int k = event->key();
-		if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
+		if ( (k >= 65) && (k <= 91) && !(m_state_modifier & Qt::ShiftModifier) )
 			k += 32;
 		m_sqgl->cb_keyPress(k);
 	}
@@ -150,12 +144,12 @@ void QGLView::keyPressEvent(QKeyEvent* event)
 
 void QGLView::keyReleaseEvent(QKeyEvent* event)
 {
-	m_state_modifier = event->modifiers();
 	QGLViewer::keyReleaseEvent(event);
 	if (m_sqgl)
 	{
+		m_state_modifier = event->modifiers();
 		int k = event->key();
-		if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
+		if ( (k >= 65) && (k <= 91) && !(m_state_modifier & Qt::ShiftModifier) )
 			k += 32;
 		m_sqgl->cb_keyRelease(k);
 	}

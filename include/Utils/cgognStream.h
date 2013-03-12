@@ -133,29 +133,35 @@ public:
 
 #ifdef WITH_QT
 
-	void toStatusBar(void* ptr);
+	/**
+	 * remove output to status bars
+	 */
+	void noStatusBar();
 
-	void toConsole(void* ptr);
+	/**
+	 * remove output to consoles
+	 */
+	void noConsole();
 
 	/**
 	 * set output to status bar of Qt interface
 	 */
-	void toStatusBar(Utils::QT::SimpleQT* sqt);
+	void toStatusBar(Utils::QT::SimpleQT* sqt = NULL);
 
 	/**
 	 * set output to console of Qt interface
 	 */
-	void toConsole(Utils::QT::SimpleQT* sqt);
+	void toConsole(Utils::QT::SimpleQT* sqt = NULL);
 
 	/**
 	 * set output to status bar of Qt interface
 	 */
-	void toStatusBar(Utils::QT::SimpleQGLV* sqglv);
+	void toStatusBar(Utils::QT::SimpleQGLV* sqglv = NULL);
 
 	/**
 	 * set output to console of Qt interface
 	 */
-	void toConsole(Utils::QT::SimpleQGLV* sqglv);
+	void toConsole(Utils::QT::SimpleQGLV* sqglv = NULL);
 
 #endif
 
