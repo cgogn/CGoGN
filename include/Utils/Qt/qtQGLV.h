@@ -373,6 +373,11 @@ public:
 	virtual void cb_exit() {}
 
 	/**
+	 * called when widgets are required to be updated
+	 */
+	void paintEvent(QPaintEvent* );
+
+	/**
 	 * Ask to Qt to update the GL widget.
 	 * Equivalent of glutPostRedisplay()
 	 */
