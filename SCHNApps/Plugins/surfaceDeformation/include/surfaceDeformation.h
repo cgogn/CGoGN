@@ -8,12 +8,13 @@
 
 #include "mapHandler.h"
 
+#include "Utils/pointSprite.h"
+
 #include "Container/fakeAttribute.h"
 
 #include "NL/nl.h"
 #include "Algo/LinearSolving/basic.h"
 #include "Eigen/Dense"
-
 
 namespace CGoGN
 {
@@ -111,7 +112,10 @@ protected:
 	SurfaceDeformationDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
+	Utils::PointSprite* m_pointSprite;
 	Utils::Drawer* m_drawer;
+
+	Utils::VBO* selectionSphereVBO;
 
 	bool selecting;
 	PFP2::VEC3 selectionCenter;

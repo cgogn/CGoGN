@@ -124,11 +124,11 @@ unsigned int PointSprite::setAttributeColor(VBO* vbo)
 	return bindVA_VBO("VertexColor", vbo);
 }
 
-void PointSprite::predraw(const Geom::Vec3f& color)
+void PointSprite::predraw(const Geom::Vec4f& color)
 {
 	bind();
 	glUniform1i(*m_uniform_texture, 0);
-	glUniform3fv(*m_uniform_color, 1, color.data());
+	glUniform4fv(*m_uniform_color, 1, color.data());
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, *m_idTexture);
 	glEnable(GL_TEXTURE_2D);

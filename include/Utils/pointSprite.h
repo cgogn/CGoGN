@@ -88,7 +88,7 @@ public:
 	 * call once before sending points to gpu
 	 * @param color set global color of sprites
 	 */
-	void predraw(const Geom::Vec3f& color);
+	void predraw(const Geom::Vec4f& color);
 
 	/**
 	 * call once before sending points to gpu

@@ -12,7 +12,7 @@ uniform float size;
 #ifdef WITH_COLOR_PER_VERTEX 
 	VARYING_FRAG vec3 colorsprite;
 #else
-	uniform vec3 colorsprite;
+	uniform vec4 colorsprite;
 #endif
 
 VARYING_FRAG vec2 spriteCoord;
@@ -51,6 +51,8 @@ void main(void)
 	vec3 L = normalize (lightPos - frag_position_eye);
 	float lambertTerm = dot(N,L);
 	
-	gl_FragColor = vec4(colorsprite*lambertTerm + ambiant ,1.0);
+	vec4 result = colorsprite*lambertTerm;
+	result.xyz += ambiant;
 
+	gl_FragColor = result;
 }

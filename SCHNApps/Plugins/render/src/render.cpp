@@ -99,7 +99,7 @@ void RenderPlugin::redraw(View* view)
 			{
 				m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * p->verticesScaleFactor);
 				m_pointSprite->setAttributePosition(p->positionVBO);
-				m_pointSprite->predraw(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+				m_pointSprite->predraw(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
 				m->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
 				m_pointSprite->postdraw();
 			}

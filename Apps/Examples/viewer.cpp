@@ -128,7 +128,7 @@ void Viewer::cb_redraw()
 	{
 		float size = vertexScaleFactor ;
 		m_pointSprite->setSize(size) ;
-		m_pointSprite->predraw(Geom::Vec3f(0.0f, 0.0f, 1.0f)) ;
+		m_pointSprite->predraw(Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f)) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
 		m_pointSprite->postdraw() ;
 	}

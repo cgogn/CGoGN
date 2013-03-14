@@ -200,7 +200,7 @@ void MyQT::cb_redraw()
 
 	if (render_balls)
 	{
-		m_sprite->predraw(Geom::Vec3f(1.0f, 0.0f ,0.0f));
+		m_sprite->predraw(Geom::Vec4f(1.0f, 0.0f , 0.0f, 1.0f));
 		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
 		m_sprite->postdraw();
 	}

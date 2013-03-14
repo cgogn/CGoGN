@@ -110,6 +110,11 @@ bool SurfaceDeformationPlugin::enable()
 	m_dockTab = new SurfaceDeformationDockTab(m_window, this);
 	addTabInDock(m_dockTab, "Surface Deformation");
 
+	selectionSphereVBO = new Utils::VBO();
+
+	m_pointSprite = new CGoGN::Utils::PointSprite();
+	registerShader(m_pointSprite);
+
 	m_drawer = new Utils::Drawer();
 	registerShader(m_drawer->getShader());
 
@@ -122,6 +127,7 @@ bool SurfaceDeformationPlugin::enable()
 
 void SurfaceDeformationPlugin::disable()
 {
+	delete m_pointSprite;
 	delete m_drawer;
 }
 
@@ -129,25 +135,22 @@ void SurfaceDeformationPlugin::redraw(View* view)
 {
 	if(selecting)
 	{
-		glDisable(GL_LIGHTING) ;
-		m_drawer->newList(GL_COMPILE_AND_EXECUTE) ;
-		m_drawer->lineWidth(2.0f) ;
-		m_drawer->begin(GL_LINES) ;
-		m_drawer->color3f(0.0f, 0.0f, 1.0f) ;
-		m_drawer->vertex(selectionCenter) ;
-		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(1,0,0)) ;
-		m_drawer->vertex(selectionCenter) ;
-		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(-1,0,0)) ;
-		m_drawer->vertex(selectionCenter) ;
-		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(0,1,0)) ;
-		m_drawer->vertex(selectionCenter) ;
-		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(0,-1,0)) ;
-		m_drawer->vertex(selectionCenter) ;
-		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(0,0,1)) ;
-		m_drawer->vertex(selectionCenter) ;
-		m_drawer->vertex(selectionCenter + selectionRadius * PFP2::VEC3(0,0,-1)) ;
-		m_drawer->end() ;
-		m_drawer->endList() ;
+		std::vector<PFP2::VEC3> selectionPoint;
+		selectionPoint.push_back(selectionCenter);
+		selectionSphereVBO->updateData(selectionPoint);
+
+		m_pointSprite->setSize(selectionRadius);
+		m_pointSprite->setAttributePosition(selectionSphereVBO);
+		m_pointSprite->predraw(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+
+		m_pointSprite->enableVertexAttribs();
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDrawArrays(GL_POINTS, 0, 1);
+		glDisable(GL_BLEND);
+		m_pointSprite->disableVertexAttribs();
+
+		m_pointSprite->postdraw();
 	}
 
 	ParameterSet* params = h_viewParams[view];
