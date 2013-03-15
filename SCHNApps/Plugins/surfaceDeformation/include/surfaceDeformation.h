@@ -1,8 +1,6 @@
 #ifndef _SURFACEDEFORMATION_PLUGIN_H_
 #define _SURFACEDEFORMATION_PLUGIN_H_
 
-#include "Utils/drawer.h"
-
 #include "plugin.h"
 #include "surfaceDeformationDockTab.h"
 
@@ -45,8 +43,11 @@ struct PerMapParameterSet
 	CellMarker<VERTEX>* lockingMarker;
 	CellMarker<VERTEX>* handleMarker;
 	SelectionMode verticesSelectionMode;
-	std::vector<unsigned int> locked_vertices;
-	std::vector<unsigned int> handle_vertices;
+	std::vector<PFP2::VEC3> lockedVertices;
+	std::vector<PFP2::VEC3> handleVertices;
+	std::vector<unsigned int> handleVerticesId;
+	Utils::VBO* lockedVerticesVBO;
+	Utils::VBO* handleVerticesVBO;
 
 	VertexAttribute<PFP2::VEC3> positionInit;
 	VertexAttribute<PFP2::VEC3> vertexNormal;
@@ -113,7 +114,6 @@ protected:
 	QHash<View*, ParameterSet*> h_viewParams;
 
 	Utils::PointSprite* m_pointSprite;
-	Utils::Drawer* m_drawer;
 
 	Utils::VBO* selectionSphereVBO;
 

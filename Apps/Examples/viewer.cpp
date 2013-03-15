@@ -114,6 +114,7 @@ void Viewer::cb_initGL()
 
 	m_pointSprite = new Utils::PointSprite() ;
 	m_pointSprite->setAttributePosition(m_positionVBO) ;
+	m_pointSprite->setColor(Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f)) ;
 
 	registerShader(m_phongShader) ;
 	registerShader(m_flatShader) ;
@@ -126,11 +127,8 @@ void Viewer::cb_redraw()
 {
 	if(m_drawVertices)
 	{
-		float size = vertexScaleFactor ;
-		m_pointSprite->setSize(size) ;
-		m_pointSprite->predraw(Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f)) ;
+		m_pointSprite->setSize(vertexScaleFactor) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
-		m_pointSprite->postdraw() ;
 	}
 
 	if(m_drawEdges)

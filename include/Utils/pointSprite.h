@@ -36,100 +36,66 @@ namespace CGoGN
 namespace Utils
 {
 
-class PointSprite: public Utils::GLSLShader
+class PointSprite : public Utils::GLSLShader
 {
 protected:
-	static const unsigned int WIDTHSPRITE = 64;
-
 	static std::string vertexShaderText;
-
 	static std::string geometryShaderText;
-
 	static std::string fragmentShaderText;
 
-	static unsigned char* m_ptrSphere;
-
-	static PointSprite* m_instance0;
-
-	// compute the sphere instead of storing it in image file.
-	static void computeSphere();
+	bool colorPerVertex;
+	bool plane;
 
 	CGoGNGLuint m_uniform_size;
-
 	CGoGNGLuint m_uniform_color;
-
-	CGoGNGLuint m_idTexture;
-
-	CGoGNGLuint m_uniform_texture;
-	
-	CGoGNGLuint m_uniform_EyePos;
-	
-//	CGoGNGLuint m_uniform_EyeY;
-
 	CGoGNGLuint m_uniform_ambiant;
-
 	CGoGNGLuint m_uniform_lightPos;
+	CGoGNGLuint m_uniform_eyePos;
+
+	VBO* m_vboPos;
+	VBO* m_vboColor;
+
+	float m_size;
+	Geom::Vec4f m_color;
+	Geom::Vec3f m_lightPos;
+	Geom::Vec3f m_ambiant;
+	Geom::Vec3f m_eyePos;
+
+	void getLocations();
+
+	void sendParams();
+
+	void restoreUniformsAttribs();
 
 public:
 	/**
-	 * init shaders, texture and variables
-	 * @param withColorPerVertex if true use setAttributeColor for per vertex color, else use predraw(color) for global color
-	 * @param radius of sphere
+	 * init shaders & variables
+	 * @param withColorPerVertex if true use setAttributeColor for per vertex color, else use setColor(color) for global color
+	 * @param withPlane
 	 */
+	PointSprite(bool withColorPerVertex = false, bool withPlane = false);
 
-	PointSprite(bool withColorPerVertex=false, float radius=1.0f, bool with_plane=false);
+	unsigned int setAttributePosition(VBO* vbo);
 
-	/**
-	 * clean shaders, texture and variables
-	 */
-	~PointSprite();
+	unsigned int setAttributeColor(VBO* vbo);
 
-	/**
-	 * call once before sending points to gpu
-	 * @param color set global color of sprites
-	 */
-	void predraw(const Geom::Vec4f& color);
+	void setSize(float size);
 
-	/**
-	 * call once before sending points to gpu
-	 */
-	void predraw();
+	void setColor(const Geom::Vec4f& color);
 
-	/**
-	 * call once after sending points to gpu
-	 */
-	void postdraw();
+	void setLightPosition(const Geom::Vec3f& pos);
 
-	/**
-	 * set the radius of sphere
-	 * @param radius
-	 */
-	void setSize(float radius);
+	void setAmbiantColor(const Geom::Vec3f& amb);
 	
 	/**
 	* set the plane of rendering for VR rendering
 	*/
 	void setEyePosition(const Geom::Vec3f& ep);
 
-
-	/**
-	 * set position attribute
-	 */
-	unsigned int setAttributePosition(VBO* vbo);
-
-	/**
-	 * set color attribute
-	 */
-	unsigned int setAttributeColor(VBO* vbo);
-
-
-	void setLightPosition(const Geom::Vec3f& pos);
-
-	void setAmbiantColor(const Geom::Vec3f& amb);
-
 };
 
 } // namespace Utils
 
 } // namespace CGoGN
+
 #endif

@@ -33,12 +33,11 @@ namespace Utils
 #include "shaderScalarField.vert"
 #include "shaderScalarField.frag"
 
-ShaderScalarField::ShaderScalarField()
+ShaderScalarField::ShaderScalarField() :
+	m_minValue(0.0f),
+	m_maxValue(0.0f),
+	m_expansion(0)
 {
-	m_nameVS = "ShaderColorPerVertex_vs";
-	m_nameFS = "ShaderColorPerVertex_fs";
-	m_nameGS = "ShaderColorPerVertex_gs";
-
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
@@ -90,30 +89,33 @@ unsigned int ShaderScalarField::setAttributeScalar(VBO* vbo)
 
 void ShaderScalarField::setMinValue(float f)
 {
+	m_minValue = f;
 	bind();
 	glUniform1f(*m_uniform_minValue, f);
-	m_minValue = f;
 	unbind();
 }
 
 void ShaderScalarField::setMaxValue(float f)
 {
+	m_maxValue = f;
 	bind();
 	glUniform1f(*m_uniform_maxValue, f);
-	m_maxValue = f;
 	unbind();
 }
 
 void ShaderScalarField::setExpansion(int f)
 {
+	m_expansion = f;
 	bind();
 	glUniform1i(*m_uniform_expansion, f);
-	m_expansion = f;
 	unbind();
 }
 
 void ShaderScalarField::restoreUniformsAttribs()
 {
+	getLocations();
+	sendParams();
+
 	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexScalar", m_vboScal);

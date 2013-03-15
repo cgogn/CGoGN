@@ -129,6 +129,7 @@ void MyQT::cb_initGL()
 
 	m_sprite = new Utils::PointSprite();
 	m_sprite->setAttributePosition(m_positionVBO);
+	m_sprite->setColor(Geom::Vec4f(1.0f, 0.0f , 0.0f, 1.0f));
 
     m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
     storeVerticesInfo();
@@ -200,9 +201,7 @@ void MyQT::cb_redraw()
 
 	if (render_balls)
 	{
-		m_sprite->predraw(Geom::Vec4f(1.0f, 0.0f , 0.0f, 1.0f));
 		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
-		m_sprite->postdraw();
 	}
 
 	if (render_vectors)

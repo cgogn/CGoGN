@@ -46,12 +46,12 @@ protected:
 	CGoGNGLuint m_uniform_maxValue;
 	CGoGNGLuint m_uniform_expansion;
 
+	VBO* m_vboPos;
+	VBO* m_vboScal;
+
 	float m_minValue;
 	float m_maxValue;
 	int m_expansion;
-
-    VBO* m_vboPos;
-    VBO* m_vboScal;
 
 	void getLocations();
 

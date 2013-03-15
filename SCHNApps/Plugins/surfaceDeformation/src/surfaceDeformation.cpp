@@ -39,6 +39,9 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
 	lockingMarker = new CellMarker<VERTEX>(*map);
 	handleMarker = new CellMarker<VERTEX>(*map);
 
+	lockedVerticesVBO = new Utils::VBO();
+	handleVerticesVBO = new Utils::VBO();
+
 	positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit", false) ;
 	if(!positionInit.isValid())
 		positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit", false) ;
@@ -74,6 +77,8 @@ PerMapParameterSet::~PerMapParameterSet()
 {
 	delete lockingMarker;
 	delete handleMarker;
+	delete lockedVerticesVBO;
+	delete handleVerticesVBO;
 	nlDeleteContext(nlContext);
 }
 
@@ -115,9 +120,6 @@ bool SurfaceDeformationPlugin::enable()
 	m_pointSprite = new CGoGN::Utils::PointSprite();
 	registerShader(m_pointSprite);
 
-	m_drawer = new Utils::Drawer();
-	registerShader(m_drawer->getShader());
-
 	connect(m_window, SIGNAL(viewAndPluginLinked(View*, Plugin*)), this, SLOT(viewLinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(currentViewChanged(View*)), this, SLOT(currentViewChanged(View*)));
@@ -128,20 +130,54 @@ bool SurfaceDeformationPlugin::enable()
 void SurfaceDeformationPlugin::disable()
 {
 	delete m_pointSprite;
-	delete m_drawer;
 }
 
 void SurfaceDeformationPlugin::redraw(View* view)
 {
+	ParameterSet* params = h_viewParams[view];
+	MapHandlerGen* mh = params->selectedMap;
+	if(mh)
+	{
+		PerMapParameterSet* perMap = params->perMap[mh->getName()];
+
+		if(!perMap->lockedVertices.empty() || !perMap->handleVertices.empty())
+		{
+			m_pointSprite->setAttributePosition(perMap->lockedVerticesVBO);
+			m_pointSprite->setSize(mh->getBBdiagSize() / 250.0f);
+			m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 0.75f));
+			m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+
+			m_pointSprite->enableVertexAttribs();
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDrawArrays(GL_POINTS, 0, perMap->lockedVertices.size());
+			glDisable(GL_BLEND);
+			m_pointSprite->disableVertexAttribs();
+
+			m_pointSprite->setAttributePosition(perMap->handleVerticesVBO);
+			m_pointSprite->setSize(mh->getBBdiagSize() / 250.0f);
+			m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 1.0f, 0.0f, 0.75f));
+			m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+
+			m_pointSprite->enableVertexAttribs();
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDrawArrays(GL_POINTS, 0, perMap->handleVertices.size());
+			glDisable(GL_BLEND);
+			m_pointSprite->disableVertexAttribs();
+		}
+	}
+
 	if(selecting)
 	{
 		std::vector<PFP2::VEC3> selectionPoint;
 		selectionPoint.push_back(selectionCenter);
 		selectionSphereVBO->updateData(selectionPoint);
 
-		m_pointSprite->setSize(selectionRadius);
 		m_pointSprite->setAttributePosition(selectionSphereVBO);
-		m_pointSprite->predraw(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+		m_pointSprite->setSize(selectionRadius);
+		m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+		m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
 
 		m_pointSprite->enableVertexAttribs();
 		glEnable(GL_BLEND);
@@ -149,34 +185,6 @@ void SurfaceDeformationPlugin::redraw(View* view)
 		glDrawArrays(GL_POINTS, 0, 1);
 		glDisable(GL_BLEND);
 		m_pointSprite->disableVertexAttribs();
-
-		m_pointSprite->postdraw();
-	}
-
-	ParameterSet* params = h_viewParams[view];
-	MapHandlerGen* mh = params->selectedMap;
-	if(mh)
-	{
-		PerMapParameterSet* perMap = params->perMap[mh->getName()];
-
-		if(!perMap->locked_vertices.empty() || !perMap->handle_vertices.empty())
-		{
-			glDisable(GL_LIGHTING) ;
-			m_drawer->newList(GL_COMPILE_AND_EXECUTE) ;
-			m_drawer->pointSize(4.0f) ;
-			m_drawer->begin(GL_POINTS) ;
-			m_drawer->color3f(1.0f, 0.0f, 0.0f) ;
-			for(unsigned int i = 0; i < perMap->locked_vertices.size(); ++i)
-			{
-				if (!perMap->handleMarker->isMarked(perMap->locked_vertices[i]))
-					m_drawer->vertex(perMap->positionAttribute[perMap->locked_vertices[i]]) ;
-			}
-			m_drawer->color3f(0.0f, 0.0f, 1.0f) ;
-			for(unsigned int i = 0; i < perMap->handle_vertices.size(); ++i)
-				m_drawer->vertex(perMap->positionAttribute[perMap->handle_vertices[i]]) ;
-			m_drawer->end() ;
-			m_drawer->endList() ;
-		}
 	}
 }
 
@@ -229,29 +237,31 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 			PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
 			PFP2::VEC3 AB(dir.x, dir.y, dir.z);
 
-			Dart d ;
+			Dart d;
 			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(params->selectedMap)->getMap();
-			Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d) ;
+			Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d);
 
 			if(d != NIL)
 			{
-				Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, perMap->positionAttribute, selectionRadius) ;
-				neigh.collectAll(d) ;
-				const std::vector<Dart>& insideV = neigh.getInsideVertices() ;
+				Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, perMap->positionAttribute, selectionRadius);
+				neigh.collectAll(d);
+				const std::vector<Dart>& insideV = neigh.getInsideVertices();
 
 				for(unsigned int i = 0; i < insideV.size(); ++i)
 				{
-					unsigned int v = map->getEmbedding<VERTEX>(insideV[i]) ;
+					unsigned int v = map->getEmbedding<VERTEX>(insideV[i]);
 					if (!perMap->lockingMarker->isMarked(v))
 					{
-						perMap->locked_vertices.push_back(v) ;
+						if(perMap->verticesSelectionMode == LOCKED)
+							perMap->lockedVertices.push_back(perMap->positionAttribute[v]);
 						perMap->lockingMarker->mark(v);
 					}
 					if(perMap->verticesSelectionMode == HANDLE)
 					{
 						if(!perMap->handleMarker->isMarked(v))
 						{
-							perMap->handle_vertices.push_back(v) ;
+							perMap->handleVertices.push_back(perMap->positionAttribute[v]);
+							perMap->handleVerticesId.push_back(v);
 							perMap->handleMarker->mark(v);
 						}
 					}
@@ -259,6 +269,10 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 
 				nlMakeCurrent(perMap->nlContext) ;
 				nlReset(NL_FALSE) ;
+
+				perMap->lockedVerticesVBO->updateData(perMap->lockedVertices);
+				if(perMap->verticesSelectionMode == HANDLE)
+					perMap->handleVerticesVBO->updateData(perMap->handleVertices);
 
 				view->updateGL() ;
 			}
@@ -277,13 +291,13 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 			dragging = true ;
 
 			dragZ = 0;
-			for(unsigned int i = 0; i < perMap->handle_vertices.size(); ++i)
+			for(unsigned int i = 0; i < perMap->handleVertices.size(); ++i)
 			{
-				const PFP2::VEC3& p = perMap->positionAttribute[perMap->handle_vertices[i]] ;
+				const PFP2::VEC3& p = perMap->handleVertices[i] ;
 				qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(p[0],p[1],p[2]));
 				dragZ += q.z ;
 			}
-			dragZ /= perMap->handle_vertices.size() ;
+			dragZ /= perMap->handleVertices.size() ;
 
 			qglviewer::Vec p(event->x(), event->y(), dragZ);
 			dragPrevious = view->camera()->unprojectedCoordinatesOf(p);
@@ -294,9 +308,7 @@ void SurfaceDeformationPlugin::mousePress(View* view, QMouseEvent* event)
 void SurfaceDeformationPlugin::mouseRelease(View* view, QMouseEvent* event)
 {
 	if(event->button() == Qt::RightButton)
-	{
-		dragging = false ;
-	}
+		dragging = false;
 }
 
 void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
@@ -313,10 +325,14 @@ void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
 
 			qglviewer::Vec vec = q - dragPrevious;
 			PFP2::VEC3 t(vec.x, vec.y, vec.z);
-			for(unsigned int i = 0; i < perMap->handle_vertices.size(); ++i)
-				perMap->positionAttribute[perMap->handle_vertices[i]] += t ;
+			for(unsigned int i = 0; i < perMap->handleVertices.size(); ++i)
+			{
+				perMap->handleVertices[i] += t;
+				perMap->positionAttribute[perMap->handleVerticesId[i]] += t;
+			}
+			perMap->handleVerticesVBO->updateData(perMap->handleVertices);
 
-			dragPrevious = q ;
+			dragPrevious = q;
 
 //			matchDiffCoord(view, map);
 			asRigidAsPossible(view, params->selectedMap);
@@ -335,13 +351,13 @@ void SurfaceDeformationPlugin::mouseMove(View* view, QMouseEvent* event)
 			PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
 			PFP2::VEC3 AB(dir.x, dir.y, dir.z);
 
-			Dart d ;
+			Dart d;
 			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(params->selectedMap)->getMap();
-			Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d) ;
+			Algo::Selection::vertexRaySelection<PFP2>(*map, perMap->positionAttribute, rayA, AB, d);
 			if(d != NIL)
 			{
-				selectionCenter = perMap->positionAttribute[d] ;
-				view->updateGL() ;
+				selectionCenter = perMap->positionAttribute[d];
+				view->updateGL();
 			}
 		}
 	}
