@@ -57,8 +57,8 @@
 
 typedef struct {
 	cholmod_common c ;
-	cholmod_factor* cL ;
-	cholmod_dense* cb ;
+	cholmod_factor* cL ; // factor
+	cholmod_dense* cb ;  // right-hand side
 } cholmod_context ;
 
 
@@ -66,9 +66,9 @@ typedef struct {
 NLboolean nlFactorize_CHOLMOD() {
 
 	/* OpenNL Context */
-	NLSparseMatrix* M = &(nlCurrentContext->M) ;
-	NLuint n   = nlCurrentContext->n ;
-	NLuint nnz = nlSparseMatrixNNZ(M) ; /* Number of Non-Zero coeffs */
+	NLSparseMatrix* M   = &(nlCurrentContext->M) ;
+	NLuint          n   = nlCurrentContext->n ;
+	NLuint          nnz = nlSparseMatrixNNZ(M) ; /* Number of Non-Zero coeffs */
 
 	cholmod_context* context = (cholmod_context*)(nlCurrentContext->direct_solver_context) ;
 	if(context == NULL) {
@@ -87,12 +87,12 @@ NLboolean nlFactorize_CHOLMOD() {
 	nl_assert(M->storage & NL_MATRIX_STORE_COLUMNS) ;
 	nl_assert(M->m == M->n) ;
 
+	cholmod_start(&(context->c)) ;
+
 	/*
 	 * Step 1: convert matrix M into CHOLMOD compressed column representation
 	 * ----------------------------------------------------------------------
 	 */
-
-	cholmod_start(&(context->c)) ;
 
 	cA = cholmod_allocate_sparse(n, n, nnz, NL_FALSE, NL_TRUE, -1, CHOLMOD_REAL, &(context->c)) ;
 	int* colptr = (int*)(cA->p) ;
@@ -137,7 +137,7 @@ NLboolean nlSolve_CHOLMOD() {
 	/* OpenNL Context */
 	NLdouble* b = nlCurrentContext->b ;
 	NLdouble* x = nlCurrentContext->x ;
-	NLuint n    = nlCurrentContext->n ;
+	NLuint    n = nlCurrentContext->n ;
 
 	cholmod_context* context = (cholmod_context*)(nlCurrentContext->direct_solver_context) ;
 	nl_assert(context != NULL) ;
@@ -154,9 +154,8 @@ NLboolean nlSolve_CHOLMOD() {
 	 */
 
 	double* cbx = (double*)(context->cb->x) ;
-	for(i = 0; i < n; i++) {
+	for(i = 0; i < n; i++)
 		cbx[i] = b[i] ;
-	}
 
 	/*
 	 * Step 2: solve
@@ -205,6 +204,10 @@ NLboolean nlFactorize_CHOLMOD() {
 NLboolean nlSolve_CHOLMOD() {
 	nl_assert_not_reached ;
 	return NL_FALSE ;
+}
+
+void nlClear_CHOLMOD() {
+	nl_assert_not_reached ;
 }
 
 #endif

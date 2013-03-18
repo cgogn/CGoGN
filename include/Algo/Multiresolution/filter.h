@@ -43,9 +43,111 @@ public:
 	Filter() {}
 	virtual ~Filter() {}
 	virtual void operator() () = 0 ;
-	virtual void operator() (bool filtering) { }
 } ;
 
+template <typename PFP>
+unsigned int vertexLevel(typename PFP::MAP& map, Dart d)
+{
+	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"edgeLevel : called with a dart inserted after current level") ;
+
+	unsigned int level = map.getMaxLevel();
+
+	TraversorDartsOfOrbit<typename PFP::MAP,VERTEX> tv(map,d);
+
+	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
+	{
+		unsigned int ldit = map.getDartLevel(dit) ;
+		if(ldit < level)
+			level = ldit;
+	}
+
+//	Dart dit = d;
+//	do
+//	{
+//		unsigned int ldit = map.getDartLevel(dit) ;
+//		if(ldit < level)
+//			level = ldit;
+//
+//		dit = map.phi2(map.phi_1(dit));
+//	}
+//	while(dit != d);
+
+	return level;
+}
+
+
+template <typename PFP, typename T>
+void filterLowPass(typename PFP::MAP& map, VertexAttribute<T>& attIn, unsigned int cutoffLevel)
+{
+	unsigned int cur = map.getCurrentLevel();
+	unsigned int max = map.getMaxLevel();
+
+	map.setCurrentLevel(max);
+
+	TraversorV<typename PFP::MAP> tv(map);
+	for (Dart d = tv.begin(); d != tv.end(); d = tv.next())
+	{
+		if(vertexLevel<PFP>(map,d) > cutoffLevel)
+			attIn[d] = T(0.0);
+	}
+
+	map.setCurrentLevel(cur);
+}
+
+template <typename PFP, typename T>
+void filterHighPass(typename PFP::MAP& map, VertexAttribute<T>& attIn, unsigned int cutoffLevel)
+{
+	unsigned int cur = map.getCurrentLevel();
+	unsigned int max = map.getMaxLevel();
+
+	map.setCurrentLevel(max);
+
+	TraversorV<typename PFP::MAP> tv(map);
+	for (Dart d = tv.begin(); d != tv.end(); d = tv.next())
+	{
+		if(vertexLevel<PFP>(map,d) < cutoffLevel)
+			attIn[d] = T(0.0);
+	}
+
+	map.setCurrentLevel(cur);
+}
+
+template <typename PFP, typename T>
+void filterBandPass(typename PFP::MAP& map, VertexAttribute<T>& attIn, unsigned int cutoffLevelLow, unsigned int cutoffLevelHigh)
+{
+	unsigned int cur = map.getCurrentLevel();
+	unsigned int max = map.getMaxLevel();
+
+	map.setCurrentLevel(max);
+
+	TraversorV<typename PFP::MAP> tv(map);
+	for (Dart d = tv.begin(); d != tv.end(); d = tv.next())
+	{
+		unsigned int vLevel = vertexLevel<PFP>(map,d);
+		if(cutoffLevelLow > vLevel && vLevel < cutoffLevelHigh)
+			attIn[d] = T(0.0);
+	}
+
+	map.setCurrentLevel(cur);
+}
+
+template <typename PFP, typename T>
+void frequencyDeformation(typename PFP::MAP& map, VertexAttribute<T>& attIn, unsigned int cutoffLevel)
+{
+	unsigned int cur = map.getCurrentLevel();
+	unsigned int max = map.getMaxLevel();
+
+	map.setCurrentLevel(max);
+
+	TraversorV<typename PFP::MAP> tv(map);
+	for (Dart d = tv.begin(); d != tv.end(); d = tv.next())
+	{
+		if(vertexLevel<PFP>(map,d) == cutoffLevel)
+			attIn[d] += T(0.0,0.0,0.2);
+	}
+
+	map.setCurrentLevel(cur);
+}
 
 
 } // namespace MR

@@ -37,41 +37,49 @@ namespace SVG
 template <typename PFP>
 void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread)
 {
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("vertices", svg.m_model, svg.m_proj);
 	TraversorV<typename PFP::MAP> trac(map);
-	svg.beginPoints();
+	svg1->beginPoints();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg.addPoint(position[d]);
-	svg.endPoints();
+		svg1->addPoint(position[d]);
+	svg1->endPoints();
+	svg.addGroup(svg1);
 }
 
 template <typename PFP>
 void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, unsigned int thread)
 {
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("vertices", svg.m_model, svg.m_proj);
 	TraversorV<typename PFP::MAP> trac(map);
-	svg.beginPoints();
+	svg1->beginPoints();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg.addPoint(position[d], color[d]);
-	svg.endPoints();
+		svg1->addPoint(position[d], color[d]);
+	svg1->endPoints();
+	svg.addGroup(svg1);
 }
 
 template <typename PFP>
 void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread)
 {
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("edges", svg.m_model, svg.m_proj);
 	TraversorE<typename PFP::MAP> trac(map);
-	svg.beginLines();
+	svg1->beginLines();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg.addLine(position[d], position[map.phi1(d)]);
-	svg.endLines();
+		svg1->addLine(position[d], position[map.phi1(d)]);
+	svg1->endLines();
+	svg.addGroup(svg1);
 }
 
 template <typename PFP>
 void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, unsigned int thread)
 {
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("edges", svg.m_model, svg.m_proj);
 	TraversorE<typename PFP::MAP> trac(map);
-	svg.beginLines();
+	svg1->beginLines();
 	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg.addLine(position[d], position[map.phi1(d)], color[d]);
-	svg.endLines();
+		svg1->addLine(position[d], position[map.phi1(d)], color[d]);
+	svg1->endLines();
+	svg.addGroup(svg1);
 }
 
 } // namespace SVG

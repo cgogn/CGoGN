@@ -42,8 +42,20 @@ protected:
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
 
-    VBO* m_vboPos;
-    VBO* m_vboScal;
+	CGoGNGLuint m_uniform_minValue;
+	CGoGNGLuint m_uniform_maxValue;
+	CGoGNGLuint m_uniform_expansion;
+
+	VBO* m_vboPos;
+	VBO* m_vboScal;
+
+	float m_minValue;
+	float m_maxValue;
+	int m_expansion;
+
+	void getLocations();
+
+	void sendParams();
 
     void restoreUniformsAttribs();
 
@@ -53,6 +65,12 @@ public:
     unsigned int setAttributePosition(VBO* vbo);
 
     unsigned int setAttributeScalar(VBO* vbo);
+
+	void setMinValue(float f);
+
+	void setMaxValue(float f);
+
+	void setExpansion(int i);
 };
 
 } // namespace Utils

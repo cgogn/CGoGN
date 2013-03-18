@@ -89,7 +89,7 @@ void RenderExplodDockTab::selectedMapChanged()
 	{
 		QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 		if(!currentItems.empty())
-			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()), true);
+			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
 	}
 }
 
@@ -150,6 +150,19 @@ void RenderExplodDockTab::volumesScaleFactorChanged(int i)
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
 		m_plugin->changeVolumesScaleFactor(view, map, i, true);
+	}
+}
+
+void RenderExplodDockTab::addAttributeToList(unsigned int orbit, const QString& nameAttr)
+{
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+
+	const QString& typeAttr = m_currentParams->selectedMap->getAttributeTypeName(orbit, nameAttr);
+
+	if(typeAttr == vec3TypeName)
+	{
+		combo_positionAttribute->addItem(nameAttr);
+		combo_colorAttribute->addItem(nameAttr);
 	}
 }
 

@@ -19,10 +19,16 @@ struct PerMapParameterSet
 
 	void updateRender();
 
-	Algo::Render::GL2::TopoRender* m_renderTopo;
 	MapHandlerGen* mh;
+	Algo::Render::GL2::TopoRender* m_renderTopo;
 	VertexAttribute<PFP2::VEC3> positionAttribute;
 
+	bool drawDarts;
+	QColor dartsColor;
+	bool drawPhi1;
+	QColor phi1Color;
+	bool drawPhi2;
+	QColor phi2Color;
 	float edgesScaleFactor;
 	float facesScaleFactor;
 };
@@ -63,7 +69,6 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-
 protected:
 	RenderTopoSurfaceDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
@@ -76,10 +81,20 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
+
+public slots:
+	void changeSelectedMap(View* view, MapHandlerGen* map);
 
 	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI = false);
-
+	void changeDrawDarts(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeDartsColor(View* view, MapHandlerGen* map, QColor c, bool fromUI = false);
+	void changeDrawPhi1(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changePhi1Color(View* view, MapHandlerGen* map, QColor c, bool fromUI = false);
+	void changeDrawPhi2(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changePhi2Color(View* view, MapHandlerGen* map, QColor c, bool fromUI = false);
 	void changeEdgesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 

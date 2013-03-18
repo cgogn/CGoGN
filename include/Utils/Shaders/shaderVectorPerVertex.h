@@ -26,6 +26,7 @@
 #define __CGOGN_SHADER_VPV__
 
 #include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN
@@ -34,7 +35,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderVectorPerVertex : public GLSLShader
+class ShaderVectorPerVertex : public ClippingShader
 {
 protected:
 	// shader sources

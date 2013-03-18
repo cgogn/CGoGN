@@ -2,6 +2,7 @@
 #define _RENDER_DOCK_TAB_H_
 
 #include "ui_render.h"
+#include "Utils/vbo.h"
 
 namespace CGoGN
 {
@@ -30,8 +31,7 @@ public slots:
 	void refreshUI(ParameterSet* params);
 
 	void selectedMapChanged();
-	void addVBOToList(QString name);
-	void removeVBOFromList(QString name);
+
 	void positionVBOChanged(int index);
 	void normalVBOChanged(int index);
 	void renderVerticesChanged(bool b);
@@ -39,6 +39,8 @@ public slots:
 	void renderEdgesChanged(bool b);
 	void renderFacesChanged(bool b);
 	void faceStyleChanged(QAbstractButton* b);
+
+	void addVBOToList(Utils::VBO* vbo);
 };
 
 } // namespace SCHNApps

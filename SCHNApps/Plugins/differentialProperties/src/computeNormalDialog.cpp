@@ -28,7 +28,6 @@ ComputeNormalDialog::ComputeNormalDialog(Window* w) :
 	{
 		QListWidgetItem* item = new QListWidgetItem(map->getName(), mapList);
 		item->setCheckState(Qt::Unchecked);
-		connect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
 	}
 }
 

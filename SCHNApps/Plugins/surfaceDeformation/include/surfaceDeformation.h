@@ -1,19 +1,18 @@
 #ifndef _SURFACEDEFORMATION_PLUGIN_H_
 #define _SURFACEDEFORMATION_PLUGIN_H_
 
-#include "Utils/drawer.h"
-
 #include "plugin.h"
 #include "surfaceDeformationDockTab.h"
 
 #include "mapHandler.h"
+
+#include "Utils/pointSprite.h"
 
 #include "Container/fakeAttribute.h"
 
 #include "NL/nl.h"
 #include "Algo/LinearSolving/basic.h"
 #include "Eigen/Dense"
-
 
 namespace CGoGN
 {
@@ -44,8 +43,11 @@ struct PerMapParameterSet
 	CellMarker<VERTEX>* lockingMarker;
 	CellMarker<VERTEX>* handleMarker;
 	SelectionMode verticesSelectionMode;
-	std::vector<unsigned int> locked_vertices;
-	std::vector<unsigned int> handle_vertices;
+	std::vector<PFP2::VEC3> lockedVertices;
+	std::vector<PFP2::VEC3> handleVertices;
+	std::vector<unsigned int> handleVerticesId;
+	Utils::VBO* lockedVerticesVBO;
+	Utils::VBO* handleVerticesVBO;
 
 	VertexAttribute<PFP2::VEC3> positionInit;
 	VertexAttribute<PFP2::VEC3> vertexNormal;
@@ -111,7 +113,9 @@ protected:
 	SurfaceDeformationDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
-	Utils::Drawer* m_drawer;
+	Utils::PointSprite* m_pointSprite;
+
+	Utils::VBO* selectionSphereVBO;
 
 	bool selecting;
 	PFP2::VEC3 selectionCenter;
@@ -128,10 +132,17 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute);
-	void changeVerticesSelectionMode(View* view, MapHandlerGen* map, SelectionMode m);
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
 
+public slots:
+	void changeSelectedMap(View* view, MapHandlerGen* map);
+
+	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI = false);
+	void changeVerticesSelectionMode(View* view, MapHandlerGen* map, SelectionMode m, bool fromUI = false);
+
+protected:
 	void matchDiffCoord(View* view, MapHandlerGen* map);
 	void asRigidAsPossible(View* view, MapHandlerGen* map);
 };

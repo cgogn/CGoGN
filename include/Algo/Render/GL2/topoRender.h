@@ -197,6 +197,12 @@ public:
 	void drawTopo();
 
 	/**
+	 * get shader objects
+	 */
+	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
+	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
+
+	/**
 	 * change dart drawing color
 	 * @param d the dart
 	 * @param r red !
@@ -286,9 +292,6 @@ public:
 	 * @param ns distance shift
 	 */
 	void setBoundaryShift(float bs);
-
-	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
-	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
 };
 
 // just for compatibility with old code

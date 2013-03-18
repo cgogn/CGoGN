@@ -43,10 +43,9 @@ namespace Regular
 template <typename PFP>
 Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
 	m_map(map),
-	shareVertexEmbeddings(true),
-	filter(F_None)
+	shareVertexEmbeddings(true)
 {
-	std::cout << "filter = " << filter << std::endl;
+
 }
 
 template <typename PFP>
@@ -252,14 +251,8 @@ void Map2MR<PFP>::analysis()
 
 	m_map.decCurrentLevel() ;
 
-//	for(unsigned int i = 0; i < analysisFilters.size(); ++i)
-//		(*analysisFilters[i])() ;
-
 	for(unsigned int i = 0; i < analysisFilters.size(); ++i)
-	{
-		std::cout << "filter false" << std::endl;
-		(*analysisFilters[i])(false) ;
-	}
+		(*analysisFilters[i])() ;
 
 }
 
@@ -268,26 +261,8 @@ void Map2MR<PFP>::synthesis()
 {
 	assert(m_map.getCurrentLevel() < m_map.getMaxLevel() || !"synthesis : called on max level") ;
 
-//	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
-//		(*synthesisFilters[i])() ;
-
 	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
-	{
-		std::cout << "filter = " << filter << std::endl;
-
-		if((filter == F_LowPass && m_map.getCurrentLevel() <= thresholdHigh))// ||
-		//(filter == F_HighPass && m_map.getCurrentLevel() >= thresholdLow) ||
-		//(filter == F_BandPass && (thresholdLow >= m_map.getCurrentLevel() &&  m_map.getCurrentLevel() <= thresholdHigh)))
-		{
-			std::cout << "filter true , currentLevel = " << m_map.getCurrentLevel() << ", level = " << thresholdHigh << std::endl;
-			(*synthesisFilters[i])(true) ;
-		}
-		else
-		{
-			std::cout << "filter false" << std::endl;
-			(*synthesisFilters[i])(false) ;
-		}
-	}
+		(*synthesisFilters[i])() ;
 
 	m_map.incCurrentLevel() ;
 }
