@@ -1,4 +1,4 @@
- *** English version below ***
+ *** english version below ***
 
 Pour utiliser Eclipse (testé avec la version Helios, Galileo, Indigo & Juno)
  * Configurer un projet dans Eclipse :

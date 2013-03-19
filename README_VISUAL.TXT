@@ -1,4 +1,6 @@
-Compilation sous VisualExpress C++ (english version bellow)
+ *** english version below ***
+
+Compilation sous VisualExpress C++
 
 Prérequis:
 Visual Studio ou C++ Express (au moins 2005, si possible 2010)

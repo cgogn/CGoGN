@@ -1,34 +1,44 @@
+*** english version below ***
+
 Dépendences Linux:
 installer les paquets suivants:
 cmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 Pour compiler CGoGN:
-- aller dans ThirdParty, cd build, taper "cmake .", puis make ( avec -j x si vous avez x core sur votre machine)
+
+  - on compile d'abord les bibliothèques annexes :
+
+	cd CGoGN/ThirdParty/build
+	cmake ..
+	make (-j x si vous avez x cores)
+	make install
+
 	On peut fixer certaines option pour ne pas tout compiler (cf le README.TXT dans ThirdParty)
-	On peut aussi compiler en debug en créant un répertoir qui fini par Debug à la place de build
-	
-- aller dans build et taper "cmake ..", puis make
-	Des options (booléennes) sont ici aussi disponible:
+
+  - ensuite on compile CGoGN (compile les libs dans CGoGN/lib et des exemples dans CGoGN/bin) :
+
+	cd CGoGN/build
+	cmake ..
+	make (-j x si vous avez x cores)
+
+	Certaines options (booléennes) sont ici aussi disponible:
 	BUILD_SHARED_LIBS  (F) experimental !
 	WITH_ASSIMP        (T)
 	WITH_NUMERICAL     (T)
 	WITH_ZINRI         (T)
 	WITH_QT	           (T)
-	afin de limiter les dépendances et le temps de compilation/
-	
+	afin de limiter les dépendances et le temps de compilation
 	FORCE_MR           (2)
-	permet de compiler dans 3 modes: mixte (0), multi-resolution(1), mono-resolution(2).
-	
+	permet de compiler dans 3 modes: mono-resolution (0), multi-resolution (1)
 	ONELIB             (F)
 	permet de forcer la compilation en une seule lib (libcgogn.a) au lieu de quatre.
 	
-	
+  - on peut ensuite compiler SCHNApps ainsi que les plugins fournis :
 
-- la compilation des sous-parties se fait en allant dans les sous-repertoires de build
+	cd CGoGN/SCHNApps/build
+	cmake ..
+	make (-j x si vous avez x cores)
 
-Les applications (Examples et Tutos) sont dans le répertoire Apps
-
-Les binaires sont générés dans le repertoire bin
 
 Des exemples de données:
 - fichiers trianbgz, off, etc
@@ -44,31 +54,40 @@ install the following packages:
 ccmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 To compile CGoGN:
-- Go ThirdParty, cd build, type "cmake .." and then make (with -j x if you have x core on your machine)
-We can set some option to not compile everything (see the README.TXT in ThirdParty)
-You can also compile debug by creating a directory that ended Debug build instead
 
-- Go to build and type "cmake .." and then make
-	Options (Boolean) are also available here:
-	BUILD_SHARED_LIBS (F) experimental!
-	WITH_ASSIMP (T)
-	WITH_NUMERICAL (T)
-	WITH_ZINRI (T)
-	WITH_QT (T)
-	to minimize dependencies and compilation time /
-	
+  - first compile third-party libraries:
+
+	cd CGoGN/ThirdParty/build
+	cmake ..
+	make (-j x if you have x cores)
+	make install
+
+	Some options are available to not compile everything (see the README.TXT in ThirdParty)
+
+  - then compile CGoGN (the libs are generated in CGoGN/lib and some examples in CGoGN/bin):
+
+	cd CGoGN/build
+	cmake ..
+	make (-j x if you have x cores)
+
+	Some options are available:
+	BUILD_SHARED_LIBS  (F) experimental !
+	WITH_ASSIMP        (T)
+	WITH_NUMERICAL     (T)
+	WITH_ZINRI         (T)
+	WITH_QT	           (T)
+	to minimize dependencies and compilation time
 	FORCE_MR           (2)
-	allow the compilation in 3 mode: mixed(0), multi-resolution(1), mono-resolution(2).
-	
+	allows the compilation in 3 modes: mono-resolution (0), multi-resolution (1)
 	ONELIB             (F)
-	allow compilation in one lib (libcgogn.a) instead of four.
+	allowss to force the compilation in one lib (libcgogn.a) instead of four.
 
+  - we can then compile SCHNApps and the provided plugins :
 
-- the compilation of each sub-parts is done by going in the subdirectories of build
+	cd CGoGN/SCHNApps/build
+	cmake ..
+	make (-j x if you have x cores)
 
-Applications (examples and tutorials) are in the Apps directory
-
-The binaries are generated in the bin directory
 
 Examples of data:
 - Trianbgz files, off, etc.
