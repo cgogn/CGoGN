@@ -1,4 +1,4 @@
-Principe des applications dans CGoGN_Apps (english version bellow
+Principe des applications dans CGoGN_Apps (english version below)
 
 
 
