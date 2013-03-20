@@ -110,6 +110,6 @@ public:
 
 } // namespace CGoGN
 
-#include "mapBrowser.hpp"
+#include "Topology/generic/mapBrowser.hpp"
 
 #endif /* MAPBROWSER_H_ */

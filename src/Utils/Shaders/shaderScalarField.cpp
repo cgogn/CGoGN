@@ -56,6 +56,7 @@ void ShaderScalarField::getLocations()
 	bind();
 	*m_uniform_minValue = glGetUniformLocation(this->program_handler(), "minValue");
 	*m_uniform_maxValue = glGetUniformLocation(this->program_handler(), "maxValue");
+	*m_uniform_colorMap = glGetUniformLocation(this->program_handler(), "colorMap");
 	*m_uniform_expansion = glGetUniformLocation(this->program_handler(), "expansion");
 	unbind();
 }
@@ -65,6 +66,7 @@ void ShaderScalarField::sendParams()
 	bind();
 	glUniform1f(*m_uniform_minValue, m_minValue);
 	glUniform1f(*m_uniform_maxValue, m_maxValue);
+	glUniform1i(*m_uniform_colorMap, m_colorMap);
 	glUniform1i(*m_uniform_expansion, m_expansion);
 	unbind();
 }
@@ -103,11 +105,19 @@ void ShaderScalarField::setMaxValue(float f)
 	unbind();
 }
 
-void ShaderScalarField::setExpansion(int f)
+void ShaderScalarField::setColorMap(int i)
 {
-	m_expansion = f;
+	m_colorMap = i;
 	bind();
-	glUniform1i(*m_uniform_expansion, f);
+	glUniform1i(*m_uniform_colorMap, i);
+	unbind();
+}
+
+void ShaderScalarField::setExpansion(int i)
+{
+	m_expansion = i;
+	bind();
+	glUniform1i(*m_uniform_expansion, i);
 	unbind();
 }
 
