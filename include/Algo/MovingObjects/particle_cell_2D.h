@@ -23,10 +23,12 @@ namespace Surface
 namespace MovingObjects
 {
 
+#ifndef PARTCELL25D_H
 enum
 {
 	NO_CROSS, CROSS_EDGE, CROSS_OTHER
 } ;
+#endif
 
 template <typename PFP>
 class ParticleCell2D : public Algo::MovingObjects::ParticleBase<PFP>

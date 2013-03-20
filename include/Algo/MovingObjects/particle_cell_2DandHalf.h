@@ -1,5 +1,5 @@
-#ifndef PARTCELL_H
-#define PARTCELL_H
+#ifndef PARTCELL25D_H
+#define PARTCELL25D_H
 
 #include "Algo/MovingObjects/particle_base.h"
 
@@ -24,15 +24,17 @@ namespace Surface
 namespace MovingObjects
 {
 
+#ifndef PARTCELL_H
 enum
 {
 	NO_CROSS,
 	CROSS_EDGE,
 	CROSS_OTHER
 };
+#endif
 
 template <typename PFP>
-class ParticleCell2DAndHalf : public MovingObjects::ParticleBase
+class ParticleCell2DAndHalf : public Algo::MovingObjects::ParticleBase<PFP>
 {
 public :
 	typedef typename PFP::MAP Map;
@@ -56,7 +58,7 @@ public :
 	{}
 
 	ParticleCell2DAndHalf(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(FACE), crossCell(NO_CROSS), distance(0)
+		Algo::MovingObjects::ParticleBase<PFP>(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(FACE), crossCell(NO_CROSS), distance(0)
 	{}
 
 	Dart getCell() { return d; }
@@ -88,7 +90,7 @@ public :
 	{
 		distance = 0 ;
 		crossCell = NO_CROSS ;
-		if(!Geom::arePointsEquals(newCurrent, m_position))
+		if(!Geom::arePointsEquals(newCurrent, this->getPosition()))
 		{
 			switch(state) {
 				case VERTEX : 	vertexState(newCurrent); break;
@@ -99,7 +101,7 @@ public :
 //			display();
 		}
 		else
-			m_position = newCurrent;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(newCurrent);
 	}
 };
 
