@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MR_SQRT3_FILTER__
-#define __MR_SQRT3_FILTER__
+#ifndef __2MR_SQRT3_FILTER__
+#define __2MR_SQRT3_FILTER__
 
 #include <cmath>
 #include "Algo/Multiresolution/filter.h"
@@ -115,11 +115,6 @@ public:
 
 	void operator() ()
 	{
-
-	}
-
-	void operator() (bool filtering)
-	{
 		TraversorF<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
@@ -149,7 +144,6 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
-
 } ;
 
 template <typename PFP>
@@ -164,11 +158,6 @@ public:
 	{}
 
 	void operator() ()
-	{
-
-	}
-
-	void operator() (bool filtering)
 	{
 		TraversorV<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -239,7 +228,6 @@ public:
 			}
 		}
 	}
-
 } ;
 
 template <typename PFP>
@@ -254,11 +242,6 @@ public:
 	{}
 
 	void operator() ()
-	{
-
-	}
-
-	void operator() (bool filtering)
 	{
 		TraversorV<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -295,7 +278,6 @@ public:
 
 		}
 	}
-
 } ;
 
 template <typename PFP>
@@ -310,11 +292,6 @@ public:
 	{}
 
 	void operator() ()
-	{
-
-	}
-
-	void operator() (bool filtering)
 	{
 		TraversorF<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -338,7 +315,6 @@ public:
 
 		}
 	}
-
 } ;
 
 /*********************************************************************************

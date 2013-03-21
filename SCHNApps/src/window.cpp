@@ -6,6 +6,7 @@
 #include <QDockWidget>
 #include <QPluginLoader>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QDir>
 #include <QKeyEvent>
@@ -66,6 +67,7 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQ
 	m_pythonDock->setWidget(&m_pythonConsole);
 
 	connect(actionShowHidePythonDock, SIGNAL(triggered()), this, SLOT(cb_showHidePythonDock()));
+	connect(actionLoadPythonScript, SIGNAL(triggered()), this, SLOT(cb_loadPythonScript()));
 
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
@@ -453,7 +455,7 @@ void Window::registerPluginsDirectory(const QString& path)
 Plugin* Window::loadPlugin(const QString& pluginName)
 {
 	if (h_plugins.contains(pluginName))
-		return NULL;
+		return h_plugins[pluginName];
 
 	if (m_availablePlugins.contains(pluginName))
 	{
@@ -492,13 +494,13 @@ Plugin* Window::loadPlugin(const QString& pluginName)
 		// if loading fails
 		else
 		{
-			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toStdString() << std::endl;
+//			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toStdString() << std::endl;
 			return NULL;
 		}
 	}
 	else
 	{
-		std::cout << "loadPlugin: plugin not found (" << pluginName.toStdString() << ")" << std::endl;
+//		std::cout << "loadPlugin: plugin not found (" << pluginName.toStdString() << ")" << std::endl;
 		return NULL;
 	}
 }
@@ -748,6 +750,14 @@ void Window::cb_showHideDock()
 void Window::cb_showHidePythonDock()
 {
 	m_pythonDock->setVisible(m_pythonDock->isHidden());
+}
+
+void Window::cb_loadPythonScript()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", getAppPath(), "Python script (*.py)");
+	QFileInfo fi(fileName);
+	if(fi.exists())
+		m_pythonContext.evalFile(fi.filePath());
 }
 
 void Window::cb_showCamerasDialog()

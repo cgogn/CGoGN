@@ -59,12 +59,12 @@ void RenderVectorPlugin::redraw(View* view)
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* m, maps)
 	{
-		const PerMapParameterSet& p = params->perMap[m->getName()];
-		m_vectorShader->setScale(m->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
-		if(p.positionVBO != NULL)
+		PerMapParameterSet* p = params->perMap[m->getName()];
+		m_vectorShader->setScale(m->getBBdiagSize() / 100.0f * p->vectorsScaleFactor) ;
+		if(p->positionVBO != NULL)
 		{
-			m_vectorShader->setAttributePosition(p.positionVBO) ;
-			for(std::vector<Utils::VBO*>::const_iterator it = p.vectorVBO.begin(); it != p.vectorVBO.end(); ++it)
+			m_vectorShader->setAttributePosition(p->positionVBO) ;
+			for(std::vector<Utils::VBO*>::const_iterator it = p->vectorVBO.begin(); it != p->vectorVBO.end(); ++it)
 			{
 				m_vectorShader->setAttributeVector(*it) ;
 				glLineWidth(1.0f) ;
@@ -80,14 +80,10 @@ void RenderVectorPlugin::viewLinked(View* view, Plugin* plugin)
 	{
 		ParameterSet* params = new ParameterSet();
 		h_viewParams.insert(view, params);
+
 		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
-		foreach(MapHandlerGen* map, maps)
-		{
-			PerMapParameterSet p(map);
-			params->perMap.insert(map->getName(), p);
-		}
-		if (!maps.empty())
-			changeSelectedMap(view, maps[0]);
+		foreach(MapHandlerGen* mh, maps)
+			addManagedMap(view, mh);
 
 		connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
 		connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
@@ -101,6 +97,12 @@ void RenderVectorPlugin::viewUnlinked(View* view, Plugin* plugin)
 {
 	if(plugin == this)
 	{
+		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+		foreach(MapHandlerGen* mh, maps)
+			removeManagedMap(view, mh);
+
+		ParameterSet* params = h_viewParams[view];
+		delete params;
 		h_viewParams.remove(view);
 
 		disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
@@ -118,55 +120,55 @@ void RenderVectorPlugin::mapLinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
-
-	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet p(m);
-	params->perMap.insert(m->getName(), p);
-	if(params->selectedMap == NULL || params->perMap.count() == 1)
-		changeSelectedMap(view, m);
-	else
-		m_dockTab->refreshUI(params);
+	addManagedMap(view, m);
 }
 
 void RenderVectorPlugin::mapUnlinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+	removeManagedMap(view, m);
+}
 
-	ParameterSet* params = h_viewParams[view];
+void RenderVectorPlugin::addManagedMap(View* v, MapHandlerGen *m)
+{
+//	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+//	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = new PerMapParameterSet(m);
+
+	params->perMap.insert(m->getName(), perMap);
+
+	if(params->selectedMap == NULL || params->perMap.count() == 1)
+		changeSelectedMap(v, m);
+	else
+		m_dockTab->refreshUI(params);
+}
+
+void RenderVectorPlugin::removeManagedMap(View *v, MapHandlerGen *m)
+{
+//	disconnect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+//	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = params->perMap[m->getName()];
+
+	delete perMap;
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)
 	{
 		if(!params->perMap.empty())
-			changeSelectedMap(view, m_window->getMap(params->perMap.begin().key()));
+			changeSelectedMap(v, m_window->getMap(params->perMap.begin().key()));
 		else
-			changeSelectedMap(view, NULL);
+			changeSelectedMap(v, NULL);
 	}
 	else
 		m_dockTab->refreshUI(params);
 }
 
-void RenderVectorPlugin::vboAdded(Utils::VBO* vbo)
-{
-	assert(h_viewParams[m_window->getCurrentView()]->selectedMap == static_cast<MapHandlerGen*>(QObject::sender()));
-	if(vbo->dataSize() == 3)
-		m_dockTab->addVBOToList(QString::fromStdString(vbo->name()));
-}
-
-void RenderVectorPlugin::vboRemoved(Utils::VBO* vbo)
-{
-	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-
-	View* view = m_window->getCurrentView();
-	ParameterSet* params = h_viewParams[view];
-	if(params->perMap[map->getName()].positionVBO == vbo)
-		changePositionVBO(view, map, NULL);
-
-	m_dockTab->refreshUI(h_viewParams[view]);
-}
-
-void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
+void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 {
 	ParameterSet* params = h_viewParams[view];
 
@@ -176,20 +178,18 @@ void RenderVectorPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool 
 	if(view->isCurrentView())
 	{
 		if(prev)
-			disconnect(prev, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+			disconnect(prev, SIGNAL(vboAdded(Utils::VBO*)), m_dockTab, SLOT(addVBOToList(Utils::VBO*)));
 		if(map)
-			connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
+			connect(map, SIGNAL(vboAdded(Utils::VBO*)), m_dockTab, SLOT(addVBOToList(Utils::VBO*)));
 
-		if(!fromUI)
-			m_dockTab->refreshUI(params);
-		view->updateGL();
+		m_dockTab->refreshUI(params);
 	}
 }
 
 void RenderVectorPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].positionVBO = vbo;
+	params->perMap[map->getName()]->positionVBO = vbo;
 
 	if(view->isCurrentView())
 	{
@@ -202,7 +202,7 @@ void RenderVectorPlugin::changePositionVBO(View* view, MapHandlerGen* map, Utils
 void RenderVectorPlugin::changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].vectorVBO = vbos;
+	params->perMap[map->getName()]->vectorVBO = vbos;
 
 	if(view->isCurrentView())
 	{
@@ -215,7 +215,7 @@ void RenderVectorPlugin::changeSelectedVectorsVBO(View* view, MapHandlerGen* map
 void RenderVectorPlugin::changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()].vectorsScaleFactor = i / 50.0;
+	params->perMap[map->getName()]->vectorsScaleFactor = i / 50.0;
 
 	if(view->isCurrentView())
 	{

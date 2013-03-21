@@ -517,8 +517,11 @@ void nlEndMatrix() {
         ) ;
     }
 
-	if(nlCurrentContext->solver == NL_CHOLMOD_EXT && // or any other direct solver
-	   nlCurrentContext->direct_solver_context == NULL) {
+	if((nlCurrentContext->solver == NL_CHOLMOD_EXT || // or any other direct solver
+		nlCurrentContext->solver == NL_SUPERLU_EXT ||
+		nlCurrentContext->solver == NL_PERM_SUPERLU_EXT ||
+		nlCurrentContext->solver == NL_SYMMETRIC_SUPERLU_EXT) &&
+			nlCurrentContext->direct_solver_context == NULL) {
 		nlCurrentContext->factorize_func() ;
 	}
 }
@@ -567,9 +570,9 @@ void nlEndRow() {
     NLRowColumn*    al = &nlCurrentContext->al ;
     NLRowColumn*    xl = &nlCurrentContext->xl ;
     NLSparseMatrix* M  = &nlCurrentContext->M  ;
-    NLdouble* b        = nlCurrentContext->b ;
-    NLuint nf          = af->size ;
-    NLuint nl          = al->size ;
+	NLdouble*       b  = nlCurrentContext->b ;
+	NLuint          nf = af->size ;
+	NLuint          nl = al->size ;
     NLuint current_row = nlCurrentContext->current_row ;
     NLuint i ;
     NLuint j ;
@@ -674,15 +677,15 @@ void nlEnd(NLenum prim) {
 /* nlSolve() driver routine */
 
 NLboolean nlSolve() {
-    NLboolean result ;
-    NLdouble start_time = nlCurrentTime() ; 
-    nlCheckState(NL_STATE_SYSTEM_CONSTRUCTED) ;
-    nlCurrentContext->elapsed_time = 0 ;
+	NLboolean result ;
+	NLdouble start_time = nlCurrentTime() ;
+	nlCheckState(NL_STATE_SYSTEM_CONSTRUCTED) ;
+	nlCurrentContext->elapsed_time = 0 ;
 	result = nlCurrentContext->solver_func() ;
-    nlVectorToVariables() ;
+	nlVectorToVariables() ;
 	nlCurrentContext->elapsed_time = nlCurrentTime() - start_time ;
-    nlTransition(NL_STATE_SYSTEM_CONSTRUCTED, NL_STATE_SOLVED) ;
-    return result ;
+	nlTransition(NL_STATE_SYSTEM_CONSTRUCTED, NL_STATE_SOLVED) ;
+	return result ;
 }
 
 /************************************************************************/
@@ -717,7 +720,10 @@ void nlReset(NLboolean keep_matrix) {
 				nlUnlockVariable(i);
 			}
 			nlCurrentContext->matrix_already_set = NL_FALSE ;
-			if(nlCurrentContext->solver == NL_CHOLMOD_EXT) { // or any other direct solver
+			if( nlCurrentContext->solver == NL_CHOLMOD_EXT || // or any other direct solver
+				nlCurrentContext->solver == NL_SUPERLU_EXT ||
+				nlCurrentContext->solver == NL_PERM_SUPERLU_EXT ||
+				nlCurrentContext->solver == NL_SYMMETRIC_SUPERLU_EXT) {
 				nlCurrentContext->clear_factor_func() ;
 			}
 		}

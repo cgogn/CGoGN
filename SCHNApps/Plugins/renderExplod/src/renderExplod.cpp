@@ -16,7 +16,6 @@ PerMapParameterSet::PerMapParameterSet(MapHandlerGen* m) :
 	renderFaces(true),
 	faceStyle(FLAT)
 {
-
 	m_renderExplod = new Algo::Render::GL2::ExplodeVolumeRender(false, false, false);
 
 	m_renderExplod->setNoClippingPlane();
@@ -50,15 +49,11 @@ PerMapParameterSet::~PerMapParameterSet()
 
 void PerMapParameterSet::updateRender()
 {
-	MapHandler<PFP3>* mh3 = static_cast<MapHandler<PFP3>*>(mh);
-	if(mh3 == NULL)
-		return;
-
-	PFP3::MAP* m = mh3->getMap();
-
+	PFP3::MAP* m = static_cast<MapHandler<PFP3>*>(mh)->getMap();
 	//if(!color.isValid())
-	m_renderExplod->updateData<PFP3>(*m,positionAttribute);
+	m_renderExplod->updateData<PFP3>(*m, positionAttribute);
 }
+
 
 bool RenderExplodPlugin::enable()
 {
@@ -69,13 +64,12 @@ bool RenderExplodPlugin::enable()
 	connect(m_window, SIGNAL(viewAndPluginUnlinked(View*, Plugin*)), this, SLOT(viewUnlinked(View*, Plugin*)));
 	connect(m_window, SIGNAL(currentViewChanged(View*)), this, SLOT(currentViewChanged(View*)));
 
-
 	return true;
 }
 
 void RenderExplodPlugin::disable()
 {
-	//delete m_renderExplod;
+
 }
 
 void RenderExplodPlugin::redraw(View* view)
@@ -112,16 +106,10 @@ void RenderExplodPlugin::viewLinked(View* view, Plugin* plugin)
 	{
 		ParameterSet* params = new ParameterSet();
 		h_viewParams.insert(view, params);
+
 		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 		foreach(MapHandlerGen* mh, maps)
-		{
-			PerMapParameterSet* p = new PerMapParameterSet(mh);
-			registerShader(p->m_renderExplod->shaderFaces());
-			registerShader(p->m_renderExplod->shaderLines());
-			params->perMap.insert(mh->getName(), p);
-		}
-		if (!maps.empty())
-			changeSelectedMap(view, maps[0]);
+			addManagedMap(view, mh);
 
 		connect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
 		connect(view, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(mapUnlinked(MapHandlerGen*)));
@@ -135,6 +123,12 @@ void RenderExplodPlugin::viewUnlinked(View* view, Plugin* plugin)
 {
 	if(plugin == this)
 	{
+		const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+		foreach(MapHandlerGen* mh, maps)
+			removeManagedMap(view, mh);
+
+		ParameterSet* params = h_viewParams[view];
+		delete params;
 		h_viewParams.remove(view);
 
 		disconnect(view, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(mapLinked(MapHandlerGen*)));
@@ -145,60 +139,68 @@ void RenderExplodPlugin::viewUnlinked(View* view, Plugin* plugin)
 void RenderExplodPlugin::currentViewChanged(View* view)
 {
 	if(isLinkedToView(view))
-	{
-		ParameterSet* params = h_viewParams[view];
-		changeSelectedMap(view, params->selectedMap);
 		m_dockTab->refreshUI(h_viewParams[view]);
-	}
 }
 
 void RenderExplodPlugin::mapLinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
-
-	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
-	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
-
-
-	ParameterSet* params = h_viewParams[view];
-
-	PerMapParameterSet* p = new PerMapParameterSet(m);
-	registerShader(p->m_renderExplod->shaderFaces());
-	registerShader(p->m_renderExplod->shaderLines());
-	params->perMap.insert(m->getName(), p);
-
-	if(params->selectedMap == NULL || params->perMap.count() == 1)
-		changeSelectedMap(view, m);
-	else
-		m_dockTab->refreshUI(params);
+	addManagedMap(view, m);
 }
 
 void RenderExplodPlugin::mapUnlinked(MapHandlerGen* m)
 {
 	View* view = static_cast<View*>(QObject::sender());
 	assert(isLinkedToView(view));
+	removeManagedMap(view, m);
+}
 
+void RenderExplodPlugin::addManagedMap(View* v, MapHandlerGen *m)
+{
+	connect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+	connect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
+
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = new PerMapParameterSet(m);
+
+	registerShader(perMap->m_renderExplod->shaderFaces());
+	registerShader(perMap->m_renderExplod->shaderLines());
+
+	params->perMap.insert(m->getName(), perMap);
+
+	if(params->selectedMap == NULL || params->perMap.count() == 1)
+		changeSelectedMap(v, m);
+	else
+		m_dockTab->refreshUI(params);
+}
+
+void RenderExplodPlugin::removeManagedMap(View *v, MapHandlerGen *m)
+{
 	disconnect(m, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
 	disconnect(m, SIGNAL(connectivityModified()), this, SLOT(connectivityModified()));
 
+	ParameterSet* params = h_viewParams[v];
+	PerMapParameterSet* perMap = params->perMap[m->getName()];
 
-	ParameterSet* params = h_viewParams[view];
+	unregisterShader(perMap->m_renderExplod->shaderFaces());
+	unregisterShader(perMap->m_renderExplod->shaderLines());
+
+	delete perMap;
 	params->perMap.remove(m->getName());
 
 	if(params->selectedMap == m)
 	{
 		if(!params->perMap.empty())
-			changeSelectedMap(view, m_window->getMap(params->perMap.begin().key()));
+			changeSelectedMap(v, m_window->getMap(params->perMap.begin().key()));
 		else
-			changeSelectedMap(view, NULL);
+			changeSelectedMap(v, NULL);
 	}
 	else
 		m_dockTab->refreshUI(params);
 }
 
-
-void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI)
+void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map)
 {
 	ParameterSet* params = h_viewParams[view];
 
@@ -207,9 +209,12 @@ void RenderExplodPlugin::changeSelectedMap(View* view, MapHandlerGen* map, bool 
 
 	if(view->isCurrentView())
 	{
-		if(!fromUI)
-			m_dockTab->refreshUI(params);
-		view->updateGL();
+		if(prev)
+			disconnect(prev, SIGNAL(attributeAdded(unsigned int, const QString&)), m_dockTab, SLOT(addAttributeToList(unsigned int, const QString&)));
+		if(map)
+			connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), m_dockTab, SLOT(addAttributeToList(unsigned int, const QString&)));
+
+		m_dockTab->refreshUI(params);
 	}
 }
 

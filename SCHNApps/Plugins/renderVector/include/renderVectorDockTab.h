@@ -2,6 +2,7 @@
 #define _RENDERVECTOR_DOCK_TAB_H_
 
 #include "ui_renderVector.h"
+#include "Utils/vbo.h"
 
 namespace CGoGN
 {
@@ -30,11 +31,12 @@ public slots:
 	void refreshUI(ParameterSet* params);
 
 	void selectedMapChanged();
-	void addVBOToList(QString name);
-	void removeVBOFromList(QString name);
+
 	void positionVBOChanged(int index);
 	void selectedVectorsVBOChanged();
 	void vectorsScaleFactorChanged(int i);
+
+	void addVBOToList(Utils::VBO* vbo);
 };
 
 } // namespace SCHNApps

@@ -25,10 +25,11 @@ struct PerMapParameterSet
 
 	void updateRender();
 
-	Algo::Render::GL2::ExplodeVolumeRender* m_renderExplod;
 	MapHandlerGen* mh;
+	Algo::Render::GL2::ExplodeVolumeRender* m_renderExplod;
 	VertexAttribute<PFP3::VEC3> positionAttribute;
 	VolumeAttribute<PFP3::VEC3> colorAttribute;
+
 	float facesScaleFactor;
 	float volumesScaleFactor;
 	bool renderEdges;
@@ -84,13 +85,15 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	//void addAttributeToList(unsigned int orbit, const QString& nameAttr);
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+public slots:
+	void changeSelectedMap(View* view, MapHandlerGen* map);
 
 	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI = false);
 	void changeColorAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI = false);
-
 	void changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
 	void changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
 	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);

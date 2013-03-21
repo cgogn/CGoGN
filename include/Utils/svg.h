@@ -157,13 +157,11 @@ public:
 
 class AnimatedSVGOut;
 
-class SVGOut
+class SvgGroup
 {
-	friend class AnimatedSVGOut;
 
-protected:
-	std::ofstream* m_out;
-
+public:
+	std::string m_name;
 	const glm::mat4& m_model;
 	const glm::mat4& m_proj;
 	glm::i32vec4 m_viewport;
@@ -176,12 +174,84 @@ protected:
 
 	std::vector<float> m_opacities_animations;
 
+
+	bool m_isLayer;
+
+
+public:
+
+	/**
+	 * Object that allow the rendering/exporting in svg file
+	 * @param filename file name ended by .svg
+	 * @param model the modelview matrix
+	 * @param proj the projection matrix
+	 */
+	SvgGroup(const std::string& name, const glm::mat4& model, const glm::mat4& proj);
+
+	/**
+	 * Object that allow the rendering/exporting in svg file
+	 * no file parameter for use in animateSVG
+	 * @param model the modelview matrix
+	 * @param proj the projection matrix
+	 */
+	//SvgGroup(const glm::mat4& model, const glm::mat4& proj);
+
+	/**
+	 * destructor
+	 * flush and close the file
+	 */
+	~SvgGroup();
+
+	void setColor(const Geom::Vec3f& col);
+
+	void setWidth(float w);
+
+
+	void beginPoints();
+	void endPoints();
+	void addPoint(const Geom::Vec3f& P);
+	void addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C);
+
+
+	void beginLines();
+	void endLines();
+	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2);
+	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C);
+
+
+	void beginStrings(float scalefactor = 1.0f);
+	void endStrings();
+	void addString(const Geom::Vec3f& P, const std::string& str);
+	void addString(const Geom::Vec3f& P, const Geom::Vec3f& Q, const std::string& str);
+	void addString(const Geom::Vec3f& P, const std::string& str, const Geom::Vec3f& C);
+
+
+	void sortSimpleDepth( std::vector<DepthSort>& vds);
+
+	void addOpacityAnimation(float val) { m_opacities_animations.push_back(val);}
+	void clearpacityAnimation()  { m_opacities_animations.clear();}
+
+	void setToLayer() { m_isLayer = true; }
+
+	//static void animateSVG(const std::string& filename, const std::vector<SVGOut*>& outs, float timestep);
+};
+
+
+class SVGOut
+{
+public:
+	std::ofstream* m_out;
+
+	const glm::mat4& m_model;
+	const glm::mat4& m_proj;
+	glm::i32vec4 m_viewport;
+
+	std::vector<SvgGroup*> m_groups;
+
 	unsigned int m_bbX0;
 	unsigned int m_bbY0;
 	unsigned int m_bbX1;
 	unsigned int m_bbY1;
-
-
 
 protected:
 	void computeBB(unsigned int& a, unsigned int& b, unsigned int& c, unsigned& d);
@@ -204,44 +274,13 @@ public:
 	 */
 	SVGOut(const glm::mat4& model, const glm::mat4& proj);
 
-	/**
-	 * destructor
-	 * flush and close the file
-	 */
 	~SVGOut();
 
-	void setColor(const Geom::Vec3f& col);
+	void addGroup(SvgGroup* group) { m_groups.push_back(group); }
 
-	void setWidth(float w);
-
-	void closeFile();
-
-	void beginPoints();
-	void endPoints();
-	void addPoint(const Geom::Vec3f& P);
-	void addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C);
-
-
-	void beginLines();
-	void endLines();
-	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2);
-	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C);
-
-
-	void beginStrings(float scalefactor = 1.0f);
-	void endStrings();
-	void addString(const Geom::Vec3f& P, const std::string& str);
-	void addString(const Geom::Vec3f& P, const Geom::Vec3f& Q, const std::string& str);
-	void addString(const Geom::Vec3f& P, const std::string& str, const Geom::Vec3f& C);
-
-	void sortSimpleDepth( std::vector<DepthSort>& vds);
-
-	void addOpacityAnimation(float val) { m_opacities_animations.push_back(val);}
-	void clearpacityAnimation()  { m_opacities_animations.clear();}
-
-	static void animateSVG(const std::string& filename, const std::vector<SVGOut*>& outs, float timestep);
-
+	void write();
 };
+
 
 class AnimatedSVGOut
 {

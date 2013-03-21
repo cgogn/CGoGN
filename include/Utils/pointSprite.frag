@@ -4,15 +4,16 @@ uniform mat4 ProjectionMatrix;
 uniform vec3 lightPos;
 uniform vec3 ambiant;
 uniform float size;
+
 #ifdef WITH_PLANE
-	uniform vec3 eyePos;
-	VARYING_FRAG vec3 shiftedEye;
+uniform vec3 eyePos;
+VARYING_FRAG vec3 shiftedEye;
 #endif
 
 #ifdef WITH_COLOR_PER_VERTEX 
-	VARYING_FRAG vec3 colorsprite;
+VARYING_FRAG vec4 colorsprite;
 #else
-	uniform vec3 colorsprite;
+uniform vec4 colorsprite;
 #endif
 
 VARYING_FRAG vec2 spriteCoord;
@@ -43,7 +44,6 @@ void main(void)
 	vec3 frag_position_eye = ray_direction * t ;
 #endif	
 
-
 	vec4 pos = ProjectionMatrix * vec4(frag_position_eye, 1.0);
 	gl_FragDepth = (pos.z / pos.w + 1.0) / 2.0;
 
@@ -51,6 +51,8 @@ void main(void)
 	vec3 L = normalize (lightPos - frag_position_eye);
 	float lambertTerm = dot(N,L);
 	
-	gl_FragColor = vec4(colorsprite*lambertTerm + ambiant ,1.0);
+	vec4 result = colorsprite*lambertTerm;
+	result.xyz += ambiant;
 
+	gl_FragColor = result;
 }

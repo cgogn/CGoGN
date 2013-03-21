@@ -235,6 +235,16 @@ void MyQT::operation(int x)
 			std::cout << "nb darts after = " << myMap.getNbDarts() << std::endl;
 		}
 		break;
+	case 11 :
+		CGoGNout <<"unsew volumes"<<CGoGNendl;
+		if (m_selected != NIL)
+		{
+			myMap.unsewVolumes(m_selected);
+			dm.markAll();
+			m_selected = NIL;
+			updateMap();
+		}
+		break;
 	default:
 		break;
 	}

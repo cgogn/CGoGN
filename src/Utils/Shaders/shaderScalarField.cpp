@@ -33,12 +33,11 @@ namespace Utils
 #include "shaderScalarField.vert"
 #include "shaderScalarField.frag"
 
-ShaderScalarField::ShaderScalarField()
+ShaderScalarField::ShaderScalarField() :
+	m_minValue(0.0f),
+	m_maxValue(0.0f),
+	m_expansion(0)
 {
-	m_nameVS = "ShaderColorPerVertex_vs";
-	m_nameFS = "ShaderColorPerVertex_fs";
-	m_nameGS = "ShaderColorPerVertex_gs";
-
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
@@ -46,6 +45,28 @@ ShaderScalarField::ShaderScalarField()
 	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+
+	// get and fill uniforms
+	getLocations();
+	sendParams();
+}
+
+void ShaderScalarField::getLocations()
+{
+	bind();
+	*m_uniform_minValue = glGetUniformLocation(this->program_handler(), "minValue");
+	*m_uniform_maxValue = glGetUniformLocation(this->program_handler(), "maxValue");
+	*m_uniform_expansion = glGetUniformLocation(this->program_handler(), "expansion");
+	unbind();
+}
+
+void ShaderScalarField::sendParams()
+{
+	bind();
+	glUniform1f(*m_uniform_minValue, m_minValue);
+	glUniform1f(*m_uniform_maxValue, m_maxValue);
+	glUniform1i(*m_uniform_expansion, m_expansion);
+	unbind();
 }
 
 unsigned int ShaderScalarField::setAttributePosition(VBO* vbo)
@@ -66,8 +87,35 @@ unsigned int ShaderScalarField::setAttributeScalar(VBO* vbo)
 	return id;
 }
 
+void ShaderScalarField::setMinValue(float f)
+{
+	m_minValue = f;
+	bind();
+	glUniform1f(*m_uniform_minValue, f);
+	unbind();
+}
+
+void ShaderScalarField::setMaxValue(float f)
+{
+	m_maxValue = f;
+	bind();
+	glUniform1f(*m_uniform_maxValue, f);
+	unbind();
+}
+
+void ShaderScalarField::setExpansion(int f)
+{
+	m_expansion = f;
+	bind();
+	glUniform1i(*m_uniform_expansion, f);
+	unbind();
+}
+
 void ShaderScalarField::restoreUniformsAttribs()
 {
+	getLocations();
+	sendParams();
+
 	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexScalar", m_vboScal);
