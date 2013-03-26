@@ -2533,10 +2533,15 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	assert(m_quadricHF.isValid() | !"EdgeSelector_Lightfield<PFP>::computeEdgeInfo: quadricHF is not valid") ;
 	Utils::QuadricHF<REAL> quadHF = m_quadricHF[d] ;
 
+	assert(m_avgColor.isValid()) ;
+	VEC3 avgColDiff = m_avgColor[d] ;
+	avgColDiff -= m_avgColor[dd] ;
+
 	//std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << " vs " << quadHF(newHF) << std::endl ;
 	// sum of QEM metric and frame orientation difference
 	const REAL& errG = quadGeom(newPos) ; // geom
-	const REAL& errAngle = alpha / M_PI ; // frame
+	//const REAL& errAngle = alpha / M_PI ; // frame
+	const REAL& errAngle = (alpha / M_PI) * avgColDiff.norm2() / 3. ; // avg color times covering area
 	const REAL& errLF = quadHF(newHF) ; // function coefficients
 
 	// Check if errated values appear
@@ -2544,7 +2549,8 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 		einfo.valid = false ;
 	else
 	{
-		einfo.it = edges.insert(std::make_pair(std::max(errG + errAngle + errLF, REAL(0)), d)) ;
+		einfo.it = edges.insert(std::make_pair(std::max(errG, REAL(0)) + 10*(errAngle + errLF), d)) ;
+		//einfo.it = edges.insert(std::make_pair(errG+errLF+errAngle, d)) ;
 		einfo.valid = true ;
 	}
 }

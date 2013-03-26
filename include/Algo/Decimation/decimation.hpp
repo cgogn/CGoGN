@@ -95,6 +95,13 @@ void decimate(
 			approximators.push_back(new Approximator_ColorQEMext<PFP>(map, attribs)) ;
 		}
 		break;
+		case A_GeomColorOpt :
+		{
+			// pos + col
+			assert(attribs.size() >= 2 || !"Decimate: A_GeomColorOpt --> not enough attribs provided") ;
+			approximators.push_back(new Approximator_GeomColOpt<PFP>(map, attribs)) ;
+		}
+		break ;
 		case A_hQEM :
 			// pos
 			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs)) ;
@@ -190,23 +197,29 @@ void decimate(
 		case S_hLightfield :
 			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
 			break ;
-		case S_hLightfieldExp :
-			selector = new HalfEdgeSelector_LightfieldExp<PFP>(map, position, approximators) ;
+		case S_hLightfieldAvgColor :
+			selector = new HalfEdgeSelector_LightfieldAvgColor<PFP>(map, position, approximators) ;
 			break ;
 		case S_hLightfieldKCL :
 			selector = new HalfEdgeSelector_LightfieldKCL<PFP>(map, position, approximators) ;
 			break ;
 		case S_hColorExperimental:
-			selector = new HalfEdgeSelector_ColorExperimental<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_ColorExperimental<PFP>(map, position, approximators) ;
+			break ;
+		case S_hColorGradient:
+			selector = new HalfEdgeSelector_ColorGradient<PFP>(map, position, approximators) ;
 			break ;
 		case S_hLFexperimental:
-			selector = new HalfEdgeSelector_LFexperimental<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_LFexperimental<PFP>(map, position, approximators) ;
+			break ;
+		case S_hLFgradient:
+			selector = new HalfEdgeSelector_LFgradient<PFP>(map, position, approximators) ;
 			break ;
 		case S_hColorPerFace:
-			selector = new HalfEdgeSelector_ColorPerFace<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_ColorPerFace<PFP>(map, position, approximators) ;
 			break ;
 		case S_hLFperFace:
-			selector = new HalfEdgeSelector_LFperFace<PFP>(map, position, approximators, selected) ;
+			selector = new HalfEdgeSelector_LFperFace<PFP>(map, position, approximators) ;
 			break ;
 	}
 

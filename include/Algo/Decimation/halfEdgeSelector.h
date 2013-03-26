@@ -166,16 +166,18 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
-			(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
 				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
 		}
 	}
 } ;
@@ -259,16 +261,18 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
-			(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
 				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
 		}
 	}
 } ;
@@ -277,7 +281,7 @@ public:
  *                                 HALF-EDGE LIGHTFIELD METRIC experimental                                      *
  *****************************************************************************************************************/
 template <typename PFP>
-class HalfEdgeSelector_LightfieldExp : public EdgeSelector<PFP>
+class HalfEdgeSelector_LightfieldAvgColor : public EdgeSelector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -317,7 +321,7 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	HalfEdgeSelector_LightfieldExp(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	HalfEdgeSelector_LightfieldAvgColor(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		EdgeSelector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
@@ -331,12 +335,12 @@ public:
 		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
 		assert(m_avgColor.isValid()) ;
 	}
-	~HalfEdgeSelector_LightfieldExp()
+	~HalfEdgeSelector_LightfieldAvgColor()
 	{
 		this->m_map.removeAttribute(m_quadricGeom) ;
 		this->m_map.removeAttribute(halfEdgeInfo) ;
 	}
-	SelectorType getType() { return S_hLightfieldExp ; }
+	SelectorType getType() { return S_hLightfieldAvgColor ; }
 	bool init() ;
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
@@ -354,16 +358,18 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
-			(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
 				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
 		}
 	}
 } ;
@@ -460,17 +466,18 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
-			(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
-				(*errors)[dd] = halfEdgeInfo[dd].it->first ;
+				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
-			//m_avgColor[d] = VEC3(m_visualImportance[d]/6.,m_visualImportance[d]/6.,m_visualImportance[d]/6.) ;
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
 		}
 	}
 } ;
@@ -513,7 +520,7 @@ private:
 	//void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 	void recomputeQuadric(const Dart d) ;
 
-	typename PFP::REAL computeExperimentalColorError(const Dart& v0, const Dart& v1) ;
+	typename PFP::VEC3 computeExperimentalColorError(const Dart& v0, const Dart& v1) ;
 
 
 public:
@@ -550,19 +557,113 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
-			(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
 				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
 		}
 	}
 } ;
+
+/*****************************************************************************************************************
+ *                                 HALF-EDGE COLOR GRADIENT ERR                                                  *
+ *****************************************************************************************************************/
+template <typename PFP>
+class HalfEdgeSelector_ColorGradient : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "ColorExperimentalHalfEdgeInfo" ; }
+	} QEMextColorHalfEdgeInfo ;
+	typedef NoMathIOAttribute<QEMextColorHalfEdgeInfo> HalfEdgeInfo ;
+
+	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
+	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
+
+	VertexAttribute<VEC3> m_pos, m_color ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_color, m_attrindex_color ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3,DART>* > m_approx ;
+
+	std::multimap<float,Dart> halfEdges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initHalfEdgeInfo(Dart d) ;
+	void updateHalfEdgeInfo(Dart d) ;
+	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
+	//void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+	void recomputeQuadric(const Dart d) ;
+
+	typename PFP::VEC3 computeGradientColorError(const Dart& v0, const Dart& v1) ;
+
+
+public:
+	HalfEdgeSelector_ColorGradient(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		EdgeSelector<PFP>(m, pos, approx),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_color(-1),
+		m_attrindex_color(-1)
+	{
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+	}
+	~HalfEdgeSelector_ColorGradient()
+	{
+		this->m_map.removeAttribute(m_quadric) ;
+		this->m_map.removeAttribute(halfEdgeInfo) ;
+	}
+	SelectorType getType() { return S_hColorGradient ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
+		if (!errors->isValid())
+			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
+		assert(halfEdgeInfo.isValid()) ;
+
+		TraversorE<typename PFP::MAP> travE(this->m_map) ;
+		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
+		{
+			Dart dd = this->m_map.phi2(d) ;
+			if (halfEdgeInfo[d].valid)
+			{
+				(*errors)[d] = halfEdgeInfo[d].it->first ;
+			}
+			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
+			{
+				(*errors)[d] = halfEdgeInfo[dd].it->first ;
+			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
+		}
+	}
+} ;
+
 
 /*****************************************************************************************************************
  *                                 HALF-EDGE LF EXPERIMENTAL METRIC                                              *
@@ -653,19 +754,127 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
-			(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
 				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
 		}
 	}
 } ;
+
+/*****************************************************************************************************************
+ *                                 HALF-EDGE LF EXPERIMENTAL METRIC                                              *
+ *****************************************************************************************************************/
+template <typename PFP>
+class HalfEdgeSelector_LFgradient : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "LightfieldGradHalfEdgeInfo" ; }
+	} LightfieldHalfEdgeInfo ;
+	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
+
+	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
+
+	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
+
+	VertexAttribute<REAL> m_visualImportance ;
+	VertexAttribute<VEC3> m_avgColor ;
+
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_FT, m_attrindex_FT ;
+	int m_approxindex_FB, m_attrindex_FB ;
+	int m_approxindex_FN, m_attrindex_FN ;
+	std::vector<unsigned int> m_approxindex_HF, m_attrindex_HF ;
+	unsigned int m_K ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3,DART>* > m_approx ;
+
+	std::multimap<float,Dart> halfEdges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initHalfEdgeInfo(Dart d) ;
+	void updateHalfEdgeInfo(Dart d) ;
+	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d) ;
+
+	REAL computeLightfieldError(const Dart& v0, const Dart& v1) ;
+	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) ;
+
+public:
+	HalfEdgeSelector_LFgradient(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		EdgeSelector<PFP>(m, pos, approx),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_FT(-1),
+		m_attrindex_FT(-1),
+		m_approxindex_FB(-1),
+		m_attrindex_FB(-1),
+		m_approxindex_FN(-1),
+		m_attrindex_FN(-1),
+		m_K(0)
+	{
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+		assert(m_avgColor.isValid()) ;
+	}
+	~HalfEdgeSelector_LFgradient()
+	{
+		this->m_map.removeAttribute(m_quadric) ;
+		this->m_map.removeAttribute(halfEdgeInfo) ;
+	}
+
+	SelectorType getType() { return S_hLFexperimental ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		assert(errors != NULL || !"HalfEdgeSelector_LFgradient::getEdgeErrors requires non null vertexattribute argument") ;
+		if (!errors->isValid())
+			std::cerr << "HalfEdgeSelector_LFgradient::getEdgeErrors requires valid edgeattribute argument" << std::endl ;
+		assert(halfEdgeInfo.isValid()) ;
+
+		TraversorE<typename PFP::MAP> travE(this->m_map) ;
+		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
+		{
+			Dart dd = this->m_map.phi2(d) ;
+			if (halfEdgeInfo[d].valid)
+			{
+				(*errors)[d] = halfEdgeInfo[d].it->first ;
+			}
+			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
+			{
+				(*errors)[d] = halfEdgeInfo[dd].it->first ;
+			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
+		}
+	}
+} ;
+
 
 /*****************************************************************************************************************
  *                                 HALF-EDGE COLOR PER FACE                                                      *
@@ -690,9 +899,9 @@ private:
 	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
 
-	VertexAttribute<VEC3> m_pos, m_color ;
+	VertexAttribute<VEC3> m_pos ;
+	FaceAttribute<VEC3> m_facecolor ;
 	int m_approxindex_pos, m_attrindex_pos ;
-	int m_approxindex_color, m_attrindex_color ;
 
 	std::vector<Approximator<PFP, typename PFP::VEC3,DART>* > m_approx ;
 
@@ -705,16 +914,14 @@ private:
 	//void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 	void recomputeQuadric(const Dart d) ;
 
-	typename PFP::REAL computeExperimentalColorError(const Dart& v0, const Dart& v1) ;
+	typename PFP::REAL computeFaceColorError(const Dart& v0, const Dart& v1) ;
 
 
 public:
-	HalfEdgeSelector_ColorPerFace(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
-		EdgeSelector<PFP>(m, pos, approx, select),
+	HalfEdgeSelector_ColorPerFace(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		EdgeSelector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
-		m_attrindex_pos(-1),
-		m_approxindex_color(-1),
-		m_attrindex_color(-1)
+		m_attrindex_pos(-1)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
 		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
@@ -742,16 +949,18 @@ public:
 		TraversorE<typename PFP::MAP> travE(this->m_map) ;
 		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
 		{
-			(*errors)[d] = -1 ;
+			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[d].valid)
 			{
 				(*errors)[d] = halfEdgeInfo[d].it->first ;
 			}
-			Dart dd = this->m_map.phi2(d) ;
 			if (halfEdgeInfo[dd].valid && halfEdgeInfo[dd].it->first < (*errors)[d])
 			{
 				(*errors)[d] = halfEdgeInfo[dd].it->first ;
 			}
+			if (!(halfEdgeInfo[d].valid || halfEdgeInfo[dd].valid))
+				(*errors)[d] = -1 ;
+
 		}
 	}
 } ;
@@ -804,8 +1013,8 @@ private:
 	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) ;
 
 public:
-	HalfEdgeSelector_LFperFace(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
-		EdgeSelector<PFP>(m, pos, approx, select),
+	HalfEdgeSelector_LFperFace(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		EdgeSelector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_FT(-1),

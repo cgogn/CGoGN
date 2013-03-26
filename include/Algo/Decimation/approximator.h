@@ -41,19 +41,20 @@ namespace Decimation
 
 enum ApproximatorType
 {
-	A_QEM,
-	A_MidEdge,
-	A_CornerCutting,
-	A_TangentPredict1,
-	A_TangentPredict2,
-	A_NormalArea,
-	A_ColorNaive,
-	A_ColorQEMext,
-	A_Lightfield,
+	A_QEM = 0,
+	A_MidEdge = 1,
+	A_CornerCutting = 2,
+	A_TangentPredict1 = 3,
+	A_TangentPredict2 = 4,
+	A_NormalArea = 5,
+	A_ColorNaive = 6,
+	A_ColorQEMext = 7,
+	A_GeomColorOpt = 8,
+	A_Lightfield = 9,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	A_hHalfCollapse,
-	A_hQEM,
-	A_hLightfieldHalf
+	A_hHalfCollapse = 10,
+	A_hQEM = 11,
+	A_hLightfieldHalf = 12
 } ;
 
 template <typename PFP>
@@ -164,13 +165,17 @@ public:
 	void saveApprox(Dart d)
 	{
 		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+		{
 			m_app[i] = m_approx[i][d] ;
+		}
 	}
 
 	void affectApprox(Dart d)
 	{
 		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+		{
 			m_attrV[i]->operator[](d) = m_app[i] ;
+		}
 	}
 
 	const T& getApprox(Dart d, unsigned int index = 0) const

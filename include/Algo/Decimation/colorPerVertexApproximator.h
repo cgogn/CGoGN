@@ -121,44 +121,43 @@ public:
 	void approximate(Dart d) ;
 } ;
 
-/*
+
 template <typename PFP>
-class Approximator_ColorQEMextHalfCollapse : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_GeomColOpt : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef Geom::Vector<6,REAL> VEC6 ;
 
 protected:
-	VertexAttribute<Utils::QuadricNd<REAL,6> > m_quadric ;
+	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
 	VertexAttribute<VEC3> *m_position ;
 	VertexAttribute<VEC3> *m_color ;
 
 public:
-	Approximator_ColorQEMextHalfCollapse(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, attr, pred)
+	Approximator_GeomColOpt(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
 	{
-		assert(attr.size() > 1 || !"Approximator_ColorQEMext_HalfCollapse: there are not sufficient attributes provided") ;
+		assert(attr.size() > 1 || !"Approximator_GeomColOpt: there are not sufficient attributes provided") ;
 
 		m_position = this->m_attrV[0] ;
 		m_color = this->m_attrV[1] ;
 	}
 
-	~Approximator_ColorQEMextHalfCollapse()
+	~Approximator_GeomColOpt()
 	{}
 
 	ApproximatorType getType() const
 	{
-		return A_ColorQEMextHalfCollapse ;
+		return A_GeomColorOpt ;
 	}
 
 	bool init() ;
 
 	void approximate(Dart d) ;
 } ;
-*/
+
 
 } //namespace Decimation
 

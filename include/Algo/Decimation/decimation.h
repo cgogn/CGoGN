@@ -62,7 +62,7 @@ void decimate(
 	typename PFP::MAP& map,
 	SelectorType s,
 	ApproximatorType a,
-	std::vector<VertexAttribute<typename PFP::VEC3> *>& position,
+	std::vector<VertexAttribute<typename PFP::VEC3> *>& attribs,
 	unsigned int nbWantedVertices,
 	EdgeAttribute<typename PFP::REAL> *edgeErrors = NULL,
 	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL

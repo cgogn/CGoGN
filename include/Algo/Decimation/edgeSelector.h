@@ -701,7 +701,7 @@ private:
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 
-	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN ;
+	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN, m_avgColor ;
 	std::vector<VertexAttribute<VEC3> > m_HF ;
 	int m_approxindex_pos, m_attrindex_pos ;
 	int m_approxindex_FN, m_attrindex_FN ;
@@ -733,6 +733,8 @@ public:
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 		m_quadricGeom = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
 		m_quadricHF = m.template getAttribute<Utils::QuadricHF<REAL>, EDGE>("HFquadric") ;
+		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+		assert(m_avgColor.isValid()) ;
 	}
 	~EdgeSelector_Lightfield()
 	{

@@ -165,6 +165,102 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 	}
 }
 
+/************************************************************************************
+ *                    GEOM + COLOR OPTIMIZED ERROR METRIC                           *
+ ************************************************************************************/
+template <typename PFP>
+bool Approximator_GeomColOpt<PFP>::init()
+{
+	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+	// Does not require to be valid (if it is not, altenatives will be used).
+
+	if(this->m_predictor)
+	{
+		return false ;
+	}
+
+	return m_position->isValid() && m_color->isValid() ;
+}
+
+template <typename PFP>
+void Approximator_GeomColOpt<PFP>::approximate(Dart d)
+{
+	MAP& m = this->m_map ;
+
+	// get some darts
+	Dart dd = m.phi2(d) ;
+
+	// POSITION
+	Utils::Quadric<REAL> q1, q2 ;
+	if(!m_quadric.isValid()) // if the selector is not QEM, compute local error quadrics
+	{
+		// compute the error quadric associated to v1
+		Dart it = d ;
+		do
+		{
+			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			q1 += q ;
+			it = m.phi2_1(it) ;
+		} while(it != d) ;
+
+		// compute the error quadric associated to v2
+		it = dd ;
+		do
+		{
+			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			q2 += q ;
+			it = m.phi2_1(it) ;
+		} while(it != dd) ;
+	}
+	else // if the selector is QEM, use the error quadrics computed by the selector
+	{
+		q1 = m_quadric[d] ;
+		q2 = m_quadric[dd] ;
+	}
+
+	Utils::Quadric<REAL> quad ;
+	quad += q1 ;	// compute the sum of the
+	quad += q2 ;	// two vertices quadrics
+
+	VEC3 res ;
+	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
+
+	const VEC3& p0 = this->m_attrV[0]->operator[](d) ;    // let the new vertex lie
+	const VEC3& p1 = this->m_attrV[0]->operator[](dd) ;   // on either one of the two endpoints
+
+	if(!opt)
+	{
+		VEC3 p12 = (p0 + p1) / 2.0f ;   // or the middle of the edge
+		REAL e1 = quad(p0) ;
+		REAL e2 = quad(p1) ;
+		REAL e12 = quad(p12) ;
+		REAL minerr = std::min(std::min(e1, e2), e12) ; // consider only the one for
+		if(minerr == e12)		this->m_approx[0][d] = p12 ;             // which the error is minimal
+		else if(minerr == e1)	this->m_approx[0][d] = p0 ;
+		else					this->m_approx[0][d] = p1 ;
+	}
+	// copy res into m_approx
+	else
+	{
+		this->m_approx[0][d] = res ;
+	}
+	const VEC3& p = this->m_approx[0][d] ;
+
+	// COLOR
+	const VEC3& c1 = this->m_attrV[1]->operator[](d) ;    // let the new vertex lie
+	const VEC3& c2 = this->m_attrV[1]->operator[](dd) ;   // on either one of the two endpoints
+
+	VEC3 e = p1 - p0 ;
+	VEC3 e1 = p - p0 ;
+	const REAL normE1 = e1.normalize() ;
+	const REAL normE = e.normalize() ;
+	REAL ratio = (e * e1)*normE1/normE ;
+	ratio = std::max(REAL(0),std::min(REAL(1),ratio)) ;
+
+	this->m_approx[1][d] = ratio*c1 + (1-ratio)*c2 ;
+}
+
+
 } //namespace Decimation
 
 }
