@@ -137,7 +137,12 @@ template <typename PFP>
 bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
 
 
+template <typename PFP>
+Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
 
+
+template <typename PFP>
+Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, unsigned int n, bool withBoundary, float radius, float height);
 
 
 

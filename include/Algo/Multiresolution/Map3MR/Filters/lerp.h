@@ -103,12 +103,7 @@ public:
 
 			m_map.incCurrentLevel() ;
 			Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-			if(m_position[midV] != typename PFP::VEC3(0.0f,0.0f,0.0f))
-			{
-				std::cout << "position[midV] = " << m_position[midV] << std::endl;
-			}
-			else
-				m_position[midV] += vc + ec + fc;
+			m_position[midV] += vc + ec + fc;
 			m_map.decCurrentLevel() ;
 		}
 
@@ -135,13 +130,7 @@ public:
 
 			m_map.incCurrentLevel() ;
 			Dart midF = m_map.phi1(m_map.phi1(d));
-			if(m_position[midF] != typename PFP::VEC3(0.0f,0.0f,0.0f))
-			{
-				std::cout << "position[midF] = " << m_position[midF] << std::endl;
-				//m_position[midF] = vf + ef ;
-			}
-			else
-				m_position[midF] += vf + ef ;
+			m_position[midF] += vf + ef ;
 			m_map.decCurrentLevel() ;
 		}
 
@@ -152,13 +141,7 @@ public:
 
 			m_map.incCurrentLevel() ;
 			Dart midE = m_map.phi1(d) ;
-			if(m_position[midE] != typename PFP::VEC3(0.0f,0.0f,0.0f))
-			{
-				std::cout << "position[midE] = " << m_position[midE] << std::endl;
-				//m_position[midE] = ve;
-			}
-			else
-				m_position[midE] += ve;
+			m_position[midE] += ve;
 			m_map.decCurrentLevel() ;
 		}
 	}

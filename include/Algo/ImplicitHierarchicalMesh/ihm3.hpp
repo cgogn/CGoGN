@@ -80,7 +80,7 @@ inline void ImplicitHierarchicalMap3::update_topo_shortcuts()
 
 
 /***************************************************
- *          			 	    MAP TRAVERSAL         		  		         *
+ *     		 	    MAP TRAVERSAL         		   *
  ***************************************************/
 
 inline Dart ImplicitHierarchicalMap3::newDart()

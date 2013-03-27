@@ -430,6 +430,196 @@ public:
 	}
 } ;
 
+
+
+
+
+
+
+
+
+
+
+
+
+//template <typename PFP>
+//class SHW04OddSynthesisFilter : public Algo::MR::Filter
+//{
+//protected:
+//	typename PFP::MAP& m_map;
+//	VertexAttribute<typename PFP::VEC3>& m_position;
+//
+//public:
+//	SHW04OddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+//	{}
+//
+//	void operator() ()
+//	{
+//		TraversorW<typename PFP::MAP> travW(m_map) ;
+//		for (Dart d = travW.begin(); d != travW.end(); d = travW.next())
+//		{
+//			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
+//			{
+//				typename PFP::VEC3 vc = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+//
+//				unsigned int count = 0;
+//				typename PFP::VEC3 ec(0.0);
+//				Traversor3WE<typename PFP::MAP> travWE(m_map, d);
+//				for (Dart dit = travWE.begin(); dit != travWE.end(); dit = travWE.next())
+//				{
+//					m_map.incCurrentLevel();
+//					ec += m_position[m_map.phi1(dit)];
+//					m_map.decCurrentLevel();
+//					++count;
+//				}
+//				ec /= count;
+//				ec *= 3;
+//
+//				count = 0;
+//				typename PFP::VEC3 fc(0.0);
+//				Traversor3WF<typename PFP::MAP> travWF(m_map, d);
+//				for (Dart dit = travWF.begin(); dit != travWF.end(); dit = travWF.next())
+//				{
+//					m_map.incCurrentLevel();
+//					fc += m_position[m_map.phi1(m_map.phi1(dit))];
+//					m_map.decCurrentLevel();
+//					++count;
+//				}
+//				fc /= count;
+//				fc *= 3;
+//
+//				m_map.incCurrentLevel() ;
+//				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
+//				m_position[midV] += vc + ec + fc;
+//				m_map.decCurrentLevel() ;
+//			}
+//		}
+//
+//		TraversorE<typename PFP::MAP> trav(m_map) ;
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		{
+//			if(m_map.isBoundaryEdge(d))
+//			{
+//				Dart db = m_map.findBoundaryFaceOfEdge(d);
+//				typename PFP::VEC3 p = loopOddVertex<PFP>(m_map, m_position, db) ;
+//
+//				m_map.incCurrentLevel() ;
+//
+//				Dart oddV = m_map.phi2(db) ;
+//				m_position[oddV] += p ;
+//
+//				m_map.decCurrentLevel() ;
+//			}
+//			else
+//			{
+//				typename PFP::VEC3 ve = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
+//
+//				m_map.incCurrentLevel() ;
+//				Dart midV = m_map.phi1(d) ;
+//				m_position[midV] += ve;
+//				m_map.decCurrentLevel() ;
+//			}
+//		}
+//	}
+//};
+//
+//template <typename PFP>
+//class LoopNormalisationSynthesisFilter : public Algo::MR::Filter
+//{
+//protected:
+//	typename PFP::MAP& m_map ;
+//	VertexAttribute<typename PFP::VEC3>& m_position ;
+//
+//public:
+//	LoopNormalisationSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+//	{}
+//
+//	void operator() ()
+//	{
+//		TraversorV<typename PFP::MAP> trav(m_map) ;
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		{
+//			if(m_map.isBoundaryVertex(d))
+//			{
+//				Dart db = m_map.findBoundaryFaceOfVertex(d);
+//
+//				unsigned int degree = m_map.vertexDegreeOnBoundary(db) ;
+//				float n = 3.0/8.0 + 1.0/4.0 * cos(2.0 * M_PI / degree) ;
+//				n = 8.0/5.0 * (n * n) ;
+//
+//				m_position[db] *= n ;
+//			}
+//		}
+//	}
+//} ;
+//
+//template <typename PFP>
+//class LoopEvenSynthesisFilter : public Algo::MR::Filter
+//{
+//protected:
+//	typename PFP::MAP& m_map ;
+//	VertexAttribute<typename PFP::VEC3>& m_position ;
+//
+//public:
+//	LoopEvenSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+//	{}
+//
+//	void operator() ()
+//	{
+//		TraversorV<typename PFP::MAP> trav(m_map) ;
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		{
+//			if(m_map.isBoundaryVertex(d))
+//			{
+//				Dart db = m_map.findBoundaryFaceOfVertex(d);
+//				typename PFP::VEC3 p = loopEvenVertex<PFP>(m_map, m_position, db) ;
+//				m_position[db] += p ;
+//			}
+//		}
+//	}
+//} ;
+//
+//
+//template <typename PFP>
+//class SHW04NormalisationSynthesisFilter : public Algo::MR::Filter
+//{
+//protected:
+//	typename PFP::MAP& m_map ;
+//	VertexAttribute<typename PFP::VEC3>& m_position ;
+//
+//public:
+//	SHW04NormalisationSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+//	{}
+//
+//	void operator() ()
+//	{
+//		m_map.incCurrentLevel() ;
+//		TraversorV<typename PFP::MAP> trav(m_map) ;
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		{
+//			if(!m_map.isBoundaryVertex(d))
+//			{
+//				typename PFP::VEC3 p = typename PFP::VEC3(0);
+//				unsigned int degree = 0;
+//
+//				Traversor3VW<typename PFP::MAP> travVW(m_map, d);
+//				for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
+//				{
+//					p += SHW04Vertex<PFP>(m_map, m_position, dit);
+//					++degree;
+//				}
+//
+//				p /= degree;
+//
+//				m_position[d] = p ;
+//			}
+//		}
+//		m_map.decCurrentLevel() ;
+//	}
+//} ;
+
+
+
 } // namespace Filters
 
 } // namespace Primal
