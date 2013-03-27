@@ -79,8 +79,6 @@ void Viewer::cb_initGL()
 {
 	Utils::GLSLShader::setCurrentOGLVersion(2) ;
 
-	setFocal(5.0f) ;
-
 	m_render = new Algo::Render::GL2::MapRender() ;
 	m_topoRender = new Algo::Render::GL2::TopoRender() ;
 
@@ -110,7 +108,7 @@ void Viewer::cb_initGL()
 
 	m_simpleColorShader = new Utils::ShaderSimpleColor() ;
 	m_simpleColorShader->setAttributePosition(m_positionVBO) ;
-	Geom::Vec4f c(0.1f, 0.1f, 0.1f, 1.0f) ;
+	Geom::Vec4f c(0.0f, 0.0f, 0.0f, 1.0f) ;
 	m_simpleColorShader->setColor(c) ;
 
 	m_pointSprite = new Utils::PointSprite() ;
@@ -295,6 +293,17 @@ void Viewer::slot_drawEdges(bool b)
 void Viewer::slot_drawFaces(bool b)
 {
 	m_drawFaces = b ;
+	if (b)
+	{
+		Geom::Vec4f c(0.0f, 0.0f, 0.0f, 1.0f) ;
+		m_simpleColorShader->setColor(c) ;
+	}
+	else
+	{
+		Geom::Vec4f c(0.9f, 0.9f, 0.1f, 1.0f) ;
+		m_simpleColorShader->setColor(c) ;
+	}
+
 	updateGL() ;
 }
 
