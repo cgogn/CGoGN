@@ -598,6 +598,87 @@ public:
 } ;
 
 /*****************************************************************************************************************
+ *                                  EDGE GEOMETRY+COLOR METRIC (using QEMml and Gradient norm)                   *
+ *****************************************************************************************************************/
+template <typename PFP>
+class EdgeSelector_GeomColOptGradient : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "GeomColOptGradEdgeInfo" ; }
+	} ColorNaiveedgeInfo ;
+	typedef NoMathIOAttribute<ColorNaiveedgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
+
+	VertexAttribute<VEC3> m_pos, m_color ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_color, m_attrindex_color ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3, EDGE>* > m_approx ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d) ;
+	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+	VEC3 computeHalfEdgeGradientColorError(const Dart& v0, const VEC3& p, const VEC3& c) ;
+
+public:
+	EdgeSelector_GeomColOptGradient(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+		EdgeSelector<PFP>(m, pos, approx),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_color(-1),
+		m_attrindex_color(-1)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+	}
+	~EdgeSelector_GeomColOptGradient()
+	{
+		this->m_map.removeAttribute(edgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
+	}
+	SelectorType getType() { return S_GeomColOptGrad ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
+		if (!errors->isValid())
+			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
+		assert(edgeInfo.isValid()) ;
+
+		TraversorE<typename PFP::MAP> travE(this->m_map) ;
+		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
+		{
+			(*errors)[d] = -1 ;
+			if (edgeInfo[d].valid)
+			{
+				(*errors)[d] = edgeInfo[d].it->first ;
+			}
+		}
+	}
+} ;
+
+/*****************************************************************************************************************
  *                                 QEM extended to color metric                                                  *
  *****************************************************************************************************************/
 template <typename PFP>

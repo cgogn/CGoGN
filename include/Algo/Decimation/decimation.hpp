@@ -221,6 +221,8 @@ void decimate(
 		case S_hLFperFace:
 			selector = new HalfEdgeSelector_LFperFace<PFP>(map, position, approximators) ;
 			break ;
+		case S_GeomColOptGrad:
+			selector = new EdgeSelector_GeomColOptGradient<PFP>(map, position, approximators) ;
 	}
 
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)

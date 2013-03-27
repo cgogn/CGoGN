@@ -51,6 +51,7 @@ enum SelectorType
 	S_ColorNaive = 9,
 	S_QEMextColor = 10,
 	S_Lightfield = 11,
+	S_GeomColOptGrad = 23,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	S_hQEMextColor = 12,
 	S_hQEMml = 13,
@@ -63,6 +64,7 @@ enum SelectorType
 	S_hLFgradient = 20,
 	S_hColorPerFace = 21,
 	S_hLFperFace = 22
+
 } ;
 
 template <typename PFP> class ApproximatorGen ;

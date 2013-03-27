@@ -2503,8 +2503,8 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 			const REAL colChangeE = fabs(c1[i]-c0[i]) * (ei ^ ej).norm() / REAL(2) ;
 
 			count[i] += displacementE + colChangeE ;
-			if (isnan(count[i]))
-				std::cerr << "nan" << std::endl ;
+			/*if (isnan(count[i]))
+				std::cerr << "nan" << std::endl ;*/
 		}
 	}
 

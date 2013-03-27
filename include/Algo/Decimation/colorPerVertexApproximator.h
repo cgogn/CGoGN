@@ -121,7 +121,6 @@ public:
 	void approximate(Dart d) ;
 } ;
 
-
 template <typename PFP>
 class Approximator_GeomColOpt : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {

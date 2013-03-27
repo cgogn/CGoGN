@@ -663,7 +663,6 @@ void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomput
     } while(dFront != dInit) ;
 }
 
-
 template <typename PFP>
 void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
@@ -984,7 +983,6 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
-
 
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::computeEdgeMatrix(Dart d)
@@ -1906,6 +1904,326 @@ void EdgeSelector_ColorNaive<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
+
+/************************************************************************************
+ *                         EDGESELECTOR GEOM+COL OPT GRADIENT                       *
+ ************************************************************************************/
+
+template <typename PFP>
+bool EdgeSelector_GeomColOptGradient<PFP>::init()
+{
+	typename PFP::MAP& m = this->m_map ;
+
+	// Verify availability of required approximators
+	unsigned int ok = 0 ;
+	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
+	{
+		bool saved = false ;
+		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
+		{
+			// constraint : 2 approximators in specific order
+			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
+			{
+				++ok ;
+				m_approxindex_pos = approxindex ;
+				m_attrindex_pos = attrindex ;
+				m_pos = this->m_position ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
+					saved = true ;
+				}
+			}
+			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "color")
+			{
+				++ok ;
+				m_approxindex_color = approxindex ;
+				m_attrindex_color = attrindex ;
+				m_color = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+				assert(m_color.isValid() || !"EdgeSelector_GeomColOptGradient: color attribute is not valid") ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
+					saved = true ;
+				}
+			}
+		}
+	}
+
+	if(ok != 2)
+		return false ;
+
+	TraversorV<MAP> travV(m);
+	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
+	{
+		Utils::Quadric<REAL> q ;	// create one quadric
+		m_quadric[dit] = q ;		// per vertex
+	}
+
+	// Compute quadric per vertex
+	TraversorF<MAP> travF(m) ;
+	for(Dart dit = travF.begin() ; dit != travF.end() ; dit = travF.next()) // init QEM quadrics
+	{
+		Dart d1 = m.phi1(dit) ;					// for each triangle,
+		Dart d_1 = m.phi_1(dit) ;					// initialize the quadric of the triangle
+		Utils::Quadric<REAL> q(this->m_position[dit], this->m_position[d1], this->m_position[d_1]) ;
+		m_quadric[dit] += q ;						// and add the contribution of
+		m_quadric[d1] += q ;						// this quadric to the ones
+		m_quadric[d_1] += q ;						// of the 3 incident vertices
+	}
+
+	TraversorE<MAP> travE(m);
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	{
+		initEdgeInfo(dit) ; // init the edges with their optimal position
+							// and insert them in the multimap according to their error
+	}
+
+	cur = edges.begin() ; // init the current edge to the first one
+
+	return true ;
+}
+
+template <typename PFP>
+bool EdgeSelector_GeomColOptGradient<PFP>::nextEdge(Dart& d)
+{
+	if(cur == edges.end() || edges.empty())
+		return false ;
+	d = (*cur).second ;
+	return true ;
+}
+
+template <typename PFP>
+void EdgeSelector_GeomColOptGradient<PFP>::updateBeforeCollapse(Dart d)
+{
+	typedef typename PFP::MAP MAP ;
+	MAP& m = this->m_map ;
+
+	const Dart& v0 = d ;
+	const Dart& v1 = m.phi2(d) ;
+
+	// remove all the edges that will disappear from the multimap
+	// namely : all edges adjacent to a vertex which is adjacent
+	// to either v0 or v1
+
+	// collect vertices (1-ring)
+	std::vector<Dart> vertices ;
+
+	CellMarker<VERTEX> cvm(m) ;
+	Traversor2VVaE<MAP> tv0(m,v0) ;
+	for (Dart v = tv0.begin() ; v != tv0.end() ; v = tv0.next())
+	{
+		if (!cvm.isMarked(v))
+		{
+			vertices.push_back(v) ;
+			cvm.mark(v) ;
+		}
+	}
+	Traversor2VVaE<MAP> tv1(m,v1) ;
+	for (Dart v = tv1.begin() ; v != tv1.end() ; v = tv1.next())
+	{
+		if (!cvm.isMarked(v))
+		{
+			vertices.push_back(v) ;
+			cvm.mark(v) ;
+		}
+	}
+
+	// apply to all adjacent edges (2-ring w/o border)
+	CellMarker<EDGE> cem(m) ;
+	for (std::vector<Dart>::const_iterator it = vertices.begin() ; it != vertices.end() ; ++it)
+	{
+		const Dart& v = *it ;
+		Traversor2VE<MAP> te(m,v) ;
+		for (Dart e = te.begin() ; e != te.end() ; e = te.next())
+		{
+			if (!cem.isMarked(e))
+			{
+				if(edgeInfo[e].valid)
+				{
+					edges.erase(edgeInfo[e].it) ;
+					edgeInfo[e].valid = false ;
+				}
+
+				cem.mark(e) ;
+			}
+		}
+	}
+}
+
+/**
+ * Update quadric of a vertex
+ * Discards quadrics of d and assigns freshly calculated
+ * quadrics depending on the actual planes surrounding d
+ * @param dart d
+ */
+template <typename PFP>
+void EdgeSelector_GeomColOptGradient<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
+{
+	Dart dFront,dBack ;
+	Dart dInit = d ;
+
+	// Init Front
+	dFront = dInit ;
+
+	m_quadric[d].zero() ;
+
+	do
+	{
+		// Make step
+		dBack = this->m_map.phi2(dFront) ;
+		dFront = this->m_map.phi2_1(dFront) ;
+
+		if (dBack != dFront)
+		{ // if dFront is no border
+			m_quadric[d] += Utils::Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+		}
+		if (recomputeNeighbors)
+			recomputeQuadric(dBack, false) ;
+
+	} while(dFront != dInit) ;
+}
+
+template <typename PFP>
+void EdgeSelector_GeomColOptGradient<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	typename PFP::MAP& m = this->m_map ;
+
+	// update quadrics
+	recomputeQuadric(d2, true) ;
+
+	// update the multimap
+	Traversor2VVaE<MAP> tv (m,d2);
+	CellMarker<EDGE> eMark (m);
+
+	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
+	{
+		Traversor2VE<MAP> te2 (m,dit);
+		for(Dart dit2 = te2.begin() ; dit2 != te2.end() ; dit2 = te2.next())
+		{
+			if (!eMark.isMarked(dit2))
+			{
+				updateEdgeInfo(dit2) ;
+				eMark.mark(dit2);
+			}
+		}
+	}
+
+	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_GeomColOptGradient<PFP>::initEdgeInfo(Dart d)
+{
+	typename PFP::MAP& m = this->m_map ;
+	EdgeInfo einfo ;
+	if(m.edgeCanCollapse(d))
+		computeEdgeInfo(d, einfo) ;
+	else
+		einfo.valid = false ;
+	edgeInfo[d] = einfo ;
+}
+
+template <typename PFP>
+void EdgeSelector_GeomColOptGradient<PFP>::updateEdgeInfo(Dart d)
+{
+	typename PFP::MAP& m = this->m_map ;
+	EdgeInfo& einfo = edgeInfo[d] ;
+
+	if(einfo.valid)
+		edges.erase(einfo.it) ;		// remove the edge from the multimap
+
+	if(m.edgeCanCollapse(d))
+		computeEdgeInfo(d, einfo) ;
+	else
+		einfo.valid = false ;
+}
+
+template <typename PFP>
+void EdgeSelector_GeomColOptGradient<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
+{
+	typename PFP::MAP& m = this->m_map ;
+	Dart dd = m.phi1(d) ;
+
+	// New position
+	Utils::Quadric<REAL> quad ;
+	quad += m_quadric[d] ;	// compute the sum of the
+	quad += m_quadric[dd] ;	// two vertices quadrics
+
+	// compute all approximated attributes
+	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
+			it != this->m_approximators.end() ;
+			++it)
+	{
+		(*it)->approximate(d) ;
+	}
+
+	// get pos
+	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
+	// get col
+	const VEC3& newCol = this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) ; // get newPos
+
+
+	// sum of QEM metric and color gradient metric
+	const REAL err = quad(newPos) + (computeHalfEdgeGradientColorError(d,newPos,newCol) + computeHalfEdgeGradientColorError(m.phi2(d),newPos,newCol)).norm() / (2*sqrt(3)) ;
+
+	einfo.it = edges.insert(std::make_pair(err, d)) ;
+	einfo.valid = true ;
+}
+
+template <typename PFP>
+typename PFP::VEC3
+EdgeSelector_GeomColOptGradient<PFP>::computeHalfEdgeGradientColorError(const Dart& v0, const VEC3& P, const VEC3& c)
+{
+	MAP& m = this->m_map ;
+
+	Traversor2VF<MAP> tf(m,v0) ; // all faces around vertex v0
+
+	const VEC3& P0 = m_pos[v0] ;
+	const VEC3& c0 = m_color[v0] ;
+
+	VEC3 count ;
+	for (Dart fi = tf.begin() ; fi != tf.end() ; fi = tf.next()) // foreach "blue" face
+	{
+		// get the data
+		const Dart& vi = m.phi1(fi) ;
+		const Dart& vj = m.phi_1(fi) ;
+		const VEC3& Pi = this->m_position[vi] ;
+		const VEC3& Pj = this->m_position[vj] ;
+		const VEC3& ci = m_color[vi] ;
+		const VEC3& cj = m_color[vj] ;
+
+		// utils
+		const VEC3 ei = P0 - Pj ;
+		const VEC3 ej = Pi - P0 ;
+		//const VEC3 e0 = Pj - Pi ;
+		const VEC3 d = P - P0 ; // displacement vector
+
+		// per-channel treatment
+		for (unsigned int i = 0 ; i < 3 ;  ++i)
+		{
+			// color gradient for channel i
+			VEC3 grad = (ei.norm2()*fabs(ci[i]-c[i]) + (ei*ej)*fabs(cj[i]-c[i]))*ej ;
+			grad -= (ej.norm2()*fabs(cj[i]-c[i]) + (ei*ej)*fabs(ci[i]-c[i]))*ei ;
+			const REAL denom = (ei ^ ej).norm2() ;
+			if (denom == 0) // case flat triangles
+				grad = VEC3(0,0,0) ;
+			else
+				grad /= denom ;
+
+			// displacement error for channel i
+			const REAL displacementE = (0.5*(ei ^ ej).norm()) * fabs(d*grad) ; // area x <disp,grad>
+
+			// color change error for channel i
+			const REAL colChangeE = fabs(c[i]-c0[i]) * (ei ^ ej).norm() / REAL(2) ;
+
+			count[i] += displacementE + colChangeE ;
+		}
+	}
+
+	return count ;
+}
+
 
 /************************************************************************************
  *                         EDGESELECTOR QEMext for Color                            *
