@@ -112,7 +112,7 @@ SimpleQGLV::SimpleQGLV() :
 	m_qglWidget->setFocus(Qt::MouseFocusReason);
 
 	QGLFormat format(/*QGL::SampleBuffers |*/ QGL::DoubleBuffer | QGL::AlphaChannel);
-	format.setSamples(16);
+	format.setSamples(2);
 	m_qglWidget->setFormat(format);
 	m_qglWidget->makeCurrent();
 }
