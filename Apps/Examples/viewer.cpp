@@ -318,7 +318,6 @@ void Viewer::slot_drawNormals(bool b)
 void Viewer::slot_normalsSize(int i)
 {
 	normalScaleFactor = i / 50.0f ;
-	m_topoRender->updateData<PFP>(myMap, position, i / 100.0f, i / 100.0f) ;
 	updateGL() ;
 }
 
