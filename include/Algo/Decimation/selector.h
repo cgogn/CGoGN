@@ -96,7 +96,7 @@ public:
 	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
 	virtual void updateWithoutCollapse() = 0;
 
-	virtual void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	virtual void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		std::cout << "WARNING:: getEdgeErrors was not overridden" << std::endl ;
 	}

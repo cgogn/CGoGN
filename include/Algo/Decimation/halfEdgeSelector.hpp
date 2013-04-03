@@ -1697,7 +1697,7 @@ void HalfEdgeSelector_LightfieldKCL<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 }
 
 template <typename PFP>
-typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeLightfieldError(Dart v0)
+typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeLightfieldError(Dart v0) const
 {
 	Dart v1 = this->m_map.phi1(v0) ;
 
@@ -1728,7 +1728,7 @@ typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeLightfieldError(D
 }
 
 template <typename PFP>
-typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeSquaredLightfieldDifference(Dart d1, Dart d2)
+typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeSquaredLightfieldDifference(Dart d1, Dart d2) const
 {
 	// get two frames
 	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[d1] ;
@@ -1771,14 +1771,14 @@ typename PFP::REAL HalfEdgeSelector_LightfieldKCL<PFP>::computeSquaredLightfield
 		coefs2[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[d2] ;
 	}
 
-	Utils::QuadricHF<REAL> q(coefs1, gamma1, alpha1) ;
+	Utils::QuadricHF<REAL> q(coefs2, gamma2, alpha2) ;
 	bool opt = q.findOptimizedCoefs(coefs) ; // coefs of d1's lightfield rotated around new local axis
-	q += Utils::QuadricHF<REAL>(coefs2, gamma2, alpha2) ;
+	q += Utils::QuadricHF<REAL>(coefs1, gamma1, alpha1) ;
 
 	if (!opt)
 	{
-		std::cerr << "HalfEdgeSelector_LightfieldKCL::Optimization failed (should never happen since no optim is done)" << std::endl ;
-		std::cout << alpha1 << std::endl ;
+		std::cerr << "HalfEdgeSelector_LightfieldKCL<PFP>::Optimization failed (should never happen since no optim is done)" << std::endl ;
+		std::cout << alpha2 << std::endl ;
 	}
 
 	const VEC3 avgColDiff = m_avgColor[d1] - m_avgColor[d2] ;
@@ -2084,7 +2084,7 @@ void HalfEdgeSelector_ColorExperimental<PFP>::computeHalfEdgeInfo(Dart d, HalfEd
 
 template <typename PFP>
 typename PFP::VEC3
-HalfEdgeSelector_ColorExperimental<PFP>::computeExperimentalColorError(const Dart& v0, const Dart& v1)
+HalfEdgeSelector_ColorExperimental<PFP>::computeExperimentalColorError(const Dart& v0, const Dart& v1) const
 {
 	MAP& m = this->m_map ;
 
@@ -2456,7 +2456,7 @@ void HalfEdgeSelector_ColorGradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 
 template <typename PFP>
 typename PFP::VEC3
-HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, const Dart& v1)
+HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, const Dart& v1) const
 {
 	MAP& m = this->m_map ;
 
@@ -2466,8 +2466,10 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 	const VEC3& P1 = m_pos[v1] ;
 	const VEC3& c0 = m_color[v0] ;
 	const VEC3& c1 = m_color[v1] ;
+	const VEC3 colDiff = c1 - c0 ;
 
 	VEC3 count ;
+	REAL areaSum = 0 ;
 	for (Dart fi = tf.begin() ; fi != tf.end() ; fi = tf.next()) // foreach "blue" face
 	{
 		// get the data
@@ -2483,6 +2485,8 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 		const VEC3 ej = Pi - P0 ;
 		//const VEC3 e0 = Pj - Pi ;
 		const VEC3 d = P1 - P0 ; // displacement vector
+
+		areaSum += (ei ^ ej).norm() / REAL(2) ;
 
 		// per-channel treatment
 		for (unsigned int i = 0 ; i < 3 ;  ++i)
@@ -2500,13 +2504,15 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 			const REAL displacementE = (0.5*(ei ^ ej).norm()) * fabs(d*grad) ; // area x <disp,grad>
 
 			// color change error for channel i
-			const REAL colChangeE = fabs(c1[i]-c0[i]) * (ei ^ ej).norm() / REAL(2) ;
-
-			count[i] += displacementE + colChangeE ;
+			//const REAL colChangeE = fabs(colDiff[i]) * (ei ^ ej).norm() / REAL(2) ;
+			count[i] += displacementE ;
 			/*if (isnan(count[i]))
 				std::cerr << "nan" << std::endl ;*/
 		}
 	}
+
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		count[i] += fabs(colDiff[i]) * areaSum ;
 
 	return count ;
 }
@@ -2817,7 +2823,7 @@ void HalfEdgeSelector_LFexperimental<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeI
 
 template <typename PFP>
 typename PFP::REAL
-HalfEdgeSelector_LFexperimental<PFP>::computeLightfieldError(const Dart& v0, const Dart& v1)
+HalfEdgeSelector_LFexperimental<PFP>::computeLightfieldError(const Dart& v0, const Dart& v1) const
 {
 	MAP& m = this->m_map ;
 
@@ -2883,18 +2889,21 @@ HalfEdgeSelector_LFexperimental<PFP>::computeLightfieldError(const Dart& v0, con
 }
 
 template <typename PFP>
-typename PFP::REAL HalfEdgeSelector_LFexperimental<PFP>::computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2)
+typename PFP::REAL HalfEdgeSelector_LFexperimental<PFP>::computeSquaredLightfieldDifference(const Dart& v0, const Dart& v1) const
 {
 	// get two frames
-	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[d1] ;
-	const VEC3& T2 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[d2] ;
-	const VEC3& B1 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[d1] ;
-	const VEC3& B2 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[d2] ;
-	const VEC3& N1 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[d1] ;
-	const VEC3& N2 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[d2] ;
+	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v0] ;
+	const VEC3& T2 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v1] ;
+	const VEC3& B1 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v0] ;
+	const VEC3& B2 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v1] ;
+	const VEC3& N1 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v0] ;
+	const VEC3& N2 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v1] ;
+
+	// Get new frame
+	// precondition : this->m_approx[m_approxindex_FN]->approximate should have been called !
+	const VEC3& N = N2 ; // assumption : half-collapse
 
 	// compute new frame
-	const VEC3& N = N1 ;
 	VEC3 T ;
 	if (N2 != N1)
 		T = N2 ^ N1 ; // i is perpendicular to newNormal
@@ -2917,26 +2926,26 @@ typename PFP::REAL HalfEdgeSelector_LFexperimental<PFP>::computeSquaredLightfiel
 
 	double alpha = fabs(alpha1 + alpha2) ;
 
-	// get coefs of v1 and v2
+	// get coefs of v0 and v1
 	std::vector<VEC3> coefs1, coefs2, coefs ;
 	coefs1.resize(m_K) ; coefs2.resize(m_K) ;
 	for (unsigned int i = 0 ; i < m_K ; ++i)
 	{
-		coefs1[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[d1] ;
-		coefs2[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[d2] ;
+		coefs1[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[v0] ;
+		coefs2[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[v1] ;
 	}
 
-	Utils::QuadricHF<REAL> q(coefs1, gamma1, alpha1) ;
+	Utils::QuadricHF<REAL> q(coefs2, gamma2, alpha2) ;
 	bool opt = q.findOptimizedCoefs(coefs) ; // coefs of d1's lightfield rotated around new local axis
-	q += Utils::QuadricHF<REAL>(coefs2, gamma2, alpha2) ;
+	q += Utils::QuadricHF<REAL>(coefs1, gamma1, alpha1) ;
 
 	if (!opt)
 	{
-		std::cerr << "HalfEdgeSelector_LightfieldKCL::Optimization failed (should never happen since no optim is done)" << std::endl ;
-		std::cout << alpha1 << std::endl ;
+		std::cerr << "HalfEdgeSelector_LFexperimental::Optimization failed (should never happen since no optim is done)" << std::endl ;
+		std::cout << alpha2 << std::endl ;
 	}
 
-	const VEC3 avgColDiff = m_avgColor[d1] - m_avgColor[d2] ;
+	const VEC3 avgColDiff = m_avgColor[v0] - m_avgColor[v1] ;
 
 	REAL err = q(coefs) ;
 	if (fabs(err) < 1e-6)
@@ -2953,9 +2962,6 @@ template <typename PFP>
 bool
 HalfEdgeSelector_LFgradient<PFP>::init()
 {
-	std::cerr << "Do not use this yet !" << std::endl ;
-	return false ;
-
 	MAP& m = this->m_map ;
 
 	// Verify availability of required approximators
@@ -3051,6 +3057,10 @@ HalfEdgeSelector_LFgradient<PFP>::init()
 		std::cerr << "HalfEdgeSelector_LFexperimental<PFP>::init() not OK" << std::endl ;
 		return false ;
 	}
+
+	m_integrator.Init(65) ;
+	// allocate workspaces
+	m_workspace = new double[28+2*m_K] ;
 
 	TraversorV<MAP> travV(m);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
@@ -3232,9 +3242,9 @@ HalfEdgeSelector_LFgradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 	// New position
 	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
 
+	// WARNING : in the following, we consider the half-edge contraction v0 --> v1
 	const Dart& v0 = dd ;
 	const Dart& v1 = d ;
-
 	assert(newPos == this->m_position[v1]) ;
 
 	// Compute errors
@@ -3243,10 +3253,11 @@ HalfEdgeSelector_LFgradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 	quadGeom += m_quadric[d] ;	// compute the sum of the
 	quadGeom += m_quadric[dd] ;	// two vertices quadrics
 
-	// sum of QEM metric
-	const REAL& err =
-			quadGeom(newPos) + // geom
-			1000*computeLightfieldError(v0,v1) // lf
+	// sum of QEM metric and LF
+	const REAL t = 0.01 ;
+	const REAL err =
+			t*quadGeom(newPos) + // geom
+			(1-t)*computeGradientLFerror(v0,v1).norm()/sqrt(3) // lf
 			;
 	//std::cout << computeLightfieldError(v0,v1) / quadGeom(newPos) << std::endl ;
 
@@ -3261,86 +3272,151 @@ HalfEdgeSelector_LFgradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 }
 
 template <typename PFP>
-typename PFP::REAL
-HalfEdgeSelector_LFgradient<PFP>::computeLightfieldError(const Dart& v0, const Dart& v1)
+typename PFP::VEC3
+HalfEdgeSelector_LFgradient<PFP>::computeGradientLFerror(const Dart& v0, const Dart& v1) const
 {
 	MAP& m = this->m_map ;
 
-	Traversor2VF<MAP> tf(m,v0) ;
-	const unsigned int& v1_vertexId = m.template getEmbedding<VERTEX>(v1) ;
+	const VEC3& P0 = this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos)[v0] ;
+	const VEC3& P1 = this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos)[v1] ;
 
-	const VEC3& P0 = this->m_position[v0] ;
-	const VEC3& P1 = this->m_position[v1] ;
+	Traversor2VF<MAP> tf(m,v0) ; // all faces around vertex v0
 
-	REAL res1 = 0, res2 = 0 ;
-	unsigned int count = 0 ;
-	for (Dart fi = tf.begin() ; fi != tf.end() ; fi = tf.next())
+	VEC3 count ;
+	REAL areaSum = 0 ;
+
+	for (Dart fi = tf.begin() ; fi != tf.end() ; fi = tf.next()) // foreach "blue" face
 	{
+		// get the data
 		const Dart& vi = m.phi1(fi) ;
 		const Dart& vj = m.phi_1(fi) ;
-
 		const VEC3& Pi = this->m_position[vi] ;
 		const VEC3& Pj = this->m_position[vj] ;
 
-		const VEC3 Pi_P0 = P0 - Pi ;
-		//const VEC3 PjP0 = P0 - Pj ;
-		const VEC3 Pi_Pj = Pj - Pi ;
-		const REAL b = Pi_Pj.norm() ;
+		// utils
+		const VEC3 ei = P0 - Pj ;
+		const VEC3 ej = Pi - P0 ;
+		//const VEC3 e0 = Pj - Pi ;
+		const VEC3 d = P1 - P0 ; // displacement vector
 
-		const VEC3 P0proj2D = Pi + (Pi_P0 * Pi_Pj)*Pi_Pj ;
-		const VEC3 P0_P0proj2D = P0proj2D - P0 ;
-		const REAL h0 = P0_P0proj2D.norm() ;
+		const REAL denom = (ei ^ ej).norm2() ;
+		const REAL area = sqrt(denom) / REAL(2) ;
+		areaSum += area ;
 
-		const REAL lfdiff01 = computeSquaredLightfieldDifference(v0,v1) ;
-		res1 += lfdiff01 * b * h0 / (6.*sqrt(3)) ;
-
-		// test if v1 is adjacent to this face
-		bool adjacent = false ;
-		Traversor2FV<MAP> tv(m,fi) ;
-		for (Dart v = tv.begin() ; v != tv.end() ; v = tv.next())
+		// per-channel treatment
+		for (unsigned int i = 0 ; i < 3 ;  ++i)
 		{
-			if (v1_vertexId == m.template getEmbedding<VERTEX>(v))
-				adjacent = true ;
+			// lf gradient for channel i
+			VEC3 grad = computeGradient(P0,Pi,Pj,v0,v1,vi,vj,i) ;
+			if (denom == 0) // case flat triangles
+				grad.zero() ;
+			else
+				grad /= denom ;
+
+			// displacement error for channel i
+			const REAL displacementE = area * fabs(d*grad) ; // area x <disp,grad>
+
+			count[i] += displacementE ;
 		}
-
-		// if v1 is not adjacent to this face
-		if (!adjacent)
-		{
-			const VEC3 P1proj3D = P1 ;
-			const VEC3 Pi_P1 = P1proj3D - Pi ;
-			//const VEC3 PjP1 = newP1 - Pj ;
-
-			const VEC3 P1proj2D = Pi + (Pi_P1 * Pi_Pj)*Pi_Pj ;
-			const VEC3 P1proj2D_P1proj3D = P1proj2D - P1proj3D ;
-			const REAL h1 = P1proj2D_P1proj3D.norm() ;
-
-			const REAL lfdiff0i = computeSquaredLightfieldDifference(vi,v0) ;
-			const REAL lfdiff1i = computeSquaredLightfieldDifference(vi,v1) ;
-			const REAL lfdiff0j = computeSquaredLightfieldDifference(vj,v0) ;
-			const REAL lfdiff1j = computeSquaredLightfieldDifference(vj,v1) ;
-
-			res2 += (lfdiff0i + lfdiff0j + lfdiff1i + lfdiff1j) * b * std::fabs(h1 - h0) / (12.*sqrt(3)) ;
-		}
-		++count ;
 	}
 
-	return res1 / count + res2 / (count-2) ;
+	const VEC3 lfDiff = computeSquaredLightfieldDifferenceAnalytical(v0,v1) ;
+	/*const VEC3 lfDiff2 = computeSquaredLightfieldDifferenceNumerical(v0,v1) ;
+	if ((lfDiff-lfDiff2).norm2() > 0.01)
+		std::cout << lfDiff << " ; " <<  lfDiff2 << " ; "  << lfDiff - lfDiff2 << std::endl ;*/
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		count[i] += sqrt(lfDiff[i]) * areaSum ; // lf change error for channel i
+
+	return count ;
 }
 
 template <typename PFP>
-typename PFP::REAL
-HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2)
+typename PFP::VEC3
+HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical(const Dart& v0, const Dart& v1) const
 {
 	// get two frames
-	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[d1] ;
-	const VEC3& T2 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[d2] ;
-	const VEC3& B1 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[d1] ;
-	const VEC3& B2 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[d2] ;
-	const VEC3& N1 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[d1] ;
-	const VEC3& N2 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[d2] ;
+	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v0] ;
+	const VEC3& T2 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v1] ;
+	const VEC3& B1 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v0] ;
+	const VEC3& B2 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v1] ;
+	const VEC3& N1 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v0] ;
+	const VEC3& N2 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v1] ;
+
+	// get coefs of v1 and v2
+	std::vector<VEC3> coefs1, coefs2 ;
+	coefs1.resize(m_K) ; coefs2.resize(m_K) ;
+	for (unsigned int i = 0 ; i < m_K ; ++i)
+	{
+		coefs1[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[v0] ;
+		coefs2[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[v1] ;
+	}
+
+	// fill workspace
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[i] = double(N1[i]) ; // n
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[4+i] = double(T1[i]) ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[7+i] = double(B1[i]) ;
+	m_workspace[10] = double(m_K) ;
+
+	// fill workspace 2
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[11+m_K+i] = double(N2[i]) ; // n
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[15+m_K+i] = double(T2[i]) ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[18+m_K+i] = double(B2[i]) ;
+	m_workspace[21+m_K] = double(m_K) ;
+
+	// Get new frame
+	// precondition : this->m_approx[m_approxindex_FN]->approximate should have been called !
+	const VEC3& N = this->m_approx[m_approxindex_FN]->getApprox(v1,m_attrindex_FN) ; // get new N
+	assert(N == N2 || !"HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical: only works with half-collapse") ;
+	m_n[0] = N[0] ;
+	m_n[1] = N[1] ;
+	m_n[2] = N[2] ;
+
+	// call integral function
+
+	double integ, ar ;
+	VEC3 integral ;
+	VEC3 area ;
+	for (unsigned int channel = 0 ; channel < 3 ; ++channel)
+	{
+		m_workspace[3] = m_avgColor[v0][channel];
+		m_workspace[14+m_K] = m_avgColor[v1][channel];
+		for (unsigned int i = 0 ; i < m_K ; ++i)
+		{
+			m_workspace[11+i] = coefs1[i][channel] ;
+			m_workspace[22+m_K+i] = coefs2[i][channel] ;
+		}
+		m_integrator.Compute(&integ, &ar, &SquaredDifferenceOfCartesianFunctions, m_workspace, &isInDomain, m_n) ;
+		integral[channel] = integ/(2*M_PI) ;
+		area[channel] = ar ;
+	}
+
+	return integral ;
+}
+
+template <typename PFP>
+typename PFP::VEC3
+HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceAnalytical(const Dart& v0, const Dart& v1) const
+{
+	// get two frames
+	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v0] ;
+	const VEC3& T2 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v1] ;
+	const VEC3& B1 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v0] ;
+	const VEC3& B2 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v1] ;
+	const VEC3& N1 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v0] ;
+	const VEC3& N2 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v1] ;
+
+	// Get new frame
+	// precondition : this->m_approx[m_approxindex_FN]->approximate should have been called !
+	const VEC3& N = this->m_approx[m_approxindex_FN]->getApprox(v1,m_attrindex_FN) ; // get new N
+	assert(N == N2 || !"HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceAnalytical: only works with half-collapse") ;
 
 	// compute new frame
-	const VEC3& N = N1 ;
 	VEC3 T ;
 	if (N2 != N1)
 		T = N2 ^ N1 ; // i is perpendicular to newNormal
@@ -3368,27 +3444,189 @@ HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifference(const Dart&
 	coefs1.resize(m_K) ; coefs2.resize(m_K) ;
 	for (unsigned int i = 0 ; i < m_K ; ++i)
 	{
-		coefs1[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[d1] ;
-		coefs2[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[d2] ;
+		coefs1[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[v0] ;
+		coefs2[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[v1] ;
 	}
 
-	Utils::QuadricHF<REAL> q(coefs1, gamma1, alpha1) ;
+	Utils::QuadricHF<REAL> q(coefs2, gamma2, alpha2) ;
 	bool opt = q.findOptimizedCoefs(coefs) ; // coefs of d1's lightfield rotated around new local axis
-	q += Utils::QuadricHF<REAL>(coefs2, gamma2, alpha2) ;
+	q += Utils::QuadricHF<REAL>(coefs1, gamma1, alpha1) ;
 
 	if (!opt)
 	{
-		std::cerr << "HalfEdgeSelector_LightfieldKCL::Optimization failed (should never happen since no optim is done)" << std::endl ;
+		std::cerr << "HalfEdgeSelector_LFgradient::Optimization failed (should never happen since no optim is done)" << std::endl ;
 		std::cout << alpha1 << std::endl ;
 	}
 
-	const VEC3 avgColDiff = m_avgColor[d1] - m_avgColor[d2] ;
+	VEC3 avgColDiff = m_avgColor[v0] - m_avgColor[v1] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		avgColDiff[i] = pow(avgColDiff[i],2) ;
 
-	REAL err = q(coefs) ;
-	if (fabs(err) < 1e-6)
-		err = 0 ;
+	const VEC3 LFerr = q.evalR3(coefs) ;
+	VEC3 err = (alpha / M_PI) * avgColDiff + LFerr ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		err[i] = std::max(REAL(0),err[i]) ;
 
-	return (alpha / M_PI) * avgColDiff.norm2()/3. + err ;
+	return err ;
+}
+
+template <typename PFP>
+typename PFP::VEC3
+HalfEdgeSelector_LFgradient<PFP>::computeGradient(const VEC3& P0, const VEC3& Pi, const VEC3& Pj, const Dart& v0, const Dart& v1, const Dart& vi, const Dart& vj, unsigned int channel) const
+{
+	const VEC3 ei = P0 - Pj ;
+	const VEC3 ej = Pi - P0 ;
+
+	// domaine sur lequel intégrer : hémisphère défini par n
+	const VEC3& ni = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[vi] ;
+	const VEC3& nj = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[vj] ;
+	const VEC3& n0 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v0] ;
+	VEC3 normal = (ni+nj+n0)/3. ;	normal.normalize() ;
+
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_n[i] = normal[i] ;
+	std::vector<Dart> vertices ;	vertices.resize(3) ;
+	vertices[0] = vi ;
+	vertices[1] = vj ;
+	vertices[2] = v1 ;
+
+	std::vector<double> coefs ;	coefs.resize(m_K) ;
+	VEC3 res ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+	{
+		const Dart& d = vertices[i] ;
+		const VEC3& t = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[d] ;
+		const VEC3& b = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[d] ;
+		const VEC3& n_d = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[d] ;
+
+		double avgCol = m_avgColor[d][channel] ;
+		for (unsigned int k = 0 ; k < m_K ; ++k)
+		{
+			coefs[k] = this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[d][channel] ;
+		}
+		res[i] = computeIntegral(&avgCol, t, b, n_d, m_K, coefs) ;
+	}
+
+	const REAL& ci = res[0] ;
+	const REAL& cj = res[1] ;
+	const REAL& c1 = res[2] ;
+
+	return (ei.norm2()*fabs(ci-c1) + (ei*ej)*fabs(cj-c1))*ej - (ej.norm2()*fabs(cj-c1) + (ei*ej)*fabs(ci-c1))*ei ;
+}
+
+template <typename PFP>
+typename PFP::REAL
+HalfEdgeSelector_LFgradient<PFP>::computeIntegral(const double *avgi, const VEC3& ti, const VEC3& bi, const VEC3& ni, unsigned int nbCoefs, const std::vector<double>& coefs) const
+{
+	// n is filled
+
+	// fill workspace
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[i] = double(ni[i]) ; // n
+	m_workspace[3] = *avgi ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[4+i] = double(ti[i]) ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[7+i] = double(bi[i]) ;
+	m_workspace[10] = double(nbCoefs) ;
+	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
+		m_workspace[11+i] = coefs[i] ;
+
+	// call integral function
+	double integral ;
+	double area ;
+	m_integrator.Compute(&integral, &area, &CartesianFunction, m_workspace, &isInDomain, m_n) ;
+
+	return integral*2*M_PI ;
+}
+
+// fonction qui retourne bool est_dans_domaine en fonction de f et omega
+template <typename PFP>
+bool
+HalfEdgeSelector_LFgradient<PFP>::isInDomain(double x, double y, double z, void *data)
+{
+	// (x,y,z) vecteur de vue
+	// n vecteur normal
+	double *n = (double*)data ;
+
+	// vrai ssi n*(x,y,z) > 0
+	return n[0]*x+n[1]*y+n[2]*z >= 0 ;
+}
+
+// fonction qui retourne col en fonction de f et de omega
+template <typename PFP>
+double
+HalfEdgeSelector_LFgradient<PFP>::CartesianFunction (double x, double y, double z, void* data)
+{
+	// (x,y,z) vecteur de vue
+	// data = {n,avgCol,t,b,nbCoefs,coefs}
+	double *myData = (double*)data ;
+
+	// normale
+	if (myData[0]*x + myData[1]*y + myData[2]*z < 0)
+	{
+		return myData[3] ;
+	}
+
+	// tangente
+	double u = myData[4]*x + myData[5]*y + myData[6]*z ;
+
+	// binormale
+	double v = myData[7]*x + myData[8]*y + myData[9]*z ;
+
+	// nbcoefs
+	unsigned int nb = (unsigned int)(myData[10]) ;
+
+	// eval en ((xyz)*t,(xyz)*b)
+	double res = 0 ;
+	if (nb > 0)
+	{
+		// coefs
+		double *coefs = &(myData[11]) ;
+		res = coefs[0] ;
+		if (nb > 1)
+		{
+			res += coefs[1]*v ;
+			res += coefs[2]*u ;
+			if (nb > 3)
+			{
+				res += coefs[3]*u*v ;
+				res += coefs[4]*v*v ;
+				res += coefs[5]*u*u ;
+				if (nb > 6)
+				{
+					res += coefs[6]*u*v*v ;
+					res += coefs[7]*v*u*u ;
+					res += coefs[8]*v*v*v ;
+					res += coefs[9]*u*u*u ;
+					if (nb > 10)
+					{
+						res += coefs[10]*v*v*u*u ;
+						res += coefs[11]*v*v*v*u ;
+						res += coefs[12]*v*u*u*u ;
+						res += coefs[13]*v*v*v*v ;
+						res += coefs[14]*u*u*u*u ;
+					}
+				}
+			}
+		}
+	}
+
+	return res ;
+}
+
+// fonction qui retourne col en fonction de f et de omega
+template <typename PFP>
+double
+HalfEdgeSelector_LFgradient<PFP>::SquaredDifferenceOfCartesianFunctions (double x, double y, double z, void* data)
+{
+	// (x,y,z) vecteur de vue
+	// data = {n1,avgCol1,t1,b1,nbCoefs1,coefs1, n2,avgCol2,t2,b2,nbCoefs2,coefs2}
+	double *myData1 = (double*)data ;
+	unsigned int nb = (unsigned int)(myData1[10]) ;
+	double *myData2 = &(myData1[11+nb]) ;
+
+	return pow(CartesianFunction(x,y,z,myData1) - CartesianFunction(x,y,z,myData2),2) ;
 }
 
 /************************************************************************************
@@ -4013,7 +4251,7 @@ void HalfEdgeSelector_LFperFace<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& 
 
 template <typename PFP>
 typename PFP::REAL
-HalfEdgeSelector_LFperFace<PFP>::computeLightfieldError(const Dart& v0, const Dart& v1)
+HalfEdgeSelector_LFperFace<PFP>::computeLightfieldError(const Dart& v0, const Dart& v1) const
 {
 	MAP& m = this->m_map ;
 
@@ -4080,7 +4318,7 @@ HalfEdgeSelector_LFperFace<PFP>::computeLightfieldError(const Dart& v0, const Da
 
 template <typename PFP>
 typename PFP::REAL
-HalfEdgeSelector_LFperFace<PFP>::computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2)
+HalfEdgeSelector_LFperFace<PFP>::computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) const
 {
 	// get two frames
 	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[d1] ;
@@ -4123,14 +4361,14 @@ HalfEdgeSelector_LFperFace<PFP>::computeSquaredLightfieldDifference(const Dart& 
 		coefs2[i] = this->m_approx[m_approxindex_HF[i]]->getAttr(m_attrindex_HF[i])[d2] ;
 	}
 
-	Utils::QuadricHF<REAL> q(coefs1, gamma1, alpha1) ;
+	Utils::QuadricHF<REAL> q(coefs2, gamma2, alpha2) ;
 	bool opt = q.findOptimizedCoefs(coefs) ; // coefs of d1's lightfield rotated around new local axis
-	q += Utils::QuadricHF<REAL>(coefs2, gamma2, alpha2) ;
+	q += Utils::QuadricHF<REAL>(coefs1, gamma1, alpha1) ;
 
 	if (!opt)
 	{
-		std::cerr << "HalfEdgeSelector_LightfieldKCL::Optimization failed (should never happen since no optim is done)" << std::endl ;
-		std::cout << alpha1 << std::endl ;
+		std::cerr << "HalfEdgeSelector_LFperFace::Optimization failed (should never happen since no optim is done)" << std::endl ;
+		std::cout << alpha2 << std::endl ;
 	}
 
 	const VEC3 avgColDiff = m_avgColor[d1] - m_avgColor[d2] ;

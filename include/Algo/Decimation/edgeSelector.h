@@ -151,7 +151,7 @@ public:
 
 	void updateWithoutCollapse();
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -659,7 +659,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -740,7 +740,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -830,7 +830,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())

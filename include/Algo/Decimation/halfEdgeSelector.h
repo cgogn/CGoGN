@@ -26,6 +26,7 @@
 #define __HALFEDGESELECTOR_H__
 
 #include "Algo/Decimation/selector.h"
+#include "Utils/SphericalFunctionIntegratorCartesian.h"
 
 namespace CGoGN
 {
@@ -156,7 +157,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -251,7 +252,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -348,7 +349,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -420,8 +421,8 @@ private:
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
-	REAL computeLightfieldError(Dart v0) ;
-	REAL computeSquaredLightfieldDifference(Dart d1, Dart d2) ;
+	REAL computeLightfieldError(Dart v0) const ;
+	REAL computeSquaredLightfieldDifference(Dart d1, Dart d2) const ;
 
 public:
 	HalfEdgeSelector_LightfieldKCL(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
@@ -456,7 +457,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -520,7 +521,7 @@ private:
 	//void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 	void recomputeQuadric(const Dart d) ;
 
-	typename PFP::VEC3 computeExperimentalColorError(const Dart& v0, const Dart& v1) ;
+	typename PFP::VEC3 computeExperimentalColorError(const Dart& v0, const Dart& v1) const ;
 
 
 public:
@@ -547,7 +548,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -611,7 +612,7 @@ private:
 	//void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 	void recomputeQuadric(const Dart d) ;
 
-	typename PFP::VEC3 computeGradientColorError(const Dart& v0, const Dart& v1) ;
+	typename PFP::VEC3 computeGradientColorError(const Dart& v0, const Dart& v1) const ;
 
 
 public:
@@ -638,7 +639,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -709,8 +710,8 @@ private:
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
 	void recomputeQuadric(const Dart d) ;
 
-	REAL computeLightfieldError(const Dart& v0, const Dart& v1) ;
-	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) ;
+	REAL computeLightfieldError(const Dart& v0, const Dart& v1) const ;
+	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) const ;
 
 public:
 	HalfEdgeSelector_LFexperimental(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
@@ -744,7 +745,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -771,7 +772,7 @@ public:
 } ;
 
 /*****************************************************************************************************************
- *                                 HALF-EDGE LF EXPERIMENTAL METRIC                                              *
+ *                                 HALF-EDGE LF GRADIENT METRIC                                                  *
  *****************************************************************************************************************/
 template <typename PFP>
 class HalfEdgeSelector_LFgradient : public EdgeSelector<PFP>
@@ -794,7 +795,6 @@ private:
 
 	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
 
-	VertexAttribute<REAL> m_visualImportance ;
 	VertexAttribute<VEC3> m_avgColor ;
 
 	int m_approxindex_pos, m_attrindex_pos ;
@@ -803,6 +803,10 @@ private:
 	int m_approxindex_FN, m_attrindex_FN ;
 	std::vector<unsigned int> m_approxindex_HF, m_attrindex_HF ;
 	unsigned int m_K ;
+
+	SphericalFunctionIntegratorCartesian m_integrator ;
+	double *m_n ;
+	double *m_workspace ;
 
 	std::vector<Approximator<PFP, typename PFP::VEC3,DART>* > m_approx ;
 
@@ -814,8 +818,15 @@ private:
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
 	void recomputeQuadric(const Dart d) ;
 
-	REAL computeLightfieldError(const Dart& v0, const Dart& v1) ;
-	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) ;
+	VEC3 computeGradientLFerror(const Dart& v0, const Dart& v1) const ;
+	VEC3 computeSquaredLightfieldDifferenceAnalytical(const Dart& d1, const Dart& d2) const ;
+	VEC3 computeSquaredLightfieldDifferenceNumerical(const Dart& d1, const Dart& d2) const ;
+	VEC3 computeGradient(const VEC3& P0, const VEC3& Pi, const VEC3& Pj, const Dart& v0, const Dart& v1, const Dart& vi, const Dart& vj, unsigned int channel) const ;
+	REAL computeIntegral(const double *avgi, const VEC3& ti, const VEC3& bi, const VEC3& ni, unsigned int nbCoefs, const std::vector<double>& coefs) const ;
+
+	static bool isInDomain(double x, double y, double z, void *data) ;
+	static double CartesianFunction (double x, double y, double z, void* data) ;
+	static double SquaredDifferenceOfCartesianFunctions (double x, double y, double z, void* data) ;
 
 public:
 	HalfEdgeSelector_LFgradient(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
@@ -828,20 +839,26 @@ public:
 		m_attrindex_FB(-1),
 		m_approxindex_FN(-1),
 		m_attrindex_FN(-1),
-		m_K(0)
+		m_K(0),
+		m_n(NULL),
+		m_workspace(NULL)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
 		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
 		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+		m_n = new double[3] ;
 		assert(m_avgColor.isValid()) ;
 	}
 	~HalfEdgeSelector_LFgradient()
 	{
 		this->m_map.removeAttribute(m_quadric) ;
 		this->m_map.removeAttribute(halfEdgeInfo) ;
+		m_integrator.Release() ;
+		delete[] m_workspace ;
+		delete[] m_n ;
 	}
 
-	SelectorType getType() { return S_hLFexperimental ; }
+	SelectorType getType() { return S_hLFgradient ; }
 	bool init() ;
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
@@ -849,7 +866,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"HalfEdgeSelector_LFgradient::getEdgeErrors requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -874,7 +891,6 @@ public:
 		}
 	}
 } ;
-
 
 /*****************************************************************************************************************
  *                                 HALF-EDGE COLOR PER FACE                                                      *
@@ -939,7 +955,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -1009,8 +1025,8 @@ private:
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
 	void recomputeQuadric(const Dart d) ;
 
-	REAL computeLightfieldError(const Dart& v0, const Dart& v1) ;
-	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) ;
+	REAL computeLightfieldError(const Dart& v0, const Dart& v1) const ;
+	REAL computeSquaredLightfieldDifference(const Dart& d1, const Dart& d2) const ;
 
 public:
 	HalfEdgeSelector_LFperFace(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
@@ -1044,7 +1060,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())

@@ -2183,6 +2183,7 @@ EdgeSelector_GeomColOptGradient<PFP>::computeHalfEdgeGradientColorError(const Da
 	const VEC3& c0 = m_color[v0] ;
 
 	VEC3 count ;
+	REAL areaSum = 0 ;
 	for (Dart fi = tf.begin() ; fi != tf.end() ; fi = tf.next()) // foreach "blue" face
 	{
 		// get the data
@@ -2198,6 +2199,8 @@ EdgeSelector_GeomColOptGradient<PFP>::computeHalfEdgeGradientColorError(const Da
 		const VEC3 ej = Pi - P0 ;
 		//const VEC3 e0 = Pj - Pi ;
 		const VEC3 d = P - P0 ; // displacement vector
+
+		areaSum += (ei ^ ej).norm() / REAL(2) ;
 
 		// per-channel treatment
 		for (unsigned int i = 0 ; i < 3 ;  ++i)
@@ -2215,11 +2218,15 @@ EdgeSelector_GeomColOptGradient<PFP>::computeHalfEdgeGradientColorError(const Da
 			const REAL displacementE = (0.5*(ei ^ ej).norm()) * fabs(d*grad) ; // area x <disp,grad>
 
 			// color change error for channel i
-			const REAL colChangeE = fabs(c[i]-c0[i]) * (ei ^ ej).norm() / REAL(2) ;
+			//const REAL colChangeE = fabs(c[i]-c0[i]) * (ei ^ ej).norm() / REAL(2) ;
 
-			count[i] += displacementE + colChangeE ;
+			count[i] += displacementE ;
 		}
 	}
+
+	const VEC3 colDiff = c - c0 ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		count[i] += fabs(colDiff[i]) * areaSum ;
 
 	return count ;
 }
