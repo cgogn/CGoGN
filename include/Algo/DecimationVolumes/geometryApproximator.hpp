@@ -34,7 +34,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 
 /************************************************************************************
@@ -122,9 +122,9 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 //	}
 }
 
-} //end namespace DecimationVolumes
+} //end namespace Decimation
 
-}
+} //namespace Volume
 
 } //end namespace Algo
 

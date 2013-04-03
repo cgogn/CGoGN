@@ -37,7 +37,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 
 enum ApproximatorType
@@ -144,9 +144,9 @@ public:
 };
 
 
-} // namespace DecimationVolumes
+} // namespace Decimation
 
-}
+} // namespace Volume
 
 } // namespace Algo
 

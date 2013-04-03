@@ -39,7 +39,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 
 template <typename PFP>
@@ -51,9 +51,9 @@ void decimate(
 	unsigned int percentWantedVertices
 );
 
-} //namespace DecimationVolumes
+} //namespace Decimation
 
-}
+} //namesapce Volume
 
 } //namespace Algo
 
