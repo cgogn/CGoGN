@@ -1,10 +1,8 @@
-
 #include <QSplashScreen>
 #include "window.h"
 #include <QFileInfo>
 #include "PythonQt/PythonQt.h"
 #include "PythonQt/gui/PythonQtScriptingConsole.h"
-
 
 int main(int argc, char* argv[])
 {
@@ -32,7 +30,7 @@ int main(int argc, char* argv[])
 	schnapps.show();
 
 	pythonContext.addObject("schnapps", &schnapps);
-	QFileInfo fi(app.applicationDirPath() + QString("/init.py"));
+	QFileInfo fi(app.applicationDirPath() + QString("/schnappsInit.py"));
 	if(fi.exists())
 		pythonContext.evalFile(fi.filePath());
 

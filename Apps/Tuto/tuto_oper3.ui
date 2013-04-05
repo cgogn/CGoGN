@@ -145,6 +145,11 @@
         <string>splitVertex</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>unsewVolumes</string>
+       </property>
+      </item>
      </widget>
     </item>
     <item row="6" column="0">

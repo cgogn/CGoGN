@@ -57,14 +57,23 @@ int main(int argc, char **argv)
 
 	std::string filename(argv[1]);
 
+	size_t pos = filename.rfind(".");    // position of "." in filename
+	std::string extension = filename.substr(pos);
+
 	// declaration of the map
 	PFP::MAP myMap;
 
 	std::vector<std::string> attrNames ;
-	Algo::Volume::Import::importMesh<PFP>(myMap, argv[1], attrNames);
+
+	if (extension == std::string(".map"))
+		myMap.loadMapBin(filename);
+	else
+		Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
 	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
+
+	// Les faces vont devenir des aretes -> echange de FACE ET EDGE
 
 	VolumeAttribute<PFP::VEC3> positionV = myMap.getAttribute<PFP::VEC3, VOLUME>("position") ;
 	if(!positionV.isValid())
@@ -81,21 +90,74 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-	if(dsave != NIL)
-		positionV[dsave] = PFP::VEC3(0.0);
 
-	//Algo::Modelisation::computeDual3<PFP>(myMap,allDarts) ;
-	myMap.computeDual();
 
+	Dart dcenter = myMap.explodBorderTopo(dsave);
+
+	DartMarker mf(myMap);
+	for(Dart dit = myMap.begin() ; dit != myMap.end() ; myMap.next(dit))
+	{
+		if(myMap.isBoundaryMarked3(dit) && !mf.isMarked(dit))
+		{
+			mf.markOrbit<FACE>(dit);
+			positionV[dit] = Algo::Surface::Geometry::faceCentroid<PFP>(myMap,dit,position);
+		}
+	}
+
+	for(Dart dit = myMap.begin() ; dit != myMap.end() ; myMap.next(dit))
+	{
+		if(myMap.isBoundaryMarked3(dit))
+		{
+			myMap.fillHole(dit);
+		}
+	}
+
+	//
+	//Compute Dual Test -- begin
+	//
+	DartAttribute<Dart> old_phi1 = myMap.getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart> old_phi_1 = myMap.getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart> new_phi1 = myMap.addAttribute<Dart, DART>("new_phi1") ;
+	DartAttribute<Dart> new_phi_1 = myMap.addAttribute<Dart, DART>("new_phi_1") ;
+
+	DartAttribute<Dart> old_phi2 = myMap.getAttribute<Dart, DART>("phi2") ;
+	DartAttribute<Dart> new_phi2 = myMap.addAttribute<Dart, DART>("new_phi2") ;
+
+	for(Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+	{
+		Dart dd = myMap.phi2(myMap.phi3(d)) ;
+		new_phi1[d] = dd ;
+		new_phi_1[dd] = d ;
+
+		Dart ddd = myMap.phi1(myMap.phi3(d));
+		new_phi2[d] = ddd;
+		new_phi2[ddd] = d;
+	}
+
+	myMap.swapAttributes<Dart>(old_phi1, new_phi1) ;
+	myMap.swapAttributes<Dart>(old_phi_1, new_phi_1) ;
+	myMap.swapAttributes<Dart>(old_phi2, new_phi2) ;
+
+	myMap.removeAttribute(new_phi1) ;
+	myMap.removeAttribute(new_phi_1) ;
+	myMap.removeAttribute(new_phi2) ;
+
+	myMap.swapEmbeddingContainers(VERTEX, VOLUME) ;
+
+	//
+	//ComputeDualTest -- end
+	//
+
+	myMap.createHole(dcenter);
+
+	VolumeAttribute<PFP::VEC3> del;
+	del = position;
 	position = positionV ;
 
-	//turn_to<VertexAttribute<PFP::VEC3>, FaceAttribute<PFP::VEC3> >(&positionF);
-	//turn_to<FaceAttribute<PFP::VEC3>, VertexAttribute<PFP::VEC3> >(position);
+	myMap.removeAttribute(del);
 
-	//const std::type_info &t1 = typeid(&positionF);
-	//std::cout << "type name : " << t1.name() << std::endl;
+	myMap.dumpAttributesAndMarkers();
 
-	//Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
 	myMap.saveMapBin("result.map");
 	std::cout << "Exported" << std::endl;
 

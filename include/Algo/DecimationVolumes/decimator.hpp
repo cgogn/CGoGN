@@ -35,10 +35,8 @@ namespace DecimationVolumes
 {
 
 template <typename PFP>
-void decimate(
-	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	VertexAttribute<typename PFP::VEC3>& position, unsigned int percentWantedVertices, const FunctorSelect& selected
-)
+void decimate(typename PFP::MAP& map, SelectorType s, ApproximatorType a,
+	VertexAttribute<typename PFP::VEC3>& position, unsigned int percentWantedVertices)
 {
 	std::vector<ApproximatorGen<PFP>*> approximators ;
 	Selector<PFP>* selector = NULL ;
@@ -58,10 +56,10 @@ void decimate(
 	switch(s)
 	{
 		case S_MapOrder :
-			selector = new Algo::DecimationVolumes::EdgeSelector_MapOrder<PFP>(map, position, approximators, selected) ;
+			selector = new Algo::DecimationVolumes::EdgeSelector_MapOrder<PFP>(map, position, approximators) ;
 			break ;
 		case S_Random :
-			selector = new Algo::DecimationVolumes::EdgeSelector_Random<PFP>(map, position, approximators, selected) ;
+			selector = new Algo::DecimationVolumes::EdgeSelector_Random<PFP>(map, position, approximators) ;
 			break ;
 		default:
 			CGoGNout << "not yet implemented" << CGoGNendl;

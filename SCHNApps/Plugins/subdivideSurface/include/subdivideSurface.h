@@ -2,13 +2,13 @@
 #define _SUBDIVIDESURFACE_PLUGIN_H_
 
 #include "plugin.h"
-
 #include "subdivideSurfaceDialog.h"
 
+namespace CGoGN
+{
 
-using namespace CGoGN;
-using namespace SCHNApps;
-
+namespace SCHNApps
+{
 
 class SubdivideSurfacePlugin : public Plugin
 {
@@ -38,16 +38,29 @@ public:
 
 public slots:
 	void openSubdivideSurfaceDialog();
-	void subdivideSurface();
+	void subdivideSurfaceFromDialog();
 
-	void loopSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
-	void CCSubdivision(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
-	void trianguleFaces(PFP2::MAP* map, VertexAttribute<PFP2::VEC3>& position);
+	void loopSubdivision(
+		const QString& mapName,
+		const QString& positionAttributeName = "position"
+	);
+	void CCSubdivision(
+		const QString& mapName,
+		const QString& positionAttributeName = "position"
+	);
+	void trianguleFaces(
+		const QString& mapName,
+		const QString& positionAttributeName = "position"
+	);
 
 private:
 	SubdivideSurfaceDialog* m_subdivideSurfaceDialog;
 
 	QAction* m_subdivideSurfaceAction;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

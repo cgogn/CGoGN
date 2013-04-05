@@ -1061,14 +1061,10 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 		glUniformMatrix4fv(*m_uniMat_Model,	1, false, &modelview[0][0]);
 
 	if (*m_uniMat_ModelProj >= 0)
-	{
 		glUniformMatrix4fv(*m_uniMat_ModelProj,	1 , false, &PMV[0][0]);
-	}
 
 	if (*m_uniMat_Normal >= 0)
-	{
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
-	}
 
 	this->unbind();
 }
@@ -1083,7 +1079,7 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
-		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)begin);
+		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)((unsigned long)(begin)));
 	}
 //	this->unbind();
 }

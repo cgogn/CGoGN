@@ -38,12 +38,15 @@ namespace Render
 namespace GL2
 {
 
-TopoRender::TopoRender():
+TopoRender::TopoRender(float bs):
 	m_nbDarts(0),
 	m_nbRel2(0),
 	m_topo_dart_width(2.0f),
 	m_topo_relation_width(3.0f),
+	m_normalShift(0.0f),
+	m_boundShift(bs),
 	m_dartsColor(1.0f,1.0f,1.0f),
+	m_dartsBoundaryColor(0.7f,1.0f,0.7f),
 	m_bufferDartPosition(NULL)
 {
 	m_vbo0 = new Utils::VBO();
@@ -127,6 +130,12 @@ void TopoRender::setAllDartsColor(float r, float g, float b)
 void TopoRender::setInitialDartsColor(float r, float g, float b)
 {
 	m_dartsColor = Geom::Vec3f(r,g,b);
+}
+
+
+void TopoRender::setInitialBoundaryDartsColor(float r, float g, float b)
+{
+	m_dartsBoundaryColor = Geom::Vec3f(r,g,b);
 }
 
 void TopoRender::drawDarts()
@@ -288,51 +297,111 @@ void TopoRender::svgout2D(const std::string& filename, const glm::mat4& model, c
 {
 	Utils::SVG::SVGOut svg(filename,model,proj);
 	toSVG(svg);
+	svg.write();
 }
 
 void TopoRender::toSVG(Utils::SVG::SVGOut& svg)
 {
-	svg.setWidth(m_topo_relation_width);
+//	svg.setWidth(m_topo_relation_width);
+//
+//	// PHI2 / beta2
+//	const Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo2->lockPtr());
+//	svg.beginLines();
+//	for (unsigned int i=0; i<m_nbRel2; ++i)
+//		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.8f,0.0f,0.0f));
+//	svg.endLines();
+//
+//	m_vbo2->releasePtr();
+//
+//	//PHI1 /beta1
+//	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
+//	svg.beginLines();
+//	for (unsigned int i=0; i<m_nbRel1; ++i)
+//		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
+//	svg.endLines();
+//	m_vbo1->releasePtr();
+//
+//
+//	const Geom::Vec3f* colorsPtr = reinterpret_cast<const Geom::Vec3f*>(m_vbo3->lockPtr());
+//	ptr= reinterpret_cast<Geom::Vec3f*>(m_vbo0->lockPtr());
+//
+//	svg.setWidth(m_topo_dart_width);
+//	svg.beginLines();
+//	for (unsigned int i=0; i<m_nbDarts; ++i)
+//		svg.addLine(ptr[2*i], ptr[2*i+1], colorsPtr[2*i]);
+//	svg.endLines();
+//
+//	svg.beginPoints();
+//	for (unsigned int i=0; i<m_nbDarts; ++i)
+//			svg.addPoint(ptr[2*i], colorsPtr[2*i]);
+//	svg.endPoints();
+//
+//	m_vbo0->releasePtr();
+//	m_vbo3->releasePtr();
+
 
 	// PHI2 / beta2
-
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("phi2", svg.m_model, svg.m_proj);
+	svg1->setToLayer();
 	const Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo2->lockPtr());
-
-	svg.beginLines();
+	svg1->setWidth(m_topo_relation_width);
+	svg1->beginLines();
 	for (unsigned int i=0; i<m_nbRel2; ++i)
-		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.8f,0.0f,0.0f));
-	svg.endLines();
-
+		svg1->addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.8f,0.0f,0.0f));
+	svg1->endLines();
 	m_vbo2->releasePtr();
 
+	svg.addGroup(svg1);
+
 	//PHI1 /beta1
+	Utils::SVG::SvgGroup* svg2 = new Utils::SVG::SvgGroup("phi1", svg.m_model, svg.m_proj);
+	svg2->setToLayer();
 	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
-
-	svg.beginLines();
+	svg2->setWidth(m_topo_relation_width);
+	svg2->beginLines();
 	for (unsigned int i=0; i<m_nbRel1; ++i)
-		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
-	svg.endLines();
-
+		svg2->addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
+	svg2->endLines();
 	m_vbo1->releasePtr();
 
+	svg.addGroup(svg2);
 
 	const Geom::Vec3f* colorsPtr = reinterpret_cast<const Geom::Vec3f*>(m_vbo3->lockPtr());
 	ptr= reinterpret_cast<Geom::Vec3f*>(m_vbo0->lockPtr());
 
-	svg.setWidth(m_topo_dart_width);
-
-	svg.beginLines();
+	Utils::SVG::SvgGroup* svg3 = new Utils::SVG::SvgGroup("darts", svg.m_model, svg.m_proj);
+	svg3->setToLayer();
+	svg3->setWidth(m_topo_dart_width);
+	svg3->beginLines();
 	for (unsigned int i=0; i<m_nbDarts; ++i)
-		svg.addLine(ptr[2*i], ptr[2*i+1], colorsPtr[2*i]);
-	svg.endLines();
+		svg3->addLine(ptr[2*i], ptr[2*i+1], colorsPtr[2*i]);
+	svg3->endLines();
 
-	svg.beginPoints();
+	svg.addGroup(svg3);
+
+	Utils::SVG::SvgGroup* svg4 = new Utils::SVG::SvgGroup("dartEmb", svg.m_model, svg.m_proj);
+	svg4->setWidth(m_topo_dart_width);
+	svg4->setToLayer();
+	svg4->beginPoints();
 	for (unsigned int i=0; i<m_nbDarts; ++i)
-			svg.addPoint(ptr[2*i], colorsPtr[2*i]);
-	svg.endPoints();
+			svg4->addPoint(ptr[2*i], colorsPtr[2*i]);
+	svg4->endPoints();
+
+	svg.addGroup(svg4);
 
 	m_vbo0->releasePtr();
 	m_vbo3->releasePtr();
+}
+
+
+void TopoRender::setNormalShift(float ns)
+{
+	m_normalShift = ns;
+}
+
+void TopoRender::setBoundaryShift(float bs)
+{
+	m_boundShift = bs;
 }
 
 

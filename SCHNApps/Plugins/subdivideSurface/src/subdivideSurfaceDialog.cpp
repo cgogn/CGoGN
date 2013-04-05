@@ -19,39 +19,36 @@ SubdivideSurfaceDialog::SubdivideSurfaceDialog(Window* w) :
 	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
 	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
 
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(refreshUI()));
+	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
 
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
 		mapList->addItem(map->getName());
 }
 
-void SubdivideSurfaceDialog::refreshUI()
+void SubdivideSurfaceDialog::selectedMapChanged()
 {
 	if(m_selectedMap)
-		disconnect(m_selectedMap, SIGNAL(attributeAdded()), this, SLOT(refreshUI()));
+		disconnect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(addAttributeToList(unsigned int, const QString&)));
 
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 	if(!currentItems.empty())
 	{
 		combo_positionAttribute->clear();
+
 		const QString& mapname = currentItems[0]->text();
 		MapHandlerGen* mh = m_window->getMap(mapname);
-		GenericMap* map = mh->getGenericMap();
-		AttributeContainer& cont = map->getAttributeContainer<VERTEX>();
 
-		std::vector<std::string> names;
-		std::vector<std::string> types;
-		cont.getAttributesNames(names);
-		cont.getAttributesTypes(types);
-		std::string vec3TypeName = nameOfType(PFP2::VEC3());
+		QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+
 		unsigned int j = 0;
-		for(unsigned int i = 0; i < names.size(); ++i)
+		const AttributeHash& attribs = mh->getAttributesList(VERTEX);
+		for(AttributeHash::const_iterator i = attribs.constBegin(); i != attribs.constEnd(); ++i)
 		{
-			if(types[i] == vec3TypeName)
+			if(i.value() == vec3TypeName)
 			{
-				combo_positionAttribute->addItem(QString::fromStdString(names[i]));
-				if(names[i] == "position") // try to select a position attribute named "position"
+				combo_positionAttribute->addItem(i.key());
+				if(i.key() == "position") // try to select a position attribute named "position"
 					combo_positionAttribute->setCurrentIndex(j);
 
 				++j;
@@ -59,7 +56,7 @@ void SubdivideSurfaceDialog::refreshUI()
 		}
 
 		m_selectedMap = mh;
-		connect(m_selectedMap, SIGNAL(attributeAdded()), this, SLOT(refreshUI()));
+		connect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(addAttributeToList(unsigned int, const QString&)));
 	}
 	else
 		m_selectedMap = NULL;
@@ -78,8 +75,20 @@ void SubdivideSurfaceDialog::removeMapFromList(MapHandlerGen* m)
 
 	if(m_selectedMap == m)
 	{
-		disconnect(m_selectedMap, SIGNAL(attributeAdded()), this, SLOT(refreshUI()));
+		disconnect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(addAttributeToList(unsigned int, const QString&)));
 		m_selectedMap = NULL;
+	}
+}
+
+void SubdivideSurfaceDialog::addAttributeToList(unsigned int orbit, const QString& nameAttr)
+{
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+
+	const QString& typeAttr = m_selectedMap->getAttributeTypeName(orbit, nameAttr);
+
+	if(typeAttr == vec3TypeName)
+	{
+		combo_positionAttribute->addItem(nameAttr);
 	}
 }
 

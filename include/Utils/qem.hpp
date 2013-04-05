@@ -130,8 +130,9 @@ REAL
 Quadric<REAL>::evaluate(const VEC4& v) const
 {
 	// Double computation is crucial for stability
-	Geom::Vector<4, double> Av = A * v ;
-	return v * Av ;
+	Geom::Vector<4, double> vd(v);
+	Geom::Vector<4, double> Av = A * vd ;
+	return REAL(vd * Av) ;
 }
 
 template <typename REAL>
@@ -149,8 +150,9 @@ Quadric<REAL>::optimize(VEC4& v) const
 	REAL det = A2.invert(Ainv) ;
 	if(det > -1e-6 && det < 1e-6)
 		return false ;
-	VEC4 right(0,0,0,1) ;
-	v = Ainv * right ;
+//	VEC4 right(0,0,0,1) ;
+	Geom::Vector<4, double> right(0,0,0,1) ;
+	v = VEC4(Ainv * right) ;
 
 	return true;
 }

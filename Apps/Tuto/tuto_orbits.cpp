@@ -80,7 +80,7 @@ template< unsigned int ORBIT>
 void MyQT::storeVerticesInfo(const AttributeHandler<int, ORBIT>* attrib)
 {
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->computeDartMiddlePositions<PFP>(myMap, middleDarts, nb);
+	m_render_topo->computeDartMiddlePositions<PFP>(myMap, middleDarts/*, nb*/);
 
 	m_strings->clear();
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
@@ -142,8 +142,7 @@ void MyQT::cb_initGL()
 	Utils::GLSLShader::setCurrentOGLVersion(2);
 
     m_render_topo = new Algo::Render::GL2::Topo3Render();
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.8f, 0.8f, nb);
+	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.8f, 0.8f);
 
     m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
 	registerShader(m_strings);
@@ -167,8 +166,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);	
-		m_clicked = m_render_topo->picking<PFP>(myMap, x,y, nb);
+		m_clicked = m_render_topo->picking<PFP>(myMap, x,y);
 		if (m_clicked != Dart::nil())
 		{
 			unsigned int orbs[9] = {VERTEX,EDGE,FACE,VOLUME,PFP::MAP::VERTEX_OF_PARENT,PFP::MAP::EDGE_OF_PARENT,PFP::MAP::FACE_OF_PARENT,PFP::MAP::VERTEX_OF_PARENT2,PFP::MAP::EDGE_OF_PARENT2};

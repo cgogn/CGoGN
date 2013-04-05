@@ -2,17 +2,18 @@
 #define _RENDER_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_render.h"
+#include "renderDockTab.h"
 
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderPhong.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/pointSprite.h"
 
+namespace CGoGN
+{
 
-using namespace CGoGN;
-using namespace SCHNApps;
-
+namespace SCHNApps
+{
 
 enum FaceShadingStyle
 {
@@ -48,25 +49,8 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
-};
-
-
-class RenderPlugin;
-
-class RenderDockTab : public QWidget, public Ui::RenderWidget
-{
-public:
-	RenderDockTab(RenderPlugin* p) : plugin(p)
-	{
-		setupUi(this);
-	}
-
-	void refreshUI(ParameterSet* params);
-
-private:
-	RenderPlugin* plugin;
 };
 
 
@@ -76,7 +60,7 @@ class RenderPlugin : public Plugin
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderPlugin() : b_refreshingUI(false)
+	RenderPlugin()
 	{
 		setProvidesRendering(true);
 	}
@@ -96,8 +80,6 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-	void setRefreshingUI(bool b) { b_refreshingUI = b; }
-
 protected:
 	RenderDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
@@ -107,8 +89,6 @@ protected:
 	CGoGN::Utils::ShaderSimpleColor* m_simpleColorShader;
 	CGoGN::Utils::PointSprite* m_pointSprite;
 
-	bool b_refreshingUI;
-
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
 	void viewUnlinked(View* view, Plugin* plugin);
@@ -117,26 +97,28 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
+
+public slots:
+
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
 	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeRenderVertices(View* view, MapHandlerGen* map, bool b);
-	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i);
-	void changeRenderEdges(View* view, MapHandlerGen* map, bool b);
-	void changeRenderFaces(View* view, MapHandlerGen* map, bool b);
-	void changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style);
 
-	void cb_selectedMapChanged();
-	void cb_positionVBOChanged(int index);
-	void cb_normalVBOChanged(int index);
-	void cb_renderVerticesChanged(bool b);
-	void cb_verticesScaleFactorChanged(int i);
-	void cb_renderEdgesChanged(bool b);
-	void cb_renderFacesChanged(bool b);
-	void cb_faceStyleChanged(QAbstractButton* b);
+	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeRenderVertices(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, float f, bool fromUI = false);
+	void changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style, bool fromUI = false);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

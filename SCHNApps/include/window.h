@@ -193,6 +193,7 @@ public slots:
 	
 	void cb_showHideDock();
 	void cb_showHidePythonDock();
+	void cb_loadPythonScript();
 
 	void cb_showCamerasDialog();
 	void cb_showPluginsDialog();

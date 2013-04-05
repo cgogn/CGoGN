@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MR_LERP_FILTER__
-#define __MR_LERP_FILTER__
+#ifndef __2MR_LERP_FILTER__
+#define __2MR_LERP_FILTER__
 
 #include <cmath>
 #include "Algo/Multiresolution/filter.h"

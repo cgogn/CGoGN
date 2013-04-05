@@ -34,179 +34,111 @@ namespace Utils
 #include "pointSprite.frag"
 #include "pointSprite.geom"
 
-
-unsigned char* PointSprite::m_ptrSphere = NULL;
-
-PointSprite* PointSprite::m_instance0 = NULL;
-
-
-
-PointSprite::PointSprite(bool withColorPervertex, float radius,  bool with_plane)
+PointSprite::PointSprite(bool withColorPerVertex, bool withPlane) :
+	colorPerVertex(withColorPerVertex),
+	plane(withPlane),
+	m_size(1.0f),
+	m_color(Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f)),
+	m_lightPos(Geom::Vec3f(100.0f, 100.0f, 100.0f)),
+	m_ambiant(Geom::Vec3f(0.1f, 0.1f, 0.1f)),
+	m_eyePos(Geom::Vec3f(0.0f, 0.0f, 0.0f))
 {
-	std::string defineColor("#define WITH_COLOR_PER_VERTEX 1\n");
-
 	std::string glxvert(*GLSLShader::DEFINES_GL);
-	if (withColorPervertex)
-		glxvert.append(defineColor);
+	if (withColorPerVertex)
+		glxvert.append("#define WITH_COLOR_PER_VERTEX 1\n");
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom = GLSLShader::defines_Geom("points","triangle_strip",4);
-	if (withColorPervertex)
-		glxgeom.append(defineColor);
-	if (with_plane)
+	std::string glxgeom = GLSLShader::defines_Geom("points", "triangle_strip", 4);
+	if (withColorPerVertex)
+		glxgeom.append("#define WITH_COLOR_PER_VERTEX 1\n");
+	if (withPlane)
 		glxgeom.append("#define WITH_PLANE 1\n");
-
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	if (withColorPervertex)
-		glxfrag.append(defineColor);
-	if (with_plane)
+	if (withColorPerVertex)
+		glxfrag.append("#define WITH_COLOR_PER_VERTEX 1\n");
+	if (withPlane)
 		glxfrag.append("#define WITH_PLANE 1\n");
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_TRIANGLE_STRIP,4);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_TRIANGLE_STRIP, 4);
 
-	bind();
-	*m_uniform_size = glGetUniformLocation(program_handler(),"size");
-	*m_uniform_color = glGetUniformLocation(program_handler(),"colorsprite");
-	glUniform1f(*m_uniform_size, radius);
-	unbind();
-
-	// load texture
-	if (m_ptrSphere == NULL)
-	{
-		computeSphere();
-		m_instance0 = this;
-		glGenTextures(1, &(*m_idTexture));
-		glBindTexture(GL_TEXTURE_2D, *m_idTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, 1, WIDTHSPRITE, WIDTHSPRITE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)m_ptrSphere);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-	else
-	{
-		*m_idTexture = *(this->m_idTexture);
-	}
-
-	*m_uniform_texture = glGetUniformLocation(program_handler(),"SpriteTexture");
-
-	if (with_plane)
-	{
-		*m_uniform_EyePos = glGetUniformLocation(program_handler(),"eyePos");
-//		*m_uniform_EyeY = glGetUniformLocation(program_handler(),"eyeY");
-	}
-
-	*m_uniform_ambiant = glGetUniformLocation(program_handler(),"ambiant");
-	*m_uniform_lightPos = glGetUniformLocation(program_handler(),"lightPos");
-
-	setLightPosition(Geom::Vec3f(2000.0,2000.0,2000.0));
-	setAmbiantColor(Geom::Vec3f(0.1f,0.1f,0.1f));
+	// get and fill uniforms
+	getLocations();
+	sendParams();
 }
 
-
-PointSprite::~PointSprite()
+void PointSprite::getLocations()
 {
-	if (m_ptrSphere!=NULL)
-	{
-		delete[] m_ptrSphere;
-		glDeleteTextures(1, &(*m_idTexture));
-	}
+	bind();
+	*m_uniform_size = glGetUniformLocation(program_handler(),"size");
+	if (!colorPerVertex)
+		*m_uniform_color = glGetUniformLocation(program_handler(),"colorsprite");
+	*m_uniform_ambiant = glGetUniformLocation(program_handler(),"ambiant");
+	*m_uniform_lightPos = glGetUniformLocation(program_handler(),"lightPos");
+	if (plane)
+		*m_uniform_eyePos = glGetUniformLocation(program_handler(),"eyePos");
+	unbind();
+}
+
+void PointSprite::sendParams()
+{
+	bind();
+	glUniform1f(*m_uniform_size, m_size);
+	if (!colorPerVertex)
+		glUniform4fv(*m_uniform_color, 1, m_color.data());
+	glUniform3fv(*m_uniform_ambiant, 1, m_ambiant.data());
+	glUniform3fv(*m_uniform_lightPos, 1, m_lightPos.data());
+	if (plane)
+		glUniform3fv(*m_uniform_eyePos, 1, m_eyePos.data());
+	unbind();
 }
 
 unsigned int PointSprite::setAttributePosition(VBO* vbo)
 {
-	return bindVA_VBO("VertexPosition", vbo);
+	m_vboPos = vbo;
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
 unsigned int PointSprite::setAttributeColor(VBO* vbo)
 {
-	return bindVA_VBO("VertexColor", vbo);
-}
-
-void PointSprite::predraw(const Geom::Vec3f& color)
-{
-	bind();
-	glUniform1i(*m_uniform_texture, 0);
-	glUniform3fv(*m_uniform_color, 1, color.data());
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, *m_idTexture);
-	glEnable(GL_TEXTURE_2D);
-}
-
-void PointSprite::predraw()
-{
-	bind();
-	glUniform1i(*m_uniform_texture, 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, *m_idTexture);
-	glEnable(GL_TEXTURE_2D);
-}
-
-void PointSprite::postdraw()
-{
-	glDisable(GL_TEXTURE_2D);
-	unbind();
-}
-
-void PointSprite::setSize(float radius)
-{
-	bind();
-	glUniform1f(*m_uniform_size, radius);
-	unbind();
-}
-
-void PointSprite::setEyePosition(const Geom::Vec3f& ep)
-{
-	bind();
-	glUniform3fv(*m_uniform_EyePos, 1, ep.data());
-//	glUniform3fv(*m_uniform_EyeY, 1, oy.data());
-	unbind();
-}
-
-
-void PointSprite::computeSphere()
-{
-	if (m_ptrSphere == NULL) // normally useless
+	if (colorPerVertex)
 	{
-		m_ptrSphere = new unsigned char[WIDTHSPRITE*WIDTHSPRITE];
+		m_vboColor = vbo;
+		bind();
+		unsigned int id = bindVA_VBO("VertexColor", vbo);
+		unbind();
+		return id;
 	}
+	return 0;
+}
 
-	unsigned char* ptr = m_ptrSphere;
+void PointSprite::setSize(float size)
+{
+	m_size = size;
+	bind();
+	glUniform1f(*m_uniform_size, size);
+	unbind();
+}
 
-	Geom::Vec3f eye(0.0f , 0.0f, -1.0f);
-	Geom::Vec3f light(5.0f, 3.0f, 10.0f);
-	light.normalize();
-	float r2 = float((WIDTHSPRITE - 1) * (WIDTHSPRITE - 1)) / 4.0f;
-	float mid = 0.5f - float(WIDTHSPRITE / 2);
-
-	for (unsigned int i = 0; i < WIDTHSPRITE; ++i)
+void PointSprite::setColor(const Geom::Vec4f& color)
+{
+	if (!colorPerVertex)
 	{
-		for (unsigned int j = 0; j < WIDTHSPRITE; ++j)
-		{
-			float x = float(i) + mid;
-			float y = float(j) + mid;
-			float a =  x*x + y*y;
-			if (r2 >= a)
-			{
-				float z = sqrt(r2 - a);
-				Geom::Vec3f P(x, y, z);
-				P.normalize();
-				float col = P * light;
-				if (col < 0.0f)
-					col = 0.02f; // ambiant
-
-				*ptr++ = (unsigned char)(255.0f * col);
-			}
-			else
-				*ptr++ = (unsigned char)0;
-		}
+		m_color = color;
+		bind();
+		glUniform4fv(*m_uniform_color, 1, color.data());
+		unbind();
 	}
 }
-
 
 void PointSprite::setLightPosition(const Geom::Vec3f& pos)
 {
+	m_lightPos = pos;
 	bind();
 	glUniform3fv(*m_uniform_lightPos, 1, pos.data());
 	unbind();
@@ -214,11 +146,34 @@ void PointSprite::setLightPosition(const Geom::Vec3f& pos)
 
 void PointSprite::setAmbiantColor(const Geom::Vec3f& amb)
 {
+	m_ambiant = amb;
 	bind();
 	glUniform3fv(*m_uniform_ambiant, 1, amb.data());
 	unbind();
 }
 
+void PointSprite::setEyePosition(const Geom::Vec3f& ep)
+{
+	if (plane)
+	{
+		m_eyePos = ep;
+		bind();
+		glUniform3fv(*m_uniform_eyePos, 1, ep.data());
+		unbind();
+	}
+}
+
+void PointSprite::restoreUniformsAttribs()
+{
+	getLocations();
+	sendParams();
+
+	bind();
+	bindVA_VBO("VertexPosition", m_vboPos);
+	if (colorPerVertex)
+		bindVA_VBO("VertexColor", m_vboColor);
+	unbind();
+}
 
 } // namespace Utils
 

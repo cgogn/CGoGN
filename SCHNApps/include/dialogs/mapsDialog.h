@@ -26,10 +26,11 @@ private:
 	void clearInfo();
 
 public slots:
-	void cb_removeMap();
-	void cb_selectedMapChanged();
-	void cb_addMapToList(MapHandlerGen* m);
-	void cb_removeMapFromList(MapHandlerGen* m);
+	void removeMap();
+	void selectedMapChanged();
+	void toggleVBO(QListWidgetItem* item);
+	void addMapToList(MapHandlerGen* m);
+	void removeMapFromList(MapHandlerGen* m);
 };
 
 } // namespace SCHNApps

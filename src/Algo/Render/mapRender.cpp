@@ -41,7 +41,10 @@ MapRender::MapRender()
 {
 	glGenBuffers(SIZE_BUFFER, m_indexBuffers) ;
 	for(unsigned int i = 0; i < SIZE_BUFFER; ++i)
+	{
 		m_nbIndices[i] = 0 ;
+		m_indexBufferUpToDate[i] = false;
+	}
 }
 
 MapRender::~MapRender()
@@ -51,65 +54,33 @@ MapRender::~MapRender()
 
 void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 {
-	// indice du VBO a utiliser
-	int vbo_ind = 0;
-	int size = 0;
-
-	switch(prim)
-	{
-		case POINTS:
-			m_nbIndices[POINT_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[POINT_INDICES];
-			size = m_nbIndices[POINT_INDICES];
-			break;
-		case LINES:
-			m_nbIndices[LINE_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[LINE_INDICES];
-			size = m_nbIndices[LINE_INDICES];
-			break;
-		case TRIANGLES:
-			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
-			size = m_nbIndices[TRIANGLE_INDICES];
-			break;
-		case BOUNDARY:
-			m_nbIndices[BOUNDARY_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[BOUNDARY_INDICES];
-			size = m_nbIndices[BOUNDARY_INDICES];
-			break;
-		default:
-			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
-			break;
-	}
+	m_nbIndices[prim] = tableIndices.size();
+	m_indexBufferUpToDate[prim] = true;
 
 	// setup du buffer d'indices
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
 void MapRender::draw(Utils::GLSLShader* sh, int prim)
 {
 	sh->enableVertexAttribs();
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
 	switch(prim)
 	{
 		case POINTS:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[POINT_INDICES]);
-			glDrawElements(GL_POINTS, m_nbIndices[POINT_INDICES], GL_UNSIGNED_INT, 0) ;
+			glDrawElements(GL_POINTS, m_nbIndices[POINTS], GL_UNSIGNED_INT, 0) ;
 			break;
 		case LINES:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[LINE_INDICES]);
-			glDrawElements(GL_LINES, m_nbIndices[LINE_INDICES], GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_LINES, m_nbIndices[LINES], GL_UNSIGNED_INT, 0);
 			break;
 		case TRIANGLES:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[TRIANGLE_INDICES]);
-			glDrawElements(GL_TRIANGLES, m_nbIndices[TRIANGLE_INDICES], GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, m_nbIndices[TRIANGLES], GL_UNSIGNED_INT, 0);
 			break;
 		case BOUNDARY:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[BOUNDARY_INDICES]);
-			glDrawElements(GL_LINES, m_nbIndices[BOUNDARY_INDICES], GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_LINES, m_nbIndices[BOUNDARY], GL_UNSIGNED_INT, 0);
 			break;
-
 		default:
 			break;
 	}
@@ -121,25 +92,22 @@ unsigned int MapRender::drawSub(Utils::GLSLShader* sh, int prim, unsigned int nb
 {
 	sh->enableVertexAttribs();
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
 	switch(prim)
 	{
 		case POINTS:
-			if (nb_elm > m_nbIndices[POINT_INDICES])
-				nb_elm = m_nbIndices[POINT_INDICES];
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[POINT_INDICES]);
+			if (nb_elm > m_nbIndices[POINTS])
+				nb_elm = m_nbIndices[POINTS];
 			glDrawElements(GL_POINTS, nb_elm, GL_UNSIGNED_INT, 0) ;
-
 			break;
 		case LINES:
-			if (2*nb_elm > m_nbIndices[LINE_INDICES])
-				nb_elm = m_nbIndices[LINE_INDICES]/2;
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[LINE_INDICES]);
+			if (2*nb_elm > m_nbIndices[LINES])
+				nb_elm = m_nbIndices[LINES]/2;
 			glDrawElements(GL_LINES, 2*nb_elm, GL_UNSIGNED_INT, 0);
 			break;
 		case TRIANGLES:
-			if (3*nb_elm > m_nbIndices[TRIANGLE_INDICES])
-				nb_elm = m_nbIndices[TRIANGLE_INDICES]/3;
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[TRIANGLE_INDICES]);
+			if (3*nb_elm > m_nbIndices[TRIANGLES])
+				nb_elm = m_nbIndices[TRIANGLES]/3;
 			glDrawElements(GL_TRIANGLES, 3*nb_elm, GL_UNSIGNED_INT, 0);
 			break;
 		default:

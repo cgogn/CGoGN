@@ -85,11 +85,6 @@ protected:
 	*/
 	std::vector<Dart> m_poly;
 
-	/**
-	* Dart selector to restrict the rendering
-	*/
-	const FunctorSelect& m_selector;
-
 
 public:
 	/**
@@ -99,10 +94,9 @@ public:
 	* @param expl exploding coefficient
 	* @param stor shall we store faces that are not of the good primitive type
 	* @param vn the vertex normal vector (indiced by dart label)
-	* @param good dart selector
 	*/
 	FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const FunctorSelect& good);
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals );
 
 	/**
 	* get back the vector of darts of faces that have not been treated
@@ -184,16 +178,11 @@ protected:
 	*/
 	std::vector<Dart> m_poly;
 
-	/**
-	* Dart selector to restrict the rendering
-	*/
-	const FunctorSelect& m_selector;
-
 
 public:
 
 	FunctorGLFaceColor(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const VertexAttribute<typename PFP::VEC3>& colors ,const FunctorSelect& good);
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const VertexAttribute<typename PFP::VEC3>& colors);
 
 	std::vector<Dart>& getPolyDarts();
 
@@ -221,19 +210,12 @@ protected:
 	 */
 	const VertexAttribute<typename PFP::VEC3>& m_normals;
 
-	/**
-	* Dart selector to restrict the rendering
-	*/
-	const FunctorSelect& m_selector;
 
 	float m_scale;
 
 public:
-	/**
 
-	* @param good dart selector
-	*/
-	FunctorGLNormal(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale);
+	FunctorGLNormal(MAP& map, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale);
 
 	bool operator() (Dart d);
 };
@@ -255,19 +237,12 @@ protected:
 	 */
 	const VertexAttribute<typename PFP::VEC3> *m_frames;
 
-	/**
-	* Dart selector to restrict the rendering
-	*/
-	const FunctorSelect& m_selector;
 
 	float m_scale;
 
 public:
-	/**
 
-	* @param good dart selector
-	*/
-	FunctorGLFrame (MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale);
+	FunctorGLFrame (MAP& map, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale);
 
 	bool operator() (Dart d);
 };

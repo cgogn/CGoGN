@@ -114,6 +114,7 @@ void Viewer::cb_initGL()
 
 	m_pointSprite = new Utils::PointSprite() ;
 	m_pointSprite->setAttributePosition(m_positionVBO) ;
+	m_pointSprite->setColor(Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f)) ;
 
 	registerShader(m_phongShader) ;
 	registerShader(m_flatShader) ;
@@ -126,11 +127,8 @@ void Viewer::cb_redraw()
 {
 	if(m_drawVertices)
 	{
-		float size = vertexScaleFactor ;
-		m_pointSprite->setSize(size) ;
-		m_pointSprite->predraw(Geom::Vec3f(0.0f, 0.0f, 1.0f)) ;
+		m_pointSprite->setSize(vertexScaleFactor) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
-		m_pointSprite->postdraw() ;
 	}
 
 	if(m_drawEdges)
@@ -229,9 +227,9 @@ void Viewer::importMesh(std::string& filename)
 
 	myMap.enableQuickTraversal<VERTEX>() ;
 
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
 	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f) ;
 
@@ -258,7 +256,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 	std::string extension = filename.substr(pos) ;
 
 	if (extension == std::string(".off"))
-		Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+		Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str()) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 	{
 		int ascii = 0 ;
@@ -267,7 +265,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 
 		std::vector<VertexAttribute<VEC3>*> attributes ;
 		attributes.push_back(&position) ;
-		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
+		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii) ;
 	}
 	else if (extension == std::string(".map"))
 		myMap.saveMapBin(filename) ;
@@ -320,7 +318,6 @@ void Viewer::slot_drawNormals(bool b)
 void Viewer::slot_normalsSize(int i)
 {
 	normalScaleFactor = i / 50.0f ;
-	m_topoRender->updateData<PFP>(myMap, position, i / 100.0f, i / 100.0f) ;
 	updateGL() ;
 }
 

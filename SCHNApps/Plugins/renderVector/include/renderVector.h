@@ -2,14 +2,15 @@
 #define _RENDERVECTOR_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_renderVector.h"
+#include "renderVectorDockTab.h"
 
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 
+namespace CGoGN
+{
 
-using namespace CGoGN;
-using namespace SCHNApps;
-
+namespace SCHNApps
+{
 
 struct PerMapParameterSet
 {
@@ -30,25 +31,8 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
-};
-
-
-class RenderVectorPlugin;
-
-class RenderVectorDockTab : public QWidget, public Ui::RenderVectorWidget
-{
-public:
-	RenderVectorDockTab(RenderVectorPlugin* p) : plugin(p)
-	{
-		setupUi(this);
-	}
-
-	void refreshUI(ParameterSet* params);
-
-private:
-	RenderVectorPlugin* plugin;
 };
 
 
@@ -58,7 +42,7 @@ class RenderVectorPlugin : public Plugin
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderVectorPlugin() : b_refreshingUI(false)
+	RenderVectorPlugin()
 	{
 		setProvidesRendering(true);
 	}
@@ -78,15 +62,11 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-	void setRefreshingUI(bool b) { b_refreshingUI = b; }
-
 protected:
 	RenderVectorDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
 
 	CGoGN::Utils::ShaderVectorPerVertex* m_vectorShader;
-
-	bool b_refreshingUI;
 
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
@@ -96,18 +76,20 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void vboAdded(Utils::VBO* vbo);
-	void vboRemoved(Utils::VBO* vbo);
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
 
+public slots:
 	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos);
-	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i);
 
-	void cb_selectedMapChanged();
-	void cb_positionVBOChanged(int index);
-	void cb_selectedVectorsVBOChanged();
-	void cb_vectorsScaleFactorChanged(int i);
+	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI = false);
+	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

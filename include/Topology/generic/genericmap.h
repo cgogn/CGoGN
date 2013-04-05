@@ -64,7 +64,7 @@ class DartMarkerGen ;
 class CellMarkerGen ;
 template<unsigned int CELL> class CellMarkerBase ;
 
-class GenericMap : public MapBrowser
+class GenericMap// : public MapBrowser
 {
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler ;
 	template<typename T> friend class DartAutoAttribute ;
@@ -77,6 +77,12 @@ class GenericMap : public MapBrowser
 	template<unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
+
+	/**
+	 * @brief current MapBrowser use to traverse
+	 */
+	MapBrowser* m_currentBrowser;
+
 	/**
 	 * Attributes Containers
 	 */
@@ -182,6 +188,12 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
+
+	/**
+	 * @brief set the current MapBrowser
+	 * @param mb pointer on MapBrowser to use (default is map it self)
+	 */
+	void setBrowser(MapBrowser* mb) { m_currentBrowser = mb; }
 
 	/****************************************
 	 *     RESOLUTION LEVELS MANAGEMENT     *
@@ -455,7 +467,7 @@ public:
 	void enableQuickTraversal() ;
 
 	template <unsigned int ORBIT>
-	void updateQuickTraversal(const FunctorSelect& good = allDarts) ;
+	void updateQuickTraversal() ;
 
 	template <unsigned int ORBIT>
 	AttributeMultiVector<Dart>* getQuickTraversal() ;
@@ -649,6 +661,13 @@ public:
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
 
+	Dart realBegin() const;
+
+	Dart realEnd() const;
+
+	void realNext(Dart& d) const;
+
+
 	/**
 	 * Begin of map
 	 * @return the first dart of the map
@@ -672,7 +691,7 @@ public:
 	 * Apply a functor on each dart of the map
 	 * @param f a ref to the functor obj
 	 */
-	bool foreach_dart(FunctorType& f, const FunctorSelect& good = allDarts) ;
+	bool foreach_dart(FunctorType& f) ;
 
 	//! Apply a functor on every dart of an orbit
 	/*! @param dim dimension of orbit
@@ -699,18 +718,16 @@ public:
 	* execute functor for each orbit
 	* @param dim the dimension of the orbit
 	* @param f the functor
-	* @param good the selector of darts
 	*/
 	template <unsigned int ORBIT>
-	bool foreach_orbit(FunctorType& f, const FunctorSelect& good = allDarts, unsigned int thread = 0) ;
+	bool foreach_orbit(FunctorType& f, unsigned int thread = 0) ;
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit
-	 *	@param good the selector of darts
 	 * 	@return the number of orbits
 	 */
 	template <unsigned int ORBIT>
-	unsigned int getNbOrbits(const FunctorSelect& good = allDarts) ;
+	unsigned int getNbOrbits() ;
 
 	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
 	/*! @param d a dart

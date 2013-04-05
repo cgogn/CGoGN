@@ -2,33 +2,39 @@
 #define _RENDER_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_renderExplod.h"
+#include "renderExplodDockTab.h"
 
 #include "Algo/Render/GL2/explodeVolumeRender.h"
 
-using namespace CGoGN;
-using namespace SCHNApps;
+namespace CGoGN
+{
 
+namespace SCHNApps
+{
+
+enum FaceShadingStyle
+{
+	FLAT = 0,
+	SMOOTH = 1
+};
 
 struct PerMapParameterSet
 {
-	PerMapParameterSet() :
-		positionVBO(NULL),
-		colorVBO(NULL),
-		facesScaleFactor(1.0f),
-		volumesScaleFactor(1.0f),
-		renderEdges(false),
-		renderFaces(true)
-	{}
+	PerMapParameterSet(MapHandlerGen* mh);
+	~PerMapParameterSet();
 
-	PerMapParameterSet(MapHandlerGen* map);
+	void updateRender();
 
-	Utils::VBO* positionVBO;
-	Utils::VBO* colorVBO;
+	MapHandlerGen* mh;
+	Algo::Render::GL2::ExplodeVolumeRender* m_renderExplod;
+	VertexAttribute<PFP3::VEC3> positionAttribute;
+	VolumeAttribute<PFP3::VEC3> colorAttribute;
+
 	float facesScaleFactor;
 	float volumesScaleFactor;
 	bool renderEdges;
 	bool renderFaces;
+	FaceShadingStyle faceStyle;
 };
 
 struct ParameterSet
@@ -36,25 +42,8 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
-};
-
-
-class RenderExplodPlugin;
-
-class RenderExplodDockTab : public QWidget, public Ui::RenderExplodWidget
-{
-public:
-	RenderExplodDockTab(RenderExplodPlugin* p) : plugin(p)
-	{
-		setupUi(this);
-	}
-
-	void refreshUI(ParameterSet* params);
-
-private:
-	RenderExplodPlugin* plugin;
 };
 
 
@@ -64,7 +53,7 @@ class RenderExplodPlugin : public Plugin
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderExplodPlugin() : b_refreshingUI(false)
+	RenderExplodPlugin()
 	{
 		setProvidesRendering(true);
 	}
@@ -84,13 +73,9 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
 
-	void setRefreshingUI(bool b) { b_refreshingUI = b; }
-
 protected:
 	RenderExplodDockTab* m_dockTab;
 	QHash<View*, ParameterSet*> h_viewParams;
-
-	bool b_refreshingUI;
 
 public slots:
 	void viewLinked(View* view, Plugin* plugin);
@@ -100,24 +85,26 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void vboAdded(Utils::VBO* vbo);
-	void vboRemoved(Utils::VBO* vbo);
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
 
+public slots:
 	void changeSelectedMap(View* view, MapHandlerGen* map);
-	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeColorVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo);
-	void changeRenderEdges(View* view, MapHandlerGen* map, bool b);
-	void changeRenderFaces(View* view, MapHandlerGen* map, bool b);
-	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i);
-	void changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i);
 
-	void cb_selectedMapChanged();
-	void cb_positionVBOChanged(int index);
-	void cb_colorVBOChanged(int index);
-	void cb_renderEdgesChanged(bool b);
-	void cb_renderFacesChanged(bool b);
-	void cb_facesScaleFactorChanged(int i);
-	void cb_volumesScaleFactorChanged(int i);
+	void changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI = false);
+	void changeColorAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP3::VEC3> attribute, bool fromUI = false);
+	void changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
+	void changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+	void changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+
+	void attributeModified(unsigned int orbit, QString nameAttr);
+	void connectivityModified();
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

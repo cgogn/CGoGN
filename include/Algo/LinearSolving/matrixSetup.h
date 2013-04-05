@@ -31,64 +31,69 @@ namespace CGoGN
 namespace LinearSolving
 {
 
+template <typename CoeffType>
+struct Coeff
+{
+	unsigned int index;
+	CoeffType value;
+	Coeff(unsigned int i, CoeffType v) : index(i), value(v)
+	{}
+} ;
+
 /*******************************************************************************
  * EQUALITY MATRIX : right-hand-side SCALAR
  *******************************************************************************/
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_PerVertexWeight_Scalar : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	const VertexAttribute<typename PFP::REAL>& weightTable ;
 
 public:
 	FunctorEquality_PerVertexWeight_Scalar(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		const VertexAttribute<typename PFP::REAL>& weight
-	) :	solver(s), indexTable(index), attrTable(attr), weightTable(weight)
+	) :	indexTable(index), attrTable(attr), weightTable(weight)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
-		solver->add_coefficient(indexTable[d], 1) ;
-		solver->set_right_hand_side(attrTable[d]) ;
-		solver->normalize_row(weightTable[d]) ;
-		solver->end_row() ;
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attrTable[d]) ;
+		nlRowParameterd(NL_ROW_SCALING, weightTable[d]) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(indexTable[d], 1) ;
+		nlEnd(NL_ROW) ;
 		return false ;
 	}
 } ;
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_UniformWeight_Scalar : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	float weight ;
 
 public:
 	FunctorEquality_UniformWeight_Scalar(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		float w
-	) :	solver(s), indexTable(index), attrTable(attr), weight(w)
+	) :	indexTable(index), attrTable(attr), weight(w)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
-		solver->add_coefficient(indexTable[d], 1) ;
-		solver->set_right_hand_side(attrTable[d]) ;
-		solver->normalize_row(weight) ;
-		solver->end_row() ;
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attrTable[d]) ;
+		nlRowParameterd(NL_ROW_SCALING, weight) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(indexTable[d], 1) ;
+		nlEnd(NL_ROW) ;
 		return false ;
 	}
 } ;
@@ -97,11 +102,10 @@ public:
  * EQUALITY MATRIX : right-hand-side VECTOR + coordinate
  *******************************************************************************/
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_PerVertexWeight_Vector : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	const VertexAttribute<typename PFP::REAL>& weightTable ;
@@ -109,30 +113,28 @@ protected:
 
 public:
 	FunctorEquality_PerVertexWeight_Vector(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		const VertexAttribute<typename PFP::REAL>& weight,
 		unsigned int c
-	) :	solver(s), indexTable(index), attrTable(attr), weightTable(weight), coord(c)
+	) :	indexTable(index), attrTable(attr), weightTable(weight), coord(c)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
-		solver->add_coefficient(indexTable[d], 1) ;
-		solver->set_right_hand_side((attrTable[d])[coord]) ;
-		solver->normalize_row(weightTable[d]) ;
-		solver->end_row() ;
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attrTable[d])[coord]) ;
+		nlRowParameterd(NL_ROW_SCALING, weightTable[d]) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(indexTable[d], 1) ;
+		nlEnd(NL_ROW) ;
 		return false ;
 	}
 } ;
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_UniformWeight_Vector : public FunctorType
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	float weight ;
@@ -140,21 +142,20 @@ protected:
 
 public:
 	FunctorEquality_UniformWeight_Vector(
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		float w,
 		unsigned int c
-	) :	solver(s), indexTable(index), attrTable(attr), weight(w), coord(c)
+	) :	indexTable(index), attrTable(attr), weight(w), coord(c)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
-		solver->add_coefficient(indexTable[d], 1) ;
-		solver->set_right_hand_side((attrTable[d])[coord]) ;
-		solver->normalize_row(weight) ;
-		solver->end_row() ;
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attrTable[d])[coord]) ;
+		nlRowParameterd(NL_ROW_SCALING, weight) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(indexTable[d], 1) ;
+		nlEnd(NL_ROW) ;
 		return false ;
 	}
 } ;
@@ -163,11 +164,10 @@ public:
  * LAPLACIAN TOPO MATRIX : right-hand-side 0
  *******************************************************************************/
 
-template<typename PFP, class SOLVER_TRAITS>
+template<typename PFP>
 class FunctorLaplacianTopo : public FunctorMap<typename PFP::MAP>
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 
 public:
@@ -176,26 +176,24 @@ public:
 
 	FunctorLaplacianTopo(
 		MAP& m,
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index
-	) :	FunctorMap<MAP>(m), solver(s), indexTable(index)
+	) :	FunctorMap<MAP>(m), indexTable(index)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, 0) ;
+		nlBegin(NL_ROW);
 		REAL aii = 0 ;
 		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
 			aii += aij ;
-			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			nlCoefficient(indexTable[this->m_map.phi1(it)], aij) ;
 		}
-		solver->add_coefficient(indexTable[d], -aii) ;
-		solver->normalize_row() ;
-		solver->set_right_hand_side(0) ;
-		solver->end_row() ;
+		nlCoefficient(indexTable[d], -aii) ;
+		nlEnd(NL_ROW) ;
 		return false ;
 	}
 } ;
@@ -204,11 +202,10 @@ public:
  * LAPLACIAN TOPO MATRIX : right-hand-side SCALAR
  *******************************************************************************/
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianTopoRHS_Scalar : public FunctorMap<typename PFP::MAP>
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 
@@ -218,27 +215,35 @@ public:
 
 	FunctorLaplacianTopoRHS_Scalar(
 		MAP& m,
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const VertexAttribute<ATTR_TYPE>& attr
-	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), attrTable(attr)
+	) :	FunctorMap<MAP>(m), indexTable(index), attrTable(attr)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
+		std::vector<Coeff<REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
+		REAL norm2 = 0 ;
 		REAL aii = 0 ;
 		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
 			aii += aij ;
-			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			coeffs.push_back(Coeff<REAL>(indexTable[this->m_map.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
 		}
-		solver->add_coefficient(indexTable[d], -aii) ;
-		solver->normalize_row() ;
-		solver->set_right_hand_side(attrTable[d]) ;
-		solver->end_row() ;
+		coeffs.push_back(Coeff<REAL>(indexTable[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attrTable[d] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+
 		return false ;
 	}
 } ;
@@ -247,11 +252,10 @@ public:
  * LAPLACIAN TOPO MATRIX : right-hand-side VECTOR + coordinate
  *******************************************************************************/
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianTopoRHS_Vector : public FunctorMap<typename PFP::MAP>
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	unsigned int coord ;
@@ -262,28 +266,36 @@ public:
 
 	FunctorLaplacianTopoRHS_Vector(
 		MAP& m,
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		unsigned int c
-	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), attrTable(attr), coord(c)
+	) :	FunctorMap<MAP>(m), indexTable(index), attrTable(attr), coord(c)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
+		std::vector<Coeff<REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
+		REAL norm2 = 0 ;
 		REAL aii = 0 ;
 		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
 			aii += aij ;
-			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			coeffs.push_back(Coeff<REAL>(indexTable[this->m_map.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
 		}
-		solver->add_coefficient(indexTable[d], -aii) ;
-		solver->normalize_row() ;
-		solver->set_right_hand_side((attrTable[d])[coord]) ;
-		solver->end_row() ;
+		coeffs.push_back(Coeff<REAL>(indexTable[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attrTable[d])[coord] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+
 		return false ;
 	}
 } ;
@@ -292,11 +304,10 @@ public:
  * LAPLACIAN COTAN MATRIX : right-hand-side 0
  *******************************************************************************/
 
-template<typename PFP, class SOLVER_TRAITS>
+template<typename PFP>
 class FunctorLaplacianCotan : public FunctorMap<typename PFP::MAP>
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
 	const VertexAttribute<typename PFP::REAL>& vertexArea ;
@@ -307,32 +318,28 @@ public:
 
 	FunctorLaplacianCotan(
 		MAP& m,
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const EdgeAttribute<typename PFP::REAL>& eWeight,
 		const VertexAttribute<typename PFP::REAL>& vArea
-	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea)
+	) :	FunctorMap<MAP>(m), indexTable(index), edgeWeight(eWeight), vertexArea(vArea)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, 0) ;
+		nlBegin(NL_ROW);
 		REAL vArea = vertexArea[d] ;
 		REAL aii = 0 ;
-		Dart it = d ;
-//		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
-//		for(Dart it = t.begin(); it != t.end(); it = t.next())
-		do
+		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
-			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			it = this->m_map.phi2_1(it) ;
-		} while(it != d) ;
-		solver->add_coefficient(indexTable[d], -aii) ;
-		solver->normalize_row() ;
-		solver->set_right_hand_side(0) ;
-		solver->end_row() ;
+			nlCoefficient(indexTable[this->m_map.phi1(it)], aij) ;
+		}
+		nlCoefficient(indexTable[d], -aii) ;
+		nlEnd(NL_ROW) ;
+
 		return false ;
 	}
 } ;
@@ -341,11 +348,10 @@ public:
  * LAPLACIAN COTAN MATRIX : right-hand-side SCALAR
  *******************************************************************************/
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianCotanRHS_Scalar : public FunctorMap<typename PFP::MAP>
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
 	const VertexAttribute<typename PFP::REAL>& vertexArea ;
@@ -357,30 +363,38 @@ public:
 
 	FunctorLaplacianCotanRHS_Scalar(
 		MAP& m,
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const EdgeAttribute<typename PFP::REAL>& eWeight,
 		const VertexAttribute<typename PFP::REAL>& vArea,
 		const VertexAttribute<ATTR_TYPE>& attr
-	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr)
+	) :	FunctorMap<MAP>(m), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
+		std::vector<Coeff<REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
 		REAL vArea = vertexArea[d] ;
+		REAL norm2 = 0 ;
 		REAL aii = 0 ;
 		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
-			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			coeffs.push_back(Coeff<REAL>(indexTable[this->m_map.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
 		}
-		solver->add_coefficient(indexTable[d], -aii) ;
-		solver->normalize_row() ;
-		solver->set_right_hand_side(attrTable[d]) ;
-		solver->end_row() ;
+		coeffs.push_back(Coeff<REAL>(indexTable[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attrTable[d] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+
 		return false ;
 	}
 } ;
@@ -389,11 +403,10 @@ public:
  * LAPLACIAN COTAN MATRIX : right-hand-side VECTOR + coordinate
  *******************************************************************************/
 
-template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianCotanRHS_Vector : public FunctorMap<typename PFP::MAP>
 {
 protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
 	const VertexAttribute<unsigned int>& indexTable ;
 	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
 	const VertexAttribute<typename PFP::REAL>& vertexArea ;
@@ -406,31 +419,39 @@ public:
 
 	FunctorLaplacianCotanRHS_Vector(
 		MAP& m,
-		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
 		const EdgeAttribute<typename PFP::REAL>& eWeight,
 		const VertexAttribute<typename PFP::REAL>& vArea,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		unsigned int c
-	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr), coord(c)
+	) :	FunctorMap<MAP>(m), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr), coord(c)
 	{}
 
 	bool operator()(Dart d)
 	{
-		solver->begin_row() ;
+		std::vector<Coeff<REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
 		REAL vArea = vertexArea[d] ;
+		REAL norm2 = 0 ;
 		REAL aii = 0 ;
 		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
-			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			coeffs.push_back(Coeff<REAL>(indexTable[this->m_map.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
 		}
-		solver->add_coefficient(indexTable[d], -aii) ;
-		solver->normalize_row() ;
-		solver->set_right_hand_side((attrTable[d])[coord]) ;
-		solver->end_row() ;
+		coeffs.push_back(Coeff<REAL>(indexTable[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attrTable[d])[coord] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+
 		return false ;
 	}
 } ;

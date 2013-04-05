@@ -87,20 +87,18 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
 * catmull clark volumic : do not move the original vertices
 * @param map the map
 * @param attributs geometric attributes of the vertices
-* @param selected a functor to select volumes to subdivide
-* TODO : test if it works for the functorselect
 */
 template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts);
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs);
 
 template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts)
+void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
-	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected);
+	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position);
 }
 
 template <typename PFP>
-void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts);
+void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 template <typename PFP>
 void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);

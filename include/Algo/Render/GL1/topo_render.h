@@ -77,7 +77,7 @@ void renderTopoMD2(typename PFP::MAP& the_map, const VertexAttribute<typename PF
  * @param kv exploding coefficient for volumes (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, const FunctorSelect& good=allDarts);
+void renderTopoMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
 
 /**
  * Render darts of g-map

@@ -101,6 +101,8 @@ GenericMap::GenericMap() : m_nbThreads(1)
 
 	if (m_isMultiRes)
 		initMR() ;
+
+	m_currentBrowser = NULL;
 }
 
 GenericMap::~GenericMap()
@@ -616,8 +618,11 @@ bool GenericMap::loadMapBin(const std::string& filename)
 			++m_nbThreads;
 	}
 
-
-
+	// restore quick traversals pointers if necessary (containers  already ok)
+	for (unsigned int orb=0; orb<NB_ORBITS; ++orb)
+	{
+		m_quickTraversal[orb] = m_attribs[orb].getDataVector<Dart>("quick_traversal") ;
+	}
 
 	return true;
 }
@@ -880,13 +885,12 @@ void GenericMap::compact()
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-bool GenericMap::foreach_dart(FunctorType& f, const FunctorSelect& good)
+bool GenericMap::foreach_dart(FunctorType& f)
 {
 	for (Dart d = begin(); d != end(); next(d))
 	{
-		if(good(d))
-			if (f(d))
-				return true;
+		if (f(d))
+			return true;
 	}
 	return false;
 }

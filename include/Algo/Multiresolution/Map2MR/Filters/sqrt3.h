@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MR_SQRT3_FILTER__
-#define __MR_SQRT3_FILTER__
+#ifndef __2MR_SQRT3_FILTER__
+#define __2MR_SQRT3_FILTER__
 
 #include <cmath>
 #include "Algo/Multiresolution/filter.h"
@@ -144,11 +144,6 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
-
-	void operator() (bool filtering)
-	{
-
-	}
 } ;
 
 template <typename PFP>
@@ -233,11 +228,6 @@ public:
 			}
 		}
 	}
-
-	void operator() (bool filtering)
-	{
-
-	}
 } ;
 
 template <typename PFP>
@@ -288,11 +278,6 @@ public:
 
 		}
 	}
-
-	void operator() (bool filtering)
-	{
-
-	}
 } ;
 
 template <typename PFP>
@@ -329,11 +314,6 @@ public:
 			m_map.decCurrentLevel() ;
 
 		}
-	}
-
-	void operator() (bool filtering)
-	{
-
 	}
 } ;
 

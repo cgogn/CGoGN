@@ -24,6 +24,7 @@
 
 #include "tuto1.h"
 #include "Algo/Geometry/boundingbox.h"
+#include "Topology/generic/mapBrowser.h"
 
 using namespace CGoGN ;
 
@@ -41,7 +42,22 @@ int main(int argc, char **argv)
 	// final show for redraw
 	sqt.show();
 	// and wait for the end
+
+//	QGLViewer* ptr = sqt.getQGLWidget();
 	return app.exec();
+}
+
+void MyQT::cb_keyPress(int keycode)
+{
+	switch(keycode)
+	{
+		case 'c' :
+			getQGLWidget()->camera()->centerScene();
+			updateGL();
+			break;
+		default:
+			break;
+	}
 }
 
 void MyQT::createMap()
@@ -69,6 +85,7 @@ void MyQT::createMap()
     float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
+	show();
     // send BB info to interface for centering on GL screen
 	setParamObject(lWidthObj, lPosObj.data());
 
@@ -76,8 +93,8 @@ void MyQT::createMap()
 	show();
 
 	// render the topo of the map without boundary darts
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, nb);
+	m_render_topo->setInitialBoundaryDartsColor(0,1,0);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true);
 }
 
 // initialization GL callback

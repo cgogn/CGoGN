@@ -36,9 +36,9 @@
 #include "Utils/vbo_base.h"
 #include "Utils/svg.h"
 
-// forward
-namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
-namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 
 namespace CGoGN
 {
@@ -94,10 +94,20 @@ protected:
 	 */
 	float m_topo_relation_width;
 
+	/// shifting along normals for 3-map boundary drawing
+	float m_normalShift;
+
+	float m_boundShift;
+
 	/**
 	 * initial darts color (set in update)
 	 */
 	Geom::Vec3f m_dartsColor;
+
+	/**
+	 * initial darts color (set in update)
+	 */
+	Geom::Vec3f m_dartsBoundaryColor;
 
 	float *m_color_save;
 
@@ -130,7 +140,7 @@ protected:
 	 * affect a color to each dart
 	 */
 	template<typename PFP>
-	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
+	void setDartsIdColor(typename PFP::MAP& map, bool withBoundary);
 
 	/**
 	 * save colors before picking
@@ -145,12 +155,9 @@ protected:
 public:
 	/**
 	* Constructor
-	* @param map the map to draw
-	* @param good functor that return true for darts of part to draw
-	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
+	* @param bs shift for boundary drawing
 	*/	
-
-	TopoRender();
+	TopoRender(float bs = 0.01f);
 
 	/**
 	* Destructor
@@ -188,6 +195,13 @@ public:
 	 * draw all topo
 	 */
 	void drawTopo();
+
+	/**
+	 * get shader objects
+	 */
+	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
+	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
+
 	/**
 	 * change dart drawing color
 	 * @param d the dart
@@ -208,6 +222,8 @@ public:
 
 	void setInitialDartsColor(float r, float g, float b);
 
+	void setInitialBoundaryDartsColor(float r, float g, float b);
+
 	/**
 	 * redraw one dart with specific width and color (not efficient use only for debug with small amount of call)
 	 * @param d the dart
@@ -223,31 +239,37 @@ public:
 	 * pick dart with color set by setDartsIdColor
 	 * Do not forget to apply same transformation to scene before picking than before drawing !
 	 * @param map the map in which we pick (same as drawn !)
-	 * @param good the selector (same as used during drawing)
 	 * @param x position of mouse (x)
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
 	template<typename PFP>
-	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
+	Dart picking(typename PFP::MAP& map, int x, int y, bool withBoundary=false);
 
 
 	template<typename PFP>
-	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good=allDarts);
+	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
 
 	template<typename PFP>
-	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax, const FunctorSelect& good=allDarts);
+	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
 
 
 	template <typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
 
 	template <typename PFP>
-	void updateDataMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateDataMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
 
 	template <typename PFP>
-	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
+
+	/**
+	 * Special update function used to draw boundary of map3
+	 */
+	template<typename PFP>
+	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns);
+
 
 	/**
 	 * render to svg struct
@@ -258,6 +280,18 @@ public:
 	 * render svg into svg file
 	 */
 	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+
+	/**
+	 * @brief set normal shift for boundary of dim 3 drawing
+	 * @param ns distance shift along normals (use BB.diagSize()/100 is good approximation)
+	 */
+	void setNormalShift(float ns);
+
+	/**
+	 * @brief set boundary shift for boundary of dim 2 drawing
+	 * @param ns distance shift
+	 */
+	void setBoundaryShift(float bs);
 };
 
 // just for compatibility with old code

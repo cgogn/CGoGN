@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RenderVectorWidget</class>
- <widget class="QWidget" name="RenderVectorWidget">
+ <class>RenderVectorDockWidget</class>
+ <widget class="QWidget" name="RenderVectorDockWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -83,12 +83,6 @@
     </spacer>
    </item>
   </layout>
-  <zorder>mapList</zorder>
-  <zorder>label_3</zorder>
-  <zorder>list_vectorVBO</zorder>
-  <zorder>label</zorder>
-  <zorder>slider_vectorsScaleFactor</zorder>
-  <zorder>label_2</zorder>
  </widget>
  <resources/>
  <connections/>

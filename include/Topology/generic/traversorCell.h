@@ -48,10 +48,9 @@ private:
 
 	Dart current ;
 	bool firstTraversal ;
-	const FunctorSelect& m_good ;
 
 public:
-	TraversorCell(MAP& map, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) ;
+	TraversorCell(MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 
 	~TraversorCell() ;
 
@@ -80,10 +79,9 @@ private:
 
 	Dart current ;
 	bool firstTraversal ;
-	const FunctorSelect& m_good ;
 
 public:
-	TraversorCell(GenericMap& map, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) ;
+	TraversorCell(GenericMap& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 
 	~TraversorCell() ;
 
@@ -101,7 +99,7 @@ template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, good, forceDartMarker, thread)
+	TraversorV(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, forceDartMarker, thread)
 	{}
 };
 
@@ -109,7 +107,7 @@ template <typename MAP>
 class TraversorE : public TraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, good, forceDartMarker, thread)
+	TraversorE(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, forceDartMarker, thread)
 	{}
 };
 
@@ -117,7 +115,7 @@ template <typename MAP>
 class TraversorF : public TraversorCell<MAP, FACE>
 {
 public:
-	TraversorF(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, good, forceDartMarker, thread)
+	TraversorF(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, forceDartMarker, thread)
 	{}
 };
 
@@ -125,7 +123,7 @@ template <typename MAP>
 class TraversorW : public TraversorCell<MAP, VOLUME>
 {
 public:
-	TraversorW(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, good, forceDartMarker, thread)
+	TraversorW(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, forceDartMarker, thread)
 	{}
 };
 

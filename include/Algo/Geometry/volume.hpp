@@ -118,11 +118,11 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int thread)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread)
 {
 	double vol = 0.0 ;
 
-	TraversorW<typename PFP::MAP> t(map, select, thread) ;
+	TraversorW<typename PFP::MAP> t(map, thread) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		vol += convexPolyhedronVolume<PFP>(map, d, position,thread) ;
 	return typename PFP::REAL(vol) ;
@@ -156,7 +156,7 @@ public:
 
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int nbth)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int nbth)
 {
 	if (nbth==0)
 		nbth = Algo::Parallel::optimalNbThreads();
@@ -170,7 +170,7 @@ typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typ
 
 	double total=0.0;
 
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, true, select);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, true);
 
 	for (unsigned int i=0; i < nbth; ++i)
 	{

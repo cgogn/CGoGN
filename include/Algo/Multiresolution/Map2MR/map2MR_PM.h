@@ -80,7 +80,7 @@ public:
 	~Map2MR_PM();
 
 	//create a progressive mesh (a coarser level)
-	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts) ;
+	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
 
 	void addNewLevel(unsigned int percentWantedVertices);
 

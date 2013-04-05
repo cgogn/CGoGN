@@ -25,6 +25,7 @@
 #include "Utils/cgognStream.h"
 #ifdef WITH_QT
 #include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtQGLV.h"
 #include <QtGui/QTextEdit>
 #endif
 namespace CGoGN
@@ -61,7 +62,6 @@ void allToStatusBar(Utils::QT::SimpleQT* sqt)
 	CGoGNout.toStatusBar(sqt);
 	CGoGNerr.toStatusBar(sqt);
 	CGoGNdbg.toStatusBar(sqt);
-
 }
 
 void allToConsole(Utils::QT::SimpleQT* sqt)
@@ -69,6 +69,21 @@ void allToConsole(Utils::QT::SimpleQT* sqt)
 	CGoGNout.toConsole(sqt);
 	CGoGNerr.toConsole(sqt);
 	CGoGNdbg.toConsole(sqt);
+
+}
+
+void allToStatusBar(Utils::QT::SimpleQGLV* sqglv)
+{
+	CGoGNout.toStatusBar(sqglv);
+	CGoGNerr.toStatusBar(sqglv);
+	CGoGNdbg.toStatusBar(sqglv);
+}
+
+void allToConsole(Utils::QT::SimpleQGLV* sqglv)
+{
+	CGoGNout.toConsole(sqglv);
+	CGoGNerr.toConsole(sqglv);
+	CGoGNdbg.toConsole(sqglv);
 
 }
 #endif
@@ -90,6 +105,8 @@ Out::Out():
 #ifdef WITH_QT
 	m_sqt_bar(NULL),
 	m_sqt_console(NULL),
+	m_sqglv_bar(NULL),
+	m_sqglv_console(NULL),
 	m_qte(NULL),
 #endif
 	m_ofs(NULL),
@@ -145,6 +162,22 @@ void Out::toFile(const std::string& filename )
 }
 
 #ifdef WITH_QT
+void Out::noStatusBar()
+{
+	m_out_mode &= ~QTSTATUSBAR;
+	m_sqt_bar = NULL;
+	m_sqglv_bar = NULL;
+}
+
+
+void Out::noConsole()
+{
+	m_out_mode &= ~QTCONSOLE;
+	m_sqt_console = NULL;
+	m_sqglv_console = NULL;
+}
+
+
 void Out::toStatusBar(Utils::QT::SimpleQT* sqt)
 {
 	if (sqt != NULL)
@@ -163,6 +196,26 @@ void Out::toConsole(Utils::QT::SimpleQT* sqt)
 		m_out_mode &= ~QTCONSOLE;
 	m_sqt_console = sqt;
 }
+
+void Out::toStatusBar(Utils::QT::SimpleQGLV* sqglv)
+{
+	if (sqglv != NULL)
+		m_out_mode |= QTSTATUSBAR;
+	else
+		m_out_mode &= ~QTSTATUSBAR;
+	m_sqglv_bar = sqglv;
+}
+
+
+void Out::toConsole(Utils::QT::SimpleQGLV* sqglv)
+{
+	if (sqglv)
+		m_out_mode |= QTCONSOLE;
+	else
+		m_out_mode &= ~QTCONSOLE;
+	m_sqglv_console = sqglv;
+}
+
 #endif
 
 void Out::toBuffer(std::stringstream* ss)
@@ -222,20 +275,41 @@ Out&  Out::operator<< (Special& os  )
 
 		if (m_out_mode & QTCONSOLE)
 		{
-			while (! m_buffer.eof())
+			if (m_sqt_console)
 			{
-				m_buffer.getline(bufc,512);
-
-				if (m_code >= 100)
-					m_sqt_console->console()->setTextColor(QColor(0, 150 - (m_code-100) * 20, 50 + (m_code-100) * 20));
-				else
+				while (! m_buffer.eof())
 				{
-					if (m_code > 0)
-						m_sqt_console->console()->setTextColor(QColor(150, 0, 0));
+					m_buffer.getline(bufc,512);
+
+					if (m_code >= 100)
+						m_sqt_console->console()->setTextColor(QColor(0, 150 - (m_code-100) * 20, 50 + (m_code-100) * 20));
 					else
-						m_sqt_console->console()->setTextColor(QColor(0, 0, 150));
+					{
+						if (m_code > 0)
+							m_sqt_console->console()->setTextColor(QColor(150, 0, 0));
+						else
+							m_sqt_console->console()->setTextColor(QColor(0, 0, 150));
+					}
+					m_sqt_console->console()->append(QString(bufc));
 				}
-				m_sqt_console->console()->append(QString(bufc));
+			}
+			if (m_sqglv_console)
+			{
+				while (! m_buffer.eof())
+				{
+					m_buffer.getline(bufc,512);
+
+					if (m_code >= 100)
+						m_sqglv_console->console()->setTextColor(QColor(0, 150 - (m_code-100) * 20, 50 + (m_code-100) * 20));
+					else
+					{
+						if (m_code > 0)
+							m_sqglv_console->console()->setTextColor(QColor(150, 0, 0));
+						else
+							m_sqglv_console->console()->setTextColor(QColor(0, 0, 150));
+					}
+					m_sqglv_console->console()->append(QString(bufc));
+				}
 			}
 		}
 #endif
@@ -278,22 +352,45 @@ Out&  Out::operator<< (Special& os  )
 
 				if (m_out_mode & QTCONSOLE)
 				{
-					while (! m_buffer.eof())
+					if (m_sqt_console)
 					{
-						m_buffer.getline(bufc,512);
-
-						if (m_code >= 100)
-							m_sqt_console->console()->setTextColor(QColor(0, 150 - (m_code-100) * 20, 50 + (m_code-100) * 20));
-						else
+						while (! m_buffer.eof())
 						{
-							if (m_code > 0)
-								m_sqt_console->console()->setTextColor(QColor(150, 0, 0));
-							else
-								m_sqt_console->console()->setTextColor(QColor(0, 0, 150));
-						}
+							m_buffer.getline(bufc,512);
 
-						m_sqt_console->console()->moveCursor(QTextCursor::End);
-						m_sqt_console->console()->insertPlainText(QString(bufc));
+							if (m_code >= 100)
+								m_sqt_console->console()->setTextColor(QColor(0, 150 - (m_code-100) * 20, 50 + (m_code-100) * 20));
+							else
+							{
+								if (m_code > 0)
+									m_sqt_console->console()->setTextColor(QColor(150, 0, 0));
+								else
+									m_sqt_console->console()->setTextColor(QColor(0, 0, 150));
+							}
+
+							m_sqt_console->console()->moveCursor(QTextCursor::End);
+							m_sqt_console->console()->insertPlainText(QString(bufc));
+						}
+					}
+					if (m_sqglv_console)
+					{
+						while (! m_buffer.eof())
+						{
+							m_buffer.getline(bufc,512);
+
+							if (m_code >= 100)
+								m_sqglv_console->console()->setTextColor(QColor(0, 150 - (m_code-100) * 20, 50 + (m_code-100) * 20));
+							else
+							{
+								if (m_code > 0)
+									m_sqglv_console->console()->setTextColor(QColor(150, 0, 0));
+								else
+									m_sqglv_console->console()->setTextColor(QColor(0, 0, 150));
+							}
+
+							m_sqglv_console->console()->moveCursor(QTextCursor::End);
+							m_sqglv_console->console()->insertPlainText(QString(bufc));
+						}
 					}
 				}
 #endif

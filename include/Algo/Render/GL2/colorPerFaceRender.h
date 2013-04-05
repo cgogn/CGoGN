@@ -68,11 +68,10 @@ public:
 	* @param map the map
 	* @param positions attribute of position vertices
 	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
-	* @param good selector
 	*/
 	template<typename PFP, unsigned int ORBIT>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX) ;
 
 	/**
 	* update drawing buffers
@@ -83,11 +82,10 @@ public:
 	* @param positions attribute of position vertices
 	* @param normals attribute of normal vertices
 	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
-	* @param good selector
 	*/
 	template<typename PFP, unsigned int ORBIT>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX) ;
 
 
 	/**

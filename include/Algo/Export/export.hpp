@@ -41,7 +41,7 @@ namespace Export
 {
 
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, bool binary, const FunctorSelect& good)
+bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, bool binary)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -71,7 +71,7 @@ bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 
 	// Go over all faces
 	CellMarker<VERTEX> markV(map) ;
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		std::vector<unsigned int> fidx ;
@@ -168,7 +168,7 @@ bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 }
 
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3>*>& attributeHandlers, const char* filename, bool binary, const FunctorSelect& good)
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3>*>& attributeHandlers, const char* filename, bool binary)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -198,7 +198,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 
 	// Go over all faces
 	CellMarker<VERTEX> markV(map) ;
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		std::vector<unsigned int> fidx ;
@@ -326,7 +326,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 }
 
 template <typename PFP>
-bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
+bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -349,7 +349,7 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	vertices.reserve(nbDarts/6) ;
 
 	CellMarker<VERTEX> markV(map) ;
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		std::vector<unsigned int> fidx ;
@@ -393,7 +393,7 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 }
 /*
 template <typename PFP>
-bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -416,7 +416,7 @@ bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	vertices.reserve(nbDarts/6) ;
 
 	CellMarker<VERTEX> markV(map) ;
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		std::vector<unsigned int> fidx ;
@@ -459,7 +459,7 @@ bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -483,7 +483,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 	faces.reserve(nbDarts/3);
 
 	CellMarker<VERTEX> markV(map);
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -599,7 +599,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 */
 /*
 template <typename PFP>
-bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
+bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -623,7 +623,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 	faces.reserve(nbDarts/3);
 
 	CellMarker markV(map, VERTEX);
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -730,7 +730,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 }
 
 template <typename PFP>
-bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
+bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -754,7 +754,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typena
 	faces.reserve(nbDarts/3);
 
 	CellMarker markV(map, VERTEX);
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -870,7 +870,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typena
 }
 
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good)
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6])
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -893,7 +893,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
 	faces.reserve(nbDarts/3);
 
 	CellMarker<VERTEX> markV(map);
-	TraversorF<MAP> t(map, good) ;
+	TraversorF<MAP> t(map) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -984,7 +984,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
 */
 
 template <typename PFP>
-bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
+bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;

@@ -88,7 +88,7 @@ void foreach_orbitGen(int dim, FunctorType<typename MM>& fonct, MM* ptr, unsigne
 //	}
 //	ptr->unmarkAll(markerCell);
 //	ptr->releaseMarker(markerCell);
-//}
+}
 
 template <typename MF, typename MM>
 void setOrbitEmbeddingGen(int dim, typename MM::Dart d, int index, Embedding* em, MM* ptr)

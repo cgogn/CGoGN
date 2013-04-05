@@ -32,7 +32,8 @@ ColourConverter<REAL>::ColourConverter(const VEC3& col, const enum ColourEncodin
 	Luv(NULL),
 	Lab(NULL),
 	HSV(NULL),
-	XYZ(NULL)
+	XYZ(NULL),
+	HSL(NULL)
 {
 	originalEnc = enc ;
 
@@ -70,12 +71,18 @@ ColourConverter<REAL>::ColourConverter(const VEC3& col, const enum ColourEncodin
 			break ;
 		case (C_HSV) :
 			#ifdef DEBUG
-				if (!(-0.001 < col[0] && col[0] < 360.001 && -0.001 < col[1] && col[1] < 1.001 && -0.001 < col[2] && col[2] < 1.001))
-						std::cerr << "Warning : an unvalid Lab color was entered in ColourConverter constructor" << std::endl ;
+				if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 && -0.001 < col[2] && col[2] < 1.001))
+						std::cerr << "Warning : an unvalid HSV color was entered in ColourConverter constructor" << std::endl ;
 			#endif
 			HSV = new VEC3(col) ;
 			break ;
-
+		case (C_HSL) :
+			#ifdef DEBUG
+				if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 && -0.001 < col[2] && col[2] < 1.001))
+						std::cerr << "Warning : an unvalid HSL color was entered in ColourConverter constructor" << std::endl ;
+			#endif
+			HSL = new VEC3(col) ;
+			break ;
 	}
 }
 
@@ -87,6 +94,7 @@ ColourConverter<REAL>::~ColourConverter()
 	delete XYZ ;
 	delete Lab ;
 	delete HSV ;
+	delete HSL ;
 }
 
 template<typename REAL>
@@ -112,6 +120,10 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getColour(enum ColourEncoding enc) {
 		return getHSV() ;
 		break ;
 
+	case (C_HSL) :
+		return getHSL() ;
+		break ;
+
 	default :
 		assert(!"Should never arrive here : ColourConverter::getColour default case") ;
 		return getOriginal() ;
@@ -119,12 +131,16 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getColour(enum ColourEncoding enc) {
 }
 
 template<typename REAL>
-Geom::Vector<3,REAL> ColourConverter<REAL>::getOriginal() {
+Geom::Vector<3,REAL>
+ColourConverter<REAL>::getOriginal()
+{
 	return getColour(this->originalEnc) ;
 }
 
 template<typename REAL>
-Geom::Vector<3,REAL> ColourConverter<REAL>::getRGB() {
+Geom::Vector<3,REAL>
+ColourConverter<REAL>::getRGB()
+{
 	if (RGB == NULL)
 		convert(originalEnc,C_RGB) ;
 
@@ -132,7 +148,9 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getRGB() {
 }
 
 template<typename REAL>
-Geom::Vector<3,REAL> ColourConverter<REAL>::getLuv() {
+Geom::Vector<3,REAL>
+ColourConverter<REAL>::getLuv()
+{
 	if (Luv == NULL)
 		convert(originalEnc,C_Luv) ;
 
@@ -140,7 +158,9 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getLuv() {
 }
 
 template<typename REAL>
-Geom::Vector<3,REAL> ColourConverter<REAL>::getLab() {
+Geom::Vector<3,REAL>
+ColourConverter<REAL>::getLab()
+{
 	if (Lab == NULL)
 		convert(originalEnc,C_Lab) ;
 
@@ -148,7 +168,9 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getLab() {
 }
 
 template<typename REAL>
-Geom::Vector<3,REAL> ColourConverter<REAL>::getXYZ() {
+Geom::Vector<3,REAL>
+ColourConverter<REAL>::getXYZ()
+{
 	if (XYZ == NULL) {
 		convert(originalEnc,C_XYZ) ;
 	}
@@ -157,7 +179,9 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getXYZ() {
 }
 
 template<typename REAL>
-Geom::Vector<3,REAL> ColourConverter<REAL>::getHSV() {
+Geom::Vector<3,REAL>
+ColourConverter<REAL>::getHSV()
+{
 	if (HSV == NULL)
 		convert(originalEnc,C_HSV) ;
 
@@ -165,7 +189,20 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getHSV() {
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertRGBtoXYZ() {
+Geom::Vector<3,REAL>
+ColourConverter<REAL>::getHSL()
+{
+	if (HSL == NULL)
+		convert(originalEnc,C_HSL) ;
+
+	return *HSL ;
+}
+
+
+template<typename REAL>
+void
+ColourConverter<REAL>::convertRGBtoXYZ()
+{
 	Geom::Matrix<3,3,REAL> M ;
 
 	M(0,0) = 0.412453 ;
@@ -189,7 +226,9 @@ void ColourConverter<REAL>::convertRGBtoXYZ() {
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertXYZtoRGB() {
+void
+ColourConverter<REAL>::convertXYZtoRGB()
+{
 	Geom::Matrix<3,3,REAL> M ;
 
 	M(0,0) = 3.240479 ;
@@ -213,7 +252,8 @@ void ColourConverter<REAL>::convertXYZtoRGB() {
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertRGBtoHSV()
+void
+ColourConverter<REAL>::convertRGBtoHSV()
 {
 	const REAL& r = (*RGB)[0] ;
 	const REAL& g = (*RGB)[1] ;
@@ -221,27 +261,38 @@ void ColourConverter<REAL>::convertRGBtoHSV()
 	const REAL& max = std::max(std::max(r,g),b) ;
 	const REAL& min = std::min(std::min(r,g),b) ;
 
+
 	VEC3 c ;
+	REAL& H = c[0] ;
+	REAL& S = c[1] ;
+	REAL& V = c[2] ;
+
+	const REAL diff = max - min ;
+
+	V = max ;
+	S = max == 0. ? 0 : diff / max ;
+
+
 	if (max == min)
 	{
-		c[0] = 0 ;
+		H = 0 ;
 	}
-	else if (max == r)
+	else
 	{
-		c[0] = 60 * (g - b) / (max - min) + 360 ;
-		c[0] = (unsigned int)(c[0]) % 360 ;
+		if (max == r)
+		{
+			H = (g - b) / diff + (g < b ? 6 : 0) ;
+		}
+		else if (max == g)
+		{
+			H = (b - r) / diff + 2 ;
+		}
+		else if (max == b)
+		{
+			H = (r - g) / diff + 4 ;
+		}
 	}
-	else if (max == g)
-	{
-		c[0] = 60 * (b - r) / (max - min) + 120 ;
-	}
-	else if (max == b)
-	{
-		c[0] = 60 * (r - g) / (max - min) + 240 ;
-	}
-
-	c[1] = (max == 0) ? 0 : 1 - min/max ;
-	c[2] = max ;
+	H /= 6. ;
 
 	if (HSV != NULL)
 		*HSV = c ;
@@ -250,53 +301,32 @@ void ColourConverter<REAL>::convertRGBtoHSV()
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertHSVtoRGB()
+void
+ColourConverter<REAL>::convertHSVtoRGB()
 {
 	const REAL& H = (*HSV)[0] ;
-	const REAL& s = (*HSV)[1] ;
-	const REAL& v = (*HSV)[2] ;
+	const REAL& S = (*HSV)[1] ;
+	const REAL& V = (*HSV)[2] ;
 
-	const unsigned int Hi = (unsigned int)(floor(H / 60)) % 6 ;
-	const REAL f = (H / 60) - Hi ;
-	const REAL l = v * (1 - s) ;
-	const REAL m = v * (1 - f * s) ;
-	const REAL n = v * (1 - (1 - f) * s) ;
+	const int i = std::floor(H * 6);
+	const REAL f = H * 6 - i;
+	const REAL p = V * (1 - S);
+	const REAL q = V * (1 - f * S);
+	const REAL t = V * (1 - (1 - f) * S);
 
 	VEC3 c ;
-	switch(Hi)
+	REAL& r = c[0] ;
+	REAL& g = c[1] ;
+	REAL& b = c[2] ;
+
+	switch(i % 6)
 	{
-		case(0) :
-		{
-			c = VEC3(v,n,l) ;
-		}
-		break ;
-		case(1):
-		{
-			c = VEC3(m,v,l) ;
-		}
-		break ;
-		case(2):
-		{
-			c = VEC3(l,v,n) ;
-		}
-		break ;
-		case(3):
-		{
-			c = VEC3(l,m,v) ;
-		}
-		break ;
-		case(4):
-		{
-			c = VEC3(n,l,v) ;
-		}
-		break ;
-
-		case(5):
-		{
-			c = VEC3(v,l,m) ;
-		}
-		break ;
-
+	case 0: r = V, g = t, b = p; break;
+	case 1: r = q, g = V, b = p; break;
+	case 2: r = p, g = V, b = t; break;
+	case 3: r = p, g = q, b = V; break;
+	case 4: r = t, g = p, b = V; break;
+	case 5: r = V, g = p, b = q; break;
 	}
 
 	if (RGB != NULL)
@@ -306,7 +336,109 @@ void ColourConverter<REAL>::convertHSVtoRGB()
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertXYZtoLuv()
+void
+ColourConverter<REAL>::convertRGBtoHSL()
+{
+	const REAL& r = (*RGB)[0] ;
+	const REAL& g = (*RGB)[1] ;
+	const REAL& b = (*RGB)[2] ;
+	const REAL& max = std::max(std::max(r,g),b) ;
+	const REAL& min = std::min(std::min(r,g),b) ;
+
+	VEC3 c ;
+	REAL& H = c[0] ;
+	REAL& S = c[1] ;
+	REAL& L = c[2] ;
+
+	const REAL sum = max + min ;
+	L = sum / 2. ;
+
+	if (max == min)
+	{
+		H = 0 ;
+		S = 0 ;
+	}
+	else
+	{
+		const REAL diff = max - min ;
+		S = L > 0.5 ? diff / (2 - sum) : diff / sum ;
+
+		if (max == r)
+		{
+			H = (g - b) / diff + (g < b ? 6 : 0) ;
+		}
+		else if (max == g)
+		{
+			H = (b - r) / diff + 2 ;
+		}
+		else if (max == b)
+		{
+			H = (r - g) / diff + 4 ;
+		}
+	}
+	H /= 6. ;
+
+	if (HSL != NULL)
+		*HSL = c ;
+	else
+		HSL = new VEC3(c) ;
+}
+
+template<typename REAL>
+REAL
+ColourConverter<REAL>::hue2rgb(const REAL& p, const REAL& q, REAL t)
+{
+	if(t < 0)
+		t += 1 ;
+	if(t > 1)
+		t -= 1 ;
+	if(t < 1/6.)
+		return p + (q - p) * 6 * t ;
+	if(t < 1/2.)
+		return q ;
+	if(t < 2/3.)
+		return p + (q - p) * (2/3. - t) * 6 ;
+
+	return p ;
+}
+
+template<typename REAL>
+void
+ColourConverter<REAL>::convertHSLtoRGB()
+{
+	const REAL& H = (*HSL)[0] ;
+	const REAL& S = (*HSL)[1] ;
+	const REAL& L = (*HSL)[2] ;
+
+	VEC3 c ;
+	REAL& r = c[0] ;
+	REAL& g = c[1] ;
+	REAL& b = c[2] ;
+
+    if(S < 1e-8)
+    {
+    	r = L ;
+    	g = L ;
+    	b = L ;
+    }
+    else
+    {
+    	const REAL q = L < 0.5 ? L * (1 + S) : L + S - L * S;
+    	const REAL p = 2 * L - q ;
+    	r = hue2rgb(p, q, H + 1/3.) ;
+    	g = hue2rgb(p, q, H) ;
+    	b = hue2rgb(p, q, H - 1/3.) ;
+    }
+
+	if (RGB != NULL)
+		*RGB = c ;
+	else
+		RGB = new VEC3(c) ;
+}
+
+template<typename REAL>
+void
+ColourConverter<REAL>::convertXYZtoLuv()
 {
 	REAL L,u,v ;
 
@@ -333,7 +465,8 @@ void ColourConverter<REAL>::convertXYZtoLuv()
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertLuvToXYZ()
+void
+ColourConverter<REAL>::convertLuvToXYZ()
 {
 	REAL X,Y,Z ;
 
@@ -360,7 +493,9 @@ void ColourConverter<REAL>::convertLuvToXYZ()
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertXYZtoLab() {
+void
+ColourConverter<REAL>::convertXYZtoLab()
+{
 	REAL L,a,b ;
 
 	REAL &X = (*XYZ)[0] ;
@@ -391,7 +526,9 @@ void ColourConverter<REAL>::convertXYZtoLab() {
 }
 
 template<typename REAL>
-void ColourConverter<REAL>::convertLabToXYZ() {
+void
+ColourConverter<REAL>::convertLabToXYZ()
+{
 	REAL X,Y,Z ;
 
 	REAL &L = (*Lab)[0] ;
@@ -423,7 +560,9 @@ void ColourConverter<REAL>::convertLabToXYZ() {
 }
 
 template<typename REAL>
-bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncoding to) {
+bool
+ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncoding to)
+{
 	if (to == from) {
 		#ifdef DEBUG
 			std::cout << "WARNING ColourConverter::convert(from,to) : conversion into same colour space" << std::endl ;
@@ -458,6 +597,10 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 					if (HSV == NULL)
 						convertRGBtoHSV() ;
 					break ;
+				case(C_HSL) :
+					if (HSL == NULL)
+						convertRGBtoHSL() ;
+					break ;
 				default :
 					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
@@ -486,7 +629,7 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 						convertXYZtoLab() ;
 					}
 					break ;
-				case(C_HSV) : {
+				case(C_HSV) :
 					if (HSV == NULL) {
 						if (RGB == NULL) {
 							if (XYZ == NULL)
@@ -494,6 +637,16 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 							convertXYZtoRGB() ;
 						}
 						convertRGBtoHSV() ;
+					}
+					break ;
+				case(C_HSL) : {
+					if (HSL == NULL) {
+						if (RGB == NULL) {
+							if (XYZ == NULL)
+								convertLuvToXYZ() ;
+							convertXYZtoRGB() ;
+						}
+						convertRGBtoHSL() ;
 					}
 					break ;
 				}
@@ -522,6 +675,13 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 							if (RGB==NULL)
 								convertXYZtoRGB() ;
 							convertRGBtoHSV() ;
+						}
+					break ;
+				case(C_HSL) :
+					if (HSL==NULL) {
+						if (RGB==NULL)
+							convertXYZtoRGB() ;
+							convertRGBtoHSL() ;
 						}
 					break ;
 				default :
@@ -563,7 +723,17 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 					}
 					break ;
 				}
-
+				case(C_HSL) : {
+					if (HSL == NULL) {
+						if (RGB == NULL) {
+							if (XYZ == NULL)
+								convertLabToXYZ() ;
+							convertXYZtoRGB() ;
+						}
+						convertRGBtoHSL() ;
+					}
+					break ;
+				}
 				default :
 					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
@@ -613,11 +783,74 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 							convertXYZtoLuv() ;
 						}
 						break ;
+					case(C_HSL) :
+						if (HSL == NULL) {
+							if (RGB == NULL)
+								convertHSVtoRGB() ;
+							convertRGBtoHSL() ;
+						}
+						break ;
 					default :
 						std::cerr << "Colour conversion not supported" << std::endl ;
 						return false ;
 				}
 				break ;
+
+				case(C_HSL) :
+						switch (to) {
+							case(C_RGB) : {
+								if (RGB == NULL) {
+									convertHSLtoRGB() ;
+								}
+								break ;
+							}
+							case(C_XYZ) : {
+								if (XYZ == NULL)
+								{
+									if (RGB == NULL)
+										convertHSLtoRGB() ;
+									convertRGBtoXYZ() ;
+								}
+								break ;
+							}
+							case(C_Lab) :
+								if (Lab == NULL) {
+									if (XYZ == NULL)
+									{
+										if (RGB == NULL)
+										{
+											convertHSLtoRGB() ;
+										}
+										convertRGBtoXYZ() ;
+									}
+									convertXYZtoLab() ;
+								}
+								break ;
+							case(C_Luv) :
+								if (Luv == NULL) {
+									if (XYZ == NULL)
+									{
+										if (RGB == NULL)
+										{
+											convertHSLtoRGB() ;
+										}
+										convertRGBtoXYZ() ;
+									}
+									convertXYZtoLuv() ;
+								}
+								break ;
+							case(C_HSL) :
+								if (HSL == NULL) {
+									if (RGB == NULL)
+										convertHSLtoRGB() ;
+									convertRGBtoHSV() ;
+								}
+								break ;
+							default :
+								std::cerr << "Colour conversion not supported" << std::endl ;
+								return false ;
+						}
+						break ;
 
 		default :
 			std::cerr << "Colour conversion not supported" << std::endl ;

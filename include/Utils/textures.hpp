@@ -354,19 +354,37 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 		{
 			QImage img = ptr->convertToFormat(QImage::Format_RGB888);
 			this->m_data_ptr = new TYPE[3*img.width()*img.height()];
-			memcpy(this->m_data_ptr, img.bits(), 3*img.width()*img.height());
+			//copy per line for alignment
+			TYPE* ptrOut = this->m_data_ptr;
+			for(int i=img.height()-1; i>0; --i)
+			{
+				memcpy(ptrOut, img.scanLine(i), 3*img.width());
+				ptrOut += img.width(); // not *3 because type is size of 3
+			}
 		}
 		else if (sizeof(TYPE) == 1)
 		{
 			QImage img = ptr->convertToFormat(QImage::Format_Indexed8);
 			this->m_data_ptr = new TYPE[img.width()*img.height()];
-			memcpy(this->m_data_ptr, img.bits(), img.width()*img.height());
+			//copy per line for alignment
+			TYPE* ptrOut = this->m_data_ptr;
+			for(int i=img.height()-1; i>0; --i)
+			{
+				memcpy(ptrOut, img.scanLine(i), img.width());
+				ptrOut += img.width();
+			}
 		}
 	}
 	else
 	{
 		this->m_data_ptr = new TYPE[ptr->width()*ptr->height()];
-		memcpy(this->m_data_ptr, ptr->bits(), ptr->width()*ptr->height());
+		TYPE* ptrOut = this->m_data_ptr;
+		//copy per line for alignment
+		for(int i=ptr->height()-1; i>0; --i)
+		{
+			memcpy(ptrOut, ptr->scanLine(i), ptr->width()*bpp);
+			ptrOut += ptr->width();
+		}
 	}
 
 	this->m_size[0] = ptr->width();
@@ -977,6 +995,7 @@ void Texture<DIM,TYPE>::checkAlignment()
 		glPixelStorei(GL_UNPACK_ALIGNMENT,2);
 	else
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
 }
 
 

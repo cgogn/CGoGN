@@ -17,6 +17,9 @@ find_package(GLEW REQUIRED)
 find_package(Qt4 REQUIRED)
 find_package(QGLViewer REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
+find_package(SuiteSparse REQUIRED)
+#find_package(SuperLU REQUIRED)
+
 
 SET( QT_USE_QTOPENGL TRUE )
 SET( QT_USE_QTXML TRUE )
@@ -66,11 +69,14 @@ SET (EXT_INCLUDES
 	${QT_INCLUDE_DIR}
 	${QGLVIEWER_INCLUDE_DIR}
 	${PYTHON_INCLUDE_DIRS}
+	${SUITESPARSE_INCLUDE_DIRS}
+#	${SUPERLU_INCLUDE_DIRS}
 )
 
 # define libs for external libs
 SET (EXT_LIBS 
 	PythonQt
+	nl
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
@@ -81,6 +87,8 @@ SET (EXT_LIBS
 	${QT_LIBRARIES}
 	${QGLVIEWER_LIBRARIES}
 	${PYTHON_LIBRARIES}
+	${SUITESPARSE_LIBRARIES}
+#	${SUPERLU_LIBRARIES}
 )
 
 
@@ -108,6 +116,7 @@ file(
 	SCHNApps_FILES
 	${SCHNApps_ROOT_DIR}/src/*.cpp
 	${SCHNApps_ROOT_DIR}/include/*.h
+	${SCHNApps_ROOT_DIR}/include/*.hpp
 )
 
 file(
@@ -129,6 +138,7 @@ SET(SCHNApps_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
 	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsViewDialog.h
 	${SCHNApps_ROOT_DIR}/include/dialogs/mapsViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
 )
 
 

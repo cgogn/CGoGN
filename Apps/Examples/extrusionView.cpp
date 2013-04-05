@@ -150,8 +150,8 @@ int main(int argc, char **argv)
 	sqt.m_positionVBO->updateData(position);
 
 	// update render primitives
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	sqt.m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
+	sqt.m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
 
 	sqt.show();
 	return app.exec();

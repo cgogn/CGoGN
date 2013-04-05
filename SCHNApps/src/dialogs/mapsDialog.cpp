@@ -16,16 +16,17 @@ MapsDialog::MapsDialog(Window* window) :
 	QDialog(window),
 	m_window(window)
 {
-	this->setupUi(this);
-	this->setModal(false);
+	setupUi(this);
+//	setModal(false);
 
-	connect(button_removeMap, SIGNAL(clicked()), this, SLOT(cb_removeMap()));
-	connect(button_refreshMapInfo, SIGNAL(clicked()), this, SLOT(cb_selectedMapChanged()));
+	connect(button_removeMap, SIGNAL(clicked()), this, SLOT(removeMap()));
+	connect(button_refreshMapInfo, SIGNAL(clicked()), this, SLOT(selectedMapChanged()));
 
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
+	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
+	connect(vertexAttributes, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(toggleVBO(QListWidgetItem*)));
 
-	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(cb_addMapToList(MapHandlerGen*)));
-	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(cb_removeMapFromList(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
 }
 
 MapsDialog::~MapsDialog()
@@ -48,7 +49,7 @@ void MapsDialog::clearInfo()
 	lineEdit_face_cells->setText("");
 }
 
-void MapsDialog::cb_removeMap()
+void MapsDialog::removeMap()
 {
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 	if(!currentItems.empty())
@@ -58,14 +59,14 @@ void MapsDialog::cb_removeMap()
 		if(!m->isUsed())
 		{
 			m_window->removeMap(name);
-			cb_selectedMapChanged();
+			clearInfo();
 		}
 		else
 			QMessageBox::warning(this, tr("Warning"), "Map is currently used");
 	}
 }
 
-void MapsDialog::cb_selectedMapChanged()
+void MapsDialog::selectedMapChanged()
 {
 	clearInfo();
 
@@ -127,11 +128,25 @@ void MapsDialog::cb_selectedMapChanged()
 					QString type = QString::fromStdString(types[i]);
 					switch(orbit)
 					{
-						case DART : dartAttributes->addItem(name + " (" + type + ")"); break;
-						case VERTEX : vertexAttributes->addItem(name + " (" + type + ")"); break;
-						case EDGE : edgeAttributes->addItem(name + " (" + type + ")"); break;
-						case FACE : faceAttributes->addItem(name + " (" + type + ")"); break;
-						case VOLUME : volumeAttributes->addItem(name + " (" + type + ")"); break;
+						case DART : {
+							dartAttributes->addItem(name + " (" + type + ")");
+						} break;
+						case VERTEX : {
+							QListWidgetItem* item = new QListWidgetItem(name + " (" + type + ")", vertexAttributes);
+							if(mh->getVBO(name))
+								item->setCheckState(Qt::Checked);
+							else
+								item->setCheckState(Qt::Unchecked);
+						} break;
+						case EDGE : {
+							edgeAttributes->addItem(name + " (" + type + ")");
+						} break;
+						case FACE : {
+							faceAttributes->addItem(name + " (" + type + ")");
+						} break;
+						case VOLUME : {
+							volumeAttributes->addItem(name + " (" + type + ")");
+						} break;
 					}
 				}
 			}
@@ -139,12 +154,32 @@ void MapsDialog::cb_selectedMapChanged()
 	}
 }
 
-void MapsDialog::cb_addMapToList(MapHandlerGen* m)
+void MapsDialog::toggleVBO(QListWidgetItem *item)
+{
+	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
+	if(!currentItems.empty())
+	{
+//		QListWidgetItem* current = currentItems[0];
+//		const QString& mapName = current->text();
+//		MapHandlerGen* mh = m_window->getMap(mapName);
+
+		if(item->checkState() == Qt::Checked)
+		{
+
+		}
+		else // Unchecked
+		{
+
+		}
+	}
+}
+
+void MapsDialog::addMapToList(MapHandlerGen* m)
 {
 	mapList->addItem(m->getName());
 }
 
-void MapsDialog::cb_removeMapFromList(MapHandlerGen* m)
+void MapsDialog::removeMapFromList(MapHandlerGen* m)
 {
 	QList<QListWidgetItem*> items = mapList->findItems(m->getName(), Qt::MatchExactly);
 	if(!items.empty())

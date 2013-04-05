@@ -129,6 +129,7 @@ void MyQT::cb_initGL()
 
 	m_sprite = new Utils::PointSprite();
 	m_sprite->setAttributePosition(m_positionVBO);
+	m_sprite->setColor(Geom::Vec4f(1.0f, 0.0f , 0.0f, 1.0f));
 
     m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
     storeVerticesInfo();
@@ -156,14 +157,13 @@ void MyQT::cb_initGL()
 	registerShader(m_sprite);
 	registerShader(m_lines);
 
-	SelectorTrue allDarts;
 
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
+//	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f); // nb
 
 	// timer example for animation
 	m_timer = new QTimer( this );
@@ -201,9 +201,7 @@ void MyQT::cb_redraw()
 
 	if (render_balls)
 	{
-		m_sprite->predraw(Geom::Vec3f(1.0f, 0.0f ,0.0f));
 		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
-		m_sprite->postdraw();
 	}
 
 	if (render_vectors)
@@ -217,8 +215,8 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);	
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+//		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y); // nb
 		if (d != Dart::nil())
 		{
 			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
@@ -238,13 +236,13 @@ void MyQT::cb_keyPress(int code)
 	{
 		std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
 		Utils::SVG::SVGOut svg(filename, modelViewMatrix(), projectionMatrix());
-		svg.setWidth(1.0f);
-		svg.setColor(Geom::Vec3f(0.0f,0.0f,0.5f));
+//		svg.setWidth(1.0f);
+//		svg.setColor(Geom::Vec3f(0.0f,0.0f,0.5f));
 		Algo::Render::SVG::renderEdges<PFP>(svg, myMap, position);
-		svg.setColor(Geom::Vec3f(0.0f,0.8f,0.0f));
-		svg.setWidth(5.0f);
+//		svg.setColor(Geom::Vec3f(0.0f,0.8f,0.0f));
+//		svg.setWidth(5.0f);
 		Algo::Render::SVG::renderVertices<PFP>(svg, myMap, position);
-		svg.setColor(Geom::Vec3f(1.0f,0.0f,0.0f));
+	//	svg.setColor(Geom::Vec3f(1.0f,0.0f,0.0f));
 		m_strings->toSVG(svg);
 		//svg destruction close the file
 	}
@@ -262,11 +260,11 @@ void MyQT::cb_keyPress(int code)
 		Algo::Volume::Modelisation::catmullClarkVol<PFP>(myMap, position);
 
 		m_positionVBO->updateData(position);
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
+		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
-		m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, 0.9f, allDarts);
+		m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, 0.9f);
 	}
 }
 
@@ -302,7 +300,7 @@ int main(int argc, char **argv)
 
 	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 
-	CGoGNout.toStatusBar(NULL);
+	CGoGNout.noStatusBar();
 
 	//  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

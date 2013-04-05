@@ -49,7 +49,7 @@ namespace GL1
 */
 template <typename PFP>
 FunctorGLFace<PFP>::FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const FunctorSelect& good):
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals):
 	FunctorMap<MAP>(map),
 	m_smooth(smooth),
 	m_lighted(lighted),
@@ -57,8 +57,7 @@ FunctorGLFace<PFP>::FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, 
 	m_explode(expl),
 	m_storing(stor),
 	m_positions(posi),
-	m_normals(normals),
-	m_selector(good)
+	m_normals(normals)
 {
 }
 
@@ -80,12 +79,10 @@ std::vector<Dart>& FunctorGLFace<PFP>::getPolyDarts()
 template<typename PFP>
 bool FunctorGLFace<PFP>::operator() (Dart d)
 {
-	if (m_selector(d)) {
 		if (m_explode == 1.0f)
 			renderFace(d);
 		else
 			renderFaceExplode(d);
-	}
 	return false;
 }
 
@@ -338,11 +335,10 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 }
 
 template<typename PFP>
-FunctorGLNormal<PFP>::FunctorGLNormal(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale):
+FunctorGLNormal<PFP>::FunctorGLNormal(MAP& map, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale):
 	FunctorMap<MAP>(map),
 	m_positions(posi),
 	m_normals(normals),
-	m_selector(good),
 	m_scale(scale)
 {
 }
@@ -350,22 +346,20 @@ FunctorGLNormal<PFP>::FunctorGLNormal(MAP& map, const FunctorSelect& good, const
 template<typename PFP>
 bool FunctorGLNormal<PFP>::operator() (Dart d)
 {
-	if (m_selector(d))
-	{
+
 		typename PFP::VEC3 p = m_positions[d];
 		glVertex3fv(p.data());
 		p += m_scale * m_normals[d];
 		glVertex3fv(p.data());
-	}
+
 	return false;
 }
 
 template<typename PFP>
-FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale):
+FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale):
 	FunctorMap<MAP>(map),
 	m_positions(posi),
 	m_frames(frames),
-	m_selector(good),
 	m_scale(scale)
 {
 }
@@ -373,8 +367,7 @@ FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const FunctorSelect& good, const V
 template<typename PFP>
 bool FunctorGLFrame<PFP>::operator() (Dart d)
 {
-	if (m_selector(d))
-	{
+
 		typename PFP::VEC3 p = m_positions[d] ;
 		for (unsigned int i = 0 ; i < 3 ; ++i) {
 			glVertex3fv(p.data());
@@ -383,13 +376,12 @@ bool FunctorGLFrame<PFP>::operator() (Dart d)
 			q += m_scale * m_frames[i][d] ;
 			glVertex3fv(q.data());
 		}
-	}
 	return false;
 }
 
 template <typename PFP>
 FunctorGLFaceColor<PFP>::FunctorGLFaceColor(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, const VertexAttribute<typename PFP::VEC3>& colors , const FunctorSelect& good):
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, const VertexAttribute<typename PFP::VEC3>& colors):
 	FunctorMap<MAP>(map),
 	m_smooth(smooth),
 	m_lighted(lighted),
@@ -398,8 +390,7 @@ FunctorGLFaceColor<PFP>::FunctorGLFaceColor(MAP& map, bool lighted, bool smooth,
 	m_storing(stor),
 	m_positions(posi),
 	m_normals(normals),
-	m_colors(colors),
-	m_selector(good)
+	m_colors(colors)
 {
 }
 template<typename PFP>
@@ -411,12 +402,12 @@ std::vector<Dart>& FunctorGLFaceColor<PFP>::getPolyDarts()
 template<typename PFP>
 bool FunctorGLFaceColor<PFP>::operator() (Dart d)
 {
-	if (m_selector(d)) {
+
 		if (m_explode == 1.0f)
 			renderFace(d);
 		else
 			renderFaceExplode(d);
-	}
+
 	return false;
 }
 

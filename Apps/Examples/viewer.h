@@ -104,7 +104,7 @@ public:
 	Algo::Render::GL2::TopoRender* m_topoRender ;
 
 	Utils::VBO* m_positionVBO ;
-	Utils::VBO* m_normalVBO ;
+	Utils::VBO* m_normalVBO;
 
 	Utils::ShaderPhong* m_phongShader ;
 	Utils::ShaderFlat* m_flatShader ;

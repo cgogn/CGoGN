@@ -6,6 +6,7 @@
 #include <QDockWidget>
 #include <QPluginLoader>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QDir>
 #include <QKeyEvent>
@@ -66,6 +67,7 @@ Window::Window(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQ
 	m_pythonDock->setWidget(&m_pythonConsole);
 
 	connect(actionShowHidePythonDock, SIGNAL(triggered()), this, SLOT(cb_showHidePythonDock()));
+	connect(actionLoadPythonScript, SIGNAL(triggered()), this, SLOT(cb_loadPythonScript()));
 
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
@@ -377,6 +379,7 @@ void Window::setCurrentView(View* view)
 			disablePluginTabWidgets(p);
 
 		disconnect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+		disconnect(m_currentView, SIGNAL(pluginUnlinked(Plugin*)), this, SLOT(disablePluginTabWidgets(Plugin*)));
 	}
 
 	View* oldCurrent = m_currentView;
@@ -387,6 +390,7 @@ void Window::setCurrentView(View* view)
 		enablePluginTabWidgets(p);
 
 	connect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
+	connect(m_currentView, SIGNAL(pluginUnlinked(Plugin*)), this, SLOT(disablePluginTabWidgets(Plugin*)));
 
 	emit(currentViewChanged(m_currentView));
 
@@ -451,7 +455,7 @@ void Window::registerPluginsDirectory(const QString& path)
 Plugin* Window::loadPlugin(const QString& pluginName)
 {
 	if (h_plugins.contains(pluginName))
-		return NULL;
+		return h_plugins[pluginName];
 
 	if (m_availablePlugins.contains(pluginName))
 	{
@@ -490,13 +494,13 @@ Plugin* Window::loadPlugin(const QString& pluginName)
 		// if loading fails
 		else
 		{
-			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toUtf8().constData() << std::endl;
+//			std::cout << "loadPlugin: loader.instance() failed" << std::endl << loader.errorString().toStdString() << std::endl;
 			return NULL;
 		}
 	}
 	else
 	{
-		std::cout << "loadPlugin: plugin not found (" << pluginName.toUtf8().constData() << ")" << std::endl;
+//		std::cout << "loadPlugin: plugin not found (" << pluginName.toStdString() << ")" << std::endl;
 		return NULL;
 	}
 }
@@ -539,18 +543,21 @@ MapHandlerGen* Window::addMap(const QString& name, unsigned int dim)
 	if (h_maps.contains(name))
 		return NULL;
 
-	GenericMap* map = NULL;
+	MapHandlerGen* mh = NULL;
 	switch(dim)
 	{
-		case 2 :
-			map = new PFP2::MAP();
+		case 2 : {
+			PFP2::MAP* map = new PFP2::MAP();
+			mh = new MapHandler<PFP2>(name, this, map);
 			break;
-		case 3 :
-			map = new PFP3::MAP();
+		}
+		case 3 : {
+			PFP3::MAP* map = new PFP3::MAP();
+			mh = new MapHandler<PFP3>(name, this, map);
 			break;
+		}
 	}
 
-	MapHandlerGen* mh = new MapHandlerGen(name, this, map);
 	h_maps.insert(name, mh);
 
 	emit(mapAdded(mh));
@@ -743,6 +750,14 @@ void Window::cb_showHideDock()
 void Window::cb_showHidePythonDock()
 {
 	m_pythonDock->setVisible(m_pythonDock->isHidden());
+}
+
+void Window::cb_loadPythonScript()
+{
+	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", getAppPath(), "Python script (*.py)");
+	QFileInfo fi(fileName);
+	if(fi.exists())
+		m_pythonContext.evalFile(fi.filePath());
 }
 
 void Window::cb_showCamerasDialog()
