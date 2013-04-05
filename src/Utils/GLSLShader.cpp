@@ -1127,7 +1127,7 @@ void GLSLShader::updateAllFromGLMatrices()
 			model[i][j] = float(modelview[4*i+j]);
 		}
 	}
-	model *= currentTransfo();
+	model = currentTransfo() * model;
 
 	currentPMV() = proj * model;
 	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
