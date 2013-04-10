@@ -42,6 +42,7 @@ std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 	{
 		CellMarkerMemo<FACE> memo_cross(this->m);
 
+
 		switch (this->getState())
 		{
 			case VERTEX :
