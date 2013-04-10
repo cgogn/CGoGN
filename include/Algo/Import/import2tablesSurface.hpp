@@ -73,6 +73,12 @@ ImportType MeshTablesSurface<PFP>::getFileType(const std::string& filename)
 	if ((filename.rfind(".ahem")!=std::string::npos) || (filename.rfind(".AHEM")!=std::string::npos))
 		return AHEM;
 
+	if ((filename.rfind(".stlb")!=std::string::npos) || (filename.rfind(".STLB")!=std::string::npos))
+		return STLB;
+
+	if ((filename.rfind(".stl")!=std::string::npos) || (filename.rfind(".STL")!=std::string::npos))
+		return STL;
+
 	return UNKNOWNSURFACE;
 }
 
@@ -124,6 +130,14 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 	case AHEM:
 		CGoGNout << "TYPE: AHEM" << CGoGNendl;
 		return importAHEM(filename, attrNames);
+		break;
+	case STLB:
+		CGoGNout << "TYPE: STLB" << CGoGNendl;
+		return importSTLBin(filename, attrNames);
+		break;
+	case STL:
+		CGoGNout << "TYPE: STL" << CGoGNendl;
+		return importSTLAscii(filename, attrNames);
 		break;
 	default:
 	#ifdef WITH_ASSIMP
@@ -1628,6 +1642,179 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
 
 	return true;
 }
+
+
+
+template<typename PFP>
+bool MeshTablesSurface<PFP>::importSTLAscii(const std::string& filename, std::vector<std::string>& attrNames)
+{
+	VertexAttribute<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
+
+	attrNames.push_back(positions.name()) ;
+
+	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
+
+	// open file
+	std::ifstream fp(filename.c_str(), std::ios::in);
+	if (!fp.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		return false;
+	}
+
+
+	std::vector<unsigned int> verticesID;
+	verticesID.reserve(1000);
+	std::vector<VEC3> m_points;
+
+	m_nbFaces = 0;
+	m_nbVertices = 0;
+
+	m_nbEdges.reserve(1000);
+	m_emb.reserve(3000);
+
+	std::string ligne;
+	std::string tag;
+
+	do
+	{
+		fp >> tag;
+		std::getline (fp, ligne);
+	}while (tag != std::string("vertex"));
+
+	do
+	{
+		for (int i=0; i<3; ++i)
+		{
+			std::stringstream oss(ligne);
+			float x,y,z;
+			oss >> x;
+			oss >> y;
+			oss >> z;
+
+			VEC3 pos(x,y,z);
+
+			typename std::vector<VEC3>::iterator it = find (m_points.begin(), m_points.end(), pos);
+			if (it != m_points.end())
+			{
+				unsigned int idP = it - m_points.begin();
+				m_emb.push_back(verticesID[idP]);
+			}
+			else
+			{
+				unsigned int id = container.insertLine();
+				positions[id] = pos;
+				verticesID.push_back(id);
+				m_points.push_back(pos);
+				m_emb.push_back(id);
+			}
+			fp >> tag;
+			std::getline (fp, ligne);
+		}
+		m_nbEdges.push_back(3);
+
+		do
+		{
+			fp >> tag;
+			std::getline (fp, ligne);
+		}while (!fp.eof() && (tag != std::string("vertex")));
+
+	}while (!fp.eof());
+
+	m_nbVertices = m_points.size();
+	m_nbFaces = m_nbEdges.size();
+
+	fp.close();
+	return true;
+}
+
+
+
+template<typename PFP>
+bool MeshTablesSurface<PFP>::importSTLBin(const std::string& filename, std::vector<std::string>& attrNames)
+{
+	VertexAttribute<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
+
+	attrNames.push_back(positions.name()) ;
+
+	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
+
+	// open file
+	std::ifstream fp(filename.c_str(), std::ios::in|std::ios::binary);
+	if (!fp.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		return false;
+	}
+
+
+	std::vector<unsigned int> verticesID;
+	verticesID.reserve(1000);
+	std::vector<VEC3> m_points;
+
+	m_nbVertices = 0;
+
+
+	std::string ligne;
+	std::string tag;
+
+	fp.ignore(80);
+	fp.read(reinterpret_cast<char*>(&m_nbFaces), sizeof(int));
+
+	m_nbEdges.reserve(m_nbFaces);
+	m_emb.reserve(m_nbFaces*3);
+
+
+	for (unsigned int j=0;j<m_nbFaces;++j)
+	{
+		fp.ignore(3*sizeof(float));
+		for (int i=0; i<3; ++i)
+		{
+			VEC3 pos;
+			fp.read(reinterpret_cast<char*>(&pos[0]), sizeof(float));
+			fp.read(reinterpret_cast<char*>(&pos[1]), sizeof(float));
+			fp.read(reinterpret_cast<char*>(&pos[2]), sizeof(float));
+
+			typename std::vector<VEC3>::iterator it = find (m_points.begin(), m_points.end(), pos);
+			if (it != m_points.end())
+			{
+				unsigned int idP = it - m_points.begin();
+				m_emb.push_back(verticesID[idP]);
+			}
+			else
+			{
+				unsigned int id = container.insertLine();
+				positions[id] = pos;
+				verticesID.push_back(id);
+				m_points.push_back(pos);
+				m_emb.push_back(id);
+			}
+		}
+		fp.ignore(2);
+		m_nbEdges.push_back(3);
+	}
+
+	m_nbVertices = m_points.size();
+	m_nbFaces = m_nbEdges.size();
+
+	fp.close();
+	return true;
+}
+
+
+
+
+
+
+
+
+
 
 } // namespace Import
 
