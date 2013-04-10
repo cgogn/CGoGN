@@ -259,7 +259,6 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 
 	assert(goal.isFinite()) ;
 	assert(this->getPosition().isFinite()) ;
-// 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	//project goal within face plane
 	VEC3 n1 = Geometry::faceNormal<PFP>(m,d,m_positions);
