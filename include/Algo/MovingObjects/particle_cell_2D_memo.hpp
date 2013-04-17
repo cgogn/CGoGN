@@ -140,8 +140,8 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 					do
 					{
 						if(Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
-								&& Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
-								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
+								&& Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current))
+//								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
 						{
 
 							this->edgeState(current,memo_cross) ;
