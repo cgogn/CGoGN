@@ -60,7 +60,21 @@ public:
 
 	static const unsigned int DIMENSION = 2 ;
 
-	void init() ;
+	//!
+	/*!
+	 *
+	 */
+	void update_topo_shortcuts();
+
+
+	void initImplicitProperties() ;
+
+	/**
+	 * clear the map
+	 * @param remove attrib remove attribute (not only clear the content)
+	 */
+	void clear(bool removeAttrib);
+
 
 	/***************************************************
 	 *             ATTRIBUTES MANAGEMENT               *

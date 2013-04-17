@@ -31,7 +31,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 
 template <typename PFP>
@@ -56,10 +56,10 @@ void decimate(typename PFP::MAP& map, SelectorType s, ApproximatorType a,
 	switch(s)
 	{
 		case S_MapOrder :
-			selector = new Algo::DecimationVolumes::EdgeSelector_MapOrder<PFP>(map, position, approximators) ;
+			selector = new Algo::Volume::Decimation::EdgeSelector_MapOrder<PFP>(map, position, approximators) ;
 			break ;
 		case S_Random :
-			selector = new Algo::DecimationVolumes::EdgeSelector_Random<PFP>(map, position, approximators) ;
+			selector = new Algo::Volume::Decimation::EdgeSelector_Random<PFP>(map, position, approximators) ;
 			break ;
 		default:
 			CGoGNout << "not yet implemented" << CGoGNendl;
@@ -122,9 +122,9 @@ void decimate(typename PFP::MAP& map, SelectorType s, ApproximatorType a,
 		delete (*it) ;
 }
 
-} //namespace DecimationVolumes
+} //namespace Decimation
 
-}
+} //namespace Volume
 
 } //namespace Algo
 
