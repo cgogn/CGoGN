@@ -228,7 +228,7 @@ void Approximator_GeomColOpt<PFP>::approximate(Dart d)
 	const VEC3& p0 = this->m_attrV[0]->operator[](d) ;    // let the new vertex lie
 	const VEC3& p1 = this->m_attrV[0]->operator[](dd) ;   // on either one of the two endpoints
 
-	if(!opt)
+	if(false && !opt)
 	{
 		VEC3 p12 = (p0 + p1) / 2.0f ;   // or the middle of the edge
 		REAL e1 = quad(p0) ;

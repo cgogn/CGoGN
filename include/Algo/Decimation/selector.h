@@ -25,6 +25,8 @@
 #ifndef __SELECTOR_H__
 #define __SELECTOR_H__
 
+#include "Utils/SphericalFunctionIntegratorCartesian.h"
+
 namespace CGoGN
 {
 
@@ -52,6 +54,7 @@ enum SelectorType
 	S_QEMextColor = 10,
 	S_Lightfield = 11,
 	S_GeomColOptGrad = 23,
+	S_LightfieldGradient = 24,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	S_hQEMextColor = 12,
 	S_hQEMml = 13,

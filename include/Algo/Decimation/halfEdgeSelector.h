@@ -26,7 +26,6 @@
 #define __HALFEDGESELECTOR_H__
 
 #include "Algo/Decimation/selector.h"
-#include "Utils/SphericalFunctionIntegratorCartesian.h"
 
 namespace CGoGN
 {
@@ -668,7 +667,7 @@ public:
 
 /*****************************************************************************************************************
  *                                 HALF-EDGE LF EXPERIMENTAL METRIC                                              *
- *****************************************************************************************************************/
+ *****************************************************************************************************************
 template <typename PFP>
 class HalfEdgeSelector_LFexperimental : public EdgeSelector<PFP>
 {
@@ -773,7 +772,7 @@ public:
 
 /*****************************************************************************************************************
  *                                 HALF-EDGE LF GRADIENT METRIC                                                  *
- *****************************************************************************************************************/
+ *****************************************************************************************************************
 template <typename PFP>
 class HalfEdgeSelector_LFgradient : public EdgeSelector<PFP>
 {
@@ -818,14 +817,27 @@ private:
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
 	void recomputeQuadric(const Dart d) ;
 
+	VEC3 computeDirDerivativeLFerror(const Dart& v0, const Dart& v1) ;
 	VEC3 computeGradientLFerror(const Dart& v0, const Dart& v1) const ;
 	VEC3 computeSquaredLightfieldDifferenceAnalytical(const Dart& d1, const Dart& d2) const ;
-	VEC3 computeSquaredLightfieldDifferenceNumerical(const Dart& d1, const Dart& d2) const ;
+	VEC3 computeSquaredLightfieldDifferenceNumerical(const Dart& d1, const Dart& d2, const VEC3& N) const ;
+	VEC3 integrateDscalGrad(const VEC3& d, const unsigned int& K, const VEC3& N, const VEC3& ei, const VEC3& ej,
+		const VEC3* coefs1, const VEC3& T1, const VEC3& B1, const VEC3& N1, const VEC3& avg1,
+		const VEC3* coefsi, const VEC3& Ti, const VEC3& Bi, const VEC3& Ni, const VEC3& avgi,
+		const VEC3* coefsj, const VEC3& Tj, const VEC3& Bj, const VEC3& Nj, const VEC3& avgj) const ;
+	VEC3 integrateDlf(const VEC3& d, const unsigned int& K, const VEC3& N, const VEC3& ei, const VEC3& ej,
+		const std::vector<VEC3*> coefs0, const VEC3& T0, const VEC3& B0, const VEC3& N0, const VEC3& avg0,
+		const std::vector<VEC3*> coefs1, const VEC3& T1, const VEC3& B1, const VEC3& N1, const VEC3& avg1,
+		const std::vector<VEC3*> coefsi, const VEC3& Ti, const VEC3& Bi, const VEC3& Ni, const VEC3& avgi,
+		const std::vector<VEC3*> coefsj, const VEC3& Tj, const VEC3& Bj, const VEC3& Nj, const VEC3& avgj) const ;
 	VEC3 computeGradient(const VEC3& P0, const VEC3& Pi, const VEC3& Pj, const Dart& v0, const Dart& v1, const Dart& vi, const Dart& vj, unsigned int channel) const ;
 	REAL computeIntegral(const double *avgi, const VEC3& ti, const VEC3& bi, const VEC3& ni, unsigned int nbCoefs, const std::vector<double>& coefs) const ;
 
 	static bool isInDomain(double x, double y, double z, void *data) ;
 	static double CartesianFunction (double x, double y, double z, void* data) ;
+	static double dispScalGrad (double x, double y, double z, void* data) ;
+	static double dlf (double x, double y, double z, void* data) ;
+	static double evalF(double* N, double* avg, unsigned int nb, double* T, double* B, double* coefs, double& x, double& y, double& z) ;
 	static double SquaredDifferenceOfCartesianFunctions (double x, double y, double z, void* data) ;
 
 public:
@@ -894,7 +906,7 @@ public:
 
 /*****************************************************************************************************************
  *                                 HALF-EDGE COLOR PER FACE                                                      *
- *****************************************************************************************************************/
+ *****************************************************************************************************************
 template <typename PFP>
 class HalfEdgeSelector_ColorPerFace : public EdgeSelector<PFP>
 {
@@ -983,7 +995,7 @@ public:
 
 /*****************************************************************************************************************
  *                                 HALF-EDGE LF PER FACE                                                         *
- *****************************************************************************************************************/
+ *****************************************************************************************************************
 template <typename PFP>
 class HalfEdgeSelector_LFperFace : public EdgeSelector<PFP>
 {
@@ -1083,7 +1095,7 @@ public:
 		}
 	}
 } ;
-
+*/
 
 } // namespace Decimation
 

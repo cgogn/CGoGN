@@ -29,7 +29,6 @@
 #include "Algo/Decimation/halfEdgeSelector.h"
 #include "Algo/Decimation/geometryApproximator.h"
 #include "Algo/Decimation/colorPerVertexApproximator.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
 
 namespace CGoGN
 {
@@ -45,20 +44,21 @@ namespace Decimation
 
 /**
  * Decimate the mesh through edge contraction
- * by using a selector and approximator scheme.
+ * by using a declared selector and approximator type (see \file approximator.h and \file selector.h).
  *
  * \param map the map to decimate
  * \param s the SelectorType
  * \param a the ApproximatorType
  * \param position the vertex position embeddings
  * \param nbWantedVertices the aimed amount of vertices after decimation
- * \param selected the selector stipulating which darts are eligible for contraction
  * \param edgeErrors will (if not null) contain the edge errors computed by the approximator/selector (default NULL)
  * \param callback_wrapper a callback function for progress monitoring (default NULL)
  * \param callback_object the object to call the callback on (default NULL)
+ *
+ * \return >= 0 if finished correctly : 1 if no more edges are collapsible, 0 is nbWantedVertices achieved, -1 if the initialisation of the selector failed
  */
 template <typename PFP>
-void decimate(
+int decimate(
 	typename PFP::MAP& map,
 	SelectorType s,
 	ApproximatorType a,
@@ -68,9 +68,33 @@ void decimate(
 	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
 ) ;
 
+/**
+ * Decimate the mesh through edge contraction
+ * by providing the selector and the approximators
+ *
+ * \param map the map to decimate
+ * \param s the selector
+ * \param a a vector containing the approximators
+ * \param nbWantedVertices the aimed amount of vertices after decimation
+ * \param edgeErrors will (if not null) contain the edge errors computed by the approximator/selector (default NULL)
+ * \param callback_wrapper a callback function for progress monitoring (default NULL)
+ * \param callback_object the object to call the callback on (default NULL)
+ *
+ * \return >= 0 if finished correctly : 1 if no more edges are collapsible, 0 is nbWantedVertices achieved, -1 if the initialisation of the selector failed
+ */
+template <typename PFP>
+int decimate(
+	typename PFP::MAP& map,
+	EdgeSelector<PFP>* s,
+	std::vector<ApproximatorGen<PFP>*>& a,
+	unsigned int nbWantedVertices,
+	EdgeAttribute<typename PFP::REAL> *edgeErrors = NULL,
+	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
+) ;
+
 } //namespace Decimation
 
-}
+} // Surface
 
 } //namespace Algo
 

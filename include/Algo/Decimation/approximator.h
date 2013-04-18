@@ -54,7 +54,8 @@ enum ApproximatorType
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	A_hHalfCollapse = 10,
 	A_hQEM = 11,
-	A_hLightfieldHalf = 12
+	A_hLightfieldHalf = 12,
+	A_MidEdgeLFopt = 13
 } ;
 
 template <typename PFP>
@@ -74,7 +75,6 @@ public:
 	virtual ~ApproximatorGen()
 	{}
 	virtual const std::string& getApproximatedAttributeName(unsigned int index = 0) const = 0 ;
-//	virtual std::vector<std::string> getApproximatedAttributeNames() const = 0 ;
 	virtual ApproximatorType getType() const = 0 ;
 	virtual unsigned int getNbApproximated() const = 0 ;
 	virtual bool init() = 0 ;
@@ -184,6 +184,11 @@ public:
 	}
 
 	const VertexAttribute<T>& getAttr(unsigned int index = 0) const
+	{
+		return *(m_attrV[index]) ;
+	}
+
+	VertexAttribute<T>& getAttr(unsigned int index = 0)
 	{
 		return *(m_attrV[index]) ;
 	}

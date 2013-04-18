@@ -22,10 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <time.h>
-#include "Algo/Geometry/basic.h"
-#include "Algo/Decimation/geometryApproximator.h"
-
 namespace CGoGN
 {
 
@@ -146,7 +142,7 @@ void HalfEdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
@@ -421,7 +417,7 @@ void HalfEdgeSelector_QEMextColor<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
@@ -775,7 +771,7 @@ void HalfEdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
@@ -1139,7 +1135,7 @@ void HalfEdgeSelector_LightfieldAvgColor<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
@@ -1528,7 +1524,7 @@ void HalfEdgeSelector_LightfieldKCL<PFP>::updateBeforeCollapse(Dart d)
 	tmpVisualImportance = m_visualImportance[d] + m_visualImportance[dd] ;
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
@@ -1951,7 +1947,7 @@ void HalfEdgeSelector_ColorExperimental<PFP>::updateBeforeCollapse(Dart d)
 //	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
@@ -2318,7 +2314,7 @@ void HalfEdgeSelector_ColorGradient<PFP>::updateBeforeCollapse(Dart d)
 //	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
@@ -2436,9 +2432,10 @@ void HalfEdgeSelector_ColorGradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 
 	//std::cout << quadGeom(newPos) / (alpha/M_PI + quadHF(newHF)) << std::endl ;
 	// sum of QEM metric and color gradient metric
+	const REAL t = 0.01 ;
 	const REAL& err =
-			quadGeom(newPos) + // geom
-			computeGradientColorError(v0,v1).norm()/sqrt(3) // color
+			t*quadGeom(newPos) + // geom
+			(1-t)*computeGradientColorError(v0,v1).norm()/sqrt(3) // color
 			;
 
 	/*std::cout << quadGeom(newPos) << std::endl ;
@@ -2466,7 +2463,7 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 	const VEC3& P1 = m_pos[v1] ;
 	const VEC3& c0 = m_color[v0] ;
 	const VEC3& c1 = m_color[v1] ;
-	const VEC3 colDiff = c1 - c0 ;
+	const VEC3 d = P1 - P0 ; // displacement vector
 
 	VEC3 count ;
 	REAL areaSum = 0 ;
@@ -2484,42 +2481,39 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 		const VEC3 ei = P0 - Pj ;
 		const VEC3 ej = Pi - P0 ;
 		//const VEC3 e0 = Pj - Pi ;
-		const VEC3 d = P1 - P0 ; // displacement vector
 
-		areaSum += (ei ^ ej).norm() / REAL(2) ;
-
+		const REAL areaIJ0sq = (ei ^ ej).norm2() ;
+		const REAL areaIJ0 = sqrt(areaIJ0sq)/2. ;
+		areaSum += areaIJ0 ;
 		// per-channel treatment
-		for (unsigned int i = 0 ; i < 3 ;  ++i)
+		for (unsigned int c = 0 ; c < 3 ;  ++c)
 		{
 			// color gradient for channel i
-			VEC3 grad = (ei.norm2()*fabs(ci[i]-c1[i]) + (ei*ej)*fabs(cj[i]-c1[i]))*ej ;
-			grad -= (ej.norm2()*fabs(cj[i]-c1[i]) + (ei*ej)*fabs(ci[i]-c1[i]))*ei ;
-			const REAL denom = (ei ^ ej).norm2() ;
-			if (denom == 0) // case flat triangles
+			VEC3 grad = (ei.norm2()*(ci[c]-c1[c]) + (ei*ej)*(cj[c]-c1[c]))*ej ;
+			grad -= (ej.norm2()*(cj[c]-c1[c]) + (ei*ej)*(ci[c]-c1[c]))*ei ;
+			const REAL denom = areaIJ0sq ;
+			if (denom < 1e-9) // case flat triangles
 				grad = VEC3(0,0,0) ;
 			else
 				grad /= denom ;
 
-			// displacement error for channel i
-			const REAL displacementE = (0.5*(ei ^ ej).norm()) * fabs(d*grad) ; // area x <disp,grad>
-
 			// color change error for channel i
-			//const REAL colChangeE = fabs(colDiff[i]) * (ei ^ ej).norm() / REAL(2) ;
-			count[i] += displacementE ;
-			/*if (isnan(count[i]))
-				std::cerr << "nan" << std::endl ;*/
+			count[c] += areaIJ0 * pow(d*grad,2) ;
 		}
 	}
 
-	for (unsigned int i = 0 ; i < 3 ; ++i)
-		count[i] += fabs(colDiff[i]) * areaSum ;
+	const VEC3 colDiff = c1 - c0 ;
+	for (unsigned int c = 0 ; c < 3 ; ++c)
+	{
+		count[c] += pow(colDiff[c],2) * areaSum ;
+	}
 
 	return count ;
 }
 
 /************************************************************************************
  *                           LIGHTFIELD EXPERIMENTAL                                *
- ************************************************************************************/
+ ************************************************************************************
 
 template <typename PFP>
 bool HalfEdgeSelector_LFexperimental<PFP>::init()
@@ -2692,12 +2686,12 @@ void HalfEdgeSelector_LFexperimental<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
  * @param dart d
- */
+ *
 template <typename PFP>
 void HalfEdgeSelector_LFexperimental<PFP>::recomputeQuadric(const Dart d)
 {
@@ -2956,7 +2950,7 @@ typename PFP::REAL HalfEdgeSelector_LFexperimental<PFP>::computeSquaredLightfiel
 
 /************************************************************************************
  *                           LIGHTFIELD GRADIENT                                    *
- ************************************************************************************/
+ ************************************************************************************
 
 template <typename PFP>
 bool
@@ -3035,16 +3029,16 @@ HalfEdgeSelector_LFgradient<PFP>::init()
 				if(ok > 3 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == s.str().c_str())
 				{
 					++ok ;
+					if (!saved)
+					{
+						m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
+						saved = true ;
+					}
 					if (this->m_approx[approxindex]->getAttr(attrindex).isValid())
 					{
 						++k ;
 						m_approxindex_HF.push_back(approxindex) ;
 						m_attrindex_HF.push_back(attrindex) ;
-						if (!saved)
-						{
-							m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-							saved = true ;
-						}
 					}
 				}
 			}
@@ -3052,15 +3046,18 @@ HalfEdgeSelector_LFgradient<PFP>::init()
 	}
 	m_K = k ;
 
-	if(ok < 6)
+	if(ok <= 6)
 	{
-		std::cerr << "HalfEdgeSelector_LFexperimental<PFP>::init() not OK" << std::endl ;
+		std::cerr << "HalfEdgeSelector_LFgradient<PFP>::init() not OK" << std::endl ;
 		return false ;
 	}
 
-	m_integrator.Init(65) ;
+	unsigned int ruleId = m_K <= 6 ? 17 : (m_K <= 10) ? 23 : 29 ;
+	//ruleId = 29 ;
+	m_integrator.Init(ruleId) ;
+
 	// allocate workspaces
-	m_workspace = new double[28+2*m_K] ;
+	m_workspace = new double[59+12*m_K] ;
 
 	TraversorV<MAP> travV(m);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
@@ -3136,12 +3133,12 @@ HalfEdgeSelector_LFgradient<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
  * @param dart d
- */
+ *
 template <typename PFP>
 void
 HalfEdgeSelector_LFgradient<PFP>::recomputeQuadric(const Dart d)
@@ -3257,7 +3254,8 @@ HalfEdgeSelector_LFgradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 	const REAL t = 0.01 ;
 	const REAL err =
 			t*quadGeom(newPos) + // geom
-			(1-t)*computeGradientLFerror(v0,v1).norm()/sqrt(3) // lf
+			(1-t)*computeDirDerivativeLFerror(v0,v1).norm()/sqrt(3) // lf
+			//(1-t)*computeGradientLFerror(v0,v1).norm()/sqrt(3) // lf
 			;
 	//std::cout << computeLightfieldError(v0,v1) / quadGeom(newPos) << std::endl ;
 
@@ -3279,11 +3277,22 @@ HalfEdgeSelector_LFgradient<PFP>::computeGradientLFerror(const Dart& v0, const D
 
 	const VEC3& P0 = this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos)[v0] ;
 	const VEC3& P1 = this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos)[v1] ;
+	const VEC3& N = this->m_approx[m_approxindex_FN]->getApprox(v1,m_attrindex_FN) ;
+
+	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v1] ;
+	const VEC3& B1 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v1] ;
+	const VEC3& N1 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v1] ;
+	VEC3 coefs1[m_K] ;
+	for (unsigned int k = 0 ; k < m_K ; ++k)
+	{
+		coefs1[k] = this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[v1] ;
+	}
 
 	Traversor2VF<MAP> tf(m,v0) ; // all faces around vertex v0
 
 	VEC3 count ;
 	REAL areaSum = 0 ;
+	const VEC3 d = P1 - P0 ; // displacement vector
 
 	for (Dart fi = tf.begin() ; fi != tf.end() ; fi = tf.next()) // foreach "blue" face
 	{
@@ -3293,46 +3302,114 @@ HalfEdgeSelector_LFgradient<PFP>::computeGradientLFerror(const Dart& v0, const D
 		const VEC3& Pi = this->m_position[vi] ;
 		const VEC3& Pj = this->m_position[vj] ;
 
+		const VEC3& Ti = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[vi] ;
+		const VEC3& Bi = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[vi] ;
+		const VEC3& Ni = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[vi] ;
+		const VEC3& Tj = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[vj] ;
+		const VEC3& Bj = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[vj] ;
+		const VEC3& Nj = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[vj] ;
+		VEC3 coefsi[m_K], coefsj[m_K] ;
+
+		for (unsigned int k = 0 ; k < m_K ; ++k)
+		{
+			coefsi[k] = this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[vi] ;
+			coefsj[k] = this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[vj] ;
+		}
+
 		// utils
 		const VEC3 ei = P0 - Pj ;
 		const VEC3 ej = Pi - P0 ;
 		//const VEC3 e0 = Pj - Pi ;
-		const VEC3 d = P1 - P0 ; // displacement vector
 
-		const REAL denom = (ei ^ ej).norm2() ;
-		const REAL area = sqrt(denom) / REAL(2) ;
-		areaSum += area ;
+		const REAL areaIJ0sq = (ei ^ ej).norm2() ;
+		const REAL areaIJ0 = sqrt(areaIJ0sq)/2. ;
+		areaSum += areaIJ0 ;
 
-		// per-channel treatment
-		for (unsigned int i = 0 ; i < 3 ;  ++i)
-		{
-			// lf gradient for channel i
-			VEC3 grad = computeGradient(P0,Pi,Pj,v0,v1,vi,vj,i) ;
-			if (denom == 0) // case flat triangles
-				grad.zero() ;
-			else
-				grad /= denom ;
+		const VEC3 displacementE = integrateDscalGrad(d, m_K, N, ei, ej,
+													  coefs1, T1, B1, N1, m_avgColor[v1],
+													  coefsi, Ti, Bi, Ni, m_avgColor[vi],
+													  coefsj, Tj, Bj, Nj, m_avgColor[vj]) ;
 
-			// displacement error for channel i
-			const REAL displacementE = area * fabs(d*grad) ; // area x <disp,grad>
-
-			count[i] += displacementE ;
-		}
+		count += displacementE * areaIJ0 ;
 	}
 
-	const VEC3 lfDiff = computeSquaredLightfieldDifferenceAnalytical(v0,v1) ;
-	/*const VEC3 lfDiff2 = computeSquaredLightfieldDifferenceNumerical(v0,v1) ;
-	if ((lfDiff-lfDiff2).norm2() > 0.01)
-		std::cout << lfDiff << " ; " <<  lfDiff2 << " ; "  << lfDiff - lfDiff2 << std::endl ;*/
-	for (unsigned int i = 0 ; i < 3 ; ++i)
-		count[i] += sqrt(lfDiff[i]) * areaSum ; // lf change error for channel i
+	const VEC3 lfDiff = computeSquaredLightfieldDifferenceNumerical(v0,v1,N) ;
 
-	return count ;
+	return lfDiff*areaSum + count ;
 }
 
 template <typename PFP>
 typename PFP::VEC3
-HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical(const Dart& v0, const Dart& v1) const
+HalfEdgeSelector_LFgradient<PFP>::computeDirDerivativeLFerror(const Dart& v0, const Dart& v1)
+{
+	MAP& m = this->m_map ;
+
+	const VEC3& P0 = this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos)[v0] ;
+	const VEC3& P1 = this->m_approx[m_approxindex_pos]->getAttr(m_attrindex_pos)[v1] ;
+	const VEC3& N = this->m_approx[m_approxindex_FN]->getApprox(v1,m_attrindex_FN) ;
+
+	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v1] ;
+	const VEC3& B1 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v1] ;
+	const VEC3& N1 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v1] ;
+	const VEC3& T0 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v0] ;
+	const VEC3& B0 = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[v0] ;
+	const VEC3& N0 = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[v0] ;
+	std::vector<VEC3*> coefs0, coefs1 ;
+	coefs0.resize(m_K) ;
+	coefs1.resize(m_K) ;
+	for (unsigned int k = 0 ; k < m_K ; ++k)
+	{
+		coefs0[k] = &(this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[v0]) ;
+		coefs1[k] = &(this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[v1]) ;
+	}
+
+	Traversor2VF<MAP> tf(m,v0) ; // all faces around vertex v0
+
+	VEC3 error ;
+	const VEC3 d = P1 - P0 ; // displacement vector
+
+	for (Dart fi = tf.begin() ; fi != tf.end() ; fi = tf.next()) // foreach "blue" face
+	{
+		// get the data
+		const Dart& vi = m.phi1(fi) ;
+		const Dart& vj = m.phi_1(fi) ;
+		const VEC3& Pi = this->m_position[vi] ;
+		const VEC3& Pj = this->m_position[vj] ;
+
+		const VEC3& Ti = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[vi] ;
+		const VEC3& Bi = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[vi] ;
+		const VEC3& Ni = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[vi] ;
+		const VEC3& Tj = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[vj] ;
+		const VEC3& Bj = this->m_approx[m_approxindex_FB]->getAttr(m_attrindex_FB)[vj] ;
+		const VEC3& Nj = this->m_approx[m_approxindex_FN]->getAttr(m_attrindex_FN)[vj] ;
+		std::vector<VEC3*> coefsi, coefsj ;
+		coefsi.resize(m_K) ;
+		coefsj.resize(m_K) ;
+		//VEC3 coefsi[m_K], coefsj[m_K] ;
+		for (unsigned int k = 0 ; k < m_K ; ++k)
+		{
+			coefsi[k] = &(this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[vi]) ;
+			coefsj[k] = &(this->m_approx[m_approxindex_HF[k]]->getAttr(m_attrindex_HF[k])[vj]) ;
+		}
+
+		// utils
+		const VEC3 ei = P1 - Pj ;
+		const VEC3 ej = Pi - P1 ;
+
+		// area x integration
+		error += (ei ^ ej).norm()/2 * integrateDlf(d, m_K, N, ei, ej,
+													  coefs0, T0, B0, N0, m_avgColor[v0],
+													  coefs1, T1, B1, N1, m_avgColor[v1],
+													  coefsi, Ti, Bi, Ni, m_avgColor[vi],
+													  coefsj, Tj, Bj, Nj, m_avgColor[vj]) ;
+	}
+
+	return error ;
+}
+
+template <typename PFP>
+typename PFP::VEC3
+HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical(const Dart& v0, const Dart& v1, const VEC3& N) const
 {
 	// get two frames
 	const VEC3& T1 = this->m_approx[m_approxindex_FT]->getAttr(m_attrindex_FT)[v0] ;
@@ -3371,8 +3448,8 @@ HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical(co
 
 	// Get new frame
 	// precondition : this->m_approx[m_approxindex_FN]->approximate should have been called !
-	const VEC3& N = this->m_approx[m_approxindex_FN]->getApprox(v1,m_attrindex_FN) ; // get new N
-	assert(N == N2 || !"HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical: only works with half-collapse") ;
+	//const VEC3& N = this->m_approx[m_approxindex_FN]->getApprox(v1,m_attrindex_FN) ; // get new N
+	//assert(N == N2 || !"HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical: only works with half-collapse") ;
 	m_n[0] = N[0] ;
 	m_n[1] = N[1] ;
 	m_n[2] = N[2] ;
@@ -3392,7 +3469,7 @@ HalfEdgeSelector_LFgradient<PFP>::computeSquaredLightfieldDifferenceNumerical(co
 			m_workspace[22+m_K+i] = coefs2[i][channel] ;
 		}
 		m_integrator.Compute(&integ, &ar, &SquaredDifferenceOfCartesianFunctions, m_workspace, &isInDomain, m_n) ;
-		integral[channel] = integ/(2*M_PI) ;
+		integral[channel] = integ/(4*M_PI) ;
 		area[channel] = ar ;
 	}
 
@@ -3515,6 +3592,169 @@ HalfEdgeSelector_LFgradient<PFP>::computeGradient(const VEC3& P0, const VEC3& Pi
 }
 
 template <typename PFP>
+typename PFP::VEC3
+HalfEdgeSelector_LFgradient<PFP>::integrateDscalGrad(const VEC3& d, const unsigned int& K, const VEC3& N, const VEC3& ei, const VEC3& ej,
+												   const VEC3* coefs1, const VEC3& T1, const VEC3& B1, const VEC3& N1, const VEC3& avg1,
+												   const VEC3* coefsi, const VEC3& Ti, const VEC3& Bi, const VEC3& Ni, const VEC3& avgi,
+												   const VEC3* coefsj, const VEC3& Tj, const VEC3& Bj, const VEC3& Nj, const VEC3& avgj) const
+{
+	// set domain of integration
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_n[i] = N[i] ;
+
+	// prepare workspace
+	for (unsigned int i = 0 ; i < 3 ; ++i)	// d
+		m_workspace[i] = d[i] ;
+	// nbCoefs
+	m_workspace[3] = K ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)	// ei
+		m_workspace[4+i] = ei[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)	// ej
+		m_workspace[7+i] = ej[i] ;
+	// avg1, avgi, avgj
+	m_workspace[11] = avg1[0] ;
+	m_workspace[12] = avgi[0] ;
+	m_workspace[13] = avgj[0] ;
+	m_workspace[14] = avg1[1] ;
+	m_workspace[15] = avgi[1] ;
+	m_workspace[16] = avgj[1] ;
+	m_workspace[17] = avg1[2] ;
+	m_workspace[18] = avgi[2] ;
+	m_workspace[19] = avgj[2] ;
+
+	// N1, Ni, Nj
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[20+i] = N1[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[23+i] = Ni[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[26+i] = Nj[i] ;
+	// T1, Ti, Tj
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[29+i] = T1[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[32+i] = Ti[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[35+i] = Tj[i] ;
+	// B1, Bi, Bj
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[38+i] = B1[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[41+i] = Bi[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[44+i] = Bj[i] ;
+
+	// coefs1, coefsi, coefsj
+	for (unsigned int c = 0 ; c < 3 ; ++c)
+		for (unsigned int k = 0 ; k < K ; ++k)
+		{
+			m_workspace[47+c*K+k] = coefs1[k][c] ;
+			m_workspace[47+(3+c)*K+k] = coefsi[k][c] ;
+			m_workspace[47+(6+c)*K+k] = coefsj[k][c] ;
+		}
+
+	VEC3 res ;
+	for (unsigned int c = 0 ; c < 3 ; ++c)
+	{
+		m_workspace[10] = c ;
+
+		// exec integrator
+		double integral, area ;
+		m_integrator.Compute(&integral, &area, &dispScalGrad, m_workspace, &isInDomain, m_n) ;
+		res[c] = integral/(4*M_PI) ;
+	}
+
+	return res ;
+}
+
+template <typename PFP>
+typename PFP::VEC3
+HalfEdgeSelector_LFgradient<PFP>::integrateDlf(const VEC3& d, const unsigned int& K, const VEC3& N, const VEC3& ei, const VEC3& ej,
+												   const std::vector<VEC3*> coefs0, const VEC3& T0, const VEC3& B0, const VEC3& N0, const VEC3& avg0,
+												   const std::vector<VEC3*> coefs1, const VEC3& T1, const VEC3& B1, const VEC3& N1, const VEC3& avg1,
+												   const std::vector<VEC3*> coefsi, const VEC3& Ti, const VEC3& Bi, const VEC3& Ni, const VEC3& avgi,
+												   const std::vector<VEC3*> coefsj, const VEC3& Tj, const VEC3& Bj, const VEC3& Nj, const VEC3& avgj) const
+{
+	// set domain of integration
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_n[i] = N[i] ;
+
+	// prepare workspace
+	for (unsigned int i = 0 ; i < 3 ; ++i)	// d
+		m_workspace[i] = d[i] ;
+	// nbCoefs
+	m_workspace[3] = K ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)	// ei
+		m_workspace[4+i] = ei[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)	// ej
+		m_workspace[7+i] = ej[i] ;
+	// avg1, avgi, avgj
+	m_workspace[11] = avg0[0] ;
+	m_workspace[12] = avg1[0] ;
+	m_workspace[13] = avgi[0] ;
+	m_workspace[14] = avgj[0] ;
+	m_workspace[15] = avg0[1] ;
+	m_workspace[16] = avg1[1] ;
+	m_workspace[17] = avgi[1] ;
+	m_workspace[18] = avgj[1] ;
+	m_workspace[19] = avg0[2] ;
+	m_workspace[20] = avg1[2] ;
+	m_workspace[21] = avgi[2] ;
+	m_workspace[22] = avgj[2] ;
+
+	// N1, Ni, Nj
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[23+i] = N0[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[26+i] = N1[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[29+i] = Ni[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[32+i] = Nj[i] ;
+	// T1, Ti, Tj
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[35+i] = T0[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[38+i] = T1[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[41+i] = Ti[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[44+i] = Tj[i] ;
+	// B1, Bi, Bj
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[47+i] = B0[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[50+i] = B1[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[53+i] = Bi[i] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		m_workspace[56+i] = Bj[i] ;
+
+	// coefs1, coefsi, coefsj
+	for (unsigned int c = 0 ; c < 3 ; ++c)
+		for (unsigned int k = 0 ; k < K ; ++k)
+		{
+			m_workspace[59+c*K+k] = coefs0[k]->operator[](c) ;
+			m_workspace[59+(3+c)*K+k] = coefs1[k]->operator[](c) ;
+			m_workspace[59+(6+c)*K+k] = coefsi[k]->operator[](c) ;
+			m_workspace[59+(9+c)*K+k] = coefsj[k]->operator[](c) ;
+		}
+
+	VEC3 res ;
+	for (unsigned int c = 0 ; c < 3 ; ++c)
+	{
+		m_workspace[10] = c ;
+
+		// exec integrator
+		double integral, area ;
+		m_integrator.Compute(&integral, &area, &dlf, m_workspace, &isInDomain, m_n) ;
+		res[c] = integral/(4*M_PI) ;
+	}
+
+	return res ;
+}
+
+template <typename PFP>
 typename PFP::REAL
 HalfEdgeSelector_LFgradient<PFP>::computeIntegral(const double *avgi, const VEC3& ti, const VEC3& bi, const VEC3& ni, unsigned int nbCoefs, const std::vector<double>& coefs) const
 {
@@ -3537,7 +3777,7 @@ HalfEdgeSelector_LFgradient<PFP>::computeIntegral(const double *avgi, const VEC3
 	double area ;
 	m_integrator.Compute(&integral, &area, &CartesianFunction, m_workspace, &isInDomain, m_n) ;
 
-	return integral*2*M_PI ;
+	return integral*4*M_PI ;
 }
 
 // fonction qui retourne bool est_dans_domaine en fonction de f et omega
@@ -3615,6 +3855,170 @@ HalfEdgeSelector_LFgradient<PFP>::CartesianFunction (double x, double y, double 
 	return res ;
 }
 
+template <typename PFP>
+double
+HalfEdgeSelector_LFgradient<PFP>::dispScalGrad (double x, double y, double z, void* data)
+{
+	double *myData = (double*)data ;
+
+	// decode workspace
+	double *d = &(myData[0]) ;
+	unsigned int K = myData[3] ;
+	double *ei = &(myData[4]) ;
+	double *ej = &(myData[7]) ;
+	unsigned int channel = myData[10] ;
+	double *avg = &(myData[11+3*channel]) ;
+	// (11=avg1_c0,avgI_c0,avgJ_c0,avg1_c1,avgI_c2,avgJ_c3,avg1_c1,avgI_c2,avgJ_c3)
+	double *N1 = &(myData[20]) ;
+	double *Ni = &(myData[23]) ;
+	double *Nj = &(myData[26]) ;
+	double *T1 = &(myData[29]) ;
+	double *Ti = &(myData[32]) ;
+	double *Tj = &(myData[35]) ;
+	double *B1 = &(myData[38]) ;
+	double *Bi = &(myData[41]) ;
+	double *Bj = &(myData[44]) ;
+	double *coefs1 = &(myData[47+K*channel]) ; // (coefs1_c0, ... coefsK_c0,coefs1_c1, ... coefsK_c1, coefs1_c2, coefsK_c2)
+	double *coefsi = &(myData[47+3*K+K*channel]) ;
+	double *coefsj = &(myData[47+6*K+K*channel]) ;
+
+	double vectorProd[3] ;
+	vectorProd[0] = ei[1]*ej[2] - ei[2]*ej[1] ;
+	vectorProd[1] = ei[2]*ej[0] - ei[0]*ej[2] ;
+	vectorProd[2] = ei[0]*ej[1] - ei[1]*ej[0] ;
+	double areaSq = vectorProd[0]*vectorProd[0] + vectorProd[1]*vectorProd[1] + vectorProd[2]*vectorProd[2] ;
+
+	if (areaSq < 1e-9)
+		return 0 ;
+
+	double einorm2 = ei[0]*ei[0] + ei[1]*ei[1] + ei[2]*ei[2] ;
+	double ejnorm2 = ej[0]*ej[0] + ej[1]*ej[1] + ej[2]*ej[2] ;
+	double eiej = ei[0]*ej[0] + ei[1]*ej[1] + ei[2] * ej[2] ;
+
+	double f1 = evalF(N1,&(avg[0]),K,T1,B1,coefs1,x,y,z) ;
+	double fi = evalF(Ni,&(avg[1]),K,Ti,Bi,coefsi,x,y,z) ;
+	double fj = evalF(Nj,&(avg[2]),K,Tj,Bj,coefsj,x,y,z) ;
+
+	double t1 = einorm2 * (fi-f1) + eiej*(fj-f1) ;
+	double t2 = ejnorm2 * (fj-f1) + eiej*(fi-f1) ;
+
+	double grad[3] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		grad[i] = (t1*ej[i] - t2*ei[i]) / areaSq ;
+
+	return pow(d[0]*grad[0] + d[1]*grad[1] + d[2]*grad[2],2) ;
+}
+
+template <typename PFP>
+double
+HalfEdgeSelector_LFgradient<PFP>::dlf (double x, double y, double z, void* data)
+{
+	double *myData = (double*)data ;
+
+	// decode workspace
+	double *d = &(myData[0]) ;
+	unsigned int K = myData[3] ;
+	double *ei = &(myData[4]) ;
+	double *ej = &(myData[7]) ;
+	unsigned int channel = myData[10] ;
+	double *avg = &(myData[11+4*channel]) ;
+	// (11=avg0_c0,avg1_c0,avgI_c0,avgJ_c0,avg0_c1,avg1_c1,avgI_c1,avgJ_c1,avg0_c2,avg1_c2,avgI_c2,avgJ_c2)
+	double *N0 = &(myData[23]) ;
+	double *N1 = &(myData[26]) ;
+	double *Ni = &(myData[29]) ;
+	double *Nj = &(myData[32]) ;
+	double *T0 = &(myData[35]) ;
+	double *T1 = &(myData[38]) ;
+	double *Ti = &(myData[41]) ;
+	double *Tj = &(myData[44]) ;
+	double *B0 = &(myData[47]) ;
+	double *B1 = &(myData[50]) ;
+	double *Bi = &(myData[53]) ;
+	double *Bj = &(myData[56]) ;
+	double *coefs0 = &(myData[59+K*channel]) ; // (coefs1_c0, ... coefsK_c0,coefs1_c1, ... coefsK_c1, coefs1_c2, coefsK_c2)
+	double *coefs1 = &(myData[59+3*K+K*channel]) ;
+	double *coefsi = &(myData[59+6*K+K*channel]) ;
+	double *coefsj = &(myData[59+9*K+K*channel]) ;
+
+	double vectorProd[3] ;
+	vectorProd[0] = ei[1]*ej[2] - ei[2]*ej[1] ;
+	vectorProd[1] = ei[2]*ej[0] - ei[0]*ej[2] ;
+	vectorProd[2] = ei[0]*ej[1] - ei[1]*ej[0] ;
+	double areaSq = vectorProd[0]*vectorProd[0] + vectorProd[1]*vectorProd[1] + vectorProd[2]*vectorProd[2] ;
+
+	if (areaSq < 1e-9)
+		return 0 ;
+
+	double einorm2 = ei[0]*ei[0] + ei[1]*ei[1] + ei[2]*ei[2] ;
+	double ejnorm2 = ej[0]*ej[0] + ej[1]*ej[1] + ej[2]*ej[2] ;
+	double eiej = ei[0]*ej[0] + ei[1]*ej[1] + ei[2] * ej[2] ;
+
+	double f0 = evalF(N0,&(avg[0]),K,T0,B0,coefs0,x,y,z) ;
+	double f1 = evalF(N1,&(avg[1]),K,T1,B1,coefs1,x,y,z) ;
+	double fi = evalF(Ni,&(avg[2]),K,Ti,Bi,coefsi,x,y,z) ;
+	double fj = evalF(Nj,&(avg[3]),K,Tj,Bj,coefsj,x,y,z) ;
+
+	double t1 = einorm2 * (fi-f1) + eiej*(fj-f1) ;
+	double t2 = ejnorm2 * (fj-f1) + eiej*(fi-f1) ;
+
+	double grad[3] ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		grad[i] = (t1*ej[i] - t2*ei[i]) / areaSq ;
+
+	// for second metric
+	return pow(f0 - f1 + d[0]*grad[0] + d[1]*grad[1] + d[2]*grad[2],2) ;
+}
+
+template <typename PFP>
+double
+HalfEdgeSelector_LFgradient<PFP>::evalF(double* N, double* avg, unsigned int nb, double* T, double* B, double* coefs, double& x, double& y, double& z)
+{
+	if (N[0]*x+N[1]*y+N[2]*z < 0)
+		return *avg ;
+
+	// tangente
+	double u = T[0]*x + T[1]*y + T[2]*z ;
+
+	// binormale
+	double v = B[0]*x + B[1]*y + B[2]*z ;
+
+	// eval en ((xyz)*t,(xyz)*b)
+	double res = 0 ;
+	if (nb > 0)
+	{
+		// coefs
+		res = coefs[0] ;
+		if (nb > 1)
+		{
+			res += coefs[1]*v ;
+			res += coefs[2]*u ;
+			if (nb > 3)
+			{
+				res += coefs[3]*u*v ;
+				res += coefs[4]*v*v ;
+				res += coefs[5]*u*u ;
+				if (nb > 6)
+				{
+					res += coefs[6]*u*v*v ;
+					res += coefs[7]*v*u*u ;
+					res += coefs[8]*v*v*v ;
+					res += coefs[9]*u*u*u ;
+					if (nb > 10)
+					{
+						res += coefs[10]*v*v*u*u ;
+						res += coefs[11]*v*v*v*u ;
+						res += coefs[12]*v*u*u*u ;
+						res += coefs[13]*v*v*v*v ;
+						res += coefs[14]*u*u*u*u ;
+					}
+				}
+			}
+		}
+	}
+
+	return res ;
+}
+
 // fonction qui retourne col en fonction de f et de omega
 template <typename PFP>
 double
@@ -3631,7 +4035,7 @@ HalfEdgeSelector_LFgradient<PFP>::SquaredDifferenceOfCartesianFunctions (double 
 
 /************************************************************************************
  *                           COLOR PER FACE                                         *
- ************************************************************************************/
+ ************************************************************************************
 
 template <typename PFP>
 bool HalfEdgeSelector_ColorPerFace<PFP>::init()
@@ -3769,12 +4173,12 @@ void HalfEdgeSelector_ColorPerFace<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
  * @param dart d
- */
+ *
 template <typename PFP>
 void HalfEdgeSelector_ColorPerFace<PFP>::recomputeQuadric(const Dart d)
 {
@@ -3947,7 +4351,7 @@ HalfEdgeSelector_ColorPerFace<PFP>::computeFaceColorError(const Dart& f0, const 
 
 /************************************************************************************
  *                           LIGHTFIELD PER FACE                                    *
- ************************************************************************************/
+ ************************************************************************************
 
 template <typename PFP>
 bool HalfEdgeSelector_LFperFace<PFP>::init()
@@ -4120,12 +4524,12 @@ void HalfEdgeSelector_LFperFace<PFP>::updateBeforeCollapse(Dart d)
 	}
 }
 
-/**
+/*
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
  * @param dart d
- */
+ *
 template <typename PFP>
 void HalfEdgeSelector_LFperFace<PFP>::recomputeQuadric(const Dart d)
 {
@@ -4380,7 +4784,7 @@ HalfEdgeSelector_LFperFace<PFP>::computeSquaredLightfieldDifference(const Dart& 
 	return (alpha / M_PI) * avgColDiff.norm2()/3. + err ;
 
 }
-
+*/
 
 } // namespace Decimation
 
