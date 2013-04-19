@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2013, IGG Team, ICube, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -25,8 +25,6 @@
 #ifndef __SELECTOR_H__
 #define __SELECTOR_H__
 
-#include "Utils/SphericalFunctionIntegratorCartesian.h"
-
 namespace CGoGN
 {
 
@@ -41,8 +39,11 @@ namespace Decimation
 
 enum SelectorType
 {
+	// EDGE selectors
+	// Topo criteria
 	S_MapOrder = 0,
 	S_Random = 1,
+	// Geom criteria
 	S_EdgeLength = 2,
 	S_QEM = 3,
 	S_QEMml = 4,
@@ -50,24 +51,19 @@ enum SelectorType
 	S_Curvature = 6,
 	S_NormalArea = 7,
 	S_CurvatureTensor = 8,
+	// Geom + color criteria
 	S_ColorNaive = 9,
 	S_QEMextColor = 10,
-	S_Lightfield = 11,
-	S_GeomColOptGrad = 23,
-	S_LightfieldGradient = 24,
-	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	S_hQEMextColor = 12,
-	S_hQEMml = 13,
-	S_hLightfield = 14,
-	S_hLightfieldAvgColor = 15,
-	S_hLightfieldKCL = 16,
-	S_hColorExperimental = 17,
-	S_hColorGradient = 18,
-	S_hLFexperimental = 19,
-	S_hLFgradient = 20,
-	S_hColorPerFace = 21,
-	S_hLFperFace = 22
+	S_GeomColOptGrad = 11,
 
+	// HALF-EDGE selectors
+	// Geom criteria
+	S_hQEMml = 12,
+	// Geom + color criteria
+	S_hQEMextColor = 13,
+	S_hColorGradient = 14,
+
+	S_OTHER // for extensions use this type
 } ;
 
 template <typename PFP> class ApproximatorGen ;
@@ -94,7 +90,7 @@ public:
 	{}
 	virtual SelectorType getType() = 0 ;
 	virtual bool init() = 0 ;
-	virtual bool nextEdge(Dart& d) = 0 ;
+	virtual bool nextEdge(Dart& d) const = 0 ;
 	virtual void updateBeforeCollapse(Dart d) = 0 ;
 	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
 	virtual void updateWithoutCollapse() = 0;
@@ -107,7 +103,7 @@ public:
 
 } // namespace Decimation
 
-}
+} // namespace Surface
 
 } // namespace Algo
 

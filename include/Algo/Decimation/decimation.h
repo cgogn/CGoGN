@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2013, IGG Team, ICube, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -76,6 +76,7 @@ int decimate(
  * \param s the selector
  * \param a a vector containing the approximators
  * \param nbWantedVertices the aimed amount of vertices after decimation
+ * \param recomputePriorityList if false and a priority list exists, it is not recomputed
  * \param edgeErrors will (if not null) contain the edge errors computed by the approximator/selector (default NULL)
  * \param callback_wrapper a callback function for progress monitoring (default NULL)
  * \param callback_object the object to call the callback on (default NULL)
@@ -88,6 +89,7 @@ int decimate(
 	EdgeSelector<PFP>* s,
 	std::vector<ApproximatorGen<PFP>*>& a,
 	unsigned int nbWantedVertices,
+	bool recomputePriorityList = true,
 	EdgeAttribute<typename PFP::REAL> *edgeErrors = NULL,
 	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
 ) ;

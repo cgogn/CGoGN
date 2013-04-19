@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2013, IGG Team, ICube, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -41,21 +41,26 @@ namespace Decimation
 
 enum ApproximatorType
 {
+	// One approx per edge
+	// Geometry approximators
 	A_QEM = 0,
 	A_MidEdge = 1,
 	A_CornerCutting = 2,
 	A_TangentPredict1 = 3,
 	A_TangentPredict2 = 4,
 	A_NormalArea = 5,
+	// Geometry + color approximators
 	A_ColorNaive = 6,
 	A_ColorQEMext = 7,
 	A_GeomColorOpt = 8,
-	A_Lightfield = 9,
-	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	A_hHalfCollapse = 10,
-	A_hQEM = 11,
-	A_hLightfieldHalf = 12,
-	A_MidEdgeLFopt = 13
+
+	// One approx per half-edge
+	// Generic (considers all provided attributes) approximator
+	A_hHalfCollapse = 9,
+	// Geometry approximator
+	A_hQEM = 10,
+
+	A_OTHER // for extensions use this type
 } ;
 
 template <typename PFP>
@@ -146,16 +151,6 @@ public:
 	{
 		return m_attrV[index]->name() ;
 	}
-
-//	std::vector<std::string> getApproximatedAttributeNames() const
-//	{
-//		std::vector<std::string> names ;
-//		names.resize(m_attrV.size()) ;
-//		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-//			names[i] = m_attrV[i]->name() ;
-//
-//		return names ;
-//	}
 
 	unsigned int getNbApproximated() const
 	{

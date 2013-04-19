@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2013, IGG Team, ICube, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -28,8 +28,6 @@
 #include "Algo/Decimation/selector.h"
 #include "Algo/Decimation/approximator.h"
 #include "Algo/Geometry/boundingbox.h"
-
-//#include "Container/fakeAttribute.h"
 #include "Utils/qem.h"
 #include "Algo/Geometry/normal.h"
 #include "Algo/Selection/collector.h"
@@ -67,7 +65,7 @@ public:
 	{}
 	SelectorType getType() { return S_MapOrder ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d)
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
@@ -99,7 +97,7 @@ public:
 	{}
 	SelectorType getType() { return S_Random ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d2)
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
@@ -145,7 +143,7 @@ public:
 	}
 	SelectorType getType() { return S_EdgeLength ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -215,7 +213,7 @@ public:
 	}
 	SelectorType getType() { return S_QEM ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -267,7 +265,7 @@ public:
 	}
 	SelectorType getType() { return S_QEMml ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -321,7 +319,7 @@ public:
 	}
 	SelectorType getType() { return S_NormalArea ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -420,7 +418,7 @@ public:
 	}
 	SelectorType getType() { return S_Curvature ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -479,7 +477,7 @@ public:
 	}
 	SelectorType getType() { return S_CurvatureTensor ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -528,7 +526,7 @@ public:
 	}
 	SelectorType getType() { return S_MinDetail ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -590,7 +588,7 @@ public:
 	}
 	SelectorType getType() { return S_ColorNaive ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -653,7 +651,7 @@ public:
 	}
 	SelectorType getType() { return S_GeomColOptGrad ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -734,7 +732,7 @@ public:
 	}
 	SelectorType getType() { return S_QEMextColor ; }
 	bool init() ;
-	bool nextEdge(Dart& d) ;
+	bool nextEdge(Dart& d) const ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
@@ -759,214 +757,9 @@ public:
 	}
 } ;
 
-/*****************************************************************************************************************
- *                                 LIGHTFIELD QUADRIC ERROR METRIC                                               *
- *****************************************************************************************************************
-template <typename PFP>
-class EdgeSelector_Lightfield : public EdgeSelector<PFP>
-{
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::REAL REAL ;
-	typedef typename PFP::VEC3 VEC3 ;
-
-private:
-	typedef	struct
-	{
-		typename std::multimap<float,Dart>::iterator it ;
-		bool valid ;
-		static std::string CGoGNnameOfType() { return "QEMextColorEdgeInfo" ; }
-	} LightfieldEdgeInfo ;
-	typedef NoMathIOAttribute<LightfieldEdgeInfo> EdgeInfo ;
-
-	EdgeAttribute<EdgeInfo> edgeInfo ;
-
-	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN, m_avgColor ;
-	std::vector<VertexAttribute<VEC3> > m_HF ;
-	int m_approxindex_pos, m_attrindex_pos ;
-	int m_approxindex_FN, m_attrindex_FN ;
-	std::vector<unsigned int> m_approxindex_HF, m_attrindex_HF ;
-	unsigned int m_K ;
-
-	VertexAttribute<Utils::Quadric<REAL> > m_quadricGeom ;
-	EdgeAttribute<Utils::QuadricHF<REAL> > m_quadricHF ;
-
-	std::vector<Approximator<PFP, typename PFP::VEC3, EDGE>* > m_approx ;
-
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
-
-	void initEdgeInfo(Dart d) ;
-	void updateEdgeInfo(Dart d, bool recompute) ;
-	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
-	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
-
-public:
-	EdgeSelector_Lightfield(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
-		m_approxindex_pos(-1),
-		m_attrindex_pos(-1),
-		m_approxindex_FN(-1),
-		m_attrindex_FN(-1),
-		m_K(0)
-	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadricGeom = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
-		m_quadricHF = m.template getAttribute<Utils::QuadricHF<REAL>, EDGE>("HFquadric") ;
-		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
-		assert(m_avgColor.isValid()) ;
-	}
-	~EdgeSelector_Lightfield()
-	{
-		this->m_map.removeAttribute(edgeInfo) ;
-		this->m_map.removeAttribute(m_quadricGeom) ;
-	}
-	SelectorType getType() { return S_Lightfield ; }
-	bool init() ;
-	bool nextEdge(Dart& d) ;
-	void updateBeforeCollapse(Dart d) ;
-	void updateAfterCollapse(Dart d2, Dart dd2) ;
-
-	void updateWithoutCollapse() { }
-
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
-	{
-		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
-		if (!errors->isValid())
-			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
-		assert(edgeInfo.isValid()) ;
-
-		TraversorE<typename PFP::MAP> travE(this->m_map) ;
-		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
-		{
-			if (edgeInfo[d].valid)
-			{
-				(*errors)[d] = edgeInfo[d].it->first ;
-			}
-			else
-				(*errors)[d] = -1 ;
-		}
-	}
-} ;
-
-/*****************************************************************************************************************
- *                                 LIGHTFIELD QUADRIC ERROR METRIC                                               *
- *****************************************************************************************************************
-template <typename PFP>
-class EdgeSelector_LightfieldGradient : public EdgeSelector<PFP>
-{
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::REAL REAL ;
-	typedef typename PFP::VEC3 VEC3 ;
-
-private:
-	typedef	struct
-	{
-		typename std::multimap<float,Dart>::iterator it ;
-		bool valid ;
-		static std::string CGoGNnameOfType() { return "LightfieldGradientEdgeInfo" ; }
-	} LightfieldEdgeInfo ;
-	typedef NoMathIOAttribute<LightfieldEdgeInfo> EdgeInfo ;
-
-	EdgeAttribute<EdgeInfo> edgeInfo ;
-
-	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
-
-	VertexAttribute<VEC3> m_avgColor ;
-
-	int m_approxindex_pos, m_attrindex_pos ;
-	int m_approxindex_FT, m_attrindex_FT ;
-	int m_approxindex_FB, m_attrindex_FB ;
-	int m_approxindex_FN, m_attrindex_FN ;
-	std::vector<unsigned int> m_approxindex_HF, m_attrindex_HF ;
-	unsigned int m_K ;
-
-	SphericalFunctionIntegratorCartesian m_integrator ;
-	double *m_n ;
-	double *m_workspace ;
-
-	std::vector<Approximator<PFP, typename PFP::VEC3, EDGE>* > m_approx ;
-
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
-
-	void initEdgeInfo(Dart d) ;
-	void updateEdgeInfo(Dart d) ;
-	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
-	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
-
-	VEC3 computeDirDerivativeLFerror(const Dart& v) const ;
-	VEC3 integrateDlf(const VEC3& d, const unsigned int& K, const VEC3& N, const VEC3& ei, const VEC3& ej,
-		const VEC3* coefs0, const VEC3& T0, const VEC3& B0, const VEC3& N0, const VEC3& avg0,
-		const VEC3* coefs1, const VEC3& T1, const VEC3& B1, const VEC3& N1, const VEC3& avg1,
-		const VEC3* coefsi, const VEC3& Ti, const VEC3& Bi, const VEC3& Ni, const VEC3& avgi,
-		const VEC3* coefsj, const VEC3& Tj, const VEC3& Bj, const VEC3& Nj, const VEC3& avgj) const ;
-	static bool isInDomain(double x, double y, double z, void *data) ;
-	static double dlf (double x, double y, double z, void* data) ;
-	static double evalF(double* N, double* avg, unsigned int nb, double* T, double* B, double* coefs, double& x, double& y, double& z) ;
-
-public:
-	EdgeSelector_LightfieldGradient(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
-		m_approxindex_pos(-1),
-		m_attrindex_pos(-1),
-		m_approxindex_FT(-1),
-		m_attrindex_FT(-1),
-		m_approxindex_FB(-1),
-		m_attrindex_FB(-1),
-		m_approxindex_FN(-1),
-		m_attrindex_FN(-1),
-		m_K(0),
-		m_n(NULL),
-		m_workspace(NULL)
-	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
-		m_avgColor = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
-		m_n = new double[3] ;
-		assert(m_avgColor.isValid()) ;
-	}
-	~EdgeSelector_LightfieldGradient()
-	{
-		this->m_map.removeAttribute(edgeInfo) ;
-		this->m_map.removeAttribute(m_quadric) ;
-		m_integrator.Release() ;
-		delete[] m_workspace ;
-		delete[] m_n ;
-	}
-	SelectorType getType() { return S_LightfieldGradient ; }
-	bool init() ;
-	bool nextEdge(Dart& d) ;
-	void updateBeforeCollapse(Dart d) ;
-	void updateAfterCollapse(Dart d2, Dart dd2) ;
-
-	void updateWithoutCollapse() { }
-
-	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors) const
-	{
-		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
-		if (!errors->isValid())
-			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
-		assert(edgeInfo.isValid()) ;
-
-		TraversorE<typename PFP::MAP> travE(this->m_map) ;
-		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
-		{
-			if (edgeInfo[d].valid)
-			{
-				(*errors)[d] = edgeInfo[d].it->first ;
-			}
-			else
-				(*errors)[d] = -1 ;
-		}
-	}
-} ;
-*/
-
 } // namespace Decimation
 
-}
+} // namespace Surface
 
 } // namespace Algo
 
