@@ -326,6 +326,11 @@ inline void ImplicitHierarchicalMap::setEdgeId(Dart d, unsigned int i)
 	m_edgeId[d] = i ;
 }
 
+inline unsigned int ImplicitHierarchicalMap::getMaxEdgeId()
+{
+        return m_idCount;
+}
+
 /***************************************************
  *               CELLS INFORMATION                 *
  ***************************************************/

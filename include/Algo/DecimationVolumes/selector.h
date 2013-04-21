@@ -26,7 +26,7 @@ enum SelectorType
 } ;
 
 template <typename PFP> class ApproximatorGen ;
-template <typename PFP, typename T> class Approximator ;
+template <typename PFP, typename T, unsigned int ORBIT> class Approximator ;
 
 /********************************************************************************
  *				 				Parent Selector									*
@@ -62,13 +62,13 @@ public:
 	virtual void updateWithoutCollapse() = 0;
 };
 
-} //end namespace Decimation
+} // namespace Decimation
 
-} //namespace Volume
+} // namespace Volume
 
-} //end namespace Algo
+} // namespace Algo
 
-} //end namespace CGoGN
+} // namespace CGoGN
 
 
 #endif
