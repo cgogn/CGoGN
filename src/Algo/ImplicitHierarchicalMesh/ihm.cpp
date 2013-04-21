@@ -53,7 +53,14 @@ ImplicitHierarchicalMap::~ImplicitHierarchicalMap()
 
 void ImplicitHierarchicalMap::init()
 {
-	initEdgeId() ;
+	//initEdgeId() ;
+
+	//init each edge Id at 0
+	TraversorE<ImplicitHierarchicalMap> te(*this);
+	for(Dart dit = te.begin() ; dit != te.next() ; dit = te.next())
+	{
+		m_edgeId[dit] = 0;
+	}
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
