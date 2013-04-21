@@ -538,7 +538,7 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<ty
 	/*
 	 * Compute volume centroid
 	 */
-	typename PFP::VEC3 volCenter =  Algo::Geometry::volumeCentroid<PFP>(map, old, position);
+	typename PFP::VEC3 volCenter =  Algo::Surface::Geometry::volumeCentroid<PFP>(map, old, position);
 
 	Traversor3WV<typename PFP::MAP> traV(map, old);
 
@@ -672,7 +672,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	/*
 	 * Compute volume centroid
 	 */
-	typename PFP::VEC3 volCenter =  Algo::Geometry::volumeCentroid<PFP>(map, old, position);
+	typename PFP::VEC3 volCenter =  Algo::Surface::Geometry::volumeCentroid<PFP>(map, old, position);
 
 	/*
 	 * Subdivide Faces

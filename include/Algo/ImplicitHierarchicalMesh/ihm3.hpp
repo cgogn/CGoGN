@@ -146,6 +146,7 @@ inline Dart ImplicitHierarchicalMap3::phi2bis(Dart d)
 
 	it = Map3::phi2(it) ;
 
+	/* du cote des volumes non subdivise (subdiv adapt) */
 	if(m_faceId[it] == faceId)
 		return it;
 	else

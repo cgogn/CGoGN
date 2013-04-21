@@ -53,19 +53,78 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 	MAP& m = this->m_map ;
 
 	// get some darts
-	Dart dd = m.phi2(d) ;
+	Dart d1 = m.phi1(d) ;
 
 	// get the contracted edge vertices positions
-	VEC3 v1 = this->m_attrV[d] ;
-	VEC3 v2 = this->m_attrV[dd] ;
+	VEC3 v1 = this->m_attrV[0]->operator[](d) ;
+	VEC3 v2 = this->m_attrV[0]->operator[](d1) ;
 
 	// Compute the approximated position
-	this->m_approx[d] = (v1 + v2) / REAL(2) ;
+	this->m_approx[0][d] = (v1 + v2) / REAL(2) ;
 
-//	if(this->m_predictor)
-//	{
-//
-//	}
+	//TODO predictor part
+}
+
+/************************************************************************************
+ *							         MID FACE                                       *
+ ************************************************************************************/
+
+template <typename PFP>
+bool Approximator_MidFace<PFP>::init()
+{
+	return true ;
+}
+
+template <typename PFP>
+void Approximator_MidFace<PFP>::approximate(Dart d)
+{
+	MAP& m = this->m_map ;
+
+	// get some darts
+	Dart d1 = m.phi1(d) ;
+	Dart d_1 = m.phi_1(d) ;
+
+	// get the contracted edge vertices positions
+	VEC3 v1 = this->m_attrV[0]->operator[](d) ;
+	VEC3 v2 = this->m_attrV[0]->operator[](d1) ;
+	VEC3 v3 = this->m_attrV[0]->operator[](d_1) ;
+
+	// Compute the approximated position
+	this->m_approx[0][d] = (v1 + v2 + v3) / REAL(3) ;
+
+	//TODO predictor part
+}
+
+/************************************************************************************
+ *							       	MID VOLUME                                      *
+ ************************************************************************************/
+
+template <typename PFP>
+bool Approximator_MidVolume<PFP>::init()
+{
+	return true ;
+}
+
+template <typename PFP>
+void Approximator_MidVolume<PFP>::approximate(Dart d)
+{
+	MAP& m = this->m_map ;
+
+	// get some darts
+	Dart d1 = m.phi1(d) ;
+	Dart d_1 = m.phi_1(d) ;
+	Dart d2_1 = m.phi_1(m.phi2(d)) ;
+
+	// get the contracted edge vertices positions
+	VEC3 v1 = this->m_attrV[0]->operator[](d) ;
+	VEC3 v2 = this->m_attrV[0]->operator[](d1) ;
+	VEC3 v3 = this->m_attrV[0]->operator[](d_1) ;
+	VEC3 v4 = this->m_attrV[0]->operator[](d2_1) ;
+
+	// Compute the approximated position
+	this->m_approx[0][d] = (v1 + v2 + v3 + v4) / REAL(4) ;
+
+	//TODO predictor part
 }
 
 /************************************************************************************
@@ -73,54 +132,37 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
  ************************************************************************************/
 
 template <typename PFP>
-bool Approximator_HalfCollapse<PFP>::init()
+bool Approximator_HalfEdgeCollapse<PFP>::init()
 {
-//	if(this->m_predictor)
-//	{
-//		if(! ( this->m_predictor->getType() == P_HalfCollapse ) )
-//		{
-//			return false ;
-//		}
-//	}
 	return true ;
 }
 
 template <typename PFP>
-void Approximator_HalfCollapse<PFP>::approximate(Dart d)
+void Approximator_HalfEdgeCollapse<PFP>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	this->m_approx[d] = this->m_attrV[d];
+	for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
+		this->m_approx[i][d] = this->m_attrV[i]->operator[](d) ;
 
+	//TODO predictor part
+}
+
+///************************************************************************************
+// *                            QUADRIC ERROR METRIC                                  *
+// ************************************************************************************/
+//template <typename PFP>
+//bool Approximator_QEM<PFP>::init()
+//{
+//	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+//	// Does not require to be valid (if it is not, altenatives will be used).
+//
 //	if(this->m_predictor)
 //	{
-//		Dart dd = m.phi2(d) ;
-//		Dart d2 = m.phi2(m.phi_1(d)) ;
-//		Dart dd2 = m.phi2(m.phi_1(dd)) ;
-//
-//		VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
-//
-//		// temporary edge collapse
-//		m.extractTrianglePair(d) ;
-//		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
-//		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
-//		{
-//			this->m_attrV[i]->operator[](newV) = this->m_approx[i][d] ;
-//		}
-//
-//		// compute the detail vector
-//		this->m_predictor->predict(d2, dd2) ;
-//		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
-//		{
-//			this->m_detail[i][d] = v2 - this->m_predictor->getPredict(1) ;
-//		}
-//
-//		// vertex split to reset the initial connectivity and embeddings
-//		m.insertTrianglePair(d, d2, dd2) ;
-//		m.template embedOrbit<VERTEX>(d, m.template getEmbedding<VERTEX>(d)) ;
-//		m.template embedOrbit<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
+//		return false ;
 //	}
-}
+//	return true ;
+//}
 
 } //end namespace Decimation
 

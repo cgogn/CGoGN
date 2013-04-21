@@ -142,6 +142,7 @@ public:
 
 	void setDartLevel(Dart d, unsigned int i) ;
 
+
 	/***************************************************
 	 *             EDGE ID MANAGEMENT                  *
 	 ***************************************************/
@@ -159,6 +160,8 @@ public:
 	unsigned int getEdgeId(Dart d) ;
 
 	void setEdgeId(Dart d, unsigned int i) ;
+
+	unsigned int getMaxEdgeId();
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
