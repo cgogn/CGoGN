@@ -280,7 +280,6 @@ inline unsigned int ImplicitHierarchicalMap2::getCurrentLevel()
 
 inline void ImplicitHierarchicalMap2::setCurrentLevel(unsigned int l)
 {
-	assert(l >= 0 || !"Trying to set current level to a negative value") ;
 	m_curLevel = l ;
 }
 

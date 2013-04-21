@@ -357,8 +357,10 @@ void MyQT::cb_Open()
 
 void MyQT::cb_Save()
 {
-	std::string filename = selectFileSave("Export SVG file ",".","(*.off)");
-	Algo::Surface::Export::exportOFF<PFP>(myMap,position,filename.c_str());
+	std::string filename = selectFileSave("Export Map file ",".","(*.map)");
+	//Algo::Surface::Export::exportOFF<PFP>(myMap,position,filename.c_str());
+	if(!myMap.saveMapBin(filename))
+		std::cout << "could not save file : " << filename << std::endl;
 }
 
 void MyQT::importMesh(std::string& filename)

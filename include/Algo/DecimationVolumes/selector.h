@@ -13,7 +13,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 
 enum SelectorType
@@ -62,9 +62,9 @@ public:
 	virtual void updateWithoutCollapse() = 0;
 };
 
-} //end namespace DecimationVolumes
+} //end namespace Decimation
 
-}
+} //namespace Volume
 
 } //end namespace Algo
 

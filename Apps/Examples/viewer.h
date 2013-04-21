@@ -24,7 +24,8 @@
 
 #include <iostream>
 
-#include "Utils/Qt/qtSimple.h"
+//#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtQGLV.h"
 #include "ui_viewer.h"
 #include "Utils/Qt/qtui.h"
 
@@ -65,7 +66,8 @@ struct PFP: public PFP_STANDARD
 typedef PFP::MAP MAP ;
 typedef PFP::VEC3 VEC3 ;
 
-class Viewer : public Utils::QT::SimpleQT
+//class Viewer : public Utils::QT::SimpleQT
+class Viewer : public Utils::QT::SimpleQGLV
 {
 	Q_OBJECT
 
@@ -96,6 +98,7 @@ public:
 	bool m_drawFaces ;
 	bool m_drawNormals ;
 	bool m_drawTopo ;
+	bool m_drawBoundaryTopo;
 
 	VertexAttribute<VEC3> position ;
 	VertexAttribute<VEC3> normal ;
