@@ -43,7 +43,8 @@ namespace Decimation
 {
 
 /**
- * Decimate the mesh through edge contraction
+ * \fn decimate
+ * Function that decimates the provided mesh through successive edge collapses
  * by using a declared selector and approximator type (see \file approximator.h and \file selector.h).
  *
  * \param map the map to decimate
@@ -69,7 +70,8 @@ int decimate(
 ) ;
 
 /**
- * Decimate the mesh through edge contraction
+ *\fn decimate
+ * Function that decimates the provided mesh through successive edge collapses
  * by providing the selector and the approximators
  *
  * \param map the map to decimate
@@ -86,7 +88,7 @@ int decimate(
 template <typename PFP>
 int decimate(
 	typename PFP::MAP& map,
-	EdgeSelector<PFP>* s,
+	Selector<PFP>* s,
 	std::vector<ApproximatorGen<PFP>*>& a,
 	unsigned int nbWantedVertices,
 	bool recomputePriorityList = true,

@@ -43,26 +43,30 @@ enum ApproximatorType
 {
 	// One approx per edge
 	// Geometry approximators
-	A_QEM = 0,
-	A_MidEdge = 1,
+	A_QEM = 0, /**< Approximates the geometry of an edge collapse by quadric error metric minimization [GH97]. */
+	A_MidEdge = 1, /**< Approximates the geometry of an edge collapse by placing the resulting vertex in its middle. */
 	A_CornerCutting = 2,
 	A_TangentPredict1 = 3,
 	A_TangentPredict2 = 4,
-	A_NormalArea = 5,
+	A_NormalArea = 5, /**< EXPERIMENTAL Approximates the geometry of an edge collapse by minimization of its normal times area measure [Sauvage] */
 	// Geometry + color approximators
-	A_ColorNaive = 6,
-	A_ColorQEMext = 7,
-	A_GeomColorOpt = 8,
+	A_ColorNaive = 6, /**< Approximates the color of the resulting vertex by linear interpolation (based on the approximated position) of its two predecessors. */
+	A_ColorQEMext = 7, /**< Approximates both geometry and color of the resulting vertex by minimization of the extended (R^6) quadric error metric [GH98]. */
+	A_GeomColorOpt = 8, /**< EXPERIMENTAL. */
 
 	// One approx per half-edge
 	// Generic (considers all provided attributes) approximator
-	A_hHalfCollapse = 9,
+	A_hHalfCollapse = 9, /**< Approximates all provided attributes of a half-edge collapse by keeping the attributes of the first of two vertices. */
 	// Geometry approximator
-	A_hQEM = 10,
+	A_hQEM = 10, /**< Approximates the geometry of a full-edge collapse by quadric error metric minimization [GH97]. Compatible version for half-edge selectors. */
 
-	A_OTHER // for extensions use this type
+	A_OTHER /**< Can be used for extensions. */
 } ;
 
+/*!
+ * \class ApproximatorGen
+ * \brief Generic class holder for approximators
+ */
 template <typename PFP>
 class ApproximatorGen
 {
@@ -92,6 +96,10 @@ public:
 } ;
 
 
+/*!
+ * \class Approximator
+ * \brief Generic class for approximators
+ */
 template <typename PFP, typename T, unsigned int ORBIT>
 class Approximator : public ApproximatorGen<PFP>
 {

@@ -43,7 +43,7 @@ namespace Decimation
  *                                 HALF-EDGE MEMORYLESS QEM METRIC                                               *
  *****************************************************************************************************************/
 template <typename PFP>
-class HalfEdgeSelector_QEMml : public EdgeSelector<PFP>
+class HalfEdgeSelector_QEMml : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -74,7 +74,7 @@ private:
 
 public:
 	HalfEdgeSelector_QEMml(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
@@ -98,7 +98,7 @@ public:
  *                                 HALF-EDGE QEMextColor METRIC                                                  *
  *****************************************************************************************************************/
 template <typename PFP>
-class HalfEdgeSelector_QEMextColor : public EdgeSelector<PFP>
+class HalfEdgeSelector_QEMextColor : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -134,7 +134,7 @@ private:
 
 public:
 	HalfEdgeSelector_QEMextColor(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),
@@ -186,7 +186,7 @@ public:
  *                                 HALF-EDGE COLOR GRADIENT ERR                                                  *
  *****************************************************************************************************************/
 template <typename PFP>
-class HalfEdgeSelector_ColorGradient : public EdgeSelector<PFP>
+class HalfEdgeSelector_ColorGradient : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -225,7 +225,7 @@ private:
 
 public:
 	HalfEdgeSelector_ColorGradient(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),

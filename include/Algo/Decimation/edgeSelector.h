@@ -47,7 +47,7 @@ namespace Decimation
 {
 
 template <typename PFP>
-class EdgeSelector_MapOrder : public EdgeSelector<PFP>
+class EdgeSelector_MapOrder : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -59,7 +59,7 @@ private:
 
 public:
 	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx)
+		Selector<PFP>(m, pos, approx)
 	{}
 	~EdgeSelector_MapOrder()
 	{}
@@ -75,7 +75,7 @@ public:
 } ;
 
 template <typename PFP>
-class EdgeSelector_Random : public EdgeSelector<PFP>
+class EdgeSelector_Random : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -89,7 +89,7 @@ private:
 
 public:
 	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		cur(0),
 		allSkipped(false)
 	{}
@@ -106,7 +106,7 @@ public:
 } ;
 
 template <typename PFP>
-class EdgeSelector_Length : public EdgeSelector<PFP>
+class EdgeSelector_Length : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -133,7 +133,7 @@ private:
 
 public:
 	EdgeSelector_Length(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx)
+		Selector<PFP>(m, pos, approx)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 	}
@@ -169,7 +169,7 @@ public:
 } ;
 
 template <typename PFP>
-class EdgeSelector_QEM : public EdgeSelector<PFP>
+class EdgeSelector_QEM : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -200,7 +200,7 @@ private:
 
 public:
 	EdgeSelector_QEM(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -221,7 +221,7 @@ public:
 } ;
 
 template <typename PFP>
-class EdgeSelector_QEMml : public EdgeSelector<PFP>
+class EdgeSelector_QEMml : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -252,7 +252,7 @@ private:
 
 public:
 	EdgeSelector_QEMml(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -274,7 +274,7 @@ public:
 
 
 template <typename PFP>
-class EdgeSelector_NormalArea : public EdgeSelector<PFP>
+class EdgeSelector_NormalArea : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -306,7 +306,7 @@ private:
 
 public:
 	EdgeSelector_NormalArea(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -328,7 +328,7 @@ public:
 
 
 template <typename PFP>
-class EdgeSelector_Curvature : public EdgeSelector<PFP>
+class EdgeSelector_Curvature : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -367,7 +367,7 @@ private:
 
 public:
 	EdgeSelector_Curvature(MAP& m, VertexAttribute<VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
@@ -427,7 +427,7 @@ public:
 
 
 template <typename PFP>
-class EdgeSelector_CurvatureTensor : public EdgeSelector<PFP>
+class EdgeSelector_CurvatureTensor : public Selector<PFP>
 {
 	// TODO : this selector still needs to be tested
 public:
@@ -458,7 +458,7 @@ private:
 
 public:
 	EdgeSelector_CurvatureTensor(MAP& m, VertexAttribute<VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
@@ -486,7 +486,7 @@ public:
 
 
 template <typename PFP>
-class EdgeSelector_MinDetail : public EdgeSelector<PFP>
+class EdgeSelector_MinDetail : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -515,7 +515,7 @@ private:
 
 public:
 	EdgeSelector_MinDetail(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -537,7 +537,7 @@ public:
  *                                      EDGE NAIVE COLOR METRIC (using QEMml)                                    *
  *****************************************************************************************************************/
 template <typename PFP>
-class EdgeSelector_ColorNaive : public EdgeSelector<PFP>
+class EdgeSelector_ColorNaive : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -572,7 +572,7 @@ private:
 
 public:
 	EdgeSelector_ColorNaive(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),
@@ -599,7 +599,7 @@ public:
  *                                  EDGE GEOMETRY+COLOR METRIC (using QEMml and Gradient norm)                   *
  *****************************************************************************************************************/
 template <typename PFP>
-class EdgeSelector_GeomColOptGradient : public EdgeSelector<PFP>
+class EdgeSelector_GeomColOptGradient : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -635,7 +635,7 @@ private:
 
 public:
 	EdgeSelector_GeomColOptGradient(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),
@@ -680,7 +680,7 @@ public:
  *                                 QEM extended to color metric                                                  *
  *****************************************************************************************************************/
 template <typename PFP>
-class EdgeSelector_QEMextColor : public EdgeSelector<PFP>
+class EdgeSelector_QEMextColor : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -716,7 +716,7 @@ private:
 
 public:
 	EdgeSelector_QEMextColor(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		EdgeSelector<PFP>(m, pos, approx),
+		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),

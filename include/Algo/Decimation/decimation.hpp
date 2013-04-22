@@ -47,7 +47,7 @@ int decimate(
 	VertexAttribute<typename PFP::VEC3> position = *(attribs[0]) ;
 
 	std::vector<ApproximatorGen<PFP>*> approximators ;
-	EdgeSelector<PFP>* selector = NULL ;
+	Selector<PFP>* selector = NULL ;
 
 	std::vector<VertexAttribute<typename PFP::VEC3>* > *v_approx = NULL ;
 
@@ -172,7 +172,7 @@ int decimate(
 template <typename PFP>
 int decimate(
 		typename PFP::MAP& map,
-		EdgeSelector<PFP>* selector, std::vector<ApproximatorGen<PFP>*>& approximators,
+		Selector<PFP>* selector, std::vector<ApproximatorGen<PFP>*>& approximators,
 		unsigned int nbWantedVertices,
 		bool recomputePriorityList,
 		EdgeAttribute<typename PFP::REAL> *edgeErrors,
