@@ -72,6 +72,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 	unsigned int cur = map.getCurrentLevel() ;
 	map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 
+	std::cout << "subdiv" << std::endl;
+
 	unsigned int degree = 0 ;
 	typename PFP::VEC3 p ;
 	Dart it = old ;
@@ -111,7 +113,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 		//map.setEdgeId(map.phi_1(e), id) ;
 
 
-		Dart dit = map.phi2(map.phi_1(dd));
+		Dart stop = map.phi2(map.phi1(old));
+		Dart dit = stop;
 		do
 		{
 			unsigned int dId = map.getEdgeId(map.phi_1(map.phi2(dit)));
@@ -119,21 +122,38 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 
 			unsigned int t = dId + eId;
 
-			if(t == 1)
+			if(t == 0)
+			{
+				map.setEdgeId(dit, 1);
+				map.setEdgeId(map.phi2(dit), 1);
+			}
+			else if(t == 1)
 			{
 				map.setEdgeId(dit, 2);
+				map.setEdgeId(map.phi2(dit), 2);
 			}
 			else if(t == 2)
 			{
+			    if(dId == eId)
+			    {
+				std::cout << "plop" << std::endl;
+				map.setEdgeId(dit, 0);
+				map.setEdgeId(map.phi2(dit), 0);
+			    }
+			    else
+			    {
 				map.setEdgeId(dit, 1);
+				map.setEdgeId(map.phi2(dit), 1);
+			    }
 			}
 			else if(t == 3)
 			{
 				map.setEdgeId(dit, 0);
+				map.setEdgeId(map.phi2(dit), 0);
 			}
 
 			dit = map.phi1(dit);
-		}while(dit != map.phi2(map.phi_1(dd)));
+		}while(dit != stop);
 
 	}
 	else											// if subdividing a polygonal face
@@ -170,10 +190,15 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 		{
 			unsigned int eId = map.getEdgeId(map.phi1(dit));
 			if(eId == 0)
+			{
 				map.setEdgeId(dit, 1);
+				map.setEdgeId(map.phi2(dit), 1);
+			}
 			else if(eId == 1)
+			{
 				map.setEdgeId(dit, 0);
-
+				map.setEdgeId(map.phi2(dit), 0);
+			}
 			dit = map.phi2(map.phi_1(dit));
 		}
 		while(dit != map.phi2(ne));

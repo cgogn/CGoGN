@@ -873,7 +873,7 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 	nlSolverParameteri(NL_LEAST_SQUARES, NL_TRUE);
 	nlSolverParameteri(NL_SOLVER, NL_CHOLMOD_EXT);
 
-	nlMakeCurrent(nlContext);
+//	nlMakeCurrent(nlContext);
 	if(nlGetCurrentState() == NL_STATE_INITIAL)
 		nlBegin(NL_SYSTEM) ;
 
@@ -894,14 +894,14 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 
 		nlBegin(NL_MATRIX) ;
 
+		nlEnable(NL_NORMALIZE_ROWS) ;
+
 		TraversorV<typename PFP::MAP> tv2(map);
 		for(Dart dit = tv2.begin() ; dit != tv2.end() ; dit = tv2.next())
 		{
 			if(!map.isBoundaryVertex(dit))
 			{
-				//nlEnable(NL_NORMALIZE_ROWS) ;
-
-				nlRowParameterd(NL_RIGHT_HAND_SIDE, indexV[dit]) ; //b[i]
+				nlRowParameterd(NL_RIGHT_HAND_SIDE, 0) ; //b[i]
 				//nlRowParameterd(NL_ROW_SCALING, weight) ;
 
 				nlBegin(NL_ROW) ;
@@ -910,15 +910,16 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 				Traversor3VVaE<typename PFP::MAP> tvvae(map, dit);
 				for(Dart ditvvae = tvvae.begin() ; ditvvae != tvvae.end() ; ditvvae = tvvae.next())
 				{
-					nlCoefficient(indexV[ditvvae],weight);
+					nlCoefficient(indexV[ditvvae], weight);
 					sum += weight;
 				}
 
 				nlCoefficient(indexV[dit], -sum) ;
 				nlEnd(NL_ROW) ;
-				//nlDisable(NL_NORMALIZE_ROWS) ;
 			}
 		}
+
+		nlDisable(NL_NORMALIZE_ROWS) ;
 
 		nlEnd(NL_MATRIX) ;
 
@@ -935,7 +936,7 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 			position[dit][coord] = nlGetVariable(indexV[dit]);
 		}
 
-		nlReset(NL_FALSE) ;
+		nlReset(NL_TRUE) ;
 		std::cout << "... done" << std::endl;
 	}
 
