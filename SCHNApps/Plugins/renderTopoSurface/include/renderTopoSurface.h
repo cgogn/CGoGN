@@ -64,7 +64,7 @@ public:
 
 	virtual void keyPress(View* view, QKeyEvent* event) {}
 	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event) {}
+	virtual void mousePress(View* view, QMouseEvent* event);
 	virtual void mouseRelease(View* view, QMouseEvent* event) {}
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
@@ -100,6 +100,9 @@ public slots:
 
 	void attributeModified(unsigned int orbit, QString nameAttr);
 	void connectivityModified();
+
+signals:
+	void dartSelected(Dart d);
 };
 
 } // namespace SCHNApps

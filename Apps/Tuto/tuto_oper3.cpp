@@ -259,9 +259,20 @@ void MyQT::createMap(int n)
 	position = myMap.getAttribute<VEC3, VERTEX>("position");
 	if (!position.isValid())
 		position = myMap.addAttribute<VEC3, VERTEX>("position");
-	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
-	prim.hexaGrid_topo(n,n,n);
-	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+//	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
+//	prim.hexaGrid_topo(n,n,n);
+//	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+
+//	Algo::Surface::Modelisation::Polyhedron<PFP> poly(myMap, position);
+//	poly.cylinder_topo(6,1,true,true);
+//	poly.embedCylinder(6.0,6.0,5.0);
+//	myMap.closeMap();
+
+	Dart d = Algo::Surface::Modelisation::embedPrism<PFP>(myMap, position, 5, true,6.0,6.0,5.0);
+	Dart d2 = Algo::Surface::Modelisation::embedPyramid<PFP>(myMap, position, 4, true,6.0,5.0);
+
+	myMap.sewVolumes(myMap.phi2(d),d2);
+	position[myMap.phi_1(myMap.phi2(d2))] += VEC3(9.0,-5.0,-2.5);
 
 	myMap.check();
 
@@ -565,8 +576,8 @@ void MyQT::cb_keyPress(int keycode)
 		updateGL();
 		break;
 	case 'W':
-		m_ex1 = 0.9f;
-		m_ex2 = 0.9f;
+		m_ex1 = 0.95f;
+		m_ex2 = 0.95f;
 		m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 		updateGL();
 		break;

@@ -46,7 +46,7 @@ namespace MR
  *********************************************************************************/
 
 template <typename PFP>
-class vertexFilter : public Filter
+class vertexFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -76,7 +76,7 @@ public:
 
 			}while(!found && dit!=d);
 
-			m_map.template embedOrbit<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
+			m_map.template setOrbitEmbedding<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
 		}
 
 //		SelectorEdgeLevel<typename PFP::MAP> ml(m_map, m_map.getCurrentLevel());
@@ -90,7 +90,7 @@ public:
 };
 
 template <typename PFP>
-class LerpVertexSynthesisFilter : public Filter
+class LerpVertexSynthesisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -140,7 +140,7 @@ public:
 
 
 template <typename PFP>
-class LerpVertexAnalysisFilter : public Filter
+class LerpVertexAnalysisFilter : public Algo::MR::Filter
 {
 protected:
 	typename PFP::MAP& m_map ;

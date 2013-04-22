@@ -156,8 +156,14 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		oss >> pt[2];
 		oss >> pt[3];
 
+//		oss >> pt[1];
+//		oss >> pt[2];
+//		oss >> pt[3];
+//		oss >> pt[0];
+
+
 		//regions ?
-		oss >> nbe;
+		//oss >> nbe;
 
 		// Embed three vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
@@ -198,44 +204,44 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 	foff.close();
 	fele.close();
 
-	//Association des phi3
-	unsigned int nbBoundaryFaces = 0 ;
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if (m.isMarked(d))
-		{
-			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
-
-			Dart good_dart = NIL;
-			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
-			{
-				if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
-				   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi_1(d)) /*&&
-				   map.template getEmbedding<VERTEX>(*it) == map.template getEmbedding<VERTEX>(map.phi1(d)) */)
-				{
-					good_dart = *it ;
-				}
-			}
-
-			if (good_dart != NIL)
-			{
-				map.sewVolumes(d, good_dart, false);
-				m.template unmarkOrbit<FACE>(d);
-			}
-			else
-			{
-				m.template unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
-				++nbBoundaryFaces;
-			}
-		}
-	}
-
-	if (nbBoundaryFaces > 0)
-	{
-		std::cout << "closing" << std::endl ;
-		map.closeMap();
-		CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces)" << CGoGNendl;
-	}
+//	//Association des phi3
+//	unsigned int nbBoundaryFaces = 0 ;
+//	for (Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if (m.isMarked(d))
+//		{
+//			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+//
+//			Dart good_dart = NIL;
+//			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
+//			{
+//				if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
+//				   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi_1(d)) /*&&
+//				   map.template getEmbedding<VERTEX>(*it) == map.template getEmbedding<VERTEX>(map.phi1(d)) */)
+//				{
+//					good_dart = *it ;
+//				}
+//			}
+//
+//			if (good_dart != NIL)
+//			{
+//				map.sewVolumes(d, good_dart, false);
+//				m.template unmarkOrbit<FACE>(d);
+//			}
+//			else
+//			{
+//				m.template unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
+//				++nbBoundaryFaces;
+//			}
+//		}
+//	}
+//
+//	if (nbBoundaryFaces > 0)
+//	{
+//		std::cout << "closing" << std::endl ;
+//		map.closeMap();
+//		CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces)" << CGoGNendl;
+//	}
 
 	return true;
 }

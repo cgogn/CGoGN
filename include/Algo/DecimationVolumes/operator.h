@@ -37,7 +37,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 
 enum OperatorType
@@ -179,9 +179,9 @@ public:
 };
 
 
-} //end namespace DecimationVolumes
+} //end namespace Decimation
 
-}
+} //namespace Volume
 
 } //end namespace Algo
 
