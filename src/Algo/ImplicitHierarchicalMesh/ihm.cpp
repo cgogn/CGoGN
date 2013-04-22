@@ -66,7 +66,14 @@ void ImplicitHierarchicalMap::clear(bool removeAttrib)
 
 void ImplicitHierarchicalMap::initImplicitProperties()
 {
-	initEdgeId() ;
+	//initEdgeId() ;
+
+	//init each edge Id at 0
+	TraversorE<ImplicitHierarchicalMap> te(*this);
+	for(Dart dit = te.begin() ; dit != te.next() ; dit = te.next())
+	{
+		m_edgeId[dit] = 0;
+	}
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
@@ -161,20 +168,21 @@ unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 	unsigned int cur = m_curLevel ;
 	m_curLevel = fLevel ;
 
-	unsigned int nbSubd = 0 ;
-	it = old ;
-	unsigned int eId = m_edgeId[old] ;			// the particular case of a face
-	do											// with all neighboring faces regularly subdivided
-	{											// but not the face itself
-		++nbSubd ;								// is treated here
-		it = phi1(it) ;
-	} while(m_edgeId[it] == eId) ;
+//	unsigned int nbSubd = 0 ;
+//	it = old ;
+//	unsigned int eId = m_edgeId[old] ;			// the particular case of a face
+//	do											// with all neighboring faces regularly subdivided
+//	{											// but not the face itself
+//		++nbSubd ;								// is treated here
+//		 std::cout << "plop" << std::endl;
+//		it = phi1(it) ;
+//	} while(m_edgeId[it] == eId) ;
 
-	while(nbSubd > 1)
-	{
-		nbSubd /= 2 ;
-		--fLevel ;
-	}
+//	while(nbSubd > 1)
+//	{
+//		nbSubd /= 2 ;
+//		--fLevel ;
+//	}
 
 	m_curLevel = cur ;
 

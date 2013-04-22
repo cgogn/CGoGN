@@ -44,7 +44,10 @@ enum ApproximatorType
 {
 	A_QEM,
 	A_MidEdge,
-	A_hHalfCollapse
+	A_MidFace,
+	A_MidVolume,
+	A_hHalfEdgeCollapse,
+	A_QEM
 };
 
 template <typename PFP>
@@ -63,7 +66,7 @@ public:
 	{}
 	virtual ~ApproximatorGen()
 	{}
-	virtual const std::string& getApproximatedAttributeName() const = 0 ;
+	virtual const std::string& getApproximatedAttributeName(unsigned int index = 0) const = 0 ;
 	virtual ApproximatorType getType() const = 0 ;
 	virtual bool init() = 0 ;
 	virtual void approximate(Dart d) = 0 ;
@@ -73,67 +76,101 @@ public:
 } ;
 
 
-template <typename PFP, typename T>
+template <typename PFP, typename T, unsigned int ORBIT>
 class Approximator :  public ApproximatorGen<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
 
 protected:
 	Predictor<PFP, T>* m_predictor ;
 
-	//Vertex attribute to be approximated
-	VertexAttribute<T>& m_attrV;
-	//Attribute to store approximation result
-	EdgeAttribute<T> m_approx;
-	// attribute to store detail information for reconstruction
-	EdgeAttribute<T> m_detail ;
-
-	T m_app;
+	std::vector<VertexAttribute<T>* > m_attrV ;	// vertex attributes to be approximated
+	std::vector<AttributeHandler<T,ORBIT> > m_approx ;	// attributes to store approximation result
+	std::vector<AttributeHandler<T,ORBIT> > m_detail ;	// attributes to store detail information for reconstruction
+	std::vector<T> m_app ;
 
 public:
-	Approximator(MAP& m, VertexAttribute<T>& a, Predictor<PFP, T>* predictor) :
-		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(a)
+	Approximator(MAP& m, std::vector<VertexAttribute<T>* > va, Predictor<PFP, T> * predictor) :
+		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(va)
 	{
-		std::stringstream aname ;
-		aname << "approx_" << m_attrV.name() ;
-		m_approx = this->m_map.template addAttribute<T, EDGE>(aname.str()) ;
+		const unsigned int& size = m_attrV.size() ;
+		assert(size > 0 || !"Approximator: no attributes provided") ;
 
-		if(m_predictor)	// if a predictor is associated to the approximator
-		{				// create an attribute to store the detail needed for reconstruction
-			std::stringstream dname ;
-			dname << "detail_" << m_attrV.name() ;
-			m_detail = this->m_map.template addAttribute<T, EDGE>(dname.str()) ;
+		m_approx.resize(size) ;
+		m_detail.resize(size) ;
+		m_app.resize(size) ;
+
+		for (unsigned int i = 0 ; i < size ; ++i)
+		{
+			if (!m_attrV[i]->isValid())
+				std::cerr << "Approximator Warning: attribute number " << i << " is not valid" << std::endl ;
+
+			std::stringstream aname ;
+			aname << "approx_" << m_attrV[i]->name() ;
+			m_approx[i] = this->m_map.template addAttribute<T, ORBIT>(aname.str()) ;
+
+			if(m_predictor)	// if predictors are associated to the approximator
+			{				// create attributes to store the details needed for reconstruction
+				std::stringstream dname ;
+				dname << "detail_" << m_attrV[i]->name() ;
+				m_detail[i] = this->m_map.template addAttribute<T, ORBIT>(dname.str()) ;
+			}
 		}
 	}
 
 	virtual ~Approximator()
 	{
-		this->m_map.template removeAttribute(m_approx) ;
-
-		if(m_predictor)
-			this->m_map.template removeAttribute(m_detail) ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+		{
+			this->m_map.template removeAttribute(m_approx[i]) ;
+			if(m_predictor)
+				this->m_map.template removeAttribute(m_detail[i]) ;
+		}
 	}
 
-	const std::string& getApproximatedAttributeName() const
+	const std::string& getApproximatedAttributeName(unsigned int index = 0) const
 	{
-		return m_attrV.name() ;
+		return m_attrV[index]->name() ;
 	}
 
-	const T& getApprox(Dart d) const
+	unsigned int getNbApproximated() const
 	{
-		return m_approx[d] ;
+		return m_attrV.size() ;
 	}
 
 	void saveApprox(Dart d)
 	{
-		m_app = m_approx[d] ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			m_app[i] = m_approx[i][d] ;
 	}
 
 	void affectApprox(Dart d)
 	{
-		m_attrV[d] = m_app ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			m_attrV[i]->operator[](d) = m_app[i] ;
+	}
+
+	const T& getApprox(Dart d, unsigned int index = 0) const
+	{
+		return m_approx[index][d] ;
+	}
+
+	const VertexAttribute<T>& getAttr(unsigned int index = 0) const
+	{
+		return *(m_attrV[index]) ;
+	}
+
+	std::vector<T> getAllApprox(Dart d) const
+	{
+		std::vector<T> res ;
+		res.resize(m_attrV.size()) ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			res[i] = m_approx[i][d] ;
+
+		return res ;
 	}
 
 	const Predictor<PFP, T>* getPredictor() const
