@@ -158,7 +158,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 		{											// linked to the central vertex
 			Dart next = map.phi1(map.phi1(dd)) ;
 			map.splitFace(map.phi1(ne), dd) ;
-			Dart nne = map.alpha1(dd) ;
+			//Dart nne = map.alpha1(dd) ;
 			//id = map.getNewEdgeId() ;
 			//map.setEdgeId(nne, id) ;
 			//map.setEdgeId(map.phi2(nne), id) ;
@@ -174,7 +174,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 			else if(eId == 1)
 				map.setEdgeId(dit, 0);
 
-			dit = map.phi2(map.phi_1(ne));
+			dit = map.phi2(map.phi_1(dit));
 		}
 		while(dit != map.phi2(ne));
 	}
