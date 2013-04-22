@@ -20,6 +20,7 @@ RenderScalarDockTab::RenderScalarDockTab(Window* w, RenderScalarPlugin* p) :
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
 	connect(list_scalarVBO, SIGNAL(itemSelectionChanged()), this, SLOT(selectedScalarVBOChanged()));
+	connect(combo_colorMap, SIGNAL(currentIndexChanged(int)), this, SLOT(colorMapChanged(int)));
 	connect(slider_expansion, SIGNAL(valueChanged(int)), this, SLOT(expansionChanged(int)));
 }
 
@@ -68,6 +69,7 @@ void RenderScalarDockTab::refreshUI(ParameterSet* params)
 				}
 			}
 
+			combo_colorMap->setCurrentIndex(p->colorMap);
 			slider_expansion->setSliderPosition(p->expansion);
 		}
 		++i;
@@ -114,6 +116,16 @@ void RenderScalarDockTab::selectedScalarVBOChanged()
 		}
 		else
 			m_plugin->changeScalarVBO(view, map, NULL, true);
+	}
+}
+
+void RenderScalarDockTab::colorMapChanged(int index)
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		MapHandlerGen* map = m_currentParams->selectedMap;
+		m_plugin->changeColorMap(view, map, index, true);
 	}
 }
 

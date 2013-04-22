@@ -47,7 +47,6 @@ namespace CGoGN
 /**
  * Class that allows to browse a map
  * This is a pure virtual class that can be overloaded in:
- * - a map (generic and so on)
  * - a MapBrowserSelector
  * - a MapBrowserLinked (Attr or Auto)
  */
@@ -64,7 +63,7 @@ class DartMarkerGen ;
 class CellMarkerGen ;
 template<unsigned int CELL> class CellMarkerBase ;
 
-class GenericMap// : public MapBrowser
+class GenericMap
 {
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler ;
 	template<typename T> friend class DartAutoAttribute ;
@@ -79,7 +78,7 @@ class GenericMap// : public MapBrowser
 protected:
 
 	/**
-	 * @brief current MapBrowser use to traverse
+	 * @brief current MapBrowser used to traverse the map
 	 */
 	MapBrowser* m_currentBrowser;
 
@@ -191,7 +190,7 @@ public:
 
 	/**
 	 * @brief set the current MapBrowser
-	 * @param mb pointer on MapBrowser to use (default is map it self)
+	 * @param mb pointer on MapBrowser to use (default is map itself)
 	 */
 	void setBrowser(MapBrowser* mb) { m_currentBrowser = mb; }
 

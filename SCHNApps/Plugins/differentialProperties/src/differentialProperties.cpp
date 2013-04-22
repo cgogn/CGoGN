@@ -137,12 +137,15 @@ void DifferentialPropertiesPlugin::computeCurvatureFromDialog()
 		else
 			KnormalName = m_computeCurvatureDialog->KnormalAttributeName->text();
 
+		bool compute_kmean = (m_computeCurvatureDialog->check_computeKmean->checkState() == Qt::Checked);
+		bool compute_kgaussian = (m_computeCurvatureDialog->check_computeKgaussian->checkState() == Qt::Checked);
 		bool autoUpdate = (currentItems[0]->checkState() == Qt::Checked);
 
 		computeCurvature(
 			mapName,
 			positionName, normalName,
 			KmaxName, kmaxName, KminName, kminName, KnormalName,
+			compute_kmean, compute_kgaussian,
 			autoUpdate
 		);
 	}
