@@ -11,6 +11,7 @@ namespace SCHNApps
 PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
 	positionVBO(NULL),
 	scalarVBO(NULL),
+	colorMap(BlueWhiteRed),
 	expansion(0)
 {
 	bool positionFound = false;
@@ -37,7 +38,6 @@ bool RenderScalarPlugin::enable()
 	addTabInDock(m_dockTab, "RenderScalar");
 
 	m_scalarShader = new Utils::ShaderScalarField();
-
 	registerShader(m_scalarShader);
 
 	connect(m_window, SIGNAL(viewAndPluginLinked(View*, Plugin*)), this, SLOT(viewLinked(View*, Plugin*)));
@@ -66,6 +66,7 @@ void RenderScalarPlugin::redraw(View* view)
 			m_scalarShader->setAttributeScalar(p->scalarVBO);
 			m_scalarShader->setMinValue(p->scalarMin);
 			m_scalarShader->setMaxValue(p->scalarMax);
+			m_scalarShader->setColorMap(p->colorMap);
 			m_scalarShader->setExpansion(p->expansion);
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -220,6 +221,19 @@ void RenderScalarPlugin::changeScalarVBO(View* view, MapHandlerGen* map, Utils::
 			perMap->scalarMax = attr[i] > perMap->scalarMax ? attr[i] : perMap->scalarMax;
 		}
 	}
+
+	if(view->isCurrentView())
+	{
+		if(!fromUI)
+			m_dockTab->refreshUI(params);
+		view->updateGL();
+	}
+}
+
+void RenderScalarPlugin::changeColorMap(View* view, MapHandlerGen* map, int c, bool fromUI)
+{
+	ParameterSet* params = h_viewParams[view];
+	params->perMap[map->getName()]->colorMap = c;
 
 	if(view->isCurrentView())
 	{
