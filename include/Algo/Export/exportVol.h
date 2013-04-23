@@ -96,6 +96,6 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 
 } // namespace CGoGN
 
-#include "Algo/Export/export.hpp"
+#include "Algo/Export/exportVol.hpp"
 
 #endif
