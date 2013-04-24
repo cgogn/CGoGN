@@ -111,13 +111,6 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CCW)
 			Dart e = d;
 			Dart f = map.template phi<21121>(d);
-			hexa.push_back(indices[e]);
-			e = map.phi1(e);
-			hexa.push_back(indices[e]);
-			e = map.phi1(e);
-			hexa.push_back(indices[e]);
-			e = map.phi1(e);
-			hexa.push_back(indices[e]);
 			hexa.push_back(indices[f]);
 			e = map.phi_1(f);
 			hexa.push_back(indices[f]);
@@ -125,11 +118,18 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 			hexa.push_back(indices[f]);
 			e = map.phi_1(f);
 			hexa.push_back(indices[f]);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
 		}
 
 		if (degree == 4)
 		{
-			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CCW)
+			//CAS TETRAEDRIQUE (ordre 2 quad superposes, le premier en CCW)
 			Dart e = d;
 			tetra.push_back(indices[e]);
 			e = map.phi1(e);
@@ -145,8 +145,6 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	unsigned int nbhexa = hexa.size()/8;
 	unsigned int nbtetra = tetra.size()/4;
 
-
-
 	fout << std::right;
 	if (nbhexa!=0)
 	{
@@ -158,7 +156,7 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 			fout << "CHEXA   ";
 			fout << std::setw(8) << countCell++ << std::setw(8)<< 0;
 			fout <<  std::setw(8) << hexa[8*i] <<  std::setw(8) << hexa[8*i+1] <<  std::setw(8) << hexa[8*i+2];
-			fout <<  std::setw(8) << hexa[8*i+3] <<  std::setw(8) << hexa[8*i+4] <<  std::setw(8) << hexa[8*i+6] << "+"<< std::endl;
+			fout <<  std::setw(8) << hexa[8*i+3] <<  std::setw(8) << hexa[8*i+4] <<  std::setw(8) << hexa[8*i+5] << "+"<< std::endl;
 			fout << "+       " <<  std::setw(8) << hexa[8*i+6] <<  std::setw(8) << hexa[8*i+7] << std::endl;
 		}
 	}
@@ -177,8 +175,171 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	}
 
 	fout << "ENDDATA" << std::endl;
+
+	fout.close();
 	return true;
 }
+
+
+
+template <typename PFP>
+bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	// open file
+	std::ofstream fout ;
+	fout.open(filename, std::ios::out) ;
+
+	if (!fout.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false ;
+	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+
+
+
+	unsigned int count=0;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		indices[i] = count++;
+	}
+
+
+	std::vector<unsigned int> hexa;
+	std::vector<unsigned int> tetra;
+	hexa.reserve(2048);
+	tetra.reserve(2048);
+
+	TraversorW<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = 0 ;
+
+		Traversor3WV<typename PFP::MAP> twv(map, d) ;
+		for(Dart it = twv.begin(); it != twv.end(); it = twv.next())
+		{
+			degree++;
+		}
+
+		if (degree == 8)
+		{
+			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CW)
+			Dart e = d;
+			Dart f = map.template phi<21121>(d);
+			hexa.push_back(indices[f]);
+			f = map.phi_1(f);
+			hexa.push_back(indices[f]);
+			f = map.phi_1(f);
+			hexa.push_back(indices[f]);
+			f = map.phi_1(f);
+			hexa.push_back(indices[f]);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+		}
+
+		if (degree == 4)
+		{
+			//CAS TETRAEDRIQUE
+			Dart e = d;
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.template phi<211>(e);
+			tetra.push_back(indices[e]);
+		}
+	}
+
+	unsigned int nbhexa = hexa.size()/8;
+	unsigned int nbtetra = tetra.size()/4;
+
+
+	fout << "<?xml version=\"1.0\"?>" << std::endl;
+	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"BigEndian\">" << std::endl;
+	fout << "  <UnstructuredGrid>" <<  std::endl;
+	fout << "    <Piece NumberOfPoints=\"" << position.nbElements() << "\" NumberOfCells=\""<< (nbhexa+nbtetra) << "\">" << std::endl;
+	fout << "      <Points>" << std::endl;
+	fout << "        <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		const VEC3& P = position[i];
+		fout << "          " << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+	}
+
+	fout << "        </DataArray>" << std::endl;
+	fout << "      </Points>" << std::endl;
+	fout << "      <Cells>" << std::endl;
+	fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+	if (nbhexa!=0)
+	{
+		for (unsigned int i=0; i<nbhexa; ++i)
+		{
+			fout << "          ";
+			fout << hexa[8*i]   << " " << hexa[8*i+1] << " " << hexa[8*i+2] << " " << hexa[8*i+3] << " " << hexa[8*i+4] << " ";
+			fout << hexa[8*i+5] << " " << hexa[8*i+6] << " " << hexa[8*i+7] << std::endl;
+		}
+	}
+
+	if (nbtetra != 0)
+	{
+
+		for (unsigned int i=0; i<nbtetra; ++i)
+		{
+			fout << "          ";
+			fout << tetra[4*i] << " " << tetra[4*i+1] << " " << tetra[4*i+2] << " " << tetra[4*i+3] << std::endl;
+		}
+	}
+
+	fout << "        </DataArray>" << std::endl;
+	fout << "        <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">" << std::endl;
+	fout << "         ";
+	unsigned int offset = 0;
+	for (unsigned int i=0; i<nbhexa; ++i)
+	{
+		offset += 8;
+		fout << " " << offset;
+	}
+	for (unsigned int i=0; i<nbtetra; ++i)
+	{
+		offset += 4;
+		fout << " "<< offset;
+	}
+
+	fout << std::endl << "        </DataArray>" << std::endl;
+	fout << "        <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">" << std::endl;
+	fout << "         ";
+	for (unsigned int i=0; i<nbhexa; ++i)
+	{
+		fout << " 12";
+	}
+	for (unsigned int i=0; i<nbtetra; ++i)
+	{
+		fout << " 10";
+	}
+
+	fout << std::endl << "        </DataArray>" << std::endl;
+	fout << "      </Cells>" << std::endl;
+	fout << "    </Piece>" << std::endl;
+	fout << "  </UnstructuredGrid>" << std::endl;
+	fout << "</VTKFile>" << std::endl;
+
+	fout.close();
+	return true;
+}
+
 
 
 template <typename PFP>
@@ -196,6 +357,104 @@ bool exportMSH(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
 		return false ;
 	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+	fout << "$NOD" << std::endl;
+	fout << position.nbElements()<< std::endl;
+	unsigned int count=1;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		const VEC3& P = position[i];
+		fout << count << " " << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+		indices[i] = count++;
+	}
+
+
+	std::vector<unsigned int> hexa;
+	std::vector<unsigned int> tetra;
+	hexa.reserve(2048);
+	tetra.reserve(2048);
+
+	TraversorW<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = 0 ;
+
+		Traversor3WV<typename PFP::MAP> twv(map, d) ;
+		for(Dart it = twv.begin(); it != twv.end(); it = twv.next())
+		{
+			degree++;
+		}
+
+		if (degree == 8)
+		{
+			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CW)
+			Dart e = d;
+			Dart f = map.template phi<21121>(d);
+			hexa.push_back(indices[f]);
+			f = map.phi_1(f);
+			hexa.push_back(indices[f]);
+			f = map.phi_1(f);
+			hexa.push_back(indices[f]);
+			f = map.phi_1(f);
+			hexa.push_back(indices[f]);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+		}
+
+		if (degree == 4)
+		{
+			//CAS TETRAEDRIQUE
+			Dart e = d;
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.template phi<211>(e);
+			tetra.push_back(indices[e]);
+		}
+	}
+
+	fout << "$ENDNOD" << std::endl;
+	fout << "$ELM" << std::endl;
+
+	unsigned int countCell=1;
+	unsigned int nbhexa = hexa.size()/8;
+	unsigned int nbtetra = tetra.size()/4;
+
+	fout << (nbhexa+nbtetra) << std::endl;
+	if (nbhexa!=0)
+	{
+		for (unsigned int i=0; i<nbhexa; ++i)
+		{
+			fout << countCell++ << " 5 1 1 8 ";
+			fout << hexa[8*i]   << " " << hexa[8*i+1] << " " << hexa[8*i+2] << " " << hexa[8*i+3] << " " << hexa[8*i+4] << " ";
+			fout << hexa[8*i+5] << " " << hexa[8*i+6] << " " << hexa[8*i+7] << std::endl;
+		}
+	}
+
+	if (nbtetra != 0)
+	{
+
+		for (unsigned int i=0; i<nbtetra; ++i)
+		{
+			fout << countCell++ << " 4 1 1 4 ";
+			fout << tetra[4*i] << " " << tetra[4*i+1] << " " << tetra[4*i+2] << " " << tetra[4*i+3] << std::endl;
+		}
+	}
+
+	fout << "$ENDELM" << std::endl;
+
+	fout.close();
+	return true;
+
 }
 
 
@@ -214,6 +473,61 @@ bool exportTet(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
 		return false ;
 	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+	fout << position.nbElements()<< " vertices" <<std::endl;
+
+	std::vector<unsigned int> tetra;
+	tetra.reserve(2048);
+
+
+	unsigned int count=0;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		indices[i] = count++;
+	}
+
+	TraversorW<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = 0 ;
+
+		Traversor3WV<typename PFP::MAP> twv(map, d) ;
+		for(Dart it = twv.begin(); it != twv.end(); it = twv.next())
+		{
+			degree++;
+		}
+
+		if (degree == 4)
+		{
+			Dart e = d;
+			tetra.push_back(indices[e]);
+			e = map.phi_1(e);
+			tetra.push_back(indices[e]);
+			e = map.phi_1(e);
+			tetra.push_back(indices[e]);
+			e = map.template phi<211>(e);
+			tetra.push_back(indices[e]);
+		}
+	}
+
+	unsigned int nbtetra = tetra.size()/4;
+	fout << nbtetra << " tets" << std::endl;
+
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		const VEC3& P = position[i];
+		fout << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+	}
+
+	for (unsigned int i=0; i<nbtetra; ++i)
+	{
+		fout << "4 " << tetra[4*i] << " " << tetra[4*i+1] << " " << tetra[4*i+2] << " " << tetra[4*i+3] << std::endl;
+	}
+
+	fout.close();
+	return true;
 }
 
 
@@ -223,9 +537,14 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
 
-	// open file
+	std::string base(filename);
+	std::string fnNode = base + ".node";
+	std::string fnEle = base + ".ele";
+
+	// open files
 	std::ofstream fout ;
-	fout.open(filename, std::ios::out) ;
+	fout.open(fnNode.c_str(), std::ios::out) ;
+
 
 	if (!fout.good())
 	{
@@ -234,13 +553,96 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 	}
 
 	std::ofstream foutEle ;
-	foutEle.open(filename, std::ios::out) ;
+	foutEle.open(fnEle.c_str(), std::ios::out) ;
 
-	if (!fout.good())
+	if (!foutEle.good())
 	{
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
 		return false ;
 	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+	fout << position.nbElements()<< " 3  0  0"<<std::endl;
+	unsigned int count=0;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		const VEC3& P = position[i];
+		fout << count << " " << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+		indices[i] = count++;
+	}
+
+	fout.close();
+
+
+	std::vector<unsigned int> hexa;
+	std::vector<unsigned int> tetra;
+	hexa.reserve(2048);
+	tetra.reserve(2048);
+
+	TraversorW<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = 0 ;
+
+		Traversor3WV<typename PFP::MAP> twv(map, d) ;
+		for(Dart it = twv.begin(); it != twv.end(); it = twv.next())
+		{
+			degree++;
+		}
+
+//		if (degree == 8)
+//		{
+//			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CW)
+//			Dart e = d;
+//			Dart f = map.template phi<21121>(d);
+//			hexa.push_back(indices[f]);
+//			e = map.phi_1(f);
+//			hexa.push_back(indices[f]);
+//			e = map.phi_1(f);
+//			hexa.push_back(indices[f]);
+//			e = map.phi_1(f);
+//			hexa.push_back(indices[f]);
+//			hexa.push_back(indices[e]);
+//			e = map.phi1(e);
+//			hexa.push_back(indices[e]);
+//			e = map.phi1(e);
+//			hexa.push_back(indices[e]);
+//			e = map.phi1(e);
+//			hexa.push_back(indices[e]);
+//		}
+
+		if (degree == 4)
+		{
+			//CAS TETRAEDRIQUE
+			Dart e = d;
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.template phi<211>(e);
+			tetra.push_back(indices[e]);
+		}
+	}
+
+	unsigned int countCell=0;
+	unsigned int nbtetra = tetra.size()/4;
+
+	foutEle << nbtetra << " 4  0" << std::endl;
+
+	if (nbtetra != 0)
+	{
+
+		for (unsigned int i=0; i<nbtetra; ++i)
+		{
+			foutEle << countCell++ << "  " << tetra[4*i] << " " << tetra[4*i+1] << " " << tetra[4*i+2] << " " << tetra[4*i+3] << std::endl;
+		}
+	}
+
+	foutEle.close();
+
+	return true;
 }
 
 

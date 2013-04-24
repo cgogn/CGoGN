@@ -110,13 +110,20 @@ template <typename PFP>
 bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenameNode, const std::string& filenameELE, std::vector<std::string>& attrNames);
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f, bool invertTetra=false);
+bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 template <typename PFP>
 bool importMoka(typename PFP::MAP& the_gmap, const std::string& filename, std::vector<std::string>& attrNames);
 
 template <typename PFP>
 bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+
+template <typename PFP>
+bool importMSH(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+
+template <typename PFP>
+bool importVTU(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+
 
 } // Import
 
@@ -134,6 +141,8 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 #include "Algo/Import/importMoka.hpp"
 #include "Algo/Import/importTs.hpp"
 #include "Algo/Import/importNodeEle.hpp"
+#include "Algo/Import/importMSH.hpp"
+#include "Algo/Import/importVTU.hpp"
 
 #include "Algo/Import/importChoupi.hpp"
 

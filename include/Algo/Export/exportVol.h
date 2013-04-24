@@ -53,6 +53,18 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 
 
 /**
+* export the map into a vtu file (vtk unstructured grid)
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of ply file
+* @param binary write in binary mode
+* @return true
+*/
+template <typename PFP>
+bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
+
+
+/**
 * export the map into a .msh (gmesh file)
 * @param the_map map to be exported
 * @param position the position container
