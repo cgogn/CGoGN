@@ -157,17 +157,17 @@ void TexView::cb_keyPress(int code)
 	updateGL();
 }
 
-void TexView::init(char *fnm, char* fnt)
+void TexView::init(const std::string& fnm, const std::string& fnt)
 {
-	if (fnm == NULL)
+	if (fnm.empty()	)
 	{
 		computeTore();
-		m_fileNameTex  = std::string(fnt);
+		m_fileNameTex  = fnt;
 	}
 	else
 	{
-		m_fileNameMesh = std::string(fnm);
-		m_fileNameTex  = std::string(fnt);
+		m_fileNameMesh = fnm;
+		m_fileNameTex  = fnt;
 		std::vector<std::string> attrNames;
 
 		m_obj.import(m_fileNameMesh,attrNames);
@@ -260,11 +260,11 @@ int main(int argc, char**argv)
 	}
 	else if (argc == 2)
 	{
-		tv.init(NULL, argv[1]);
+		tv.init("", argv[1]);
 	}
 	else
 	{
-		tv.init(NULL,"x");
+		tv.init("","x");
 	}
 
 
