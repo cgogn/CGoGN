@@ -167,10 +167,10 @@ public:
 	}
 
 	// math operator (fake, juste here to enable compilation)
-	void operator +=(const Mark& m) {}
-	void operator -=(const Mark& m) {}
-	void operator *=(double a) {}
-	void operator /=(double a) {}
+	void operator +=(const Mark& /*m*/) {}
+	void operator -=(const Mark& /*m*/) {}
+	void operator *=(double /*a*/) {}
+	void operator /=(double /*a*/) {}
 };
 
 } // namespace CGoGN

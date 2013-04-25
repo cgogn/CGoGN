@@ -109,7 +109,7 @@ Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(MAP& map, Dart dart, bool forceDartM
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(MAP& map, Dart dart, MarkerForTraversor<MAP, ORBY>& tmo, bool forceDartMarker, unsigned int thread) :
+Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(MAP& map, Dart dart, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
 	m_map(map),
 	m_tradoo(map, dart, thread),
 	m_allocated(false),

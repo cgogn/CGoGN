@@ -97,7 +97,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 	{
 		typename PFP::VEC3 P;
 		ss >> P[0]; ss >> P[1]; ss >> P[2];
-//		std::cout << P << std::endl;
+		P *= scaleFactor;
 		unsigned int id = container.insertLine();
 		position[id] = P;
 		verticesID.push_back(id);
@@ -110,10 +110,6 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	std::cout <<"CELL NODE = "<< cell_node->name << std::endl;
 
-//	cell_node = cell_node->children;
-//	while (strcmp((char*)(cell_node->name),(char*)"DataArray")!=0)
-//		cell_node = cell_node->next;
-
 
 	std::vector<unsigned char> typeVols;
 	typeVols.reserve(nbVolumes);
@@ -122,25 +118,6 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 	std::vector<unsigned int> indices;
 	indices.reserve(nbVolumes*4);
 
-
-//	cell_node = cell_node->children;
-//	while (strcmp((char*)(cell_node->name),(char*)"DataArray")!=0)
-//		cell_node = cell_node->next;
-//	std::cout <<"1NODE = "<< (char*)(cell_node->name) << std::endl;
-//	xmlChar* type = xmlGetProp(cell_node, BAD_CAST "Name");
-//	std::cout <<"1NAME = "<< (char*)(type) << std::endl;
-
-//	while (strcmp((char*)(cell_node->name),(char*)"DataArray")!=0)
-//		cell_node = cell_node->next;
-//	std::cout <<"2NODE = "<< (char*)(cell_node->name) << std::endl;
-//	type = xmlGetProp(cell_node, BAD_CAST "Name");
-//	std::cout <<"2NAME = "<< (char*)(type) << std::endl;
-
-//	while (strcmp((char*)(cell_node->name),(char*)"DataArray")!=0)
-//		cell_node = cell_node->next;
-//	std::cout <<"3NODE = "<< (char*)(cell_node->name) << std::endl;
-//	type = xmlGetProp(cell_node, BAD_CAST "Name");
-//	std::cout <<"3NAME = "<< (char*)(type) << std::endl;
 
 	for (xmlNode* x_node = cell_node->children; x_node!=NULL; x_node = x_node->next)
 	{
@@ -152,12 +129,9 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 		else
 		{
 			xmlChar* type = xmlGetProp(x_node, BAD_CAST "Name");
-//		std::cout <<"NODE = "<< (char*)(x_node->name) << std::endl;
-//		std::cout <<"NAME = "<< (char*)(type) << std::endl;
 
 			if (strcmp((char*)(type),(char*)"connectivity")==0)
 			{
-	//			c_indices =(char*)(xmlNodeGetContent(x_node->children));
 				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
 				while (!ss.eof())
 				{

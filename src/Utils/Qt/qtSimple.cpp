@@ -112,6 +112,7 @@ SimpleQT::SimpleQT() :
 }
 
 SimpleQT::SimpleQT(const SimpleQT& sqt):
+	QMainWindow(),
 	m_dock(NULL),
 	m_projection_matrix(m_mat.m_matrices[0]),
 	m_modelView_matrix(m_mat.m_matrices[1]),

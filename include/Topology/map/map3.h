@@ -158,7 +158,7 @@ public:
 	 */
 	virtual Dart splitVertex(std::vector<Dart>& vd);
 
-	virtual void splitVertex(Dart d, Dart e) { assert("use splitVertex(d,e) only in dimension 2");}
+	virtual void splitVertex(Dart /*d*/, Dart /*e*/) { assert("use splitVertex(d,e) only in dimension 2");}
 
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume
@@ -269,7 +269,7 @@ public:
 	 */
 	virtual bool mergeVolumes(Dart d);
 
-	virtual bool mergeVolumes(Dart d, Dart e) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
+	virtual bool mergeVolumes(Dart /*d*/, Dart /*e*/) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
 
 
 	//! Split a volume into two volumes along a edge path
