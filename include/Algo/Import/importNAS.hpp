@@ -38,7 +38,7 @@ namespace Volume
 namespace Import 
 {
 
-float floatFromNas(std::string& s_v)
+inline float floatFromNas(std::string& s_v)
 {
 	float x = 0.0f;
 

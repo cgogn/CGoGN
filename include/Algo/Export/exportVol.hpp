@@ -40,7 +40,7 @@ namespace Volume
 namespace Export
 {
 
-std::string truncFloatTO8(float f)
+inline std::string truncFloatTO8(float f)
 {
 	std::stringstream ss;
 	ss << f;
