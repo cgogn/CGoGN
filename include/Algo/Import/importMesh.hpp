@@ -552,6 +552,9 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 		return importVTU<PFP>(map, filename, attrNames, 1.0f);
 		break;
 
+	case NAS:
+		return importNAS<PFP>(map, filename, attrNames, 1.0f);
+		break;
 
 		case OFF:
 		{
