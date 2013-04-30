@@ -181,7 +181,6 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 		{
 			if ((type_elm==5) && (nb==8))
 			{
-				std::cout << "HEXA: "<< i << std::endl;
 				Geom::Vec4ui v;
 
 				if (i==0)

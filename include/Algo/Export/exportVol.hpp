@@ -112,11 +112,11 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 			Dart e = d;
 			Dart f = map.template phi<21121>(d);
 			hexa.push_back(indices[f]);
-			e = map.phi_1(f);
+			f = map.phi_1(f);
 			hexa.push_back(indices[f]);
-			e = map.phi_1(f);
+			f = map.phi_1(f);
 			hexa.push_back(indices[f]);
-			e = map.phi_1(f);
+			f = map.phi_1(f);
 			hexa.push_back(indices[f]);
 			hexa.push_back(indices[e]);
 			e = map.phi1(e);
@@ -129,7 +129,7 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 
 		if (degree == 4)
 		{
-			//CAS TETRAEDRIQUE (ordre 2 quad superposes, le premier en CCW)
+			//CAS TETRAEDRIQUE
 			Dart e = d;
 			tetra.push_back(indices[e]);
 			e = map.phi1(e);
