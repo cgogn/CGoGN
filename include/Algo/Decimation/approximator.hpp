@@ -66,6 +66,7 @@ Approximator<PFP,T,ORBIT>::Approximator(MAP& m, std::vector<VertexAttribute<T>* 
 template <typename PFP, typename T, unsigned int ORBIT>
 Approximator<PFP,T,ORBIT>::~Approximator()
 {
+	std::cout << "Approximator<PFP,T,ORBIT>::~Approximator()" << std::endl ;
 	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
 	{
 		this->m_map.template removeAttribute(m_approx[i]) ;

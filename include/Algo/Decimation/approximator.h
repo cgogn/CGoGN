@@ -118,7 +118,7 @@ protected:
 
 public:
 	Approximator(MAP& m, std::vector<VertexAttribute<T>* > va, Predictor<PFP, T> * predictor) ;
-	~Approximator() ;
+	virtual ~Approximator() ;
 	const std::string& getApproximatedAttributeName(unsigned int index = 0) const ;
 	unsigned int getNbApproximated() const ;
 	void saveApprox(Dart d) ;

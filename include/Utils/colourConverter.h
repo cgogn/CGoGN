@@ -38,15 +38,14 @@ namespace Utils {
 
 /*!
  * \class ColourConverter
- * \brief Class for switching between different tri-channel color-spaces
+ * \brief Class for switching between different tri-channel color-spaces (see \link #ColourEncoding ColourEncoding enumeration\endlink  for available types)
  *
- * Class for colour conversions between the enumerated colour spaces.
- * Usage :
- *  VEC3 colRGB ; 								// current colour in RGB for example
- *  ColourConverter<REAL> cc(colRGB,C_RGB) ;	// Tell constructor you provided RGB
+ * Usage:\n
+ *  VEC3 colRGB ; 								// current colour in RGB for example\n
+ *  ColourConverter<REAL> cc(colRGB,C_RGB) ;	// Tell constructor you provided RGB\n
  *  VEC3 colLuv = cc.getLuv() ; 				// ask whatever supported colour type you require
  *
- * All conversion formulae were provided by "Notes about color", january 5th, 2011 by B. Sauvage
+ * Some conversion formulae were provided by "Notes about color", january 5th, 2011 by B. Sauvage
  */
 template <typename REAL>
 class ColourConverter
@@ -61,7 +60,7 @@ public: // types
 		C_RGB = 0, /*!< R,G,B in [0,1] */
 		C_XYZ = 1, /*!< X,Y,Z in [0,1] */
 		C_Luv = 2, /*!< L in [0,100], u in [-83,175], v in [-134,108] */
-		C_Lab = 3, /*!< L in [0,100], u in [-86,98], v in [-108,95] */
+		C_Lab = 3, /*!< L in [0,100], a in [-86,98], b in [-108,95] */
 		C_HSV = 4,  /*!< H,S,V in [0,1] */
 		C_HSL = 5  /*!< H,S,L in [0,1] */
 	} ;
