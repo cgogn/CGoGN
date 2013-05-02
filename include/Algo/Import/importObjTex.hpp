@@ -36,6 +36,7 @@ namespace Surface
 namespace Import 
 {
 
+
 template <typename PFP>
 OBJModel<PFP>::OBJModel(typename PFP::MAP& map):
 	m_map(map),
@@ -70,12 +71,6 @@ inline Geom::Vec2f OBJModel<PFP>::getTexCoord(Dart d)
 
 
 template <typename PFP>
-std::vector<std::string>& OBJModel<PFP>::getMaterialNames()
-{
-	return m_materialNames;
-}
-
-template <typename PFP>
 void OBJModel<PFP>::setPositionAttribute(VertexAttribute<Geom::Vec3f> position)
 {
 	m_positions = position;
@@ -97,9 +92,9 @@ void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f>texcoord)
 
 
 template <typename PFP>
-void OBJModel<PFP>::readMaterials(const std::string& filename)
+void OBJModel<PFP>::readMaterials(const std::string& filename, std::vector<MaterialOBJ>& materials)
 {
-	m_materials.resize(m_materialNames.size());
+	materials.reserve(m_materialNames.size());
 		
 	// open file
 	std::ifstream fp(filename.c_str());
@@ -110,6 +105,7 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 	}
 	
 	std::vector<MaterialOBJ>::iterator mit;
+
 	std::string ligne;
 	std::string tag;
 	fp >> tag;
@@ -118,7 +114,8 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 		std::getline (fp, ligne);
 		if (tag == "newmtl")
 		{
-			std::vector<std::string>::iterator it = std::find(m_materialNames.begin(), m_materialNames.end(), ligne);
+
+			std::map<std::string,int>::iterator it = m_materialNames.find(ligne);
 			if (it ==  m_materialNames.end())
 			{
 				CGoGNerr << "Skipping material "<< ligne << CGoGNendl;
@@ -130,8 +127,20 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 			}
 			else
 			{
-				CGoGNerr << "Reading material "<< ligne << CGoGNendl;
-				mit =  m_materials.begin() + (it - m_materialNames.begin());
+				CGoGNout << "Reading material "<< ligne << CGoGNendl;
+
+				if (materials.empty())
+				{
+					materials.resize(1);
+					mit = materials.begin();
+				}
+				else
+				{
+					materials.resize(materials.size()+1);
+					++mit;
+				}
+				it->second = (mit-materials.begin());
+				mit->name = ligne;
 			}
 		}
 		else
@@ -160,6 +169,17 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 			{
 				oss >> mit->shininess;
 			}
+			if (tag == "Tf")
+			{
+				oss >> mit->transparentFilter[0];
+				oss >> mit->transparentFilter[1];
+				oss >> mit->transparentFilter[2];
+			}
+
+			if ((tag == "Tr") || (tag == "d"))
+			{
+				oss >> mit->transparency;
+			}
 			
 			if (tag == "map_Ka") // ambiant texture
 			{
@@ -167,7 +187,12 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 			}
 			if (tag == "map_Kd") // diffuse texture
 			{
-				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
+				mit->textureDiffuse = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
+				std::string tname;
+				oss >> tname;
+				mit->textureDiffuse->load(tname);
+				CGoGNout << "Loading texture "<< tname << CGoGNendl;
+
 			}
 			if (tag == "map_d") // opacity texture
 			{
@@ -204,6 +229,8 @@ bool OBJModel<PFP>::generateBrowsers(std::vector<MapBrowser*>& browsers)
 	{
 		MapBrowser* MBptr = new MapBrowserLinked(m_map,links);
 		browsers.push_back(MBptr);
+//		std::string& matName =  m_materialNames[i];
+		m_groupMaterialID[i]= m_materialNames[m_groupMaterialNames[i]];
 	}
 	
 	for (Dart d=m_map.begin(); d!=m_map.end(); m_map.next(d))
@@ -706,7 +733,8 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 				CGoGNerr << "problem reading OBJ, waiting for usemtl get "<< buf << CGoGNendl;
 			}
 			fp >> buf;
-			m_materialNames.push_back(buf);
+			m_materialNames.insert(std::pair<std::string,int>(buf,-1));
+			m_groupMaterialNames.push_back(buf);
 			currentGroup++;
 		}
 

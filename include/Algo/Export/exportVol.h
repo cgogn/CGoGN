@@ -22,70 +22,92 @@
 *                                                                              *
 *******************************************************************************/
 
+#ifndef __EXPORT_VOL_H__
+#define __EXPORT_VOL_H__
+
+#include "Topology/generic/attributeHandler.h"
+#include <stdint.h>
+
 namespace CGoGN
 {
 
 namespace Algo
 {
 
-namespace Render
+namespace Volume
 {
 
-namespace SVG
+namespace Export
 {
 
+/**
+* export the map into a .nas (nastran file)
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of ply file
+* @param binary write in binary mode
+* @return true
+*/
 template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int /*thread*/)
-{
-	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("vertices", svg.m_model, svg.m_proj);
-	TraversorV<typename PFP::MAP> trac(map);
-	svg1->beginPoints();
-	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg1->addPoint(position[d]);
-	svg1->endPoints();
-	svg.addGroup(svg1);
-}
+bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
+
+/**
+* export the map into a vtu file (vtk unstructured grid)
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of ply file
+* @param binary write in binary mode
+* @return true
+*/
 template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, unsigned int thread)
-{
-	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("vertices", svg.m_model, svg.m_proj);
-	TraversorV<typename PFP::MAP> trac(map);
-	svg1->beginPoints();
-	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg1->addPoint(position[d], color[d]);
-	svg1->endPoints();
-	svg.addGroup(svg1);
-}
+bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
+
+/**
+* export the map into a .msh (gmesh file)
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of ply file
+* @param binary write in binary mode
+* @return true
+*/
 template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, unsigned int /*thread*/)
-{
-	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("edges", svg.m_model, svg.m_proj);
-	TraversorE<typename PFP::MAP> trac(map);
-	svg1->beginLines();
-	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg1->addLine(position[d], position[map.phi1(d)]);
-	svg1->endLines();
-	svg.addGroup(svg1);
-}
+bool exportMSH(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
+
+/**
+* export the map into a .tet file
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of ply file
+* @param binary write in binary mode
+* @return true
+*/
 template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, unsigned int thread)
-{
-	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("edges", svg.m_model, svg.m_proj);
-	TraversorE<typename PFP::MAP> trac(map);
-	svg1->beginLines();
-	for (Dart d = trac.begin(); d != trac.end(); d = trac.next())
-		svg1->addLine(position[d], position[map.phi1(d)], color[d]);
-	svg1->endLines();
-	svg.addGroup(svg1);
+bool exportTet(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
+
+
+/**
+* export the map into a .node/.ele file pair
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of ply file
+* @param binary write in binary mode
+* @return true
+*/
+template <typename PFP>
+bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
+
+
+} // namespace Export
+
 }
-
-} // namespace SVG
-
-} // namespace Render
 
 } // namespace Algo
 
 } // namespace CGoGN
+
+#include "Algo/Export/exportVol.hpp"
+
+#endif

@@ -38,21 +38,21 @@ MAP myMap;
 VertexAttribute<VEC3> position ;
 Dart dglobal;
 
-void MyQT::balls_onoff(bool x)
+void MyQT::balls_onoff(bool /*x*/)
 {
 	render_balls = !render_balls;
 	updateGL();
 	CGoGNerr << " balls_onoff  "<< CGoGNendl;
 }
 
-void MyQT::vectors_onoff(bool x)
+void MyQT::vectors_onoff(bool /*x*/)
 {
 	render_vectors = !render_vectors;
 	updateGL();
 	CGoGNerr << " vectors_onoff  "<< CGoGNflush;
 }
 
-void MyQT::text_onoff(bool x)
+void MyQT::text_onoff(bool /*x*/)
 {
 	render_text = !render_text;
 	updateGL();
@@ -60,7 +60,7 @@ void MyQT::text_onoff(bool x)
 }
 
 
-void MyQT::topo_onoff(bool x)
+void MyQT::topo_onoff(bool /*x*/)
 {
 	render_topo = !render_topo;
 	updateGL();
@@ -211,7 +211,7 @@ void MyQT::cb_redraw()
 	}
 }
 
-void MyQT::cb_mousePress(int button, int x, int y)
+void MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
 	if (Shift())
 	{

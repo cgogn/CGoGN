@@ -316,7 +316,7 @@ void FrameManipulator::highlight(unsigned int axis)
 		m_highlighted = axis;
 }
 
-unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV, float epsilon)
+unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV, float /*epsilon*/)
 {
 	Geom::Vec3f P,V;
 

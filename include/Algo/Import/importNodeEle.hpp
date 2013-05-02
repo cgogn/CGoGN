@@ -23,6 +23,8 @@
 *******************************************************************************/
 
 #include "Algo/Modelisation/polyhedron.h"
+#include "Geometry/orientation.h"
+
 #include <vector>
 
 namespace CGoGN
@@ -105,8 +107,10 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 
 	//Reading vertices
 	//Remaining lines: [point #] [x] [y] [z] [optional attributes] [optional boundary marker]
-	std::vector<unsigned int> verticesID;
-	verticesID.reserve(m_nbVertices);
+//	std::vector<unsigned int> verticesID;
+//	verticesID.reserve(m_nbVertices);
+
+	std::map<unsigned int,unsigned int> verticesMapID;
 
 	for(unsigned int i = 0 ; i < m_nbVertices ; ++i)
 	{
@@ -130,14 +134,13 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 		unsigned int id = container.insertLine();
 		position[id] = pos;
 
-		verticesID.push_back(id);
+//		verticesID.push_back(id);
+		verticesMapID.insert(std::pair<unsigned int, unsigned int>(idv,id));
 	}
 
-	std::vector<std::vector<Dart> > vecDartPtrEmb;
-	vecDartPtrEmb.reserve(m_nbVertices);
 
 	DartMarkerNoUnmark m(map) ;
-
+	bool invertVol=false;
 	//Read and embed tetrahedra TODO
 	for(unsigned i = 0; i < m_nbVolumes ; ++i)
 	{
@@ -152,30 +155,52 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
 
 		Geom::Vec4ui pt;
-//		oss >> pt[0];
-//		--(pt[0]);
-//		oss >> pt[1];
-//		--(pt[1]);
-//		oss >> pt[2];
-//		--(pt[2]);
-//		oss >> pt[3];
-//		--(pt[3]);
-		oss >> pt[1];
-		--(pt[1]);
-		oss >> pt[2];
-		--(pt[2]);
-		oss >> pt[3];
-		--(pt[3]);
-		oss >> pt[0];
-		--(pt[0]);
 
-		//regions ?
-		//oss >> nbe;
+		// test orientation of first tetra
+		if (i==0)
+		{
+			oss >> pt[0];
+			oss >> pt[1];
+			oss >> pt[2];
+			oss >> pt[3];
+
+			typename PFP::VEC3 P = position[verticesMapID[pt[0]]];
+			typename PFP::VEC3 A = position[verticesMapID[pt[1]]];
+			typename PFP::VEC3 B = position[verticesMapID[pt[2]]];
+			typename PFP::VEC3 C = position[verticesMapID[pt[3]]];
+
+			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+			{
+				invertVol=true;
+				unsigned int ui=pt[0];
+				pt[0] = pt[3];
+				pt[3] = pt[2];
+				pt[2] = pt[1];
+				pt[1] = ui;
+			}
+		}
+		else
+		{
+			if (invertVol)
+			{
+				oss >> pt[1];
+				oss >> pt[2];
+				oss >> pt[3];
+				oss >> pt[0];
+			}
+			else
+			{
+				oss >> pt[0];
+				oss >> pt[1];
+				oss >> pt[2];
+				oss >> pt[3];
+			}
+		}
 
 		// Embed three vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
+			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesMapID[pt[2-j]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
@@ -183,7 +208,7 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 			do
 			{
 				m.mark(dd) ;
-				vecDartsPerVertex[pt[2-j]].push_back(dd);
+				vecDartsPerVertex[verticesMapID[pt[2-j]]].push_back(dd);
 				dd = map.phi1(map.phi2(dd));
 			} while(dd != d);
 
@@ -194,7 +219,7 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 		//Embed the last vertex
 		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
+		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesMapID[pt[3]]);
 		map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 		//store darts per vertices to optimize reconstruction
@@ -202,7 +227,7 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 		do
 		{
 			m.mark(dd) ;
-			vecDartsPerVertex[pt[3]].push_back(dd);
+			vecDartsPerVertex[verticesMapID[pt[3]]].push_back(dd);
 			dd = map.phi1(map.phi2(dd));
 		} while(dd != d);
 

@@ -228,7 +228,7 @@ void Out::toBuffer(std::stringstream* ss)
 	m_oss = ss;
 }
 
-Out&  Out::operator<< (Out& os)
+Out&  Out::operator<< (Out& /*os*/)
 {
 	return *this;
 }

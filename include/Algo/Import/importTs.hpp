@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 #include "Algo/Modelisation/polyhedron.h"
-
+#include "Geometry/orientation.h"
 #include <vector>
 
 namespace CGoGN
@@ -128,6 +128,18 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		oss >> pt[1];
 		oss >> pt[2];
 		oss >> pt[3];
+		typename PFP::VEC3 P = position[verticesID[pt[0]]];
+		typename PFP::VEC3 A = position[verticesID[pt[1]]];
+		typename PFP::VEC3 B = position[verticesID[pt[2]]];
+		typename PFP::VEC3 C = position[verticesID[pt[3]]];
+
+		if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+		{
+			unsigned int ui=pt[1];
+			pt[1] = pt[2];
+			pt[2] = ui;
+		}
+
 
 		//if regions are defined use this number
 		oss >> nbe; //ignored here

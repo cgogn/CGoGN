@@ -53,7 +53,7 @@ namespace Surface
 namespace Import
 {
 
-	enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
+	enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM, STL, STLB };
 
 //	namespace ImportSurfacique
 //	{
@@ -127,6 +127,10 @@ public:
 
 	bool importAHEM(const std::string& filename, std::vector<std::string>& attrNames);
 
+	bool importSTLAscii(const std::string& filename, std::vector<std::string>& attrNames);
+
+	bool importSTLBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 	/**
 	 * @param container container of vertex orbite
 	 * @param idPositions id of position attribute in the container
@@ -147,7 +151,7 @@ namespace Volume
 namespace Import
 {
 
-enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE};
+enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE, MSH, VTU, NAS};
 
 template <typename PFP>
 class MeshTablesVolume
