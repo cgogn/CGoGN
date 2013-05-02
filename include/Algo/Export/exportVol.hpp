@@ -27,6 +27,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
+#include "Algo/Import/importFileTypes.h"
 
 namespace CGoGN
 {
@@ -535,6 +536,8 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 	typedef typename PFP::VEC3 VEC3;
 
 	std::string base(filename);
+	size_t pos = base.rfind(".");
+	base.erase(pos);
 	std::string fnNode = base + ".node";
 	std::string fnEle = base + ".ele";
 
@@ -587,27 +590,6 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 		{
 			degree++;
 		}
-
-//		if (degree == 8)
-//		{
-//			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CW)
-//			Dart e = d;
-//			Dart f = map.template phi<21121>(d);
-//			hexa.push_back(indices[f]);
-//			e = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			e = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			e = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//		}
 
 		if (degree == 4)
 		{
@@ -718,23 +700,6 @@ bool exportVolBinGz(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 			e = map.phi1(e);
 			hexa.push_back(indices[e]);
 
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-
-//			Dart f = map.template phi<21121>(d);
-//			hexa.push_back(indices[f]);
-//			f = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			f = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			f = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-
 		}
 
 		if (degree == 4)
@@ -792,6 +757,37 @@ bool exportVolBinGz(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 }
 
 
+template <typename PFP>
+bool exportMesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const std::string& filename)
+{
+	Import::ImportType kind = Import::getFileType(filename);
+
+// manque TS, OFF ?
+	switch (kind)
+	{
+	case Import::TET:
+		return exportTet<PFP>(map, position, filename.c_str());
+		break;
+	case Import::NODE:
+		return exportNodeEle<PFP>(map, position, filename.c_str());
+		break;
+	case Import::MSH:
+		return exportMSH<PFP>(map, position, filename.c_str());
+		break;
+	case Import::VTU:
+		return exportVTU<PFP>(map, position, filename.c_str());
+		break;
+	case Import::NAS:
+		return exportNAS<PFP>(map, position, filename.c_str());
+		break;
+	case Import::VBGZ:
+		return exportVolBinGz<PFP>(map, position, filename.c_str());
+		break;
+	default:
+		CGoGNerr << "unknown file format for " << filename << CGoGNendl;
+		break;
+	}
+}
 
 
 

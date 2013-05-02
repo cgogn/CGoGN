@@ -516,32 +516,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool /*mergeCloseVertices*/)
 {
-	ImportType kind = Volume::Import::UNKNOWNVOLUME;
 
-	if ((filename.rfind(".tet") != std::string::npos) || (filename.rfind(".TET") != std::string::npos))
-		kind = TET;
-
-	if ((filename.rfind(".off") != std::string::npos) || (filename.rfind(".OFF") != std::string::npos))
-		kind = OFF;
-
-	if ((filename.rfind(".node") != std::string::npos) || (filename.rfind(".NODE") != std::string::npos))
-		kind = NODE;
-
-	if ((filename.rfind(".ts") != std::string::npos) || (filename.rfind(".TS") != std::string::npos))
-		kind = TS;
-
-	if ((filename.rfind(".msh") != std::string::npos) || (filename.rfind(".MSH") != std::string::npos))
-		kind = MSH;
-
-	if ((filename.rfind(".vtu") != std::string::npos) || (filename.rfind(".VTU") != std::string::npos))
-		kind = VTU;
-
-	if ((filename.rfind(".nas") != std::string::npos) || (filename.rfind(".NAS") != std::string::npos))
-		kind = NAS;
-
-	if ((filename.rfind(".volbgz") != std::string::npos) || (filename.rfind(".VOLBGZ") != std::string::npos))
-		kind = VBGZ;
-
+	ImportType kind = getFileType(filename);
 
 	switch (kind)
 	{
