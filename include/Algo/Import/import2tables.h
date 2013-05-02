@@ -151,7 +151,7 @@ namespace Volume
 namespace Import
 {
 
-enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE, MSH, VTU, NAS};
+enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE, MSH, VTU, NAS, VBGZ};
 
 template <typename PFP>
 class MeshTablesVolume

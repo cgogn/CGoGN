@@ -539,6 +539,9 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 	if ((filename.rfind(".nas") != std::string::npos) || (filename.rfind(".NAS") != std::string::npos))
 		kind = NAS;
 
+	if ((filename.rfind(".volbgz") != std::string::npos) || (filename.rfind(".VOLBGZ") != std::string::npos))
+		kind = VBGZ;
+
 
 	switch (kind)
 	{
@@ -555,6 +558,11 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 	case NAS:
 		return importNAS<PFP>(map, filename, attrNames, 1.0f);
 		break;
+
+	case VBGZ:
+		return importVBGZ<PFP>(map, filename, attrNames, 1.0f);
+		break;
+
 
 		case OFF:
 		{

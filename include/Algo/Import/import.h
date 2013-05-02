@@ -127,6 +127,10 @@ bool importVTU(typename PFP::MAP& the_map, const std::string& filename, std::vec
 template <typename PFP>
 bool importNAS(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
+template <typename PFP>
+bool importVBGZ(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+
+
 
 } // Import
 
@@ -147,6 +151,8 @@ bool importNAS(typename PFP::MAP& the_map, const std::string& filename, std::vec
 #include "Algo/Import/importMSH.hpp"
 #include "Algo/Import/importVTU.hpp"
 #include "Algo/Import/importNAS.hpp"
+#include "Algo/Import/importVBGZ.hpp"
+
 
 #include "Algo/Import/importChoupi.hpp"
 
