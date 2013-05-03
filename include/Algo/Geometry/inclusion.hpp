@@ -133,14 +133,13 @@ bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const VertexAttribute
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
 
-	bool inside = true;
 	std::list<Dart> visitedFaces;			// Faces that are traversed
 	visitedFaces.push_back(d);				// Start with the face of d
 	std::list<Dart>::iterator face;
 	VEC3 N;
 
 	DartMarkerStore mark(map);					// Lock a marker
-	for (face = visitedFaces.begin(); inside && face != visitedFaces.end(); ++face)
+	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
 		if (!mark.isMarked(*face))
 		{
@@ -149,10 +148,10 @@ bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const VertexAttribute
 			if(CCW)
 			{
 				if(o3d == Geom::OVER)
-					inside = false;
+					return false;
 			}
 			else if(o3d == Geom::UNDER)
-				inside = false;
+				return false;
 
 			Dart dNext = *face ;
 			do
@@ -166,8 +165,7 @@ bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const VertexAttribute
 		}
 	}
 
-	//if the point is in the volume there is an odd number of intersection with all faces with any direction
-	return inside;
+	return true;
 }
 
 template <typename PFP>
@@ -175,8 +173,6 @@ bool isPointInConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<t
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
-
-	bool inside = true;
 
 	Geom::Plane3D<REAL> pl = Geometry::facePlane<PFP>(map, d, position);
 	Geom::Orientation3D o3d = pl.orient(point);
@@ -193,12 +189,12 @@ bool isPointInConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<t
 			if(CCW)
 			{
 				if(o3d == Geom::UNDER)
-					inside = false;
+					return false;
 			}
 			else if(o3d == Geom::OVER)
-				inside = false;
+				return false;
 		}
-		return inside;
+		return true;
 	}
 
 	return false;
@@ -212,7 +208,6 @@ bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const VertexAttribute
 
 // 	CGoGNout << "point " << point << "d " << d << "faceDeg " << map.faceDegree(d) << CGoGNendl;
 
-	bool convex=true;
 	Geom::Orientation2D o2d;
 
 	Traversor2FV<typename PFP::MAP> tfv(map, d) ;
@@ -222,13 +217,13 @@ bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const VertexAttribute
 		if(CCW)
 		{
 			if(o2d == Geom::RIGHT)
-				convex= false;
+				return false;
 		}
 		else if(o2d == Geom::LEFT)
 			return false;
 	}
 
-	return convex;
+	return true;
 }
 
 template <typename PFP>

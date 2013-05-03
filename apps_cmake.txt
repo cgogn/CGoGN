@@ -33,6 +33,7 @@ find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(SuiteSparse REQUIRED)
+find_package(QGLViewer REQUIRED)
 
 IF (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
@@ -63,6 +64,7 @@ SET (COMMON_LIBS
 	${Boost_REGEX_LIBRARY}
 	${Boost_THREAD_LIBRARY}
 	${SUITESPARSE_LIBRARIES}
+	${QGLVIEWER_LIBRARIES}
 )
 
 #optionnal libs
