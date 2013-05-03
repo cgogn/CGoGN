@@ -225,7 +225,7 @@ public:
 	 * @param x mouse position
 	 * @param y mouse position
 	 * @param rayA first computed point of ray
-	 * @param rayA second computed point of ray
+	 * @param rayB second computed point of ray
 	 * @param radius radius on pixel for clicking precision
 	 * @return the distance in modelview world corresponding to radius pixel in screen
 	 */

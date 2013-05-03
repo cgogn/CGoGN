@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2013, IGG Team, ICube, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -35,7 +35,7 @@ namespace Decimation
 {
 
 template <typename PFP>
-void decimate(
+int decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
 	std::vector<VertexAttribute<typename PFP::VEC3>* >& attribs, unsigned int nbWantedVertices,
 	EdgeAttribute<typename PFP::REAL> *edgeErrors,
@@ -43,11 +43,11 @@ void decimate(
 )
 {
 	assert(attribs.size() >= 1 || !"Decimate: not enough attribs provided") ;
-	assert(attribs[0]->name() == "position" || !"Decimate: first attribute is not position") ;
+	assert(attribs[0]->name() == "position" || !"Decimate: first attribute should always be the position") ;
 	VertexAttribute<typename PFP::VEC3> position = *(attribs[0]) ;
 
 	std::vector<ApproximatorGen<PFP>*> approximators ;
-	EdgeSelector<PFP>* selector = NULL ;
+	Selector<PFP>* selector = NULL ;
 
 	std::vector<VertexAttribute<typename PFP::VEC3>* > *v_approx = NULL ;
 
@@ -95,51 +95,16 @@ void decimate(
 			approximators.push_back(new Approximator_ColorQEMext<PFP>(map, attribs)) ;
 		}
 		break;
+		case A_GeomColorOpt :
+		{
+			// pos + col
+			assert(attribs.size() >= 2 || !"Decimate: A_GeomColorOpt --> not enough attribs provided") ;
+			approximators.push_back(new Approximator_GeomColOpt<PFP>(map, attribs)) ;
+		}
+		break ;
 		case A_hQEM :
 			// pos
 			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs)) ;
-		break ;
-		case A_hLightfieldHalf:
-		{
-			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3>* >[3] ;
-
-			// pos
-			v_approx[0].push_back(attribs[0]) ;
-			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, v_approx[0])) ;
-
-			// frame
-			assert(attribs.size() >= 4 || !"Decimate: A_hLightfieldHalf --> not enough attribs provided") ;
-			for (unsigned int i = 0 ; i < 3 ; ++i)
-				v_approx[1].push_back(attribs[i+1]) ;
-			approximators.push_back(new Approximator_FrameInterpolationHalfEdge<PFP>(map, v_approx[1])) ;
-
-			// hemifunction
-			assert(attribs.size() >= 5 || !"Decimate: A_hLightfieldHalf --> not enough attribs provided") ;
-			for (unsigned int i = 0 ; i < attribs.size() - 4 ; ++i)
-				v_approx[2].push_back(attribs[i+4]) ;
-			approximators.push_back(new Approximator_HemiFuncCoefsHalfEdge<PFP>(map, v_approx[2])) ;
-		}
-		break ;
-		case A_Lightfield :
-		{
-			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3>* >[3] ;
-
-			// pos
-			v_approx[0].push_back(attribs[0]) ;
-			approximators.push_back(new Approximator_QEM<PFP>(map, v_approx[0])) ;
-
-			// frame
-			assert(attribs.size() >= 4 || !"Decimate: A_Lightfield --> not enough attribs provided") ;
-			for (unsigned int i = 0 ; i < 3 ; ++i)
-				v_approx[1].push_back(attribs[i+1]) ;
-			approximators.push_back(new Approximator_FrameInterpolation<PFP>(map, v_approx[1])) ;
-
-			// hemifunction
-			assert(attribs.size() >= 5 || !"Decimate: A_Lightfield --> not enough attribs provided") ;
-			for (unsigned int i = 0 ; i < attribs.size() - 4 ; ++i)
-				v_approx[2].push_back(attribs[i+4]) ;
-			approximators.push_back(new Approximator_HemiFuncCoefs<PFP>(map, v_approx[2])) ;
-		}
 		break ;
 	}
 
@@ -184,57 +149,53 @@ void decimate(
 		case S_hQEMml :
 			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
 			break ;
-		case S_Lightfield :
-			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators) ;
+		case S_hColorGradient:
+			selector = new HalfEdgeSelector_ColorGradient<PFP>(map, position, approximators) ;
 			break ;
-		case S_hLightfield :
-			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
-			break ;
-		case S_hLightfieldExp :
-			selector = new HalfEdgeSelector_LightfieldExp<PFP>(map, position, approximators) ;
-			break ;
-		case S_hLightfieldKCL :
-			selector = new HalfEdgeSelector_LightfieldKCL<PFP>(map, position, approximators) ;
-			break ;
-		case S_hColorExperimental:
-			selector = new HalfEdgeSelector_ColorExperimental<PFP>(map, position, approximators, selected) ;
-			break ;
-		case S_hLFexperimental:
-			selector = new HalfEdgeSelector_LFexperimental<PFP>(map, position, approximators, selected) ;
-			break ;
-		case S_hColorPerFace:
-			selector = new HalfEdgeSelector_ColorPerFace<PFP>(map, position, approximators, selected) ;
-			break ;
-		case S_hLFperFace:
-			selector = new HalfEdgeSelector_LFperFace<PFP>(map, position, approximators, selected) ;
+		case S_GeomColOptGrad:
+			selector = new EdgeSelector_GeomColOptGradient<PFP>(map, position, approximators) ;
 			break ;
 	}
 
+	int status = decimate(map, selector, approximators, nbWantedVertices, edgeErrors, callback_wrapper, callback_object) ;
+
+	delete selector ;
+
+	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
+		delete (*it) ;
+
+	delete[] v_approx ;
+
+	return status ;
+}
+
+template <typename PFP>
+int decimate(
+		typename PFP::MAP& map,
+		Selector<PFP>* selector, std::vector<ApproximatorGen<PFP>*>& approximators,
+		unsigned int nbWantedVertices,
+		bool recomputePriorityList,
+		EdgeAttribute<typename PFP::REAL> *edgeErrors,
+		void (*callback_wrapper)(void*, const void*), void *callback_object
+)
+{
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
 		(*it)->init() ;
 
-	if(!selector->init())
+	Dart d ;
+	if (recomputePriorityList || !selector->nextEdge(d))
 	{
-		delete selector ;
-
-		for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
-			delete (*it) ;
-
-		delete[] v_approx ;
-
-		return ;
+		if(!selector->init())
+			return -1 ; // init failed
 	}
 
 	unsigned int nbVertices = map.template getNbOrbits<VERTEX>() ;
 	bool finished = false ;
-	Dart d ;
 
 	while(!finished)
 	{
 		if(!selector->nextEdge(d))
-		{
-			break ;
-		}
+			break ; // finished before achieving amount of required vertices
 
 		--nbVertices ;
 
@@ -257,9 +218,7 @@ void decimate(
 		selector->updateAfterCollapse(d2, dd2) ;// update selector
 
 		if(nbVertices <= nbWantedVertices)
-		{
 			finished = true ;
-		}
 
 		// Progress bar support
 		if (callback_wrapper != NULL && callback_object != NULL)
@@ -269,18 +228,13 @@ void decimate(
 	if (edgeErrors != NULL)
 		selector->getEdgeErrors(edgeErrors) ;
 
-	delete selector ;
-
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
-		delete (*it) ;
-
-	delete[] v_approx ;
+	return finished == true ? 0 : 1 ; // finished correctly
 }
 
-} //namespace Decimation
+} // namespace Decimation
 
-}
+} // namespace Surface
 
-} //namespace Algo
+} // namespace Algo
 
-} //namespace CGoGN
+} // namespace CGoGN
