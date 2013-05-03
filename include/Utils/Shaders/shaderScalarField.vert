@@ -5,6 +5,7 @@ ATTRIBUTE float VertexScalar;
 uniform mat4 ModelViewProjectionMatrix;
 uniform float minValue;
 uniform float maxValue;
+uniform int colorMap;
 uniform int expansion;
 VARYING_VERT vec3 color;
 VARYING_VERT float scalar;
@@ -58,6 +59,54 @@ vec3 color_map_blue_white_red(float x)
 	return c;
 }
 
+vec3 color_map_cyan_white_red(float x)
+{
+	if (x < 0.0)
+		return vec3(0.0, 0.0, 1.0) ;
+
+	if (x < 0.5)
+		return vec3(2.0 * x, 1.0 , 1.0);
+
+	if (x < 1.0)
+		return vec3(1.0, 2.0 - 2.0 * x, 2.0 - 2.0 * x);
+
+	return vec3(1.0, 0.0, 0.0) ;
+}
+
+vec3 color_map_BCGYR(float x)
+{
+	if (x < 0.0)
+		return vec3(0.0, 0.0, 1.0) ;
+
+	if (x < 0.25)
+		return vec3(0.0, 4.0 * x, 1.0);
+
+	if (x < 0.5)
+		return vec3(0.0, 1.0 , 2.0 - 4.0 * x);
+
+	if (x < 0.75)
+		return vec3(4.0 * x - 2.0, 1.0, 0.0);
+
+	if (x < 1.0)
+		return vec3(1.0, 4.0 - 4.0 * x, 0.0);
+
+	return vec3(1.0, 0.0, 0.0) ;
+}
+
+vec3 color_map_blue_green_red(float x)
+{
+	if (x < 0.0)
+		return vec3(0.0, 0.0, 1.0) ;
+
+	if (x < 0.5)
+		return vec3(0.0, 2.0 * x, 1.0 - 2.0 * x);
+
+	if (x < 1.0)
+		return vec3(2.0 * x - 1.0, 2.0 - 2.0 * x, 0.0);
+
+	return vec3(1.0, 0.0, 0.0) ;
+}
+
 void main ()
 {
 	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);
@@ -70,6 +119,14 @@ void main ()
 			),
 			expansion
 		);
-	color = color_map_blue_white_red(value);
+
+	switch(colorMap)
+	{
+		case 0 : color = color_map_blue_white_red(value); break;
+		case 1 : color = color_map_cyan_white_red(value); break;
+		case 2 : color = color_map_BCGYR(value); break;
+		case 3 : color = color_map_blue_green_red(value); break;
+	}
+
 	scalar = value;
 }

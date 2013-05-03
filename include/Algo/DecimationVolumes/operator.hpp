@@ -31,7 +31,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 
 /************************************************************************************
@@ -161,9 +161,9 @@ void OperatorList<PFP>::refine(VertexAttribute<typename PFP::VEC3>& position)
 }
 
 
-} //end namespace DecimationVolumes
+} //end namespace Decimation
 
-}
+} //namespace Volume
 
 } //end namespace Algo
 

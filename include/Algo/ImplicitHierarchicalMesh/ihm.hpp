@@ -66,6 +66,17 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap::getAttribute(const std::
 	return AttributeHandler_IHM<T, ORBIT>(this, h.getDataVector()) ;
 }
 
+inline void ImplicitHierarchicalMap::update_topo_shortcuts()
+{
+	Map2::update_topo_shortcuts();
+	m_dartLevel = Map2::getAttribute<unsigned int, DART>("dartLevel") ;
+	m_edgeId = Map2::getAttribute<unsigned int, DART>("edgeId") ;
+
+	//AttributeContainer& cont = m_attribs[DART] ;
+	//m_nextLevelCell = cont.getDataVector<unsigned int>(cont.getAttributeIndex("nextLevelCell")) ;
+}
+
+
 /***************************************************
  *                 MAP TRAVERSAL                   *
  ***************************************************/
@@ -278,7 +289,6 @@ inline unsigned int ImplicitHierarchicalMap::getCurrentLevel()
 
 inline void ImplicitHierarchicalMap::setCurrentLevel(unsigned int l)
 {
-	assert(l >= 0 || !"Trying to set current level to a negative value") ;
 	m_curLevel = l ;
 }
 
@@ -314,6 +324,11 @@ inline unsigned int ImplicitHierarchicalMap::getEdgeId(Dart d)
 inline void ImplicitHierarchicalMap::setEdgeId(Dart d, unsigned int i)
 {
 	m_edgeId[d] = i ;
+}
+
+inline unsigned int ImplicitHierarchicalMap::getMaxEdgeId()
+{
+        return m_idCount;
 }
 
 /***************************************************

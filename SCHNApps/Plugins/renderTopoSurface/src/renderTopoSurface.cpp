@@ -86,6 +86,22 @@ void RenderTopoSurfacePlugin::redraw(View* view)
 	}
 }
 
+void RenderTopoSurfacePlugin::mousePress(View* view, QMouseEvent* event)
+{
+//  if (Shift())
+//  {
+//    ParameterSet* params = h_viewParams[view];
+
+//    m_renderTopo->updateData<PFP>(myMap, position, m_coeff_topo_explod[0], m_coeff_topo_explod[1], m_coeff_topo_explod[2], *m_selNoBoundary)	;
+
+//    Dart d = m_renderTopo->picking<PFP>(myMap, x,  y, *m_selNoBoundary);
+//    if (d != Dart::nil())
+//    {
+//      emit(dartSelected(d);
+//    }
+//  }
+}
+
 void RenderTopoSurfacePlugin::viewLinked(View* view, Plugin* plugin)
 {
 	if(plugin == this)

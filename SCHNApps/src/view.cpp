@@ -215,7 +215,7 @@ void View::mouseMoveEvent(QMouseEvent* event)
 		plugin->mouseMove(this, event);
 	QGLViewer::mouseMoveEvent(event);
 
-	QList<View*> views = m_window->getViewsList();
+	QList<View*> views = m_currentCamera->getLinkedViews();
 	foreach(View* view, views)
 	{
 		if(view != this)
@@ -229,7 +229,7 @@ void View::wheelEvent(QWheelEvent* event)
 		plugin->wheelEvent(this, event);
 	QGLViewer::wheelEvent(event);
 
-	QList<View*> views = m_window->getViewsList();
+	QList<View*> views = m_currentCamera->getLinkedViews();
 	foreach(View* view, views)
 	{
 		if(view != this)

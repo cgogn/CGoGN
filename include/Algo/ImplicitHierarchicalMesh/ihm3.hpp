@@ -80,7 +80,7 @@ inline void ImplicitHierarchicalMap3::update_topo_shortcuts()
 
 
 /***************************************************
- *          			 	    MAP TRAVERSAL         		  		         *
+ *     		 	    MAP TRAVERSAL         		   *
  ***************************************************/
 
 inline Dart ImplicitHierarchicalMap3::newDart()
@@ -146,6 +146,7 @@ inline Dart ImplicitHierarchicalMap3::phi2bis(Dart d)
 
 	it = Map3::phi2(it) ;
 
+	/* du cote des volumes non subdivise (subdiv adapt) */
 	if(m_faceId[it] == faceId)
 		return it;
 	else
@@ -453,7 +454,6 @@ inline unsigned int ImplicitHierarchicalMap3::getCurrentLevel()
 
 inline void ImplicitHierarchicalMap3::setCurrentLevel(unsigned int l)
 {
-	assert(l >= 0 || !"Trying to set current level to a negative value") ;
 	m_curLevel = l ;
 }
 

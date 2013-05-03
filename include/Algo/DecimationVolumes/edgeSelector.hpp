@@ -35,7 +35,7 @@ namespace Algo
 namespace Volume
 {
 
-namespace DecimationVolumes
+namespace Decimation
 {
 /************************************************************************************
  *                                  MAP ORDER                                       *
@@ -323,7 +323,7 @@ void EdgeSelector_SG98<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 //	einfo.valid = true ;
 }
 
-} //end namespace DecimationVolumique
-}
+} //end namespace Decimation
+} //namespace Volume
 } //end namespace Algo
 } //end namespace CGoGN
