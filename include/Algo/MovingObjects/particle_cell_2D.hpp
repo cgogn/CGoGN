@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+//#define DEBUG
 namespace CGoGN
 {
 
@@ -137,14 +138,14 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 					{
 						if(Geometry::isPointOnHalfEdge<PFP>(m,d,positionAttribut,goal)
 								&& Geometry::isPointOnHalfEdge<PFP>(m,this->m.phi2(d),positionAttribut,goal)
-								&& this->getOrientationEdge(goal, this->d) == Geom::ALIGNED)
+								)
+//								&& this->getOrientationEdge(goal, this->d) == Geom::ALIGNED) //TODO to check / alignment orientation test pb ?
 						{
 							edgeState(goal) ;
 							return;
 						}
 						this->d = this->m.phi2_1(this->d) ;
 					} while (this->getOrientationEdge(goal, this->m.phi2_1(this->d)) != Geom::RIGHT && dd_vert != this->d) ;
-
 
 					this->setState(VERTEX) ;
 					this->Algo::MovingObjects::ParticleBase < PFP > ::move(goal) ;
@@ -180,6 +181,17 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 {
 #ifdef DEBUG
 	CGoGNout << "edgeState" << d << CGoGNendl ;
+
+	VEC3 P(goal);
+	VEC3 Pa(positionAttribut[d]);
+	VEC3 Pb(positionAttribut[m.phi2(d)]);
+	float p = (P[0] - Pa[0]) * (Pb[1] - Pa[1]) - (Pb[0] - Pa[0]) * (P[1] - Pa[1]) ;
+	CGoGNout<<"p :"<<p<<CGoGNendl;
+
+
+	float p2 = (P[0] - Pb[0]) * (Pa[1] - Pb[1]) - (Pa[0] - Pb[0]) * (P[1] - Pb[1]) ;
+	CGoGNout<<"p2 :"<<p2<<CGoGNendl;
+
 #endif
 
 	assert(goal.isFinite()) ;
@@ -445,3 +457,4 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 }
 } //namespaces
 }
+//#undef DEBUG
