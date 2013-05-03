@@ -158,7 +158,7 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 		for(unsigned int i = 0; i < numbers[2] ; ++i)
 		{
 			// one hexa
-			Geom::Vec4ui pt;
+			unsigned int pt[8];
 			pt[0] = bufHexa[8*i];
 			pt[1] = bufHexa[8*i+1];
 			pt[2] = bufHexa[8*i+2];
