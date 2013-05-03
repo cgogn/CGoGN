@@ -85,7 +85,8 @@ void SurfaceDeformationDockTab::positionAttributeChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
+		if(map)
+			m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
 	}
 }
 
@@ -95,7 +96,8 @@ void SurfaceDeformationDockTab::selectLockedVertices(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVerticesSelectionMode(view, map, LOCKED, true);
+		if(map)
+			m_plugin->changeVerticesSelectionMode(view, map, LOCKED, true);
 	}
 }
 
@@ -105,7 +107,8 @@ void SurfaceDeformationDockTab::selectHandleVertices(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVerticesSelectionMode(view, map, HANDLE, true);
+		if(map)
+			m_plugin->changeVerticesSelectionMode(view, map, HANDLE, true);
 	}
 }
 

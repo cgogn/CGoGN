@@ -99,7 +99,8 @@ void RenderExplodDockTab::positionAttributeChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
+		if(map)
+			m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
 	}
 }
 
@@ -109,7 +110,8 @@ void RenderExplodDockTab::colorAttributeChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeColorAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_colorAttribute->currentText()), true);
+		if(map)
+			m_plugin->changeColorAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_colorAttribute->currentText()), true);
 	}
 }
 
@@ -119,7 +121,8 @@ void RenderExplodDockTab::renderEdgesChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeRenderEdges(view, map, b, true);
+		if(map)
+			m_plugin->changeRenderEdges(view, map, b, true);
 	}
 }
 
@@ -129,7 +132,8 @@ void RenderExplodDockTab::renderFacesChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeRenderFaces(view, map, b, true);
+		if(map)
+			m_plugin->changeRenderFaces(view, map, b, true);
 	}
 }
 
@@ -139,7 +143,8 @@ void RenderExplodDockTab::facesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeFacesScaleFactor(view, map, i, true);
+		if(map)
+			m_plugin->changeFacesScaleFactor(view, map, i, true);
 	}
 }
 
@@ -149,7 +154,8 @@ void RenderExplodDockTab::volumesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVolumesScaleFactor(view, map, i, true);
+		if(map)
+			m_plugin->changeVolumesScaleFactor(view, map, i, true);
 	}
 }
 

@@ -94,7 +94,8 @@ void RenderScalarDockTab::positionVBOChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
+		if(map)
+			m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
 	}
 }
 
@@ -104,18 +105,21 @@ void RenderScalarDockTab::selectedScalarVBOChanged()
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		QList<QListWidgetItem*> selectedItems = list_scalarVBO->selectedItems();
-		if(!selectedItems.empty())
+		if(map)
 		{
-			foreach(QListWidgetItem* item, selectedItems)
+			QList<QListWidgetItem*> selectedItems = list_scalarVBO->selectedItems();
+			if(!selectedItems.empty())
 			{
-				if(item != list_scalarVBO->currentItem())
-					item->setSelected(false);
+				foreach(QListWidgetItem* item, selectedItems)
+				{
+					if(item != list_scalarVBO->currentItem())
+						item->setSelected(false);
+				}
+				m_plugin->changeScalarVBO(view, map, map->getVBO(list_scalarVBO->currentItem()->text()), true);
 			}
-			m_plugin->changeScalarVBO(view, map, map->getVBO(list_scalarVBO->currentItem()->text()), true);
+			else
+				m_plugin->changeScalarVBO(view, map, NULL, true);
 		}
-		else
-			m_plugin->changeScalarVBO(view, map, NULL, true);
 	}
 }
 
@@ -125,7 +129,8 @@ void RenderScalarDockTab::colorMapChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeColorMap(view, map, index, true);
+		if(map)
+			m_plugin->changeColorMap(view, map, index, true);
 	}
 }
 
@@ -135,7 +140,8 @@ void RenderScalarDockTab::expansionChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeExpansion(view, map, i, true);
+		if(map)
+			m_plugin->changeExpansion(view, map, i, true);
 	}
 }
 
