@@ -257,7 +257,7 @@ void RenderHistogram::drawQuantiles(QPainter& painter)
 }
 
 
-void RenderHistogram::paintEvent(QPaintEvent* ev)
+void RenderHistogram::paintEvent(QPaintEvent* /*ev*/)
 {
 	QPainter painter;
 	painter.begin(this);

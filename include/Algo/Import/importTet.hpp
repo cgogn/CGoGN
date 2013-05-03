@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Algo/Modelisation/polyhedron.h"
+#include "Geometry/orientation.h"
 #include <vector>
 
 namespace CGoGN
@@ -38,7 +39,7 @@ namespace Import
 {
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor, bool invertTetra)
+bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -102,6 +103,8 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	DartMarkerNoUnmark m(map) ;
 
+
+	unsigned int invertTetra = 0;
 	//Read and embed all tetrahedrons
 	for(unsigned int i = 0; i < m_nbVolumes ; ++i)
 	{
@@ -119,6 +122,31 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
 
 		Geom::Vec4ui pt;
+
+
+		if (i==0)
+		{
+			oss >> pt[0];
+			oss >> pt[1];
+			oss >> pt[2];
+			oss >> pt[3];
+
+			typename PFP::VEC3 P = position[verticesID[pt[0]]];
+			typename PFP::VEC3 A = position[verticesID[pt[1]]];
+			typename PFP::VEC3 B = position[verticesID[pt[2]]];
+			typename PFP::VEC3 C = position[verticesID[pt[3]]];
+
+			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+			{
+				invertTetra=1;
+				unsigned int ui=pt[1];
+				pt[1] = pt[2];
+				pt[2] = ui;
+			}
+		}
+
+
+
 		oss >> pt[0];
 		oss >> pt[1+invertTetra];
 		oss >> pt[2-invertTetra];

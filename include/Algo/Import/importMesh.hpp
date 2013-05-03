@@ -514,27 +514,32 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
 
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool /*mergeCloseVertices*/)
 {
-	ImportType kind = Volume::Import::UNKNOWNVOLUME;
 
-	if ((filename.rfind(".tet") != std::string::npos) || (filename.rfind(".TET") != std::string::npos))
-		kind = TET;
-
-	if ((filename.rfind(".off") != std::string::npos) || (filename.rfind(".OFF") != std::string::npos))
-		kind = OFF;
-
-	if ((filename.rfind(".node") != std::string::npos) || (filename.rfind(".NODE") != std::string::npos))
-		kind = NODE;
-
-	if ((filename.rfind(".ts") != std::string::npos) || (filename.rfind(".TS") != std::string::npos))
-		kind = TS;
+	ImportType kind = getFileType(filename);
 
 	switch (kind)
 	{
 		case TET:
 			return importTet<PFP>(map, filename, attrNames, 1.0f);
 			break;
+		case MSH:
+			return importMSH<PFP>(map, filename, attrNames, 1.0f);
+			break;
+		case VTU:
+		return importVTU<PFP>(map, filename, attrNames, 1.0f);
+		break;
+
+	case NAS:
+		return importNAS<PFP>(map, filename, attrNames, 1.0f);
+		break;
+
+	case VBGZ:
+		return importVBGZ<PFP>(map, filename, attrNames, 1.0f);
+		break;
+
+
 		case OFF:
 		{
 			size_t pos = filename.rfind(".");

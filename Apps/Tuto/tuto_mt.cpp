@@ -146,7 +146,7 @@ public:
 		FunctorAttribThreaded(),m_positions(pos),m_positions2(pos2)
 	{}
 
-	void run(unsigned int i, unsigned int threadID)
+	void run(unsigned int i, unsigned int /*threadID*/)
 	{
 		m_positions2[i] = 1.1f * m_positions[i];
 	}
@@ -181,7 +181,7 @@ public:
 		m_positions(pos),m_positions2(pos2)
 	{}
 
-	void run(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int /*threadID*/)
 	{
 		typename XXX::VEC3 Q(0,0,0);
 		int nb=0;
@@ -232,7 +232,7 @@ public:
 
 	unsigned int getNb() { return m_nb;}
 
-	void run(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int /*threadID*/)
 	{
 		Dart dd = this->m_map.phi2(d);
 		typename XXX::VEC3 V = m_positions[dd] - m_positions[d];

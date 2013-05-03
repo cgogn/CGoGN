@@ -35,6 +35,8 @@
 
 #include "Utils/gzstream.h"
 
+#include "Algo/Import/importFileTypes.h"
+
 #ifdef WITH_ASSIMP
 #include "Assimp/assimp.h"
 #include "Assimp/aiPostProcess.h"
@@ -52,15 +54,6 @@ namespace Surface
 
 namespace Import
 {
-
-	enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
-
-//	namespace ImportSurfacique
-//	{
-//
-//	}
-
-
 
 template <typename PFP>
 class MeshTablesSurface
@@ -127,6 +120,10 @@ public:
 
 	bool importAHEM(const std::string& filename, std::vector<std::string>& attrNames);
 
+	bool importSTLAscii(const std::string& filename, std::vector<std::string>& attrNames);
+
+	bool importSTLBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 	/**
 	 * @param container container of vertex orbite
 	 * @param idPositions id of position attribute in the container
@@ -146,8 +143,6 @@ namespace Volume
 {
 namespace Import
 {
-
-enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE};
 
 template <typename PFP>
 class MeshTablesVolume

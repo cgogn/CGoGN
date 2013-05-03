@@ -26,6 +26,9 @@
 #define __EXPORT_H__
 
 #include "Topology/generic/attributeHandler.h"
+#include "Algo/Import/importFileTypes.h"
+
+
 #include <stdint.h>
 
 namespace CGoGN

@@ -965,7 +965,7 @@ void Clipping::cb_keyPress(int code)
 	}
 }
 
-void Clipping::cb_mousePress(int button, int x, int y)
+void Clipping::cb_mousePress(int /*button*/, int x, int y)
 {
 	// Check if no animation is active
 	if (m_lastAnimatedClippingPreset != NULL)

@@ -78,7 +78,7 @@ void drawerAddVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Ve
 }
 
 template<typename PFP>
-void drawerVertices(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3>& positions)
+void drawerVertices(Utils::Drawer& dr, typename PFP::MAP& /*map*/, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	dr.begin(GL_POINTS);
 	for (std::vector<Dart>::iterator it = vd.begin(); it !=vd.end(); ++it)
@@ -113,7 +113,7 @@ void drawerVolumes(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>&
 }
 
 template<typename PFP>
-void drawerVertex(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions)
+void drawerVertex(Utils::Drawer& dr, typename PFP::MAP& /*map*/, Dart d, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	dr.begin(GL_POINTS);
 	dr.vertex(positions[d]);

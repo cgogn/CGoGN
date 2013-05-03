@@ -37,14 +37,24 @@ namespace Import
 {
 
 
-struct MaterialOBJ
+class MaterialOBJ
 {
+public:
+	MaterialOBJ():textureDiffuse(NULL){}
+	~MaterialOBJ()
+	{
+		if (textureDiffuse!=NULL)
+			delete textureDiffuse;
+	}
+
+	std::string name;
 	Geom::Vec3f ambiantColor;
 	Geom::Vec3f diffuseColor;
 	Geom::Vec3f specularColor;
 	float shininess;
-
-	// TODO add textures info
+	Geom::Vec3f transparentFilter;
+	float transparency;
+	Utils::Texture<2,Geom::Vec3uc>* textureDiffuse;
 };
 
 
@@ -60,12 +70,16 @@ protected:
 
 	/// vector of group name
 	std::vector<std::string> m_groupNames;
+	std::vector<std::string> m_groupMaterialNames;
+	std::vector<int> m_groupMaterialID;
+
 
 	/// vector of material names
-	std::vector<std::string> m_materialNames;
+	std::map<std::string,int> m_materialNames;
+
 
 	/// vector of material struct
-	std::vector<MaterialOBJ> m_materials;
+//	std::vector<MaterialOBJ> m_materials;
 
 	/// read face line with different indices v  v/t v//n v/t/n
 	short readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices);
@@ -136,6 +150,8 @@ public:
 	 */
 	bool import(const std::string& filename, std::vector<std::string>& attrNames);
 
+
+
 	// Faire un handler ?
 	/**
 	 * @brief getNormal
@@ -176,7 +192,7 @@ public:
 	 * @brief read materials from files
 	 * @param filename name of file
 	 */
-	void readMaterials(const std::string& filename);
+	void readMaterials(const std::string& filename, std::vector<MaterialOBJ>& materials);
 
 	/**
 	 * @brief create simple VBO for separated triangles
