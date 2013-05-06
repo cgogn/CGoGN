@@ -114,14 +114,14 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 	#ifdef DEBUG
 	CGoGNout << "vertexState" << d << CGoGNendl;
 	#endif
-	assert(gola.isfinite()) ;
+	assert(goal.isFinite()) ;
 
 	crossCell = CROSS_OTHER;
 
 	if(Geometry::isPointOnVertex<PFP>(m,d,m_positions,goal))
 	{
 		state = VERTEX;
-		m_position = goal;
+		this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 		return;
 	}
 	else
@@ -129,7 +129,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 		//orientation step
 		if(m_positions[d][0] == m_positions[m.phi1(d)][0] && m_positions[d][1] == m_positions[m.phi1(d)][1])
 			d = m.phi2_1(d);
-		if(getOrientationEdge(current,m.phi2_1(d)) != Geom::UNDER)
+		if(getOrientationEdge(this->getPosition(),m.phi2_1(d)) != Geom::UNDER)
 		{
 			Dart dd_vert = d;
 			do
@@ -137,19 +137,21 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 				d = m.phi2_1(d);
 				if(m_positions[d][0] == m_positions[m.phi1(d)][0] && m_positions[d][1] == m_positions[m.phi1(d)][1])
 					d = m.phi2_1(d);
-			} while(getOrientationEdge(current, m.phi2_1(d)) != Geom::UNDER && dd_vert != d);
+//			} while(getOrientationEdge(current, m.phi2_1(d)) != Geom::UNDER && dd_vert != d);
+			} while(getOrientationEdge(goal, m.phi2_1(d)) != Geom::UNDER && dd_vert != d);
 
 			if(dd_vert == d)
 			{
 				//orbit with 2 edges : point on one edge
 				if(m.phi2_1(m.phi2_1(d)) == d)
 				{
-					if(!Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current))
+					if(!Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,goal))
+//					if(!Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current))
 						d = m.phi2_1(d);
 				}
 				else
 				{
-					m_position = goal;
+					this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 					state = VERTEX;
 					return;
 				}
@@ -158,7 +160,8 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 		else
 		{
 			Dart dd_vert = m.phi2_1(d);
-			while(getOrientationEdge(current, d) == Geom::OVER && dd_vert != d)
+			while(getOrientationEdge(goal, d) == Geom::OVER && dd_vert != d)
+//			while(getOrientationEdge(current, d) == Geom::OVER && dd_vert != d)
 			{
 				d = m.phi12(d);
 				if(m_positions[d][0] == m_positions[m.phi1(d)][0] && m_positions[d][1] == m_positions[m.phi1(d)][1])
@@ -184,7 +187,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 	CGoGNout << "edgeState" <<  d << CGoGNendl;
 	#endif
 
-	assert(goal.isfinite()) ;
+	assert(goal.isFinite()) ;
 // 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if(crossCell == NO_CROSS)
@@ -210,7 +213,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 		case Geom::OVER:
 		{
 			//transform the displacement into the new entered face
-			VEC3 displ = goal - m_position;
+			VEC3 displ = goal - this->getPosition();
 
 			VEC3 n1 = Geometry::faceNormal<PFP>(m, d, m_positions);
 			VEC3 n2 = Geometry::faceNormal<PFP>(m, m.phi2(d), m_positions);
@@ -219,7 +222,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 			float angle = Geom::angle(n1, n2) ;
 
 			displ = Geom::rotate(axis, angle, displ) ;
-			goal = m_position + displ;
+			goal = this->getPosition() + displ;
 
 			d = m.phi1(m.phi2(d));
 			faceState(goal);
@@ -232,19 +235,19 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 
 	if(!Geometry::isPointOnHalfEdge<PFP>(m, d, m_positions, goal))
 	{
-		m_position = m_positions[d];
+		this->Algo::MovingObjects::ParticleBase<PFP>::move(m_positions[d]) ;
 		vertexState(goal);
 		return;
 	}
 	else if(!Geometry::isPointOnHalfEdge<PFP>(m, m.phi2(d), m_positions, goal))
 	{
 		d = m.phi2(d);
-		m_position = m_positions[d];
+		this->Algo::MovingObjects::ParticleBase<PFP>::move(m_positions[d]) ;
 		vertexState(goal);
 		return;
 	}
 
-	m_position = goal;
+	this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 }
 
 template <typename PFP>
@@ -254,32 +257,31 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 	CGoGNout << "faceState" <<  d << CGoGNendl;
 	#endif
 
-	assert(goal.isfinite()) ;
+	assert(goal.isFinite()) ;
 	assert(this->getPosition().isFinite()) ;
-// 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	//project goal within face plane
 	VEC3 n1 = Geometry::faceNormal<PFP>(m,d,m_positions);
-	VEC3 n2 = current - m_position;
+	VEC3 n2 = goal - this->getPosition();
 //	n1.normalize();
 	VEC3 n3 = n1 ^ n2;
 	n3.normalize();
 	VEC3 n4 = n3 ^ n1;
-	current = m_position + (n2 * n4) * n4;
+	goal = this->getPosition() + (n2 * n4) * n4;
 
 	//track new position within map
 	Dart dd = d;
-	float wsoe = getOrientationFace(goal, m_position, m.phi1(d));
+	float wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d));
 
 	// orientation step
 	if(wsoe != Geom::UNDER)
 	{
 		d = m.phi1(d);
-		wsoe = getOrientationFace(goal, m_position, m.phi1(d));
+		wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d));
 		while(wsoe != Geom::UNDER && dd != d)
 		{
 			d = m.phi1(d);
-			wsoe = getOrientationFace(goal, m_position, m.phi1(d));
+			wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d));
 		}
 
  		// source and position to reach are the same : verify if no edge is crossed due to numerical approximation
@@ -291,20 +293,22 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 				{
 				case Geom::UNDER: 	d = m.phi1(d);
 									break;
-				case Geom::ON:	m_position = current;
+//				case Geom::ON:		this->Algo::MovingObjects::ParticleBase<PFP>::move(current) ;
+				case Geom::ON:		this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 									edgeState(goal);
 									return;
 				case Geom::OVER:
 //									CGoGNout << "smthg went bad " << m_position << " " << goal << CGoGNendl;
 //									CGoGNout << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi1(d)] << CGoGNendl;
-									m_position = intersectLineEdge(current, m_position, d);
+//									this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(current, this->getPosition(), d));
+									this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d));
 //									CGoGNout << " " << m_position << CGoGNendl;
 
-									edgeState(current,Geom::OVER);
+									edgeState(goal,Geom::OVER);
 									return;
 				}
 			} while(d != dd);
-			m_position = goal;
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 			state = FACE;
 
 // 			m_position = Geometry::faceCentroid<PFP>(m,d,m_positions);
@@ -317,15 +321,16 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 			return;
 		}
 		// take the orientation with d1 : in case we are going through a vertex
-		wsoe = getOrientationFace(current, m_position, d);
+//		wsoe = getOrientationFace(current, this->getPosition(), d);
+		wsoe = getOrientationFace(goal, this->getPosition(), d);
 	}
 	else
 	{
-		wsoe = getOrientationFace(goal,m_position,d);
+		wsoe = getOrientationFace(goal,this->getPosition(),d);
 		while(wsoe == Geom::UNDER && m.phi_1(d) != dd)
 		{
 			d = m.phi_1(d);
-			wsoe = getOrientationFace(goal, m_position, d);
+			wsoe = getOrientationFace(goal, this->getPosition(), d);
 		}
 
 		// in case of numerical incoherence
@@ -341,19 +346,21 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 					break;
 				case Geom::ON :
 // 					CGoGNout << "pic" << CGoGNendl;
-					m_position = goal;
+					this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 					edgeState(goal);
 					return;
 				case Geom::OVER:
 //					CGoGNout << "smthg went bad(2) " << m_position << CGoGNendl;
-					m_position = intersectLineEdge(goal, m_position, d);
+					this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
 // 					CGoGNout << " " << m_position << CGoGNendl;
-					edgeState(current, Geom::OVER);
+//					edgeState(current, Geom::OVER);
+					edgeState(goal, Geom::OVER);
 					return;
 				}
 			} while(d != dd);
 
-			m_position = goal;
+
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 			state = FACE;
 			return;
 		}
@@ -363,8 +370,8 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 	switch (getOrientationEdge(goal, d))
 	{
 	case Geom::UNDER :
-		distance += (goal - m_position).norm();
-		m_position = goal;
+		distance += (goal - this->getPosition()).norm();
+		this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 		state = FACE;
 		break;
 	default :
@@ -381,9 +388,10 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 // 			CGoGNout << "wsoe : " << wsoe << CGoGNendl;
 // 			CGoGNout << "current " << current << " " << m_position << CGoGNendl;
 // 			CGoGNout << "d " << d << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi2(d)] << CGoGNendl;
-			VEC3 isect = intersectLineEdge(current, m_position, d);
-			distance += (isect - m_position).norm();
-			m_position = isect;
+//			VEC3 isect = intersectLineEdge(current, this->getPosition(), d);
+			VEC3 isect = intersectLineEdge(goal, this->getPosition(), d);
+			distance += (isect - this->getPosition()).norm();
+			this->Algo::MovingObjects::ParticleBase<PFP>::move(isect);
 // 			CGoGNout << " inter : " << m_position << CGoGNendl;
 			edgeState(goal, Geom::OVER);
 		}

@@ -93,7 +93,7 @@ inline ExplodeVolumeRender::~ExplodeVolumeRender()
 
 template<typename PFP>
 void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
-									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace, 
+									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& /*centerNormalFace*/,
 									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals)
 {
 	typedef typename PFP::VEC3 VEC3;

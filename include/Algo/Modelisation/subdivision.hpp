@@ -22,6 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Algo/Geometry/basic.h"
 #include "Algo/Geometry/centroid.h"
 #include "Topology/generic/autoAttributeHandler.h"
 
@@ -450,15 +451,12 @@ void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 }
 
 template <typename PFP, typename EMBV, typename EMB>
-void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs)
+void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 {
 	CellMarker<EDGE> m0(map);
 	CellMarker<FACE> m1(map);
 
 	std::vector<Dart> dOrig;
-
-	m0.unmarkAll();
-	m1.unmarkAll();
 
 	//first pass cut edge
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -481,9 +479,9 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs)
 			EMB e1 = attributs[d];
 			EMB e2 = attributs[map.phi1(d)];
 			map.cutEdge(d);
-			attributs[map.phi1(d)] = e1*2.0f/3.0f+e2/3.0f;
+			attributs[map.phi1(d)] = e1*(1.0f-size)+e2*size;
 			map.cutEdge(map.phi1(d));
-			attributs[map.phi1(map.phi1(d))] = e2*2.0f/3.0f+e1/3.0f;
+			attributs[map.phi1(map.phi1(d))] = e2*(1.0f-size)+e1*size;
 			m0.mark(d);
 			m0.mark(map.phi1(d));
 			m0.mark(map.template phi<11>(d));
@@ -496,14 +494,16 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs)
 //	//second pass create corner face
 	for (std::vector<Dart>::iterator it = dOrig.begin(); it != dOrig.end(); ++it)
 	{
-		EMB c = Geometry::faceCentroid<PFP>(map,*it,attributs);
+//		EMB c = Geometry::faceCentroid<PFP>(map,*it,attributs);
 		Dart dd = *it;
 		do
 		{
 			map.splitFace(map.phi1(dd),map.phi_1(dd));
 			map.cutEdge(map.phi1(dd));
 			mCorner.mark(map.phi2(map.phi1(dd)));
-			attributs[map.template phi<11>(dd)] = c*2.0/3.0f + attributs[dd]/3.0f;
+//			attributs[map.template phi<11>(dd)] = c*(1.0-size)+ attributs[dd]*size;
+			attributs[map.template phi<11>(dd)] = attributs[dd] 	+ Geometry::vectorOutOfDart<PFP>(map,dd,attributs)
+																	- Geometry::vectorOutOfDart<PFP>(map,map.phi_1(dd),attributs);
 			dd = map.phi1(map.phi1(map.phi1(map.phi2(map.phi1(dd)))));
 		} while(!mCorner.isMarked(dd));
 	}

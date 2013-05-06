@@ -35,7 +35,7 @@ Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb)
 {
 
 	typedef typename VEC3::DATA_TYPE T ;
-	const T zero = 0.00001 ;
+	const T zero = 0.000001 ;
 
 	T p = (P[0] - Pa[0]) * (Pb[1] - Pa[1]) - (Pb[0] - Pa[0]) * (P[1] - Pa[1]) ;
 

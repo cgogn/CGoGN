@@ -269,7 +269,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge(Dart d, FunctorType& 
 	return false;
 }
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d ;
 	do
@@ -401,7 +401,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f,
 }
 
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d;
 	do
@@ -413,7 +413,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorTyp
  	return false;
 }
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d))
 		return true;

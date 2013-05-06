@@ -145,7 +145,7 @@ void MyQT::cb_redraw()
 
 }
 
-void  MyQT::cb_mousePress(int button, int x, int y)
+void  MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
 	if (!Shift())
 		return;
@@ -249,7 +249,7 @@ void  MyQT::cb_mouseMove(int buttons, int x, int y)
 }
 
 
-void  MyQT::cb_wheelEvent(int delta, int x, int y)
+void  MyQT::cb_wheelEvent(int delta, int /*x*/, int /*y*/)
 {
 	if (!Shift())
 		return;

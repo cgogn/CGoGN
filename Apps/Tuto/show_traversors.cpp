@@ -140,7 +140,7 @@ void MyQT::cb_redraw()
 	m_drawer.callList();
 }
 
-void MyQT::cb_mousePress(int button, int x, int y)
+void MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
 	if (Shift())
 	{

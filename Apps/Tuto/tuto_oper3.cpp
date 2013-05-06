@@ -88,7 +88,7 @@ void MyQT::clipping_onoff(bool x)
 	updateGL();
 }
 
-void MyQT::hide_onoff(bool x)
+void MyQT::hide_onoff(bool /*x*/)
 {
 	hide_clipping = !hide_clipping;
 	updateMap();
@@ -253,7 +253,7 @@ void MyQT::operation(int x)
 	dock.listOper->setCurrentRow(-1);
 }
 
-void MyQT::createMap(int n)
+void MyQT::createMap(int /*n*/)
 {
 	myMap.clear(true);
 	position = myMap.getAttribute<VEC3, VERTEX>("position");
@@ -440,7 +440,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 	}
 }
 
-void  MyQT::cb_mouseRelease(int button, int x, int y)
+void  MyQT::cb_mouseRelease(int /*button*/, int /*x*/, int /*y*/)
 {
 
 	if (hide_clipping || !clip_volume)

@@ -110,9 +110,15 @@ SimpleQGLV::SimpleQGLV() :
 
 	resize(1200,800);
 	m_qglWidget->setFocus(Qt::MouseFocusReason);
+
+	QGLFormat format(/*QGL::SampleBuffers |*/ QGL::DoubleBuffer | QGL::AlphaChannel);
+	format.setSamples(2);
+	m_qglWidget->setFormat(format);
+	m_qglWidget->makeCurrent();
 }
 
 SimpleQGLV::SimpleQGLV(const SimpleQGLV& sqt):
+	QMainWindow(),
 	m_dock(NULL),
 	m_projection_matrix(m_mat.m_matrices[0]),
 	m_modelView_matrix(m_mat.m_matrices[1]),
@@ -450,6 +456,15 @@ void SimpleQGLV::cb_updateMatrix()
 		}
 	}
 }
+
+void SimpleQGLV::paintEvent(QPaintEvent* )
+{
+	QPainter painter(this);
+	painter.setRenderHint(QPainter::Antialiasing, true);
+	painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+	painter.setRenderHint(QPainter::TextAntialiasing, false);
+}
+
 
 void SimpleQGLV::updateGL()
 {

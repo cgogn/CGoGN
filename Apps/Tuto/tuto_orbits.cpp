@@ -42,7 +42,7 @@ VertexAttribute<VEC3> position ;
 DartAttribute<VEC3> middleDarts;
 
 
-void MyQT::text_onoff(bool x)
+void MyQT::text_onoff(bool /*x*/)
 {
 	render_text = !render_text;
 	updateGL();
@@ -162,7 +162,7 @@ void MyQT::cb_redraw()
 
 }
 
-void MyQT::cb_mousePress(int button, int x, int y)
+void MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
 	if (Shift())
 	{

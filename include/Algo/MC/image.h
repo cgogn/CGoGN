@@ -146,6 +146,9 @@ public:
 	~Image();
 
 
+	template< typename  DataTypeIn >
+	void createMask(const Image<DataTypeIn>& img );
+
 	/**
 	* Load a file (png) in an empty image
 	* @param _cName file to open

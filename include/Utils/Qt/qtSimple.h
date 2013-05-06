@@ -323,37 +323,37 @@ public:
 	/**
 	 * Mouse button has been pressed
 	 */
-	virtual void cb_mousePress(int button, int x, int y) {}
+	virtual void cb_mousePress(int /*button*/, int /*x*/, int /*y*/) {}
 
 	/**
 	 * Mouse button has been released
 	 */
-	virtual void cb_mouseRelease(int button, int x, int y) {}
+	virtual void cb_mouseRelease(int /*button*/, int /*x*/, int /*y*/) {}
 
 	/**
 	 * Mouse button has been clicked
 	 */
-	virtual void cb_mouseClick(int button, int x, int y) {}
+	virtual void cb_mouseClick(int /*button*/, int /*x*/, int /*y*/) {}
 
 	/**
 	 * the mouse has been move (with buttons still pressed)
 	 */
-	virtual void cb_mouseMove(int buttons, int x, int y) {}
+	virtual void cb_mouseMove(int /*buttons*/, int /*x*/, int /*y*/) {}
 
 	/**
 	 * the mouse has been move (with button still pressed)
 	 */
-	virtual void cb_wheelEvent(int delta, int x, int y) {}
+	virtual void cb_wheelEvent(int /*delta*/, int /*x*/, int /*y*/) {}
 
 	/**
 	 * key press CB (context is ok)
 	 */
-	virtual void cb_keyPress(int code) {}
+	virtual void cb_keyPress(int /*code*/) {}
 
 	/**
 	 * key releaase CB (context is ok)
 	 */
-	virtual void cb_keyRelease(int code) {}
+	virtual void cb_keyRelease(int /*code*/) {}
 
 	/**
 	 * matrices need to be updated (context is ok)

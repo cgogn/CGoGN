@@ -89,7 +89,7 @@ public:
 
 	~TexView();
 
-	void init(char* fnm, char* fnt);
+	void init(const std::string& fnm, const std::string& fnt);
 
 	// callbacks of simpleQT to overdefine:
 	void cb_redraw();

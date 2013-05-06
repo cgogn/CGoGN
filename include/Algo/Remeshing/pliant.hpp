@@ -178,11 +178,11 @@ void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 	}
 
 	// update vertices normals
-	Algo::Geometry::computeNormalVertices<PFP>(map, position, normal) ;
+	Algo::Surface::Geometry::computeNormalVertices<PFP>(map, position, normal) ;
 
 	// tangential relaxation
 	VertexAttribute<VEC3> centroid = map.template addAttribute<VEC3, VERTEX>("centroid") ;
-	Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
+	Surface::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
 
 	CellMarker<VERTEX> vm(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
