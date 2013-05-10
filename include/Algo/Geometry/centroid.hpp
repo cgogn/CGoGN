@@ -45,7 +45,9 @@ namespace Geometry
 template <typename PFP, typename EMBV, typename EMB>
 EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs, unsigned int thread)
 {
-	EMB center = AttribOps::zero<EMB,PFP>() ;
+//	EMB center = AttribOps::zero<EMB,PFP>() ;
+	EMB center(0.0);
+
 	unsigned int count = 0 ;
 
 	Traversor3WV<typename PFP::MAP> tra(map,d,false,thread);
@@ -62,7 +64,8 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs, uns
 template <typename PFP, typename EMBV, typename EMB>
 EMB volumeCentroidELWGen(typename PFP::MAP& map, Dart d, const EMBV& attributs, unsigned int thread)
 {
-	EMB center = AttribOps::zero<EMB,PFP>();
+//	EMB center = AttribOps::zero<EMB,PFP>();
+	EMB center(0.0);
 	double count=0.0;
 	Traversor3WE<typename PFP::MAP> t(map, d,false,thread) ;
 	for(Dart it = t.begin(); it != t.end();it = t.next())
@@ -81,7 +84,8 @@ EMB volumeCentroidELWGen(typename PFP::MAP& map, Dart d, const EMBV& attributs, 
 template <typename PFP, typename EMBV, typename EMB>
 EMB faceCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 {
-	EMB center = AttribOps::zero<EMB,PFP>();
+//	EMB center = AttribOps::zero<EMB,PFP>();
+	EMB center(0.0);
 	unsigned int count = 0 ;
 	Traversor2FV<typename PFP::MAP> t(map, d) ;
 	for(Dart it = t.begin(); it != t.end(); it = t.next())
@@ -97,7 +101,8 @@ EMB faceCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 template <typename PFP, typename EMBV, typename EMB>
 EMB faceCentroidELWGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 {
-	EMB center = AttribOps::zero<EMB,PFP>();
+//	EMB center = AttribOps::zero<EMB,PFP>();
+	EMB center(0.0);
 	double count=0.0;
 	Traversor2FE<typename PFP::MAP> t(map, d) ;
 	for(Dart it = t.begin(); it != t.end(); it = t.next())
@@ -116,7 +121,8 @@ EMB faceCentroidELWGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 template <typename PFP, typename EMBV, typename EMB>
 EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 {
-	EMB center = AttribOps::zero<EMB,PFP>();
+//	EMB center = AttribOps::zero<EMB,PFP>();
+	EMB center(0.0);
 	unsigned int count = 0 ;
 	Traversor2VVaE<typename PFP::MAP> t(map, d) ;
 	for(Dart it = t.begin(); it != t.end(); it = t.next())
@@ -248,7 +254,8 @@ namespace Geometry
 template <typename PFP, typename EMBV, typename EMB>
 EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 {
-	EMB center = AttribOps::zero<EMB,PFP>();
+//	EMB center = AttribOps::zero<EMB,PFP>();
+	EMB center(0.0);
 	unsigned int count = 0 ;
 	Traversor3VVaE<typename PFP::MAP> t(map, d) ;
 	for(Dart it = t.begin(); it != t.end(); it = t.next())

@@ -225,7 +225,8 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		if ( !map.isBoundaryMarked2(d) && mf.isMarked(d)) // for each face not subdivided
 		{
 			// compute center skip darts of new vertices non embedded
-			EMB center = AttribOps::zero<EMB,PFP>();
+//			EMB center = AttribOps::zero<EMB,PFP>();
+			EMB center(0.0);
 			unsigned int count = 0 ;
 			mf.unmarkOrbit<FACE>(d) ;
 			Dart it = d;
@@ -254,8 +255,9 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		{
 			Dart f1 = map.phi_1(x);
 			Dart f2 = map.phi2(map.phi1(map.phi2(x)));
-			EMB temp = AttribOps::zero<EMB,PFP>();
-			temp = attributs[f1];
+//			EMB temp = AttribOps::zero<EMB,PFP>();
+//			temp = attributs[f1];
+			EMB temp = attributs[f1];
 			temp += attributs[f2];			// E' = (V0+V1+F1+F2)/4
 			temp *= 0.25;
 			attributs[x] *= 0.5;
@@ -269,8 +271,10 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	{
 		m0.unmark(*vert);
 
-		EMB temp = AttribOps::zero<EMB,PFP>();
-		EMB temp2 = AttribOps::zero<EMB,PFP>();
+//		EMB temp = AttribOps::zero<EMB,PFP>();
+//		EMB temp2 = AttribOps::zero<EMB,PFP>();
+		EMB temp(0.0);
+		EMB temp2(0.0);
 
 		unsigned int n = 0;
 		Dart x = *vert;
@@ -378,8 +382,11 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 			Dart dd = map.phi2(d);
 			attributs[d] *= 0.75;
 			Dart e1 = map.template phi<111>(d);
-			EMB temp = AttribOps::zero<EMB,PFP>();
-			temp = attributs[e1];
+
+//			EMB temp(0.0);
+//			temp += attributs[e1];
+
+			EMB temp = attributs[e1];
 			e1 = map.phi_1(map.phi_1(dd));
 			temp += attributs[e1];
 			temp *= 1.0 / 8.0;
@@ -393,7 +400,8 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	{
 		m0.unmark(*vert);
 
-		EMB temp = AttribOps::zero<EMB,PFP>();
+//		EMB temp = AttribOps::zero<EMB,PFP>();
+		EMB temp(0.0);
 		int n = 0;
 		Dart x = *vert;
 		do
