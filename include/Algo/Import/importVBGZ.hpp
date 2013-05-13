@@ -48,7 +48,7 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	//open file
 	igzstream fs(filename.c_str(), std::ios::in|std::ios::binary);

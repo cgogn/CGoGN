@@ -85,25 +85,6 @@ inline unsigned int AttributeMultiVectorGen::getBlockSize()
 	return _BLOCKSIZE_ ;
 }
 
-/**************************************
- *       ARITHMETIC OPERATIONS        *
- **************************************/
-
-inline void AttributeMultiVectorGen::toggleProcess()
-{
-	m_toProcess = true;
-}
-
-inline void AttributeMultiVectorGen::toggleNoProcess()
-{
-	m_toProcess = false;
-}
-
-inline bool AttributeMultiVectorGen::toProcess()
-{
-	return m_toProcess;
-}
-
 
 /***************************************************************************************************/
 /***************************************************************************************************/
@@ -321,81 +302,10 @@ void AttributeMultiVector<T>::overwrite(unsigned int src_b, unsigned int src_id,
 	m_tableData[dst_b][dst_id] = m_tableData[src_b][src_id];
 }
 
-/**************************************
- *       ARITHMETIC OPERATIONS        *
- **************************************/
-
-template <typename T>
-void AttributeMultiVector<T>::affect(unsigned int i, unsigned int j)
-{
-	if (m_toProcess)
-		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] = m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
-}
-
-template <typename T>
-void AttributeMultiVector<T>::add(unsigned int i, unsigned int j)
-{
-	if (m_toProcess)
-		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] += m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
-}
-
-template <typename T>
-void AttributeMultiVector<T>::sub(unsigned int i, unsigned int j)
-{
-	if (m_toProcess)
-		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] -= m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
-}
-
-template <typename T>
-void AttributeMultiVector<T>::mult(unsigned int i, double alpha)
-{
-	if (m_toProcess)
-		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] *= alpha;
-}
-
-template <typename T>
-void AttributeMultiVector<T>::div(unsigned int i, double alpha)
-{
-	if (m_toProcess)
-		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] /= alpha;
-}
-
-template <typename T>
-void AttributeMultiVector<T>::lerp(unsigned res, unsigned int i, unsigned int j, double alpha)
-{
-	if (m_toProcess)
-	{
-		T v1 = m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];
-		T v2 = m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
-
-		v1 *= alpha;
-		v2 *= 1.0 - alpha;
-		v1 += v2;
-		m_tableData[res/_BLOCKSIZE_][res%_BLOCKSIZE_] = v1;
-
-		CGoGNout << "LERP " << m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] << " & " << m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
-		CGoGNout << " = " << m_tableData[res/_BLOCKSIZE_][res%_BLOCKSIZE_] << CGoGNendl;
-	}
-}
 
 /**************************************
  *            SAVE & LOAD             *
  **************************************/
-
-template <typename T>
-std::string AttributeMultiVector<T>::output(unsigned int i)
-{
-	std::stringstream ss;
-	ss << m_tableData[i / _BLOCKSIZE_][i % _BLOCKSIZE_];
-	return ss.str();
-}
-
-template <typename T>
-void AttributeMultiVector<T>::input(unsigned int i,const std::string& st)
-{
-	std::stringstream ss(st);
-	ss >> m_tableData[i / _BLOCKSIZE_][i % _BLOCKSIZE_];
-}
 
 template <typename T>
 void AttributeMultiVector<T>::saveBin(CGoGNostream& fs, unsigned int id)

@@ -436,7 +436,7 @@ protected:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
-	typedef NoMathIOAttribute<DijkstraVertexInfo> VertexInfo ;
+	typedef NoTypeNameAttribute<DijkstraVertexInfo> VertexInfo ;
 
 	VertexAttribute<VertexInfo> vertexInfo ;
 
@@ -483,7 +483,7 @@ protected:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
-	typedef NoMathIOAttribute<DijkstraVertexInfo> VertexInfo ;
+	typedef NoTypeNameAttribute<DijkstraVertexInfo> VertexInfo ;
 
 	VertexAttribute<VertexInfo> vertexInfo ;
 

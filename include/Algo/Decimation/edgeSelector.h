@@ -120,7 +120,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "LengthEdgeInfo" ; }
 	} LengthEdgeInfo ;
-	typedef NoMathIOAttribute<LengthEdgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<LengthEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 
@@ -183,7 +183,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMedgeInfo" ; }
 	} QEMedgeInfo ;
-	typedef NoMathIOAttribute<QEMedgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<QEMedgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL> > quadric ;
@@ -235,7 +235,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMedgeInfo" ; }
 	} QEMedgeInfo ;
-	typedef NoMathIOAttribute<QEMedgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<QEMedgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL> > quadric ;
@@ -288,7 +288,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "NormalAreaEdgeInfo" ; }
 	} NormalAreaEdgeInfo ;
-	typedef NoMathIOAttribute<NormalAreaEdgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<NormalAreaEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	EdgeAttribute<Geom::Matrix<3,3,REAL> > edgeMatrix ;
@@ -342,7 +342,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "CurvatureEdgeInfo" ; }
 	} CurvatureEdgeInfo ;
-	typedef NoMathIOAttribute<CurvatureEdgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<CurvatureEdgeInfo> EdgeInfo ;
 
 	Geom::BoundingBox<VEC3> bb ;
 	REAL radius ;
@@ -442,7 +442,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "CurvatureTensorEdgeInfo" ; }
 	} CurvatureTensorEdgeInfo ;
-	typedef NoMathIOAttribute<CurvatureTensorEdgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<CurvatureTensorEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	EdgeAttribute<REAL> edgeangle ;
@@ -500,7 +500,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "MinDetailEdgeInfo" ; }
 	} MinDetailEdgeInfo ;
-	typedef NoMathIOAttribute<MinDetailEdgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<MinDetailEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 
@@ -551,7 +551,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "ColorNaiveEdgeInfo" ; }
 	} ColorNaiveedgeInfo ;
-	typedef NoMathIOAttribute<ColorNaiveedgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<ColorNaiveedgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
@@ -613,7 +613,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "GeomColOptGradEdgeInfo" ; }
 	} ColorNaiveedgeInfo ;
-	typedef NoMathIOAttribute<ColorNaiveedgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<ColorNaiveedgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
@@ -695,7 +695,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMextColorEdgeInfo" ; }
 	} QEMextColorEdgeInfo ;
-	typedef NoMathIOAttribute<QEMextColorEdgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<QEMextColorEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 	VertexAttribute<Utils::QuadricNd<REAL,6> > m_quadric ;

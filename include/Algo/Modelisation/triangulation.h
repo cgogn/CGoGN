@@ -58,7 +58,7 @@ protected:
 	// multiset typedef for simple writing
 	typedef std::multiset< VertexPoly,VertexPoly> VPMS;
 	typedef typename VPMS::iterator VMPSITER;
-	typedef NoMathIONameAttribute<VMPSITER> EarAttr ;
+	typedef NoTypeNameAttribute<VMPSITER> EarAttr ;
 
 	class VertexPoly
 	{

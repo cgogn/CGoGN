@@ -748,10 +748,10 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 			ptr->setIndex(m_tableAttribs.size());
 			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
 			ptr->copy(cont.m_tableAttribs[i]);
-			if (cont.m_tableAttribs[i]->toProcess())
-				ptr->toggleProcess();
-			else
-				ptr->toggleNoProcess();
+	//			if (cont.m_tableAttribs[i]->toProcess())
+	//				ptr->toggleProcess();
+	//			else
+	//				ptr->toggleNoProcess();
 			m_tableAttribs.push_back(ptr);
 		}
 	}

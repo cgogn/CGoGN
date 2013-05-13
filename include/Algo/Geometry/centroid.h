@@ -26,7 +26,6 @@
 #define __ALGO_GEOMETRY_CENTROID_H__
 
 #include "Geometry/basic.h"
-#include "Topology/generic/attribops.h"
 
 namespace CGoGN
 {

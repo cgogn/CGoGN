@@ -404,112 +404,13 @@ public:
 	template <typename T>
 	void setData(unsigned int attrIndex, unsigned int eltIndex, const T& data);
 
-	/**************************************
-	 *       ARITHMETIC OPERATIONS        *
-	 **************************************/
 
-	/**
-	 * Toggle an attribute to process
-	 * @param index index of attribute
-	 */
-	void toggleProcess(unsigned int index);
-
-	/**
-	 * Toggle an attribute to process
-	 * @param index index of attribute
-	 */
-	void toggleNoProcess(unsigned int index);
-
-	/**
-	 * copy process attributes of line j in line i
-	 * @param i line to modify
-	 * @param j line to copy to i
-	 */
-	void affect(unsigned int i, unsigned int j);
-
-	/**
-	 * add process attributes of line j to line i
-	 * @param i line to modify
-	 * @param j line to add to i
-	 */
-	void add(unsigned int i, unsigned int j);
-
-	/**
-	 * sub process attributes of line j from line i
-	 * @param i line to modify
-	 * @param j line to sub from i
-	 */
-	void sub(unsigned int i, unsigned int j);
-
-	/**
-	 * multiy process attributes of line j by a scalar
-	 * @param i line to multiply
-	 * @param alpha scalar
-	 */
-	void mult(unsigned int i, double alpha);
-
-	/**
-	 * multiy process attributes of line j by a scalar
-	 * @param i line to multiply
-	 * @param alpha scalar
-	 */
-	void div(unsigned int i, double alpha);
-
-	/**
-	 * interpole process attributes A_res = alpha*A_i + (1-alpha)*A_j
-	 * @param res result line
-	 * @param i first line
-	 * @param j second line
-	 * @param alpha coefficient of interpolation
-	 */
-	void lerp(unsigned res, unsigned int i, unsigned int j, double alpha);
 
 	/**************************************
 	 *            SAVE & LOAD             *
 	 **************************************/
 
-protected:
-//	/**
-//	 * load xmlpart of container
-//	 */
-//	bool loadXmlHB(xmlNodePtr node);
-
-	/**
-	 * load xmlpart of container
-	 */
-//	bool loadXmlBWF(xmlNodePtr node);
-
-	/**
-	 * load xmlpart of container
-	 */
-//	bool loadXmlAN(xmlNodePtr node, unsigned int nbb);
-
-	/**
-	 * load xmlpart of container
-	 */
-//	bool loadXmlDL(xmlNodePtr node);
-
 public:
-	/**
-	* save Xml file
-	* @param writer a xmlTextWriterPtr obj
-	* @param id the id to save
-	*/
-//	void saveXml(xmlTextWriterPtr writer, unsigned int id);
-
-	/**
-	* get id from xml node
-	* @param node the node of container node of xml tree
-	* @return the value of id of the node
-	*/
-//	static unsigned int getIdXmlNode(xmlNodePtr node);
-
-	/**
-	* load from xml node
-	* @param node the node of container node of xml tree
-	*/
-//	bool loadXml(xmlNodePtr node);
-
 	/**
 	* save binary file
 	* @param fs a file stream

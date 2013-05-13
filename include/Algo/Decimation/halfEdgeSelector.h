@@ -57,7 +57,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMhalfEdgeInfo" ; }
 	} QEMhalfEdgeInfo ;
-	typedef NoMathIOAttribute<QEMhalfEdgeInfo> HalfEdgeInfo ;
+	typedef NoTypeNameAttribute<QEMhalfEdgeInfo> HalfEdgeInfo ;
 
 	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL> > quadric ;
@@ -113,7 +113,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMextColorHalfEdgeInfo" ; }
 	} QEMextColorHalfEdgeInfo ;
-	typedef NoMathIOAttribute<QEMextColorHalfEdgeInfo> HalfEdgeInfo ;
+	typedef NoTypeNameAttribute<QEMextColorHalfEdgeInfo> HalfEdgeInfo ;
 
 	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
 	VertexAttribute<Utils::QuadricNd<REAL,6> > m_quadric ;
@@ -200,7 +200,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "ColorExperimentalHalfEdgeInfo" ; }
 	} QEMextColorHalfEdgeInfo ;
-	typedef NoMathIOAttribute<QEMextColorHalfEdgeInfo> HalfEdgeInfo ;
+	typedef NoTypeNameAttribute<QEMextColorHalfEdgeInfo> HalfEdgeInfo ;
 
 	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;

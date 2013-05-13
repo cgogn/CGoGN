@@ -34,7 +34,7 @@ protected :
 		Dart pathOrigin;
 		static std::string CGoGNnameOfType() { return "VoronoiVertexInfo" ; }
 	} VoronoiVertexInfo ;
-	typedef NoMathIOAttribute<VoronoiVertexInfo> VertexInfo ;
+	typedef NoTypeNameAttribute<VoronoiVertexInfo> VertexInfo ;
 
 	typename PFP::MAP& map;
 	const EdgeAttribute<REAL>& edgeCost; // weights on the graph edges

@@ -42,7 +42,7 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
@@ -159,7 +159,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 template <typename PFP>
 bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
@@ -273,7 +273,7 @@ namespace Import
 template <typename PFP>
 bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float dist)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
 	// buffer for tempo faces (used to remove degenerated edges)
@@ -379,7 +379,7 @@ bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<P
 template <typename PFP>
 bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float scale, unsigned int nbStage)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map);
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map);
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
 	// buffer for tempo faces (used to remove degenerated edges)
@@ -508,7 +508,7 @@ bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurf
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 	return false;
 }
 
