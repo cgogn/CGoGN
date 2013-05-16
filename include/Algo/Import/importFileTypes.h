@@ -85,10 +85,13 @@ namespace Volume
 {
 namespace Import
 {
-	enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE, MSH, VTU, NAS, VBGZ};
+	enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE, MSH, VTU, NAS, VBGZ, TETMESH/*, OVM*/};
 
 	inline ImportType getFileType(const std::string& filename)
 	{
+		if ((filename.rfind(".tetmesh")!=std::string::npos) || (filename.rfind(".TETMESH")!=std::string::npos))
+			return TETMESH;
+
 		if ((filename.rfind(".tet")!=std::string::npos) || (filename.rfind(".TET")!=std::string::npos))
 			return TET;
 
@@ -116,8 +119,11 @@ namespace Import
 		if ((filename.rfind(".nas")!=std::string::npos) || (filename.rfind(".NAS")!=std::string::npos))
 			return NAS;
 
-		if ((filename.rfind(".vbgz")!=std::string::npos) || (filename.rfind(".vbgz")!=std::string::npos))
+		if ((filename.rfind(".vbgz")!=std::string::npos) || (filename.rfind(".VBGZ")!=std::string::npos))
 			return VBGZ;
+
+//		if ((filename.rfind(".ovm")!=std::string::npos) || (filename.rfind(".OVM")!=std::string::npos))
+//			return OVM;
 
 		return UNKNOWNVOLUME;
 	}

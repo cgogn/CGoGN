@@ -539,6 +539,14 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 		return importVBGZ<PFP>(map, filename, attrNames, 1.0f);
 		break;
 
+	case TETMESH:
+		return importTetmesh<PFP>(map, filename, attrNames, 1.0f);
+		break;
+
+//	case OVM:
+//		return importOVM<PFP>(map, filename, attrNames, 1.0f);
+//		break;
+
 
 		case OFF:
 		{
