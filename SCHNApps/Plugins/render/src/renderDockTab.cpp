@@ -97,7 +97,8 @@ void RenderDockTab::positionVBOChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
+		if(map)
+			m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
 	}
 }
 
@@ -107,7 +108,8 @@ void RenderDockTab::normalVBOChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeNormalVBO(view, map, map->getVBO(combo_normalVBO->currentText()), true);
+		if(map)
+			m_plugin->changeNormalVBO(view, map, map->getVBO(combo_normalVBO->currentText()), true);
 	}
 }
 
@@ -117,7 +119,8 @@ void RenderDockTab::renderVerticesChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeRenderVertices(view, map, b, true);
+		if(map)
+			m_plugin->changeRenderVertices(view, map, b, true);
 	}
 }
 
@@ -127,7 +130,8 @@ void RenderDockTab::verticesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVerticesScaleFactor(view, map, i / 50.0, true);
+		if(map)
+			m_plugin->changeVerticesScaleFactor(view, map, i / 50.0, true);
 	}
 }
 
@@ -137,7 +141,8 @@ void RenderDockTab::renderEdgesChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeRenderEdges(view, map, b, true);
+		if(map)
+			m_plugin->changeRenderEdges(view, map, b, true);
 	}
 }
 
@@ -147,7 +152,8 @@ void RenderDockTab::renderFacesChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeRenderFaces(view, map, b, true);
+		if(map)
+			m_plugin->changeRenderFaces(view, map, b, true);
 	}
 }
 
@@ -157,10 +163,13 @@ void RenderDockTab::faceStyleChanged(QAbstractButton* b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		if(radio_flatShading->isChecked())
-			m_plugin->changeFacesStyle(view, map, FLAT, true);
-		else if(radio_phongShading->isChecked())
-			m_plugin->changeFacesStyle(view, map, PHONG, true);
+		if(map)
+		{
+			if(radio_flatShading->isChecked())
+				m_plugin->changeFacesStyle(view, map, FLAT, true);
+			else if(radio_phongShading->isChecked())
+				m_plugin->changeFacesStyle(view, map, PHONG, true);
+		}
 	}
 }
 

@@ -27,6 +27,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
+#include "Algo/Import/importFileTypes.h"
 
 namespace CGoGN
 {
@@ -112,11 +113,11 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 			Dart e = d;
 			Dart f = map.template phi<21121>(d);
 			hexa.push_back(indices[f]);
-			e = map.phi_1(f);
+			f = map.phi_1(f);
 			hexa.push_back(indices[f]);
-			e = map.phi_1(f);
+			f = map.phi_1(f);
 			hexa.push_back(indices[f]);
-			e = map.phi_1(f);
+			f = map.phi_1(f);
 			hexa.push_back(indices[f]);
 			hexa.push_back(indices[e]);
 			e = map.phi1(e);
@@ -129,7 +130,7 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 
 		if (degree == 4)
 		{
-			//CAS TETRAEDRIQUE (ordre 2 quad superposes, le premier en CCW)
+			//CAS TETRAEDRIQUE
 			Dart e = d;
 			tetra.push_back(indices[e]);
 			e = map.phi1(e);
@@ -199,9 +200,6 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	}
 
 	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
-
-
-
 
 	unsigned int count=0;
 	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
@@ -538,6 +536,8 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 	typedef typename PFP::VEC3 VEC3;
 
 	std::string base(filename);
+	size_t pos = base.rfind(".");
+	base.erase(pos);
 	std::string fnNode = base + ".node";
 	std::string fnEle = base + ".ele";
 
@@ -591,27 +591,6 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 			degree++;
 		}
 
-//		if (degree == 8)
-//		{
-//			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CW)
-//			Dart e = d;
-//			Dart f = map.template phi<21121>(d);
-//			hexa.push_back(indices[f]);
-//			e = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			e = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			e = map.phi_1(f);
-//			hexa.push_back(indices[f]);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//			e = map.phi1(e);
-//			hexa.push_back(indices[e]);
-//		}
-
 		if (degree == 4)
 		{
 			//CAS TETRAEDRIQUE
@@ -644,6 +623,172 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 
 	return true;
 }
+
+
+
+
+
+template <typename PFP>
+bool exportVolBinGz(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	// open file
+//	std::ofstream fout ;
+//	fout.open(filename, std::ios::out) ;
+
+	ogzstream fout(filename, std::ios::out|std::ios::binary);
+
+	if (!fout.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false ;
+	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+	std::vector<typename PFP::VEC3> bufposi;
+	bufposi.reserve(position.nbElements());
+
+	unsigned int count=0;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		const VEC3& P = position[i];
+		bufposi.push_back(P);
+//		fout << count << " " << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+		indices[i] = count++;
+	}
+	if (count != bufposi.size())
+		CGoGNerr << "Warning problem wrong nbElements in position attributes ?" << CGoGNendl;
+
+	std::vector<unsigned int> hexa;
+	std::vector<unsigned int> tetra;
+
+	hexa.reserve(2048);
+	tetra.reserve(2048);
+
+	TraversorW<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = 0 ;
+
+		Traversor3WV<typename PFP::MAP> twv(map, d) ;
+		for(Dart it = twv.begin(); it != twv.end(); it = twv.next())
+		{
+			degree++;
+		}
+
+		if (degree == 8)
+		{
+			//CAS HEXAEDRIQUE (ordre 2 quad superposes, le premier en CW)
+			Dart e = d;
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+
+			e = map.template phi<2112>(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+			e = map.phi1(e);
+			hexa.push_back(indices[e]);
+
+		}
+
+		if (degree == 4)
+		{
+			//CAS TETRAEDRIQUE
+			Dart e = d;
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.phi1(e);
+			tetra.push_back(indices[e]);
+			e = map.template phi<211>(e);
+			tetra.push_back(indices[e]);
+		}
+	}
+
+	unsigned int nbhexa = hexa.size()/8;
+	unsigned int nbtetra = tetra.size()/4;
+
+	unsigned int buffer[3];
+	buffer[0] = position.nbElements();
+	buffer[1] = nbtetra;
+	buffer[2] = nbhexa;
+
+	fout.write((char*)(buffer),3*sizeof(unsigned int));
+
+	// write positions
+	fout.write((char*)(&(bufposi[0])),sizeof(VEC3)*bufposi.size());
+
+	// write tetra indices if necessary
+	if (nbtetra != 0)
+	{
+
+		long int nbo = (long int)&(tetra.back()) -(long int)&(tetra.front());
+		nbo /= sizeof(unsigned int);
+		if (nbo != (long int)(tetra.size()-1))
+			CGoGNerr << "Memory vector problem"<< CGoGNendl;
+		else
+			fout.write((char*)(&(tetra[0])),sizeof(unsigned int)*tetra.size());
+	}
+
+	// write hexa indices if necessary
+	if (nbhexa!=0)
+	{
+		long int nbo = (long int)&(hexa.back()) -(long int)&(hexa.front());
+		nbo /= sizeof(unsigned int);
+		if (nbo != (long int)(hexa.size()-1))
+			CGoGNerr << "Memory vector problem"<< CGoGNendl;
+		else
+			fout.write((char*)(&(hexa[0])),sizeof(unsigned int)*hexa.size());
+	}
+
+	fout.close();
+	return true;
+}
+
+
+template <typename PFP>
+bool exportMesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const std::string& filename)
+{
+	Import::ImportType kind = Import::getFileType(filename);
+
+// manque TS, OFF ?
+	switch (kind)
+	{
+	case Import::TET:
+		return exportTet<PFP>(map, position, filename.c_str());
+		break;
+	case Import::NODE:
+		return exportNodeEle<PFP>(map, position, filename.c_str());
+		break;
+	case Import::MSH:
+		return exportMSH<PFP>(map, position, filename.c_str());
+		break;
+	case Import::VTU:
+		return exportVTU<PFP>(map, position, filename.c_str());
+		break;
+	case Import::NAS:
+		return exportNAS<PFP>(map, position, filename.c_str());
+		break;
+	case Import::VBGZ:
+		return exportVolBinGz<PFP>(map, position, filename.c_str());
+		break;
+	default:
+		CGoGNerr << "unknown file format for " << filename << CGoGNendl;
+		break;
+	}
+}
+
 
 
 } // namespace Export

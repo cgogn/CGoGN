@@ -35,6 +35,8 @@
 
 #include "Utils/gzstream.h"
 
+#include "Algo/Import/importFileTypes.h"
+
 #ifdef WITH_ASSIMP
 #include "Assimp/assimp.h"
 #include "Assimp/aiPostProcess.h"
@@ -52,15 +54,6 @@ namespace Surface
 
 namespace Import
 {
-
-	enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM, STL, STLB };
-
-//	namespace ImportSurfacique
-//	{
-//
-//	}
-
-
 
 template <typename PFP>
 class MeshTablesSurface
@@ -150,8 +143,6 @@ namespace Volume
 {
 namespace Import
 {
-
-enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE, MSH, VTU, NAS};
 
 template <typename PFP>
 class MeshTablesVolume

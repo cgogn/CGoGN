@@ -673,9 +673,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	localIndices.reserve(64*3);
 	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(m_map);
 
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(m_map, "incidents");
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<unsigned int> > > vecNormIndPerVertex(m_map, "incidentsN");
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<unsigned int> > > vecTCIndPerVertex(m_map, "incidentsTC");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(m_map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> > > vecNormIndPerVertex(m_map, "incidentsN");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> > > vecTCIndPerVertex(m_map, "incidentsTC");
 
 	unsigned int currentGroup = 0;
 

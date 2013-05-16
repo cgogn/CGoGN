@@ -198,7 +198,6 @@ ColourConverter<REAL>::getHSL()
 	return *HSL ;
 }
 
-
 template<typename REAL>
 void
 ColourConverter<REAL>::convertRGBtoXYZ()

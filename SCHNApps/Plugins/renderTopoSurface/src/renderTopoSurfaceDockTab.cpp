@@ -98,7 +98,8 @@ void RenderTopoSurfaceDockTab::positionAttributeChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
+		if(map)
+			m_plugin->changePositionAttribute(view, map, map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText()), true);
 	}
 }
 
@@ -108,7 +109,8 @@ void RenderTopoSurfaceDockTab::drawDartsChanged(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeDrawDarts(view, map, b, true);
+		if(map)
+			m_plugin->changeDrawDarts(view, map, b, true);
 	}
 }
 
@@ -118,7 +120,8 @@ void RenderTopoSurfaceDockTab::dartsColorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeDartsColor(view, map, combo_dartsColor->color(), true);
+		if(map)
+			m_plugin->changeDartsColor(view, map, combo_dartsColor->color(), true);
 	}
 }
 
@@ -128,7 +131,8 @@ void RenderTopoSurfaceDockTab::drawPhi1Changed(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeDrawPhi1(view, map, b, true);
+		if(map)
+			m_plugin->changeDrawPhi1(view, map, b, true);
 	}
 }
 
@@ -138,7 +142,8 @@ void RenderTopoSurfaceDockTab::phi1ColorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePhi1Color(view, map, combo_phi1Color->color(), true);
+		if(map)
+			m_plugin->changePhi1Color(view, map, combo_phi1Color->color(), true);
 	}
 }
 
@@ -148,7 +153,8 @@ void RenderTopoSurfaceDockTab::drawPhi2Changed(bool b)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeDrawPhi2(view, map, b, true);
+		if(map)
+			m_plugin->changeDrawPhi2(view, map, b, true);
 	}
 }
 
@@ -158,7 +164,8 @@ void RenderTopoSurfaceDockTab::phi2ColorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePhi2Color(view, map, combo_phi2Color->color(), true);
+		if(map)
+			m_plugin->changePhi2Color(view, map, combo_phi2Color->color(), true);
 	}
 }
 
@@ -168,7 +175,8 @@ void RenderTopoSurfaceDockTab::facesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeEdgesScaleFactor(view, map, i, true);
+		if(map)
+			m_plugin->changeEdgesScaleFactor(view, map, i, true);
 	}
 }
 
@@ -178,7 +186,8 @@ void RenderTopoSurfaceDockTab::edgesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeFacesScaleFactor(view, map, i, true);
+		if(map)
+			m_plugin->changeFacesScaleFactor(view, map, i, true);
 	}
 }
 

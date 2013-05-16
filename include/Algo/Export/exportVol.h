@@ -39,13 +39,21 @@ namespace Volume
 
 namespace Export
 {
+/**
+* Export a mesh choosing the format according to filename extension
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of mesh file
+* @return true
+ */
+template <typename PFP>
+bool exportMesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const std::string& filename) ;
 
 /**
 * export the map into a .nas (nastran file)
 * @param the_map map to be exported
 * @param position the position container
-* @param filename filename of ply file
-* @param binary write in binary mode
+* @param filename filename of mesh file
 * @return true
 */
 template <typename PFP>
@@ -56,8 +64,7 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * export the map into a vtu file (vtk unstructured grid)
 * @param the_map map to be exported
 * @param position the position container
-* @param filename filename of ply file
-* @param binary write in binary mode
+* @param filename filename of mesh file
 * @return true
 */
 template <typename PFP>
@@ -68,8 +75,7 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * export the map into a .msh (gmesh file)
 * @param the_map map to be exported
 * @param position the position container
-* @param filename filename of ply file
-* @param binary write in binary mode
+* @param filename filename of mesh file
 * @return true
 */
 template <typename PFP>
@@ -80,8 +86,7 @@ bool exportMSH(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * export the map into a .tet file
 * @param the_map map to be exported
 * @param position the position container
-* @param filename filename of ply file
-* @param binary write in binary mode
+* @param filename filename of mesh file
 * @return true
 */
 template <typename PFP>
@@ -92,13 +97,21 @@ bool exportTet(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * export the map into a .node/.ele file pair
 * @param the_map map to be exported
 * @param position the position container
-* @param filename filename of ply file
-* @param binary write in binary mode
+* @param filename filename of mesh file
 * @return true
 */
 template <typename PFP>
 bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
+
+/**
+* export in binary volume file (nb_vert,nb_tetra,nb_hexa, vertices, tetra, hexa)
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of mesh file
+ */
+template <typename PFP>
+bool exportVolBinGz(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
 
 } // namespace Export
 

@@ -41,8 +41,36 @@ std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 	if (!Geom::arePointsEquals(goal, this->getPosition()))
 	{
 		CellMarkerMemo<FACE> memo_cross(this->m);
-		memo_cross.mark(this->d);
 
+
+		switch (this->getState())
+		{
+			case VERTEX :
+				vertexState(goal,memo_cross) ;
+				break ;
+			case EDGE :
+				edgeState(goal,memo_cross) ;
+				break ;
+			case FACE :
+				faceState(goal,memo_cross) ;
+				break ;
+		}
+		return memo_cross.get_markedCells();
+	}
+	else
+		this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
+
+	std::vector<Dart> res;
+	res.push_back(this->d);
+	return res;
+}
+
+template <typename PFP>
+std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross)
+{
+	this->crossCell = NO_CROSS ;
+	if (!Geom::arePointsEquals(goal, this->getPosition()))
+	{
 		switch (this->getState())
 		{
 			case VERTEX :
@@ -64,14 +92,6 @@ std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 	std::vector<Dart> res;
 	res.push_back(this->d);
 	return res;
-}
-
-template <typename PFP>
-std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross)
-{
-	memo_cross.mark(this->d);
-	this->move(goal,memo_cross);
-	return memo_cross.get_markedCells();
 }
 
 template <typename PFP>
@@ -120,8 +140,8 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 					do
 					{
 						if(Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
-								&& Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
-								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
+								&& Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current))
+//								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
 						{
 
 							this->edgeState(current,memo_cross) ;

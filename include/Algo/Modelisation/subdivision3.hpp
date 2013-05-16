@@ -27,7 +27,7 @@
 #include "Algo/Modelisation/extrusion.h"
 #include "Geometry/intersection.h"
 #include "NL/nl.h"
-#include "Algo/LinearSolving/basic.h"
+//#include "Algo/LinearSolving/basic.h"
 #include "Algo/Geometry/laplacian.h"
 
 namespace CGoGN

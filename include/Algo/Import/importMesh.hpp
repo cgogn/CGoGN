@@ -42,7 +42,7 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
@@ -159,7 +159,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 template <typename PFP>
 bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
@@ -273,7 +273,7 @@ namespace Import
 template <typename PFP>
 bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float dist)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
 	// buffer for tempo faces (used to remove degenerated edges)
@@ -379,7 +379,7 @@ bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<P
 template <typename PFP>
 bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float scale, unsigned int nbStage)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map);
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map);
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
 	// buffer for tempo faces (used to remove degenerated edges)
@@ -508,7 +508,7 @@ bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurf
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 {
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 	return false;
 }
 
@@ -516,29 +516,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool /*mergeCloseVertices*/)
 {
-	ImportType kind = Volume::Import::UNKNOWNVOLUME;
 
-	if ((filename.rfind(".tet") != std::string::npos) || (filename.rfind(".TET") != std::string::npos))
-		kind = TET;
-
-	if ((filename.rfind(".off") != std::string::npos) || (filename.rfind(".OFF") != std::string::npos))
-		kind = OFF;
-
-	if ((filename.rfind(".node") != std::string::npos) || (filename.rfind(".NODE") != std::string::npos))
-		kind = NODE;
-
-	if ((filename.rfind(".ts") != std::string::npos) || (filename.rfind(".TS") != std::string::npos))
-		kind = TS;
-
-	if ((filename.rfind(".msh") != std::string::npos) || (filename.rfind(".MSH") != std::string::npos))
-		kind = MSH;
-
-	if ((filename.rfind(".vtu") != std::string::npos) || (filename.rfind(".VTU") != std::string::npos))
-		kind = VTU;
-
-	if ((filename.rfind(".nas") != std::string::npos) || (filename.rfind(".NAS") != std::string::npos))
-		kind = NAS;
-
+	ImportType kind = getFileType(filename);
 
 	switch (kind)
 	{
@@ -555,6 +534,19 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 	case NAS:
 		return importNAS<PFP>(map, filename, attrNames, 1.0f);
 		break;
+
+	case VBGZ:
+		return importVBGZ<PFP>(map, filename, attrNames, 1.0f);
+		break;
+
+	case TETMESH:
+		return importTetmesh<PFP>(map, filename, attrNames, 1.0f);
+		break;
+
+//	case OVM:
+//		return importOVM<PFP>(map, filename, attrNames, 1.0f);
+//		break;
+
 
 		case OFF:
 		{

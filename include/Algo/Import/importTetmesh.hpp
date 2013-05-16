@@ -39,7 +39,7 @@ namespace Import
 {
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
+bool importTetmesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -48,7 +48,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
-	unsigned int m_nbVertices = 0, m_nbVolumes = 0;
+	unsigned int nbVertices = 0, nbVolumes = 0;
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	//open file
@@ -60,27 +60,40 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 	}
 
 	std::string ligne;
-	unsigned int nbv, nbt;
 
-	// reading number of vertices
-	std::getline (fp, ligne);
-	std::stringstream oss(ligne);
-	oss >> nbv;
+	fp >> ligne;
 
-	// reading number of tetrahedra
+	std::cout << "READ: "<< ligne << std::endl;
+
+	if (ligne!="Vertices")
+		CGoGNerr << "Warning tetmesh file problem"<< CGoGNendl;
+
+	fp >> nbVertices;
+
+	std::cout << "READ: "<< nbVertices << std::endl;
 	std::getline (fp, ligne);
-	std::stringstream oss2(ligne);
-	oss2 >> nbt;
+	std::cout << "READ: "<< ligne << std::endl;
+
+//	// reading number of vertices
+//	std::getline (fp, ligne);
+//	std::stringstream oss(ligne);
+//	oss >> nbv;
+
+//	// reading number of tetrahedra
+//	std::getline (fp, ligne);
+//	std::stringstream oss2(ligne);
+//	oss2 >> nbt;
 
 	//reading vertices
 	std::vector<unsigned int> verticesID;
-	verticesID.reserve(nbv);
-	for(unsigned int i = 0; i < nbv;++i)
+	verticesID.reserve(nbVertices+1);
+	verticesID.push_back(0xffffffff);
+	for(unsigned int i = 0; i < nbVertices;++i)
 	{
 		do
 		{
 			std::getline (fp, ligne);
-		} while (ligne.size() == 0 );
+		} while (ligne.size() == 0);
 
 		std::stringstream oss(ligne);
 
@@ -88,7 +101,6 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		oss >> x;
 		oss >> y;
 		oss >> z;
-
 		// TODO : if required read other vertices attributes here
 		VEC3 pos(x*scaleFactor,y*scaleFactor,z*scaleFactor);
 
@@ -98,33 +110,41 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		verticesID.push_back(id);
 	}
 
-	m_nbVertices = nbv;
-	m_nbVolumes = nbt;
+	fp >> ligne;
+	if (ligne!="Tetrahedra")
+		CGoGNerr << "Warning tetmesh file problem"<< CGoGNendl;
 
-	CGoGNout << "nb points = " << m_nbVertices  << " / nb tet = " << m_nbVolumes << CGoGNendl;
+	std::cout << "READ: "<< ligne << std::endl;
+
+
+	fp >> nbVolumes;
+
+	std::cout << "READ: "<< nbVolumes << std::endl;
+
+	std::getline (fp, ligne);
+	std::cout << "READ: "<< ligne << std::endl;
+
+
+	CGoGNout << "nb points = " << nbVertices  << " / nb tet = " << nbVolumes << CGoGNendl;
 
 	DartMarkerNoUnmark m(map) ;
 
-
 	unsigned int invertTetra = 0;
 	//Read and embed all tetrahedrons
-	for(unsigned int i = 0; i < m_nbVolumes ; ++i)
+	for(unsigned int i = 0; i < nbVolumes ; ++i)
 	{
 		//start one tetra
 
-		int nbe;
 		do
 		{
 			std::getline(fp,ligne);
 		} while(ligne.size() == 0);
 
 		std::stringstream oss(ligne);
-		oss >> nbe; //number of vertices = 4 or used for region mark
 
 		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
 
 		Geom::Vec4ui pt;
-
 
 		if (i==0)
 		{
@@ -163,7 +183,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 			do
 			{
 				m.mark(dd) ;
-				vecDartsPerVertex[pt[2-j]].push_back(dd);
+				vecDartsPerVertex[verticesID[pt[2-j]]].push_back(dd);
 				dd = map.phi1(map.phi2(dd));
 			} while(dd != d);
 
@@ -181,7 +201,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		do
 		{
 			m.mark(dd) ;
-			vecDartsPerVertex[pt[3]].push_back(dd);
+			vecDartsPerVertex[verticesID[pt[3]]].push_back(dd);
 			dd = map.phi1(map.phi2(dd));
 		} while(dd != d);
 

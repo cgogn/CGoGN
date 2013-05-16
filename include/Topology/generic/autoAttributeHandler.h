@@ -31,40 +31,6 @@
 namespace CGoGN
 {
 
-///**
-// * Class that creates an access-table to an attribute
-// * that is added especially. The attribute is removed when
-// * the AutoAttributeHandler object is destroyed
-// */
-//template <typenaDartAutoAttributeRBIT>
-//class AutoAttributeHandler : public AttributeHandler<T, ORBIT>
-//{
-//public:
-//	/**
-//	 * constructor
-//	 * @param m the map
-//	 * @param orbit the orbit of map
-//	 * @param nameAttr the name of attribute
-//	 * @param nameType the name of type of attribute
-//	 */
-//	AutoAttributeHandler(AttribMap& m, const std::string& nameAttr = "")
-//	{
-//		this->m_map = &m ;
-//		if(!m.isOrbitEmbedded<ORBIT>())
-//			m.addEmbedding<ORBIT>() ;
-//		AttributeMultiVector<T>* amv = this->m_map->m_attribs[ORBIT].template addAttribute<T>(nameAttr) ;
-//		this->m_attrib = amv ;
-//		this->valid = true ;
-//		this->registerInMap() ;
-//	}
-//
-//	~AutoAttributeHandler()
-//	{
-//		if (this->valid)
-//			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
-//	}
-//} ;
-
 
 /**
  *  shortcut class for Dart AutoAttribute (Handler)
@@ -190,6 +156,7 @@ public:
 			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
 	}
 };
+
 
 } // namespace CGoGN
 

@@ -226,6 +226,18 @@ Dart ImplicitHierarchicalMap::faceOldestDart(Dart d)
 	return oldest ;
 }
 
+bool ImplicitHierarchicalMap::sameFace(Dart d, Dart e)
+{
+	Dart it = d ;
+	do
+	{
+		if(it == e)
+			return true ;
+		it = phi1(it) ;
+	} while(it != d) ;
+	return false ;
+}
+
 bool ImplicitHierarchicalMap::edgeIsSubdivided(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;

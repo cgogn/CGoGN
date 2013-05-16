@@ -24,11 +24,6 @@
 
 #include "Algo/Modelisation/polyhedron.h"
 #include "Geometry/orientation.h"
-
-#include <libxml/encoding.h>
-#include <libxml/xmlwriter.h>
-#include <libxml/parser.h>
-
 #include <vector>
 
 namespace CGoGN
@@ -44,7 +39,7 @@ namespace Import
 {
 
 template <typename PFP>
-bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
+bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -55,171 +50,125 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
-	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
-	xmlNodePtr vtu_node = xmlDocGetRootElement(doc);
+	//open file
+	igzstream fs(filename.c_str(), std::ios::in|std::ios::binary);
+	if (!fs.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		return false;
+	}
 
 
-//	std::cout << " NAME "<<vtu_node->name << std::endl;
+	unsigned int numbers[3];
 
-	xmlChar *prop = xmlGetProp(vtu_node, BAD_CAST "type");
-//	std::cout << "type = "<< prop << std::endl;
+	// read nb of points
+	fs.read(reinterpret_cast<char*>(numbers), 3*sizeof(unsigned int));
 
-	xmlNode* grid_node = vtu_node->children;
-	while (strcmp((char*)(grid_node->name),(char*)"UnstructuredGrid")!=0)
-		grid_node = grid_node->next;
-
-	xmlNode* piece_node = grid_node->children;
-	while (strcmp((char*)(piece_node->name),(char*)"Piece")!=0)
-		piece_node = piece_node->next;
-
-	prop = xmlGetProp(piece_node, BAD_CAST "NumberOfPoints");
-	unsigned int nbVertices = atoi((char*)(prop));
-
-	prop = xmlGetProp(piece_node, BAD_CAST "NumberOfCells");
-	unsigned int nbVolumes = atoi((char*)(prop));
-
-	std::cout << "Number of points = "<< nbVertices<< std::endl;
-	std::cout << "Number of cells = "<< nbVolumes << std::endl;
-
-	xmlNode* points_node = piece_node->children;
-	while (strcmp((char*)(points_node->name),(char*)"Points")!=0)
-		points_node = points_node->next;
-
-	points_node = points_node->children;
-	while (strcmp((char*)(points_node->name),(char*)"DataArray")!=0)
-		points_node = points_node->next;
+	VEC3* bufposi;
+	bufposi = new VEC3[ numbers[0] ];
+	fs.read(reinterpret_cast<char*>(bufposi), numbers[0]*sizeof(VEC3));
 
 	std::vector<unsigned int> verticesID;
-	verticesID.reserve(nbVertices);
+	verticesID.reserve(numbers[0]);
 
-	std::stringstream ss((char*)(xmlNodeGetContent(points_node->children)));
-	for (unsigned int i=0; i< nbVertices; ++i)
+	for(unsigned int i = 0; i < numbers[0];++i)
 	{
-		typename PFP::VEC3 P;
-		ss >> P[0]; ss >> P[1]; ss >> P[2];
-		P *= scaleFactor;
 		unsigned int id = container.insertLine();
-		position[id] = P;
+		position[id] = bufposi[i]*scaleFactor;
 		verticesID.push_back(id);
 	}
+	delete bufposi;
 
-
-	xmlNode* cell_node = piece_node->children;
-	while (strcmp((char*)(cell_node->name),(char*)"Cells")!=0)
-		cell_node = cell_node->next;
-
-	std::cout <<"CELL NODE = "<< cell_node->name << std::endl;
-
-
-	std::vector<unsigned char> typeVols;
-	typeVols.reserve(nbVolumes);
-	std::vector<unsigned int> offsets;
-	offsets.reserve(nbVolumes);
-	std::vector<unsigned int> indices;
-	indices.reserve(nbVolumes*4);
-
-
-	for (xmlNode* x_node = cell_node->children; x_node!=NULL; x_node = x_node->next)
+	unsigned int* bufTetra=NULL;
+	if (numbers[1] != 0)
 	{
-		while ((x_node!=NULL) && (strcmp((char*)(x_node->name),(char*)"DataArray")!=0))
-			x_node = x_node->next;
-
-		if (x_node == NULL)
-			break;
-		else
-		{
-			xmlChar* type = xmlGetProp(x_node, BAD_CAST "Name");
-
-			if (strcmp((char*)(type),(char*)"connectivity")==0)
-			{
-				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
-				while (!ss.eof())
-				{
-					unsigned int ind;
-					ss >> ind;
-					indices.push_back(ind);
-				}
-			}
-			if (strcmp((char*)(type),(char*)"offsets")==0)
-			{
-				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
-				for (unsigned int i=0; i< nbVolumes; ++i)
-				{
-					unsigned int o;
-					ss >> o;
-					offsets.push_back(o);
-				}
-			}
-			if (strcmp((char*)(type),(char*)"types")==0)
-			{
-				bool unsupported = false;
-				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
-				for (unsigned int i=0; i< nbVolumes; ++i)
-				{
-					unsigned int t;
-					ss >> t;
-					if ((t != 12) && (t!= 10))
-					{
-						unsupported = true;
-						typeVols.push_back(0);
-					}
-					else
-					{
-						typeVols.push_back((unsigned char)t);
-					}
-				}
-				if (unsupported)
-					CGoGNerr << "warning, some unsupported volume cell types"<< CGoGNendl;
-			}
-		}
+		bufTetra = new unsigned int[ 4*numbers[1] ];
+		fs.read(reinterpret_cast<char*>(bufTetra), 4*numbers[1]*sizeof(unsigned int));
 	}
 
-	xmlFreeDoc(doc);
+	unsigned int* bufHexa=NULL;
+	if (numbers[2] != 0)
+	{
+		bufHexa = new unsigned int[ 8*numbers[2] ];
+		fs.read(reinterpret_cast<char*>(bufHexa), 8*numbers[2]*sizeof(unsigned int));
+	}
+	CGoGNout << "nb vertices = " << numbers[0];
+
 
 	DartMarkerNoUnmark m(map) ;
 
-	unsigned int currentOffset = 0;
-	for (unsigned int i=0; i< nbVolumes; ++i)
+	if (numbers[1] > 0)
 	{
-		if (typeVols[i]==12)
+		//Read and embed all tetrahedrons
+		for(unsigned int i = 0; i < numbers[1] ; ++i)
 		{
-			Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
+			Geom::Vec4ui pt;
 
+			pt[0] = bufTetra[4*i];
+			pt[1] = bufTetra[4*i+1];
+			pt[2] = bufTetra[4*i+2];
+			pt[3] = bufTetra[4*i+3];
+
+			Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
+
+			// Embed three "base" vertices
+			for(unsigned int j = 0 ; j < 3 ; ++j)
+			{
+				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[j]]);
+				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+
+				//store darts per vertices to optimize reconstruction
+				Dart dd = d;
+				do
+				{
+					m.mark(dd) ;
+					vecDartsPerVertex[verticesID[pt[j]]].push_back(dd);
+					dd = map.phi1(map.phi2(dd));
+				} while(dd != d);
+
+				d = map.phi1(d);
+			}
+
+			//Embed the last "top" vertex
+			d = map.template phi<211>(d);
+			//d = map.phi_1(map.phi2(d));
+
+			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
+			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+
+			//store darts per vertex to optimize reconstruction
+			Dart dd = d;
+			do
+			{
+				m.mark(dd) ;
+				vecDartsPerVertex[verticesID[pt[3]]].push_back(dd);
+				dd = map.phi1(map.phi2(dd));
+			} while(dd != d);
+
+			//end of tetra
+		}
+		CGoGNout << " / nb tetra = " << numbers[1];
+		delete[] bufTetra;
+	}
+
+	if (numbers[2] > 0)
+	{
+
+		//Read and embed all tetrahedrons
+		for(unsigned int i = 0; i < numbers[2] ; ++i)
+		{
+			// one hexa
 			unsigned int pt[8];
-			pt[0] = indices[currentOffset];
-			pt[1] = indices[currentOffset+1];
-			pt[2] = indices[currentOffset+2];
-			pt[3] = indices[currentOffset+3];
-			pt[4] = indices[currentOffset+4];
-			typename PFP::VEC3 P = position[verticesID[indices[currentOffset+4]]];
-			typename PFP::VEC3 A = position[verticesID[indices[currentOffset  ]]];
-			typename PFP::VEC3 B = position[verticesID[indices[currentOffset+1]]];
-			typename PFP::VEC3 C = position[verticesID[indices[currentOffset+2]]];
+			pt[0] = bufHexa[8*i];
+			pt[1] = bufHexa[8*i+1];
+			pt[2] = bufHexa[8*i+2];
+			pt[3] = bufHexa[8*i+3];
+			pt[4] = bufHexa[8*i+4];
+			pt[5] = bufHexa[8*i+5];
+			pt[6] = bufHexa[8*i+6];
+			pt[7] = bufHexa[8*i+7];
 
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
-			{
-
-				pt[0] = indices[currentOffset+3];
-				pt[1] = indices[currentOffset+2];
-				pt[2] = indices[currentOffset+1];
-				pt[3] = indices[currentOffset+0];
-				pt[4] = indices[currentOffset+7];
-				pt[5] = indices[currentOffset+6];
-				pt[6] = indices[currentOffset+5];
-				pt[7] = indices[currentOffset+4];
-			}
-			else
-			{
-				pt[0] = indices[currentOffset+0];
-				pt[1] = indices[currentOffset+1];
-				pt[2] = indices[currentOffset+2];
-				pt[3] = indices[currentOffset+3];
-				pt[4] = indices[currentOffset+4];
-				pt[5] = indices[currentOffset+5];
-				pt[6] = indices[currentOffset+6];
-				pt[7] = indices[currentOffset+7];
-			}
-
+			Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
 
 			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[0]]);
 
@@ -264,7 +213,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesID[pt[4]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[4]]].push_back(dd); m.mark(dd);
 
-			d = map.phi_1(d);
+			d = map.phi1(d);
 			fsetemb.changeEmb(verticesID[pt[5]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 			dd = d;
@@ -272,7 +221,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesID[pt[5]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[5]]].push_back(dd); m.mark(dd);
 
-			d = map.phi_1(d);
+			d = map.phi1(d);
 			fsetemb.changeEmb(verticesID[pt[6]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 			dd = d;
@@ -280,73 +229,20 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesID[pt[6]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[6]]].push_back(dd); m.mark(dd);
 
-			d = map.phi_1(d);
+			d = map.phi1(d);
 			fsetemb.changeEmb(verticesID[pt[7]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 			dd = d;
 			vecDartsPerVertex[verticesID[pt[7]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[7]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[7]]].push_back(dd); m.mark(dd);
+			//end of hexa
 		}
-		else if (typeVols[i]==10)
-		{
-			Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
-
-			Geom::Vec4ui pt;
-			pt[0] = indices[currentOffset];
-			pt[1] = indices[currentOffset+1];
-			pt[2] = indices[currentOffset+2];
-			pt[3] = indices[currentOffset+3];
-
-			typename PFP::VEC3 P = position[verticesID[pt[0]]];
-			typename PFP::VEC3 A = position[verticesID[pt[1]]];
-			typename PFP::VEC3 B = position[verticesID[pt[2]]];
-			typename PFP::VEC3 C = position[verticesID[pt[3]]];
-
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
-			{
-				unsigned int ui=pt[1];
-				pt[1] = pt[2];
-				pt[2] = ui;
-			}
-
-			// Embed three "base" vertices
-			for(unsigned int j = 0 ; j < 3 ; ++j)
-			{
-				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
-				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-
-				//store darts per vertices to optimize reconstruction
-				Dart dd = d;
-				do
-				{
-					m.mark(dd) ;
-					vecDartsPerVertex[pt[2-j]].push_back(dd);
-					dd = map.phi1(map.phi2(dd));
-				} while(dd != d);
-
-				d = map.phi1(d);
-			}
-
-			//Embed the last "top" vertex
-			d = map.phi_1(map.phi2(d));
-
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-
-			//store darts per vertices to optimize reconstruction
-			Dart dd = d;
-			do
-			{
-				m.mark(dd) ;
-				vecDartsPerVertex[pt[3]].push_back(dd);
-				dd = map.phi1(map.phi2(dd));
-			} while(dd != d);
-
-		}
-		currentOffset = offsets[i];
+		CGoGNout << " / nb hexa = " << numbers[2];
+		delete[] bufHexa;
 	}
 
+	CGoGNout << CGoGNendl;
 
 	//Association des phi3
 	unsigned int nbBoundaryFaces = 0 ;
@@ -360,7 +256,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
 				if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
-						map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.template phi<11>(d)))
+				   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.template phi<11>(d)))
 				{
 					good_dart = *it ;
 				}
@@ -381,11 +277,11 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	if (nbBoundaryFaces > 0)
 	{
-		std::cout << "closing" << std::endl ;
 		map.closeMap();
 		CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces)" << CGoGNendl;
 	}
 
+	fs.close();
 	return true;
 }
 

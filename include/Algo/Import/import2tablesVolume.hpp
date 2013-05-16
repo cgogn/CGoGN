@@ -34,26 +34,6 @@ namespace Volume
 namespace Import
 {
 
-template <typename PFP>
-ImportType MeshTablesVolume<PFP>::getFileType(const std::string& filename)
-{
-	if ((filename.rfind(".tet")!=std::string::npos) || (filename.rfind(".TET")!=std::string::npos))
-		return TET;
-
-	if ((filename.rfind(".node")!=std::string::npos) || (filename.rfind(".NODE")!=std::string::npos))
-		return NODE;
-
-	if ((filename.rfind(".off")!=std::string::npos) || (filename.rfind(".OFF")!=std::string::npos))
-		return OFF;
-
-	if ((filename.rfind(".ts")!=std::string::npos) || (filename.rfind(".TS")!=std::string::npos))
-		return TS;
-
-	if ((filename.rfind(".moka")!=std::string::npos) || (filename.rfind(".MOKA")!=std::string::npos))
-		return MOKA;
-
-	return UNKNOWNVOLUME;
-}
 
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)

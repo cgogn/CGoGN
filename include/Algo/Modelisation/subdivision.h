@@ -105,8 +105,12 @@ template <typename PFP>
 void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 
+/**
+ * Cut 1 face of degree n in 2n+1 faces (cut 2 times each edge and "insert" a face in the middle)
+ * @param size indicates where to cut edges, its value must stay between 0 and 0.5 excluded
+ */
 template <typename PFP, typename EMBV, typename EMB>
-void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
+void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size=1.0f/3.0f) ;
 
 /**
  * Doo-Sabin subdivision scheme
