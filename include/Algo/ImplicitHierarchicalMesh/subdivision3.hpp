@@ -121,8 +121,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		Dart dd = map.phi1(old) ;
 		Dart e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;					// insert a new edge
-		unsigned int id = map.getNewEdgeId() ;
-		map.setEdgeId(map.phi_1(dd), id, EDGE) ;		// set the edge id of the inserted edge to the next available id
+		//unsigned int id = map.getNewEdgeId() ;
+		//map.setEdgeId(map.phi_1(dd), id, EDGE) ;		// set the edge id of the inserted edge to the next available id
 
 		unsigned int idface = map.getFaceId(old);
 		map.setFaceId(dd, idface, FACE) ;
@@ -131,8 +131,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		dd = e ;
 		e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;
-		id = map.getNewEdgeId() ;
-		map.setEdgeId(map.phi_1(dd), id, EDGE) ;
+		//id = map.getNewEdgeId() ;
+		//map.setEdgeId(map.phi_1(dd), id, EDGE) ;
 
 		map.setFaceId(dd, idface, FACE) ;
 		map.setFaceId(e, idface, FACE) ;
@@ -140,11 +140,53 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		dd = e ;
 		e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;
-		id = map.getNewEdgeId() ;
-		map.setEdgeId(map.phi_1(dd), id, EDGE) ;
+		//id = map.getNewEdgeId() ;
+		//map.setEdgeId(map.phi_1(dd), id, EDGE) ;
 
 		map.setFaceId(dd, idface, FACE) ;
 		map.setFaceId(e, idface, FACE) ;
+
+		Dart stop = map.phi2(map.phi1(old));
+		Dart dit = stop;
+		do
+		{
+			unsigned int dId = map.getEdgeId(map.phi_1(map.phi2(dit)));
+			unsigned int eId = map.getEdgeId(map.phi1(map.phi2(dit)));
+
+			unsigned int t = dId + eId;
+
+			if(t == 0)
+			{
+				map.setEdgeId(dit, 1, EDGE) ;
+				map.setEdgeId(map.phi2(dit), 1, EDGE) ;
+			}
+			else if(t == 1)
+			{
+				map.setEdgeId(dit, 2, EDGE) ;
+				map.setEdgeId(map.phi2(dit), 2, EDGE) ;
+			}
+			else if(t == 2)
+			{
+				if(dId == eId)
+				{
+					map.setEdgeId(dit, 0, EDGE) ;
+					map.setEdgeId(map.phi2(dit), 0, EDGE) ;
+				}
+				else
+				{
+					map.setEdgeId(dit, 1, EDGE) ;
+					map.setEdgeId(map.phi2(dit), 1, EDGE) ;
+				}
+			}
+			else if(t == 3)
+			{
+				map.setEdgeId(dit, 0, EDGE) ;
+				map.setEdgeId(map.phi2(dit), 0, EDGE) ;
+			}
+
+			dit = map.phi1(dit);
+		}while(dit != stop);
+
 	}
 	else
 	{

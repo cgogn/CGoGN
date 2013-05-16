@@ -69,10 +69,9 @@ void ImplicitHierarchicalMap::initImplicitProperties()
 	//initEdgeId() ;
 
 	//init each edge Id at 0
-	TraversorE<ImplicitHierarchicalMap> te(*this);
-	for(Dart dit = te.begin() ; dit != te.next() ; dit = te.next())
+	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
-		m_edgeId[dit] = 0;
+		m_edgeId[d] = 0;
 	}
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)

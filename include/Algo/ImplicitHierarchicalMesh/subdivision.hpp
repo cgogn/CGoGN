@@ -61,7 +61,7 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 }
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
+void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position, bool forceTri)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
@@ -89,7 +89,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 
 	map.setCurrentLevel(fLevel + 1) ;			// go to the next level to perform face subdivision
 
-	if(degree == 3)								// if subdividing a triangle
+	if(degree == 3 && forceTri)								// if subdividing a triangle
 	{
 		Dart dd = map.phi1(old) ;
 		Dart e = map.phi1(map.phi1(dd)) ;
@@ -134,17 +134,16 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 			}
 			else if(t == 2)
 			{
-			    if(dId == eId)
-			    {
-				std::cout << "plop" << std::endl;
-				map.setEdgeId(dit, 0);
-				map.setEdgeId(map.phi2(dit), 0);
-			    }
-			    else
-			    {
-				map.setEdgeId(dit, 1);
-				map.setEdgeId(map.phi2(dit), 1);
-			    }
+				if(dId == eId)
+				{
+					map.setEdgeId(dit, 0);
+					map.setEdgeId(map.phi2(dit), 0);
+				}
+				else
+				{
+					map.setEdgeId(dit, 1);
+					map.setEdgeId(map.phi2(dit), 1);
+				}
 			}
 			else if(t == 3)
 			{
