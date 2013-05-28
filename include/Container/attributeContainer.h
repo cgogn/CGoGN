@@ -56,7 +56,7 @@ public:
 	/**
 	* Taille du bloc
 	*/
-	static const unsigned int BlockSize = _BLOCKSIZE_;
+//	static const unsigned int BlockSize = _BLOCKSIZE_;
 
 protected:
 	/**

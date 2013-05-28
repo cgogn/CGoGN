@@ -277,13 +277,13 @@ unsigned int AttributeMultiVector<T>::getBlocksPointers(std::vector<void*>& addr
  **************************************/
 
 template <typename T>
-void AttributeMultiVector<T>::initElt(unsigned int id)
+inline void AttributeMultiVector<T>::initElt(unsigned int id)
 {
 	m_tableData[id / _BLOCKSIZE_][id % _BLOCKSIZE_] = T(0);
 }
 
 template <typename T>
-void AttributeMultiVector<T>::copyElt(unsigned int dst, unsigned int src)
+inline void AttributeMultiVector<T>::copyElt(unsigned int dst, unsigned int src)
 {
 	m_tableData[dst / _BLOCKSIZE_][dst % _BLOCKSIZE_] = m_tableData[src / _BLOCKSIZE_][src % _BLOCKSIZE_];
 }

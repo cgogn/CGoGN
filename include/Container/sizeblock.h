@@ -28,7 +28,8 @@
 #include "Utils/gzstream.h"
 #include "Utils/cgognStream.h"
 
-#define _BLOCKSIZE_ 4096
+//#define _BLOCKSIZE_ 4096
+const unsigned int _BLOCKSIZE_ = 4096;
 
 //typedef std::ifstream CGoGNistream;
 //typedef std::ofstream CGoGNostream;
