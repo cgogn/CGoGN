@@ -121,6 +121,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 	if(Geometry::isPointOnVertex<PFP>(m,d,m_positions,goal))
 	{
 		state = VERTEX;
+		distance += (goal - this->getPosition()).norm();
 		this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 		return;
 	}
@@ -151,6 +152,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 				}
 				else
 				{
+					distance += (goal - this->getPosition()).norm();
 					this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 					state = VERTEX;
 					return;
@@ -235,6 +237,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 
 	if(!Geometry::isPointOnHalfEdge<PFP>(m, d, m_positions, goal))
 	{
+		distance += (goal - this->getPosition()).norm();
 		this->Algo::MovingObjects::ParticleBase<PFP>::move(m_positions[d]) ;
 		vertexState(goal);
 		return;
@@ -242,11 +245,12 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 	else if(!Geometry::isPointOnHalfEdge<PFP>(m, m.phi2(d), m_positions, goal))
 	{
 		d = m.phi2(d);
+		distance += (m_positions[d] - this->getPosition()).norm();
 		this->Algo::MovingObjects::ParticleBase<PFP>::move(m_positions[d]) ;
 		vertexState(goal);
 		return;
 	}
-
+	distance += (goal - this->getPosition()).norm();
 	this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 }
 
@@ -265,9 +269,9 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 	VEC3 n2 = goal - this->getPosition();
 //	n1.normalize();
 	VEC3 n3 = n1 ^ n2;
-	n3.normalize();
+
 	VEC3 n4 = n3 ^ n1;
-	goal = this->getPosition() + (n2 * n4) * n4;
+	goal = this->getPosition() + n4;
 
 	//track new position within map
 	Dart dd = d;
@@ -294,20 +298,24 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 				case Geom::UNDER: 	d = m.phi1(d);
 									break;
 //				case Geom::ON:		this->Algo::MovingObjects::ParticleBase<PFP>::move(current) ;
-				case Geom::ON:		this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
+				case Geom::ON:		distance += (goal - this->getPosition()).norm();
+									this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 									edgeState(goal);
 									return;
 				case Geom::OVER:
 //									CGoGNout << "smthg went bad " << m_position << " " << goal << CGoGNendl;
 //									CGoGNout << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi1(d)] << CGoGNendl;
 //									this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(current, this->getPosition(), d));
-									this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d));
+									VEC3 inter = intersectLineEdge(goal, this->getPosition(), d);
+									distance += (inter - this->getPosition()).norm();
+									this->Algo::MovingObjects::ParticleBase<PFP>::move(inter);
 //									CGoGNout << " " << m_position << CGoGNendl;
 
 									edgeState(goal,Geom::OVER);
 									return;
 				}
 			} while(d != dd);
+			distance += (goal - this->getPosition()).norm();
 			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 			state = FACE;
 
@@ -346,12 +354,15 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 					break;
 				case Geom::ON :
 // 					CGoGNout << "pic" << CGoGNendl;
+					distance += (goal - this->getPosition()).norm();
 					this->Algo::MovingObjects::ParticleBase<PFP>::move(goal) ;
 					edgeState(goal);
 					return;
 				case Geom::OVER:
 //					CGoGNout << "smthg went bad(2) " << m_position << CGoGNendl;
-					this->Algo::MovingObjects::ParticleBase<PFP>::move(intersectLineEdge(goal, this->getPosition(), d)) ;
+					VEC3 inter = intersectLineEdge(goal, this->getPosition(), d);
+					distance += (inter - this->getPosition()).norm();
+					this->Algo::MovingObjects::ParticleBase<PFP>::move(inter) ;
 // 					CGoGNout << " " << m_position << CGoGNendl;
 //					edgeState(current, Geom::OVER);
 					edgeState(goal, Geom::OVER);
@@ -359,7 +370,7 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 				}
 			} while(d != dd);
 
-
+			distance += (goal - this->getPosition()).norm();
 			this->Algo::MovingObjects::ParticleBase<PFP>::move(goal);
 			state = FACE;
 			return;
@@ -377,7 +388,7 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 	default :
 		if(wsoe == Geom::ON)
 		{
-			std::cout << __FILE__ << " to uncomment and check" << std::endl;
+//			std::cout << __FILE__ << " to uncomment and check" << std::endl;
 //			d = m.phi1(d); //to check
 //			m_position = m_positions[d];
 //
