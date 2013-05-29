@@ -87,6 +87,12 @@ GenericMap::GenericMap() : m_nbThreads(1)
 			m_marksets[i][j].clear() ;
 			m_markTables[i][j] = NULL ;
 		}
+
+		for(unsigned int j = 0; j < NB_ORBITS; ++j)
+		{
+			m_quickLocalIncidentTraversal[i][j] = NULL ;
+			m_quickLocalAdjacentTraversal[i][j] = NULL ;
+		}
 	}
 
 	for (unsigned int i=0; i<NB_THREAD; ++i)

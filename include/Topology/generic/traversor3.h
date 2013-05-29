@@ -69,6 +69,10 @@ private:
 	CellMarkerStore<ORBY>* m_cmark ;
 	Dart m_current ;
 	TraversorDartsOfOrbit<MAP, ORBX> m_tradoo;
+
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
+
 	bool m_allocated;
 	bool m_first;
 public:
@@ -91,6 +95,9 @@ private:
 	MAP& m_map ;
 	std::vector<Dart> m_vecDarts;
 	std::vector<Dart>::iterator m_iter;
+
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor3XXaY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0);
 

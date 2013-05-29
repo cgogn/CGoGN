@@ -36,10 +36,13 @@
 #include <boost/thread/mutex.hpp>
 
 #include "Container/attributeContainer.h"
+#include "Container/fakeAttribute.h"
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
+
+
 
 namespace CGoGN
 {
@@ -101,6 +104,10 @@ protected:
 	 * (initialized by enableQuickTraversal function)
 	 */
 	AttributeMultiVector<Dart>* m_quickTraversal[NB_ORBITS] ;
+
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalIncidentTraversal[NB_ORBITS][NB_ORBITS] ;
+
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalAdjacentTraversal[NB_ORBITS][NB_ORBITS] ;
 
 	/**
 	 * Marks manager
@@ -473,6 +480,31 @@ public:
 
 	template <unsigned int ORBIT>
 	void disableQuickTraversal() ;
+
+
+	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
+	void enableQuickLocalIncidentTraversal(MAP& map);
+
+	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
+	void updateQuickLocalIncidentTraversal(MAP& map);
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickLocalIncidentTraversal();
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	void disableQuickLocalIncidentTraversal();
+
+	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
+	void enableQuickLocalAdjacentTraversal(MAP& map);
+
+	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
+	void updateQuickLocalAdjacentTraversal(MAP& map);
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickLocalAdjacentTraversal();
+
+	template <unsigned int ORBIT, unsigned int ADJ>
+	void disableQuickLocalAdjacentTraversal();
 
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *

@@ -444,6 +444,7 @@ void GenericMap::initAllOrbitsEmbedding(bool realloc)
 template <unsigned int ORBIT>
 inline void GenericMap::enableQuickTraversal()
 {
+
 	if(m_quickTraversal[ORBIT] == NULL)
 	{
 		if(!isOrbitEmbedded<ORBIT>())
@@ -484,6 +485,130 @@ inline void GenericMap::disableQuickTraversal()
 		m_quickTraversal[ORBIT] = NULL ;
 	}
 }
+
+
+template <typename MAP, unsigned int ORBIT, unsigned int INCI>
+inline void GenericMap::enableQuickLocalIncidentTraversal(MAP& map)
+{
+	if(m_quickLocalIncidentTraversal[ORBIT][INCI] == NULL)
+	{
+		if(!isOrbitEmbedded<ORBIT>())
+			addEmbedding<ORBIT>() ;
+		std::stringstream ss;
+		ss << "quickLocalIncidentTraversal_" << INCI;
+		m_quickLocalIncidentTraversal[ORBIT][INCI] = m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+	}
+	updateQuickLocalIncidentTraversal<MAP,ORBIT,INCI>(map) ;
+}
+
+template <typename MAP, unsigned int ORBIT, unsigned int INCI>
+inline void GenericMap::updateQuickLocalIncidentTraversal(MAP& map)
+{
+	assert(m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL || !"updateQuickTraversal on a disabled orbit") ;
+
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* ptrVD = m_quickLocalIncidentTraversal[ORBIT][INCI];
+	m_quickLocalIncidentTraversal[ORBIT][INCI] = NULL;
+
+	std::vector<Dart> buffer;
+	buffer.reserve(100);
+
+	TraversorCell<MAP,ORBIT> tra_glob(map);
+	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
+	{
+		buffer.clear();
+		Traversor3XY<MAP,ORBIT,INCI> tra_loc(map,d);
+		for (Dart e = tra_loc.begin(); e != tra_loc.end(); e = tra_loc.next())
+			buffer.push_back(e);
+		buffer.push_back(NIL);
+		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+		vd.reserve(buffer.size());
+		vd.assign(buffer.begin(),buffer.end());
+	}
+
+	m_quickLocalIncidentTraversal[ORBIT][INCI] = ptrVD;
+}
+
+template <unsigned int ORBIT, unsigned int INCI>
+inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickLocalIncidentTraversal()
+{
+	return m_quickLocalIncidentTraversal[ORBIT][INCI] ;
+}
+
+template <unsigned int ORBIT, unsigned int INCI>
+inline void GenericMap::disableQuickLocalIncidentTraversal()
+{
+	if(m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL)
+	{
+		m_attribs[ORBIT].removeAttribute<Dart>(m_quickLocalIncidentTraversal[ORBIT][INCI]->getIndex()) ;
+		m_quickLocalIncidentTraversal[ORBIT][INCI] = NULL ;
+	}
+}
+
+
+
+template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
+inline void GenericMap::enableQuickLocalAdjacentTraversal(MAP& map)
+{
+	if(m_quickLocalAdjacentTraversal[ORBIT][ADJ] == NULL)
+	{
+		if(!isOrbitEmbedded<ORBIT>())
+			addEmbedding<ORBIT>() ;
+		std::stringstream ss;
+		ss << "m_quickLocalAdjacentTraversal" << ADJ;
+		m_quickLocalAdjacentTraversal[ORBIT][ADJ] = m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+	}
+	updateQuickLocalAdjacentTraversal<MAP,ORBIT,ADJ>(map) ;
+}
+
+template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
+inline void GenericMap::updateQuickLocalAdjacentTraversal(MAP& map)
+{
+	assert(m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL || !"updateQuickTraversal on a disabled orbit") ;
+
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* ptrVD = m_quickLocalAdjacentTraversal[ORBIT][ADJ];
+	m_quickLocalAdjacentTraversal[ORBIT][ADJ] = NULL;
+
+	std::vector<Dart> buffer;
+	buffer.reserve(100);
+
+	TraversorCell<MAP,ORBIT> tra_glob(map);
+	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
+	{
+		buffer.clear();
+		Traversor3XXaY<MAP,ORBIT,ADJ> tra_loc(map,d);
+		for (Dart e = tra_loc.begin(); e != tra_loc.end(); e = tra_loc.next())
+			buffer.push_back(e);
+		buffer.push_back(NIL);
+
+		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+		vd.reserve(buffer.size());
+		vd.assign(buffer.begin(),buffer.end());
+	}
+
+	m_quickLocalAdjacentTraversal[ORBIT][ADJ] = ptrVD;
+}
+
+template <unsigned int ORBIT, unsigned int INCI>
+inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickLocalAdjacentTraversal()
+{
+	return m_quickLocalAdjacentTraversal[ORBIT][INCI] ;
+}
+
+template <unsigned int ORBIT, unsigned int ADJ>
+inline void GenericMap::disableQuickLocalAdjacentTraversal()
+{
+	if(m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL)
+	{
+		m_attribs[ORBIT].removeAttribute<Dart>(m_quickLocalAdjacentTraversal[ORBIT][ADJ]->getIndex()) ;
+		m_quickLocalAdjacentTraversal[ORBIT][ADJ] = NULL ;
+	}
+}
+
+
+
+
+
+
 
 /****************************************
  *        ATTRIBUTES MANAGEMENT         *
