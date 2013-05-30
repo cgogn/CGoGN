@@ -488,7 +488,7 @@ inline void GenericMap::disableQuickTraversal()
 
 
 template <typename MAP, unsigned int ORBIT, unsigned int INCI>
-inline void GenericMap::enableQuickLocalIncidentTraversal(MAP& map)
+inline void GenericMap::enableQuickIncidentTraversal()
 {
 	if(m_quickLocalIncidentTraversal[ORBIT][INCI] == NULL)
 	{
@@ -498,11 +498,11 @@ inline void GenericMap::enableQuickLocalIncidentTraversal(MAP& map)
 		ss << "quickLocalIncidentTraversal_" << INCI;
 		m_quickLocalIncidentTraversal[ORBIT][INCI] = m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
-	updateQuickLocalIncidentTraversal<MAP,ORBIT,INCI>(map) ;
+	updateQuickIncidentTraversal<MAP,ORBIT,INCI>() ;
 }
 
 template <typename MAP, unsigned int ORBIT, unsigned int INCI>
-inline void GenericMap::updateQuickLocalIncidentTraversal(MAP& map)
+inline void GenericMap::updateQuickIncidentTraversal()
 {
 	assert(m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL || !"updateQuickTraversal on a disabled orbit") ;
 
@@ -511,6 +511,8 @@ inline void GenericMap::updateQuickLocalIncidentTraversal(MAP& map)
 
 	std::vector<Dart> buffer;
 	buffer.reserve(100);
+
+	MAP& map = static_cast<MAP&>(*this);
 
 	TraversorCell<MAP,ORBIT> tra_glob(map);
 	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
@@ -543,13 +545,13 @@ inline void GenericMap::updateQuickLocalIncidentTraversal(MAP& map)
 }
 
 template <unsigned int ORBIT, unsigned int INCI>
-inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickLocalIncidentTraversal()
+inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickIncidentTraversal()
 {
 	return m_quickLocalIncidentTraversal[ORBIT][INCI] ;
 }
 
 template <unsigned int ORBIT, unsigned int INCI>
-inline void GenericMap::disableQuickLocalIncidentTraversal()
+inline void GenericMap::disableQuickIncidentTraversal()
 {
 	if(m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL)
 	{
@@ -561,7 +563,7 @@ inline void GenericMap::disableQuickLocalIncidentTraversal()
 
 
 template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
-inline void GenericMap::enableQuickLocalAdjacentTraversal(MAP& map)
+inline void GenericMap::enableQuickAdjacentTraversal()
 {
 	if(m_quickLocalAdjacentTraversal[ORBIT][ADJ] == NULL)
 	{
@@ -571,16 +573,18 @@ inline void GenericMap::enableQuickLocalAdjacentTraversal(MAP& map)
 		ss << "m_quickLocalAdjacentTraversal" << ADJ;
 		m_quickLocalAdjacentTraversal[ORBIT][ADJ] = m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
-	updateQuickLocalAdjacentTraversal<MAP,ORBIT,ADJ>(map) ;
+	updateQuickAdjacentTraversal<MAP,ORBIT,ADJ>() ;
 }
 
 template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
-inline void GenericMap::updateQuickLocalAdjacentTraversal(MAP& map)
+inline void GenericMap::updateQuickAdjacentTraversal()
 {
 	assert(m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL || !"updateQuickTraversal on a disabled orbit") ;
 
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* ptrVD = m_quickLocalAdjacentTraversal[ORBIT][ADJ];
 	m_quickLocalAdjacentTraversal[ORBIT][ADJ] = NULL;
+
+	MAP& map = static_cast<MAP&>(*this);
 
 	std::vector<Dart> buffer;
 	buffer.reserve(100);
@@ -615,14 +619,14 @@ inline void GenericMap::updateQuickLocalAdjacentTraversal(MAP& map)
 	m_quickLocalAdjacentTraversal[ORBIT][ADJ] = ptrVD;
 }
 
-template <unsigned int ORBIT, unsigned int INCI>
-inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickLocalAdjacentTraversal()
+template <unsigned int ORBIT, unsigned int ADJ>
+inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickAdjacentTraversal()
 {
-	return m_quickLocalAdjacentTraversal[ORBIT][INCI] ;
+	return m_quickLocalAdjacentTraversal[ORBIT][ADJ] ;
 }
 
 template <unsigned int ORBIT, unsigned int ADJ>
-inline void GenericMap::disableQuickLocalAdjacentTraversal()
+inline void GenericMap::disableQuickAdjacentTraversal()
 {
 	if(m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL)
 	{

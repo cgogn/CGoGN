@@ -483,28 +483,28 @@ public:
 
 
 	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
-	void enableQuickLocalIncidentTraversal(MAP& map);
+	void enableQuickIncidentTraversal();
 
 	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
-	void updateQuickLocalIncidentTraversal(MAP& map);
+	void updateQuickIncidentTraversal();
 
 	template <unsigned int ORBIT, unsigned int INCI>
-	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickLocalIncidentTraversal();
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickIncidentTraversal();
 
 	template <unsigned int ORBIT, unsigned int INCI>
-	void disableQuickLocalIncidentTraversal();
+	void disableQuickIncidentTraversal();
 
 	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
-	void enableQuickLocalAdjacentTraversal(MAP& map);
+	void enableQuickAdjacentTraversal();
 
 	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
-	void updateQuickLocalAdjacentTraversal(MAP& map);
+	void updateQuickAdjacentTraversal();
 
 	template <unsigned int ORBIT, unsigned int INCI>
-	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickLocalAdjacentTraversal();
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickAdjacentTraversal();
 
 	template <unsigned int ORBIT, unsigned int ADJ>
-	void disableQuickLocalAdjacentTraversal();
+	void disableQuickAdjacentTraversal();
 
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *
