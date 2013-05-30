@@ -43,7 +43,8 @@ private:
 	MAP& m ;
 	Dart start ;
 	Dart current ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2VE(MAP& map, Dart dart) ;
 
@@ -60,7 +61,8 @@ private:
 	MAP& m ;
 	Dart start ;
 	Dart current ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2VF(MAP& map, Dart dart) ;
 
@@ -77,7 +79,8 @@ private:
 	MAP& m ;
 	Dart start ;
 	Dart current ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2VVaE(MAP& map, Dart dart) ;
 
@@ -96,7 +99,8 @@ private:
 	Dart current ;
 
 	Dart stop ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2VVaF(MAP& map, Dart dart) ;
 
@@ -117,7 +121,8 @@ private:
 	MAP& m ;
 	Dart start ;
 	Dart current ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2EV(MAP& map, Dart dart) ;
 
@@ -134,7 +139,8 @@ private:
 	MAP& m ;
 	Dart start ;
 	Dart current ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2EF(MAP& map, Dart dart) ;
 
@@ -153,7 +159,8 @@ private:
 	Dart current ;
 
 	Dart stop1, stop2 ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2EEaV(MAP& map, Dart dart) ;
 
@@ -172,7 +179,8 @@ private:
 	Dart current ;
 
 	Dart stop1, stop2 ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2EEaF(MAP& map, Dart dart) ;
 
@@ -193,7 +201,8 @@ private:
 	MAP& m ;
 	Dart start ;
 	Dart current ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2FV(MAP& map, Dart dart) ;
 
@@ -221,7 +230,8 @@ private:
 	Dart current ;
 
 	Dart stop ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2FFaV(MAP& map, Dart dart) ;
 
@@ -238,7 +248,8 @@ private:
 	MAP& m ;
 	Dart start ;
 	Dart current ;
-
+	std::vector<Dart>* m_QLT;
+	std::vector<Dart>::iterator m_ItDarts;
 public:
 	Traversor2FFaE(MAP& map, Dart dart) ;
 

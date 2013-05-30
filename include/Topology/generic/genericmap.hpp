@@ -516,14 +516,28 @@ inline void GenericMap::updateQuickLocalIncidentTraversal(MAP& map)
 	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
 	{
 		buffer.clear();
-		Traversor3XY<MAP,ORBIT,INCI> tra_loc(map,d);
-		for (Dart e = tra_loc.begin(); e != tra_loc.end(); e = tra_loc.next())
+		Traversor<MAP>* tra_loc = TraversorFactory<MAP>::createIncident(map, d, map.dimension(), ORBIT, INCI);
+		for (Dart e = tra_loc->begin(); e != tra_loc->end(); e = tra_loc->next())
 			buffer.push_back(e);
+		delete tra_loc;
 		buffer.push_back(NIL);
 		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
 		vd.reserve(buffer.size());
 		vd.assign(buffer.begin(),buffer.end());
 	}
+
+//	TraversorCell<MAP,ORBIT> tra_glob(map);
+//	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
+//	{
+//		buffer.clear();
+//		Traversor3XY<MAP,ORBIT,INCI> tra_loc(map,d);
+//		for (Dart e = tra_loc.begin(); e != tra_loc.end(); e = tra_loc.next())
+//			buffer.push_back(e);
+//		buffer.push_back(NIL);
+//		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+//		vd.reserve(buffer.size());
+//		vd.assign(buffer.begin(),buffer.end());
+//	}
 
 	m_quickLocalIncidentTraversal[ORBIT][INCI] = ptrVD;
 }
@@ -575,8 +589,8 @@ inline void GenericMap::updateQuickLocalAdjacentTraversal(MAP& map)
 	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
 	{
 		buffer.clear();
-		Traversor3XXaY<MAP,ORBIT,ADJ> tra_loc(map,d);
-		for (Dart e = tra_loc.begin(); e != tra_loc.end(); e = tra_loc.next())
+		Traversor<MAP>* tra_loc = TraversorFactory<MAP>::createAdjacent(map, d, map.dimension(), ORBIT, ADJ);
+		for (Dart e = tra_loc->begin(); e != tra_loc->end(); e = tra_loc->next())
 			buffer.push_back(e);
 		buffer.push_back(NIL);
 
@@ -584,6 +598,19 @@ inline void GenericMap::updateQuickLocalAdjacentTraversal(MAP& map)
 		vd.reserve(buffer.size());
 		vd.assign(buffer.begin(),buffer.end());
 	}
+//	TraversorCell<MAP,ORBIT> tra_glob(map);
+//	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
+//	{
+//		buffer.clear();
+//		Traversor3XXaY<MAP,ORBIT,ADJ> tra_loc(map,d);
+//		for (Dart e = tra_loc.begin(); e != tra_loc.end(); e = tra_loc.next())
+//			buffer.push_back(e);
+//		buffer.push_back(NIL);
+
+//		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+//		vd.reserve(buffer.size());
+//		vd.assign(buffer.begin(),buffer.end());
+//	}
 
 	m_quickLocalAdjacentTraversal[ORBIT][ADJ] = ptrVD;
 }
