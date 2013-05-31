@@ -316,7 +316,7 @@ Traversor2EF<MAP>::Traversor2EF(MAP& map, Dart dart) : m(map), start(dart),m_QLT
 	else
 	{
 		if(m.isBoundaryMarked2(start))
-			start = m.phi2(current) ;
+			start = m.phi2(start) ;
 	}
 }
 

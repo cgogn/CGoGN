@@ -597,7 +597,7 @@ inline void GenericMap::updateQuickAdjacentTraversal()
 		for (Dart e = tra_loc->begin(); e != tra_loc->end(); e = tra_loc->next())
 			buffer.push_back(e);
 		buffer.push_back(NIL);
-
+		delete tra_loc;
 		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
 		vd.reserve(buffer.size());
 		vd.assign(buffer.begin(),buffer.end());
