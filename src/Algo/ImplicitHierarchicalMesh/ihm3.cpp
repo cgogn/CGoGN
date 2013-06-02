@@ -72,15 +72,14 @@ void ImplicitHierarchicalMap3::clear(bool removeAttrib)
 
 void ImplicitHierarchicalMap3::initImplicitProperties()
 {
-	//initEdgeId() ;
-	//initFaceId();
+	initEdgeId() ;
+	initFaceId();
 
-	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
-	{
-		m_edgeId[d] = 0;
-		m_faceId[d] = 0;
-	}
-
+//	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
+//	{
+//		m_edgeId[d] = 0;
+//		m_faceId[d] = 0;
+//	}
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{

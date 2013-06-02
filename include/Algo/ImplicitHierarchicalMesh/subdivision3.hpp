@@ -65,8 +65,8 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	map.setFaceId(EDGE, d) ; //mise a jour de l'id de face sur chaque brin de chaque moitie d'arete
 	map.setFaceId(EDGE, dd) ;
 
-	position[map.phi1(d)] = (p1 + p2) * typename PFP::REAL(0.5) ;
-	//map.computeEdgeVertexFunctor(map.phi1(d));
+//	position[map.phi1(d)] = (p1 + p2) * typename PFP::REAL(0.5) ;
+	map.computeEdgeVertexFunctor(map.phi1(d));
 
 	map.setCurrentLevel(cur) ;
 }
@@ -121,8 +121,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		Dart dd = map.phi1(old) ;
 		Dart e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;					// insert a new edge
-		//unsigned int id = map.getNewEdgeId() ;
-		//map.setEdgeId(map.phi_1(dd), id, EDGE) ;		// set the edge id of the inserted edge to the next available id
+		unsigned int id = map.getNewEdgeId() ;
+		map.setEdgeId(map.phi_1(dd), id, EDGE) ;		// set the edge id of the inserted edge to the next available id
 
 		unsigned int idface = map.getFaceId(old);
 		map.setFaceId(dd, idface, FACE) ;
@@ -131,8 +131,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		dd = e ;
 		e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;
-		//id = map.getNewEdgeId() ;
-		//map.setEdgeId(map.phi_1(dd), id, EDGE) ;
+		id = map.getNewEdgeId() ;
+		map.setEdgeId(map.phi_1(dd), id, EDGE) ;
 
 		map.setFaceId(dd, idface, FACE) ;
 		map.setFaceId(e, idface, FACE) ;
@@ -140,8 +140,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		dd = e ;
 		e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;
-		//id = map.getNewEdgeId() ;
-		//map.setEdgeId(map.phi_1(dd), id, EDGE) ;
+		id = map.getNewEdgeId() ;
+		map.setEdgeId(map.phi_1(dd), id, EDGE) ;
 
 		map.setFaceId(dd, idface, FACE) ;
 		map.setFaceId(e, idface, FACE) ;
@@ -202,8 +202,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		id = map.getNewEdgeId() ;
 		map.setEdgeId(ne2, id, EDGE) ;
 
-		position[map.phi1(ne)] = p ;
-		//map.computeFaceVertexFunctor(map.phi1(ne));
+		//position[map.phi1(ne)] = p ;
 
 		dd = map.phi1(map.phi1(map.phi1(map.phi1(ne)))) ;
 		while(dd != ne)
@@ -227,6 +226,9 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 			dd = map.phi2(map.phi1(dd));
 		}
 		while(dd != ne);
+
+		map.computeFaceVertexFunctor(map.phi1(ne));
+		//position[map.phi1(ne)] = p ;
 	}
 
 	map.setCurrentLevel(cur) ;
@@ -353,14 +355,14 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 	//Second step : deconnect each corner, close each hole, subdivide each new face into 3
 	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
 	{
-
 		Dart e = *edge;
+
 		std::vector<Dart> v ;
 
 		do
 		{
-			v.push_back(map.phi1(map.phi1(e)));
 			v.push_back(map.phi1(e));
+			v.push_back(map.phi1(map.phi1(e)));
 
 			e = map.phi2(map.phi_1(e));
 		}
@@ -378,7 +380,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 		Dart ne = map.phi1(map.phi1(old)) ;
 
 		map.cutEdge(ne);
-		position[map.phi1(ne)] = volCenter; //plonger a la fin de la boucle ????
+		//position[map.phi1(ne)] = volCenter; //plonger a la fin de la boucle ????
 		centralDart = map.phi1(ne);
 		newEdges.push_back(ne);
 		newEdges.push_back(map.phi1(ne));
@@ -403,11 +405,10 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 		}
 		while(dd != stop);
 
+		//map.computeVertexVertexFunctor(e);
 	}
 
 	map.deleteVolume(map.phi3(map.phi2(map.phi1(oldEdges.front()))));
-
-	//map.computerVolumeVertexFunctor(oldEdges.front());
 
 	//Third step : 3-sew internal faces
 	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
@@ -444,6 +445,20 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 			mne.markOrbit<EDGE>(newEdges[i]);
 		}
 	}
+
+//	std::cout << map.getCurrentLevel() << std::endl;
+//	//Second step : deconnect each corner, close each hole, subdivide each new face into 3
+	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
+	{
+		Dart e = *edge;
+		//std::cout << "emb ? " << map.template getEmbedding<VERTEX>(e) << std::endl;
+		//if(map.template getEmbedding<VERTEX>(e) == EMBNULL)
+		map.computeVertexVertexFunctor(e);
+		//std::cout << "emb = " << map.template getEmbedding<VERTEX>(e) << " / dartlevel = " <<  map.getDartLevel(e) << std::endl;
+	}
+	std::cout << std::endl;
+
+	map.computerVolumeVertexFunctor(centralDart);
 
 	map.setCurrentLevel(cur) ;
 

@@ -601,6 +601,25 @@ inline unsigned int ImplicitHierarchicalMap3::edgeLevel(Dart d)
 	return r;
 }
 
+template <unsigned int ORBIT>
+inline unsigned int ImplicitHierarchicalMap3::getEmbedding(Dart d)
+{
+	unsigned int nbSteps = m_curLevel - vertexInsertionLevel(d);
+	unsigned int index = EmbeddedMap3::getEmbedding<ORBIT>(d);
+
+	unsigned int step = 0;
+	while(step < nbSteps)
+	{
+		step++;
+		unsigned int next = m_nextLevelCell[ORBIT]->operator[](index);
+		index = next;
+		//if(next != EMBNULL) index = next;
+		//else break;
+	}
+
+	return index;
+}
+
 
 /***************************************************
  *               ATTRIBUTE HANDLER                 *
@@ -613,14 +632,20 @@ T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d)
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = this->getOrbit() ;
+	std::cout << std::endl << "vertexInsertionLevel[" << d <<"] = " << m->vertexInsertionLevel(d) << "\t";
+
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding<ORBIT>(d) ;
+	unsigned int index = m->EmbeddedMap3::getEmbedding<ORBIT>(d) ;
+
+//	std::cout << " m->vertexInsertionLevel(d) = " <<  m->vertexInsertionLevel(d) << std::endl;
+//	std::cout << "m_curLevel = " << m->m_curLevel << std::endl;
+//	std::cout << " nbSteps = " <<  nbSteps << std::endl;
+//	std::cout << "index EmbMap3 = " << index << std::endl;
 
 	if(index == EMBNULL)
 	{
 		index = m->setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-		m->m_nextLevelCell[orbit]->operator[](index) = EMBNULL ;
+		m->m_nextLevelCell[ORBIT]->operator[](index) = EMBNULL ;
 	}
 
 	AttributeContainer& cont = m->getAttributeContainer<ORBIT>() ;
@@ -628,17 +653,24 @@ T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d)
 	while(step < nbSteps)
 	{
 		step++ ;
-		unsigned int nextIdx = m->m_nextLevelCell[orbit]->operator[](index) ;
+		unsigned int nextIdx = m->m_nextLevelCell[ORBIT]->operator[](index) ;
 		if (nextIdx == EMBNULL)
 		{
 			nextIdx = m->newCell<ORBIT>() ;
 			m->copyCell<ORBIT>(nextIdx, index) ;
-			m->m_nextLevelCell[orbit]->operator[](index) = nextIdx ;
-			m->m_nextLevelCell[orbit]->operator[](nextIdx) = EMBNULL ;
+			m->m_nextLevelCell[ORBIT]->operator[](index) = nextIdx ;
+			m->m_nextLevelCell[ORBIT]->operator[](nextIdx) = EMBNULL ;
 			cont.refLine(index) ;
 		}
 		index = nextIdx ;
 	}
+
+	std::cout << "emb = " << index << std::endl;
+
+//	std::cout << "index IHM = " << index << std::endl;
+//	if(index != EMBNULL)
+//		std::cout << " emb = " << this->m_attrib->operator[](index) << std::endl << std::endl;
+
 	return this->m_attrib->operator[](index);
 }
 
@@ -649,20 +681,29 @@ const T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d) const
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding<ORBIT>(d) ;
+	unsigned int index = m->EmbeddedMap3::getEmbedding<ORBIT>(d) ;
+
+//	std::cout << "(const) m->vertexInsertionLevel(d) = " <<  m->vertexInsertionLevel(d) << std::endl;
+//	std::cout << "(const) m_curLevel = " << m->m_curLevel << std::endl;
+//	std::cout << "(const) nbSteps = " <<  nbSteps << std::endl;
+//	std::cout << "(const) index EmbMap3 = " << index << std::endl;
 
 	unsigned int step = 0 ;
 	while(step < nbSteps)
 	{
 		step++ ;
-		unsigned int next = m->m_nextLevelCell[orbit]->operator[](index) ;
-		if(next != EMBNULL) index = next ;
+		unsigned int nextIdx = m->m_nextLevelCell[ORBIT]->operator[](index) ;
+		if(nextIdx != EMBNULL) index = nextIdx ;
 		else break ;
 	}
+
+//	if(index != EMBNULL)
+//		std::cout << "(const) emb = " << this->m_attrib->operator[](index) << std::endl << std::endl;
+
 	return this->m_attrib->operator[](index);
 }
+
 
 } //namespace IHM
 } // Volume

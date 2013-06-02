@@ -162,6 +162,11 @@ public:
 	void deleteVertexSubdividedFace(Dart d);
 	//@}
 
+	void setVertexVertexFunctor(FunctorType* f) { vertexVertexFunctor = f ; }
+	void setEdgeVertexFunctor(FunctorType* f) { edgeVertexFunctor = f ; }
+	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
+	void setVolumeVertexFunctor(FunctorType* f) { volumeVertexFunctor = f ; }
+
 	void computeVertexVertexFunctor(Dart d) { (*vertexVertexFunctor)(d); }
 	void computeEdgeVertexFunctor(Dart d) { (*edgeVertexFunctor)(d); }
 	void computeFaceVertexFunctor(Dart d) { (*faceVertexFunctor)(d); }
@@ -373,7 +378,8 @@ public:
 	virtual bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0);
 	//@}
 
-
+	template <unsigned int ORBIT>
+	unsigned int getEmbedding(Dart d);
 } ;
 
 template <typename T, unsigned int ORBIT>
@@ -398,9 +404,9 @@ public:
 		return AttributeHandler<T, ORBIT>::isValid() ;
 	}
 
-	T& operator[](Dart d) ;
+	virtual T& operator[](Dart d) ;
 
-	const T& operator[](Dart d) const ;
+	virtual const T& operator[](Dart d) const ;
 
 	T& operator[](unsigned int a)
 	{
@@ -411,6 +417,7 @@ public:
 	{
 		return AttributeHandler<T, ORBIT>::operator[](a) ;
 	}
+
 } ;
 
 template <typename T>
