@@ -196,6 +196,16 @@ void MyQT::cb_Open()
 	updateGL() ;
 }
 
+void MyQT::cb_Save()
+{
+	std::string filters("all (*.*);; tetmesh (*.tetmesh);; tet (*.tet);; node (*.node);; msh (*.msh);; vtu (*.vtu);; nas (*.nas);; vbgz (*.vbgz)") ;
+	std::string filename = selectFileSave("Save Mesh", "", filters) ;
+	if (filename.empty())
+		return ;
+
+	Algo::Volume::Export::exportMesh<PFP>(myMap,position,filename);
+}
+
 
 void MyQT::cb_initGL()
 {

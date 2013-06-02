@@ -100,7 +100,6 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	unsigned int degree = 0 ;
 	typename PFP::VEC3 p ;
 	Traversor2FE<typename PFP::MAP>  travE(map, old);
-
 	for(Dart it = travE.begin(); it != travE.end() ; it = travE.next())
 	{
 		++degree;
@@ -306,12 +305,9 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 	newEdges.reserve(50);
 
 	Dart centralDart = NIL;
-
-
 	//Second step : deconnect each corner, close each hole, subdivide each new face into 3
 	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
 	{
-
 		Dart e = *edge;
 		std::vector<Dart> v ;
 

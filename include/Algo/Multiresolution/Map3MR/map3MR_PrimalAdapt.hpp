@@ -896,6 +896,20 @@ unsigned int Map3MR<PFP>::subdivideHexa(Dart d, bool OneLevelDifference)
 	if(m_map.getCurrentLevel() == m_map.getMaxLevel())
 		m_map.addLevelBack() ;
 
+	Traversor3WV<typename PFP::MAP> tWV(m_map, d);
+	for(Dart ditWV = tWV.begin(); ditWV != tWV.end(); ditWV = tWV.next())
+	{
+		//dupliquer tous les brins de l'orbite
+		TraversorDartsOfOrbit<typename PFP::MAP, VERTEX> td(m_map, ditWV);
+		for(Dart dtd = td.begin() ; dtd != td.end() ; dtd = td.next())
+		{
+			m_map.incCurrentLevel();
+			m_map.duplicateDart(dtd);
+			m_map.decCurrentLevel() ;
+		}
+
+	}
+
 	//
 	// Subdivide Faces and Edges
 	//
@@ -914,6 +928,7 @@ unsigned int Map3MR<PFP>::subdivideHexa(Dart d, bool OneLevelDifference)
 	for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
 	{
 		m_map.incCurrentLevel() ;
+
 		(*vertexVertexFunctor)(ditWV) ;
 
 		Dart e = ditWV;
@@ -954,8 +969,6 @@ unsigned int Map3MR<PFP>::subdivideHexa(Dart d, bool OneLevelDifference)
 		}
 
 		m_map.decCurrentLevel() ;
-
-
 	}
 
 	m_map.incCurrentLevel();

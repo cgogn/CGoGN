@@ -276,7 +276,7 @@ void RenderExplodPlugin::changeRenderFaces(View* view, MapHandlerGen* map, bool 
 void RenderExplodPlugin::changeFacesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()]->facesScaleFactor = i / 50.0;
+	params->perMap[map->getName()]->facesScaleFactor = i / 99.0;
 
 	if(view->isCurrentView())
 	{
@@ -289,7 +289,7 @@ void RenderExplodPlugin::changeFacesScaleFactor(View* view, MapHandlerGen* map, 
 void RenderExplodPlugin::changeVolumesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI)
 {
 	ParameterSet* params = h_viewParams[view];
-	params->perMap[map->getName()]->volumesScaleFactor = i / 50.0;
+	params->perMap[map->getName()]->volumesScaleFactor = i / 99.0;
 
 	if(view->isCurrentView())
 	{
