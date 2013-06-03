@@ -198,6 +198,7 @@ Traversor<MAP>* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, bo
 	{
 		case VERTEX:
 			return new VTraversorCell<MAP,VERTEX>(map,forceDartMarker,thread);
+			return new VTraversor
 			break;
 		case EDGE:
 			return new VTraversorCell<MAP,EDGE>(map,forceDartMarker,thread);

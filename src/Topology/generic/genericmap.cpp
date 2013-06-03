@@ -159,7 +159,13 @@ void GenericMap::clear(bool removeAttrib)
 			m_attribs[i].clear(true) ;
 			m_embeddings[i] = NULL ;
 			m_quickTraversal[i] = NULL;
+			for(unsigned int j = 0; j < NB_ORBITS; ++j)
+			{
+				m_quickLocalIncidentTraversal[i][j] = NULL ;
+				m_quickLocalAdjacentTraversal[i][j] = NULL ;
+			}
 		}
+
 		for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 			(*it).second->setInvalid() ;
 		attributeHandlers.clear() ;
@@ -628,6 +634,15 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	for (unsigned int orb=0; orb<NB_ORBITS; ++orb)
 	{
 		m_quickTraversal[orb] = m_attribs[orb].getDataVector<Dart>("quick_traversal") ;
+		for(unsigned int j = 0; j < NB_ORBITS; ++j)
+		{
+			std::stringstream ss;
+			ss << "quickLocalIncidentTraversal_" << j;
+			m_quickLocalIncidentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+			std::stringstream ss2;
+			ss2 << "quickLocalAdjacentTraversal" << j;
+			m_quickLocalAdjacentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss2.str()) ;
+		}
 	}
 
 	return true;

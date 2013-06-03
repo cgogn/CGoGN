@@ -21,10 +21,10 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-
-#include "Topology/map/embeddedMap3.h"
 #include <vector>
 #include <algorithm>
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/generic/traversor3.h"
 
 namespace CGoGN
 {
