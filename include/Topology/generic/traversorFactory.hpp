@@ -238,34 +238,34 @@ Traversor<MAP>* TraversorFactory<MAP>::createDartsOfOrbits(MAP& map, Dart dart, 
 	switch(orb)
 	{
 		case VERTEX:
-			return new TraversorDartsOfOrbit<MAP,VERTEX>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,VERTEX>(map,dart);
 			break;
 		case EDGE:
-			return new TraversorDartsOfOrbit<MAP,EDGE>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,EDGE>(map,dart);
 			break;
 		case FACE:
-			return new TraversorDartsOfOrbit<MAP,FACE>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,FACE>(map,dart);
 			break;
 		case VOLUME:
-			return new TraversorDartsOfOrbit<MAP,VOLUME>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,VOLUME>(map,dart);
 			break;
 		case CC:
-			return new TraversorDartsOfOrbit<MAP,CC>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,CC>(map,dart);
 			break;
 		case VERTEX1:
-			return new TraversorDartsOfOrbit<MAP,VERTEX1>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,VERTEX1>(map,dart);
 			break;
 		case EDGE1:
-			return new TraversorDartsOfOrbit<MAP,EDGE1>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,EDGE1>(map,dart);
 			break;
 		case VERTEX2:
-			return new TraversorDartsOfOrbit<MAP,VERTEX2>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,VERTEX2>(map,dart);
 			break;
 		case EDGE2:
-			return new TraversorDartsOfOrbit<MAP,EDGE2>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,EDGE2>(map,dart);
 			break;
 		case FACE2:
-			return new TraversorDartsOfOrbit<MAP,FACE2>(map,dart);
+			return new VTraversorDartsOfOrbit<MAP,FACE2>(map,dart);
 			break;
 		default:
 			return NULL;
