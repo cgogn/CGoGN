@@ -153,7 +153,7 @@ bool ParticleCell3D<PFP>::isRightDFace(VEC3 c, Dart d, VEC3 base, VEC3 normal)
 
 
 template <typename PFP>
-Dart ParticleCell3D<PFP>::nextDartOfVertexNotMarked(Dart d, CellMarkerGen& mark)
+Dart ParticleCell3D<PFP>::nextDartOfVertexNotMarked(Dart d, CellMarkerStore<FACE>& mark)
 {
 	// lock a marker
 	Dart d1;
@@ -257,7 +257,7 @@ Dart ParticleCell3D<PFP>::nextNonPlanar(Dart d)
 }
 
 template <typename PFP>
-Dart ParticleCell3D<PFP>::nextFaceNotMarked(Dart d, CellMarkerGen& mark)
+Dart ParticleCell3D<PFP>::nextFaceNotMarked(Dart d, CellMarkerStore<FACE>& mark)
 {
 	// lock a marker
 	Dart d1;
