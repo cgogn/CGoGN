@@ -61,7 +61,7 @@ public:
 		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
-	virtual ~DartMarkerGen()
+	~DartMarkerGen()
 	{
 		if (releaseOnDestruct)
 		{
@@ -79,12 +79,12 @@ public:
 		}
 	}
 
-	unsigned int getThread()
+	inline unsigned int getThread()
 	{
 		return m_thread ;
 	}
 
-	void updateMarkVector(AttributeMultiVector<Mark>* amv)
+	inline void updateMarkVector(AttributeMultiVector<Mark>* amv)
 	{
 		m_markVector = amv ;
 	}
@@ -99,7 +99,7 @@ protected:
 	/**
 	 * set if the mark has to be release on destruction or not
 	 */
-	void setReleaseOnDestruct(bool b)
+	inline void setReleaseOnDestruct(bool b)
 	{
 		releaseOnDestruct = b ;
 	}
@@ -108,7 +108,7 @@ public:
 	/**
 	 * mark the dart
 	 */
-	virtual void mark(Dart d)
+	inline void mark(Dart d)
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
@@ -118,7 +118,7 @@ public:
 	/**
 	 * unmark the dart
 	 */
-	virtual void unmark(Dart d)
+	inline void unmark(Dart d)
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
@@ -128,7 +128,7 @@ public:
 	/**
 	 * test if dart is marked
 	 */
-	virtual bool isMarked(Dart d) const
+	inline bool isMarked(Dart d) const
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
@@ -139,7 +139,7 @@ public:
 	 * mark the darts of the given orbit of d
 	 */
 	template <unsigned int ORBIT>
-	void markOrbit(Dart d)
+	inline void markOrbit(Dart d)
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		FunctorMark<GenericMap> fm(m_map, m_mark, m_markVector) ;
@@ -150,7 +150,7 @@ public:
 	 * unmark the darts of the given orbit of d
 	 */
 	template <unsigned int ORBIT>
-	void unmarkOrbit(Dart d)
+	inline void unmarkOrbit(Dart d)
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_markVector) ;
@@ -182,7 +182,7 @@ public:
 	/**
 	 * mark all darts
 	 */
-	virtual void markAll()
+	inline void markAll()
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
@@ -193,9 +193,9 @@ public:
 	/**
 	 * unmark all darts
 	 */
-	virtual void unmarkAll() = 0 ;
+//	virtual void unmarkAll() = 0 ;
 
-	bool isAllUnmarked()
+	inline bool isAllUnmarked()
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -224,7 +224,7 @@ public:
 	{
 	}
 
-	virtual ~DartMarker()
+	~DartMarker()
 	{
 		unmarkAll() ;
 	}
@@ -236,7 +236,7 @@ protected:
 	}
 
 public:
-	void unmarkAll()
+	inline void unmarkAll()
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
@@ -280,7 +280,7 @@ protected:
 	}
 
 public:
-	void mark(Dart d)
+	inline void mark(Dart d)
 	{
 		DartMarkerGen::mark(d) ;
 		unsigned int d_index = m_map.dartIndex(d) ;
@@ -288,7 +288,7 @@ public:
 	}
 
 	template <unsigned int ORBIT>
-	void markOrbit(Dart d)
+	inline void markOrbit(Dart d)
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_markVector, m_markedDarts) ;
@@ -309,7 +309,7 @@ public:
 //		m_markedDarts.push_back(d) ;
 //	}
 
-	void unmarkAll()
+	inline void unmarkAll()
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
@@ -348,7 +348,7 @@ protected:
 	}
 
 public:
-	void unmarkAll()
+	inline void unmarkAll()
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
@@ -369,11 +369,11 @@ public:
 		m_marker(m)
 	{
 	}
-	bool operator()(Dart d) const
+	inline bool operator()(Dart d) const
 	{
 		return m_marker.isMarked(d) ;
 	}
-	FunctorSelect* copy() const
+	inline FunctorSelect* copy() const
 	{
 		return new SelectorMarked(m_marker) ;
 	}
@@ -388,11 +388,11 @@ public:
 		m_marker(m)
 	{
 	}
-	bool operator()(Dart d) const
+	inline bool operator()(Dart d) const
 	{
 		return !m_marker.isMarked(d) ;
 	}
-	FunctorSelect* copy() const
+	inline FunctorSelect* copy() const
 	{
 		return new SelectorUnmarked(m_marker) ;
 	}
@@ -409,7 +409,7 @@ public:
 		m_marker(dm)
 	{
 	}
-	bool operator()(Dart d)
+	inline bool operator()(Dart d)
 	{
 		return m_marker.isMarked(d) ;
 	}
@@ -424,7 +424,7 @@ public:
 		m_marker(dm)
 	{
 	}
-	bool operator()(Dart d)
+	inline bool operator()(Dart d)
 	{
 		return !m_marker.isMarked(d) ;
 	}
