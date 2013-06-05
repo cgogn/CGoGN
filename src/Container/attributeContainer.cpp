@@ -307,13 +307,51 @@ void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
  *          LINES MANAGEMENT          *
  **************************************/
 
+//unsigned int AttributeContainer::insertLine()
+//{
+//	// if no more rooms
+//	if (m_tableBlocksWithFree.empty())
+//	{
+//		HoleBlockRef* ptr = new HoleBlockRef();					// new block
+//		m_tableBlocksWithFree.push_back(m_holesBlocks.size());	// add its future position to block_free
+//		m_holesBlocks.push_back(ptr);							// and add it to block table
+
+//		for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+//		{
+//			if (m_tableAttribs[i] != NULL)
+//				m_tableAttribs[i]->addBlock();					// add a block to every attribute
+//		}
+//	}
+
+//	// get the first free block index (last in vector)
+//	unsigned int bf = m_tableBlocksWithFree.back();
+//	// get the block
+//	HoleBlockRef* block = m_holesBlocks[bf];
+
+//	// add new element in block and compute index
+//	unsigned int ne = block->newRefElt(m_maxSize);
+//	unsigned int index = _BLOCKSIZE_ * bf + ne;
+
+//	// if no more room in block remove it from free_blocks
+//	if (block->full())
+//		m_tableBlocksWithFree.pop_back();
+
+//	++m_size;
+
+////	initLine(index);
+
+//	return index;
+//}
+
+
 unsigned int AttributeContainer::insertLine()
 {
 	// if no more rooms
 	if (m_tableBlocksWithFree.empty())
 	{
 		HoleBlockRef* ptr = new HoleBlockRef();					// new block
-		m_tableBlocksWithFree.push_back(m_holesBlocks.size());	// add its future position to block_free
+		unsigned int numBlock = m_holesBlocks.size();
+		m_tableBlocksWithFree.push_back(numBlock);	// add its future position to block_free
 		m_holesBlocks.push_back(ptr);							// and add it to block table
 
 		for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
@@ -321,7 +359,16 @@ unsigned int AttributeContainer::insertLine()
 			if (m_tableAttribs[i] != NULL)
 				m_tableAttribs[i]->addBlock();					// add a block to every attribute
 		}
+
+		// inc nb of elements
+		++m_size;
+
+		// add new element in block and compute index
+
+		unsigned int ne = ptr->newRefElt(m_maxSize);
+		return _BLOCKSIZE_ * numBlock + ne;
 	}
+	// else
 
 	// get the first free block index (last in vector)
 	unsigned int bf = m_tableBlocksWithFree.back();
@@ -332,16 +379,33 @@ unsigned int AttributeContainer::insertLine()
 	unsigned int ne = block->newRefElt(m_maxSize);
 	unsigned int index = _BLOCKSIZE_ * bf + ne;
 
+	if (ne == _BLOCKSIZE_-1)
+	{
+		if (bf == (m_holesBlocks.size()-1))
+		{
+			// we are filling the last line of capacity
+			HoleBlockRef* ptr = new HoleBlockRef();					// new block
+			unsigned int numBlock = m_holesBlocks.size();
+			m_tableBlocksWithFree.back() = numBlock;
+			m_tableBlocksWithFree.push_back(bf);
+			m_holesBlocks.push_back(ptr);
+
+			for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+			{
+				if (m_tableAttribs[i] != NULL)
+					m_tableAttribs[i]->addBlock();					// add a block to every attribute
+			}
+		}
+	}
+
 	// if no more room in block remove it from free_blocks
 	if (block->full())
 		m_tableBlocksWithFree.pop_back();
 
 	++m_size;
-
-//	initLine(index);
-
 	return index;
 }
+
 
 void AttributeContainer::removeLine(unsigned int index)
 {
