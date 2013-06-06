@@ -32,7 +32,10 @@
 
 namespace CGoGN
 {
-
+/**
+ * @brief The CellMarkerGen class
+ * @warning CellMarkerGen is no polymorphic version of CellMarker
+ */
 class CellMarkerGen
 {
 	friend class GenericMap ;
@@ -53,7 +56,7 @@ public:
 		releaseOnDestruct(true)
 	{}
 
-	virtual ~CellMarkerGen()
+	~CellMarkerGen()
 	{}
 
 	unsigned int getThread() { return m_thread ; }
@@ -66,15 +69,15 @@ public:
 	 */
 	void setReleaseOnDestruct(bool b) { releaseOnDestruct = b ; }
 
-	virtual void mark(Dart d) = 0 ;
-	virtual void unmark(Dart d) = 0 ;
-	virtual bool isMarked(Dart d) const = 0 ;
-	virtual void mark(unsigned int em) = 0 ;
-	virtual void unmark(unsigned int em) = 0 ;
-	virtual bool isMarked(unsigned int em) const = 0 ;
-	virtual void markAll() = 0 ;
-	virtual void unmarkAll() = 0 ;
-	virtual bool isAllUnmarked() = 0 ;
+//	virtual void mark(Dart d) = 0 ;
+//	virtual void unmark(Dart d) = 0 ;
+//	virtual bool isMarked(Dart d) const = 0 ;
+//	virtual void mark(unsigned int em) = 0 ;
+//	virtual void unmark(unsigned int em) = 0 ;
+//	virtual bool isMarked(unsigned int em) const = 0 ;
+//	virtual void markAll() = 0 ;
+//	virtual void unmarkAll() = 0 ;
+//	virtual bool isAllUnmarked() = 0 ;
 };
 
 /**
@@ -98,7 +101,7 @@ public:
 		m_map.cellMarkers[m_thread].push_back(this) ;
 	}
 
-	virtual ~CellMarkerBase()
+	/*virtual */~CellMarkerBase()
 	{
 		if(releaseOnDestruct)
 		{
@@ -126,7 +129,7 @@ public:
 	/**
 	 * mark the cell of dart
 	 */
-	virtual void mark(Dart d)
+	inline void mark(Dart d)
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -140,7 +143,7 @@ public:
 	/**
 	 * unmark the cell of dart
 	 */
-	virtual void unmark(Dart d)
+	inline void unmark(Dart d)
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -154,7 +157,7 @@ public:
 	/**
 	 * test if cell of dart is marked
 	 */
-	virtual bool isMarked(Dart d) const
+	inline bool isMarked(Dart d) const
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -168,7 +171,7 @@ public:
 	/**
 	 * mark the cell
 	 */
-	virtual void mark(unsigned int em)
+	inline void mark(unsigned int em)
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -179,7 +182,7 @@ public:
 	/**
 	 * unmark the cell
 	 */
-	virtual void unmark(unsigned int em)
+	inline void unmark(unsigned int em)
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -190,7 +193,7 @@ public:
 	/**
 	 * test if cell is marked
 	 */
-	virtual bool isMarked(unsigned int em) const
+	inline bool isMarked(unsigned int em) const
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -201,7 +204,7 @@ public:
 	/**
 	 * mark all the cells
 	 */
-	virtual void markAll()
+	inline void markAll()
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -211,7 +214,7 @@ public:
 			m_markVector->operator[](i).setMark(m_mark) ;
 	}
 
-	virtual bool isAllUnmarked()
+	inline bool isAllUnmarked()
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -235,7 +238,7 @@ public:
 	CellMarker(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
 
-	virtual ~CellMarker()
+	~CellMarker()
 	{
 		unmarkAll() ;
 	}
@@ -245,7 +248,7 @@ protected:
 	{}
 
 public:
-	virtual void unmarkAll()
+	inline void unmarkAll()
 	{
 		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
@@ -271,7 +274,7 @@ public:
 	CellMarkerStore(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
 
-	virtual ~CellMarkerStore()
+	~CellMarkerStore()
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked);
@@ -283,19 +286,19 @@ protected:
 	{}
 
 public:
-	void mark(Dart d)
+	inline void mark(Dart d)
 	{
 		CellMarkerBase<CELL>::mark(d) ;
 		m_markedCells.push_back(this->m_map.template getEmbedding<CELL>(d)) ;
 	}
 
-	void mark(unsigned int em)
+	inline void mark(unsigned int em)
 	{
 		CellMarkerBase<CELL>::mark(em) ;
 		m_markedCells.push_back(em) ;
 	}
 
-	void unmarkAll()
+	inline void unmarkAll()
 	{
 		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
@@ -319,7 +322,7 @@ public:
 	CellMarkerMemo(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
 
-	virtual ~CellMarkerMemo()
+	~CellMarkerMemo()
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked);
@@ -331,7 +334,7 @@ protected:
 	{}
 
 public:
-	void mark(Dart d)
+	inline void mark(Dart d)
 	{
 		if(!this->isMarked(d))
 		{
@@ -340,7 +343,7 @@ public:
 		}
 	}
 
-	void unmarkAll()
+	inline void unmarkAll()
 	{
 		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
@@ -351,7 +354,8 @@ public:
 		m_markedDarts.clear();
 
 	}
-	std::vector<Dart> get_markedCells()
+
+	inline std::vector<Dart> get_markedCells()
 	{
 		return m_markedDarts;
 	}
@@ -368,7 +372,7 @@ public:
 	CellMarkerNoUnmark(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
 
-	virtual ~CellMarkerNoUnmark()
+	~CellMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked()) ;
 //		CGoGN_ASSERT(this->isAllUnmarked())
@@ -379,7 +383,7 @@ protected:
 	{}
 
 public:
-	void unmarkAll()
+	inline void unmarkAll()
 	{
 		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
@@ -401,13 +405,13 @@ protected:
 	const CellMarkerBase<CELL>& m_cmarker ;
 public:
 	SelectorCellMarked(const CellMarkerBase<CELL>& cm) : m_cmarker(cm) {}
-	bool operator()(Dart d) const
+	inline bool operator()(Dart d) const
 	{
 		if (m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
-	FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker); }
+	inline FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker); }
 };
 
 template <unsigned int CELL>
@@ -417,13 +421,13 @@ protected:
 	const CellMarkerBase<CELL>& m_cmarker ;
 public:
 	SelectorCellUnmarked(const CellMarkerBase<CELL>& cm) : m_cmarker(cm) {}
-	bool operator()(Dart d) const
+	inline bool operator()(Dart d) const
 	{
 		if (!m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
-	FunctorSelect* copy() const { return new SelectorCellUnmarked(m_cmarker); }
+	inline FunctorSelect* copy() const { return new SelectorCellUnmarked(m_cmarker); }
 };
 
 // Functor version (needed for use with foreach_xxx)
@@ -435,7 +439,7 @@ protected:
 	CellMarkerBase<CELL>& m_marker;
 public:
 	FunctorCellIsMarked(CellMarkerBase<CELL>& cm) : m_marker(cm) {}
-	bool operator()(Dart d)
+	inline bool operator()(Dart d)
 	{
 		return m_marker.isMarked(d);
 	}
@@ -448,7 +452,7 @@ protected:
 	CellMarkerBase<CELL>& m_marker;
 public:
 	FunctorCellIsUnmarked(CellMarkerBase<CELL>& cm) : m_marker(cm) {}
-	bool operator()(Dart d)
+	inline bool operator()(Dart d)
 	{
 		return !m_marker.isMarked(d);
 	}

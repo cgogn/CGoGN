@@ -284,6 +284,15 @@ void computeCentroidELWVolumes(typename PFP::MAP& map, const VertexAttribute<typ
 }
 
 
+template <typename PFP>
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid, unsigned int thread)
+{
+	TraversorV<typename PFP::MAP> t(map, thread) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		vertex_centroid[d] = Volume::Geometry::vertexNeighborhoodCentroid<PFP>(map, d, position) ;
+}
+
+
 namespace Parallel
 {
 template <typename PFP>

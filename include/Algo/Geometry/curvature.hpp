@@ -533,7 +533,7 @@ void normalCycles_SortAndSetEigenComponents(
 	typename PFP::VEC3& Kmin,
 	typename PFP::VEC3& Knormal,
 	const typename PFP::VEC3& normal,
-	unsigned int thread)
+	unsigned int /*thread*/)
 {
 	// sort eigen components : ev[inormal] has minimal absolute value ; kmin = ev[imin] <= ev[imax] = kmax
 	int inormal=0, imin, imax ;
@@ -563,7 +563,7 @@ void normalCycles_SortAndSetEigenComponents(
 }
 
 template <typename PFP>
-void normalCycles_SortTensor(Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsigned int thread)
+void normalCycles_SortTensor(Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsigned int /*thread*/)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;

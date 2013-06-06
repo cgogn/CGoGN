@@ -86,11 +86,11 @@ public :
 
 	bool isRightDFace(VEC3 c, Dart d, VEC3 base, VEC3 normal);
 
-	Dart nextDartOfVertexNotMarked(Dart d, CellMarkerGen& mark);
+	Dart nextDartOfVertexNotMarked(Dart d, CellMarkerStore<FACE>& mark);
 
 	Dart nextNonPlanar(Dart d);
 
-	Dart nextFaceNotMarked(Dart d,CellMarkerGen& mark);
+	Dart nextFaceNotMarked(Dart d,CellMarkerStore<FACE>& mark);
 
 	Geom::Orientation3D whichSideOfEdge(VEC3 c, Dart d);
 
