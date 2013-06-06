@@ -43,7 +43,7 @@ namespace Regular
 template <typename PFP>
 Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
 	m_map(map),
-	shareVertexEmbeddings(true)
+	shareVertexEmbeddings(false)
 {
 
 }
@@ -68,57 +68,67 @@ void Map2MR<PFP>::addNewLevel(bool embedNewVertices)
 
 	m_map.addLevelBack() ;
 	m_map.duplicateDarts(m_map.getMaxLevel());
-	m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 
-	TraversorV<typename PFP::MAP> travV(m_map) ;
-	for (Dart d = travV.begin(); d != travV.end(); d = travV.next())
+
+	m_map.decCurrentLevel();
+	TraversorE<typename PFP::MAP> te(m_map);
+	for (Dart d = te.begin(); d != te.end(); d = te.next())
 	{
-		//create new faces in the previous edges
-		unsigned int count = 0;
-		Dart ditv = d;
+		m_map.incCurrentLevel();
+
+		Dart d2 = m_map.phi2(d);
+
+		m_map.unsewFaces(d,false);
+		Dart nf = m_map.newFace(4,false);
+		m_map.sewFaces(d,nf,false);
+		m_map.sewFaces(d2,m_map.phi1(m_map.phi1(nf)),false);
+
+		// take care of edge embedding
+		if(m_map.template isOrbitEmbedded<EDGE>())
+		{
+			m_map.template setOrbitEmbedding<EDGE>(nf, m_map.template getEmbedding<EDGE>(d));
+			m_map.template setOrbitEmbedding<EDGE>(m_map.phi1(m_map.phi1(nf)), m_map.template getEmbedding<EDGE>(d2));
+		}
+
+		m_map.decCurrentLevel();
+	}
+
+
+	TraversorV<typename PFP::MAP> tv(m_map);
+	for(Dart d = tv.begin() ; d != tv.end() ; d = tv.next())
+	{
+		m_map.incCurrentLevel();
+
+		m_map.PFP::MAP::TOPO_MAP::closeHole(m_map.phi1(m_map.phi2(d)),false);
+
+		Dart temp = m_map.phi2(m_map.phi1(m_map.phi2(d)));
+		Dart stop = temp;
+
 		do
 		{
-			Dart d2 = m_map.phi2(ditv);
-
-			m_map.incCurrentLevel();
-
-			if(m_map.phi2(d) == d2)
+			if(m_map.template isOrbitEmbedded<EDGE>())
 			{
+				m_map.template setOrbitEmbedding<EDGE>(temp, m_map.template getEmbedding<EDGE>(	m_map.phi2(temp)));
+			}
 
-				m_map.unsewFaces(d, false);
-				Dart nf = m_map.newFace(4,false);
-				m_map.sewFaces(nf,d,false);
-				m_map.sewFaces(m_map.phi1(m_map.phi1(nf)),d2,false);
+			if(!shareVertexEmbeddings)
+			{
+				//if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(temp) ;
+				//m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 			}
 
 
-			m_map.decCurrentLevel();
+			temp = m_map.phi1(temp);
+		}
+		while(temp != stop);
 
-			++count;
 
-			ditv = m_map.phi2(m_map.phi_1(ditv));
-		}while(ditv != d);
-
-//		// create new faces in the previous vertices
-//		Dart nf = m_map.newFace(count,false);
-//		do
-//		{
-//			m_map.incCurrentLevel();
-//
-//			Dart d21 = m_map.phi1(m_map.phi2(ditv));
-//			m_map.sewFaces(nf,d21,false);
-//
-//			if(embedNewVertices)
-//						m_map.template embedNewCell<VERTEX>(nf) ;
-//
-//			nf = m_map.phi1(nf);
-//
-//			m_map.decCurrentLevel();
-//
-//
-//			ditv = m_map.phi2(m_map.phi_1(ditv));
-//		}while(ditv != d);
+		m_map.decCurrentLevel();
 	}
+
+	m_map.incCurrentLevel() ;
 
 	m_map.popLevel() ;
 }
