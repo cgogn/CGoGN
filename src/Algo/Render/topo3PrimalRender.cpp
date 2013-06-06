@@ -48,6 +48,7 @@ Topo3PrimalRender::Topo3PrimalRender():
 	m_topo_relation_width(3.0f),
 	m_color_save(NULL),
 	m_dartsColor(1.0f,1.0f,1.0f),
+	m_boundaryDartsColor(0.5f,0.5f,0.5f),
 	m_bufferDartPosition(NULL)
 {
 	m_vbo0 = new Utils::VBO();
@@ -127,13 +128,18 @@ void Topo3PrimalRender::setAllDartsColor(float r, float g, float b)
 		*colorDartBuf++ = b;
 	}
 	glUnmapBufferARB(GL_ARRAY_BUFFER);
-
 }
 
 void Topo3PrimalRender::setInitialDartsColor(float r, float g, float b)
 {
 	m_dartsColor = Geom::Vec3f(r,g,b);
 }
+
+void Topo3PrimalRender::setInitialBoundaryDartsColor(float r, float g, float b)
+{
+	m_boundaryDartsColor = Geom::Vec3f(r,g,b);
+}
+
 
 void Topo3PrimalRender::drawDarts()
 {

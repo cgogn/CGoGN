@@ -56,27 +56,24 @@ void Topo3PrimalRender::setDartsIdColor(typename PFP::MAP& map)
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked3(d)) // topo3 Render do not traverse boundary
+		if (nb < m_nbDarts)
 		{
-			if (nb < m_nbDarts)
-			{
-				float r,g,b;
-				dartToCol(d, r,g,b);
+			float r,g,b;
+			dartToCol(d, r,g,b);
 
-				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
-				*local++ = r;
-				*local++ = g;
-				*local++ = b;
-				*local++ = r;
-				*local++ = g;
-				*local++ = b;
-				nb++;
-			}
-			else
-			{
-				CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
-				break;
-			}
+			float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
+			*local++ = r;
+			*local++ = g;
+			*local++ = b;
+			*local++ = r;
+			*local++ = g;
+			*local++ = b;
+			nb++;
+		}
+		else
+		{
+			CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
+			break;
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -91,18 +88,15 @@ void Topo3PrimalRender::updateColors(typename PFP::MAP& map, const VertexAttribu
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked3(d)) // topo3 Render do not traverse boundary
+		if (nb < m_nbDarts)
 		{
-			if (nb < m_nbDarts)
-			{
-				colorBuffer[m_attIndex[d]] = colors[d];
-				nb++;
-			}
-			else
-			{
-				CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
-				break;
-			}
+			colorBuffer[m_attIndex[d]] = colors[d];
+			nb++;
+		}
+		else
+		{
+			CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
+			break;
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -198,22 +192,40 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribut
 
 			*positionDartBuf++ = P;
 			*positionDartBuf++ = PP;
-			*positionDartBuf++ = Q;
-			*positionDartBuf++ = QQ;
-			*colorDartBuf++ = m_dartsColor;
-			*colorDartBuf++ = m_dartsColor;
-			*colorDartBuf++ = m_dartsColor;
-			*colorDartBuf++ = m_dartsColor;
+			if (map.isBoundaryMarked3(d))
+			{
+				*colorDartBuf++ = m_boundaryDartsColor;
+				*colorDartBuf++ = m_boundaryDartsColor;
+			}
+			else
+			{
+				*colorDartBuf++ = m_dartsColor;
+				*colorDartBuf++ = m_dartsColor;
+			}
 
 			m_attIndex[d] = posDBI;
 			posDBI+=2;
-
 			fv2[d] = (P+PP)*0.5f;
+
+
+			*positionDartBuf++ = Q;
+			*positionDartBuf++ = QQ;
+
 			Dart dx = map.phi3(d);
-			fv2[dx] = (Q+QQ)*0.5f;
+			if (map.isBoundaryMarked3(dx))
+			{
+				*colorDartBuf++ = m_boundaryDartsColor;
+				*colorDartBuf++ = m_boundaryDartsColor;
+			}
+			else
+			{
+				*colorDartBuf++ = m_dartsColor;
+				*colorDartBuf++ = m_dartsColor;
+			}
 
 			m_attIndex[dx] = posDBI;
 			posDBI+=2;
+			fv2[dx] = (Q+QQ)*0.5f;
 
 			d = mapx.phi1(d);
 		}

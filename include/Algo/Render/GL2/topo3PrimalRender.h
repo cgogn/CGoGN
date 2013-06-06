@@ -107,6 +107,11 @@ protected:
 	Geom::Vec3f m_dartsColor;
 
 	/**
+	 * initial darts color for boundary (set in update)
+	 */
+	Geom::Vec3f m_boundaryDartsColor;
+
+	/**
 	 * attribute index to get easy correspondence dart/color
 	 */
 	DartAttribute<unsigned int> m_attIndex;
@@ -202,6 +207,8 @@ public:
 	 * @param b blue !
 	 */
 	void setInitialDartsColor(float r, float g, float b);
+
+	void setInitialBoundaryDartsColor(float r, float g, float b);
 
 	/**
 	 * overdraw a dart with given width and color
