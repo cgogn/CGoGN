@@ -128,12 +128,13 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribut
 	if (!m_attIndex.isValid())
 		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
 
-	m_nbDarts = 0;
-	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
-	{
-//		if (!map.isBoundaryMarked3(d)) // in the following code Traversor do not traverse boundary
-			m_nbDarts++;
-	}
+//	m_nbDarts = 0;
+//	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
+//	{
+//		m_nbDarts++;
+//	}
+
+	m_nbDarts = mapx.getNbDarts();
 
 	// beta2/3
 	DartAutoAttribute<VEC3> fv2(mapx);
@@ -150,8 +151,6 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribut
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(m_bufferDartPosition);
 
 
-	std::vector<Dart> vecDartFaces;
-	vecDartFaces.reserve(m_nbDarts/6);
 	unsigned int posDBI=0;
 
 	int nbf=0;
@@ -159,8 +158,6 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribut
 	TraversorF<typename PFP::MAP> traFace(mapx);
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		vecDartFaces.push_back(d);
-
 		std::vector<VEC3> vecPos;
 		vecPos.reserve(16);
 
