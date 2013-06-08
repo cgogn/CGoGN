@@ -56,7 +56,7 @@ bool EdgeSelector_MapOrder<PFP>::nextEdge(Dart& d) const
 }
 
 template <typename PFP>
-void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart /*d2*/, Dart /*dd2*/)
 {
 	typename PFP::MAP& m = this->m_map ;
 	cur = m.begin() ;
@@ -111,7 +111,7 @@ bool EdgeSelector_Random<PFP>::nextEdge(Dart& d) const
 }
 
 template <typename PFP>
-void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart /*d2*/, Dart /*dd2*/)
 {
 	typename PFP::MAP& m = this->m_map ;
 	allSkipped = false ;
@@ -862,7 +862,7 @@ void EdgeSelector_NormalArea<PFP>::updateBeforeCollapse(Dart d)
 }
 
 template <typename PFP>
-void EdgeSelector_NormalArea<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void EdgeSelector_NormalArea<PFP>::updateAfterCollapse(Dart d2, Dart /*dd2*/)
 {
 	typename PFP::MAP& m = this->m_map ;
 
@@ -1310,7 +1310,7 @@ void EdgeSelector_CurvatureTensor<PFP>::updateBeforeCollapse(Dart d)
 }
 
 template <typename PFP>
-void EdgeSelector_CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void EdgeSelector_CurvatureTensor<PFP>::updateAfterCollapse(Dart d2, Dart /*dd2*/)
 {
 	typename PFP::MAP& m = this->m_map ;
 	CellMarkerStore<EDGE> eMark (m);
@@ -2062,7 +2062,7 @@ void EdgeSelector_GeomColOptGradient<PFP>::recomputeQuadric(const Dart d, const 
 }
 
 template <typename PFP>
-void EdgeSelector_GeomColOptGradient<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void EdgeSelector_GeomColOptGradient<PFP>::updateAfterCollapse(Dart d2, Dart /*dd2*/)
 {
 	typename PFP::MAP& m = this->m_map ;
 

@@ -363,13 +363,15 @@ public:
 		{
 			typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
-			m_map.incCurrentLevel() ;
+			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
+			{
+				m_map.incCurrentLevel() ;
 
-			Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-			m_position[midV] = p ;
+				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
+				m_position[midV] = p ;
 
-			m_map.decCurrentLevel() ;
-
+				m_map.decCurrentLevel() ;
+			}
 		}
 	}
 } ;
@@ -431,7 +433,6 @@ public:
 			m_position[midV] = p;
 
 			m_map.decCurrentLevel() ;
-
 		}
 	}
 } ;

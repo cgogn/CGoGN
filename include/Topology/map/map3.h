@@ -262,7 +262,7 @@ public:
 	//! Unsew two oriented volumes along their faces.
 	/*! @param d a dart of one volume
 	 */
-	virtual void unsewVolumes(Dart d);
+	virtual void unsewVolumes(Dart d, bool withBoundary = true);
 
 	//! Merge two volumes along their common oriented face
 	/*! @param d a dart of common face

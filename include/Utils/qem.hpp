@@ -33,7 +33,7 @@ Quadric<REAL>::Quadric()
 }
 
 template <typename REAL>
-Quadric<REAL>::Quadric(int i)
+Quadric<REAL>::Quadric(int)
 {
 	A.zero() ;
 }
@@ -166,7 +166,7 @@ QuadricNd<REAL,N>::QuadricNd()
 }
 
 template <typename REAL, unsigned int N>
-QuadricNd<REAL,N>::QuadricNd(int i)
+QuadricNd<REAL,N>::QuadricNd(int)
 {
 	A.zero() ;
 	b.zero() ;

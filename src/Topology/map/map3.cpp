@@ -706,9 +706,20 @@ bool Map3::unsewVolumesPreCond(Dart d)
 }
 
 
-void Map3::unsewVolumes(Dart d)
+void Map3::unsewVolumes(Dart d, bool withBoundary)
 {
 	assert(unsewVolumesPreCond(d)) ;
+
+	if (!withBoundary)
+	{
+		Dart fitD = d ;
+		do
+		{
+			phi3unsew(fitD) ;
+			fitD = phi1(fitD) ;
+		} while(fitD != d) ;
+		return ;
+	}
 
 	unsigned int nbE = faceDegree(d) ;
 	Dart d3 = phi3(d);

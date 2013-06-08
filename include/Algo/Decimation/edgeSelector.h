@@ -66,11 +66,9 @@ public:
 	SelectorType getType() { return S_MapOrder ; }
 	bool init() ;
 	bool nextEdge(Dart& d) const ;
-	void updateBeforeCollapse(Dart d)
-	{}
+	void updateBeforeCollapse(Dart /*d*/) {}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
-
-	void updateWithoutCollapse() { }
+	void updateWithoutCollapse() {}
 
 } ;
 
@@ -98,10 +96,8 @@ public:
 	SelectorType getType() { return S_Random ; }
 	bool init() ;
 	bool nextEdge(Dart& d) const ;
-	void updateBeforeCollapse(Dart d2)
-	{}
+	void updateBeforeCollapse(Dart /*d2*/) {}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
-
 	void updateWithoutCollapse();
 } ;
 

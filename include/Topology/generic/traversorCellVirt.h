@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR_CELL_H__
-#define __TRAVERSOR_CELL_H__
+#ifndef __TRAVERSOR_CELLVIRT_H__
+#define __TRAVERSOR_CELLVIRT_H__
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/dartmarker.h"
@@ -34,7 +34,7 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT>
-class TraversorCell //: public Traversor<MAP>
+class VTraversorCell : public Traversor<MAP>
 {
 private:
 	MAP& m ;
@@ -50,9 +50,9 @@ private:
 	bool firstTraversal ;
 
 public:
-	TraversorCell(MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
+	VTraversorCell(MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 
-	~TraversorCell() ;
+	~VTraversorCell() ;
 
 	Dart begin() ;
 
@@ -65,7 +65,7 @@ public:
 
 
 template <unsigned int ORBIT>
-class TraversorCell<GenericMap,ORBIT> //: public Traversor<GenericMap>
+class VTraversorCell<GenericMap,ORBIT> : public Traversor<GenericMap>
 {
 private:
 	GenericMap& m ;
@@ -81,9 +81,9 @@ private:
 	bool firstTraversal ;
 
 public:
-	TraversorCell(GenericMap& map, bool forceDartMarker = false, unsigned int thread = 0) ;
+	VTraversorCell(GenericMap& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 
-	~TraversorCell() ;
+	~VTraversorCell() ;
 
 	Dart begin() ;
 
@@ -95,40 +95,74 @@ public:
 } ;
 
 
+//template <typename MAP>
+//class TraversorV : public VTraversorCell<MAP, VERTEX>
+//{
+//public:
+//	TraversorV(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, VERTEX>(m, forceDartMarker, thread)
+//	{}
+//};
+
+//template <typename MAP>
+//class TraversorE : public VTraversorCell<MAP, EDGE>
+//{
+//public:
+//	TraversorE(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, EDGE>(m, forceDartMarker, thread)
+//	{}
+//};
+
+//template <typename MAP>
+//class TraversorF : public VTraversorCell<MAP, FACE>
+//{
+//public:
+//	TraversorF(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, FACE>(m, forceDartMarker, thread)
+//	{}
+//};
+
+//template <typename MAP>
+//class TraversorW : public VTraversorCell<MAP, VOLUME>
+//{
+//public:
+//	TraversorW(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, VOLUME>(m, forceDartMarker, thread)
+//	{}
+//};
+
+/*
 template <typename MAP>
-class TraversorV : public TraversorCell<MAP, VERTEX>
+class TraversorV : public VTraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, false, thread)
+	TraversorV(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, VERTEX>(m, false, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorE : public TraversorCell<MAP, EDGE>
+class TraversorE : public VTraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, false, thread)
+	TraversorE(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, EDGE>(m, false, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorF : public TraversorCell<MAP, FACE>
+class TraversorF : public VTraversorCell<MAP, FACE>
 {
 public:
-	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, false, thread)
+	TraversorF(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, FACE>(m, false, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorW : public TraversorCell<MAP, VOLUME>
+class TraversorW : public VTraversorCell<MAP, VOLUME>
 {
 public:
-	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, false, thread)
+	TraversorW(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, VOLUME>(m, false, thread)
 	{}
 };
+*/	
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversorCell.hpp"
+#include "Topology/generic/traversorCellVirt.hpp"
 
 #endif

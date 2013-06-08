@@ -33,7 +33,7 @@ namespace CGoGN
 //**********************
 
 template <typename MAP, unsigned int ORBIT>
-MarkerForTraversor<MAP, ORBIT>::MarkerForTraversor(MAP& map, bool forceDartMarker, unsigned int thread) :
+VMarkerForTraversor<MAP, ORBIT>::VMarkerForTraversor(MAP& map, bool forceDartMarker, unsigned int thread) :
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL)
@@ -45,7 +45,7 @@ MarkerForTraversor<MAP, ORBIT>::MarkerForTraversor(MAP& map, bool forceDartMarke
 }
 
 template <typename MAP, unsigned int ORBIT>
-MarkerForTraversor<MAP, ORBIT>::~MarkerForTraversor()
+VMarkerForTraversor<MAP, ORBIT>::~VMarkerForTraversor()
 {
 	if (m_cmark)
 		delete m_cmark;
@@ -54,7 +54,7 @@ MarkerForTraversor<MAP, ORBIT>::~MarkerForTraversor()
 }
 
 template <typename MAP, unsigned int ORBIT>
-void MarkerForTraversor<MAP, ORBIT>::mark(Dart d)
+void VMarkerForTraversor<MAP, ORBIT>::mark(Dart d)
 {
 	if (m_cmark)
 		m_cmark->mark(d);
@@ -63,7 +63,7 @@ void MarkerForTraversor<MAP, ORBIT>::mark(Dart d)
 }
 
 template <typename MAP, unsigned int ORBIT>
-void MarkerForTraversor<MAP, ORBIT>::unmark(Dart d)
+void VMarkerForTraversor<MAP, ORBIT>::unmark(Dart d)
 {
 	if (m_cmark)
 		m_cmark->unmark(d);
@@ -72,7 +72,7 @@ void MarkerForTraversor<MAP, ORBIT>::unmark(Dart d)
 }
 
 template <typename MAP, unsigned int ORBIT>
-bool MarkerForTraversor<MAP, ORBIT>::isMarked(Dart d)
+bool VMarkerForTraversor<MAP, ORBIT>::isMarked(Dart d)
 {
 	if (m_cmark)
 		return m_cmark->isMarked(d);
@@ -80,13 +80,13 @@ bool MarkerForTraversor<MAP, ORBIT>::isMarked(Dart d)
 }
 
 template <typename MAP, unsigned int ORBIT>
-CellMarkerStore<ORBIT>* MarkerForTraversor<MAP, ORBIT>::cmark()
+CellMarkerStore<ORBIT>* VMarkerForTraversor<MAP, ORBIT>::cmark()
 {
 	return m_cmark;
 }
 
 template <typename MAP, unsigned int ORBIT>
-DartMarkerStore* MarkerForTraversor<MAP, ORBIT>::dmark()
+DartMarkerStore* VMarkerForTraversor<MAP, ORBIT>::dmark()
 {
 	return m_dmark;
 }
@@ -96,7 +96,7 @@ DartMarkerStore* MarkerForTraversor<MAP, ORBIT>::dmark()
 //**************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(MAP& map, Dart dart, bool forceDartMarker, unsigned int thread) :
+VTraversor3XY<MAP, ORBX, ORBY>::VTraversor3XY(MAP& map, Dart dart, bool forceDartMarker, unsigned int thread) :
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL),
@@ -120,7 +120,7 @@ Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(MAP& map, Dart dart, bool forceDartM
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(MAP& map, Dart dart, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
+VTraversor3XY<MAP, ORBX, ORBY>::VTraversor3XY(MAP& map, Dart dart, VMarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
 	m_map(map),
 	m_tradoo(map, dart, thread),
 	m_QLT(NULL),
@@ -132,7 +132,7 @@ Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(MAP& map, Dart dart, MarkerForTraver
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::~Traversor3XY()
+VTraversor3XY<MAP, ORBX, ORBY>::~VTraversor3XY()
 {
 	if (m_allocated)
 	{
@@ -144,7 +144,7 @@ Traversor3XY<MAP, ORBX, ORBY>::~Traversor3XY()
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
+Dart VTraversor3XY<MAP, ORBX, ORBY>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -162,7 +162,7 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
 	m_first = false;
 
 	m_current = m_tradoo.begin() ;
-	// for the case of beginning with a given MarkerForTraversor
+	// for the case of beginning with a given VMarkerForTraversor
 	if (!m_allocated)
 	{
 		if (m_cmark)
@@ -187,13 +187,13 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XY<MAP, ORBX, ORBY>::end()
+Dart VTraversor3XY<MAP, ORBX, ORBY>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XY<MAP, ORBX, ORBY>::next()
+Dart VTraversor3XY<MAP, ORBX, ORBY>::next()
 {
 	if(m_QLT != NULL)
 	{
@@ -255,7 +255,7 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 //*********************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(MAP& map, Dart dart, bool forceDartMarker, unsigned int thread):
+VTraversor3XXaY<MAP, ORBX, ORBY>::VTraversor3XXaY(MAP& map, Dart dart, bool forceDartMarker, unsigned int thread):
 	m_map(map),m_QLT(NULL)
 {
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<ORBX,ORBY>() ;
@@ -265,13 +265,13 @@ Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(MAP& map, Dart dart, bool forceD
 	}
 	else
 	{
-		MarkerForTraversor<MAP, ORBX> mk(map, forceDartMarker, thread);
+		VMarkerForTraversor<MAP, ORBX> mk(map, forceDartMarker, thread);
 		mk.mark(dart);
 
-		Traversor3XY<MAP, ORBX, ORBY> traAdj(map, dart, forceDartMarker, thread);
+		VTraversor3XY<MAP, ORBX, ORBY> traAdj(map, dart, forceDartMarker, thread);
 		for (Dart d = traAdj.begin(); d != traAdj.end(); d = traAdj.next())
 		{
-			Traversor3XY<MAP, ORBY, ORBX> traInci(map, d, mk, forceDartMarker, thread);
+			VTraversor3XY<MAP, ORBY, ORBX> traInci(map, d, mk, forceDartMarker, thread);
 			for (Dart e = traInci.begin(); e != traInci.end(); e = traInci.next())
 				m_vecDarts.push_back(e);
 		}
@@ -280,7 +280,7 @@ Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(MAP& map, Dart dart, bool forceD
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XXaY<MAP, ORBX, ORBY>::begin()
+Dart VTraversor3XXaY<MAP, ORBX, ORBY>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -293,13 +293,13 @@ Dart Traversor3XXaY<MAP, ORBX, ORBY>::begin()
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XXaY<MAP, ORBX, ORBY>::end()
+Dart VTraversor3XXaY<MAP, ORBX, ORBY>::end()
 {
 	return NIL;
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XXaY<MAP, ORBX, ORBY>::next()
+Dart VTraversor3XXaY<MAP, ORBX, ORBY>::next()
 {
 	if(m_QLT != NULL)
 	{
@@ -313,50 +313,50 @@ Dart Traversor3XXaY<MAP, ORBX, ORBY>::next()
 
 
 //template<typename MAP>
-//Traversor3<MAP>* Traversor3<MAP>::createXY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//VTraversor3<MAP>* VTraversor3<MAP>::createXY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
 //{
 //	int code = 0x10*(orbX-VERTEX) + orbY-VERTEX;
 //
 //	switch(code)
 //	{
 //	case 0x01:
-//		return new Traversor3XY<MAP, VERTEX, EDGE>(map,dart);
+//		return new VTraversor3XY<MAP, VERTEX, EDGE>(map,dart);
 //		break;
 //	case 0x02:
-//		return new Traversor3XY<MAP, VERTEX, FACE>(map,dart);
+//		return new VTraversor3XY<MAP, VERTEX, FACE>(map,dart);
 //		break;
 //	case 0x03:
-//		return new Traversor3XY<MAP, VERTEX, VOLUME>(map,dart);
+//		return new VTraversor3XY<MAP, VERTEX, VOLUME>(map,dart);
 //		break;
 //
 //	case 0x10:
-//		return new Traversor3XY<MAP, EDGE, VERTEX>(map,dart);
+//		return new VTraversor3XY<MAP, EDGE, VERTEX>(map,dart);
 //		break;
 //	case 0x12:
-//		return new Traversor3XY<MAP, EDGE, FACE>(map,dart);
+//		return new VTraversor3XY<MAP, EDGE, FACE>(map,dart);
 //		break;
 //	case 0x13:
-//		return new Traversor3XY<MAP, EDGE, VOLUME>(map,dart);
+//		return new VTraversor3XY<MAP, EDGE, VOLUME>(map,dart);
 //		break;
 //
 //	case 0x20:
-//		return new Traversor3XY<MAP, FACE, VERTEX>(map,dart);
+//		return new VTraversor3XY<MAP, FACE, VERTEX>(map,dart);
 //		break;
 //	case 0x21:
-//		return new Traversor3XY<MAP, FACE, EDGE>(map,dart);
+//		return new VTraversor3XY<MAP, FACE, EDGE>(map,dart);
 //		break;
 //	case 0x23:
-//		return new Traversor3XY<MAP, FACE, VOLUME>(map,dart);
+//		return new VTraversor3XY<MAP, FACE, VOLUME>(map,dart);
 //		break;
 //
 //	case 0x30:
-//		return new Traversor3XY<MAP, VOLUME, VERTEX>(map,dart);
+//		return new VTraversor3XY<MAP, VOLUME, VERTEX>(map,dart);
 //		break;
 //	case 0x31:
-//		return new Traversor3XY<MAP, VOLUME, EDGE>(map,dart);
+//		return new VTraversor3XY<MAP, VOLUME, EDGE>(map,dart);
 //		break;
 //	case 0x32:
-//		return new Traversor3XY<MAP, VOLUME, FACE>(map,dart);
+//		return new VTraversor3XY<MAP, VOLUME, FACE>(map,dart);
 //		break;
 //
 //	default:
@@ -368,50 +368,50 @@ Dart Traversor3XXaY<MAP, ORBX, ORBY>::next()
 //
 //
 //template<typename MAP>
-//Traversor3<MAP>* Traversor3<MAP>::createXXaY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//VTraversor3<MAP>* VTraversor3<MAP>::createXXaY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
 //{
 //	int code = 0x10*(orbX-VERTEX) + orbY-VERTEX;
 //
 //	switch(code)
 //	{
 //	case 0x01:
-//		return new Traversor3XXaY<MAP, VERTEX, EDGE>(map,dart);
+//		return new VTraversor3XXaY<MAP, VERTEX, EDGE>(map,dart);
 //		break;
 //	case 0x02:
-//		return new Traversor3XXaY<MAP, VERTEX, FACE>(map,dart);
+//		return new VTraversor3XXaY<MAP, VERTEX, FACE>(map,dart);
 //		break;
 //	case 0x03:
-//		return new Traversor3XXaY<MAP, VERTEX, VOLUME>(map,dart);
+//		return new VTraversor3XXaY<MAP, VERTEX, VOLUME>(map,dart);
 //		break;
 //
 //	case 0x10:
-//		return new Traversor3XXaY<MAP, EDGE, VERTEX>(map,dart);
+//		return new VTraversor3XXaY<MAP, EDGE, VERTEX>(map,dart);
 //		break;
 //	case 0x12:
-//		return new Traversor3XXaY<MAP, EDGE, FACE>(map,dart);
+//		return new VTraversor3XXaY<MAP, EDGE, FACE>(map,dart);
 //		break;
 //	case 0x13:
-//		return new Traversor3XXaY<MAP, EDGE, VOLUME>(map,dart);
+//		return new VTraversor3XXaY<MAP, EDGE, VOLUME>(map,dart);
 //		break;
 //
 //	case 0x20:
-//		return new Traversor3XXaY<MAP, FACE, VERTEX>(map,dart);
+//		return new VTraversor3XXaY<MAP, FACE, VERTEX>(map,dart);
 //		break;
 //	case 0x21:
-//		return new Traversor3XXaY<MAP, FACE, EDGE>(map,dart);
+//		return new VTraversor3XXaY<MAP, FACE, EDGE>(map,dart);
 //		break;
 //	case 0x23:
-//		return new Traversor3XXaY<MAP, FACE, VOLUME>(map,dart);
+//		return new VTraversor3XXaY<MAP, FACE, VOLUME>(map,dart);
 //		break;
 //
 //	case 0x30:
-//		return new Traversor3XXaY<MAP, VOLUME, VERTEX>(map,dart);
+//		return new VTraversor3XXaY<MAP, VOLUME, VERTEX>(map,dart);
 //		break;
 //	case 0x31:
-//		return new Traversor3XXaY<MAP, VOLUME, EDGE>(map,dart);
+//		return new VTraversor3XXaY<MAP, VOLUME, EDGE>(map,dart);
 //		break;
 //	case 0x32:
-//		return new Traversor3XXaY<MAP, VOLUME, FACE>(map,dart);
+//		return new VTraversor3XXaY<MAP, VOLUME, FACE>(map,dart);
 //		break;
 //
 //	default:
