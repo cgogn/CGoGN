@@ -45,7 +45,7 @@ namespace Adaptive
 template <typename PFP>
 Map3MR<PFP>::Map3MR(typename PFP::MAP& map) :
 	m_map(map),
-	shareVertexEmbeddings(true),
+	shareVertexEmbeddings(false),
 	vertexVertexFunctor(NULL),
 	edgeVertexFunctor(NULL),
 	faceVertexFunctor(NULL),
@@ -460,6 +460,20 @@ void Map3MR<PFP>::subdivideEdge(Dart d)
 	assert(m_map.getCurrentLevel() == edgeLevel(d) || !"Trying to subdivide an edge on a bad current level") ;
 
 	m_map.incCurrentLevel();
+
+	if(!shareVertexEmbeddings)
+	{
+//		if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+//		{
+//			std::cout << "plop" << std::endl;
+			m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+//		}
+//		if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
+//		{
+//			std::cout << "plop2" << std::endl;
+			m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+//		}
+	}
 
 	Dart nd = cutEdge(d);
 
@@ -896,6 +910,7 @@ unsigned int Map3MR<PFP>::subdivideHexa(Dart d, bool OneLevelDifference)
 	if(m_map.getCurrentLevel() == m_map.getMaxLevel())
 		m_map.addLevelBack() ;
 
+
 	Traversor3WV<typename PFP::MAP> tWV(m_map, d);
 	for(Dart ditWV = tWV.begin(); ditWV != tWV.end(); ditWV = tWV.next())
 	{
@@ -909,6 +924,14 @@ unsigned int Map3MR<PFP>::subdivideHexa(Dart d, bool OneLevelDifference)
 		}
 
 	}
+
+	//	std::vector<Dart> vertices;
+//	Traversor3WV<typename PFP::MAP> traWV(m_map, d);
+//	for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+//	{
+//		vertices.push_back(ditWV);
+//		std::cout << "back" << std::endl;
+//	}
 
 	//
 	// Subdivide Faces and Edges
@@ -924,6 +947,11 @@ unsigned int Map3MR<PFP>::subdivideHexa(Dart d, bool OneLevelDifference)
 	std::vector<std::pair<Dart, Dart> > subdividedFaces;
 	subdividedFaces.reserve(128);
 	Dart centralDart = NIL;
+
+//	for(std::vector<Dart>::iterator it = vertices.begin() ; it != vertices.end() ; ++it)
+//	{
+//		Dart ditWV = *it;
+
 	Traversor3WV<typename PFP::MAP> traWV(m_map, d);
 	for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
 	{
@@ -987,6 +1015,25 @@ unsigned int Map3MR<PFP>::subdivideHexa(Dart d, bool OneLevelDifference)
 	}
 
 	(*volumeVertexFunctor)(centralDart) ;
+
+
+	{
+		m_map.decCurrentLevel() ;
+		Traversor3WV<typename PFP::MAP> traWV(m_map, d);
+		for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+		{
+			std::cout << "plop" << std::endl;
+		}
+		m_map.incCurrentLevel();
+	}
+
+
+
+
+
+
+
+
 
 	m_map.popLevel() ;
 
