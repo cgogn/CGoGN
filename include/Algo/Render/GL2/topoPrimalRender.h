@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _TOPO3_VBO_RENDER
-#define _TOPO3_VBO_RENDER
+#ifndef _TOPO_PRIMAL_RENDER
+#define _TOPO_PRIMAL_RENDER
 
 #include <vector>
 #include <list>
@@ -36,9 +36,6 @@
 #include "Utils/GLSLShader.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
-
-
-
 
 #include "Utils/vbo_base.h"
 #include "Utils/svg.h"
@@ -57,23 +54,19 @@ namespace GL2
 {
 
 
-class Topo3Render
+class TopoPrimalRender
 {
 protected:
 
 	/**
 	* vbo buffers
 	* 0: vertices darts
-	* 1: vertices phi1 / beta1
-	* 2: vertices phi2 / beta2
-	* 3: vertices phi3 / beta3
-	* 4: colors
+	* 1: vertices alpha1
+	* 2: colors
 	*/
 	Utils::VBO* m_vbo0;
 	Utils::VBO* m_vbo1;
 	Utils::VBO* m_vbo2;
-	Utils::VBO* m_vbo3;
-	Utils::VBO* m_vbo4;
 
 	unsigned int m_vaId;
 
@@ -89,16 +82,6 @@ protected:
 	* number of relations 2 to draw
 	*/
 	GLuint m_nbRel1;
-
-	/**
-	* number of relations 2 to draw
-	*/
-	GLuint m_nbRel2;
-
-	/**
-	* number of relations 3 to draw
-	*/
-	GLuint m_nbRel3;
 
 	/**
 	 * width of lines use to draw darts
@@ -119,6 +102,11 @@ protected:
 	 * initial darts color (set in update)
 	 */
 	Geom::Vec3f m_dartsColor;
+
+	/**
+	 * initial darts color for boundary (set in update)
+	 */
+	Geom::Vec3f m_boundaryDartsColor;
 
 	/**
 	 * attribute index to get easy correspondence dart/color
@@ -151,12 +139,12 @@ public:
 	/**
 	* Constructor
 	*/
-	Topo3Render();
+	TopoPrimalRender();
 
 	/**
 	* Destructor
 	*/
-	~Topo3Render();
+	~TopoPrimalRender();
 
 
 	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1);}
@@ -180,27 +168,15 @@ public:
 	void drawDarts();
 
 	/**
-	* Drawing function for phi1 only
+	* Drawing function for phi2 only
 	*/
 	void drawRelation1();
-
-	/**
-	* Drawing function for phi2 only
-	*/
-	void drawRelation2();
-
-	/**
-	* Drawing function for phi2 only
-	*/
-	void drawRelation3(Geom::Vec4f c);
 
 	/**
 	 * draw all topo
 	 * \warning DO NOT FORGET TO DISABLE CULLFACE BEFORE CALLING
 	 */
 	void drawTopo();
-
-//	void drawDart(Dart d, float R, float G, float B, float width);
 
 	/**
 	 * change dart drawing color
@@ -226,6 +202,8 @@ public:
 	 * @param b blue !
 	 */
 	void setInitialDartsColor(float r, float g, float b);
+
+	void setInitialBoundaryDartsColor(float r, float g, float b);
 
 	/**
 	 * overdraw a dart with given width and color
@@ -272,26 +250,17 @@ public:
 	* @param map the map
 	* @param positions  attribute of position vertices
 	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
 	*/
-	template<typename PFP, typename EMBV, typename EMB>
-	void updateDataGen(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
-
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke);
 
 	/**
 	* update color buffer with color attribute handler
 	* @param map the map
 	* @param colors  attribute of dart's colors
 	*/
-	template<typename PFP, typename EMBV, typename EMB>
-	void updateColorsGen(typename PFP::MAP& map, const EMBV& colors);
-
 	template<typename PFP>
-	void updateColors(typename PFP::MAP& map, const VertexAttribute<Geom::Vec3f>& colors);
-
+	void updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors);
 
 	/**
 	 * Get back middle position of drawn darts
@@ -317,29 +286,6 @@ public:
 
 	template<typename PFP>
 	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
-
-protected:
-	/**
-	* update all drawing buffers to render a dual map
-	* @param map the map
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
-	*/
-	template<typename PFP, typename EMBV, typename EMB>
-	void updateDataMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
-
-	/**
-	* update all drawing buffers to render a gmap
-	* @param map the map
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
-	*/
-	template<typename PFP, typename EMBV, typename EMB>
-	void updateDataGMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
 };
 
 
@@ -351,6 +297,6 @@ protected:
 
 }//end namespace CGoGN
 
-#include "Algo/Render/GL2/topo3Render.hpp"
+#include "Algo/Render/GL2/topoPrimalRender.hpp"
 
 #endif
