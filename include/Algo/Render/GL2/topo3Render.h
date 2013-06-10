@@ -275,6 +275,9 @@ public:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
+	template<typename PFP, typename EMBV, typename EMB>
+	void updateDataGen(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
+
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
 
@@ -283,8 +286,12 @@ public:
 	* @param map the map
 	* @param colors  attribute of dart's colors
 	*/
+	template<typename PFP, typename EMBV, typename EMB>
+	void updateColorsGen(typename PFP::MAP& map, const EMBV& colors);
+
 	template<typename PFP>
-	void updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors);
+	void updateColors(typename PFP::MAP& map, const VertexAttribute<Geom::Vec3f>& colors);
+
 
 	/**
 	 * Get back middle position of drawn darts
@@ -320,8 +327,8 @@ protected:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP>
-	void updateDataMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
+	template<typename PFP, typename EMBV, typename EMB>
+	void updateDataMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
 
 	/**
 	* update all drawing buffers to render a gmap
@@ -331,8 +338,8 @@ protected:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP>
-	void updateDataGMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
+	template<typename PFP, typename EMBV, typename EMB>
+	void updateDataGMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
 };
 
 

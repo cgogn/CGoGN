@@ -347,6 +347,35 @@ void computeCentroidELWVolumes(typename PFP::MAP& map,
 }
 
 
+template <typename PFP, typename EMBV, typename EMB>
+class FunctorComputeCentroidELWVolumesGen: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const EMBV& m_position;
+	 VolumeAttribute<typename PFP::VEC3>& m_vol_centroid;
+public:
+	 FunctorComputeCentroidELWVolumesGen<PFP,EMBV,EMB>( typename PFP::MAP& map, const EMBV& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid):
+		 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol_centroid(vol_centroid)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_vol_centroid[d] = Surface::Geometry::volumeCentroidELWGen<PFP,EMBV,EMB>(this->m_map, d, m_position,threadID) ;
+	}
+};
+
+
+template <typename PFP, typename EMBV, typename EMB>
+void computeCentroidELWVolumesGen(typename PFP::MAP& map,
+		const EMBV& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
+		unsigned int nbth = 0)
+{
+	FunctorComputeCentroidELWVolumesGen<PFP,EMBV,EMB> funct(map,position,vol_centroid);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true);
+}
+
+
+
+
 template <typename PFP>
 class FunctorComputeNeighborhoodCentroidVertices: public FunctorMapThreaded<typename PFP::MAP >
 {

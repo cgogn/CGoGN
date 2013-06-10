@@ -322,6 +322,12 @@ void computeCentroidELWVolumes(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
 		unsigned int nbth = 0) ;
 
+
+template <typename PFP, typename EMBV, typename EMB>
+void computeCentroidELWVolumesGen(typename PFP::MAP& map,
+		const EMBV& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
+		unsigned int nbth = 0) ;
+
 		
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
