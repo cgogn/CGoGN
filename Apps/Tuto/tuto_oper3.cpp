@@ -290,11 +290,6 @@ void MyQT::createMap(int /*n*/)
 	m_render_topo->setInitialDartsColor(0.0f,0.0f,0.0f);
 	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3/*, nb*/);
 
-//	SelectorDartBoundary<PFP::MAP> sdb(myMap);
-//	MapBrowserSelector mbs(myMap,sdb);
-//	myMap.setBrowser(&mbs);
-//	m_render_topo_boundary->updateData<PFP>(myMap,position,m_ex1,m_ex2);
-//	myMap.setBrowser(NULL);
 	m_render_topo_boundary->updateDataBoundary<PFP>(myMap,position,m_ex1,m_ex2,m_shift);
 }
 

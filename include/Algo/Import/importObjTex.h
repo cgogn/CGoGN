@@ -24,7 +24,8 @@
 #ifndef IMPORTOBJTEX_H
 #define IMPORTOBJTEX_H
 
-#include "Topology/generic/mapBrowser.h"
+//#include "Topology/generic/mapBrowser.h"
+#include "Container/containerBrowser.h"
 #include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
@@ -180,7 +181,7 @@ public:
 	 * @param browsers vector of MapBrowers representing the groups
 	 * @return ok or not
 	 */
-	bool generateBrowsers(std::vector<MapBrowser*>& browsers);
+	bool generateBrowsers(std::vector<ContainerBrowser*>& browsers);
 
 	/**
 	 * @brief getMaterialNames

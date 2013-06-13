@@ -26,7 +26,7 @@
 #define __ALGO_GEOMETRY_NORMALIZATION_H__
 
 #include "Geometry/vector_gen.h"
-#include "Topology/generic/mapBrowser.h"
+#include "Container/containerBrowser.h"
 
 namespace CGoGN
 {
@@ -41,27 +41,50 @@ namespace Geometry
 template <typename PFP, unsigned int ORBIT>
 typename PFP::REAL normalizeLength(typename PFP::MAP & the_map, AttributeHandler<typename PFP::VEC3,ORBIT> & m_attr, const typename PFP::REAL scale = 1.0, )
 {
+//	typename PFP::REAL sum = 0 ;
+//	int count = 0 ;
+
+//	MapBrowserLinked<typename PFP::MAP> mb(the_map) ;
+//	the_map.foreach_orbit(m_attr.getOrbit(), mb) ;
+
+//	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
+//	{
+//		typename PFP::VEC3 length = m_attr[d] ;
+//		length -= m_attr[the_map.phi2(d)] ;
+//        sum += length.norm() ;
+//        ++count ;
+//	}
+
+//    sum /= typename PFP::REAL(count) ;
+
+//    typename PFP::REAL div = sum / scale ; // mutiply res by scale factor
+
+//	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
+//	{
+//        m_attr[d] /= div ;
+//	}
+
+//	return div ;
+
 	typename PFP::REAL sum = 0 ;
 	int count = 0 ;
 
-	MapBrowserLinked<typename PFP::MAP> mb(the_map) ;
-	the_map.foreach_orbit(m_attr.getOrbit(), mb) ;
-
-	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
+	TraversorCell<PFP::MAP,ORBIT> trav(the_map);
+	for (Dart d = trav.begin(); d != trav.end(); d=trav.next())
 	{
 		typename PFP::VEC3 length = m_attr[d] ;
 		length -= m_attr[the_map.phi2(d)] ;
-        sum += length.norm() ;
-        ++count ;
+		sum += length.norm() ;
+		++count ;
 	}
 
-    sum /= typename PFP::REAL(count) ;
+	sum /= typename PFP::REAL(count) ;
 
-    typename PFP::REAL div = sum / scale ; // mutiply res by scale factor
+	typename PFP::REAL div = sum / scale ; // mutiply res by scale factor
 
-	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
+	for (Dart d = trav.begin(); d != trav.end(); d=trav.next())
 	{
-        m_attr[d] /= div ;
+		m_attr[d] /= div ;
 	}
 
 	return div ;

@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Topology/generic/attributeHandler.h"
+#include "Topology/generic/autoAttributeHandler.h"
 #include "Container/fakeAttribute.h"
 #include <fstream>
 
@@ -214,30 +215,51 @@ void OBJModel<PFP>::readMaterials(const std::string& filename, std::vector<Mater
 
 
 template <typename PFP>
-bool OBJModel<PFP>::generateBrowsers(std::vector<MapBrowser*>& browsers)
+bool OBJModel<PFP>::generateBrowsers(std::vector<ContainerBrowser*>& browsers)
 {
-	browsers.clear();
+//	browsers.clear();
 	
+//	if (m_groupNames.empty())
+//		return false;
+	
+//	MapBrowserLinked* MBLptr = new MapBrowserLinked(m_map);
+//	DartAttribute<Dart>& links = MBLptr->getLinkAttr();
+//	browsers.push_back(MBLptr);
+	
+//	for (unsigned int i = 1; i<m_groupNames.size(); ++i)
+//	{
+//		MapBrowser* MBptr = new MapBrowserLinked(m_map,links);
+//		browsers.push_back(MBptr);
+//		m_groupMaterialID[i]= m_materialNames[m_groupMaterialNames[i]];
+//	}
+	
+//	for (Dart d=m_map.begin(); d!=m_map.end(); m_map.next(d))
+//	{
+//		unsigned int g = m_groups[d] -1 ; // groups are name from 1
+//		MapBrowserLinked* mb = static_cast<MapBrowserLinked*>(browsers[g]);
+//		mb->pushBack(d);
+//	}
+//	return true;
+
+	browsers.clear();
 	if (m_groupNames.empty())
 		return false;
-	
-	MapBrowserLinked* MBLptr = new MapBrowserLinked(m_map);
-	DartAttribute<Dart>& links = MBLptr->getLinkAttr();
+
+	ContainerBrowserLinked* MBLptr = new ContainerBrowserLinked(m_map,DART);
 	browsers.push_back(MBLptr);
-	
+
 	for (unsigned int i = 1; i<m_groupNames.size(); ++i)
 	{
-		MapBrowser* MBptr = new MapBrowserLinked(m_map,links);
+		ContainerBrowser* MBptr = new ContainerBrowserLinked(*MBLptr);
 		browsers.push_back(MBptr);
-//		std::string& matName =  m_materialNames[i];
 		m_groupMaterialID[i]= m_materialNames[m_groupMaterialNames[i]];
 	}
-	
+
 	for (Dart d=m_map.begin(); d!=m_map.end(); m_map.next(d))
 	{
 		unsigned int g = m_groups[d] -1 ; // groups are name from 1
-		MapBrowserLinked* mb = static_cast<MapBrowserLinked*>(browsers[g]);
-		mb->pushBack(d);
+		ContainerBrowserLinked* mb = static_cast<ContainerBrowserLinked*>(browsers[g]);
+		mb->pushBack(d.index);
 	}
 	return true;
 }

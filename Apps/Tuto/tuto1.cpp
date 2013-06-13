@@ -24,7 +24,6 @@
 
 #include "tuto1.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Topology/generic/mapBrowser.h"
 
 using namespace CGoGN ;
 

@@ -703,7 +703,8 @@ void GenericMap::addEmbedding()
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-inline Dart GenericMap::realBegin() const
+//inline Dart GenericMap::realBegin() const
+inline Dart GenericMap::begin() const
 {
 	if (m_isMultiRes)
 	{
@@ -719,7 +720,8 @@ inline Dart GenericMap::realBegin() const
 	return Dart::create(m_attribs[DART].begin()) ;
 }
 
-inline Dart GenericMap::realEnd() const
+//inline Dart GenericMap::realEnd() const
+inline Dart GenericMap::end() const
 {
 	if (m_isMultiRes)
 		return Dart::create(m_mrattribs.end()) ;
@@ -727,7 +729,8 @@ inline Dart GenericMap::realEnd() const
 	return Dart::create(m_attribs[DART].end()) ;
 }
 
-inline void GenericMap::realNext(Dart& d) const
+//inline void GenericMap::realNext(Dart& d) const
+inline void GenericMap::next(Dart& d) const
 {
 	if (m_isMultiRes)
 	{
@@ -743,27 +746,27 @@ inline void GenericMap::realNext(Dart& d) const
 }
 
 
-inline Dart GenericMap::begin() const
-{
-	if (m_currentBrowser != NULL)
-		return m_currentBrowser->begin();
-	return GenericMap::realBegin();
-}
+//inline Dart GenericMap::begin() const
+//{
+//	if (m_currentBrowser != NULL)
+//		return m_currentBrowser->begin();
+//	return GenericMap::realBegin();
+//}
 
-inline Dart GenericMap::end() const
-{
-	if (m_currentBrowser != NULL)
-		return m_currentBrowser->end();
-	return GenericMap::realEnd();
-}
+//inline Dart GenericMap::end() const
+//{
+//	if (m_currentBrowser != NULL)
+//		return m_currentBrowser->end();
+//	return GenericMap::realEnd();
+//}
 
-inline void GenericMap::next(Dart& d) const
-{
-	if (m_currentBrowser != NULL)
-		m_currentBrowser->next(d);
-	else
-		realNext(d);
-}
+//inline void GenericMap::next(Dart& d) const
+//{
+//	if (m_currentBrowser != NULL)
+//		m_currentBrowser->next(d);
+//	else
+//		realNext(d);
+//}
 
 //inline Dart GenericMap::begin() const
 //{
