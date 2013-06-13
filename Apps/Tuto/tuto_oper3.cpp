@@ -31,7 +31,6 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
-#include "Topology/generic/mapBrowser.h"
 
 using namespace CGoGN ;
 
