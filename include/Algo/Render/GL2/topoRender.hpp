@@ -35,7 +35,7 @@
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Geometry/normal.h"
 
-#include "Topology/generic/mapBrowser.h"
+#include "Container/containerBrowser.h"
 
 namespace CGoGN
 {
@@ -56,12 +56,18 @@ void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribut
 	m_normalShift = ns;
 //	SelectorDartBoundary<typename PFP::MAP> sdb(map);
 //	MapBrowserSelector mbs(map,sdb);
-	MapBrowserSelector mbs(map,SelectorDartBoundary<typename PFP::MAP>(map));
-	map.setBrowser(&mbs);
+//	MapBrowserSelector mbs(map,SelectorDartBoundary<typename PFP::MAP>(map));
+//	map.setBrowser(&mbs);
+
+	SelectorDartBoundary<typename PFP::MAP> sdb(map);
+	DartContainerBrowserSelector browser(map,sdb);
+	browser.enable();
+
 
 	updateData<PFP>(map,positions, ke, kf,true);
 
-	map.setBrowser(NULL);
+	browser.disable();
+//	map.setBrowser(NULL);
 	m_normalShift = 0.0f;
 }
 

@@ -53,13 +53,13 @@ namespace CGoGN
  * - a MapBrowserSelector
  * - a MapBrowserLinked (Attr or Auto)
  */
-class MapBrowser
-{
-public:
-	virtual Dart begin() const = 0;
-	virtual Dart end() const = 0;
-	virtual void next(Dart& d) const = 0;
-};
+//class MapBrowser
+//{
+//public:
+//	virtual Dart begin() const = 0;
+//	virtual Dart end() const = 0;
+//	virtual void next(Dart& d) const = 0;
+//};
 
 class AttributeHandlerGen ;
 class DartMarkerGen ;
@@ -83,7 +83,7 @@ protected:
 	/**
 	 * @brief current MapBrowser used to traverse the map
 	 */
-	MapBrowser* m_currentBrowser;
+//	MapBrowser* m_currentBrowser;
 
 	/**
 	 * Attributes Containers
@@ -195,11 +195,11 @@ public:
 	template <unsigned int ORBIT>
 	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
 
-	/**
-	 * @brief set the current MapBrowser
-	 * @param mb pointer on MapBrowser to use (default is map itself)
-	 */
-	void setBrowser(MapBrowser* mb) { m_currentBrowser = mb; }
+//	/**
+//	 * @brief set the current MapBrowser
+//	 * @param mb pointer on MapBrowser to use (default is map itself)
+//	 */
+//	void setBrowser(MapBrowser* mb) { m_currentBrowser = mb; }
 
 	/****************************************
 	 *     RESOLUTION LEVELS MANAGEMENT     *
@@ -692,11 +692,11 @@ public:
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
 
-	Dart realBegin() const;
+//	Dart realBegin() const;
 
-	Dart realEnd() const;
+//	Dart realEnd() const;
 
-	void realNext(Dart& d) const;
+//	void realNext(Dart& d) const;
 
 
 	/**

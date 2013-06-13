@@ -108,7 +108,7 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	if (m_isMultiRes)
 		initMR() ;
 
-	m_currentBrowser = NULL;
+//	m_currentBrowser = NULL;
 }
 
 GenericMap::~GenericMap()
