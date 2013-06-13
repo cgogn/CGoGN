@@ -39,6 +39,18 @@ namespace CGoGN
 {
 
 class RegisteredBaseAttribute;
+class AttributeContainer;
+
+
+class ContainerBrowser
+{
+public:
+	virtual unsigned int begin() const = 0;
+	virtual unsigned int end() const = 0;
+	virtual void next(unsigned int &it) const = 0;
+	virtual void enable() = 0;
+	virtual void disable() = 0;
+};
 
 /**
  * Container for AttributeMultiVectors
@@ -84,6 +96,8 @@ protected:
 	*/
 	std::vector<unsigned int> m_tableBlocksEmpty;
 
+	ContainerBrowser* m_currentBrowser;
+
 	/**
 	 * orbit of the container
 	 */
@@ -128,6 +142,8 @@ public:
 	void setOrbit(unsigned int orbit);
 
 	void setRegistry(std::map<std::string, RegisteredBaseAttribute*>* re);
+
+	void setContainerBrowser(ContainerBrowser* bro) { m_currentBrowser = bro;}
 
 	/**************************************
 	 *          BASIC FEATURES            *
@@ -223,6 +239,25 @@ public:
 	 * MUST BE USED INSTEAD OF ++ !
 	 */
 	void next(unsigned int &it) const;
+
+
+
+	/**
+	 * return the index of the first line of the container
+	 */
+	unsigned int realBegin() const;
+
+	/**
+	 * return the index of the last line of the container
+	 */
+	unsigned int realEnd() const;
+
+	/**
+	 * get the index of the line after it in the container
+	 * MUST BE USED INSTEAD OF ++ !
+	 */
+	void realNext(unsigned int &it) const;
+
 
 	/**************************************
 	 *       INFO ABOUT ATTRIBUTES        *

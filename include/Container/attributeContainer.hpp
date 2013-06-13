@@ -231,7 +231,50 @@ inline bool AttributeContainer::used(unsigned int index) const
  *         CONTAINER TRAVERSAL        *
  **************************************/
 
+//inline unsigned int AttributeContainer::begin() const
+//{
+//	unsigned int it = 0;
+//	while ((it < m_maxSize) && (!used(it)))
+//		++it;
+//	return it;
+//}
+
+//inline unsigned int AttributeContainer::end() const
+//{
+//	return m_maxSize;
+//}
+
+//inline void AttributeContainer::next(unsigned int &it) const
+//{
+//	do
+//	{
+//		++it;
+//	} while ((it < m_maxSize) && (!used(it)));
+//}
+
 inline unsigned int AttributeContainer::begin() const
+{
+	if (m_currentBrowser != NULL)
+		return m_currentBrowser->begin();
+	return AttributeContainer::realBegin();
+}
+
+inline unsigned int AttributeContainer::end() const
+{
+	if (m_currentBrowser != NULL)
+		return m_currentBrowser->end();
+	return AttributeContainer::realEnd();
+}
+
+inline void AttributeContainer::next(unsigned int &it) const
+{
+	if (m_currentBrowser != NULL)
+		m_currentBrowser->next(it);
+	else
+		AttributeContainer::realNext(it);
+}
+
+inline unsigned int AttributeContainer::realBegin() const
 {
 	unsigned int it = 0;
 	while ((it < m_maxSize) && (!used(it)))
@@ -239,12 +282,12 @@ inline unsigned int AttributeContainer::begin() const
 	return it;
 }
 
-inline unsigned int AttributeContainer::end() const
+inline unsigned int AttributeContainer::realEnd() const
 {
 	return m_maxSize;
 }
 
-inline void AttributeContainer::next(unsigned int &it) const
+inline void AttributeContainer::realNext(unsigned int &it) const
 {
 	do
 	{

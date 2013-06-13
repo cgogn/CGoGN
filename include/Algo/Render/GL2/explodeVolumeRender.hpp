@@ -624,6 +624,7 @@ inline void ExplodeVolumeRender::drawEdges()
 
 inline void ExplodeVolumeRender::setExplodeVolumes(float explode)
 {
+	m_explodeV = explode;
 	if (m_smooth)
 		m_shaderS->setExplodeVolumes(explode);
 	else
@@ -696,6 +697,40 @@ inline Utils::GLSLShader* ExplodeVolumeRender::shaderLines()
 {
 	return m_shaderL;
 }
+
+inline void ExplodeVolumeRender::svgoutEdges(const std::string& filename, const glm::mat4& model, const glm::mat4& proj)
+{
+	Utils::SVG::SVGOut svg(filename,model,proj);
+	toSVG(svg);
+	svg.write();
+}
+
+inline void ExplodeVolumeRender::toSVG(Utils::SVG::SVGOut& svg)
+{
+
+	Utils::SVG::SvgGroup* svg2 = new Utils::SVG::SvgGroup("alpha2", svg.m_model, svg.m_proj);
+
+	Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vboPosLine->lockPtr());
+	svg2->setWidth(1.0f);
+	svg2->beginLines();
+
+	const Geom::Vec4f& col4 = m_shaderL->getColor();
+	Geom::Vec3f col3(col4[0],col4[1],col4[2]);
+
+	float XexplV = (1.0f-m_explodeV);
+	for (unsigned int i=0; i<m_nbLines; ++i)
+	{
+		Geom::Vec3f C = ptr[3*i];
+		Geom::Vec3f P = XexplV*C + m_explodeV*ptr[3*i+1];
+		Geom::Vec3f Q = XexplV*C + m_explodeV*ptr[3*i+2];
+		svg2->addLine(P, Q, col3);
+	}
+	svg2->endLines();
+	m_vboPosLine->releasePtr();
+	svg.addGroup(svg2);
+
+}
+
 
 }//end namespace VBO
 

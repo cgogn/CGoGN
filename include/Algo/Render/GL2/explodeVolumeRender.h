@@ -35,6 +35,7 @@
 #include "Utils/Shaders/shaderExplodeSmoothVolumes.h"
 #include "Utils/Shaders/shaderExplodeVolumes.h"
 #include "Utils/Shaders/shaderExplodeVolumesLines.h"
+#include "Utils/svg.h"
 
 namespace CGoGN
 {
@@ -78,9 +79,17 @@ protected:
 	*/
 	GLuint m_nbTris;
 
+	/**
+	*number of lines to draw
+	*/
 	GLuint m_nbLines;
 
 	Geom::Vec3f m_globalColor;
+
+	/**
+	 * explode volume factor
+	 */
+	float m_explodeV;
 	
 	template<typename PFP>
 	void computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
@@ -185,6 +194,20 @@ public:
 	 * set color parameter for edge drawing
 	 */
 	void setColorLine(const Geom::Vec4f& col) ;
+
+	/**
+	 * @brief svgout2D
+	 * @param filename name of svg file
+	 * @param model modelview matrix
+	 * @param proj projection matrix
+	 */
+	void svgoutEdges(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+
+	/**
+	 * @brief toSVG
+	 * @param svg svg struct reference
+	 */
+	void toSVG(Utils::SVG::SVGOut& svg);
 };
 
 }//end namespace GL2

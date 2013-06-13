@@ -35,6 +35,7 @@ namespace CGoGN
 {
 
 AttributeContainer::AttributeContainer() :
+	m_currentBrowser(NULL),
 	m_orbit(0),
 	m_nbAttributes(0),
 	m_nbUnknown(0),

@@ -64,6 +64,8 @@ public:
 
 	void setColor(const Geom::Vec4f& color);
 
+	const Geom::Vec4f& getColor() const;
+
 	void setClippingPlane(const Geom::Vec4f& plane);
 
 	void setParams(float explodeV, const Geom::Vec4f& color, const Geom::Vec4f& plane);
