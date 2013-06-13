@@ -367,7 +367,7 @@ public:
 template <typename PFP, typename EMBV, typename EMB>
 void computeCentroidELWVolumesGen(typename PFP::MAP& map,
 		const EMBV& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		unsigned int nbth = 0)
+		unsigned int nbth)
 {
 	FunctorComputeCentroidELWVolumesGen<PFP,EMBV,EMB> funct(map,position,vol_centroid);
 	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true);
