@@ -107,21 +107,6 @@ public:
 //	void append(MapBrowserLinked& mbl);
 } ;
 
-
-class MapBrowserLinked : public FunctorType
-{
-protected:
-	ContainerBrowserLinked m_cbrowser;
-public:
-	MapBrowserLinked(AttribMap& m);
-	Dart begin() const;
-	Dart end() const;
-	void next(Dart& d) const;
-	bool operator()(Dart d);
-
-	ContainerBrowserLinked& getContainerBrowser();
-};
-
 } // namespace CGoGN
 
 
