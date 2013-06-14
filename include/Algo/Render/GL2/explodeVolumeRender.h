@@ -96,13 +96,22 @@ protected:
 									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace, 
 									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
 
+    template<typename PFP, typename EMBV, typename EMB>
+    void computeFaceGen(typename PFP::MAP& map, Dart d, const EMBV& positions,
+                                          const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace,
+                                          std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
 
 	template<typename PFP>
 	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
 
+    template<typename PFP, typename EMBV, typename EMB>
+    void updateSmoothGen(typename PFP::MAP& map, const EMBV& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+
 	template<typename PFP>
 	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
 
+    template<typename PFP, typename EMBV, typename EMB>
+    void updateSmooth(typename PFP::MAP& map, const EMBV& positions) ;
 
 public:
 	/**
@@ -136,6 +145,9 @@ public:
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
 
+    template<typename PFP, typename EMBV, typename EMB>
+    void updateDataGen(typename PFP::MAP& map, const EMBV& positions) ;
+
 	/**
 	* update all drawing buffers
 	* @param map the map
@@ -144,6 +156,10 @@ public:
 	*/
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+
+    template<typename PFP, typename EMBV, typename EMB>
+    void updateDataGen(typename PFP::MAP& map, const EMBV& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+
 
 	/**
 	 * draw edges
