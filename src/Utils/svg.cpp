@@ -184,7 +184,30 @@ void SvgPoints::saveOne(std::ofstream& out, unsigned int i, unsigned int /*bbl*/
 	out <<"\"/>"<< std::endl;
 }
 
+void SvgPoints::saveOneDepthAttenuation(std::ofstream& out, float da, unsigned int i, unsigned int /*bbl*/) const
+{
+	std::stringstream ss;
 
+	out << "<circle cx=\""<< m_vertices[i][0];
+	out << "\" cy=\""<< m_vertices[i][1];
+	out << "\" r=\""<< m_width;
+	out << "\" style=\"stroke: none; fill: #";
+
+	Geom::Vec3f color = m_colors[i] * da;
+
+	out << std::hex;
+	unsigned int wp = out.width(2);
+	char prev = out.fill('0');
+	out << int(color[0]*255);
+	out.width(2); out.fill('0');
+	out<< int(color[1]*255);
+	out.width(2); out.fill('0');
+	out << int(color[2]*255)<<std::dec;
+	out.fill(prev);
+	out.width(wp);
+
+	out <<"\"/>"<< std::endl;
+}
 
 unsigned int SvgPoints::nbPrimtives() const
 {
@@ -229,6 +252,31 @@ void SvgLines::saveOne(std::ofstream& out, unsigned int i, unsigned int /*bbl*/)
 	out << m_vertices[2*i+1][0] << ","<< m_vertices[2*i+1][1];
 	out <<"\"/>"<< std::endl;
 }
+
+void SvgLines::saveOneDepthAttenuation(std::ofstream& out, float da, unsigned int i, unsigned int /*bbl*/) const
+{
+	std::stringstream ss;
+
+	Geom::Vec3f color = m_colors[i] * da + Geom::Vec3f(1.0f,1.0f,1.0f)*(1.0f-da);
+
+	out << "<polyline fill=\"none\" stroke=\"#";
+	out << std::hex;
+	unsigned int wp = out.width(2);
+	char prev = out.fill('0');
+	out << int(color[0]*255);
+	out.width(2); out.fill('0');
+	out<< int(color[1]*255);
+	out.width(2); out.fill('0');
+	out << int(color[2]*255)<<std::dec;
+	out <<"\" stroke-width=\""<<m_width<<"\" points=\"";
+	out.fill(prev);
+	out.width(wp);
+	out << m_vertices[2*i][0] << ","<< m_vertices[2*i][1]<< " ";
+	out << m_vertices[2*i+1][0] << ","<< m_vertices[2*i+1][1];
+	out <<"\"/>"<< std::endl;
+}
+
+
 
 unsigned int SvgLines::nbPrimtives() const
 {
@@ -282,6 +330,34 @@ void SvgStrings::saveOne(std::ofstream& out, unsigned int i, unsigned int bbl) c
 
 	out <<"\">"<< m_strings[i]<< "</tspan></text>"<< std::endl;
 }
+
+void SvgStrings::saveOneDepthAttenuation(std::ofstream& out, float da, unsigned int i, unsigned int bbl) const
+{
+
+	float scale = m_sf * sqrt(1.0f - m_vertices[i][2])*0.007f*float(bbl);
+
+	Geom::Vec3f color = m_colors[i] * da;
+
+	out << "<text style=\"font-size:24px;";
+	out << "font-family:Bitstream Vera Sans\" ";
+	 out << "transform=\"scale(" << scale <<"," << scale <<")\""<< std::endl;
+	out << "x=\""<< (m_vertices[i][0])/scale << "\" y=\""<< (m_vertices[i][1])/scale<< "\">";
+	out << "<tspan style=\"fill:#";
+
+	out << std::hex;
+	unsigned int wp = out.width(2);
+	char prev = out.fill('0');
+	out << int(color[0]*255);
+	out.width(2); out.fill('0');
+	out<< int(color[1]*255);
+	out.width(2); out.fill('0');
+	out << int(color[2]*255)<<std::dec;
+	out.fill(prev);
+	out.width(wp);
+
+	out <<"\">"<< m_strings[i]<< "</tspan></text>"<< std::endl;
+}
+
 
 
 unsigned int SvgStrings::nbPrimtives() const
@@ -524,7 +600,7 @@ void SvgGroup::sortSimpleDepth(std::vector<DepthSort>& vds)
 
 
 SVGOut::SVGOut(const std::string& filename, const glm::mat4& model, const glm::mat4& proj):
-		m_model(model),m_proj(proj)
+	m_model(model),m_proj(proj),m_attFact(0.0f)
 {
 	m_groups.reserve(1000);
 
@@ -538,7 +614,7 @@ SVGOut::SVGOut(const std::string& filename, const glm::mat4& model, const glm::m
 }
 
 SVGOut::SVGOut(const glm::mat4& model, const glm::mat4& proj):
-		m_model(model),m_proj(proj)
+	m_model(model),m_proj(proj),m_attFact(0.0f)
 {
 	m_groups.reserve(1000);
 
@@ -627,10 +703,15 @@ void SVGOut::write()
 		std::vector<DepthSort> vds;
 		(*it)->sortSimpleDepth(vds);
 
-
 		for (std::vector<DepthSort>::iterator itd = vds.begin(); itd != vds.end(); ++itd)
 		{
-			(*it)->m_objs[itd->obj]->saveOne(*m_out,itd->id, m_bbX1-m_bbX0);
+			if (m_attFact > 0.0f)
+			{
+				float da = float( pow(double(itd-vds.begin()),m_attFact) / pow(double(vds.size()),m_attFact));
+				(*it)->m_objs[itd->obj]->saveOneDepthAttenuation(*m_out,da,itd->id, m_bbX1-m_bbX0);
+			}
+			else
+				(*it)->m_objs[itd->obj]->saveOne(*m_out,itd->id, m_bbX1-m_bbX0);
 		}
 
 		*m_out << "</g>" << std::endl;
