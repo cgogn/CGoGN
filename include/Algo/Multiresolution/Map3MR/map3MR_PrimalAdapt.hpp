@@ -232,7 +232,7 @@ bool Map3MR<PFP>::faceIsSubdivided(Dart d)
 	if(edgesAreSubdivided)
 	{
 		m_map.incCurrentLevel() ;
-		if(m_map.getDartLevel(m_map.phi1(m_map.phi1(d))) == m_map.getCurrentLevel())
+		if(m_map.getDartLevel(m_map.phi1(m_map.phi1(d))) == m_map.getCurrentLevel()) //TODO a vérifier le phi1(phi1())
 			subd = true ;
 		m_map.decCurrentLevel() ;
 	}
