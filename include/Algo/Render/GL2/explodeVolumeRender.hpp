@@ -45,7 +45,7 @@ namespace GL2
 
 inline ExplodeVolumeRender::ExplodeVolumeRender(bool withColorPerFace, bool withExplodeFace, bool withSmoothFaces):
 		m_cpf(withColorPerFace),m_ef(withExplodeFace),m_smooth(withSmoothFaces),
-		m_nbTris(0), m_nbLines(0),m_globalColor(0.7f,0.7f,0.7f)
+        m_nbTris(0), m_nbLines(0), m_globalColor(0.9f,0.5f,0.0f)//m_globalColor(0.7f,0.7f,0.7f)
 {
 	m_vboPos = new Utils::VBO();
 	m_vboPos->setDataSize(3);
@@ -93,10 +93,20 @@ inline ExplodeVolumeRender::~ExplodeVolumeRender()
 
 template<typename PFP>
 void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
-									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& /*centerNormalFace*/,
+                                     const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace,
 									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals)
 {
-	typedef typename PFP::VEC3 VEC3;
+    computeFaceGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map,d,positions,centerFace, centerNormalFace, vertices, normals);
+}
+
+
+template<typename PFP, typename EMBV, typename EMB>
+void ExplodeVolumeRender::computeFaceGen(typename PFP::MAP& map, Dart d, const EMBV& positions,
+                                      const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace,
+                                      std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals)
+{
+    //typedef typename PFP::VEC3 VEC3;
+    typedef EMB VEC3;
 	typedef typename PFP::REAL REAL;
 
 	normals.clear();
@@ -129,15 +139,21 @@ void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const Vert
 }
 
 
-
 template<typename PFP>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX)
 {
-	typedef typename PFP::VEC3 VEC3;
+    updateSmoothGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map,positions,colorPerXXX);
+}
+
+
+template<typename PFP, typename EMBV, typename EMB>
+void ExplodeVolumeRender::updateSmoothGen(typename PFP::MAP& map, const EMBV& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX)
+{
+    typedef EMB VEC3;
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
+    Algo::Volume::Geometry::Parallel::computeCentroidELWVolumesGen<PFP, EMBV, EMB>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -158,10 +174,10 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		// compute normals
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
-		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
+        VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELWGen<PFP, EMBV, EMB>(map, d, positions);
+        VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormalGen<PFP, EMBV, EMB>(map,d,positions);
 		
-		computeFace<PFP>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
+        computeFaceGen<PFP, EMBV, EMB>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
 		
 		VEC3 volCol = colorPerXXX[d];
 
@@ -260,11 +276,17 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 template<typename PFP>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
 {
+    updateSmoothGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, positions);
+}
+
+template<typename PFP, typename EMBV, typename EMB>
+void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& positions)
+{
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
+    Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP, EMBV, EMB>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -284,10 +306,10 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		// compute normals
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
-		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
+        VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELWGen<PFP, EMBV, EMB>(map, d, positions);
+        VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormalGen<PFP, EMBV, EMB>(map, d, positions);
 
-		computeFace<PFP>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
+        computeFaceGen<PFP, EMBV, EMB>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
 		
 		unsigned int nbs = vertices.size();
 		// just to have more easy algo further
@@ -384,6 +406,12 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttri
 template<typename PFP>
 void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX)
 {
+    updateDataGen<PFP,  const VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, positions, colorPerXXX);
+}
+
+template<typename PFP, typename EMBV, typename EMB>
+void ExplodeVolumeRender::updateDataGen(typename PFP::MAP& map, const EMBV& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX)
+{
 	if (!m_cpf)
 	{
 		CGoGNerr<< "ExplodeVolumeRender: problem wrong update fonction use the other (without VolumeAttribute parameter)" << CGoGNendl;
@@ -393,16 +421,17 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	if (m_smooth)
 	{
 
-		updateSmooth<PFP>(map,positions,colorPerXXX);
+        updateSmoothGen<PFP, EMBV, EMB>(map,positions,colorPerXXX);
 		return;
 	}
 
 
-	typedef typename PFP::VEC3 VEC3;
+    //typedef typename PFP::VEC3 VEC3;
+    typedef EMB VEC3;
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
+    Algo::Volume::Geometry::Parallel::computeCentroidELWVolumesGen<PFP, EMBV, EMB>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -415,7 +444,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
+        VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELWGen<PFP, EMBV, EMB>(map, d, positions);
 		VEC3 volColor = colorPerXXX[d];
 		
 		Dart b = d;
@@ -495,18 +524,25 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 template<typename PFP>
 void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
 {
+    updateDataGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, positions);
+}
+
+template<typename PFP, typename EMBV, typename EMB>
+void ExplodeVolumeRender::updateDataGen(typename PFP::MAP& map, const EMBV& positions)
+{
 	if (m_smooth)
 	{
-		updateSmooth<PFP>(map,positions);
+        updateSmoothGen<PFP, EMBV, EMB>(map,positions);
 		return;
 	}
 
 
-	typedef typename PFP::VEC3 VEC3;
+    //typedef typename PFP::VEC3 VEC3;
+    typedef EMB VEC3;
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Volume::Geometry::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
+    Algo::Volume::Geometry::Parallel::computeCentroidELWVolumesGen<PFP, EMBV, EMB>(map, positions, centerVolumes);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -519,7 +555,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
+        VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELWGen<PFP, EMBV, EMB>(map, d, positions);
 
 		Dart b = d;
 		Dart c = map.phi1(b);

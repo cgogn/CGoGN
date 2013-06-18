@@ -71,6 +71,26 @@ typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const VertexAttr
 	return N;
 }
 
+template<typename PFP, typename EMBV, typename EMB>
+EMB newellNormalGen(typename PFP::MAP& map, Dart d, const EMBV& position)
+{
+    typedef EMB VEC3;
+    VEC3 N(0);
+
+    Traversor2FV<typename PFP::MAP> t(map, d) ;
+    for(Dart it = t.begin(); it != t.end(); it = t.next())
+    {
+        const VEC3& P = position[it];
+        const VEC3& Q = position[map.phi1(it)];
+        N[0] += (P[1] - Q[1]) * (P[2] + Q[2]);
+        N[1] += (P[2] - Q[2]) * (P[0] + Q[0]);
+        N[2] += (P[0] - Q[0]) * (P[1] + Q[1]);
+    }
+
+    N.normalize();
+    return N;
+}
+
 template <typename PFP>
 typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {

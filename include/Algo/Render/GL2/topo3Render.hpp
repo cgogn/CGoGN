@@ -102,7 +102,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const EMBV& positions,
 	CellMarker<VOLUME> cmv(mapx);
 	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
 
-	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(mapx, positions, centerVolumes,3);
+    Algo::Volume::Geometry::Parallel::computeCentroidELWVolumesGen<PFP, EMBV, EMB>(mapx, positions, centerVolumes,3);
 
 
 	// debut phi1
@@ -143,7 +143,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const EMBV& positions,
 
 		VEC3 vc = centerVolumes[d];
 		
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions)*kv +vc*okv;
+        VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELWGen<PFP, EMBV, EMB>(mapx,d,positions)*kv +vc*okv;
 
 		//shrink the face
 		float okf = 1.0f - kf;
