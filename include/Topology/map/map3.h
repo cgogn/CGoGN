@@ -301,6 +301,15 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
+
+	//! Check number of edges of the vertex of d with given parameter
+	/*! @param d a dart
+	 *	@param vd degree to compare with
+	 *  @return  negative/null/positive if vertex degree is less/equal/greater than given degree
+	 */
+	int checkVertexDegree(Dart d, unsigned int vd);
+
+
 	//! Compute the number of edges of the vertex of d on the boundary
 	/*!	@param d a dart
 	 */

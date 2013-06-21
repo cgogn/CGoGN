@@ -187,6 +187,12 @@ inline unsigned int GMap2::faceDegree(Dart d)
 	return GMap1::cycleDegree(d) ;
 }
 
+inline int GMap2::checkFaceDegree(Dart d, unsigned int le)
+{
+	return GMap1::checkCycleDegree(d,le) ;
+}
+
+
 inline bool GMap2::sameVolume(Dart d, Dart e)
 {
 	return sameOrientedVolume(d, e) || sameOrientedVolume(beta2(d), e) ;

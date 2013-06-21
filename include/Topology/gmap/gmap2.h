@@ -287,6 +287,13 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
+	//! Check number of edges of the vertex of d with given parameter
+	/*! @param d a dart
+	 *	@param vd degree to compare with
+	 *  @return  negative/null/positive if vertex degree is less/equal/greater than given degree
+	 */
+	int checkVertexDegree(Dart d, unsigned int vd);
+
 	//! tell if the vertex of d is on the boundary of the map
 	/*! @param d a dart
 	 */
@@ -326,6 +333,13 @@ public:
 	 */
 	unsigned int faceDegree(Dart d) ;
 
+	//! Check number of edges of the face of d with given parameter
+	/*! @param d a dart
+	 *	@param vd degree to compare with
+	 *  @return  negative/null/positive if vertex degree is less/equal/greater than given degree
+	 */
+	int checkFaceDegree(Dart d, unsigned int le);
+
 	/**
 	 * tell if the face of d is on the boundary of the map
 	 */
@@ -347,6 +361,13 @@ public:
 	/*! @param d a dart
 	 */
 	unsigned int volumeDegree(Dart d);
+
+	//! Check number of faces of the volume of d with given parameter
+	/*! @param d a dart
+	 *	@param vd degree to compare with
+	 *  @return  negative/null/positive if volume degree is less/equal/greater than given degree
+	 */
+	int checkVolumeDegree(Dart d, unsigned int volDeg);
 
 	// TODO a mettre en algo
 	/**

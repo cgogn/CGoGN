@@ -286,6 +286,20 @@ inline unsigned int GMap1::cycleDegree(Dart d)
 	return count ;
 }
 
+inline int GMap1::checkCycleDegree(Dart d, unsigned int degree)
+{
+	unsigned int count = 0 ;
+	Dart it = d ;
+	do
+	{
+		++count ;
+		it = phi1(it) ;
+	} while ((count<=degree) && (it != d)) ;
+
+	return count-degree;
+}
+
+
 inline bool GMap1::isCycleTriangle(Dart d)
 {
 	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
