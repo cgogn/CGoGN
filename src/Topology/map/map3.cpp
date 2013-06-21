@@ -840,6 +840,22 @@ unsigned int Map3::vertexDegree(Dart d)
 	return count;
 }
 
+
+int Map3::checkVertexDegree(Dart d, unsigned int vd)
+{
+	unsigned int count = 0;
+
+	Traversor3VE<Map3> trav3VE(*this, d);
+	Dart dit = trav3VE.begin();
+	for( ; (count<=vd) && (dit != trav3VE.end()) ; dit = trav3VE.next())
+	{
+		++count;
+	}
+
+	return count - vd;
+}
+
+
 unsigned int Map3::vertexDegreeOnBoundary(Dart d)
 {
 	assert(Map3::isBoundaryVertex(d));
