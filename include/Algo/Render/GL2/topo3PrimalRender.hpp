@@ -115,13 +115,17 @@ Dart Topo3PrimalRender::picking(typename PFP::MAP& map, int x, int y)
 template<typename PFP>
 void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf)
 {
-	typedef typename PFP::VEC3 VEC3;
+    updateDataGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(mapx,positions,ke,kf);
+}
+
+template<typename PFP, typename EMBV, typename EMB>
+void Topo3PrimalRender::updateDataGen(typename PFP::MAP& mapx, const EMBV& positions, float ke, float kf)
+{
+    typedef EMB VEC3;
 	typedef typename PFP::REAL REAL;
 
 	Map3& map = dynamic_cast<Map3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3
 
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
 
 	if (m_attIndex.map() != &mapx)
 		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
@@ -161,7 +165,7 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribut
 		std::vector<VEC3> vecPos;
 		vecPos.reserve(16);
 
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+        VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELWGen<PFP, EMBV, EMB>(mapx,d,positions);
 
 		//shrink the face
 		float okf = 1.0f - kf;
@@ -184,8 +188,11 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribut
 			VEC3 P = vecPos[i]*ke + vecPos[i+1]*oke;
 			VEC3 Q = vecPos[i+1]*ke + vecPos[i]*oke;
 
-			VEC3 PP = 0.52f*P + 0.48f*Q;
-			VEC3 QQ = 0.52f*Q + 0.48f*P;
+//			VEC3 PP = 0.52f*P + 0.48f*Q;
+//			VEC3 QQ = 0.52f*Q + 0.48f*P;
+
+            VEC3 PP = 0.56f*P + 0.44f*Q;
+            VEC3 QQ = 0.56f*Q + 0.44f*P;
 
 			*positionDartBuf++ = P;
 			*positionDartBuf++ = PP;

@@ -160,19 +160,18 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 		Algo::Volume::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
 	}
 
-
-	//
-	// 2-3 swap of all old interior faces
-	//
-	TraversorF<typename PFP::MAP> tF(m_map);
-	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
-	{
-		if(m.isMarked(dit))
-		{
-			m.unmarkOrbit<FACE>(dit);
-			Algo::Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
-		}
-	}
+    //
+    // 2-3 swap of all old interior faces
+    //
+    TraversorF<typename PFP::MAP> tF(m_map);
+    for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
+    {
+        if(m.isMarked(dit))
+        {
+            m.unmarkOrbit<FACE>(dit);
+            Algo::Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
+        }
+    }
 
 /*
 	//
@@ -357,7 +356,7 @@ void Map3MR<PFP>::addNewLevelTetraOcta()
 			}
 			m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ;
 		}
-	}
+    }
 
 	m_map.popLevel() ;
 }

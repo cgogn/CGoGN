@@ -261,6 +261,9 @@ public:
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf);
 
+    template<typename PFP, typename EMBV, typename EMB>
+    void updateDataGen(typename PFP::MAP& mapx, const EMBV& positions, float ke, float kf);
+
 	/**
 	* update color buffer with color attribute handler
 	* @param map the map
