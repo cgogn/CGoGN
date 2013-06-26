@@ -240,7 +240,7 @@ public:
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
 			m_markVector->operator[](i).unsetMark(m_mark) ;
 	}
 } ;
@@ -352,7 +352,7 @@ public:
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
 			m_markVector->operator[](i).unsetMark(m_mark) ;
 	}
 } ;

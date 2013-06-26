@@ -86,10 +86,10 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const EMBV& positions,
 	typedef EMB VEC3;
 	typedef typename PFP::REAL REAL;
 
-	m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
+	m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index3");
 
 	if (!m_attIndex.isValid())
-		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index3");
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -103,7 +103,6 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const EMBV& positions,
 	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
 
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(mapx, positions, centerVolumes,3);
-
 
 	// debut phi1
 	DartAutoAttribute<VEC3> fv1(mapx);
@@ -334,9 +333,9 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const EMBV& positions
 	GMap3& map = dynamic_cast<GMap3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3
 
 	if (m_attIndex.map() != &mapx)
-		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index3");
 	if (!m_attIndex.isValid())
-		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index3");
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -562,9 +561,9 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribu
 //
 //	if (m_attIndex.map() != &map)
 //	{
-//		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+//		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index3");
 //		if (!m_attIndex.isValid())
-//			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+//			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index3");
 //	}
 //
 //	m_nbDarts = 0;

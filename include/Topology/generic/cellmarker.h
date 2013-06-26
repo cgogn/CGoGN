@@ -254,7 +254,7 @@ public:
 		assert(this->m_markVector != NULL);
 
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
 			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;
 	}
 };
@@ -389,7 +389,7 @@ public:
 		assert(this->m_markVector != NULL);
 
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
 			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;
 	}
 };
