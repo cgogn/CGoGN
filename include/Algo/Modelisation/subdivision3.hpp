@@ -435,9 +435,11 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
     return vRes;
 }
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	//std::vector<Dart> l_centers;
 	std::vector<Dart> l_vertices;
 
@@ -474,7 +476,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 	TraversorF<typename PFP::MAP> travF(map) ;
 	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 	{
-		EMB center = Surface::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map,d,attributs);
+		EMB center = Surface::Geometry::faceCentroid<PFP,EMBV>(map,d,attributs);
 
 		Dart dd = map.phi1(d) ;
 		Dart next = map.phi1(map.phi1(dd)) ;

@@ -282,9 +282,11 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map)
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-template<typename PFP, typename EMBV, typename EMB>
+template<typename PFP, typename EMBV>
 void Topo3Render::updateColorsGen(typename PFP::MAP& map, const EMBV& colors)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	m_vbo4->bind();
 	EMB* colorBuffer =  reinterpret_cast<EMB*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
@@ -311,7 +313,8 @@ void Topo3Render::updateColorsGen(typename PFP::MAP& map, const EMBV& colors)
 template<typename PFP>
 void Topo3Render::updateColors(typename PFP::MAP& map, const VertexAttribute<Geom::Vec3f>& colors)
 {
-	updateColorsGen<PFP, Geom::Vec3f, VertexAttribute<Geom::Vec3f> >(map,colors);
+//	updateColorsGen<PFP, VertexAttribute<Geom::Vec3f> >(map,colors);
+	updateColorsGen<PFP>(map,colors);
 }
 
 template<typename PFP>

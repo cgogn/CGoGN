@@ -286,7 +286,7 @@ public:
 	* @param map the map
 	* @param colors  attribute of dart's colors
 	*/
-	template<typename PFP, typename EMBV, typename EMB>
+	template<typename PFP, typename EMBV>
 	void updateColorsGen(typename PFP::MAP& map, const EMBV& colors);
 
 	template<typename PFP>
