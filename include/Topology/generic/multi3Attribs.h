@@ -70,6 +70,8 @@ struct RefCompo3Type
 	RefCompo3Type (Compo3Type<T1,T2,T3>& comp);
 
 	RefCompo3Type<T1,T2,T3>& operator=(const RefCompo3Type<T1,T2,T3>& v);
+	RefCompo3Type<T1,T2,T3>& operator=(Compo3Type<T1,T2,T3> v);
+
 	Compo3Type<T1,T2,T3> operator+(const RefCompo3Type<T1,T2,T3>& v) const;
 	Compo3Type<T1,T2,T3> operator-(const RefCompo3Type<T1,T2,T3>& v) const;
 	Compo3Type<T1,T2,T3> operator/(double d) const;
@@ -89,8 +91,8 @@ class Vertex3Attributes
 	VertexAttribute<T2>& m_h2;
 	VertexAttribute<T3>& m_h3;
 public:
-	typedef Compo3Type<T1,T2,T3> VALUE;
-	typedef RefCompo3Type<T1,T2,T3> REF;
+	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
+	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
 
 	Vertex3Attributes(VertexAttribute<T1>& h1, VertexAttribute<T2>& h2, VertexAttribute<T3>& h3):
 		m_h1(h1), m_h2(h2), m_h3(h3) {}
@@ -104,6 +106,16 @@ public:
 	{
 		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
 	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
+	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](Dart d) const
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
+	}
 };
 
 
@@ -114,8 +126,8 @@ class Face3Attributes
 	FaceAttribute<T2>& m_h2;
 	FaceAttribute<T3>& m_h3;
 public:
-	typedef Compo3Type<T1,T2,T3> VALUE;
-	typedef RefCompo3Type<T1,T2,T3> REF;
+	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
+	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
 
 	Face3Attributes(FaceAttribute<T1>& h1, FaceAttribute<T2>& h2, FaceAttribute<T3>& h3):
 		m_h1(h1), m_h2(h2), m_h3(h3) {}
@@ -129,6 +141,16 @@ public:
 	{
 		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
 	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
+	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](Dart d) const
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
+	}
 };
 
 template <typename T1, typename T2,  typename T3>
@@ -138,8 +160,8 @@ class Volume3Attributes
 	VolumeAttribute<T2>& m_h2;
 	VolumeAttribute<T3>& m_h3;
 public:
-	typedef Compo3Type<T1,T2,T3> VALUE;
-	typedef RefCompo3Type<T1,T2,T3> REF;
+	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
+	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
 
 	 Volume3Attributes(VolumeAttribute<T1>& h1, VolumeAttribute<T2>& h2, VolumeAttribute<T2>& h3):
 		 m_h1(h1), m_h2(h2), m_h3(h3) {}
@@ -150,6 +172,16 @@ public:
 	}
 
 	RefCompo3Type<T1,T2,T3> operator[](Dart d)
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
+	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
+	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](Dart d) const
 	{
 		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
 	}
@@ -274,6 +306,16 @@ RefCompo3Type<T1,T2,T3>& RefCompo3Type<T1,T2,T3>::operator=(const RefCompo3Type<
 	m_v3 = v.m_v3;
 	return *this;
 }
+
+template < typename T1, typename T2, typename T3>
+RefCompo3Type<T1,T2,T3>& RefCompo3Type<T1,T2,T3>::operator=(Compo3Type<T1,T2,T3> v)
+{
+	m_v1 = v.m_v1;
+	m_v2 = v.m_v2;
+	m_v3 = v.m_v3;
+	return *this;
+}
+
 
 template < typename T1, typename T2, typename T3>
 Compo3Type<T1,T2,T3> RefCompo3Type<T1,T2,T3>::operator+(const RefCompo3Type<T1,T2,T3>& v) const

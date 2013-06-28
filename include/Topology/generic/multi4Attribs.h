@@ -72,6 +72,8 @@ struct RefCompo4Type
 	RefCompo4Type (Compo4Type<T1,T2,T3,T4>& comp);
 
 	RefCompo4Type<T1,T2,T3,T4>& operator=(const RefCompo4Type<T1,T2,T3,T4>& v);
+	RefCompo4Type<T1,T2,T3,T4>& operator=(Compo4Type<T1,T2,T3,T4> v);
+
 	Compo4Type<T1,T2,T3,T4> operator+(const RefCompo4Type<T1,T2,T3,T4>& v) const;
 	Compo4Type<T1,T2,T3,T4> operator-(const RefCompo4Type<T1,T2,T3,T4>& v) const;
 	Compo4Type<T1,T2,T3,T4> operator/(double d) const;
@@ -92,8 +94,8 @@ class Vertex4Attributes
 	VertexAttribute<T3>& m_h3;
 	VertexAttribute<T4>& m_h4;
 public:
-	typedef Compo4Type<T1,T2,T3,T4> VALUE;
-	typedef RefCompo4Type<T1,T2,T3,T4> REF;
+	typedef Compo4Type<T1,T2,T3,T4> DATA_TYPE;
+	typedef RefCompo4Type<T1,T2,T3,T4> REF_DATA_TYPE;
 
 	Vertex4Attributes(VertexAttribute<T1>& h1, VertexAttribute<T2>& h2, VertexAttribute<T3>& h3, VertexAttribute<T4>& h4):
 		m_h1(h1), m_h2(h2), m_h3(h3), m_h4(h4) {}
@@ -104,6 +106,16 @@ public:
 	}
 
 	RefCompo4Type<T1,T2,T3,T4> operator[](Dart d)
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
+	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](unsigned int a) const
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[a],m_h2[a],m_h3[a],m_h4[a]);
+	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](Dart d) const
 	{
 		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
 	}
@@ -118,8 +130,8 @@ class Face4Attributes
 	FaceAttribute<T3>& m_h3;
 	FaceAttribute<T4>& m_h4;
 public:
-	typedef Compo4Type<T1,T2,T3,T4> VALUE;
-	typedef RefCompo4Type<T1,T2,T3,T4> REF;
+	typedef Compo4Type<T1,T2,T3,T4> DATA_TYPE;
+	typedef RefCompo4Type<T1,T2,T3,T4> REF_DATA_TYPE;
 
 	Face4Attributes(FaceAttribute<T1>& h1, FaceAttribute<T2>& h2, FaceAttribute<T3>& h3, FaceAttribute<T4>& h4):
 		m_h1(h1), m_h2(h2), m_h3(h3), m_h4(h4) {}
@@ -133,6 +145,16 @@ public:
 	{
 		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
 	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](unsigned int a) const
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[a],m_h2[a],m_h3[a],m_h4[a]);
+	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](Dart d) const
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
+	}
 };
 
 template <typename T1, typename T2,  typename T3, typename T4>
@@ -143,8 +165,8 @@ class Volume4Attributes
 	VolumeAttribute<T3>& m_h3;
 	VolumeAttribute<T4>& m_h4;
 public:
-	typedef Compo4Type<T1,T2,T3,T4> VALUE;
-	typedef RefCompo4Type<T1,T2,T3,T4> REF;
+	typedef Compo4Type<T1,T2,T3,T4> DATA_TYPE;
+	typedef RefCompo4Type<T1,T2,T3,T4> REF_DATA_TYPE;
 
 	 Volume4Attributes(VolumeAttribute<T1>& h1, VolumeAttribute<T2>& h2, VolumeAttribute<T3>& h3, VolumeAttribute<T4>& h4):
 		 m_h1(h1), m_h2(h2), m_h3(h3), m_h4(h4) {}
@@ -155,6 +177,16 @@ public:
 	}
 
 	RefCompo4Type<T1,T2,T3,T4> operator[](Dart d)
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
+	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](unsigned int a) const
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[a],m_h2[a],m_h3[a],m_h4[a]);
+	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](Dart d) const
 	{
 		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
 	}
@@ -291,6 +323,17 @@ RefCompo4Type<T1,T2,T3,T4>& RefCompo4Type<T1,T2,T3,T4>::operator=(const RefCompo
 	m_v4 = v.m_v4;
 	return *this;
 }
+
+template < typename T1, typename T2, typename T3, typename T4 >
+RefCompo4Type<T1,T2,T3,T4>& RefCompo4Type<T1,T2,T3,T4>::operator=(Compo4Type<T1,T2,T3,T4> v)
+{
+	m_v1 = v.m_v1;
+	m_v2 = v.m_v2;
+	m_v3 = v.m_v3;
+	m_v4 = v.m_v4;
+	return *this;
+}
+
 
 template < typename T1, typename T2, typename T3, typename T4 >
 Compo4Type<T1,T2,T3,T4> RefCompo4Type<T1,T2,T3,T4>::operator+(const RefCompo4Type<T1,T2,T3,T4>& v) const

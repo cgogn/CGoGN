@@ -66,6 +66,7 @@ struct RefCompo2Type
 	RefCompo2Type (Compo2Type<T1,T2>& comp);
 
 	RefCompo2Type<T1,T2>& operator=(const RefCompo2Type<T1,T2>& v);
+	RefCompo2Type<T1,T2>& operator=(Compo2Type<T1,T2> v);
 
 	Compo2Type<T1,T2> operator+(const RefCompo2Type<T1,T2>& v) const;
 	Compo2Type<T1,T2> operator-(const RefCompo2Type<T1,T2>& v) const;
@@ -85,8 +86,8 @@ class Vertex2Attributes
 	VertexAttribute<T1>& m_h1;
 	VertexAttribute<T2>& m_h2;
 public:
-	typedef Compo2Type<T1,T2> VALUE;
-	typedef RefCompo2Type<T1,T2> REF;
+	typedef Compo2Type<T1,T2> DATA_TYPE;
+	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
 
 	Vertex2Attributes(VertexAttribute<T1>& h1, VertexAttribute<T2>& h2):
 		m_h1(h1), m_h2(h2) {}
@@ -100,6 +101,16 @@ public:
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
+
+	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+	{
+		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+	}
+
+	const RefCompo2Type<T1,T2> operator[](Dart d) const
+	{
+		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+	}
 };
 
 
@@ -109,8 +120,8 @@ class Face2Attributes
 	FaceAttribute<T1>& m_h1;
 	FaceAttribute<T2>& m_h2;
 public:
-	typedef Compo2Type<T1,T2> VALUE;
-	typedef RefCompo2Type<T1,T2> REF;
+	typedef Compo2Type<T1,T2> DATA_TYPE;
+	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
 
 	Face2Attributes(FaceAttribute<T1>& h1, FaceAttribute<T2>& h2):
 		m_h1(h1), m_h2(h2) {}
@@ -124,6 +135,17 @@ public:
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
+
+	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+	{
+		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+	}
+
+	const RefCompo2Type<T1,T2> operator[](Dart d) const
+	{
+		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+	}
+
 };
 
 template <typename T1, typename T2>
@@ -132,8 +154,8 @@ class Volume2Attributes
 	VolumeAttribute<T1>& m_h1;
 	VolumeAttribute<T2>& m_h2;
 public:
-	typedef Compo2Type<T1,T2> VALUE;
-	typedef RefCompo2Type<T1,T2> REF;
+	typedef Compo2Type<T1,T2> DATA_TYPE;
+	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
 
 	 Volume2Attributes(VolumeAttribute<T1>& h1, VolumeAttribute<T2>& h2):
 		m_h1(h1), m_h2(h2) {}
@@ -144,6 +166,16 @@ public:
 	}
 
 	RefCompo2Type<T1,T2> operator[](Dart d)
+	{
+		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+	}
+
+	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+	{
+		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+	}
+
+	const RefCompo2Type<T1,T2> operator[](Dart d) const
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -259,6 +291,15 @@ RefCompo2Type<T1,T2>& RefCompo2Type<T1,T2>::operator=(const RefCompo2Type<T1,T2>
 	m_v2 = v.m_v2;
 	return *this;
 }
+
+template < typename T1, typename T2>
+RefCompo2Type<T1,T2>& RefCompo2Type<T1,T2>::operator=(Compo2Type<T1,T2>  v)
+{
+	m_v1 = v.m_v1;
+	m_v2 = v.m_v2;
+	return *this;
+}
+
 
 template < typename T1, typename T2>
 Compo2Type<T1,T2> RefCompo2Type<T1,T2>::operator+(const RefCompo2Type<T1,T2>& v) const
