@@ -86,6 +86,8 @@ protected:
 
 	Geom::Vec3f m_globalColor;
 
+	Geom::Vec4f m_clipPlane;
+
 	/**
 	 * explode volume factor
 	 */
@@ -200,8 +202,9 @@ public:
 	 * @param filename name of svg file
 	 * @param model modelview matrix
 	 * @param proj projection matrix
+	 * @param af attenuation factor 0.0:none 1.0 color->with, more fastest attenuation (^af)
 	 */
-	void svgoutEdges(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+	void svgoutEdges(const std::string& filename, const glm::mat4& model, const glm::mat4& proj,float af=0.0f);
 
 	/**
 	 * @brief toSVG

@@ -642,6 +642,7 @@ inline void ExplodeVolumeRender::setExplodeFaces(float explode)
 
 inline void ExplodeVolumeRender::setClippingPlane(const Geom::Vec4f& p)
 {
+	m_clipPlane = p;
 	if (m_smooth)
 		m_shaderS->setClippingPlane(p);
 	else
@@ -651,12 +652,12 @@ inline void ExplodeVolumeRender::setClippingPlane(const Geom::Vec4f& p)
 
 inline void ExplodeVolumeRender::setNoClippingPlane()
 {
-	Geom::Vec4f p(1.0f,1.0f,1.0f,-99999999.9f);
+	m_clipPlane = Geom::Vec4f(1.0f,1.0f,1.0f,-99999999.9f);
 	if (m_smooth)
-		m_shaderS->setClippingPlane(p);
+		m_shaderS->setClippingPlane(m_clipPlane);
 	else
-		m_shader->setClippingPlane(p);
-	m_shaderL->setClippingPlane(p);
+		m_shader->setClippingPlane(m_clipPlane);
+	m_shaderL->setClippingPlane(m_clipPlane);
 }
 
 inline void ExplodeVolumeRender::setAmbiant(const Geom::Vec4f& ambiant)
@@ -698,9 +699,10 @@ inline Utils::GLSLShader* ExplodeVolumeRender::shaderLines()
 	return m_shaderL;
 }
 
-inline void ExplodeVolumeRender::svgoutEdges(const std::string& filename, const glm::mat4& model, const glm::mat4& proj)
+inline void ExplodeVolumeRender::svgoutEdges(const std::string& filename, const glm::mat4& model, const glm::mat4& proj,float af)
 {
 	Utils::SVG::SVGOut svg(filename,model,proj);
+	svg.setAttenuationFactor(af);
 	toSVG(svg);
 	svg.write();
 }
@@ -721,9 +723,13 @@ inline void ExplodeVolumeRender::toSVG(Utils::SVG::SVGOut& svg)
 	for (unsigned int i=0; i<m_nbLines; ++i)
 	{
 		Geom::Vec3f C = ptr[3*i];
-		Geom::Vec3f P = XexplV*C + m_explodeV*ptr[3*i+1];
-		Geom::Vec3f Q = XexplV*C + m_explodeV*ptr[3*i+2];
-		svg2->addLine(P, Q, col3);
+		Geom::Vec4f C4 = Geom::Vec4f(C[0],C[1],C[2],1.0f);
+		if (m_clipPlane*C4 <=0.0f)
+		{
+			Geom::Vec3f P = XexplV*C + m_explodeV*ptr[3*i+1];
+			Geom::Vec3f Q = XexplV*C + m_explodeV*ptr[3*i+2];
+			svg2->addLine(P, Q, col3);
+		}
 	}
 	svg2->endLines();
 	m_vboPosLine->releasePtr();
