@@ -775,7 +775,7 @@ bool exportTetmesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 
 	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
 
-	fout << " Vertices" << std::endl<< position.nbElements() << std::endl;
+	fout << "Vertices" << std::endl<< position.nbElements() << std::endl;
 
 	std::vector<unsigned int> tetra;
 	tetra.reserve(2048);
@@ -784,7 +784,7 @@ bool exportTetmesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
 	{
 		const VEC3& P = position[i];
-		fout << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+		fout << P[0]<< " " << P[1]<< " " << P[2] << " " << "0" << std::endl;
 		indices[i] = count++;
 	}
 
@@ -815,7 +815,7 @@ bool exportTetmesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 	}
 
 	unsigned int nbtetra = tetra.size()/4;
-	fout << " Tetrahedra" << std::endl << nbtetra << std::endl;
+	fout << "Tetrahedra" << std::endl << nbtetra << std::endl;
 
 	for (unsigned int i=0; i<nbtetra; ++i)
 	{
@@ -858,6 +858,7 @@ bool exportMesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3
 		break;
 	default:
 		CGoGNerr << "unknown file format for " << filename << CGoGNendl;
+		return false;
 		break;
 	}
 }

@@ -275,11 +275,11 @@ public:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP, typename EMBV, typename EMB>
-	void updateDataGen(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
+	template<typename PFP, typename EMBV>
+	void updateData(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
 
-	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
+//	template<typename PFP>
+//	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
 
 	/**
 	* update color buffer with color attribute handler
@@ -327,7 +327,7 @@ protected:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP, typename EMBV, typename EMB>
+	template<typename PFP, typename EMBV>
 	void updateDataMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
 
 	/**
@@ -338,7 +338,7 @@ protected:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP, typename EMBV, typename EMB>
+	template<typename PFP, typename EMBV>
 	void updateDataGMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
 };
 

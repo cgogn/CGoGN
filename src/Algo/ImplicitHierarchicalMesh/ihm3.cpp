@@ -75,6 +75,12 @@ void ImplicitHierarchicalMap3::initImplicitProperties()
 	initEdgeId() ;
 	initFaceId();
 
+//	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
+//	{
+//		m_edgeId[d] = 0;
+//		m_faceId[d] = 0;
+//	}
+
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if(m_nextLevelCell[orbit] != NULL)
@@ -86,6 +92,19 @@ void ImplicitHierarchicalMap3::initImplicitProperties()
 	}
 }
 
+
+//void ImplicitHierarchicalMap3::deleteVolume(Dart d)
+//{
+//	unsigned int emb = getEmbedding<VERTEX>(d);
+//	Dart dr = phi1(phi1(d));
+
+//	EmbeddedMap3::deleteVolume(d);
+
+//	if(isOrbitEmbedded<VERTEX>())
+//	{
+//		setOrbitEmbedding<VERTEX>(dr,emb);
+//	}
+//}
 
 void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 {

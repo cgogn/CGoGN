@@ -112,16 +112,20 @@ Dart Topo3PrimalRender::picking(typename PFP::MAP& map, int x, int y)
 	return d;
 }
 
-template<typename PFP>
-void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf)
+//template<typename PFP>
+//void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf)
+//{
+//    updateDataGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(mapx,positions,ke,kf);
+//}
+
+template<typename PFP, typename EMBV>
+void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& positions, float ke, float kf)
 {
-	typedef typename PFP::VEC3 VEC3;
+	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
 
 	Map3& map = dynamic_cast<Map3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3
 
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
 
 	if (m_attIndex.map() != &mapx)
 		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
@@ -184,8 +188,11 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const VertexAttribut
 			VEC3 P = vecPos[i]*ke + vecPos[i+1]*oke;
 			VEC3 Q = vecPos[i+1]*ke + vecPos[i]*oke;
 
-			VEC3 PP = 0.52f*P + 0.48f*Q;
-			VEC3 QQ = 0.52f*Q + 0.48f*P;
+//			VEC3 PP = 0.52f*P + 0.48f*Q;
+//			VEC3 QQ = 0.52f*Q + 0.48f*P;
+
+            VEC3 PP = 0.56f*P + 0.44f*Q;
+            VEC3 QQ = 0.56f*Q + 0.44f*P;
 
 			*positionDartBuf++ = P;
 			*positionDartBuf++ = PP;

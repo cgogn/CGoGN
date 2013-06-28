@@ -42,22 +42,22 @@ namespace MovingObjects
 template <typename PFP>
 void ParticleCell3D<PFP>::display()
 {
-//	std::cout << "position : " << m_position << std::endl;
+//	std::cout << "position : " << this->m_position << std::endl;
 }
 
 template <typename PFP>
 typename PFP::VEC3 ParticleCell3D<PFP>::pointInFace(Dart d)
 {
 	return Algo::Surface::Geometry::faceCentroid<PFP>(m,d,position);
-//	const VEC3& p1(m_positions[d]);
+//	const VEC3& p1(this->m_positions[d]);
 //	Dart dd=m.phi1(d);
-//	const VEC3& p2(m_positions[dd]);
+//	const VEC3& p2(this->m_positions[dd]);
 //	dd=m.phi1(dd);
-//	VEC3& p3(m_positions[dd]);
+//	VEC3& p3(this->m_positions[dd]);
 //
 //	while(Geom::testOrientation2D(p3,p1,p2)==Geom::ALIGNED) {
 //		dd = m.phi1(dd);
-//		p3 = m_positions[dd];
+//		p3 = this->m_positions[dd];
 //	}
 //
 //	CGoGNout << "pointInFace " << (p1+p3)*0.5f << CGoGNendl;
@@ -365,8 +365,8 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 
 	VEC3 som = position[d];
 
-	if(Geom::arePointsEquals(current, m_position)) {
-		m_position = m_positionFace = som;
+	if(Geom::arePointsEquals(current, this->m_position)) {
+		this->m_position = this->m_positionFace = som;
 		state = VERTEX;
 		return;
 	}
@@ -442,8 +442,8 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 					std::cout << "numerical rounding ?" << std::endl;
 
 					d = dd;
-					m_position = pointInFace(d);
-					m_positionFace = m_position;
+					this->m_position = pointInFace(d);
+					this->m_positionFace = this->m_position;
 					volumeState(current);
 					return;
 				}
@@ -453,9 +453,9 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 
 	if(wsof!=0)
 	{
-		m_position = pointInFace(d);
+		this->m_position = pointInFace(d);
 		d = nextNonPlanar(d);
-		m_positionFace = pointInFace(d);
+		this->m_positionFace = pointInFace(d);
 		volumeState(current);
 	}
 	else
@@ -470,7 +470,7 @@ template <typename PFP>
 void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 {
 	#ifdef DEBUG
-	std::cout << "edgeState" <<  d <<  " " << m_position << std::endl;
+	std::cout << "edgeState" <<  d <<  " " << this->m_position << std::endl;
 
 	#endif
 
@@ -521,9 +521,9 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 
 	if(wsof==-1)  {
 
-		m_position = pointInFace(d);
+		this->m_position = pointInFace(d);
 		d = nextNonPlanar(m.phi1(d));
-		m_positionFace = pointInFace(d);
+		this->m_positionFace = pointInFace(d);
 		volumeState(current);
 		return;
 	}
@@ -532,7 +532,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 			if(isOnHalfEdge(current,d))
 				if (isOnHalfEdge(current,m.phi3(d))) {
 					state=2;
-					m_position = m_positionFace = current;
+					this->m_position = this->m_positionFace = current;
 				}
 				else {
 					d=m.phi1(d);
@@ -543,7 +543,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 			}
 		}
 		else {
-			m_positionFace = m_position;
+			this->m_positionFace = this->m_position;
 			d=m.phi1(d);
 			faceState(current,wsof);
 		}
@@ -565,13 +565,13 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 	if (wsof==Geom::OVER) {
 		d = m.phi3(d);
 		d = nextNonPlanar(d);
-		m_positionFace = pointInFace(d);
+		this->m_positionFace = pointInFace(d);
 		volumeState(current);
 		return;
 	}
 	else if(wsof==Geom::UNDER) {
 		d = nextNonPlanar(d);
-		m_positionFace = pointInFace(d);
+		this->m_positionFace = pointInFace(d);
 		volumeState(current);
 		return;
 	}
@@ -579,9 +579,9 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 	VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(m,d,position);
 
 	Dart dd=d;
-	if(isLeftL1DFace(current,d,m_positionFace,norm)!=Geom::UNDER) {
+	if(isLeftL1DFace(current,d,this->m_positionFace,norm)!=Geom::UNDER) {
 		d = m.phi_1(d);
-		while(isLeftL1DFace(current,d,m_positionFace,norm)!=Geom::UNDER && dd!=d)
+		while(isLeftL1DFace(current,d,this->m_positionFace,norm)!=Geom::UNDER && dd!=d)
 			d = m.phi_1(d);
 
 		if(dd==d) {
@@ -590,29 +590,29 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 				switch (whichSideOfEdge(current,d)) {
 				case Geom::OVER : d=m.phi_1(d);
 					break;
-				case Geom::ON :m_position = current;
+				case Geom::ON :this->m_position = current;
 					state = EDGE;
 					return;
 				default :
 					Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
-					VEC3 p3 = pl.normal()+m_position;
-					Geom::Plane3D<typename PFP::REAL> plOrtho(m_position,current,p3);
+					VEC3 p3 = pl.normal()+this->m_position;
+					Geom::Plane3D<typename PFP::REAL> plOrtho(this->m_position,current,p3);
 					VEC3 e(position[m.phi1(d)]-position[d]);
 
-					Geom::intersectionPlaneRay(plOrtho,m_position,current-m_position,m_position);
+					Geom::intersectionPlaneRay(plOrtho,this->m_position,current-this->m_position,this->m_position);
 
 					edgeState(current);
 					return;
 				}
 			} while(d!=dd);
 
-			m_position = m_positionFace = current;
+			this->m_position = this->m_positionFace = current;
 			state = FACE;
 			return;
 		}
 	}
 	else {
-		while(isRightDFace(current,d,m_positionFace,norm) && m.phi1(d)!=dd)
+		while(isRightDFace(current,d,this->m_positionFace,norm) && m.phi1(d)!=dd)
 			d = m.phi1(d);
 
 		if(m.phi_1(d)==dd) {
@@ -623,22 +623,22 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 				case Geom::OVER :
 					d=m.phi_1(d);
 					break;
-				case Geom::ON :m_position = current;
+				case Geom::ON :this->m_position = current;
 					state = EDGE;
 					return;
 				default :
 					 Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
-					 VEC3 p3 = pl.normal()+m_position;
-					 Geom::Plane3D<typename PFP::REAL> plOrtho(m_position,current,p3);
+					 VEC3 p3 = pl.normal()+this->m_position;
+					 Geom::Plane3D<typename PFP::REAL> plOrtho(this->m_position,current,p3);
 					 VEC3 e(position[m.phi1(d)]-position[d]);
 
-					 Geom::intersectionPlaneRay(plOrtho,m_position,current-m_position,m_position);
+					 Geom::intersectionPlaneRay(plOrtho,this->m_position,current-this->m_position,this->m_position);
 					edgeState(current);
 					return;
 				}
 			}while(d!=dd);
 
-			m_position = m_positionFace = current;
+			this->m_position = this->m_positionFace = current;
 			state = FACE;
 			return;
 		}
@@ -648,22 +648,22 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 	switch (whichSideOfEdge(current,d))
 	{
 	case Geom::OVER :
-		 m_position = m_positionFace = current;
+		 this->m_position = this->m_positionFace = current;
 		 state = FACE;
 		 break;
 	case Geom::ON :
-		 m_position = m_positionFace = current;
+		 this->m_position = this->m_positionFace = current;
 		 state = EDGE;
 		 break;
 	default :
 		 Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,d,position);
-		 VEC3 p3 = pl.normal()+m_position;
-		 Geom::Plane3D<typename PFP::REAL> plOrtho(m_position,current,p3);
+		 VEC3 p3 = pl.normal()+this->m_position;
+		 Geom::Plane3D<typename PFP::REAL> plOrtho(this->m_position,current,p3);
 		 VEC3 e(position[m.phi1(d)]-position[d]);
 
-		 Geom::intersectionPlaneRay(plOrtho,m_position,current-m_position,m_position);
+		 Geom::intersectionPlaneRay(plOrtho,this->m_position,current-this->m_position,this->m_position);
 
-		 m_positionFace = m_position;
+		 this->m_positionFace = this->m_position;
 
 		 edgeState(current);
 	}
@@ -686,13 +686,13 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 
 		Dart dd=d;
 		bool particularcase=false;
-		Geom::Orientation3D testLeft = isLeftL1DVol(current,d,m_positionFace,m_position);
+		Geom::Orientation3D testLeft = isLeftL1DVol(current,d,this->m_positionFace,this->m_position);
 
 		if(testLeft!=Geom::UNDER) {
 
 			d = m.phi_1(d);
 
-			while(dd!=d && isLeftL1DVol(current,d,m_positionFace,m_position)!=Geom::UNDER)
+			while(dd!=d && isLeftL1DVol(current,d,this->m_positionFace,this->m_position)!=Geom::UNDER)
 				d = m.phi_1(d);
 
 			if(dd==d)
@@ -700,26 +700,26 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 		}
 		else {
 
-			testRight = isRightDVol(current,d,m_positionFace,m_position);
+			testRight = isRightDVol(current,d,this->m_positionFace,this->m_position);
 
 
 			while(testRight!=Geom::OVER && dd!=m.phi1(d)) {
 				d = m.phi1(d);
-				testRight = isRightDVol(current,d,m_positionFace,m_position);
+				testRight = isRightDVol(current,d,this->m_positionFace,this->m_position);
 			}
 
 			if(testLeft==0 && dd==m.phi1(d))
 				particularcase=true;
 		}
 
-		if(particularcase) //(m_position,m_positionFace,c) presque alignés et si c est proche de la face
+		if(particularcase) //(this->m_position,this->m_positionFace,c) presque alignés et si c est proche de la face
 				  //aucun des "above" sur les dart ne va donner de résultats concluant (proche de 0 pour tous)
 		{
 			if(isnan(current[0]) || isnan(current[1]) || isnan(current[2]))
 			{
 				std::cout << __FILE__ << " " << __LINE__ << " NaN !" << std::endl;
 				display();
-				m_position = current;
+				this->m_position = current;
 				return;
 			}
 
@@ -727,9 +727,9 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 			return;
 		}
 
-		Geom::Orientation3D testAbove = isAbove(current,d,m_position);
+		Geom::Orientation3D testAbove = isAbove(current,d,this->m_position);
 
-		if(testAbove!=Geom::UNDER || (testRight==Geom::ON && isAbove(current,m.phi_1(d),m_position)!=Geom::UNDER)) {
+		if(testAbove!=Geom::UNDER || (testRight==Geom::ON && isAbove(current,m.phi_1(d),this->m_position)!=Geom::UNDER)) {
 
 			if(testAbove==Geom::OVER || whichSideOfFace(current,d)==Geom::UNDER) {
 
@@ -749,7 +749,7 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 					}
 				}
 
-				m_positionFace = pointInFace(d);
+				this->m_positionFace = pointInFace(d);
 			}
 		}
 	} while(above);
@@ -757,28 +757,28 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 	Geom::Orientation3D wsof = whichSideOfFace(current,d);
 
 	if(wsof==Geom::UNDER) {
-		m_position = current;
+		this->m_position = current;
 		state = VOLUME;
 	}
 	else if(wsof==Geom::ON) {
-		if(isAbove(current,d,m_position)==Geom::UNDER) {
-			m_position = m_positionFace = current;
+		if(isAbove(current,d,this->m_position)==Geom::UNDER) {
+			this->m_position = this->m_positionFace = current;
 			state = FACE;
 		}
 		else {
-			m_position = m_positionFace = current;
+			this->m_position = this->m_positionFace = current;
 			edgeState(current);
 		}
 	}
 	else {
-		if(isAbove(current,d,m_position)==Geom::UNDER) {
-//			m_position = m.intersectDartPlaneLine(d,m_position,current);
-			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+		if(isAbove(current,d,this->m_position)==Geom::UNDER) {
+//			this->m_position = m.intersectDartPlaneLine(d,this->m_position,current);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,this->m_position,current-this->m_position,this->m_position);
 			faceState(current,wsof);
 		}
 		else {
-//			m_position = m.intersectDartPlaneLineEdge(d,m_position,current);
-			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+//			this->m_position = m.intersectDartPlaneLineEdge(d,this->m_position,current);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,this->m_position,current-this->m_position,this->m_position);
 			edgeState(current);
 		}
 	}
@@ -814,16 +814,16 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 			{
 				d = *face;
 
-				if(isAbove(current,d,m_position)==Geom::UNDER)
+				if(isAbove(current,d,this->m_position)==Geom::UNDER)
 				{
-//					m_position = m.intersectDartPlaneLine(d,m_position,current);
-					Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+//					this->m_position = m.intersectDartPlaneLine(d,this->m_position,current);
+					Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,this->m_position,current-this->m_position,this->m_position);
 					faceState(current,Geom::OVER);
 				}
 				else
 				{
-//					m_position = m.intersectDartPlaneLineEdge(d,m_position,current);
-					Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+//					this->m_position = m.intersectDartPlaneLineEdge(d,this->m_position,current);
+					Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,this->m_position,current-this->m_position,this->m_position);
 					edgeState(current);
 				}
 
@@ -831,7 +831,7 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 			}
 			else if(wsof==Geom::ON)
 			{
-				m_position = current;
+				this->m_position = current;
 				d = *face;
 
 				faceState(current);
@@ -839,7 +839,7 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 			}
 
 			Geom::Plane3D<typename PFP::REAL> pl = Algo::Surface::Geometry::facePlane<PFP>(m,*face,position);
-			if(pl.normal()*VEC3(current-m_position)>0)
+			if(pl.normal()*VEC3(current-this->m_position)>0)
 			{
 				dist_list.push_back(-pl.distance(current));
 				dart_list.push_back(*face);
@@ -869,34 +869,34 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 		}
 	}
 
-	m_positionFace = pointInFace(d);
+	this->m_positionFace = pointInFace(d);
 
 	Geom::Orientation3D wsof = whichSideOfFace(current,d);
 
 	if(wsof==Geom::UNDER) {
-		m_position = current;
+		this->m_position = current;
 		state = VOLUME;
 	}
 	else if(wsof==Geom::ON) {
-		if(isAbove(current,d,m_position)==Geom::UNDER) {
-			m_position = current;
+		if(isAbove(current,d,this->m_position)==Geom::UNDER) {
+			this->m_position = current;
 			state = FACE;
 		}
 		else {
-			m_position = current;
+			this->m_position = current;
 			state = EDGE;
 		}
 	}
 	else {
-		if(isAbove(current,d,m_position)==Geom::UNDER)
+		if(isAbove(current,d,this->m_position)==Geom::UNDER)
 		{
-//			m_position = m.intersectDartPlaneLine(d,m_position,current);
-			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+//			this->m_position = m.intersectDartPlaneLine(d,this->m_position,current);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,this->m_position,current-this->m_position,this->m_position);
 			faceState(current,wsof);
 		}
 		else {
-//			m_position = m.intersectDartPlaneLineEdge(d,m_position,current);
-			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,m_position,current-m_position,m_position);
+//			this->m_position = m.intersectDartPlaneLineEdge(d,this->m_position,current);
+			Algo::Surface::Geometry::intersectionLineConvexFace<PFP>(m,d,position,this->m_position,current-this->m_position,this->m_position);
 			edgeState(current);
 		}
 	}

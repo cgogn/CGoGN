@@ -46,44 +46,44 @@ namespace Render
 
 namespace GL2
 {
-template<typename PFP>
-void Topo3Render::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv)
+//template<typename PFP>
+//void Topo3Render::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv)
+//{
+//	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
+//	if (ptrMap3 != NULL)
+//	{
+//		updateDataMap3<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3 >(map,positions,ke,kf,kv);
+//	}
+//	GMap3* ptrGMap3 = dynamic_cast<GMap3*>(&map);
+//	if (ptrGMap3 != NULL)
+//	{
+//		updateDataGMap3<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map,positions,ke,kf,kv);
+//	}
+//}
+
+
+template<typename PFP, typename EMBV>
+void Topo3Render::updateData(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv)
 {
 	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
 	if (ptrMap3 != NULL)
 	{
-		updateDataMap3<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3 >(map,positions,ke,kf,kv);
+		updateDataMap3<PFP,EMBV>(map,positions,ke,kf,kv);
 	}
 	GMap3* ptrGMap3 = dynamic_cast<GMap3*>(&map);
 	if (ptrGMap3 != NULL)
 	{
-		updateDataGMap3<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map,positions,ke,kf,kv);
-	}
-}
-
-
-template<typename PFP, typename EMBV, typename EMB>
-void Topo3Render::updateDataGen(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv)
-{
-	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
-	if (ptrMap3 != NULL)
-	{
-		updateDataMap3<PFP,EMBV,EMB>(map,positions,ke,kf,kv);
-	}
-	GMap3* ptrGMap3 = dynamic_cast<GMap3*>(&map);
-	if (ptrGMap3 != NULL)
-	{
-		updateDataGMap3<PFP,EMBV,EMB>(map,positions,ke,kf,kv);
+		updateDataGMap3<PFP,EMBV>(map,positions,ke,kf,kv);
 	}
 }
 
 
 
 
-template<typename PFP, typename EMBV, typename EMB>
+template<typename PFP, typename EMBV>
 void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const EMBV& positions, float ke, float kf, float kv)
 {
-	typedef EMB VEC3;
+	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
 
 	m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index3");
@@ -327,10 +327,10 @@ Dart Topo3Render::picking(typename PFP::MAP& map, int x, int y)
 	return d;
 }
 
-template<typename PFP, typename EMBV, typename EMB>
+template<typename PFP, typename EMBV>
 void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const EMBV& positions, float ke, float kf, float kv)
 {
-	typedef EMB VEC3;
+	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
 
 	GMap3& map = dynamic_cast<GMap3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3

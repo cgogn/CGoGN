@@ -22,119 +22,76 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __MAP3MR_DUAL_REGULAR__
+#define __MAP3MR_DUAL_REGULAR__
 
-#include "Topology/map/map3.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor3.h"
+
+#include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Algo
+{
+
+namespace Volume
+{
+
+namespace MR
+{
+
+namespace Dual
+{
+
+namespace Regular
+{
+
+template <typename PFP>
+class Map3MR
 {
 public:
-	typedef Map3 TOPO_MAP;
+	typedef typename PFP::MAP MAP ;
 
-	static const unsigned int DIMENSION = 3 ;
+protected:
+	MAP& m_map;
+	bool shareVertexEmbeddings ;
 
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
 
+public:
+	Map3MR(MAP& map);
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+	~Map3MR();
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
+	//if true : tri and quad else quad
+	void addNewLevel(bool embedNewVertices = true) ;
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+	void clearSynthesisFilters() { synthesisFilters.clear() ; }
+	void clearAnalysisFilters() { analysisFilters.clear() ; }
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
-
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
-
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	/**
-	 * The attributes attached to the face of dart d are kept on the resulting face
-	 */
-	virtual bool mergeFaces(Dart d);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
+	void analysis() ;
+	void synthesis() ;
 } ;
 
+} // namespace Regular
+
+} // namespace Dual
+
+} // namespace MR
+
+} // namespace Volume
+
+} // namespace Algo
+
 } // namespace CGoGN
+
+#include "Algo/Multiresolution/Map3MR/map3MR_DualRegular.hpp"
 
 #endif

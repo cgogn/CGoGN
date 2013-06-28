@@ -55,13 +55,43 @@ template <typename PFP>
 void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType = S_TRI);
 
 template <typename PFP>
+Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+
+
+
+
+
+
+
+
+template <typename PFP>
+void subdivideEdgeWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
+
+template <typename PFP>
+void subdivideFaceWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType = S_TRI);
+
+template <typename PFP>
+Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+
+
+
+
+
+
+
+
+
+template <typename PFP>
 Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+
+
+
+
 
 template <typename PFP>
 Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
-template <typename PFP>
-Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+
 
 template <typename PFP>
 Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);

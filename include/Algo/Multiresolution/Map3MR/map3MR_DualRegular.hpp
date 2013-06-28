@@ -22,13 +22,15 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Algo/Modelisation/polyhedron.h"
+
 namespace CGoGN
 {
 
 namespace Algo
 {
 
-namespace Surface
+namespace Volume
 {
 
 namespace MR
@@ -41,7 +43,7 @@ namespace Regular
 {
 
 template <typename PFP>
-Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
+Map3MR<PFP>::Map3MR(typename PFP::MAP& map) :
 	m_map(map),
 	shareVertexEmbeddings(false)
 {
@@ -49,7 +51,7 @@ Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
 }
 
 template <typename PFP>
-Map2MR<PFP>::~Map2MR()
+Map3MR<PFP>::~Map3MR()
 {
 	unsigned int level = m_map.getCurrentLevel();
 	unsigned int maxL = m_map.getMaxLevel();
@@ -62,7 +64,7 @@ Map2MR<PFP>::~Map2MR()
 }
 
 template <typename PFP>
-void Map2MR<PFP>::addNewLevel(bool embedNewVertices)
+void Map3MR<PFP>::addNewLevel(bool embedNewVertices)
 {
 	m_map.pushLevel() ;
 
@@ -70,63 +72,72 @@ void Map2MR<PFP>::addNewLevel(bool embedNewVertices)
 	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 
-
 	m_map.decCurrentLevel();
+
+
+	TraversorF<typename PFP::MAP> tf(m_map);
+	for (Dart d = tf.begin(); d != tf.end(); d = tf.next())
+	{
+		if(!m_map.isBoundaryFace(d))
+		{
+			unsigned int nbSides = m_map.faceDegree(d);
+			Dart d3 = m_map.phi3(d);
+
+			m_map.incCurrentLevel();
+
+			m_map.unsewVolumes(d,false);
+
+			Dart nf = Algo::Surface::Modelisation::createPrism<PFP>(m_map, nbSides, false);
+
+			m_map.sewVolumes(d,nf,false);
+			m_map.sewVolumes(d3,m_map.phi2(m_map.phi1(m_map.phi1(m_map.phi2(nf)))),false);
+
+			m_map.decCurrentLevel();
+		}
+	}
+
+
 	TraversorE<typename PFP::MAP> te(m_map);
-	for (Dart d = te.begin(); d != te.end(); d = te.next())
+	for(Dart d = te.begin() ; d != te.end() ; d = te.next())
 	{
-		m_map.incCurrentLevel();
-
-		Dart d2 = m_map.phi2(d);
-
-		m_map.unsewFaces(d,false);
-		Dart nf = m_map.newFace(4,false);
-		m_map.sewFaces(d,nf,false);
-		m_map.sewFaces(d2,m_map.phi1(m_map.phi1(nf)),false);
-
-		// take care of edge embedding
-		if(m_map.template isOrbitEmbedded<EDGE>())
+		if(!m_map.isBoundaryEdge(d))
 		{
-			m_map.template setOrbitEmbedding<EDGE>(nf, m_map.template getEmbedding<EDGE>(d));
-			m_map.template setOrbitEmbedding<EDGE>(m_map.phi1(m_map.phi1(nf)), m_map.template getEmbedding<EDGE>(d2));
-		}
+			m_map.incCurrentLevel();
 
-		m_map.decCurrentLevel();
+			m_map.PFP::MAP::TOPO_MAP::closeHole(m_map.phi3(d),false);
+
+			m_map.decCurrentLevel();
+		}
 	}
 
 
-	TraversorV<typename PFP::MAP> tv(m_map);
-	for(Dart d = tv.begin() ; d != tv.end() ; d = tv.next())
-	{
-		m_map.incCurrentLevel();
-
-		m_map.PFP::MAP::TOPO_MAP::closeHole(m_map.phi1(m_map.phi2(d)),false);
-
-		Dart temp = m_map.phi2(m_map.phi1(m_map.phi2(d)));
-		Dart stop = temp;
-
-		do
-		{
-			if(m_map.template isOrbitEmbedded<EDGE>())
-			{
-				m_map.template setOrbitEmbedding<EDGE>(temp, m_map.template getEmbedding<EDGE>(	m_map.phi2(temp)));
-			}
-
-			if(!shareVertexEmbeddings)
-			{
-				//if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
-				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(temp) ;
-				//m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
-			}
-
-
-			temp = m_map.phi1(temp);
-		}
-		while(temp != stop);
-
-
-		m_map.decCurrentLevel();
-	}
+//	TraversorV<typename PFP::MAP> tv(m_map);
+//	for(Dart d = tv.begin() ; d != tv.end() ; d = tv.next())
+//	{
+//		m_map.incCurrentLevel();
+//
+//		m_map.PFP::MAP::TOPO_MAP::closeHole(m_map.phi2(m_map.phi_1(m_map.phi3(m_map.phi2(d)))),false);
+//
+//		Dart temp = m_map.phi2(m_map.phi1(m_map.phi2(d)));
+//		Dart stop = temp;
+//
+//		do
+//		{
+//			if(!shareVertexEmbeddings)
+//			{
+//				//if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(temp) ;
+//				//m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
+//			}
+//
+//
+//			temp = m_map.phi1(temp);
+//		}
+//		while(temp != stop);
+//
+//
+//		m_map.decCurrentLevel();
+//	}
 
 	m_map.incCurrentLevel() ;
 
@@ -134,7 +145,7 @@ void Map2MR<PFP>::addNewLevel(bool embedNewVertices)
 }
 
 template <typename PFP>
-void Map2MR<PFP>::analysis()
+void Map3MR<PFP>::analysis()
 {
 	assert(m_map.getCurrentLevel() > 0 || !"analysis : called on level 0") ;
 
@@ -145,7 +156,7 @@ void Map2MR<PFP>::analysis()
 }
 
 template <typename PFP>
-void Map2MR<PFP>::synthesis()
+void Map3MR<PFP>::synthesis()
 {
 	assert(m_map.getCurrentLevel() < m_map.getMaxLevel() || !"synthesis : called on max level") ;
 

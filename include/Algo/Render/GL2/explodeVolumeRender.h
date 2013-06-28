@@ -93,18 +93,27 @@ protected:
 	 */
 	float m_explodeV;
 	
-	template<typename PFP>
-	void computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
-									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace, 
-									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
+//	template<typename PFP>
+//	void computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
+//									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace,
+//									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
 
+	template<typename PFP, typename EMBV>
+	void computeFace(typename PFP::MAP& map, Dart d, const EMBV& positions,
+                                          const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace,
+                                          std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
 
-	template<typename PFP>
-	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+//	template<typename PFP>
+//	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
 
-	template<typename PFP>
-	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+	template<typename PFP, typename V_ATT, typename W_ATT>
+	void updateSmooth(typename PFP::MAP& map, const V_ATT& positions, const W_ATT& colorPerFace) ;
 
+//	template<typename PFP>
+//	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+
+	template<typename PFP, typename EMBV>
+    void updateSmooth(typename PFP::MAP& map, const EMBV& positions) ;
 
 public:
 	/**
@@ -135,8 +144,11 @@ public:
 	* @param map the map
 	* @param positions  attribute of position vertices
 	*/
-	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+//	template<typename PFP>
+//	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+
+	template<typename PFP, typename EMBV>
+	void updateData(typename PFP::MAP& map, const EMBV& positions) ;
 
 	/**
 	* update all drawing buffers
@@ -144,8 +156,12 @@ public:
 	* @param positions attribute of position vertices
 	* @param colorPerFace attribute of color (per face)
 	*/
-	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+//	template<typename PFP>
+//	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+
+	template<typename PFP, typename V_ATT, typename W_ATT>
+	void updateData(typename PFP::MAP& map, const V_ATT& positions, const W_ATT& colorPerFace) ;
+
 
 	/**
 	 * draw edges

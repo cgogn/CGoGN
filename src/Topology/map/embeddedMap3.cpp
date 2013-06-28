@@ -357,8 +357,14 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 	}
 }
 
-void EmbeddedMap3::unsewVolumes(Dart d)
+void EmbeddedMap3::unsewVolumes(Dart d, bool withBoundary)
 {
+	if (!withBoundary)
+	{
+		Map3::unsewVolumes(d, false) ;
+		return ;
+	}
+
 	Dart dd = alpha1(d);
 
 	unsigned int fEmb = EMBNULL ;

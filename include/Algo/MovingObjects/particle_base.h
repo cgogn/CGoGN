@@ -41,7 +41,7 @@ namespace MovingObjects
 template <typename PFP>
 class ParticleBase
 {
-private:
+protected:
 	typename PFP::VEC3 m_position ;
 	unsigned int m_state ;
 

@@ -349,6 +349,7 @@ public:
 };
 
 
+
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidELWVolumes(typename PFP::MAP& map,
 		const V_ATT& position, W_ATT& vol_centroid,

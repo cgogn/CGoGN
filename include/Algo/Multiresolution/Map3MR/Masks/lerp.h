@@ -63,9 +63,17 @@ public:
 	{
 		m_map.decCurrentLevel() ;
 		typename PFP::VEC3 p = m_position[d] ;
+//		std::cout << " p du niv i-1 = " << p << std::endl;
 		m_map.incCurrentLevel() ;
 
-		m_position[d] = p ;
+//		std::cout << " p du niv i+1 = " << p << std::endl;
+
+		m_position[d] = p;
+
+//		m_map.decCurrentLevel() ;
+//		std::cout << "dec = " <<  m_position[d] << std::endl;
+//		m_map.incCurrentLevel();
+//		std::cout << "inc = " <<  m_position[d] << std::endl << std::endl;
 
 		return false ;
 	}

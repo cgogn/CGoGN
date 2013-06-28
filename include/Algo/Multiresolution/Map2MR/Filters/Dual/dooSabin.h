@@ -22,119 +22,80 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __MR_DOOSABIN_MASK__
+#define __MR_DOOSABIN_MASK__
 
-#include "Topology/map/map3.h"
+#include <cmath>
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Algo
 {
+
+namespace Surface
+{
+
+namespace MR
+{
+
+namespace Dual
+{
+
+namespace Filters
+{
+
+template <typename PFP>
+class DooSabinVertexSynthesisFilter : public Algo::MR::Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
 public:
-	typedef Map3 TOPO_MAP;
+	DooSabinVertexSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
-	static const unsigned int DIMENSION = 3 ;
+	void operator() ()
+	{
+		for (Dart dV = m_map.begin(); dV != m_map.end();  m_map.next(dV))
+		{
+			typename PFP::VEC3 p(0.0);
 
+			unsigned int N = m_map.faceDegree(dV);
+			typename PFP::REAL K0 = float(N+5)/float(4*N);//(1.0 / 4.0) + (5.0 / 4.0) * double(N);
+			p += K0 * m_position[dV];
+			unsigned int j = 1;
+			Dart tmp = m_map.phi1(dV);
+			do
+			{
+				typename PFP::REAL Kj = (3.0 + 2.0 * cos(2.0 * double(j) * M_PI / double(N))) / (4.0 * N);
+				p += Kj * m_position[tmp];
+				tmp = m_map.phi1(tmp);
+				++j;
+			}while(tmp != dV);
 
+			m_map.incCurrentLevel();
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+			m_position[dV] = p;
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
-
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
-
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
-
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
-
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	/**
-	 * The attributes attached to the face of dart d are kept on the resulting face
-	 */
-	virtual bool mergeFaces(Dart d);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
+			m_map.decCurrentLevel();
+		}
+	}
 } ;
+
+
+} // namespace Masks
+
+} // namespace Primal
+
+} // namespace MR
+
+} // namespace Surface
+
+} // namespace Algo
 
 } // namespace CGoGN
 
 #endif
+
