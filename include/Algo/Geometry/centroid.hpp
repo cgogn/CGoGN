@@ -353,7 +353,7 @@ public:
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidELWVolumes(typename PFP::MAP& map,
 		const V_ATT& position, W_ATT& vol_centroid,
-		unsigned int nbth = 0)
+		unsigned int nbth)
 {
 	FunctorComputeCentroidELWVolumes<PFP,V_ATT,W_ATT> funct(map,position,vol_centroid);
 	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true);

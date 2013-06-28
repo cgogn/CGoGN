@@ -14,6 +14,7 @@ SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared 
 SET ( WITH_ASSIMP ON CACHE BOOL "build CGoGN with Assimp" )
 SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib" )
 SET ( WITH_QT ON CACHE BOOL "build CGoGN with Qt lib" )
+SET ( DESIRED_QT_VERSION "4" CACHE STRING "4: QT4/ 5 not yet implemented" )
 
 # for CGoGN MR
 SET ( FORCE_MR "0" CACHE STRING "0: normal mode / 1 multires mode" )
