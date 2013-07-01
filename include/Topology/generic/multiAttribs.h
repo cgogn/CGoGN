@@ -41,6 +41,9 @@ struct Compo2Type
 
 	Compo2Type(){}
 	Compo2Type(double z ): m_v1(z), m_v2(z) {}
+
+	Compo2Type(const Compo2Type<double,double>& ct ): m_v1(ct.m_v1), m_v2(ct.m_v1) {}
+
 	Compo2Type(const RefCompo2Type<T1,T2>& v);
 
 	Compo2Type<T1,T2>& operator =(const Compo2Type<T1,T2>& comp);
@@ -78,6 +81,20 @@ struct RefCompo2Type
 	RefCompo2Type<T1,T2>& operator/=(double d);
 };
 
+template <typename T1, typename T2>
+Compo2Type<double, double> length( const Compo2Type<T1,T2>& v)
+{
+	Compo2Type<double, double> l;
+	l.m_v1 = sqrt(v.m_v1*v.m_v1);
+	l.m_v2 = sqrt(v.m_v2*v.m_v2);
+	return l;
+}
+
+template <typename T>
+double length(const T& v)
+{
+	return v.norm();
+}
 
 
 template <typename T1, typename T2>
@@ -111,7 +128,47 @@ public:
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
+
+	static unsigned int getOrbit() { return VERTEX; }
 };
+
+
+
+template <typename T1, typename T2>
+class Edge2Attributes
+{
+	EdgeAttribute<T1>& m_h1;
+	EdgeAttribute<T2>& m_h2;
+public:
+	typedef Compo2Type<T1,T2> DATA_TYPE;
+	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
+
+	Edge2Attributes(EdgeAttribute<T1>& h1, EdgeAttribute<T2>& h2):
+		m_h1(h1), m_h2(h2) {}
+
+	RefCompo2Type<T1,T2> operator[](unsigned int a)
+	{
+		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+	}
+
+	RefCompo2Type<T1,T2> operator[](Dart d)
+	{
+		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+	}
+
+	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+	{
+		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+	}
+
+	const RefCompo2Type<T1,T2> operator[](Dart d) const
+	{
+		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+	}
+
+	static unsigned int getOrbit() { return EDGE; }
+};
+
 
 
 template <typename T1, typename T2>
@@ -146,6 +203,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
 
+	static unsigned int getOrbit() { return FACE; }
 };
 
 template <typename T1, typename T2>
@@ -179,6 +237,9 @@ public:
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
+
+	static unsigned int getOrbit() { return VOLUME; }
+
 };
 
 

@@ -142,7 +142,7 @@ public:
 	/**
 	 * get attribute orbit
 	 */
-	unsigned int getOrbit() const ;
+	static unsigned int getOrbit() ;
 
 	/**
 	 * get attribute index

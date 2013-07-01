@@ -139,7 +139,7 @@ inline AttributeMultiVector<T>* AttributeHandler<T, ORBIT>::getDataVector() cons
 }
 
 template <typename T, unsigned int ORBIT>
-inline unsigned int AttributeHandler<T, ORBIT>::getOrbit() const
+inline unsigned int AttributeHandler<T, ORBIT>::getOrbit()
 {
 	return ORBIT ;
 }
