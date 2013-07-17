@@ -168,6 +168,7 @@ public:
 	*/
 	bool loadInrgz(const char* filename);
 
+	bool loadVTK(const char* filename);
 	/**
 	* Constructor
 	* @param data pointer on voxel
