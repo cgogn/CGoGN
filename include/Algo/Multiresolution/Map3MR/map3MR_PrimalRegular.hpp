@@ -320,42 +320,42 @@ void Map3MR<PFP>::addNewLevelTetraOcta()
 	}
 
 	m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ;
-	for(Dart dit = traW.begin(); dit != traW.end(); dit = traW.next())
-	{
-		Traversor3WV<typename PFP::MAP> traWV(m_map, dit);
+    for(Dart dit = traW.begin(); dit != traW.end(); dit = traW.next())
+    {
+        Traversor3WV<typename PFP::MAP> traWV(m_map, dit);
 
-		for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
-		{
-			m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-			Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
+        for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+        {
+            m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+            Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
 
-			if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
-			{
-				DartMarkerStore me(m_map);
+            if(!Algo::Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
+            {
+                DartMarkerStore me(m_map);
 
-				Dart f = x;
+                Dart f = x;
 
-				do
-				{
-					Dart f3 = m_map.phi3(f);
+                do
+                {
+                    Dart f3 = m_map.phi3(f);
 
-					if(!me.isMarked(f3))
-					{
-						Dart tmp =  m_map.phi_1(m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi_1(f3))))); //future voisin par phi2
+                    if(!me.isMarked(f3))
+                    {
+                        Dart tmp =  m_map.phi_1(m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi_1(f3))))); //future voisin par phi2
 
-						Dart f32 = m_map.phi2(f3);
-						swapEdges(f3, tmp);
+                        Dart f32 = m_map.phi2(f3);
+                        swapEdges(f3, tmp);
 
-						me.markOrbit<EDGE>(f3);
-						me.markOrbit<EDGE>(f32);
-					}
+                        me.markOrbit<EDGE>(f3);
+                        me.markOrbit<EDGE>(f32);
+                    }
 
-					f = m_map.phi2(m_map.phi_1(f));
-				}while(f != x);
+                    f = m_map.phi2(m_map.phi_1(f));
+                }while(f != x);
 
-			}
-			m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ;
-		}
+            }
+            m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ;
+        }
     }
 
 	m_map.popLevel() ;

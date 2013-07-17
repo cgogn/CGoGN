@@ -27,6 +27,7 @@
 
 //#define USE_GMAP
 
+//#define PRIMAL_TOPO 1
 
 #include "Topology/generic/parameters.h"
 
@@ -36,8 +37,11 @@
 	#include "Topology/map/embeddedMap2.h"
 #endif
 
-#include "Algo/Render/GL2/topoRender.h"
-
+#ifdef PRIMAL_TOPO
+    #include "Algo/Render/GL2/topoPrimalRender.h"
+#else
+    #include "Algo/Render/GL2/topoRender.h"
+#endif
 
 #include "ui_tuto_oper2.h"
 #include "Utils/Qt/qtui.h"
@@ -88,7 +92,11 @@ protected:
 	DartAttribute<VEC3> colorDarts;
 
 	// render (for the topo)
-	Algo::Render::GL2::TopoRender* m_render_topo;
+#ifdef PRIMAL_TOPO
+    Algo::Render::GL2::TopoPrimalRender* m_render_topo;
+#else
+    Algo::Render::GL2::TopoRender* m_render_topo;
+#endif
 	Dart m_selected;
 	Dart m_selected2;
 	DartMarker dm;

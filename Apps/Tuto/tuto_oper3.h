@@ -27,6 +27,7 @@
 
 //#define USE_GMAP
 
+#define PRIMAL_TOPO 1
 
 #include "Topology/generic/parameters.h"
 
@@ -36,7 +37,12 @@
 	#include "Topology/map/embeddedMap3.h"
 #endif
 
-#include "Algo/Render/GL2/topo3Render.h"
+#ifdef PRIMAL_TOPO
+    #include "Algo/Render/GL2/topo3PrimalRender.h"
+#else
+    #include "Algo/Render/GL2/topo3Render.h"
+#endif
+
 #include "Algo/Render/GL2/topoRender.h"
 #include "Algo/Geometry/boundingbox.h"
 
@@ -71,7 +77,7 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
-	MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f), clip_volume(true) , hide_clipping(false) {}
+    MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f), clip_volume(true) , hide_clipping(false) {}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -95,12 +101,15 @@ protected:
 	Geom::BoundingBox<PFP::VEC3> bb;
 
 	// render (for the topo)
+#ifdef PRIMAL_TOPO
+    Algo::Render::GL2::Topo3PrimalRender* m_render_topo;
+#else
 	Algo::Render::GL2::Topo3Render* m_render_topo;
+#endif
 	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
 	Dart m_selected;
 	Dart m_selected2;
 	std::vector<Dart> m_selecteds;
-	DartMarker dm;
 	float m_shift;
 
 	float m_ex1, m_ex2, m_ex3;
