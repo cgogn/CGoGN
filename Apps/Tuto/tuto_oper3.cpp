@@ -295,6 +295,55 @@ void MyQT::createMap(int n)
     updateMap();
 }
 
+void MyQT::createMapTets()
+{
+    myMap.clear(true);
+    position = myMap.getAttribute<VEC3, VERTEX>("position");
+    if (!position.isValid())
+        position = myMap.addAttribute<VEC3, VERTEX>("position");
+
+
+    Dart dd = Algo::Surface::Modelisation::createTetrahedron<PFP>(myMap);
+    myMap.closeMap();
+    Dart ee =Algo::Surface::Modelisation::createTetrahedron<PFP>(myMap);
+    myMap.closeMap();
+    myMap.sewVolumes(dd,ee);
+
+    Dart t1 = dd;
+    position[t1] = VEC3(0.0f, 0.0f, 0.0f);
+    t1 = myMap.phi1(t1);
+    position[t1] = VEC3(0.0f, 1.0f, 0.0f);
+    t1 = myMap.phi1(t1);
+    position[t1] = VEC3(1.0f, 0.5f, 0.0f);
+    t1 = myMap.phi_1(myMap.phi2(dd));
+    position[t1] = VEC3(0.f, 0.5f, 1.0f);
+
+    Dart t2 = ee;
+    position[t2] = VEC3(0.0f, 1.0f, 0.0f);
+    t2 = myMap.phi1(t2);
+    position[t2] = VEC3(0.0f, 0.0f, 0.0f);
+    t2 = myMap.phi1(t2);
+    position[t2] = VEC3(1.0f, 0.5f, 0.0f);
+    t2 = myMap.phi_1(myMap.phi2(ee));
+    position[t2] = VEC3(0.f, 0.5f, -1.0f);
+
+    myMap.check();
+
+    //  bounding box of scene
+    bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+    setParamObject(bb.maxSize(), bb.center().data()) ;
+    m_shift = bb.maxSize()/200.0f;
+
+    // first show for be sure that GL context is binded
+    show();
+
+    // render the topo of the map without boundary darts
+
+    m_render_topo->setDartWidth(3.0f);
+    m_render_topo->setInitialDartsColor(0.0f,0.0f,0.0f);
+    updateMap();
+}
+
 void MyQT::updateMap()
 {
 #ifdef PRIMAL_TOPO
@@ -356,7 +405,7 @@ void MyQT::cb_redraw()
 
     m_render_topo->drawTopo();
 
-        m_render_topo_boundary->drawTopo();
+    m_render_topo_boundary->drawTopo();
 
     glDisable( GL_POLYGON_OFFSET_FILL );
 
@@ -386,7 +435,13 @@ void MyQT::cb_mousePress(int button, int x, int y)
         if (button == Qt::LeftButton)
         {
             if (d != Dart::nil())
+            {
                 m_selected = d;
+
+                std::cout << "m_selected = " << m_selected << std::endl;
+
+
+            }
         }
         if (button == Qt::RightButton)
         {
@@ -544,6 +599,51 @@ void MyQT::cb_keyPress(int keycode)
             updateMap();
             updateGL();
             break;
+        case '9':
+            createMapTets();
+            updateMap();
+            updateGL();
+            break;
+        case '8':
+        {
+            if (m_selected != NIL)
+            {
+                std::vector<Dart> edges;
+
+                Dart d2_1 = myMap.phi_1(myMap.phi2(m_selected));
+                myMap.mergeVolumes(m_selected,false);
+
+                Dart d2 = myMap.phi1(d2_1);
+                Dart d3 = myMap.phi3(d2);
+
+                myMap.flipEdge(d2);
+                myMap.flipBackEdge(d3);
+
+                Dart e = myMap.phi2(d2) ;
+                myMap.copyDartEmbedding<VERTEX>(d2, myMap.phi1(e)) ;
+                myMap.copyDartEmbedding<VERTEX>(e, myMap.phi1(d2)) ;
+
+                Dart e3 = myMap.phi2(d3);
+                myMap.copyDartEmbedding<VERTEX>(d3, myMap.phi1(e3)) ;
+                myMap.copyDartEmbedding<VERTEX>(e3, myMap.phi1(d3)) ;
+
+                Dart stop = myMap.phi_1(d2_1);
+                Dart dit = stop;
+                do
+                {
+                    edges.push_back(dit);
+                    dit = myMap.phi1(myMap.phi2(myMap.phi1(dit)));
+                }
+                while(dit != stop);
+
+                myMap.splitVolumeWithFace(edges,myMap.phi_1(myMap.phi3(m_selected)));
+
+                m_selected = NIL;
+                updateMap();
+                updateGL();
+            }
+            break;
+        }
         case 'c':
             myMap.check();
             break;

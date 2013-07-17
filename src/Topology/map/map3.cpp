@@ -1051,6 +1051,7 @@ bool Map3::check()
 				std::cout << "Boundary case - Check: phi3 , faces are not entirely sewn" << std::endl;
 			else
 				std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
+            std::cout << "face : " << phi1(d3) << " and face = " << phi3(phi_1(d)) << std::endl;
 			return false;
 		}
 

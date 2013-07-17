@@ -180,14 +180,18 @@ Dart Map3MR<PFP>::swap2To2(Dart d)
     m_map.mergeVolumes(d,false);
 
     Dart d2 = m_map.phi1(d2_1);
-    m_map.flipEdge(m_map.phi1(d2_1));
-    //m_map.flipBackEdge(m_map.phi3(m_map.phi1(d2_1)));
+    Dart d3 = m_map.phi3(d2);
+
+    m_map.flipEdge(d2);
+    m_map.flipBackEdge(d3);
 
     Dart e = m_map.phi2(d2) ;
     m_map.template copyDartEmbedding<VERTEX>(d2, m_map.phi1(e)) ;
-    //m_map.template setOrbitEmbedding<VERTEX>(d2,  m_map.template getEmbedding<VERTEX>(m_map.phi1(e))) ;
-    //m_map.template setOrbitEmbedding<VERTEX>(e,  m_map.template getEmbedding<VERTEX>(m_map.phi1(d2))) ;
     m_map.template copyDartEmbedding<VERTEX>(e, m_map.phi1(d2)) ;
+
+    Dart e3 = m_map.phi2(d3);
+    m_map.template copyDartEmbedding<VERTEX>(d3, m_map.phi1(e3)) ;
+    m_map.template copyDartEmbedding<VERTEX>(e3, m_map.phi1(d3)) ;
 
     Dart stop = m_map.phi_1(d2_1);
     Dart dit = stop;
@@ -296,9 +300,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 
 	DartMarkerStore m(m_map);
-
 	DartMarkerStore newBoundaryV(m_map);
-
 
     if(embedNewVertices)
     {
@@ -390,42 +392,80 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 	{
 		if(m_map.isBoundaryVertex(dit) && !newBoundaryV.isMarked(dit))
 		{
-			Dart db = m_map.findBoundaryFaceOfVertex(dit);
+            m_map.decCurrentLevel() ;
+            Dart db = m_map.findBoundaryFaceOfVertex(dit);
 
-			typename PFP::VEC3 P = position[db] ;
-			typename PFP::VEC3 newP(0) ;
-			unsigned int val = 0 ;
-			Dart vit = db ;
-			do
-			{
-				newP += position[m_map.phi_1(m_map.phi2(m_map.phi1(vit)))] ;
-				++val ;
-				vit = m_map.phi2(m_map.phi_1(vit)) ;
-			} while(vit != db) ;
-			typename PFP::REAL K = sqrt3_K(val) ;
-			newP *= typename PFP::REAL(3) ;
-			newP -= typename PFP::REAL(val) * P ;
-			newP *= K / typename PFP::REAL(2 * val) ;
-			newP += (typename PFP::REAL(1) - K) * P ;
-			position[db] = newP ;
+            typename PFP::VEC3 np(0) ;
+            unsigned int degree = 0 ;
+            Traversor2VVaE<typename PFP::MAP> trav(m_map, db) ;
+            for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+            {
+                ++degree ;
+                np += position[it] ;
+            }
+            float alpha = 1.0/9.0 * ( 4.0 - 2.0 * cos(2.0 * M_PI / degree));
+            np *= alpha / degree ;
+
+            typename PFP::VEC3 vp = position[db] ;
+            vp *= 1.0 - alpha ;
+
+            m_map.incCurrentLevel() ;
+
+            position[dit] = np + vp;
+
+
+
+
+//            Dart db = m_map.findBoundaryFaceOfVertex(dit);
+
+//            typename PFP::VEC3 P = position[db] ;
+//            typename PFP::VEC3 newP(0) ;
+//            unsigned int val = 0 ;
+//            Dart vit = db ;
+//            do
+//            {
+//                newP += position[m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi1(vit))))] ;
+//                ++val ;
+//                vit = m_map.phi2(m_map.phi_1(vit)) ;
+//            } while(vit != db) ;
+//            typename PFP::REAL K = sqrt3_K(val) ;
+//            newP *= typename PFP::REAL(3) ;
+//            newP -= typename PFP::REAL(val) * P ;
+//            newP *= K / typename PFP::REAL(2 * val) ;
+//            newP += (typename PFP::REAL(1) - K) * P ;
+//            position[db] = newP ;
 		}
 	}
 
-
-	//
-	// edge-removal on all old boundary edges
-	//
-	TraversorE<typename PFP::MAP> tE(m_map);
-	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
-	{
-		if(m.isMarked(dit))
-		{
-			m.unmarkOrbit<EDGE>(dit);
-			Dart d = m_map.phi2(m_map.phi3(m_map.findBoundaryFaceOfEdge(dit)));
+    //
+    // edge-removal on all old boundary edges
+    //
+    TraversorE<typename PFP::MAP> tE(m_map);
+    for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
+    {
+        if(m.isMarked(dit))
+        {
+            m.unmarkOrbit<EDGE>(dit);
+            Dart d = m_map.phi2(m_map.phi3(m_map.findBoundaryFaceOfEdge(dit)));
             swapGen3To2(d);
 
-		}
-	}
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 	m_map.popLevel() ;

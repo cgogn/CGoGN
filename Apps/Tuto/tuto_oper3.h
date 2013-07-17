@@ -145,6 +145,7 @@ protected:
 public:
 	// example of simple map creation
 	void createMap(int n);
+    void createMapTets();
 	void updateMap();
 	void importMesh(std::string& filename);
 
