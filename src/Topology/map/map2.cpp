@@ -521,7 +521,7 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	phi2sew(phi1(e), vv2) ;
 }
 
-bool Map2::mergeVolumes(Dart d, Dart e)
+bool Map2::mergeVolumes(Dart d, Dart e, bool deleteFace)
 {
 	assert(!isBoundaryMarked2(d) && !isBoundaryMarked2(e)) ;
 
@@ -564,8 +564,12 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 		phi2unsew(e2);
 		phi2sew(d2, e2);	// Link the two adjacent faces together
 	}
-	Map1::deleteCycle(d);		// Delete the two alone faces
-	Map1::deleteCycle(e);
+
+	if(deleteFace)
+	{
+		Map1::deleteCycle(d);		// Delete the two alone faces
+		Map1::deleteCycle(e);
+	}
 
 	return true ;
 }

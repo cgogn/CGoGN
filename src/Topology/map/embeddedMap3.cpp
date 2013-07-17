@@ -426,11 +426,11 @@ void EmbeddedMap3::unsewVolumes(Dart d, bool withBoundary)
 	}
 }
 
-bool EmbeddedMap3::mergeVolumes(Dart d)
+bool EmbeddedMap3::mergeVolumes(Dart d, bool deleteFace)
 {
 	Dart d2 = phi2(d);
 
-	if(Map3::mergeVolumes(d))
+	if(Map3::mergeVolumes(d, deleteFace))
 	{
 		if (isOrbitEmbedded<VOLUME>())
 		{
@@ -444,6 +444,57 @@ bool EmbeddedMap3::mergeVolumes(Dart d)
 void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 {
 	Map3::splitVolume(vd);
+
+	// follow the edge path a second time to embed the vertex, edge and volume orbits
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		Dart dit = *it;
+		Dart dit23 = phi3(phi2(dit));
+
+		// embed the vertex embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<VERTEX>())
+		{
+			copyDartEmbedding<VERTEX>(dit23, dit);
+			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
+		}
+
+		// embed the edge embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<EDGE2>())
+		{
+			setOrbitEmbeddingOnNewCell<EDGE2>(dit23) ;
+			copyCell<EDGE2>(dit23, dit) ;
+
+			copyDartEmbedding<EDGE2>(phi2(dit), dit);
+		}
+
+		// embed the edge embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<EDGE>())
+		{
+			unsigned int eEmb = getEmbedding<EDGE>(dit) ;
+			setDartEmbedding<EDGE>(dit23, eEmb);
+			setDartEmbedding<EDGE>(phi2(dit), eEmb);
+		}
+
+		// embed the volume embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<VOLUME>())
+		{
+			copyDartEmbedding<VOLUME>(phi2(dit), dit);
+		}
+	}
+
+	if(isOrbitEmbedded<VOLUME>())
+	{
+		Dart v = vd.front() ;
+		Dart v23 = phi3(phi2(v));
+		setOrbitEmbeddingOnNewCell<VOLUME>(v23) ;
+		copyCell<VOLUME>(v23, v) ;
+	}
+}
+
+//! Split a volume into two volumes along a edge path and add the given face between
+void EmbeddedMap3::splitVolumeWithFace(std::vector<Dart>& vd, Dart d)
+{
+	Map3::splitVolumeWithFace(vd,d);
 
 	// follow the edge path a second time to embed the vertex, edge and volume orbits
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)

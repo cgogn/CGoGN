@@ -301,7 +301,7 @@ public:
 	 *  @param e a dart of the second face
 	 *  @return true if the merge has been executed, false otherwise
 	 */
-	virtual bool mergeVolumes(Dart d, Dart e);
+	virtual bool mergeVolumes(Dart d, Dart e, bool deleteFace = true);
 
 	//! Split a surface into two disconnected surfaces along a edge path
 	/*! @param vd a vector of darts

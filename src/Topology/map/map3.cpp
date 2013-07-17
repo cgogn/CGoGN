@@ -755,11 +755,11 @@ void Map3::unsewVolumes(Dart d, bool withBoundary)
 	} while(fitB1 != b1) ;
 }
 
-bool Map3::mergeVolumes(Dart d)
+bool Map3::mergeVolumes(Dart d, bool deleteFace)
 {
 	if(!Map3::isBoundaryFace(d))
 	{
-		Map2::mergeVolumes(d, phi3(d)); // merge the two volumes along common face
+		Map2::mergeVolumes(d, phi3(d), deleteFace); // merge the two volumes along common face
 		return true ;
 	}
 	return false ;
@@ -776,6 +776,26 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 
 	//sew the two connected components
 	Map3::sewVolumes(phi2(e), phi2(e2), false);
+}
+
+void Map3::splitVolumeWithFace(std::vector<Dart>& vd, Dart d)
+{
+	assert(vd.size() == faceDegree(d));
+
+	// deconnect edges around the path
+	// sew the given face into the paths
+	Dart dit = d;
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		Dart it2 = phi2(*it);
+		unsewFaces(*it, false) ;
+
+		sewFaces(*it,dit,false);
+		sewFaces(it2, phi3(dit),false);
+
+		dit = phi_1(dit);
+
+	}
 }
 
 Dart Map3::collapseVolume(Dart d, bool delDegenerateVolumes)

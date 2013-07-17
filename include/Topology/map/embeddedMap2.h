@@ -141,7 +141,7 @@ public:
 	 * The attributes attached to the vertices of the face of d are kept on the resulting vertices
 	 * The attributes attached to the edges of the face of d are kept on the resulting edges
 	 */
-	virtual bool mergeVolumes(Dart d, Dart e) ;
+	virtual bool mergeVolumes(Dart d, Dart e, bool deleteFace = true) ;
 
 	/**
 	 *
