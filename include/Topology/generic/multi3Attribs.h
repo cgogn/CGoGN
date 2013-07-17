@@ -116,7 +116,47 @@ public:
 	{
 		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
 	}
+
+	static unsigned int getOrbit() { return VERTEX; }
 };
+
+
+template <typename T1, typename T2,  typename T3>
+class Edge3Attributes
+{
+	EdgeAttribute<T1>& m_h1;
+	EdgeAttribute<T2>& m_h2;
+	EdgeAttribute<T3>& m_h3;
+public:
+	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
+	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
+
+	Edge3Attributes(EdgeAttribute<T1>& h1, EdgeAttribute<T2>& h2, EdgeAttribute<T3>& h3):
+		m_h1(h1), m_h2(h2), m_h3(h3) {}
+
+	RefCompo3Type<T1,T2,T3> operator[](unsigned int a)
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
+	}
+
+	RefCompo3Type<T1,T2,T3> operator[](Dart d)
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
+	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
+	}
+
+	const RefCompo3Type<T1,T2,T3> operator[](Dart d) const
+	{
+		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
+	}
+
+	static unsigned int getOrbit() { return EDGE; }
+};
+
 
 
 template <typename T1, typename T2,  typename T3>
@@ -151,6 +191,8 @@ public:
 	{
 		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
 	}
+
+	static unsigned int getOrbit() { return FACE; }
 };
 
 template <typename T1, typename T2,  typename T3>
@@ -185,6 +227,9 @@ public:
 	{
 		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
 	}
+
+	static unsigned int getOrbit() { return VOLUME; }
+
 };
 
 

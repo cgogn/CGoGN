@@ -40,21 +40,7 @@ SimpleGMap3::SimpleGMap3()
 	Dart d = primCat.hexaGrid_topo(3,1,1);
 	primCat.embedHexaGrid(2,1,1);
 	myMap.check();
-//	DartMarker markOrient(myMap);
-//	std::vector<Dart> orient;
-//	FunctorStore fs(orient);
-	
-//	d = 49;
-//	myMap.foreach_dart_of_oriented_volume(d, fs);
 
-//	for(std::vector<Dart>::iterator it = orient.begin() ; it != orient.end() ; ++it)
-//		markOrient.mark(*it);
-
-//	SelectorMarked sm(markOrient);
-//	std::cout << "AAA"<< std::endl;
-//	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap, position, sm);
-
-//	Geom::Plane3D<PFP::REAL> pl(VEC3(0.5,0.14,0.5),VEC3(1.5,0.45,0.5),VEC3(0.5,0.15,1.5));
 	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
 	Algo::Volume::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
 
@@ -104,7 +90,7 @@ void SimpleGMap3::initGUI()
 
 void SimpleGMap3::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(1) ;
+	Utils::GLSLShader::setCurrentOGLVersion(2) ;
 
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	VEC3 gPosObj = bb.center() ;
@@ -113,20 +99,18 @@ void SimpleGMap3::cb_initGL()
 	float tailleZ = bb.size(2) ;
 	float gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
 	setParamObject(gWidthObj, gPosObj.data());
+
+	m_render_topo = new Algo::Render::GL2::Topo3Render();
+	m_render_topo->setDartWidth(2.0f);
+	m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.9f);
 }
 
 void SimpleGMap3::cb_redraw()
 {
 	glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
-	Algo::Render::GL1::renderTopoGMD3<PFP>(myMap, position, true, true, true, true, 0.9f, 0.9f, 0.9f, 0.9f);
-//	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
-
-//	glDisable(GL_LIGHTING);
-//	glColor3f(1.0f, 1.0f, 1.0f);
-//	glLineWidth(1.0f);
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap, Algo::Render::GL1::LINE, 1.0,position, normal);
+	m_render_topo->drawTopo();
 }
 
 /**********************************************************************************************

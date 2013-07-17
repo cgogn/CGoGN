@@ -35,6 +35,7 @@ SimpleMap3::SimpleMap3()
 	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap, position);
 	Dart d = primCat.hexaGrid_topo(2,1,1);
 	primCat.embedHexaGrid(1,1,1);
+	myMap.closeMap();
 
 	unsigned int nb=0;
 	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
@@ -42,6 +43,7 @@ SimpleMap3::SimpleMap3()
 
 	std::cout << "Nb vertices (equals 12) : " << nb << std::endl;
 	assert(nb==12);
+
 
 	d = myMap.phi2(myMap.phi1(myMap.phi1(myMap.phi2(d))));
 
@@ -68,6 +70,7 @@ SimpleMap3::SimpleMap3()
 
 	std::cout << "Nb vertices after resew (equals 12) : " << nb << std::endl;
 	assert(nb==12);
+
 }
 
 void SimpleMap3::initGUI()
@@ -76,7 +79,7 @@ void SimpleMap3::initGUI()
 
 void SimpleMap3::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(1) ;
+	Utils::GLSLShader::setCurrentOGLVersion(2) ;
 
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	VEC3 gPosObj = bb.center() ;
@@ -85,13 +88,26 @@ void SimpleMap3::cb_initGL()
 	float tailleZ = bb.size(2) ;
 	float gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
 	setParamObject(gWidthObj, gPosObj.data());
+
+	m_render_topo = new Algo::Render::GL2::Topo3Render();
+	m_render_topo->setDartWidth(2.0f);
+	m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.9f);
+
+	m_render_topo_boundary = new Algo::Render::GL2::TopoRender();
+	m_render_topo_boundary->setDartWidth(2.0f);
+	m_render_topo_boundary->setInitialDartsColor(0.4f,0.8f,0.4f);
+	m_render_topo_boundary->updateDataBoundary<PFP>(myMap, position, 0.9f,0.9f,bb.maxSize()/50.0f);
 }
+
+
 
 void SimpleMap3::cb_redraw()
 {
 	glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
-	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
+	m_render_topo->drawTopo();
+	m_render_topo_boundary->drawTopo();
 }
 
 /**********************************************************************************************
