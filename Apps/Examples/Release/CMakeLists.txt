@@ -66,3 +66,8 @@ target_link_libraries( mcmesh ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
 QT4_WRAP_CPP( concave_rendering_moc ../concave_rendering.h )
 add_executable( concave_rendering ../concave_rendering.cpp ${concave_rendering_moc} ${concave_rendering_ui} )
 target_link_libraries( concave_rendering ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
+
+QT4_WRAP_CPP( viewerOBJ_moc ../viewerOBJ.h )
+add_executable( viewerOBJ ../viewerOBJ.cpp ${viewerOBJ_moc} )
+target_link_libraries( viewerOBJ ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS}  )
+

@@ -42,6 +42,7 @@ class DartContainerBrowserSelector : public ContainerBrowser
 protected:
 	AttributeContainer* m_cont ;
 	const FunctorSelect* m_selector ;
+	AttribMap& m_map;
 
 public:
 	DartContainerBrowserSelector(AttribMap& m, const FunctorSelect& fs);

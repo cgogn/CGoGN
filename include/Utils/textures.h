@@ -33,6 +33,8 @@
 #include <QImage>
 //#else
 //#error "Texture class need Qt for loading images, please recompile CGoGN with Qt support if necessary"
+#else
+#include <IL/il.h>
 #endif
 
 // TODO externaliser le chargement d'image pour enlever la dependance Qt ??
@@ -261,6 +263,14 @@ public:
 	 */
 	template <typename TYPEDOUBLE>
 	void subSample2();
+
+
+	/**
+	 * @brief Compute new size by setting the min in all dim to maxSize (sz[0] is kept multiple of 4 for texture)
+	 * @param maxSize
+	 * @return
+	 */
+	COORD newMaxSize(unsigned int maxSize);
 
 	/**
 	* scale image

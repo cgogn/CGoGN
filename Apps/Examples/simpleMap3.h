@@ -32,7 +32,8 @@
 
 #include "Geometry/vector_gen.h"
 
-#include "Algo/Render/GL1/topo_render.h"
+#include "Algo/Render/GL2/topo3Render.h"
+#include "Algo/Render/GL2/topoRender.h"
 
 using namespace CGoGN ;
 
@@ -54,6 +55,9 @@ public:
 	SelectorTrue allDarts ;
 
 	VertexAttribute<VEC3> position ;
+
+	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
 
 	SimpleMap3() ;
 

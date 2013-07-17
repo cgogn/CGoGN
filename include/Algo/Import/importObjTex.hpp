@@ -26,6 +26,7 @@
 #include "Topology/generic/autoAttributeHandler.h"
 #include "Container/fakeAttribute.h"
 #include <fstream>
+#include <algorithm>
 
 
 namespace CGoGN
@@ -44,6 +45,14 @@ OBJModel<PFP>::OBJModel(typename PFP::MAP& map):
 	m_tagV(0),m_tagVT(0),m_tagVN(0),m_tagG(0),m_tagF(0),
 	m_specialVertices(map),m_dirtyEdges(map)
 {
+}
+
+
+template <typename PFP>
+OBJModel<PFP>::~OBJModel()
+{
+	for (std::vector<MaterialOBJ*>::iterator it = m_materials.begin(); it != m_materials.end(); ++it)
+		delete *it;
 }
 
 template <typename PFP>
@@ -92,34 +101,46 @@ void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f>texcoord)
 
 
 
+
+
+
 template <typename PFP>
-void OBJModel<PFP>::readMaterials(const std::string& filename, std::vector<MaterialOBJ>& materials)
+void OBJModel<PFP>::readMaterials(unsigned int /*maxTextureSize*/, const std::string& filename)
 {
-	materials.reserve(m_materialNames.size());
-		
+	m_materials.reserve(m_materialNames.size());
+
+	if (!filename.empty())
+	{
+		m_matFileName = filename;
+	}
+
 	// open file
-	std::ifstream fp(filename.c_str());
+	std::ifstream fp(m_matFileName.c_str());
 	if (!fp.good())
 	{
-		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		CGoGNerr << "Unable to open file " << m_matFileName << CGoGNendl;
 		return ;
 	}
 	
-	std::vector<MaterialOBJ>::iterator mit;
+	MaterialOBJ* currentMat = NULL;
+
+	m_materials.resize(m_materialNames.size(),NULL);
 
 	std::string ligne;
-	std::string tag;
-	fp >> tag;
 	do
 	{
 		std::getline (fp, ligne);
+		std::stringstream oss(ligne);
+		std::string tag;
+		oss >> tag;
 		if (tag == "newmtl")
 		{
-
-			std::map<std::string,int>::iterator it = m_materialNames.find(ligne);
+			std::string name;
+			oss >> name ;
+			std::map<std::string,int>::iterator it = m_materialNames.find(name);
 			if (it ==  m_materialNames.end())
 			{
-				CGoGNerr << "Skipping material "<< ligne << CGoGNendl;
+				CGoGNerr << "Skipping material "<< name << CGoGNendl;
 				do
 				{
 					fp >> tag;
@@ -128,73 +149,95 @@ void OBJModel<PFP>::readMaterials(const std::string& filename, std::vector<Mater
 			}
 			else
 			{
-				CGoGNout << "Reading material "<< ligne << CGoGNendl;
-
-				if (materials.empty())
-				{
-					materials.resize(1);
-					mit = materials.begin();
-				}
-				else
-				{
-					materials.resize(materials.size()+1);
-					++mit;
-				}
-				it->second = (mit-materials.begin());
-				mit->name = ligne;
+				CGoGNout << "Reading material "<< name << CGoGNendl;
+				currentMat = new MaterialOBJ();
+				m_materials[it->second] = currentMat;
+				currentMat->name = name;
 			}
 		}
-		else
+		else if (currentMat != NULL)
 		{
-			std::stringstream oss(ligne);
 			if (tag == "Ka")
 			{
-				oss >> mit->ambiantColor[0];
-				oss >> mit->ambiantColor[1];
-				oss >> mit->ambiantColor[2];
+				oss >> currentMat->ambiantColor[0];
+				oss >> currentMat->ambiantColor[1];
+				oss >> currentMat->ambiantColor[2];
 			}
 			if (tag == "Kd")
 			{
-				oss >> mit->diffuseColor[0];
-				oss >> mit->diffuseColor[1];
-				oss >> mit->diffuseColor[2];
-				
+				oss >> currentMat->diffuseColor[0];
+				oss >> currentMat->diffuseColor[1];
+				oss >> currentMat->diffuseColor[2];
+
 			}
 			if (tag == "Ks")
 			{
-				oss >> mit->specularColor[0];
-				oss >> mit->specularColor[1];
-				oss >> mit->specularColor[2];
+				oss >> currentMat->specularColor[0];
+				oss >> currentMat->specularColor[1];
+				oss >> currentMat->specularColor[2];
 			}
 			if (tag == "Ns")
 			{
-				oss >> mit->shininess;
+				oss >> currentMat->shininess;
 			}
 			if (tag == "Tf")
 			{
-				oss >> mit->transparentFilter[0];
-				oss >> mit->transparentFilter[1];
-				oss >> mit->transparentFilter[2];
+				oss >> currentMat->transparentFilter[0];
+				oss >> currentMat->transparentFilter[1];
+				oss >> currentMat->transparentFilter[2];
 			}
+
+			if ((tag == "illum"))
+			{
+				oss >> currentMat->illuminationModel;
+			}
+
 
 			if ((tag == "Tr") || (tag == "d"))
 			{
-				oss >> mit->transparency;
+				oss >> currentMat->transparency;
 			}
 			
-			if (tag == "map_Ka") // ambiant texture
-			{
-				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
-			}
 			if (tag == "map_Kd") // diffuse texture
 			{
-				mit->textureDiffuse = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
-				std::string tname;
-				oss >> tname;
-				mit->textureDiffuse->load(tname);
-				CGoGNout << "Loading texture "<< tname << CGoGNendl;
+				if (currentMat->textureDiffuse == NULL)
+				{
+					currentMat->textureDiffuse = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
+					std::string buff;
+					getline (oss, buff);
+					std::string tname = buff.substr(buff.find_first_not_of(' '));
+					if (tname[tname.length()-1] == '\r')
+						tname = tname.substr(0,tname.length()-1);
+
+					currentMat->textureDiffuse->load(m_matPath+tname);
+					CGoGNout << "Loading texture "<< m_matPath+tname << " -> "<<std::hex << currentMat->textureDiffuse <<std::dec<<CGoGNendl;
+//					currentMat->textureDiffuse->scaleNearest( currentMat->textureDiffuse->newMaxSize(maxTextureSize));
+					currentMat->textureDiffuse->setFiltering(GL_LINEAR);
+					currentMat->textureDiffuse->setWrapping(GL_REPEAT);
+					currentMat->textureDiffuse->update();
+				}
+			}
+
+			if (tag == "map_Ka") // ambiant texture
+			{
+//				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
+				if (currentMat->textureDiffuse == NULL)
+				{
+					currentMat->textureDiffuse = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
+					std::string buff;
+					getline (oss, buff);
+					std::string tname = buff.substr(buff.find_first_not_of(' '));
+					if (tname[tname.length()-1] == '\r')
+						tname = tname.substr(0,tname.length()-1);
+					currentMat->textureDiffuse->load(m_matPath+tname);
+					CGoGNout << "Loading texture "<< m_matPath+tname << " -> "<<std::hex << currentMat->textureDiffuse <<std::dec<<CGoGNendl;
+					currentMat->textureDiffuse->setFiltering(GL_LINEAR);
+					currentMat->textureDiffuse->setWrapping(GL_REPEAT);
+					currentMat->textureDiffuse->update();
+				}
 
 			}
+
 			if (tag == "map_d") // opacity texture
 			{
 				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
@@ -203,66 +246,54 @@ void OBJModel<PFP>::readMaterials(const std::string& filename, std::vector<Mater
 			{
 				CGoGNerr << tag << " not yet supported in OBJ material reading" << CGoGNendl;
 			}
-			
-			fp >> tag;
-
+			tag="";
 		}
 	}while (!fp.eof());
+
+	for (std::vector<MaterialOBJ*>::iterator it = m_materials.begin(); it != m_materials.end(); ++it)
+	{
+		if (*it == NULL)
+			CGoGNerr << "Warning missing material in .mtl"<< CGoGNendl;
+	}
+
 }
-
-
-
 
 
 template <typename PFP>
-bool OBJModel<PFP>::generateBrowsers(std::vector<ContainerBrowser*>& browsers)
+unsigned int OBJModel<PFP>::getMaterialIndex(const std::string& name) const
 {
+	std::map<std::string, int>::iterator it = m_materialNames.find(name);
+	if (it != m_materialNames.end())
+		return it->second;
+	return 0xffffffff;
+}
+
+
+//template <typename PFP>
+//bool OBJModel<PFP>::generateBrowsers(std::vector<ContainerBrowser*>& browsers)
+//{
 //	browsers.clear();
-	
 //	if (m_groupNames.empty())
 //		return false;
-	
-//	MapBrowserLinked* MBLptr = new MapBrowserLinked(m_map);
-//	DartAttribute<Dart>& links = MBLptr->getLinkAttr();
+
+//	ContainerBrowserLinked* MBLptr = new ContainerBrowserLinked(m_map,DART);
 //	browsers.push_back(MBLptr);
-	
+
 //	for (unsigned int i = 1; i<m_groupNames.size(); ++i)
 //	{
-//		MapBrowser* MBptr = new MapBrowserLinked(m_map,links);
+//		ContainerBrowser* MBptr = new ContainerBrowserLinked(*MBLptr);
 //		browsers.push_back(MBptr);
 //		m_groupMaterialID[i]= m_materialNames[m_groupMaterialNames[i]];
 //	}
-	
+
 //	for (Dart d=m_map.begin(); d!=m_map.end(); m_map.next(d))
 //	{
 //		unsigned int g = m_groups[d] -1 ; // groups are name from 1
-//		MapBrowserLinked* mb = static_cast<MapBrowserLinked*>(browsers[g]);
-//		mb->pushBack(d);
+//		ContainerBrowserLinked* mb = static_cast<ContainerBrowserLinked*>(browsers[g]);
+//		mb->pushBack(d.index);
 //	}
 //	return true;
-
-	browsers.clear();
-	if (m_groupNames.empty())
-		return false;
-
-	ContainerBrowserLinked* MBLptr = new ContainerBrowserLinked(m_map,DART);
-	browsers.push_back(MBLptr);
-
-	for (unsigned int i = 1; i<m_groupNames.size(); ++i)
-	{
-		ContainerBrowser* MBptr = new ContainerBrowserLinked(*MBLptr);
-		browsers.push_back(MBptr);
-		m_groupMaterialID[i]= m_materialNames[m_groupMaterialNames[i]];
-	}
-
-	for (Dart d=m_map.begin(); d!=m_map.end(); m_map.next(d))
-	{
-		unsigned int g = m_groups[d] -1 ; // groups are name from 1
-		ContainerBrowserLinked* mb = static_cast<ContainerBrowserLinked*>(browsers[g]);
-		mb->pushBack(d.index);
-	}
-	return true;
-}
+//}
 
 
 
@@ -404,6 +435,79 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PT(Utils::VBO* positionVBO, Utils::V
 	return 3*nbtris;
 }
 
+
+
+
+
+template <typename PFP>
+unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO )
+{
+	TraversorF<typename PFP::MAP> traf(m_map);
+	std::vector<Geom::Vec3f> posBuff;
+	std::vector<Geom::Vec2f> normalBuff;
+	posBuff.reserve(16384);
+	normalBuff.reserve(16384);
+
+	unsigned int nbtris = 0;
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		Dart e = m_map.phi1(d);
+		Dart f = m_map.phi1(e);
+		do
+		{
+			posBuff.push_back(m_positions[d]);
+			if (m_specialVertices.isMarked(d))
+			{
+				normalBuff.push_back(m_normalsF[d]);
+			}
+			else
+			{
+				normalBuff.push_back(m_normals[d]);
+			}
+
+			posBuff.push_back(m_positions[e]);
+			if (m_specialVertices.isMarked(e))
+			{
+				normalBuff.push_back(m_normalsF[e]);
+			}
+			else
+			{
+				normalBuff.push_back(m_normals[e]);
+			}
+
+			posBuff.push_back(m_positions[f]);
+			if (m_specialVertices.isMarked(f))
+			{
+				normalBuff.push_back(m_normalsF[f]);
+			}
+			else
+			{
+				normalBuff.push_back(m_normals[f]);
+			}
+			e=f;
+			f = m_map.phi1(e);
+			nbtris++;
+		}while (f!=d);
+	}
+
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	normalVBO->setDataSize(3);
+	normalVBO->allocate(normalBuff.size());
+	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
+	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
+	normalVBO->releasePtr();
+
+
+	return 3*nbtris;
+}
+
+
+
 template <typename PFP>
 unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO )
 {
@@ -511,60 +615,231 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
 
-
 	return 3*nbtris;
 }
 
 
 template <typename PFP>
-unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO )
+bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
 {
+	m_beginIndices.clear();
+	m_nbIndices.clear();
+
+	std::vector<Geom::Vec3f> posBuff;
+	posBuff.reserve(16384);
+
+	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
 	TraversorF<typename PFP::MAP> traf(m_map);
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		unsigned int g = m_attMat[d];
+		group_faces[g].push_back(d);
+	}
+
+	unsigned int firstIndex = 0;
+
+	unsigned int sz = group_faces.size();
+	m_beginIndices.resize(sz);
+	m_nbIndices.resize(sz);
+
+
+	for (unsigned int g=0; g<sz; ++g)
+	{
+		unsigned int nbtris = 0;
+		std::vector<Dart>& traf = group_faces[g];
+
+		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
+		{
+			Dart d = *id;
+			Dart e = m_map.phi1(d);
+			Dart f = m_map.phi1(e);
+			do
+			{
+				posBuff.push_back(m_positions[d]);
+				posBuff.push_back(m_positions[e]);
+				posBuff.push_back(m_positions[f]);
+				e=f;
+				f = m_map.phi1(e);
+				nbtris++;
+			}while (f!=d);
+		}
+		m_beginIndices[g] = firstIndex;
+		m_nbIndices[g] = 3*nbtris;
+		firstIndex += 3*nbtris;
+	}
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	return true;
+}
+
+
+
+template <typename PFP>
+bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO)
+{
+	m_beginIndices.clear();
+	m_nbIndices.clear();
+
+	std::vector<Geom::Vec3f> posBuff;
+	std::vector<Geom::Vec2f> TCBuff;
+	posBuff.reserve(16384);
+	TCBuff.reserve(16384);
+
+	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
+	TraversorF<typename PFP::MAP> traf(m_map);
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		unsigned int g = m_attMat[d];
+		group_faces[g].push_back(d);
+	}
+
+	unsigned int firstIndex = 0;
+
+	unsigned int sz = group_faces.size();
+	m_beginIndices.resize(sz);
+	m_nbIndices.resize(sz);
+
+
+	for (unsigned int g=0; g<sz; ++g)
+	{
+		unsigned int nbtris = 0;
+		std::vector<Dart>& traf = group_faces[g];
+
+		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
+		{
+			Dart d = *id;
+
+			Dart e = m_map.phi1(d);
+			Dart f = m_map.phi1(e);
+			do
+			{
+				posBuff.push_back(m_positions[d]);
+				if (m_specialVertices.isMarked(d))
+					TCBuff.push_back(m_texCoordsF[d]);
+				else
+					TCBuff.push_back(m_texCoords[d]);
+
+				posBuff.push_back(m_positions[e]);
+				if (m_specialVertices.isMarked(e))
+					TCBuff.push_back(m_texCoordsF[e]);
+				else
+					TCBuff.push_back(m_texCoords[e]);
+
+				posBuff.push_back(m_positions[f]);
+				if (m_specialVertices.isMarked(f))
+					TCBuff.push_back(m_texCoordsF[f]);
+				else
+					TCBuff.push_back(m_texCoords[f]);
+				e=f;
+				f = m_map.phi1(e);
+				nbtris++;
+			}while (f!=d);
+		}
+		m_beginIndices[g] = firstIndex;
+		m_nbIndices[g] = 3*nbtris;
+		firstIndex += 3*nbtris;
+	}
+
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	texcoordVBO->setDataSize(2);
+	texcoordVBO->allocate(TCBuff.size());
+	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
+	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
+	texcoordVBO->releasePtr();
+
+	return true;
+}
+
+
+
+
+
+
+template <typename PFP>
+bool OBJModel<PFP>::createGroupMatVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO)
+{
+	m_beginIndices.clear();
+	m_nbIndices.clear();
+
 	std::vector<Geom::Vec3f> posBuff;
 	std::vector<Geom::Vec2f> normalBuff;
 	posBuff.reserve(16384);
 	normalBuff.reserve(16384);
 
-	unsigned int nbtris = 0;
+	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
+	TraversorF<typename PFP::MAP> traf(m_map);
 	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
 	{
-		Dart e = m_map.phi1(d);
-		Dart f = m_map.phi1(e);
-		do
+		unsigned int g = m_attMat[d];
+		group_faces[g].push_back(d);
+	}
+
+	unsigned int firstIndex = 0;
+
+	unsigned int sz = group_faces.size();
+	m_beginIndices.resize(sz);
+	m_nbIndices.resize(sz);
+
+
+	for (unsigned int g=0; g<sz; ++g)
+	{
+		unsigned int nbtris = 0;
+		std::vector<Dart>& traf = group_faces[g];
+
+		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
 		{
-			posBuff.push_back(m_positions[d]);
-			if (m_specialVertices.isMarked(d))
-			{
-				normalBuff.push_back(m_normalsF[d]);
-			}
-			else
-			{
-				normalBuff.push_back(m_normals[d]);
-			}
+			Dart d = *id;
 
-			posBuff.push_back(m_positions[e]);
-			if (m_specialVertices.isMarked(e))
+			Dart e = m_map.phi1(d);
+			Dart f = m_map.phi1(e);
+			do
 			{
-				normalBuff.push_back(m_normalsF[e]);
-			}
-			else
-			{
-				normalBuff.push_back(m_normals[e]);
-			}
+				posBuff.push_back(m_positions[d]);
+				if (m_specialVertices.isMarked(d))
+				{
+					normalBuff.push_back(m_normalsF[d]);
+				}
+				else
+				{
+					normalBuff.push_back(m_normals[d]);
+				}
 
-			posBuff.push_back(m_positions[f]);
-			if (m_specialVertices.isMarked(f))
-			{
-				normalBuff.push_back(m_normalsF[f]);
-			}
-			else
-			{
-				normalBuff.push_back(m_normals[f]);
-			}
-			e=f;
-			f = m_map.phi1(e);
-			nbtris++;
-		}while (f!=d);
+				posBuff.push_back(m_positions[e]);
+				if (m_specialVertices.isMarked(e))
+				{
+					normalBuff.push_back(m_normalsF[e]);
+				}
+				else
+				{
+					normalBuff.push_back(m_normals[e]);
+				}
+
+				posBuff.push_back(m_positions[f]);
+				if (m_specialVertices.isMarked(f))
+				{
+					normalBuff.push_back(m_normalsF[f]);
+				}
+				else
+				{
+					normalBuff.push_back(m_normals[f]);
+				}
+				e=f;
+				f = m_map.phi1(e);
+				nbtris++;
+			}while (f!=d);
+		}
+		m_beginIndices[g] = firstIndex;
+		m_nbIndices[g] = 3*nbtris;
+		firstIndex += 3*nbtris;
 	}
 
 	positionVBO->setDataSize(3);
@@ -579,15 +854,154 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::V
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
 
-
-	return 3*nbtris;
+	return true;
 }
 
 
-// template <typename PFP>
-// bool importObjTex(typename PFP::MAP& map, const std::string& filename,
-// 				  std::vector<std::string>& attrNames,/* std::vector<MapBrowserLinked*>& browsers,*/
-// 				  CellMarker<VERTEX>& specialVertices, DartMarker& dirtyEdges)
+
+
+template <typename PFP>
+bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
+											Utils::VBO* texcoordVBO,
+											Utils::VBO* normalVBO)
+{
+	m_beginIndices.clear();
+	m_nbIndices.clear();
+
+	if (!m_normals.isValid())
+	{
+		CGoGNerr << "no normal attribute "<< CGoGNendl;
+		return false;
+	}
+	if (!m_texCoords.isValid())
+	{
+		CGoGNerr << "no tex coords attribute "<< CGoGNendl;
+		return false;
+	}
+
+	std::vector<Geom::Vec3f> posBuff;
+	std::vector<Geom::Vec2f> TCBuff;
+	std::vector<Geom::Vec3f> normalBuff;
+	posBuff.reserve(16384);
+	TCBuff.reserve(16384);
+	normalBuff.reserve(16384);
+
+
+	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
+	TraversorF<typename PFP::MAP> traf(m_map);
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		unsigned int g = m_attMat[d];
+		group_faces[g].push_back(d);
+	}
+
+	unsigned int firstIndex = 0;
+
+	unsigned int sz = group_faces.size();
+	m_beginIndices.resize(sz);
+	m_nbIndices.resize(sz);
+
+
+	for (unsigned int g=0; g<sz; ++g)
+	{
+		unsigned int nbtris = 0;
+		std::vector<Dart>& traf = group_faces[g];
+
+		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
+		{
+			Dart d = *id;
+
+			Dart e = m_map.phi1(d);
+			Dart f = m_map.phi1(e);
+			do
+			{
+				posBuff.push_back(m_positions[d]);
+//				if (m_specialVertices.isMarked(d))
+				{
+					if (hasTexCoords())
+						TCBuff.push_back(m_texCoordsF[d]);
+					else
+						TCBuff.push_back(m_texCoords[d]);
+					if (hasNormals())
+						normalBuff.push_back(m_normalsF[d]);
+					else
+						normalBuff.push_back(m_normals[d]);
+				}
+//				else
+//				{
+//					TCBuff.push_back(m_texCoords[d]);
+//					normalBuff.push_back(m_normals[d]);
+//				}
+
+				posBuff.push_back(m_positions[e]);
+//				if (m_specialVertices.isMarked(e))
+				{
+					if (hasTexCoords())
+						TCBuff.push_back(m_texCoordsF[e]);
+					else
+						TCBuff.push_back(m_texCoords[e]);
+					if (hasNormals())
+						normalBuff.push_back(m_normalsF[e]);
+					else
+						normalBuff.push_back(m_normals[e]);
+				}
+//				else
+//				{
+//					TCBuff.push_back(m_texCoords[e]);
+//					normalBuff.push_back(m_normals[e]);
+//				}
+
+				posBuff.push_back(m_positions[f]);
+//				if (m_specialVertices.isMarked(f))
+				{
+					if (hasTexCoords())
+						TCBuff.push_back(m_texCoordsF[f]);
+					else
+						TCBuff.push_back(m_texCoords[f]);
+					if (hasNormals())
+						normalBuff.push_back(m_normalsF[f]);
+					else
+						normalBuff.push_back(m_normals[f]);
+				}
+//				else
+//				{
+//					TCBuff.push_back(m_texCoords[f]);
+//					normalBuff.push_back(m_normals[f]);
+//				}
+
+				e=f;
+				f = m_map.phi1(e);
+				nbtris++;
+			}while (f!=d);
+		}
+		m_beginIndices[g] = firstIndex;
+		m_nbIndices[g] = 3*nbtris;
+
+		firstIndex += 3*nbtris;
+	}
+
+	positionVBO->setDataSize(3);
+	positionVBO->allocate(posBuff.size());
+	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+	positionVBO->releasePtr();
+
+	texcoordVBO->setDataSize(2);
+	texcoordVBO->allocate(TCBuff.size());
+	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
+	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
+	texcoordVBO->releasePtr();
+
+	normalVBO->setDataSize(3);
+	normalVBO->allocate(normalBuff.size());
+	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
+	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
+	normalVBO->releasePtr();
+
+	return true;
+}
+
+
 
 template <typename PFP>
 bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string>& attrNames)
@@ -608,8 +1022,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	std::string tag;
 	do
 	{
-		fp >> tag;
 		std::getline (fp, ligne);
+		std::stringstream oss(ligne);
+		oss >> tag;
 		if (tag == "v")
 			m_tagV++;
 		if (tag == "vn")
@@ -620,14 +1035,19 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			m_tagG++;
 		if (tag == "f")
 			m_tagF++;
+
+		if (tag == "mtllib")
+		{
+			unsigned found = filename.find_last_of("/\\");
+			std::string mtfn;
+			oss >> mtfn;
+			m_matPath = filename.substr(0,found) + "/";
+			m_matFileName = m_matPath + mtfn;
+		}
+		tag.clear();
+
 	}while (!fp.eof());
 
-	std::cout << "Parsing OBJ"<< m_tagV<< std::endl;
-	std::cout << "Vertices:"<< m_tagV<< std::endl;
-	std::cout << "Normals:"<< m_tagVN<< std::endl;
-	std::cout << "TexCoords:"<< m_tagVT<< std::endl;
-	std::cout << "Groups:"<< m_tagG<< std::endl;
-	std::cout << "Faces:"<< m_tagF<< std::endl;
 
 
 	m_positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
@@ -635,25 +1055,27 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		m_positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(m_positions.name()) ;
 
+
+
+	m_texCoords =  m_map.template getAttribute<VEC2, VERTEX>("texCoord") ;
+	if (!m_texCoords.isValid())
+		m_texCoords = m_map.template addAttribute<VEC2, VERTEX>("texCoord") ;
+	attrNames.push_back(m_texCoords.name()) ;
+
 	if (m_tagVT != 0)
 	{
-		m_texCoords =  m_map.template getAttribute<VEC2, VERTEX>("texCoord") ;
-		if (!m_texCoords.isValid())
-			m_texCoords = m_map.template addAttribute<VEC2, VERTEX>("texCoord") ;
-		attrNames.push_back(m_texCoords.name()) ;
-
 		m_texCoordsF =  m_map.template getAttribute<VEC2, VERTEX1>("texCoordF") ;
 		if (!m_texCoordsF.isValid())
 			m_texCoordsF = m_map.template addAttribute<VEC2, VERTEX1>("texCoordF") ;
 	}
 
+	m_normals =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("normal") ;
+	if (!m_normals.isValid())
+		m_normals = m_map.template addAttribute<VEC3, VERTEX>("normal") ;
+	attrNames.push_back(m_normals.name()) ;
+
 	if (m_tagVN != 0)
 	{
-		m_normals =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("normal") ;
-		if (!m_normals.isValid())
-			m_normals = m_map.template addAttribute<VEC3, VERTEX>("normal") ;
-		attrNames.push_back(m_normals.name()) ;
-
 		m_normalsF =  m_map.template getAttribute<VEC3, VERTEX1>("normalF") ;
 		if (!m_normalsF.isValid())
 			m_normalsF = m_map.template addAttribute<VEC3, VERTEX1>("normalF") ;
@@ -668,6 +1090,10 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		attrNames.push_back(m_groups.name()) ;
 	}
 	
+	m_attMat =  m_map.template getAttribute<unsigned int, FACE>("material") ;
+	if (!m_attMat.isValid())
+		m_attMat = m_map.template addAttribute<unsigned int, FACE>("material") ;
+	attrNames.push_back(m_attMat.name()) ;
 
 	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
 
@@ -689,7 +1115,6 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	std::vector<unsigned int> texCoordsID;
 	texCoordsID.reserve(m_tagV);
 	
-	
 
 	std::vector<unsigned int> localIndices;
 	localIndices.reserve(64*3);
@@ -700,6 +1125,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> > > vecTCIndPerVertex(m_map, "incidentsTC");
 
 	unsigned int currentGroup = 0;
+	unsigned int currentMat = 0;
+	unsigned int nextMat = 0;
+
 
 	DartMarkerNoUnmark mk(m_map) ;
 	unsigned int i = 0;
@@ -745,20 +1173,42 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			texCoordsBuffer.push_back(tc);
 		}
 
-		if (tag == std::string("g"))
+
+		if (tag == std::string("usemtl"))
 		{
-			m_groupNames.push_back(ligne);
-			std::string buf;
-			fp >> buf;
-			if (buf != "usemtl")
+			std::stringstream oss(ligne);
+			std::string matName;
+			oss >> matName;
+			std::map<std::string, int>::iterator it = m_materialNames.find(matName);
+
+			if (it==m_materialNames.end())
 			{
-				CGoGNerr << "problem reading OBJ, waiting for usemtl get "<< buf << CGoGNendl;
+				m_materialNames.insert(std::pair<std::string,int>(matName,nextMat));
+				currentMat = nextMat++;
+				std::cout << "New Material Name = "<< matName << "  index = "<< currentMat << std::endl;
+
 			}
-			fp >> buf;
-			m_materialNames.insert(std::pair<std::string,int>(buf,-1));
-			m_groupMaterialNames.push_back(buf);
-			currentGroup++;
+			else
+			{
+				currentMat = it->second;
+				std::cout << "Using Material Name = "<<  matName << "  index = "<< currentMat << std::endl;
+			}
 		}
+
+//		if (tag == std::string("g"))
+//		{
+//			m_groupNames.push_back(ligne);
+//			std::string buf;
+//			fp >> buf;
+//			if (buf != "usemtl")
+//			{
+//				CGoGNerr << "problem reading OBJ, waiting for usemtl get "<< buf << CGoGNendl;
+//			}
+//			fp >> buf;
+//			m_materialNames.insert(std::pair<std::string,int>(buf,-1));
+//			m_groupMaterialNames.push_back(buf);
+//			currentGroup++;
+//		}
 
 		if (tag == std::string("f"))
 		{
@@ -769,6 +1219,8 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			Dart d = m_map.newFace(nbe, false);
 			if (m_tagG!=0)
 				m_groups[d] = currentGroup;
+
+			m_attMat[d] = currentMat;
 			
 			for (short j = 0; j < nbe; ++j)
 			{
@@ -821,6 +1273,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		}
 	}
 
+
+	// A SIMPLIFIER ???
+
 	TraversorV<typename PFP::MAP> tra(m_map);
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
@@ -844,9 +1299,19 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			{
 				Dart e = vec[j];
 				if (m_tagVT)
-					m_texCoordsF[e] = texCoordsBuffer[ vecTCIndPerVertex[e][j] ];
+				{
+					if (vecTCIndPerVertex[e][j] != 0xffffffff)
+						m_texCoordsF[e] = texCoordsBuffer[ vecTCIndPerVertex[e][j] ];
+					else
+						m_texCoordsF[e] = Geom::Vec2f(0);
+				}
 				if (m_tagVN)
-					m_normalsF[e] = normalsBuffer[ vecNormIndPerVertex[e][j] ];
+				{
+					if (vecNormIndPerVertex[e][j] != 0xffffffff)
+						m_normalsF[e] = normalsBuffer[ vecNormIndPerVertex[e][j] ];
+					else
+						m_normalsF[e] = VEC3(0);
+				}
 			}
 			m_specialVertices.mark(d);
 //		}
@@ -859,6 +1324,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 //			m_specialVertices.unmark(d);
 //		}
 	}
+
+
+	readMaterials();
 
 	return true;
 

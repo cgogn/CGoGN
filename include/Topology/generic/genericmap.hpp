@@ -236,6 +236,14 @@ inline unsigned int GenericMap::dartIndex(Dart d) const
 	return d.index;
 }
 
+inline Dart GenericMap::indexDart(unsigned int index) const
+{
+	if (m_isMultiRes)
+		return Dart( (*m_mrDarts[m_mrCurrentLevel])[index]) ;
+	return Dart(index);
+}
+
+
 inline unsigned int GenericMap::getDartLevel(Dart d) const
 {
 	return (*m_mrLevels)[d.index] ;

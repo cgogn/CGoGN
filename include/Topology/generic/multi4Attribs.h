@@ -119,7 +119,48 @@ public:
 	{
 		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
 	}
+
+	static unsigned int getOrbit() { return VERTEX; }
 };
+
+
+template <typename T1, typename T2,  typename T3, typename T4>
+class Edge4Attributes
+{
+	EdgeAttribute<T1>& m_h1;
+	EdgeAttribute<T2>& m_h2;
+	EdgeAttribute<T3>& m_h3;
+	EdgeAttribute<T4>& m_h4;
+public:
+	typedef Compo4Type<T1,T2,T3,T4> DATA_TYPE;
+	typedef RefCompo4Type<T1,T2,T3,T4> REF_DATA_TYPE;
+
+	Edge4Attributes(EdgeAttribute<T1>& h1, EdgeAttribute<T2>& h2, EdgeAttribute<T3>& h3, EdgeAttribute<T4>& h4):
+		m_h1(h1), m_h2(h2), m_h3(h3), m_h4(h4) {}
+
+	RefCompo4Type<T1,T2,T3,T4> operator[](unsigned int a)
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[a],m_h2[a],m_h3[a],m_h4[a]);
+	}
+
+	RefCompo4Type<T1,T2,T3,T4> operator[](Dart d)
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
+	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](unsigned int a) const
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[a],m_h2[a],m_h3[a],m_h4[a]);
+	}
+
+	const RefCompo4Type<T1,T2,T3,T4> operator[](Dart d) const
+	{
+		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
+	}
+
+	static unsigned int getOrbit() { return EDGE; }
+};
+
 
 
 template <typename T1, typename T2,  typename T3, typename T4>
@@ -155,6 +196,8 @@ public:
 	{
 		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
 	}
+
+	static unsigned int getOrbit() { return FACE; }
 };
 
 template <typename T1, typename T2,  typename T3, typename T4>
@@ -190,6 +233,8 @@ public:
 	{
 		return RefCompo4Type<T1,T2,T3,T4>(m_h1[d],m_h2[d],m_h3[d],m_h4[d]);
 	}
+
+	static unsigned int getOrbit() { return VOLUME; }
 };
 
 

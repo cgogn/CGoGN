@@ -270,7 +270,7 @@ ImageData<DIM,TYPE>(size)
 template < unsigned int DIM, typename TYPE >
 Image<DIM,TYPE>::~Image()
 {
-	this->m_data_ptr = NULL;
+//	this->m_data_ptr = NULL;
 }
 
 /*
@@ -318,7 +318,58 @@ bool Image<DIM,TYPE>::load(const unsigned char *ptr, unsigned int w, unsigned in
 
 
 
-#ifdef WITH_QT
+#ifndef WITH_QT
+
+template < unsigned int DIM, typename TYPE >
+bool Image<DIM,TYPE>::load(const std::string& filename)
+{
+	CGoGN_STATIC_ASSERT(DIM==2, incompatible_image_dimension);
+	CGoGN_STATIC_ASSERT(sizeof(TYPE)==3, incompatible_image_type_loading);
+
+	ilInit();
+	ilEnable(IL_ORIGIN_SET);
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	ILuint imgName;
+	ilGenImages(1,&imgName);
+	ilBindImage(imgName);
+	ilLoadImage(filename.c_str());
+
+	ILuint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
+
+	if (bpp != sizeof(TYPE))
+	{
+		CGoGNerr << "wrong image (" << filename << ") bpp"<< CGoGNendl;
+		ilDeleteImage(imgName);
+		return false;
+	}
+
+	this->m_size[0] = ilGetInteger(IL_IMAGE_WIDTH);
+	this->m_size[1] = ilGetInteger(IL_IMAGE_HEIGHT);
+	this->computeSub();
+
+	this->m_data_ptr = new TYPE[ptr->width()*ptr->height()];
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(this->m_data_ptr);
+
+	for (int i=this->m_size[1]-1; i>=0; --i)
+	{
+		ilCopyPixels(0, i, 0, this->m_size[0],1, 1, IL_RGB, IL_UNSIGNED_BYTE, ptr);
+		ptr += 3*w;
+	}
+	ilDeleteImage(imgName);
+
+	return true;
+}
+
+template < unsigned int DIM, typename TYPE >
+void Image<DIM,TYPE>::save(const std::string& /*filename*/)
+{
+	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
+
+	CGoGNerr << "Save image not implemented" << CGoGNendl;
+}
+
+
+#else
 template < unsigned int DIM, typename TYPE >
 bool Image<DIM,TYPE>::load(const std::string& filename)
 {
@@ -338,8 +389,9 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 	// compatible TYPE
 	if (bpp < sizeof(TYPE))
 	{
-		CGoGNout << "Image::load incompatible type: bbp=" << bpp << CGoGNendl;
-		CGoGNout << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
+		CGoGNerr << "Image::load incompatible type: bbp=" << bpp << CGoGNendl;
+
+		CGoGNerr << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
 		delete ptr;
 		return false;
 	}
@@ -356,7 +408,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 			this->m_data_ptr = new TYPE[3*img.width()*img.height()];
 			//copy per line for alignment
 			TYPE* ptrOut = this->m_data_ptr;
-			for(int i=img.height()-1; i>0; --i)
+			for(int i=img.height()-1; i>=0; --i)
 			{
 				memcpy(ptrOut, img.scanLine(i), 3*img.width());
 				ptrOut += img.width(); // not *3 because type is size of 3
@@ -368,7 +420,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 			this->m_data_ptr = new TYPE[img.width()*img.height()];
 			//copy per line for alignment
 			TYPE* ptrOut = this->m_data_ptr;
-			for(int i=img.height()-1; i>0; --i)
+			for(int i=img.height()-1; i>=0; --i)
 			{
 				memcpy(ptrOut, img.scanLine(i), img.width());
 				ptrOut += img.width();
@@ -380,7 +432,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 		this->m_data_ptr = new TYPE[ptr->width()*ptr->height()];
 		TYPE* ptrOut = this->m_data_ptr;
 		//copy per line for alignment
-		for(int i=ptr->height()-1; i>0; --i)
+		for(int i=ptr->height()-1; i>=0; --i)
 		{
 			memcpy(ptrOut, ptr->scanLine(i), ptr->width()*bpp);
 			ptrOut += ptr->width();
@@ -549,11 +601,44 @@ Image<DIM,TYPE>* Image<DIM,TYPE>::scaleNearestToNewImage(const COORD& newSize)
 template < unsigned int DIM, typename TYPE >
 void Image<DIM,TYPE>::scaleNearest(const COORD& newSize)
 {
-	Image<DIM,TYPE>* newImg = scaleNearestToNewImage(newSize);
-	swap(*newImg);
-	delete newImg;
+	if (newSize != this->m_size)
+	{
+		Image<DIM,TYPE>* newImg = scaleNearestToNewImage(newSize);
+		this->swap(*newImg);
+		delete newImg;
+	}
 }
 
+
+template < unsigned int DIM, typename TYPE >
+typename Image<DIM,TYPE>::COORD Image<DIM,TYPE>::newMaxSize(unsigned int maxSize)
+{
+	unsigned int currentMax=0;
+	double sf = 1.0;
+
+	for (unsigned int d=0; d<DIM; ++d)
+	{
+		if (this->m_size[d] > maxSize)
+		{
+			currentMax = this->m_size[d];
+			sf = double(maxSize) / double(currentMax);
+		}
+	}
+
+	COORD nc;
+	// ensure width of image (texture) is numultiple of 4
+	nc[0] = (unsigned int)(this->m_size[0]*sf);
+	if (nc[0]%4)
+	{
+		nc[0] = (nc[0]/4)*4;
+		sf = double(nc[0])/double(this->m_size[0]);
+	}
+
+	for (unsigned int d=1; d<DIM; ++d)
+		nc[d] = (unsigned int)(this->m_size[d]*sf);
+
+	return nc;
+}
 
 template < unsigned int DIM, typename TYPE >
 template <typename TYPEDOUBLE>
@@ -1003,13 +1088,14 @@ template < unsigned int DIM, typename TYPE >
 void Texture<DIM,TYPE>::update()
 {
 	glBindTexture(m_target, *m_id);
-	checkAlignment();
+//	checkAlignment();
 	switch(DIM)
 	{
 	case 1:
 		glTexImage1D(m_target, 0, internalFormat(), this->m_size[0], 0, format(), m_type, this->m_data_ptr);
 		break;
 	case 2:
+			std::cout << "updateSize: " << this->m_size[0] << " / " << this->m_size[1] << std::endl;
 		glTexImage2D(m_target, 0, internalFormat(), this->m_size[0], this->m_size[1], 0, format(), m_type, this->m_data_ptr);
 		break;
 	case 3:
