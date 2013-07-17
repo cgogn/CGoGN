@@ -267,7 +267,7 @@ public:
 	//! Merge two volumes along their common oriented face
 	/*! @param d a dart of common face
 	 */
-	virtual bool mergeVolumes(Dart d);
+	virtual bool mergeVolumes(Dart d, bool deleteFace = true);
 
 	virtual bool mergeVolumes(Dart /*d*/, Dart /*e*/) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
 
@@ -276,6 +276,11 @@ public:
 	/*! @param vd a vector of darts
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
+
+
+	//! Split a volume into two volumes along a edge path and add the given face between
+	virtual void splitVolumeWithFace(std::vector<Dart>& vd, Dart d);
+
 
 	//! Collapse a volume (that is deleted) possibly merging its vertices
 	/*! \warning
