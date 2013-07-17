@@ -89,6 +89,12 @@ public:
 
 	void swapEdges(Dart d, Dart e);
 
+
+    Dart swap2To2(Dart d);
+    void swap4To4(Dart d);
+	Dart swap2To3(Dart d);
+	void swapGen3To2(Dart d);
+
 	/*! @name Level creation
 	 *
 	 *************************************************************************/
@@ -109,6 +115,8 @@ public:
 	void addNewLevel();
 
 	void addNewLevelSqrt3(bool embedNewVertices = false);
+
+	void addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typename PFP::VEC3> position);
 
 	//!
 	/*

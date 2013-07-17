@@ -564,6 +564,36 @@ public:
 	}
 } ;
 
+
+//template <typename PFP>
+//bool isDartOfFaceAtLevel(typename PFP::MAP map, Dart d, unsigned int level)
+//{
+//	unsigned int cur = map.getCurrentLevel();
+//	map.setCurrentLevel(level);
+////	TraversorDartsOfOrbit<typename PFP::MAP, FACE> to(map,d);
+////	for (Dart dit = to.begin(); dit != to.end(); dit = to.next())
+////	{
+////		if(d == dit)
+////		{
+////			map.setCurrentLevel(cur);
+////			return true;
+////		}
+////	}
+//	Dart dit = d;
+//	do
+//	{
+//		if(d == dit)
+//		{
+//			map.setCurrentLevel(cur);
+//			return true;
+//		}
+//		dit = map.phi1(dit);
+//	}while(dit != d);
+
+//	map.setCurrentLevel(cur);
+//	return false;
+//}
+
 template <typename PFP>
 class LerpSqrt3VolumeSynthesisFilter : public Algo::MR::Filter
 {
@@ -575,21 +605,115 @@ public:
 	LerpSqrt3VolumeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
+	Dart findDartOfCentralVertex(Dart d)
+	{
+		Dart olddart = NIL;
+		TraversorDartsOfOrbit<typename PFP::MAP, VOLUME> to(m_map,d);
+		for(Dart dit = to.begin() ; (olddart == NIL) && (dit != to.end()) ; dit = to.next())
+		{
+			m_map.incCurrentLevel();
+			unsigned int emb = m_map.template getEmbedding<VERTEX>(dit);
+			m_map.decCurrentLevel();
+			if(!m_map.isBoundaryMarked3(m_map.phi3(dit)))
+			{
+				if(emb == EMBNULL)
+					olddart = dit;
+			}
+		}
+
+		std::cout << "findDartOfCentralVertex = " << olddart << std::endl;
+		return olddart;
+	}
+
 	void operator() ()
 	{
+//		m_map.incCurrentLevel() ;
+
+//		unsigned int cur = m_map.getCurrentLevel();
+
+//		TraversorV<typename PFP::MAP> trav(m_map) ;
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		{
+//			if(!m_map.isBoundaryVertex(d))
+//			{
+//				std::cout << "sommet" << std::endl;
+
+//				//search an old dart
+//				Dart olddart = NIL;
+//				TraversorDartsOfOrbit<typename PFP::MAP, VERTEX> to(m_map,d);
+//				for(Dart dit = to.begin() ; (olddart == NIL) && (dit != to.end()) ; dit = to.next())
+//				{
+//					if(m_map.getDartLevel(dit) == (cur - 1)) && isDartOfFaceAtLevel<PFP>(m_map,dit, cur-1))
+//					{
+//						olddart = dit;
+//					}
+//				}
+
+//				if(olddart != NIL)
+//				{
+//					std::cout << "olddart = " << olddart << std::endl;
+
+//					m_map.decCurrentLevel();
+//					typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, olddart, m_position);
+//					m_map.incCurrentLevel() ;
+//					m_position[d] = p;
+//				}
+//			}
+//		}
+//		m_map.decCurrentLevel() ;
+
+
+
+
+
+//		TraversorW<typename PFP::MAP> trav(m_map) ;
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		{
+
+//			typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d , m_position);
+
+//			m_map.incCurrentLevel() ;
+
+//			Dart midV = m_map.phi_1(m_map.phi2(d));
+//			m_position[midV] = p;
+//			//m_position[d] = p;
+
+//			m_map.decCurrentLevel() ;
+//		}
+
+
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
+			Dart dit = d;
+
+			if(m_map.isBoundaryVolume(d))
+			{
+				dit = findDartOfCentralVertex(d);
+			}
+
 			typename PFP::VEC3 p = Algo::Surface::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
+			//Dart midV = m_map.phi1(dit);
+
 			m_map.incCurrentLevel() ;
-
-            Dart midV = m_map.phi_1(m_map.phi2(d));
-            //Dart midV = m_map.phi_1(d);
-			m_position[midV] = p;
-
+			m_position[dit] = p;
 			m_map.decCurrentLevel() ;
 		}
+
+		TraversorF<typename PFP::MAP> tf(m_map);
+		for(Dart dit = tf.begin() ; dit != tf.end() ; dit = tf.next())
+		{
+			if(m_map.isBoundaryFace(dit))
+			{
+				typename PFP::VEC3 p = Algo::Surface::Geometry::faceCentroid<PFP>(m_map, dit, m_position);
+				m_map.incCurrentLevel();
+				Dart midF = m_map.phi_1(dit);
+				m_position[midF] = p;
+				m_map.decCurrentLevel();
+			}
+		}
+
 	}
 } ;
 

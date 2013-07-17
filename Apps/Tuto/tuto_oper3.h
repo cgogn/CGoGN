@@ -27,7 +27,7 @@
 
 //#define USE_GMAP
 
-#define PRIMAL_TOPO 1
+//#define PRIMAL_TOPO 1
 
 #include "Topology/generic/parameters.h"
 

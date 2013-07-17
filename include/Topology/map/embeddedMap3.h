@@ -112,12 +112,16 @@ public:
 	//!
 	/*!
 	 */
-	virtual bool mergeVolumes(Dart d);
+	virtual bool mergeVolumes(Dart d, bool deleteFace = true);
 
 	//!
 	/*!
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
+
+	//!
+	virtual void splitVolumeWithFace(std::vector<Dart>& vd, Dart d);
+
 
 	//!
 	/*!

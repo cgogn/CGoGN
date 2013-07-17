@@ -356,7 +356,7 @@ void MyQT::cb_redraw()
 
     m_render_topo->drawTopo();
 
-    //	m_render_topo_boundary->drawTopo();
+        m_render_topo_boundary->drawTopo();
 
     glDisable( GL_POLYGON_OFFSET_FILL );
 
