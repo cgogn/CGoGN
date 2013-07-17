@@ -29,9 +29,17 @@ namespace CGoGN
 {
 
 
-inline DartContainerBrowserSelector::DartContainerBrowserSelector(AttribMap& m, const FunctorSelect& fs)
+inline DartContainerBrowserSelector::DartContainerBrowserSelector(AttribMap& m, const FunctorSelect& fs):
+	m_map(m)
 {
-	m_cont = &(m.getAttributeContainer<DART>());
+	if (GenericMap::isMultiRes())
+	{
+		m_cont = &(m.getMRAttributeContainer());
+	}
+	else
+	{
+		m_cont = &(m.getAttributeContainer<DART>());
+	}
 	m_selector = fs.copy();
 }
 
@@ -42,11 +50,20 @@ inline DartContainerBrowserSelector::~DartContainerBrowserSelector()
 
 inline unsigned int DartContainerBrowserSelector::begin() const
 {
-	unsigned int it = m_cont->realBegin() ;
-	while ( (it != m_cont->realEnd()) && !m_selector->operator()(Dart(it)) )
-		m_cont->realNext(it);
-
-	return it;
+	if (GenericMap::isMultiRes())
+	{
+		unsigned int it = m_cont->realBegin() ;
+		while ( (it != m_cont->realEnd()) && !m_selector->operator()(m_map.indexDart(it)) )
+			m_cont->realNext(it);
+		return it;
+	}
+	else
+	{
+		unsigned int it = m_cont->realBegin() ;
+		while ( (it != m_cont->realEnd()) && !m_selector->operator()(Dart(it)) )
+			m_cont->realNext(it);
+		return it;
+	}
 }
 
 inline unsigned int DartContainerBrowserSelector::end() const

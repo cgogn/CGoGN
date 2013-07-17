@@ -321,6 +321,16 @@ public:
 	unsigned int dartIndex(Dart d) const;
 
 	/**
+	 * get the Dart of index in topological table
+	 */
+	Dart indexDart(unsigned int index) const;
+
+	/**
+	 * @brief are we in MR ?
+	 */
+	static bool isMultiRes() { return m_isMultiRes; }
+
+	/**
 	 * get the insertion level of a dart (use only in MRMaps)
 	 */
 	unsigned int getDartLevel(Dart d) const ;
