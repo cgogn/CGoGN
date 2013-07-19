@@ -41,7 +41,7 @@ namespace Import
 
 template <typename PFP>
 OBJModel<PFP>::OBJModel(typename PFP::MAP& map):
-	m_map(map),
+	m_map(map), m_maxTextureSize(2048),
 	m_tagV(0),m_tagVT(0),m_tagVN(0),m_tagG(0),m_tagF(0),
 	m_specialVertices(map),m_dirtyEdges(map)
 {
@@ -55,11 +55,22 @@ OBJModel<PFP>::~OBJModel()
 		delete *it;
 }
 
+
+
+
+template <typename PFP>
+inline void OBJModel<PFP>::setMaxTextureSize(unsigned int mts)
+{
+	m_maxTextureSize = mts;
+}
+
+
 template <typename PFP>
 inline typename PFP::VEC3 OBJModel<PFP>::getPosition(Dart d)
 {
 	return m_positions[d];
 }
+
 
 
 template <typename PFP>
@@ -105,7 +116,7 @@ void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f>texcoord)
 
 
 template <typename PFP>
-void OBJModel<PFP>::readMaterials(unsigned int /*maxTextureSize*/, const std::string& filename)
+void OBJModel<PFP>::readMaterials(const std::string& filename)
 {
 	m_materials.reserve(m_materialNames.size());
 
@@ -211,7 +222,7 @@ void OBJModel<PFP>::readMaterials(unsigned int /*maxTextureSize*/, const std::st
 
 					currentMat->textureDiffuse->load(m_matPath+tname);
 					CGoGNout << "Loading texture "<< m_matPath+tname << " -> "<<std::hex << currentMat->textureDiffuse <<std::dec<<CGoGNendl;
-//					currentMat->textureDiffuse->scaleNearest( currentMat->textureDiffuse->newMaxSize(maxTextureSize));
+					currentMat->textureDiffuse->scaleNearest( currentMat->textureDiffuse->newMaxSize(m_maxTextureSize));
 					currentMat->textureDiffuse->setFiltering(GL_LINEAR);
 					currentMat->textureDiffuse->setWrapping(GL_REPEAT);
 					currentMat->textureDiffuse->update();
@@ -231,6 +242,7 @@ void OBJModel<PFP>::readMaterials(unsigned int /*maxTextureSize*/, const std::st
 						tname = tname.substr(0,tname.length()-1);
 					currentMat->textureDiffuse->load(m_matPath+tname);
 					CGoGNout << "Loading texture "<< m_matPath+tname << " -> "<<std::hex << currentMat->textureDiffuse <<std::dec<<CGoGNendl;
+					currentMat->textureDiffuse->scaleNearest( currentMat->textureDiffuse->newMaxSize(m_maxTextureSize));
 					currentMat->textureDiffuse->setFiltering(GL_LINEAR);
 					currentMat->textureDiffuse->setWrapping(GL_REPEAT);
 					currentMat->textureDiffuse->update();

@@ -93,6 +93,8 @@ protected:
 	std::vector<unsigned int> m_beginIndices;
 	std::vector<unsigned int> m_nbIndices;
 
+	unsigned int m_maxTextureSize;
+
 	/// vector of group name
 //	std::vector<std::string> m_groupNames;
 //	std::vector<std::string> m_groupMaterialNames;
@@ -148,6 +150,12 @@ public:
 	OBJModel(typename PFP::MAP& map);
 
 	~OBJModel();
+
+	/**
+	 * @brief resize texture (at import) to max size
+	 * @param mts max texture size in x & y
+	 */
+	void setMaxTextureSize(unsigned int mts);
 
 	/**
 	 * @brief set position attribute
@@ -231,7 +239,7 @@ public:
 	 * @brief read materials from files. Call after creating VBOs !!
 	 * @param filename name of file
 	 */
-	void readMaterials(unsigned int maxTextureSize=2048, const std::string& filename="");
+	void readMaterials(const std::string& filename="");
 
 	/**
 	 * @brief getMaterials
