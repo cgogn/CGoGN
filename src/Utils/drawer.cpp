@@ -261,62 +261,72 @@ void Drawer::toSVG(Utils::SVG::SVGOut& svg)
 	const Geom::Vec3f* ptrP = reinterpret_cast<Geom::Vec3f*>(m_vboPos->lockPtr());
 	const Geom::Vec3f* ptrC = reinterpret_cast<Geom::Vec3f*>(m_vboCol->lockPtr());
 
+	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("points", svg.m_model, svg.m_proj);
+	Utils::SVG::SvgGroup* svg2 = new Utils::SVG::SvgGroup("lines", svg.m_model, svg.m_proj);
+	Utils::SVG::SvgGroup* svg3 = new Utils::SVG::SvgGroup("faces", svg.m_model, svg.m_proj);
+
 	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
 	{
-		svg.setWidth(pp->width);
+		svg1->setWidth(pp->width);
 		if (pp->mode == GL_POINTS)
 		{
 			unsigned int end = pp->begin + pp->nb;
-			svg.beginPoints();
+			svg1->beginPoints();
 			for (unsigned int i=pp->begin; i<end; ++i)
-				svg.addPoint(ptrP[i], ptrC[i]);
-			svg.endPoints();
+				svg1->addPoint(ptrP[i], ptrC[i]);
+			svg1->endPoints();
 		}
 
+		svg2->setWidth(pp->width);
 		if (pp->mode == GL_LINES)
 		{
 			unsigned int end = pp->begin + pp->nb;
-			svg.beginLines();
+			svg2->beginLines();
 			for (unsigned int i=pp->begin; i<end; i+=2)
-				svg.addLine(ptrP[i], ptrP[i+1], ptrC[i]);
-			svg.endLines();
+				svg2->addLine(ptrP[i], ptrP[i+1], ptrC[i]);
+			svg2->endLines();
 		}
 
+		svg3->setWidth(pp->width);
 		if ((pp->mode == GL_LINE_LOOP) || (pp->mode == GL_POLYGON))
 		{
 			unsigned int end = pp->begin + pp->nb-1;
-			svg.beginLines();
+			svg3->beginLines();
 			for (unsigned int i=pp->begin; i<=end; ++i)
-				svg.addLine(ptrP[i], ptrP[i+1], ptrC[i]);
-			svg.addLine(ptrP[end], ptrP[pp->begin], ptrC[end]);
-			svg.endLines();
+				svg3->addLine(ptrP[i], ptrP[i+1], ptrC[i]);
+			svg3->addLine(ptrP[end], ptrP[pp->begin], ptrC[end]);
+			svg3->endLines();
 		}
 		if (pp->mode == GL_TRIANGLES)
 		{
 			unsigned int end = pp->begin + pp->nb;
-			svg.beginLines();
+			svg3->beginLines();
 			for (unsigned int i=pp->begin; i<end; i+=3)
 			{
-				svg.addLine(ptrP[i],   ptrP[i+1], ptrC[i]);
-				svg.addLine(ptrP[i+1], ptrP[i+2], ptrC[i+1]);
-				svg.addLine(ptrP[i+2], ptrP[i],   ptrC[i+2]);
+				svg3->addLine(ptrP[i],   ptrP[i+1], ptrC[i]);
+				svg3->addLine(ptrP[i+1], ptrP[i+2], ptrC[i+1]);
+				svg3->addLine(ptrP[i+2], ptrP[i],   ptrC[i+2]);
 			}
-			svg.endLines();
+			svg3->endLines();
 		}
 		if (pp->mode == GL_QUADS)
 		{
 			unsigned int end = pp->begin + pp->nb;
-			svg.beginLines();
+			svg3->beginLines();
 			for (unsigned int i=pp->begin; i<end; i+=4)
 			{
-				svg.addLine(ptrP[i],   ptrP[i+1], ptrC[i]);
-				svg.addLine(ptrP[i+1], ptrP[i+2], ptrC[i+1]);
-				svg.addLine(ptrP[i+2], ptrP[i+3], ptrC[i+2]);
-				svg.addLine(ptrP[i+3], ptrP[i],   ptrC[i+3]);
+				svg3->addLine(ptrP[i],   ptrP[i+1], ptrC[i]);
+				svg3->addLine(ptrP[i+1], ptrP[i+2], ptrC[i+1]);
+				svg3->addLine(ptrP[i+2], ptrP[i+3], ptrC[i+2]);
+				svg3->addLine(ptrP[i+3], ptrP[i],   ptrC[i+3]);
 			}
-			svg.endLines();
+			svg3->endLines();
 		}
 	}
+
+	svg.addGroup(svg1);
+	svg.addGroup(svg2);
+	svg.addGroup(svg3);
 
 	m_vboPos->releasePtr();
 	m_vboCol->releasePtr();

@@ -56,8 +56,12 @@ MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 
 void ImportVolumePlugin::importFromFileDialog()
 {
-	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.node *.ts *.off *.tet)");
-	importFromFile(fileName);
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_window, "Import volumes", m_window->getAppPath(), "Volume mesh Files (*.node *.ts *.off *.tet)");
+	QStringList::Iterator it = fileNames.begin();
+	while(it != fileNames.end()) {
+		importFromFile(*it);
+		++it;
+	}
 }
 
 #ifndef DEBUG

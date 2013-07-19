@@ -49,14 +49,6 @@ namespace Primal
 namespace Regular
 {
 
-enum FilteringType
-{
-	F_HighPass = 0,
-	F_LowPass,
-	F_BandPass,
-	F_None
-} ;
-
 template <typename PFP>
 class Map2MR
 {
@@ -69,10 +61,6 @@ protected:
 
 	std::vector<Algo::MR::Filter*> synthesisFilters ;
 	std::vector<Algo::MR::Filter*> analysisFilters ;
-
-	FilteringType filter;
-	unsigned int thresholdLow;
-	unsigned int thresholdHigh;
 
 public:
 	Map2MR(MAP& map);
@@ -94,12 +82,6 @@ public:
 
 	void analysis() ;
 	void synthesis() ;
-
-	void lowPassFiltering(unsigned int cutoff) { thresholdHigh = cutoff; filter = F_LowPass; }
-	void highPassFiltering(unsigned int cutoff) { thresholdLow = cutoff; filter = F_HighPass; }
-	void bandPassFiltering(unsigned int cutoffLow, unsigned int cutoffHigh) { thresholdLow = cutoffLow; thresholdHigh = cutoffHigh; filter = F_BandPass; }
-	void resetFiltering() { thresholdLow = 0; thresholdHigh = 0; filter = F_None; }
-
 } ;
 
 } // namespace Regular

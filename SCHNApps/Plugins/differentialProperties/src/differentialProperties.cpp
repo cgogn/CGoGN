@@ -49,8 +49,19 @@ void DifferentialPropertiesPlugin::attributeModified(unsigned int orbit, QString
 		if(computeNormalLastParameters.contains(map->getName()))
 		{
 			ComputeNormalParameters& params = computeNormalLastParameters[map->getName()];
-			if(params.positionName == nameAttr && params.autoUpdate)
-				computeNormal(map->getName(), params.positionName, params.normalName);
+			if(params.autoUpdate && params.positionName == nameAttr)
+				computeNormal(map->getName(), params.positionName, params.normalName, true);
+		}
+		if(computeCurvatureLastParameters.contains(map->getName()))
+		{
+			ComputeCurvatureParameters& params = computeCurvatureLastParameters[map->getName()];
+			if(params.autoUpdate && (params.positionName == nameAttr || params.normalName == nameAttr))
+				computeCurvature(
+					map->getName(),
+					params.positionName, params.normalName,
+					params.KmaxName, params.kmaxName, params.KminName, params.kminName, params.KnormalName,
+					true
+				);
 		}
 	}
 }
@@ -175,6 +186,8 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	const QString& KminAttributeName,
 	const QString& kminAttributeName,
 	const QString& KnormalAttributeName,
+	bool compute_kmean,
+	bool compute_kgaussian,
 	bool autoUpdate)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
@@ -215,13 +228,13 @@ void DifferentialPropertiesPlugin::computeCurvature(
 
 	PFP2::MAP* map = mh->getMap();
 	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, position, edgeAngle);
-	Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP2>(*map, 0.02f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
+	Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP2>(*map, 0.01f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
 
 	computeCurvatureLastParameters[mapName] =
 		ComputeCurvatureParameters(
 			positionAttributeName, normalAttributeName,
 			KmaxAttributeName, kmaxAttributeName, KminAttributeName, kminAttributeName, KnormalAttributeName,
-			autoUpdate);
+			compute_kmean, compute_kgaussian, autoUpdate);
 
 	mh->createVBO(Kmax);
 	mh->createVBO(kmax);
@@ -234,6 +247,32 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	mh->notifyAttributeModification(Kmin);
 	mh->notifyAttributeModification(kmin);
 	mh->notifyAttributeModification(Knormal);
+
+	if(compute_kmean)
+	{
+		VertexAttribute<PFP2::REAL> kmean = mh->getAttribute<PFP2::REAL, VERTEX>("kmean");
+		if(!kmean.isValid())
+			kmean = mh->addAttribute<PFP2::REAL, VERTEX>("kmean");
+
+		for(unsigned int i = kmin.begin(); i != kmin.end(); kmin.next(i))
+			kmean[i] = (kmin[i] + kmax[i]) / 2.0;
+
+		mh->createVBO(kmean);
+		mh->notifyAttributeModification(kmean);
+	}
+
+	if(compute_kgaussian)
+	{
+		VertexAttribute<PFP2::REAL> kgaussian = mh->getAttribute<PFP2::REAL, VERTEX>("kgaussian");
+		if(!kgaussian.isValid())
+			kgaussian = mh->addAttribute<PFP2::REAL, VERTEX>("kgaussian");
+
+		for(unsigned int i = kmin.begin(); i != kmin.end(); kmin.next(i))
+			kgaussian[i] = kmin[i] * kmax[i];
+
+		mh->createVBO(kgaussian);
+		mh->notifyAttributeModification(kgaussian);
+	}
 }
 
 #ifndef DEBUG

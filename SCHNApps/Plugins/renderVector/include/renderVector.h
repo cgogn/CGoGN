@@ -31,7 +31,7 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
 };
 
@@ -76,10 +76,13 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
-	void vboAdded(Utils::VBO* vbo);
-	void vboRemoved(Utils::VBO* vbo);
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+public slots:
+	void changeSelectedMap(View* view, MapHandlerGen* map);
+
 	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeSelectedVectorsVBO(View* view, MapHandlerGen* map, const std::vector<Utils::VBO*>& vbos, bool fromUI = false);
 	void changeVectorsScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);

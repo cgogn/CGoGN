@@ -39,7 +39,7 @@ void RenderDockTab::refreshUI(ParameterSet* params)
 
 	MapHandlerGen* map = params->selectedMap;
 
-	QHash<QString, PerMapParameterSet>::const_iterator i = params->perMap.constBegin();
+	QHash<QString, PerMapParameterSet*>::const_iterator i = params->perMap.constBegin();
 	while (i != params->perMap.constEnd())
 	{
 		mapList->addItem(i.key());
@@ -48,7 +48,7 @@ void RenderDockTab::refreshUI(ParameterSet* params)
 			QList<QListWidgetItem*> item = mapList->findItems(map->getName(), Qt::MatchExactly);
 			item[0]->setSelected(true);
 
-			PerMapParameterSet& p = params->perMap[map->getName()];
+			PerMapParameterSet* p = params->perMap[map->getName()];
 
 			QList<Utils::VBO*> vbos = map->getVBOList();
 			unsigned int j = 0;
@@ -57,23 +57,23 @@ void RenderDockTab::refreshUI(ParameterSet* params)
 				if(vbos[i]->dataSize() == 3)
 				{
 					combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
-					if(vbos[i] == p.positionVBO)
+					if(vbos[i] == p->positionVBO)
 						combo_positionVBO->setCurrentIndex(j);
 
 					combo_normalVBO->addItem(QString::fromStdString(vbos[i]->name()));
-					if(vbos[i] == p.normalVBO)
+					if(vbos[i] == p->normalVBO)
 						combo_normalVBO->setCurrentIndex(j);
 
 					++j;
 				}
 			}
 
-			check_renderVertices->setChecked(p.renderVertices);
-			slider_verticesScaleFactor->setSliderPosition(p.verticesScaleFactor * 50.0);
-			check_renderEdges->setChecked(p.renderEdges);
-			check_renderFaces->setChecked(p.renderFaces);
-			radio_flatShading->setChecked(p.faceStyle == FLAT);
-			radio_phongShading->setChecked(p.faceStyle == PHONG);
+			check_renderVertices->setChecked(p->renderVertices);
+			slider_verticesScaleFactor->setSliderPosition(p->verticesScaleFactor * 50.0);
+			check_renderEdges->setChecked(p->renderEdges);
+			check_renderFaces->setChecked(p->renderFaces);
+			radio_flatShading->setChecked(p->faceStyle == FLAT);
+			radio_phongShading->setChecked(p->faceStyle == PHONG);
 		}
 		++i;
 	}
@@ -87,25 +87,8 @@ void RenderDockTab::selectedMapChanged()
 	{
 		QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 		if(!currentItems.empty())
-			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()), true);
+			m_plugin->changeSelectedMap(m_window->getCurrentView(), m_window->getMap(currentItems[0]->text()));
 	}
-}
-
-void RenderDockTab::addVBOToList(QString name)
-{
-	combo_positionVBO->addItem(name);
-	combo_normalVBO->addItem(name);
-}
-
-void RenderDockTab::removeVBOFromList(QString name)
-{
-	int itemIdx = combo_positionVBO->findText(name, Qt::MatchExactly);
-	if(itemIdx != -1)
-		combo_positionVBO->removeItem(itemIdx);
-
-	itemIdx = combo_normalVBO->findText(name, Qt::MatchExactly);
-	if(itemIdx != -1)
-		combo_normalVBO->removeItem(itemIdx);
 }
 
 void RenderDockTab::positionVBOChanged(int index)
@@ -144,7 +127,7 @@ void RenderDockTab::verticesScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVerticesScaleFactor(view, map, i, true);
+		m_plugin->changeVerticesScaleFactor(view, map, i / 50.0, true);
 	}
 }
 
@@ -178,6 +161,16 @@ void RenderDockTab::faceStyleChanged(QAbstractButton* b)
 			m_plugin->changeFacesStyle(view, map, FLAT, true);
 		else if(radio_phongShading->isChecked())
 			m_plugin->changeFacesStyle(view, map, PHONG, true);
+	}
+}
+
+void RenderDockTab::addVBOToList(Utils::VBO* vbo)
+{
+	if(vbo->dataSize() == 3)
+	{
+		QString name = QString::fromStdString(vbo->name());
+		combo_positionVBO->addItem(name);
+		combo_normalVBO->addItem(name);
 	}
 }
 

@@ -35,91 +35,91 @@ namespace Utils {
 
 /**
  * Create a ref to a type from a ref from another type
- * No copy only casting. No need to used IN template parameter
+ * No copy only casting. No need to used T_IN template parameter
  * @param vec input ref
- * @ return a ref on same object with OUT type
+ * @ return a ref on same object with T_OUT type
  */
-template <typename OUT, typename IN>
-inline OUT& convertRef(IN& vec)
+template <typename T_OUT, typename T_IN>
+inline T_OUT& convertRef(T_IN& vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return *(reinterpret_cast<OUT*>(&vec));
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return *(reinterpret_cast<T_OUT*>(&vec));
 }
 
 /**
  * Create a const ref to a type from a const ref from another type
- * No copy only casting. No need to used IN template parameter
+ * No copy only casting. No need to used T_IN template parameter
  * @param vec input ref
- * @ return a ref on same object with OUT type
+ * @ return a ref on same object with T_OUT type
  */
-template <typename OUT, typename IN>
-inline const OUT& convertRef(const IN& vec)
+template <typename T_OUT, typename T_IN>
+inline const T_OUT& convertRef(const T_IN& vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return *(reinterpret_cast<const OUT*>(&vec));
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return *(reinterpret_cast<const T_OUT*>(&vec));
 }
 
 /**
  * Create a ptr of a type from a ptr of another type
  * Just a reinterpret cast in fact
  * @param vec input ptr
- * @return a ptr on same object with OUT type
+ * @return a ptr on same object with T_OUT type
  */
-template <typename OUT, typename IN>
-inline OUT* convertPtr(IN* vec)
+template <typename T_OUT, typename T_IN>
+inline T_OUT* convertPtr(T_IN* vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return reinterpret_cast<OUT*>(vec);
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return reinterpret_cast<T_OUT*>(vec);
 }
 
 /**
  * Create a const ptr of a type from a const ptr of another type
  * Just a reinterpret cast in fact
  * @param vec input ptr
- * @return a ptr on same object with OUT type
+ * @return a ptr on same object with T_OUT type
  */
-template <typename OUT, typename IN>
-inline const OUT* convertPtr(const IN* vec)
+template <typename T_OUT, typename T_IN>
+inline const T_OUT* convertPtr(const T_IN* vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return reinterpret_cast<const OUT*>(vec);
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return reinterpret_cast<const T_OUT*>(vec);
 }
 
 
 
 
-template <typename OUT, typename IN>
-inline std::vector<OUT>& convertVector(std::vector<IN>& vec)
+template <typename T_OUT, typename T_IN>
+inline std::vector<T_OUT>& convertVector(std::vector<T_IN>& vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return *(reinterpret_cast< std::vector<OUT>* >(&vec));
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return *(reinterpret_cast< std::vector<T_OUT>* >(&vec));
 }
 
 
-template <typename OUT, typename IN>
-inline const std::vector<OUT>& convertVector(const std::vector<IN>& vec)
+template <typename T_OUT, typename T_IN>
+inline const std::vector<T_OUT>& convertVector(const std::vector<T_IN>& vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return *(reinterpret_cast< const std::vector<OUT>* >(&vec));
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return *(reinterpret_cast< const std::vector<T_OUT>* >(&vec));
 }
 
 
 
 
 
-template <typename OUT, typename IN>
-inline const std::list<OUT>& convertList(const std::list<IN>& vec)
+template <typename T_OUT, typename T_IN>
+inline const std::list<T_OUT>& convertList(const std::list<T_IN>& vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return *(reinterpret_cast< const std::list<OUT>* >(&vec));
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return *(reinterpret_cast< const std::list<T_OUT>* >(&vec));
 }
 
 
-template <typename OUT, typename IN>
-inline std::list<OUT>& convertList(std::list<IN>& vec)
+template <typename T_OUT, typename T_IN>
+inline std::list<T_OUT>& convertList(std::list<T_IN>& vec)
 {
-	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
-	return *(reinterpret_cast< std::list<OUT>* >(&vec));
+	assert(sizeof(T_IN) == sizeof(T_OUT) || "incompatible size cast");
+	return *(reinterpret_cast< std::list<T_OUT>* >(&vec));
 }
 
 

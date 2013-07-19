@@ -163,15 +163,15 @@ void  MyQT::cb_Save()
 
 	Utils::SVG::SVGOut svg1(modelViewMatrix(), projectionMatrix());
 	m_drawer.toSVG(svg1);
-	svg1.addOpacityAnimation(1.0f);
-	svg1.addOpacityAnimation(1.0f);
-	svg1.addOpacityAnimation(0.0f);
+//	svg1.addOpacityAnimation(1.0f);
+//	svg1.addOpacityAnimation(1.0f);
+//	svg1.addOpacityAnimation(0.0f);
 
 	Utils::SVG::SVGOut svg2(modelViewMatrix(), projectionMatrix());
 	m_render_topo->toSVG(svg2);
-	svg2.addOpacityAnimation(1.0f);
-	svg2.addOpacityAnimation(0.0f);
-	svg2.addOpacityAnimation(1.0f);
+//	svg2.addOpacityAnimation(1.0f);
+//	svg2.addOpacityAnimation(0.0f);
+//	svg2.addOpacityAnimation(1.0f);
 
 	Utils::SVG::AnimatedSVGOut anim;
 

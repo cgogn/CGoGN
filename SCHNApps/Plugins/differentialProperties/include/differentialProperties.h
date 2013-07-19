@@ -62,6 +62,8 @@ public slots:
 		const QString& KminAttributeName = "Kmin",
 		const QString& kminAttributeName = "kmin",
 		const QString& KnormalAttributeName = "Knormal",
+		bool compute_kmean = true,
+		bool compute_kgaussian = true,
 		bool autoUpdate = true
 	);
 
@@ -90,10 +92,10 @@ private:
 		ComputeCurvatureParameters(
 			const QString& p, const QString& n,
 			const QString& Kmax, const QString& kmax, const QString& Kmin, const QString& kmin, const QString& Knormal,
-			bool update) :
+			bool kmean, bool kgaussian, bool update) :
 			positionName(p), normalName(n),
 			KmaxName(Kmax), kmaxName(kmax), KminName(Kmin), kminName(kmin), KnormalName(Knormal),
-			autoUpdate(update)
+			compute_kmean(kmean), compute_kgaussian(kgaussian), autoUpdate(update)
 		{}
 		QString positionName;
 		QString normalName;
@@ -102,6 +104,8 @@ private:
 		QString KminName;
 		QString kminName;
 		QString KnormalName;
+		bool compute_kmean;
+		bool compute_kgaussian;
 		bool autoUpdate;
 	};
 	QHash<QString, ComputeCurvatureParameters> computeCurvatureLastParameters;

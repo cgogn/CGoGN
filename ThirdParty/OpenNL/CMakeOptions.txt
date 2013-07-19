@@ -56,6 +56,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/OpenNL/CMakeModules)
 # underscores). If you got two underscores, remove the 
 # second one, make clean and re-make SuperLU.
 #SET(USE_SUPERLU TRUE)
+#find_package(SuperLU REQUIRED)
 
 # Edit these lines to match your installation
 #SET(SUPERLU_HOME /home/yourself/SuperLU_4.0 )

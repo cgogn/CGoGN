@@ -29,7 +29,10 @@ ComputeCurvatureDialog::ComputeCurvatureDialog(Window* w) :
 
 	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
 	foreach(MapHandlerGen* map, maps)
-		mapList->addItem(map->getName());
+	{
+		QListWidgetItem* item = new QListWidgetItem(map->getName(), mapList);
+		item->setCheckState(Qt::Unchecked);
+	}
 }
 
 void ComputeCurvatureDialog::selectedMapChanged()
@@ -106,7 +109,8 @@ void ComputeCurvatureDialog::selectedMapChanged()
 
 void ComputeCurvatureDialog::addMapToList(MapHandlerGen* m)
 {
-	mapList->addItem(m->getName());
+	QListWidgetItem* item = new QListWidgetItem(m->getName(), mapList);
+	item->setCheckState(Qt::Unchecked);
 }
 
 void ComputeCurvatureDialog::removeMapFromList(MapHandlerGen* m)

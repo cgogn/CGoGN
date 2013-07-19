@@ -49,7 +49,7 @@ struct ParameterSet
 	ParameterSet() : selectedMap(NULL)
 	{}
 
-	QHash<QString, PerMapParameterSet> perMap;
+	QHash<QString, PerMapParameterSet*> perMap;
 	MapHandlerGen* selectedMap;
 };
 
@@ -97,14 +97,21 @@ public slots:
 	void mapLinked(MapHandlerGen* m);
 	void mapUnlinked(MapHandlerGen* m);
 
+protected:
+	void addManagedMap(View *v, MapHandlerGen* m);
+	void removeManagedMap(View *v, MapHandlerGen* m);
+
+public slots:
+
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
-	void changeSelectedMap(View* view, MapHandlerGen* map, bool fromUI = false);
+	void changeSelectedMap(View* view, MapHandlerGen* map);
+
 	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeNormalVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeRenderVertices(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
-	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, int i, bool fromUI = false);
+	void changeVerticesScaleFactor(View* view, MapHandlerGen* map, float f, bool fromUI = false);
 	void changeRenderEdges(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
 	void changeRenderFaces(View* view, MapHandlerGen* map, bool b, bool fromUI = false);
 	void changeFacesStyle(View* view, MapHandlerGen* map, FaceShadingStyle style, bool fromUI = false);
