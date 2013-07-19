@@ -3,7 +3,10 @@ installer les paquets suivants:
 cmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 Pour compiler CGoGN:
+
+
 - aller dans ThirdParty, cd build, taper "cmake .", puis make ( avec -j x si vous avez x core sur votre machine) suivi de make install
+
 	On peut fixer certaines option pour ne pas tout compiler (cf le README.TXT dans ThirdParty)
 	On peut aussi compiler en debug en créant un répertoir qui fini par Debug à la place de build
 	
@@ -44,19 +47,28 @@ install the following packages:
 ccmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 To compile CGoGN:
-- Go ThirdParty, cd build, type "cmake .." and then make (with -j x if you have x core on your machine) followed by make install
-We can set some option to not compile everything (see the README.TXT in ThirdParty)
-You can also compile debug by creating a directory that ended Debug build instead
+  - first compile third-party libraries:
 
-- Go to build and type "cmake .." and then make
-	Options (Boolean) are also available here:
-	BUILD_SHARED_LIBS (F) experimental!
-	WITH_ASSIMP (T)
-	WITH_NUMERICAL (T)
-	WITH_ZINRI (T)
-	WITH_QT (T)
-	to minimize dependencies and compilation time /
-	
+	cd CGoGN/ThirdParty/build
+	cmake ..
+	make (-j x if you have x cores)
+	make install
+
+	Some options are available to not compile everything (see the README.TXT in ThirdParty)
+
+  - then compile CGoGN (the libs are generated in CGoGN/lib and some examples in CGoGN/bin):
+
+	cd CGoGN/build
+	cmake ..
+	make (-j x if you have x cores)
+
+	Some options are available:
+	BUILD_SHARED_LIBS  (F) experimental !
+	WITH_ASSIMP        (T)
+	WITH_NUMERICAL     (T)
+	WITH_ZINRI         (T)
+	WITH_QT	           (T)
+	to minimize dependencies and compilation time
 	FORCE_MR           (2)
 	allow the compilation in 3 mode: mixed(0), multi-resolution(1), mono-resolution(2).
 	

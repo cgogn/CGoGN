@@ -33,24 +33,26 @@
 
 #include "Utils/chrono.h"
 
+#include "Algo/Export/exportVol.h"
+
 
 PFP::MAP myMap;
 VertexAttribute<PFP::VEC3> position ;
 VolumeAttribute<PFP::VEC3> color ;
 
-void MyQT::volumes_onoff(bool x)
+void MyQT::volumes_onoff(bool /*x*/)
 {
 	render_volumes = !render_volumes;
 	updateGL();
 }
 
-void MyQT::edges_onoff(bool x)
+void MyQT::edges_onoff(bool /*x*/)
 {
 	render_edges = !render_edges;
 	updateGL();
 }
 
-void MyQT::topo_onoff(bool x)
+void MyQT::topo_onoff(bool /*x*/)
 {
 	render_topo = !render_topo;
 	if (render_topo)
@@ -88,7 +90,7 @@ void MyQT::clipping_onoff(bool x)
 	updateGL();
 }
 
-void MyQT::hide_onoff(bool x)
+void MyQT::hide_onoff(bool /*x*/)
 {
 	hide_clipping = !hide_clipping;
 	updateGL();
@@ -146,21 +148,21 @@ void MyQT::cb_Open()
 	size_t pos = filename.rfind(".");    // position of "." in filename
 	std::string extension = filename.substr(pos);
 
-	if(extension == std::string(".off"))
-	{
-		if(!Algo::Volume::Import::importMeshToExtrude<PFP>(myMap, filename, attrNames))
-		{
-			std::cerr << "could not import " << filename << std::endl ;
-			return ;
-		}
-		else
-		{
-			position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
-			myMap.closeMap();
-		}
-	}
-	else
-	{
+//	if(extension == std::string(".off"))
+//	{
+//		if(!Algo::Volume::Import::importMeshToExtrude<PFP>(myMap, filename, attrNames))
+//		{
+//			std::cerr << "could not import " << filename << std::endl ;
+//			return ;
+//		}
+//		else
+//		{
+//			position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
+//			myMap.closeMap();
+//		}
+//	}
+//	else
+//	{
 		if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
 			std::cerr << "could not import " << filename << std::endl ;
@@ -168,7 +170,7 @@ void MyQT::cb_Open()
 		}
 		else
 			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
-	}
+//	}
 
 	color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
 
@@ -270,7 +272,7 @@ void MyQT::cb_redraw()
 }
 
 
-void  MyQT::cb_mousePress(int button, int x, int y)
+void  MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
 	if (!Shift())
 		return;
@@ -299,7 +301,7 @@ void  MyQT::cb_mousePress(int button, int x, int y)
 	}
 }
 
-void  MyQT::cb_mouseRelease(int button, int x, int y)
+void  MyQT::cb_mouseRelease(int /*button*/, int /*x*/, int /*y*/)
 {
 
 	if (hide_clipping || !clip_volume)
@@ -418,6 +420,12 @@ int main(int argc, char **argv)
 			color[i][0] /= maxV;
 			color[i][2] = 1.0f - color[i][0];
 		}
+//		Algo::Volume::Export::exportNAS<PFP>(myMap,position,"/tmp/test2.nas");
+//		Algo::Volume::Export::exportMSH<PFP>(myMap,position,"/tmp/test2.msh");
+//		Algo::Volume::Export::exportTet<PFP>(myMap,position,"/tmp/test2.tet");
+//		Algo::Volume::Export::exportNodeEle<PFP>(myMap,position,"/tmp/test2");
+//		Algo::Volume::Export::exportVTU<PFP>(myMap,position,"/tmp/test4.vtu");
+
 	}
 	else
 	{
@@ -437,6 +445,9 @@ int main(int argc, char **argv)
 		TraversorW<PFP::MAP> tra(myMap);
 		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 			color[d] = position[d] + PFP::VEC3(0.5,0.5,0.5);
+//		Algo::Volume::Export::exportMSH<PFP>(myMap,position,"/tmp/test2.msh");
+//		Algo::Volume::Export::exportNAS<PFP>(myMap,position,"/tmp/test1.nas");
+//		Algo::Volume::Export::exportVTU<PFP>(myMap,position,"/tmp/test3.vtu");
 	}
     // un peu d'interface
 	QApplication app(argc, argv);

@@ -110,7 +110,8 @@ void TextureSticker::fullScreenTextureDepth(CGoGNGLuint texId, CGoGNGLuint dtexI
 	}
 
 	// Check if depth test is enabled
-	GLboolean wasDepthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
+
+//	GLboolean wasDepthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
 
 	// Disable depth test if it was enabled
 //	if (wasDepthTestEnabled == GL_TRUE)

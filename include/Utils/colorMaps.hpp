@@ -47,10 +47,10 @@ inline Geom::Vec3f color_map_blue_green_red(float x)
 	if (x < 0.5f)
 		return Geom::Vec3f(0.0f, 2.0f * x, 1.0f - 2.0f * x);
 
-	 if (x < 1.0f)
-		 return Geom::Vec3f(2.0f * x - 1.0f, 2.0f - 2.0f * x, 0.0f);
+	if (x < 1.0f)
+		return Geom::Vec3f(2.0f * x - 1.0f, 2.0f - 2.0f * x, 0.0f);
 
-	 return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
+	return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
 }
 
 inline Geom::Vec3f color_map_BCGYR(float x)
@@ -67,10 +67,10 @@ inline Geom::Vec3f color_map_BCGYR(float x)
 	if (x < 0.75f)
 		return Geom::Vec3f(4.0f * x - 2.0f, 1.0f, 0.0f);
 
-	 if (x < 1.0f)
-		 return Geom::Vec3f(1.0f, 4.0f - 4.0f * x, 0.0f);
+	if (x < 1.0f)
+		return Geom::Vec3f(1.0f, 4.0f - 4.0f * x, 0.0f);
 
-	 return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
+	return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
 }
 
 inline Geom::Vec3f color_map_blue_white_red(float x)
@@ -81,10 +81,10 @@ inline Geom::Vec3f color_map_blue_white_red(float x)
 	if (x < 0.5f)
 		return Geom::Vec3f(2.0f * x, 2.0f * x, 1.0f);
 
-	 if (x < 1.0f)
-		 return Geom::Vec3f(1.0f, 2.0f - 2.0f * x, 2.0f - 2.0f * x);
+	if (x < 1.0f)
+		return Geom::Vec3f(1.0f, 2.0f - 2.0f * x, 2.0f - 2.0f * x);
 
-	 return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
+	return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
 }
 
 inline Geom::Vec3f color_map_cyan_white_red(float x)
@@ -95,10 +95,10 @@ inline Geom::Vec3f color_map_cyan_white_red(float x)
 	if (x < 0.5f)
 		return Geom::Vec3f(2.0f * x, 1.0f , 1.0f);
 
-	 if (x < 1.0f)
-		 return Geom::Vec3f(1.0f, 2.0f - 2.0f * x, 2.0f - 2.0f * x);
+	if (x < 1.0f)
+		return Geom::Vec3f(1.0f, 2.0f - 2.0f * x, 2.0f - 2.0f * x);
 
-	 return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
+	return Geom::Vec3f(1.0f, 0.0f, 0.0f) ;
 }
 
 

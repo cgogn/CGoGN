@@ -44,6 +44,7 @@ protected:
 
 	CGoGNGLuint m_uniform_minValue;
 	CGoGNGLuint m_uniform_maxValue;
+	CGoGNGLuint m_uniform_colorMap;
 	CGoGNGLuint m_uniform_expansion;
 
 	VBO* m_vboPos;
@@ -51,6 +52,7 @@ protected:
 
 	float m_minValue;
 	float m_maxValue;
+	int m_colorMap;
 	int m_expansion;
 
 	void getLocations();
@@ -69,6 +71,8 @@ public:
 	void setMinValue(float f);
 
 	void setMaxValue(float f);
+
+	void setColorMap(int i);
 
 	void setExpansion(int i);
 };

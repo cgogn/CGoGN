@@ -86,33 +86,33 @@ void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typena
 template<typename PFP>
 void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
-	Map2& map = reinterpret_cast<Map2&>(mapx);
+	//Map2& map = reinterpret_cast<Map2&>(mapx);
 
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 	std::vector<Dart> vecDarts;
-	vecDarts.reserve(map.getNbDarts());  // no problem dart is int: no problem of memory
+	vecDarts.reserve(mapx.getNbDarts());  // no problem dart is int: no problem of memory
 
-	m_attIndex = map.template getAttribute<unsigned int, DART>("dart_index");
+	m_attIndex = mapx.template getAttribute<unsigned int, DART>("dart_index");
 
 	if (!m_attIndex.isValid())
-		m_attIndex  = map.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
 
-	for(Dart d = map.begin(); d!= map.end(); map.next(d))
+	for(Dart d = mapx.begin(); d!= mapx.end(); mapx.next(d))
 	{
-		if (withBoundary || !map.isBoundaryMarked2(d))
+		if (withBoundary || !mapx.isBoundaryMarked2(d))
 			vecDarts.push_back(d);
 
 	}
 	m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	DartAutoAttribute<VEC3> fv1(map);
+	DartAutoAttribute<VEC3> fv1(mapx);
 	// fin phi1
-	DartAutoAttribute<VEC3> fv11(map);
+	DartAutoAttribute<VEC3> fv11(mapx);
 	// phi2
-	DartAutoAttribute<VEC3> fv2(map);
+	DartAutoAttribute<VEC3> fv2(mapx);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -134,22 +134,23 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 
 	unsigned int indexDC=0;
 
-	DartMarker mf(map);
+	DartMarker mf(mapx);
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
 	{
 		Dart d = *id;
 		if (!mf.isMarked(d))
 		{
 			vecPos.clear();
-			if (!map.isBoundaryMarked2(d))
+			if (!mapx.isBoundaryMarked2(d))
 			{
-				VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+				//VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
+				VEC3 center = Algo::Surface::Geometry::faceCentroid<PFP>(mapx,d,positions);
 				float k = 1.0f - kf;
 				Dart dd = d;
 				do
 				{
 					vecPos.push_back(center*k + positions[dd]*kf);
-					dd = map.phi1(dd);
+					dd = mapx.phi1(dd);
 				} while (dd != d);
 
 
@@ -184,7 +185,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 					fv1[d] = f;
 					f = P*0.9f + Q*0.1f;
 					fv11[d] = f;
-					d = map.phi1(d);
+					d = mapx.phi1(d);
 				}
 				mf.markOrbit<FACE>(d);
 			}
@@ -199,11 +200,11 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 					VEC3 vd = Algo::Surface::Geometry::vectorOutOfDart<PFP>(mapx,ee,positions);
 					VEC3 v = vd ^ normal;
 					v.normalize();
-					VEC3 P = positions[map.phi1(ee)] + v* m_boundShift;
+					VEC3 P = positions[mapx.phi1(ee)] + v* m_boundShift;
 					vecPos.push_back(P);
-					dd = map.phi1(dd);
+					dd = mapx.phi1(dd);
 					ee = mapx.phi2(dd);
-					P = positions[map.phi1(ee)] + v* m_boundShift;
+					P = positions[mapx.phi1(ee)] + v* m_boundShift;
 					vecPos.push_back(P);
 				} while (dd != d);
 
@@ -227,7 +228,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 					fv1[d] = f;
 					f = P*0.9f + Q*0.1f;
 					fv11[d] = f;
-					d = map.phi1(d);
+					d = mapx.phi1(d);
 				}
 				mf.markOrbit<FACE>(d);
 			}
@@ -257,17 +258,17 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 	{
 		Dart d = *id;
 
-		Dart e = map.phi2(d);
+		Dart e = mapx.phi2(d);
 
 //		if (good(e) && (e.index > d.index))
-		if ( (withBoundary || !map.isBoundaryMarked2(e)) && (e.index > d.index))
+		if ( (withBoundary || !mapx.isBoundaryMarked2(e)) && (e.index > d.index))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
 			m_nbRel2++;
 		}
 
-		e = map.phi1(d);
+		e = mapx.phi1(d);
 		*positionF1++ = fv1[d];
 		*positionF1++ = fv11[e];
 	}

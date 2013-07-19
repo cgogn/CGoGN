@@ -501,6 +501,16 @@ public:
 	 */
 	REAL operator() (const std::vector<VEC3>& coefs) const ;
 
+
+	/*!
+	 * \brief method to evaluate the error for a given lightfield function
+	 *
+	 * \param coefs the given function
+	 *
+	 * \return the squared error per color channel
+	 */
+	VEC3 evalR3(const std::vector<VEC3>& coefs) const ;
+
 	/*!
 	 * \brief Write to stream operator
 	 *
@@ -591,7 +601,7 @@ private:
 	 *
 	 * \param coefs the given function
 	 *
-	 * \return the error
+	 * \return the norm of the squared error per color channel
 	 */
 	REAL evaluate(const std::vector<VEC3>& coefs) const ;
 

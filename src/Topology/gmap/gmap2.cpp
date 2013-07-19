@@ -803,7 +803,7 @@ bool GMap2::checkSimpleOrientedPath(std::vector<Dart>& vd)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread)
+bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart it = d;
 	do
@@ -815,7 +815,7 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int
  	return false;
 }
 
-bool GMap2::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int thread)
+bool GMap2::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d))
 		return true ;
@@ -826,7 +826,7 @@ bool GMap2::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int t
 	return false ;
 }
 
-bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
+bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d))
 		return true ;

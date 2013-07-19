@@ -12,6 +12,13 @@ namespace CGoGN
 namespace SCHNApps
 {
 
+enum ColorMap {
+	BlueWhiteRed = 0,
+	CyanWhiteRed = 1,
+	BlueCyanGreenYellowRed = 2,
+	BlueGreenRed = 3
+};
+
 struct PerMapParameterSet
 {
 	PerMapParameterSet() :
@@ -23,6 +30,7 @@ struct PerMapParameterSet
 	Utils::VBO* positionVBO;
 	Utils::VBO* scalarVBO;
 	float scalarMin, scalarMax;
+	int colorMap;
 	int expansion;
 };
 
@@ -85,6 +93,7 @@ public slots:
 
 	void changePositionVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
 	void changeScalarVBO(View* view, MapHandlerGen* map, Utils::VBO* vbo, bool fromUI = false);
+	void changeColorMap(View* view, MapHandlerGen* map, int c, bool fromUI = false);
 	void changeExpansion(View* view, MapHandlerGen* map, int i, bool fromUI = false);
 
 	void attributeModified(unsigned int orbit, QString nameAttr);

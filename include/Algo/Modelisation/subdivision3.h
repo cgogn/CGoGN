@@ -101,6 +101,9 @@ template <typename PFP>
 void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 template <typename PFP>
+void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
+template <typename PFP>
 void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 

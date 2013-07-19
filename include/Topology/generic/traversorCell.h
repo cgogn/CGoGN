@@ -95,11 +95,43 @@ public:
 } ;
 
 
+//template <typename MAP>
+//class TraversorV : public TraversorCell<MAP, VERTEX>
+//{
+//public:
+//	TraversorV(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, forceDartMarker, thread)
+//	{}
+//};
+
+//template <typename MAP>
+//class TraversorE : public TraversorCell<MAP, EDGE>
+//{
+//public:
+//	TraversorE(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, forceDartMarker, thread)
+//	{}
+//};
+
+//template <typename MAP>
+//class TraversorF : public TraversorCell<MAP, FACE>
+//{
+//public:
+//	TraversorF(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, forceDartMarker, thread)
+//	{}
+//};
+
+//template <typename MAP>
+//class TraversorW : public TraversorCell<MAP, VOLUME>
+//{
+//public:
+//	TraversorW(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, forceDartMarker, thread)
+//	{}
+//};
+
 template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, forceDartMarker, thread)
+	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, false, thread)
 	{}
 };
 
@@ -107,7 +139,7 @@ template <typename MAP>
 class TraversorE : public TraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, forceDartMarker, thread)
+	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, false, thread)
 	{}
 };
 
@@ -115,7 +147,7 @@ template <typename MAP>
 class TraversorF : public TraversorCell<MAP, FACE>
 {
 public:
-	TraversorF(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, forceDartMarker, thread)
+	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, false, thread)
 	{}
 };
 
@@ -123,7 +155,7 @@ template <typename MAP>
 class TraversorW : public TraversorCell<MAP, VOLUME>
 {
 public:
-	TraversorW(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, forceDartMarker, thread)
+	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, false, thread)
 	{}
 };
 

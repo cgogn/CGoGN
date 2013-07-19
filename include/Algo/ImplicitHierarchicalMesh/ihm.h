@@ -60,7 +60,21 @@ public:
 
 	static const unsigned int DIMENSION = 2 ;
 
-	void init() ;
+	//!
+	/*!
+	 *
+	 */
+	void update_topo_shortcuts();
+
+
+	void initImplicitProperties() ;
+
+	/**
+	 * clear the map
+	 * @param remove attrib remove attribute (not only clear the content)
+	 */
+	void clear(bool removeAttrib);
+
 
 	/***************************************************
 	 *             ATTRIBUTES MANAGEMENT               *
@@ -128,6 +142,7 @@ public:
 
 	void setDartLevel(Dart d, unsigned int i) ;
 
+
 	/***************************************************
 	 *             EDGE ID MANAGEMENT                  *
 	 ***************************************************/
@@ -145,6 +160,8 @@ public:
 	unsigned int getEdgeId(Dart d) ;
 
 	void setEdgeId(Dart d, unsigned int i) ;
+
+	unsigned int getMaxEdgeId();
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *

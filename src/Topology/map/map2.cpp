@@ -819,7 +819,7 @@ bool Map2::checkSimpleOrientedPath(std::vector<Dart>& vd)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d;
 	do
@@ -831,7 +831,7 @@ bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
  	return false;
 }
 
-bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread)
+bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int /*thread*/)
 {
 	if (fonct(d))
 		return true;

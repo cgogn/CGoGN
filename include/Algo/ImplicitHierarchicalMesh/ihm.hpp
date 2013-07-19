@@ -66,6 +66,17 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap::getAttribute(const std::
 	return AttributeHandler_IHM<T, ORBIT>(this, h.getDataVector()) ;
 }
 
+inline void ImplicitHierarchicalMap::update_topo_shortcuts()
+{
+	Map2::update_topo_shortcuts();
+	m_dartLevel = Map2::getAttribute<unsigned int, DART>("dartLevel") ;
+	m_edgeId = Map2::getAttribute<unsigned int, DART>("edgeId") ;
+
+	//AttributeContainer& cont = m_attribs[DART] ;
+	//m_nextLevelCell = cont.getDataVector<unsigned int>(cont.getAttributeIndex("nextLevelCell")) ;
+}
+
+
 /***************************************************
  *                 MAP TRAVERSAL                   *
  ***************************************************/
@@ -163,7 +174,7 @@ inline void ImplicitHierarchicalMap::next(Dart& d) const
 	} while(d != Map2::end() && m_dartLevel[d] > m_curLevel) ;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d;
 	do
@@ -175,7 +186,7 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_vertex(Dart d, FunctorType&
  	return false;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d))
 		return true;
@@ -187,7 +198,7 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_edge(Dart d, FunctorType& f
 		return false;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d ;
 	do
@@ -201,12 +212,12 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_face(Dart d, Funct
 
 inline bool ImplicitHierarchicalMap::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_face(d, f) ;
+	return foreach_dart_of_oriented_face(d, f,thread) ;
 }
 
 inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mark(*this);	// Lock a marker
+	DartMarkerStore mark(*this,thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
@@ -242,12 +253,12 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_volume(Dart d, Fun
 
 inline bool ImplicitHierarchicalMap::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f) ;
+	return foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
 inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f) ;
+	return foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
 /***************************************************
@@ -278,7 +289,6 @@ inline unsigned int ImplicitHierarchicalMap::getCurrentLevel()
 
 inline void ImplicitHierarchicalMap::setCurrentLevel(unsigned int l)
 {
-	assert(l >= 0 || !"Trying to set current level to a negative value") ;
 	m_curLevel = l ;
 }
 
@@ -314,6 +324,11 @@ inline unsigned int ImplicitHierarchicalMap::getEdgeId(Dart d)
 inline void ImplicitHierarchicalMap::setEdgeId(Dart d, unsigned int i)
 {
 	m_edgeId[d] = i ;
+}
+
+inline unsigned int ImplicitHierarchicalMap::getMaxEdgeId()
+{
+        return m_idCount;
 }
 
 /***************************************************

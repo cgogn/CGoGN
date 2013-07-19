@@ -38,21 +38,21 @@ MAP myMap;
 VertexAttribute<VEC3> position ;
 Dart dglobal;
 
-void MyQT::balls_onoff(bool x)
+void MyQT::balls_onoff(bool /*x*/)
 {
 	render_balls = !render_balls;
 	updateGL();
 	CGoGNerr << " balls_onoff  "<< CGoGNendl;
 }
 
-void MyQT::vectors_onoff(bool x)
+void MyQT::vectors_onoff(bool /*x*/)
 {
 	render_vectors = !render_vectors;
 	updateGL();
 	CGoGNerr << " vectors_onoff  "<< CGoGNflush;
 }
 
-void MyQT::text_onoff(bool x)
+void MyQT::text_onoff(bool /*x*/)
 {
 	render_text = !render_text;
 	updateGL();
@@ -60,7 +60,7 @@ void MyQT::text_onoff(bool x)
 }
 
 
-void MyQT::topo_onoff(bool x)
+void MyQT::topo_onoff(bool /*x*/)
 {
 	render_topo = !render_topo;
 	updateGL();
@@ -212,7 +212,7 @@ void MyQT::cb_redraw()
 	}
 }
 
-void MyQT::cb_mousePress(int button, int x, int y)
+void MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
 	if (Shift())
 	{
@@ -301,7 +301,7 @@ int main(int argc, char **argv)
 
 	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 
-//	CGoGNout.toStatusBar(NULL);
+    CGoGNout.noStatusBar();
 
 	//  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

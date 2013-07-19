@@ -295,7 +295,7 @@ inline bool GMap1::isCycleTriangle(Dart d)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap1::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+inline bool GMap1::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d)) return true;
 	Dart d1 = beta1(d);
@@ -303,7 +303,7 @@ inline bool GMap1::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int t
 	return false;
 }
 
-inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
+inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d)) return true;
 	Dart d1 = beta0(d);
@@ -311,7 +311,7 @@ inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thr
 	return false;
 }
 
-inline bool GMap1::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread)
+inline bool GMap1::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart it = d ;
 	do

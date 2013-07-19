@@ -518,6 +518,26 @@ QuadricHF<REAL>::evaluate(const std::vector<VEC3>& coefs) const
 }
 
 template <typename REAL>
+typename QuadricHF<REAL>::VEC3
+QuadricHF<REAL>::evalR3(const std::vector<VEC3>& coefs) const
+{
+	VEC3 res ;
+	for (unsigned int c = 0 ; c < 3 ; ++c)
+	{
+		Eigen::VectorXd tmp(coefs.size()) ;
+		for (unsigned int i = 0 ; i < coefs.size() ; ++i)
+			tmp[i] = coefs[i][c] ;
+		res[c] = tmp.transpose() * m_A * tmp ;		// A
+		res[c] -= 2. * (m_b[c]).transpose() * tmp ;	// - 2b
+		res[c] += m_c[c] ;							// + c
+	}
+
+	res /= 2*M_PI ; // max integral value over hemisphere
+
+	return res ;
+}
+
+template <typename REAL>
 Geom::Matrix33d
 QuadricHF<REAL>::buildRotateMatrix(const REAL& gamma)
 {

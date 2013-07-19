@@ -42,8 +42,8 @@ namespace IHM
 ImplicitHierarchicalMap3::ImplicitHierarchicalMap3() : m_curLevel(0), m_maxLevel(0), m_edgeIdCount(0), m_faceIdCount(0)
 {
 	m_dartLevel = Map3::addAttribute<unsigned int, DART>("dartLevel") ;
-	m_faceId = Map3::addAttribute<unsigned int, DART>("faceId") ;
 	m_edgeId = Map3::addAttribute<unsigned int, DART>("edgeId") ;
+	m_faceId = Map3::addAttribute<unsigned int, DART>("faceId") ;
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;

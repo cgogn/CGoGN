@@ -161,7 +161,7 @@ void SvgPoints::save(std::ofstream& out) const
 }
 
 
-void SvgPoints::saveOne(std::ofstream& out, unsigned int i, unsigned int bbl) const
+void SvgPoints::saveOne(std::ofstream& out, unsigned int i, unsigned int /*bbl*/) const
 {
 	std::stringstream ss;
 
@@ -209,7 +209,7 @@ void SvgLines::save(std::ofstream& out) const
 		saveOne(out,i);
 }
 
-void SvgLines::saveOne(std::ofstream& out, unsigned int i, unsigned int bbl) const
+void SvgLines::saveOne(std::ofstream& out, unsigned int i, unsigned int /*bbl*/) const
 {
 	std::stringstream ss;
 
@@ -648,7 +648,7 @@ void AnimatedSVGOut::add(SVGOut* svg)
 	m_svgs.push_back(svg);
 }
 
-void AnimatedSVGOut::write(const std::string& filename, float timeStep)
+void AnimatedSVGOut::write(const std::string& /*filename*/, float /*timeStep*/)
 {
 //	std::ofstream outfile(filename.c_str()) ;
 //

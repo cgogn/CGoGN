@@ -118,6 +118,7 @@ SimpleQGLV::SimpleQGLV() :
 }
 
 SimpleQGLV::SimpleQGLV(const SimpleQGLV& sqt):
+	QMainWindow(),
 	m_dock(NULL),
 	m_projection_matrix(m_mat.m_matrices[0]),
 	m_modelView_matrix(m_mat.m_matrices[1]),

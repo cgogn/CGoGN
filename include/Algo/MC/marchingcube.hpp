@@ -955,7 +955,7 @@ void MarchingCube<DataType, Windowing, PFP>::setNeighbour(L_DART d1, L_DART d2)
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int  const *_lVertTable, const unsigned short _usMask, float curv, unsigned char tag)
+void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/,  unsigned int  const *_lVertTable, const unsigned short _usMask, float /*curv*/, unsigned char /*tag*/)
 {
 // TODO parametre _LZ not used => a supprimer ?
 // TODO parametre curv not used => a supprimer ?

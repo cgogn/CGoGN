@@ -88,7 +88,8 @@ void RenderVectorDockTab::positionVBOChanged(int index)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
+		if(map)
+			m_plugin->changePositionVBO(view, map, map->getVBO(combo_positionVBO->currentText()), true);
 	}
 }
 
@@ -98,11 +99,14 @@ void RenderVectorDockTab::selectedVectorsVBOChanged()
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		QList<QListWidgetItem*> currentItems = list_vectorVBO->selectedItems();
-		std::vector<Utils::VBO*> vbos;
-		foreach(QListWidgetItem* item, currentItems)
-			vbos.push_back(map->getVBO(item->text()));
-		m_plugin->changeSelectedVectorsVBO(view, map, vbos, true);
+		if(map)
+		{
+			QList<QListWidgetItem*> currentItems = list_vectorVBO->selectedItems();
+			std::vector<Utils::VBO*> vbos;
+			foreach(QListWidgetItem* item, currentItems)
+				vbos.push_back(map->getVBO(item->text()));
+			m_plugin->changeSelectedVectorsVBO(view, map, vbos, true);
+		}
 	}
 }
 
@@ -112,7 +116,8 @@ void RenderVectorDockTab::vectorsScaleFactorChanged(int i)
 	{
 		View* view = m_window->getCurrentView();
 		MapHandlerGen* map = m_currentParams->selectedMap;
-		m_plugin->changeVectorsScaleFactor(view, map, i, true);
+		if(map)
+			m_plugin->changeVectorsScaleFactor(view, map, i, true);
 	}
 }
 

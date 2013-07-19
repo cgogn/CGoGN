@@ -34,6 +34,7 @@ public slots:
 
 	void positionVBOChanged(int index);
 	void selectedScalarVBOChanged();
+	void colorMapChanged(int index);
 	void expansionChanged(int i);
 
 	void addVBOToList(Utils::VBO* vbo);

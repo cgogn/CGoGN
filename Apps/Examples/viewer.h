@@ -98,6 +98,7 @@ public:
 	bool m_drawFaces ;
 	bool m_drawNormals ;
 	bool m_drawTopo ;
+	bool m_drawBoundaryTopo;
 
 	VertexAttribute<VEC3> position ;
 	VertexAttribute<VEC3> normal ;

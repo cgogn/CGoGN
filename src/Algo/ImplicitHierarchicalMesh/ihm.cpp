@@ -39,8 +39,8 @@ namespace IHM
 
 ImplicitHierarchicalMap::ImplicitHierarchicalMap() : m_curLevel(0), m_maxLevel(0), m_idCount(0)
 {
-	m_dartLevel = addAttribute<unsigned int, DART>("dartLevel") ;
-	m_edgeId = addAttribute<unsigned int, DART>("edgeId") ;
+	m_dartLevel = Map2::addAttribute<unsigned int, DART>("dartLevel") ;
+	m_edgeId = Map2::addAttribute<unsigned int, DART>("edgeId") ;
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;
 }
@@ -51,9 +51,29 @@ ImplicitHierarchicalMap::~ImplicitHierarchicalMap()
 	removeAttribute(m_dartLevel) ;
 }
 
-void ImplicitHierarchicalMap::init()
+void ImplicitHierarchicalMap::clear(bool removeAttrib)
 {
-	initEdgeId() ;
+	Map2::clear(removeAttrib) ;
+	if (removeAttrib)
+	{
+		m_dartLevel = Map2::addAttribute<unsigned int, DART>("dartLevel") ;
+		m_edgeId = Map2::addAttribute<unsigned int, DART>("edgeId") ;
+
+		for(unsigned int i = 0; i < NB_ORBITS; ++i)
+			m_nextLevelCell[i] = NULL ;
+	}
+}
+
+void ImplicitHierarchicalMap::initImplicitProperties()
+{
+	//initEdgeId() ;
+
+	//init each edge Id at 0
+	TraversorE<ImplicitHierarchicalMap> te(*this);
+	for(Dart dit = te.begin() ; dit != te.next() ; dit = te.next())
+	{
+		m_edgeId[dit] = 0;
+	}
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
@@ -148,20 +168,21 @@ unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 	unsigned int cur = m_curLevel ;
 	m_curLevel = fLevel ;
 
-	unsigned int nbSubd = 0 ;
-	it = old ;
-	unsigned int eId = m_edgeId[old] ;			// the particular case of a face
-	do											// with all neighboring faces regularly subdivided
-	{											// but not the face itself
-		++nbSubd ;								// is treated here
-		it = phi1(it) ;
-	} while(m_edgeId[it] == eId) ;
+//	unsigned int nbSubd = 0 ;
+//	it = old ;
+//	unsigned int eId = m_edgeId[old] ;			// the particular case of a face
+//	do											// with all neighboring faces regularly subdivided
+//	{											// but not the face itself
+//		++nbSubd ;								// is treated here
+//		 std::cout << "plop" << std::endl;
+//		it = phi1(it) ;
+//	} while(m_edgeId[it] == eId) ;
 
-	while(nbSubd > 1)
-	{
-		nbSubd /= 2 ;
-		--fLevel ;
-	}
+//	while(nbSubd > 1)
+//	{
+//		nbSubd /= 2 ;
+//		--fLevel ;
+//	}
 
 	m_curLevel = cur ;
 

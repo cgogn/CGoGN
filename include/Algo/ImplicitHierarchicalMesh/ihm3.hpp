@@ -80,7 +80,7 @@ inline void ImplicitHierarchicalMap3::update_topo_shortcuts()
 
 
 /***************************************************
- *          			 	    MAP TRAVERSAL         		  		         *
+ *     		 	    MAP TRAVERSAL         		   *
  ***************************************************/
 
 inline Dart ImplicitHierarchicalMap3::newDart()
@@ -146,6 +146,7 @@ inline Dart ImplicitHierarchicalMap3::phi2bis(Dart d)
 
 	it = Map3::phi2(it) ;
 
+	/* du cote des volumes non subdivise (subdiv adapt) */
 	if(m_faceId[it] == faceId)
 		return it;
 	else
@@ -268,7 +269,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge(Dart d, FunctorType& 
 	return false;
 }
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d ;
 	do
@@ -400,7 +401,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f,
 }
 
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d;
 	do
@@ -412,7 +413,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorTyp
  	return false;
 }
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d))
 		return true;
@@ -453,7 +454,6 @@ inline unsigned int ImplicitHierarchicalMap3::getCurrentLevel()
 
 inline void ImplicitHierarchicalMap3::setCurrentLevel(unsigned int l)
 {
-	assert(l >= 0 || !"Trying to set current level to a negative value") ;
 	m_curLevel = l ;
 }
 

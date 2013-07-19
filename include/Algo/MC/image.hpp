@@ -82,6 +82,39 @@ Image<DataType>::Image(DataType *data, int wx, int wy, int wz, float sx, float s
 
 
 template< typename  DataType >
+template< typename  DataTypeIn >
+void Image<DataType>::createMask(const Image<DataTypeIn>& img )
+{
+	m_WX = img.m_WX;
+	m_WY = img.m_WY;
+	m_WZ = img.m_WZ;
+	m_OX = 0;
+	m_OY = 0;
+	m_OZ = 0;
+	m_SX = img.m_SX;
+	m_SY = img.m_SY;
+	m_SZ = img.m_SZ;
+	m_WXY = m_WX * m_WY;
+	m_Data = new DataType[m_WXY*m_WZ];
+
+	DataType* ptrO = m_Data;
+	DataTypeIn* ptrI = img.m_Data;
+
+	unsigned int nb = m_WXY*m_WZ;
+	for (unsigned int i=0; i<nb; ++i)
+	{
+		if (*ptrI++ != 0)
+			*ptrO++ = (DataType)255;
+		else
+			*ptrO++ = 0;
+	}
+	m_Alloc=true;
+}
+
+
+
+
+template< typename  DataType >
 void Image<DataType>::loadRaw(char *filename)
 {
 	std::ifstream fp( filename, std::ios::in|std::ios::binary);
@@ -109,7 +142,6 @@ void Image<DataType>::loadRaw(char *filename)
 	m_SZ = 1.0;
 
 	m_Alloc=true;
-
 }
 
 
@@ -226,12 +258,27 @@ bool Image<DataType>::loadInrgz(const char* filename)
 			return false;
 		}
 
-		m_SX = 1.0;
-		m_SY = 1.0;
-		m_SZ = 1.0;
+		m_SX = mImage->vx;
+		m_SY = mImage->vy;
+		m_SZ = mImage->vz;
 
 		return true;
 }
+
+template< typename  DataType >
+void Image<DataType>::saveInrMask(const char* filename)
+{
+	mImage = createInrimage(this->getWidthX(), this->getWidthY(), this->getWidthZ(), 1, WT_UNSIGNED_CHAR);
+	mImage->vx = this->getVoxSizeX();
+	mImage->vy = this->getVoxSizeY();
+	mImage->vz = this->getVoxSizeZ();
+	memcpy(mImage->data,this->getData(),this->getWidthX()*this->getWidthY()*this->getWidthZ());
+//	setInrimageData(mImage, this->getData());
+	writeZInrimage(mImage, filename);
+	delete mImage;
+	mImage = NULL;
+}
+
 #endif
 
 

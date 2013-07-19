@@ -65,14 +65,14 @@ private:
 
 	bool m_initOk ;
 
-	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
-	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
-	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
+	Algo::Surface::Decimation::EdgeSelector<PFP>* m_selector ;
+	std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*> m_approximators ;
+	std::vector<Algo::Surface::Decimation::PredictorGen<PFP>*> m_predictors ;
 
-	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
+	Algo::Surface::Decimation::Approximator<PFP, VEC3, EDGE>* m_positionApproximator ;
 
-	std::vector<Filter*> synthesisFilters ;
-	std::vector<Filter*> analysisFilters ;
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
 	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position);
@@ -80,7 +80,7 @@ public:
 	~Map2MR_PM();
 
 	//create a progressive mesh (a coarser level)
-	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
+	void createPM(Algo::Surface::Decimation::SelectorType s, Algo::Surface::Decimation::ApproximatorType a) ;
 
 	void addNewLevel(unsigned int percentWantedVertices);
 
@@ -94,8 +94,8 @@ public:
 
 	bool initOk() { return m_initOk; }
 
-	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
 	void clearAnalysisFilters() { analysisFilters.clear() ; }

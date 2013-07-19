@@ -165,7 +165,7 @@ inline void ImplicitHierarchicalMap2::next(Dart& d) const
 	} while(d != Map2::end() && m_dartLevel[d] > m_curLevel) ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d;
 	do
@@ -177,7 +177,7 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FunctorType
  	return false;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	if (f(d))
 		return true;
@@ -189,7 +189,7 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FunctorType& 
 		return false;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int /*thread*/)
 {
 	Dart dNext = d ;
 	do
@@ -203,12 +203,12 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, Func
 
 inline bool ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_face(d, f) ;
+	return foreach_dart_of_oriented_face(d, f, thread) ;
 }
 
 inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mark(*this);	// Lock a marker
+	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
@@ -221,7 +221,7 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, Fu
 		if (!mark.isMarked(*face))		// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			found = foreach_dart_of_oriented_face(*face, f);
+			found = foreach_dart_of_oriented_face(*face, f, thread);
 
 			// If functor returns false then mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face
@@ -244,12 +244,12 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, Fu
 
 inline bool ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f) ;
+	return foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
 inline bool ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f) ;
+	return foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
 /***************************************************
@@ -280,7 +280,6 @@ inline unsigned int ImplicitHierarchicalMap2::getCurrentLevel()
 
 inline void ImplicitHierarchicalMap2::setCurrentLevel(unsigned int l)
 {
-	assert(l >= 0 || !"Trying to set current level to a negative value") ;
 	m_curLevel = l ;
 }
 

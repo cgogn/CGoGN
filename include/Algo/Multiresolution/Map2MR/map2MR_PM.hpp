@@ -88,6 +88,12 @@ void Map2MR_PM<PFP>::createPM(Algo::Surface::Decimation::SelectorType s, Algo::S
 			m_predictors.push_back(pred) ;
 			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
 			break ; }
+		case Algo::Surface::Decimation::A_NormalArea :
+		case Algo::Surface::Decimation::A_ColorQEMext :
+		case Algo::Surface::Decimation::A_hQEM :
+		case Algo::Surface::Decimation::A_hLightfieldHalf :
+		case Algo::Surface::Decimation::A_Lightfield :
+		default: break;
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
@@ -109,9 +115,25 @@ void Map2MR_PM<PFP>::createPM(Algo::Surface::Decimation::SelectorType s, Algo::S
 	case Algo::Surface::Decimation::S_MinDetail : {
 		m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
-	case Algo::Surface::Decimation::S_Curvature : {
+	case Algo::Surface::Decimation::S_CurvatureTensor : {
 		m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, m_position, m_approximators) ;
 		break ; }
+	case Algo::Surface::Decimation::S_QEMml :
+	case Algo::Surface::Decimation::S_Curvature :
+	case Algo::Surface::Decimation::S_NormalArea :
+	case Algo::Surface::Decimation::S_ColorNaive :
+	case Algo::Surface::Decimation::S_QEMextColor :
+	case Algo::Surface::Decimation::S_hQEMextColor :
+	case Algo::Surface::Decimation::S_hQEMml :
+	case Algo::Surface::Decimation::S_Lightfield :
+	case Algo::Surface::Decimation::S_hLightfield :
+	case Algo::Surface::Decimation::S_hLightfieldExp :
+	case Algo::Surface::Decimation::S_hLightfieldKCL :
+	case Algo::Surface::Decimation::S_hColorExperimental :
+	case Algo::Surface::Decimation::S_hLFexperimental :
+	case Algo::Surface::Decimation::S_hColorPerFace :
+	case Algo::Surface::Decimation::S_hLFperFace :
+	default: break;
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
@@ -123,7 +145,7 @@ void Map2MR_PM<PFP>::createPM(Algo::Surface::Decimation::SelectorType s, Algo::S
 		if(! (*it)->init())
 			m_initOk = false ;
 		if((*it)->getApproximatedAttributeName() == "position")
-			m_positionApproximator = reinterpret_cast<Algo::Surface::Decimation::Approximator<PFP, VEC3>*>(*it) ;
+			m_positionApproximator = reinterpret_cast<Algo::Surface::Decimation::Approximator<PFP, VEC3, EDGE>*>(*it) ;
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
@@ -291,6 +313,8 @@ Dart Map2MR_PM<PFP>::vertexOrigin(Dart d)
 //		dit = m_map.phi2(m_map.phi_1(dit));
 //	}
 //	while(dit != d);
+
+	return NIL;
 }
 
 //template <typename PFP>
