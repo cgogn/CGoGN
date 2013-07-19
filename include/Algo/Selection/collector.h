@@ -116,12 +116,12 @@ public:
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
 
-	virtual REAL computeArea (const VertexAttribute<VEC3>& pos) {
+	virtual REAL computeArea (const VertexAttribute<VEC3>& /*pos*/) {
 		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
 		return 0.0;
 	}
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& /*pos*/, const EdgeAttribute<REAL>& /*edgeangle*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& /*pos*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
 
 };
 
@@ -436,7 +436,7 @@ protected:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
-	typedef NoMathIOAttribute<DijkstraVertexInfo> VertexInfo ;
+	typedef NoTypeNameAttribute<DijkstraVertexInfo> VertexInfo ;
 
 	VertexAttribute<VertexInfo> vertexInfo ;
 
@@ -483,7 +483,7 @@ protected:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
-	typedef NoMathIOAttribute<DijkstraVertexInfo> VertexInfo ;
+	typedef NoTypeNameAttribute<DijkstraVertexInfo> VertexInfo ;
 
 	VertexAttribute<VertexInfo> vertexInfo ;
 

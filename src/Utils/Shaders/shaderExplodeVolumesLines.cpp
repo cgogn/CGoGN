@@ -112,6 +112,11 @@ void ShaderExplodeVolumesLines::setColor(const Geom::Vec4f& color)
 	unbind();
 }
 
+const Geom::Vec4f& ShaderExplodeVolumesLines::getColor() const
+{
+	return m_color;
+}
+
 void ShaderExplodeVolumesLines::setClippingPlane(const Geom::Vec4f& plane)
 {
 	m_plane = plane;

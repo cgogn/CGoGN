@@ -24,6 +24,7 @@
 
 #include "Topology/gmap/gmap3.h"
 #include "Topology/generic/dartmarker.h"
+#include "Topology/generic/traversor3.h"
 
 namespace CGoGN
 {
@@ -519,46 +520,74 @@ bool GMap3::sameVertex(Dart d, Dart e)
 	return false;
 }
 
+//unsigned int GMap3::vertexDegree(Dart d)
+//{
+//	unsigned int count = 0;
+//	DartMarkerStore mv(*this);	// Lock a marker
+
+//	std::vector<Dart> darts;	// Darts that are traversed
+//	darts.reserve(256);
+//	darts.push_back(d);			// Start with the dart d
+//	mv.mark(d);
+
+//	for(unsigned int i = 0; i < darts.size(); ++i)
+//	{
+//		//add phi21 and phi23 successor if they are not marked yet
+//		Dart d2 = phi2(darts[i]);
+//		Dart d21 = phi1(d2); // turn in volume
+//		Dart d23 = phi3(d2); // change volume
+
+//		if(!mv.isMarked(d21))
+//		{
+//			darts.push_back(d21);
+//			mv.mark(d21);
+//		}
+//		if(!mv.isMarked(d23))
+//		{
+//			darts.push_back(d23);
+//			mv.mark(d23);
+//		}
+//	}
+
+//	DartMarkerStore me(*this);
+//	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
+//	{
+//		if(!me.isMarked(*it))
+//		{
+//			++count;
+//			me.markOrbit<EDGE>(*it);
+//		}
+//	}
+
+//	return count;
+//}
+
 unsigned int GMap3::vertexDegree(Dart d)
 {
 	unsigned int count = 0;
-	DartMarkerStore mv(*this);	// Lock a marker
 
-	std::vector<Dart> darts;	// Darts that are traversed
-	darts.reserve(256);
-	darts.push_back(d);			// Start with the dart d
-	mv.mark(d);
-
-	for(unsigned int i = 0; i < darts.size(); ++i)
+	Traversor3VE<GMap3> trav3VE(*this, d);
+	for(Dart dit = trav3VE.begin() ; dit != trav3VE.end() ; dit = trav3VE.next())
 	{
-		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(darts[i]);
-		Dart d21 = phi1(d2); // turn in volume
-		Dart d23 = phi3(d2); // change volume
-
-		if(!mv.isMarked(d21))
-		{
-			darts.push_back(d21);
-			mv.mark(d21);
-		}
-		if(!mv.isMarked(d23))
-		{
-			darts.push_back(d23);
-			mv.mark(d23);
-		}
-	}
-
-	DartMarkerStore me(*this);
-	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
-	{
-		if(!me.isMarked(*it))
-		{
-			++count;
-			me.markOrbit<EDGE>(*it);
-		}
+		++count;
 	}
 
 	return count;
+}
+
+
+int GMap3::checkVertexDegree(Dart d, unsigned int vd)
+{
+	unsigned int count = 0;
+
+	Traversor3VE<GMap3> trav3VE(*this, d);
+	Dart dit = trav3VE.begin();
+	for( ; (count<=vd) && (dit != trav3VE.end()) ; dit = trav3VE.next())
+	{
+		++count;
+	}
+
+	return count - vd;
 }
 
 bool GMap3::isBoundaryVertex(Dart d)

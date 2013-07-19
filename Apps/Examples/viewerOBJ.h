@@ -21,81 +21,73 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef ATTRIBOPS_H_
-#define ATTRIBOPS_H_
+#ifndef _TEXTURE_EXAMPLE_
+#define _TEXTURE_EXAMPLE_
 
-#include "Utils/cgognStream.h"
+#include <iostream>
 
-namespace CGoGN
+
+//#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtQGLV.h"
+#include "Utils/textures.h"
+#include "Utils/Shaders/shaderSimpleTexture.h"
+#include "Utils/Shaders/shaderPhongTexture.h"
+#include "Utils/Shaders/shaderPhong.h"
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Import/importObjTex.h"
+
+
+// forward definitions (minimize includes)
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
+namespace CGoGN { namespace Utils { class VBO; } }
+
+using namespace CGoGN ;
+
+struct PFP: public PFP_STANDARD
 {
-
-namespace AttribOps
-{
-
-
-template <typename X, typename PFP>
-struct lerpStruct
-{
-	static X apply( X u, X v, double a)
-	{
-		return u*a + v*(1.0-a);
-	}
+	// definition of the map
+	typedef EmbeddedMap2 MAP ;
 };
 
-template <typename PFP>
-struct lerpStruct<typename PFP::EVERTEX ,PFP>
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
+/**
+ * A class for a little interface and rendering
+ */
+
+//class ObjView: public Utils::QT::SimpleQT
+class ObjView: public Utils::QT::SimpleQGLV
 {
-	static typename PFP::EVERTEX apply(typename PFP::EVERTEX u, typename PFP::EVERTEX v, double a)
-	{
-		CGoGNout << "Static Lerp"<< CGoGNendl;
-		typename PFP::EVERTEX ec;
-		ec.lerp(u,v,a);
-		return ec;
-	}
+	Q_OBJECT
+public:
+
+	MAP myMap ;
+	Algo::Surface::Import::OBJModel<PFP> m_obj;
+
+	// VBO
+	Utils::VBO* m_positionVBO;
+	Utils::VBO* m_normalVBO;
+	Utils::VBO* m_texcoordVBO;
+
+
+	// shader simple texture
+	Utils::ShaderSimpleTexture* m_shader;
+	Utils::ShaderPhongTexture* m_shader2;
+	Utils::ShaderPhong* m_phongShader;
+
+	ObjView();
+
+	~ObjView();
+
+	void init(const std::string& fnm);
+
+	// callbacks of simpleQT to overdefine:
+	void cb_redraw();
+
+	void cb_initGL();
+
 };
 
-
-template < typename X, typename PFP>
-X  lerp( X u, X v, double a )
-{
-	CGoGNout << "function Lerp"<< CGoGNendl;
-	return lerpStruct< X, PFP >::apply( u,v,a );
-}
-
-
-
-template <typename X, typename PFP>
-struct zeroStruct
-{
-	static X  apply()
-	{
-		return X(0);
-	}
-};
-
-template <typename PFP>
-struct zeroStruct<typename PFP::EVERTEX ,PFP>
-{
-	static typename PFP::EVERTEX apply()
-	{
-		typename PFP::EVERTEX ev;
-		ev.zero();
-		return ev;
-	}
-};
-
-
-template < typename X, typename PFP>
-X zero()
-{
-	return zeroStruct< X, PFP >::apply();
-}
-
-
-} // end namespace
-}
-
-
-
-
-#endif /* ATTRIBOPS_H_ */
+#endif

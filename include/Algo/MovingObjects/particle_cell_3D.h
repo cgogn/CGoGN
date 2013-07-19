@@ -1,7 +1,7 @@
 #ifndef PARTCELL_H
 #define PARTCELL_H
 
-#include "particle_base.h"
+#include "Algo/MovingObjects/particle_base.h"
 
 #include "Algo/Geometry/inclusion.h"
 #include "Geometry/intersection.h"
@@ -31,12 +31,12 @@ enum {
 };
 
 template <typename PFP>
-class ParticleCell3D : public Algo::MovingObjects::ParticleBase
+class ParticleCell3D : public Algo::MovingObjects::ParticleBase<PFP>
 {
 public :
 	typedef typename PFP::MAP Map;
 	typedef typename PFP::VEC3 VEC3;
-	typedef VertexAttribute<typename PFP::VEC3> TAB_POS;
+	typedef VertexAttribute<VEC3> TAB_POS;
 
 	Map& m;
 
@@ -55,7 +55,11 @@ public :
 	{}
 
 	ParticleCell3D(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		Algo::MovingObjects::ParticleBase(pos), m(map), position(tabPos), d(belonging_cell), state(3)
+		Algo::MovingObjects::ParticleBase<PFP>(pos),
+		m(map),
+		position(tabPos),
+		d(belonging_cell),
+		state(3)
 	{
 		m_positionFace = pointInFace(d);
 	}
@@ -82,11 +86,11 @@ public :
 
 	bool isRightDFace(VEC3 c, Dart d, VEC3 base, VEC3 normal);
 
-	Dart nextDartOfVertexNotMarked(Dart d, CellMarkerGen& mark);
+	Dart nextDartOfVertexNotMarked(Dart d, CellMarkerStore<FACE>& mark);
 
 	Dart nextNonPlanar(Dart d);
 
-	Dart nextFaceNotMarked(Dart d,CellMarkerGen& mark);
+	Dart nextFaceNotMarked(Dart d,CellMarkerStore<FACE>& mark);
 
 	Geom::Orientation3D whichSideOfEdge(VEC3 c, Dart d);
 
@@ -107,7 +111,7 @@ public :
 	{
 		crossCell = NO_CROSS ;
 
-		if(!Geom::arePointsEquals(newCurrent, m_position))
+		if(!Geom::arePointsEquals(newCurrent, this->getPosition()))
 		{
 			switch(state) {
 			case VERTEX : vertexState(newCurrent); break;
@@ -121,10 +125,10 @@ public :
 	}
 };
 
-}
-}
-}
-}
+} //MovingObjects
+} //Volume
+} //Algo
+} //CGoGN
 
 #include "particle_cell_3D.hpp"
 

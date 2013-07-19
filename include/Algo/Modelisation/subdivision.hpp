@@ -64,13 +64,15 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d)
 	return map.phi2(x);	// Return a dart of the central vertex
 }
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void trianguleFaces(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	TraversorF<typename PFP::MAP> t(map) ;
 	for (Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		EMB center = Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
+		EMB center = Geometry::faceCentroid<PFP,EMBV>(map, d, attributs);	// compute center
 		Dart cd = trianguleFace<PFP>(map, d);	// triangule the face
 		attributs[cd] = center;					// affect the data to the central vertex
 		Dart fit = cd ;
@@ -82,11 +84,11 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs)
 	}
 }
 
-template <typename PFP>
-void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
-{
-	trianguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
-}
+//template <typename PFP>
+//void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+//{
+//	trianguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
+//}
 
 template <typename PFP>
 void trianguleFaces(
@@ -125,9 +127,11 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d)
 	return map.phi2(x);	// Return a dart of the central vertex
 }
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	DartMarker me(map) ;
 	DartMarker mf(map) ;
 
@@ -156,7 +160,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 	{
 		if ( !map.isBoundaryMarked2(d) && !mf.isMarked(d))
 		{
-			EMB center = Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
+			EMB center = Geometry::faceCentroid<PFP,EMBV>(map, d, attributs);	// compute center
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
 			attributs[cf] = center;					// affect the data to the central vertex
 			Dart e = cf;
@@ -169,15 +173,17 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 	}
 }
 
-template <typename PFP>
-void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
-{
-	quadranguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
-}
+//template <typename PFP>
+//void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+//{
+//	quadranguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
+//}
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
@@ -225,7 +231,8 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		if ( !map.isBoundaryMarked2(d) && mf.isMarked(d)) // for each face not subdivided
 		{
 			// compute center skip darts of new vertices non embedded
-			EMB center = AttribOps::zero<EMB,PFP>();
+//			EMB center = AttribOps::zero<EMB,PFP>();
+			EMB center(0.0);
 			unsigned int count = 0 ;
 			mf.unmarkOrbit<FACE>(d) ;
 			Dart it = d;
@@ -254,8 +261,9 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		{
 			Dart f1 = map.phi_1(x);
 			Dart f2 = map.phi2(map.phi1(map.phi2(x)));
-			EMB temp = AttribOps::zero<EMB,PFP>();
-			temp = attributs[f1];
+//			EMB temp = AttribOps::zero<EMB,PFP>();
+//			temp = attributs[f1];
+			EMB temp = attributs[f1];
 			temp += attributs[f2];			// E' = (V0+V1+F1+F2)/4
 			temp *= 0.25;
 			attributs[x] *= 0.5;
@@ -269,8 +277,10 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	{
 		m0.unmark(*vert);
 
-		EMB temp = AttribOps::zero<EMB,PFP>();
-		EMB temp2 = AttribOps::zero<EMB,PFP>();
+//		EMB temp = AttribOps::zero<EMB,PFP>();
+//		EMB temp2 = AttribOps::zero<EMB,PFP>();
+		EMB temp(0.0);
+		EMB temp2(0.0);
 
 		unsigned int n = 0;
 		Dart x = *vert;
@@ -297,11 +307,11 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	}
 }
 
-template <typename PFP>
-void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
-{
-	CatmullClarkSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
-}
+//template <typename PFP>
+//void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+//{
+//	CatmullClarkSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
+//}
 
 inline double betaF(unsigned int n)
 {
@@ -327,9 +337,11 @@ inline double betaF(unsigned int n)
 	}
 }
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
@@ -378,8 +390,11 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 			Dart dd = map.phi2(d);
 			attributs[d] *= 0.75;
 			Dart e1 = map.template phi<111>(d);
-			EMB temp = AttribOps::zero<EMB,PFP>();
-			temp = attributs[e1];
+
+//			EMB temp(0.0);
+//			temp += attributs[e1];
+
+			EMB temp = attributs[e1];
 			e1 = map.phi_1(map.phi_1(dd));
 			temp += attributs[e1];
 			temp *= 1.0 / 8.0;
@@ -393,7 +408,8 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	{
 		m0.unmark(*vert);
 
-		EMB temp = AttribOps::zero<EMB,PFP>();
+//		EMB temp = AttribOps::zero<EMB,PFP>();
+		EMB temp(0.0);
 		int n = 0;
 		Dart x = *vert;
 		do
@@ -444,15 +460,18 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	}
 }
 
-template <typename PFP>
-void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
-{
-	LoopSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
-}
+//template <typename PFP>
+//void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+//{
+////	LoopSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
+//	LoopSubdivisionGen<PFP, VertexAttribute<typename PFP::VEC3> >(map, position) ;
+//}
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	CellMarker<EDGE> m0(map);
 	CellMarker<FACE> m1(map);
 
@@ -521,9 +540,12 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 	}
 }
 
-template <typename PFP>
-void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+
+template <typename PFP, typename EMBV>
+void DooSabin(typename PFP::MAP& map, EMBV& position)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	DartMarker dm(map);
 	// storage of boundary of hole (missing vertex faces)
 	std::vector<Dart> fp;
@@ -586,7 +608,7 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		}
 	}
 
-	std::vector<typename PFP::VEC3> buffer;
+	std::vector<EMB> buffer;
 	buffer.reserve(8);
 	for (std::vector<Dart>::iterator di=faces.begin(); di != faces.end(); ++di)
 	{
@@ -603,17 +625,17 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		int N = buffer.size();
 		for (int i=0; i<N; ++i)
 		{
-			typename PFP::VEC3 P(0,0,0);
+			EMB P(0);
 			for (int j=0; j<N; ++j)
 			{
 				if (j==i)
 				{
-					float c1 = float(N+5)/float(4*N);
+					/*float*/typename PFP::REAL c1 = double(N+5)/double(4*N);
 					P += buffer[j]*c1;
 				}
 				else
 				{
-					float c2 = (3.0+2.0*cos(2.0*M_PI*(double(i-j))/double(N))) /(4.0*N);
+					/*float*/typename PFP::REAL c2 = (3.0+2.0*cos(2.0*M_PI*(double(i-j))/double(N))) /(4.0*N);
 					P+= c2*buffer[j];
 				}
 			}

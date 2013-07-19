@@ -298,7 +298,7 @@ private:
 
 	typedef typename std::multimap<float, CRIT*>::iterator CRIT_IT;
 
-	typedef NoMathIONameAttribute<CRIT_IT> CRIT_IT_ATT;
+	typedef NoTypeNameAttribute<CRIT_IT> CRIT_IT_ATT;
 
 	// attribut d'arête
 	AutoAttributeHandler<CRIT_IT_ATT> m_edgeEmb;

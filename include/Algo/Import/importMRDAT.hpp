@@ -192,7 +192,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	std::cout << "  Create base level mesh.." << std::flush ;
 
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents") ;
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents") ;
 	DartMarkerNoUnmark m(map) ;
 
 	unsigned nbf = qt.roots.size() ;

@@ -314,8 +314,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 	CellMarker<EDGE> brokenMark(map);
 	EdgeAttribute<float> edgeWidth = map.template addAttribute<float, EDGE>("width");
-	EdgeAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
-
+//	EdgeAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
+	EdgeAttribute<NoTypeNameAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoTypeNameAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create broken lines
 	DartMarker brokenL(map);

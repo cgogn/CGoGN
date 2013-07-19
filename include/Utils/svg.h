@@ -94,6 +94,8 @@ public:
 
 	virtual void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const = 0;
 
+	virtual void saveOneDepthAttenuation(std::ofstream& out, float da, unsigned int i, unsigned int bbl = 0) const = 0;
+
 	unsigned int nbv() const;
 
 	virtual unsigned int nbPrimtives() const = 0;
@@ -113,6 +115,7 @@ class SvgPoints: public SvgObj
 public:
 	void save(std::ofstream& out) const;
 	void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const;
+	void saveOneDepthAttenuation(std::ofstream& out, float da, unsigned int i, unsigned int bbl = 0) const;
 	unsigned int nbPrimtives() const;
 	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
@@ -122,6 +125,7 @@ class SvgLines: public SvgObj
 public:
 	void save(std::ofstream& out) const;
 	void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const;
+	void saveOneDepthAttenuation(std::ofstream& out, float da, unsigned int i, unsigned int bbl = 0) const;
 	unsigned int nbPrimtives() const;
 	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
@@ -135,6 +139,7 @@ public:
 	SvgStrings(float scalefactor = 1.0f) : m_sf(scalefactor) {}
 	void save(std::ofstream& out) const;
 	void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const;
+	void saveOneDepthAttenuation(std::ofstream& out, float da, unsigned int i, unsigned int bbl = 0) const;
 	unsigned int nbPrimtives() const;
 	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
@@ -253,6 +258,8 @@ public:
 	unsigned int m_bbX1;
 	unsigned int m_bbY1;
 
+	float m_attFact;
+
 protected:
 	void computeBB(unsigned int& a, unsigned int& b, unsigned int& c, unsigned& d);
 
@@ -279,6 +286,12 @@ public:
 	void addGroup(SvgGroup* group) { m_groups.push_back(group); }
 
 	void write();
+
+	/**
+	 * @brief set Attenuation Factor of color with depth
+	 * @param af 0.0 for none 1.0 for color to white,  more for faster attenuation (^att)
+	 */
+	void setAttenuationFactor(float af) { m_attFact = af;}
 };
 
 

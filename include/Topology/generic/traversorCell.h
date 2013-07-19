@@ -34,7 +34,7 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT>
-class TraversorCell : public Traversor<MAP>
+class TraversorCell //: public Traversor<MAP>
 {
 private:
 	MAP& m ;
@@ -65,7 +65,7 @@ public:
 
 
 template <unsigned int ORBIT>
-class TraversorCell<GenericMap,ORBIT> : public Traversor<GenericMap>
+class TraversorCell<GenericMap,ORBIT> //: public Traversor<GenericMap>
 {
 private:
 	GenericMap& m ;
@@ -94,38 +94,6 @@ public:
 	void skip(Dart d);
 } ;
 
-
-//template <typename MAP>
-//class TraversorV : public TraversorCell<MAP, VERTEX>
-//{
-//public:
-//	TraversorV(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, forceDartMarker, thread)
-//	{}
-//};
-
-//template <typename MAP>
-//class TraversorE : public TraversorCell<MAP, EDGE>
-//{
-//public:
-//	TraversorE(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, forceDartMarker, thread)
-//	{}
-//};
-
-//template <typename MAP>
-//class TraversorF : public TraversorCell<MAP, FACE>
-//{
-//public:
-//	TraversorF(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, forceDartMarker, thread)
-//	{}
-//};
-
-//template <typename MAP>
-//class TraversorW : public TraversorCell<MAP, VOLUME>
-//{
-//public:
-//	TraversorW(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, forceDartMarker, thread)
-//	{}
-//};
 
 template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>

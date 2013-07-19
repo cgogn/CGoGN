@@ -159,53 +159,10 @@ public:
 
 	virtual void overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id) = 0;
 
-	/**************************************
-	 *       ARITHMETIC OPERATIONS        *
-	 **************************************/
-
- 	void toggleProcess();
-
- 	void toggleNoProcess();
-
- 	bool toProcess();
-
-	/**
-	 * copy attribute j on i
-	 */
-	virtual void affect(unsigned int i, unsigned int j) = 0;
-
-	/**
-	 * add attribute j to i
-	 */
-	virtual void add(unsigned int i, unsigned int j) = 0;
-
-	/**
-	 * sub attribute j from i
-	 */
-	virtual void sub(unsigned int i, unsigned int j) = 0;
-
-	/**
-	 * multiply attribute i by alpha
-	 */
-	virtual void mult(unsigned int i, double alpha) = 0;
-
-	/**
-	 * divide attribute i by alpha
-	 */
-	virtual void div(unsigned int i, double alpha) = 0;
-
-	/**
-	 * interpolate attribute i and j in res (with alpha coefficient)
-	 */
-	virtual void lerp(unsigned res, unsigned int i, unsigned int j, double alpha) = 0;
 
 	/**************************************
 	 *            SAVE & LOAD             *
 	 **************************************/
-
-	virtual std::string output(unsigned int i) = 0;
-
-	virtual void input(unsigned int i,const std::string& st) = 0;
 
 	virtual void saveBin(CGoGNostream& fs, unsigned int id) = 0;
 
@@ -317,19 +274,6 @@ public:
 	/**************************************
 	 *            SAVE & LOAD             *
 	 **************************************/
-
-	/**
-	 *  export en string d'un element
-	 *  @param i index de l'element a sortie
-	 */
-	std::string output(unsigned int i);
-
-	/**
-	 *  import d'un element depuis une string
-	 *  @param i index de l'element a importer
-	 *  @param st string contenant l'element a importer
-	 */
-	void input(unsigned int i,const std::string& st);
 
 	/**
 	 * Sauvegarde binaire

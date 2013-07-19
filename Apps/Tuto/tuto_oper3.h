@@ -113,8 +113,6 @@ protected:
 	unsigned int m_pickedAxis;
 	int m_begX;
 	int m_begY;
-	int clip_id1;
-	int clip_id2;
 
 	// just for more compact writing
 	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
@@ -124,8 +122,15 @@ protected:
 	template<int X>
 	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
 
+	int clip_id1;
+	int clip_id2;
+	int clip_id3;
+	int clip_id4;
 	Utils::ClippingShader* m_sh1;
 	Utils::ClippingShader* m_sh2;
+	Utils::ClippingShader* m_sh3;
+	Utils::ClippingShader* m_sh4;
+
 
 
 public:

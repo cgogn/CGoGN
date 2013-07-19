@@ -46,31 +46,50 @@ namespace Render
 
 namespace GL2
 {
-template<typename PFP>
-void Topo3Render::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv)
+//template<typename PFP>
+//void Topo3Render::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv)
+//{
+//	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
+//	if (ptrMap3 != NULL)
+//	{
+//		updateDataMap3<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3 >(map,positions,ke,kf,kv);
+//	}
+//	GMap3* ptrGMap3 = dynamic_cast<GMap3*>(&map);
+//	if (ptrGMap3 != NULL)
+//	{
+//		updateDataGMap3<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map,positions,ke,kf,kv);
+//	}
+//}
+
+
+template<typename PFP, typename EMBV>
+void Topo3Render::updateData(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv)
 {
 	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
 	if (ptrMap3 != NULL)
 	{
-		updateDataMap3<PFP>(map,positions,ke,kf,kv);
+		updateDataMap3<PFP,EMBV>(map,positions,ke,kf,kv);
 	}
 	GMap3* ptrGMap3 = dynamic_cast<GMap3*>(&map);
 	if (ptrGMap3 != NULL)
 	{
-		updateDataGMap3<PFP>(map,positions,ke,kf,kv);
+		updateDataGMap3<PFP,EMBV>(map,positions,ke,kf,kv);
 	}
 }
 
-template<typename PFP>
-void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv)
+
+
+
+template<typename PFP, typename EMBV>
+void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const EMBV& positions, float ke, float kf, float kv)
 {
-	typedef typename PFP::VEC3 VEC3;
+	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
 
-	m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
+	m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index3");
 
 	if (!m_attIndex.isValid())
-		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index3");
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -84,7 +103,6 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<
 	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
 
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(mapx, positions, centerVolumes,3);
-
 
 	// debut phi1
 	DartAutoAttribute<VEC3> fv1(mapx);
@@ -264,11 +282,13 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map)
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-template<typename PFP>
-void Topo3Render::updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors)
+template<typename PFP, typename EMBV>
+void Topo3Render::updateColorsGen(typename PFP::MAP& map, const EMBV& colors)
 {
+	typedef typename EMBV::DATA_TYPE EMB;
+
 	m_vbo4->bind();
-	Geom::Vec3f* colorBuffer =  reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	EMB* colorBuffer =  reinterpret_cast<EMB*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -291,6 +311,13 @@ void Topo3Render::updateColors(typename PFP::MAP& map, const VertexAttribute<typ
 }
 
 template<typename PFP>
+void Topo3Render::updateColors(typename PFP::MAP& map, const VertexAttribute<Geom::Vec3f>& colors)
+{
+//	updateColorsGen<PFP, VertexAttribute<Geom::Vec3f> >(map,colors);
+	updateColorsGen<PFP>(map,colors);
+}
+
+template<typename PFP>
 Dart Topo3Render::picking(typename PFP::MAP& map, int x, int y)
 {
 	pushColors();
@@ -300,21 +327,18 @@ Dart Topo3Render::picking(typename PFP::MAP& map, int x, int y)
 	return d;
 }
 
-template<typename PFP>
-void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv)
+template<typename PFP, typename EMBV>
+void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const EMBV& positions, float ke, float kf, float kv)
 {
-	typedef typename PFP::VEC3 VEC3;
+	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
 
 	GMap3& map = dynamic_cast<GMap3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3
 
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
 	if (m_attIndex.map() != &mapx)
-		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index3");
 	if (!m_attIndex.isValid())
-		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index3");
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -540,9 +564,9 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribu
 //
 //	if (m_attIndex.map() != &map)
 //	{
-//		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+//		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index3");
 //		if (!m_attIndex.isValid())
-//			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+//			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index3");
 //	}
 //
 //	m_nbDarts = 0;

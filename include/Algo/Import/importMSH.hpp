@@ -49,7 +49,7 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbVolumes = 0;
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	//open file
 	std::ifstream fp(filename.c_str(), std::ios::in);

@@ -107,18 +107,18 @@ int main(int argc, char **argv)
 
 	// define the face extruded (here a cross)
 	std::vector<PFP::VEC3> objV;
-	objV.push_back(PFP::VEC3(-1, 0,-1));
-	objV.push_back(PFP::VEC3(-1, 0,-2));
-	objV.push_back(PFP::VEC3(+1, 0,-2));
-	objV.push_back(PFP::VEC3(+1, 0,-1));
-	objV.push_back(PFP::VEC3(+2, 0,-1));
-	objV.push_back(PFP::VEC3(+2, 0,+1));
-	objV.push_back(PFP::VEC3(+1, 0,+1));
-	objV.push_back(PFP::VEC3(+1, 0,+2));
-	objV.push_back(PFP::VEC3(-1, 0,+2));
-	objV.push_back(PFP::VEC3(-1, 0,+1));
-	objV.push_back(PFP::VEC3(-2, 0,+1));
 	objV.push_back(PFP::VEC3(-2, 0,-1));
+	objV.push_back(PFP::VEC3(-2, 0,+1));
+	objV.push_back(PFP::VEC3(-1, 0,+1));
+	objV.push_back(PFP::VEC3(-1, 0,+2));
+	objV.push_back(PFP::VEC3(+1, 0,+2));
+	objV.push_back(PFP::VEC3(+1, 0,+1));
+	objV.push_back(PFP::VEC3(+2, 0,+1));
+	objV.push_back(PFP::VEC3(+2, 0,-1));
+	objV.push_back(PFP::VEC3(+1, 0,-1));
+	objV.push_back(PFP::VEC3(+1, 0,-2));
+	objV.push_back(PFP::VEC3(-1, 0,-2));
+	objV.push_back(PFP::VEC3(-1, 0,-1));
 
 	// define a path (here an helicoid)
 	std::vector<PFP::VEC3> pathV;
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 		PFP::REAL alpha = 3.141592/20.0 * i;
 		PFP::REAL rad = 20.0 - 0.2*i;
 		pathV.push_back(PFP::VEC3(rad*cos(alpha),rad*sin(alpha), 0.5*i));
-		pathRadius.push_back(1.5f+0.7*cos(alpha));
+		pathRadius.push_back(2.0f+0.3*cos(alpha));
 	}
 
 	// extrusion

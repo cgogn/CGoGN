@@ -49,7 +49,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbVolumes = 0;
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	//open file
 	std::ifstream fp(filename.c_str(), std::ios::in);
@@ -61,6 +61,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	std::string ligne;
 	unsigned int nbv, nbt;
+
 	// reading number of vertices
 	std::getline (fp, ligne);
 	std::stringstream oss(ligne);
@@ -79,7 +80,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		do
 		{
 			std::getline (fp, ligne);
-		} while (ligne.size() == 0);
+		} while (ligne.size() == 0 );
 
 		std::stringstream oss(ligne);
 
@@ -87,6 +88,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		oss >> x;
 		oss >> y;
 		oss >> z;
+
 		// TODO : if required read other vertices attributes here
 		VEC3 pos(x*scaleFactor,y*scaleFactor,z*scaleFactor);
 
@@ -145,15 +147,10 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 			}
 		}
 
-
-
 		oss >> pt[0];
 		oss >> pt[1+invertTetra];
 		oss >> pt[2-invertTetra];
 		oss >> pt[3];
-
-		//if regions are defined use this number
-		oss >> nbe; //ignored here
 
 		// Embed three "base" vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)

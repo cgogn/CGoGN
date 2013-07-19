@@ -88,14 +88,14 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
 * @param map the map
 * @param attributs geometric attributes of the vertices
 */
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs);
 
-template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
-{
-	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position);
-}
+//template <typename PFP>
+//void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+//{
+//	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position);
+//}
 
 template <typename PFP>
 void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);

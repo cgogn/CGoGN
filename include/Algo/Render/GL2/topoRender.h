@@ -268,8 +268,7 @@ public:
 	 * Special update function used to draw boundary of map3
 	 */
 	template<typename PFP>
-	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns);
-
+	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float ns);
 
 	/**
 	 * render to svg struct

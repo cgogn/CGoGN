@@ -231,7 +231,50 @@ inline bool AttributeContainer::used(unsigned int index) const
  *         CONTAINER TRAVERSAL        *
  **************************************/
 
+//inline unsigned int AttributeContainer::begin() const
+//{
+//	unsigned int it = 0;
+//	while ((it < m_maxSize) && (!used(it)))
+//		++it;
+//	return it;
+//}
+
+//inline unsigned int AttributeContainer::end() const
+//{
+//	return m_maxSize;
+//}
+
+//inline void AttributeContainer::next(unsigned int &it) const
+//{
+//	do
+//	{
+//		++it;
+//	} while ((it < m_maxSize) && (!used(it)));
+//}
+
 inline unsigned int AttributeContainer::begin() const
+{
+	if (m_currentBrowser != NULL)
+		return m_currentBrowser->begin();
+	return AttributeContainer::realBegin();
+}
+
+inline unsigned int AttributeContainer::end() const
+{
+	if (m_currentBrowser != NULL)
+		return m_currentBrowser->end();
+	return AttributeContainer::realEnd();
+}
+
+inline void AttributeContainer::next(unsigned int &it) const
+{
+	if (m_currentBrowser != NULL)
+		m_currentBrowser->next(it);
+	else
+		AttributeContainer::realNext(it);
+}
+
+inline unsigned int AttributeContainer::realBegin() const
 {
 	unsigned int it = 0;
 	while ((it < m_maxSize) && (!used(it)))
@@ -239,12 +282,12 @@ inline unsigned int AttributeContainer::begin() const
 	return it;
 }
 
-inline unsigned int AttributeContainer::end() const
+inline unsigned int AttributeContainer::realEnd() const
 {
 	return m_maxSize;
 }
 
-inline void AttributeContainer::next(unsigned int &it) const
+inline void AttributeContainer::realNext(unsigned int &it) const
 {
 	do
 	{
@@ -394,78 +437,6 @@ inline void AttributeContainer::setData(unsigned int attrIndex, unsigned int elt
 	assert((atm != NULL) || !"getData: wrong type");
 
 	atm->operator[](eltIndex) = data;
-}
-
-/**************************************
- *       ARITHMETIC OPERATIONS        *
- **************************************/
-
-inline void AttributeContainer::toggleProcess(unsigned int index)
-{
-	assert(index < m_tableAttribs.size() || !"toggleProcess: attribute index out of bounds");
-	assert(m_tableAttribs[index] != NULL || !"toggleProcess: attribute does not exist");
-	m_tableAttribs[index]->toggleProcess();
-}
-
-inline void AttributeContainer::toggleNoProcess(unsigned int index)
-{
-	assert(index < m_tableAttribs.size() || !"toggleNoProcess: attribute index out of bounds");
-	assert(m_tableAttribs[index] != NULL || !"toggleNoProcess: attribute does not exist");
-	m_tableAttribs[index]->toggleNoProcess();
-}
-
-inline void AttributeContainer::affect(unsigned int i, unsigned int j)
-{
-	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
-	{
-		if (*it != NULL)
-			(*it)->affect(i, j);
-	}
-}
-
-inline void AttributeContainer::add(unsigned int i, unsigned int j)
-{
-	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
-	{
-		if ((*it) != NULL)
-			(*it)->add(i, j);
-	}
-}
-
-inline void AttributeContainer::sub(unsigned int i, unsigned int j)
-{
-	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
-	{
-		if ((*it) != NULL)
-			(*it)->sub(i, j);
-	}
-}
-
-inline void AttributeContainer::mult(unsigned int i, double alpha)
-{
-	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
-	{
-		if ((*it) != NULL)
-			(*it)->mult(i, alpha);
-	}
-}
-
-inline void AttributeContainer::div(unsigned int i, double alpha)
-{
-	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
-	{
-		if ((*it) != NULL)
-			(*it)->div(i, alpha);
-	}
-}
-
-inline void AttributeContainer::lerp(unsigned res, unsigned int i, unsigned int j, double alpha)
-{
-	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
-	{
-		if ((*it) != NULL)
-			(*it)->lerp(res, i, j, alpha);
-	}
 }
 
 } // namespace CGoGN

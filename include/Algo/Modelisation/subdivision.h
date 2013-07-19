@@ -89,20 +89,21 @@ void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3
 /**
  * Catmull-Clark subdivision scheme
  */
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
-template <typename PFP>
-void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
+//template <typename PFP>
+//void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 /**
  * Loop subdivision scheme
  */
-template <typename PFP, typename EMBV, typename EMB>
+//template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
-template <typename PFP>
-void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
+//template <typename PFP>
+//void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 
 /**
@@ -115,8 +116,8 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size=
 /**
  * Doo-Sabin subdivision scheme
  */
-template <typename PFP>
-void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+template <typename PFP, typename EMBV>
+void DooSabin(typename PFP::MAP& map, EMBV& position);
 
 ///**
 // * Reverse the orientation of the map

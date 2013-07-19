@@ -706,9 +706,20 @@ bool Map3::unsewVolumesPreCond(Dart d)
 }
 
 
-void Map3::unsewVolumes(Dart d)
+void Map3::unsewVolumes(Dart d, bool withBoundary)
 {
 	assert(unsewVolumesPreCond(d)) ;
+
+	if (!withBoundary)
+	{
+		Dart fitD = d ;
+		do
+		{
+			phi3unsew(fitD) ;
+			fitD = phi1(fitD) ;
+		} while(fitD != d) ;
+		return ;
+	}
 
 	unsigned int nbE = faceDegree(d) ;
 	Dart d3 = phi3(d);
@@ -839,6 +850,22 @@ unsigned int Map3::vertexDegree(Dart d)
 
 	return count;
 }
+
+
+int Map3::checkVertexDegree(Dart d, unsigned int vd)
+{
+	unsigned int count = 0;
+
+	Traversor3VE<Map3> trav3VE(*this, d);
+	Dart dit = trav3VE.begin();
+	for( ; (count<=vd) && (dit != trav3VE.end()) ; dit = trav3VE.next())
+	{
+		++count;
+	}
+
+	return count - vd;
+}
+
 
 unsigned int Map3::vertexDegreeOnBoundary(Dart d)
 {

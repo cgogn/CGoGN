@@ -101,7 +101,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "LengthEdgeInfo" ; }
 	} LengthEdgeInfo ;
-	typedef NoMathIOAttribute<LengthEdgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<LengthEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 
@@ -151,7 +151,7 @@ private:
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "SG98edgeInfo" ; }
 	} SG98edgeInfo ;
-	typedef NoMathIOAttribute<SG98edgeInfo> EdgeInfo ;
+	typedef NoTypeNameAttribute<SG98edgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 

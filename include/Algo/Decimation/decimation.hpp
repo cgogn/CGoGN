@@ -105,7 +105,10 @@ int decimate(
 		case A_hQEM :
 			// pos
 			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs)) ;
-		break ;
+			break ;
+
+		case A_OTHER:
+			break;
 	}
 
 	switch(s)
@@ -155,9 +158,11 @@ int decimate(
 		case S_GeomColOptGrad:
 			selector = new EdgeSelector_GeomColOptGradient<PFP>(map, position, approximators) ;
 			break ;
+		case S_OTHER:
+			break;
 	}
 
-	int status = decimate(map, selector, approximators, nbWantedVertices, edgeErrors, callback_wrapper, callback_object) ;
+	int status = decimate<PFP>(map, selector, approximators, nbWantedVertices, true, edgeErrors, callback_wrapper, callback_object) ;
 
 	delete selector ;
 

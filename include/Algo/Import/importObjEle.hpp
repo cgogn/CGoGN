@@ -49,7 +49,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 
 	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	// open files
 	std::ifstream foff(filenameOFF.c_str(), std::ios::in);

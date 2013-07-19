@@ -58,4 +58,39 @@ Dart TraversorDartsOfOrbit<MAP, ORBIT>::next()
 	return *m_current;
 }
 
+
+
+
+template <typename MAP, unsigned int ORBIT>
+VTraversorDartsOfOrbit<MAP, ORBIT>::VTraversorDartsOfOrbit(MAP& map, Dart d, unsigned int thread)
+{
+	m_vd.reserve(16);
+	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
+	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
+	m_vd.push_back(NIL);
+}
+
+template <typename MAP, unsigned int ORBIT>
+Dart VTraversorDartsOfOrbit<MAP, ORBIT>::begin()
+{
+	m_current = m_vd.begin();
+	return *m_current;
+}
+
+template <typename MAP, unsigned int ORBIT>
+Dart VTraversorDartsOfOrbit<MAP, ORBIT>::end()
+{
+	return NIL;
+}
+
+template <typename MAP, unsigned int ORBIT>
+Dart VTraversorDartsOfOrbit<MAP, ORBIT>::next()
+{
+	if (*m_current != NIL)
+		m_current++;
+	return *m_current;
+}
+
+
+
 } // namespace CGoGN

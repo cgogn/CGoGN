@@ -236,6 +236,14 @@ inline unsigned int GenericMap::dartIndex(Dart d) const
 	return d.index;
 }
 
+inline Dart GenericMap::indexDart(unsigned int index) const
+{
+	if (m_isMultiRes)
+		return Dart( (*m_mrDarts[m_mrCurrentLevel])[index]) ;
+	return Dart(index);
+}
+
+
 inline unsigned int GenericMap::getDartLevel(Dart d) const
 {
 	return (*m_mrLevels)[d.index] ;
@@ -444,6 +452,7 @@ void GenericMap::initAllOrbitsEmbedding(bool realloc)
 template <unsigned int ORBIT>
 inline void GenericMap::enableQuickTraversal()
 {
+
 	if(m_quickTraversal[ORBIT] == NULL)
 	{
 		if(!isOrbitEmbedded<ORBIT>())
@@ -484,6 +493,133 @@ inline void GenericMap::disableQuickTraversal()
 		m_quickTraversal[ORBIT] = NULL ;
 	}
 }
+
+
+template <typename MAP, unsigned int ORBIT, unsigned int INCI>
+inline void GenericMap::enableQuickIncidentTraversal()
+{
+	if(m_quickLocalIncidentTraversal[ORBIT][INCI] == NULL)
+	{
+		if(!isOrbitEmbedded<ORBIT>())
+			addEmbedding<ORBIT>() ;
+		std::stringstream ss;
+		ss << "quickLocalIncidentTraversal_" << INCI;
+		m_quickLocalIncidentTraversal[ORBIT][INCI] = m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+	}
+	updateQuickIncidentTraversal<MAP,ORBIT,INCI>() ;
+}
+
+template <typename MAP, unsigned int ORBIT, unsigned int INCI>
+inline void GenericMap::updateQuickIncidentTraversal()
+{
+	assert(m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL || !"updateQuickTraversal on a disabled orbit") ;
+
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* ptrVD = m_quickLocalIncidentTraversal[ORBIT][INCI];
+	m_quickLocalIncidentTraversal[ORBIT][INCI] = NULL;
+
+	std::vector<Dart> buffer;
+	buffer.reserve(100);
+
+	MAP& map = static_cast<MAP&>(*this);
+
+	TraversorCell<MAP,ORBIT> tra_glob(map);
+	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
+	{
+		buffer.clear();
+		Traversor<MAP>* tra_loc = TraversorFactory<MAP>::createIncident(map, d, map.dimension(), ORBIT, INCI);
+		for (Dart e = tra_loc->begin(); e != tra_loc->end(); e = tra_loc->next())
+			buffer.push_back(e);
+		delete tra_loc;
+		buffer.push_back(NIL);
+		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+		vd.reserve(buffer.size());
+		vd.assign(buffer.begin(),buffer.end());
+	}
+	m_quickLocalIncidentTraversal[ORBIT][INCI] = ptrVD;
+}
+
+template <unsigned int ORBIT, unsigned int INCI>
+inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickIncidentTraversal()
+{
+	return m_quickLocalIncidentTraversal[ORBIT][INCI] ;
+}
+
+template <unsigned int ORBIT, unsigned int INCI>
+inline void GenericMap::disableQuickIncidentTraversal()
+{
+	if(m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL)
+	{
+		m_attribs[ORBIT].removeAttribute<Dart>(m_quickLocalIncidentTraversal[ORBIT][INCI]->getIndex()) ;
+		m_quickLocalIncidentTraversal[ORBIT][INCI] = NULL ;
+	}
+}
+
+
+
+template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
+inline void GenericMap::enableQuickAdjacentTraversal()
+{
+	if(m_quickLocalAdjacentTraversal[ORBIT][ADJ] == NULL)
+	{
+		if(!isOrbitEmbedded<ORBIT>())
+			addEmbedding<ORBIT>() ;
+		std::stringstream ss;
+		ss << "quickLocalAdjacentTraversal" << ADJ;
+		m_quickLocalAdjacentTraversal[ORBIT][ADJ] = m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+	}
+	updateQuickAdjacentTraversal<MAP,ORBIT,ADJ>() ;
+}
+
+template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
+inline void GenericMap::updateQuickAdjacentTraversal()
+{
+	assert(m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL || !"updateQuickTraversal on a disabled orbit") ;
+
+	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* ptrVD = m_quickLocalAdjacentTraversal[ORBIT][ADJ];
+	m_quickLocalAdjacentTraversal[ORBIT][ADJ] = NULL;
+
+	MAP& map = static_cast<MAP&>(*this);
+
+	std::vector<Dart> buffer;
+	buffer.reserve(100);
+
+	TraversorCell<MAP,ORBIT> tra_glob(map);
+	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
+	{
+		buffer.clear();
+		Traversor<MAP>* tra_loc = TraversorFactory<MAP>::createAdjacent(map, d, map.dimension(), ORBIT, ADJ);
+		for (Dart e = tra_loc->begin(); e != tra_loc->end(); e = tra_loc->next())
+			buffer.push_back(e);
+		buffer.push_back(NIL);
+		delete tra_loc;
+		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+		vd.reserve(buffer.size());
+		vd.assign(buffer.begin(),buffer.end());
+	}
+	m_quickLocalAdjacentTraversal[ORBIT][ADJ] = ptrVD;
+}
+
+template <unsigned int ORBIT, unsigned int ADJ>
+inline AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* GenericMap::getQuickAdjacentTraversal()
+{
+	return m_quickLocalAdjacentTraversal[ORBIT][ADJ] ;
+}
+
+template <unsigned int ORBIT, unsigned int ADJ>
+inline void GenericMap::disableQuickAdjacentTraversal()
+{
+	if(m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL)
+	{
+		m_attribs[ORBIT].removeAttribute<Dart>(m_quickLocalAdjacentTraversal[ORBIT][ADJ]->getIndex()) ;
+		m_quickLocalAdjacentTraversal[ORBIT][ADJ] = NULL ;
+	}
+}
+
+
+
+
+
+
 
 /****************************************
  *        ATTRIBUTES MANAGEMENT         *
@@ -575,7 +711,8 @@ void GenericMap::addEmbedding()
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-inline Dart GenericMap::realBegin() const
+//inline Dart GenericMap::realBegin() const
+inline Dart GenericMap::begin() const
 {
 	if (m_isMultiRes)
 	{
@@ -591,7 +728,8 @@ inline Dart GenericMap::realBegin() const
 	return Dart::create(m_attribs[DART].begin()) ;
 }
 
-inline Dart GenericMap::realEnd() const
+//inline Dart GenericMap::realEnd() const
+inline Dart GenericMap::end() const
 {
 	if (m_isMultiRes)
 		return Dart::create(m_mrattribs.end()) ;
@@ -599,7 +737,8 @@ inline Dart GenericMap::realEnd() const
 	return Dart::create(m_attribs[DART].end()) ;
 }
 
-inline void GenericMap::realNext(Dart& d) const
+//inline void GenericMap::realNext(Dart& d) const
+inline void GenericMap::next(Dart& d) const
 {
 	if (m_isMultiRes)
 	{
@@ -615,27 +754,27 @@ inline void GenericMap::realNext(Dart& d) const
 }
 
 
-inline Dart GenericMap::begin() const
-{
-	if (m_currentBrowser != NULL)
-		return m_currentBrowser->begin();
-	return GenericMap::realBegin();
-}
+//inline Dart GenericMap::begin() const
+//{
+//	if (m_currentBrowser != NULL)
+//		return m_currentBrowser->begin();
+//	return GenericMap::realBegin();
+//}
 
-inline Dart GenericMap::end() const
-{
-	if (m_currentBrowser != NULL)
-		return m_currentBrowser->end();
-	return GenericMap::realEnd();
-}
+//inline Dart GenericMap::end() const
+//{
+//	if (m_currentBrowser != NULL)
+//		return m_currentBrowser->end();
+//	return GenericMap::realEnd();
+//}
 
-inline void GenericMap::next(Dart& d) const
-{
-	if (m_currentBrowser != NULL)
-		m_currentBrowser->next(d);
-	else
-		realNext(d);
-}
+//inline void GenericMap::next(Dart& d) const
+//{
+//	if (m_currentBrowser != NULL)
+//		m_currentBrowser->next(d);
+//	else
+//		realNext(d);
+//}
 
 //inline Dart GenericMap::begin() const
 //{

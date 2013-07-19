@@ -32,7 +32,7 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT>
-class TraversorDartsOfOrbit : public Traversor<MAP>
+class TraversorDartsOfOrbit //: public Traversor<MAP>
 {
 private:
 	std::vector<Dart>::iterator m_current ;
@@ -47,6 +47,27 @@ public:
 
 	Dart next() ;
 } ;
+
+
+
+template <typename MAP, unsigned int ORBIT>
+class VTraversorDartsOfOrbit : public Traversor<MAP>
+{
+private:
+	std::vector<Dart>::iterator m_current ;
+	std::vector<Dart> m_vd ;
+
+public:
+	VTraversorDartsOfOrbit(MAP& map, Dart d, unsigned int thread = 0) ;
+
+	Dart begin() ;
+
+	Dart end() ;
+
+	Dart next() ;
+} ;
+
+
 
 } // namespace CGoGN
 

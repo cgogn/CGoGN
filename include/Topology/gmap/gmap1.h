@@ -180,6 +180,13 @@ public:
 	 */
 	unsigned int cycleDegree(Dart d);
 
+	//! Check the Length of a cycle (its number of oriented edges)
+	/*! @param d a dart of the cycle
+	 *  @param le the length to compare
+	 *  @return  negative/null/positive if face degree is less/equal/greater than given degree
+	 */
+	 int checkCycleDegree(Dart d, unsigned int le) ;
+
 	/**
 	 * check if the face of d is a triangle
 	 * @return a boolean indicating if the face is a triangle

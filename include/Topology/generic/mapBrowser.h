@@ -22,94 +22,37 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef MAPBROWSER_H_
-#define MAPBROWSER_H_
+#ifndef _MAPBROWSER_H_
+#define _MAPBROWSER_H_
 
+#include "Container/containerBrowser.h"
 #include "Topology/generic/dart.h"
-#include "Topology/generic/attribmap.h"
-#include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/autoAttributeHandler.h"
 
 namespace CGoGN
 {
-
 /**
- * Browser that traverses all darts and jumps over
- * those not selected by the selector
+ * @brief The MapBrowserLinked class for compatibility of old code only
  */
-class MapBrowserSelector : public MapBrowser
+class MapBrowserLinked : public FunctorType
 {
 protected:
-	AttribMap& m_map ;
-	const FunctorSelect* m_selector ;
-
+	ContainerBrowserLinked m_cbrowser;
 public:
-	MapBrowserSelector(AttribMap& m, const FunctorSelect& fs);
+	inline MapBrowserLinked(AttribMap& m): m_cbrowser(m, DART)
+	{
+	#ifndef NDEBUG
+		std::cout << "DO NOT USE MAP BROWER. USE TRAVERSOR INSTEAD "<< std::endl;
+	#endif
+	}
 
-	~MapBrowserSelector();
-
-	Dart begin() const;
-
-	Dart end() const;
-
-	void next(Dart& d) const;
-} ;
-
-/**
- * Browser that traverses a "submap" stored in a
- * linked list (an attribute of dart orbit)
- * It inherits from FunctorType to allow the use in
- * a foreach_cell which adds darts in the list
- */
-class MapBrowserLinked : public MapBrowser, public FunctorType
-{
-protected:
-	// The browsed map
-	AttribMap& m_map ;
-
-	// The table attributes of links storing the linking
-	// The boolean autoAttribute is set if this attribute is managed by the browser
-	bool autoAttribute ;
-	DartAttribute<Dart> m_links ;
-
-	Dart m_first ;
-	Dart m_end ;
-
-public:
-	MapBrowserLinked(AttribMap& m);
-
-	MapBrowserLinked(AttribMap& m, DartAttribute<Dart>& links);
-	
-	MapBrowserLinked(AttribMap& m, DartAttribute<Dart>& links, Dart first, Dart end);
-
-	~MapBrowserLinked();
-	DartAttribute<Dart>& getLinkAttr();
-	
-	void clear();
-
-	Dart begin() const;
-
-	Dart end() const;
-
-	void next(Dart& d) const;
-
-	void pushFront(Dart d);
-
-	void pushBack(Dart d);
-
-	void popFront();
-
-
-	void addSelected(const FunctorSelect& fs);
-
-	// operator() for use of foreach_cell
-	bool operator()(Dart d);
-
-	void append(MapBrowserLinked& mbl);
-} ;
+	inline Dart begin() const			{return Dart(m_cbrowser.begin());}
+	inline Dart end() const			{return NIL;}
+	inline void next(Dart& d) const	{m_cbrowser.next(d.index);}
+	inline bool operator()(Dart d)		{m_cbrowser.pushBack(d.index); return false;}
+	inline ContainerBrowserLinked& getContainerBrowser() {return m_cbrowser;}
+};
 
 } // namespace CGoGN
 
-#include "Topology/generic/mapBrowser.hpp"
 
-#endif /* MAPBROWSER_H_ */
+#endif /* _MAPBROWSER_H_ */

@@ -107,7 +107,7 @@ public:
 	//!
 	/*!
 	 */
-	virtual void unsewVolumes(Dart d);
+	virtual void unsewVolumes(Dart d, bool withBoundary = true);
 
 	//!
 	/*!

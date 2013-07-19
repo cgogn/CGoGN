@@ -758,6 +758,76 @@ bool exportVolBinGz(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 
 
 template <typename PFP>
+bool exportTetmesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	// open file
+	std::ofstream fout ;
+	fout.open(filename, std::ios::out) ;
+
+	if (!fout.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false ;
+	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+	fout << "Vertices" << std::endl<< position.nbElements() << std::endl;
+
+	std::vector<unsigned int> tetra;
+	tetra.reserve(2048);
+
+	unsigned int count=1;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		const VEC3& P = position[i];
+		fout << P[0]<< " " << P[1]<< " " << P[2] << " " << "0" << std::endl;
+		indices[i] = count++;
+	}
+
+
+	TraversorW<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+#ifndef _OPTIMIZED_FOR_TETRA_ONLY_
+		unsigned int degree = 0 ;
+		Traversor3WV<typename PFP::MAP> twv(map, d) ;
+		for(Dart it = twv.begin(); it != twv.end(); it = twv.next())
+		{
+			degree++;
+		}
+
+		if (degree == 4)
+#endif
+		{
+			Dart e = d;
+			tetra.push_back(indices[e]);
+			e = map.phi_1(e);
+			tetra.push_back(indices[e]);
+			e = map.phi_1(e);
+			tetra.push_back(indices[e]);
+			e = map.template phi<211>(e);
+			tetra.push_back(indices[e]);
+		}
+	}
+
+	unsigned int nbtetra = tetra.size()/4;
+	fout << "Tetrahedra" << std::endl << nbtetra << std::endl;
+
+	for (unsigned int i=0; i<nbtetra; ++i)
+	{
+		fout << tetra[4*i] << " " << tetra[4*i+1] << " " << tetra[4*i+2] << " " << tetra[4*i+3] << std::endl;
+	}
+
+	fout.close();
+	return true;
+}
+
+
+template <typename PFP>
 bool exportMesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const std::string& filename)
 {
 	Import::ImportType kind = Import::getFileType(filename);
@@ -783,8 +853,12 @@ bool exportMesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3
 	case Import::VBGZ:
 		return exportVolBinGz<PFP>(map, position, filename.c_str());
 		break;
+	case Import::TETMESH:
+		return exportTetmesh<PFP>(map, position, filename.c_str());
+		break;
 	default:
 		CGoGNerr << "unknown file format for " << filename << CGoGNendl;
+		return false;
 		break;
 	}
 }

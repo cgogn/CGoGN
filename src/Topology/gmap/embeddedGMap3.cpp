@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include "Topology/gmap/embeddedGMap3.h"
+#include "Topology/generic/traversor3.h"
 
 namespace CGoGN
 {

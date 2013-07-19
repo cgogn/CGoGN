@@ -108,6 +108,8 @@ public:
 	 */
 	void addNewLevel();
 
+	void addNewLevelSqrt3(bool embedNewVertices = false);
+
 	//!
 	/*
 	 */

@@ -619,6 +619,19 @@ unsigned int Map2::vertexDegree(Dart d)
 	return count ;
 }
 
+int Map2::checkVertexDegree(Dart d, unsigned int vd)
+{
+	unsigned int count = 0 ;
+	Dart it = d ;
+	do
+	{
+		++count ;
+		it = phi2(phi_1(it)) ;
+	} while ((count<=vd) && (it != d)) ;
+
+	return count-vd;
+}
+
 bool Map2::isBoundaryVertex(Dart d)
 {
 	Dart it = d ;
@@ -728,6 +741,43 @@ unsigned int Map2::volumeDegree(Dart d)
 
 	return count;
 }
+
+
+
+int Map2::checkVolumeDegree(Dart d, unsigned int volDeg)
+{
+	unsigned int count = 0;
+	DartMarkerStore mark(*this);		// Lock a marker
+
+	std::vector<Dart> visitedFaces;		// Faces that are traversed
+	visitedFaces.reserve(16);
+	visitedFaces.push_back(d);			// Start with the face of d
+
+	// For every face added to the list
+	for (unsigned int i = 0; i != visitedFaces.size(); ++i)
+	{
+		Dart df = visitedFaces[i];
+		if (!isBoundaryMarked2(df) && !mark.isMarked(df))		// Face has not been visited yet
+		{
+			++count;
+			Dart it = df ;
+			do
+			{
+				mark.mark(it);					// Mark
+				Dart adj = phi2(it);			// Get adjacent face
+				if ( !isBoundaryMarked2(adj) && !mark.isMarked(adj) )
+					visitedFaces.push_back(adj);// Add it
+				it = phi1(it);
+			} while(it != df);
+		}
+		if (count > volDeg)
+			break;
+	}
+
+	return count - volDeg;
+}
+
+
 
 bool Map2::isTriangular()
 {

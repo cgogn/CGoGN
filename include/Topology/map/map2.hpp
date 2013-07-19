@@ -184,6 +184,13 @@ inline unsigned int Map2::faceDegree(Dart d)
 	return Map1::cycleDegree(d) ;
 }
 
+
+inline int Map2::checkFaceDegree(Dart d, unsigned int le)
+{
+	return Map1::checkCycleDegree(d,le) ;
+}
+
+
 inline bool Map2::sameVolume(Dart d, Dart e)
 {
 	return sameOrientedVolume(d, e) ;

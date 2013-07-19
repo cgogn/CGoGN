@@ -39,6 +39,18 @@ namespace CGoGN
 {
 
 class RegisteredBaseAttribute;
+class AttributeContainer;
+
+
+class ContainerBrowser
+{
+public:
+	virtual unsigned int begin() const = 0;
+	virtual unsigned int end() const = 0;
+	virtual void next(unsigned int &it) const = 0;
+	virtual void enable() = 0;
+	virtual void disable() = 0;
+};
 
 /**
  * Container for AttributeMultiVectors
@@ -56,7 +68,7 @@ public:
 	/**
 	* Taille du bloc
 	*/
-	static const unsigned int BlockSize = _BLOCKSIZE_;
+//	static const unsigned int BlockSize = _BLOCKSIZE_;
 
 protected:
 	/**
@@ -83,6 +95,8 @@ protected:
 	* vector of indices of blocks that are empty
 	*/
 	std::vector<unsigned int> m_tableBlocksEmpty;
+
+	ContainerBrowser* m_currentBrowser;
 
 	/**
 	 * orbit of the container
@@ -128,6 +142,8 @@ public:
 	void setOrbit(unsigned int orbit);
 
 	void setRegistry(std::map<std::string, RegisteredBaseAttribute*>* re);
+
+	void setContainerBrowser(ContainerBrowser* bro) { m_currentBrowser = bro;}
 
 	/**************************************
 	 *          BASIC FEATURES            *
@@ -223,6 +239,25 @@ public:
 	 * MUST BE USED INSTEAD OF ++ !
 	 */
 	void next(unsigned int &it) const;
+
+
+
+	/**
+	 * return the index of the first line of the container
+	 */
+	unsigned int realBegin() const;
+
+	/**
+	 * return the index of the last line of the container
+	 */
+	unsigned int realEnd() const;
+
+	/**
+	 * get the index of the line after it in the container
+	 * MUST BE USED INSTEAD OF ++ !
+	 */
+	void realNext(unsigned int &it) const;
+
 
 	/**************************************
 	 *       INFO ABOUT ATTRIBUTES        *
@@ -404,112 +439,13 @@ public:
 	template <typename T>
 	void setData(unsigned int attrIndex, unsigned int eltIndex, const T& data);
 
-	/**************************************
-	 *       ARITHMETIC OPERATIONS        *
-	 **************************************/
 
-	/**
-	 * Toggle an attribute to process
-	 * @param index index of attribute
-	 */
-	void toggleProcess(unsigned int index);
-
-	/**
-	 * Toggle an attribute to process
-	 * @param index index of attribute
-	 */
-	void toggleNoProcess(unsigned int index);
-
-	/**
-	 * copy process attributes of line j in line i
-	 * @param i line to modify
-	 * @param j line to copy to i
-	 */
-	void affect(unsigned int i, unsigned int j);
-
-	/**
-	 * add process attributes of line j to line i
-	 * @param i line to modify
-	 * @param j line to add to i
-	 */
-	void add(unsigned int i, unsigned int j);
-
-	/**
-	 * sub process attributes of line j from line i
-	 * @param i line to modify
-	 * @param j line to sub from i
-	 */
-	void sub(unsigned int i, unsigned int j);
-
-	/**
-	 * multiy process attributes of line j by a scalar
-	 * @param i line to multiply
-	 * @param alpha scalar
-	 */
-	void mult(unsigned int i, double alpha);
-
-	/**
-	 * multiy process attributes of line j by a scalar
-	 * @param i line to multiply
-	 * @param alpha scalar
-	 */
-	void div(unsigned int i, double alpha);
-
-	/**
-	 * interpole process attributes A_res = alpha*A_i + (1-alpha)*A_j
-	 * @param res result line
-	 * @param i first line
-	 * @param j second line
-	 * @param alpha coefficient of interpolation
-	 */
-	void lerp(unsigned res, unsigned int i, unsigned int j, double alpha);
 
 	/**************************************
 	 *            SAVE & LOAD             *
 	 **************************************/
 
-protected:
-//	/**
-//	 * load xmlpart of container
-//	 */
-//	bool loadXmlHB(xmlNodePtr node);
-
-	/**
-	 * load xmlpart of container
-	 */
-//	bool loadXmlBWF(xmlNodePtr node);
-
-	/**
-	 * load xmlpart of container
-	 */
-//	bool loadXmlAN(xmlNodePtr node, unsigned int nbb);
-
-	/**
-	 * load xmlpart of container
-	 */
-//	bool loadXmlDL(xmlNodePtr node);
-
 public:
-	/**
-	* save Xml file
-	* @param writer a xmlTextWriterPtr obj
-	* @param id the id to save
-	*/
-//	void saveXml(xmlTextWriterPtr writer, unsigned int id);
-
-	/**
-	* get id from xml node
-	* @param node the node of container node of xml tree
-	* @return the value of id of the node
-	*/
-//	static unsigned int getIdXmlNode(xmlNodePtr node);
-
-	/**
-	* load from xml node
-	* @param node the node of container node of xml tree
-	*/
-//	bool loadXml(xmlNodePtr node);
-
 	/**
 	* save binary file
 	* @param fs a file stream

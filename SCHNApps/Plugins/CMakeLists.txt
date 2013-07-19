@@ -9,5 +9,5 @@ ADD_SUBDIRECTORY(renderScalar)
 ADD_SUBDIRECTORY(renderExplod)
 ADD_SUBDIRECTORY(renderTopoSurface)
 ADD_SUBDIRECTORY(subdivideSurface)
-ADD_SUBDIRECTORY(surfaceDeformation)
-
+#ADD_SUBDIRECTORY(surfaceDeformation)
+ADD_SUBDIRECTORY(subdivideMRVolume)

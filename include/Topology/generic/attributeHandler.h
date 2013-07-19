@@ -29,6 +29,7 @@
 #include <map>
 
 #include "Topology/generic/genericmap.h"
+#include "Container/fakeAttribute.h"
 
 namespace CGoGN
 {
@@ -141,7 +142,7 @@ public:
 	/**
 	 * get attribute orbit
 	 */
-	unsigned int getOrbit() const ;
+	static unsigned int getOrbit() ;
 
 	/**
 	 * get attribute index
@@ -230,6 +231,7 @@ public:
 	DartAttribute<T>& operator=(const AttributeHandler<T, DART>& ah) { this->AttributeHandler<T, DART>::operator=(ah); return *this; }
 };
 
+
 /**
  *  shortcut class for Vertex Attribute (Handler)
  */
@@ -246,6 +248,7 @@ public:
 	VertexAttribute<T>& operator=(const AttributeHandler<T, VOLUME>& ah) { this->AttributeHandler<T,VERTEX>::operator=(ah); return *this; }
 };
 
+
 /**
  *  shortcut class for Edge Attribute (Handler)
  */
@@ -258,6 +261,7 @@ public:
 	EdgeAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, EDGE>(m,amv) {}
 	EdgeAttribute<T>& operator=(const AttributeHandler<T, EDGE>& ah) { this->AttributeHandler<T, EDGE>::operator=(ah); return *this; }
 };
+
 
 /**
  *  shortcut class for Face Attribute (Handler)
@@ -272,6 +276,7 @@ public:
 	FaceAttribute<T>& operator=(const AttributeHandler<T, FACE>& ah) { this->AttributeHandler<T, FACE>::operator=(ah); return *this; }
 	FaceAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ah) { this->AttributeHandler<T,FACE>::operator=(ah); return *this; }
 };
+
 
 /**
  *  shortcut class for Volume Attribute (Handler)

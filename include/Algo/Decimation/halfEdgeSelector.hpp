@@ -167,7 +167,7 @@ void HalfEdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool reco
 }
 
 template <typename PFP>
-void HalfEdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void HalfEdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart /*dd2*/)
 {
 	MAP& m = this->m_map ;
 
@@ -450,7 +450,7 @@ void HalfEdgeSelector_QEMextColor<PFP>::recomputeQuadric(const Dart d, const boo
 }
 
 template <typename PFP>
-void HalfEdgeSelector_QEMextColor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void HalfEdgeSelector_QEMextColor<PFP>::updateAfterCollapse(Dart d2, Dart /*dd2*/)
 {
 	MAP& m = this->m_map ;
 
@@ -763,7 +763,7 @@ void HalfEdgeSelector_ColorGradient<PFP>::recomputeQuadric(const Dart d)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_ColorGradient<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void HalfEdgeSelector_ColorGradient<PFP>::updateAfterCollapse(Dart d2, Dart /*dd2*/)
 {
 	MAP& m = this->m_map ;
 

@@ -32,8 +32,7 @@
 
 #include "Geometry/vector_gen.h"
 
-#include "Algo/Render/GL1/map_glRender.h"
-#include "Algo/Render/GL1/topo_render.h"
+#include "Algo/Render/GL2/topo3Render.h"
 
 using namespace CGoGN ;
 
@@ -41,7 +40,6 @@ struct PFP: public PFP_STANDARD
 {
 	// definition of the map
 	typedef EmbeddedGMap3 MAP ;
-//	typedef EmbeddedMap3 MAP ;
 };
 
 typedef PFP::MAP MAP ;
@@ -57,6 +55,8 @@ public:
 	VertexAttribute<VEC3> position ;
 	VertexAttribute<VEC3> normal ;
 	VolumeAttribute<VEC3> volume ;
+
+	Algo::Render::GL2::Topo3Render* m_render_topo;
 
 	SimpleGMap3() ;
 

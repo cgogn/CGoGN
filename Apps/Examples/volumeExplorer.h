@@ -48,6 +48,8 @@
 #include "ui_volumeExplorer.h"
 #include "Utils/Qt/qtui.h"
 
+#include "Algo/Export/exportVol.h"
+
 
 using namespace CGoGN ;
 
@@ -127,6 +129,7 @@ protected:
 	void cb_mousePress(int button, int x, int y);
 	void cb_mouseRelease(int button, int x, int y);
 	void cb_Open();
+	void cb_Save();
 
 
 // slots locaux

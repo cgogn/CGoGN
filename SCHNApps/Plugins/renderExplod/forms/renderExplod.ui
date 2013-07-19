@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>174</width>
+    <width>200</width>
     <height>545</height>
    </rect>
   </property>
@@ -101,7 +101,7 @@
      <item row="1" column="1">
       <widget class="QSlider" name="slider_facesScaleFactor">
        <property name="value">
-        <number>50</number>
+        <number>99</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -118,7 +118,7 @@
      <item row="2" column="1">
       <widget class="QSlider" name="slider_volumesScaleFactor">
        <property name="value">
-        <number>50</number>
+        <number>99</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

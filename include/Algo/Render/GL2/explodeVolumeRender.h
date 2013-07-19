@@ -35,6 +35,7 @@
 #include "Utils/Shaders/shaderExplodeSmoothVolumes.h"
 #include "Utils/Shaders/shaderExplodeVolumes.h"
 #include "Utils/Shaders/shaderExplodeVolumesLines.h"
+#include "Utils/svg.h"
 
 namespace CGoGN
 {
@@ -78,22 +79,41 @@ protected:
 	*/
 	GLuint m_nbTris;
 
+	/**
+	*number of lines to draw
+	*/
 	GLuint m_nbLines;
 
 	Geom::Vec3f m_globalColor;
+
+	Geom::Vec4f m_clipPlane;
+
+	/**
+	 * explode volume factor
+	 */
+	float m_explodeV;
 	
-	template<typename PFP>
-	void computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
-									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace, 
-									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
+//	template<typename PFP>
+//	void computeFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,
+//									 const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace,
+//									 std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
 
+	template<typename PFP, typename EMBV>
+	void computeFace(typename PFP::MAP& map, Dart d, const EMBV& positions,
+                                          const typename PFP::VEC3& centerFace, const typename PFP::VEC3& centerNormalFace,
+                                          std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals);
 
-	template<typename PFP>
-	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+//	template<typename PFP>
+//	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
 
-	template<typename PFP>
-	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+	template<typename PFP, typename V_ATT, typename W_ATT>
+	void updateSmooth(typename PFP::MAP& map, const V_ATT& positions, const W_ATT& colorPerFace) ;
 
+//	template<typename PFP>
+//	void updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+
+	template<typename PFP, typename EMBV>
+    void updateSmooth(typename PFP::MAP& map, const EMBV& positions) ;
 
 public:
 	/**
@@ -124,8 +144,11 @@ public:
 	* @param map the map
 	* @param positions  attribute of position vertices
 	*/
-	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+//	template<typename PFP>
+//	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions) ;
+
+	template<typename PFP, typename EMBV>
+	void updateData(typename PFP::MAP& map, const EMBV& positions) ;
 
 	/**
 	* update all drawing buffers
@@ -133,8 +156,12 @@ public:
 	* @param positions attribute of position vertices
 	* @param colorPerFace attribute of color (per face)
 	*/
-	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+//	template<typename PFP>
+//	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace) ;
+
+	template<typename PFP, typename V_ATT, typename W_ATT>
+	void updateData(typename PFP::MAP& map, const V_ATT& positions, const W_ATT& colorPerFace) ;
+
 
 	/**
 	 * draw edges
@@ -185,6 +212,21 @@ public:
 	 * set color parameter for edge drawing
 	 */
 	void setColorLine(const Geom::Vec4f& col) ;
+
+	/**
+	 * @brief svgout2D
+	 * @param filename name of svg file
+	 * @param model modelview matrix
+	 * @param proj projection matrix
+	 * @param af attenuation factor 0.0:none 1.0 color->with, more fastest attenuation (^af)
+	 */
+	void svgoutEdges(const std::string& filename, const glm::mat4& model, const glm::mat4& proj,float af=0.0f);
+
+	/**
+	 * @brief toSVG
+	 * @param svg svg struct reference
+	 */
+	void toSVG(Utils::SVG::SVGOut& svg);
 };
 
 }//end namespace GL2

@@ -35,7 +35,7 @@
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Geometry/normal.h"
 
-#include "Topology/generic/mapBrowser.h"
+#include "Container/containerBrowser.h"
 
 namespace CGoGN
 {
@@ -54,14 +54,11 @@ template<typename PFP>
 void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf,float ns)
 {
 	m_normalShift = ns;
-//	SelectorDartBoundary<typename PFP::MAP> sdb(map);
-//	MapBrowserSelector mbs(map,sdb);
-	MapBrowserSelector mbs(map,SelectorDartBoundary<typename PFP::MAP>(map));
-	map.setBrowser(&mbs);
-
+	SelectorDartBoundary<typename PFP::MAP> sdb(map);
+	DartContainerBrowserSelector browser(map,sdb);
+	browser.enable();
 	updateData<PFP>(map,positions, ke, kf,true);
-
-	map.setBrowser(NULL);
+	browser.disable();
 	m_normalShift = 0.0f;
 }
 
@@ -94,10 +91,10 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(mapx.getNbDarts());  // no problem dart is int: no problem of memory
 
-	m_attIndex = mapx.template getAttribute<unsigned int, DART>("dart_index");
+	m_attIndex = mapx.template getAttribute<unsigned int, DART>("dart_index2");
 
 	if (!m_attIndex.isValid())
-		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index2");
 
 	for(Dart d = mapx.begin(); d!= mapx.end(); mapx.next(d))
 	{
@@ -293,10 +290,10 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<t
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
 
 	if (m_attIndex.map() != &map)
-		m_attIndex  = map.template getAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = map.template getAttribute<unsigned int, DART>("dart_index2");
 
 	if (!m_attIndex.isValid())
-		m_attIndex  = map.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = map.template addAttribute<unsigned int, DART>("dart_index2");
 
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
@@ -448,7 +445,7 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, bool withBoundary)
 	float* colorBuffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb = 0;
 
-	m_attIndex = map.template getAttribute<unsigned int, DART>("dart_index");
+	m_attIndex = map.template getAttribute<unsigned int, DART>("dart_index2");
 	if (!m_attIndex.isValid())
 	{
 		CGoGNerr << "Error attribute_dartIndex does not exist during TopoRender::picking" << CGoGNendl;

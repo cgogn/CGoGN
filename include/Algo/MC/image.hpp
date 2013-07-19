@@ -282,6 +282,63 @@ void Image<DataType>::saveInrMask(const char* filename)
 #endif
 
 
+template< typename  DataType >
+bool Image<DataType>::loadVTK(const char* filename)
+{
+	std::ifstream in(filename, std::ios::binary);
+	if (!in)
+	{
+		CGoGNerr << "Mesh_Base::loadVox: Unable to open file " << CGoGNendl;
+		exit(0);
+	}
+
+	m_SX = 1.0 ;
+	m_SY = 1.0 ;
+	m_SZ = 1.0 ;
+
+	// read encoding
+//	while(in.good())
+	for (unsigned int i=0; i< 10; ++i)
+	{
+		char line[1024] ;
+		in.getline(line, 1024) ;
+		std::istringstream line_input(line) ;
+		std::string keyword ;
+		line_input >> keyword ;
+
+		if(keyword == "VTK") 
+		{
+				std::cout << "reading vtk file" << std::endl;
+		} else if(keyword == "DIMENSIONS") 
+		{
+			line_input >> m_WX ;
+			line_input >> m_WY ;
+			line_input >> m_WZ ;
+		} else if(keyword == "SPACING") 
+		{
+			line_input >> m_SX ;
+			line_input >> m_SY ;
+			line_input >> m_SZ ;
+		} 
+		/*else if(keyword == "ORIGIN") 
+		{
+
+		} else if(keyword == "POINT_DATA") 
+		{
+			
+		} */
+	}
+
+	m_WXY = m_WX * m_WY;
+	int total = m_WXY * m_WZ;
+
+	m_Data = new DataType[total];
+
+	in.read(reinterpret_cast<char*>(m_Data), total*sizeof(DataType));
+
+	m_Alloc=true;
+
+}
 
 template< typename  DataType >
 bool Image<DataType>::loadIPB(const char* filename)

@@ -113,6 +113,18 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 template <typename PFP>
 bool exportVolBinGz(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
 
+
+/**
+* export tetmesh format
+* @warning if macro _OPTIMIZED_FOR_TETRA_ONLY_ (before include) is define assume map contain only tetrahedrons
+* @param the_map map to be exported
+* @param position the position container
+* @param filename filename of mesh file
+ */
+template <typename PFP>
+bool exportTetmesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
+
+
 } // namespace Export
 
 }
