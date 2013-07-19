@@ -317,9 +317,6 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
         }
     }
 
-
-
-
 	//
 	// 1-4 flip of all tetrahedra
 	//
@@ -351,11 +348,11 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 	//TraversorF<typename PFP::MAP> tF(m_map);
 	for(Dart dit = m_map.begin() ; dit != m_map.end() ; m_map.next(dit))
 	{
-		if(m.isMarked(dit))
-		{
-			m.unmarkOrbit<FACE>(dit);
-			swap2To3(dit);
-		}
+        if(m.isMarked(dit))
+        {
+            m.unmarkOrbit<FACE>(dit);
+            swap2To3(dit);
+        }
 	}
 
 	//
@@ -386,7 +383,6 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 		}
 	}
 
-
 	TraversorV<typename PFP::MAP> tVg(m_map);
 	for(Dart dit = tVg.begin() ; dit != tVg.end() ; dit = tVg.next())
 	{
@@ -413,9 +409,6 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 
             position[dit] = np + vp;
 
-
-
-
 //            Dart db = m_map.findBoundaryFaceOfVertex(dit);
 
 //            typename PFP::VEC3 P = position[db] ;
@@ -437,6 +430,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 		}
 	}
 
+
     //
     // edge-removal on all old boundary edges
     //
@@ -451,21 +445,6 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 	m_map.popLevel() ;
