@@ -133,6 +133,9 @@ protected:
 	PTRINRIMAGE mImage;
 #endif
 
+	template< typename T>
+	void readVTKBuffer(std::ifstream& in);
+
 public:
 
 	/**
@@ -168,7 +171,13 @@ public:
 	*/
 	bool loadInrgz(const char* filename);
 
-	bool loadVTK(const char* filename);
+	/**
+	 * @brief load VTK binary mask image
+	 * @param filename
+	 * @return
+	 */
+	bool loadVTKBinaryMask(const char* filename);
+
 	/**
 	* Constructor
 	* @param data pointer on voxel
