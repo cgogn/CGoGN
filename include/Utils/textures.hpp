@@ -1095,7 +1095,6 @@ void Texture<DIM,TYPE>::update()
 		glTexImage1D(m_target, 0, internalFormat(), this->m_size[0], 0, format(), m_type, this->m_data_ptr);
 		break;
 	case 2:
-			std::cout << "updateSize: " << this->m_size[0] << " / " << this->m_size[1] << std::endl;
 		glTexImage2D(m_target, 0, internalFormat(), this->m_size[0], this->m_size[1], 0, format(), m_type, this->m_data_ptr);
 		break;
 	case 3:

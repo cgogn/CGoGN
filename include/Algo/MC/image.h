@@ -133,6 +133,9 @@ protected:
 	PTRINRIMAGE mImage;
 #endif
 
+	template< typename T>
+	void readVTKBuffer(std::ifstream& in);
+
 public:
 
 	/**
@@ -167,6 +170,13 @@ public:
 	* @param filname file to open
 	*/
 	bool loadInrgz(const char* filename);
+
+	/**
+	 * @brief load VTK binary mask image
+	 * @param filename
+	 * @return
+	 */
+	bool loadVTKBinaryMask(const char* filename);
 
 	/**
 	* Constructor
