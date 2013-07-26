@@ -236,13 +236,11 @@ public:
 	*/
 	bool load(const unsigned char *ptr, unsigned int w, unsigned int h, unsigned int bpp);
 	
-#ifdef WITH_QT
 	/// load from file
 	bool load(const std::string& filename);
 
 	/// load from file
 	void save(const std::string& filename);
-#endif
 
 	/**
 	* crop image
