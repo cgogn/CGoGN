@@ -347,13 +347,13 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 	this->m_size[1] = ilGetInteger(IL_IMAGE_HEIGHT);
 	this->computeSub();
 
-	this->m_data_ptr = new TYPE[ptr->width()*ptr->height()];
+	this->m_data_ptr = new TYPE[this->m_size[0]*this->m_size[1]];
 	unsigned char* ptr = reinterpret_cast<unsigned char*>(this->m_data_ptr);
 
 	for (int i=this->m_size[1]-1; i>=0; --i)
 	{
 		ilCopyPixels(0, i, 0, this->m_size[0],1, 1, IL_RGB, IL_UNSIGNED_BYTE, ptr);
-		ptr += 3*w;
+		ptr += 3*this->m_size[0];
 	}
 	ilDeleteImage(imgName);
 

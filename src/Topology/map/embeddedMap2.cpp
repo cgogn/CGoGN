@@ -518,7 +518,7 @@ bool EmbeddedMap2::mergeFaces(Dart d)
 	return false ;
 }
 
-bool EmbeddedMap2::mergeVolumes(Dart d, Dart e)
+bool EmbeddedMap2::mergeVolumes(Dart d, Dart e, bool deleteFace)
 {
 	std::vector<Dart> darts ;
 	std::vector<unsigned int> vEmb ;
@@ -543,7 +543,7 @@ bool EmbeddedMap2::mergeVolumes(Dart d, Dart e)
 		fit = phi1(fit) ;
 	} while (fit != d) ;
 
-	if(Map2::mergeVolumes(d, e))
+	if(Map2::mergeVolumes(d, e, deleteFace))
 	{
 		for(unsigned int i = 0; i < darts.size(); ++i)
 		{
