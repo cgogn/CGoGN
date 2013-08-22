@@ -261,6 +261,7 @@ void Map3MR<PFP>::swapGen3To2(Dart d)
 	}
 	else // si (n == 2)
 	{
+		std::cout << "arrrrrrghhhhhhhhhhhh" << std::endl;
        swap2To2(d);
 	}
 }
@@ -301,6 +302,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 
 	DartMarkerStore m(m_map);
 	DartMarkerStore newBoundaryV(m_map);
+	DartMarkerStore newV(m_map);
 
     if(embedNewVertices)
     {
@@ -339,6 +341,8 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 
 		Dart dres = Volume::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
 		position[dres] = volCenter;
+		newV.markOrbit<VERTEX>(dres);
+
 	}
 
 
@@ -354,6 +358,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
             swap2To3(dit);
         }
 	}
+
 
 	//
 	// 1-3 flip of all boundary tetrahedra
@@ -382,6 +387,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 			newBoundaryV.markOrbit<VERTEX>(dres);
 		}
 	}
+
 
 	TraversorV<typename PFP::MAP> tVg(m_map);
 	for(Dart dit = tVg.begin() ; dit != tVg.end() ; dit = tVg.next())
@@ -428,8 +434,24 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 //            newP += (typename PFP::REAL(1) - K) * P ;
 //            position[db] = newP ;
 		}
-	}
+//		else if(!m_map.isBoundaryVertex(dit) && !newV.isMarked(dit))
+//		{
+//			m_map.decCurrentLevel() ;
+//			typename PFP::VEC3 np(0) ;
+//			unsigned int degree = 0 ;
+//			Traversor3VVaE<typename PFP::MAP> trav(m_map, dit) ;
+//			for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+//			{
+//				++degree ;
+//				np += position[it] ;
+//			}
+//			np /= degree;
 
+//			m_map.incCurrentLevel() ;
+
+//			position[dit] = np;
+//		}
+	}
 
     //
     // edge-removal on all old boundary edges
@@ -445,6 +467,8 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices, VertexAttribute<typena
 
         }
     }
+
+
 
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 	m_map.popLevel() ;
