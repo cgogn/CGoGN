@@ -131,23 +131,55 @@ void filterBandPass(typename PFP::MAP& map, VertexAttribute<T>& attIn, unsigned 
 	map.setCurrentLevel(cur);
 }
 
-template <typename PFP, typename T>
-void frequencyDeformation(typename PFP::MAP& map, VertexAttribute<T>& attIn, unsigned int cutoffLevel)
+template <typename PFP>
+typename PFP::VEC3 doTwist(typename PFP::VEC3 pos, float t )
 {
-	unsigned int cur = map.getCurrentLevel();
-	unsigned int max = map.getMaxLevel();
+	typedef typename PFP::VEC3 VEC3;
 
-	map.setCurrentLevel(max);
+	float st = std::sin(t);
+	float ct = std::cos(t);
+	VEC3 new_pos;
+
+	new_pos[0] = pos[0]*ct - pos[2]*st;
+	new_pos[2] = pos[0]*st + pos[2]*ct;
+
+	new_pos[1] = pos[1];
+
+	return new_pos;
+}
+
+template <typename PFP>
+void frequencyDeformation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& attIn, unsigned int cutoffLevel)
+{
+	float time = 1.0;
+	//float angle_deg_max = 0.4;
+	//float height = 0.4;
+
+	float A = 20.0;
+	float frequency = 1.0;
+	float phase = time * 2.0;
 
 	TraversorV<typename PFP::MAP> tv(map);
 	for (Dart d = tv.begin(); d != tv.end(); d = tv.next())
 	{
-		if(vertexLevel<PFP>(map,d) == cutoffLevel)
-			attIn[d] += T(0.0,0.0,0.2);
-	}
 
-	map.setCurrentLevel(cur);
+		typename PFP::VEC3 p = attIn[d];
+
+		float dist = std::sqrt(p[0]*p[0] + p[2]*p[2]);
+
+		p[1] += A * std::sin(frequency * dist + phase);
+
+//		float angle_deg = angle_deg_max * std::sin(time);
+//		float angle_rad = angle_deg * 3.14159 / 180.0;
+
+//		float ang = (height*0.5 + attIn[d][1])/height * angle_rad;
+
+//		attIn[d] = doTwist<PFP>(attIn[d], ang);
+	}
 }
+
+
+
 
 
 } // namespace MR

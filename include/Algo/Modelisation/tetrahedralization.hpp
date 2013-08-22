@@ -542,9 +542,11 @@ Dart flip1To3(typename PFP::MAP& map, Dart d)
 	edges.push_back(dit);
 
 	map.splitVolume(edges);
-	map.splitFace(map.phi1(map.phi2(edges[0])),map.phi1(map.phi2(edges[2])));
 
 	// Cut the 2nd Tetrahedron
+	map.splitFace(map.phi1(map.phi2(edges[0])),map.phi1(map.phi2(edges[2])));
+
+	// Cut the 3rd Tetrahedron
 	dit = map.phi1(map.phi2(edges[0]));
 	edges.clear();
 	edges.push_back(dit);
