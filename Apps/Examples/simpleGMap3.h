@@ -53,7 +53,6 @@ public:
 	MAP myMap ;
 
 	VertexAttribute<VEC3> position ;
-	VertexAttribute<VEC3> normal ;
 	VolumeAttribute<VEC3> volume ;
 
 	Algo::Render::GL2::Topo3Render* m_render_topo;
@@ -64,4 +63,5 @@ public:
 
 	void cb_initGL() ;
 	void cb_redraw() ;
+    void cb_keyPress(int c);
 };

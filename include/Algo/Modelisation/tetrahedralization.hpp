@@ -410,36 +410,49 @@ void swapGen3To2(typename PFP::MAP& map, Dart d)
 {
 	unsigned int n = map.edgeDegree(d);
 
-	if(n >= 4)
-	{
-		Dart dit = d;
-		if(map.isBoundaryEdge(dit))
-		{
-			for(unsigned int i = 0 ; i < n - 2 ; ++i)
-			{
-				dit = map.phi2(Tetrahedralization::swap2To3<PFP>(map, dit));
-			}
 
-			Tetrahedralization::swap2To2<PFP>(map, dit);
-		}
-		else
-		{
-			for(unsigned int i = 0 ; i < n - 4 ; ++i)
-			{
-				dit = map.phi2(Tetrahedralization::swap2To3<PFP>(map, dit));
-			}
-			Tetrahedralization::swap4To4<PFP>(map,  map.alpha2(dit));
-		}
-	}
-	else if (n == 3)
-	{
-		Dart dres = Tetrahedralization::swap2To3<PFP>(map, d);
-		Tetrahedralization::swap2To2<PFP>(map, map.phi2(dres));
-	}
-	else // si (n == 2)
-	{
-		Tetrahedralization::swap2To2<PFP>(map, d);
-	}
+    if(n >= 4)
+    {
+        Dart dit = d;
+        for(unsigned int i = 0 ; i < n - 4 ; ++i)
+        {
+            dit = map.phi2(Tetrahedralization::swap2To3<PFP>(map, dit));
+        }
+        Tetrahedralization::swap4To4<PFP>(map,  map.alpha2(dit));
+    }
+
+
+
+
+//	if(n >= 4)
+//	{
+//		Dart dit = d;
+//		if(map.isBoundaryEdge(dit))
+//		{
+//			for(unsigned int i = 0 ; i < n - 2 ; ++i)
+//			{
+//				dit = map.phi2(Tetrahedralization::swap2To3<PFP>(map, dit));
+//			}
+//			Tetrahedralization::swap2To2<PFP>(map, dit);
+//		}
+//		else
+//		{
+//			for(unsigned int i = 0 ; i < n - 4 ; ++i)
+//			{
+//				dit = map.phi2(Tetrahedralization::swap2To3<PFP>(map, dit));
+//			}
+//			Tetrahedralization::swap4To4<PFP>(map,  map.alpha2(dit));
+//		}
+//	}
+//	else if (n == 3)
+//	{
+//		Dart dres = Tetrahedralization::swap2To3<PFP>(map, d);
+//		Tetrahedralization::swap2To2<PFP>(map, map.phi2(dres));
+//	}
+//	else // si (n == 2)
+//	{
+//		Tetrahedralization::swap2To2<PFP>(map, d);
+//	}
 
 }
 

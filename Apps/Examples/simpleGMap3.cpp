@@ -30,87 +30,120 @@
 
 SimpleGMap3::SimpleGMap3()
 {
-	position = myMap.addAttribute<VEC3, VERTEX>("position");
-	normal = myMap.addAttribute<VEC3, VERTEX>("normal");
-	volume = myMap.addAttribute<VEC3, VOLUME>("volume");
+    position = myMap.addAttribute<VEC3, VERTEX>("position");
+    volume = myMap.addAttribute<VEC3, VOLUME>("volume");
 
-	CellMarker<EDGE> mE(myMap);
+    //	CellMarker<EDGE> mE(myMap);
 
-	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap,position);
-	Dart d = primCat.hexaGrid_topo(3,1,1);
-	primCat.embedHexaGrid(2,1,1);
-	myMap.check();
+    Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap,position);
+    Dart d = primCat.hexaGrid_topo(1,1,1);
+    primCat.embedHexaGrid(1,1,1);
+    myMap.check();
 
-	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
-	Algo::Volume::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
+    Dart dp = Algo::Surface::Modelisation::createQuadrangularPyramid<PFP>(myMap);
 
-	myMap.check();
+    position[dp] = typename PFP::VEC3(0.5,0.5,-0.5);
+    position[myMap.phi1(dp)] = typename PFP::VEC3(0.5,0.5,0.5);
+    position[myMap.phi1(myMap.phi1(dp))] = typename PFP::VEC3(0.5,-0.5,0.5);
+    position[myMap.phi_1(dp)] = typename PFP::VEC3(0.5,-0.5,-0.5);
+    position[myMap.phi_1(myMap.phi2(dp))] = typename PFP::VEC3(1.5f, 0.0f, 0.0f);
 
-	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
-		position[i] += VEC3(2,0,0);
+    Dart dtemp = myMap.beta1(myMap.beta0(myMap.beta1(myMap.beta2(myMap.beta1(myMap.beta0(myMap.beta1(myMap.beta2(d))))))));
 
-	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
-	d = prim.hexaGrid_topo(2,2,1);
-	prim.embedHexaGrid(1,1,1);
+    myMap.sewVolumes(dtemp,dp);
 
-	Dart d1 = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-	VEC3 mid0 = (position[d1] + position[myMap.phi1(d1)]) / 2.0f;
-	myMap.cutEdge(d1);
-	position[myMap.phi1(d1)] = mid0;
+    //	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
+    //	Algo::Volume::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
 
-	VEC3 mid1 = (position[d] + position[myMap.phi1(d)]) / 2.0f;
-	myMap.cutEdge(d);
-	position[myMap.phi1(d)] = mid1;
+    //	myMap.check();
 
-	d = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-	VEC3 mid = (position[d] + position[myMap.phi1(d)]) / 2.0f;
-	myMap.cutEdge(d);
-	position[myMap.phi1(d)] = mid;
+    //	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
+    //		position[i] += VEC3(2,0,0);
 
-	myMap.splitFace(d,myMap.phi1(myMap.phi1(myMap.phi1(d))));
+    //	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
+    //	d = prim.hexaGrid_topo(2,2,1);
+    //	prim.embedHexaGrid(1,1,1);
 
-	myMap.check();
+    //	Dart d1 = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
+    //	VEC3 mid0 = (position[d1] + position[myMap.phi1(d1)]) / 2.0f;
+    //	myMap.cutEdge(d1);
+    //	position[myMap.phi1(d1)] = mid0;
 
-	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
-		position[i] += VEC3(0,2,0);
+    //	VEC3 mid1 = (position[d] + position[myMap.phi1(d)]) / 2.0f;
+    //	myMap.cutEdge(d);
+    //	position[myMap.phi1(d)] = mid1;
 
-	Algo::Volume::Modelisation::Primitive3D<PFP> prim2(myMap,position);
-	d = prim2.hexaGrid_topo(2,1,1);
-	prim2.embedHexaGrid(1,1,1);
+    //	d = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
+    //	VEC3 mid = (position[d] + position[myMap.phi1(d)]) / 2.0f;
+    //	myMap.cutEdge(d);
+    //	position[myMap.phi1(d)] = mid;
 
-	d = myMap.phi2(myMap.phi1(myMap.phi1(myMap.phi2(d))));
-	myMap.unsewVolumes(d);
+    //	myMap.splitFace(d,myMap.phi1(myMap.phi1(myMap.phi1(d))));
 
-	myMap.check();
+    //	myMap.check();
+
+    //	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
+    //		position[i] += VEC3(0,2,0);
+
+    //	Algo::Volume::Modelisation::Primitive3D<PFP> prim2(myMap,position);
+    //	d = prim2.hexaGrid_topo(2,1,1);
+    //	prim2.embedHexaGrid(1,1,1);
+
+    //	d = myMap.phi2(myMap.phi1(myMap.phi1(myMap.phi2(d))));
+    //	myMap.unsewVolumes(d);
+
+    //	myMap.check();
 }
 
 void SimpleGMap3::initGUI()
 {
 }
 
+void SimpleGMap3::cb_keyPress(int code)
+{
+    switch(code)
+    {
+        case 'e':
+        {
+            time_t rawtime;
+            struct tm * timeinfo;
+            char buffer[80];
+
+            time (&rawtime);
+            timeinfo = localtime (&rawtime);
+
+            strftime (buffer,80,".%F.%H:%M:%S",timeinfo);
+
+            std::string filename = std::string("topo_screenshot") + std::string(buffer) + std::string(".svg");
+            m_render_topo->svgout2D(filename, modelViewMatrix(), projectionMatrix());
+            break;
+        }
+    }
+}
+
 void SimpleGMap3::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(2) ;
+    Utils::GLSLShader::setCurrentOGLVersion(2) ;
 
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
-	VEC3 gPosObj = bb.center() ;
-	float tailleX = bb.size(0) ;
-	float tailleY = bb.size(1) ;
-	float tailleZ = bb.size(2) ;
-	float gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
-	setParamObject(gWidthObj, gPosObj.data());
+    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+    VEC3 gPosObj = bb.center() ;
+    float tailleX = bb.size(0) ;
+    float tailleY = bb.size(1) ;
+    float tailleZ = bb.size(2) ;
+    float gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
+    setParamObject(gWidthObj, gPosObj.data());
 
-	m_render_topo = new Algo::Render::GL2::Topo3Render();
-	m_render_topo->setDartWidth(2.0f);
-	m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.9f);
+    m_render_topo = new Algo::Render::GL2::Topo3Render();
+    m_render_topo->setDartWidth(2.0f);
+    m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
+    m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.8f);
 }
 
 void SimpleGMap3::cb_redraw()
 {
-	glDisable(GL_LIGHTING);
-	glLineWidth(1.0f);
-	m_render_topo->drawTopo();
+    glDisable(GL_LIGHTING);
+    glLineWidth(1.0f);
+    m_render_topo->drawTopo();
 }
 
 /**********************************************************************************************
@@ -119,13 +152,13 @@ void SimpleGMap3::cb_redraw()
 
 int main(int argc, char **argv)
 {
-	QApplication app(argc, argv) ;
+    QApplication app(argc, argv) ;
 
-	SimpleGMap3 sqt ;
-	sqt.setGeometry(0, 0, 1000, 800) ;
- 	sqt.show() ;
+    SimpleGMap3 sqt ;
+    sqt.setGeometry(0, 0, 1000, 800) ;
+    sqt.show() ;
 
-	sqt.initGUI() ;
+    sqt.initGUI() ;
 
-	return app.exec() ;
+    return app.exec() ;
 }

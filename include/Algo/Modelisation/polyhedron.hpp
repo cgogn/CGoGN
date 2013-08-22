@@ -305,8 +305,12 @@ Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 
 	return dres;
 }
+
+
+//VertexAttribute<typename PFP::VEC3>
+
 template <typename PFP>
-Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, unsigned int n, bool withBoundary, float radius, float height)
+Dart embedPyramid(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, unsigned int n, bool withBoundary, float radius, float height)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

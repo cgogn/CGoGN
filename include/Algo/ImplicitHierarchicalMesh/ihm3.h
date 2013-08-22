@@ -26,6 +26,7 @@
 #define __IMPLICIT_HIERARCHICAL_MAP3__
 
 #include "Topology/map/embeddedMap3.h"
+#include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
 {
@@ -63,6 +64,9 @@ public:
 	DartAttribute<unsigned int> m_faceId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
+
+    std::vector<Algo::MR::Filter*> synthesisFilters ;
+    std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
 	ImplicitHierarchicalMap3() ;
@@ -152,6 +156,19 @@ public:
 	 *
 	 */
 	void swapEdges(Dart d, Dart e);
+
+
+
+
+
+    void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+    void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
+
+    void clearSynthesisFilters() { synthesisFilters.clear() ; }
+    void clearAnalysisFilters() { analysisFilters.clear() ; }
+
+    void analysis() ;
+    void synthesis() ;
 
 	//!
 	/*!

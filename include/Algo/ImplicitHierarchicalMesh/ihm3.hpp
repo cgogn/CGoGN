@@ -655,6 +655,36 @@ inline bool ImplicitHierarchicalMap3::isWellEmbedded()
 }
 
 
+
+
+
+
+
+
+
+
+
+
+void ImplicitHierarchicalMap3::analysis()
+{
+    assert(getCurrentLevel() > 0 || !"analysis : called on level 0") ;
+
+   decCurrentLevel() ;
+
+    for(unsigned int i = 0; i < analysisFilters.size(); ++i)
+        (*analysisFilters[i])() ;
+}
+
+void ImplicitHierarchicalMap3::synthesis()
+{
+    assert(getCurrentLevel() < getMaxLevel() || !"synthesis : called on max level") ;
+
+    for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
+        (*synthesisFilters[i])() ;
+
+    incCurrentLevel() ;
+}
+
 /***************************************************
  *               ATTRIBUTE HANDLER                 *
  ***************************************************/
