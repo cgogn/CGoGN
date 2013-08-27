@@ -57,6 +57,10 @@ public:
 	{
 	}
 
+	~ParticleCell2D()
+	{
+	}
+
 	Dart getCell()
 	{
 		return d ;
