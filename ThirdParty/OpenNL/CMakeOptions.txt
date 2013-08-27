@@ -66,8 +66,9 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/OpenNL/CMakeModules)
 # CHOLMOD
 ###########
 SET(USE_CHOLMOD TRUE)
-find_package(SuiteSparse REQUIRED)
-
+IF (NOT WIN32)
+	find_package(SuiteSparse REQUIRED)
+ENDIF (NOT WIN32)
 ###########
 #  CNC
 ###########

@@ -65,23 +65,34 @@ typedef struct {
 
 NLboolean nlFactorize_CHOLMOD() {
 
-	/* OpenNL Context */
-	NLSparseMatrix* M   = &(nlCurrentContext->M) ;
-	NLuint          n   = nlCurrentContext->n ;
-	NLuint          nnz = nlSparseMatrixNNZ(M) ; /* Number of Non-Zero coeffs */
+	NLSparseMatrix* M;
+	NLuint          n;
+	NLuint          nnz;
+	cholmod_sparse* cA;
+	NLRowColumn* Ci;
+	cholmod_context* context;
+	NLuint       i,j,count ;
+	int* colptr;
+	int* rowind;
+	double* a;
 
-	cholmod_context* context = (cholmod_context*)(nlCurrentContext->direct_solver_context) ;
+	/* OpenNL Context */
+	M   = &(nlCurrentContext->M) ;
+	n   = nlCurrentContext->n ;
+	nnz = nlSparseMatrixNNZ(M) ; /* Number of Non-Zero coeffs */
+
+	context = (cholmod_context*)(nlCurrentContext->direct_solver_context) ;
 	if(context == NULL) {
 		nlCurrentContext->direct_solver_context = malloc(sizeof(cholmod_context)) ;
 		context = (cholmod_context*)(nlCurrentContext->direct_solver_context) ;
 	}
 
 	/* CHOLMOD variables */
-	cholmod_sparse* cA = NULL ;
+	cA = NULL ;
 
 	/* Temporary variables */
-	NLRowColumn* Ci = NULL ;
-	NLuint       i,j,count ;
+	Ci = NULL ;
+	
 
 	/* Sanity checks */
 	nl_assert(M->storage & NL_MATRIX_STORE_COLUMNS) ;
@@ -95,9 +106,9 @@ NLboolean nlFactorize_CHOLMOD() {
 	 */
 
 	cA = cholmod_allocate_sparse(n, n, nnz, NL_FALSE, NL_TRUE, -1, CHOLMOD_REAL, &(context->c)) ;
-	int* colptr = (int*)(cA->p) ;
-	int* rowind = (int*)(cA->i) ;
-	double* a = (double*)(cA->x) ;
+	colptr = (int*)(cA->p) ;
+	rowind = (int*)(cA->i) ;
+	a = (double*)(cA->x) ;
 
 	count = 0 ;
 	for(i = 0; i < n; i++) {
@@ -134,26 +145,33 @@ NLboolean nlFactorize_CHOLMOD() {
 
 NLboolean nlSolve_CHOLMOD() {
 
-	/* OpenNL Context */
-	NLdouble* b = nlCurrentContext->b ;
-	NLdouble* x = nlCurrentContext->x ;
-	NLuint    n = nlCurrentContext->n ;
+	cholmod_dense* cx;
+	NLuint i ;
+	NLdouble* b;
+	NLdouble* x;
+	NLuint    n;
+	/* Temporary variables */
+	double* cbx;
+	double* cxx;
+	cholmod_context* context;
 
-	cholmod_context* context = (cholmod_context*)(nlCurrentContext->direct_solver_context) ;
+	/* OpenNL Context */
+	b = nlCurrentContext->b ;
+	x = nlCurrentContext->x ;
+	n = nlCurrentContext->n ;
+
+	context = (cholmod_context*)(nlCurrentContext->direct_solver_context) ;
 	nl_assert(context != NULL) ;
 
 	/* CHOLMOD variables */
-	cholmod_dense* cx = NULL ;
-
-	/* Temporary variables */
-	NLuint i ;
+	cx = NULL ;
 
 	/*
 	 * Step 1: convert right-hand side into CHOLMOD representation
 	 * -----------------------------------------------------------
 	 */
 
-	double* cbx = (double*)(context->cb->x) ;
+	cbx = (double*)(context->cb->x) ;
 	for(i = 0; i < n; i++)
 		cbx[i] = b[i] ;
 
@@ -169,7 +187,7 @@ NLboolean nlSolve_CHOLMOD() {
 	 * ------------------------
 	 */
 
-	double* cxx = (double*)(cx->x) ;
+	cxx = (double*)(cx->x) ;
 	for(i = 0; i < n; i++)
 		x[i] = cxx[i] ;
 

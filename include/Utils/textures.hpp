@@ -546,7 +546,7 @@ Image<DIM,TYPE>* Image<DIM,TYPE>::scaleNearestToNewImage(const COORD& newSize)
 			double p0 = inc0/2.0 - 0.5;
 			for (unsigned int i=0; i< newSize[0]; ++i)
 			{
-				newImg->texel(i) = this->texel( (unsigned int)(rint(p0)) );
+				newImg->texel(i) = this->texel( (unsigned int)(p0+0.5) );
 				p0 += inc0;
 			}
 		}
@@ -561,7 +561,7 @@ Image<DIM,TYPE>* Image<DIM,TYPE>::scaleNearestToNewImage(const COORD& newSize)
 				double p0 = inc0/2.0 - 0.5;
 				for (unsigned int i=0; i< newSize[0]; ++i)
 				{
-					newImg->texel(i,j) = this->texel( (unsigned int)(rint(p0)), (unsigned int)(rint(p1)) );
+					newImg->texel(i,j) = this->texel( (unsigned int)(p0+0.5), (unsigned int)(p1+0.5) );
 					p0 += inc0;
 				}
 				p1 += inc1;
@@ -582,7 +582,7 @@ Image<DIM,TYPE>* Image<DIM,TYPE>::scaleNearestToNewImage(const COORD& newSize)
 					double p0 = inc0/2.0 - 0.5;
 					for (unsigned int i=0; i< newSize[0]; ++i)
 					{
-						newImg->texel(i,j,k) = this->texel( (unsigned int)(rint(p0)), (unsigned int)(rint(p1)), (unsigned int)(rint(p2)) );
+						newImg->texel(i,j,k) = this->texel( (unsigned int)(p0+0.5), (unsigned int)(p1+0.5), (unsigned int)(p2+0.5) );
 						p0 += inc0;
 					}
 					p1 += inc1;
