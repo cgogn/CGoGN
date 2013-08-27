@@ -6,7 +6,12 @@ cmake  cmake-curses-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-al
 
 Pour compiler CGoGN:
 
-- aller dans ThirdParty, cd build, taper "cmake .", puis make ( avec -j x si vous avez x core sur votre machine) suivi de make install
+  - on compile tout d'abord les bibliothèques third-party :
+
+	cd CGoGN/ThirdParty/build
+	cmake ..
+	make (-j x if you have x cores)
+	make install
 
 	On peut fixer certaines option pour ne pas tout compiler (cf le README.TXT dans ThirdParty)
 
