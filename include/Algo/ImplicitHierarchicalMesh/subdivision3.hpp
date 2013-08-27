@@ -1123,6 +1123,214 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<ty
 
 }
 
+
+
+
+
+
+
+
+
+
+template <typename PFP>
+void subdivideEdgeLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+{
+    assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+    assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
+    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+
+    unsigned int eLevel = map.edgeLevel(d) ;
+
+    unsigned int cur = map.getCurrentLevel() ;
+    map.setCurrentLevel(eLevel) ;
+
+    Dart dd = map.phi2(d) ;
+    typename PFP::VEC3 p1 = position[d] ;
+    typename PFP::VEC3 p2 = position[map.phi1(d)] ;
+
+    map.setCurrentLevel(eLevel + 1) ;
+
+    map.cutEdge(d) ;
+    unsigned int eId = map.getEdgeId(d) ;
+    map.setEdgeId(map.phi1(d), eId, EDGE) ; //mise a jour de l'id d'arrete sur chaque moitie d'arete
+    map.setEdgeId(map.phi1(dd), eId, EDGE) ;
+
+    map.setFaceId(EDGE, d) ; //mise a jour de l'id de face sur chaque brin de chaque moitie d'arete
+    map.setFaceId(EDGE, dd) ;
+
+    position[map.phi1(d)] = (p1 + p2) * typename PFP::REAL(0.5) ;
+    map.setCurrentLevel(cur) ;
+}
+
+template <typename PFP>
+void subdivideFaceLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
+{
+    assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+    assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
+    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+
+    unsigned int fLevel = map.faceLevel(d) ;
+    Dart old = map.faceOldestDart(d) ;
+
+    unsigned int cur = map.getCurrentLevel() ;
+    map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
+
+    unsigned int vLevel = map.volumeLevel(old);
+    //one level of subdivision in the neighbordhood
+//	Traversor3VW<typename PFP::MAP> trav3EW(map, old);
+//	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
+//	{
+//		Dart oldit = map.volumeOldestDart(dit);
+//
+//		//std::cout << "vLevel courant = " << map.volumeLevel(oldit) << std::endl;
+//
+//		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
+//				IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
+//	}
+
+    unsigned int degree = 0 ;
+    typename PFP::VEC3 p ;
+    Traversor2FE<typename PFP::MAP>  travE(map, old);
+    for(Dart it = travE.begin(); it != travE.end() ; it = travE.next())
+    {
+        ++degree;
+        p += position[it] ;
+
+        if(!map.edgeIsSubdivided(it))							// first cut the edges (if they are not already)
+            IHM::subdivideEdgeLoop<PFP>(map, it, position) ;	// and compute the degree of the face
+    }
+    p /= typename PFP::REAL(degree) ;
+
+
+    map.setCurrentLevel(fLevel + 1) ;			// go to the next level to perform face subdivision
+
+    Dart res;
+
+    if(degree == 3 && sType == IHM::S_TRI)	//subdiviser une face triangulaire
+    {
+        Dart dd = map.phi1(old) ;
+        Dart e = map.phi1(map.phi1(dd)) ;
+        map.splitFace(dd, e) ;					// insert a new edge
+        unsigned int id = map.getNewEdgeId() ;
+        map.setEdgeId(map.phi_1(dd), id, EDGE) ;		// set the edge id of the inserted edge to the next available id
+
+        unsigned int idface = map.getFaceId(old);
+        map.setFaceId(dd, idface, FACE) ;
+        map.setFaceId(e, idface, FACE) ;
+
+        dd = e ;
+        e = map.phi1(map.phi1(dd)) ;
+        map.splitFace(dd, e) ;
+        id = map.getNewEdgeId() ;
+        map.setEdgeId(map.phi_1(dd), id, EDGE) ;
+
+        map.setFaceId(dd, idface, FACE) ;
+        map.setFaceId(e, idface, FACE) ;
+
+        dd = e ;
+        e = map.phi1(map.phi1(dd)) ;
+        map.splitFace(dd, e) ;
+        id = map.getNewEdgeId() ;
+        map.setEdgeId(map.phi_1(dd), id, EDGE) ;
+
+        map.setFaceId(dd, idface, FACE) ;
+        map.setFaceId(e, idface, FACE) ;
+
+        Dart stop = map.phi2(map.phi1(old));
+        Dart dit = stop;
+        do
+        {
+            unsigned int dId = map.getEdgeId(map.phi_1(map.phi2(dit)));
+            unsigned int eId = map.getEdgeId(map.phi1(map.phi2(dit)));
+
+            unsigned int t = dId + eId;
+
+            if(t == 0)
+            {
+                map.setEdgeId(dit, 1, EDGE) ;
+                map.setEdgeId(map.phi2(dit), 1, EDGE) ;
+            }
+            else if(t == 1)
+            {
+                map.setEdgeId(dit, 2, EDGE) ;
+                map.setEdgeId(map.phi2(dit), 2, EDGE) ;
+            }
+            else if(t == 2)
+            {
+                if(dId == eId)
+                {
+                    map.setEdgeId(dit, 0, EDGE) ;
+                    map.setEdgeId(map.phi2(dit), 0, EDGE) ;
+                }
+                else
+                {
+                    map.setEdgeId(dit, 1, EDGE) ;
+                    map.setEdgeId(map.phi2(dit), 1, EDGE) ;
+                }
+            }
+            else if(t == 3)
+            {
+                map.setEdgeId(dit, 0, EDGE) ;
+                map.setEdgeId(map.phi2(dit), 0, EDGE) ;
+            }
+
+            dit = map.phi1(dit);
+        }while(dit != stop);
+
+    }
+    else
+    {
+        Dart dd = map.phi1(old) ;
+        map.splitFace(dd, map.phi1(map.phi1(dd))) ;
+
+        Dart ne = map.phi2(map.phi_1(dd));
+        Dart ne2 = map.phi2(ne);
+
+        map.cutEdge(ne) ;
+        unsigned int id = map.getNewEdgeId() ;
+        map.setEdgeId(ne, id, EDGE) ;
+        id = map.getNewEdgeId() ;
+        map.setEdgeId(ne2, id, EDGE) ;
+
+        position[map.phi1(ne)] = p ;
+
+        dd = map.phi1(map.phi1(map.phi1(map.phi1(ne)))) ;
+        while(dd != ne)
+        {
+            Dart next = map.phi1(map.phi1(dd)) ;
+            map.splitFace(map.phi1(ne), dd) ;
+            Dart nne = map.phi2(map.phi_1(dd)) ;
+
+            id = map.getNewEdgeId() ;
+            map.setEdgeId(nne, id, EDGE) ;
+
+            dd = next ;
+        }
+
+        unsigned int idface = map.getFaceId(old);
+        //Dart e = dd;
+        do
+        {
+            map.setFaceId(dd, idface, DART) ;
+            map.setFaceId(map.phi2(dd), idface, DART) ;
+            dd = map.phi2(map.phi1(dd));
+        }
+        while(dd != ne);
+
+        position[map.phi1(ne)] = p ;
+    }
+
+    map.setCurrentLevel(cur) ;
+}
+
+
+
+
+
+
+
+
+
 template <typename PFP>
 void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
@@ -1152,7 +1360,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	{
 		//if needed subdivide face
 		if(!map.faceIsSubdivided(dit))
-			IHM::subdivideFace<PFP>(map, dit, position, IHM::S_TRI);
+            IHM::subdivideFaceLoop<PFP>(map, dit, position, IHM::S_TRI);
 
 		//save a dart from the subdivided face
 		unsigned int cur = map.getCurrentLevel() ;
@@ -1259,60 +1467,60 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		}
 	}
 
-	//switch inner faces
-	if(isNotTet)
-	{
-		DartMarker me(map);
+    //switch inner faces
+    if(isNotTet)
+    {
+        DartMarker me(map);
 
-		for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
-		{
-			Dart x = map.phi_1(map.phi2(map.phi1(dit)));
-			Dart f = x;
+        for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
+        {
+            Dart x = map.phi_1(map.phi2(map.phi1(dit)));
+            Dart f = x;
 
-			do
-			{
-				Dart f3 = map.phi3(f);
+            do
+            {
+                Dart f3 = map.phi3(f);
 
-				if(!me.isMarked(f3))
-				{
-					Dart tmp =  map.phi_1(map.phi2(map.phi_1(map.phi2(map.phi_1(f3))))); //future voisin par phi2
+                if(!me.isMarked(f3))
+                {
+                    Dart tmp =  map.phi_1(map.phi2(map.phi_1(map.phi2(map.phi_1(f3))))); //future voisin par phi2
 
-					Dart f32 = map.phi2(f3);
-					map.swapEdges(f3, tmp);
+                    Dart f32 = map.phi2(f3);
+                    map.swapEdges(f3, tmp);
 
-					unsigned int idface = map.getNewFaceId();
-					map.setFaceId(f3,idface, FACE);
-					idface = map.getNewFaceId();
-					map.setFaceId(f32,idface, FACE);
+                    unsigned int idface = map.getNewFaceId();
+                    map.setFaceId(f3,idface, FACE);
+                    idface = map.getNewFaceId();
+                    map.setFaceId(f32,idface, FACE);
 
-					unsigned int idedge = map.getNewEdgeId();
-					map.setEdgeId(f3, idedge, EDGE);
+                    unsigned int idedge = map.getNewEdgeId();
+                    map.setEdgeId(f3, idedge, EDGE);
 
-					map.setEdgeId(f3,map.getEdgeId(f3), EDGE);
-					map.setEdgeId(f32,map.getEdgeId(f32), EDGE);
+                    map.setEdgeId(f3,map.getEdgeId(f3), EDGE);
+                    map.setEdgeId(f32,map.getEdgeId(f32), EDGE);
 
-					me.markOrbit<EDGE>(f3);
-					me.markOrbit<EDGE>(f32);
-				}
+                    me.markOrbit<EDGE>(f3);
+                    me.markOrbit<EDGE>(f32);
+                }
 
-				f = map.phi2(map.phi_1(f));
-			}while(f != x);
-		}
+                f = map.phi2(map.phi_1(f));
+            }while(f != x);
+        }
 
-		map.template setOrbitEmbedding<VERTEX>(centralDart, map.template getEmbedding<VERTEX>(centralDart));
+        map.template setOrbitEmbedding<VERTEX>(centralDart, map.template getEmbedding<VERTEX>(centralDart));
 
-		//Third step : 3-sew internal faces
-		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
-		{
-			Dart f1 = (*it).first;
-			Dart f2 = (*it).second;
+        //Third step : 3-sew internal faces
+        for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
+        {
+            Dart f1 = (*it).first;
+            Dart f2 = (*it).second;
 
-			unsigned int idedge = map.getEdgeId(f1);
-			map.setEdgeId(map.phi2(f1), idedge, EDGE);
-			map.setEdgeId(map.phi2(f2), idedge, EDGE);
-		}
+            unsigned int idedge = map.getEdgeId(f1);
+            map.setEdgeId(map.phi2(f1), idedge, EDGE);
+            map.setEdgeId(map.phi2(f2), idedge, EDGE);
+        }
 
-	}
+    }
 
 	map.setCurrentLevel(cur) ;
 }

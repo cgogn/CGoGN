@@ -50,10 +50,11 @@ namespace Masks
 
 /* MJ96 basic functions : polyhedral meshes
  *********************************************************************************/
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 class MJ96VertexVertexFunctor : public FunctorType
 {
 protected:
+    typedef typename EMBV::DATA_TYPE EMB;
 	typename PFP::MAP& m_map ;
 	EMBV& m_attribut;
 	//Algo::Volume::IHM::AttributeHandler_IHM<typename PFP::VEC3, VERTEX>& m_position ;
@@ -118,7 +119,7 @@ public:
 			Traversor3VW<typename PFP::MAP> travVW(m_map, d);
 			for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
 			{
-				Cavg += Algo::Surface::Geometry::volumeCentroidGen<PFP, EMBV, EMB>(m_map, dit, m_attribut);
+                Cavg += Algo::Surface::Geometry::volumeCentroid<PFP, EMBV>(m_map, dit, m_attribut);
 				++degree;
 			}
 			Cavg /= degree;
@@ -128,7 +129,7 @@ public:
 			Traversor3VF<typename PFP::MAP> travVF(m_map, d);
 			for(Dart dit = travVF.begin() ; dit != travVF.end() ; dit = travVF.next())
 			{
-				Aavg += Algo::Surface::Geometry::faceCentroidGen<PFP, EMBV, EMB>(m_map, dit, m_attribut);
+                Aavg += Algo::Surface::Geometry::faceCentroid<PFP, EMBV>(m_map, dit, m_attribut);
 				++degree;
 			}
 			Aavg /= degree;
@@ -156,10 +157,11 @@ public:
 	}
 };
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 class MJ96EdgeVertexFunctor : public FunctorType
 {
 protected:
+    typedef typename EMBV::DATA_TYPE EMB;
 	typename PFP::MAP& m_map ;
 	EMBV& m_attribut;
 	//Algo::Volume::IHM::AttributeHandler_IHM<typename PFP::VEC3, VERTEX>& m_position ;
@@ -217,7 +219,7 @@ public:
 			Traversor3EW<typename PFP::MAP> travEW(m_map, d2);
 			for(Dart dit = travEW.begin() ; dit != travEW.end() ; dit = travEW.next())
 			{
-				Cavg += Algo::Surface::Geometry::volumeCentroidGen<PFP, EMBV, EMB>(m_map, dit, m_attribut);
+                Cavg += Algo::Surface::Geometry::volumeCentroid<PFP, EMBV>(m_map, dit, m_attribut);
 				++degree;
 			}
 			Cavg /= degree;
@@ -227,7 +229,7 @@ public:
 			Traversor3EF<typename PFP::MAP> travEF(m_map, d2);
 			for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
 			{
-				Aavg += Algo::Surface::Geometry::faceCentroidGen<PFP, EMBV, EMB>(m_map, dit, m_attribut);
+                Aavg += Algo::Surface::Geometry::faceCentroid<PFP, EMBV>(m_map, dit, m_attribut);
 				++degree;
 			}
 			Aavg /= degree;
@@ -247,10 +249,11 @@ public:
 	}
 };
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 class MJ96FaceVertexFunctor : public FunctorType
 {
 protected:
+    typedef typename EMBV::DATA_TYPE EMB;
 	typename PFP::MAP& m_map ;
 	EMBV& m_attribut;
 	//Algo::Volume::IHM::AttributeHandler_IHM<typename PFP::VEC3, VERTEX>& m_position ;
@@ -291,10 +294,10 @@ public:
 			m_map.decCurrentLevel() ;
 
 			//face points
-			EMB C0 = Algo::Surface::Geometry::volumeCentroidGen<PFP, EMBV, EMB>(m_map, df, m_attribut);
-			EMB C1 = Algo::Surface::Geometry::volumeCentroidGen<PFP, EMBV, EMB>(m_map, m_map.phi3(df), m_attribut);
+            EMB C0 = Algo::Surface::Geometry::volumeCentroid<PFP, EMBV>(m_map, df, m_attribut);
+            EMB C1 = Algo::Surface::Geometry::volumeCentroid<PFP, EMBV>(m_map, m_map.phi3(df), m_attribut);
 
-			EMB A = Algo::Surface::Geometry::faceCentroidGen<PFP, EMBV, EMB>(m_map, df, m_attribut);
+            EMB A = Algo::Surface::Geometry::faceCentroid<PFP, EMBV>(m_map, df, m_attribut);
 
 			EMB fp = C0 + A * 2 + C1;
 			fp /= 4;
@@ -309,10 +312,11 @@ public:
 
 };
 
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 class MJ96VolumeVertexFunctor : public FunctorType
 {
 protected:
+    typedef typename EMBV::DATA_TYPE EMB;
 	typename PFP::MAP& m_map ;
 	EMBV& m_attribut;
 	//Algo::Volume::IHM::AttributeHandler_IHM<typename PFP::VEC3, VERTEX>& m_position ;
@@ -332,7 +336,7 @@ public:
 
 		//cell points : these points are the average of the
 		//vertices of the lattice that bound the cell
-		EMB p = Algo::Surface::Geometry::volumeCentroidGen<PFP, EMBV, EMB>(m_map,df,m_attribut);
+        EMB p = Algo::Surface::Geometry::volumeCentroid<PFP, EMBV>(m_map,df,m_attribut);
 
 		m_map.incCurrentLevel() ;
 
