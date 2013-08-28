@@ -194,7 +194,12 @@ void MyQT::createMap(int n)
 	m_render_topo->setDartWidth(4.0f);
 	m_render_topo->setInitialDartsColor(0.0f,0.0f,0.0f);
 	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true); // nb
+
+#ifdef PRIMAL_TOPO
+    m_render_topo->updateData<PFP>(myMap, position, 0.9);
+#else
+   m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true);
+#endif
 
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
@@ -213,7 +218,12 @@ void MyQT::createMap(int n)
 void MyQT::updateMap()
 {
 	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true); // nb
+#ifdef PRIMAL_TOPO
+    m_render_topo->updateData<PFP>(myMap, position, 0.9);
+#else
+    m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true);
+#endif
+
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
 		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
@@ -229,7 +239,11 @@ void MyQT::updateMap()
 void MyQT::cb_initGL()
 {
 	glClearColor(1.0f,1.0f,1.0f,1.0f);
-	m_render_topo = new Algo::Render::GL2::TopoRender(0.01f) ;
+#ifdef PRIMAL_TOPO
+    m_render_topo = new Algo::Render::GL2::TopoPrimalRender() ;
+#else
+    m_render_topo = new Algo::Render::GL2::TopoRender(0.01f) ;
+#endif
 }
 
 // redraw GL callback (clear and swap already done)

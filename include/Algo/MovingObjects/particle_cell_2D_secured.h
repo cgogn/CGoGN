@@ -40,7 +40,12 @@ public:
 	ParticleCell2DSecured(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
 	ParticleCell2DMemo<PFP>(map, belonging_cell, pos, tabPos)
 	{
-		std::cout << "Particle Memo : for debugging (unoptimized)" << std::endl;
+//		std::cout << "Particle Memo : for debugging (unoptimized)" << std::endl;
+
+	}
+
+	~ParticleCell2DSecured()
+	{
 
 	}
 

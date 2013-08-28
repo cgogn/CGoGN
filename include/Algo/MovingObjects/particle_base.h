@@ -51,6 +51,11 @@ public:
 	{
 	}
 
+	virtual ~ParticleBase()
+	{
+
+	}
+
 	void setState(unsigned int state)
 	{
 		m_state = state ;
