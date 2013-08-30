@@ -30,9 +30,14 @@ int main(int argc, char* argv[])
 	schnapps.show();
 
 	pythonContext.addObject("schnapps", &schnapps);
-	QFileInfo fi(app.applicationDirPath() + QString("/schnappsInit.py"));
-	if(fi.exists())
-		pythonContext.evalFile(fi.filePath());
+
+	if(argc > 1)
+	{
+		QString filename(argv[1]);
+		QFileInfo fi(filename);
+		if(fi.exists())
+			pythonContext.evalFile(fi.filePath());
+	}
 
 	splash->finish(&schnapps);
 	delete splash;
