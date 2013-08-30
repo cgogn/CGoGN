@@ -29,6 +29,7 @@
 #include <vector>
 #include "Utils/gl_def.h"
 #include "Container/convert.h"
+#include "Topology/generic/attributeHandler.h"
 
 namespace CGoGN
 {
@@ -41,7 +42,7 @@ class GLSLShader;
 /**
  * Encapsulation of OpenGL Vertex Buffer Object
  * Manage
- * - alloc /release of GL buffer
+ * - alloc / release of GL buffer
  * - ref by Shaders
  * - size of data (invidual cells)
  */
@@ -124,17 +125,15 @@ public:
 
 	/**
 	 * update data from attribute handler to the vbo
-	 * @warning use only with include vbo.h (not vbo_base.h)
 	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib);
+	void updateData(const AttributeHandlerGen& attrib);
+	void updateData(const AttributeMultiVectorGen* attrib);
 
 	/**
 	 * update data from attribute handler to the vbo, with conversion
-	 * @warning use only with include vbo.h (not vbo_base.h)
 	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv);
+	void updateData(const AttributeHandlerGen& attrib, ConvertAttrib* conv);
+	void updateData(const AttributeMultiVectorGen* attrib, ConvertAttrib* conv);
 
 	/**
 	 * update data from given data vector

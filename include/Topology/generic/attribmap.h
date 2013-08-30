@@ -43,7 +43,6 @@ public:
 
 	virtual void clear(bool removeAttrib) ;
 
-
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *
 	 ****************************************/
@@ -71,6 +70,14 @@ public:
 	*/
 	template <typename T, unsigned int ORBIT>
 	AttributeHandler<T, ORBIT> getAttribute(const std::string& nameAttr) ;
+
+	/**
+	 * @brief get a generic pointer to an existing attribute multi vector
+	 * @param orbit the concerned orbit
+	 * @param nameAttr attribute name
+	 * @return a pointer to an AttributeMultiVectorGen
+	 */
+	AttributeMultiVectorGen* getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
 	* check if an attribute exist ( get, test if valid and add if necessary)

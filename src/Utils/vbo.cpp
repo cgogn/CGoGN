@@ -74,6 +74,89 @@ void VBO::sameAllocSameBufferSize(const VBO& vbo)
 	glBufferData(GL_ARRAY_BUFFER, nbbytes, NULL, GL_STREAM_DRAW);
 }
 
+void VBO::updateData(const AttributeHandlerGen& attrib)
+{
+	updateData(attrib.getDataVectorGen()) ;
+}
+
+void VBO::updateData(const AttributeMultiVectorGen* attrib)
+{
+	if (m_lock)
+	{
+		CGoGNerr << "Error locked VBO" << CGoGNendl;
+		return;
+	}
+
+	m_name = attrib->getName();
+	m_typeName = attrib->getTypeName();
+
+	m_data_size = attrib->getSizeOfType() / sizeof(float);
+
+	std::vector<void*> addr;
+	unsigned int byteTableSize;
+	unsigned int nbb = attrib->getBlocksPointers(addr, byteTableSize);
+
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
+	glBufferData(GL_ARRAY_BUFFER, nbb * byteTableSize, 0, GL_STREAM_DRAW);
+
+	m_nbElts = nbb * byteTableSize / attrib->getSizeOfType();
+
+	unsigned int offset = 0;
+
+	for (unsigned int i = 0; i < nbb; ++i)
+	{
+		glBufferSubDataARB(GL_ARRAY_BUFFER, offset, byteTableSize, addr[i]);
+		offset += byteTableSize;
+	}
+}
+
+void VBO::updateData(const AttributeHandlerGen& attrib, ConvertAttrib* conv)
+{
+	updateData(attrib.getDataVectorGen(), conv) ;
+}
+
+void VBO::updateData(const AttributeMultiVectorGen* attrib, ConvertAttrib* conv)
+{
+	if (m_lock)
+	{
+		CGoGNerr << "Error locked VBO" << CGoGNendl;
+		return;
+	}
+
+	m_name = attrib->getName();
+	m_typeName = attrib->getTypeName();
+
+	m_data_size = conv->sizeElt();
+
+	std::vector<void*> addr;
+	unsigned int byteTableSize;
+	unsigned int nbb = attrib->getBlocksPointers(addr, byteTableSize);
+
+	// alloue la memoire pour le buffer et initialise le conv
+	conv->reserve(attrib->getBlockSize());
+
+	// bind buffer to update
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
+	glBufferData(GL_ARRAY_BUFFER, nbb * conv->sizeBuffer(), 0, GL_STREAM_DRAW);
+
+	m_nbElts = nbb * conv->nbElt();
+
+	unsigned int offset = 0;
+
+	for (unsigned int i = 0; i < nbb; ++i)
+	{
+		// convertit les donnees dans le buffer de conv
+		conv->convert(addr[i]);
+		// update sub-vbo
+		glBufferSubDataARB(GL_ARRAY_BUFFER, offset, conv->sizeBuffer(), conv->buffer());
+		// block suivant
+		offset += conv->sizeBuffer();
+	}
+
+	// libere la memoire de la conversion
+	conv->release();
+}
+
 void* VBO::lockPtr()
 {
 	if (m_lock)

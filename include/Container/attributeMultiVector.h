@@ -96,21 +96,21 @@ public:
 	/**
 	* get / set name of the attribute
 	*/
-	const std::string& getName();
+	const std::string& getName() const;
 
 	void setName(const std::string& n);
 
 	/**
 	* get / set name of the type of the attribute
 	*/
-	const std::string& getTypeName();
+	const std::string& getTypeName() const;
 
 	void setTypeName(const std::string& n);
 
 	/**
 	 * get block size
 	 */
- 	unsigned int getBlockSize();
+	unsigned int getBlockSize() const;
 
 	/**************************************
 	 *       MULTI VECTOR MANAGEMENT      *
@@ -141,11 +141,16 @@ public:
 	*/
 	virtual void clear() = 0;
 
+	/**
+	 * get size of type
+	 */
+	virtual int getSizeOfType() const = 0;
+
 	/**************************************
 	 *             DATA ACCESS            *
 	 **************************************/
 
-	virtual unsigned int getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize) = 0;
+	virtual unsigned int getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize) const = 0;
 
 	/**************************************
 	 *          LINES MANAGEMENT          *
@@ -258,6 +263,8 @@ public:
 
 	void clear();
 
+	int getSizeOfType() const;
+
 	/**************************************
 	 *             DATA ACCESS            *
 	 **************************************/
@@ -277,7 +284,7 @@ public:
 	/**
 	 * Get the addresses of each block of data
 	 */
-	unsigned int getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize);
+	unsigned int getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize) const;
 
 	/**************************************
 	 *          LINES MANAGEMENT          *

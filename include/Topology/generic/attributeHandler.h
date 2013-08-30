@@ -45,7 +45,9 @@ protected:
 	bool valid ;
 
 public:
-	AttributeHandlerGen(GenericMap* m, bool v) : m_map(m), valid(v)
+	AttributeHandlerGen(GenericMap* m, bool v) :
+		m_map(m),
+		valid(v)
 	{}
 
 	GenericMap* map() const
@@ -58,8 +60,14 @@ public:
 		return valid ;
 	}
 
+	virtual int getSizeOfType() const = 0;
+
+	virtual unsigned int getOrbit() const = 0;
+
 	virtual const std::string& name() const = 0;
-//	virtual const std::string& typeName() const = 0;
+	virtual const std::string& typeName() const = 0;
+
+	virtual AttributeMultiVectorGen* getDataVectorGen() const = 0;
 
 protected:
 	void setInvalid()
@@ -139,9 +147,19 @@ public:
 	AttributeMultiVector<T>* getDataVector() const ;
 
 	/**
+	 * get attribute data vector (generic MultiVector)
+	 */
+	virtual AttributeMultiVectorGen* getDataVectorGen() const ;
+
+	/**
+	 * get size of attribute type
+	 */
+	virtual int getSizeOfType() const ;
+
+	/**
 	 * get attribute orbit
 	 */
-	unsigned int getOrbit() const ;
+	virtual unsigned int getOrbit() const ;
 
 	/**
 	 * get attribute index
@@ -153,10 +171,10 @@ public:
 	 */
 	virtual const std::string& name() const ;
 
-//	/**
-//	 * get attribute type name
-//	 */
-//	virtual const std::string& typeName() const ;
+	/**
+	 * get attribute type name
+	 */
+	virtual const std::string& typeName() const ;
 
 	/**
 	 * give the number of elements of the attribute container

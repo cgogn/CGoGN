@@ -226,15 +226,13 @@ public:
 	void initPrimitives(int prim, std::vector<GLuint>& tableIndices) ;
 
 	/**
-	 * initialization of the VBO indices primitives
-	 * using the given table
+	 * return if the given primitive connectivity VBO is up to date
 	 * @param prim primitive to draw: POINT_INDICES, LINE_INDICES, TRIANGLE_INDICES
 	 */
 	bool isPrimitiveUpToDate(int prim) { return m_indexBufferUpToDate[prim]; }
 
 	/**
-	 * initialization of the VBO indices primitives
-	 * using the given table
+	 * set the given primitive connectivity VBO dirty
 	 * @param prim primitive to draw: POINT_INDICES, LINE_INDICES, TRIANGLE_INDICES
 	 */
 	void setPrimitiveDirty(int prim) { m_indexBufferUpToDate[prim] = false; }

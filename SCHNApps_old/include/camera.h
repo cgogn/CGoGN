@@ -33,6 +33,7 @@ public slots:
 	bool isUsed() const { return !l_views.empty(); }
 	bool isShared()	const { return l_views.size() > 1; }
 
+	qglviewer::Camera::Type getType() { return type(); }
 	void changeType(qglviewer::Camera::Type type);
 
 	/*********************************************************
