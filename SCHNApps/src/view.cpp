@@ -67,6 +67,7 @@ void View::setCurrentCamera(Camera* c)
 
 		emit(currentCameraChanged(prev, c));
 
+		updateCurrentCameraBB();
 		updateGL();
 	}
 }
@@ -131,7 +132,7 @@ void View::linkMap(MapHandlerGen* map)
 		l_maps.push_back(map);
 		map->linkView(this);
 		emit(mapLinked(map));
-		updateViewBB();
+		updateCurrentCameraBB();
 		updateGL();
 	}
 }
@@ -149,7 +150,7 @@ void View::unlinkMap(MapHandlerGen* map)
 	{
 		map->unlinkView(this);
 		emit(mapUnlinked(map));
-		updateViewBB();
+		updateCurrentCameraBB();
 		updateGL();
 	}
 }
@@ -397,7 +398,7 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 	return mvpm;
 }
 
-void View::updateViewBB()
+void View::updateCurrentCameraBB()
 {
 	qglviewer::Vec bbMin(0,0,0);
 	qglviewer::Vec bbMax(1,1,1);

@@ -83,7 +83,7 @@ private:
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
-	void updateViewBB();
+	void updateCurrentCameraBB();
 
 private slots:
 	void ui_verticalSplitView(int x, int y, int globalX, int globalY);

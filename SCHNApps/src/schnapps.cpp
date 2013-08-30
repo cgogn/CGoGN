@@ -413,7 +413,15 @@ void SCHNApps::addPluginDockTab(Plugin* plugin, QWidget* tabWidget, const QStrin
 
 		int idx = m_pluginDockTabWidget->addTab(tabWidget, tabText);
 		m_pluginDock->setVisible(true);
-		m_pluginDockTabWidget->setTabEnabled(idx, true);
+
+		PluginInteraction* pi = dynamic_cast<PluginInteraction*>(plugin);
+		if(pi)
+		{
+			if(pi->isLinkedToView(m_selectedView))
+				m_pluginDockTabWidget->setTabEnabled(idx, true);
+			else
+				m_pluginDockTabWidget->setTabEnabled(idx, false);
+		}
 
 		if(currentTab != -1)
 			m_pluginDockTabWidget->setCurrentIndex(currentTab);
