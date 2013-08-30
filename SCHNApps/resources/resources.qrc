@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/splash">
+        <file>cgogn/splash.png</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file>cgogn/cgogn2.png</file>
+        <file>icons/cameras.png</file>
+        <file>icons/plugins.png</file>
+        <file>icons/maps.png</file>
+        <file>icons/close.png</file>
+        <file>icons/Vsplit.png</file>
+        <file>icons/Hsplit.png</file>
+        <file>icons/arrow_down.png</file>
+        <file>icons/arrow_up.png</file>
+    </qresource>
+</RCC>
