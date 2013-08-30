@@ -40,8 +40,9 @@ inline bool AttribMap::removeAttribute(AttributeHandler<T, ORBIT>& attr)
 	assert(attr.isValid() || !"Invalid attribute handler") ;
 	if(m_attribs[attr.getOrbit()].template removeAttribute<T>(attr.getIndex()))
 	{
+		AttributeMultiVectorGen* amv = attr.getDataVector();
 		typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
-		std::pair<IT, IT> bounds = attributeHandlers.equal_range(attr.getDataVector()) ;
+		std::pair<IT, IT> bounds = attributeHandlers.equal_range(amv) ;
 		for(IT i = bounds.first; i != bounds.second; ++i)
 			(*i).second->setInvalid() ;
 		attributeHandlers.erase(bounds.first, bounds.second) ;
@@ -62,7 +63,7 @@ inline AttributeHandler<T ,ORBIT> AttribMap::checkAttribute(const std::string& n
 {
 	AttributeHandler<T,ORBIT> att = this->getAttribute<T,ORBIT>(nameAttr);
 	if (!att.isValid())
-		att = this->addAttribute<T,ORBIT>("position");
+		att = this->addAttribute<T,ORBIT>(nameAttr);
 	return att;
 }
 

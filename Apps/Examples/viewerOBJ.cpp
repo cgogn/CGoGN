@@ -104,18 +104,17 @@ void ObjView::cb_redraw()
 		{
 			m_shader2->setTexture(mats[i]->textureDiffuse);
 			m_shader2->setShininess(mats[i]->shininess);
-			m_shader2->setAmbient(0.3f);
+			m_shader2->setAmbient(0.8f);
 			m_shader2->activeTexture();
 			m_shader2->enableVertexAttribs();
 			glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i), m_obj.nbIndices(i));
 			m_shader2->disableVertexAttribs();
-
-
 		}
 		else
 		{
 			Geom::Vec4f v;
-			v[0] = mats[i]->ambiantColor[0]; v[1] = mats[i]->ambiantColor[1]; v[2] = mats[i]->ambiantColor[2]; v[3] = 0.0f;
+//			v[0] = mats[i]->ambiantColor[0]; v[1] = mats[i]->ambiantColor[1]; v[2] = mats[i]->ambiantColor[2]; v[3] = 0.0f;
+			v[0] = 0.5f; v[1] = 0.5f; v[2] = 0.5f; v[3] = 0.0f;
 			m_phongShader->setAmbiant(v) ;
 			v[0] = mats[i]->diffuseColor[0]; v[1] = mats[i]->diffuseColor[1]; v[2] = mats[i]->diffuseColor[2]; v[3] = 0.0f;
 			m_phongShader->setDiffuse(v) ;

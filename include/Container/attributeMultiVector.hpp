@@ -60,7 +60,7 @@ inline void AttributeMultiVectorGen::setIndex(unsigned int i)
 	m_index = i ;
 }
 
-inline const std::string& AttributeMultiVectorGen::getName()
+inline const std::string& AttributeMultiVectorGen::getName() const
 {
 	return m_attrName;
 }
@@ -70,7 +70,7 @@ inline void AttributeMultiVectorGen::setName(const std::string& n)
 	m_attrName = n ;
 }
 
-inline const std::string& AttributeMultiVectorGen::getTypeName()
+inline const std::string& AttributeMultiVectorGen::getTypeName() const
 {
 	return m_typeName;
 }
@@ -80,7 +80,7 @@ inline void AttributeMultiVectorGen::setTypeName(const std::string& n)
 	m_typeName = n ;
 }
 
-inline unsigned int AttributeMultiVectorGen::getBlockSize()
+inline unsigned int AttributeMultiVectorGen::getBlockSize() const
 {
 	return _BLOCKSIZE_ ;
 }
@@ -242,6 +242,12 @@ inline void AttributeMultiVector<T>::clear()
 	m_tableData.clear();
 }
 
+template <typename T>
+inline int AttributeMultiVector<T>::getSizeOfType() const
+{
+	return sizeof(T);
+}
+
 /**************************************
  *             DATA ACCESS            *
  **************************************/
@@ -259,14 +265,14 @@ inline const T& AttributeMultiVector<T>::operator[](unsigned int i) const
 }
 
 template <typename T>
-unsigned int AttributeMultiVector<T>::getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize)
+unsigned int AttributeMultiVector<T>::getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize) const
 {
 	byteBlockSize = _BLOCKSIZE_ * sizeof(T);
 
 	addr.reserve(m_tableData.size());
 	addr.clear();
 
-	for (typename std::vector<T*>::iterator it = m_tableData.begin(); it != m_tableData.end(); ++it)
+	for (typename std::vector<T*>::const_iterator it = m_tableData.begin(); it != m_tableData.end(); ++it)
 		addr.push_back(*it);
 
 	return addr.size();

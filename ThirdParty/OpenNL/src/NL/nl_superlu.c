@@ -276,7 +276,7 @@ NLboolean nlSolve_SUPERLU() {
     return NL_FALSE;
 }
 
-void nlCLear_SUPERLU() {
+void nlClear_SUPERLU() {
 	nl_assert_not_reached ;
 }
 

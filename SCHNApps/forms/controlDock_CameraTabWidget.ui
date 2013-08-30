@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ControlDock_CameraTabWidget</class>
+ <widget class="QWidget" name="ControlDock_CameraTabWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>200</width>
+    <height>617</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>200</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>200</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="2">
+    <widget class="QPushButton" name="button_addCamera">
+     <property name="text">
+      <string>Add</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QListWidget" name="list_cameras">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QRadioButton" name="radio_orthographicProjection">
+     <property name="text">
+      <string>Orthographic</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">group_projectionType</string>
+     </attribute>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QRadioButton" name="radio_perspectiveProjection">
+     <property name="text">
+      <string>Perspective</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">group_projectionType</string>
+     </attribute>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QCheckBox" name="check_drawCamera">
+     <property name="text">
+      <string>draw</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QCheckBox" name="check_drawCameraPath">
+     <property name="text">
+      <string>draw path</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>68</width>
+       <height>257</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="group_projectionType"/>
+ </buttongroups>
+</ui>

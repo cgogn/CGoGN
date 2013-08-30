@@ -281,6 +281,177 @@ void Image<DataType>::saveInrMask(const char* filename)
 
 #endif
 
+template< typename  DataType >
+template< typename T>
+void Image<DataType>::readVTKBuffer(std::ifstream& in)
+{
+
+	int total = m_WXY * m_WZ;
+
+	if (m_Data != NULL)
+			delete[] m_Data;
+
+	m_Data = new DataType[total];
+
+	DataType* ptr = m_Data;
+	T* buffer = new T[total];
+	in.read(reinterpret_cast<char*>(buffer), total*sizeof(T));
+	T* buf = buffer;
+	for (int i=0; i<total; ++i)
+		if (*buf++ !=0)
+			*ptr++ = 255;
+		else
+			*ptr++ = 0;
+	delete[] buffer;
+}
+
+
+template< typename  DataType >
+bool Image<DataType>::loadVTKBinaryMask(const char* filename)
+{
+	std::ifstream in(filename, std::ios::binary);
+	if (!in)
+	{
+		CGoGNerr << "Mesh_Base::loadVox: Unable to open file " << CGoGNendl;
+		return false;
+	}
+
+	m_SX = 1.0 ;
+	m_SY = 1.0 ;
+	m_SZ = 1.0 ;
+
+	// read encoding
+	std::string keyword ;
+	int dtType = 0;
+
+	do
+	{
+		char line[1024] ;
+		in.getline(line, 1024) ;
+
+		std::cout << "LINE = "<< line << std::endl;
+
+
+		std::istringstream line_input(line) ;
+
+		line_input >> keyword ;
+
+		std::cout << "keyword = "<< keyword << std::endl;
+
+		if(keyword == "VTK") 
+		{
+				std::cout << "reading vtk file" << std::endl;
+		} else if(keyword == "DIMENSIONS") 
+		{
+			line_input >> m_WX ;
+			line_input >> m_WY ;
+			line_input >> m_WZ ;
+
+			std::cout << "DIM= "<< m_WX << "/"<< m_WY << "/"<< m_WZ << std::endl;
+
+		} else if(keyword == "SPACING") 
+		{
+			line_input >> m_SX ;
+			line_input >> m_SY ;
+			line_input >> m_SZ ;
+
+			std::cout << "SPACING= "<< m_SX << "/"<< m_SY << "/"<< m_SZ << std::endl;
+		} 
+		else if(keyword == "SCALARS")
+		{
+			std::string str;
+			line_input >> str;
+			line_input >> str;
+
+			std::cout << "SCALAR= "<< str << std::endl;
+
+			if (str == "unsigned_char")
+				dtType = 1 ;
+			else if (str == "unsigned_short")
+				dtType = 2 ;
+			else if (str == "unsigned_int")
+				dtType = 3 ;
+			else if (str == "char")
+				dtType = 4 ;
+			else if (str == "short")
+				dtType = 5 ;
+			else if (str == "int")
+				dtType = 6 ;
+		}
+		/*else if(keyword == "POINT_DATA")
+		{
+			
+		} */
+	}while (keyword != "LOOKUP_TABLE");
+
+	m_WXY = m_WX * m_WY;
+//	int total = m_WXY * m_WZ;
+
+//	m_Data = new DataType[total];
+//	DataType* ptr = m_Data;
+
+	switch(dtType)
+	{
+		case 1:
+			readVTKBuffer<unsigned char>(in);
+//			{
+//			unsigned char* buffer = new unsigned char[total];
+//			in.read(reinterpret_cast<char*>(buffer), total*sizeof(unsigned char));
+//			unsigned char* buf = buffer;
+//			for (int i=0; i<total; ++i)
+//				if (*buf++ !=0)
+//					*ptr++ = 255;
+//				else
+//					*ptr++ = 0;
+//			delete[] buffer;
+//			}
+			break;
+
+		case 2:
+			readVTKBuffer<unsigned short>(in);
+//			{
+//			unsigned short* buffer = new unsigned short[total];
+//			in.read(reinterpret_cast<char*>(buffer), total*sizeof(unsigned short));
+//			unsigned short* buf = buffer;
+//			for (int i=0; i<total; ++i)
+//				if (*buf++ !=0)
+//					*ptr++ = 255;
+//				else
+//					*ptr++ = 0;
+//			delete[] buffer;
+//			}
+			break;
+
+		case 3:
+			readVTKBuffer<unsigned int>(in);
+//			{
+//			unsigned int* buffer = new unsigned int[total];
+//			in.read(reinterpret_cast<char*>(buffer), total*sizeof(unsigned int));
+//			unsigned int* buf = buffer;
+//			for (int i=0; i<total; ++i)
+//				if (*buf++ !=0)
+//					*ptr++ = 255;
+//				else
+//					*ptr++ = 0;
+//			delete[] buffer;
+//			}
+			break;
+		case 4:
+			readVTKBuffer<char>(in);
+			break;
+		case 5:
+			readVTKBuffer<short>(in);
+			break;
+		case 6:
+			readVTKBuffer<int>(in);
+			break;
+		default:
+			CGoGNerr << "unknown format" << CGoGNendl;
+			break;
+	}
+	m_Alloc=true;
+	return true;
+}
 
 
 template< typename  DataType >

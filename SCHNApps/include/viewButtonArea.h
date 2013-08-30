@@ -52,8 +52,12 @@ public:
 		m_view(view),
 		m_form(0,0,0,0)
 	{}
+
 	~ViewButtonArea()
-	{}
+	{
+//		foreach(ViewButton* b, l_buttons)
+//			delete b;
+	}
 
 	void addButton(ViewButton* button);
 	void removeButton(ViewButton* button);

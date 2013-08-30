@@ -707,7 +707,7 @@ void SVGOut::write()
 		{
 			if (m_attFact > 0.0f)
 			{
-				float da = float( pow(double(itd-vds.begin()),m_attFact) / pow(double(vds.size()),m_attFact));
+				float da = float( pow(double(itd-vds.begin()),double(m_attFact)) / pow(double(vds.size()),double(m_attFact)));
 				(*it)->m_objs[itd->obj]->saveOneDepthAttenuation(*m_out,da,itd->id, m_bbX1-m_bbX0);
 			}
 			else

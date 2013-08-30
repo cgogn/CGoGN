@@ -347,13 +347,13 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 	this->m_size[1] = ilGetInteger(IL_IMAGE_HEIGHT);
 	this->computeSub();
 
-	this->m_data_ptr = new TYPE[ptr->width()*ptr->height()];
+	this->m_data_ptr = new TYPE[this->m_size[0]*this->m_size[1]];
 	unsigned char* ptr = reinterpret_cast<unsigned char*>(this->m_data_ptr);
 
 	for (int i=this->m_size[1]-1; i>=0; --i)
 	{
 		ilCopyPixels(0, i, 0, this->m_size[0],1, 1, IL_RGB, IL_UNSIGNED_BYTE, ptr);
-		ptr += 3*w;
+		ptr += 3*this->m_size[0];
 	}
 	ilDeleteImage(imgName);
 
@@ -546,7 +546,7 @@ Image<DIM,TYPE>* Image<DIM,TYPE>::scaleNearestToNewImage(const COORD& newSize)
 			double p0 = inc0/2.0 - 0.5;
 			for (unsigned int i=0; i< newSize[0]; ++i)
 			{
-				newImg->texel(i) = this->texel( (unsigned int)(rint(p0)) );
+				newImg->texel(i) = this->texel( (unsigned int)(p0+0.5) );
 				p0 += inc0;
 			}
 		}
@@ -561,7 +561,7 @@ Image<DIM,TYPE>* Image<DIM,TYPE>::scaleNearestToNewImage(const COORD& newSize)
 				double p0 = inc0/2.0 - 0.5;
 				for (unsigned int i=0; i< newSize[0]; ++i)
 				{
-					newImg->texel(i,j) = this->texel( (unsigned int)(rint(p0)), (unsigned int)(rint(p1)) );
+					newImg->texel(i,j) = this->texel( (unsigned int)(p0+0.5), (unsigned int)(p1+0.5) );
 					p0 += inc0;
 				}
 				p1 += inc1;
@@ -582,7 +582,7 @@ Image<DIM,TYPE>* Image<DIM,TYPE>::scaleNearestToNewImage(const COORD& newSize)
 					double p0 = inc0/2.0 - 0.5;
 					for (unsigned int i=0; i< newSize[0]; ++i)
 					{
-						newImg->texel(i,j,k) = this->texel( (unsigned int)(rint(p0)), (unsigned int)(rint(p1)), (unsigned int)(rint(p2)) );
+						newImg->texel(i,j,k) = this->texel( (unsigned int)(p0+0.5), (unsigned int)(p1+0.5), (unsigned int)(p2+0.5) );
 						p0 += inc0;
 					}
 					p1 += inc1;
@@ -1095,7 +1095,6 @@ void Texture<DIM,TYPE>::update()
 		glTexImage1D(m_target, 0, internalFormat(), this->m_size[0], 0, format(), m_type, this->m_data_ptr);
 		break;
 	case 2:
-			std::cout << "updateSize: " << this->m_size[0] << " / " << this->m_size[1] << std::endl;
 		glTexImage2D(m_target, 0, internalFormat(), this->m_size[0], this->m_size[1], 0, format(), m_type, this->m_data_ptr);
 		break;
 	case 3:

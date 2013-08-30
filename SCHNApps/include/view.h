@@ -4,8 +4,7 @@
 #include <GL/glew.h>
 #include <QGLViewer/qglviewer.h>
 
-#include "types.h"
-#include "window.h"
+#include "schnapps.h"
 #include "Utils/gl_matrices.h"
 
 namespace CGoGN
@@ -14,42 +13,62 @@ namespace CGoGN
 namespace SCHNApps
 {
 
+class Camera;
 class ViewButtonArea;
 class ViewButton;
-
-class CameraViewDialog;
-class PluginsViewDialog;
-class MapsViewDialog;
+class PluginInteraction;
 
 class View : public QGLViewer
 {
 	Q_OBJECT
 
+	friend class SCHNApps;
+
 public:
 	static unsigned int viewCount;
 
-	View(const QString& name, Window* w, const QGLWidget* shareWidget = NULL);
+	View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget = NULL);
 	~View();
 
 	const QString& getName() const { return m_name; }
 
 public slots:
 	QString getName() { return m_name; }
-	void setName(const QString& name) { m_name = name; }
+	SCHNApps* getSCHNApps() const { return m_schnapps; }
 
-	Window* getWindow() const { return m_window; }
-	void setWindow(Window* w) { m_window = w; }
+	bool isSelectedView() const { return m_schnapps->getSelectedView() == this; }
 
-	bool isCurrentView() const { return m_window->getCurrentView() == this; }
+	void setCurrentCamera(Camera* c);
+	void setCurrentCamera(const QString& name);
 
-public:
+	Camera* getCurrentCamera() const { return m_currentCamera; }
+	bool usesCamera(const QString& cameraName) const;
+
+	void linkPlugin(PluginInteraction* plugin);
+	void linkPlugin(const QString& name);
+	void unlinkPlugin(PluginInteraction* plugin);
+	void unlinkPlugin(const QString& name);
+
+	const QList<PluginInteraction*>& getLinkedPlugins() const { return l_plugins; }
+	bool isLinkedToPlugin(PluginInteraction* plugin) const { return l_plugins.contains(plugin); }
+	bool isLinkedToPlugin(const QString& name) const;
+
+	void linkMap(MapHandlerGen* map);
+	void linkMap(const QString& name);
+	void unlinkMap(MapHandlerGen* map);
+	void unlinkMap(const QString& name);
+
+	const QList<MapHandlerGen*>& getLinkedMaps() const { return l_maps; }
+	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
+	bool isLinkedToMap(const QString& name) const;
+
+private:
 	virtual void init();
 	virtual void preDraw();
 	virtual void draw();
 	virtual void postDraw();
 	virtual void resizeGL(int width, int height);
 
-	void drawText();
 	void drawButtons();
 	void drawFrame();
 
@@ -60,87 +79,41 @@ public:
 	void mouseMoveEvent(QMouseEvent* event);
 	void wheelEvent(QWheelEvent* event);
 
-	/*********************************************************
-	 * MANAGE LINKED CAMERA
-	 *********************************************************/
-
-public slots:
-	Camera* getCurrentCamera() const { return m_currentCamera; }
-
-public:
-	void setCurrentCamera(Camera* c);
-
-	/*********************************************************
-	 * MANAGE LINKED PLUGINS
-	 *********************************************************/
-
-	void linkPlugin(Plugin* plugin);
-	void unlinkPlugin(Plugin* plugin);
-	const QList<Plugin*>& getLinkedPlugins() const { return l_plugins; }
-	bool isLinkedToPlugin(Plugin* plugin) const { return l_plugins.contains(plugin); }
-
-	/*********************************************************
-	 * MANAGE LINKED MAPS
-	 *********************************************************/
-
-	void linkMap(MapHandlerGen* map);
-	void unlinkMap(MapHandlerGen* map);
-	const QList<MapHandlerGen*>& getLinkedMaps() const { return l_maps; }
-	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
-
-	void updateViewBB();
-
-	/*********************************************************
-	 * MANAGE MATRICES
-	 *********************************************************/
-
 	glm::mat4 getCurrentModelViewMatrix() const;
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
+	void updateViewBB();
+
+private slots:
+	void ui_verticalSplitView(int x, int y, int globalX, int globalY);
+	void ui_horizontalSplitView(int x, int y, int globalX, int globalY);
+	void ui_closeView(int x, int y, int globalX, int globalY);
+
+signals:
+	void currentCameraChanged(Camera*, Camera*);
+
+	void mapLinked(MapHandlerGen*);
+	void mapUnlinked(MapHandlerGen*);
+
+	void pluginLinked(PluginInteraction*);
+	void pluginUnlinked(PluginInteraction*);
+
 protected:
 	QString m_name;
-	Window* m_window;
+	SCHNApps* m_schnapps;
 
 	Camera* m_currentCamera;
-	QList<Plugin*> l_plugins;
+	QList<PluginInteraction*> l_plugins;
 	QList<MapHandlerGen*> l_maps;
 
 	ViewButtonArea* m_buttonArea;
 
-	ViewButton* m_cameraButton;
-	ViewButton* m_pluginsButton;
-	ViewButton* m_mapsButton;
 	ViewButton* m_closeButton;
 	ViewButton* m_VsplitButton;
 	ViewButton* m_HsplitButton;
 
 	QString m_textInfo;
-
-	CameraViewDialog* m_cameraViewDialog;
-	PluginsViewDialog* m_pluginsViewDialog;
-	MapsViewDialog* m_mapsViewDialog;
-
-public slots:
-	CameraViewDialog* getCameraViewDialog() { return m_cameraViewDialog; }
-	PluginsViewDialog* getPluginsViewDialog() { return m_pluginsViewDialog; }
-	MapsViewDialog* getMapsViewDialog() { return m_mapsViewDialog; }
-
-	void cb_cameraView(int x, int y, int globalX, int globalY);
-	void cb_pluginsView(int x, int y, int globalX, int globalY);
-	void cb_mapsView(int x, int y, int globalX, int globalY);
-	void cb_closeView(int x, int y, int globalX, int globalY);
-	void cb_VsplitView(int x, int y, int globalX, int globalY);
-	void cb_HsplitView(int x, int y, int globalX, int globalY);
-
-signals:
-	void currentCameraChanged(Camera*);
-
-	void mapLinked(MapHandlerGen*);
-	void mapUnlinked(MapHandlerGen*);
-
-	void pluginLinked(Plugin*);
-	void pluginUnlinked(Plugin*);
 };
 
 } // namespace SCHNApps

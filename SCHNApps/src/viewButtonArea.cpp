@@ -1,9 +1,9 @@
 #include "viewButtonArea.h"
 
-#include "window.h"
+#include "schnapps.h"
 #include "view.h"
 #include "texture.h"
-#include "camera.h"
+//#include "camera.h"
 
 #include <iostream>
 
@@ -17,12 +17,12 @@ ViewButton::ViewButton(const QString& image, View* view) :
 	m_img(image),
 	m_view(view)
 {
-	m_tex = m_view->getWindow()->getTexture(m_img);
+	m_tex = m_view->getSCHNApps()->getTexture(m_img);
 }
 
 ViewButton::~ViewButton()
 {
-	m_view->getWindow()->releaseTexture(m_img);
+	m_view->getSCHNApps()->releaseTexture(m_img);
 }
 
 QSize ViewButton::getSize()
