@@ -1,6 +1,6 @@
 Dépendences Linux:
 installer les paquets suivants:
-cmake  cmake-curses-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
+cmake cmake-curses-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 Pour compiler CGoGN:
 
@@ -8,39 +8,43 @@ Pour compiler CGoGN:
 
 	cd CGoGN/ThirdParty/build
 	cmake ..
-	make (-j x if you have x cores)
+	make (-j x si vous avez x cores)
 	make install
 
 	On peut fixer certaines option pour ne pas tout compiler (cf le README.TXT dans ThirdParty)
-	On peut aussi compiler en debug en créant un répertoir qui fini par Debug à la place de build
+	On peut aussi compiler en debug en compilant dans un répertoire dont le nom finit par Debug ("buildDebug" par exemple)
 	
-- aller dans build et taper "cmake ..", puis make
-	Des options (booléennes) sont ici aussi disponible:
-	BUILD_SHARED_LIBS  (F) experimental !
-	WITH_ASSIMP        (T)
-	WITH_NUMERICAL     (T)
-	WITH_ZINRI         (T)
-	WITH_QT	           (T)
-	afin de limiter les dépendances et le temps de compilation/
-	
-	FORCE_MR           (2)
-	permet de compiler dans 3 modes: mixte (0), multi-resolution(1), mono-resolution(2).
-	
-	ONELIB             (F)
-	permet de forcer la compilation en une seule lib (libcgogn.a) au lieu de quatre.
-	
-	
+  - ensuite on compile CGoGN (compile les libs dans CGoGN/lib et des exemples dans CGoGN/bin) :
 
-- la compilation des sous-parties se fait en allant dans les sous-repertoires de build
+	cd CGoGN/build
+	cmake ..
+	make (-j x si vous avez x cores)
 
-Les applications (Examples et Tutos) sont dans le répertoire Apps
+    -> certaines options sont disponibles :
 
-Les binaires sont générés dans le repertoire bin
+	  BUILD_SHARED_LIBS  (F) experimental !
+	  WITH_ASSIMP        (T)
+	  WITH_NUMERICAL     (T)
+	  WITH_ZINRI         (T)
+	  WITH_QT	         (T)
+	    -> afin de limiter les dépendances et le temps de compilation
+	
+	  FORCE_MR           (0)
+	    -> permet de compiler dans 2 modes: mono-resolution(0), multi-resolution(1)
+	
+	  ONELIB             (F)
+	    -> permet de forcer la compilation en une seule lib (libcgogn.a) au lieu de quatre.
 
-Des exemples de données:
-- fichiers trianbgz, off, etc
-sont accessible à l'adresse suivante: 
+  - on peut ensuite compiler SCHNApps ainsi que les plugins fournis :
+	
+	cd CGoGN/SCHNApps/build
+	cmake ..
+	make (-j x si vous avez x cores)
+
+
+Des exemples de données (fichiers trianbgz, off, etc..) sont accessible à l'adresse suivante: 
 https://iggservis.u-strasbg.fr/Data/data.zip
+
 
 =========================================================================================
                                 ENGLISH VERSION
@@ -51,6 +55,7 @@ install the following packages:
 cmake cmake-curses-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
 
 To compile CGoGN:
+
   - first compile third-party libraries:
 
 	cd CGoGN/ThirdParty/build
@@ -66,27 +71,27 @@ To compile CGoGN:
 	cmake ..
 	make (-j x if you have x cores)
 
-	Some options are available:
-	BUILD_SHARED_LIBS  (F) experimental !
-	WITH_ASSIMP        (T)
-	WITH_NUMERICAL     (T)
-	WITH_ZINRI         (T)
-	WITH_QT	           (T)
-	to minimize dependencies and compilation time
-	FORCE_MR           (2)
-	allow the compilation in 3 mode: mixed(0), multi-resolution(1), mono-resolution(2).
+	-> some options are available:.
+
+	  BUILD_SHARED_LIBS  (F) experimental !
+	  WITH_ASSIMP        (T)
+	  WITH_NUMERICAL     (T)
+	  WITH_ZINRI         (T)
+	  WITH_QT	         (T)
+	    -> to minimize dependencies and compilation time
 	
-	ONELIB             (F)
-	allow compilation in one lib (libcgogn.a) instead of four.
+	  FORCE_MR           (1)
+	    -> allows the compilation in 2 modes: mono-resolution(0), multi-resolution(1)
+	
+	  ONELIB             (F)
+	    -> allow compilation in one lib (libcgogn.a) instead of four.
+
+  - we can then compile SCHNApps and the provided plugins :
+	
+	cd CGoGN/SCHNApps/build
+	cmake ..
+	make (-j x if you have x cores)
 
 
-- the compilation of each sub-parts is done by going in the subdirectories of build
-
-Applications (examples and tutorials) are in the Apps directory
-
-The binaries are generated in the bin directory
-
-Examples of data:
-- Trianbgz files, off, etc.
-are accessible at the following address:
+Examples of data (trianbgz, off, etc.. files) are available at the following address:
 https://iggservis.u-strasbg.fr/Data/data.zip
