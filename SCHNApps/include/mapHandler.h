@@ -13,6 +13,7 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Utils/vbo.h"
 #include "Algo/Render/GL2/mapRender.h"
+#include "Utils/drawer.h"
 #include "Algo/Geometry/boundingbox.h"
 
 namespace CGoGN
@@ -25,31 +26,41 @@ class MapHandlerGen : public QObject
 {
 	Q_OBJECT
 
+	friend class View;
+
 public:
-	MapHandlerGen(const QString& name, Window* window, GenericMap* map);
+	MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map);
 	virtual ~MapHandlerGen();
 
-	inline const QString& getName() const { return m_name; }
+	const QString& getName() const { return m_name; }
 
 public slots:
-	inline QString getName() { return m_name; }
-	inline void setName(const QString& name) { m_name = name; }
+	QString getName() { return m_name; }
+	SCHNApps* getSCHNApps() const { return m_schnapps; }
 
-	inline Window* getWindow() const { return m_window; }
-	inline void setWindow(Window* w) { m_window = w; }
+	bool isSelectedMap() const { return m_schnapps->getSelectedMap() == this; }
 
-	inline GenericMap* getGenericMap() const { return m_map; }
+	GenericMap* getGenericMap() const { return m_map; }
 
-	inline const qglviewer::Vec& getBBmin() const { return m_bbMin; }
-	inline const qglviewer::Vec& getBBmax() const { return m_bbMax; }
-	inline float getBBdiagSize() const { return m_bbDiagSize; }
+	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
+	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
+	float getBBdiagSize() const { return m_bbDiagSize; }
+	Utils::GLSLShader* getBBDrawerShader() const
+	{
+		if(m_bbDrawer)
+			return m_bbDrawer->getShader();
+		else
+			return NULL;
+	}
 
-	inline bool isUsed() const { return !l_views.empty(); }
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
+	virtual void drawBB() = 0;
 
-	inline void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
+	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
 	/*********************************************************
 	 * MANAGE ATTRIBUTES
@@ -61,27 +72,25 @@ public:
 	template <typename T, unsigned int ORBIT>
 	AttributeHandler<T, ORBIT> addAttribute(const QString& nameAttr, bool registerAttr = true);
 
-	template <typename T, unsigned int ORBIT>
-	inline void registerAttribute(const AttributeHandler<T, ORBIT>& ah);
+	inline void registerAttribute(const AttributeHandlerGen& ah);
 
 	inline QString getAttributeTypeName(unsigned int orbit, const QString& nameAttr) const;
 
-	inline const AttributeHash& getAttributesList(unsigned int orbit) const { return h_attribs[orbit];	}
+	const AttributeSet& getAttributeSet(unsigned int orbit) const { return m_attribs[orbit]; }
 
-	template <typename T, unsigned int ORBIT>
-	inline void notifyAttributeModification(const AttributeHandler<T, ORBIT>& attr)
+	void notifyAttributeModification(const AttributeHandlerGen& attr)
 	{
 		QString nameAttr = QString::fromStdString(attr.name());
-		if(h_vbo.contains(nameAttr))
-			h_vbo[nameAttr]->updateData(attr);
+		if(m_vbo.contains(nameAttr))
+			m_vbo[nameAttr]->updateData(attr);
 
-		emit(attributeModified(ORBIT, nameAttr));
+		emit(attributeModified(attr.getOrbit(), nameAttr));
 
 		foreach(View* view, l_views)
 			view->updateGL();
 	}
 
-	inline void notifyConnectivityModification()
+	void notifyConnectivityModification()
 	{
 		m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
 		m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
@@ -97,40 +106,31 @@ public:
 	 * MANAGE VBOs
 	 *********************************************************/
 
-	template <typename ATTR_HANDLER>
-	Utils::VBO* createVBO(const ATTR_HANDLER& attr);
+public slots:
+	Utils::VBO* createVBO(const AttributeMultiVectorGen* attr);
+	Utils::VBO* createVBO(const AttributeHandlerGen& attr);
+	Utils::VBO* createVBO(const QString& name);
 
-	template <typename ATTR_HANDLER>
-	void updateVBO(const ATTR_HANDLER& attr);
+	void updateVBO(const AttributeMultiVectorGen* attr);
+	void updateVBO(const AttributeHandlerGen& attr);
+	void updateVBO(const QString& name);
 
 	Utils::VBO* getVBO(const QString& name) const;
-	inline QList<Utils::VBO*> getVBOList() const { return h_vbo.values(); }
+	const VBOSet& getVBOSet() const { return m_vbo; }
+
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
+private:
 	void linkView(View* view);
 	void unlinkView(View* view);
-	inline const QList<View*>& getLinkedViews() const { return l_views; }
-	inline bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-protected:
-	QString m_name;
-	Window* m_window;
-	GenericMap* m_map;
-
-	Algo::Render::GL2::MapRender* m_render;
-
-	qglviewer::Vec m_bbMin;
-	qglviewer::Vec m_bbMax;
-	float m_bbDiagSize;
-
-	QList<View*> l_views;
-
-	VBOHash h_vbo;
-	AttributeHash h_attribs[NB_ORBITS];
+	/*********************************************************
+	 * SIGNALS
+	 *********************************************************/
 
 signals:
 	void connectivityModified();
@@ -140,14 +140,32 @@ signals:
 
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
+
+protected:
+	QString m_name;
+	SCHNApps* m_schnapps;
+	GenericMap* m_map;
+
+	qglviewer::Vec m_bbMin;
+	qglviewer::Vec m_bbMax;
+	float m_bbDiagSize;
+
+	Algo::Render::GL2::MapRender* m_render;
+	Utils::Drawer* m_bbDrawer;
+
+	QList<View*> l_views;
+
+	VBOSet m_vbo;
+	AttributeSet m_attribs[NB_ORBITS];
 };
+
 
 template <typename PFP>
 class MapHandler : public MapHandlerGen
 {
 public:
-	MapHandler(const QString& name, Window* window, typename PFP::MAP* map) :
-		MapHandlerGen(name, window, map)
+	MapHandler(const QString& name, SCHNApps* s, typename PFP::MAP* map) :
+		MapHandlerGen(name, s, map)
 	{}
 
 	~MapHandler()
@@ -157,10 +175,15 @@ public:
 	}
 
 	void draw(Utils::GLSLShader* shader, int primitive);
+	void drawBB();
 
 	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
 
 	void updateBB(const VertexAttribute<typename PFP::VEC3>& position);
+	void updateBBDrawer();
+
+protected:
+	Geom::BoundingBox<typename PFP::VEC3> m_bb;
 };
 
 } // namespace SCHNApps

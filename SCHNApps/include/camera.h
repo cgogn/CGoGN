@@ -10,69 +10,57 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Window;
+class SCHNApps;
 
 class Camera : public qglviewer::Camera
 {
 	Q_OBJECT
 
+	friend class View;
+
 public:
 	static unsigned int cameraCount;
 
-	Camera(const QString& name, Window* window);
+	Camera(const QString& name, SCHNApps* s);
 	~Camera();
 	const QString& getName() const { return m_name; }
 
 public slots:
 	QString getName() { return m_name; }
-	void setName(const QString& name) { m_name = name; }
-
-	Window* getWindow() const { return m_window; }
-	void setWindow(Window* w) { m_window = w; }
+	SCHNApps* getSCHNApps() const { return m_schnapps; }
 
 	bool isUsed() const { return !l_views.empty(); }
 	bool isShared()	const { return l_views.size() > 1; }
 
-	void changeType(qglviewer::Camera::Type type);
-
-	/*********************************************************
-	 * CAMERA DRAWING
-	 *********************************************************/
-
+	qglviewer::Camera::Type getProjectionType() { return type(); }
 	bool getDraw() const { return m_draw; }
-	void setDraw(bool b);
-
 	bool getDrawPath() const { return m_drawPath; }
-	void setDrawPath(bool b);
 
-	/*********************************************************
-	 * MANAGE LINKED VIEWS
-	 *********************************************************/
-
-public:
-	void linkView(View* view);
-	void unlinkView(View* view);
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-	/*********************************************************
-	 * SNAPSHOTS
-	 *********************************************************/
+private:
+	void linkView(View* view);
+	void unlinkView(View* view);
 
 public slots:
-	void resetSnapCount() { m_snapCount = 0; }
-	void saveSnapshot(QString snapPathName);
+	void setProjectionType(int t);
+	void setDraw(bool b);
+	void setDrawPath(bool b);
+
+signals:
+	void projectionTypeChanged(int);
+	void drawChanged(bool);
+	void drawPathChanged(bool);
 
 protected:
 	QString m_name;
-	Window* m_window;
+	SCHNApps* m_schnapps;
 
 	QList<View*> l_views;
 
 	bool m_draw;
 	bool m_drawPath;
-
-	int m_snapCount;
 };
 
 } // namespace SCHNApps

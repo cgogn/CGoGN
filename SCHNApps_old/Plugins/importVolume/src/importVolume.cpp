@@ -1,0 +1,75 @@
+#include "importVolume.h"
+
+#include "mapHandler.h"
+
+#include "Algo/Import/import.h"
+
+#include <QFileDialog>
+#include <QFileInfo>
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+bool ImportVolumePlugin::enable()
+{
+	importAction = new QAction("import", this);
+	addMenuAction("Volume;Import", importAction);
+	connect(importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
+	return true;
+}
+
+MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
+{
+	QFileInfo fi(fileName);
+	if(fi.exists())
+	{
+		MapHandlerGen* mhg = m_window->addMap(fi.baseName(), 3);
+		if(mhg)
+		{
+			MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(mhg);
+			PFP3::MAP* map = mh->getMap();
+
+			std::vector<std::string> attrNames ;
+			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toStdString(), attrNames);
+
+			// get vertex position attribute
+			VertexAttribute<PFP3::VEC3> position = map->getAttribute<PFP3::VEC3, VERTEX>(attrNames[0]);
+			mh->registerAttribute(position);
+
+			// create position VBO
+			mh->createVBO(position);
+
+			// update corresponding VBO & emit attribute update signal
+			mh->notifyAttributeModification(position);
+
+			// compute map bounding box
+			mh->updateBB(position);
+		}
+		return mhg;
+	}
+	else
+		return NULL;
+}
+
+void ImportVolumePlugin::importFromFileDialog()
+{
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_window, "Import volumes", m_window->getAppPath(), "Volume mesh Files (*.node *.ts *.off *.tet)");
+	QStringList::Iterator it = fileNames.begin();
+	while(it != fileNames.end()) {
+		importFromFile(*it);
+		++it;
+	}
+}
+
+#ifndef DEBUG
+Q_EXPORT_PLUGIN2(ImportVolumePlugin, ImportVolumePlugin)
+#else
+Q_EXPORT_PLUGIN2(ImportVolumePluginD, ImportVolumePlugin)
+#endif
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

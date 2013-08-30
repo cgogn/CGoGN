@@ -35,7 +35,7 @@ void AttribMap::init()
 		for (unsigned int t = 0; t < m_nbThreads; ++t)
 		{
 			std::stringstream ss ;
-			ss << "Mark_"<< t ;
+			ss << "Mark_" << t ;
 			AttributeMultiVector<Mark>* amvMark = cont.addAttribute<Mark>(ss.str()) ;
 			for(unsigned int i = cont.begin(); i < cont.end(); cont.next(i))
 				amvMark->operator[](i).clear() ;
@@ -43,10 +43,9 @@ void AttribMap::init()
 		}
 	}
 
-	for (unsigned int j=0; j<NB_THREAD; ++j)
+	for (unsigned int j = 0; j < NB_THREAD; ++j)
 	{
 		std::vector<CellMarkerGen*>& cmg = cellMarkers[j];
-
 		for(unsigned int i = 0; i < cmg.size(); ++i)
 		{
 			CellMarkerGen* cm = cmg[i] ;
@@ -56,8 +55,8 @@ void AttribMap::init()
 		std::vector<DartMarkerGen*>& dmg = dartMarkers[j];
 		for(unsigned int i = 0; i < dmg.size(); ++i)
 		{
-			DartMarkerGen* cm = dmg[i] ;
-			cm->updateMarkVector(m_markTables[DART][cm->getThread()]) ;
+			DartMarkerGen* dm = dmg[i] ;
+			dm->updateMarkVector(m_markTables[DART][dm->getThread()]) ;
 		}
 	}
 }
@@ -72,6 +71,11 @@ void AttribMap::clear(bool removeAttrib)
 	GenericMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
+}
+
+AttributeMultiVectorGen* AttribMap::getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr)
+{
+	return m_attribs[orbit].getVirtualDataVector(nameAttr) ;
 }
 
 } // namespace CGoGN

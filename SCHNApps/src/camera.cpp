@@ -1,5 +1,4 @@
 #include "camera.h"
-#include "dialogs/camerasDialog.h"
 
 namespace CGoGN
 {
@@ -9,12 +8,11 @@ namespace SCHNApps
 
 unsigned int Camera::cameraCount = 0;
 
-Camera::Camera(const QString& name, Window* window) :
+Camera::Camera(const QString& name, SCHNApps* s) :
 	m_name(name),
-	m_window(window),
+	m_schnapps(s),
 	m_draw(false),
-	m_drawPath(false),
-	m_snapCount(0)
+	m_drawPath(false)
 {
 	++cameraCount;
 }
@@ -22,31 +20,28 @@ Camera::Camera(const QString& name, Window* window) :
 Camera::~Camera()
 {}
 
-void Camera::changeType(qglviewer::Camera::Type type)
+void Camera::setProjectionType(int t)
 {
-	setType(type);
-	foreach(View* view, m_window->getViewsList())
+	setType(qglviewer::Camera::Type(t));
+	emit(projectionTypeChanged(t));
+	foreach(View* view, m_schnapps->getViewSet().values())
 		view->updateGL();
-
-	m_window->getCamerasDialog()->setCameraType(m_name, type);
 }
 
 void Camera::setDraw(bool b)
 {
 	m_draw = b;
-	foreach(View* view, m_window->getViewsList())
+	emit(drawChanged(b));
+	foreach(View* view, m_schnapps->getViewSet().values())
 		view->updateGL();
-
-	m_window->getCamerasDialog()->setDrawCamera(m_name, b);
 }
 
 void Camera::setDrawPath(bool b)
 {
 	m_drawPath = b;
-	foreach(View* view, m_window->getViewsList())
+	emit(drawPathChanged(b));
+	foreach(View* view, m_schnapps->getViewSet().values())
 		view->updateGL();
-
-	m_window->getCamerasDialog()->setDrawCameraPath(m_name, b);
 }
 
 void Camera::linkView(View* view)
@@ -58,13 +53,6 @@ void Camera::linkView(View* view)
 void Camera::unlinkView(View* view)
 {
 	l_views.removeOne(view);
-}
-
-void Camera::saveSnapshot(QString snapPathName)
-{
-	foreach(View* view, l_views)
-		view->saveSnapshot(snapPathName + view->getName() + '_' + QString::number(m_snapCount) + ".jpg", true);
-	++m_snapCount;
 }
 
 } // namespace SCHNApps

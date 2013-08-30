@@ -1,5 +1,5 @@
 #include <QSplashScreen>
-#include "window.h"
+#include "schnapps.h"
 #include <QFileInfo>
 #include "PythonQt/PythonQt.h"
 #include "PythonQt/gui/PythonQtScriptingConsole.h"
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 	PythonQtObjectPtr pythonContext = PythonQt::self()->getMainModule();
 	PythonQtScriptingConsole pythonConsole(NULL, pythonContext);
 
-	CGoGN::SCHNApps::Window schnapps(app.applicationDirPath(), pythonContext, pythonConsole);
+	CGoGN::SCHNApps::SCHNApps schnapps(app.applicationDirPath(), pythonContext, pythonConsole);
 	schnapps.show();
 
 	pythonContext.addObject("schnapps", &schnapps);

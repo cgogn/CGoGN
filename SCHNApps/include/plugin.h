@@ -4,6 +4,8 @@
 #include <QtPlugin>
 #include <QAction>
 
+#include <GL/glew.h>
+
 #include "types.h"
 
 namespace CGoGN
@@ -12,98 +14,39 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Window;
-
 class Plugin : public QObject
 {
 	Q_OBJECT
 
+	friend class SCHNApps;
+
 public:
-	Plugin();
-	virtual ~Plugin();
+	Plugin() : m_schnapps(NULL)
+	{
+		glewInit();
+	}
+
+	virtual ~Plugin() {}
 
 	const QString& getName() const { return m_name; }
 
 public slots:
 	QString getName() { return m_name; }
-	void setName(const QString& name) { m_name = name; }
-
 	const QString& getFilePath() { return m_filePath; }
+	SCHNApps* getSCHNApps() { return m_schnapps; }
+
+private:
+	void setName(const QString& name) { m_name = name; }
 	void setFilePath(const QString& f) { m_filePath = f; }
+	void setSCHNApps(SCHNApps* s) { m_schnapps = s; }
 
-	Window* getWindow() { return m_window; }
-	void setWindow(Window* w) { m_window = w; }
-
-	bool isUsed() const { return !l_views.empty(); }
-
-	bool getProvidesRendering() { return b_providesRendering; }
-	void setProvidesRendering(bool b) {	b_providesRendering = b; }
-
-public:
 	virtual bool enable() = 0;
 	virtual void disable() = 0;
-
-	virtual void redraw(View* view) = 0;
-
-	virtual void keyPress(View* view, QKeyEvent* event) = 0;
-	virtual void keyRelease(View* view, QKeyEvent* event) = 0;
-	virtual void mousePress(View* view, QMouseEvent* event) = 0;
-	virtual void mouseRelease(View* view, QMouseEvent* event) = 0;
-	virtual void mouseMove(View* view, QMouseEvent* event) = 0;
-	virtual void wheelEvent(View* view, QWheelEvent* event) = 0;
-
-	/*********************************************************
-	 * MANAGE LINKED VIEWS
-	 *********************************************************/
-
-	void linkView(View* view);
-	void unlinkView(View* view);
-	const QList<View*>& getLinkedViews() const { return l_views; }
-	bool isLinkedToView(View* view) const { return l_views.contains(view); }
-
-	/*********************************************************
-	 * MANAGE SHADERS
-	 *********************************************************/
-
-	void registerShader(Utils::GLSLShader* shader);
-	void unregisterShader(Utils::GLSLShader* shader);
-	const QList<Utils::GLSLShader*> getShaders() const { return l_shaders; }
-
-	/*********************************************************
-	 * MANAGE DOCK TABS
-	 *********************************************************/
-
-	bool addTabInDock(QWidget* tabWidget, const QString& tabText);
-	void removeTabInDock(QWidget* tabWidget);
-	const QList<QWidget*>& getTabWidgets() const { return l_tabWidgets; }
-
-	/*********************************************************
-	 * MANAGE MENU ACTIONS
-	 *********************************************************/
-
-	bool addMenuAction(const QString& menuPath, QAction* action);
-	void removeMenuAction(QAction* action);
-
-	/*********************************************************
-	 * MANAGE TOOLBAR ACTIONS
-	 *********************************************************/
-
-	bool addToolbarAction(QAction* action);
-	void removeToolbarAction(QAction* action);
 
 protected:
 	QString m_name;
 	QString m_filePath;
-	Window* m_window;
-
-	bool b_providesRendering;
-
-	QList<View*> l_views;
-	QList<QWidget*> l_tabWidgets;
-	QList<QAction*> l_menuActions;
-	QList<QAction*> l_toolbarActions;
-
-	QList<Utils::GLSLShader*> l_shaders;
+	SCHNApps* m_schnapps;
 };
 
 } // namespace SCHNApps
