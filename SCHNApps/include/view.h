@@ -86,6 +86,8 @@ private:
 	void updateCurrentCameraBB();
 
 private slots:
+	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
+
 	void ui_verticalSplitView(int x, int y, int globalX, int globalY);
 	void ui_horizontalSplitView(int x, int y, int globalX, int globalY);
 	void ui_closeView(int x, int y, int globalX, int globalY);

@@ -34,7 +34,7 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 
 	m_currentCamera = m_schnapps->addCamera();
 
-	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(updateGL()));
+	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
 }
 
 View::~View()
@@ -196,23 +196,6 @@ void View::preDraw()
 {
 	m_currentCamera->setScreenWidthAndHeight(width(), height());
 
-	glm::mat4 mm = getCurrentModelViewMatrix();
-	glm::mat4 pm = getCurrentProjectionMatrix();
-
-	MapHandlerGen* map = m_schnapps->getSelectedMap();
-	if(map)
-	{
-		Utils::GLSLShader* bbShader = map->getBBDrawerShader();
-		if(bbShader)
-			bbShader->updateMatrices(pm, mm);
-	}
-
-	foreach(PluginInteraction* plugin, l_plugins)
-	{
-		foreach(Utils::GLSLShader* shader, plugin->getShaders())
-			shader->updateMatrices(pm, mm);
-	}
-
 	QGLViewer::preDraw();
 }
 
@@ -227,12 +210,33 @@ void View::draw()
 		}
 	}
 
-	MapHandlerGen* map = m_schnapps->getSelectedMap();
-	if(map && isLinkedToMap(map))
-		map->drawBB();
+	glm::mat4 mm = getCurrentModelViewMatrix();
+	glm::mat4 pm = getCurrentProjectionMatrix();
+
+	MapHandlerGen* selectedMap = m_schnapps->getSelectedMap();
+
+	foreach(MapHandlerGen* map, l_maps)
+	{
+		glm::mat4 map_mm = mm * map->getFrameMatrix();
+
+		if(map == selectedMap)
+		{
+			Utils::GLSLShader* bbShader = map->getBBDrawerShader();
+			if(bbShader)
+				bbShader->updateMatrices(pm, map_mm);
+			map->drawBB();
+		}
+
+		foreach(PluginInteraction* plugin, l_plugins)
+		{
+			foreach(Utils::GLSLShader* shader, plugin->getShaders())
+				shader->updateMatrices(pm, map_mm);
+			plugin->drawMap(this, map);
+		}
+	}
 
 	foreach(PluginInteraction* plugin, l_plugins)
-		plugin->redraw(this);
+		plugin->draw(this);
 }
 
 void View::postDraw()
@@ -422,6 +426,13 @@ void View::updateCurrentCameraBB()
 	}
 	camera()->setSceneBoundingBox(bbMin, bbMax);
 	camera()->showEntireScene();
+}
+
+void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
+{
+	if(cur && isLinkedToMap(cur))
+		setManipulatedFrame(cur->getFrame());
+	updateGL();
 }
 
 void View::ui_verticalSplitView(int x, int y, int globalX, int globalY)

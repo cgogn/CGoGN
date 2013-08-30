@@ -59,51 +59,46 @@ void SurfaceRenderPlugin::disable()
 		mapRemoved(map);
 }
 
-void SurfaceRenderPlugin::redraw(View* view)
+void SurfaceRenderPlugin::drawMap(View* view, MapHandlerGen* map)
 {
-	const QHash<MapHandlerGen*, MapParameters>& viewParamSet = h_viewParameterSet[view];
-
-	foreach(MapHandlerGen* m, view->getLinkedMaps())
+	const MapParameters& p = h_viewParameterSet[view][map];
+	if(p.positionVBO)
 	{
-		const MapParameters& p = viewParamSet[m];
-		if(p.positionVBO)
+		if(p.renderVertices)
 		{
-			if(p.renderVertices)
+			m_pointSprite->setSize(map->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
+			m_pointSprite->setAttributePosition(p.positionVBO);
+			m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+			map->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
+		}
+		if(p.renderEdges)
+		{
+			glLineWidth(1.0f);
+			m_simpleColorShader->setAttributePosition(p.positionVBO);
+			map->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
+		}
+		if(p.renderFaces)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glEnable(GL_LIGHTING);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0f, 1.0f);
+			switch(p.faceStyle)
 			{
-				m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
-				m_pointSprite->setAttributePosition(p.positionVBO);
-				m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
-				m->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
+				case MapParameters::FLAT :
+					m_flatShader->setAttributePosition(p.positionVBO);
+					map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+					break ;
+				case MapParameters::PHONG :
+					if(p.normalVBO != NULL)
+					{
+						m_phongShader->setAttributePosition(p.positionVBO) ;
+						m_phongShader->setAttributeNormal(p.normalVBO) ;
+						map->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+					}
+					break ;
 			}
-			if(p.renderEdges)
-			{
-				glLineWidth(1.0f);
-				m_simpleColorShader->setAttributePosition(p.positionVBO);
-				m->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
-			}
-			if(p.renderFaces)
-			{
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				glEnable(GL_LIGHTING);
-				glEnable(GL_POLYGON_OFFSET_FILL);
-				glPolygonOffset(1.0f, 1.0f);
-				switch(p.faceStyle)
-				{
-					case MapParameters::FLAT :
-						m_flatShader->setAttributePosition(p.positionVBO);
-						m->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
-						break ;
-					case MapParameters::PHONG :
-						if(p.normalVBO != NULL)
-						{
-							m_phongShader->setAttributePosition(p.positionVBO) ;
-							m_phongShader->setAttributeNormal(p.normalVBO) ;
-							m->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
-						}
-						break ;
-				}
-				glDisable(GL_POLYGON_OFFSET_FILL);
-			}
+			glDisable(GL_POLYGON_OFFSET_FILL);
 		}
 	}
 }

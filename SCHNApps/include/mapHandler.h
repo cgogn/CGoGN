@@ -11,10 +11,12 @@
 #include "Topology/generic/attribmap.h"
 #include "Topology/generic/functor.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Utils/vbo.h"
+
 #include "Algo/Render/GL2/mapRender.h"
-#include "Utils/drawer.h"
 #include "Algo/Geometry/boundingbox.h"
+
+#include "Utils/vbo.h"
+#include "Utils/drawer.h"
 
 namespace CGoGN
 {
@@ -45,12 +47,27 @@ public slots:
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
 	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	float getBBdiagSize() const { return m_bbDiagSize; }
+
 	Utils::GLSLShader* getBBDrawerShader() const
 	{
 		if(m_bbDrawer)
 			return m_bbDrawer->getShader();
 		else
 			return NULL;
+	}
+
+	qglviewer::ManipulatedFrame* getFrame() const { return m_frame; }
+	glm::mat4 getFrameMatrix() const
+	{
+		GLdouble m[16];
+		m_frame->getMatrix(m);
+		glm::mat4 matrix;
+		for(unsigned int i = 0; i < 4; ++i)
+		{
+			for(unsigned int j = 0; j < 4; ++j)
+				matrix[i][j] = (float)m[i*4+j];
+		}
+		return matrix;
 	}
 
 	const QList<View*>& getLinkedViews() const { return l_views; }
@@ -149,9 +166,11 @@ protected:
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
 	float m_bbDiagSize;
+	Utils::Drawer* m_bbDrawer;
+
+	qglviewer::ManipulatedFrame* m_frame;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Utils::Drawer* m_bbDrawer;
 
 	QList<View*> l_views;
 

@@ -57,7 +57,10 @@ void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 	if(!m_render->isPrimitiveUpToDate(primitive))
 		m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), primitive) ;
 
+	glPushMatrix();
+	glMultMatrixd(m_frame->matrix());
 	m_render->draw(shader, primitive);
+	glPopMatrix();
 }
 
 template <typename PFP>
@@ -68,7 +71,12 @@ void MapHandler<PFP>::drawBB()
 		m_bbDrawer = new Utils::Drawer();
 		updateBBDrawer();
 	}
+
+	glPushMatrix();
+	glMultMatrixd(m_frame->matrix());
+	QGLViewer::drawAxis();
 	m_bbDrawer->callList();
+	glPopMatrix();
 }
 
 template <typename PFP>
