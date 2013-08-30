@@ -233,25 +233,21 @@ View* SCHNApps::getView(const QString& name) const
 
 void SCHNApps::setSelectedView(View* view)
 {
-//	if(m_selectedView)
-//	{
-//		const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
-//		foreach(Plugin* p, oldPlugins)
-//			disablePluginTabWidgets(p);
-
-//		disconnect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
-//		disconnect(m_currentView, SIGNAL(pluginUnlinked(Plugin*)), this, SLOT(disablePluginTabWidgets(Plugin*)));
-//	}
+	if(m_selectedView)
+	{
+		foreach(PluginInteraction* p, m_selectedView->getLinkedPlugins())
+			disablePluginTabWidgets(p);
+		disconnect(m_selectedView, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(enablePluginTabWidgets(PluginInteraction*)));
+		disconnect(m_selectedView, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(disablePluginTabWidgets(PluginInteraction*)));
+	}
 
 	View* oldSelected = m_selectedView;
 	m_selectedView = view;
 
-//	const QList<Plugin*>& newPlugins = m_currentView->getLinkedPlugins();
-//	foreach(Plugin* p, newPlugins)
-//		enablePluginTabWidgets(p);
-
-//	connect(m_currentView, SIGNAL(pluginLinked(Plugin*)), this, SLOT(enablePluginTabWidgets(Plugin*)));
-//	connect(m_currentView, SIGNAL(pluginUnlinked(Plugin*)), this, SLOT(disablePluginTabWidgets(Plugin*)));
+	foreach(PluginInteraction* p, m_selectedView->getLinkedPlugins())
+		enablePluginTabWidgets(p);
+	connect(m_selectedView, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(enablePluginTabWidgets(PluginInteraction*)));
+	connect(m_selectedView, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(disablePluginTabWidgets(PluginInteraction*)));
 
 	emit(selectedViewChanged(oldSelected, m_selectedView));
 
@@ -436,27 +432,31 @@ void SCHNApps::removePluginDockTab(Plugin* plugin, QWidget *tabWidget)
 	}
 }
 
-//void SCHNApps::enablePluginTabWidgets(Plugin* plugin)
-//{
+void SCHNApps::enablePluginTabWidgets(PluginInteraction* plugin)
+{
 //	int currentTab = m_dockTabWidget->currentIndex();
 
-//	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
-//	foreach(QWidget* w, tabWidgets)
-//		m_dockTabWidget->setTabEnabled(m_dockTabWidget->indexOf(w), true);
+	if(m_pluginTabs.contains(plugin))
+	{
+		foreach(QWidget* w, m_pluginTabs[plugin])
+			m_pluginDockTabWidget->setTabEnabled(m_pluginDockTabWidget->indexOf(w), true);
+	}
 
 //	m_dockTabWidget->setCurrentIndex(currentTab);
-//}
+}
 
-//void SCHNApps::disablePluginTabWidgets(Plugin* plugin)
-//{
+void SCHNApps::disablePluginTabWidgets(PluginInteraction* plugin)
+{
 //	int currentTab = m_dockTabWidget->currentIndex();
 
-//	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
-//	foreach(QWidget* w, tabWidgets)
-//		m_dockTabWidget->setTabEnabled(m_dockTabWidget->indexOf(w), false);
+	if(m_pluginTabs.contains(plugin))
+	{
+		foreach(QWidget* w, m_pluginTabs[plugin])
+			m_pluginDockTabWidget->setTabEnabled(m_pluginDockTabWidget->indexOf(w), false);
+	}
 
 //	m_dockTabWidget->setCurrentIndex(currentTab);
-//}
+}
 
 /*********************************************************
  * MANAGE MAPS

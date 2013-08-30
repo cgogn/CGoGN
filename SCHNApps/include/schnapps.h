@@ -79,8 +79,9 @@ public:
 	void addPluginDockTab(Plugin* plugin, QWidget* tabWidget, const QString& tabText);
 	void removePluginDockTab(Plugin* plugin, QWidget* tabWidget);
 
-//	void enablePluginTabWidgets(Plugin* plugin);
-//	void disablePluginTabWidgets(Plugin* plugin);
+private slots:
+	void enablePluginTabWidgets(PluginInteraction* plugin);
+	void disablePluginTabWidgets(PluginInteraction* plugin);
 
 	/*********************************************************
 	 * MANAGE MAPS
