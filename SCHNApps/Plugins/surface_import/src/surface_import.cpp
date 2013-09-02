@@ -14,7 +14,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-bool ImportSurfacePlugin::enable()
+bool Surface_Import_Plugin::enable()
 {
 	importAction = new QAction("import", this);
 	m_schnapps->addMenuAction(this, "Surface;Import", importAction);
@@ -22,7 +22,7 @@ bool ImportSurfacePlugin::enable()
 	return true;
 }
 
-MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
+MapHandlerGen* Surface_Import_Plugin::importFromFile(const QString& fileName)
 {
 	QFileInfo fi(fileName);
 	if(fi.exists())
@@ -52,7 +52,7 @@ MapHandlerGen* ImportSurfacePlugin::importFromFile(const QString& fileName)
 		return NULL;
 }
 
-void ImportSurfacePlugin::importFromFileDialog()
+void Surface_Import_Plugin::importFromFileDialog()
 {
 	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import surfaces", m_schnapps->getAppPath(), "Surface mesh Files (*.ply *.off *.trian)");
 	QStringList::Iterator it = fileNames.begin();
@@ -63,9 +63,9 @@ void ImportSurfacePlugin::importFromFileDialog()
 }
 
 #ifndef DEBUG
-Q_EXPORT_PLUGIN2(ImportSurfacePlugin, ImportSurfacePlugin)
+Q_EXPORT_PLUGIN2(Surface_Import_Plugin, Surface_Import_Plugin)
 #else
-Q_EXPORT_PLUGIN2(ImportSurfacePluginD, ImportSurfacePlugin)
+Q_EXPORT_PLUGIN2(Surface_Import_PluginD, Surface_Import_Plugin)
 #endif
 
 } // namespace SCHNApps

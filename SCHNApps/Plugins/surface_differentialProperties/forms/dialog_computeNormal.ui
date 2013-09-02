@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ComputeNormalDialog</class>
- <widget class="QDialog" name="ComputeNormalDialog">
+ <class>Dialog_ComputeNormal</class>
+ <widget class="QDialog" name="Dialog_ComputeNormal">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QListWidget" name="mapList"/>
+    <widget class="QListWidget" name="list_maps"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -110,7 +110,7 @@
   <connection>
    <sender>button_ok</sender>
    <signal>clicked()</signal>
-   <receiver>ComputeNormalDialog</receiver>
+   <receiver>Dialog_ComputeNormal</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -126,7 +126,7 @@
   <connection>
    <sender>button_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>ComputeNormalDialog</receiver>
+   <receiver>Dialog_ComputeNormal</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

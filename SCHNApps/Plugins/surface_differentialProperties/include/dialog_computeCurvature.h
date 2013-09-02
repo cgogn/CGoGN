@@ -1,7 +1,7 @@
-#ifndef _COMPUTECURVATURE_DIALOG_H_
-#define _COMPUTECURVATURE_DIALOG_H_
+#ifndef _DIALOG_COMPUTECURVATURE_H_
+#define _DIALOG_COMPUTECURVATURE_H_
 
-#include "ui_computeCurvatureDialog.h"
+#include "ui_dialog_computeCurvature.h"
 
 namespace CGoGN
 {
@@ -9,18 +9,18 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Window;
+class SCHNApps;
 class MapHandlerGen;
 
-class ComputeCurvatureDialog : public QDialog, public Ui::ComputeCurvatureDialog
+class Dialog_ComputeCurvature : public QDialog, public Ui::Dialog_ComputeCurvature
 {
 	Q_OBJECT
 
 public:
-	ComputeCurvatureDialog(Window* w);
+	Dialog_ComputeCurvature(SCHNApps* s);
 
 private:
-	Window* m_window;
+	SCHNApps* m_schnapps;
 	MapHandlerGen* m_selectedMap;
 
 public slots:

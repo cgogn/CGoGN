@@ -1,43 +1,33 @@
-#ifndef _DIFFERENTIALPROPERTIES_PLUGIN_H_
-#define _DIFFERENTIALPROPERTIES_PLUGIN_H_
+#ifndef _SURFACE_DIFFERENTIALPROPERTIES_PLUGIN_H_
+#define _SURFACE_DIFFERENTIALPROPERTIES_PLUGIN_H_
 
-#include "plugin.h"
+#include "plugin_processing.h"
 
-#include "computeNormalDialog.h"
-#include "computeCurvatureDialog.h"
+#include "dialog_computeNormal.h"
+#include "dialog_computeCurvature.h"
 
+namespace CGoGN
+{
 
-using namespace CGoGN;
-using namespace SCHNApps;
+namespace SCHNApps
+{
 
-
-class DifferentialPropertiesPlugin : public Plugin
+class Surface_DifferentialProperties_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	DifferentialPropertiesPlugin()
-	{
-		setProvidesRendering(false);
-	}
+	Surface_DifferentialProperties_Plugin()
+	{}
 
-	~DifferentialPropertiesPlugin()
+	~Surface_DifferentialProperties_Plugin()
 	{}
 
 	virtual bool enable();
 	virtual void disable() {}
 
-	virtual void redraw(View *view) {}
-
-	virtual void keyPress(View* view, QKeyEvent* event) {}
-	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event) {}
-	virtual void mouseRelease(View* view, QMouseEvent* event) {}
-	virtual void mouseMove(View* view, QMouseEvent* event) {}
-	virtual void wheelEvent(View* view, QWheelEvent* event) {}
-
-public slots:
+private slots:
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
 	void attributeModified(unsigned int orbit, QString nameAttr);
@@ -48,6 +38,7 @@ public slots:
 	void computeNormalFromDialog();
 	void computeCurvatureFromDialog();
 
+public slots:
 	void computeNormal(const QString& mapName,
 		const QString& positionAttributeName = "position",
 		const QString& normalAttributeName = "normal",
@@ -68,8 +59,8 @@ public slots:
 	);
 
 private:
-	ComputeNormalDialog* m_computeNormalDialog;
-	ComputeCurvatureDialog* m_computeCurvatureDialog;
+	Dialog_ComputeNormal* m_computeNormalDialog;
+	Dialog_ComputeCurvature* m_computeCurvatureDialog;
 
 	QAction* m_computeNormalAction;
 	QAction* m_computeCurvatureAction;
@@ -110,5 +101,9 @@ private:
 	};
 	QHash<QString, ComputeCurvatureParameters> computeCurvatureLastParameters;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

@@ -1,7 +1,7 @@
-#ifndef _COMPUTENORMAL_DIALOG_H_
-#define _COMPUTENORMAL_DIALOG_H_
+#ifndef _DIALOG_COMPUTENORMAL_H_
+#define _DIALOG_COMPUTENORMAL_H_
 
-#include "ui_computeNormalDialog.h"
+#include "ui_dialog_computeNormal.h"
 
 namespace CGoGN
 {
@@ -9,18 +9,18 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Window;
+class SCHNApps;
 class MapHandlerGen;
 
-class ComputeNormalDialog : public QDialog, public Ui::ComputeNormalDialog
+class Dialog_ComputeNormal : public QDialog, public Ui::Dialog_ComputeNormal
 {
 	Q_OBJECT
 
 public:
-	ComputeNormalDialog(Window* w);
+	Dialog_ComputeNormal(SCHNApps* s);
 
 private:
-	Window* m_window;
+	SCHNApps* m_schnapps;
 	MapHandlerGen* m_selectedMap;
 
 public slots:

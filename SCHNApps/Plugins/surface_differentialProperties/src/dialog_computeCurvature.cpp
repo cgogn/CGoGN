@@ -1,7 +1,7 @@
-#include "computeCurvatureDialog.h"
+#include "dialog_computeCurvature.h"
 
-#include "differentialProperties.h"
-#include "window.h"
+#include "surface_differentialProperties.h"
+#include "schnapps.h"
 #include "mapHandler.h"
 
 namespace CGoGN
@@ -10,8 +10,8 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-ComputeCurvatureDialog::ComputeCurvatureDialog(Window* w) :
-	m_window(w),
+Dialog_ComputeCurvature::Dialog_ComputeCurvature(SCHNApps* s) :
+	m_schnapps(s),
 	m_selectedMap(NULL)
 {
 	setupUi(this);
@@ -22,25 +22,24 @@ ComputeCurvatureDialog::ComputeCurvatureDialog(Window* w) :
 	kminAttributeName->setText("kmin");
 	KnormalAttributeName->setText("Knormal");
 
-	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
-	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(addMapToList(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(removeMapFromList(MapHandlerGen*)));
 
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
+	connect(list_maps, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
 
-	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
-	foreach(MapHandlerGen* map, maps)
+	foreach(MapHandlerGen* map,  m_schnapps->getMapSet().values())
 	{
-		QListWidgetItem* item = new QListWidgetItem(map->getName(), mapList);
+		QListWidgetItem* item = new QListWidgetItem(map->getName(), list_maps);
 		item->setCheckState(Qt::Unchecked);
 	}
 }
 
-void ComputeCurvatureDialog::selectedMapChanged()
+void Dialog_ComputeCurvature::selectedMapChanged()
 {
 	if(m_selectedMap)
 		disconnect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(addAttributeToList(unsigned int, const QString&)));
 
-	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
+	QList<QListWidgetItem*> currentItems = list_maps->selectedItems();
 	if(!currentItems.empty())
 	{
 		combo_positionAttribute->clear();
@@ -52,49 +51,30 @@ void ComputeCurvatureDialog::selectedMapChanged()
 		combo_kminAttribute->clear();
 
 		const QString& mapname = currentItems[0]->text();
-		MapHandlerGen* mh = m_window->getMap(mapname);
+		MapHandlerGen* mh = m_schnapps->getMap(mapname);
 
 		QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
 		QString realTypeName = QString::fromStdString(nameOfType(PFP2::REAL()));
 
 		unsigned int j = 0;
 		unsigned int k = 0;
-		const AttributeHash& attribs = mh->getAttributesList(VERTEX);
-		for(AttributeHash::const_iterator i = attribs.constBegin(); i != attribs.constEnd(); ++i)
+		const AttributeSet& attribs = mh->getAttributeSet(VERTEX);
+		for(AttributeSet::const_iterator i = attribs.constBegin(); i != attribs.constEnd(); ++i)
 		{
 			if(i.value() == vec3TypeName)
 			{
 				combo_positionAttribute->addItem(i.key());
-				if(i.key() == "position") // try to select a position attribute named "position"
-					combo_positionAttribute->setCurrentIndex(j);
-
 				combo_normalAttribute->addItem(i.key());
-				if(i.key() == "normal") // try to select a normal attribute named "normal"
-					combo_normalAttribute->setCurrentIndex(j);
-
 				combo_KmaxAttribute->addItem(i.key());
-				if(i.key() == "Kmax") // try to select a normal attribute named "Kmax"
-					combo_KmaxAttribute->setCurrentIndex(j);
-
 				combo_KminAttribute->addItem(i.key());
-				if(i.key() == "Kmin") // try to select a normal attribute named "Kmin"
-					combo_KminAttribute->setCurrentIndex(j);
-
 				combo_KnormalAttribute->addItem(i.key());
-				if(i.key() == "Knormal") // try to select a normal attribute named "Knormal"
-					combo_KnormalAttribute->setCurrentIndex(j);
 
 				++j;
 			}
 			else if(i.value() == realTypeName)
 			{
 				combo_kmaxAttribute->addItem(i.key());
-				if(i.key() == "kmax") // try to select a normal attribute named "kmax"
-					combo_kmaxAttribute->setCurrentIndex(k);
-
 				combo_kminAttribute->addItem(i.key());
-				if(i.key() == "kmin") // try to select a normal attribute named "kmin"
-					combo_kminAttribute->setCurrentIndex(k);
 
 				++k;
 			}
@@ -107,15 +87,15 @@ void ComputeCurvatureDialog::selectedMapChanged()
 		m_selectedMap = NULL;
 }
 
-void ComputeCurvatureDialog::addMapToList(MapHandlerGen* m)
+void Dialog_ComputeCurvature::addMapToList(MapHandlerGen* m)
 {
-	QListWidgetItem* item = new QListWidgetItem(m->getName(), mapList);
+	QListWidgetItem* item = new QListWidgetItem(m->getName(), list_maps);
 	item->setCheckState(Qt::Unchecked);
 }
 
-void ComputeCurvatureDialog::removeMapFromList(MapHandlerGen* m)
+void Dialog_ComputeCurvature::removeMapFromList(MapHandlerGen* m)
 {
-	QList<QListWidgetItem*> items = mapList->findItems(m->getName(), Qt::MatchExactly);
+	QList<QListWidgetItem*> items = list_maps->findItems(m->getName(), Qt::MatchExactly);
 	if(!items.empty())
 		delete items[0];
 
@@ -126,7 +106,7 @@ void ComputeCurvatureDialog::removeMapFromList(MapHandlerGen* m)
 	}
 }
 
-void ComputeCurvatureDialog::addAttributeToList(unsigned int orbit, const QString& nameAttr)
+void Dialog_ComputeCurvature::addAttributeToList(unsigned int orbit, const QString& nameAttr)
 {
 	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
 	QString realTypeName = QString::fromStdString(nameOfType(PFP2::REAL()));

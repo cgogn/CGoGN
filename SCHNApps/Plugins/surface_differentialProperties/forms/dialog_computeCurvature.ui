@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ComputeCurvatureDialog</class>
- <widget class="QDialog" name="ComputeCurvatureDialog">
+ <class>Dialog_ComputeCurvature</class>
+ <widget class="QDialog" name="Dialog_ComputeCurvature">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
-    <widget class="QListWidget" name="mapList"/>
+    <widget class="QListWidget" name="list_maps"/>
    </item>
    <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -321,7 +321,7 @@
   <connection>
    <sender>button_ok</sender>
    <signal>clicked()</signal>
-   <receiver>ComputeCurvatureDialog</receiver>
+   <receiver>Dialog_ComputeCurvature</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -337,7 +337,7 @@
   <connection>
    <sender>button_cancel</sender>
    <signal>clicked()</signal>
-   <receiver>ComputeCurvatureDialog</receiver>
+   <receiver>Dialog_ComputeCurvature</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

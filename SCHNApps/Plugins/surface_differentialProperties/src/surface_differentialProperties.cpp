@@ -1,20 +1,26 @@
-#include "differentialProperties.h"
+#include "surface_differentialProperties.h"
 
 #include "mapHandler.h"
 
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/curvature.h"
 
-bool DifferentialPropertiesPlugin::enable()
+namespace CGoGN
 {
-	m_computeNormalDialog = new ComputeNormalDialog(m_window);
-	m_computeCurvatureDialog = new ComputeCurvatureDialog(m_window);
+
+namespace SCHNApps
+{
+
+bool Surface_DifferentialProperties_Plugin::enable()
+{
+	m_computeNormalDialog = new Dialog_ComputeNormal(m_schnapps);
+	m_computeCurvatureDialog = new Dialog_ComputeCurvature(m_schnapps);
 
 	m_computeNormalAction = new QAction("Compute Normal", this);
 	m_computeCurvatureAction = new QAction("Compute Curvature", this);
 
-	addMenuAction("Surface;Differential Properties;Compute Normal", m_computeNormalAction);
-	addMenuAction("Surface;Differential Properties;Compute Curvature", m_computeCurvatureAction);
+	m_schnapps->addMenuAction(this, "Surface;Differential Properties;Compute Normal", m_computeNormalAction);
+	m_schnapps->addMenuAction(this, "Surface;Differential Properties;Compute Curvature", m_computeCurvatureAction);
 
 	connect(m_computeNormalAction, SIGNAL(triggered()), this, SLOT(openComputeNormalDialog()));
 	connect(m_computeCurvatureAction, SIGNAL(triggered()), this, SLOT(openComputeCurvatureDialog()));
@@ -25,23 +31,23 @@ bool DifferentialPropertiesPlugin::enable()
 	connect(m_computeCurvatureDialog, SIGNAL(accepted()), this, SLOT(computeCurvatureFromDialog()));
 	connect(m_computeCurvatureDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeCurvatureFromDialog()));
 
-	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
-	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
 	return true;
 }
 
-void DifferentialPropertiesPlugin::mapAdded(MapHandlerGen *map)
+void Surface_DifferentialProperties_Plugin::mapAdded(MapHandlerGen *map)
 {
 	connect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
 }
 
-void DifferentialPropertiesPlugin::mapRemoved(MapHandlerGen *map)
+void Surface_DifferentialProperties_Plugin::mapRemoved(MapHandlerGen *map)
 {
 	disconnect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
 }
 
-void DifferentialPropertiesPlugin::attributeModified(unsigned int orbit, QString nameAttr)
+void Surface_DifferentialProperties_Plugin::attributeModified(unsigned int orbit, QString nameAttr)
 {
 	if(orbit == VERTEX)
 	{
@@ -66,19 +72,19 @@ void DifferentialPropertiesPlugin::attributeModified(unsigned int orbit, QString
 	}
 }
 
-void DifferentialPropertiesPlugin::openComputeNormalDialog()
+void Surface_DifferentialProperties_Plugin::openComputeNormalDialog()
 {
 	m_computeNormalDialog->show();
 }
 
-void DifferentialPropertiesPlugin::openComputeCurvatureDialog()
+void Surface_DifferentialProperties_Plugin::openComputeCurvatureDialog()
 {
 	m_computeCurvatureDialog->show();
 }
 
-void DifferentialPropertiesPlugin::computeNormalFromDialog()
+void Surface_DifferentialProperties_Plugin::computeNormalFromDialog()
 {
-	QList<QListWidgetItem*> currentItems = m_computeNormalDialog->mapList->selectedItems();
+	QList<QListWidgetItem*> currentItems = m_computeNormalDialog->list_maps->selectedItems();
 	if(!currentItems.empty())
 	{
 		const QString& mapName = currentItems[0]->text();
@@ -97,9 +103,9 @@ void DifferentialPropertiesPlugin::computeNormalFromDialog()
 	}
 }
 
-void DifferentialPropertiesPlugin::computeCurvatureFromDialog()
+void Surface_DifferentialProperties_Plugin::computeCurvatureFromDialog()
 {
-	QList<QListWidgetItem*> currentItems = m_computeCurvatureDialog->mapList->selectedItems();
+	QList<QListWidgetItem*> currentItems = m_computeCurvatureDialog->list_maps->selectedItems();
 	if(!currentItems.empty())
 	{
 		const QString& mapName = currentItems[0]->text();
@@ -151,13 +157,13 @@ void DifferentialPropertiesPlugin::computeCurvatureFromDialog()
 	}
 }
 
-void DifferentialPropertiesPlugin::computeNormal(
+void Surface_DifferentialProperties_Plugin::computeNormal(
 	const QString& mapName,
 	const QString& positionAttributeName,
 	const QString& normalAttributeName,
 	bool autoUpdate)
 {
-	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
+	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
 	if(mh == NULL)
 		return;
 
@@ -175,12 +181,10 @@ void DifferentialPropertiesPlugin::computeNormal(
 	computeNormalLastParameters[mapName] =
 		ComputeNormalParameters(positionAttributeName, normalAttributeName, autoUpdate);
 
-	mh->createVBO(normal);
-
 	mh->notifyAttributeModification(normal);
 }
 
-void DifferentialPropertiesPlugin::computeCurvature(
+void Surface_DifferentialProperties_Plugin::computeCurvature(
 	const QString& mapName,
 	const QString& positionAttributeName,
 	const QString& normalAttributeName,
@@ -193,7 +197,7 @@ void DifferentialPropertiesPlugin::computeCurvature(
 	bool compute_kgaussian,
 	bool autoUpdate)
 {
-	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_window->getMap(mapName));
+	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
 	if(mh == NULL)
 		return;
 
@@ -239,12 +243,6 @@ void DifferentialPropertiesPlugin::computeCurvature(
 			KmaxAttributeName, kmaxAttributeName, KminAttributeName, kminAttributeName, KnormalAttributeName,
 			compute_kmean, compute_kgaussian, autoUpdate);
 
-	mh->createVBO(Kmax);
-	mh->createVBO(kmax);
-	mh->createVBO(Kmin);
-	mh->createVBO(kmin);
-	mh->createVBO(Knormal);
-
 	mh->notifyAttributeModification(Kmax);
 	mh->notifyAttributeModification(kmax);
 	mh->notifyAttributeModification(Kmin);
@@ -260,7 +258,6 @@ void DifferentialPropertiesPlugin::computeCurvature(
 		for(unsigned int i = kmin.begin(); i != kmin.end(); kmin.next(i))
 			kmean[i] = (kmin[i] + kmax[i]) / 2.0;
 
-		mh->createVBO(kmean);
 		mh->notifyAttributeModification(kmean);
 	}
 
@@ -273,13 +270,16 @@ void DifferentialPropertiesPlugin::computeCurvature(
 		for(unsigned int i = kmin.begin(); i != kmin.end(); kmin.next(i))
 			kgaussian[i] = kmin[i] * kmax[i];
 
-		mh->createVBO(kgaussian);
 		mh->notifyAttributeModification(kgaussian);
 	}
 }
 
 #ifndef DEBUG
-Q_EXPORT_PLUGIN2(DifferentialPropertiesPlugin, DifferentialPropertiesPlugin)
+Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
 #else
-Q_EXPORT_PLUGIN2(DifferentialPropertiesPluginD, DifferentialPropertiesPlugin)
+Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_PluginD, Surface_DifferentialProperties_Plugin)
 #endif
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
