@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME DifferentialProperties )
+SET( PLUGIN_NAME Surface_DifferentialProperties )
 
 SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surface_differentialProperties )
 

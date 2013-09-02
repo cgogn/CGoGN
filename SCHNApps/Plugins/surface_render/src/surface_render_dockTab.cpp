@@ -10,7 +10,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-SurfaceRender_DockTab::SurfaceRender_DockTab(SCHNApps* s, SurfaceRenderPlugin* p) :
+Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugin* p) :
 	m_schnapps(s),
 	m_plugin(p),
 	b_updatingUI(false)
@@ -26,7 +26,11 @@ SurfaceRender_DockTab::SurfaceRender_DockTab(SCHNApps* s, SurfaceRenderPlugin* p
 	connect(group_faceShading, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(faceStyleChanged(QAbstractButton*)));
 }
 
-void SurfaceRender_DockTab::positionVBOChanged(int index)
+
+
+
+
+void Surface_Render_DockTab::positionVBOChanged(int index)
 {
 	if(!b_updatingUI)
 	{
@@ -40,7 +44,7 @@ void SurfaceRender_DockTab::positionVBOChanged(int index)
 	}
 }
 
-void SurfaceRender_DockTab::normalVBOChanged(int index)
+void Surface_Render_DockTab::normalVBOChanged(int index)
 {
 	if(!b_updatingUI)
 	{
@@ -54,7 +58,7 @@ void SurfaceRender_DockTab::normalVBOChanged(int index)
 	}
 }
 
-void SurfaceRender_DockTab::renderVerticesChanged(bool b)
+void Surface_Render_DockTab::renderVerticesChanged(bool b)
 {
 	if(!b_updatingUI)
 	{
@@ -68,7 +72,7 @@ void SurfaceRender_DockTab::renderVerticesChanged(bool b)
 	}
 }
 
-void SurfaceRender_DockTab::verticesScaleFactorChanged(int i)
+void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
 {
 	if(!b_updatingUI)
 	{
@@ -82,7 +86,7 @@ void SurfaceRender_DockTab::verticesScaleFactorChanged(int i)
 	}
 }
 
-void SurfaceRender_DockTab::renderEdgesChanged(bool b)
+void Surface_Render_DockTab::renderEdgesChanged(bool b)
 {
 	if(!b_updatingUI)
 	{
@@ -96,7 +100,7 @@ void SurfaceRender_DockTab::renderEdgesChanged(bool b)
 	}
 }
 
-void SurfaceRender_DockTab::renderFacesChanged(bool b)
+void Surface_Render_DockTab::renderFacesChanged(bool b)
 {
 	if(!b_updatingUI)
 	{
@@ -110,7 +114,7 @@ void SurfaceRender_DockTab::renderFacesChanged(bool b)
 	}
 }
 
-void SurfaceRender_DockTab::faceStyleChanged(QAbstractButton* b)
+void Surface_Render_DockTab::faceStyleChanged(QAbstractButton* b)
 {
 	if(!b_updatingUI)
 	{
@@ -131,14 +135,14 @@ void SurfaceRender_DockTab::faceStyleChanged(QAbstractButton* b)
 
 
 
-void SurfaceRender_DockTab::addPositionVBO(QString name)
+void Surface_Render_DockTab::addPositionVBO(QString name)
 {
 	b_updatingUI = true;
 	combo_positionVBO->addItem(name);
 	b_updatingUI = false;
 }
 
-void SurfaceRender_DockTab::removePositionVBO(QString name)
+void Surface_Render_DockTab::removePositionVBO(QString name)
 {
 	b_updatingUI = true;
 	int curIndex = combo_positionVBO->currentIndex();
@@ -149,14 +153,14 @@ void SurfaceRender_DockTab::removePositionVBO(QString name)
 	b_updatingUI = false;
 }
 
-void SurfaceRender_DockTab::addNormalVBO(QString name)
+void Surface_Render_DockTab::addNormalVBO(QString name)
 {
 	b_updatingUI = true;
 	combo_normalVBO->addItem(name);
 	b_updatingUI = false;
 }
 
-void SurfaceRender_DockTab::removeNormalVBO(QString name)
+void Surface_Render_DockTab::removeNormalVBO(QString name)
 {
 	b_updatingUI = true;
 	int curIndex = combo_normalVBO->currentIndex();
@@ -167,14 +171,14 @@ void SurfaceRender_DockTab::removeNormalVBO(QString name)
 	b_updatingUI = false;
 }
 
-void SurfaceRender_DockTab::updateMapParameters()
+void Surface_Render_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
 
 	combo_positionVBO->clear();
-	combo_normalVBO->clear();
-
 	combo_positionVBO->addItem("- select VBO -");
+
+	combo_normalVBO->clear();
 	combo_normalVBO->addItem("- select VBO -");
 
 	View* view = m_schnapps->getSelectedView();

@@ -11,21 +11,21 @@ namespace SCHNApps
 {
 
 class SCHNApps;
-class SurfaceRenderPlugin;
+class Surface_Render_Plugin;
 struct MapParameters;
 
-class SurfaceRender_DockTab : public QWidget, public Ui::SurfaceRender_TabWidget
+class Surface_Render_DockTab : public QWidget, public Ui::Surface_Render_TabWidget
 {
 	Q_OBJECT
 
-	friend class SurfaceRenderPlugin;
+	friend class Surface_Render_Plugin;
 
 public:
-	SurfaceRender_DockTab(SCHNApps* s, SurfaceRenderPlugin* p);
+	Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugin* p);
 
 private:
 	SCHNApps* m_schnapps;
-	SurfaceRenderPlugin* m_plugin;
+	Surface_Render_Plugin* m_plugin;
 	bool b_updatingUI;
 
 private slots:

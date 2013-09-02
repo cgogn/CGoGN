@@ -8,10 +8,10 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-bool SurfaceRenderPlugin::enable()
+bool Surface_Render_Plugin::enable()
 {
-	m_dockTab = new SurfaceRender_DockTab(m_schnapps, this);
-	m_schnapps->addPluginDockTab(this, m_dockTab, "SurfaceRender");
+	m_dockTab = new Surface_Render_DockTab(m_schnapps, this);
+	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Render");
 
 	m_flatShader = new CGoGN::Utils::ShaderFlat();
 	m_flatShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
@@ -48,7 +48,7 @@ bool SurfaceRenderPlugin::enable()
 	return true;
 }
 
-void SurfaceRenderPlugin::disable()
+void Surface_Render_Plugin::disable()
 {
 	delete m_flatShader;
 	delete m_phongShader;
@@ -59,7 +59,7 @@ void SurfaceRenderPlugin::disable()
 		mapRemoved(map);
 }
 
-void SurfaceRenderPlugin::drawMap(View* view, MapHandlerGen* map)
+void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	const MapParameters& p = h_viewParameterSet[view][map];
 	if(p.positionVBO)
@@ -88,15 +88,15 @@ void SurfaceRenderPlugin::drawMap(View* view, MapHandlerGen* map)
 				case MapParameters::FLAT :
 					m_flatShader->setAttributePosition(p.positionVBO);
 					map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
-					break ;
+					break;
 				case MapParameters::PHONG :
 					if(p.normalVBO != NULL)
 					{
-						m_phongShader->setAttributePosition(p.positionVBO) ;
-						m_phongShader->setAttributeNormal(p.normalVBO) ;
+						m_phongShader->setAttributePosition(p.positionVBO);
+						m_phongShader->setAttributeNormal(p.normalVBO);
 						map->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
 					}
-					break ;
+					break;
 			}
 			glDisable(GL_POLYGON_OFFSET_FILL);
 		}
@@ -107,23 +107,23 @@ void SurfaceRenderPlugin::drawMap(View* view, MapHandlerGen* map)
 
 
 
-void SurfaceRenderPlugin::selectedViewChanged(View *prev, View *cur)
+void Surface_Render_Plugin::selectedViewChanged(View *prev, View *cur)
 {
 	m_dockTab->updateMapParameters();
 }
 
-void SurfaceRenderPlugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
+void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
 }
 
-void SurfaceRenderPlugin::mapAdded(MapHandlerGen *map)
+void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
 {
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 }
 
-void SurfaceRenderPlugin::mapRemoved(MapHandlerGen *map)
+void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 {
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
@@ -133,7 +133,7 @@ void SurfaceRenderPlugin::mapRemoved(MapHandlerGen *map)
 
 
 
-void SurfaceRenderPlugin::vboAdded(Utils::VBO *vbo)
+void Surface_Render_Plugin::vboAdded(Utils::VBO *vbo)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
@@ -147,7 +147,7 @@ void SurfaceRenderPlugin::vboAdded(Utils::VBO *vbo)
 	}
 }
 
-void SurfaceRenderPlugin::vboRemoved(Utils::VBO *vbo)
+void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
@@ -188,7 +188,7 @@ void SurfaceRenderPlugin::vboRemoved(Utils::VBO *vbo)
 
 
 
-void SurfaceRenderPlugin::changePositionVBO(const QString& view, const QString& map, const QString& vbo)
+void Surface_Render_Plugin::changePositionVBO(const QString& view, const QString& map, const QString& vbo)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -204,7 +204,7 @@ void SurfaceRenderPlugin::changePositionVBO(const QString& view, const QString& 
 	}
 }
 
-void SurfaceRenderPlugin::changeNormalVBO(const QString& view, const QString& map, const QString& vbo)
+void Surface_Render_Plugin::changeNormalVBO(const QString& view, const QString& map, const QString& vbo)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -220,7 +220,7 @@ void SurfaceRenderPlugin::changeNormalVBO(const QString& view, const QString& ma
 	}
 }
 
-void SurfaceRenderPlugin::changeRenderVertices(const QString& view, const QString& map, bool b)
+void Surface_Render_Plugin::changeRenderVertices(const QString& view, const QString& map, bool b)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -235,7 +235,7 @@ void SurfaceRenderPlugin::changeRenderVertices(const QString& view, const QStrin
 	}
 }
 
-void SurfaceRenderPlugin::changeVerticesScaleFactor(const QString& view, const QString& map, float f)
+void Surface_Render_Plugin::changeVerticesScaleFactor(const QString& view, const QString& map, float f)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -250,7 +250,7 @@ void SurfaceRenderPlugin::changeVerticesScaleFactor(const QString& view, const Q
 	}
 }
 
-void SurfaceRenderPlugin::changeRenderEdges(const QString& view, const QString& map, bool b)
+void Surface_Render_Plugin::changeRenderEdges(const QString& view, const QString& map, bool b)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -265,7 +265,7 @@ void SurfaceRenderPlugin::changeRenderEdges(const QString& view, const QString& 
 	}
 }
 
-void SurfaceRenderPlugin::changeRenderFaces(const QString& view, const QString& map, bool b)
+void Surface_Render_Plugin::changeRenderFaces(const QString& view, const QString& map, bool b)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -280,7 +280,7 @@ void SurfaceRenderPlugin::changeRenderFaces(const QString& view, const QString& 
 	}
 }
 
-void SurfaceRenderPlugin::changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style)
+void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -296,9 +296,9 @@ void SurfaceRenderPlugin::changeFacesStyle(const QString& view, const QString& m
 }
 
 #ifndef DEBUG
-Q_EXPORT_PLUGIN2(SurfaceRenderPlugin, SurfaceRenderPlugin)
+Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)
 #else
-Q_EXPORT_PLUGIN2(SurfaceRenderPluginD, SurfaceRenderPlugin)
+Q_EXPORT_PLUGIN2(Surface_Render_PluginD, Surface_Render_Plugin)
 #endif
 
 } // namespace SCHNApps

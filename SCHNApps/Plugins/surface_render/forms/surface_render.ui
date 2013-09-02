@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SurfaceRender_TabWidget</class>
- <widget class="QWidget" name="SurfaceRender_TabWidget">
+ <class>Surface_Render_TabWidget</class>
+ <widget class="QWidget" name="Surface_Render_TabWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
