@@ -125,7 +125,7 @@ void Surface_RenderVector_DockTab::updateMapParameters()
 	{
 		const MapParameters& p = m_plugin->h_viewParameterSet[view][map];
 
-		unsigned int i = 0;
+		unsigned int i = 1;
 		foreach(Utils::VBO* vbo, map->getVBOSet().values())
 		{
 			if(vbo->dataSize() == 3)

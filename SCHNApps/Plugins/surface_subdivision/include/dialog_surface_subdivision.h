@@ -1,7 +1,7 @@
-#ifndef _DIALOG_COMPUTENORMAL_H_
-#define _DIALOG_COMPUTENORMAL_H_
+#ifndef _DIALOG_SURFACE_SUBDIVISION_H_
+#define _DIALOG_SURFACE_SUBDIVISION_H_
 
-#include "ui_dialog_computeNormal.h"
+#include "ui_dialog_surface_subdivision.h"
 
 namespace CGoGN
 {
@@ -12,12 +12,12 @@ namespace SCHNApps
 class SCHNApps;
 class MapHandlerGen;
 
-class Dialog_ComputeNormal : public QDialog, public Ui::Dialog_ComputeNormal
+class Dialog_Surface_Subdivision : public QDialog, public Ui::Dialog_Surface_Subdivision
 {
 	Q_OBJECT
 
 public:
-	Dialog_ComputeNormal(SCHNApps* s);
+	Dialog_Surface_Subdivision(SCHNApps* s);
 
 private:
 	SCHNApps* m_schnapps;
