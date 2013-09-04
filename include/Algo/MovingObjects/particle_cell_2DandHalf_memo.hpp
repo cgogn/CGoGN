@@ -246,7 +246,7 @@ void ParticleCell2DAndHalfMemo<PFP>::faceState(VEC3 current, CellMarkerMemo<FACE
 	#ifdef DEBUG
 	CGoGNout << "faceState" <<  this->d << CGoGNendl;
 	#endif
-
+	if(memo_cross.isMarked(this->d)) return ;
 	memo_cross.mark(this->d);
 
  	assert(this->getPosition().isFinite());
@@ -258,9 +258,9 @@ void ParticleCell2DAndHalfMemo<PFP>::faceState(VEC3 current, CellMarkerMemo<FACE
 	VEC3 n2 = current - this->getPosition();
 //	n1.normalize();
 	VEC3 n3 = n1 ^ n2;
-	n3.normalize();
+
 	VEC3 n4 = n3 ^ n1;
-	current = this->getPosition() + (n2 * n4) * n4;
+	current = this->getPosition() + n4;
 
 	//track new position within map
 	Dart dd = this->d;

@@ -17,6 +17,7 @@ ENDIF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
 IF(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib) #release added by visual
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/)
+	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
 ELSE(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
 ENDIF(WIN32)

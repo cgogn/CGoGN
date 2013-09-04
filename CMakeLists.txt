@@ -37,7 +37,6 @@ find_package(Boost COMPONENTS regex thread system REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
-#find_package(SuiteSparse REQUIRED)
 
 IF (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
@@ -77,7 +76,6 @@ SET (CGoGN_EXT_INCLUDES
 	${ZLIB_INCLUDE_DIRS}
 	${LIBXML2_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
-#	${SUITESPARSE_INCLUDE_DIRS}
 )
 
 # define libs for external libs
@@ -90,8 +88,21 @@ SET (CGoGN_EXT_LIBS
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
 	${Boost_THREAD_LIBRARY}
-#	${SUITESPARSE_LIBRARIES}
 )
+
+IF(WIN32)
+	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
+	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} 
+		${CGoGN_ROOT_DIR}/windows_dependencies/lib/suitesparse.lib
+		${CGoGN_ROOT_DIR}/windows_dependencies/lib/metis.lib
+		${CGoGN_ROOT_DIR}/windows_dependencies/lib/liblapack.lib
+		${CGoGN_ROOT_DIR}/windows_dependencies/lib/libblas.lib		)
+ELSE(WIN32)
+	find_package(SuiteSparse REQUIRED)
+	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${SUITESPARSE_INCLUDE_DIRS})
+	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES})
+ENDIF(WIN32)
+
 
 #optionnal libs
 IF (WITH_ASSIMP)

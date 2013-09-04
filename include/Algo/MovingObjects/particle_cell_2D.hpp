@@ -191,7 +191,7 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 
 	float p2 = (P[0] - Pb[0]) * (Pa[1] - Pb[1]) - (Pa[0] - Pb[0]) * (P[1] - Pb[1]) ;
 	CGoGNout<<"p2 :"<<p2<<CGoGNendl;
-
+	CGoGNout<<"goal :"<<goal<<CGoGNendl;
 #endif
 
 	assert(goal.isFinite()) ;

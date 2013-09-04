@@ -1,7 +1,6 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
-#include <QHash>
 #include <QMap>
 #include <QString>
 
@@ -31,22 +30,24 @@ struct PFP3: public PFP_STANDARD
 namespace SCHNApps
 {
 
+class SCHNApps;
 class Plugin;
+class PluginInteraction;
+class PluginProcessing;
 class View;
 class Camera;
 class MapHandlerGen;
 struct Texture;
 
-typedef QHash<QString, Plugin*> PluginHash;
-typedef QHash<QString, View*> ViewHash;
-typedef QHash<QString, Camera*> CameraHash;
+typedef QMap<QString, Plugin*> PluginSet;
+typedef QMap<QString, View*> ViewSet;
+typedef QMap<QString, Camera*> CameraSet;
+typedef QMap<QString, MapHandlerGen*> MapSet;
+typedef QMap<QString, Utils::VBO*> VBOSet;
+typedef QMap<QString, QString> AttributeSet;
+typedef QMap<QString, Utils::GLSLShader*> ShaderSet;
 
-typedef QHash<QString, MapHandlerGen*> MapHash;
-typedef QHash<QString, Utils::VBO*> VBOHash;
-typedef QHash<QString, QString> AttributeHash;
-typedef QHash<QString, Utils::GLSLShader*> ShaderHash;
-
-typedef QHash<QString, Texture*> TextureHash;
+typedef QMap<QString, Texture*> TextureSet;
 
 } // namespace SCHNApps
 

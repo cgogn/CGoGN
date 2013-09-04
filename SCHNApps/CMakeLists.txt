@@ -129,16 +129,15 @@ SET(SCHNApps_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/camera.h
 	${SCHNApps_ROOT_DIR}/include/mapHandler.h
 	${SCHNApps_ROOT_DIR}/include/plugin.h
+	${SCHNApps_ROOT_DIR}/include/plugin_interaction.h
+	${SCHNApps_ROOT_DIR}/include/plugin_processing.h
 	${SCHNApps_ROOT_DIR}/include/view.h
-	${SCHNApps_ROOT_DIR}/include/window.h
+	${SCHNApps_ROOT_DIR}/include/schnapps.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/camerasDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/mapsDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsViewDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/mapsViewDialog.h
-	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
+	${SCHNApps_ROOT_DIR}/include/controlDock_cameraTab.h
+	${SCHNApps_ROOT_DIR}/include/controlDock_pluginTab.h
+	${SCHNApps_ROOT_DIR}/include/controlDock_mapTab.h
+#	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
 )
 
 

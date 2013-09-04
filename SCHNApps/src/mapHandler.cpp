@@ -6,17 +6,24 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-MapHandlerGen::MapHandlerGen(const QString& name, Window* window, GenericMap* map) :
+MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) :
 	m_name(name),
-	m_window(window),
-	m_map(map)
+	m_schnapps(s),
+	m_map(map),
+	m_frame(NULL),
+	m_render(NULL),
+	m_bbDrawer(NULL)
 {
-	m_render = new Algo::Render::GL2::MapRender();
+	m_frame = new qglviewer::ManipulatedFrame();
 }
 
 MapHandlerGen::~MapHandlerGen()
 {
-	foreach(CGoGN::Utils::VBO* vbo, h_vbo)
+	if(m_bbDrawer)
+		delete m_bbDrawer;
+	if(m_render)
+		delete m_render;
+	foreach(CGoGN::Utils::VBO* vbo, m_vbo)
 		delete vbo;
 }
 
@@ -24,20 +31,73 @@ MapHandlerGen::~MapHandlerGen()
  * MANAGE VBOs
  *********************************************************/
 
+Utils::VBO* MapHandlerGen::createVBO(const AttributeMultiVectorGen* attr)
+{
+	if(attr)
+	{
+		QString name = QString::fromStdString(attr->getName());
+		Utils::VBO* vbo = getVBO(name);
+		if(!vbo)
+		{
+			vbo = new Utils::VBO(attr->getName());
+			vbo->updateData(attr);
+			m_vbo.insert(name, vbo);
+			emit(vboAdded(vbo));
+		}
+		else
+		{
+			vbo->updateData(attr);
+		}
+		return vbo;
+	}
+	else
+		return NULL;
+}
+
+Utils::VBO* MapHandlerGen::createVBO(const AttributeHandlerGen& attr)
+{
+	return createVBO(attr.getDataVectorGen());
+}
+
+Utils::VBO* MapHandlerGen::createVBO(const QString& name)
+{
+	return createVBO(static_cast<AttribMap*>(m_map)->getAttributeVectorGen(VERTEX, name.toUtf8().constData()));
+}
+
+void MapHandlerGen::updateVBO(const AttributeMultiVectorGen* attr)
+{
+	if(attr)
+	{
+		Utils::VBO* vbo = getVBO(QString::fromStdString(attr->getName()));
+		if(vbo)
+			vbo->updateData(attr);
+	}
+}
+
+void MapHandlerGen::updateVBO(const AttributeHandlerGen& attr)
+{
+	return updateVBO(attr.getDataVectorGen());
+}
+
+void MapHandlerGen::updateVBO(const QString& name)
+{
+	updateVBO(static_cast<AttribMap*>(m_map)->getAttributeVectorGen(VERTEX, name.toUtf8().constData()));
+}
+
 Utils::VBO* MapHandlerGen::getVBO(const QString& name) const
 {
-	if (h_vbo.contains(name))
-		return h_vbo[name];
+	if (m_vbo.contains(name))
+		return m_vbo[name];
 	else
 		return NULL;
 }
 
 void MapHandlerGen::deleteVBO(const QString& name)
 {
-	if (h_vbo.contains(name))
+	if (m_vbo.contains(name))
 	{
-		Utils::VBO* vbo = h_vbo[name];
-		h_vbo.remove(name);
+		Utils::VBO* vbo = m_vbo[name];
+		m_vbo.remove(name);
 		emit(vboRemoved(vbo));
 		delete vbo;
 	}

@@ -707,7 +707,7 @@ void SVGOut::write()
 		{
 			if (m_attFact > 0.0f)
 			{
-				float da = float( pow(double(itd-vds.begin()),m_attFact) / pow(double(vds.size()),m_attFact));
+				float da = float( pow(double(itd-vds.begin()),double(m_attFact)) / pow(double(vds.size()),double(m_attFact)));
 				(*it)->m_objs[itd->obj]->saveOneDepthAttenuation(*m_out,da,itd->id, m_bbX1-m_bbX0);
 			}
 			else
@@ -729,65 +729,65 @@ void AnimatedSVGOut::add(SVGOut* svg)
 	m_svgs.push_back(svg);
 }
 
-void AnimatedSVGOut::write(const std::string& /*filename*/, float /*timeStep*/)
+void AnimatedSVGOut::write(const std::string& filename, float timeStep)
 {
-//	std::ofstream outfile(filename.c_str()) ;
-//
-//	unsigned int bbX0=1000000;
-//	unsigned int bbY0=1000000;
-//	unsigned int bbX1=0;
-//	unsigned int bbY1=0;
-//
-//	for (unsigned int i=0; i< m_svgs.size(); ++i)
-//		m_svgs[i]->computeBB(bbX0, bbY0, bbX1, bbY1);
-//
-//	outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"<< std::endl;
-//	outfile << "<svg xmlns=\"http://www.w3.org/2000/svg\""<< std::endl;
-//	outfile << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""<< std::endl;
-//	outfile << "viewBox=\""<< bbX0 <<" "<< bbY0 <<" "<< bbX1-bbX0 << " " << bbY1-bbY0 <<"\">"<< std::endl;
-//	outfile << "<title>Animated SVG</title>"<< std::endl;
-//	outfile << "<desc>"<< std::endl;
-//	outfile << "Rendered from CGoGN"<< std::endl;
-//	outfile << "</desc>"<< std::endl;
-//
-//	outfile << "<defs>"<< std::endl;
-//
-//
-//	for (unsigned int i=0; i< m_svgs.size(); ++i)
-//	{
-//		std::vector<DepthSort> vds;
-//		m_svgs[i]->sortSimpleDepth(vds);
-//
-//		outfile << "<g id=\"slice"<<i<< "\">" << std::endl;
-//		for (std::vector<DepthSort>::iterator it = vds.begin(); it != vds.end(); ++it)
-//			m_svgs[i]->m_objs[it->obj]->saveOne(outfile,it->id, bbX1-bbX0);
-//		outfile << "</g>" << std::endl;
-//	}
-//
-//	outfile << "</defs>"<< std::endl;
-//
-//
-//	for (unsigned int i=0; i< m_svgs.size(); ++i)
-//	{
-//		unsigned int nbo = m_svgs[i]->m_opacities_animations.size();
-//
-//		outfile << "<use xlink:href=\"#slice"<<i<<"\" >" << std::endl;
-//		outfile << "<animate attributeName=\"opacity\" dur=\""<<timeStep*nbo<<"s\" fill=\"freeze\" values=\"";
-//
-//
-//		for (unsigned int j = 0; j < nbo; ++j)
-//		{
-//			outfile << m_svgs[i]->m_opacities_animations[j];
-//			if ( j != (nbo-1))
-//				outfile<< ";";
-//		}
-//
-//		outfile << "\" calcMode=\"discrete\" repeatCount=\"indefinite\" />" << std::endl;
-//		outfile << "</use>" << std::endl;
-//	}
-//
-//	outfile << "</svg>" << std::endl;
-//	outfile.close();
+//    std::ofstream outfile(filename.c_str()) ;
+
+//    unsigned int bbX0=1000000;
+//    unsigned int bbY0=1000000;
+//    unsigned int bbX1=0;
+//    unsigned int bbY1=0;
+
+//    for (unsigned int i=0; i< m_svgs.size(); ++i)
+//        m_svgs[i]->computeBB(bbX0, bbY0, bbX1, bbY1);
+
+//    outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"<< std::endl;
+//    outfile << "<svg xmlns=\"http://www.w3.org/2000/svg\""<< std::endl;
+//    outfile << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""<< std::endl;
+//    outfile << "viewBox=\""<< bbX0 <<" "<< bbY0 <<" "<< bbX1-bbX0 << " " << bbY1-bbY0 <<"\">"<< std::endl;
+//    outfile << "<title>Animated SVG</title>"<< std::endl;
+//    outfile << "<desc>"<< std::endl;
+//    outfile << "Rendered from CGoGN"<< std::endl;
+//    outfile << "</desc>"<< std::endl;
+
+//    outfile << "<defs>"<< std::endl;
+
+
+//    for (unsigned int i=0; i< m_svgs.size(); ++i)
+//    {
+//        std::vector<DepthSort> vds;
+//        m_svgs[i]->sortSimpleDepth(vds);
+
+//        outfile << "<g id=\"slice"<<i<< "\">" << std::endl;
+//        for (std::vector<DepthSort>::iterator it = vds.begin(); it != vds.end(); ++it)
+//            m_svgs[i]->m_groups[it->obj]->saveOne(outfile,it->id, bbX1-bbX0);
+//        outfile << "</g>" << std::endl;
+//    }
+
+//    outfile << "</defs>"<< std::endl;
+
+
+//    for (unsigned int i=0; i< m_svgs.size(); ++i)
+//    {
+//        unsigned int nbo = m_svgs[i]->m_opacities_animations.size();
+
+//        outfile << "<use xlink:href=\"#slice"<<i<<"\" >" << std::endl;
+//        outfile << "<animate attributeName=\"opacity\" dur=\""<<timeStep*nbo<<"s\" fill=\"freeze\" values=\"";
+
+
+//        for (unsigned int j = 0; j < nbo; ++j)
+//        {
+//            outfile << m_svgs[i]->m_opacities_animations[j];
+//            if ( j != (nbo-1))
+//                outfile<< ";";
+//        }
+
+//        outfile << "\" calcMode=\"discrete\" repeatCount=\"indefinite\" />" << std::endl;
+//        outfile << "</use>" << std::endl;
+//    }
+
+//    outfile << "</svg>" << std::endl;
+//    outfile.close();
 }
 
 

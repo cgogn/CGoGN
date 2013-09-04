@@ -55,8 +55,8 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d);
 template <typename PFP, typename EMBV, typename EMB>
 void trianguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
-template <typename PFP>
-void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
+//template <typename PFP>
+//void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
 
 /**
  * Triangule all the faces of the mesh
