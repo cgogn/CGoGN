@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME RenderScalar )
+SET( PLUGIN_NAME Surface_RenderScalar )
 
-SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/renderScalar )
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surface_renderScalar )
 
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
@@ -25,8 +25,8 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/renderScalar.h
-	${PLUGIN_ROOT_DIR}/include/renderScalarDockTab.h
+	${PLUGIN_ROOT_DIR}/include/surface_renderScalar.h
+	${PLUGIN_ROOT_DIR}/include/surface_renderScalar_dockTab.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

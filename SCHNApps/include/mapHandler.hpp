@@ -74,7 +74,7 @@ void MapHandler<PFP>::drawBB()
 
 	glPushMatrix();
 	glMultMatrixd(m_frame->matrix());
-	QGLViewer::drawAxis();
+//	QGLViewer::drawAxis();
 	m_bbDrawer->callList();
 	glPopMatrix();
 }
