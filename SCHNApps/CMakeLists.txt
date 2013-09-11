@@ -137,7 +137,7 @@ SET(SCHNApps_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/controlDock_cameraTab.h
 	${SCHNApps_ROOT_DIR}/include/controlDock_pluginTab.h
 	${SCHNApps_ROOT_DIR}/include/controlDock_mapTab.h
-#	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
+	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
 )
 
 

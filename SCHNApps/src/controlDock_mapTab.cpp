@@ -219,32 +219,32 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 		{
 			case DART : {
 				unsigned int nb = m->getNbDarts();
-				lineEdit_dartNbOrbits->setText(QString::number(nb));
-				lineEdit_dartNbCells->setText(QString::number(nbc));
+				label_dartNbOrbits->setText(QString::number(nb));
+				label_dartNbCells->setText(QString::number(nbc));
 				break;
 			}
 			case VERTEX : {
 				unsigned int nb = m->getNbOrbits<VERTEX>();
-				lineEdit_vertexNbOrbits->setText(QString::number(nb));
-				lineEdit_vertexNbCells->setText(QString::number(nbc));
+				label_vertexNbOrbits->setText(QString::number(nb));
+				label_vertexNbCells->setText(QString::number(nbc));
 				break;
 			}
 			case EDGE : {
 				unsigned int nb = m->getNbOrbits<EDGE>();
-				lineEdit_edgeNbOrbits->setText(QString::number(nb));
-				lineEdit_edgeNbCells->setText(QString::number(nbc));
+				label_edgeNbOrbits->setText(QString::number(nb));
+				label_edgeNbCells->setText(QString::number(nbc));
 				break;
 			}
 			case FACE : {
 				unsigned int nb = m->getNbOrbits<FACE>();
-				lineEdit_faceNbOrbits->setText(QString::number(nb));
-				lineEdit_faceNbCells->setText(QString::number(nbc));
+				label_faceNbOrbits->setText(QString::number(nb));
+				label_faceNbCells->setText(QString::number(nbc));
 				break;
 			}
 			case VOLUME : {
 				unsigned int nb = m->getNbOrbits<VOLUME>();
-				lineEdit_volumeNbOrbits->setText(QString::number(nb));
-				lineEdit_volumeNbCells->setText(QString::number(nbc));
+				label_volumeNbOrbits->setText(QString::number(nb));
+				label_volumeNbCells->setText(QString::number(nbc));
 				break;
 			}
 		}

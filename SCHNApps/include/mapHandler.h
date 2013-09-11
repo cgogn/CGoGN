@@ -6,6 +6,7 @@
 #include "types.h"
 #include "view.h"
 #include "plugin.h"
+#include "primitiveSelector.h"
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attribmap.h"
@@ -161,6 +162,7 @@ signals:
 protected:
 	QString m_name;
 	SCHNApps* m_schnapps;
+
 	GenericMap* m_map;
 
 	qglviewer::Vec m_bbMin;
@@ -176,6 +178,8 @@ protected:
 
 	VBOSet m_vbo;
 	AttributeSet m_attribs[NB_ORBITS];
+
+	QList<PrimitiveSelectorGen*> m_selectors[NB_ORBITS];
 };
 
 
@@ -193,10 +197,10 @@ public:
 			delete m_map;
 	}
 
+	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
+
 	void draw(Utils::GLSLShader* shader, int primitive);
 	void drawBB();
-
-	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
 
 	void updateBB(const VertexAttribute<typename PFP::VEC3>& position);
 	void updateBBDrawer();

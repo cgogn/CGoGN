@@ -10,9 +10,9 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_name(name),
 	m_schnapps(s),
 	m_map(map),
+	m_bbDrawer(NULL),
 	m_frame(NULL),
-	m_render(NULL),
-	m_bbDrawer(NULL)
+	m_render(NULL)
 {
 	m_frame = new qglviewer::ManipulatedFrame();
 }

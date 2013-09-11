@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME RenderTopoSurface )
+SET( PLUGIN_NAME Surface_RenderTopo )
 
-SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/renderTopoSurface )
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surface_renderTopo )
 
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
@@ -25,8 +25,8 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/renderTopoSurface.h
-	${PLUGIN_ROOT_DIR}/include/renderTopoSurfaceDockTab.h
+	${PLUGIN_ROOT_DIR}/include/surface_renderTopo.h
+	${PLUGIN_ROOT_DIR}/include/surface_renderTopo_dockTab.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )
