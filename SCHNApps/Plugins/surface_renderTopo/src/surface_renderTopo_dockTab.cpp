@@ -185,7 +185,7 @@ void Surface_RenderTopo_DockTab::updateMapParameters()
 			if(it.value() == vec3TypeName)
 			{
 				combo_positionAttribute->addItem(it.key());
-				if(it.key() == QString::fromStdString(p.positionAttribute.name()))
+				if(p.positionAttribute.isValid() && it.key() == QString::fromStdString(p.positionAttribute.name()))
 					combo_positionAttribute->setCurrentIndex(i);
 
 				++i;
@@ -207,10 +207,12 @@ void Surface_RenderTopo_DockTab::updateMapParameters()
 
 void Surface_RenderTopo_DockTab::addAttributeToList(unsigned int orbit, const QString& nameAttr)
 {
+	b_updatingUI = true;
 	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
 	const QString& typeAttr = m_schnapps->getSelectedMap()->getAttributeTypeName(orbit, nameAttr);
 	if(typeAttr == vec3TypeName)
 		combo_positionAttribute->addItem(nameAttr);
+	b_updatingUI = false;
 }
 
 } // namespace SCHNApps

@@ -353,6 +353,7 @@ Plugin* SCHNApps::enablePlugin(const QString& pluginName)
 		// if loading fails
 		else
 		{
+			std::cout << "loader.instance() failed.." << std::endl;
 			return NULL;
 		}
 	}
