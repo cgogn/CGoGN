@@ -104,6 +104,53 @@ void MapHandlerGen::deleteVBO(const QString& name)
 }
 
 /*********************************************************
+ * MANAGE CELL SELECTORS
+ *********************************************************/
+
+CellSelectorGen* MapHandlerGen::addCellSelector(unsigned int orbit, const QString& name)
+{
+	if(m_cellSelectors[orbit].contains(name))
+		return NULL;
+
+	CellSelectorGen* cs = NULL;
+
+	switch(orbit)
+	{
+		case DART: cs = new CellSelector<DART>(*m_map, name); break;
+		case VERTEX: cs = new CellSelector<VERTEX>(*m_map, name); break;
+		case EDGE: cs = new CellSelector<EDGE>(*m_map, name); break;
+		case FACE: cs = new CellSelector<FACE>(*m_map, name); break;
+		case VOLUME: cs = new CellSelector<VOLUME>(*m_map, name); break;
+	}
+
+	if(!cs)
+		return NULL;
+
+	m_cellSelectors[orbit].insert(name, cs);
+	emit(cellSelectorAdded(orbit, name));
+	return cs;
+}
+
+void MapHandlerGen::removeCellSelector(unsigned int orbit, const QString& name)
+{
+	CellSelectorGen* cs = getCellSelector(orbit, name);
+	if (cs)
+	{
+		m_cellSelectors[orbit].remove(name);
+		emit(cellSelectorRemoved(orbit, name));
+		delete cs;
+	}
+}
+
+CellSelectorGen* MapHandlerGen::getCellSelector(unsigned int orbit, const QString& name) const
+{
+	if (m_cellSelectors[orbit].contains(name))
+		return m_cellSelectors[orbit][name];
+	else
+		return NULL;
+}
+
+/*********************************************************
  * MANAGE LINKED VIEWS
  *********************************************************/
 

@@ -33,6 +33,16 @@ private slots:
 	void selectedMapChanged();
 	void mapCheckStateChanged(QListWidgetItem* item);
 	void vertexAttributeCheckStateChanged(QListWidgetItem* item);
+	void addDartSelector();
+	void removeDartSelector();
+	void addVertexSelector();
+	void removeVertexSelector();
+	void addEdgeSelector();
+	void removeEdgeSelector();
+	void addFaceSelector();
+	void removeFaceSelector();
+	void addVolumeSelector();
+	void removeVolumeSelector();
 
 	// slots called from SCHNApps signals
 	void mapAdded(MapHandlerGen* m);
@@ -47,6 +57,8 @@ private slots:
 	void selectedMapAttributeAdded(unsigned int orbit, const QString& name);
 	void selectedMapVBOAdded(Utils::VBO* vbo);
 	void selectedMapVBORemoved(Utils::VBO* vbo);
+	void selectedMapCellSelectorAdded(unsigned int orbit, const QString& name);
+	void selectedMapCellSelectorRemoved(unsigned int orbit, const QString& name);
 
 private:
 	void updateSelectedMapInfo();

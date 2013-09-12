@@ -166,7 +166,7 @@
        <item row="5" column="0" colspan="3">
         <widget class="QListWidget" name="list_dartSelectors">
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
         </widget>
        </item>
@@ -273,7 +273,7 @@
        <item row="5" column="0" colspan="3">
         <widget class="QListWidget" name="list_vertexSelectors">
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
         </widget>
        </item>
@@ -380,7 +380,7 @@
        <item row="5" column="0" colspan="3">
         <widget class="QListWidget" name="list_edgeSelectors">
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
         </widget>
        </item>
@@ -487,7 +487,7 @@
        <item row="5" column="0" colspan="3">
         <widget class="QListWidget" name="list_faceSelectors">
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
         </widget>
        </item>
@@ -594,7 +594,7 @@
        <item row="5" column="0" colspan="3">
         <widget class="QListWidget" name="list_volumeSelectors">
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
         </widget>
        </item>

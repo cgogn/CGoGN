@@ -6,7 +6,7 @@
 #include "types.h"
 #include "view.h"
 #include "plugin.h"
-#include "primitiveSelector.h"
+#include "cellSelector.h"
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attribmap.h"
@@ -139,6 +139,16 @@ public slots:
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
+	 * MANAGE CELL SELECTORS
+	 *********************************************************/
+
+	CellSelectorGen* addCellSelector(unsigned int orbit, const QString& name);
+	void removeCellSelector(unsigned int orbit, const QString& name);
+
+	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
+	const QMap<QString, CellSelectorGen*>& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
+
+	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
@@ -158,6 +168,9 @@ signals:
 
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
+
+	void cellSelectorAdded(unsigned int orbit, const QString& name);
+	void cellSelectorRemoved(unsigned int orbit, const QString& name);
 
 protected:
 	QString m_name;
@@ -179,7 +192,7 @@ protected:
 	VBOSet m_vbo;
 	AttributeSet m_attribs[NB_ORBITS];
 
-	QList<PrimitiveSelectorGen*> m_selectors[NB_ORBITS];
+	QMap<QString, CellSelectorGen*> m_cellSelectors[NB_ORBITS];
 };
 
 
@@ -204,6 +217,8 @@ public:
 
 	void updateBB(const VertexAttribute<typename PFP::VEC3>& position);
 	void updateBBDrawer();
+
+	CellSelectorGen* addPrimitiveSelector(unsigned int orbit, const QString& name);
 
 protected:
 	Geom::BoundingBox<typename PFP::VEC3> m_bb;
