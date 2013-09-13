@@ -87,7 +87,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 				const std::vector<Dart>& selectedCells = selector->getSelectedCells();
 
 				m_drawer->newList(GL_COMPILE_AND_EXECUTE);
-				m_drawer->pointSize(2.0f);
+				m_drawer->pointSize(3.0f);
 				m_drawer->color3f(0.0f, 0.0f, 1.0f);
 				m_drawer->begin(GL_POINTS);
 				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)

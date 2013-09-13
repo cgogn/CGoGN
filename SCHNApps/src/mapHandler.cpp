@@ -10,15 +10,21 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_name(name),
 	m_schnapps(s),
 	m_map(map),
-	m_bbDrawer(NULL),
 	m_frame(NULL),
+	m_bbDrawer(NULL),
 	m_render(NULL)
 {
 	m_frame = new qglviewer::ManipulatedFrame();
+	connect(m_frame, SIGNAL(modified()), this, SLOT(frameModified()));
 }
 
 MapHandlerGen::~MapHandlerGen()
 {
+	if(m_frame)
+	{
+		disconnect(m_frame, SIGNAL(modified()), this, SLOT(frameModified()));
+		delete m_frame;
+	}
 	if(m_bbDrawer)
 		delete m_bbDrawer;
 	if(m_render)

@@ -45,6 +45,9 @@ public slots:
 
 	GenericMap* getGenericMap() const { return m_map; }
 
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
 	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	float getBBdiagSize() const { return m_bbDiagSize; }
@@ -71,8 +74,12 @@ public slots:
 		return matrix;
 	}
 
-	const QList<View*>& getLinkedViews() const { return l_views; }
-	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+private slots:
+	void frameModified()
+	{
+		foreach(View* view, l_views)
+			view->updateGL();
+	}
 
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
@@ -178,12 +185,12 @@ protected:
 
 	GenericMap* m_map;
 
+	qglviewer::ManipulatedFrame* m_frame;
+
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
 	float m_bbDiagSize;
 	Utils::Drawer* m_bbDrawer;
-
-	qglviewer::ManipulatedFrame* m_frame;
 
 	Algo::Render::GL2::MapRender* m_render;
 

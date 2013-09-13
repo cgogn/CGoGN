@@ -134,6 +134,7 @@ void View::linkMap(MapHandlerGen* map)
 		emit(mapLinked(map));
 		updateCurrentCameraBB();
 		updateGL();
+		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
 	}
 }
 
@@ -152,6 +153,7 @@ void View::unlinkMap(MapHandlerGen* map)
 		emit(mapUnlinked(map));
 		updateCurrentCameraBB();
 		updateGL();
+		disconnect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
 	}
 }
 
@@ -320,23 +322,6 @@ void View::mouseMoveEvent(QMouseEvent* event)
 	foreach(PluginInteraction* plugin, l_plugins)
 		plugin->mouseMove(this, event);
 	QGLViewer::mouseMoveEvent(event);
-
-	if(m_currentCamera->getDraw() || m_currentCamera->getDrawPath())
-	{
-		foreach(View* view, m_schnapps->getViewSet().values())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
-	else
-	{
-		foreach(View* view, m_currentCamera->getLinkedViews())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
 }
 
 void View::wheelEvent(QWheelEvent* event)
@@ -344,23 +329,6 @@ void View::wheelEvent(QWheelEvent* event)
 	foreach(PluginInteraction* plugin, l_plugins)
 		plugin->wheelEvent(this, event);
 	QGLViewer::wheelEvent(event);
-
-	if(m_currentCamera->getDraw() || m_currentCamera->getDrawPath())
-	{
-		foreach(View* view, m_schnapps->getViewSet().values())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
-	else
-	{
-		foreach(View* view, m_currentCamera->getLinkedViews())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
 }
 
 glm::mat4 View::getCurrentModelViewMatrix() const
