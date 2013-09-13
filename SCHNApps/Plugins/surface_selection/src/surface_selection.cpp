@@ -132,8 +132,11 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 			qglviewer::Vec dir;
 			view->camera()->convertClickToLine(pixel, orig, dir);
 
-			PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
-			PFP2::VEC3 AB(dir.x, dir.y, dir.z);
+			qglviewer::Vec orig_inv = mh->getFrame()->coordinatesOf(orig);
+			qglviewer::Vec dir_inv = mh->getFrame()->transformOf(dir);
+
+			PFP2::VEC3 rayA(orig_inv.x, orig_inv.y, orig_inv.z);
+			PFP2::VEC3 AB(dir_inv.x, dir_inv.y, dir_inv.z);
 
 			Dart d;
 			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
@@ -182,8 +185,11 @@ void Surface_Selection_Plugin::mouseMove(View* view, QMouseEvent* event)
 			qglviewer::Vec dir;
 			view->camera()->convertClickToLine(pixel, orig, dir);
 
-			PFP2::VEC3 rayA(orig.x, orig.y, orig.z);
-			PFP2::VEC3 AB(dir.x, dir.y, dir.z);
+			qglviewer::Vec orig_inv = mh->getFrame()->coordinatesOf(orig);
+			qglviewer::Vec dir_inv = mh->getFrame()->transformOf(dir);
+
+			PFP2::VEC3 rayA(orig_inv.x, orig_inv.y, orig_inv.z);
+			PFP2::VEC3 AB(dir_inv.x, dir_inv.y, dir_inv.z);
 
 			Dart d;
 			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
