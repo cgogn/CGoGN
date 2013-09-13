@@ -5,6 +5,7 @@
 #include "surface_selection_dockTab.h"
 
 #include "Utils/pointSprite.h"
+#include "Utils/drawer.h"
 
 namespace CGoGN
 {
@@ -36,7 +37,7 @@ public:
 	virtual bool enable();
 	virtual void disable();
 
-	virtual void draw(View *view) {}
+	virtual void draw(View *view);
 	virtual void drawMap(View* view, MapHandlerGen* map);
 
 	virtual void keyPress(View* view, QKeyEvent* event);
@@ -66,8 +67,10 @@ protected:
 	Surface_Selection_DockTab* m_dockTab;
 	QHash<View*, QHash<MapHandlerGen*, MapParameters> > h_viewParameterSet;
 
-	Utils::PointSprite* m_pointSprite;
+	Utils::Drawer* m_drawer;
+
 	Utils::VBO* m_selectionSphereVBO;
+	Utils::PointSprite* m_pointSprite;
 
 	bool m_selecting;
 

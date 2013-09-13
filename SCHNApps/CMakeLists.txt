@@ -128,6 +128,7 @@ file(
 SET(SCHNApps_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/camera.h
 	${SCHNApps_ROOT_DIR}/include/mapHandler.h
+	${SCHNApps_ROOT_DIR}/include/cellSelector.h
 	${SCHNApps_ROOT_DIR}/include/plugin.h
 	${SCHNApps_ROOT_DIR}/include/plugin_interaction.h
 	${SCHNApps_ROOT_DIR}/include/plugin_processing.h

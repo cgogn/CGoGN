@@ -25,9 +25,11 @@ bool Surface_Selection_Plugin::enable()
 	m_dockTab = new Surface_Selection_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Selection");
 
+	m_drawer = new Utils::Drawer();
 	m_selectionSphereVBO = new Utils::VBO();
-
 	m_pointSprite = new CGoGN::Utils::PointSprite();
+
+	registerShader(m_drawer->getShader());
 	registerShader(m_pointSprite);
 
 	connect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
@@ -49,7 +51,7 @@ void Surface_Selection_Plugin::disable()
 	delete m_pointSprite;
 }
 
-void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
+void Surface_Selection_Plugin::draw(View *view)
 {
 	if(m_selecting)
 	{
@@ -68,6 +70,32 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 		glDrawArrays(GL_POINTS, 0, 1);
 		glDisable(GL_BLEND);
 		m_pointSprite->disableVertexAttribs();
+	}
+}
+
+void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
+{
+	if(map == m_schnapps->getSelectedMap())
+	{
+		const MapParameters& p = h_viewParameterSet[view][map];
+		if(p.positionAttribute.isValid())
+		{
+			unsigned int orbit = m_schnapps->getCurrentOrbit();
+			CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
+			if(selector)
+			{
+				const std::vector<Dart>& selectedCells = selector->getSelectedCells();
+
+				m_drawer->newList(GL_COMPILE_AND_EXECUTE);
+				m_drawer->pointSize(2.0f);
+				m_drawer->color3f(0.0f, 0.0f, 1.0f);
+				m_drawer->begin(GL_POINTS);
+				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
+					m_drawer->vertex(p.positionAttribute[*it]);
+				m_drawer->end();
+				m_drawer->endList();
+			}
+		}
 	}
 }
 
@@ -115,6 +143,20 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 			{
 				Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
 				neigh.collectAll(d);
+
+				unsigned int orbit = m_schnapps->getCurrentOrbit();
+				CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
+
+				if(selector)
+				{
+					switch(orbit)
+					{
+						case DART: break;
+						case VERTEX: selector->select(neigh.getInsideVertices()); break;
+						case EDGE: selector->select(neigh.getInsideEdges()); break;
+						case FACE: selector->select(neigh.getInsideFaces()); break;
+					}
+				}
 
 				view->updateGL() ;
 			}

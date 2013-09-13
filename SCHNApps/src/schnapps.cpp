@@ -528,6 +528,16 @@ MapHandlerGen* SCHNApps::getSelectedMap() const
 	return m_controlMapTab->getSelectedMap();
 }
 
+unsigned int SCHNApps::getCurrentOrbit() const
+{
+	return m_controlMapTab->getCurrentOrbit();
+}
+
+CellSelectorGen* SCHNApps::getSelectedSelector(unsigned int orbit) const
+{
+	return m_controlMapTab->getSelectedSelector(orbit);
+}
+
 /*********************************************************
  * MANAGE TEXTURES
  *********************************************************/

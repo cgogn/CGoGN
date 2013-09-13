@@ -3,6 +3,8 @@
 
 #include "ui_controlDock_MapTabWidget.h"
 
+#include "mapHandler.h"
+
 namespace CGoGN
 {
 
@@ -15,7 +17,6 @@ namespace SCHNApps
 {
 
 class SCHNApps;
-class MapHandlerGen;
 class View;
 
 class ControlDock_MapTab : public QWidget, public Ui::ControlDock_MapTabWidget
@@ -27,20 +28,32 @@ public:
 	QString title() { return QString("Maps"); }
 
 	MapHandlerGen* getSelectedMap() { return m_selectedMap; }
+	unsigned int getCurrentOrbit();
+	CellSelectorGen* getSelectedSelector(unsigned int orbit) { return m_selectedSelector[orbit]; }
 
 private slots:
 	// slots called from UI actions
 	void selectedMapChanged();
 	void mapCheckStateChanged(QListWidgetItem* item);
 	void vertexAttributeCheckStateChanged(QListWidgetItem* item);
+
+	void selectedDartSelectorChanged();
 	void addDartSelector();
 	void removeDartSelector();
+
+	void selectedVertexSelectorChanged();
 	void addVertexSelector();
 	void removeVertexSelector();
+
+	void selectedEdgeSelectorChanged();
 	void addEdgeSelector();
 	void removeEdgeSelector();
+
+	void selectedFaceSelectorChanged();
 	void addFaceSelector();
 	void removeFaceSelector();
+
+	void selectedVolumeSelectorChanged();
 	void addVolumeSelector();
 	void removeVolumeSelector();
 
@@ -65,6 +78,7 @@ private:
 
 	SCHNApps* m_schnapps;
 	MapHandlerGen* m_selectedMap;
+	CellSelectorGen* m_selectedSelector[NB_ORBITS];
 	bool b_updatingUI;
 };
 

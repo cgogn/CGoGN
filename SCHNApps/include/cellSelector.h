@@ -7,14 +7,18 @@
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/cellmarker.h"
 
+#include <QObject>
+
 namespace CGoGN
 {
 
 namespace SCHNApps
 {
 
-class CellSelectorGen
+class CellSelectorGen : public QObject
 {
+	Q_OBJECT
+
 public:
 	static unsigned int selectorCount;
 
@@ -28,15 +32,18 @@ public:
 
 	virtual unsigned int getOrbit() = 0;
 
-//	virtual void select(Dart d) = 0;
-//	virtual void unselect(Dart d) = 0;
+	virtual void select(Dart d, bool emitSignal) = 0;
+	virtual void unselect(Dart d, bool emitSignal) = 0;
 
-//	virtual void select(const std::vector<Dart>& d) = 0;
-//	virtual void unselect(const std::vector<Dart>& d) = 0;
+	virtual void select(const std::vector<Dart>& d) = 0;
+	virtual void unselect(const std::vector<Dart>& d) = 0;
 
-//	virtual bool isSelected(Dart d) = 0;
+	virtual bool isSelected(Dart d) = 0;
 
-private:
+signals:
+	void selectedCellsChanged();
+
+protected:
 	QString m_name;
 	std::vector<Dart> m_cells;
 };
@@ -56,17 +63,19 @@ public:
 
 	inline unsigned int getOrbit() { return ORBIT; }
 
-	inline void select(Dart d)
+	inline void select(Dart d, bool emitSignal = true)
 	{
 		unsigned int v = m_map.getEmbedding<ORBIT>(d);
 		if(!m_cm.isMarked(v))
 		{
 			m_cells.push_back(d);
 			m_cm.mark(v);
+			if(emitSignal)
+				emit(selectedCellsChanged());
 		}
 	}
 
-	inline void unselect(Dart d)
+	inline void unselect(Dart d, bool emitSignal = true)
 	{
 		unsigned int v = m_map.getEmbedding<ORBIT>(d);
 		if(m_cm.isMarked(v))
@@ -83,6 +92,8 @@ public:
 				m_cm.unmark(m_cells[i-1]);
 				m_cells[i-1] = m_cells.back();
 				m_cells.pop_back();
+				if(emitSignal)
+					emit(selectedCellsChanged());
 			}
 		}
 	}
@@ -90,13 +101,13 @@ public:
 	inline void select(const std::vector<Dart>& d)
 	{
 		for(unsigned int i = 0; i < d.size(); ++i)
-			select(d[i]);
+			select(d[i], false);
 	}
 
 	inline void unselect(const std::vector<Dart>& d)
 	{
 		for(unsigned int i = 0; i < d.size(); ++i)
-			unselect(d[i]);
+			unselect(d[i], false);
 	}
 
 	inline bool isSelected(Dart d)
