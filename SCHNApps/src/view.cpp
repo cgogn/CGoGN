@@ -132,9 +132,15 @@ void View::linkMap(MapHandlerGen* map)
 		l_maps.push_back(map);
 		map->linkView(this);
 		emit(mapLinked(map));
+
 		updateCurrentCameraBB();
 		updateGL();
+
 		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
+		connect(map, SIGNAL(selectedCellsChanged()), this, SLOT(updateGL()));
+
+		if(map == m_schnapps->getSelectedMap())
+			setManipulatedFrame(map->getFrame());
 	}
 }
 
@@ -151,9 +157,15 @@ void View::unlinkMap(MapHandlerGen* map)
 	{
 		map->unlinkView(this);
 		emit(mapUnlinked(map));
+
 		updateCurrentCameraBB();
 		updateGL();
+
 		disconnect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
+		disconnect(map, SIGNAL(selectedCellsChanged()), this, SLOT(updateGL()));
+
+		if(map == m_schnapps->getSelectedMap())
+			setManipulatedFrame(NULL);
 	}
 }
 

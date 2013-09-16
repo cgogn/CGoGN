@@ -47,7 +47,7 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event);
 	virtual void wheelEvent(View* view, QWheelEvent* event);
 
-	virtual void viewLinked(View *view) {}
+	virtual void viewLinked(View *view);
 	virtual void viewUnlinked(View *view) {}
 
 private slots:

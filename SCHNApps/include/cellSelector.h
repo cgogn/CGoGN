@@ -102,12 +102,14 @@ public:
 	{
 		for(unsigned int i = 0; i < d.size(); ++i)
 			select(d[i], false);
+		emit(selectedCellsChanged());
 	}
 
 	inline void unselect(const std::vector<Dart>& d)
 	{
 		for(unsigned int i = 0; i < d.size(); ++i)
 			unselect(d[i], false);
+		emit(selectedCellsChanged());
 	}
 
 	inline bool isSelected(Dart d)

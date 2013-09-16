@@ -74,13 +74,6 @@ public slots:
 		return matrix;
 	}
 
-private slots:
-	void frameModified()
-	{
-		foreach(View* view, l_views)
-			view->updateGL();
-	}
-
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
 	virtual void drawBB() = 0;
@@ -178,6 +171,7 @@ signals:
 
 	void cellSelectorAdded(unsigned int orbit, const QString& name);
 	void cellSelectorRemoved(unsigned int orbit, const QString& name);
+	void selectedCellsChanged();
 
 protected:
 	QString m_name;

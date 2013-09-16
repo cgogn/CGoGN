@@ -15,16 +15,12 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_render(NULL)
 {
 	m_frame = new qglviewer::ManipulatedFrame();
-	connect(m_frame, SIGNAL(modified()), this, SLOT(frameModified()));
 }
 
 MapHandlerGen::~MapHandlerGen()
 {
 	if(m_frame)
-	{
-		disconnect(m_frame, SIGNAL(modified()), this, SLOT(frameModified()));
 		delete m_frame;
-	}
 	if(m_bbDrawer)
 		delete m_bbDrawer;
 	if(m_render)
@@ -134,6 +130,9 @@ CellSelectorGen* MapHandlerGen::addCellSelector(unsigned int orbit, const QStrin
 
 	m_cellSelectors[orbit].insert(name, cs);
 	emit(cellSelectorAdded(orbit, name));
+
+	connect(cs, SIGNAL(selectedCellsChanged()), this, SIGNAL(selectedCellsChanged()));
+
 	return cs;
 }
 
@@ -144,6 +143,9 @@ void MapHandlerGen::removeCellSelector(unsigned int orbit, const QString& name)
 	{
 		m_cellSelectors[orbit].remove(name);
 		emit(cellSelectorRemoved(orbit, name));
+
+		disconnect(cs, SIGNAL(selectedCellsChanged()), this, SIGNAL(selectedCellsChanged()));
+
 		delete cs;
 	}
 }

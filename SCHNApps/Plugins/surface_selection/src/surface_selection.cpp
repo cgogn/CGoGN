@@ -53,24 +53,6 @@ void Surface_Selection_Plugin::disable()
 
 void Surface_Selection_Plugin::draw(View *view)
 {
-	if(m_selecting)
-	{
-		std::vector<PFP2::VEC3> selectionPoint;
-		selectionPoint.push_back(m_selectionCenter);
-		m_selectionSphereVBO->updateData(selectionPoint);
-
-		m_pointSprite->setAttributePosition(m_selectionSphereVBO);
-		m_pointSprite->setSize(m_selectionRadius);
-		m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
-		m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-
-		m_pointSprite->enableVertexAttribs();
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDrawArrays(GL_POINTS, 0, 1);
-		glDisable(GL_BLEND);
-		m_pointSprite->disableVertexAttribs();
-	}
 }
 
 void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
@@ -95,6 +77,25 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 				m_drawer->end();
 				m_drawer->endList();
 			}
+		}
+
+		if(m_selecting)
+		{
+			std::vector<PFP2::VEC3> selectionPoint;
+			selectionPoint.push_back(m_selectionCenter);
+			m_selectionSphereVBO->updateData(selectionPoint);
+
+			m_pointSprite->setAttributePosition(m_selectionSphereVBO);
+			m_pointSprite->setSize(m_selectionRadius);
+			m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+			m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+
+			m_pointSprite->enableVertexAttribs();
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDrawArrays(GL_POINTS, 0, 1);
+			glDisable(GL_BLEND);
+			m_pointSprite->disableVertexAttribs();
 		}
 	}
 }
@@ -121,7 +122,7 @@ void Surface_Selection_Plugin::keyRelease(View* view, QKeyEvent* event)
 
 void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 {
-	if(event->button() == Qt::LeftButton && m_selecting)
+	if(m_selecting && (event->button() == Qt::LeftButton || event->button() == Qt::RightButton))
 	{
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
 		const MapParameters& p = h_viewParameterSet[view][mh];
@@ -152,16 +153,27 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 
 				if(selector)
 				{
-					switch(orbit)
+					if(event->button() == Qt::LeftButton)
 					{
-						case DART: break;
-						case VERTEX: selector->select(neigh.getInsideVertices()); break;
-						case EDGE: selector->select(neigh.getInsideEdges()); break;
-						case FACE: selector->select(neigh.getInsideFaces()); break;
+						switch(orbit)
+						{
+							case DART: break;
+							case VERTEX: selector->select(neigh.getInsideVertices()); break;
+							case EDGE: selector->select(neigh.getInsideEdges()); break;
+							case FACE: selector->select(neigh.getInsideFaces()); break;
+						}
+					}
+					else if(event->button() == Qt::RightButton)
+					{
+						switch(orbit)
+						{
+							case DART: break;
+							case VERTEX: selector->unselect(neigh.getInsideVertices()); break;
+							case EDGE: selector->unselect(neigh.getInsideEdges()); break;
+							case FACE: selector->unselect(neigh.getInsideFaces()); break;
+						}
 					}
 				}
-
-				view->updateGL() ;
 			}
 		}
 	}
@@ -208,11 +220,18 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 	if(m_selecting)
 	{
 		if(event->delta() > 0)
-			m_selectionRadius *= 0.9f ;
+			m_selectionRadius *= 0.9f;
 		else
-			m_selectionRadius *= 1.1f ;
-		view->updateGL() ;
+			m_selectionRadius *= 1.1f;
+		view->updateGL();
 	}
+}
+
+void Surface_Selection_Plugin::viewLinked(View *view)
+{
+	MapHandlerGen* map = m_schnapps->getSelectedMap();
+	if(map)
+		m_selectionRadius = map->getBBdiagSize() / 50.0f;
 }
 
 
