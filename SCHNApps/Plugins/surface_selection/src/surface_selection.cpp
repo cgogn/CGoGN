@@ -49,6 +49,11 @@ void Surface_Selection_Plugin::disable()
 {
 	delete m_selectionSphereVBO;
 	delete m_pointSprite;
+
+	disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
+	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 }
 
 void Surface_Selection_Plugin::draw(View *view)
@@ -106,7 +111,7 @@ void Surface_Selection_Plugin::keyPress(View* view, QKeyEvent* event)
 	{
 		view->setMouseTracking(true);
 		m_selecting = true;
-		view->updateGL();
+//		view->updateGL();
 	}
 }
 
@@ -116,7 +121,7 @@ void Surface_Selection_Plugin::keyRelease(View* view, QKeyEvent* event)
 	{
 		view->setMouseTracking(false);
 		m_selecting = false;
-		view->updateGL();
+//		view->updateGL();
 	}
 }
 

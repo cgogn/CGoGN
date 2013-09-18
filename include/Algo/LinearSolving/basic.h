@@ -43,7 +43,7 @@ template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
 	const VertexAttribute<unsigned int>& index,
-	CellMarker<VERTEX>& lm,
+	const CellMarker<VERTEX>& lm,
 	const VertexAttribute<ATTR_TYPE>& attr)
 {
 	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE> fmts(index, lm, attr) ;
@@ -54,7 +54,7 @@ template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
 	const VertexAttribute<unsigned int>& index,
-	CellMarker<VERTEX>& lm,
+	const CellMarker<VERTEX>& lm,
 	const VertexAttribute<ATTR_TYPE>& attr,
 	unsigned int coord)
 {

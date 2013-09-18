@@ -63,6 +63,8 @@ public:
 
 	inline unsigned int getOrbit() { return ORBIT; }
 
+	inline const CellMarker<ORBIT>& getMarker() { return m_cm; }
+
 	inline void select(Dart d, bool emitSignal = true)
 	{
 		unsigned int v = m_map.getEmbedding<ORBIT>(d);

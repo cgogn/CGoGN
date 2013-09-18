@@ -26,6 +26,14 @@ bool Surface_Subdivision_Plugin::enable()
 	return true;
 }
 
+void Surface_Subdivision_Plugin::disable()
+{
+	disconnect(m_subdivisionAction, SIGNAL(triggered()), this, SLOT(openSubdivisionDialog()));
+
+	disconnect(m_subdivisionDialog, SIGNAL(accepted()), this, SLOT(subdivideFromDialog()));
+	disconnect(m_subdivisionDialog->button_apply, SIGNAL(clicked()), this, SLOT(subdivideFromDialog()));
+}
+
 void Surface_Subdivision_Plugin::openSubdivisionDialog()
 {
 	m_subdivisionDialog->show();
