@@ -74,7 +74,7 @@ private slots:
 	void mapRemoved(MapHandlerGen* map);
 
 	// slots called from MapHandler signals
-	void attributeAdded(unsigned int orbit, const QString& nameAttr);
+	void attributeAdded(unsigned int orbit, const QString& name);
 
 public slots:
 	// slots for Python calls

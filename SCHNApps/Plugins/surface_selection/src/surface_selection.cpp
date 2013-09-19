@@ -62,7 +62,7 @@ void Surface_Selection_Plugin::draw(View *view)
 
 void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
-	if(map == m_schnapps->getSelectedMap())
+	if(map->isSelectedMap())
 	{
 		const MapParameters& p = h_viewParameterSet[view][map];
 		if(p.positionAttribute.isValid())
@@ -269,11 +269,27 @@ void Surface_Selection_Plugin::mapRemoved(MapHandlerGen* map)
 
 
 
-void Surface_Selection_Plugin::attributeAdded(unsigned int orbit, const QString& nameAttr)
+void Surface_Selection_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-	if(map == m_schnapps->getSelectedMap())
-		m_dockTab->addAttributeToList(orbit, nameAttr);
+	if(orbit == VERTEX && map->isSelectedMap())
+		m_dockTab->addVertexAttribute(name);
+}
+
+
+
+
+
+void Surface_Selection_Plugin::changePositionAttribute(const QString& view, const QString& map, const QString& name)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].positionAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
+		if(v->isSelectedView() && m->isSelectedMap())
+			m_dockTab->updateMapParameters();
+	}
 }
 
 #ifndef DEBUG

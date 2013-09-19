@@ -58,10 +58,11 @@ private slots:
 	void mapRemoved(MapHandlerGen* map);
 
 	// slots called from MapHandler signals
-	void attributeAdded(unsigned int orbit, const QString& nameAttr);
+	void attributeAdded(unsigned int orbit, const QString& name);
 
 public slots:
 	// slots for Python calls
+	void changePositionAttribute(const QString& view, const QString& map, const QString& name);
 
 protected:
 	Surface_Selection_DockTab* m_dockTab;

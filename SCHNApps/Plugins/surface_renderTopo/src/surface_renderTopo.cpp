@@ -80,11 +80,11 @@ void Surface_RenderTopo_Plugin::mapRemoved(MapHandlerGen* map)
 
 
 
-void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString& nameAttr)
+void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-	if(map == m_schnapps->getSelectedMap())
-		m_dockTab->addAttributeToList(orbit, nameAttr);
+	if(orbit == VERTEX && map == m_schnapps->getSelectedMap())
+		m_dockTab->addVertexAttribute(name);
 }
 
 
