@@ -126,6 +126,10 @@ void Surface_Deformation_Plugin::disable()
 	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 }
 
+void Surface_Deformation_Plugin::draw(View *view)
+{
+}
+
 void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 {
 	switch(event->key())
@@ -133,8 +137,21 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 		case Qt::Key_D : {
 			MapHandlerGen* mh = m_schnapps->getSelectedMap();
 			const MapParameters& p = h_parameterSet[mh];
-			if(p.handleSelector && !p.handleSelector->getSelectedCells().empty())
-				m_dragging = !m_dragging;
+			if(!m_dragging)
+			{
+				if(p.handleSelector && !p.handleSelector->getSelectedCells().empty())
+				{
+					m_dragging = true;
+					m_draginit = false;
+					view->setMouseTracking(true);
+				}
+			}
+			else
+			{
+				m_dragging = false;
+				m_draginit = false;
+				view->setMouseTracking(false);
+			}
 			break;
 		}
 		case Qt::Key_R : {
@@ -152,50 +169,50 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 	}
 }
 
-void Surface_Deformation_Plugin::mousePress(View* view, QMouseEvent* event)
-{
-	if(event->button() == Qt::LeftButton && m_dragging)
-	{
-		MapHandlerGen* mh = m_schnapps->getSelectedMap();
-		const MapParameters& p = h_parameterSet[mh];
-		const std::vector<Dart>& handle = p.handleSelector->getSelectedCells();
-
-		m_dragZ = 0;
-		for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
-		{
-			const PFP2::VEC3& pp = p.positionAttribute[*it];
-			qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(pp[0],pp[1],pp[2]));
-			m_dragZ += q.z;
-		}
-		m_dragZ /= handle.size();
-
-		qglviewer::Vec pp(event->x(), event->y(), m_dragZ);
-		m_dragPrevious = view->camera()->unprojectedCoordinatesOf(pp);
-	}
-}
-
 void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 {
 	if(m_dragging)
 	{
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
+
 		MapParameters& p = h_parameterSet[mh];
 		const std::vector<Dart>& handle = p.handleSelector->getSelectedCells();
 
-		qglviewer::Vec pp(event->x(), event->y(), m_dragZ);
-		qglviewer::Vec qq = view->camera()->unprojectedCoordinatesOf(pp);
+		if(!m_draginit)
+		{
+			m_dragZ = 0;
+			for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			{
+				const PFP2::VEC3& pp = p.positionAttribute[*it];
+				qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(pp[0],pp[1],pp[2]));
+				m_dragZ += q.z;
+			}
+			m_dragZ /= handle.size();
 
-		qglviewer::Vec vec = qq - m_dragPrevious;
-		PFP2::VEC3 t(vec.x, vec.y, vec.z);
-		for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
-			p.positionAttribute[*it] += t;
+			qglviewer::Vec pp(event->x(), event->y(), m_dragZ);
+			m_dragPrevious = view->camera()->unprojectedCoordinatesOf(pp);
 
-		m_dragPrevious = qq;
+			m_draginit = true;
+		}
+		else
+		{
+			qglviewer::Vec pp(event->x(), event->y(), m_dragZ);
+			qglviewer::Vec qq = view->camera()->unprojectedCoordinatesOf(pp);
 
-//		matchDiffCoord(mh);
-//		asRigidAsPossible(mh);
+			qglviewer::Vec vec = qq - m_dragPrevious;
+			PFP2::VEC3 t(vec.x, vec.y, vec.z);
+			for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+				p.positionAttribute[*it] += t;
 
-		mh->notifyAttributeModification(p.positionAttribute);
+			m_dragPrevious = qq;
+
+//			matchDiffCoord(map);
+			if(p.initialized)
+				asRigidAsPossible(mh);
+
+			mh->notifyAttributeModification(p.positionAttribute);
+			static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
+		}
 
 		view->updateGL();
 	}
@@ -271,7 +288,6 @@ void Surface_Deformation_Plugin::selectedCellsChanged()
 {
 //	nlMakeCurrent(perMap->nlContext) ;
 //	nlReset(NL_FALSE) ;
-
 }
 
 
@@ -484,18 +500,18 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 
 		nlMakeCurrent(p.nlContext);
 		if(nlGetCurrentState() == NL_STATE_INITIAL)
-			nlBegin(NL_SYSTEM) ;
+			nlBegin(NL_SYSTEM);
 		for(int coord = 0; coord < 3; ++coord)
 		{
-			LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.lockedSelector->getMarker(), p.positionAttribute, coord) ;
-			nlBegin(NL_MATRIX) ;
-	//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, p.vIndex, p.edgeWeight, p.vertexArea, p.rotatedDiffCoord, coord) ;
-			LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.rotatedDiffCoord, coord) ;
-			nlEnd(NL_MATRIX) ;
-			nlEnd(NL_SYSTEM) ;
-			nlSolve() ;
-			LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord) ;
-			nlReset(NL_TRUE) ;
+			LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.lockedSelector->getMarker(), p.positionAttribute, coord);
+			nlBegin(NL_MATRIX);
+	//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, p.vIndex, p.edgeWeight, p.vertexArea, p.rotatedDiffCoord, coord);
+			LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.rotatedDiffCoord, coord);
+			nlEnd(NL_MATRIX);
+			nlEnd(NL_SYSTEM);
+			nlSolve();
+			LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
+			nlReset(NL_TRUE);
 		}
 	}
 }

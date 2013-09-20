@@ -113,11 +113,13 @@ void Surface_Deformation_DockTab::removeVertexSelector(const QString& name)
 
 void Surface_Deformation_DockTab::mapParametersInitialized(bool b)
 {
+	b_updatingUI = true;
 	combo_positionAttribute->setEnabled(!b);
 	combo_lockedSelector->setEnabled(!b);
 	combo_handleSelector->setEnabled(!b);
 	if(b) button_start_stop->setText("Stop");
 	else button_start_stop->setText("Start");
+	b_updatingUI = false;
 }
 
 void Surface_Deformation_DockTab::updateMapParameters()
@@ -173,6 +175,8 @@ void Surface_Deformation_DockTab::updateMapParameters()
 		else
 			button_start_stop->setText("Start");
 	}
+
+	b_updatingUI = false;
 }
 
 } // namespace SCHNApps

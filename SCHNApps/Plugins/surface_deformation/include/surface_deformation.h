@@ -55,6 +55,7 @@ class Surface_Deformation_Plugin : public PluginInteraction
 
 public:
 	Surface_Deformation_Plugin() :
+		m_draginit(false),
 		m_dragging(false)
 	{}
 
@@ -64,12 +65,12 @@ public:
 	virtual bool enable();
 	virtual void disable();
 
-	virtual void draw(View *view) {}
+	virtual void draw(View *view);
 	virtual void drawMap(View* view, MapHandlerGen* map) {}
 
 	virtual void keyPress(View* view, QKeyEvent* event);
 	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event);
+	virtual void mousePress(View* view, QMouseEvent* event) {}
 	virtual void mouseRelease(View* view, QMouseEvent* event) {}
 	virtual void mouseMove(View* view, QMouseEvent* event);
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
@@ -104,6 +105,7 @@ protected:
 	Surface_Deformation_DockTab* m_dockTab;
 	QHash<MapHandlerGen*, MapParameters> h_parameterSet;
 
+	bool m_draginit;
 	bool m_dragging;
 	PFP2::REAL m_dragZ;
 	qglviewer::Vec m_dragPrevious;
