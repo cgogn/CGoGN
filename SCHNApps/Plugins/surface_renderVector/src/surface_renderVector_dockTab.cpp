@@ -4,6 +4,8 @@
 #include "schnapps.h"
 #include "mapHandler.h"
 
+#include "Utils/vbo.h"
+
 namespace CGoGN
 {
 

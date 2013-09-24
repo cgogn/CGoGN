@@ -353,6 +353,7 @@ Plugin* SCHNApps::enablePlugin(const QString& pluginName)
 		// if loading fails
 		else
 		{
+			std::cout << "loader.instance() failed.." << std::endl;
 			return NULL;
 		}
 	}
@@ -525,6 +526,16 @@ MapHandlerGen* SCHNApps::getMap(const QString& name) const
 MapHandlerGen* SCHNApps::getSelectedMap() const
 {
 	return m_controlMapTab->getSelectedMap();
+}
+
+unsigned int SCHNApps::getCurrentOrbit() const
+{
+	return m_controlMapTab->getCurrentOrbit();
+}
+
+CellSelectorGen* SCHNApps::getSelectedSelector(unsigned int orbit) const
+{
+	return m_controlMapTab->getSelectedSelector(orbit);
 }
 
 /*********************************************************

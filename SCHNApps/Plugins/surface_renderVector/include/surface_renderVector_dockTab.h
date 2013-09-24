@@ -1,8 +1,7 @@
-#ifndef _RENDERVECTOR_DOCK_TAB_H_
-#define _RENDERVECTOR_DOCK_TAB_H_
+#ifndef _SURFACE_RENDERVECTOR_DOCK_TAB_H_
+#define _SURFACE_RENDERVECTOR_DOCK_TAB_H_
 
 #include "ui_surface_renderVector.h"
-#include "Utils/vbo.h"
 
 namespace CGoGN
 {

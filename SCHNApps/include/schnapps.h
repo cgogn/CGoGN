@@ -97,6 +97,9 @@ public slots:
 	void notifySelectedMapChanged(MapHandlerGen* old, MapHandlerGen* cur) { emit(selectedMapChanged(old, cur)); }
 	MapHandlerGen* getSelectedMap() const;
 
+	unsigned int getCurrentOrbit() const;
+	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
+
 	/*********************************************************
 	 * MANAGE TEXTURES
 	 *********************************************************/

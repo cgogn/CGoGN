@@ -37,6 +37,7 @@ class PluginProcessing;
 class View;
 class Camera;
 class MapHandlerGen;
+class CellSelectorGen;
 struct Texture;
 
 typedef QMap<QString, Plugin*> PluginSet;

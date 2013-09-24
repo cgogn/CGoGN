@@ -43,6 +43,9 @@ private:
 	void linkView(View* view);
 	void unlinkView(View* view);
 
+private slots:
+	void frameModified();
+
 public slots:
 	void setProjectionType(int t);
 	void setDraw(bool b);

@@ -6,6 +6,7 @@
 #include "types.h"
 #include "view.h"
 #include "plugin.h"
+#include "cellSelector.h"
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attribmap.h"
@@ -44,6 +45,9 @@ public slots:
 
 	GenericMap* getGenericMap() const { return m_map; }
 
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
 	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	float getBBdiagSize() const { return m_bbDiagSize; }
@@ -69,9 +73,6 @@ public slots:
 		}
 		return matrix;
 	}
-
-	const QList<View*>& getLinkedViews() const { return l_views; }
-	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
@@ -138,6 +139,16 @@ public slots:
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
+	 * MANAGE CELL SELECTORS
+	 *********************************************************/
+
+	CellSelectorGen* addCellSelector(unsigned int orbit, const QString& name);
+	void removeCellSelector(unsigned int orbit, const QString& name);
+
+	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
+	const QMap<QString, CellSelectorGen*>& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
+
+	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
@@ -158,17 +169,22 @@ signals:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
+	void cellSelectorAdded(unsigned int orbit, const QString& name);
+	void cellSelectorRemoved(unsigned int orbit, const QString& name);
+	void selectedCellsChanged();
+
 protected:
 	QString m_name;
 	SCHNApps* m_schnapps;
+
 	GenericMap* m_map;
+
+	qglviewer::ManipulatedFrame* m_frame;
 
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
 	float m_bbDiagSize;
 	Utils::Drawer* m_bbDrawer;
-
-	qglviewer::ManipulatedFrame* m_frame;
 
 	Algo::Render::GL2::MapRender* m_render;
 
@@ -176,6 +192,8 @@ protected:
 
 	VBOSet m_vbo;
 	AttributeSet m_attribs[NB_ORBITS];
+
+	QMap<QString, CellSelectorGen*> m_cellSelectors[NB_ORBITS];
 };
 
 
@@ -193,13 +211,15 @@ public:
 			delete m_map;
 	}
 
+	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
+
 	void draw(Utils::GLSLShader* shader, int primitive);
 	void drawBB();
 
-	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
-
 	void updateBB(const VertexAttribute<typename PFP::VEC3>& position);
 	void updateBBDrawer();
+
+	CellSelectorGen* addPrimitiveSelector(unsigned int orbit, const QString& name);
 
 protected:
 	Geom::BoundingBox<typename PFP::VEC3> m_bb;
