@@ -28,6 +28,11 @@ bool Surface_RenderTopo_Plugin::enable()
 
 void Surface_RenderTopo_Plugin::disable()
 {
+	disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
+	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapRemoved(map);
 }
@@ -75,11 +80,11 @@ void Surface_RenderTopo_Plugin::mapRemoved(MapHandlerGen* map)
 
 
 
-void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString& nameAttr)
+void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-	if(map == m_schnapps->getSelectedMap())
-		m_dockTab->addAttributeToList(orbit, nameAttr);
+	if(orbit == VERTEX && map == m_schnapps->getSelectedMap())
+		m_dockTab->addVertexAttribute(name);
 }
 
 

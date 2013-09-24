@@ -46,6 +46,7 @@ typedef QMap<QString, Camera*> CameraSet;
 typedef QMap<QString, MapHandlerGen*> MapSet;
 typedef QMap<QString, Utils::VBO*> VBOSet;
 typedef QMap<QString, QString> AttributeSet;
+typedef QMap<QString, CellSelectorGen*> CellSelectorSet;
 typedef QMap<QString, Utils::GLSLShader*> ShaderSet;
 
 typedef QMap<QString, Texture*> TextureSet;

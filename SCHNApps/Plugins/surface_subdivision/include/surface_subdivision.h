@@ -24,7 +24,7 @@ public:
 	{}
 
 	virtual bool enable();
-	virtual void disable() {}
+	virtual void disable();
 
 private slots:
 	void openSubdivisionDialog();

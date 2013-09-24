@@ -49,6 +49,11 @@ void Surface_Selection_Plugin::disable()
 {
 	delete m_selectionSphereVBO;
 	delete m_pointSprite;
+
+	disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
+	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 }
 
 void Surface_Selection_Plugin::draw(View *view)
@@ -57,7 +62,7 @@ void Surface_Selection_Plugin::draw(View *view)
 
 void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
-	if(map == m_schnapps->getSelectedMap())
+	if(map->isSelectedMap())
 	{
 		const MapParameters& p = h_viewParameterSet[view][map];
 		if(p.positionAttribute.isValid())
@@ -106,7 +111,7 @@ void Surface_Selection_Plugin::keyPress(View* view, QKeyEvent* event)
 	{
 		view->setMouseTracking(true);
 		m_selecting = true;
-		view->updateGL();
+//		view->updateGL();
 	}
 }
 
@@ -116,7 +121,7 @@ void Surface_Selection_Plugin::keyRelease(View* view, QKeyEvent* event)
 	{
 		view->setMouseTracking(false);
 		m_selecting = false;
-		view->updateGL();
+//		view->updateGL();
 	}
 }
 
@@ -264,11 +269,27 @@ void Surface_Selection_Plugin::mapRemoved(MapHandlerGen* map)
 
 
 
-void Surface_Selection_Plugin::attributeAdded(unsigned int orbit, const QString& nameAttr)
+void Surface_Selection_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-	if(map == m_schnapps->getSelectedMap())
-		m_dockTab->addAttributeToList(orbit, nameAttr);
+	if(orbit == VERTEX && map->isSelectedMap())
+		m_dockTab->addVertexAttribute(name);
+}
+
+
+
+
+
+void Surface_Selection_Plugin::changePositionAttribute(const QString& view, const QString& map, const QString& name)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].positionAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
+		if(v->isSelectedView() && m->isSelectedMap())
+			m_dockTab->updateMapParameters();
+	}
 }
 
 #ifndef DEBUG

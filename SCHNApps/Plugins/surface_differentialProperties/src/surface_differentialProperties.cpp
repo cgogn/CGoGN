@@ -37,6 +37,21 @@ bool Surface_DifferentialProperties_Plugin::enable()
 	return true;
 }
 
+void Surface_DifferentialProperties_Plugin::disable()
+{
+	disconnect(m_computeNormalAction, SIGNAL(triggered()), this, SLOT(openComputeNormalDialog()));
+	disconnect(m_computeCurvatureAction, SIGNAL(triggered()), this, SLOT(openComputeCurvatureDialog()));
+
+	disconnect(m_computeNormalDialog, SIGNAL(accepted()), this, SLOT(computeNormalFromDialog()));
+	disconnect(m_computeNormalDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeNormalFromDialog()));
+
+	disconnect(m_computeCurvatureDialog, SIGNAL(accepted()), this, SLOT(computeCurvatureFromDialog()));
+	disconnect(m_computeCurvatureDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeCurvatureFromDialog()));
+
+	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+}
+
 void Surface_DifferentialProperties_Plugin::mapAdded(MapHandlerGen *map)
 {
 	connect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));

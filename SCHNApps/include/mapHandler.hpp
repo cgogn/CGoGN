@@ -44,6 +44,15 @@ inline QString MapHandlerGen::getAttributeTypeName(unsigned int orbit, const QSt
 		return "";
 }
 
+template <unsigned int ORBIT>
+CellSelector<ORBIT>* MapHandlerGen::getCellSelector(const QString& name) const
+{
+	if (m_cellSelectors[ORBIT].contains(name))
+		return static_cast<CellSelector<ORBIT>*>(m_cellSelectors[ORBIT][name]);
+	else
+		return NULL;
+}
+
 
 
 

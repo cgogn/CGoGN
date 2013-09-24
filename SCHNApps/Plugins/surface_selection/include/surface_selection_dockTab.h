@@ -31,7 +31,7 @@ private slots:
 	void positionAttributeChanged(int index);
 
 private:
-	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
+	void addVertexAttribute(const QString& name);
 
 	void updateMapParameters();
 };

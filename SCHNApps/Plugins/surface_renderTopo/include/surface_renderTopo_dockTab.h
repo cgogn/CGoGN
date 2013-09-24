@@ -39,7 +39,7 @@ private slots:
 	void facesScaleFactorChanged(int i);
 
 private:
-	void addAttributeToList(unsigned int orbit, const QString& nameAttr);
+	void addVertexAttribute(const QString& name);
 
 	void updateMapParameters();
 };

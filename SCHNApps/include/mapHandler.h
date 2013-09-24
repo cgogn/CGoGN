@@ -146,7 +146,11 @@ public slots:
 	void removeCellSelector(unsigned int orbit, const QString& name);
 
 	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
-	const QMap<QString, CellSelectorGen*>& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
+	const CellSelectorSet& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
+
+public:
+	template <unsigned int ORBIT>
+	CellSelector<ORBIT>* getCellSelector(const QString& name) const;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
@@ -193,7 +197,7 @@ protected:
 	VBOSet m_vbo;
 	AttributeSet m_attribs[NB_ORBITS];
 
-	QMap<QString, CellSelectorGen*> m_cellSelectors[NB_ORBITS];
+	CellSelectorSet m_cellSelectors[NB_ORBITS];
 };
 
 

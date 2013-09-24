@@ -233,6 +233,8 @@ View* SCHNApps::getView(const QString& name) const
 
 void SCHNApps::setSelectedView(View* view)
 {
+	int currentTab = m_pluginDockTabWidget->currentIndex();
+
 	if(m_selectedView)
 	{
 		foreach(PluginInteraction* p, m_selectedView->getLinkedPlugins())
@@ -248,6 +250,8 @@ void SCHNApps::setSelectedView(View* view)
 		enablePluginTabWidgets(p);
 	connect(m_selectedView, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(enablePluginTabWidgets(PluginInteraction*)));
 	connect(m_selectedView, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(disablePluginTabWidgets(PluginInteraction*)));
+
+	m_pluginDockTabWidget->setCurrentIndex(currentTab);
 
 	emit(selectedViewChanged(oldSelected, m_selectedView));
 
@@ -443,28 +447,20 @@ void SCHNApps::removePluginDockTab(Plugin* plugin, QWidget *tabWidget)
 
 void SCHNApps::enablePluginTabWidgets(PluginInteraction* plugin)
 {
-//	int currentTab = m_dockTabWidget->currentIndex();
-
 	if(m_pluginTabs.contains(plugin))
 	{
 		foreach(QWidget* w, m_pluginTabs[plugin])
 			m_pluginDockTabWidget->setTabEnabled(m_pluginDockTabWidget->indexOf(w), true);
 	}
-
-//	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 void SCHNApps::disablePluginTabWidgets(PluginInteraction* plugin)
 {
-//	int currentTab = m_dockTabWidget->currentIndex();
-
 	if(m_pluginTabs.contains(plugin))
 	{
 		foreach(QWidget* w, m_pluginTabs[plugin])
 			m_pluginDockTabWidget->setTabEnabled(m_pluginDockTabWidget->indexOf(w), false);
 	}
-
-//	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 /*********************************************************

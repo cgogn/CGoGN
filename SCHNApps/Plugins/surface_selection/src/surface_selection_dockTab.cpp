@@ -41,6 +41,16 @@ void Surface_Selection_DockTab::positionAttributeChanged(int index)
 
 
 
+void Surface_Selection_DockTab::addVertexAttribute(const QString& nameAttr)
+{
+	b_updatingUI = true;
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+	const QString& typeAttr = m_schnapps->getSelectedMap()->getAttributeTypeName(VERTEX, nameAttr);
+	if(typeAttr == vec3TypeName)
+		combo_positionAttribute->addItem(nameAttr);
+	b_updatingUI = false;
+}
+
 void Surface_Selection_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -72,16 +82,6 @@ void Surface_Selection_DockTab::updateMapParameters()
 		}
 	}
 
-	b_updatingUI = false;
-}
-
-void Surface_Selection_DockTab::addAttributeToList(unsigned int orbit, const QString& nameAttr)
-{
-	b_updatingUI = true;
-	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
-	const QString& typeAttr = m_schnapps->getSelectedMap()->getAttributeTypeName(orbit, nameAttr);
-	if(typeAttr == vec3TypeName)
-		combo_positionAttribute->addItem(nameAttr);
 	b_updatingUI = false;
 }
 

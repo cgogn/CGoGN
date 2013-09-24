@@ -40,7 +40,10 @@ void Surface_RenderTopo_DockTab::positionAttributeChanged(int index)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(view && map)
 		{
-			m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+			if(index == 0)
+				;
+			else
+				m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
 			view->updateGL();
 		}
 	}
@@ -162,6 +165,16 @@ void Surface_RenderTopo_DockTab::edgesScaleFactorChanged(int i)
 
 
 
+void Surface_RenderTopo_DockTab::addVertexAttribute(const QString& name)
+{
+	b_updatingUI = true;
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+	const QString& typeAttr = m_schnapps->getSelectedMap()->getAttributeTypeName(VERTEX, name);
+	if(typeAttr == vec3TypeName)
+		combo_positionAttribute->addItem(name);
+	b_updatingUI = false;
+}
+
 void Surface_RenderTopo_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -202,16 +215,6 @@ void Surface_RenderTopo_DockTab::updateMapParameters()
 		slider_facesScaleFactor->setSliderPosition(p.facesScaleFactor * 100.0);
 	}
 
-	b_updatingUI = false;
-}
-
-void Surface_RenderTopo_DockTab::addAttributeToList(unsigned int orbit, const QString& nameAttr)
-{
-	b_updatingUI = true;
-	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
-	const QString& typeAttr = m_schnapps->getSelectedMap()->getAttributeTypeName(orbit, nameAttr);
-	if(typeAttr == vec3TypeName)
-		combo_positionAttribute->addItem(nameAttr);
 	b_updatingUI = false;
 }
 
