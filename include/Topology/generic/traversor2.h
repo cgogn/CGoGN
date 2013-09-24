@@ -48,9 +48,9 @@ private:
 public:
 	Traversor2VE(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 // Traverse the faces incident to a given vertex
@@ -66,9 +66,9 @@ private:
 public:
 	Traversor2VF(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
@@ -84,9 +84,9 @@ private:
 public:
 	Traversor2VVaE(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 // Traverse the vertices adjacent to a given vertex through sharing a common face
@@ -104,9 +104,9 @@ private:
 public:
 	Traversor2VVaF(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 /*******************************************************************************
@@ -126,9 +126,9 @@ private:
 public:
 	Traversor2EV(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 // Traverse the faces incident to a given edge
@@ -144,9 +144,9 @@ private:
 public:
 	Traversor2EF(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
@@ -164,9 +164,9 @@ private:
 public:
 	Traversor2EEaV(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 // Traverse the edges adjacent to a given edge through sharing a common face
@@ -184,9 +184,9 @@ private:
 public:
 	Traversor2EEaF(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 /*******************************************************************************
@@ -206,9 +206,9 @@ private:
 public:
 	Traversor2FV(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 
@@ -235,9 +235,9 @@ private:
 public:
 	Traversor2FFaV(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 // Traverse the faces adjacent to a given face through sharing a common edge
@@ -253,9 +253,9 @@ private:
 public:
 	Traversor2FFaE(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	inline Dart begin() ;
+	inline Dart end() ;
+	inline Dart next() ;
 } ;
 
 } // namespace CGoGN

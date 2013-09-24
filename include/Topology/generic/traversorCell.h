@@ -54,13 +54,13 @@ public:
 
 	~TraversorCell() ;
 
-	Dart begin() ;
+	inline Dart begin() ;
 
-	Dart end() ;
+	inline Dart end() ;
 
-	Dart next() ;
+	inline Dart next() ;
 
-	void skip(Dart d);
+	inline void skip(Dart d);
 } ;
 
 
@@ -85,13 +85,13 @@ public:
 
 	~TraversorCell() ;
 
-	Dart begin() ;
+	inline Dart begin() ;
 
-	Dart end() ;
+	inline Dart end() ;
 
-	Dart next() ;
+	inline Dart next() ;
 
-	void skip(Dart d);
+	inline void skip(Dart d);
 } ;
 
 
