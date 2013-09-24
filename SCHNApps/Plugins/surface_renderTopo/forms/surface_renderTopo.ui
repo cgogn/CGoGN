@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
+    <width>207</width>
     <height>600</height>
    </rect>
   </property>
@@ -131,6 +131,17 @@
    <header>colorComboBox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>combo_positionAttribute</tabstop>
+  <tabstop>check_drawDarts</tabstop>
+  <tabstop>combo_dartsColor</tabstop>
+  <tabstop>check_drawPhi1</tabstop>
+  <tabstop>combo_phi1Color</tabstop>
+  <tabstop>check_drawPhi2</tabstop>
+  <tabstop>combo_phi2Color</tabstop>
+  <tabstop>slider_edgesScaleFactor</tabstop>
+  <tabstop>slider_facesScaleFactor</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
