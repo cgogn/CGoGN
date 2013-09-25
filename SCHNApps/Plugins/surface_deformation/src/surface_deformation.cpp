@@ -13,8 +13,8 @@ namespace SCHNApps
 {
 
 MapParameters::MapParameters() :
-	lockedSelector(NULL),
 	handleSelector(NULL),
+	freeSelector(NULL),
 	initialized(false),
 	nlContext(NULL)
 {}
@@ -29,7 +29,7 @@ void MapParameters::start(MapHandlerGen* mh)
 {
 	if(!initialized)
 	{
-		if(positionAttribute.isValid() && lockedSelector && handleSelector)
+		if(positionAttribute.isValid() && handleSelector && freeSelector)
 		{
 			positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit", false);
 			if(!positionInit.isValid())
@@ -268,19 +268,19 @@ void Surface_Deformation_Plugin::cellSelectorRemoved(unsigned int orbit, const Q
 		m_dockTab->removeVertexSelector(name);
 
 	MapParameters& p = h_parameterSet[map];
-	if(p.lockedSelector->getName() == name)
-	{
-		p.stop(map);
-		if(!p.initialized && map->isSelectedMap())
-			m_dockTab->mapParametersInitialized(false);
-		p.lockedSelector = NULL;
-	}
 	if(p.handleSelector->getName() == name)
 	{
 		p.stop(map);
 		if(!p.initialized && map->isSelectedMap())
 			m_dockTab->mapParametersInitialized(false);
 		p.handleSelector = NULL;
+	}
+	if(p.freeSelector->getName() == name)
+	{
+		p.stop(map);
+		if(!p.initialized && map->isSelectedMap())
+			m_dockTab->mapParametersInitialized(false);
+		p.freeSelector = NULL;
 	}
 }
 
@@ -309,21 +309,6 @@ void Surface_Deformation_Plugin::changePositionAttribute(const QString& map, con
 	}
 }
 
-void Surface_Deformation_Plugin::changeLockedSelector(const QString& map, const QString& name)
-{
-	MapHandlerGen* m = m_schnapps->getMap(map);
-	if(m)
-	{
-		MapParameters& p = h_parameterSet[m];
-		if(!p.initialized)
-		{
-			p.lockedSelector = m->getCellSelector<VERTEX>(name);
-			if(m->isSelectedMap())
-				m_dockTab->updateMapParameters();
-		}
-	}
-}
-
 void Surface_Deformation_Plugin::changeHandleSelector(const QString& map, const QString& name)
 {
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -333,6 +318,21 @@ void Surface_Deformation_Plugin::changeHandleSelector(const QString& map, const 
 		if(!p.initialized)
 		{
 			p.handleSelector = m->getCellSelector<VERTEX>(name);
+			if(m->isSelectedMap())
+				m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Deformation_Plugin::changeFreeSelector(const QString& map, const QString& name)
+{
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(m)
+	{
+		MapParameters& p = h_parameterSet[m];
+		if(!p.initialized)
+		{
+			p.freeSelector = m->getCellSelector<VERTEX>(name);
 			if(m->isSelectedMap())
 				m_dockTab->updateMapParameters();
 		}
@@ -373,7 +373,7 @@ void Surface_Deformation_Plugin::matchDiffCoord(MapHandlerGen* mh)
 		nlBegin(NL_SYSTEM) ;
 	for(int coord = 0; coord < 3; ++coord)
 	{
-		LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.lockedSelector->getMarker(), p.positionAttribute, coord);
+		LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 		nlBegin(NL_MATRIX);
 		LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.diffCoord, coord);
 		nlEnd(NL_MATRIX);
@@ -503,7 +503,7 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 			nlBegin(NL_SYSTEM);
 		for(int coord = 0; coord < 3; ++coord)
 		{
-			LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.lockedSelector->getMarker(), p.positionAttribute, coord);
+			LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 			nlBegin(NL_MATRIX);
 	//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, p.vIndex, p.edgeWeight, p.vertexArea, p.rotatedDiffCoord, coord);
 			LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.rotatedDiffCoord, coord);

@@ -29,8 +29,8 @@ private:
 
 private slots:
 	void positionAttributeChanged(int index);
-	void lockedSelectorChanged(int index);
 	void handleSelectorChanged(int index);
+	void freeSelectorChanged(int index);
 	void startStopButtonClicked();
 
 private:

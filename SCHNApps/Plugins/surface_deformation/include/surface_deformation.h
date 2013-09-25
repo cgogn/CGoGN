@@ -30,8 +30,8 @@ struct MapParameters
 
 	VertexAttribute<PFP2::VEC3> positionAttribute;
 
-	CellSelector<VERTEX>* lockedSelector;
 	CellSelector<VERTEX>* handleSelector;
+	CellSelector<VERTEX>* freeSelector;
 
 	bool initialized;
 
@@ -93,8 +93,8 @@ private slots:
 public slots:
 	// slots for Python calls
 	void changePositionAttribute(const QString& map, const QString& name);
-	void changeLockedSelector(const QString& map, const QString& name);
 	void changeHandleSelector(const QString& map, const QString& name);
+	void changeFreeSelector(const QString& map, const QString& name);
 
 protected:
 	void toggleMapDeformation(MapHandlerGen* map);
