@@ -47,9 +47,7 @@ Utils::VBO* MapHandlerGen::createVBO(const AttributeMultiVectorGen* attr)
 			emit(vboAdded(vbo));
 		}
 		else
-		{
 			vbo->updateData(attr);
-		}
 		return vbo;
 	}
 	else
@@ -156,6 +154,18 @@ CellSelectorGen* MapHandlerGen::getCellSelector(unsigned int orbit, const QStrin
 		return m_cellSelectors[orbit][name];
 	else
 		return NULL;
+}
+
+void MapHandlerGen::updateMutuallyExclusiveSelectors(unsigned int orbit)
+{
+	QList<CellSelectorGen*> mex;
+	foreach(CellSelectorGen* cs, m_cellSelectors[orbit])
+	{
+		if(cs->isMutuallyExclusive())
+			mex.append(cs);
+	}
+	foreach(CellSelectorGen* cs, m_cellSelectors[orbit])
+		cs->setMutuallyExclusiveSet(mex);
 }
 
 /*********************************************************

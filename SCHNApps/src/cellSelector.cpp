@@ -9,7 +9,9 @@ namespace SCHNApps
 unsigned int CellSelectorGen::selectorCount = 0;
 
 CellSelectorGen::CellSelectorGen(const QString& name) :
-	m_name(name)
+	m_name(name),
+	m_selectionChanged(false),
+	m_isMutuallyExclusive(false)
 {
 	++selectorCount;
 }

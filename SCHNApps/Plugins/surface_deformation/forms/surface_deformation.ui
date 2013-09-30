@@ -33,7 +33,7 @@
    <item row="5" column="0" colspan="2">
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Free selector :</string>
+      <string>Free vertices selector :</string>
      </property>
     </widget>
    </item>
@@ -59,6 +59,22 @@
      </property>
     </widget>
    </item>
+   <item row="10" column="0" colspan="2">
+    <widget class="QPushButton" name="button_start_stop">
+     <property name="text">
+      <string>Start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QComboBox" name="combo_handleSelector">
+     <item>
+      <property name="text">
+       <string>- select selector -</string>
+      </property>
+     </item>
+    </widget>
+   </item>
    <item row="11" column="0" colspan="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -72,27 +88,11 @@
      </property>
     </spacer>
    </item>
-   <item row="10" column="0" colspan="2">
-    <widget class="QPushButton" name="button_start_stop">
-     <property name="text">
-      <string>Start</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
+   <item row="3" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Handle selector :</string>
+      <string>Handle vertices selector :</string>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QComboBox" name="combo_handleSelector">
-     <item>
-      <property name="text">
-       <string>- select selector -</string>
-      </property>
-     </item>
     </widget>
    </item>
   </layout>

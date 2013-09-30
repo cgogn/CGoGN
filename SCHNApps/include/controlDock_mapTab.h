@@ -38,6 +38,7 @@ private slots:
 	void vertexAttributeCheckStateChanged(QListWidgetItem* item);
 
 	void selectedSelectorChanged();
+	void selectorCheckStateChanged(QListWidgetItem* item);
 	void addSelector();
 	void removeSelector();
 

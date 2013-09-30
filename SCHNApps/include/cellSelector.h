@@ -1,13 +1,13 @@
 #ifndef _CELL_SELECTOR_H_
 #define _CELL_SELECTOR_H_
 
+#include <QObject>
 #include <QString>
+#include <QList>
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/cellmarker.h"
-
-#include <QObject>
 
 namespace CGoGN
 {
@@ -35,10 +35,47 @@ public:
 	virtual void select(Dart d, bool emitSignal) = 0;
 	virtual void unselect(Dart d, bool emitSignal) = 0;
 
-	virtual void select(const std::vector<Dart>& d) = 0;
-	virtual void unselect(const std::vector<Dart>& d) = 0;
+	inline void select(const std::vector<Dart>& d)
+	{
+		for(unsigned int i = 0; i < d.size(); ++i)
+			select(d[i], false);
+		checkChange();
+		if(m_isMutuallyExclusive && !m_mutuallyExclusive.empty())
+		{
+			foreach(CellSelectorGen* cs, m_mutuallyExclusive)
+				cs->checkChange();
+		}
+	}
+
+	inline void unselect(const std::vector<Dart>& d)
+	{
+		for(unsigned int i = 0; i < d.size(); ++i)
+			unselect(d[i], false);
+		checkChange();
+	}
 
 	virtual bool isSelected(Dart d) = 0;
+
+	inline void setMutuallyExclusive(bool b) { m_isMutuallyExclusive = b; }
+	inline bool isMutuallyExclusive() const { return m_isMutuallyExclusive; }
+	inline void setMutuallyExclusiveSet(const QList<CellSelectorGen*>& mex)
+	{
+		m_mutuallyExclusive.clear();
+		foreach(CellSelectorGen* cs, mex)
+		{
+			if(cs != this)
+				m_mutuallyExclusive.append(cs);
+		}
+	}
+
+	inline void checkChange()
+	{
+		if(m_selectionChanged)
+		{
+			emit(selectedCellsChanged());
+			m_selectionChanged = false;
+		}
+	}
 
 signals:
 	void selectedCellsChanged();
@@ -46,16 +83,21 @@ signals:
 protected:
 	QString m_name;
 	std::vector<Dart> m_cells;
+
+	bool m_selectionChanged;
+
+	bool m_isMutuallyExclusive;
+	QList<CellSelectorGen*> m_mutuallyExclusive;
 };
 
 template <unsigned int ORBIT>
 class CellSelector : public CellSelectorGen
 {
 public:
-	CellSelector(GenericMap& m, const QString& name, unsigned int thread = 0) :
+	CellSelector(GenericMap& map, const QString& name, unsigned int thread = 0) :
 		CellSelectorGen(name),
-		m_map(m),
-		m_cm(m, thread)
+		m_map(map),
+		m_cm(map, thread)
 	{}
 
 	~CellSelector()
@@ -72,8 +114,15 @@ public:
 		{
 			m_cells.push_back(d);
 			m_cm.mark(v);
+			if(m_isMutuallyExclusive && !m_mutuallyExclusive.empty())
+			{
+				foreach(CellSelectorGen* cs, m_mutuallyExclusive)
+					cs->unselect(d, emitSignal);
+			}
 			if(emitSignal)
 				emit(selectedCellsChanged());
+			else
+				m_selectionChanged = true;
 		}
 	}
 
@@ -96,22 +145,10 @@ public:
 				m_cells.pop_back();
 				if(emitSignal)
 					emit(selectedCellsChanged());
+				else
+					m_selectionChanged = true;
 			}
 		}
-	}
-
-	inline void select(const std::vector<Dart>& d)
-	{
-		for(unsigned int i = 0; i < d.size(); ++i)
-			select(d[i], false);
-		emit(selectedCellsChanged());
-	}
-
-	inline void unselect(const std::vector<Dart>& d)
-	{
-		for(unsigned int i = 0; i < d.size(); ++i)
-			unselect(d[i], false);
-		emit(selectedCellsChanged());
 	}
 
 	inline bool isSelected(Dart d)

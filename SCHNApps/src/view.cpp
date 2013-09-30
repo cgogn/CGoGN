@@ -139,7 +139,7 @@ void View::linkMap(MapHandlerGen* map)
 		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
 		connect(map, SIGNAL(selectedCellsChanged()), this, SLOT(updateGL()));
 
-		if(map == m_schnapps->getSelectedMap())
+		if(map->isSelectedMap())
 			setManipulatedFrame(map->getFrame());
 	}
 }

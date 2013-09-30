@@ -152,6 +152,8 @@ public:
 	template <unsigned int ORBIT>
 	CellSelector<ORBIT>* getCellSelector(const QString& name) const;
 
+	void updateMutuallyExclusiveSelectors(unsigned int orbit);
+
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
