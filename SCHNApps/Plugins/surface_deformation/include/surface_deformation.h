@@ -88,7 +88,7 @@ private slots:
 	void attributeAdded(unsigned int orbit, const QString& name);
 	void cellSelectorAdded(unsigned int orbit, const QString& name);
 	void cellSelectorRemoved(unsigned int orbit, const QString& name);
-	void selectedCellsChanged();
+	void selectedCellsChanged(CellSelectorGen *cs);
 
 public slots:
 	// slots for Python calls

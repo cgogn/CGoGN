@@ -232,6 +232,7 @@ void Surface_Deformation_Plugin::mapAdded(MapHandlerGen* map)
 	connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
 	connect(map, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(cellSelectorAdded(unsigned int, const QString&)));
 	connect(map, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(cellSelectorRemoved(unsigned int, const QString&)));
+	connect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(selectedCellsChanged(CellSelectorGen*)));
 }
 
 void Surface_Deformation_Plugin::mapRemoved(MapHandlerGen* map)
@@ -239,6 +240,7 @@ void Surface_Deformation_Plugin::mapRemoved(MapHandlerGen* map)
 	disconnect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
 	disconnect(map, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(cellSelectorAdded(unsigned int, const QString&)));
 	disconnect(map, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(cellSelectorRemoved(unsigned int, const QString&)));
+	disconnect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(selectedCellsChanged(CellSelectorGen*)));
 }
 
 
@@ -284,10 +286,15 @@ void Surface_Deformation_Plugin::cellSelectorRemoved(unsigned int orbit, const Q
 	}
 }
 
-void Surface_Deformation_Plugin::selectedCellsChanged()
+void Surface_Deformation_Plugin::selectedCellsChanged(CellSelectorGen* cs)
 {
-//	nlMakeCurrent(perMap->nlContext) ;
-//	nlReset(NL_FALSE) ;
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+	MapParameters& p = h_parameterSet[map];
+	if(p.initialized && (p.handleSelector == cs || p.freeSelector == cs))
+	{
+		nlMakeCurrent(p.nlContext) ;
+		nlReset(NL_FALSE) ;
+	}
 }
 
 

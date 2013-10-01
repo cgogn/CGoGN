@@ -137,7 +137,7 @@ void View::linkMap(MapHandlerGen* map)
 		updateGL();
 
 		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
-		connect(map, SIGNAL(selectedCellsChanged()), this, SLOT(updateGL()));
+		connect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
 
 		if(map->isSelectedMap())
 			setManipulatedFrame(map->getFrame());

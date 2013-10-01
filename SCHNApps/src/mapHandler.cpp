@@ -129,7 +129,7 @@ CellSelectorGen* MapHandlerGen::addCellSelector(unsigned int orbit, const QStrin
 	m_cellSelectors[orbit].insert(name, cs);
 	emit(cellSelectorAdded(orbit, name));
 
-	connect(cs, SIGNAL(selectedCellsChanged()), this, SIGNAL(selectedCellsChanged()));
+	connect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));
 
 	return cs;
 }
@@ -154,6 +154,12 @@ CellSelectorGen* MapHandlerGen::getCellSelector(unsigned int orbit, const QStrin
 		return m_cellSelectors[orbit][name];
 	else
 		return NULL;
+}
+
+void MapHandlerGen::selectedCellsChanged()
+{
+	CellSelectorGen* cs = static_cast<CellSelectorGen*>(QObject::sender());
+	emit(selectedCellsChanged(cs));
 }
 
 void MapHandlerGen::updateMutuallyExclusiveSelectors(unsigned int orbit)

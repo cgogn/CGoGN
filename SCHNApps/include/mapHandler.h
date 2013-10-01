@@ -148,6 +148,8 @@ public slots:
 	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
 	const CellSelectorSet& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
 
+	void selectedCellsChanged();
+
 public:
 	template <unsigned int ORBIT>
 	CellSelector<ORBIT>* getCellSelector(const QString& name) const;
@@ -177,7 +179,7 @@ signals:
 
 	void cellSelectorAdded(unsigned int orbit, const QString& name);
 	void cellSelectorRemoved(unsigned int orbit, const QString& name);
-	void selectedCellsChanged();
+	void selectedCellsChanged(CellSelectorGen* cs);
 
 protected:
 	QString m_name;

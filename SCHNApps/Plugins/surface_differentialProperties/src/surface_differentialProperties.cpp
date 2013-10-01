@@ -34,6 +34,9 @@ bool Surface_DifferentialProperties_Plugin::enable()
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
+	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
+		mapAdded(map);
+
 	return true;
 }
 
