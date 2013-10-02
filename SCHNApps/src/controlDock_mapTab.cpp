@@ -157,7 +157,10 @@ void ControlDock_MapTab::selectedSelectorChanged()
 				case VOLUME: items = list_volumeSelectors->selectedItems(); break;
 			}
 			if(!items.empty())
+			{
 				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
+				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
+			}
 		}
 	}
 }

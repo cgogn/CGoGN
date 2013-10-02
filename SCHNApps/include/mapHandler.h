@@ -148,6 +148,7 @@ public slots:
 	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
 	const CellSelectorSet& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
 
+private slots:
 	void selectedCellsChanged();
 
 public:
