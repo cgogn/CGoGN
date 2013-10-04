@@ -174,11 +174,13 @@ void AttributeContainer::clear(bool removeAttrib)
 	for (std::vector<HoleBlockRef*>::iterator it = m_holesBlocks.begin(); it != m_holesBlocks.end(); ++it)
 		delete (*it);
 
-	std::vector<HoleBlockRef*> bf;
-	m_holesBlocks.swap(bf);
+	{ // add bracket just for scope of temporary vectors
+		std::vector<HoleBlockRef*> bf;
+		m_holesBlocks.swap(bf);
 
-	std::vector<unsigned int> bwf;
-	m_tableBlocksWithFree.swap(bwf);
+		std::vector<unsigned int> bwf;
+		m_tableBlocksWithFree.swap(bwf);
+	}
 
 	// detruit les données
 	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)

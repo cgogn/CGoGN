@@ -185,7 +185,7 @@ void Drawer::callList(float opacity)
 	{
 		if (pp->mode == GL_POINTS)
 			glPointSize(pp->width);
-		if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+		if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
 			glLineWidth(pp->width);
 		glDrawArrays(pp->mode, pp->begin, pp->nb);
 	}
@@ -206,7 +206,7 @@ void Drawer::callSubList(int index, float opacity)
 
 	if (pp->mode == GL_POINTS)
 		glPointSize(pp->width);
-	if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+	if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
 		glLineWidth(pp->width);
 	glDrawArrays(pp->mode, pp->begin, pp->nb);
 
@@ -226,7 +226,7 @@ void Drawer::callSubLists(int first, int nb, float opacity)
 
 			if (pp->mode == GL_POINTS)
 				glPointSize(pp->width);
-			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
 				glLineWidth(pp->width);
 			glDrawArrays(pp->mode, pp->begin, pp->nb);
 		}
@@ -247,7 +247,7 @@ void Drawer::callSubLists(std::vector<int> indices, float opacity)
 
 			if (pp->mode == GL_POINTS)
 				glPointSize(pp->width);
-			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
 				glLineWidth(pp->width);
 			glDrawArrays(pp->mode, pp->begin, pp->nb);
 		}

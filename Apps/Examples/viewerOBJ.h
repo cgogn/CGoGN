@@ -77,6 +77,8 @@ public:
 	Utils::ShaderPhongTexture* m_shader2;
 	Utils::ShaderPhong* m_phongShader;
 
+	int m_RenderStyle;
+
 	ObjView();
 
 	~ObjView();
@@ -87,6 +89,9 @@ public:
 	void cb_redraw();
 
 	void cb_initGL();
+
+	void cb_keyPress(int k);
+
 
 };
 
