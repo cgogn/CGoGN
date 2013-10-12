@@ -75,17 +75,17 @@ void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 template <typename PFP>
 void MapHandler<PFP>::drawBB()
 {
-	if(!m_bbDrawer)
-	{
-		m_bbDrawer = new Utils::Drawer();
-		updateBBDrawer();
-	}
+//	if(!m_bbDrawer)
+//	{
+//		m_bbDrawer = new Utils::Drawer();
+//		updateBBDrawer();
+//	}
 
-	glPushMatrix();
-	glMultMatrixd(m_frame->matrix());
-//	QGLViewer::drawAxis();
-	m_bbDrawer->callList();
-	glPopMatrix();
+//	glPushMatrix();
+//	glMultMatrixd(m_frame->matrix());
+////	QGLViewer::drawAxis();
+//	m_bbDrawer->callList();
+//	glPopMatrix();
 }
 
 template <typename PFP>
@@ -96,46 +96,46 @@ void MapHandler<PFP>::updateBB(const VertexAttribute<typename PFP::VEC3>& positi
 	m_bbMax = qglviewer::Vec(m_bb.max()[0], m_bb.max()[1], m_bb.max()[2]);
 	m_bbDiagSize = (m_bbMax - m_bbMin).norm();
 
-	updateBBDrawer();
+//	updateBBDrawer();
 }
 
 template <typename PFP>
 void MapHandler<PFP>::updateBBDrawer()
 {
-	if(!m_bbDrawer)
-		m_bbDrawer = new Utils::Drawer();
+//	if(!m_bbDrawer)
+//		m_bbDrawer = new Utils::Drawer();
 
-	const Geom::Vec3f& bbmin = m_bb.min();
-	const Geom::Vec3f& bbmax = m_bb.max();
+//	const Geom::Vec3f& bbmin = m_bb.min();
+//	const Geom::Vec3f& bbmax = m_bb.max();
 
-	m_bbDrawer->newList(GL_COMPILE);
-	m_bbDrawer->color3f(0.0f,1.0f,0.0f);
-	m_bbDrawer->lineWidth(1.0f);
-	m_bbDrawer->begin(GL_LINE_LOOP);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->end();
-	m_bbDrawer->begin(GL_LINE_LOOP);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->end();
-	m_bbDrawer->begin(GL_LINES);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->end();
-	m_bbDrawer->endList();
+//	m_bbDrawer->newList(GL_COMPILE);
+//	m_bbDrawer->color3f(0.0f,1.0f,0.0f);
+//	m_bbDrawer->lineWidth(1.0f);
+//	m_bbDrawer->begin(GL_LINE_LOOP);
+//	m_bbDrawer->vertex(bbmin);
+//	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
+//	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
+//	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
+//	m_bbDrawer->vertex(bbmin);
+//	m_bbDrawer->end();
+//	m_bbDrawer->begin(GL_LINE_LOOP);
+//	m_bbDrawer->vertex(bbmax);
+//	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
+//	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
+//	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
+//	m_bbDrawer->vertex(bbmax);
+//	m_bbDrawer->end();
+//	m_bbDrawer->begin(GL_LINES);
+//	m_bbDrawer->vertex(bbmin);
+//	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
+//	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
+//	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
+//	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
+//	m_bbDrawer->vertex(bbmax);
+//	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
+//	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
+//	m_bbDrawer->end();
+//	m_bbDrawer->endList();
 }
 
 } // namespace SCHNApps
