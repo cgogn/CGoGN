@@ -49,6 +49,8 @@ void Surface_Modelisation_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHan
 void Surface_Modelisation_Plugin::mapAdded(MapHandlerGen* map)
 {
 	connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
+	connect(map, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(cellSelectorAdded(unsigned int, const QString&)));
+	connect(map, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(cellSelectorRemoved(unsigned int, const QString&)));
 }
 
 void Surface_Modelisation_Plugin::mapRemoved(MapHandlerGen* map)
@@ -65,6 +67,48 @@ void Surface_Modelisation_Plugin::attributeAdded(unsigned int orbit, const QStri
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 	if(orbit == VERTEX && map->isSelectedMap())
 		m_dockTab->addVertexAttribute(name);
+}
+
+void Surface_Modelisation_Plugin::cellSelectorAdded(unsigned int orbit, const QString& name)
+{
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+
+	if(map->isSelectedMap())
+	{
+		switch(orbit)
+		{
+			case VERTEX :
+				m_dockTab->addVertexSelector(name);
+				break;
+			case EDGE :
+				m_dockTab->addEdgeSelector(name);
+				break;
+			case FACE :
+				m_dockTab->addFaceSelector(name);
+				break;
+		}
+	}
+}
+
+void Surface_Modelisation_Plugin::cellSelectorRemoved(unsigned int orbit, const QString& name)
+{
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+
+	if(map->isSelectedMap())
+	{
+		switch(orbit)
+		{
+			case VERTEX :
+				m_dockTab->removeVertexSelector(name);
+				break;
+			case EDGE :
+				m_dockTab->removeEdgeSelector(name);
+				break;
+			case FACE :
+				m_dockTab->removeFaceSelector(name);
+				break;
+		}
+	}
 }
 
 
@@ -122,7 +166,22 @@ void Surface_Modelisation_Plugin::changeFaceSelector(const QString& map, const Q
 
 
 
-void Surface_Modelisation_Plugin::createCube(MapHandlerGen *mhg)
+void Surface_Modelisation_Plugin::createEmptyMap()
+{
+	MapHandlerGen* mhg = m_schnapps->addMap("map", 2);
+	if(mhg)
+	{
+		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
+
+		// add vertex position attribute
+		VertexAttribute<PFP2::VEC3> position = mh->addAttribute<PFP2::VEC3, VERTEX>("position");
+
+		// update corresponding VBO & emit attribute update signal
+		mh->notifyAttributeModification(position);
+	}
+}
+
+void Surface_Modelisation_Plugin::addCube(MapHandlerGen *mhg)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 	PFP2::MAP* map = mh->getMap();
@@ -133,6 +192,9 @@ void Surface_Modelisation_Plugin::createCube(MapHandlerGen *mhg)
 
 	mh->notifyAttributeModification(position);
 	mh->notifyConnectivityModification();
+
+	// compute map bounding box
+	mh->updateBB(position);
 }
 
 void Surface_Modelisation_Plugin::flipEdge(MapHandlerGen *mhg)

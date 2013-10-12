@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>259</width>
+    <width>345</width>
     <height>600</height>
    </rect>
   </property>
@@ -14,89 +14,14 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0" colspan="3">
-    <widget class="QLabel" name="label_3">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Vertex selector :</string>
+      <string>Position :</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Edge selector :</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2" colspan="3">
-    <widget class="QComboBox" name="combo_edgeSelector">
-     <item>
-      <property name="text">
-       <string>- select selector -</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Face selector :</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2" colspan="3">
-    <widget class="QComboBox" name="combo_faceSelector">
-     <item>
-      <property name="text">
-       <string>- select selector -</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="5">
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3" colspan="2">
-    <widget class="QComboBox" name="combo_vertexSelector">
-     <item>
-      <property name="text">
-       <string>- select selector -</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="5">
-    <widget class="QPushButton" name="button_createCube">
-     <property name="text">
-      <string>Create cube</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="5">
-    <widget class="QPushButton" name="button_flipEdge">
-     <property name="text">
-      <string>Flip edge</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="2" colspan="3">
+   <item row="0" column="1" colspan="3">
     <widget class="QComboBox" name="combo_positionAttribute">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -111,12 +36,94 @@
      </item>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="label_2">
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Position :</string>
+      <string>Vertex selector :</string>
      </property>
     </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QComboBox" name="combo_vertexSelector">
+     <item>
+      <property name="text">
+       <string>- select selector -</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Edge selector :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="3">
+    <widget class="QComboBox" name="combo_edgeSelector">
+     <item>
+      <property name="text">
+       <string>- select selector -</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Face selector :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="3">
+    <widget class="QComboBox" name="combo_faceSelector">
+     <item>
+      <property name="text">
+       <string>- select selector -</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="4">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="4">
+    <widget class="QPushButton" name="button_createEmptyMap">
+     <property name="text">
+      <string>Create empty map</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="4">
+    <widget class="QPushButton" name="button_addCube">
+     <property name="text">
+      <string>Add cube</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="4">
+    <widget class="QPushButton" name="button_flipEdge">
+     <property name="text">
+      <string>Flip edge</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

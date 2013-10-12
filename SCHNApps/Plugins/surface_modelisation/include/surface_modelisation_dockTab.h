@@ -33,11 +33,18 @@ private slots:
 	void edgeSelectorChanged(int index);
 	void faceSelectorChanged(int index);
 
-	void createCubeButtonClicked();
+	void createEmptyMapButtonClicked();
+	void addCubeButtonClicked();
 	void flipEdgeButtonClicked();
 
 private:
 	void addVertexAttribute(const QString& name);
+	void addVertexSelector(const QString& name);
+	void removeVertexSelector(const QString& name);
+	void addEdgeSelector(const QString& name);
+	void removeEdgeSelector(const QString& name);
+	void addFaceSelector(const QString& name);
+	void removeFaceSelector(const QString& name);
 
 	void updateMapParameters();
 };

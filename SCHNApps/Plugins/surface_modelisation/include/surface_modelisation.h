@@ -75,7 +75,8 @@ public slots:
 	void changeFaceSelector(const QString& map, const QString& name);
 
 protected:
-	void createCube(MapHandlerGen* mhg);
+	void createEmptyMap();
+	void addCube(MapHandlerGen* mhg);
 	void flipEdge(MapHandlerGen* mhg);
 
 protected:
