@@ -81,26 +81,26 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 					m_drawer->vertex(p.positionAttribute[*it]);
 				m_drawer->end();
 				m_drawer->endList();
+
+				if(m_selecting)
+				{
+					std::vector<PFP2::VEC3> selectionPoint;
+					selectionPoint.push_back(m_selectionCenter);
+					m_selectionSphereVBO->updateData(selectionPoint);
+
+					m_pointSprite->setAttributePosition(m_selectionSphereVBO);
+					m_pointSprite->setSize(m_selectionRadius);
+					m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+					m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+
+					m_pointSprite->enableVertexAttribs();
+					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+					glDrawArrays(GL_POINTS, 0, 1);
+					glDisable(GL_BLEND);
+					m_pointSprite->disableVertexAttribs();
+				}
 			}
-		}
-
-		if(m_selecting)
-		{
-			std::vector<PFP2::VEC3> selectionPoint;
-			selectionPoint.push_back(m_selectionCenter);
-			m_selectionSphereVBO->updateData(selectionPoint);
-
-			m_pointSprite->setAttributePosition(m_selectionSphereVBO);
-			m_pointSprite->setSize(m_selectionRadius);
-			m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
-			m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-
-			m_pointSprite->enableVertexAttribs();
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glDrawArrays(GL_POINTS, 0, 1);
-			glDisable(GL_BLEND);
-			m_pointSprite->disableVertexAttribs();
 		}
 	}
 }
@@ -111,7 +111,7 @@ void Surface_Selection_Plugin::keyPress(View* view, QKeyEvent* event)
 	{
 		view->setMouseTracking(true);
 		m_selecting = true;
-//		view->updateGL();
+		view->updateGL();
 	}
 }
 
@@ -121,7 +121,7 @@ void Surface_Selection_Plugin::keyRelease(View* view, QKeyEvent* event)
 	{
 		view->setMouseTracking(false);
 		m_selecting = false;
-//		view->updateGL();
+		view->updateGL();
 	}
 }
 

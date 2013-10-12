@@ -51,6 +51,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_controlDockTabWidget->setObjectName("ControlDockTabWidget");
 	m_controlDockTabWidget->setLayoutDirection(Qt::LeftToRight);
 	m_controlDockTabWidget->setTabPosition(QTabWidget::North);
+	m_controlDockTabWidget->setMovable(true);
 
 	addDockWidget(Qt::LeftDockWidgetArea, m_controlDock);
 	m_controlDock->setVisible(true);
@@ -77,6 +78,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_pluginDockTabWidget->setObjectName("PluginDockTabWidget");
 	m_pluginDockTabWidget->setLayoutDirection(Qt::LeftToRight);
 	m_pluginDockTabWidget->setTabPosition(QTabWidget::East);
+	m_pluginDockTabWidget->setMovable(true);
 
 	addDockWidget(Qt::RightDockWidgetArea, m_pluginDock);
 	m_pluginDock->setVisible(false);

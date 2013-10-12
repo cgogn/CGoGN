@@ -18,8 +18,8 @@ Surface_Deformation_DockTab::Surface_Deformation_DockTab(SCHNApps* s, Surface_De
 	setupUi(this);
 
 	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
-	connect(combo_lockedSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(lockedSelectorChanged(int)));
 	connect(combo_handleSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(handleSelectorChanged(int)));
+	connect(combo_freeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(freeSelectorChanged(int)));
 	connect(button_start_stop, SIGNAL(clicked()), this, SLOT(startStopButtonClicked()));
 }
 
@@ -42,16 +42,6 @@ void Surface_Deformation_DockTab::positionAttributeChanged(int index)
 	}
 }
 
-void Surface_Deformation_DockTab::lockedSelectorChanged(int index)
-{
-	if(!b_updatingUI)
-	{
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(map)
-			m_plugin->h_parameterSet[map].lockedSelector = map->getCellSelector<VERTEX>(combo_lockedSelector->currentText());
-	}
-}
-
 void Surface_Deformation_DockTab::handleSelectorChanged(int index)
 {
 	if(!b_updatingUI)
@@ -59,6 +49,16 @@ void Surface_Deformation_DockTab::handleSelectorChanged(int index)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
 			m_plugin->h_parameterSet[map].handleSelector = map->getCellSelector<VERTEX>(combo_handleSelector->currentText());
+	}
+}
+
+void Surface_Deformation_DockTab::freeSelectorChanged(int index)
+{
+	if(!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(map)
+			m_plugin->h_parameterSet[map].freeSelector = map->getCellSelector<VERTEX>(combo_freeSelector->currentText());
 	}
 }
 
@@ -89,25 +89,25 @@ void Surface_Deformation_DockTab::addVertexAttribute(const QString& name)
 void Surface_Deformation_DockTab::addVertexSelector(const QString& name)
 {
 	b_updatingUI = true;
-	combo_lockedSelector->addItem(name);
 	combo_handleSelector->addItem(name);
+	combo_freeSelector->addItem(name);
 	b_updatingUI = false;
 }
 
 void Surface_Deformation_DockTab::removeVertexSelector(const QString& name)
 {
 	b_updatingUI = true;
-	int curIndex = combo_lockedSelector->currentIndex();
-	int index = combo_lockedSelector->findText(name, Qt::MatchExactly);
-	if(curIndex == index)
-		combo_lockedSelector->setCurrentIndex(0);
-	combo_lockedSelector->removeItem(index);
-
-	curIndex = combo_handleSelector->currentIndex();
-	index = combo_handleSelector->findText(name, Qt::MatchExactly);
+	int curIndex = combo_handleSelector->currentIndex();
+	int index = combo_handleSelector->findText(name, Qt::MatchExactly);
 	if(curIndex == index)
 		combo_handleSelector->setCurrentIndex(0);
 	combo_handleSelector->removeItem(index);
+
+	curIndex = combo_freeSelector->currentIndex();
+	index = combo_freeSelector->findText(name, Qt::MatchExactly);
+	if(curIndex == index)
+		combo_freeSelector->setCurrentIndex(0);
+	combo_freeSelector->removeItem(index);
 	b_updatingUI = false;
 }
 
@@ -115,8 +115,8 @@ void Surface_Deformation_DockTab::mapParametersInitialized(bool b)
 {
 	b_updatingUI = true;
 	combo_positionAttribute->setEnabled(!b);
-	combo_lockedSelector->setEnabled(!b);
 	combo_handleSelector->setEnabled(!b);
+	combo_freeSelector->setEnabled(!b);
 	if(b) button_start_stop->setText("Stop");
 	else button_start_stop->setText("Start");
 	b_updatingUI = false;
@@ -128,10 +128,10 @@ void Surface_Deformation_DockTab::updateMapParameters()
 
 	combo_positionAttribute->clear();
 	combo_positionAttribute->addItem("- select attribute -");
-	combo_lockedSelector->clear();
-	combo_lockedSelector->addItem("- select selector -");
 	combo_handleSelector->clear();
 	combo_handleSelector->addItem("- select selector -");
+	combo_freeSelector->clear();
+	combo_freeSelector->addItem("- select selector -");
 
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
 
@@ -159,13 +159,13 @@ void Surface_Deformation_DockTab::updateMapParameters()
 		const CellSelectorSet& selectors = map->getCellSelectorSet(VERTEX);
 		for(CellSelectorSet::const_iterator it = selectors.constBegin(); it != selectors.constEnd(); ++it)
 		{
-			combo_lockedSelector->addItem(it.key());
-			if(p.lockedSelector && it.key() == p.lockedSelector->getName())
-				combo_lockedSelector->setCurrentIndex(i);
-
 			combo_handleSelector->addItem(it.key());
 			if(p.handleSelector && it.key() == p.handleSelector->getName())
 				combo_handleSelector->setCurrentIndex(i);
+
+			combo_freeSelector->addItem(it.key());
+			if(p.freeSelector && it.key() == p.freeSelector->getName())
+				combo_freeSelector->setCurrentIndex(i);
 
 			++i;
 		}

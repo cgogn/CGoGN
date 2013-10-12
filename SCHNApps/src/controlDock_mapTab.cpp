@@ -28,22 +28,27 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
 
 	connect(list_dartSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_dartSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
 	connect(button_dartAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
 	connect(button_dartRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
 
 	connect(list_vertexSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_vertexSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
 	connect(button_vertexAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
 	connect(button_vertexRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
 
 	connect(list_edgeSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_edgeSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
 	connect(button_edgeAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
 	connect(button_edgeRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
 
 	connect(list_faceSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_faceSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
 	connect(button_faceAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
 	connect(button_faceRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
 
 	connect(list_volumeSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_volumeSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
 	connect(button_volumeAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
 	connect(button_volumeRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
 }
@@ -152,7 +157,24 @@ void ControlDock_MapTab::selectedSelectorChanged()
 				case VOLUME: items = list_volumeSelectors->selectedItems(); break;
 			}
 			if(!items.empty())
+			{
 				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
+				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
+			}
+		}
+	}
+}
+
+void ControlDock_MapTab::selectorCheckStateChanged(QListWidgetItem* item)
+{
+	if(!b_updatingUI)
+	{
+		if(m_selectedMap)
+		{
+			unsigned int orbit = getCurrentOrbit();
+			CellSelectorGen* cs = m_selectedMap->getCellSelector(orbit, item->text());
+			cs->setMutuallyExclusive(item->checkState() == Qt::Checked);
+			m_selectedMap->updateMutuallyExclusiveSelectors(orbit);
 		}
 	}
 }
@@ -327,73 +349,58 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 	for(unsigned int orbit = DART; orbit <= VOLUME; ++orbit)
 	{
 		unsigned int nbc = m->getNbCells(orbit);
+
+		QListWidget* selectorList = NULL;
+
 		switch(orbit)
 		{
 			case DART : {
 				unsigned int nb = m->getNbDarts();
 				label_dartNbOrbits->setText(QString::number(nb));
 				label_dartNbCells->setText(QString::number(nbc));
-				foreach(CellSelectorGen* cs, m_selectedMap->getCellSelectorSet(orbit).values())
-				{
-					QListWidgetItem* item = new QListWidgetItem(cs->getName(), list_dartSelectors);
-					item->setFlags(item->flags() | Qt::ItemIsEditable);
-					if(m_selectedSelector[orbit] == cs)
-						item->setSelected(true);
-				}
+				selectorList = list_dartSelectors;
 				break;
 			}
 			case VERTEX : {
 				unsigned int nb = m->getNbOrbits<VERTEX>();
 				label_vertexNbOrbits->setText(QString::number(nb));
 				label_vertexNbCells->setText(QString::number(nbc));
-				foreach(CellSelectorGen* cs, m_selectedMap->getCellSelectorSet(orbit).values())
-				{
-					QListWidgetItem* item = new QListWidgetItem(cs->getName(), list_vertexSelectors);
-					item->setFlags(item->flags() | Qt::ItemIsEditable);
-					if(m_selectedSelector[orbit] == cs)
-						item->setSelected(true);
-				}
+				selectorList = list_vertexSelectors;
 				break;
 			}
 			case EDGE : {
 				unsigned int nb = m->getNbOrbits<EDGE>();
 				label_edgeNbOrbits->setText(QString::number(nb));
 				label_edgeNbCells->setText(QString::number(nbc));
-				foreach(CellSelectorGen* cs, m_selectedMap->getCellSelectorSet(orbit).values())
-				{
-					QListWidgetItem* item = new QListWidgetItem(cs->getName(), list_edgeSelectors);
-					item->setFlags(item->flags() | Qt::ItemIsEditable);
-					if(m_selectedSelector[orbit] == cs)
-						item->setSelected(true);
-				}
+				selectorList = list_edgeSelectors;
 				break;
 			}
 			case FACE : {
 				unsigned int nb = m->getNbOrbits<FACE>();
 				label_faceNbOrbits->setText(QString::number(nb));
 				label_faceNbCells->setText(QString::number(nbc));
-				foreach(CellSelectorGen* cs, m_selectedMap->getCellSelectorSet(orbit).values())
-				{
-					QListWidgetItem* item = new QListWidgetItem(cs->getName(), list_faceSelectors);
-					item->setFlags(item->flags() | Qt::ItemIsEditable);
-					if(m_selectedSelector[orbit] == cs)
-						item->setSelected(true);
-				}
+				selectorList = list_faceSelectors;
 				break;
 			}
 			case VOLUME : {
 				unsigned int nb = m->getNbOrbits<VOLUME>();
 				label_volumeNbOrbits->setText(QString::number(nb));
 				label_volumeNbCells->setText(QString::number(nbc));
-				foreach(CellSelectorGen* cs, m_selectedMap->getCellSelectorSet(orbit).values())
-				{
-					QListWidgetItem* item = new QListWidgetItem(cs->getName(), list_volumeSelectors);
-					item->setFlags(item->flags() | Qt::ItemIsEditable);
-					if(m_selectedSelector[orbit] == cs)
-						item->setSelected(true);
-				}
+				selectorList = list_volumeSelectors;
 				break;
 			}
+		}
+
+		foreach(CellSelectorGen* cs, m_selectedMap->getCellSelectorSet(orbit).values())
+		{
+			QListWidgetItem* item = new QListWidgetItem(cs->getName(), selectorList);
+			item->setFlags(item->flags() | Qt::ItemIsEditable);
+			if(m_selectedSelector[orbit] == cs)
+				item->setSelected(true);
+			if(cs->isMutuallyExclusive())
+				item->setCheckState(Qt::Checked);
+			else
+				item->setCheckState(Qt::Unchecked);
 		}
 
 		if(m->isOrbitEmbedded(orbit))

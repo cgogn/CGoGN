@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>180</width>
+    <width>207</width>
     <height>545</height>
    </rect>
   </property>
@@ -14,6 +14,15 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="6" column="0" colspan="2">
+    <widget class="QComboBox" name="combo_freeSelector">
+     <item>
+      <property name="text">
+       <string>- select selector -</string>
+      </property>
+     </item>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
@@ -21,49 +30,11 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="0" colspan="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>156</width>
-       <height>161</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Locked selector :</string>
+      <string>Free vertices selector :</string>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QComboBox" name="combo_lockedSelector">
-     <item>
-      <property name="text">
-       <string>- select selector -</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Handle selector :</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QComboBox" name="combo_handleSelector">
-     <item>
-      <property name="text">
-       <string>- select selector -</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="0" column="1">
@@ -81,17 +52,46 @@
      </item>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2">
+   <item row="9" column="0" colspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
+   <item row="10" column="0" colspan="2">
     <widget class="QPushButton" name="button_start_stop">
      <property name="text">
       <string>Start</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QComboBox" name="combo_handleSelector">
+     <item>
+      <property name="text">
+       <string>- select selector -</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="11" column="0" colspan="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>156</width>
+       <height>161</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Handle vertices selector :</string>
      </property>
     </widget>
    </item>

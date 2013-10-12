@@ -98,6 +98,7 @@ public slots:
 	MapHandlerGen* getSelectedMap() const;
 
 	unsigned int getCurrentOrbit() const;
+	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { emit(selectedCellSelectorChanged(cs)); }
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
 
 	/*********************************************************
@@ -140,6 +141,7 @@ signals:
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
 	void selectedMapChanged(MapHandlerGen* old, MapHandlerGen* cur);
+	void selectedCellSelectorChanged(CellSelectorGen* cs);
 
 	void pluginAvailableAdded(QString name);
 	void pluginEnabled(Plugin* plugin);

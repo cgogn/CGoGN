@@ -35,6 +35,7 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	m_currentCamera = m_schnapps->addCamera();
 
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateGL()));
 }
 
 View::~View()
@@ -137,9 +138,9 @@ void View::linkMap(MapHandlerGen* map)
 		updateGL();
 
 		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
-		connect(map, SIGNAL(selectedCellsChanged()), this, SLOT(updateGL()));
+		connect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
 
-		if(map == m_schnapps->getSelectedMap())
+		if(map->isSelectedMap())
 			setManipulatedFrame(map->getFrame());
 	}
 }
@@ -162,7 +163,7 @@ void View::unlinkMap(MapHandlerGen* map)
 		updateGL();
 
 		disconnect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
-		disconnect(map, SIGNAL(selectedCellsChanged()), this, SLOT(updateGL()));
+		disconnect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
 
 		if(map == m_schnapps->getSelectedMap())
 			setManipulatedFrame(NULL);
