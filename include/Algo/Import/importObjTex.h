@@ -28,6 +28,7 @@
 #include "Container/containerBrowser.h"
 #include "Topology/generic/cellmarker.h"
 #include "Utils/textures.h"
+#include "Geometry/bounding_box.h"
 
 namespace CGoGN
 {
@@ -92,13 +93,13 @@ protected:
 
 	std::vector<unsigned int> m_beginIndices;
 	std::vector<unsigned int> m_nbIndices;
+	std::vector<unsigned int> m_groupIdx;
+
+	std::vector<unsigned int> m_objGroups;
+	std::vector<std::string> m_groupNames;
+	std::vector< Geom::BoundingBox<VEC3> > m_groupBBs;
 
 	unsigned int m_maxTextureSize;
-
-	/// vector of group name
-//	std::vector<std::string> m_groupNames;
-//	std::vector<std::string> m_groupMaterialNames;
-//	std::vector<int> m_groupMaterialID;
 
 	/// map of material names -> group id
 	std::map<std::string,int> m_materialNames;
@@ -120,6 +121,9 @@ protected:
 	unsigned int m_tagVN ;
 	unsigned int m_tagG ;
 	unsigned int m_tagF ;
+
+
+	void updateGroups(const std::vector<Geom::Vec3f>& pos);
 
 public:
 
@@ -267,6 +271,30 @@ public:
 	 * @return number of indices
 	 */
 	unsigned int nbIndices(unsigned int i) const { return m_nbIndices[i]; }
+
+	/**
+	 * @brief get the id of group in OBJ file
+	 * @param i id of group
+	 * @return obj group index
+	 */
+	unsigned int groupIdx(unsigned int i) const { return m_groupIdx[i]; }
+
+	/**
+	 * @brief get the number of groups in OBJ file
+	 * @return number of groups
+	 */
+	unsigned int nbObjGroups() { return m_objGroups.size()-1; }
+
+	/**
+	 * @brief get the index of first group mat of obj
+	 * @param i id of obj group
+	 * @return id of first group mat
+	 */
+	unsigned int objGroup(unsigned int i) const { return m_objGroups[i]; }
+
+	const Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) const { return m_groupBBs[i];}
+
+	const std::string& objGroupName(unsigned int i) const { return m_groupNames[i];}
 
 	/**
 	 * @brief create simple VBO for separated triangles

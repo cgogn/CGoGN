@@ -653,12 +653,17 @@ bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
 	unsigned int sz = group_faces.size();
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
-
+	m_groupIdx.resize(sz);
 
 	for (unsigned int g=0; g<sz; ++g)
 	{
 		unsigned int nbtris = 0;
 		std::vector<Dart>& traf = group_faces[g];
+
+		if (m_tagG != 0)
+			m_groupIdx[g] = m_groups[traf.front()];
+		else
+			m_groupIdx[g]=0;
 
 		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
 		{
@@ -684,6 +689,8 @@ bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
+
+	updateGroups();
 
 	return true;
 }
@@ -714,12 +721,17 @@ bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* te
 	unsigned int sz = group_faces.size();
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
-
+	m_groupIdx.resize(sz);
 
 	for (unsigned int g=0; g<sz; ++g)
 	{
 		unsigned int nbtris = 0;
 		std::vector<Dart>& traf = group_faces[g];
+
+		if (m_tagG != 0)
+			m_groupIdx[g] = m_groups[traf.front()];
+		else
+			m_groupIdx[g]=0;
 
 		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
 		{
@@ -768,6 +780,8 @@ bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* te
 	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
 	texcoordVBO->releasePtr();
 
+	updateGroups();
+
 	return true;
 }
 
@@ -800,12 +814,17 @@ bool OBJModel<PFP>::createGroupMatVBO_PN(Utils::VBO* positionVBO, Utils::VBO* no
 	unsigned int sz = group_faces.size();
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
-
+	m_groupIdx.resize(sz);
 
 	for (unsigned int g=0; g<sz; ++g)
 	{
 		unsigned int nbtris = 0;
 		std::vector<Dart>& traf = group_faces[g];
+
+		if (m_tagG != 0)
+			m_groupIdx[g] = m_groups[traf.front()];
+		else
+			m_groupIdx[g]=0;
 
 		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
 		{
@@ -866,6 +885,8 @@ bool OBJModel<PFP>::createGroupMatVBO_PN(Utils::VBO* positionVBO, Utils::VBO* no
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
 
+	updateGroups();
+
 	return true;
 }
 
@@ -913,11 +934,17 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
 
+	m_groupIdx.resize(sz);
 
 	for (unsigned int g=0; g<sz; ++g)
 	{
 		unsigned int nbtris = 0;
 		std::vector<Dart>& traf = group_faces[g];
+
+		if (m_tagG != 0)
+			m_groupIdx[g] = m_groups[traf.front()];
+		else
+			m_groupIdx[g]=0;
 
 		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
 		{
@@ -1010,8 +1037,40 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
 
+	updateGroups(posBuff);
+
 	return true;
 }
+
+
+
+template <typename PFP>
+void OBJModel<PFP>::updateGroups(const std::vector<Geom::Vec3f>& pos)
+{
+	unsigned int sz = m_beginIndices.size();
+	unsigned int i=0;
+	do
+	{
+		m_objGroups.push_back(i);
+		m_groupBBs.resize(m_objGroups.size());
+		Geom::BoundingBox<VEC3>& bb = m_groupBBs.back();
+
+		unsigned int grp = m_groupIdx[i];
+		while ((i<sz) && (m_groupIdx[i]==grp))
+		{
+			// update BB
+			unsigned int beg = m_beginIndices[i];
+			unsigned int end = m_beginIndices[i] + m_nbIndices[i];
+			for (unsigned int j=beg; j!=end; ++j )
+				bb.addPoint(pos[j]);
+			++i;
+		}
+		bb.centeredScale(1.1);
+	}while (i<sz);
+
+	m_objGroups.push_back(sz);
+}
+
 
 
 
@@ -1043,7 +1102,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			m_tagVN++;
 		if (tag == "vt")
 			m_tagVT++;
-		if (tag == "g")
+		if ((tag == "g") || (tag == "o"))
 			m_tagG++;
 		if (tag == "f")
 			m_tagF++;
@@ -1094,7 +1153,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	}
 
 	
-	if (m_tagG != 0)
+//	if (m_tagG != 0) always use group even if not in the file
 	{
 		m_groups =  m_map.template getAttribute<unsigned int, FACE>("groups") ;
 		if (!m_groups.isValid())
@@ -1207,20 +1266,11 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			}
 		}
 
-//		if (tag == std::string("g"))
-//		{
-//			m_groupNames.push_back(ligne);
-//			std::string buf;
-//			fp >> buf;
-//			if (buf != "usemtl")
-//			{
-//				CGoGNerr << "problem reading OBJ, waiting for usemtl get "<< buf << CGoGNendl;
-//			}
-//			fp >> buf;
-//			m_materialNames.insert(std::pair<std::string,int>(buf,-1));
-//			m_groupMaterialNames.push_back(buf);
-//			currentGroup++;
-//		}
+		if ( (tag == std::string("g")) && (tag == std::string("g")) )
+		{
+			m_groupNames.push_back(ligne);
+			currentGroup++;
+		}
 
 		if (tag == std::string("f"))
 		{
