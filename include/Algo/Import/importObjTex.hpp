@@ -160,7 +160,7 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 			}
 			else
 			{
-				CGoGNout << "Reading material "<< name << CGoGNendl;
+//				CGoGNout << "Reading material "<< name << CGoGNendl;
 				currentMat = new MaterialOBJ();
 				m_materials[it->second] = currentMat;
 				currentMat->name = name;
@@ -221,7 +221,7 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 						tname = tname.substr(0,tname.length()-1);
 
 					currentMat->textureDiffuse->load(m_matPath+tname);
-					CGoGNout << "Loading texture "<< m_matPath+tname << " -> "<<std::hex << currentMat->textureDiffuse <<std::dec<<CGoGNendl;
+//					CGoGNout << "Loading texture "<< m_matPath+tname << " -> "<<std::hex << currentMat->textureDiffuse <<std::dec<<CGoGNendl;
 					currentMat->textureDiffuse->scaleNearest( currentMat->textureDiffuse->newMaxSize(m_maxTextureSize));
 					currentMat->textureDiffuse->setFiltering(GL_LINEAR);
 					currentMat->textureDiffuse->setWrapping(GL_REPEAT);
@@ -1256,17 +1256,17 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			{
 				m_materialNames.insert(std::pair<std::string,int>(matName,nextMat));
 				currentMat = nextMat++;
-				std::cout << "New Material Name = "<< matName << "  index = "<< currentMat << std::endl;
+//				std::cout << "New Material Name = "<< matName << "  index = "<< currentMat << std::endl;
 
 			}
 			else
 			{
 				currentMat = it->second;
-				std::cout << "Using Material Name = "<<  matName << "  index = "<< currentMat << std::endl;
+//				std::cout << "Using Material Name = "<<  matName << "  index = "<< currentMat << std::endl;
 			}
 		}
 
-		if ( (tag == std::string("g")) && (tag == std::string("g")) )
+		if ( (tag == std::string("g")) || (tag == std::string("o")) )
 		{
 			m_groupNames.push_back(ligne);
 			currentGroup++;
