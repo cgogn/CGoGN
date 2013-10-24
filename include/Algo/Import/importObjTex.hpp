@@ -1268,7 +1268,8 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 
 		if ( (tag == std::string("g")) || (tag == std::string("o")) )
 		{
-			m_groupNames.push_back(ligne);
+			std::string name = ligne.substr(1);
+			m_groupNames.push_back(name);
 			currentGroup++;
 		}
 
