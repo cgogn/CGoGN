@@ -111,9 +111,12 @@ public:
 
 	void notifyConnectivityModification()
 	{
-		m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
-		m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
-		m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		if (m_render)
+		{
+			m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
+			m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
+			m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		}
 
 		emit(connectivityModified());
 

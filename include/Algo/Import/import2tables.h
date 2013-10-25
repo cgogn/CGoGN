@@ -113,6 +113,8 @@ public:
 	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
 	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
 
+	bool importFromVoxelGrid(const VoxelGrid& grid);
+
 #ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	
