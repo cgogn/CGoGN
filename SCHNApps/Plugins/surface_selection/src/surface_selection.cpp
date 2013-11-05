@@ -25,14 +25,16 @@ bool Surface_Selection_Plugin::enable()
 	m_dockTab = new Surface_Selection_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Selection");
 
-	m_drawer = new Utils::Drawer();
-	m_selectionSphereVBO = new Utils::VBO();
 	m_pointSprite = new CGoGN::Utils::PointSprite();
+	m_drawer = new Utils::Drawer();
+
+	m_selectedVerticesVBO = new Utils::VBO();
+
+	m_selectionSphereVBO = new Utils::VBO();
 
 	registerShader(m_drawer->getShader());
 	registerShader(m_pointSprite);
 
-	connect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
@@ -47,8 +49,9 @@ bool Surface_Selection_Plugin::enable()
 
 void Surface_Selection_Plugin::disable()
 {
-	delete m_selectionSphereVBO;
 	delete m_pointSprite;
+	delete m_selectedVerticesVBO;
+	delete m_selectionSphereVBO;
 
 	disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
 	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
@@ -64,7 +67,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	if(map->isSelectedMap())
 	{
-		const MapParameters& p = h_viewParameterSet[view][map];
+		const MapParameters& p = h_parameterSet[map];
 		if(p.positionAttribute.isValid())
 		{
 			unsigned int orbit = m_schnapps->getCurrentOrbit();
@@ -72,33 +75,58 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 			if(selector)
 			{
 				const std::vector<Dart>& selectedCells = selector->getSelectedCells();
-
-				m_drawer->newList(GL_COMPILE_AND_EXECUTE);
-				m_drawer->pointSize(3.0f);
-				m_drawer->color3f(0.0f, 0.0f, 1.0f);
-				m_drawer->begin(GL_POINTS);
-				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
-					m_drawer->vertex(p.positionAttribute[*it]);
-				m_drawer->end();
-				m_drawer->endList();
-
-				if(m_selecting)
+				switch(orbit)
 				{
-					std::vector<PFP2::VEC3> selectionPoint;
-					selectionPoint.push_back(m_selectionCenter);
-					m_selectionSphereVBO->updateData(selectionPoint);
+					case VERTEX : {
+						m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
+						m_pointSprite->setSize(map->getBBdiagSize() / 500.0f);
+						m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+						m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
 
-					m_pointSprite->setAttributePosition(m_selectionSphereVBO);
-					m_pointSprite->setSize(m_selectionRadius);
-					m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
-					m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+						m_pointSprite->enableVertexAttribs();
+						glEnable(GL_BLEND);
+						glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+						glDrawArrays(GL_POINTS, 0, selectedCells.size());
+						glDisable(GL_BLEND);
+						m_pointSprite->disableVertexAttribs();
 
-					m_pointSprite->enableVertexAttribs();
-					glEnable(GL_BLEND);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					glDrawArrays(GL_POINTS, 0, 1);
-					glDisable(GL_BLEND);
-					m_pointSprite->disableVertexAttribs();
+						if(m_selecting)
+						{
+							std::vector<PFP2::VEC3> selectionPoint;
+							selectionPoint.push_back(m_selectionCenter);
+							m_selectionSphereVBO->updateData(selectionPoint);
+
+							m_pointSprite->setAttributePosition(m_selectionSphereVBO);
+							m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+
+							switch(p.selectionMethod)
+							{
+								case SingleCell : {
+									m_pointSprite->setSize(map->getBBdiagSize() / 250.0f);
+									break;
+								}
+								case WithinSphere : {
+									m_pointSprite->setSize(m_selectionRadius);
+									break;
+								}
+							}
+
+							m_pointSprite->enableVertexAttribs();
+							glEnable(GL_BLEND);
+							glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+							glDrawArrays(GL_POINTS, 0, 1);
+							glDisable(GL_BLEND);
+							m_pointSprite->disableVertexAttribs();
+						}
+						break;
+					}
+					case EDGE : {
+						break;
+					}
+					case FACE : {
+						break;
+					}
 				}
 			}
 		}
@@ -130,53 +158,67 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 	if(m_selecting && (event->button() == Qt::LeftButton || event->button() == Qt::RightButton))
 	{
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
-		const MapParameters& p = h_viewParameterSet[view][mh];
+		const MapParameters& p = h_parameterSet[mh];
 		if(p.positionAttribute.isValid())
 		{
-			QPoint pixel(event->x(), event->y());
-			qglviewer::Vec orig;
-			qglviewer::Vec dir;
-			view->camera()->convertClickToLine(pixel, orig, dir);
+			unsigned int orbit = m_schnapps->getCurrentOrbit();
+			CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
 
-			qglviewer::Vec orig_inv = mh->getFrame()->coordinatesOf(orig);
-			qglviewer::Vec dir_inv = mh->getFrame()->transformOf(dir);
-
-			PFP2::VEC3 rayA(orig_inv.x, orig_inv.y, orig_inv.z);
-			PFP2::VEC3 AB(dir_inv.x, dir_inv.y, dir_inv.z);
-
-			Dart d;
-			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
-			Algo::Selection::vertexRaySelection<PFP2>(*map, p.positionAttribute, rayA, AB, d);
-
-			if(d != NIL)
+			if(selector)
 			{
-				Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
-				neigh.collectAll(d);
+				QPoint pixel(event->x(), event->y());
+				qglviewer::Vec orig;
+				qglviewer::Vec dir;
+				view->camera()->convertClickToLine(pixel, orig, dir);
 
-				unsigned int orbit = m_schnapps->getCurrentOrbit();
-				CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
+				qglviewer::Vec orig_inv = mh->getFrame()->coordinatesOf(orig);
+				qglviewer::Vec dir_inv = mh->getFrame()->transformOf(dir);
 
-				if(selector)
+				PFP2::VEC3 rayA(orig_inv.x, orig_inv.y, orig_inv.z);
+				PFP2::VEC3 AB(dir_inv.x, dir_inv.y, dir_inv.z);
+
+				Dart d;
+				PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
+
+				switch(orbit)
 				{
-					if(event->button() == Qt::LeftButton)
-					{
-						switch(orbit)
+					case VERTEX : {
+						Algo::Selection::vertexRaySelection<PFP2>(*map, p.positionAttribute, rayA, AB, d);
+						if(d != NIL)
 						{
-							case DART: break;
-							case VERTEX: selector->select(neigh.getInsideVertices()); break;
-							case EDGE: selector->select(neigh.getInsideEdges()); break;
-							case FACE: selector->select(neigh.getInsideFaces()); break;
+							switch(p.selectionMethod)
+							{
+								case SingleCell : {
+									if(event->button() == Qt::LeftButton)
+										selector->select(d);
+									else if(event->button() == Qt::RightButton)
+										selector->unselect(d);
+									break;
+								}
+								case WithinSphere : {
+									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
+									neigh.collectAll(d);
+									if(event->button() == Qt::LeftButton)
+										selector->select(neigh.getInsideVertices());
+									else if(event->button() == Qt::RightButton)
+										selector->unselect(neigh.getInsideVertices());
+									break;
+								}
+							}
+
+							const std::vector<Dart>& selectedCells = selector->getSelectedCells();
+							std::vector<PFP2::VEC3> selectedPoints;
+							for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
+								selectedPoints.push_back(p.positionAttribute[*it]);
+							m_selectedVerticesVBO->updateData(selectedPoints);
 						}
+						break;
 					}
-					else if(event->button() == Qt::RightButton)
-					{
-						switch(orbit)
-						{
-							case DART: break;
-							case VERTEX: selector->unselect(neigh.getInsideVertices()); break;
-							case EDGE: selector->unselect(neigh.getInsideEdges()); break;
-							case FACE: selector->unselect(neigh.getInsideFaces()); break;
-						}
+					case EDGE : {
+						break;
+					}
+					case FACE : {
+						break;
 					}
 				}
 			}
@@ -194,7 +236,7 @@ void Surface_Selection_Plugin::mouseMove(View* view, QMouseEvent* event)
 	if(m_selecting)
 	{
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
-		const MapParameters& p = h_viewParameterSet[view][mh];
+		const MapParameters& p = h_parameterSet[mh];
 		if(p.positionAttribute.isValid())
 		{
 			QPoint pixel(event->x(), event->y());
@@ -224,11 +266,17 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 {
 	if(m_selecting)
 	{
-		if(event->delta() > 0)
-			m_selectionRadius *= 0.9f;
-		else
-			m_selectionRadius *= 1.1f;
-		view->updateGL();
+		MapHandlerGen* mh = m_schnapps->getSelectedMap();
+		const MapParameters& p = h_parameterSet[mh];
+
+		if(p.selectionMethod == WithinSphere)
+		{
+			if(event->delta() > 0)
+				m_selectionRadius *= 0.9f;
+			else
+				m_selectionRadius *= 1.1f;
+			view->updateGL();
+		}
 	}
 }
 
@@ -242,11 +290,6 @@ void Surface_Selection_Plugin::viewLinked(View *view)
 
 
 
-
-void Surface_Selection_Plugin::selectedViewChanged(View *prev, View *cur)
-{
-	m_dockTab->updateMapParameters();
-}
 
 void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
@@ -286,8 +329,20 @@ void Surface_Selection_Plugin::changePositionAttribute(const QString& view, cons
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
 	{
-		h_viewParameterSet[v][m].positionAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
-		if(v->isSelectedView() && m->isSelectedMap())
+		h_parameterSet[m].positionAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
+		if(m->isSelectedMap())
+			m_dockTab->updateMapParameters();
+	}
+}
+
+void Surface_Selection_Plugin::changeSelectionMethod(const QString& view, const QString& map, unsigned int method)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_parameterSet[m].selectionMethod = SelectionMethod(method);
+		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
 }

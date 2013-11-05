@@ -32,8 +32,8 @@ public:
 
 	virtual unsigned int getOrbit() = 0;
 
-	virtual void select(Dart d, bool emitSignal) = 0;
-	virtual void unselect(Dart d, bool emitSignal) = 0;
+	virtual void select(Dart d, bool emitSignal = true) = 0;
+	virtual void unselect(Dart d, bool emitSignal = true) = 0;
 
 	inline void select(const std::vector<Dart>& d)
 	{

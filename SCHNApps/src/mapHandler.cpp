@@ -11,7 +11,7 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_schnapps(s),
 	m_map(map),
 	m_frame(NULL),
-//	m_bbDrawer(NULL),
+	m_bbDrawer(NULL),
 	m_render(NULL)
 {
 	m_frame = new qglviewer::ManipulatedFrame();
@@ -21,8 +21,8 @@ MapHandlerGen::~MapHandlerGen()
 {
 	if(m_frame)
 		delete m_frame;
-//	if(m_bbDrawer)
-//		delete m_bbDrawer;
+	if(m_bbDrawer)
+		delete m_bbDrawer;
 	if(m_render)
 		delete m_render;
 	foreach(CGoGN::Utils::VBO* vbo, m_vbo)

@@ -29,6 +29,7 @@ private:
 
 private slots:
 	void positionAttributeChanged(int index);
+	void selectionMethodChanged(int index);
 
 private:
 	void addVertexAttribute(const QString& name);

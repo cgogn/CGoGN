@@ -13,7 +13,7 @@
 #include "Topology/generic/functor.h"
 #include "Topology/generic/attributeHandler.h"
 
-//#include "Utils/drawer.h"
+#include "Utils/drawer.h"
 
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -55,9 +55,9 @@ public slots:
 
 	Utils::GLSLShader* getBBDrawerShader() const
 	{
-//		if(m_bbDrawer)
-//			return m_bbDrawer->getShader();
-//		else
+		if(m_bbDrawer)
+			return m_bbDrawer->getShader();
+		else
 			return NULL;
 	}
 
@@ -197,7 +197,7 @@ protected:
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
 	float m_bbDiagSize;
-//	Utils::Drawer* m_bbDrawer;
+	Utils::Drawer* m_bbDrawer;
 
 	Algo::Render::GL2::MapRender* m_render;
 

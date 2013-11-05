@@ -13,12 +13,20 @@ namespace CGoGN
 namespace SCHNApps
 {
 
+enum SelectionMethod
+{
+	SingleCell = 0,
+	WithinSphere = 1
+};
+
 struct MapParameters
 {
-	MapParameters()
+	MapParameters() :
+		selectionMethod(SingleCell)
 	{}
 
 	VertexAttribute<PFP2::VEC3> positionAttribute;
+	SelectionMethod selectionMethod;
 };
 
 class Surface_Selection_Plugin : public PluginInteraction
@@ -52,7 +60,6 @@ public:
 
 private slots:
 	// slots called from SCHNApps signals
-	void selectedViewChanged(View* prev, View* cur);
 	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
@@ -63,18 +70,22 @@ private slots:
 public slots:
 	// slots for Python calls
 	void changePositionAttribute(const QString& view, const QString& map, const QString& name);
+	void changeSelectionMethod(const QString& view, const QString& map, unsigned int method);
 
 protected:
 	Surface_Selection_DockTab* m_dockTab;
-	QHash<View*, QHash<MapHandlerGen*, MapParameters> > h_viewParameterSet;
-
-	Utils::Drawer* m_drawer;
-
-	Utils::VBO* m_selectionSphereVBO;
-	Utils::PointSprite* m_pointSprite;
+	QHash<MapHandlerGen*, MapParameters> h_parameterSet;
 
 	bool m_selecting;
 
+	Utils::PointSprite* m_pointSprite;
+	Utils::Drawer* m_drawer;
+
+	// selected cells drawing
+	Utils::VBO* m_selectedVerticesVBO;
+
+	// WithinSphere parameters
+	Utils::VBO* m_selectionSphereVBO;
 	PFP2::VEC3 m_selectionCenter;
 	PFP2::REAL m_selectionRadius;
 };
