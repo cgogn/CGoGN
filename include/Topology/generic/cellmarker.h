@@ -198,6 +198,8 @@ public:
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
+		if (em == EMBNULL)
+			return false ;
 		return m_markVector->operator[](em).testMark(m_mark) ;
 	}
 

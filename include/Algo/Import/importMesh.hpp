@@ -155,6 +155,20 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 	return importMesh<PFP>(map, mts);
 }
 
+template <typename PFP>
+bool importVoxellisation(typename PFP::MAP& map, Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames, bool mergeCloseVertices)
+{
+    MeshTablesSurface<PFP> mts(map);
+
+    if(!mts.importVoxellisation(voxellisation, attrNames))
+        return false;
+
+    if (mergeCloseVertices)
+        mts.mergeCloseVertices();
+
+    return importMesh<PFP>(map, mts);
+}
+
 
 template <typename PFP>
 bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)

@@ -224,21 +224,6 @@ public:
 
 
 
-template <typename PFP>
-bool distndartOrdering(const std::pair<typename PFP::REAL, Dart>& e1, const std::pair<typename PFP::REAL, Dart>& e2)
-{
-	return (e1.first < e2.first);
-}
-
-template <typename PFP>
-bool distnintOrdering(const std::pair<typename PFP::REAL, unsigned int>& e1, const std::pair<typename PFP::REAL, unsigned int>& e2)
-{
-	return (e1.first < e2.first);
-}
-
-
-
-
 namespace Parallel
 {
 

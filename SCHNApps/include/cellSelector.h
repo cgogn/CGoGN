@@ -109,11 +109,10 @@ public:
 
 	inline void select(Dart d, bool emitSignal = true)
 	{
-		unsigned int v = m_map.getEmbedding<ORBIT>(d);
-		if(!m_cm.isMarked(v))
+		if(!m_cm.isMarked(d))
 		{
 			m_cells.push_back(d);
-			m_cm.mark(v);
+			m_cm.mark(d);
 			if(m_isMutuallyExclusive && !m_mutuallyExclusive.empty())
 			{
 				foreach(CellSelectorGen* cs, m_mutuallyExclusive)
@@ -128,9 +127,9 @@ public:
 
 	inline void unselect(Dart d, bool emitSignal = true)
 	{
-		unsigned int v = m_map.getEmbedding<ORBIT>(d);
-		if(m_cm.isMarked(v))
+		if(m_cm.isMarked(d))
 		{
+			unsigned int v = m_map.getEmbedding<ORBIT>(d);
 			bool found = false;
 			unsigned int i;
 			for(i = 0; i < m_cells.size() && !found; ++i)

@@ -81,12 +81,16 @@ protected:
 	Utils::PointSprite* m_pointSprite;
 	Utils::Drawer* m_drawer;
 
+	// cell under the mouse when selecting
+	Dart m_selectingVertex;
+	Dart m_selectingEdge;
+	Dart m_selectingFace;
+
 	// selected cells drawing
 	Utils::VBO* m_selectedVerticesVBO;
 
 	// WithinSphere parameters
 	Utils::VBO* m_selectionSphereVBO;
-	PFP2::VEC3 m_selectionCenter;
 	PFP2::REAL m_selectionRadius;
 };
 
