@@ -38,6 +38,7 @@ bool Surface_Selection_Plugin::enable()
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateSelectedCellsRendering()));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapAdded(map);
@@ -53,10 +54,10 @@ void Surface_Selection_Plugin::disable()
 	delete m_selectedVerticesVBO;
 	delete m_selectionSphereVBO;
 
-	disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
 	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateSelectedCellsRendering()));
 }
 
 void Surface_Selection_Plugin::draw(View *view)
@@ -257,12 +258,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 							}
-
-							const std::vector<Dart>& selectedCells = selector->getSelectedCells();
-							std::vector<PFP2::VEC3> selectedPoints;
-							for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
-								selectedPoints.push_back(p.positionAttribute[*it]);
-							m_selectedVerticesVBO->updateData(selectedPoints);
+							updateSelectedCellsRendering();
 						}
 						break;
 					}
@@ -406,6 +402,40 @@ void Surface_Selection_Plugin::mapAdded(MapHandlerGen* map)
 void Surface_Selection_Plugin::mapRemoved(MapHandlerGen* map)
 {
 	disconnect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
+}
+
+void Surface_Selection_Plugin::updateSelectedCellsRendering()
+{
+	MapHandlerGen* mh = m_schnapps->getSelectedMap();
+	const MapParameters& p = h_parameterSet[mh];
+	if(p.positionAttribute.isValid())
+	{
+		unsigned int orbit = m_schnapps->getCurrentOrbit();
+		CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
+		const std::vector<Dart>& selectedCells = selector->getSelectedCells();
+		switch(orbit)
+		{
+			case VERTEX : {
+				std::vector<PFP2::VEC3> selectedPoints;
+				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
+					selectedPoints.push_back(p.positionAttribute[*it]);
+				m_selectedVerticesVBO->updateData(selectedPoints);
+				break;
+			}
+			case EDGE : {
+				break;
+			}
+			case FACE : {
+				break;
+			}
+		}
+	}
+
+	foreach(View* view, l_views)
+	{
+		if(view->isLinkedToMap(mh))
+			view->updateGL();
+	}
 }
 
 

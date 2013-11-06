@@ -63,6 +63,7 @@ private slots:
 	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
+	void updateSelectedCellsRendering();
 
 	// slots called from MapHandler signals
 	void attributeAdded(unsigned int orbit, const QString& name);
