@@ -26,22 +26,30 @@ bool Surface_Selection_Plugin::enable()
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Selection");
 
 	m_pointSprite = new CGoGN::Utils::PointSprite();
-	m_drawer = new Utils::Drawer();
-
 	m_selectedVerticesVBO = new Utils::VBO();
+
+	m_selectedEdgesDrawer = new Utils::Drawer();
+	m_selectedFacesDrawer = new Utils::Drawer();
+
+	m_selectingCellDrawer = new Utils::Drawer();
 
 	m_selectionSphereVBO = new Utils::VBO();
 
-	registerShader(m_drawer->getShader());
 	registerShader(m_pointSprite);
+	registerShader(m_selectedEdgesDrawer->getShader());
+	registerShader(m_selectedFacesDrawer->getShader());
+	registerShader(m_selectingCellDrawer->getShader());
 
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateSelectedCellsRendering()));
 
-	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
-		mapAdded(map);
+	MapHandlerGen* cur = m_schnapps->getSelectedMap();
+	if(cur)
+	{
+		connect(cur, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
+		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
+		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
+	}
 
 	m_dockTab->updateMapParameters();
 
@@ -52,12 +60,15 @@ void Surface_Selection_Plugin::disable()
 {
 	delete m_pointSprite;
 	delete m_selectedVerticesVBO;
+
+	delete m_selectedEdgesDrawer;
+	delete m_selectedFacesDrawer;
+	delete m_selectingCellDrawer;
+
 	delete m_selectionSphereVBO;
 
-	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
-	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-	disconnect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateSelectedCellsRendering()));
 }
 
 void Surface_Selection_Plugin::draw(View *view)
@@ -121,33 +132,22 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						break;
 					}
 					case EDGE : {
-						PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
-
-						m_drawer->newList(GL_COMPILE_AND_EXECUTE);
-						m_drawer->lineWidth(3.0f);
-						m_drawer->color3f(1.0f, 0.0f, 0.0f);
-						m_drawer->begin(GL_LINES);
-						for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
-						{
-							m_drawer->vertex(p.positionAttribute[*it]);
-							m_drawer->vertex(p.positionAttribute[m->phi1(*it)]);
-						}
-						m_drawer->end();
-						m_drawer->endList();
+						m_selectedEdgesDrawer->callList();
 
 						if(m_selecting && m_selectingEdge != NIL)
 						{
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
-									m_drawer->newList(GL_COMPILE_AND_EXECUTE);
-									m_drawer->lineWidth(6.0f);
-									m_drawer->color3f(0.0f, 0.0f, 1.0f);
-									m_drawer->begin(GL_LINES);
-									m_drawer->vertex(p.positionAttribute[m_selectingEdge]);
-									m_drawer->vertex(p.positionAttribute[m->phi1(m_selectingEdge)]);
-									m_drawer->end();
-									m_drawer->endList();
+									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+									m_selectingCellDrawer->newList(GL_COMPILE_AND_EXECUTE);
+									m_selectingCellDrawer->lineWidth(6.0f);
+									m_selectingCellDrawer->color3f(0.0f, 0.0f, 1.0f);
+									m_selectingCellDrawer->begin(GL_LINES);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m_selectingEdge]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi1(m_selectingEdge)]);
+									m_selectingCellDrawer->end();
+									m_selectingCellDrawer->endList();
 									break;
 								}
 								case WithinSphere : {
@@ -158,33 +158,22 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						break;
 					}
 					case FACE : {
-						PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
-
-						m_drawer->newList(GL_COMPILE_AND_EXECUTE);
-						m_drawer->color3f(1.0f, 0.0f, 0.0f);
-						m_drawer->begin(GL_TRIANGLES);
-						for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
-						{
-							m_drawer->vertex(p.positionAttribute[*it]);
-							m_drawer->vertex(p.positionAttribute[m->phi1(*it)]);
-							m_drawer->vertex(p.positionAttribute[m->phi_1(*it)]);
-						}
-						m_drawer->end();
-						m_drawer->endList();
+						m_selectedFacesDrawer->callList();
 
 						if(m_selecting && m_selectingFace != NIL)
 						{
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
-									m_drawer->newList(GL_COMPILE_AND_EXECUTE);
-									m_drawer->color3f(0.0f, 0.0f, 1.0f);
-									m_drawer->begin(GL_TRIANGLES);
-									m_drawer->vertex(p.positionAttribute[m_selectingFace]);
-									m_drawer->vertex(p.positionAttribute[m->phi1(m_selectingFace)]);
-									m_drawer->vertex(p.positionAttribute[m->phi_1(m_selectingFace)]);
-									m_drawer->end();
-									m_drawer->endList();
+									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+									m_selectingCellDrawer->newList(GL_COMPILE_AND_EXECUTE);
+									m_selectingCellDrawer->color3f(0.0f, 0.0f, 1.0f);
+									m_selectingCellDrawer->begin(GL_TRIANGLES);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m_selectingFace]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi1(m_selectingFace)]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi_1(m_selectingFace)]);
+									m_selectingCellDrawer->end();
+									m_selectingCellDrawer->endList();
 									break;
 								}
 								case WithinSphere : {
@@ -278,6 +267,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 							}
+							updateSelectedCellsRendering();
 						}
 						break;
 					}
@@ -297,6 +287,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 							}
+							updateSelectedCellsRendering();
 						}
 						break;
 					}
@@ -390,24 +381,23 @@ void Surface_Selection_Plugin::viewLinked(View *view)
 void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
+	if(prev)
+	{
+		disconnect(prev, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
+		disconnect(prev, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
+	}
 	if(cur)
+	{
+		connect(cur, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
+		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
 		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
-}
-
-void Surface_Selection_Plugin::mapAdded(MapHandlerGen* map)
-{
-	connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
-}
-
-void Surface_Selection_Plugin::mapRemoved(MapHandlerGen* map)
-{
-	disconnect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
+	}
 }
 
 void Surface_Selection_Plugin::updateSelectedCellsRendering()
 {
-	MapHandlerGen* mh = m_schnapps->getSelectedMap();
-	const MapParameters& p = h_parameterSet[mh];
+	MapHandlerGen* map = m_schnapps->getSelectedMap();
+	const MapParameters& p = h_parameterSet[map];
 	if(p.positionAttribute.isValid())
 	{
 		unsigned int orbit = m_schnapps->getCurrentOrbit();
@@ -423,9 +413,35 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 				break;
 			}
 			case EDGE : {
+				PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+
+				m_selectedEdgesDrawer->newList(GL_COMPILE);
+				m_selectedEdgesDrawer->lineWidth(3.0f);
+				m_selectedEdgesDrawer->color3f(1.0f, 0.0f, 0.0f);
+				m_selectedEdgesDrawer->begin(GL_LINES);
+				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
+				{
+					m_selectedEdgesDrawer->vertex(p.positionAttribute[*it]);
+					m_selectedEdgesDrawer->vertex(p.positionAttribute[m->phi1(*it)]);
+				}
+				m_selectedEdgesDrawer->end();
+				m_selectedEdgesDrawer->endList();
 				break;
 			}
 			case FACE : {
+				PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+
+				m_selectedFacesDrawer->newList(GL_COMPILE);
+				m_selectedFacesDrawer->color3f(1.0f, 0.0f, 0.0f);
+				m_selectedFacesDrawer->begin(GL_TRIANGLES);
+				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
+				{
+					m_selectedFacesDrawer->vertex(p.positionAttribute[*it]);
+					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi1(*it)]);
+					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi_1(*it)]);
+				}
+				m_selectedFacesDrawer->end();
+				m_selectedFacesDrawer->endList();
 				break;
 			}
 		}
@@ -433,7 +449,7 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 
 	foreach(View* view, l_views)
 	{
-		if(view->isLinkedToMap(mh))
+		if(view->isLinkedToMap(map))
 			view->updateGL();
 	}
 }
@@ -442,11 +458,21 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 
 
 
-void Surface_Selection_Plugin::attributeAdded(unsigned int orbit, const QString& name)
+void Surface_Selection_Plugin::selectedMapAttributeAdded(unsigned int orbit, const QString& name)
 {
-	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
-	if(orbit == VERTEX && map->isSelectedMap())
+	if(orbit == VERTEX)
 		m_dockTab->addVertexAttribute(name);
+}
+
+void Surface_Selection_Plugin::selectedMapAttributeModified(unsigned int orbit, const QString &name)
+{
+	if(orbit == VERTEX)
+	{
+		MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+		const MapParameters& p = h_parameterSet[map];
+		if(p.positionAttribute.isValid() && QString::fromStdString(p.positionAttribute.name()) == name)
+			updateSelectedCellsRendering();
+	}
 }
 
 

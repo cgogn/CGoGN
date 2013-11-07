@@ -61,12 +61,11 @@ public:
 private slots:
 	// slots called from SCHNApps signals
 	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
-	void mapAdded(MapHandlerGen* map);
-	void mapRemoved(MapHandlerGen* map);
 	void updateSelectedCellsRendering();
 
 	// slots called from MapHandler signals
-	void attributeAdded(unsigned int orbit, const QString& name);
+	void selectedMapAttributeAdded(unsigned int orbit, const QString& name);
+	void selectedMapAttributeModified(unsigned int orbit, const QString& name);
 
 public slots:
 	// slots for Python calls
@@ -79,16 +78,19 @@ protected:
 
 	bool m_selecting;
 
-	Utils::PointSprite* m_pointSprite;
-	Utils::Drawer* m_drawer;
-
 	// cell under the mouse when selecting
 	Dart m_selectingVertex;
 	Dart m_selectingEdge;
 	Dart m_selectingFace;
 
-	// selected cells drawing
+	// selecting & selected cells drawing
+	Utils::PointSprite* m_pointSprite;
 	Utils::VBO* m_selectedVerticesVBO;
+
+	Utils::Drawer* m_selectedEdgesDrawer;
+	Utils::Drawer* m_selectedFacesDrawer;
+
+	Utils::Drawer* m_selectingCellDrawer;
 
 	// WithinSphere parameters
 	Utils::VBO* m_selectionSphereVBO;
