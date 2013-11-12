@@ -151,6 +151,21 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									break;
 								}
 								case WithinSphere : {
+									std::vector<PFP2::VEC3> selectionPoint;
+									selectionPoint.push_back(p.positionAttribute[m_selectingEdge]);
+									m_selectionSphereVBO->updateData(selectionPoint);
+
+									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
+									m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+									m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+									m_pointSprite->setSize(m_selectionRadius);
+
+									m_pointSprite->enableVertexAttribs();
+									glEnable(GL_BLEND);
+									glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+									glDrawArrays(GL_POINTS, 0, 1);
+									glDisable(GL_BLEND);
+									m_pointSprite->disableVertexAttribs();
 									break;
 								}
 							}
@@ -177,6 +192,21 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									break;
 								}
 								case WithinSphere : {
+									std::vector<PFP2::VEC3> selectionPoint;
+									selectionPoint.push_back(p.positionAttribute[m_selectingFace]);
+									m_selectionSphereVBO->updateData(selectionPoint);
+
+									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
+									m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
+									m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+									m_pointSprite->setSize(m_selectionRadius);
+
+									m_pointSprite->enableVertexAttribs();
+									glEnable(GL_BLEND);
+									glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+									glDrawArrays(GL_POINTS, 0, 1);
+									glDisable(GL_BLEND);
+									m_pointSprite->disableVertexAttribs();
 									break;
 								}
 							}
@@ -264,6 +294,12 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 								case WithinSphere : {
+									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
+									neigh.collectAll(m_selectingEdge);
+									if(event->button() == Qt::LeftButton)
+										selector->select(neigh.getInsideEdges());
+									else if(event->button() == Qt::RightButton)
+										selector->unselect(neigh.getInsideEdges());
 									break;
 								}
 							}
@@ -284,6 +320,12 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 								case WithinSphere : {
+									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
+									neigh.collectAll(m_selectingFace);
+									if(event->button() == Qt::LeftButton)
+										selector->select(neigh.getInsideFaces());
+									else if(event->button() == Qt::RightButton)
+										selector->unselect(neigh.getInsideFaces());
 									break;
 								}
 							}
