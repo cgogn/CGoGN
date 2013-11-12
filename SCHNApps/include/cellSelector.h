@@ -56,6 +56,8 @@ public:
 
 	virtual bool isSelected(Dart d) = 0;
 
+	virtual void rebuild() = 0;
+
 	inline void setMutuallyExclusive(bool b) { m_isMutuallyExclusive = b; }
 	inline bool isMutuallyExclusive() const { return m_isMutuallyExclusive; }
 	inline void setMutuallyExclusiveSet(const QList<CellSelectorGen*>& mex)
@@ -111,8 +113,8 @@ public:
 	{
 		if(!m_cm.isMarked(d))
 		{
-			m_cells.push_back(d);
 			m_cm.mark(d);
+			m_cells.push_back(d);
 			if(m_isMutuallyExclusive && !m_mutuallyExclusive.empty())
 			{
 				foreach(CellSelectorGen* cs, m_mutuallyExclusive)
@@ -153,6 +155,18 @@ public:
 	inline bool isSelected(Dart d)
 	{
 		return m_cm.isMarked(d);
+	}
+
+	void rebuild()
+	{
+		m_cells.clear();
+		TraversorCell<GenericMap, ORBIT> t(m_map, true);
+		for(Dart d = t.begin(); d != t.end(); d = t.next())
+		{
+			if(m_cm.isMarked(d))
+				m_cells.push_back(d);
+		}
+		emit(selectedCellsChanged());
 	}
 
 private:

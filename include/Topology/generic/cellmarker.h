@@ -309,6 +309,7 @@ public:
 			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
 	}
 };
+
 /**
  * class that allows the marking of Darts
  * the marked Darts are stored to optimize the unmarking task at destruction
@@ -362,6 +363,7 @@ public:
 		return m_markedDarts;
 	}
 };
+
 /**
  * class that allows the marking of cells
  * the markers are not unmarked at destruction

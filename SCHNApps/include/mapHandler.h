@@ -118,6 +118,12 @@ public:
 			m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
 		}
 
+		for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+		{
+			foreach (CellSelectorGen* cs, m_cellSelectors[orbit])
+				cs->rebuild();
+		}
+
 		emit(connectivityModified());
 
 		foreach(View* view, l_views)

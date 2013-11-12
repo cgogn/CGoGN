@@ -51,7 +51,7 @@ public:
 	virtual void keyPress(View* view, QKeyEvent* event);
 	virtual void keyRelease(View* view, QKeyEvent* event);
 	virtual void mousePress(View* view, QMouseEvent* event);
-	virtual void mouseRelease(View* view, QMouseEvent* event);
+	virtual void mouseRelease(View* view, QMouseEvent* event) {}
 	virtual void mouseMove(View* view, QMouseEvent* event);
 	virtual void wheelEvent(View* view, QWheelEvent* event);
 
@@ -66,6 +66,7 @@ private slots:
 	// slots called from MapHandler signals
 	void selectedMapAttributeAdded(unsigned int orbit, const QString& name);
 	void selectedMapAttributeModified(unsigned int orbit, const QString& name);
+	void selectedMapConnectivityModified();
 
 public slots:
 	// slots for Python calls

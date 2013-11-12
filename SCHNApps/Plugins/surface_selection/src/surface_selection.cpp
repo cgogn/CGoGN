@@ -48,6 +48,7 @@ bool Surface_Selection_Plugin::enable()
 	{
 		connect(cur, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
+		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
 	}
 
@@ -339,11 +340,6 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 	}
 }
 
-void Surface_Selection_Plugin::mouseRelease(View* view, QMouseEvent* event)
-{
-
-}
-
 void Surface_Selection_Plugin::mouseMove(View* view, QMouseEvent* event)
 {
 	if(m_selecting)
@@ -427,11 +423,13 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 	{
 		disconnect(prev, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 		disconnect(prev, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
+		disconnect(prev, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 	}
 	if(cur)
 	{
 		connect(cur, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
+		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
 	}
 }
@@ -515,6 +513,14 @@ void Surface_Selection_Plugin::selectedMapAttributeModified(unsigned int orbit, 
 		if(p.positionAttribute.isValid() && QString::fromStdString(p.positionAttribute.name()) == name)
 			updateSelectedCellsRendering();
 	}
+}
+
+void Surface_Selection_Plugin::selectedMapConnectivityModified()
+{
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+	const MapParameters& p = h_parameterSet[map];
+	if(p.positionAttribute.isValid())
+		updateSelectedCellsRendering();
 }
 
 
