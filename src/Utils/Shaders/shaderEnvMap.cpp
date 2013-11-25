@@ -353,8 +353,13 @@ bool ShaderEnvMap::setCubeMapColored()
 	unsigned char* texture = new unsigned char[3*sz*sz];
 
 	for (unsigned int i = 0; i< sz*sz; ++i)
-	{
-		texture[i*3]   = 255;
+	{	
+		unsigned int j = (i/sz)/8;
+		unsigned int k = (i%sz)/8;
+		unsigned char val=255;
+		if ((j+k)%2 ==0)
+			val /= 2;
+		texture[i*3]   = val;
 		texture[i*3+1] = 0;
 		texture[i*3+2] = 0;
 	}
@@ -362,7 +367,12 @@ bool ShaderEnvMap::setCubeMapColored()
 
 	for (unsigned int i = 0; i< sz*sz; ++i)
 	{
-		texture[i*3]   = 128;
+		unsigned int j = (i/sz)/8;
+		unsigned int k = (i%sz)/8;
+		unsigned char val=128;
+		if ((j+k)%2 ==0)
+			val /= 2;
+		texture[i*3]   = val;
 		texture[i*3+1] = 0;
 		texture[i*3+2] = 0;
 	}
@@ -371,16 +381,26 @@ bool ShaderEnvMap::setCubeMapColored()
 
 	for (unsigned int i = 0; i< sz*sz; ++i)
 	{
+		unsigned int j = (i/sz)/8;
+		unsigned int k = (i%sz)/8;
+		unsigned char val=255;
+		if ((j+k)%2 ==0)
+			val /= 2;
 		texture[i*3]   = 0;
-		texture[i*3+1] = 255;
+		texture[i*3+1] = val;
 		texture[i*3+2] = 0;
 	}
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
 
 	for (unsigned int i = 0; i< sz*sz; ++i)
 	{
+		unsigned int j = (i/sz)/8;
+		unsigned int k = (i%sz)/8;
+		unsigned char val=128;
+		if ((j+k)%2 ==0)
+			val /= 2;
 		texture[i*3]   = 0;
-		texture[i*3+1] = 128;
+		texture[i*3+1] = val;
 		texture[i*3+2] = 0;
 	}
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
@@ -388,17 +408,27 @@ bool ShaderEnvMap::setCubeMapColored()
 
 	for (unsigned int i = 0; i< sz*sz; ++i)
 	{
+		unsigned int j = (i/sz)/8;
+		unsigned int k = (i%sz)/8;
+		unsigned char val=255;
+		if ((j+k)%2 ==0)
+			val /= 2;
 		texture[i*3]   = 0;
 		texture[i*3+1] = 0;
-		texture[i*3+2] = 255;
+		texture[i*3+2] = val;
 	}
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
 
 	for (unsigned int i = 0; i< sz*sz; ++i)
 	{
+		unsigned int j = (i/sz)/8;
+		unsigned int k = (i%sz)/8;
+		unsigned char val=128;
+		if ((j+k)%2 ==0)
+			val /= 2;
 		texture[i*3]   = 0;
 		texture[i*3+1] = 0;
-		texture[i*3+2] = 128;
+		texture[i*3+2] = val;
 	}
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
 
