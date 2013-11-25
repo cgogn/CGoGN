@@ -17,6 +17,7 @@ Surface_Selection_DockTab::Surface_Selection_DockTab(SCHNApps* s, Surface_Select
 	setupUi(this);
 
 	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
+	connect(combo_selectionMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(selectionMethodChanged(int)));
 }
 
 
@@ -27,13 +28,19 @@ void Surface_Selection_DockTab::positionAttributeChanged(int index)
 {
 	if(!b_updatingUI)
 	{
-		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
-			view->updateGL();
-		}
+		if(map)
+			m_plugin->h_parameterSet[map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+	}
+}
+
+void Surface_Selection_DockTab::selectionMethodChanged(int index)
+{
+	if(!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(map)
+			m_plugin->h_parameterSet[map].selectionMethod = SelectionMethod(index);
 	}
 }
 
@@ -58,12 +65,11 @@ void Surface_Selection_DockTab::updateMapParameters()
 	combo_positionAttribute->clear();
 	combo_positionAttribute->addItem("- select attribute -");
 
-	View* view = m_schnapps->getSelectedView();
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
 
-	if(view && map)
+	if(map)
 	{
-		const MapParameters& p = m_plugin->h_viewParameterSet[view][map];
+		const MapParameters& p = m_plugin->h_parameterSet[map];
 
 		QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
 
@@ -80,6 +86,8 @@ void Surface_Selection_DockTab::updateMapParameters()
 				++i;
 			}
 		}
+
+		combo_selectionMethod->setCurrentIndex(p.selectionMethod);
 	}
 
 	b_updatingUI = false;

@@ -41,17 +41,53 @@ namespace Selection
 /**
  * Function that does the selection of faces, returned darts are sorted from closest to farthest
  * @param map the map we want to test
+ * @param position the vertex attribute storing positions
+ * @param rayA first point of ray (user side)
+ * @param rayAB direction of ray (directed to the scene)
+ * @param vecFaces (out) vector to store the darts of intersected faces
+ * @param iPoints (out) vector to store the intersection points
+ */
+template<typename PFP>
+void facesRaySelection(
+		typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position,
+		const typename PFP::VEC3& rayA,
+		const typename PFP::VEC3& rayAB,
+		std::vector<Dart>& vecFaces,
+		std::vector<typename PFP::VEC3>& iPoints);
+
+/**
+ * Function that does the selection of faces, returned darts are sorted from closest to farthest
+ * @param map the map we want to test
+ * @param position the vertex attribute storing positions
  * @param rayA first point of ray (user side)
  * @param rayAB direction of ray (directed to the scene)
  * @param vecFaces (out) vector to store the darts of intersected faces
  */
 template<typename PFP>
-void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
-		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces);
+void facesRaySelection(
+		typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position,
+		const typename PFP::VEC3& rayA,
+		const typename PFP::VEC3& rayAB,
+		std::vector<Dart>& vecFaces);
+
+/**
+ * Function that does the selection of one face
+ * @param map the map we want to test
+ * @param position the vertex attribute storing positions
+ * @param rayA first point of  ray (user side)
+ * @param rayAB vector of ray (directed ot the scene)
+ * @param face (out) dart of selected vertex (set to NIL if no face selected)
+ */
+template<typename PFP>
+void faceRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
+		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& face);
 
 /**
  * Function that does the selection of edges, returned darts are sorted from closest to farthest
  * @param map the map we want to test
+ * @param position the vertex attribute storing positions
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
  * @param vecEdges (out) vector to store dart of intersected edges
@@ -62,8 +98,21 @@ void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PF
 				const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float distMax);
 
 /**
+ * Function that does the selection of one vertex
+ * @param map the map we want to test
+ * @param position the vertex attribute storing positions
+ * @param rayA first point of  ray (user side)
+ * @param rayAB vector of ray (directed ot the scene)
+ * @param edge (out) dart of selected vertex (set to NIL if no edge selected)
+ */
+template<typename PFP>
+void edgeRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
+		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& edge);
+
+/**
  * Function that does the selection of vertices, returned darts are sorted from closest to farthest
  * @param map the map we want to test
+ * @param position the vertex attribute storing positions
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
  * @param vecVertices (out) vector to store dart of intersected vertices
@@ -73,6 +122,17 @@ template<typename PFP>
 void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
 		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices);
 
+/**
+ * Function that does the selection of one vertex
+ * @param map the map we want to test
+ * @param position the vertex attribute storing positions
+ * @param rayA first point of  ray (user side)
+ * @param rayAB vector of ray (directed ot the scene)
+ * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
+ */
+template<typename PFP>
+void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
+		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex);
 
 /**
  * Volume selection, not yet functional
@@ -81,19 +141,6 @@ template<typename PFP>
 void volumesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
 		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVolumes);
 
-
-
-
-/**
- * Function that does the selection of one vertex
- * @param map the map we want to test
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
- */
-template<typename PFP>
-void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
-		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex);
 
 
 template<typename PFP>

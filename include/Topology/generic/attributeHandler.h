@@ -315,11 +315,11 @@ public:
 // that means it just replaces VTBL of the object by VTBL of another class.
 // NOTE: these two classes has to be ABI compatible!
 template <typename TO_T, typename FROM_T>
-  inline void turn_to(FROM_T* p)
-  {
-    assert( sizeof(FROM_T) == sizeof(TO_T));
-    ::new(p) TO_T(); // use of placement new
-  }
+inline void turn_to(FROM_T* p)
+{
+assert(sizeof(FROM_T) == sizeof(TO_T));
+::new(p) TO_T(); // use of placement new
+}
 
 } // namespace CGoGN
 

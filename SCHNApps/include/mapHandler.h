@@ -13,11 +13,12 @@
 #include "Topology/generic/functor.h"
 #include "Topology/generic/attributeHandler.h"
 
+#include "Utils/drawer.h"
+
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Geometry/boundingbox.h"
 
 #include "Utils/vbo.h"
-#include "Utils/drawer.h"
 
 namespace CGoGN
 {
@@ -110,9 +111,18 @@ public:
 
 	void notifyConnectivityModification()
 	{
-		m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
-		m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
-		m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		if (m_render)
+		{
+			m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
+			m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
+			m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		}
+
+		for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+		{
+			foreach (CellSelectorGen* cs, m_cellSelectors[orbit])
+				cs->rebuild();
+		}
 
 		emit(connectivityModified());
 

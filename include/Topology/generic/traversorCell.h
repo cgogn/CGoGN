@@ -65,7 +65,7 @@ public:
 
 
 template <unsigned int ORBIT>
-class TraversorCell<GenericMap,ORBIT> //: public Traversor<GenericMap>
+class TraversorCell<GenericMap, ORBIT> //: public Traversor<GenericMap>
 {
 private:
 	GenericMap& m ;

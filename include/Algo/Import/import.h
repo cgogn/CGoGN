@@ -54,6 +54,16 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
+/**
+* import a voxellisation
+* @param map the map in which the function imports the mesh
+* @param voxellisation
+* @param attrNames attribute names
+* @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
+* @return a boolean indicating if import was successful
+*/
+template <typename PFP>
+bool importVoxellisation(typename PFP::MAP& map, Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames, bool mergeCloseVertices=false);
 
 /**
  * import a Choupi file
@@ -63,7 +73,6 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
  */
 template <typename PFP>
 bool importChoupi(const std::string& filename, const std::vector<typename PFP::VEC3>& tabV, const std::vector<unsigned int>& tabE);
-
 
 } // namespace Import
 

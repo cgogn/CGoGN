@@ -92,6 +92,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 		}
 	}
 
+	bool needBijectiveCheck = false;
+
 	// reconstruct neighbourhood
 	unsigned int nbBoundaryEdges = 0;
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -103,27 +105,31 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 			unsigned int embd = map.template getEmbedding<VERTEX>(d);
 			Dart good_dart = NIL;
+			bool firstOK = true;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
 				if (map.template getEmbedding<VERTEX>(map.phi1(*it)) == embd)
+				{
 					good_dart = *it;
+					if (good_dart == map.phi2(good_dart))
+					{
+						map.sewFaces(d, good_dart, false);
+						m.unmarkOrbit<EDGE>(d);
+					}
+					else
+					{
+						good_dart = NIL;
+						firstOK = false;
+					}
+				}
 			}
 
-			if (good_dart != NIL)
+			if (!firstOK)
+				needBijectiveCheck = true;
+
+			if (good_dart == NIL)
 			{
-				if (good_dart == map.phi2(good_dart))
-				{
-					map.sewFaces(d, good_dart, false);
-					m.unmarkOrbit<EDGE>(d);
-				}
-				else
-				{
-					++nbBoundaryEdges;
-				}
-			}
-			else
-			{
-				m.unmark(d);
+				m.unmarkOrbit<EDGE>(d);
 				++nbBoundaryEdges;
 			}
 		}
@@ -133,6 +139,10 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 	{
 		unsigned int nbH = map.closeMap();
 		CGoGNout << "Map closed (" << nbBoundaryEdges << " boundary edges / " << nbH << " holes)" << CGoGNendl;
+	}
+
+	if (needBijectiveCheck)
+	{
 		// ensure bijection between topo and embedding
 		map.template bijectiveOrbitEmbedding<VERTEX>();
 	}
@@ -153,6 +163,20 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 		mts.mergeCloseVertices();
 
 	return importMesh<PFP>(map, mts);
+}
+
+template <typename PFP>
+bool importVoxellisation(typename PFP::MAP& map, Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames, bool mergeCloseVertices)
+{
+    MeshTablesSurface<PFP> mts(map);
+
+    if(!mts.importVoxellisation(voxellisation, attrNames))
+        return false;
+
+    if (mergeCloseVertices)
+        mts.mergeCloseVertices();
+
+    return importMesh<PFP>(map, mts);
 }
 
 

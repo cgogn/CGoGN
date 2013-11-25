@@ -136,34 +136,41 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 	{
 		case Qt::Key_D : {
 			MapHandlerGen* mh = m_schnapps->getSelectedMap();
-			const MapParameters& p = h_parameterSet[mh];
-			if(!m_dragging)
+			if(mh)
 			{
-				if(p.handleSelector && !p.handleSelector->getSelectedCells().empty())
+				const MapParameters& p = h_parameterSet[mh];
+				if(!m_dragging)
 				{
-					m_dragging = true;
-					m_draginit = false;
-					view->setMouseTracking(true);
+					if(p.handleSelector && !p.handleSelector->getSelectedCells().empty())
+					{
+						m_dragging = true;
+						m_draginit = false;
+						view->setMouseTracking(true);
+					}
 				}
-			}
-			else
-			{
-				m_dragging = false;
-				m_draginit = false;
-				view->setMouseTracking(false);
+				else
+				{
+					m_dragging = false;
+					m_draginit = false;
+					view->setMouseTracking(false);
+				}
 			}
 			break;
 		}
+
 		case Qt::Key_R : {
-//			ParameterSet* params = h_viewParams[view];
-//			MapHandlerGen* map = params->selectedMap;
-//			if(map)
-//			{
-//				asRigidAsPossible(view, map);
-//				PerMapParameterSet* perMap = params->perMap[map->getName()];
-//				params->selectedMap->notifyAttributeModification(perMap->positionAttribute);
-//				view->updateGL();
-//			}
+			MapHandlerGen* mh = m_schnapps->getSelectedMap();
+			if(mh)
+			{
+				const MapParameters& p = h_parameterSet[mh];
+				if(p.initialized)
+				{
+					asRigidAsPossible(mh);
+					mh->notifyAttributeModification(p.positionAttribute);
+					static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
+					view->updateGL();
+				}
+			}
 			break;
 		}
 	}
@@ -208,10 +215,11 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 
 //			matchDiffCoord(map);
 			if(p.initialized)
+			{
 				asRigidAsPossible(mh);
-
-			mh->notifyAttributeModification(p.positionAttribute);
-			static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
+				mh->notifyAttributeModification(p.positionAttribute);
+				static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
+			}
 		}
 
 		view->updateGL();

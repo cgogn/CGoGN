@@ -23,9 +23,7 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 	connect(list_maps, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
 	connect(list_vertexAttributes, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(vertexAttributeCheckStateChanged(QListWidgetItem*)));
 
-	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
+	connect(tabWidget_mapInfo, SIGNAL(currentChanged(int)), this, SLOT(selectedSelectorChanged()));
 
 	connect(list_dartSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
 	connect(list_dartSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
@@ -51,6 +49,10 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 	connect(list_volumeSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
 	connect(button_volumeAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
 	connect(button_volumeRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
+
+	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
 }
 
 unsigned int ControlDock_MapTab::getCurrentOrbit()

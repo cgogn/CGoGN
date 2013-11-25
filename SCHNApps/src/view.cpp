@@ -35,7 +35,6 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	m_currentCamera = m_schnapps->addCamera();
 
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateGL()));
 }
 
 View::~View()

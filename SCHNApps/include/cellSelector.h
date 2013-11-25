@@ -32,8 +32,8 @@ public:
 
 	virtual unsigned int getOrbit() = 0;
 
-	virtual void select(Dart d, bool emitSignal) = 0;
-	virtual void unselect(Dart d, bool emitSignal) = 0;
+	virtual void select(Dart d, bool emitSignal = true) = 0;
+	virtual void unselect(Dart d, bool emitSignal = true) = 0;
 
 	inline void select(const std::vector<Dart>& d)
 	{
@@ -55,6 +55,8 @@ public:
 	}
 
 	virtual bool isSelected(Dart d) = 0;
+
+	virtual void rebuild() = 0;
 
 	inline void setMutuallyExclusive(bool b) { m_isMutuallyExclusive = b; }
 	inline bool isMutuallyExclusive() const { return m_isMutuallyExclusive; }
@@ -109,11 +111,10 @@ public:
 
 	inline void select(Dart d, bool emitSignal = true)
 	{
-		unsigned int v = m_map.getEmbedding<ORBIT>(d);
-		if(!m_cm.isMarked(v))
+		if(!m_cm.isMarked(d))
 		{
+			m_cm.mark(d);
 			m_cells.push_back(d);
-			m_cm.mark(v);
 			if(m_isMutuallyExclusive && !m_mutuallyExclusive.empty())
 			{
 				foreach(CellSelectorGen* cs, m_mutuallyExclusive)
@@ -128,9 +129,9 @@ public:
 
 	inline void unselect(Dart d, bool emitSignal = true)
 	{
-		unsigned int v = m_map.getEmbedding<ORBIT>(d);
-		if(m_cm.isMarked(v))
+		if(m_cm.isMarked(d))
 		{
+			unsigned int v = m_map.getEmbedding<ORBIT>(d);
 			bool found = false;
 			unsigned int i;
 			for(i = 0; i < m_cells.size() && !found; ++i)
@@ -154,6 +155,18 @@ public:
 	inline bool isSelected(Dart d)
 	{
 		return m_cm.isMarked(d);
+	}
+
+	void rebuild()
+	{
+		m_cells.clear();
+		TraversorCell<GenericMap, ORBIT> t(m_map, true);
+		for(Dart d = t.begin(); d != t.end(); d = t.next())
+		{
+			if(m_cm.isMarked(d))
+				m_cells.push_back(d);
+		}
+		emit(selectedCellsChanged());
 	}
 
 private:

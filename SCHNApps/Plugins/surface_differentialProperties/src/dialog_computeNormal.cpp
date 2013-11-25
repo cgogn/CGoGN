@@ -86,14 +86,17 @@ void Dialog_ComputeNormal::removeMapFromList(MapHandlerGen* map)
 
 void Dialog_ComputeNormal::addAttributeToList(unsigned int orbit, const QString& nameAttr)
 {
-	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
-
-	const QString& typeAttr = m_selectedMap->getAttributeTypeName(orbit, nameAttr);
-
-	if(typeAttr == vec3TypeName)
+	if(orbit == VERTEX)
 	{
-		combo_positionAttribute->addItem(nameAttr);
-		combo_normalAttribute->addItem(nameAttr);
+		QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
+
+		const QString& typeAttr = m_selectedMap->getAttributeTypeName(orbit, nameAttr);
+
+		if(typeAttr == vec3TypeName)
+		{
+			combo_positionAttribute->addItem(nameAttr);
+			combo_normalAttribute->addItem(nameAttr);
+		}
 	}
 }
 
