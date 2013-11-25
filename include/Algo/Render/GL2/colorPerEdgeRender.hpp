@@ -55,36 +55,37 @@ void ColorPerEdgeRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
+	std::vector<VEC3F> bufferColors;
 	bufferColors.reserve(16384);
 
 	TraversorCell<typename PFP::MAP, EDGE> traEdge(map);
 
 	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
 	{
-		buffer.push_back(positions[d]);
-		bufferColors.push_back(colorPerXXX[d]);
+		buffer.push_back(PFP::toVec3f(positions[d]);
+		bufferColors.push_back(PFP::toVec3f(colorPerXXX[d]));
 		Dart e = map.phi2(d);
-		buffer.push_back(positions[e]);
-		bufferColors.push_back(colorPerXXX[e]);
+		buffer.push_back(PFP::toVec3f(positions[e]));
+		bufferColors.push_back(PFP::toVec3f(colorPerXXX[e]))	;
 	}
 
 	m_nbEdges = buffer.size()/2;
 
 	vboPosition.setDataSize(3);
 	vboPosition.allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(vboPosition.lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	vboColor.setDataSize(3);
 	vboColor.allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboColor.lockPtr());
-	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(vboColor.lockPtr());
+	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	vboColor.releasePtr();
 }
 

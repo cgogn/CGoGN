@@ -55,11 +55,12 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
+	std::vector<VEC3F> bufferColors;
 	bufferColors.reserve(16384);
 
 	TraversorCell<typename PFP::MAP, FACE> traFace(map);
@@ -87,14 +88,14 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 
 	vboPosition.setDataSize(3);
 	vboPosition.allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(vboPosition.lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	vboColor.setDataSize(3);
 	vboColor.allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboColor.lockPtr());
-	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(vboColor.lockPtr());
+	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	vboColor.releasePtr();
 }
 
@@ -105,14 +106,15 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferNormals;
+	std::vector<VEC3F> bufferNormals;
 	bufferNormals.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
+	std::vector<VEC3F> bufferColors;
 	bufferColors.reserve(16384);
 
 	TraversorCell<typename PFP::MAP, FACE> traFace(map);
@@ -125,15 +127,15 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 		// loop to cut a polygon in triangle on the fly (works only with convex faces)
 		do
 		{
-			buffer.push_back(positions[d]);
-			bufferNormals.push_back(normals[d]);
-			bufferColors.push_back(colorPerXXX[d]);
-			buffer.push_back(positions[b]);
-			bufferNormals.push_back(normals[b]);
-			bufferColors.push_back(colorPerXXX[b]);
-			buffer.push_back(positions[c]);
-			bufferNormals.push_back(normals[c]);
-			bufferColors.push_back(colorPerXXX[c]);
+			buffer.push_back(PFP::toVec3f(positions[d]));
+			bufferNormals.push_back(PFP::toVec3f(normals[d]));
+			bufferColors.push_back(PFP::toVec3f(colorPerXXX[d]));
+			buffer.push_back(PFP::toVec3f(positions[b]));
+			bufferNormals.push_back(PFP::toVec3f(normals[b]);
+			bufferColors.push_back(PFP::toVec3f(colorPerXXX[b]));
+			buffer.push_back(PFP::toVec3f(positions[c]);
+			bufferNormals.push_back(PFP::toVec3f(normals[c]));
+			bufferColors.push_back(PFP::toVec3f(colorPerXXX[c]));
 			b = c;
 			c = map.phi1(b);
 		} while (c != d);
@@ -143,20 +145,20 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 
 	vboPosition.setDataSize(3);
 	vboPosition.allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(vboPosition.lockPtr());
-	memcpy(ptrPos, &buffer[0], buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
+	memcpy(ptrPos, &buffer[0], buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	vboNormal.setDataSize(3);
 	vboNormal.allocate(bufferColors.size());
-	VEC3* ptrNorm = reinterpret_cast<VEC3*>(vboNormal.lockPtr());
-	memcpy(ptrNorm, &bufferColors[0], bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrNorm = reinterpret_cast<VEC3F*>(vboNormal.lockPtr());
+	memcpy(ptrNorm, &bufferColors[0], bufferColors.size()*sizeof(VEC3F));
 	vboNormal.releasePtr();
 
 	vboColor.setDataSize(3);
 	vboColor.allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboColor.lockPtr());
-	memcpy(ptrCol, &bufferColors[0], bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(vboColor.lockPtr());
+	memcpy(ptrCol, &bufferColors[0], bufferColors.size()*sizeof(VEC3F));
 	vboColor.releasePtr();
 }
 

@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Geometry/vector_gen.h"
+
 namespace CGoGN
 {
 
@@ -34,11 +36,12 @@ namespace Render
 template<typename PFP>
 void drawerAddEdge(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, float k)
 {
-	const typename PFP::VEC3& P = positions[d];
-	Dart e = map.phi1(d);
-	const typename PFP::VEC3& Q = positions[e];
 
-	typename PFP::VEC3 C = (P+Q)/ typename PFP::REAL(2.0);
+	const Geom::Vec3f& P = PFP::toVec3f(positions[d]);
+	Dart e = map.phi1(d);
+	const Geom::Vec3f& Q = PFP::toVec3f(positions[e]);
+
+	Geom::Vec3f C = (P+Q)/ typename PFP::REAL(2.0);
 
 	dr.vertex(C*(1.0f-k) + k*P);
 	dr.vertex(C*(1.0f-k) + k*Q);
@@ -47,9 +50,9 @@ void drawerAddEdge(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Vert
 template<typename PFP>
 void drawerAddEdgeShrink(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, const typename PFP::VEC3& C, float k)
 {
-	const typename  PFP::VEC3& P = positions[d];
+	const Geom::Vec3f& P = PFP::toVec3f(positions[d]);
 	Dart e = map.phi1(d);
-	const typename PFP::VEC3& Q = positions[e];
+	const Geom::Vec3f& Q = PFP::toVec3f(positions[e]);
 
 	dr.vertex(C*(1.0f-k) + k*P);
 	dr.vertex(C*(1.0f-k) + k*Q);
@@ -58,7 +61,7 @@ void drawerAddEdgeShrink(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, cons
 template<typename PFP>
 void drawerAddFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, float k)
 {
-	typename PFP::VEC3 C = Algo::Surface::Geometry::faceCentroid<PFP>(map,d,positions);
+	Geom::Vec3f C = PFP::toVec3f(Algo::Surface::Geometry::faceCentroid<PFP>(map,d,positions));
 
 	Traversor2FE<typename PFP::MAP> trav(map,d);
 	for (Dart e=trav.begin(); e!=trav.end(); e=trav.next())
@@ -70,7 +73,7 @@ void drawerAddFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Vert
 template<typename PFP>
 void drawerAddVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
-	typename PFP::VEC3 C = Algo::Surface::Geometry::volumeCentroid<PFP>(map,d,positions);
+	Geom::Vec3f C = PFP::toVec3f(Algo::Surface::Geometry::volumeCentroid<PFP>(map,d,positions));
 
 	Traversor3WE<typename PFP::MAP> trav(map,d);
 	for (Dart e=trav.begin(); e!=trav.end(); e=trav.next())

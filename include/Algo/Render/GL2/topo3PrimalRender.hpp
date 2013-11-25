@@ -123,6 +123,7 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 {
 	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
 	Map3& map = dynamic_cast<Map3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3
 
@@ -144,15 +145,15 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 	DartAutoAttribute<VEC3> fv2(mapx);
 
 	m_vbo2->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3* colorDartBuf = reinterpret_cast<VEC3*>(ColorDartsBuffer);
+	VEC3F* colorDartBuf = reinterpret_cast<VEC3F*>(ColorDartsBuffer);
 
 
 	if (m_bufferDartPosition!=NULL)
 		delete m_bufferDartPosition;
-	m_bufferDartPosition = new Geom::Vec3f[2*m_nbDarts];
-	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(m_bufferDartPosition);
+	m_bufferDartPosition = new VEC3F[2*m_nbDarts];
+	VEC3F* positionDartBuf = reinterpret_cast<VEC3F*>(m_bufferDartPosition);
 
 
 	unsigned int posDBI=0;
@@ -194,8 +195,8 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
             VEC3 PP = 0.56f*P + 0.44f*Q;
             VEC3 QQ = 0.56f*Q + 0.44f*P;
 
-			*positionDartBuf++ = P;
-			*positionDartBuf++ = PP;
+			*positionDartBuf++ = PFP::toVec3f(P);
+			*positionDartBuf++ = PFP::toVec3f(PP);
 			if (map.isBoundaryMarked3(d))
 			{
 				*colorDartBuf++ = m_boundaryDartsColor;
@@ -212,8 +213,8 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 			fv2[d] = (P+PP)*0.5f;
 
 
-			*positionDartBuf++ = Q;
-			*positionDartBuf++ = QQ;
+			*positionDartBuf++ = PFP::toVec3f(Q);
+			*positionDartBuf++ = PFP::toVec3f(QQ);
 
 			Dart dx = map.phi3(d);
 			if (map.isBoundaryMarked3(dx))
@@ -239,14 +240,14 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	m_vbo0->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), m_bufferDartPosition, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), m_bufferDartPosition, GL_STREAM_DRAW);
 
 	// alpha2
 	m_vbo1->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
-	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
+	VEC3F* positionF2 = reinterpret_cast<VEC3F*>(PositionBuffer2);
 
 	m_nbRel2=0;
 
@@ -256,8 +257,8 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 		//if (d < e)
 		{
 
-			*positionF2++ = fv2[d];
-			*positionF2++ = fv2[e];
+			*positionF2++ = PFP::toVec3f(fv2[d]);
+			*positionF2++ = PFP::toVec3f(fv2[e]);
 			m_nbRel2++;
 		}
 	}
@@ -271,12 +272,16 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 template<typename PFP>
 void Topo3PrimalRender::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3>& posExpl)
 {
+	typedef Geom::Vec3f VEC3F;
+	typedef typename PFP::VEC3 VEC3;
+
 	m_vbo0->bind();
-	typename PFP::VEC3* positionsPtr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
+	VEC3F* positionsPtr = reinterpret_cast<VEC3F*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		posExpl[d] = (positionsPtr[m_attIndex[d]] + positionsPtr[m_attIndex[d]+1])*0.5f;
+		const VEC3F& v =(positionsPtr[m_attIndex[d]] + positionsPtr[m_attIndex[d]+1])*0.5f;
+		posExpl[d] = PFP::toVec3f(v);
 	}
 
 	m_vbo0->bind();

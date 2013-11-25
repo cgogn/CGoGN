@@ -54,8 +54,9 @@ DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typen
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
 	std::vector<T> bufferData;
@@ -71,11 +72,11 @@ DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typen
 		// loop to cut a polygon in triangle on the fly (works only with convex faces)
 		do
 		{
-			buffer.push_back(positions[d]);
+			buffer.push_back(PFP::toVec3f(positions[d]));
 			bufferData.push_back(dataPerXXX[d]);
-			buffer.push_back(positions[b]);
+			buffer.push_back(PFP::toVec3f(positions[b]));
 			bufferData.push_back(dataPerXXX[b]);
-			buffer.push_back(positions[c]);
+			buffer.push_back(PFP::toVec3f(positions[c]));
 			bufferData.push_back(dataPerXXX[c]);
 			b = c;
 			c = map.phi1(b);
@@ -86,8 +87,8 @@ DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typen
 
 	vboPosition.setDataSize(3);
 	vboPosition.allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(vboPosition.lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	assert(sizeof(T) % sizeof(float) == 0 || !"DataPerFaceRender::updateVBO: VBO's only work with data types which are a multiple of 4 bytes") ;

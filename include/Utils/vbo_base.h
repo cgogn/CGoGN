@@ -61,17 +61,31 @@ protected:
 	unsigned int m_nbElts;
 	mutable bool m_lock;
 
-	// name of the last attribute used to fill the VBO
+	/// name of the last attribute used to fill the VBO
 	std::string m_name;
 
-	// type name of the last attribute used to fill the VBO
+	/// type name of the last attribute used to fill the VBO
 	std::string m_typeName;
+
+	/// pointer to buffer converter
+	ConvertBuffer* m_conv;
+
+
+	/**
+	 * update data from AttributeMultiVectorGen to the vbo, with conversion
+	 */
+	void updateData_withConversion(const AttributeMultiVectorGen* attrib, ConvertBuffer* conv);
 
 public:
 	/**
 	 * constructor: allocate the OGL VBO
 	 */
 	VBO(const std::string& name = "");
+
+	/**
+	 * constructor with buffer converter: allocate the OGL VBO
+	 */
+	VBO(ConvertBuffer* conv, const std::string& name = "");
 
 	/**
 	 * copy constructor, new VBO copy content
@@ -126,14 +140,17 @@ public:
 	/**
 	 * update data from attribute handler to the vbo
 	 */
-	void updateData(const AttributeHandlerGen& attrib);
+	inline void updateData(const AttributeHandlerGen& attrib)
+	{
+		updateData(attrib.getDataVectorGen()) ;
+	}
+
 	void updateData(const AttributeMultiVectorGen* attrib);
 
 	/**
-	 * update data from attribute handler to the vbo, with conversion
+	 * set the converter that convert buffer to float *
 	 */
-	void updateData(const AttributeHandlerGen& attrib, ConvertAttrib* conv);
-	void updateData(const AttributeMultiVectorGen* attrib, ConvertAttrib* conv);
+	void setBufferConverter(ConvertBuffer* conv);
 
 	/**
 	 * update data from given data vector

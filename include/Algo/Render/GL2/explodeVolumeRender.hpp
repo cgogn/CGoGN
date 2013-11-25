@@ -150,17 +150,19 @@ template<typename PFP, typename V_ATT, typename W_ATT>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& positions, const W_ATT& colorPerXXX)
 {
 	typedef typename V_ATT::DATA_TYPE VEC3;
+	typedef typename W_ATT::DATA_TYPE COL3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
+	std::vector<VEC3F> bufferColors;
 	bufferColors.reserve(16384);
-	std::vector<VEC3> bufferNormals;
+	std::vector<VEC3F> bufferNormals;
 	bufferNormals.reserve(16384);
 	
 	std::vector<VEC3> normals;
@@ -179,7 +181,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 		
 		computeFace<PFP>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
 		
-		VEC3 volCol = colorPerXXX[d];
+		VEC3F volCol = PFP::toVec3f(colorPerXXX[d]);
 
 		unsigned int nbs = vertices.size();
 		// just to have more easy algo further
@@ -191,40 +193,40 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 		
 		if (nbs == 3)
 		{
-			buffer.push_back(centerVolumes[d]);
-			bufferColors.push_back(centerFace);
-			bufferNormals.push_back(centerNormalFace); // unsused just for fill
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+			bufferColors.push_back(PFP::toVec3f(centerFace));
+			bufferNormals.push_back(PFP::toVec3f(centerNormalFace)); // unsused just for fill
 			
-			buffer.push_back(*iv++);
-			bufferNormals.push_back(*in++);
+			buffer.push_back(PFP::toVec3f(*iv++));
+			bufferNormals.push_back(PFP::toVec3f(*in++));
 			bufferColors.push_back(volCol);
 			
-			buffer.push_back(*iv++);
-			bufferNormals.push_back(*in++);
+			buffer.push_back(PFP::toVec3f(*iv++));
+			bufferNormals.push_back(PFP::toVec3f(*in++));
 			bufferColors.push_back(volCol);
 
-			buffer.push_back(*iv++);
-			bufferNormals.push_back(*in++);
+			buffer.push_back(PFP::toVec3f(*iv++));
+			bufferNormals.push_back(PFP::toVec3f(*in++));
 			bufferColors.push_back(volCol);
 		}
 		else
 		{
 			for (unsigned int i=0; i<nbs; ++i)
 			{
-				buffer.push_back(centerVolumes[d]);
-				bufferColors.push_back(centerFace);
-				bufferNormals.push_back(centerNormalFace); // unsused just for fill
+				buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+				bufferColors.push_back(PFP::toVec3f(centerFace));
+				bufferNormals.push_back(PFP::toVec3f(centerNormalFace)); // unsused just for fill
 
-				buffer.push_back(centerFace);
+				buffer.push_back(PFP::toVec3f(centerFace));
 				bufferColors.push_back(volCol);
-				bufferNormals.push_back(centerNormalFace);
+				bufferNormals.push_back(PFP::toVec3f(centerNormalFace));
 				
-				buffer.push_back(*iv++);
-				bufferNormals.push_back(*in++);
+				buffer.push_back(PFP::toVec3f(*iv++));
+				bufferNormals.push_back(PFP::toVec3f(*in++));
 				bufferColors.push_back(volCol);
 				
-				buffer.push_back(*iv);
-				bufferNormals.push_back(*in);
+				buffer.push_back(PFP::toVec3f(*iv));
+				bufferNormals.push_back(PFP::toVec3f(*in));
 				bufferColors.push_back(volCol);
 			}
 		}
@@ -234,20 +236,20 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	m_nbTris = buffer.size()/4;
 
 	m_vboPos->allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(m_vboPos->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shaderS->setAttributePosition(m_vboPos);
 
 	m_vboColors->allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(m_vboColors->lockPtr());
-	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
+	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
 	m_shaderS->setAttributeColor(m_vboColors);
 
 	m_vboNormals->allocate(bufferNormals.size());
-	VEC3* ptrNorm = reinterpret_cast<VEC3*>(m_vboNormals->lockPtr());
-	memcpy(ptrNorm,&bufferNormals[0],bufferNormals.size()*sizeof(VEC3));
+	VEC3F* ptrNorm = reinterpret_cast<VEC3F*>(m_vboNormals->lockPtr());
+	memcpy(ptrNorm,&bufferNormals[0],bufferNormals.size()*sizeof(VEC3F));
 	m_vboNormals->releasePtr();
 	m_shaderS->setAttributeNormal(m_vboNormals);
 
@@ -256,17 +258,17 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
-			buffer.push_back(centerVolumes[d]);
-			buffer.push_back(positions[d]);
-			buffer.push_back(positions[map.phi1(d)]);
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+			buffer.push_back(PFP::toVec3f(positions[d]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
 	}
 
 	m_nbLines = buffer.size()/3;
 
 	m_vboPosLine->allocate(buffer.size());
 
-	ptrPos = reinterpret_cast<VEC3*>(m_vboPosLine->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 
 	m_vboPosLine->releasePtr();
 	m_shaderL->setAttributePosition(m_vboPosLine);
@@ -282,19 +284,19 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 template<typename PFP, typename EMBV>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& positions)
 {
-//	typedef typename PFP::VEC3 VEC3;
 	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef typename Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
+	std::vector<VEC3F> bufferColors;
 	bufferColors.reserve(16384);
-	std::vector<VEC3> bufferNormals;
+	std::vector<VEC3F> bufferNormals;
 	bufferNormals.reserve(16384);
 	
 	std::vector<VEC3> normals;
@@ -322,40 +324,40 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 		
 		if (nbs == 3)
 		{
-			buffer.push_back(centerVolumes[d]);
-			bufferColors.push_back(centerFace);
-			bufferNormals.push_back(centerNormalFace); // unsused just for fill
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+			bufferColors.push_back(PFP::toVec3f(centerFace));
+			bufferNormals.push_back(PFP::toVec3f(centerNormalFace)); // unsused just for fill
 
-			buffer.push_back(*iv++);
-			bufferNormals.push_back(*in++);
+			buffer.push_back(PFP::toVec3f(*iv++));
+			bufferNormals.push_back(PFP::toVec3f(*in++));
 			bufferColors.push_back(m_globalColor);
 			
-			buffer.push_back(*iv++);
-			bufferNormals.push_back(*in++);
+			buffer.push_back(PFP::toVec3f(*iv++));
+			bufferNormals.push_back(PFP::toVec3f(*in++));
 			bufferColors.push_back(m_globalColor);
 
-			buffer.push_back(*iv++);
-			bufferNormals.push_back(*in++);
+			buffer.push_back(PFP::toVec3f(*iv++));
+			bufferNormals.push_back(PFP::toVec3f(*in++));
 			bufferColors.push_back(m_globalColor);
 		}
 		else
 		{
 			for (unsigned int i=0; i<nbs; ++i)
 			{
-				buffer.push_back(centerVolumes[d]);
-				bufferColors.push_back(centerFace);
-				bufferNormals.push_back(centerNormalFace); // unsused just for fill
+				buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+				bufferColors.push_back(PFP::toVec3f(centerFace));
+				bufferNormals.push_back(PFP::toVec3f(centerNormalFace)); // unsused just for fill
 
-				buffer.push_back(centerFace);
+				buffer.push_back(PFP::toVec3f(centerFace));
 				bufferColors.push_back(m_globalColor);
-				bufferNormals.push_back(centerNormalFace);
+				bufferNormals.push_back(PFP::toVec3f(centerNormalFace));
 				
-				buffer.push_back(*iv++);
-				bufferNormals.push_back(*in++);
+				buffer.push_back(PFP::toVec3f(*iv++));
+				bufferNormals.push_back(PFP::toVec3f(*in++));
 				bufferColors.push_back(m_globalColor);
 				
-				buffer.push_back(*iv);
-				bufferNormals.push_back(*in);
+				buffer.push_back(PFP::toVec3f(*iv));
+				bufferNormals.push_back(PFP::toVec3f(*in));
 				bufferColors.push_back(m_globalColor);
 			}
 		}
@@ -364,20 +366,20 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 	m_nbTris = buffer.size()/4;
 
 	m_vboPos->allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(m_vboPos->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shaderS->setAttributePosition(m_vboPos);
 
 	m_vboColors->allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(m_vboColors->lockPtr());
-	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
+	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
 	m_shaderS->setAttributeColor(m_vboColors);
 
 	m_vboNormals->allocate(bufferNormals.size());
-	VEC3* ptrNorm = reinterpret_cast<VEC3*>(m_vboNormals->lockPtr());
-	memcpy(ptrNorm,&bufferNormals[0],bufferNormals.size()*sizeof(VEC3));
+	VEC3F* ptrNorm = reinterpret_cast<VEC3F*>(m_vboNormals->lockPtr());
+	memcpy(ptrNorm,&bufferNormals[0],bufferNormals.size()*sizeof(VEC3F));
 	m_vboNormals->releasePtr();
 	m_shaderS->setAttributeNormal(m_vboNormals);
 
@@ -386,17 +388,17 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
-			buffer.push_back(centerVolumes[d]);
-			buffer.push_back(positions[d]);
-			buffer.push_back(positions[map.phi1(d)]);
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+			buffer.push_back(PFP::toVec3f(positions[d]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
 	}
 
 	m_nbLines = buffer.size()/3;
 
 	m_vboPosLine->allocate(buffer.size());
 
-	ptrPos = reinterpret_cast<VEC3*>(m_vboPosLine->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 
 	m_vboPosLine->releasePtr();
 	m_shaderL->setAttributePosition(m_vboPosLine);
@@ -430,14 +432,15 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
     //typedef typename PFP::VEC3 VEC3;
 	typedef typename V_ATT::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
+	std::vector<VEC3F> bufferColors;
 
 	bufferColors.reserve(16384);
 
@@ -445,8 +448,8 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
-		VEC3 volColor = colorPerXXX[d];
+		VEC3F centerFace = PFP::toVec3f(Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions));
+		VEC3F volColor = PFP::toVec3f(colorPerXXX[d]);
 		
 		Dart b = d;
 		Dart c = map.phi1(b);
@@ -454,16 +457,16 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 		
 		if (map.phi1(a) == d)
 		{
-			buffer.push_back(centerVolumes[d]);
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
 			bufferColors.push_back(centerFace);
 			
-			buffer.push_back(positions[b]);
+			buffer.push_back(PFP::toVec3f(positions[b]));
 			bufferColors.push_back(volColor);
-			buffer.push_back(positions[c]);
+			buffer.push_back(PFP::toVec3f(positions[c]));
 			bufferColors.push_back(volColor);
 			c = map.phi1(c);
-			buffer.push_back(positions[c]);
-			bufferColors.push_back(volColor);	
+			buffer.push_back(PFP::toVec3f(positions[c]));
+			bufferColors.push_back(volColor);
 		}
 		else
 		{
@@ -471,15 +474,15 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 			// loop to cut a polygon in triangle on the fly (ceter point method)
 			do
 			{
-				buffer.push_back(centerVolumes[d]);
+				buffer.push_back(PFP::toVec3f(centerVolumes[d]));
 				bufferColors.push_back(centerFace);
 				
 				buffer.push_back(centerFace);
 				bufferColors.push_back(volColor);
 				
-				buffer.push_back(positions[b]);
+				buffer.push_back(PFP::toVec3f(positions[b]));
 				bufferColors.push_back(volColor);
-				buffer.push_back(positions[c]);
+				buffer.push_back(PFP::toVec3f(positions[c]));
 				bufferColors.push_back(volColor);
 				b = c;
 				c = map.phi1(b);
@@ -490,14 +493,14 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 	m_nbTris = buffer.size()/4;
 
 	m_vboPos->allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(m_vboPos->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shader->setAttributePosition(m_vboPos);
 
 	m_vboColors->allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(m_vboColors->lockPtr());
-	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
+	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
 	m_shader->setAttributeColor(m_vboColors);
 
@@ -506,17 +509,17 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
-			buffer.push_back(centerVolumes[d]);
-			buffer.push_back(positions[d]);
-			buffer.push_back(positions[map.phi1(d)]);
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+			buffer.push_back(PFP::toVec3f(positions[d]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
 	}
 
 	m_nbLines = buffer.size()/3;
 
 	m_vboPosLine->allocate(buffer.size());
 
-	ptrPos = reinterpret_cast<VEC3*>(m_vboPosLine->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 
 	m_vboPosLine->releasePtr();
 	m_shaderL->setAttributePosition(m_vboPosLine);
@@ -539,22 +542,22 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 
 	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::REAL REAL;
+	typedef Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
-	std::vector<VEC3> buffer;
+	std::vector<VEC3F> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferColors;
-
+	std::vector<VEC3F> bufferColors;
 	bufferColors.reserve(16384);
 
 	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
+		VEC3F centerFace = PFP::toVec3f(Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions));
 
 		Dart b = d;
 		Dart c = map.phi1(b);
@@ -562,15 +565,15 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 		
 		if (map.phi1(a) == d)
 		{
-			buffer.push_back(centerVolumes[d]);
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
 			bufferColors.push_back(centerFace);
 			
-			buffer.push_back(positions[b]);
+			buffer.push_back(PFP::toVec3f(positions[b]));
 			bufferColors.push_back(m_globalColor);
-			buffer.push_back(positions[c]);
+			buffer.push_back(PFP::toVec3f(positions[c]));
 			bufferColors.push_back(m_globalColor);
 			c = map.phi1(c);
-			buffer.push_back(positions[c]);
+			buffer.push_back(PFP::toVec3f(positions[c]));
 			bufferColors.push_back(m_globalColor);	
 		}
 		else
@@ -579,15 +582,15 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 			// loop to cut a polygon in triangle on the fly (ceter point method)
 			do
 			{
-				buffer.push_back(centerVolumes[d]);
+				buffer.push_back(PFP::toVec3f(centerVolumes[d]));
 				bufferColors.push_back(centerFace);
 				
 				buffer.push_back(centerFace);
 				bufferColors.push_back(m_globalColor);
 				
-				buffer.push_back(positions[b]);
+				buffer.push_back(PFP::toVec3f(positions[b]));
 				bufferColors.push_back(m_globalColor);
-				buffer.push_back(positions[c]);
+				buffer.push_back(PFP::toVec3f(positions[c]));
 				bufferColors.push_back(m_globalColor);
 				b = c;
 				c = map.phi1(b);
@@ -599,14 +602,14 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	m_nbTris = buffer.size()/4;
 
 	m_vboPos->allocate(buffer.size());
-	VEC3* ptrPos = reinterpret_cast<VEC3*>(m_vboPos->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shader->setAttributePosition(m_vboPos);
 
 	m_vboColors->allocate(bufferColors.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(m_vboColors->lockPtr());
-	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
+	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
 	m_shader->setAttributeColor(m_vboColors);
 
@@ -615,17 +618,17 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
-			buffer.push_back(centerVolumes[d]);
-			buffer.push_back(positions[d]);
-			buffer.push_back(positions[map.phi1(d)]);
+			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
+			buffer.push_back(PFP::toVec3f(positions[d]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
 	}
 
 	m_nbLines = buffer.size()/3;
 
 	m_vboPosLine->allocate(buffer.size());
 
-	ptrPos = reinterpret_cast<VEC3*>(m_vboPosLine->lockPtr());
-	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 
 	m_vboPosLine->releasePtr();
 	m_shaderL->setAttributePosition(m_vboPosLine);
