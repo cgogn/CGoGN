@@ -29,6 +29,7 @@ SET (BUILD_SHARED_LIBS OFF CACHE BOOL
 
 SET (WITH_ASSIMP ON CACHE BOOL "build with Assimp")
 SET (WITH_ZINRI ON CACHE BOOL "build with Zinri libs")
+SET (WITH_PYTHONQT ON CACHE BOOL "build PythonQt (for Schnapps)")
 
 IF (APPLE)
 	SET(CMAKE_OSX_ARCHITECTURES x86_64)
@@ -38,8 +39,10 @@ ENDIF(APPLE)
 
 add_subdirectory(Tools Tools/build)
 
-add_subdirectory(PythonQt PythonQt/build)
-INSTALL (DIRECTORY PythonQt/src/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/PythonQt FILES_MATCHING PATTERN "*.h")
+IF (WITH_PYTHONQT)
+	add_subdirectory(PythonQt PythonQt/build)
+	INSTALL (DIRECTORY PythonQt/src/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/PythonQt FILES_MATCHING PATTERN "*.h")
+ENDIF (WITH_PYTHONQT)
 
 add_subdirectory(OpenNL OpenNL/build)
 INSTALL (DIRECTORY OpenNL/src/NL/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/NL FILES_MATCHING PATTERN "*.h")

@@ -1,5 +1,3 @@
-#include "schnapps.h"
-
 #include <QVBoxLayout>
 #include <QSplitter>
 #include <QMessageBox>
@@ -13,6 +11,9 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 
+#include "mapHandler.h"
+#include "schnapps.h"
+
 #include "controlDock_cameraTab.h"
 #include "controlDock_mapTab.h"
 #include "controlDock_pluginTab.h"
@@ -23,7 +24,6 @@
 #include "plugin.h"
 #include "plugin_interaction.h"
 #include "plugin_processing.h"
-#include "mapHandler.h"
 
 namespace CGoGN
 {
@@ -100,8 +100,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	connect(action_LoadPythonScript, SIGNAL(triggered()), this, SLOT(loadPythonScriptFromFileDialog()));
 
 	// create & setup central widget (views)
-
-	glewInit();
+//	glewInit();
 
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
