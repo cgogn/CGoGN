@@ -80,7 +80,7 @@ To compile CGoGN:
 	  WITH_QT	         (T)
 	    -> to minimize dependencies and compilation time
 	
-	  FORCE_MR           (1)
+	  FORCE_MR           (0)
 	    -> allows the compilation in 2 modes: mono-resolution(0), multi-resolution(1)
 	
 	  ONELIB             (F)

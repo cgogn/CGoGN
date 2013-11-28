@@ -36,6 +36,7 @@
 #include "Utils/gzstream.h"
 
 #include "Algo/Import/importFileTypes.h"
+#include "Algo/Modelisation/voxellisation.h"
 
 #ifdef WITH_ASSIMP
 #include "Assimp/assimp.h"
@@ -103,9 +104,11 @@ public:
 
 	bool importOff(const std::string& filename, std::vector<std::string>& attrNames);
 
+    bool importVoxellisation(Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames);
+
 	bool importMeshBin(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importObj(const std::string& filename, std::vector<std::string>& attrNames);
+    bool importObj(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 

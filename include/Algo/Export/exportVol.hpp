@@ -46,6 +46,15 @@ inline std::string truncFloatTO8(float f)
 	std::stringstream ss;
 	ss << f;
 	std::string res = ss.str();
+
+	size_t expo = res.find('e');
+	if (expo != std::string::npos)
+	{
+		if ( res[expo+2] == '0')
+			return res.substr(0,6) + res[expo+1] + res[expo+3];
+
+		return res.substr(0,5) + res.substr(expo+1);
+	}
 	return res.substr(0,8);
 }
 

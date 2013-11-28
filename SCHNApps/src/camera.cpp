@@ -15,6 +15,7 @@ Camera::Camera(const QString& name, SCHNApps* s) :
 	m_drawPath(false)
 {
 	++cameraCount;
+	connect(this->frame(), SIGNAL(modified()), this, SLOT(frameModified()));
 }
 
 Camera::~Camera()
@@ -53,6 +54,20 @@ void Camera::linkView(View* view)
 void Camera::unlinkView(View* view)
 {
 	l_views.removeOne(view);
+}
+
+void Camera::frameModified()
+{
+	if(m_draw || m_drawPath)
+	{
+		foreach(View* view, m_schnapps->getViewSet().values())
+			view->updateGL();
+	}
+	else
+	{
+		foreach(View* view, l_views)
+			view->updateGL();
+	}
 }
 
 } // namespace SCHNApps

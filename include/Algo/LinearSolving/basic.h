@@ -43,10 +43,10 @@ template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
 	const VertexAttribute<unsigned int>& index,
-	CellMarker<VERTEX>& lm,
+	const CellMarker<VERTEX>& fm,
 	const VertexAttribute<ATTR_TYPE>& attr)
 {
-	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE> fmts(index, lm, attr) ;
+	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE> fmts(index, fm, attr) ;
 	m.template foreach_orbit<VERTEX>(fmts) ;
 }
 
@@ -54,11 +54,11 @@ template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
 	const VertexAttribute<unsigned int>& index,
-	CellMarker<VERTEX>& lm,
+	const CellMarker<VERTEX>& fm,
 	const VertexAttribute<ATTR_TYPE>& attr,
 	unsigned int coord)
 {
-	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE> fmts(index, lm, attr, coord) ;
+	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE> fmts(index, fm, attr, coord) ;
 	m.template foreach_orbit<VERTEX>(fmts) ;
 }
 

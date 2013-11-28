@@ -10,12 +10,17 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_name(name),
 	m_schnapps(s),
 	m_map(map),
-	m_render(NULL),
-	m_bbDrawer(NULL)
-{}
+	m_frame(NULL),
+	m_bbDrawer(NULL),
+	m_render(NULL)
+{
+	m_frame = new qglviewer::ManipulatedFrame();
+}
 
 MapHandlerGen::~MapHandlerGen()
 {
+	if(m_frame)
+		delete m_frame;
 	if(m_bbDrawer)
 		delete m_bbDrawer;
 	if(m_render)
@@ -42,9 +47,7 @@ Utils::VBO* MapHandlerGen::createVBO(const AttributeMultiVectorGen* attr)
 			emit(vboAdded(vbo));
 		}
 		else
-		{
 			vbo->updateData(attr);
-		}
 		return vbo;
 	}
 	else
@@ -98,6 +101,77 @@ void MapHandlerGen::deleteVBO(const QString& name)
 		emit(vboRemoved(vbo));
 		delete vbo;
 	}
+}
+
+/*********************************************************
+ * MANAGE CELL SELECTORS
+ *********************************************************/
+
+CellSelectorGen* MapHandlerGen::addCellSelector(unsigned int orbit, const QString& name)
+{
+	if(m_cellSelectors[orbit].contains(name))
+		return NULL;
+
+	CellSelectorGen* cs = NULL;
+
+	switch(orbit)
+	{
+		case DART: cs = new CellSelector<DART>(*m_map, name); break;
+		case VERTEX: cs = new CellSelector<VERTEX>(*m_map, name); break;
+		case EDGE: cs = new CellSelector<EDGE>(*m_map, name); break;
+		case FACE: cs = new CellSelector<FACE>(*m_map, name); break;
+		case VOLUME: cs = new CellSelector<VOLUME>(*m_map, name); break;
+	}
+
+	if(!cs)
+		return NULL;
+
+	m_cellSelectors[orbit].insert(name, cs);
+	emit(cellSelectorAdded(orbit, name));
+
+	connect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));
+
+	return cs;
+}
+
+void MapHandlerGen::removeCellSelector(unsigned int orbit, const QString& name)
+{
+	CellSelectorGen* cs = getCellSelector(orbit, name);
+	if (cs)
+	{
+		m_cellSelectors[orbit].remove(name);
+		emit(cellSelectorRemoved(orbit, name));
+
+		disconnect(cs, SIGNAL(selectedCellsChanged()), this, SIGNAL(selectedCellsChanged()));
+
+		delete cs;
+	}
+}
+
+CellSelectorGen* MapHandlerGen::getCellSelector(unsigned int orbit, const QString& name) const
+{
+	if (m_cellSelectors[orbit].contains(name))
+		return m_cellSelectors[orbit][name];
+	else
+		return NULL;
+}
+
+void MapHandlerGen::selectedCellsChanged()
+{
+	CellSelectorGen* cs = static_cast<CellSelectorGen*>(QObject::sender());
+	emit(selectedCellsChanged(cs));
+}
+
+void MapHandlerGen::updateMutuallyExclusiveSelectors(unsigned int orbit)
+{
+	QList<CellSelectorGen*> mex;
+	foreach(CellSelectorGen* cs, m_cellSelectors[orbit])
+	{
+		if(cs->isMutuallyExclusive())
+			mex.append(cs);
+	}
+	foreach(CellSelectorGen* cs, m_cellSelectors[orbit])
+		cs->setMutuallyExclusiveSet(mex);
 }
 
 /*********************************************************

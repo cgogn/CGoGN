@@ -44,25 +44,26 @@ struct MapParameters
 	FaceShadingStyle faceStyle;
 };
 
-class SurfaceRenderPlugin : public PluginInteraction
+class Surface_Render_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
-	friend class SurfaceRender_DockTab;
+	friend class Surface_Render_DockTab;
 
 public:
-	SurfaceRenderPlugin()
+	Surface_Render_Plugin()
 	{}
 
-	~SurfaceRenderPlugin()
+	~Surface_Render_Plugin()
 	{}
 
 private:
 	virtual bool enable();
 	virtual void disable();
 
-	virtual void redraw(View *view);
+	virtual void draw(View *view) {}
+	virtual void drawMap(View* view, MapHandlerGen* map);
 
 	virtual void keyPress(View* view, QKeyEvent* event) {}
 	virtual void keyRelease(View* view, QKeyEvent* event) {}
@@ -96,7 +97,7 @@ public slots:
 	void changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style);
 
 protected:
-	SurfaceRender_DockTab* m_dockTab;
+	Surface_Render_DockTab* m_dockTab;
 	QHash<View*, QHash<MapHandlerGen*, MapParameters> > h_viewParameterSet;
 
 	CGoGN::Utils::ShaderFlat* m_flatShader;

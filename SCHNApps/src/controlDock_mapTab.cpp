@@ -1,7 +1,6 @@
 #include "controlDock_mapTab.h"
 
 #include "schnapps.h"
-#include "mapHandler.h"
 #include "view.h"
 
 namespace CGoGN
@@ -15,15 +14,59 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 	m_selectedMap(NULL),
 	b_updatingUI(false)
 {
+	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+		m_selectedSelector[i] = NULL;
+
 	setupUi(this);
 
+	connect(list_maps, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
 	connect(list_maps, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
 	connect(list_vertexAttributes, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(vertexAttributeCheckStateChanged(QListWidgetItem*)));
-	connect(list_maps, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
+
+	connect(tabWidget_mapInfo, SIGNAL(currentChanged(int)), this, SLOT(selectedSelectorChanged()));
+
+	connect(list_dartSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_dartSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
+	connect(button_dartAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
+	connect(button_dartRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
+
+	connect(list_vertexSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_vertexSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
+	connect(button_vertexAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
+	connect(button_vertexRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
+
+	connect(list_edgeSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_edgeSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
+	connect(button_edgeAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
+	connect(button_edgeRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
+
+	connect(list_faceSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_faceSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
+	connect(button_faceAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
+	connect(button_faceRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
+
+	connect(list_volumeSelectors, SIGNAL(itemSelectionChanged()), this, SLOT(selectedSelectorChanged()));
+	connect(list_volumeSelectors, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(selectorCheckStateChanged(QListWidgetItem*)));
+	connect(button_volumeAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
+	connect(button_volumeRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
 
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
+}
+
+unsigned int ControlDock_MapTab::getCurrentOrbit()
+{
+	int current = tabWidget_mapInfo->currentIndex();
+	switch(current)
+	{
+		case 0 : return DART; break;
+		case 1 : return VERTEX; break;
+		case 2 : return EDGE; break;
+		case 3 : return FACE; break;
+		case 4 : return VOLUME; break;
+	}
+	return DART;
 }
 
 
@@ -34,18 +77,20 @@ void ControlDock_MapTab::selectedMapChanged()
 {
 	if(!b_updatingUI)
 	{
-		MapHandlerGen* old = m_selectedMap;
-
 		if(m_selectedMap)
 		{
 			disconnect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 			disconnect(m_selectedMap, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(selectedMapVBOAdded(Utils::VBO*)));
 			disconnect(m_selectedMap, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(selectedMapVBORemoved(Utils::VBO*)));
+			disconnect(m_selectedMap, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorAdded(unsigned int, const QString&)));
+			disconnect(m_selectedMap, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorRemoved(unsigned int, const QString&)));
 		}
 
 		QList<QListWidgetItem*> items = list_maps->selectedItems();
 		if(!items.empty())
 		{
+			MapHandlerGen* old = m_selectedMap;
+
 			QString selectedMapName = items[0]->text();
 			m_selectedMap = m_schnapps->getMap(selectedMapName);
 
@@ -56,6 +101,8 @@ void ControlDock_MapTab::selectedMapChanged()
 			connect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 			connect(m_selectedMap, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(selectedMapVBOAdded(Utils::VBO*)));
 			connect(m_selectedMap, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(selectedMapVBORemoved(Utils::VBO*)));
+			connect(m_selectedMap, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorAdded(unsigned int, const QString&)));
+			connect(m_selectedMap, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorRemoved(unsigned int, const QString&)));
 		}
 	}
 }
@@ -92,6 +139,79 @@ void ControlDock_MapTab::vertexAttributeCheckStateChanged(QListWidgetItem *item)
 		}
 		else
 			m_selectedMap->deleteVBO(item->text());
+	}
+}
+
+void ControlDock_MapTab::selectedSelectorChanged()
+{
+	if(!b_updatingUI)
+	{
+		if(m_selectedMap)
+		{
+			QList<QListWidgetItem*> items;
+			unsigned int orbit = getCurrentOrbit();
+			switch(orbit)
+			{
+				case DART: items = list_dartSelectors->selectedItems(); break;
+				case VERTEX: items = list_vertexSelectors->selectedItems(); break;
+				case EDGE: items = list_edgeSelectors->selectedItems(); break;
+				case FACE: items = list_faceSelectors->selectedItems(); break;
+				case VOLUME: items = list_volumeSelectors->selectedItems(); break;
+			}
+			if(!items.empty())
+			{
+				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
+				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
+			}
+		}
+	}
+}
+
+void ControlDock_MapTab::selectorCheckStateChanged(QListWidgetItem* item)
+{
+	if(!b_updatingUI)
+	{
+		if(m_selectedMap)
+		{
+			unsigned int orbit = getCurrentOrbit();
+			CellSelectorGen* cs = m_selectedMap->getCellSelector(orbit, item->text());
+			cs->setMutuallyExclusive(item->checkState() == Qt::Checked);
+			m_selectedMap->updateMutuallyExclusiveSelectors(orbit);
+		}
+	}
+}
+
+void ControlDock_MapTab::addSelector()
+{
+	if(!b_updatingUI)
+	{
+		if(m_selectedMap)
+		{
+			unsigned int orbit = getCurrentOrbit();
+			m_selectedMap->addCellSelector(orbit, QString("selector_") + QString::number(CellSelectorGen::selectorCount));
+		}
+	}
+}
+
+void ControlDock_MapTab::removeSelector()
+{
+	if(!b_updatingUI)
+	{
+		if(m_selectedMap)
+		{
+			QList<QListWidgetItem*> items;
+			unsigned int orbit = getCurrentOrbit();
+			switch(orbit)
+			{
+				case DART: items = list_dartSelectors->selectedItems(); break;
+				case VERTEX: items = list_vertexSelectors->selectedItems(); break;
+				case EDGE: items = list_edgeSelectors->selectedItems(); break;
+				case FACE: items = list_faceSelectors->selectedItems(); break;
+				case VOLUME: items = list_volumeSelectors->selectedItems(); break;
+			}
+			if(!items.empty())
+				m_selectedMap->removeCellSelector(orbit, items[0]->text());
+		}
 	}
 }
 
@@ -197,6 +317,16 @@ void ControlDock_MapTab::selectedMapVBORemoved(Utils::VBO *vbo)
 	updateSelectedMapInfo();
 }
 
+void ControlDock_MapTab::selectedMapCellSelectorAdded(unsigned int orbit, const QString& name)
+{
+	updateSelectedMapInfo();
+}
+
+void ControlDock_MapTab::selectedMapCellSelectorRemoved(unsigned int orbit, const QString& name)
+{
+	updateSelectedMapInfo();
+}
+
 
 
 
@@ -211,42 +341,68 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 	list_faceAttributes->clear();
 	list_volumeAttributes->clear();
 
+	list_dartSelectors->clear();
+	list_vertexSelectors->clear();
+	list_edgeSelectors->clear();
+	list_faceSelectors->clear();
+	list_volumeSelectors->clear();
+
 	GenericMap* m = m_selectedMap->getGenericMap();
 	for(unsigned int orbit = DART; orbit <= VOLUME; ++orbit)
 	{
 		unsigned int nbc = m->getNbCells(orbit);
+
+		QListWidget* selectorList = NULL;
+
 		switch(orbit)
 		{
 			case DART : {
 				unsigned int nb = m->getNbDarts();
-				lineEdit_dartNbOrbits->setText(QString::number(nb));
-				lineEdit_dartNbCells->setText(QString::number(nbc));
+				label_dartNbOrbits->setText(QString::number(nb));
+				label_dartNbCells->setText(QString::number(nbc));
+				selectorList = list_dartSelectors;
 				break;
 			}
 			case VERTEX : {
 				unsigned int nb = m->getNbOrbits<VERTEX>();
-				lineEdit_vertexNbOrbits->setText(QString::number(nb));
-				lineEdit_vertexNbCells->setText(QString::number(nbc));
+				label_vertexNbOrbits->setText(QString::number(nb));
+				label_vertexNbCells->setText(QString::number(nbc));
+				selectorList = list_vertexSelectors;
 				break;
 			}
 			case EDGE : {
 				unsigned int nb = m->getNbOrbits<EDGE>();
-				lineEdit_edgeNbOrbits->setText(QString::number(nb));
-				lineEdit_edgeNbCells->setText(QString::number(nbc));
+				label_edgeNbOrbits->setText(QString::number(nb));
+				label_edgeNbCells->setText(QString::number(nbc));
+				selectorList = list_edgeSelectors;
 				break;
 			}
 			case FACE : {
 				unsigned int nb = m->getNbOrbits<FACE>();
-				lineEdit_faceNbOrbits->setText(QString::number(nb));
-				lineEdit_faceNbCells->setText(QString::number(nbc));
+				label_faceNbOrbits->setText(QString::number(nb));
+				label_faceNbCells->setText(QString::number(nbc));
+				selectorList = list_faceSelectors;
 				break;
 			}
 			case VOLUME : {
 				unsigned int nb = m->getNbOrbits<VOLUME>();
-				lineEdit_volumeNbOrbits->setText(QString::number(nb));
-				lineEdit_volumeNbCells->setText(QString::number(nbc));
+				label_volumeNbOrbits->setText(QString::number(nb));
+				label_volumeNbCells->setText(QString::number(nbc));
+				selectorList = list_volumeSelectors;
 				break;
 			}
+		}
+
+		foreach(CellSelectorGen* cs, m_selectedMap->getCellSelectorSet(orbit).values())
+		{
+			QListWidgetItem* item = new QListWidgetItem(cs->getName(), selectorList);
+			item->setFlags(item->flags() | Qt::ItemIsEditable);
+			if(m_selectedSelector[orbit] == cs)
+				item->setSelected(true);
+			if(cs->isMutuallyExclusive())
+				item->setCheckState(Qt::Checked);
+			else
+				item->setCheckState(Qt::Unchecked);
 		}
 
 		if(m->isOrbitEmbedded(orbit))

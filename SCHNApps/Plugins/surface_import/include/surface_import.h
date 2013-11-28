@@ -1,5 +1,5 @@
-#ifndef _IMPORTSURFACE_PLUGIN_H_
-#define _IMPORTSURFACE_PLUGIN_H_
+#ifndef _SURFACE_IMPORT_PLUGIN_H_
+#define _SURFACE_IMPORT_PLUGIN_H_
 
 #include "plugin_processing.h"
 
@@ -9,16 +9,16 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class ImportSurfacePlugin : public PluginProcessing
+class Surface_Import_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	ImportSurfacePlugin()
+	Surface_Import_Plugin()
 	{}
 
-	~ImportSurfacePlugin()
+	~Surface_Import_Plugin()
 	{}
 
 private:

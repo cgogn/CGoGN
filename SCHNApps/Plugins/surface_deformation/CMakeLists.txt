@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME SurfaceDeformation )
+SET( PLUGIN_NAME Surface_Deformation )
 
-SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surfaceDeformation )
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surface_deformation )
 
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
@@ -25,8 +25,8 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/surfaceDeformation.h
-	${PLUGIN_ROOT_DIR}/include/surfaceDeformationDockTab.h
+	${PLUGIN_ROOT_DIR}/include/surface_deformation.h
+	${PLUGIN_ROOT_DIR}/include/surface_deformation_dockTab.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

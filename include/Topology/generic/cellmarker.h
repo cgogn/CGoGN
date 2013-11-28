@@ -198,6 +198,8 @@ public:
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
+		if (em == EMBNULL)
+			return false ;
 		return m_markVector->operator[](em).testMark(m_mark) ;
 	}
 
@@ -307,6 +309,7 @@ public:
 			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
 	}
 };
+
 /**
  * class that allows the marking of Darts
  * the marked Darts are stored to optimize the unmarking task at destruction
@@ -360,6 +363,7 @@ public:
 		return m_markedDarts;
 	}
 };
+
 /**
  * class that allows the marking of cells
  * the markers are not unmarked at destruction

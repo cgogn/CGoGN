@@ -92,8 +92,10 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs)
 
 template <typename PFP>
 void trianguleFaces(
-		typename PFP::MAP& map,
-		VertexAttribute<typename PFP::VEC3>& position, const FaceAttribute<typename PFP::VEC3>& positionF)
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& positionF
+)
 {
 	TraversorF<typename PFP::MAP> t(map) ;
 	for (Dart d = t.begin(); d != t.end(); d = t.next())

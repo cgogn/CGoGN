@@ -6,15 +6,19 @@
 #include "types.h"
 #include "view.h"
 #include "plugin.h"
+#include "cellSelector.h"
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attribmap.h"
 #include "Topology/generic/functor.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Utils/vbo.h"
-#include "Algo/Render/GL2/mapRender.h"
+
 #include "Utils/drawer.h"
+
+#include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Geometry/boundingbox.h"
+
+#include "Utils/vbo.h"
 
 namespace CGoGN
 {
@@ -42,9 +46,13 @@ public slots:
 
 	GenericMap* getGenericMap() const { return m_map; }
 
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
 	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	float getBBdiagSize() const { return m_bbDiagSize; }
+
 	Utils::GLSLShader* getBBDrawerShader() const
 	{
 		if(m_bbDrawer)
@@ -53,8 +61,19 @@ public slots:
 			return NULL;
 	}
 
-	const QList<View*>& getLinkedViews() const { return l_views; }
-	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+	qglviewer::ManipulatedFrame* getFrame() const { return m_frame; }
+	glm::mat4 getFrameMatrix() const
+	{
+		GLdouble m[16];
+		m_frame->getMatrix(m);
+		glm::mat4 matrix;
+		for(unsigned int i = 0; i < 4; ++i)
+		{
+			for(unsigned int j = 0; j < 4; ++j)
+				matrix[i][j] = (float)m[i*4+j];
+		}
+		return matrix;
+	}
 
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
@@ -92,9 +111,18 @@ public:
 
 	void notifyConnectivityModification()
 	{
-		m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
-		m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
-		m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		if (m_render)
+		{
+			m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
+			m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
+			m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		}
+
+		for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+		{
+			foreach (CellSelectorGen* cs, m_cellSelectors[orbit])
+				cs->rebuild();
+		}
 
 		emit(connectivityModified());
 
@@ -121,6 +149,25 @@ public slots:
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
+	 * MANAGE CELL SELECTORS
+	 *********************************************************/
+
+	CellSelectorGen* addCellSelector(unsigned int orbit, const QString& name);
+	void removeCellSelector(unsigned int orbit, const QString& name);
+
+	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
+	const CellSelectorSet& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
+
+private slots:
+	void selectedCellsChanged();
+
+public:
+	template <unsigned int ORBIT>
+	CellSelector<ORBIT>* getCellSelector(const QString& name) const;
+
+	void updateMutuallyExclusiveSelectors(unsigned int orbit);
+
+	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
@@ -141,22 +188,31 @@ signals:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
+	void cellSelectorAdded(unsigned int orbit, const QString& name);
+	void cellSelectorRemoved(unsigned int orbit, const QString& name);
+	void selectedCellsChanged(CellSelectorGen* cs);
+
 protected:
 	QString m_name;
 	SCHNApps* m_schnapps;
+
 	GenericMap* m_map;
+
+	qglviewer::ManipulatedFrame* m_frame;
 
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
 	float m_bbDiagSize;
+	Utils::Drawer* m_bbDrawer;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Utils::Drawer* m_bbDrawer;
 
 	QList<View*> l_views;
 
 	VBOSet m_vbo;
 	AttributeSet m_attribs[NB_ORBITS];
+
+	CellSelectorSet m_cellSelectors[NB_ORBITS];
 };
 
 
@@ -174,13 +230,15 @@ public:
 			delete m_map;
 	}
 
+	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
+
 	void draw(Utils::GLSLShader* shader, int primitive);
 	void drawBB();
 
-	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
-
 	void updateBB(const VertexAttribute<typename PFP::VEC3>& position);
 	void updateBBDrawer();
+
+	CellSelectorGen* addPrimitiveSelector(unsigned int orbit, const QString& name);
 
 protected:
 	Geom::BoundingBox<typename PFP::VEC3> m_bb;

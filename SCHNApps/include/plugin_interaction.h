@@ -29,7 +29,8 @@ public slots:
 	const QList<Utils::GLSLShader*> getShaders() const { return l_shaders; }
 
 private:
-	virtual void redraw(View* view) = 0;
+	virtual void draw(View* view) = 0;
+	virtual void drawMap(View* view, MapHandlerGen* map) = 0;
 
 	virtual void keyPress(View* view, QKeyEvent* event) = 0;
 	virtual void keyRelease(View* view, QKeyEvent* event) = 0;

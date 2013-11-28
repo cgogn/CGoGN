@@ -51,6 +51,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_controlDockTabWidget->setObjectName("ControlDockTabWidget");
 	m_controlDockTabWidget->setLayoutDirection(Qt::LeftToRight);
 	m_controlDockTabWidget->setTabPosition(QTabWidget::North);
+	m_controlDockTabWidget->setMovable(true);
 
 	addDockWidget(Qt::LeftDockWidgetArea, m_controlDock);
 	m_controlDock->setVisible(true);
@@ -77,6 +78,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_pluginDockTabWidget->setObjectName("PluginDockTabWidget");
 	m_pluginDockTabWidget->setLayoutDirection(Qt::LeftToRight);
 	m_pluginDockTabWidget->setTabPosition(QTabWidget::East);
+	m_pluginDockTabWidget->setMovable(true);
 
 	addDockWidget(Qt::RightDockWidgetArea, m_pluginDock);
 	m_pluginDock->setVisible(false);
@@ -233,6 +235,8 @@ View* SCHNApps::getView(const QString& name) const
 
 void SCHNApps::setSelectedView(View* view)
 {
+	int currentTab = m_pluginDockTabWidget->currentIndex();
+
 	if(m_selectedView)
 	{
 		foreach(PluginInteraction* p, m_selectedView->getLinkedPlugins())
@@ -248,6 +252,8 @@ void SCHNApps::setSelectedView(View* view)
 		enablePluginTabWidgets(p);
 	connect(m_selectedView, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(enablePluginTabWidgets(PluginInteraction*)));
 	connect(m_selectedView, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(disablePluginTabWidgets(PluginInteraction*)));
+
+	m_pluginDockTabWidget->setCurrentIndex(currentTab);
 
 	emit(selectedViewChanged(oldSelected, m_selectedView));
 
@@ -353,6 +359,7 @@ Plugin* SCHNApps::enablePlugin(const QString& pluginName)
 		// if loading fails
 		else
 		{
+			std::cout << "loader.instance() failed.." << std::endl;
 			return NULL;
 		}
 	}
@@ -413,7 +420,15 @@ void SCHNApps::addPluginDockTab(Plugin* plugin, QWidget* tabWidget, const QStrin
 
 		int idx = m_pluginDockTabWidget->addTab(tabWidget, tabText);
 		m_pluginDock->setVisible(true);
-		m_pluginDockTabWidget->setTabEnabled(idx, true);
+
+		PluginInteraction* pi = dynamic_cast<PluginInteraction*>(plugin);
+		if(pi)
+		{
+			if(pi->isLinkedToView(m_selectedView))
+				m_pluginDockTabWidget->setTabEnabled(idx, true);
+			else
+				m_pluginDockTabWidget->setTabEnabled(idx, false);
+		}
 
 		if(currentTab != -1)
 			m_pluginDockTabWidget->setCurrentIndex(currentTab);
@@ -434,28 +449,20 @@ void SCHNApps::removePluginDockTab(Plugin* plugin, QWidget *tabWidget)
 
 void SCHNApps::enablePluginTabWidgets(PluginInteraction* plugin)
 {
-//	int currentTab = m_dockTabWidget->currentIndex();
-
 	if(m_pluginTabs.contains(plugin))
 	{
 		foreach(QWidget* w, m_pluginTabs[plugin])
 			m_pluginDockTabWidget->setTabEnabled(m_pluginDockTabWidget->indexOf(w), true);
 	}
-
-//	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 void SCHNApps::disablePluginTabWidgets(PluginInteraction* plugin)
 {
-//	int currentTab = m_dockTabWidget->currentIndex();
-
 	if(m_pluginTabs.contains(plugin))
 	{
 		foreach(QWidget* w, m_pluginTabs[plugin])
 			m_pluginDockTabWidget->setTabEnabled(m_pluginDockTabWidget->indexOf(w), false);
 	}
-
-//	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 /*********************************************************
@@ -517,6 +524,16 @@ MapHandlerGen* SCHNApps::getMap(const QString& name) const
 MapHandlerGen* SCHNApps::getSelectedMap() const
 {
 	return m_controlMapTab->getSelectedMap();
+}
+
+unsigned int SCHNApps::getCurrentOrbit() const
+{
+	return m_controlMapTab->getCurrentOrbit();
+}
+
+CellSelectorGen* SCHNApps::getSelectedSelector(unsigned int orbit) const
+{
+	return m_controlMapTab->getSelectedSelector(orbit);
 }
 
 /*********************************************************

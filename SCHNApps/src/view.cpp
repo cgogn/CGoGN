@@ -34,7 +34,7 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 
 	m_currentCamera = m_schnapps->addCamera();
 
-	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(updateGL()));
+	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
 }
 
 View::~View()
@@ -67,6 +67,7 @@ void View::setCurrentCamera(Camera* c)
 
 		emit(currentCameraChanged(prev, c));
 
+		updateCurrentCameraBB();
 		updateGL();
 	}
 }
@@ -131,8 +132,15 @@ void View::linkMap(MapHandlerGen* map)
 		l_maps.push_back(map);
 		map->linkView(this);
 		emit(mapLinked(map));
-		updateViewBB();
+
+		updateCurrentCameraBB();
 		updateGL();
+
+		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
+		connect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
+
+		if(map->isSelectedMap())
+			setManipulatedFrame(map->getFrame());
 	}
 }
 
@@ -149,8 +157,15 @@ void View::unlinkMap(MapHandlerGen* map)
 	{
 		map->unlinkView(this);
 		emit(mapUnlinked(map));
-		updateViewBB();
+
+		updateCurrentCameraBB();
 		updateGL();
+
+		disconnect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
+		disconnect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
+
+		if(map == m_schnapps->getSelectedMap())
+			setManipulatedFrame(NULL);
 	}
 }
 
@@ -195,23 +210,6 @@ void View::preDraw()
 {
 	m_currentCamera->setScreenWidthAndHeight(width(), height());
 
-	glm::mat4 mm = getCurrentModelViewMatrix();
-	glm::mat4 pm = getCurrentProjectionMatrix();
-
-	MapHandlerGen* map = m_schnapps->getSelectedMap();
-	if(map)
-	{
-		Utils::GLSLShader* bbShader = map->getBBDrawerShader();
-		if(bbShader)
-			bbShader->updateMatrices(pm, mm);
-	}
-
-	foreach(PluginInteraction* plugin, l_plugins)
-	{
-		foreach(Utils::GLSLShader* shader, plugin->getShaders())
-			shader->updateMatrices(pm, mm);
-	}
-
 	QGLViewer::preDraw();
 }
 
@@ -226,12 +224,33 @@ void View::draw()
 		}
 	}
 
-	MapHandlerGen* map = m_schnapps->getSelectedMap();
-	if(map && isLinkedToMap(map))
-		map->drawBB();
+	glm::mat4 mm = getCurrentModelViewMatrix();
+	glm::mat4 pm = getCurrentProjectionMatrix();
+
+	MapHandlerGen* selectedMap = m_schnapps->getSelectedMap();
+
+	foreach(MapHandlerGen* map, l_maps)
+	{
+		glm::mat4 map_mm = mm * map->getFrameMatrix();
+
+		if(map == selectedMap)
+		{
+			Utils::GLSLShader* bbShader = map->getBBDrawerShader();
+			if(bbShader)
+				bbShader->updateMatrices(pm, map_mm);
+			map->drawBB();
+		}
+
+		foreach(PluginInteraction* plugin, l_plugins)
+		{
+			foreach(Utils::GLSLShader* shader, plugin->getShaders())
+				shader->updateMatrices(pm, map_mm);
+			plugin->drawMap(this, map);
+		}
+	}
 
 	foreach(PluginInteraction* plugin, l_plugins)
-		plugin->redraw(this);
+		plugin->draw(this);
 }
 
 void View::postDraw()
@@ -315,23 +334,6 @@ void View::mouseMoveEvent(QMouseEvent* event)
 	foreach(PluginInteraction* plugin, l_plugins)
 		plugin->mouseMove(this, event);
 	QGLViewer::mouseMoveEvent(event);
-
-	if(m_currentCamera->getDraw() || m_currentCamera->getDrawPath())
-	{
-		foreach(View* view, m_schnapps->getViewSet().values())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
-	else
-	{
-		foreach(View* view, m_currentCamera->getLinkedViews())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
 }
 
 void View::wheelEvent(QWheelEvent* event)
@@ -339,23 +341,6 @@ void View::wheelEvent(QWheelEvent* event)
 	foreach(PluginInteraction* plugin, l_plugins)
 		plugin->wheelEvent(this, event);
 	QGLViewer::wheelEvent(event);
-
-	if(m_currentCamera->getDraw() || m_currentCamera->getDrawPath())
-	{
-		foreach(View* view, m_schnapps->getViewSet().values())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
-	else
-	{
-		foreach(View* view, m_currentCamera->getLinkedViews())
-		{
-			if(view != this)
-				view->updateGL();
-		}
-	}
 }
 
 glm::mat4 View::getCurrentModelViewMatrix() const
@@ -397,7 +382,7 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 	return mvpm;
 }
 
-void View::updateViewBB()
+void View::updateCurrentCameraBB()
 {
 	qglviewer::Vec bbMin(0,0,0);
 	qglviewer::Vec bbMax(1,1,1);
@@ -421,6 +406,13 @@ void View::updateViewBB()
 	}
 	camera()->setSceneBoundingBox(bbMin, bbMax);
 	camera()->showEntireScene();
+}
+
+void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
+{
+	if(cur && isLinkedToMap(cur))
+		setManipulatedFrame(cur->getFrame());
+	updateGL();
 }
 
 void View::ui_verticalSplitView(int x, int y, int globalX, int globalY)

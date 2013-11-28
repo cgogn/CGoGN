@@ -36,22 +36,22 @@ class FunctorMeshToSolver_Scalar : public FunctorType
 {
 protected:
 	const VertexAttribute<unsigned int>& indexTable ;
-	CellMarker<VERTEX>& lockingMarker ;
+	const CellMarker<VERTEX>& freeMarker ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	bool lockedVertices ;
 
 public:
 	FunctorMeshToSolver_Scalar(
 		const VertexAttribute<unsigned int>& index,
-		CellMarker<VERTEX>& lm,
+		const CellMarker<VERTEX>& fm,
 		const VertexAttribute<ATTR_TYPE>& attr
-	) :	indexTable(index), lockingMarker(lm), attrTable(attr), lockedVertices(false)
+	) :	indexTable(index), freeMarker(fm), attrTable(attr), lockedVertices(false)
 	{}
 
 	bool operator()(Dart d)
 	{
 		nlSetVariable(indexTable[d], attrTable[d]);
-		if(lockingMarker.isMarked(d))
+		if(!freeMarker.isMarked(d))
 		{
 			nlLockVariable(indexTable[d]);
 			lockedVertices = true ;
@@ -67,7 +67,7 @@ class FunctorMeshToSolver_Vector : public FunctorType
 {
 protected:
 	const VertexAttribute<unsigned int>& indexTable ;
-	CellMarker<VERTEX>& lockingMarker ;
+	const CellMarker<VERTEX>& freeMarker ;
 	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	unsigned int coord ;
 	bool lockedVertices ;
@@ -75,16 +75,16 @@ protected:
 public:
 	FunctorMeshToSolver_Vector(
 		const VertexAttribute<unsigned int>& index,
-		CellMarker<VERTEX>& lm,
+		const CellMarker<VERTEX>& fm,
 		const VertexAttribute<ATTR_TYPE>& attr,
 		unsigned int c
-	) :	indexTable(index), lockingMarker(lm), attrTable(attr), coord(c), lockedVertices(false)
+	) :	indexTable(index), freeMarker(fm), attrTable(attr), coord(c), lockedVertices(false)
 	{}
 
 	bool operator()(Dart d)
 	{
 		nlSetVariable(indexTable[d], (attrTable[d])[coord]);
-		if(lockingMarker.isMarked(d))
+		if(!freeMarker.isMarked(d))
 		{
 			nlLockVariable(indexTable[d]);
 			lockedVertices = true ;

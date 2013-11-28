@@ -54,18 +54,18 @@ public:
 
 	~TraversorCell() ;
 
-	Dart begin() ;
+	inline Dart begin() ;
 
-	Dart end() ;
+	inline Dart end() ;
 
-	Dart next() ;
+	inline Dart next() ;
 
-	void skip(Dart d);
+	inline void skip(Dart d);
 } ;
 
 
 template <unsigned int ORBIT>
-class TraversorCell<GenericMap,ORBIT> //: public Traversor<GenericMap>
+class TraversorCell<GenericMap, ORBIT> //: public Traversor<GenericMap>
 {
 private:
 	GenericMap& m ;
@@ -85,13 +85,13 @@ public:
 
 	~TraversorCell() ;
 
-	Dart begin() ;
+	inline Dart begin() ;
 
-	Dart end() ;
+	inline Dart end() ;
 
-	Dart next() ;
+	inline Dart next() ;
 
-	void skip(Dart d);
+	inline void skip(Dart d);
 } ;
 
 

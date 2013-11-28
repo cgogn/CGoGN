@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME DifferentialProperties )
+SET( PLUGIN_NAME Surface_DifferentialProperties )
 
-SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties )
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surface_differentialProperties )
 
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
@@ -25,9 +25,9 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/differentialProperties.h
-	${PLUGIN_ROOT_DIR}/include/computeNormalDialog.h
-	${PLUGIN_ROOT_DIR}/include/computeCurvatureDialog.h
+	${PLUGIN_ROOT_DIR}/include/surface_differentialProperties.h
+	${PLUGIN_ROOT_DIR}/include/dialog_computeNormal.h
+	${PLUGIN_ROOT_DIR}/include/dialog_computeCurvature.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )
