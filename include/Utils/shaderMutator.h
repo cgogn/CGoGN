@@ -25,6 +25,9 @@
 #ifndef _CGoGN_SHADERMUTATOR_H_
 #define _CGoGN_SHADERMUTATOR_H_
 
+#undef tolower
+#undef toupper
+
 #include "Utils/cgognStream.h"
 #include <boost/regex.hpp>
 #include <string>

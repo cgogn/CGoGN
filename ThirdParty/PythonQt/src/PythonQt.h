@@ -42,6 +42,7 @@
 */
 //----------------------------------------------------------------------------------
 
+#include <iostream>
 #include "PythonQtSystem.h"
 #include "PythonQtInstanceWrapper.h"
 #include "PythonQtClassWrapper.h"
@@ -55,7 +56,6 @@
 #include <QByteArray>
 #include <QStringList>
 #include <QtDebug>
-#include <iostream>
 
 
 class PythonQtClassInfo;
