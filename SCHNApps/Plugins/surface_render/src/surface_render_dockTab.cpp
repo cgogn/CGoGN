@@ -24,6 +24,7 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(renderEdgesChanged(bool)));
 	connect(check_renderFaces, SIGNAL(toggled(bool)), this, SLOT(renderFacesChanged(bool)));
 	connect(group_faceShading, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(faceStyleChanged(QAbstractButton*)));
+	connect(check_renderBoundary, SIGNAL(toggled(bool)), this, SLOT(renderBoundaryChanged(bool)));
 }
 
 
@@ -126,6 +127,20 @@ void Surface_Render_DockTab::faceStyleChanged(QAbstractButton* b)
 				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::FLAT;
 			else if(radio_phongShading->isChecked())
 				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::PHONG;
+			view->updateGL();
+		}
+	}
+}
+
+void Surface_Render_DockTab::renderBoundaryChanged(bool b)
+{
+	if(!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].renderBoundary = b;
 			view->updateGL();
 		}
 	}

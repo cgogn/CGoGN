@@ -25,8 +25,6 @@ bool Surface_Render_Plugin::enable()
 	m_phongShader->setShininess(80.0f) ;
 
 	m_simpleColorShader = new CGoGN::Utils::ShaderSimpleColor();
-	CGoGN::Geom::Vec4f c(0.1f, 0.1f, 0.1f, 1.0f);
-	m_simpleColorShader->setColor(c);
 
 	m_pointSprite = new CGoGN::Utils::PointSprite();
 
@@ -79,6 +77,8 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 		if(p.renderEdges)
 		{
 			glLineWidth(1.0f);
+			CGoGN::Geom::Vec4f c(0.1f, 0.1f, 0.1f, 1.0f);
+			m_simpleColorShader->setColor(c);
 			m_simpleColorShader->setAttributePosition(p.positionVBO);
 			map->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
 		}
@@ -104,6 +104,14 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 					break;
 			}
 			glDisable(GL_POLYGON_OFFSET_FILL);
+		}
+		if(p.renderBoundary)
+		{
+			glLineWidth(5.0f);
+			CGoGN::Geom::Vec4f c(0.8f, 0.8f, 0.1f, 1.0f);
+			m_simpleColorShader->setColor(c);
+			m_simpleColorShader->setAttributePosition(p.positionVBO);
+			map->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::BOUNDARY);
 		}
 	}
 }
@@ -292,6 +300,21 @@ void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString&
 	if(v && m)
 	{
 		h_viewParameterSet[v][m].faceStyle = style;
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QString& map, bool b)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].renderBoundary = b;
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
