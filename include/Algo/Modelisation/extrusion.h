@@ -191,6 +191,10 @@ template<typename PFP>
 Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	Dart d,	float dist);
 
+template<typename PFP>
+Dart extrudeRegion(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position,
+   Dart d, const CellMarker<FACE>& cm);
+
 } // namespace Modelisation
 
 }

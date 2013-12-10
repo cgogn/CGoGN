@@ -42,4 +42,8 @@ TARGET_LINK_LIBRARIES( SCHNApps
 
 
 ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
-ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/../../SCHNAppsPlugins ExtPlugins)
+
+IF(IS_DIRECTORY ${SCHNApps_ROOT_DIR}/../../Plugins)
+	ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/../../Plugins ExtPlugins)
+ENDIF(IS_DIRECTORY ${SCHNApps_ROOT_DIR}/../../Plugins)
+

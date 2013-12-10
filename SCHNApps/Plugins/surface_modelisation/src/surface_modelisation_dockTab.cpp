@@ -16,19 +16,27 @@ Surface_Modelisation_DockTab::Surface_Modelisation_DockTab(SCHNApps* s, Surface_
 {
 	setupUi(this);
 
+    generalOperations << "Create empty map" << "Create new face" << "Add cube" << "Fill hole" << "Delete connected component"
+                      << "Revolution" << "Merge volumes" << "Split surface" << "Extrude region";
+    vertexOperations << "Split vertex" << "Delete vertex";
+    edgeOperations << "Cut edge" << "Uncut edge" << "Collapse edge" << "Flip edge" << "Flip back edge";
+    faceOperations << "Split face" << "Merge faces" << "Delete face" << "Sew faces" << "Unsew faces" << "Extrude face" << "Extrude face following a path";
+
 	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
 	connect(combo_vertexSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(vertexSelectorChanged(int)));
 	connect(combo_edgeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(edgeSelectorChanged(int)));
 	connect(combo_faceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(faceSelectorChanged(int)));
-	connect(button_createEmptyMap, SIGNAL(clicked()), this, SLOT(createEmptyMapButtonClicked()));
-	connect(button_addCube, SIGNAL(clicked()), this, SLOT(addCubeButtonClicked()));
-	connect(button_flipEdge, SIGNAL(clicked()), this, SLOT(flipEdgeButtonClicked()));
+    //connect(combo_operation, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(operationChanged(const QString&)));
+    connect(button_applyGeneralOperation, SIGNAL(clicked()), this, SLOT(applyGeneralOperationButtonClicked()));
+    connect(button_applyVertexOperation, SIGNAL(clicked()), this, SLOT(applyVertexOperationButtonClicked()));
+    connect(button_applyEdgeOperation, SIGNAL(clicked()), this, SLOT(applyEdgeOperationButtonClicked()));
+    connect(button_applyFaceOperation, SIGNAL(clicked()), this, SLOT(applyFaceOperationButtonClicked()));
+    connect(button_start, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+    connect(button_accept, SIGNAL(clicked()), this, SLOT(acceptButtonClicked()));
+    connect(button_cancel, SIGNAL(clicked()), this, SLOT(cancelButtonClicked()));
 }
 
-
-
-
-
+/* -------------------------- Position and selectors -----------------------------------*/
 void Surface_Modelisation_DockTab::positionAttributeChanged(int index)
 {
 	if(!b_updatingUI)
@@ -69,38 +77,6 @@ void Surface_Modelisation_DockTab::faceSelectorChanged(int index)
 	}
 }
 
-void Surface_Modelisation_DockTab::createEmptyMapButtonClicked()
-{
-	if(!b_updatingUI)
-	{
-		m_plugin->createEmptyMap();
-	}
-}
-
-void Surface_Modelisation_DockTab::addCubeButtonClicked()
-{
-	if(!b_updatingUI)
-	{
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(map)
-			m_plugin->addCube(map);
-	}
-}
-
-void Surface_Modelisation_DockTab::flipEdgeButtonClicked()
-{
-	if(!b_updatingUI)
-	{
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(map)
-			m_plugin->flipEdge(map);
-	}
-}
-
-
-
-
-
 void Surface_Modelisation_DockTab::addVertexAttribute(const QString& nameAttr)
 {
 	b_updatingUI = true;
@@ -108,7 +84,7 @@ void Surface_Modelisation_DockTab::addVertexAttribute(const QString& nameAttr)
 	const QString& typeAttr = m_schnapps->getSelectedMap()->getAttributeTypeName(VERTEX, nameAttr);
 	if(typeAttr == vec3TypeName)
 		combo_positionAttribute->addItem(nameAttr);
-	b_updatingUI = false;
+    b_updatingUI = false;
 }
 
 void Surface_Modelisation_DockTab::addVertexSelector(const QString& name)
@@ -164,6 +140,172 @@ void Surface_Modelisation_DockTab::removeFaceSelector(const QString& name)
 	combo_faceSelector->removeItem(index);
 	b_updatingUI = false;
 }
+
+/* -------------------------------- Operations -----------------------------------------*/
+
+void Surface_Modelisation_DockTab::applyGeneralOperationButtonClicked()
+{
+    if(!b_updatingUI)
+    {
+        if (generalOperations.indexOf(combo_generalOperation->currentText()) == 0) // Create empty map
+            m_plugin->createEmptyMap();
+        else
+        {
+            MapHandlerGen* map = m_schnapps->getSelectedMap();
+            if(map)
+            {
+                switch ( generalOperations.indexOf(combo_generalOperation->currentText()) )
+                {
+                    case 1: // Create new face
+                        m_plugin->createNewFace(map);
+                        break;
+                    case 2: // Add cube
+                        m_plugin->addCube(map);
+                        break;
+                    case 3: // Fill hole
+                        m_plugin->fillHole(map);
+                        break;
+                    case 4:  // Delete connected component
+                        m_plugin->deleteCC(map);
+                        break;
+                    case 5: // Revolution
+                        m_plugin->revolution(map);
+                        break;
+                    case 6: // Merge volumes
+                        m_plugin->mergeVolumes(map);
+                        break;
+                    case 7: // Split surface
+                        m_plugin->splitSurface(map);
+                        break;
+                    case 8 : // Extrude region
+                        m_plugin->extrudeRegion(map);
+                        break;
+                }
+            }
+        }
+    }
+}
+
+void Surface_Modelisation_DockTab::applyVertexOperationButtonClicked()
+{
+    if(!b_updatingUI)
+    {
+         MapHandlerGen* map = m_schnapps->getSelectedMap();
+         if(map)
+         {
+            switch ( vertexOperations.indexOf(combo_vertexOperation->currentText()) )
+            {
+                case 0: // Split vertex
+                    m_plugin->splitVertex(map);
+                    break;
+                case 1: // Delete vertex
+                    m_plugin->deleteVertex(map);
+                    break;
+            }
+        }
+    }
+}
+
+void Surface_Modelisation_DockTab::applyEdgeOperationButtonClicked()
+{
+    if(!b_updatingUI)
+    {
+         MapHandlerGen* map = m_schnapps->getSelectedMap();
+         if(map)
+         {
+            switch ( edgeOperations.indexOf(combo_edgeOperation->currentText()) )
+            {
+                case 0: // Cut edge
+                    m_plugin->cutEdge(map);
+                    break;
+                case 1: // Uncut edge
+                    m_plugin->uncutEdge(map);
+                    break;
+                case 2: // Collapse edge
+                    m_plugin->collapseEdge(map);
+                    break;
+                case 3: // Flip edge
+                    m_plugin->flipEdge(map);
+                    break;
+                case 4: // Flip back edge
+                    m_plugin->flipBackEdge(map);
+                    break;
+            }
+        }
+    }
+}
+
+void Surface_Modelisation_DockTab::applyFaceOperationButtonClicked()
+{
+    if(!b_updatingUI)
+    {
+         MapHandlerGen* map = m_schnapps->getSelectedMap();
+         if(map)
+         {
+            switch ( faceOperations.indexOf(combo_faceOperation->currentText()) )
+            {
+                case 0: // Split face
+                    m_plugin->splitFace(map);
+                    break;
+                case 1: // Merge faces
+                    m_plugin->mergeFaces(map);
+                    break;
+                case 2: // Delete face
+                    m_plugin->deleteFace(map);
+                    break;
+                case 3: // Sew faces
+                    m_plugin->sewFaces(map);
+                    break;
+                case 4: // Unsew faces
+                    m_plugin->unsewFaces(map);
+                    break;
+                case 5: // Extrude face
+                    m_plugin->extrudeFace(map);
+                    break;
+                case 6 : // Extrude face following a path
+                    m_plugin->pathExtrudeFace(map);
+                    break;
+            }
+        }
+    }
+}
+
+
+/*
+void Surface_Modelisation_DockTab::operationChanged(const QString& text)
+{
+    if(!b_updatingUI)
+    {
+        switch(operations.indexOf(text))
+        {
+            case 0: // Create empty map
+                break;
+            case 1: // Add cube
+                break;
+        }
+    }
+}
+*/
+
+/* -------------------------------- Clicks -----------------------------------------*/
+
+void Surface_Modelisation_DockTab::startButtonClicked()
+{
+    m_plugin->collect = true;
+}
+
+void Surface_Modelisation_DockTab::acceptButtonClicked()
+{
+    m_plugin->collect = false;
+}
+
+void Surface_Modelisation_DockTab::cancelButtonClicked()
+{
+    m_plugin->collect = false;
+    m_plugin->collectedVertices.clear();
+}
+
+/* -------------------------------- Updates -----------------------------------------*/
 
 void Surface_Modelisation_DockTab::updateMapParameters()
 {

@@ -328,6 +328,154 @@ Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>
 	return extrudeFace<PFP>(the_map, position, d, normal);
 }
 
+template<typename PFP>
+Dart extrudeRegion(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position,
+   Dart d,	const CellMarker<FACE>& cm)
+{
+   typedef typename PFP::MAP MAP;
+
+   /*----------- find a dart of the border of the region -----------*/
+   std::vector<Dart> borderDarts;
+   std::vector<Dart> pile;
+   pile.push_back(d);
+   CellMarker<EDGE>* em = new CellMarker<EDGE>(the_map);
+
+   while(!pile.empty())
+   {
+	   Traversor2FE<MAP> trav2FE(the_map , pile[pile.size()-1]) ;
+	   pile.pop_back();
+	   for (Dart it = trav2FE.begin(); it != trav2FE.end (); it = trav2FE.next())
+	   {
+		   if (!cm.isMarked(it))
+		   {
+			   borderDarts.push_back(the_map.phi2(it));
+			   break;
+		   }
+		   else if (!em->isMarked(the_map.phi2(it)))
+					   pile.push_back(the_map.phi2(it));
+		   em->mark(it);
+	   }
+   }
+
+   /*----------- find borders of the region -----------*/
+   std::vector<std::vector<Dart> > contours; // border
+   for (int i = 0; i < borderDarts.size(); i++)
+   {
+	   bool used = false;
+	   for (int j = 0; j < contours.size(); j++)
+	   {
+		   for (int k = 0; k < contours[j].size(); k++)
+		   {
+			   if (borderDarts[i] == contours[j][k])
+			   {
+				   used = true;
+				   break;
+			   }
+		   }
+		   if(used) break;
+	   }
+
+	   if (!used)
+	   {
+		   std::vector<Dart> contour;
+		   Dart contourDart = borderDarts[i];
+		   Dart it = contourDart;
+		   do
+		   {
+			   contour.push_back(it);
+			   it = the_map.phi2(it);
+			   while(!cm.isMarked(it))
+				   it = the_map.phi2(the_map.phi_1(it));
+
+		   } while(it != contourDart);
+		   contours.push_back(contour);
+	   }
+   }
+
+   /*----------- calculate the height of the extrusion -----------*/
+   typename PFP::REAL dist = 0;
+   for(int i = 0; i < (contours.size()); i++)
+   {
+	   for(int j = 0; j < contours[i].size()-1; j++)
+	   {
+		   dist = dist + (position[contours[i][j]] - position[contours[i][j+1]]).norm();
+	   }
+	   dist = dist + (position[contours[i][contours[i].size()-1]] - position[contours[i][0]]).norm();
+   }
+   int size = 0;
+   for (int i = 0; i < contours.size(); i++)
+   {
+	   size = size + contours[i].size();
+   }
+   dist = dist / size; // height
+
+   /*----------- calculate the normal -----------*/
+   pile.clear();
+   pile.push_back(contours[0][0]);
+   typename PFP::VEC3 normal;
+   CellMarker<FACE>* fm = new CellMarker<FACE>(the_map);
+   int faceNb = 0;
+   while(!pile.empty())
+   {
+	   Traversor2FE<MAP> trav2FE2(the_map , pile[pile.size()-1]) ;
+	   pile.pop_back();
+	   for (Dart it = trav2FE2.begin(); it != trav2FE2.end (); it = trav2FE2.next())
+	   {
+		   if((cm.isMarked(the_map.phi2(it))) && (!fm->isMarked(the_map.phi2(it))))
+			   pile.push_back(the_map.phi2(it));
+		   if(!fm->isMarked(it))
+		   {
+			   normal = normal + Surface::Geometry::faceNormal<PFP>(the_map, it, position);
+			   faceNb++;
+			   fm->mark(it);
+		   }
+	   }
+   }
+   normal = normal / faceNb * dist;
+
+   /*----------- add new faces -----------*/
+   for (int i = 0; i < contours.size(); i++)
+   {
+	   Dart prev;
+	   for(int j = 0; j < contours[i].size(); j++)
+	   {
+		   d = the_map.newFace(4);
+		   Dart e = the_map.phi2(contours[i][j]);
+		   the_map.unsewFaces(contours[i][j]);
+		   the_map.sewFaces(contours[i][j], d);
+		   the_map.sewFaces(e, the_map.phi1(the_map.phi1(d)));
+		   if (j > 0)
+			   the_map.sewFaces(prev, the_map.phi1(d));
+		   prev = the_map.phi_1(d);
+		   position[the_map.phi1(the_map.phi1(d))] = position[contours[i][j]];
+	   }
+	   the_map.sewFaces(prev, the_map.phi1(the_map.phi2(contours[i][0])));
+   }
+
+   /*----------- fix positions of vertices of the region -----------*/
+   pile.clear();
+   pile.push_back(contours[0][0]);
+   CellMarker<VERTEX>* vm = new CellMarker<VERTEX>(the_map);
+
+   while(!pile.empty())
+   {
+	   Traversor2VF<MAP> trav2VF(the_map , pile[pile.size()-1]);
+	   pile.pop_back();
+	   for (Dart it = trav2VF.begin(); it != trav2VF.end (); it = trav2VF.next())
+	   {
+		   if(!vm->isMarked(it))
+		   {
+			   position[it] = position[it]+normal;
+			   vm->mark(it);
+		   }
+		   if (cm.isMarked(it) && (!vm->isMarked(the_map.phi2(it))))
+			   pile.push_back(the_map.phi2(it));
+	   }
+   }
+
+   return contours[0][0];
+}
+
 } // namespace Modelisation
 
 }
