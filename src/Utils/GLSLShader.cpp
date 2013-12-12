@@ -298,18 +298,18 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadVertexShader() - source string is empty." << CGoGNendl;
 
-		glDeleteObjectARB(*m_vertex_shader_object );
+		glDeleteShader(*m_vertex_shader_object );
 		*m_vertex_shader_object = 0;
 
 		return false;
 	}
 
-	glShaderSourceARB( *m_vertex_shader_object, 1, (const char**)&vertex_shader_source, NULL );
+	glShaderSource( *m_vertex_shader_object, 1, (const char**)&vertex_shader_source, NULL );
 
 	/*** compile shader object ***/
-	glCompileShaderARB( *m_vertex_shader_object );
+	glCompileShader( *m_vertex_shader_object );
 
-	glGetObjectParameterivARB( *m_vertex_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
+	glGetProgramiv( *m_vertex_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLshader::loadVertexShader() - error occured while compiling shader " << m_nameVS<< CGoGNendl;
@@ -317,7 +317,7 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 				CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDeleteObjectARB( *m_vertex_shader_object );
+		glDeleteShader( *m_vertex_shader_object );
 		*m_vertex_shader_object = 0;
 
 		return false;
@@ -352,18 +352,18 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadFragmentShader() - source string is empty." << CGoGNendl;
 
-		glDeleteObjectARB( *m_fragment_shader_object );
+		glDeleteShader( *m_fragment_shader_object );
 		*m_fragment_shader_object = 0;
 
 		return false;
 	}
 
-	glShaderSourceARB( *m_fragment_shader_object, 1, (const char**)&fragment_shader_source, NULL );
+	glShaderSource( *m_fragment_shader_object, 1, (const char**)&fragment_shader_source, NULL );
 
 	/*** compile shader object ***/
-	glCompileShaderARB( *m_fragment_shader_object );
+	glCompileShader( *m_fragment_shader_object );
 
-	glGetObjectParameterivARB( *m_fragment_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
+	glGetProgramiv( *m_fragment_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLshader::loadFragmentShader() - error occured while compiling shader " <<  m_nameFS << CGoGNendl;
@@ -371,7 +371,7 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 		CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDeleteObjectARB( *m_fragment_shader_object );
+		glDeleteShader( *m_fragment_shader_object );
 		*m_fragment_shader_object = 0;
 
 		return false;
@@ -405,18 +405,18 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadGeometryShader() - source string is empty." << CGoGNendl;
 
-		glDeleteObjectARB( *m_geom_shader_object );
+		glDeleteShader( *m_geom_shader_object );
 		*m_geom_shader_object = 0;
 
 		return false;
 	}
 
-	glShaderSourceARB( *m_geom_shader_object, 1, (const char**)&geom_shader_source, NULL );
+	glShaderSource( *m_geom_shader_object, 1, (const char**)&geom_shader_source, NULL );
 
 	/*** compile shader object ***/
-	glCompileShaderARB( *m_geom_shader_object );
+	glCompileShader( *m_geom_shader_object );
 
-	glGetObjectParameterivARB( *m_geom_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
+	glGetProgramiv( *m_geom_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLshader::loadGeometryShader() - error occured while compiling shader "<< m_nameGS << CGoGNendl;
@@ -424,7 +424,7 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 		CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDeleteObjectARB( *m_geom_shader_object );
+		glDeleteShader( *m_geom_shader_object );
 		*m_geom_shader_object = 0;
 
 		return false;
@@ -434,16 +434,16 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	return true;
 }
 
-char* GLSLShader::getInfoLog( GLhandleARB obj )
+char* GLSLShader::getInfoLog( GLuint obj )
 {
 	char	*info_log;
 	int		info_log_length;
 	int		length;
 
-	glGetObjectParameterivARB( obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, &info_log_length );
+	glGetProgramiv( obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, &info_log_length );
 
 	info_log = new char [info_log_length];
-	glGetInfoLogARB( obj, info_log_length, &length, info_log );
+	glGetProgramInfoLog( obj, info_log_length, &length, info_log );
 
 	return info_log;
 }
@@ -467,7 +467,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	}
 
 	/*** create program object ***/
-	m_program_object = glCreateProgramObjectARB();
+	m_program_object = glCreateProgram();
 
 	if( !*m_program_object )
 	{
@@ -476,11 +476,11 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	}
 
 	/*** attach shaders to program object ***/
-	glAttachObjectARB( *m_program_object, *m_vertex_shader_object );
-	glAttachObjectARB( *m_program_object, *m_fragment_shader_object );
+	glAttachShader( *m_program_object, *m_vertex_shader_object );
+	glAttachShader( *m_program_object, *m_fragment_shader_object );
 	if (*m_geom_shader_object)
 	{
-		glAttachObjectARB( *m_program_object, *m_geom_shader_object );
+		glAttachShader( *m_program_object, *m_geom_shader_object );
 
 		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_INPUT_TYPE_EXT, inputGeometryPrimitive);
 		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_OUTPUT_TYPE_EXT, outputGeometryPrimitive);
@@ -488,9 +488,9 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	}
 
 	/*** link program object ***/
-	glLinkProgramARB( *m_program_object );
+	glLinkProgram( *m_program_object );
 
-	glGetObjectParameterivARB( *m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
+	glGetProgramiv( *m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << CGoGNendl;
@@ -498,11 +498,11 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 		CGoGNerr << "  LINK " << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDetachObjectARB( *m_program_object, *m_vertex_shader_object );
-		glDetachObjectARB( *m_program_object, *m_fragment_shader_object );
+		glDetachShader( *m_program_object, *m_vertex_shader_object );
+		glDetachShader( *m_program_object, *m_fragment_shader_object );
 		if (*m_geom_shader_object)
-			glDetachObjectARB( *m_program_object, *m_geom_shader_object );
-		glDeleteObjectARB( *m_program_object );
+			glDetachShader( *m_program_object, *m_geom_shader_object );
+		glDeleteShader( *m_program_object );
 		*m_program_object = 0;
 
 		return false;
@@ -542,9 +542,9 @@ bool GLSLShader::link()
 	char	*info_log;
 
 	/*** link program object ***/
-	glLinkProgramARB( *m_program_object );
+	glLinkProgram( *m_program_object );
 
-	glGetObjectParameterivARB( *m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
+	glGetProgramiv( *m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << CGoGNendl;
@@ -552,11 +552,11 @@ bool GLSLShader::link()
 		CGoGNerr << "  LINK " << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDetachObjectARB( *m_program_object, *m_vertex_shader_object );
-		glDetachObjectARB( *m_program_object, *m_fragment_shader_object );
+		glDetachShader( *m_program_object, *m_vertex_shader_object );
+		glDetachShader( *m_program_object, *m_fragment_shader_object );
 		if (*m_geom_shader_object)
-			glDetachObjectARB( *m_program_object, *m_geom_shader_object );
-		glDeleteObjectARB( *m_program_object );
+			glDetachShader( *m_program_object, *m_geom_shader_object );
+		glDeleteShader( *m_program_object );
 		*m_program_object = 0;
 
 		return false;
@@ -569,7 +569,7 @@ bool GLSLShader::bind() const
 {
 	if( *m_program_object )
 	{
-		glUseProgramObjectARB( *m_program_object );
+		glUseProgram( *m_program_object );
 		return true;
 	}
 	else
@@ -580,13 +580,18 @@ void GLSLShader::unbind() const
 {
 	if( *m_program_object )
 	{
-		glUseProgramObjectARB( 0 );
+		glUseProgram( 0 );
 	}
 }
 
 bool GLSLShader::isBinded()
 {
-	return ( *m_program_object && *m_program_object == glGetHandleARB(GL_PROGRAM_OBJECT_ARB) );
+	if (*m_program_object == 0)
+		return false;
+
+	GLint po;
+	glGetIntegerv(GL_CURRENT_PROGRAM,&po);
+	return ( *m_program_object == po );
 }
 
 GLSLShader::~GLSLShader()
@@ -597,21 +602,21 @@ GLSLShader::~GLSLShader()
 
 		if( *m_vertex_shader_object )
 		{
-			glDetachObjectARB( *m_program_object, *m_vertex_shader_object );
-			glDeleteObjectARB( *m_vertex_shader_object );
+			glDetachShader( *m_program_object, *m_vertex_shader_object );
+			glDeleteShader( *m_vertex_shader_object );
 		}
 		if( *m_fragment_shader_object )
 		{
-			glDetachObjectARB( *m_program_object, *m_fragment_shader_object );
-			glDeleteObjectARB( *m_fragment_shader_object );
+			glDetachShader( *m_program_object, *m_fragment_shader_object );
+			glDeleteShader( *m_fragment_shader_object );
 		}
 		if (*m_geom_shader_object)
 		{
-			glDetachObjectARB( *m_program_object, *m_geom_shader_object );
-			glDeleteObjectARB( *m_geom_shader_object );
+			glDetachShader( *m_program_object, *m_geom_shader_object );
+			glDeleteShader( *m_geom_shader_object );
 		}
 
-		glDeleteObjectARB( *m_program_object );
+		glDeleteShader( *m_program_object );
 	}
 
 	if (m_vertex_shader_source != NULL)
@@ -915,7 +920,7 @@ bool GLSLShader::checkShader(int shaderType)
 {
 	GLint Result = GL_FALSE;
 	int InfoLogLength;
-	GLhandleARB id;
+	GLuint id;
 
 	switch(shaderType)
 	{

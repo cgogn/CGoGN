@@ -305,13 +305,13 @@ void SimpleQGLV::keyPressEvent(QKeyEvent *e)
     else
         QWidget::keyPressEvent(e);
 
-	m_qglWidget->keyPressEvent(e); // ?
+//	m_qglWidget->keyPressEvent(e); // ?
 }
 
 void SimpleQGLV::keyReleaseEvent(QKeyEvent *e)
 {
 	QWidget::keyReleaseEvent(e);
-	m_qglWidget->keyReleaseEvent(e);
+//	m_qglWidget->keyReleaseEvent(e);
 }
 
 void SimpleQGLV::glMousePosition(int& x, int& y)
