@@ -1,5 +1,6 @@
-#include "importVolume.h"
+#include "volume_import.h"
 
+#include "schnapps.h"
 #include "mapHandler.h"
 
 #include "Algo/Import/import.h"
@@ -13,20 +14,20 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-bool ImportVolumePlugin::enable()
+bool Volume_Import_Plugin::enable()
 {
 	importAction = new QAction("import", this);
-	addMenuAction("Volume;Import", importAction);
+	m_schnapps->addMenuAction(this, "Volume;Import", importAction);
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
 	return true;
 }
 
-MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
+MapHandlerGen* Volume_Import_Plugin::importFromFile(const QString& fileName)
 {
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
-		MapHandlerGen* mhg = m_window->addMap(fi.baseName(), 3);
+		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 3);
 		if(mhg)
 		{
 			MapHandler<PFP3>* mh = static_cast<MapHandler<PFP3>*>(mhg);
@@ -38,9 +39,6 @@ MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 			// get vertex position attribute
 			VertexAttribute<PFP3::VEC3> position = map->getAttribute<PFP3::VEC3, VERTEX>(attrNames[0]);
 			mh->registerAttribute(position);
-
-			// create position VBO
-			mh->createVBO(position);
 
 			// update corresponding VBO & emit attribute update signal
 			mh->notifyAttributeModification(position);
@@ -54,9 +52,9 @@ MapHandlerGen* ImportVolumePlugin::importFromFile(const QString& fileName)
 		return NULL;
 }
 
-void ImportVolumePlugin::importFromFileDialog()
+void Volume_Import_Plugin::importFromFileDialog()
 {
-	QStringList fileNames = QFileDialog::getOpenFileNames(m_window, "Import volumes", m_window->getAppPath(), "Volume mesh Files (*.node *.ts *.off *.tet)");
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import volumes", m_schnapps->getAppPath(), "Volume mesh Files (*.msh *.vtu *.nas *.vbgz *.tetmesh *.node *.ts *.off *.tet)");
 	QStringList::Iterator it = fileNames.begin();
 	while(it != fileNames.end()) {
 		importFromFile(*it);
@@ -65,9 +63,9 @@ void ImportVolumePlugin::importFromFileDialog()
 }
 
 #ifndef DEBUG
-Q_EXPORT_PLUGIN2(ImportVolumePlugin, ImportVolumePlugin)
+Q_EXPORT_PLUGIN2(Volume_Import_Plugin, Volume_Import_Plugin)
 #else
-Q_EXPORT_PLUGIN2(ImportVolumePluginD, ImportVolumePlugin)
+Q_EXPORT_PLUGIN2(Volume_Import_PluginD, Volume_Import_Plugin)
 #endif
 
 } // namespace SCHNApps

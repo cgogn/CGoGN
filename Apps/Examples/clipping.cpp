@@ -790,36 +790,27 @@ void Clipping::importMesh(std::string& filename)
 	size_t pos = filename.rfind(".");    // position of "." in filename
 	std::string extension = filename.substr(pos);
 
-	if(extension == std::string(".tet"))
-	{
-		if(!Algo::Volume::Import::importTet<PFP>(myMap,filename.c_str(),attrNames))
-		{
-			CGoGNerr << "could not import " << filename << CGoGNendl ;
-			return;
-		}
-		else
-			position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
-	}
-	else if(extension == std::string(".ts"))
-	{
-		if(!Algo::Volume::Import::importTs<PFP>(myMap,filename.c_str(),attrNames))
-		{
-			CGoGNerr << "could not import " << filename << CGoGNendl ;
-			return;
-		}
-		else
-			position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
-	}
-	if(extension == std::string(".map"))
-	{
-		if(!myMap.loadMapBin(filename))
-		{
-			CGoGNerr << "could not import " << filename << CGoGNendl ;
-			return;
-		}
-		else
-			position = myMap.getAttribute<VEC3, VERTEX>("position") ;
-	}
+    if(extension == std::string(".map"))
+    {
+        if(!myMap.loadMapBin(filename))
+        {
+            CGoGNerr << "could not import " << filename << CGoGNendl ;
+            return;
+        }
+        else
+            position = myMap.getAttribute<VEC3, VERTEX>("position") ;
+    }
+    else
+    {
+        if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
+        {
+            std::cerr << "could not import " << filename << std::endl ;
+            return ;
+        }
+        else
+            position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
+    }
+
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 

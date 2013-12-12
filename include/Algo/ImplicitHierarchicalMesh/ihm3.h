@@ -65,8 +65,8 @@ public:
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
-    std::vector<Algo::MR::Filter*> synthesisFilters ;
-    std::vector<Algo::MR::Filter*> analysisFilters ;
+//    std::vector<Algo::MR::Filter*> synthesisFilters ;
+//    std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
 	ImplicitHierarchicalMap3() ;
@@ -161,14 +161,14 @@ public:
 
 
 
-    void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
-    void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
+//    void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+//    void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
-    void clearSynthesisFilters() { synthesisFilters.clear() ; }
-    void clearAnalysisFilters() { analysisFilters.clear() ; }
+//    void clearSynthesisFilters() { synthesisFilters.clear() ; }
+//    void clearAnalysisFilters() { analysisFilters.clear() ; }
 
-    void analysis() ;
-    void synthesis() ;
+//    void analysis() ;
+//    void synthesis() ;
 
 	//!
 	/*!
@@ -399,8 +399,8 @@ public:
 	virtual bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0);
 	//@}
 
-	template <unsigned int ORBIT>
-		unsigned int getEmbedding(Dart d);
+    template <unsigned int ORBIT>
+    unsigned int getEmbedding(Dart d);
 } ;
 
 template <typename T, unsigned int ORBIT>

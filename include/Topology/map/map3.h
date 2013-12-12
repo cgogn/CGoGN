@@ -290,6 +290,10 @@ public:
 	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
 	//@}
 
+
+    //BROUILLON
+    Dart faceToEdge(Dart d);
+
 	/*! @name Topological Queries
 	 *  Return or set various topological information
 	 *************************************************************************/
