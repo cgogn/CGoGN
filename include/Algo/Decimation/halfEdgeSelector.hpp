@@ -626,7 +626,7 @@ bool HalfEdgeSelector_QEMextColorNormal<PFP>::init()
 					saved = true ;
 				}
 			}
-			else if(ok == 2 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "normal")
+			else if(ok == 2 && (this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "normal" || this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameN"))
 			{
 				++ok ;
 				m_approxindex_normal = approxindex ;
@@ -639,7 +639,6 @@ bool HalfEdgeSelector_QEMextColorNormal<PFP>::init()
 					saved = true ;
 				}
 			}
-
 		}
 	}
 
