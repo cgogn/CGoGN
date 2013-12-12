@@ -105,7 +105,7 @@ protected:
 	/**
 	 * handle of program
 	 */
-	CGoGNGLhandleARB m_program_object;
+	CGoGNGLint m_program_object;
 
 	CGoGNGLint m_uniMat_Proj;
 	CGoGNGLint m_uniMat_Model;
