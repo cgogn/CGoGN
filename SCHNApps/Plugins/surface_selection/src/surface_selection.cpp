@@ -284,7 +284,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 								case NormalAngle : {
 									if(p.normalAttribute.isValid())
 									{
-										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_selectionRadius);
+										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
 										neigh.collectAll(m_selectingVertex);
 										if(event->button() == Qt::LeftButton)
 											selector->select(neigh.getInsideVertices());
@@ -322,7 +322,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 								case NormalAngle : {
 									if(p.normalAttribute.isValid())
 									{
-										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_selectionRadius);
+										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
 										neigh.collectAll(m_selectingEdge);
 										if(event->button() == Qt::LeftButton)
 											selector->select(neigh.getInsideEdges());
@@ -360,7 +360,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 								case NormalAngle : {
 									if(p.normalAttribute.isValid())
 									{
-										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_selectionRadius);
+										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
 										neigh.collectAll(m_selectingFace);
 										if(event->button() == Qt::LeftButton)
 											selector->select(neigh.getInsideFaces());
@@ -452,6 +452,7 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 					m_normalAngleThreshold *= 0.9f;
 				else
 					m_normalAngleThreshold *= 1.1f;
+				// view->displayMessage(QString("Angle threshold : ") + m_normalAngleThreshold);
 				break;
 			}
 		}
