@@ -16,7 +16,8 @@ namespace SCHNApps
 enum SelectionMethod
 {
 	SingleCell = 0,
-	WithinSphere = 1
+	WithinSphere = 1,
+	NormalAngle = 2
 };
 
 struct MapParameters
@@ -26,6 +27,7 @@ struct MapParameters
 	{}
 
 	VertexAttribute<PFP2::VEC3> positionAttribute;
+	VertexAttribute<PFP2::VEC3> normalAttribute;
 	SelectionMethod selectionMethod;
 };
 
@@ -70,8 +72,9 @@ private slots:
 
 public slots:
 	// slots for Python calls
-	void changePositionAttribute(const QString& view, const QString& map, const QString& name);
-	void changeSelectionMethod(const QString& view, const QString& map, unsigned int method);
+	void changePositionAttribute(const QString& map, const QString& name);
+	void changeNormalAttribute(const QString& map, const QString& name);
+	void changeSelectionMethod(const QString& map, unsigned int method);
 
 protected:
 	Surface_Selection_DockTab* m_dockTab;
@@ -96,6 +99,9 @@ protected:
 	// WithinSphere parameters
 	Utils::VBO* m_selectionSphereVBO;
 	PFP2::REAL m_selectionRadius;
+
+	// NormalAngle parameters
+	PFP2::REAL m_normalAngleThreshold;
 };
 
 } // namespace SCHNApps
