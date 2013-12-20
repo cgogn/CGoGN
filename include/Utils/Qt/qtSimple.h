@@ -419,6 +419,11 @@ public:
 
 	void snapshot(const QString& filename, const char* format = 0, const int& quality = -1);
 
+
+    void exportPOV2file(const QString& filename);
+
+    void importFile2POV(const QString& filename);
+
 public slots:
 	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }
 	virtual void cb_Open() { std::cerr << "callback not implemented" << std::endl; }

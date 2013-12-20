@@ -39,15 +39,14 @@ namespace ShapeMatching
 
 
 template <typename PFP>
-ShapeMatching<PFP>::ShapeMatching(VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass):
+ShapeMatching<PFP>::ShapeMatching(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass):
+    m_map(map),
     m_position(position),
     m_mass(mass)
 {
     unsigned int nbE = m_position.nbElements();
 
-    m_p.reserve(nbE);
     m_q.reserve(nbE);
-
 
     m_goal = this->m_map.template getAttribute<VEC3, VERTEX>("goal");
 
@@ -62,15 +61,19 @@ ShapeMatching<PFP>::~ShapeMatching()
       m_map.template removeAttribute<VEC3, VERTEX>(m_goal);
 }
 
-
-VEC3 ShapeMatching<PFP>::massCenter()
+template <typename PFP>
+Eigen::Vector3d ShapeMatching<PFP>::massCenter() //
 {
-    VEC3 xcm(0);
+    Eigen::Vector3d xcm = Eigen::Vector3d::Zero();
     REAL m = 0.0;
 
-    for(unsigned int i = m_position.begin() ; i < m_position.end() ; i = m_position.next())
+    for(unsigned int i = m_position.begin() ; i < m_position.end() ; m_position.next(i))
     {
-        xcm += m_mass[i] * m_p[i];
+        Eigen::Vector3d tmp ;
+        for (unsigned int j = 0 ; j < 3 ; ++j)
+            tmp(j) = m_position[i][j] ;
+
+        xcm += m_mass[i] * tmp;
         m += m_mass[i];
     }
 
@@ -87,30 +90,47 @@ VEC3 ShapeMatching<PFP>::massCenter()
 template <typename PFP>
 void ShapeMatching<PFP>::initialize()
 {
-    VEC3 x0cm = massCenter();
+    Eigen::Vector3d x0cm = massCenter();
 
-    for(unsigned int i = m_position.begin() ; i < m_position.end() ; i = m_position.next())
+    for(unsigned int i = m_position.begin() ; i < m_position.end() ; m_position.next(i))
     {
-        m_q[i] = VEC3(m_position[i] - x0cm); //q_{i} = x^{0}_{i} - x^{0}_{cm}
+        Eigen::Vector3d tmp ;
+        for (unsigned int j = 0 ; j < 3 ; ++j)
+            tmp(j) = m_position[i][j] ;
+
+        Eigen::Vector3d qi = tmp - x0cm;
+
+        m_q.push_back(qi); //q_{i} = x^{0}_{i} - x^{0}_{cm}
     }
 }
 
 template <typename PFP>
 void ShapeMatching<PFP>::shapeMatch()
 {
-    //1.
-    VEC3 xcm = massCenter();
+    // p_{i}
+    std::vector<Eigen::Vector3d> m_p;
 
-    for(unsigned int i = m_position.begin() ; i < m_position.end() ; i = m_position.next())
+    m_p.reserve(m_position.nbElements());
+
+    //1.
+    Eigen::Vector3d xcm = massCenter();
+
+    for(unsigned int i = m_position.begin() ; i < m_position.end() ; m_position.next(i))
     {
-        m_p[i] = VEC3(m_position[i] - xcm); //p_{i} = x_{i} - x_{cm}
+        Eigen::Vector3d tmp ;
+        for (unsigned int j = 0 ; j < 3 ; ++j)
+            tmp(j) = m_position[i][j] ;
+
+        Eigen::Vector3d pi = tmp - xcm ;
+
+        m_p.push_back(pi) ; //p_{i} = x_{i} - x_{cm}
+
     }
 
     //2.
-    Eigen::Matrix3f apq;
-    apq = Eigen::Matrix3f::Zero();
+    Eigen::Matrix3d apq = Eigen::Matrix3d::Zero();
 
-    for(unsigned int i=0 ; i < p.size() ; ++i)
+    for(unsigned int i=0 ; i < m_p.size() ; ++i)
     {
         apq(0,0) += m_p[i][0] * m_q[i][0];
         apq(0,1) += m_p[i][0] * m_q[i][1];
@@ -125,24 +145,59 @@ void ShapeMatching<PFP>::shapeMatch()
         apq(2,2) += m_p[i][2] * m_q[i][2];
     }
 
-    Eigen::Matrix3f S = apq.transpose() * apq ; //symmetric matrix
+    Eigen::Matrix3d S = apq.transpose() * apq ; //symmetric matrix
 
-    //3. Jacobi Diagonlisation
-    Eigen::JacobiSVD<Eigen::Matrix3f> svd(S, ComputeFullU);
-    Eigen::Matrix3f SR = svd.matrixU(); // diagonalization with Jacobi rotations
+    //3. Jacobi Diagonalisation
+    Eigen::EigenSolver<Eigen::Matrix3d> es(S);
 
-    S(0,0) = 1.0f/sqrt(S(0,0));
-    S(1,1) = 1.0f/sqrt(S(1,1));
-    S(2,2) = 1.0f/sqrt(S(2,2));
+    //V * D * V^(-1)
+    Eigen::Matrix3d D =  es.pseudoEigenvalueMatrix();
+    Eigen::Matrix3d U =  es.pseudoEigenvectors() ;
 
-    S = SR * S * SR.transpose();
+    for(int j = 0; j < 3; j++)
+    {
+        if(D(j,j) <= 0)
+        {
+            D(j,j) = 0.05f;
+        }
+        D(j,j) = 1.0f/sqrt(D(j,j));
+    }
 
-    Eigen::Matrix3f R = apq * S; //S^{-1}
+    S = U * D * U.transpose();
+
+    // Now we can get the rotation part
+    Eigen::Matrix3d R = apq * S; //S^{-1}
 
     //4.
-    for(unsigned int i = m_goal.begin() ; i < m_goal.end() ; i = m_goal.next())
+    for(unsigned int i = m_goal.begin() ; i < m_goal.end() ; m_goal.next(i))
     {
-        m_goal[i] = R * m_q[i] + xcm; // g_{i} = R * q_i + x_{cm}
+       Eigen::Vector3d tmp = R * m_q[i] + xcm; // g_{i} = R * q_i + x_{cm}
+
+       VEC3 g;
+       for (unsigned int j = 0 ; j < 3 ; ++j)
+            g[j] = tmp(j);
+
+       m_goal[i] = g;
+    }
+}
+
+
+// \alpha : stiffness | v_i : velocity | f_ext : force exterieure
+template <typename PFP>
+void ShapeMatching<PFP>::computeVelocities(VertexAttribute<VEC3>& velocity, VertexAttribute<VEC3>& fext, REAL h, REAL alpha)
+{
+    for(unsigned int i = velocity.begin() ; i < velocity.end() ; velocity.next(i))
+    {
+        velocity[i] = velocity[i] + alpha * ((m_goal[i] - m_position[i]) / h ) + (h * fext[i]) / m_mass[i];
+    }
+}
+
+template <typename PFP>
+void ShapeMatching<PFP>::applyVelocities(VertexAttribute<VEC3>& velocity, REAL h)
+{
+    for(unsigned int i = m_position.begin() ; i < m_position.end() ; m_position.next(i))
+    {
+        m_position[i] = m_position[i] + h * velocity[i];
     }
 }
 
