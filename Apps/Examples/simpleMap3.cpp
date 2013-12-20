@@ -32,44 +32,62 @@ SimpleMap3::SimpleMap3()
 {
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap, position);
-	Dart d = primCat.hexaGrid_topo(2,1,1);
-	primCat.embedHexaGrid(1,1,1);
-	myMap.closeMap();
+    Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap,position);
+    Dart d = primCat.hexaGrid_topo(1,1,1);
+    primCat.embedHexaGrid(1,1,1);
+    myMap.closeMap();
+    myMap.check();
 
-	unsigned int nb=0;
-	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
-		nb++;
+    Dart dp = Algo::Surface::Modelisation::createQuadrangularPyramid<PFP>(myMap);
 
-	std::cout << "Nb vertices (equals 12) : " << nb << std::endl;
-	assert(nb==12);
+    position[dp] = typename PFP::VEC3(0.5,0.5,-0.5);
+    position[myMap.phi1(dp)] = typename PFP::VEC3(0.5,0.5,0.5);
+    position[myMap.phi1(myMap.phi1(dp))] = typename PFP::VEC3(0.5,-0.5,0.5);
+    position[myMap.phi_1(dp)] = typename PFP::VEC3(0.5,-0.5,-0.5);
+    position[myMap.phi_1(myMap.phi2(dp))] = typename PFP::VEC3(1.5f, 0.0f, 0.0f);
+
+    Dart dtemp = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(d)))));
+
+    myMap.sewVolumes(dtemp,dp);
+
+//	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap, position);
+//	Dart d = primCat.hexaGrid_topo(2,1,1);
+//	primCat.embedHexaGrid(1,1,1);
+//	myMap.closeMap();
+
+//	unsigned int nb=0;
+//	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
+//		nb++;
+
+//	std::cout << "Nb vertices (equals 12) : " << nb << std::endl;
+//	assert(nb==12);
 
 
-	d = myMap.phi2(myMap.phi1(myMap.phi1(myMap.phi2(d))));
+//	d = myMap.phi2(myMap.phi1(myMap.phi1(myMap.phi2(d))));
 
-	Dart dd = myMap.phi3(d);
+//	Dart dd = myMap.phi3(d);
 
-	myMap.unsewVolumes(d);
+//	myMap.unsewVolumes(d);
 
-	myMap.check();
+//	myMap.check();
 
-	nb=0;
-	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
-		nb++;
+//	nb=0;
+//	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
+//		nb++;
 
-	std::cout << "Nb vertices after unsew (equals 16) : " << nb << std::endl;
-	assert(nb==16);
+//	std::cout << "Nb vertices after unsew (equals 16) : " << nb << std::endl;
+//	assert(nb==16);
 
-	myMap.sewVolumes(d,dd);
+//	myMap.sewVolumes(d,dd);
 
-	myMap.check();
+//	myMap.check();
 
-	nb=0;
-	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
-		nb++;
+//	nb=0;
+//	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
+//		nb++;
 
-	std::cout << "Nb vertices after resew (equals 12) : " << nb << std::endl;
-	assert(nb==12);
+//	std::cout << "Nb vertices after resew (equals 12) : " << nb << std::endl;
+//	assert(nb==12);
 
 }
 
@@ -92,22 +110,64 @@ void SimpleMap3::cb_initGL()
 	m_render_topo = new Algo::Render::GL2::Topo3Render();
 	m_render_topo->setDartWidth(2.0f);
 	m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.9f);
+    m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.8f);
 
 	m_render_topo_boundary = new Algo::Render::GL2::TopoRender();
 	m_render_topo_boundary->setDartWidth(2.0f);
 	m_render_topo_boundary->setInitialDartsColor(0.4f,0.8f,0.4f);
 	m_render_topo_boundary->updateDataBoundary<PFP>(myMap, position, 0.9f,0.9f,bb.maxSize()/50.0f);
+
+    m_render_topo_primal = new Algo::Render::GL2::Topo3PrimalRender();
+    m_render_topo_primal->setDartWidth(2.0f);
+    m_render_topo_primal->setInitialDartsColor(1.0f,1.0f,1.0f);
+    m_render_topo_primal->updateData<PFP>(myMap, position, 0.95f,0.85f);
 }
 
+void SimpleMap3::cb_keyPress(int code)
+{
+    switch(code)
+    {
+        case 'e':
+        {
+            time_t rawtime;
+            struct tm * timeinfo;
+            char buffer[80];
+
+            time (&rawtime);
+            timeinfo = localtime (&rawtime);
+
+            strftime (buffer,80,".%F.%H:%M:%S",timeinfo);
+
+            std::string filename = std::string("topo_screenshot") + std::string(buffer) + std::string(".svg");
+            m_render_topo->svgout2D(filename, modelViewMatrix(), projectionMatrix());
+            break;
+        }
+        case 'E':
+        {
+            time_t rawtime;
+            struct tm * timeinfo;
+            char buffer[80];
+
+            time (&rawtime);
+            timeinfo = localtime (&rawtime);
+
+            strftime (buffer,80,".%F.%H:%M:%S",timeinfo);
+
+            std::string filename = std::string("topo_screenshot") + std::string(buffer) + std::string(".svg");
+            m_render_topo_primal->svgout2D(filename, modelViewMatrix(), projectionMatrix());
+            break;
+        }
+    }
+}
 
 
 void SimpleMap3::cb_redraw()
 {
 	glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
-	m_render_topo->drawTopo();
-	m_render_topo_boundary->drawTopo();
+    m_render_topo->drawTopo();
+    //m_render_topo_boundary->drawTopo();
+    //m_render_topo_primal->drawTopo();
 }
 
 /**********************************************************************************************

@@ -222,8 +222,7 @@ bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			{
 				unsigned int em = edgesBuffer[j];		// get embedding
 
-				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
-//				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+                FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
 				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT2>(d, fsetemb);
 
 				m.mark(d) ;								// mark on the fly to unmark on second loop
@@ -284,8 +283,10 @@ bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::ve
 }
 
 
-}
-}
+} // namespace Import
+
+} // namespace Surface
+
 
 
 namespace Volume
@@ -533,71 +534,135 @@ template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 {
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
-	return false;
+
+    unsigned int nbv = mtv.getNbVolumes();
+    int index = 0;
+    // buffer for tempo faces (used to remove degenerated edges)
+    std::vector<unsigned int> edgesBuffer;
+    edgesBuffer.reserve(16);
+
+    DartMarkerNoUnmark m(map) ;
+    FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(map);
+
+    //for each volume of table
+    for(unsigned int i = 0 ; i < nbv ; ++i)
+    {
+        // store volume in buffer, removing degenated faces
+        unsigned int nbf = mtv.getNbFacesVolume(i);
+
+        //unsigned int nbe = mtv.getNbEdgesFace(i);
+        edgesBuffer.clear();
+        unsigned int prec = EMBNULL;
+        for (unsigned int j = 0; j < nbf; ++j)
+        {
+            unsigned int em = mtv.getEmbIdx(index++);
+            if (em != prec)
+            {
+                prec = em;
+                edgesBuffer.push_back(em);
+            }
+        }
+
+        if(nbf == 4) //tetrahedral case
+        {
+            Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
+
+            // Embed three "base" vertices
+            for(unsigned int j = 0 ; j < 3 ; ++j)
+            {
+                unsigned int em = edgesBuffer[j];		// get embedding
+                fsetemb.changeEmb(em) ;
+                map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+
+                //store darts per vertices to optimize reconstruction
+                Dart dd = d;
+                do
+                {
+                    m.mark(dd) ;
+                    vecDartsPerVertex[em].push_back(dd);
+                    dd = map.phi1(map.phi2(dd));
+                } while(dd != d);
+
+                d = map.phi1(d);
+            }
+
+            //Embed the last "top" vertex
+            d = map.phi_1(map.phi2(d));
+
+            unsigned int em = edgesBuffer[3];		// get embedding
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+
+            //store darts per vertices to optimize reconstruction
+            Dart dd = d;
+            do
+            {
+                m.mark(dd) ;
+                vecDartsPerVertex[em].push_back(dd);
+                dd = map.phi1(map.phi2(dd));
+            } while(dd != d);
+
+        }
+        else if(nbf == 6) //hexahedral case
+        {
+
+        }  //end of hexa
+    }
+
+
+    //reconstruct neighbourhood
+    unsigned int nbBoundaryFaces = 0 ;
+    for (Dart d = map.begin(); d != map.end(); map.next(d))
+    {
+        if (m.isMarked(d))
+        {
+            std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+
+            Dart good_dart = NIL;
+            for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
+            {
+                if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
+                   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi_1(d)))
+                {
+                    good_dart = *it ;
+                }
+            }
+
+            if (good_dart != NIL)
+            {
+                map.sewVolumes(d, good_dart, false);
+                m.template unmarkOrbit<FACE>(d);
+            }
+            else
+            {
+                m.unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
+                ++nbBoundaryFaces;
+            }
+        }
+    }
+
+    if (nbBoundaryFaces > 0)
+    {
+        unsigned int nbH =  map.closeMap();
+        CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces / " << nbH << " holes)" << CGoGNendl;
+    }
+
+    return true;
 }
 
 
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool /*mergeCloseVertices*/)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
 {
+    MeshTablesVolume<PFP> mtv(map);
 
-	ImportType kind = getFileType(filename);
+    if(!mtv.importMesh(filename, attrNames))
+        return false;
 
-	switch (kind)
-	{
-		case TET:
-			return importTet<PFP>(map, filename, attrNames, 1.0f);
-			break;
-		case MSH:
-			return importMSH<PFP>(map, filename, attrNames, 1.0f);
-			break;
-		case VTU:
-		return importVTU<PFP>(map, filename, attrNames, 1.0f);
-		break;
+    //sif(mergeCloseVertices)
+        //mtv.mergeCloseVertices();
 
-	case NAS:
-		return importNAS<PFP>(map, filename, attrNames, 1.0f);
-		break;
-
-	case VBGZ:
-		return importVBGZ<PFP>(map, filename, attrNames, 1.0f);
-		break;
-
-	case TETMESH:
-		return importTetmesh<PFP>(map, filename, attrNames, 1.0f);
-		break;
-
-//	case OVM:
-//		return importOVM<PFP>(map, filename, attrNames, 1.0f);
-//		break;
-
-
-		case OFF:
-		{
-			size_t pos = filename.rfind(".");
-			std::string fileEle = filename;
-			fileEle.erase(pos);
-			fileEle.append(".ele");
-			return importOFFWithELERegions<PFP>(map, filename, fileEle, attrNames);
-			break;
-		}
-		case NODE:
-		{
-			size_t pos = filename.rfind(".");
-			std::string fileEle = filename;
-			fileEle.erase(pos);
-			fileEle.append(".ele");
-			return importNodeWithELERegions<PFP>(map, filename, fileEle, attrNames);
-			break;
-		}
-		case Volume::Import::TS:
-			return importTs<PFP>(map, filename, attrNames, 1.0f);
-			break;
-		default:
-			CGoGNerr << "Not yet supported" << CGoGNendl;
-			break;
-	}
-	return false;
+    return importMesh<PFP>(map, mtv);
 }
 
 template <typename PFP>
@@ -614,7 +679,8 @@ bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, st
 
 
 } // namespace Import
-}
+
+} // namespace Volume
 
 
 } // namespace Algo

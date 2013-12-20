@@ -604,20 +604,20 @@ inline unsigned int ImplicitHierarchicalMap3::edgeLevel(Dart d)
 template <unsigned int ORBIT>
 inline unsigned int ImplicitHierarchicalMap3::getEmbedding(Dart d)
 {
-	unsigned int nbSteps = m_curLevel - vertexInsertionLevel(d);
-	unsigned int index = EmbeddedMap3::getEmbedding<ORBIT>(d);
+    unsigned int nbSteps = m_curLevel - vertexInsertionLevel(d);
+    unsigned int index = EmbeddedMap3::getEmbedding<ORBIT>(d);
 
-	unsigned int step = 0;
-	while(step < nbSteps)
-	{
-		step++;
-		unsigned int next = m_nextLevelCell[ORBIT]->operator[](index);
-		//index = next;
-		if(next != EMBNULL) index = next;
-		else break;
-	}
+    unsigned int step = 0;
+    while(step < nbSteps)
+    {
+        step++;
+        unsigned int next = m_nextLevelCell[ORBIT]->operator[](index);
+        //index = next;
+        if(next != EMBNULL) index = next;
+        else break;
+    }
 
-	return index;
+    return index;
 }
 
 inline bool ImplicitHierarchicalMap3::isWellEmbedded()
@@ -654,6 +654,36 @@ inline bool ImplicitHierarchicalMap3::isWellEmbedded()
 	return true;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+//void ImplicitHierarchicalMap3::analysis()
+//{
+//    assert(getCurrentLevel() > 0 || !"analysis : called on level 0") ;
+
+//   decCurrentLevel() ;
+
+//    for(unsigned int i = 0; i < analysisFilters.size(); ++i)
+//        (*analysisFilters[i])() ;
+//}
+
+//void ImplicitHierarchicalMap3::synthesis()
+//{
+//    assert(getCurrentLevel() < getMaxLevel() || !"synthesis : called on max level") ;
+
+//    for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
+//        (*synthesisFilters[i])() ;
+
+//    incCurrentLevel() ;
+//}
 
 /***************************************************
  *               ATTRIBUTE HANDLER                 *
@@ -716,7 +746,8 @@ const T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d) const
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->EmbeddedMap3::getEmbedding<ORBIT>(d) ;
+    //unsigned int index = m->EmbeddedMap3::getEmbedding<ORBIT>(d) ;
+    unsigned int index = m->EmbeddedMap3::getEmbedding<ORBIT>(d) ;
 
 //	std::cout << "(const) m->vertexInsertionLevel(d) = " <<  m->vertexInsertionLevel(d) << std::endl;
 //	std::cout << "(const) m_curLevel = " << m->m_curLevel << std::endl;

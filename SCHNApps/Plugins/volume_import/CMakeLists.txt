@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME ImportVolume )
+SET( PLUGIN_NAME Volume_Import )
 
-SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/importVolume )
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/volume_import )
 
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
@@ -25,7 +25,7 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/importVolume.h
+	${PLUGIN_ROOT_DIR}/include/volume_import.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

@@ -35,8 +35,6 @@ IF (APPLE)
 	SET(CMAKE_OSX_ARCHITECTURES x86_64)
 ENDIF(APPLE)
 
-
-
 add_subdirectory(Tools Tools/build)
 
 IF (WITH_PYTHONQT)
@@ -46,6 +44,9 @@ ENDIF (WITH_PYTHONQT)
 
 add_subdirectory(OpenNL OpenNL/build)
 INSTALL (DIRECTORY OpenNL/src/NL/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/NL FILES_MATCHING PATTERN "*.h")
+
+add_subdirectory(tetgen tetgen/build)
+INSTALL (DIRECTORY tetgen/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/tetgen FILES_MATCHING PATTERN "*.h")
 
 IF (WITH_ZINRI)
 	add_subdirectory(Zinri Zinri/build)

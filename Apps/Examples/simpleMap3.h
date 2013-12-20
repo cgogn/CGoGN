@@ -33,6 +33,7 @@
 #include "Geometry/vector_gen.h"
 
 #include "Algo/Render/GL2/topo3Render.h"
+#include "Algo/Render/GL2/topo3PrimalRender.h"
 #include "Algo/Render/GL2/topoRender.h"
 
 using namespace CGoGN ;
@@ -58,6 +59,7 @@ public:
 
 	Algo::Render::GL2::Topo3Render* m_render_topo;
 	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
+    Algo::Render::GL2::Topo3PrimalRender* m_render_topo_primal;
 
 	SimpleMap3() ;
 
@@ -65,5 +67,6 @@ public:
 
 	void cb_initGL() ;
 	void cb_redraw() ;
+    void cb_keyPress(int code);
 };
 

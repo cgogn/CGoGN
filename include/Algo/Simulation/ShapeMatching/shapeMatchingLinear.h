@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2013, IGG Team, ICube, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,51 +17,70 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.unistra.fr/                                  *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
+#ifndef _SHAPE_MATCHING_LINEAR_H_
+#define _SHAPE_MATCHING_LINEAR_H_
 
-#include "Utils/Qt/qtSimple.h"
-
-#include "Topology/generic/parameters.h"
-#include "Topology/gmap/embeddedGMap3.h"
-//#include "Topology/map/embeddedMap3.h"
-
-#include "Geometry/vector_gen.h"
-
-#include "Algo/Render/GL2/topo3Render.h"
-
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the map
-	typedef EmbeddedGMap3 MAP ;
-};
 
-typedef PFP::MAP MAP ;
-typedef PFP::VEC3 VEC3 ;
-
-class SimpleGMap3 : public Utils::QT::SimpleQT
+namespace Algo
 {
-	Q_OBJECT
+
+namespace Surface
+{
+
+namespace Simulation
+{
+
+namespace ShapeMatching
+{
+
+template <typename PFP>
+class ShapeMatchingLinear : public ShapeMatching<PFP>
+{
+public:
+    typedef typename PFP::MAP MAP;
+    typedef typename PFP::VEC3 VEC3;
+    typedef typename PFP::REAL REAL;
+
+protected:
+    REAL m_beta;
+
+    // A_{qq}
+    Eigen::Matrix3f m_aqq;
+
+private:
+    void computeAqqMatrix();
 
 public:
-	MAP myMap ;
+    ShapeMatchingLinear(VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass, REAL beta):
+        ShapeMatching(position, mass),
+        m_beta(beta)
+    { }
 
-	VertexAttribute<VEC3> position ;
-	VolumeAttribute<VEC3> volume ;
+    ~ShapeMatchingLinear()
+    { }
 
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+    void initialize();
 
-	SimpleGMap3() ;
-
-	void initGUI() ;
-
-	void cb_initGL() ;
-	void cb_redraw() ;
-    void cb_keyPress(int c);
+    void shapeMatch();
 };
+
+} // namespace ShapeMatching
+
+} // namespace Simulation
+
+} // namespace Surface
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "shapeMatchingLinear.hpp"
+
+#endif

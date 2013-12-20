@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-SET( PLUGIN_NAME RenderExplod )
+SET( PLUGIN_NAME Volume_Render )
 
-SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/renderExplod )
+SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/volume_render )
 
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
@@ -25,8 +25,8 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/renderExplod.h
-	${PLUGIN_ROOT_DIR}/include/renderExplodDockTab.h
+	${PLUGIN_ROOT_DIR}/include/volume_render.h
+	${PLUGIN_ROOT_DIR}/include/volume_render_dockTab.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

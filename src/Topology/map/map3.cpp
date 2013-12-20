@@ -821,6 +821,26 @@ Dart Map3::collapseVolume(Dart d, bool delDegenerateVolumes)
 	return resV;
 }
 
+
+Dart Map3::faceToEdge(Dart d)
+{
+    Dart dc = phi2(phi1(d));
+    Dart dc1 = phi_1(d);
+    Dart dc2 = phi1(phi2(dc));
+
+    unsewFaces(dc,false);
+    unsewFaces(dc1,false);
+    unsewFaces(dc2,false);
+
+    unsewFaces(phi3(dc),false);
+    unsewFaces(phi3(dc1),false);
+    unsewFaces(phi3(dc2),false);
+
+
+
+    return dc;
+}
+
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/

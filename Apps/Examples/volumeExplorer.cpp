@@ -136,7 +136,7 @@ void MyQT::slider_released()
 
 void MyQT::cb_Open()
 {
-	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)") ;
+    std::string filters("all (*.*)") ;
 	std::string filename = selectFile("Open Mesh", "", filters) ;
 	if (filename.empty())
 		return ;
@@ -145,8 +145,8 @@ void MyQT::cb_Open()
 
 	std::vector<std::string> attrNames ;
 
-	size_t pos = filename.rfind(".");    // position of "." in filename
-	std::string extension = filename.substr(pos);
+    //size_t pos = filename.rfind(".");    // position of "." in filename
+    //std::string extension = filename.substr(pos);
 
 //	if(extension == std::string(".off"))
 //	{
