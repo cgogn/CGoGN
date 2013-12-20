@@ -523,6 +523,83 @@ void SimpleQT::snapshot(const QString& filename, const char* format, const int& 
 	im.save(filename, format, quality);
 }
 
+void SimpleQT::exportPOV2file(const QString& filename)
+{
+    std::ofstream out(filename.toStdString().c_str(), std::ios::out) ;
+    if (!out.good())
+    {
+        CGoGNerr << "Unable to open file" << CGoGNendl ;
+    }
+
+    out << m_glWidget->getObjPos().x << std::endl ;
+    out << m_glWidget->getObjPos().y << std::endl ;
+    out << m_glWidget->getObjPos().z << std::endl ;
+
+    for (unsigned int i = 0 ; i < 4 ; ++i)
+        for (unsigned int j = 0 ; j < 4 ; ++j)
+            out << m_projection_matrix[i][j] << std::endl ;
+
+    for (unsigned int i = 0 ; i < 4 ; ++i)
+        for (unsigned int j = 0 ; j < 4 ; ++j)
+            out << m_modelView_matrix[i][j] << std::endl ;
+
+    for (unsigned int i = 0; i < 4; ++i)
+    {
+        out << m_curquat[i] << std::endl ;
+        out << m_lastquat[i] << std::endl ;
+    }
+
+    out << m_trans_x << std::endl ;
+    out << m_trans_y << std::endl ;
+    out << m_trans_z << std::endl ;
+
+    QRect geom = this->geometry() ;
+    out << geom.width() << std::endl ;
+    out << geom.height() << std::endl ;
+}
+
+void SimpleQT::importFile2POV(const QString& filename)
+{
+    std::ifstream in(filename.toStdString().c_str(), std::ios::in) ;
+    if (!in.good())
+    {
+        CGoGNerr << "Unable to open file" << CGoGNendl ;
+    }
+
+    in >> m_glWidget->getObjPos().x ;
+    in >> m_glWidget->getObjPos().y ;
+    in >> m_glWidget->getObjPos().z ;
+
+    for (unsigned int i = 0 ; i < 4 ; ++i)
+        for (unsigned int j = 0 ; j < 4 ; ++j)
+            in >> m_projection_matrix[i][j] ;
+
+    for (unsigned int i = 0 ; i < 4 ; ++i)
+        for (unsigned int j = 0 ; j < 4 ; ++j)
+            in >> m_modelView_matrix[i][j] ;
+
+    for (unsigned int i = 0; i < 4; ++i)
+    {
+        in >> m_curquat[i] ;
+        in >> m_lastquat[i] ;
+    }
+
+    in >> m_trans_x ;
+    in >> m_trans_y ;
+    in >> m_trans_z ;
+
+    unsigned int width, height ;
+    in >> width ;
+    in >> height ;
+
+    this->resize(width, height) ;
+
+    SimpleQT::cb_updateMatrix() ;
+    m_glWidget->modelModified() ;
+    updateGL() ;
+}
+
+
 void SimpleQT::setGeometry(int x, int y, int w, int h)
 {
 	move(x,y);

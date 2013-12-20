@@ -34,26 +34,29 @@ namespace Surface
 namespace Simulation
 {
 
-void ShapeMatching<PFP>::computeAqqMatrix()
+namespace ShapeMatching
 {
 
+template <typename PFP>
+void ShapeMatchingLinear<PFP>::computeAqqMatrix()
+{
     //A_{qq} = (Sum_i{ m_{i} q_{i} q_i^{T} })^{-1}
 
-    m_aqq = Eigen::Matrix3f::Zero();
+    m_aqq = Eigen::Matrix3d::Zero();
 
-    for(unsigned int i = 0 ; i < m_q.size() ; ++i)
+    for(unsigned int i = 0 ; i < this->m_q.size() ; ++i)
     {
-        m_aqq(0,0) += m_q[i][0] * m_q[i][0];
-        m_aqq(1,0) += m_q[i][0] * m_q[i][1];
-        m_aqq(2,0) += m_q[i][0] * m_q[i][2];
+        m_aqq(0,0) += this->m_q[i][0] * this->m_q[i][0];
+        m_aqq(1,0) += this->m_q[i][1] * this->m_q[i][0];
+        m_aqq(2,0) += this->m_q[i][2] * this->m_q[i][0];
 
-        m_aqq(0,1) += m_q[i][1] * m_q[i][0];
-        m_aqq(1,1) += m_q[i][1] * m_q[i][1];
-        m_aqq(2,1) += m_q[i][1] * m_q[i][2];
+        m_aqq(0,1) += this->m_q[i][0] * this->m_q[i][1];
+        m_aqq(1,1) += this->m_q[i][1] * this->m_q[i][1];
+        m_aqq(2,1) += this->m_q[i][2] * this->m_q[i][1];
 
-        m_aqq(0,2) += m_q[i][2] * m_q[i][0];
-        m_aqq(1,2) += m_q[i][2] * m_q[i][1];
-        m_aqq(2,2) += m_q[i][2] * m_q[i][2];
+        m_aqq(0,2) += this->m_q[i][0] * this->m_q[i][2];
+        m_aqq(1,2) += this->m_q[i][1] * this->m_q[i][2];
+        m_aqq(2,2) += this->m_q[i][2] * this->m_q[i][2];
     }
 
     m_aqq = m_aqq.inverse();
@@ -63,7 +66,7 @@ void ShapeMatching<PFP>::computeAqqMatrix()
 template <typename PFP>
 void ShapeMatchingLinear<PFP>::initialize()
 {
-    this->initialize();
+    this->ShapeMatching<PFP>::initialize();
 
     computeAqqMatrix();
 }
@@ -71,81 +74,110 @@ void ShapeMatchingLinear<PFP>::initialize()
 template <typename PFP>
 void ShapeMatchingLinear<PFP>::shapeMatch()
 {
-    //1.
-    VEC3 xcm = massCenter();
+    // p_{i}
+    std::vector<Eigen::Vector3d> m_p;
 
-    for(unsigned int i = m_position.begin() ; i < m_position.end() ; i = m_position.next())
+    m_p.reserve(this->m_position.nbElements());
+
+    //1.
+    Eigen::Vector3d xcm = this->massCenter();
+
+    for(unsigned int i = this->m_position.begin() ; i < this->m_position.end() ; this->m_position.next(i))
     {
-        m_p[i] = VEC3(m_position[i] - xcm); //p_{i} = x_{i} - x_{cm}
+       //this->m_p[i] = VEC3(this->m_position[i] - xcm); //p_{i} = x_{i} - x_{cm}
+
+        Eigen::Vector3d tmp ;
+        for (unsigned int j = 0 ; j < 3 ; ++j)
+            tmp(j) = this->m_position[i][j] ;
+
+       m_p[i] = tmp - xcm; //p_{i} = x_{i} - x_{cm}
     }
 
     //2.
-    Eigen::Matrix3f apq;
-    apq = Eigen::Matrix3f::Zero();
+    Eigen::Matrix3d apq = Eigen::Matrix3d::Zero();
 
-    for(unsigned int i=0 ; i < p.size() ; ++i)
+    for(unsigned int i=0 ; i < m_p.size() ; ++i)
     {
-        apq(0,0) += m_p[i][0] * m_q[i][0];
-        apq(0,1) += m_p[i][0] * m_q[i][1];
-        apq(0,2) += m_p[i][0] * m_q[i][2];
+        apq(0,0) += m_p[i][0] * this->m_q[i][0];
+        apq(0,1) += m_p[i][0] * this->m_q[i][1];
+        apq(0,2) += m_p[i][0] * this->m_q[i][2];
 
-        apq(1,0) += m_p[i][1] * m_q[i][0];
-        apq(1,1) += m_p[i][1] * m_q[i][1];
-        apq(1,2) += m_p[i][1] * m_q[i][2];
+        apq(1,0) += m_p[i][1] * this->m_q[i][0];
+        apq(1,1) += m_p[i][1] * this->m_q[i][1];
+        apq(1,2) += m_p[i][1] * this->m_q[i][2];
 
-        apq(2,0) += m_p[i][2] * m_q[i][0];
-        apq(2,1) += m_p[i][2] * m_q[i][1];
-        apq(2,2) += m_p[i][2] * m_q[i][2];
+        apq(2,0) += m_p[i][2] * this->m_q[i][0];
+        apq(2,1) += m_p[i][2] * this->m_q[i][1];
+        apq(2,2) += m_p[i][2] * this->m_q[i][2];
     }
 
-    Eigen::Matrix3f S = apq.transpose() * apq ; //symmetric matrix
+    Eigen::Matrix3d S = apq.transpose() * apq ; //symmetric matrix
 
-    //3. Jacobi Diagonlisation
-    Eigen::JacobiSVD<Eigen::Matrix3f> svd(S, ComputeFullU);
-    Eigen::Matrix3f SR = svd.matrixU(); // diagonalization with Jacobi rotations
+    //3. Jacobi Diagonalisation
+    Eigen::EigenSolver<Eigen::Matrix3d> es(S);
 
-    S(0,0) = 1.0f/sqrt(S(0,0));
-    S(1,1) = 1.0f/sqrt(S(1,1));
-    S(2,2) = 1.0f/sqrt(S(2,2));
+    //V * D * V^(-1)
+    Eigen::Matrix3d D = es.pseudoEigenvalueMatrix();
+    Eigen::Matrix3d U = es.pseudoEigenvectors() ;
 
-    S = SR * S * SR.transpose();
+    for(int j = 0; j < 3; j++)
+    {
+        if(D(j,j) <= 0)
+        {
+            D(j,j) = 0.05f;
+        }
+        D(j,j) = 1.0f/sqrt(D(j,j));
+    }
 
-    Eigen::Matrix3f R = apq * S; //S^{-1}
+    S = U * D * U.transpose();
+
+
+    Eigen::Matrix3d R = apq * S; //S^{-1}
 
     //4.
-    Eigen::Matrix3f A = apq * m_aqq; //
+    Eigen::Matrix3d A = apq * m_aqq; //
 
     REAL det = A.determinant();
-    REAL detAInv = 1.0f/powf(det,1.0f/3.0f);
+    det = 1.0f/powf(det,1.0f/3.0f);
 
-    if(std::isfinite(detAInv))
+    // \beta * A + (1 - \beta) * R
+    if(std::isfinite(det))
     {
-        R(0,0) += (m_beta * A(0,0) * detAInv) + ((1.0f - m_beta) * R(0,0));
-        R(0,1) += (m_beta * A(0,1) * detAInv) + ((1.0f - m_beta) * R(0,1));
-        R(0,2) += (m_beta * A(0,2) * detAInv) + ((1.0f - m_beta) * R(0,2));
+        R(0,0) += (m_beta * A(0,0) * det) + ((1.0f - m_beta) * R(0,0));
+        R(0,1) += (m_beta * A(0,1) * det) + ((1.0f - m_beta) * R(0,1));
+        R(0,2) += (m_beta * A(0,2) * det) + ((1.0f - m_beta) * R(0,2));
 
-        R(1,0) += (m_beta * A(1,0) * detAInv) + ((1.0f - m_beta) * R(1,0));
-        R(1,1) += (m_beta * A(1,1) * detAInv) + ((1.0f - m_beta) * R(1,1));
-        R(1,2) += (m_beta * A(1,2) * detAInv) + ((1.0f - m_beta) * R(1,2));
+        R(1,0) += (m_beta * A(1,0) * det) + ((1.0f - m_beta) * R(1,0));
+        R(1,1) += (m_beta * A(1,1) * det) + ((1.0f - m_beta) * R(1,1));
+        R(1,2) += (m_beta * A(1,2) * det) + ((1.0f - m_beta) * R(1,2));
 
-        R(2,0) += (m_beta * A(2,0) * detAInv) + ((1.0f - m_beta) * R(2,0));
-        R(2,1) += (m_beta * A(2,1) * detAInv) + ((1.0f - m_beta) * R(2,1));
-        R(2,2) += (m_beta * A(2,2) * detAInv) + ((1.0f - m_beta) * R(2,2));
+        R(2,0) += (m_beta * A(2,0) * det) + ((1.0f - m_beta) * R(2,0));
+        R(2,1) += (m_beta * A(2,1) * det) + ((1.0f - m_beta) * R(2,1));
+        R(2,2) += (m_beta * A(2,2) * det) + ((1.0f - m_beta) * R(2,2));
     }
     else
     {
         //no linear deformation (planar config ?), applying identity
-        R.identity();
+        R = Eigen::Matrix3d::Identity();
     }
 
     //5.
-    for(unsigned int i = m_goal.begin() ; i < m_goal.end() ; i = m_goal.next())
+    for(unsigned int i = this->m_goal.begin() ; i < this->m_goal.end() ; this->m_goal.next(i))
     {
-        m_goal[i] = R * m_q[i] + xcm; // g_{i} = R * q_i + x_{cm}
+        //this->m_goal[i] = R * this->m_q[i] + xcm; // g_{i} = R * q_i + x_{cm}
+
+        Eigen::Vector3d tmp = R * this->m_q[i] + xcm; // g_{i} = R * q_i + x_{cm}
+
+        VEC3 g;
+        for (unsigned int j = 0 ; j < 3 ; ++j)
+             g[j] = tmp(j);
+
+         this->m_goal[i] = g;
     }
 
 }
 
+} // namespace ShapeMatching
 
 } // namespace Simulation
 

@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "shapeMatching.h"
+
 #ifndef _SHAPE_MATCHING_LINEAR_H_
 #define _SHAPE_MATCHING_LINEAR_H_
 
@@ -52,14 +54,14 @@ protected:
     REAL m_beta;
 
     // A_{qq}
-    Eigen::Matrix3f m_aqq;
+    Eigen::Matrix3d m_aqq;
 
 private:
     void computeAqqMatrix();
 
 public:
-    ShapeMatchingLinear(VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass, REAL beta):
-        ShapeMatching(position, mass),
+    ShapeMatchingLinear(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass, REAL beta):
+        ShapeMatching<PFP>(map, position, mass),
         m_beta(beta)
     { }
 

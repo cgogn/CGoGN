@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
 
 #ifndef _SHAPE_MATCHING_H_
 #define _SHAPE_MATCHING_H_
@@ -51,26 +52,28 @@ public:
     typedef typename PFP::REAL REAL;
 
 protected:
-    VertexAttribute<VEC3>& m_position;
-    VertexAttribute<REAL>& m_mass;
-    VertexAttribute<REAL> m_goal;
+    MAP& m_map;
+    VertexAttribute<VEC3>& m_position; // x_i : position
+    VertexAttribute<REAL>& m_mass;  // m_i : mass
+    VertexAttribute<VEC3> m_goal;
 
     // q_{i} = x^{0} - x^{0}_{cm}
-    std::vector<VEC3> m_q;
-
-    // p_{i}
-    std::vector<VEC3> m_p;
+    std::vector<Eigen::Vector3d> m_q;
 
 public:
-    ShapeMatching(VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass);
+    ShapeMatching(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass);
 
-    ~ShapeMatching();
+    virtual ~ShapeMatching();
 
-    VEC3 massCenter();
+    Eigen::Vector3d massCenter();
 
     void initialize();
 
     void shapeMatch();
+
+    void computeVelocities(VertexAttribute<VEC3>& velocity, VertexAttribute<VEC3>& fext, REAL h, REAL alpha);
+
+    void applyVelocities(VertexAttribute<VEC3>& velocity, REAL h);
 };
 
 } // namespace ShapeMatching

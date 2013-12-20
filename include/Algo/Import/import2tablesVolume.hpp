@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Geometry/orientation.h"
+
 namespace CGoGN
 {
 
@@ -33,40 +35,6 @@ namespace Volume
 
 namespace Import
 {
-
-
-//template<typename PFP>
-//ImportType MeshTablesVolume<PFP>::getFileType(const std::string& filename)
-//{
-//    if ((filename.rfind(".tetmesh")!=std::string::npos) || (filename.rfind(".TETMESH")!=std::string::npos))
-//        return TETMESH;
-
-//    if ((filename.rfind(".tet")!=std::string::npos) || (filename.rfind(".TET")!=std::string::npos))
-//        return TET;
-
-//    if ((filename.rfind(".node")!=std::string::npos) || (filename.rfind(".NODE")!=std::string::npos))
-//        return NODE;
-
-//    if ((filename.rfind(".off")!=std::string::npos) || (filename.rfind(".OFF")!=std::string::npos))
-//        return OFF;
-
-//    if ((filename.rfind(".ts")!=std::string::npos) || (filename.rfind(".TS")!=std::string::npos))
-//        return TS;
-
-//    if ((filename.rfind(".msh")!=std::string::npos) || (filename.rfind(".MSH")!=std::string::npos))
-//        return MSH;
-
-//    if ((filename.rfind(".vtu")!=std::string::npos) || (filename.rfind(".VTU")!=std::string::npos))
-//        return VTU;
-
-//    if ((filename.rfind(".nas")!=std::string::npos) || (filename.rfind(".NAS")!=std::string::npos))
-//        return NAS;
-
-//    if ((filename.rfind(".vbgz")!=std::string::npos) || (filename.rfind(".VBGZ")!=std::string::npos))
-//        return VBGZ;
-
-//    return UNKNOWNVOLUME;
-//}
 
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames)
@@ -211,6 +179,18 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 		oss >> s2;
 		oss >> s3;
 
+        typename PFP::VEC3 P = position[verticesID[s0]];
+        typename PFP::VEC3 A = position[verticesID[s1]];
+        typename PFP::VEC3 B = position[verticesID[s2]];
+        typename PFP::VEC3 C = position[verticesID[s3]];
+
+        if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+        {
+            int ui = s1;
+            s1 = s2;
+            s2 = ui;
+        }
+
         m_emb.push_back(verticesID[s0]);
         m_emb.push_back(verticesID[s1]);
         m_emb.push_back(verticesID[s2]);
@@ -336,6 +316,20 @@ bool MeshTablesVolume<PFP>::importOFFWithELERegions(const std::string& filenameO
         oss >> s2;
         oss >> s3;
 
+        typename PFP::VEC3 P = position[verticesID[s0]];
+        typename PFP::VEC3 A = position[verticesID[s1]];
+        typename PFP::VEC3 B = position[verticesID[s2]];
+        typename PFP::VEC3 C = position[verticesID[s3]];
+
+        if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+        {
+            int ui= s0;
+            s0 = s3;
+            s3 = s2;
+            s2 = s1;
+            s1 = ui;
+        }
+
         m_emb.push_back(verticesID[s0]);
         m_emb.push_back(verticesID[s1]);
         m_emb.push_back(verticesID[s2]);
@@ -457,6 +451,20 @@ bool MeshTablesVolume<PFP>::importNodeWithELERegions(const std::string& filename
         oss >> s2;
         oss >> s3;
 
+        typename PFP::VEC3 P = position[verticesMapID[s0]];
+        typename PFP::VEC3 A = position[verticesMapID[s1]];
+        typename PFP::VEC3 B = position[verticesMapID[s2]];
+        typename PFP::VEC3 C = position[verticesMapID[s3]];
+
+        if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+        {
+            int ui= s0;
+            s0 = s3;
+            s3 = s2;
+            s2 = s1;
+            s1 = ui;
+        }
+
         m_emb.push_back(verticesMapID[s0]);
         m_emb.push_back(verticesMapID[s1]);
         m_emb.push_back(verticesMapID[s2]);
@@ -558,6 +566,18 @@ bool MeshTablesVolume<PFP>::importTetmesh(const std::string& filename, std::vect
         oss >> s2;
         oss >> s3;
 
+        typename PFP::VEC3 P = position[verticesID[s0]];
+        typename PFP::VEC3 A = position[verticesID[s1]];
+        typename PFP::VEC3 B = position[verticesID[s2]];
+        typename PFP::VEC3 C = position[verticesID[s3]];
+
+        if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+        {
+            int ui=s1;
+            s1 = s2;
+            s2 = ui;
+        }
+
         m_emb.push_back(verticesID[s0]);
         m_emb.push_back(verticesID[s1]);
         m_emb.push_back(verticesID[s2]);
@@ -638,8 +658,7 @@ bool MeshTablesVolume<PFP>::importTs(const std::string& filename, std::vector<st
 
     //Read and embed all tetrahedrons
     for(unsigned int i = 0; i < m_nbVolumes ; ++i)
-    {
-        int nbe;
+    {        
         do
         {
             std::getline(fp,ligne);
@@ -649,12 +668,25 @@ bool MeshTablesVolume<PFP>::importTs(const std::string& filename, std::vector<st
 
         m_nbFaces.push_back(4);
 
-        int s0,s1,s2,s3;
+        int s0,s1,s2,s3,nbe;
 
         oss >> s0;
         oss >> s1;
         oss >> s2;
         oss >> s3;
+
+        typename PFP::VEC3 P = position[verticesID[s0]];
+        typename PFP::VEC3 A = position[verticesID[s1]];
+        typename PFP::VEC3 B = position[verticesID[s2]];
+        typename PFP::VEC3 C = position[verticesID[s3]];
+
+        if(Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+        {
+            int ui = s1;
+            s1 = s2;
+            s2 = ui;
+        }
+
 
         //if regions are defined use this number
         oss >> nbe; //ignored here

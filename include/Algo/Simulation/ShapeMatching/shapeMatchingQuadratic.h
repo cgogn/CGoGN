@@ -22,6 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
+
+#include "shapeMatching.h"
+
 #ifndef _SHAPE_MATCHING_QUADRATIC_H_
 #define _SHAPE_MATCHING_QUADRATIC_H_
 
@@ -48,23 +51,21 @@ public:
     typedef typename PFP::VEC3 VEC3;
     typedef typename PFP::REAL REAL;
 
+    typedef Eigen::Matrix<double, 9, 9> Matrix9d;
+    typedef Eigen::Matrix<double, 9, 1> Vec9d;
+    typedef Eigen::Matrix<double, 3, 9> Matrix39d;
+
 protected:
     REAL m_beta;
 
-    // A_{qq}
-    Eigen::Matrix3f m_aqq;
-
-    Eigen::Vector9f m_qtild;
+    Matrix9d m_aqqtild;
 
     // q^{~}_{i} where q^{~} = [q_x, q_y, q_z, q^2_x, q^2_y, q^2_z, q_x q_y , q_y q_z, q_z q_x]
-    std::vector<Eigen::Vector9f> m_qtild;
-
-private:
-    void computeAqqMatrix();
+    std::vector<Vec9d > m_qtild;
 
 public:
-    ShapeMatchingQuadratic(VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass, REAL beta):
-        ShapeMatching(position, mass),
+    ShapeMatchingQuadratic(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass, REAL beta):
+        ShapeMatching<PFP>(map, position, mass),
         m_beta(beta)
     { }
 
