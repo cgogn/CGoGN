@@ -116,6 +116,7 @@ public:
 			m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
 			m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
 			m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+			m_render->setPrimitiveDirty(Algo::Render::GL2::BOUNDARY);
 		}
 
 		for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)

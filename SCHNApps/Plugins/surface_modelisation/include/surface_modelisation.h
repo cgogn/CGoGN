@@ -5,6 +5,11 @@
 #include "surface_modelisation_dockTab.h"
 
 #include "mapHandler.h"
+#include "Utils/drawer.h"
+#include "Topology/map/map2.h"
+#include <QVector>
+#include "QGLViewer/camera.h"
+#include "QGLViewer/vec.h"
 
 namespace CGoGN
 {
@@ -43,12 +48,12 @@ public:
 	virtual bool enable();
 	virtual void disable();
 
-	virtual void draw(View *view) {}
-	virtual void drawMap(View* view, MapHandlerGen* map) {}
+    virtual void draw(View *view);
+    virtual void drawMap(View* view, MapHandlerGen* map);
 
 	virtual void keyPress(View* view, QKeyEvent* event) {}
 	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event) {}
+    virtual void mousePress(View* view, QMouseEvent* event);
 	virtual void mouseRelease(View* view, QMouseEvent* event) {}
 	virtual void mouseMove(View* view, QMouseEvent* event) {}
 	virtual void wheelEvent(View* view, QWheelEvent* event) {}
@@ -76,12 +81,40 @@ public slots:
 
 protected:
 	void createEmptyMap();
-	void addCube(MapHandlerGen* mhg);
+    void createNewFace(MapHandlerGen* mhg);
+    void addCube(MapHandlerGen* mhg);
+    void fillHole(MapHandlerGen* mhg);
+    void deleteCC(MapHandlerGen* mhg);
+    void revolution(MapHandlerGen* mhg);
+    void mergeVolumes(MapHandlerGen* mhg);
+    void splitSurface(MapHandlerGen* mhg);
+    void extrudeRegion(MapHandlerGen* mhg);
+
+    void splitVertex(MapHandlerGen* mhg);
+    void deleteVertex(MapHandlerGen* mhg);
+
+    void cutEdge(MapHandlerGen* mhg);
+    void uncutEdge(MapHandlerGen* mhg);
 	void flipEdge(MapHandlerGen* mhg);
+    void flipBackEdge(MapHandlerGen* mhg);
+    void collapseEdge(MapHandlerGen* mhg);
+
+    void splitFace(MapHandlerGen* mhg);
+    void mergeFaces(MapHandlerGen* mhg);
+    void deleteFace(MapHandlerGen* mhg);
+    void sewFaces(MapHandlerGen* mhg);
+    void unsewFaces(MapHandlerGen* mhg);
+    void extrudeFace(MapHandlerGen* mhg);
+    void pathExtrudeFace(MapHandlerGen *mhg);
+
 
 protected:
 	Surface_Modelisation_DockTab* m_dockTab;
 	QHash<MapHandlerGen*, MapParameters> h_parameterSet;
+    Utils::Drawer* m_drawer;
+    bool collect;
+    std::vector<PFP2::VEC3> collectedVertices;
+
 };
 
 } // namespace SCHNApps

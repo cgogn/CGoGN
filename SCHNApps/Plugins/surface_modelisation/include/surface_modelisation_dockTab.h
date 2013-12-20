@@ -2,6 +2,11 @@
 #define _SURFACE_MODELISATION_DOCK_TAB_H_
 
 #include "ui_surface_modelisation.h"
+#include "QString"
+
+//#include "mapHandler.h"
+//#include "Utils/drawer.h"
+//#include "Topology/map/map2.h"
 
 namespace CGoGN
 {
@@ -27,15 +32,27 @@ private:
 	Surface_Modelisation_Plugin* m_plugin;
 	bool b_updatingUI;
 
+
+    QStringList generalOperations;
+    QStringList vertexOperations;
+    QStringList edgeOperations;
+    QStringList faceOperations;
+
 private slots:
 	void positionAttributeChanged(int index);
 	void vertexSelectorChanged(int index);
 	void edgeSelectorChanged(int index);
 	void faceSelectorChanged(int index);
 
-	void createEmptyMapButtonClicked();
-	void addCubeButtonClicked();
-	void flipEdgeButtonClicked();
+    //void operationChanged(const QString &text);
+
+    void applyGeneralOperationButtonClicked();
+    void applyVertexOperationButtonClicked();
+    void applyEdgeOperationButtonClicked();
+    void applyFaceOperationButtonClicked();
+    void startButtonClicked();
+    void acceptButtonClicked();
+    void cancelButtonClicked();
 
 private:
 	void addVertexAttribute(const QString& name);

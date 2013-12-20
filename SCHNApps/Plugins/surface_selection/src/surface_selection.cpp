@@ -17,7 +17,8 @@ namespace SCHNApps
 {
 
 Surface_Selection_Plugin::Surface_Selection_Plugin() :
-	m_selecting(false)
+	m_selecting(false),
+	m_normalAngleThreshold(10)
 {}
 
 bool Surface_Selection_Plugin::enable()
@@ -113,6 +114,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 							switch(p.selectionMethod)
 							{
+								case NormalAngle :
 								case SingleCell : {
 									m_pointSprite->setSize(30 * map->getBBdiagSize() / nbCells);
 									break;
@@ -139,6 +141,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						{
 							switch(p.selectionMethod)
 							{
+								case NormalAngle :
 								case SingleCell : {
 									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									m_selectingCellDrawer->newList(GL_COMPILE_AND_EXECUTE);
@@ -180,6 +183,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						{
 							switch(p.selectionMethod)
 							{
+								case NormalAngle :
 								case SingleCell : {
 									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									m_selectingCellDrawer->newList(GL_COMPILE_AND_EXECUTE);
@@ -277,6 +281,18 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 										selector->unselect(neigh.getInsideVertices());
 									break;
 								}
+								case NormalAngle : {
+									if(p.normalAttribute.isValid())
+									{
+										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
+										neigh.collectAll(m_selectingVertex);
+										if(event->button() == Qt::LeftButton)
+											selector->select(neigh.getInsideVertices());
+										else if(event->button() == Qt::RightButton)
+											selector->unselect(neigh.getInsideVertices());
+									}
+									break;
+								}
 							}
 							updateSelectedCellsRendering();
 						}
@@ -303,6 +319,18 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 										selector->unselect(neigh.getInsideEdges());
 									break;
 								}
+								case NormalAngle : {
+									if(p.normalAttribute.isValid())
+									{
+										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
+										neigh.collectAll(m_selectingEdge);
+										if(event->button() == Qt::LeftButton)
+											selector->select(neigh.getInsideEdges());
+										else if(event->button() == Qt::RightButton)
+											selector->unselect(neigh.getInsideEdges());
+									}
+									break;
+								}
 							}
 							updateSelectedCellsRendering();
 						}
@@ -327,6 +355,18 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 										selector->select(neigh.getInsideFaces());
 									else if(event->button() == Qt::RightButton)
 										selector->unselect(neigh.getInsideFaces());
+									break;
+								}
+								case NormalAngle : {
+									if(p.normalAttribute.isValid())
+									{
+										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
+										neigh.collectAll(m_selectingFace);
+										if(event->button() == Qt::LeftButton)
+											selector->select(neigh.getInsideFaces());
+										else if(event->button() == Qt::RightButton)
+											selector->unselect(neigh.getInsideFaces());
+									}
 									break;
 								}
 							}
@@ -394,13 +434,27 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
 		const MapParameters& p = h_parameterSet[mh];
 
-		if(p.selectionMethod == WithinSphere)
+		switch(p.selectionMethod)
 		{
-			if(event->delta() > 0)
-				m_selectionRadius *= 0.9f;
-			else
-				m_selectionRadius *= 1.1f;
-			view->updateGL();
+			case SingleCell : {
+				break;
+			}
+			case WithinSphere : {
+				if(event->delta() > 0)
+					m_selectionRadius *= 0.9f;
+				else
+					m_selectionRadius *= 1.1f;
+				view->updateGL();
+				break;
+			}
+			case NormalAngle : {
+				if(event->delta() > 0)
+					m_normalAngleThreshold *= 0.9f;
+				else
+					m_normalAngleThreshold *= 1.1f;
+				// view->displayMessage(QString("Angle threshold : ") + m_normalAngleThreshold);
+				break;
+			}
 		}
 	}
 }
@@ -527,11 +581,10 @@ void Surface_Selection_Plugin::selectedMapConnectivityModified()
 
 
 
-void Surface_Selection_Plugin::changePositionAttribute(const QString& view, const QString& map, const QString& name)
+void Surface_Selection_Plugin::changePositionAttribute(const QString& map, const QString& name)
 {
-	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
-	if(v && m)
+	if(m)
 	{
 		h_parameterSet[m].positionAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
 		if(m->isSelectedMap())
@@ -539,11 +592,21 @@ void Surface_Selection_Plugin::changePositionAttribute(const QString& view, cons
 	}
 }
 
-void Surface_Selection_Plugin::changeSelectionMethod(const QString& view, const QString& map, unsigned int method)
+void Surface_Selection_Plugin::changeNormalAttribute(const QString& map, const QString& name)
 {
-	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
-	if(v && m)
+	if(m)
+	{
+		h_parameterSet[m].normalAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
+		if(m->isSelectedMap())
+			m_dockTab->updateMapParameters();
+	}
+}
+
+void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigned int method)
+{
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(m)
 	{
 		h_parameterSet[m].selectionMethod = SelectionMethod(method);
 		if(m->isSelectedMap())

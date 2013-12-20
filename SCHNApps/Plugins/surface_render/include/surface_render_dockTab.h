@@ -36,6 +36,7 @@ private slots:
 	void renderEdgesChanged(bool b);
 	void renderFacesChanged(bool b);
 	void faceStyleChanged(QAbstractButton* b);
+	void renderBoundaryChanged(bool b);
 
 private:
 	void addPositionVBO(QString name);

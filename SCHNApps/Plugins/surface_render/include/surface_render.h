@@ -41,6 +41,7 @@ struct MapParameters
 	bool renderVertices;
 	bool renderEdges;
 	bool renderFaces;
+	bool renderBoundary;
 	FaceShadingStyle faceStyle;
 };
 
@@ -86,6 +87,7 @@ private slots:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
+
 public slots:
 	// slots for Python calls
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
@@ -95,6 +97,7 @@ public slots:
 	void changeRenderEdges(const QString& view, const QString& map, bool b);
 	void changeRenderFaces(const QString& view, const QString& map, bool b);
 	void changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style);
+	void changeRenderBoundary(const QString& view, const QString& map, bool b);
 
 protected:
 	Surface_Render_DockTab* m_dockTab;
