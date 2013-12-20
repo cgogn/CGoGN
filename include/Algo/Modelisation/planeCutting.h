@@ -22,67 +22,43 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_GL_DEF_H_
-#define __CGOGN_GL_DEF_H_
+#ifndef __PLANE_CUTTING_H__
+#define __PLANE_CUTTING_H__
 
-#ifdef USE_VRJUGGLER
-#include <vrj/Draw/OGL/GlApp.h>
-#include <vrj/Draw/OGL/GlContextData.h>
-#endif
-
-#include <GL/glew.h>
-
-#include "Utils/cgognStream.h"
+#include <math.h>
+#include <vector>
+#include "Geometry/plane_3d.h"
+#include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversorCell.h"
+#include "Algo/Modelisation/triangulation.h"
 
 namespace CGoGN
 {
 
-#ifdef USE_VRJUGGLER
-
-#include <vrj/Draw/OGL/GlApp.h>
-#include <vrj/Draw/OGL/GlContextData.h>
-typedef vrj::opengl::ContextData<GLint> CGoGNGLint;
-typedef vrj::opengl::ContextData<GLuint> CGoGNGLuint;
-typedef vrj::opengl::ContextData<GLhandleARB> CGoGNGLhandleARB;
-typedef vrj::opengl::ContextData<GLenum> CGoGNGLenum;
-typedef vrj::opengl::ContextData<GLenum*> CGoGNGLenumTable;
-#else
-
-template <typename T>
-class FalsePtr
+namespace Algo
 {
-        T m_v;
-public:
-        FalsePtr() :m_v(T(0)) {}
-        FalsePtr(const T& v) : m_v(v) {}
-        T& operator*() { return m_v; }
-        const T& operator*() const { return m_v; }
-};
 
-typedef FalsePtr<GLint> CGoGNGLint;
-typedef FalsePtr<GLuint> CGoGNGLuint;
-typedef FalsePtr<GLuint> CGoGNGLhandleARB;
-typedef FalsePtr<GLenum> CGoGNGLenum;
-typedef FalsePtr<GLenum*> CGoGNGLenumTable;
+namespace Surface
+{
+
+namespace Modelisation
+{
+
+/**
+*/
+template <typename PFP>
+void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
+			  CellMarker<FACE>& cmf_over, bool keepTriangles=false, bool with_unsew = true);
+
+
+} // namespace Modelisation
+
+} // namespace Surface
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "Algo/Modelisation/planeCutting.hpp"
 
 #endif
-
-inline void glCheckErrors()
-{
-	GLenum glError = glGetError();
-	if (glError != GL_NO_ERROR)
-		CGoGNerr<<"GL error: " << gluErrorString(glError) << CGoGNendl;
-}
-
-inline void glCheckErrors(const std::string& message)
-{
-	GLenum glError = glGetError();
-	if (glError != GL_NO_ERROR)
-		CGoGNerr<< message <<" : " << gluErrorString(glError) << CGoGNendl;
-}
-
-
-}
-
-
-#endif /* GL_DEF_H_ */

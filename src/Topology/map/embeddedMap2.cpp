@@ -440,6 +440,9 @@ void EmbeddedMap2::unsewFaces(Dart d, bool withBoundary)
 
 	if (isOrbitEmbedded<VERTEX>())
 	{
+		copyDartEmbedding<VERTEX>(phi2(e), d) ;
+		copyDartEmbedding<VERTEX>(phi2(d), e) ;
+
 		Dart ee = phi1(e) ;
 		if(!sameVertex(d, ee))
 		{

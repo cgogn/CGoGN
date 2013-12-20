@@ -105,7 +105,7 @@ protected:
 	/**
 	 * handle of program
 	 */
-	CGoGNGLhandleARB m_program_object;
+	CGoGNGLint m_program_object;
 
 	CGoGNGLint m_uniMat_Proj;
 	CGoGNGLint m_uniMat_Model;
@@ -178,7 +178,7 @@ protected:
 	 * @param obj what log do you want ?
 	 * @return the log
 	 */
-	char* getInfoLog( GLhandleARB obj );
+	char* getInfoLog( GLuint obj );
 
 public:
 	/**
@@ -304,7 +304,7 @@ public:
 	/**
 	 * get handler of program for external use og gl functions
 	 */
-	GLhandleARB program_handler() { return *m_program_object;}
+	GLuint program_handler() { return *m_program_object;}
 
 	/**
 	 * check shader validity width official GLSL syntax
