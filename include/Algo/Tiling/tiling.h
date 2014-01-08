@@ -25,6 +25,9 @@
 #ifndef _TILING_H_
 #define _TILING_H_
 
+#include "Geometry/transfo.h"
+#include "Topology/generic/cellmarker.h"
+
 namespace CGoGN
 {
 
@@ -53,6 +56,8 @@ protected:
 
     unsigned int m_nx, m_ny, m_nz;
 
+    VEC3 m_center;
+
     /**
     * Table of vertex darts (one dart per vertex)
     * Order depend on tiling kind
@@ -65,10 +70,19 @@ public:
         m_nx(x), m_ny(y), m_nz(z)
     { }
 
+    Tiling(const Tiling<PFP>& t1, const Tiling<PFP> t2);
+
     /**
     * get the table of darts (one per vertex)
     */
     std::vector<Dart>& getVertexDarts() { return m_tableVertDarts; }
+
+    void computeCenter(VertexAttribute<VEC3>& position);
+
+    //void Polyhedron<PFP>::transform(float* matrice)
+    void transform(VertexAttribute<VEC3>& position, const Geom::Matrix44f& matrice);
+
+    void mark(CellMarker<VERTEX>& m);
 
 };
 
@@ -79,5 +93,7 @@ public:
 } // namespace Algo
 
 } // namespace CGoGN
+
+#include "Algo/Tiling/tiling.hpp"
 
 #endif //_TILING_H_

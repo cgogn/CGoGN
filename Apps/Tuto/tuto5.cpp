@@ -25,7 +25,7 @@
 #include "tuto5.h"
 #include <iostream>
 
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/subdivision.h"
 #include "Algo/Modelisation/subdivision3.h"
@@ -275,12 +275,12 @@ int main(int argc, char **argv)
 	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 	CGoGNout << 3 << " tutu "<< 4 << CGoGNendl;
 
-	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	int nb=3;
 	if (argc>1)
 		nb = atoi(argv[1]);
-	dglobal = prim.hexaGrid_topo(nb,nb,nb);
-	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+    Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
+    cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
+    dglobal = NIL;
 
     // un peu d'interface
 	QApplication app(argc, argv);

@@ -1114,10 +1114,10 @@ int main(int argc, char** argv)
     }
 	else
 	{
-		sqt.position = sqt.myMap.addAttribute<PFP::VEC3, VERTEX>("position");
-		Algo::Volume::Modelisation::Primitive3D<PFP> prim(sqt.myMap, sqt.position);
-		prim.hexaGrid_topo(10,10,10);
-		prim.embedHexaGrid(1.0f,1.0f,1.0f);
+        sqt.position = sqt.myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+
+        Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(sqt.myMap, 10,10,10);
+        cubic.embedIntoGrid(sqt.position, 1.0f, 1.0f, 1.0f);
 	}
 
     sqt.initGUI();

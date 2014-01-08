@@ -798,10 +798,10 @@ bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<s
             oss >> s2;
             oss >> s3;
 
-            typename PFP::VEC3 P = position[verticesID[s0]];
-            typename PFP::VEC3 A = position[verticesID[s1]];
-            typename PFP::VEC3 B = position[verticesID[s2]];
-            typename PFP::VEC3 C = position[verticesID[s3]];
+            typename PFP::VEC3 P = position[verticesMapID[s0]];
+            typename PFP::VEC3 A = position[verticesMapID[s1]];
+            typename PFP::VEC3 B = position[verticesMapID[s2]];
+            typename PFP::VEC3 C = position[verticesMapID[s3]];
 
             if(Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
             {
@@ -812,13 +812,14 @@ bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<s
                 s1 = ui;
             }
 
+            unsigned int nbe;
             //if regions are defined use this number
             oss >> nbe; //ignored here
 
-            m_emb.push_back(verticesID[s0]);
-            m_emb.push_back(verticesID[s1]);
-            m_emb.push_back(verticesID[s2]);
-            m_emb.push_back(verticesID[s3]);
+            m_emb.push_back(verticesMapID[s0]);
+            m_emb.push_back(verticesMapID[s1]);
+            m_emb.push_back(verticesMapID[s2]);
+            m_emb.push_back(verticesMapID[s3]);
         }
         else if((type_elm==5) && (nb==8))
         {

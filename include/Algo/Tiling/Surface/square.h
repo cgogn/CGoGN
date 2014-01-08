@@ -52,11 +52,15 @@ class Grid : public Tiling<PFP>
     typedef typename PFP::VEC3 VEC3;
 
 public:
-    Grid(MAP& map, unsigned int x, unsigned int y, bool closed):
+    Grid(MAP& map, unsigned int x, unsigned int y, bool close):
         Tiling<PFP>(map,x,y,-1)
     {
-        grid(x,y,closed);
+        grid(x,y,close);
     }
+
+    Grid(MAP& map, unsigned int x, unsigned int y):
+        Grid<PFP>(map,x,y,-1,true)
+    { }
 
     /*! @name Embedding Operators
      * Tiling creation
@@ -100,7 +104,7 @@ protected:
      *  @param y nb of squares in y
      *  @param closed close the boundary face of the 2D grid
      */
-    void grid(unsigned int x, unsigned int y, bool closed);
+    void grid(unsigned int x, unsigned int y, bool close);
     //@}
 
 };
@@ -115,15 +119,23 @@ class Cylinder : public Tiling<PFP>
 
 private:
     bool m_top_closed, m_bottom_closed;
+    bool m_top_triangulated, m_bottom_triangulated;
+    Dart m_topVertDart, m_bottomVertDart;
 
 public:
-    Cylinder(MAP& map, unsigned int n, unsigned int z):
+    Cylinder(MAP& map, unsigned int n, unsigned int z, bool close_top, bool close_bottom):
         Tiling<PFP>(map, n, -1, z),
-        m_top_closed(false),
-        m_bottom_closed(false)
+        m_top_closed(close_top),
+        m_bottom_closed(close_bottom),
+        m_top_triangulated(false),
+        m_bottom_triangulated(false)
     {
         cylinder(n,z);
     }
+
+    Cylinder(MAP& map, unsigned int n, unsigned int z):
+        Cylinder<PFP>(map,n,z,true,true)
+    { }
 
     /*! @name Embedding Operators
      * Tiling creation
@@ -177,7 +189,7 @@ public:
      */
     void cone(unsigned int x, unsigned int y);
 
-private:
+protected:
     //! Create a subdivided 2D cylinder
     /*! @param n nb of squares around circumference
      *  @param z nb of squares in height
@@ -199,7 +211,7 @@ class Cube : public Cylinder<PFP>
 
 public:
     Cube(MAP& map, unsigned int x, unsigned int y, unsigned int z):
-        Tiling<PFP>(map)
+        Cylinder<PFP>(map,2*(x+y),z, false, false)
     {
         cube(x,y,z);
     }
@@ -218,7 +230,7 @@ public:
     void embedIntoCube(VertexAttribute<VEC3>& position, float x, float y, float z);
     //@}
 
-private:
+protected:
     /*! @name Topological Operators
      * Tiling creation
      *************************************************************************/
@@ -244,7 +256,7 @@ class Tore : public Cylinder<PFP>
 
 public:
     Tore(MAP& map, unsigned int n, unsigned int m):
-        Tiling<PFP>(map)
+        Cylinder<PFP>(map,n,m)
     {
         tore(n,m);
     }
@@ -267,7 +279,7 @@ public:
      *************************************************************************/
 
     //@{
-private:
+protected:
     //! Create a subdivided 2D tore
     /*! @param n nb of squares around big circumference
      *  @param m nb of squares around small circumference
@@ -287,6 +299,6 @@ private:
 
 } // namespace CGoGN
 
-#include "Algo/Tiling/square.hpp"
+#include "Algo/Tiling/Surface/square.hpp"
 
 #endif // _TILING_SQUARE_H_

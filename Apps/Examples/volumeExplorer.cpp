@@ -26,7 +26,7 @@
 #include "volumeExplorer.h"
 #include <iostream>
 
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/volume.h"
@@ -440,10 +440,10 @@ int main(int argc, char **argv)
 	else
 	{
 		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
-		Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
+
 		int nb = 8;
-		prim.hexaGrid_topo(nb,nb,nb);
-		prim.embedHexaGrid(1.0f,1.0f,1.0f);
+        Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
+        cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
 		for (unsigned int i=position.begin(); i != position.end(); position.next(i))
 		{

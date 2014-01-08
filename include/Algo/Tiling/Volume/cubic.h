@@ -22,8 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _TILING_TRIANGULAR_H_
-#define _TILING_TRIANGULAR_H_
+#include "Algo/Tiling/tiling.h"
+
+#ifndef _TILING_CUBIC_H_
+#define _TILING_CUBIC_H_
 
 namespace CGoGN
 {
@@ -31,56 +33,31 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Surface
+namespace Volume
 {
 
 namespace Tilings
 {
 
-/*! \brief The class of regular triangular tiling
- * It allows the creation of
- * - grid 2D
- * - subdivided cube
- * - subdivided cone
- * - subdivided cylinder
- * - subdivided tore
- * - subdivided sphere (with pole)
+namespace Cubic
+{
+
+
+/*! \brief The class of regular grid square tiling
  */
 template <typename PFP>
-class Triangular
+class Grid : public Algo::Surface::Tilings::Tiling<PFP>
 {
     typedef typename PFP::MAP MAP;
     typedef typename PFP::VEC3 VEC3;
 
-protected:
-    /**
-    * Map in which we are working
-    */
-    MAP& m_map;
-
-    /**
-    * Table of vertex darts (one dart per vertex)
-    * Order depend on tiling kind
-    */
-    std::vector<Dart> m_tableVertDarts;
-
 public:
-    Triangular(MAP& map):
-        m_map(map)
-    { }
+    Grid(MAP& map, unsigned int x, unsigned int y, unsigned int z):
+        Algo::Surface::Tilings::Tiling<PFP>(map,x,y,z)
+    {
+        grid3D(x,y,z);
+    }
 
-    /*! @name Topological Operators
-     * Tiling creation
-     *************************************************************************/
-
-    //@{
-    //! Create a 2D grid
-    /*! @param x nb of squares in x
-     *  @param y nb of squares in y
-     *  @param closed close the boundary face of the 2D grid
-     */
-    void grid(unsigned int x, unsigned int y, bool closed);
-    //@}
 
     /*! @name Embedding Operators
      * Tiling creation
@@ -93,18 +70,67 @@ public:
      *  @param x size in Y
      *  @param y position in Z (centered on 0 by default)
      */
-    void embedGrid(VertexAttribute<VEC3>& position, float x, float y, float z = 0.0f);
+    void embedIntoGrid(VertexAttribute<VEC3>& position, float x, float y, float z);
+
+    //! Embed a topological grid into a twister open ribbon with turns=PI it is a Moebius strip, needs only to be closed (if model allow it)
+    /*! @param position Attribute used to store vertices positions
+     *  @param radius_min
+     *  @param radius_max
+     *  @param turns number of turn multiplied by 2*PI
+     */
+    void embedIntoTwistedStrip(VertexAttribute<VEC3>& position, float radius_min, float radius_max, float turns);
+
+    //! Embed a topological grid into a helicoid
+    /*! @param position Attribute used to store vertices positions
+     *  @param radius_min
+     *  @param radius_max
+     *  @param maxHeight height to reach
+     *  @param turns number of turn
+     */
+    void embedIntoHelicoid(VertexAttribute<VEC3>& position, float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
     //@}
+
+protected:
+    /*! @name Topological Operators
+     * Tiling creation
+     *************************************************************************/
+
+    //@{
+    //! Create a 3D grid
+    /*! @param x nb of squares in x
+     *  @param y nb of squares in y
+     *  @param z nb of squares in z
+     */
+    void grid3D(unsigned int x, unsigned int y, unsigned int z);
+
+    //! Create a 3D grid
+    /*! @param x nb of squares in x
+     *  @param y nb of squares in y
+     */
+    Dart grid2D(unsigned int x, unsigned int y);
+
+    //! Create a 3D grid
+    /*! @param x nb of squares in x
+     */
+    Dart grid1D(unsigned int x);
+    //@}
+
 };
+
+
+
+
+
+} // namespace Cubic
 
 } // namespace Tilings
 
-} // namespace Surface
+} // namespace Volume
 
 } // namespace Algo
 
 } // namespace CGoGN
 
-#include "Algo/Tiling/triangular.hpp"
+#include "Algo/Tiling/Volume/cubic.hpp"
 
-#endif //_TILING_TRIANGULAR_H_
+#endif // _TILING_CUBIC_H_

@@ -25,35 +25,34 @@
 #include "simpleMap3.h"
 #include "Utils/GLSLShader.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Modelisation/subdivision3.h"
 
 SimpleMap3::SimpleMap3()
 {
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-    Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap,position);
-    Dart d = primCat.hexaGrid_topo(1,1,1);
-    primCat.embedHexaGrid(1,1,1);
-    myMap.closeMap();
-    myMap.check();
 
-    Dart dp = Algo::Surface::Modelisation::createQuadrangularPyramid<PFP>(myMap);
+      Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, 1, 1, 1);
+      cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
+      myMap.check();
 
-    position[dp] = typename PFP::VEC3(0.5,0.5,-0.5);
-    position[myMap.phi1(dp)] = typename PFP::VEC3(0.5,0.5,0.5);
-    position[myMap.phi1(myMap.phi1(dp))] = typename PFP::VEC3(0.5,-0.5,0.5);
-    position[myMap.phi_1(dp)] = typename PFP::VEC3(0.5,-0.5,-0.5);
-    position[myMap.phi_1(myMap.phi2(dp))] = typename PFP::VEC3(1.5f, 0.0f, 0.0f);
 
-    Dart dtemp = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(d)))));
+//    Dart dp = Algo::Surface::Modelisation::createQuadrangularPyramid<PFP>(myMap);
 
-    myMap.sewVolumes(dtemp,dp);
+//    position[dp] = typename PFP::VEC3(0.5,0.5,-0.5);
+//    position[myMap.phi1(dp)] = typename PFP::VEC3(0.5,0.5,0.5);
+//    position[myMap.phi1(myMap.phi1(dp))] = typename PFP::VEC3(0.5,-0.5,0.5);
+//    position[myMap.phi_1(dp)] = typename PFP::VEC3(0.5,-0.5,-0.5);
+//    position[myMap.phi_1(myMap.phi2(dp))] = typename PFP::VEC3(1.5f, 0.0f, 0.0f);
 
-//	Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap, position);
-//	Dart d = primCat.hexaGrid_topo(2,1,1);
-//	primCat.embedHexaGrid(1,1,1);
-//	myMap.closeMap();
+//    Dart dtemp = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(d)))));
+
+//    myMap.sewVolumes(dtemp,dp);
+
+//      Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, 2, 1, 1);
+//      cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
+//      myMap.check();
 
 //	unsigned int nb=0;
 //	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))

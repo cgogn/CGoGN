@@ -43,7 +43,7 @@ namespace Square
  *************************************************************************/
 
 template <typename PFP>
-void Grid<PFP>::grid(unsigned int x, unsigned int y, bool closed)
+void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
 {
     // nb vertices
     int nb = (x+1)*(y+1);
@@ -95,7 +95,7 @@ void Grid<PFP>::grid(unsigned int x, unsigned int y, bool closed)
         }
     }
 
-    if(closed)
+    if(close)
         this->m_map.closeHole(this->m_tableVertDarts[0]) ;
 }
 
@@ -225,6 +225,12 @@ void Cylinder<PFP>::cylinder(unsigned int n, unsigned int z)
             }
         }
     }
+
+    if(m_top_closed)
+        closeTop();
+
+    if(m_bottom_closed)
+        closeBottom();
 }
 
 template <typename PFP>
@@ -246,9 +252,11 @@ void Cylinder<PFP>::triangleTop()
         if(this->m_map.faceDegree(d) > 3)
         {
             Algo::Surface::Modelisation::trianguleFace<PFP>(this->m_map, d);
-            this->m_tableVertDarts.push_back(this->m_map.phi_1(d));
+            //this->m_tableVertDarts.push_back(this->m_map.phi_1(d));
+            m_topVertDart = this->m_map.phi_1(d);
         }
 
+        m_top_triangulated = true;
     }
 }
 
@@ -271,9 +279,11 @@ void Cylinder<PFP>::triangleBottom()
         if(this->m_map.faceDegree(d) > 3)
         {
             Algo::Surface::Modelisation::trianguleFace<PFP>(this->m_map, d);
-            this->m_tableVertDarts.push_back(this->m_map.phi_1(d));
+            //this->m_tableVertDarts.push_back(this->m_map.phi_1(d));
+            m_bottomVertDart = this->m_map.phi_1(d);
         }
 
+        m_bottom_triangulated = true;
     }
 }
 
@@ -296,16 +306,18 @@ void Cylinder<PFP>::embedIntoCylinder(VertexAttribute<VEC3>& position, float bot
         }
     }
 
-    int indexUmbrella = this->m_nx*(this->m_nz+1);
+    //int indexUmbrella = this->m_nx*(this->m_nz+1);
 
-    if (m_bottom_closed)
+    if (m_bottom_triangulated)
     {
-        position[this->m_tableVertDarts[indexUmbrella++] ] = VEC3(0.0f, 0.0f, -height/2 );
+        //position[this->m_tableVertDarts[indexUmbrella++] ] = VEC3(0.0f, 0.0f, height/2 );
+        position[m_bottomVertDart] = VEC3(0.0f, 0.0f, -height/2 );
     }
 
-    if (m_top_closed)
+    if (m_top_triangulated)
     {
-        position[this->m_tableVertDarts[indexUmbrella] ] = VEC3(0.0f, 0.0f, height/2 );
+        //position[this->m_tableVertDarts[indexUmbrella] ] = VEC3(0.0f, 0.0f, -height/2 );
+        position[m_topVertDart] = VEC3(0.0f, 0.0f, height/2 );
     }
 }
 
@@ -330,22 +342,24 @@ void Cylinder<PFP>::embedIntoSphere(VertexAttribute<VEC3>& position, float radiu
     }
 
     // bottom  pole
-    if (m_bottom_closed)
+    if (m_bottom_triangulated)
     {
-        position[this->m_tableVertDarts[this->m_nx*(this->m_nz+1)] ] = VEC3(0.0f, 0.0f, -radius);
+        //position[this->m_tableVertDarts[this->m_nx*(this->m_nz+1)] ] = VEC3(0.0f, 0.0f, radius);
+        position[m_bottomVertDart] = VEC3(0.0f, 0.0f, -radius);
     }
 
     //  top pole
-    if (m_top_closed)
+    if (m_top_triangulated)
     {
-        position[this->m_tableVertDarts[this->m_nx*(this->m_nz+1)+1] ] = VEC3(0.0f, 0.0f, radius);
+        //position[this->m_tableVertDarts[this->m_nx*(this->m_nz+1)+1] ] = VEC3(0.0f, 0.0f, -radius);
+        position[m_topVertDart] = VEC3(0.0f, 0.0f, radius);
     }
 }
 
 template <typename PFP>
 void Cylinder<PFP>::embedIntoCone(VertexAttribute<VEC3>& position, float radius, float height)
 {
-    if(m_top_closed && !m_bottom_closed)
+    if(m_top_closed && m_top_triangulated)
     {
         float alpha = float(2.0*M_PI/this->m_nx);
         float dz = height/float(this->m_nz+1);
@@ -362,15 +376,18 @@ void Cylinder<PFP>::embedIntoCone(VertexAttribute<VEC3>& position, float radius,
             }
         }
 
-        int indexUmbrella = this->m_nx*(this->m_nz+1);
-        if (m_bottom_closed)
+        //int indexUmbrella = this->m_nx*(this->m_nz+1);
+        if (m_bottom_triangulated)
         {
-            position[this->m_tableVertDarts[indexUmbrella++] ] = VEC3(0.0f, 0.0f, -height/2 );
+            //position[this->m_tableVertDarts[indexUmbrella] ] = VEC3(0.0f, 0.0f, -height/2 );
+            position[m_bottomVertDart] = VEC3(0.0f, 0.0f, -height/2 );
         }
 
         //  top always closed in cone
-        position[this->m_tableVertDarts[indexUmbrella] ] = VEC3(0.0f, 0.0f, height/2 );
+        //position[this->m_tableVertDarts[indexUmbrella++] ] = VEC3(0.0f, 0.0f, height/2 );
+        position[m_topVertDart] = VEC3(0.0f, 0.0f, height/2 );
     }
+
 }
 
 /*! Cube
@@ -379,17 +396,17 @@ void Cylinder<PFP>::embedIntoCone(VertexAttribute<VEC3>& position, float radius,
 template <typename PFP>
 void Cube<PFP>::cube(unsigned int x, unsigned int y, unsigned int z)
 {
-    this->cylinder(2*(x+y), z);
+    //this->cylinder(2*(x+y), z, false, false);
     this->m_nx = x;
     this->m_ny = y;
     this->m_nz = z;
 
     int nb = 2*(x+y)*(z+1) + 2*(x-1)*(y-1);
-    m_tableVertDarts.reserve(nb);
+    this->m_tableVertDarts.reserve(nb);
 
     // we now have the 4 sides, just need to create store and sew top & bottom
     // the top
-    Grid<PFP> gtop(m_map,x,y);
+    Grid<PFP> gtop(this->m_map,x,y,false);
     std::vector<Dart>& tableTop = gtop.getVertexDarts();
 
     int index_side = 2*(x+y)*z;
@@ -421,7 +438,7 @@ void Cube<PFP>::cube(unsigned int x, unsigned int y, unsigned int z)
     }
 
     // the bottom
-    Grid<PFP> gBottom(m_map,x,y);
+    Grid<PFP> gBottom(this->m_map,x,y,false);
     std::vector<Dart>& tableBottom = gBottom.getVertexDarts();
 
     index_side = 3*(x+y)+(x-1);
@@ -504,9 +521,9 @@ void Cube<PFP>::embedIntoCube(VertexAttribute<VEC3>& position, float sx, float s
     }
 
     // the top
-    for(unsigned int i = 1; i  <m_ny; ++i)
+    for(unsigned int i = 1; i  < this->m_ny; ++i)
     {
-        for(unsigned int j = 1; j < m_nx; ++j)
+        for(unsigned int j = 1; j < this->m_nx; ++j)
         {
             VEC3 pos(-sx/2.0f+float(j)*dx, -sy/2.0f+float(i)*dy, sz/2.0f);
             position[this->m_tableVertDarts[ index++ ] ] = pos;
@@ -514,9 +531,9 @@ void Cube<PFP>::embedIntoCube(VertexAttribute<VEC3>& position, float sx, float s
     }
 
     // the bottom
-    for(unsigned int i = 1; i < m_ny; ++i)
+    for(unsigned int i = 1; i < this->m_ny; ++i)
     {
-        for(unsigned int j = 1; j < m_nx; ++j)
+        for(unsigned int j = 1; j < this->m_nx; ++j)
         {
             VEC3 pos(-sx/2.0f+float(j)*dx, sy/2.0f-float(i)*dy, -sz/2.0f);
             position[this->m_tableVertDarts[ index++ ] ] = pos;
@@ -530,7 +547,7 @@ void Cube<PFP>::embedIntoCube(VertexAttribute<VEC3>& position, float sx, float s
 template <typename PFP>
 void Tore<PFP>::tore(unsigned int n, unsigned int m)
 {
-    this->cylinder(n, m);
+    //this->cylinder(n, m);
     this->m_nx = n;
     this->m_ny = m;
     this->m_nz = -1;
@@ -546,7 +563,7 @@ void Tore<PFP>::tore(unsigned int n, unsigned int m)
 
     // remove the last n vertex darts that are no more necessary (sewed with n first)
     // memory not freed (but will be when destroy the Polyhedron), not important ??
-    m_tableVertDarts.resize(m*n);
+    this->m_tableVertDarts.resize(m*n);
 }
 
 template <typename PFP>
