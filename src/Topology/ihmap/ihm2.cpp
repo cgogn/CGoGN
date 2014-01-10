@@ -59,6 +59,12 @@ void ImplicitHierarchicalMap2::initImplicitProperties()
 {
 	initEdgeId() ;
 
+//    //init each edge Id at 0
+//	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
+//	{
+//		m_edgeId[d] = 0;
+//	}
+
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if(m_nextLevelCell[orbit] != NULL)

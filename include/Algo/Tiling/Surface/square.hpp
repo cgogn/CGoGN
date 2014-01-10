@@ -97,6 +97,8 @@ void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
 
     if(close)
         this->m_map.closeHole(this->m_tableVertDarts[0]) ;
+
+    this->m_dart = this->m_tableVertDarts[0];
 }
 
 template <typename PFP>
@@ -231,6 +233,8 @@ void Cylinder<PFP>::cylinder(unsigned int n, unsigned int z)
 
     if(m_bottom_closed)
         closeBottom();
+
+    this->m_dart = this->m_tableVertDarts.front();
 }
 
 template <typename PFP>

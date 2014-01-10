@@ -87,7 +87,7 @@ public:
 
 			m_map.incCurrentLevel() ;
 			Dart midF = m_map.phi1(m_map.phi1(d));
-			m_position[midF] += vf + ef ;
+            m_position[midF] += vf + ef ;
 			m_map.decCurrentLevel() ;
 		}
 

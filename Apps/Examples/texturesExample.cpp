@@ -24,7 +24,7 @@
 
 #include "texturesExample.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Tiling/Surface/square.h"
 #include "Utils/vbo.h" 
 
 TexView::TexView():
@@ -215,9 +215,9 @@ void TexView::computeTore()
 
 	VertexAttribute<VEC3> position = myMap.addAttribute<VEC3, VERTEX>("position");
 	VertexAttribute<Geom::Vec2f> texcoord = myMap.addAttribute<Geom::Vec2f, VERTEX>("texcoord");
-	Algo::Surface::Modelisation::Polyhedron<PFP> prim(myMap, position);
-	prim.tore_topo(NB, NB);
-	prim.embedTore(40.0f,20.0f);
+    //Algo::Surface::Modelisation::Polyhedron<PFP> prim(myMap, position);
+    Algo::Surface::Tilings::Square::Tore<PFP> prim(myMap, NB, NB);
+    prim.embedIntoTore(position, 40.0f,20.0f);
 	Dart d = prim.getDart();
 	for(unsigned int i=0; i<NB; ++i)
 	{

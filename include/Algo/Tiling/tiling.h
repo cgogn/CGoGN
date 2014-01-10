@@ -59,6 +59,11 @@ protected:
     VEC3 m_center;
 
     /**
+        * Reference dart of Polyhedron
+        */
+    Dart m_dart;
+
+    /**
     * Table of vertex darts (one dart per vertex)
     * Order depend on tiling kind
     */
@@ -68,6 +73,11 @@ public:
     Tiling(MAP& map, unsigned int x, unsigned int y, unsigned int z):
         m_map(map),
         m_nx(x), m_ny(y), m_nz(z)
+    { }
+
+    Tiling(MAP& map) :
+        m_map(map),
+        m_nx(-1), m_ny(-1), m_nz(-1)
     { }
 
     Tiling(const Tiling<PFP>& t1, const Tiling<PFP> t2);
@@ -83,6 +93,11 @@ public:
     void transform(VertexAttribute<VEC3>& position, const Geom::Matrix44f& matrice);
 
     void mark(CellMarker<VERTEX>& m);
+
+    /*
+        * get the reference dart
+        */
+    Dart getDart() { return m_dart; }
 
 };
 

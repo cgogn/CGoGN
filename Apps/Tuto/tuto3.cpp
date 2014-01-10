@@ -25,7 +25,7 @@
 #include "tuto3.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Selection/raySelector.h"
-#include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Tiling/Surface/square.h"
 
 using namespace CGoGN ;
 
@@ -154,9 +154,8 @@ void MyQT::createMap()
 
     position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
-    Algo::Surface::Modelisation::Polyhedron<PFP> prim1(myMap, position);
-    prim1.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
-    prim1.embedSphere(2.0f);
+    Algo::Surface::Tilings::Square::Cylinder<PFP> prim1(myMap, 256,256,true,true);
+    prim1.embedIntoSphere(position, 2.0f);
 
 //	Dart d2 = d1;
 //	position[d2] = PFP::VEC3(1, 0, 0);
@@ -167,14 +166,14 @@ void MyQT::createMap()
 //	d2 = PHI<211>(d2);
 //	position[d2] = PFP::VEC3(0, 1, 2);
 
-    Algo::Surface::Modelisation::Polyhedron<PFP> prim2(myMap, position);
-    prim2.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
-    prim2.embedSphere(2.0f);
+    Algo::Surface::Tilings::Square::Cylinder<PFP> prim2(myMap, 256 ,256, true, true);
+    prim2.embedIntoSphere(position, 2.0f);
+
 
     Geom::Matrix44f trf;
     trf.identity();
     Geom::translate<float>(5.0f, 0.0, 0.0, trf);
-    prim2.transform(trf);
+    prim2.transform(position, trf);
 
     xd1 = prim2.getDart();
 
