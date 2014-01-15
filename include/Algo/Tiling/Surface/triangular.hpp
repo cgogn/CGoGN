@@ -64,9 +64,8 @@ void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
     // store last row of vertices
     for (unsigned int i = 0; i < x; ++i)
     {
-        //this->m_tableVertDarts.push_back(this->m_map.phi_1(this->m_tableVertDarts[(y-1)*(x+1) + i]) );
-    }
-    //this-> m_tableVertDarts.push_back(this->m_map.phi1(this->m_tableVertDarts[(y-1)*(x+1) +x]) );
+		this->m_tableVertDarts.push_back(this->m_map.phi_1(this->m_tableVertDarts[(y-1)*(x+1) + i]) );
+    }    
 
     //sewing the triangles
     for (unsigned int i = 0; i < y; ++i)
@@ -75,11 +74,11 @@ void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
         {
             if (i > 0) // sew with preceeding row
             {
-                int pos = i*(x+1)+j;
-                Dart d = this->m_tableVertDarts[pos];
-                Dart e = this->m_tableVertDarts[pos-(x+1)];
-                e = this->m_map.phi1(this->m_map.phi1(e));
-                this->m_map.sewFaces(d, e, false);
+//				int pos = i*(x+1)+j;
+//				Dart d = this->m_tableVertDarts[pos];
+//				Dart e = this->m_tableVertDarts[pos-(x+1)];
+//				e = this->m_map.phi_1(e);
+//				this->m_map.sewFaces(d, e, false);
             }
             if (j > 0) // sew with preceeding column
             {
@@ -107,7 +106,7 @@ void Grid<PFP>::embedIntoGrid(VertexAttribute<VEC3>& position, float x, float y,
     {
         for(unsigned int j = 0; j <= this->m_nx;++j)
         {
-            position[this->m_tableVertDarts[i*(this->m_nx+1)+j] ] = VEC3(-x/2 + dx*float(j), -y/2 + dy*float(i), z);
+			position[this->m_tableVertDarts[i*(this->m_nx+1)+j] ] = VEC3(dx*float(j) + 0.5f*float(i), dy*float(i) * sqrtf(3.0f)/2.0f, z);
         }
     }
 }

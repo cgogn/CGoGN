@@ -44,8 +44,8 @@ using namespace CGoGN ;
  */
 struct PFP: public PFP_STANDARD
 {
-    // definition of the map
-    typedef EmbeddedMap2 MAP;
+	// definition of the map
+	typedef EmbeddedMap2 MAP;
 };
 
 
@@ -56,178 +56,265 @@ VertexAttribute<PFP::VEC3> normal;
 
 void MyQT::cb_initGL()
 {
-    Utils::GLSLShader::setCurrentOGLVersion(2);
+	Utils::GLSLShader::setCurrentOGLVersion(2);
 
-    // create the render
-    m_render = new Algo::Render::GL2::MapRender();
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
 
-    // create VBO for position
-    m_positionVBO = new Utils::VBO();
-    m_positionVBO->updateData(position);
+	// create VBO for position
+	m_positionVBO = new Utils::VBO();
+	m_positionVBO->updateData(position);
 
-    m_normalVBO =  new Utils::VBO();
+	m_normalVBO =  new Utils::VBO();
 
-    m_shader = new Utils::ShaderSimpleColor();
-    m_shader->setAttributePosition(m_positionVBO);
-    m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(m_positionVBO);
+	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
 
 
-    m_lines = new Utils::ShaderVectorPerVertex();
-    m_lines->setAttributePosition(m_positionVBO);
-    m_lines->setAttributeVector(m_normalVBO);
-    m_lines->setScale(0.2f);
-    m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
+	m_lines = new Utils::ShaderVectorPerVertex();
+	m_lines->setAttributePosition(m_positionVBO);
+	m_lines->setAttributeVector(m_normalVBO);
+	m_lines->setScale(0.2f);
+	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
 
-    Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+	Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
-    m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
-    m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
-    registerShader(m_shader);
-    registerShader(m_lines);
+	registerShader(m_shader);
+	registerShader(m_lines);
 
-    m_normalVBO->updateData(normal);
+	m_normalVBO->updateData(normal);
 
 }
 
 void MyQT::cb_redraw()
 {
-    m_render->draw(m_shader, Algo::Render::GL2::LINES);
-    m_render->draw(m_lines, Algo::Render::GL2::POINTS);
+	m_render->draw(m_shader, Algo::Render::GL2::LINES);
+	m_render->draw(m_lines, Algo::Render::GL2::POINTS);
+}
+
+void MyQT::squareTiling(int code)
+{
+	switch(code)
+	{
+		case 1:
+		{
+			std::cout << "square grid tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
+			g.embedIntoGrid(position,50,50);
+
+			break;
+		}
+		case 2:
+		{
+			std::cout << "square grid twisted strip tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
+			g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
+
+			break;
+		}
+		case 3:
+		{
+			std::cout << "square grid helocoid tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,20,20,true);
+			g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
+
+			break;
+		}
+		case 4:
+		{
+			std::cout << "square cylinder tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+			c.embedIntoCylinder(position,0.5,0.7,5.0);
+
+			break;
+		}
+		case 5:
+		{
+			std::cout << "square cylinder tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+			c.triangleBottom();
+			c.triangleTop();
+			c.embedIntoCylinder(position,0.5,0.7,5.0);
+
+			break;
+		}
+		case 6:
+		{
+			std::cout << "square cylinder sphere tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+			c.triangleTop();
+			c.triangleBottom();
+			c.embedIntoSphere(position,0.5);
+
+			break;
+		}
+		case 7:
+		{
+			std::cout << "square cylinder cone tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+			c.triangleTop();
+			c.triangleBottom();
+			c.embedIntoCone(position,0.5, 5.0);
+
+			break;
+		}
+		case 8:
+		{
+			std::cout << "square cylinder cone tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
+			c.embedIntoCube(position,5.0,5.0, 5.0);
+
+			break;
+		}
+		case 9:
+		{
+			std::cout << "square cylinder cone tiling" << std::endl;
+			Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
+			c.embedIntoTore(position,5.0,2.0);
+
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
 }
 
 // mouse picking
-void MyQT::tiling(int code)
+void MyQT::triangularTiling(int code)
 {
-    //myMap.clear(false);
+	switch(code)
+	{
+		case 1:
+		{
+			std::cout << "square grid tiling" << std::endl;
+			Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,10,10,true);
+			g.embedIntoGrid(position,50,50);
 
-    switch(code)
-    {
-    case 1:
-    {
-        std::cout << "square grid tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
-        g.embedIntoGrid(position,50,50);
+			break;
+		}
+		case 2:
+		{
+//			std::cout << "square grid twisted strip tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
+//			g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
 
-        break;
-    }
-    case 2:
-    {
-        std::cout << "square grid twisted strip tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
-        g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
+			break;
+		}
+		case 3:
+		{
+//			std::cout << "square grid helocoid tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,20,20,true);
+//			g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
 
-        break;
-    }
-    case 3:
-    {
-        std::cout << "square grid helocoid tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,20,20,true);
-        g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
+			break;
+		}
+		case 4:
+		{
+//			std::cout << "square cylinder tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+//			c.embedIntoCylinder(position,0.5,0.7,5.0);
 
-        break;
-    }
-    case 4:
-    {
-        std::cout << "square cylinder tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-        c.embedIntoCylinder(position,0.5,0.7,5.0);
+			break;
+		}
+		case 5:
+		{
+//			std::cout << "square cylinder tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+//			c.triangleBottom();
+//			c.triangleTop();
+//			c.embedIntoCylinder(position,0.5,0.7,5.0);
 
-        break;
-    }
-    case 5:
-    {
-        std::cout << "square cylinder tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-        c.triangleBottom();
-        c.triangleTop();
-        c.embedIntoCylinder(position,0.5,0.7,5.0);
+			break;
+		}
+		case 6:
+		{
+//			std::cout << "square cylinder sphere tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+//			c.triangleTop();
+//			c.triangleBottom();
+//			c.embedIntoSphere(position,0.5);
 
-        break;
-    }
-    case 6:
-    {
-        std::cout << "square cylinder sphere tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-        c.triangleTop();
-        c.triangleBottom();
-        c.embedIntoSphere(position,0.5);
+			break;
+		}
+		case 7:
+		{
+//			std::cout << "square cylinder cone tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+//			c.triangleTop();
+//			c.triangleBottom();
+//			c.embedIntoCone(position,0.5, 5.0);
 
-        break;
-    }
-    case 7:
-    {
-        std::cout << "square cylinder cone tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-        c.triangleTop();
-        c.triangleBottom();
-        c.embedIntoCone(position,0.5, 5.0);
+			break;
+		}
+		case 8:
+		{
+//			std::cout << "square cylinder cone tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
+//			c.embedIntoCube(position,5.0,5.0, 5.0);
 
-        break;
-    }
-    case 8:
-    {
-        std::cout << "square cylinder cone tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
-        c.embedIntoCube(position,5.0,5.0, 5.0);
+			break;
+		}
+		case 9:
+		{
+//			std::cout << "square cylinder cone tiling" << std::endl;
+//			Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
+//			c.embedIntoTore(position,5.0,2.0);
 
-        break;
-    }
-    case 9:
-    {
-        std::cout << "square cylinder cone tiling" << std::endl;
-        Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
-        c.embedIntoTore(position,5.0,2.0);
+			break;
+		}
 
-        break;
-    }
-
-    default:
-    {
-        break;
-    }
-    }
-
-    //    m_positionVBO->updateData(position);
-    //    m_lines->setAttributePosition(m_positionVBO);
-    //    updateGL();
+		default:
+		{
+			break;
+		}
+	}
 }
 
 int main(int argc, char **argv)
 {
-    // interface:
-    QApplication app(argc, argv);
-    MyQT sqt;
+	// interface:
+	QApplication app(argc, argv);
+	MyQT sqt;
 
-    sqt.statusMsg("Neww to create a sphere or Load for a mesh file");
-    CGoGNStream::allToConsole(&sqt);
+	sqt.statusMsg("Neww to create a sphere or Load for a mesh file");
+	CGoGNStream::allToConsole(&sqt);
 
-    if (!position.isValid())
-        position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+	if (!position.isValid())
+		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
-    if (!normal.isValid())
-        normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
+	if (!normal.isValid())
+		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
 
-    if(argc == 2)
-    {
-        sqt.tiling(atoi(argv[1]));
-    }
-
-
-    //  bounding box
-    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
-    CGoGNout << "lPosObj=" << lPosObj << CGoGNendl;
-    CGoGNout << "lWidthObj=" << lWidthObj << CGoGNendl;
-    sqt.setParamObject(lWidthObj,lPosObj.data());
-
-    //	myMap.enableQuickTraversal<EDGE>() ;
-    //	myMap.enableQuickTraversal<VERTEX>() ;
-
-    sqt.show();
+	if(argc == 3)
+	{
+		if(argv[1][0] == 'S')
+			sqt.squareTiling(atoi(argv[2]));
+		else if(argv[1][0] == 'T')
+			sqt.triangularTiling(atoi(argv[2]));
+	}
 
 
-    return app.exec();
+	//  bounding box
+	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+	CGoGNout << "lPosObj=" << lPosObj << CGoGNendl;
+	CGoGNout << "lWidthObj=" << lWidthObj << CGoGNendl;
+	sqt.setParamObject(lWidthObj,lPosObj.data());
+
+	//	myMap.enableQuickTraversal<EDGE>() ;
+	//	myMap.enableQuickTraversal<VERTEX>() ;
+
+	sqt.show();
+
+
+	return app.exec();
 }
 
