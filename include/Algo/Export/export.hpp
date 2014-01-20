@@ -1016,6 +1016,187 @@ bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::V
 	return true ;
 }
 
+
+
+
+template <typename PFP>
+bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+{
+	if (map.dimension() != 2)
+	{
+		CGoGNerr << "Surface::Export::exportVTU works only with map of dimension 2"<< CGoGNendl;
+		return false;
+	}
+
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	// open file
+	std::ofstream fout ;
+	fout.open(filename, std::ios::out) ;
+
+	if (!fout.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false ;
+	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+	unsigned int count=0;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		indices[i] = count++;
+	}
+
+
+	std::vector<unsigned int> triangles;
+	std::vector<unsigned int> quads;
+	std::vector<unsigned int> others;
+	std::vector<unsigned int> others_begin;
+	triangles.reserve(2048);
+	quads.reserve(2048);
+	others.reserve(2048);
+	others_begin.reserve(2048);
+
+	TraversorF<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = map.faceDegree(d);
+		Dart f=d;
+		switch(degree)
+		{
+			case 3:
+				triangles.push_back(indices[f]); f = map.phi1(f);
+				triangles.push_back(indices[f]); f = map.phi1(f);
+				triangles.push_back(indices[f]);
+				break;
+			case 4:
+				quads.push_back(indices[f]); f = map.phi1(f);
+				quads.push_back(indices[f]); f = map.phi1(f);
+				quads.push_back(indices[f]); f = map.phi1(f);
+				quads.push_back(indices[f]);
+				break;
+
+			default:
+				others_begin.push_back(others.size());
+				do
+				{
+					others.push_back(indices[f]); f = map.phi1(f);
+
+				} while (f!=d);
+				break;
+		}
+	}
+	others_begin.push_back(others.size());
+
+	unsigned int nbtotal = triangles.size()/3 + quads.size()/4 + others_begin.size()-1;
+
+	fout << "<?xml version=\"1.0\"?>" << std::endl;
+	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"BigEndian\">" << std::endl;
+	fout << "  <UnstructuredGrid>" <<  std::endl;
+	fout << "    <Piece NumberOfPoints=\"" << position.nbElements() << "\" NumberOfCells=\""<< nbtotal << "\">" << std::endl;
+	fout << "      <Points>" << std::endl;
+	fout << "        <DataArray type=\"Float32\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
+
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		const VEC3& P = position[i];
+		fout << "          " << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+	}
+
+	fout << "        </DataArray>" << std::endl;
+	fout << "      </Points>" << std::endl;
+	fout << "      <Cells>" << std::endl;
+	fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" Format=\"ascii\">" << std::endl;
+
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		fout << "          ";
+		fout << triangles[i]   << " " << triangles[i+1] << " " << triangles[i+2] << std::endl;
+	}
+
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		fout << "          ";
+		fout << quads[i]   << " " << quads[i+1] << " " << quads[i+2] << " " << quads[i+3]<< std::endl;
+	}
+
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		fout << "          ";
+		unsigned int beg = others_begin[i-1];
+		unsigned int end = others_begin[i];
+		for (unsigned int j=beg; j<end; ++j)
+		{
+			fout <<  others[j] << " ";
+		}
+		fout << std::endl;
+	}
+
+	fout << "        </DataArray>" << std::endl;
+	fout << "        <DataArray type=\"Int32\" Name=\"offsets\" Format=\"ascii\">" ;
+
+	unsigned int offset = 0;
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		offset += 3;
+		if (i%200 ==0)
+			fout << std::endl<< "         ";
+		fout << " " << offset;
+	}
+
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		offset += 4;
+		if (i%200 ==0)
+			fout << std::endl<< "         ";
+		fout << " "<< offset;
+	}
+
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		unsigned int length = others_begin[i] - others_begin[i-1];
+		offset += length;
+		if (i%200 ==0)
+			fout << std::endl<< "         ";
+		fout << " "<< offset;
+		fout << std::endl;
+	}
+
+	fout << std::endl << "        </DataArray>" << std::endl;
+	fout << "        <DataArray type=\"UInt8\" Name=\"types\" Format=\"ascii\">";
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		if (i%200 ==0)
+			fout << std::endl<< "         ";
+		fout << " 5";
+	}
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		if (i%200 ==0)
+			fout << std::endl<< "         ";
+		fout << " 9";
+	}
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		if (i%200 ==0)
+			fout << std::endl<< "         ";
+		fout << " 7";
+	}
+
+	fout << std::endl << "        </DataArray>" << std::endl;
+	fout << "      </Cells>" << std::endl;
+	fout << "    </Piece>" << std::endl;
+	fout << "  </UnstructuredGrid>" << std::endl;
+	fout << "</VTKFile>" << std::endl;
+
+	fout.close();
+	return true;
+}
+
+
+
 } // namespace Export
 
 }
