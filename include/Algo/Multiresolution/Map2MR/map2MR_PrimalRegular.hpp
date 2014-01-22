@@ -74,13 +74,13 @@ void Map2MR<PFP>::addNewLevel(bool triQuad)
 	TraversorE<typename PFP::MAP> travE(m_map) ;
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
-//		if(!shareVertexEmbeddings)
-//		{
-//			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
-//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
-//			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
-//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
-//		}
+		//		if(!shareVertexEmbeddings)
+		//		{
+		//			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+		//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+		//			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
+		//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+		//		}
 
 		m_map.cutEdge(d) ;
 		travE.skip(d) ;
@@ -265,6 +265,81 @@ void Map2MR<PFP>::synthesis()
 		(*synthesisFilters[i])() ;
 
 	m_map.incCurrentLevel() ;
+}
+
+template <typename PFP>
+void Map2MR<PFP>::addLevelFront()
+{
+	DartMarker md(m_map);
+
+	m_map.addLevelFront() ;
+	m_map.duplicateDarts(0);
+	m_map.setCurrentLevel(0);
+
+	std::vector<Dart> visitedVertices;
+	visitedVertices.reserve(1024);
+
+	//look for an irregular vertex
+
+	TraversorV<typename PFP::MAP> tv(m_map);
+	bool found = false;
+	for(Dart d = tv.begin() ; !found && d != tv.end() ; d = tv.next())
+	{
+		if(m_map.vertexDegree(d) != 6)
+		{
+			found = true;
+			visitedVertices.push_back(d);
+		}
+	}
+
+	std::cout << "d = " << visitedVertices[0] << std::endl;
+
+	for(unsigned int i = 0 ; i < visitedVertices.size() ; ++i)
+	{
+		Dart d = visitedVertices[i];
+
+			Dart fit1 = m_map.phi2(m_map.phi1(d));
+			//m_map.mergeFaces(fit1) ;
+
+
+//		Traversor2VE<typename PFP::MAP> tve(m_map, d);
+//		for(Dart eit = tve.begin() ; eit != tve.end() ; eit = tve.next())
+//		{
+//			//coarse all faces around the vertex
+//			if(!md.isMarked(eit))
+//			{
+//				unsigned int degree = m_map.faceDegree(eit);
+
+//				if(degree == 3)
+//				{
+//					Dart fit1 = m_map.phi2(m_map.phi1(eit));
+//					//Dart fit2 = m_map.phi1(fit1);
+//					//Dart fit3 = m_map.phi1(fit2);
+
+//					m_map.mergeFaces(fit1) ;
+//					//m_map.mergeFaces(fit2) ;
+//					//m_map.mergeFaces(fit3) ;
+//				}
+//				else
+//				{
+
+//				}
+
+//				//visitedVertices.push_back(m_map.phi1(m_map.phi1(eit)));
+//				//visitedVertices.push_back(m_map.phi_1(m_map.phi_1(eit)));
+//			}
+//		}
+
+//		for(Dart eit = tve.begin() ; eit != tve.end() ; eit = tve.next())
+//		{
+//			if(!md.isMarked(eit))
+//			{
+//				//coarse all edges around the vertex
+//				m_map.uncutEdge(eit) ;
+//				md.markOrbit<EDGE>(eit);
+//			}
+//		}
+	}
 }
 
 

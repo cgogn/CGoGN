@@ -22,22 +22,21 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL_REGULAR__
-#define __MAP2MR_PRIMAL_REGULAR__
+#ifndef _IHM2MR_PRIMAL_REGULAR_
+#define _IHM2MR_PRIMAL_REGULAR_
 
-#include "Topology/map/embeddedMap2.h"
+#include "Topology/ihmap/ihm2.h"
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
 #include "Algo/Multiresolution/filter.h"
 
+#include <cmath>
+
 namespace CGoGN
 {
 
 namespace Algo
-{
-
-namespace Surface
 {
 
 namespace MR
@@ -50,54 +49,46 @@ namespace Regular
 {
 
 template <typename PFP>
-class Map2MR
+class IHM2
 {
 public:
-	typedef typename PFP::MAP MAP ;
+    typedef typename PFP::MAP MAP ;
 
 protected:
-	MAP& m_map;
+    MAP& m_map;
 	bool shareVertexEmbeddings ;
 
-	std::vector<Algo::MR::Filter*> synthesisFilters ;
-	std::vector<Algo::MR::Filter*> analysisFilters ;
+    std::vector<Algo::MR::Filter*> synthesisFilters ;
+    std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
-	Map2MR(MAP& map);
+    IHM2(MAP& map) ;
 
-	~Map2MR();
+    //if true : tri and quad else quad
+    void addNewLevel(bool triQuad = true) ;
 
-	//if true : tri and quad else quad
-	void addNewLevel(bool triQuad = true) ;
+    void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+    void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
-	void addNewLevelSqrt3();
+    void clearSynthesisFilters() { synthesisFilters.clear() ; }
+    void clearAnalysisFilters() { analysisFilters.clear() ; }
 
-	void addNewLevelSqrt2();
-
-	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
-
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
-
-	void analysis() ;
-	void synthesis() ;
+    void analysis() ;
+    void synthesis() ;
 
 	void addLevelFront();
 } ;
 
-} // namespace Regular
+} // namespace Adaptive
 
 } // namespace Primal
 
 } // namespace MR
 
-} // namespace Surface
-
 } // namespace Algo
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/Map2MR/map2MR_PrimalRegular.hpp"
+#include "Algo/Multiresolution/IHM2/ihm2_PrimalRegular.hpp"
 
-#endif
+#endif // _IHM2MR_PRIMAL_REGULAR_

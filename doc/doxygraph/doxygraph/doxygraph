@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+package doxygraph 0.1;
+use strict;
+use warnings;
+use lib::abs 'lib';
+use Doxygen::XML;
+use GraphViz::UML;
+
+@ARGV == 2 or usage();
+grep { /^-/ } @ARGV and usage();
+my ($index, $output) = @ARGV;
+
+my $uml = GraphViz::UML->new;
+my $xml = Doxygen::XML->new({ handler => $uml });
+my @compounds = $xml->parse_index($index);
+$xml->parse_compound($_) for @compounds;
+my $dot = $uml->export->command;
+
+open my $fh, '>', $output or die "$output: $!";
+$dot->foreach(sub { print $fh $_ });
+print $fh "}\n";
+close $fh;
+
+sub usage
+{
+  print STDERR << "EOF";
+Expected commandline usage:
+  doxygraph path/to/index.xml path/to/output.dot
+EOF
+  exit 0;
+}
+
+=head1 NAME
+
+doxygraph - Create Graphviz UML class diagram from Doxygen XML output
+
+=head1 SYNOPSIS
+
+ doxygraph index.xml graph.dot
+
+=head1 DESCRIPTION
+
+Doxygen can output an XML representation of all the documented entities it
+encounters in the source code it examines, by setting C<GENERATE_XML = YES> in
+your C<Doxyfile>. Doxygraph will convert this XML representation into a UML
+class diagram in the format recognized by Graphviz and its C<dot> command.
+
+All the heavy lifting is done in the L<Doxygen::XML> and L<GraphViz::UML>
+modules.
+
+=head1 OPTIONS
+
+None.
+
+=head1 EXAMPLES
+
+ doxygen
+ doxygraph xml/index.xml graph.dot
+ dot -T svg -o graph.svg graph.dot
+
+=head1 AUTHORS
+
+Available through the git repository at L<http://code.google.com/p/doxygraph>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2013 Doxygraph project
+
+This Source Code Form is subject to the terms of the Mozilla Public License,
+version 2.0. If a copy of the MPL was not distributed with this file, You can
+obtain one at L<http://mozilla.org/MPL/2.0/>.
+
+=head1 SEE ALSO
+
+L<http://www.doxygen.org/>, L<http://www.graphviz.org/>.
