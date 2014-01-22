@@ -51,7 +51,7 @@ void IHM2<PFP>::addNewLevel(bool triQuad)
 {
     unsigned int cur = m_map.getCurrentLevel() ; //pushLevel
 
-    m_map.setCurrentLevel(cur + 1) ;
+	m_map.setCurrentLevel(m_map.getMaxLevel() + 1) ;
 
     // cut edges
     TraversorE<typename PFP::MAP> travE(m_map) ;
