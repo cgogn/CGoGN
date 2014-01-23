@@ -103,6 +103,110 @@ bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC
 template <typename PFP>
 bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
 
+template <typename PFP>
+bool exportVTUCompressed(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
+
+
+template <typename PFP>
+class VTUExporter
+{
+protected:
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	typename PFP::MAP& m_map;
+	const VertexAttribute<typename PFP::VEC3>& m_position;
+
+	unsigned int nbtotal;
+	bool noPointData;
+	bool noCellData;
+	bool closed;
+
+	std::ofstream fout ;
+
+	std::vector<unsigned int> triangles;
+	std::vector<unsigned int> quads;
+	std::vector<unsigned int> others;
+	std::vector<unsigned int> others_begin;
+
+	std::vector<Dart> bufferTri;
+	std::vector<Dart> bufferQuad;
+	std::vector<Dart> bufferOther;
+
+
+public:
+
+	VTUExporter(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position);
+
+	~VTUExporter();
+
+	/**
+	 * @brief start writing header of vru file
+	 * @param filename
+	 * @return true if ok
+	 */
+	bool init(const char* filename);
+
+
+	/**
+	 * @brief add a vertex attribute of type scalar
+	 * @param attrib
+	 * @param vtkType Float32/Int32
+	 * @param name Data name if none then used Attribute's name
+	 */
+	template<typename T>
+	void addVertexAttributeScal(const VertexAttribute<T>& attrib, const std::string& vtkType, const std::string& name="");
+
+	/**
+	 * @brief add a vertex attribute of type vector
+	 * @param attrib
+	 * @param vtkType Float32/Int32
+	 * @param nbComp number components in attribute (if none comute for size of attribute)
+	 * @param name Data name if none then used Attribute's name
+	 */
+	template<typename T>
+	void addVertexAttributeVect(const VertexAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+
+
+	/**
+	 * @brief finish adding vertex attributes data
+	 */
+	void endVertexAttributes();
+
+	/**
+	 * @brief add a face attribute of type scalar
+	 * @param attrib
+	 * @param vtkType Float32/Int32
+	 * @param name Data name if none then used Attribute's name
+	 */
+	template<typename T>
+	void addFaceAttributeScal(const FaceAttribute<T>& attrib, const std::string& vtkType, const std::string& name="");
+
+	/**
+	 * @brief add a face aatribute of type vector
+	 * @param attrib
+	 * @param vtkType Float32/Int32
+	 * @param nbComp number components in attribute (if none comute for size of attribute)
+	 * @param name Data name if none then used Attribute's name
+	 */
+	template<typename T>
+	void addFaceAttributeVect(const FaceAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+
+
+	/**
+	 * @brief finish adding face attributes data
+	 */
+	void endFaceAttributes();
+
+
+	/**
+	 * @brief finalize file writing & close (automatically called at destruction)
+	 * @return true if ok
+	 */
+	bool close();
+
+};
+
 
 
 /**

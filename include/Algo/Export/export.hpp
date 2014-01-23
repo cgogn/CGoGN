@@ -28,6 +28,8 @@
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
 
+#include "Utils/compress.h"
+
 namespace CGoGN
 {
 
@@ -1049,7 +1051,6 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 		indices[i] = count++;
 	}
 
-
 	std::vector<unsigned int> triangles;
 	std::vector<unsigned int> quads;
 	std::vector<unsigned int> others;
@@ -1094,37 +1095,34 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 
 	fout << "<?xml version=\"1.0\"?>" << std::endl;
 	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"BigEndian\">" << std::endl;
-	fout << "  <UnstructuredGrid>" <<  std::endl;
-	fout << "    <Piece NumberOfPoints=\"" << position.nbElements() << "\" NumberOfCells=\""<< nbtotal << "\">" << std::endl;
-	fout << "      <Points>" << std::endl;
-	fout << "        <DataArray type=\"Float32\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
+	fout << "<UnstructuredGrid>" <<  std::endl;
+	fout << "<Piece NumberOfPoints=\"" << position.nbElements() << "\" NumberOfCells=\""<< nbtotal << "\">" << std::endl;
+	fout << "<Points>" << std::endl;
+	fout << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
 
 	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
 	{
 		const VEC3& P = position[i];
-		fout << "          " << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+		fout << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
 	}
 
-	fout << "        </DataArray>" << std::endl;
-	fout << "      </Points>" << std::endl;
-	fout << "      <Cells>" << std::endl;
-	fout << "        <DataArray type=\"Int32\" Name=\"connectivity\" Format=\"ascii\">" << std::endl;
+	fout << "</DataArray>" << std::endl;
+	fout << "</Points>" << std::endl;
+	fout << "<Cells>" << std::endl;
+	fout << "<DataArray type=\"Int32\" Name=\"connectivity\" Format=\"ascii\">" << std::endl;
 
 	for (unsigned int i=0; i<triangles.size(); i+=3)
 	{
-		fout << "          ";
 		fout << triangles[i]   << " " << triangles[i+1] << " " << triangles[i+2] << std::endl;
 	}
 
 	for (unsigned int i=0; i<quads.size(); i+=4)
 	{
-		fout << "          ";
 		fout << quads[i]   << " " << quads[i+1] << " " << quads[i+2] << " " << quads[i+3]<< std::endl;
 	}
 
 	for (unsigned int i=1; i<others_begin.size(); ++i)
 	{
-		fout << "          ";
 		unsigned int beg = others_begin[i-1];
 		unsigned int end = others_begin[i];
 		for (unsigned int j=beg; j<end; ++j)
@@ -1134,23 +1132,23 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 		fout << std::endl;
 	}
 
-	fout << "        </DataArray>" << std::endl;
-	fout << "        <DataArray type=\"Int32\" Name=\"offsets\" Format=\"ascii\">" ;
+	fout << "</DataArray>" << std::endl;
+	fout << "<DataArray type=\"Int32\" Name=\"offsets\" Format=\"ascii\">" ;
 
 	unsigned int offset = 0;
 	for (unsigned int i=0; i<triangles.size(); i+=3)
 	{
 		offset += 3;
-		if (i%200 ==0)
-			fout << std::endl<< "         ";
+		if (i%60 ==0)
+			fout << std::endl;
 		fout << " " << offset;
 	}
 
 	for (unsigned int i=0; i<quads.size(); i+=4)
 	{
 		offset += 4;
-		if (i%200 ==0)
-			fout << std::endl<< "         ";
+		if (i%80 ==0)
+			fout << std::endl;
 		fout << " "<< offset;
 	}
 
@@ -1158,43 +1156,585 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	{
 		unsigned int length = others_begin[i] - others_begin[i-1];
 		offset += length;
-		if (i%200 ==0)
-			fout << std::endl<< "         ";
+		if (i%20 ==0)
+			fout << std::endl;
 		fout << " "<< offset;
 		fout << std::endl;
 	}
 
-	fout << std::endl << "        </DataArray>" << std::endl;
-	fout << "        <DataArray type=\"UInt8\" Name=\"types\" Format=\"ascii\">";
+	fout << std::endl << "</DataArray>" << std::endl;
+	fout << "<DataArray type=\"UInt8\" Name=\"types\" Format=\"ascii\">";
 	for (unsigned int i=0; i<triangles.size(); i+=3)
 	{
-		if (i%200 ==0)
-			fout << std::endl<< "         ";
+		if (i%60 ==0)
+			fout << std::endl;
 		fout << " 5";
 	}
 	for (unsigned int i=0; i<quads.size(); i+=4)
 	{
-		if (i%200 ==0)
-			fout << std::endl<< "         ";
+		if (i%80 ==0)
+			fout << std::endl;
 		fout << " 9";
 	}
 	for (unsigned int i=1; i<others_begin.size(); ++i)
 	{
-		if (i%200 ==0)
-			fout << std::endl<< "         ";
+		if (i%20 ==0)
+			fout << std::endl;
 		fout << " 7";
 	}
 
-	fout << std::endl << "        </DataArray>" << std::endl;
-	fout << "      </Cells>" << std::endl;
-	fout << "    </Piece>" << std::endl;
-	fout << "  </UnstructuredGrid>" << std::endl;
+	fout << std::endl << "</DataArray>" << std::endl;
+	fout << "</Cells>" << std::endl;
+	fout << "</Piece>" << std::endl;
+	fout << "</UnstructuredGrid>" << std::endl;
 	fout << "</VTKFile>" << std::endl;
 
 	fout.close();
 	return true;
 }
 
+
+template <typename PFP>
+bool exportVTUCompressed(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+{
+	if (map.dimension() != 2)
+	{
+		CGoGNerr << "Surface::Export::exportVTU works only with map of dimension 2"<< CGoGNendl;
+		return false;
+	}
+
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	// open file
+	std::ofstream fout ;
+	fout.open(filename, std::ios::out) ;
+
+	if (!fout.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false ;
+	}
+
+	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+
+	unsigned int count=0;
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+	{
+		indices[i] = count++;
+	}
+
+	std::vector<unsigned int> triangles;
+	std::vector<unsigned int> quads;
+	std::vector<unsigned int> others;
+	std::vector<unsigned int> others_begin;
+	triangles.reserve(2048);
+	quads.reserve(2048);
+	others.reserve(2048);
+	others_begin.reserve(2048);
+
+	TraversorF<MAP> trav(map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = map.faceDegree(d);
+		Dart f=d;
+		switch(degree)
+		{
+			case 3:
+				triangles.push_back(indices[f]); f = map.phi1(f);
+				triangles.push_back(indices[f]); f = map.phi1(f);
+				triangles.push_back(indices[f]);
+				break;
+			case 4:
+				quads.push_back(indices[f]); f = map.phi1(f);
+				quads.push_back(indices[f]); f = map.phi1(f);
+				quads.push_back(indices[f]); f = map.phi1(f);
+				quads.push_back(indices[f]);
+				break;
+
+			default:
+				others_begin.push_back(others.size());
+				do
+				{
+					others.push_back(indices[f]); f = map.phi1(f);
+
+				} while (f!=d);
+				break;
+		}
+	}
+	others_begin.push_back(others.size());
+
+	unsigned int nbtotal = triangles.size()/3 + quads.size()/4 + others_begin.size()-1;
+
+	fout << "<?xml version=\"1.0\"?>" << std::endl;
+	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"BigEndian\" compressor=\"vtkZLibDataCompressor\">" << std::endl;
+	fout << "<UnstructuredGrid>" <<  std::endl;
+	fout << "<Piece NumberOfPoints=\"" << position.nbElements() << "\" NumberOfCells=\""<< nbtotal << "\">" << std::endl;
+	fout << "<Points>" << std::endl;
+	fout << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
+
+	{
+		std::vector<VEC3> bufferV3;
+		bufferV3.reserve(position.nbElements());
+		for (unsigned int i = position.begin(); i != position.end(); position.next(i))
+			bufferV3.push_back(position[i]);
+		Utils::zlibWriteCompressed((unsigned char*)(&bufferV3[0]),bufferV3.size()*sizeof(VEC3), fout);
+	}
+
+	fout << "</DataArray>" << std::endl;
+	fout << "</Points>" << std::endl;
+	fout << "<Cells>" << std::endl;
+	fout << "<DataArray type=\"Int32\" Name=\"connectivity\" Format=\"ascii\">" << std::endl;
+
+	std::vector<int> bufferInt;
+	bufferInt.reserve(triangles.size()+quads.size()+others.size());
+
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		bufferInt.push_back(triangles[i]);
+		bufferInt.push_back(triangles[i+1]);
+		bufferInt.push_back(triangles[i+2]);
+	}
+
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		bufferInt.push_back(quads[i]);
+		bufferInt.push_back(quads[i+1]);
+		bufferInt.push_back(quads[i+2]);
+		bufferInt.push_back(quads[i+3]);
+	}
+
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		unsigned int beg = others_begin[i-1];
+		unsigned int end = others_begin[i];
+		for (unsigned int j=beg; j<end; ++j)
+			bufferInt.push_back(others[j]);
+	}
+
+	Utils::zlibWriteCompressed((unsigned char*)(&bufferInt[0]),bufferInt.size()*sizeof(int), fout);
+
+	fout << "</DataArray>" << std::endl;
+	fout << "<DataArray type=\"Int32\" Name=\"offsets\" Format=\"ascii\">" ;
+
+	bufferInt.clear();
+
+	unsigned int offset = 0;
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		offset += 3;
+		bufferInt.push_back(offset);
+	}
+
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		offset += 4;
+		bufferInt.push_back(offset);
+	}
+
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		unsigned int length = others_begin[i] - others_begin[i-1];
+		offset += length;
+		bufferInt.push_back(offset);
+	}
+	Utils::zlibWriteCompressed((unsigned char*)(&bufferInt[0]),bufferInt.size()*sizeof(int), fout);
+
+	fout << std::endl << "</DataArray>" << std::endl;
+	fout << "<DataArray type=\"UInt8\" Name=\"types\" Format=\"ascii\">";
+
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+		bufferInt.push_back(5);
+
+	for (unsigned int i=0; i<quads.size(); i+=4)
+		bufferInt.push_back(9);
+
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+		bufferInt.push_back(7);
+
+	Utils::zlibWriteCompressed((unsigned char*)(&bufferInt[0]),bufferInt.size()*sizeof(int), fout);
+
+	fout << std::endl << "</DataArray>" << std::endl;
+	fout << "</Cells>" << std::endl;
+	fout << "</Piece>" << std::endl;
+	fout << "</UnstructuredGrid>" << std::endl;
+	fout << "</VTKFile>" << std::endl;
+
+	fout.close();
+	return true;
+}
+
+
+
+
+template <typename PFP>
+VTUExporter<PFP>::VTUExporter(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position):
+	m_map(map),m_position(position),
+	nbtotal(0),noPointData(true),noCellData(true),closed(false)
+{
+	if (map.dimension() != 2)
+	{
+		CGoGNerr << "Surface::Export::exportVTU works only with map of dimension 2"<< CGoGNendl;
+	}
+
+}
+
+template <typename PFP>
+bool VTUExporter<PFP>::init(const char* filename)
+{
+
+	// open file
+	fout.open(filename, std::ios::out) ;
+
+	if (!fout.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false;
+	}
+
+	VertexAutoAttribute<unsigned int> indices(m_map,"indices_vert");
+
+	unsigned int count=0;
+	for (unsigned int i = m_position.begin(); i != m_position.end(); m_position.next(i))
+	{
+		indices[i] = count++;
+	}
+
+	triangles.reserve(4096);
+	quads.reserve(4096);
+	others.reserve(4096);
+	others_begin.reserve(4096);
+
+	bufferTri.reserve(4096);
+	bufferQuad.reserve(4096);
+	bufferOther.reserve(4096);
+
+	TraversorF<MAP> trav(m_map) ;
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		unsigned int degree = m_map.faceDegree(d);
+		Dart f=d;
+		switch(degree)
+		{
+			case 3:
+				bufferTri.push_back(d);
+				triangles.push_back(indices[f]); f = m_map.phi1(f);
+				triangles.push_back(indices[f]); f = m_map.phi1(f);
+				triangles.push_back(indices[f]);
+				break;
+			case 4:
+				bufferQuad.push_back(d);
+				quads.push_back(indices[f]); f = m_map.phi1(f);
+				quads.push_back(indices[f]); f = m_map.phi1(f);
+				quads.push_back(indices[f]); f = m_map.phi1(f);
+				quads.push_back(indices[f]);
+				break;
+
+			default:
+				bufferOther.push_back(d);
+				others_begin.push_back(others.size());
+				do
+				{
+					others.push_back(indices[f]); f = m_map.phi1(f);
+
+				} while (f!=d);
+				break;
+		}
+	}
+	others_begin.push_back(others.size());
+
+	nbtotal = triangles.size()/3 + quads.size()/4 + others_begin.size()-1;
+
+	fout << "<?xml version=\"1.0\"?>" << std::endl;
+	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"BigEndian\">" << std::endl;
+	fout << "<UnstructuredGrid>" <<  std::endl;
+	fout << "<Piece NumberOfPoints=\"" << m_position.nbElements() << "\" NumberOfCells=\""<< nbtotal << "\">" << std::endl;
+
+	return true;
+}
+
+template <typename PFP>
+template<typename T>
+void VTUExporter<PFP>::addVertexAttributeScal(const VertexAttribute<T>& attrib, const std::string& vtkType, const std::string& name)
+{
+	if (!noCellData)
+	{
+		CGoGNerr << "VTUExporter<PFP>::addVertexAttribute: endFaceAttributes before adding VertexAttribute"<< CGoGNendl;
+		return;
+	}
+
+	if (noPointData)
+	{
+		fout << "<PointData Scalars=\"scalars\">" << std::endl;
+		noPointData = false;
+	}
+
+	if (name.size() != 0)
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<name<<"\" Format=\"ascii\">" << std::endl;
+	else
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<attrib.name()<<"\" Format=\"ascii\">" << std::endl;
+
+	for (unsigned int i = attrib.begin(); i != attrib.end(); attrib.next(i))
+		fout << attrib[i] << std::endl;
+
+	fout << "</DataArray>" << std::endl;
+
+}
+
+template <typename PFP>
+template<typename T>
+void VTUExporter<PFP>::addVertexAttributeVect(const VertexAttribute<T>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
+{
+	if (!noCellData)
+	{
+		CGoGNerr << "VTUExporter<PFP>::addVertexAttribute: endFaceAttributes before adding VertexAttribute"<< CGoGNendl;
+		return;
+	}
+
+	if (noPointData)
+	{
+		fout << "<PointData Scalars=\"scalars\">" << std::endl;
+		noPointData = false;
+	}
+
+	if (nbComp==0)
+		nbComp = sizeof(T)/(unsigned int)(2*(vtkType[vtkType.size()-1]-'0')); // Float32 -> 2*2=4 bytes Int64 -> 8 bytes
+
+	if (name.size() != 0)
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<name<<"\" NumberOfComponents=\""<< nbComp <<"\" Format=\"ascii\">" << std::endl;
+	else
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<attrib.name()<<"\" NumberOfComponents=\""<< nbComp <<"\" Format=\"ascii\">" << std::endl;
+
+	for (unsigned int i = attrib.begin(); i != attrib.end(); attrib.next(i))
+	{
+		const T& a = attrib[i];
+		for (unsigned int j=0;j<nbComp;++j)
+			fout << a[j]<< " ";
+		fout << std::endl;
+	}
+	fout << "</DataArray>" << std::endl;
+}
+
+
+
+template <typename PFP>
+void VTUExporter<PFP>::endVertexAttributes()
+{
+	if (!noPointData)
+		fout << "</PointData>" << std::endl;
+
+	noPointData = true;
+}
+
+
+
+
+template <typename PFP>
+template<typename T>
+void VTUExporter<PFP>::addFaceAttributeScal(const FaceAttribute<T>& attrib, const std::string& vtkType, const std::string& name)
+{
+	if (!noPointData)
+	{
+		CGoGNerr << "VTUExporter<PFP>::addFaceAttribute: endVertexAttributes before adding FaceAttribute"<< CGoGNendl;
+		return;
+	}
+
+	if (noCellData)
+	{
+		fout << "<CellData Scalars=\"scalars\">" << std::endl;
+		noCellData = false;
+	}
+
+	if (name.size() != 0)
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<name<<"\" Format=\"ascii\">" << std::endl;
+	else
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<attrib.name()<<"\" Format=\"ascii\">" << std::endl;
+
+
+	for (typename std::vector<Dart>::iterator it = bufferTri.begin(); it != bufferTri.end(); ++it)
+		fout << attrib[*it] << std::endl;
+	for (typename std::vector<Dart>::iterator it = bufferQuad.begin(); it != bufferQuad.end(); ++it)
+		fout << attrib[*it] << std::endl;
+	for (typename std::vector<Dart>::iterator it = bufferOther.begin(); it != bufferOther.end(); ++it)
+		fout << attrib[*it] << std::endl;
+	fout << "</DataArray>" << std::endl;
+
+}
+
+
+template <typename PFP>
+template<typename T>
+void VTUExporter<PFP>::addFaceAttributeVect(const FaceAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
+{
+	if (!noPointData)
+	{
+		CGoGNerr << "VTUExporter<PFP>::addFaceAttribute: endVertexAttributes before adding FaceAttribute"<< CGoGNendl;
+		return;
+	}
+
+	if (noCellData)
+	{
+		fout << "<CellData Scalars=\"scalars\">" << std::endl;
+		noCellData = false;
+	}
+
+	if (nbComp==0)
+		nbComp = sizeof(T)/(unsigned int)(2*(vtkType[vtkType.size()-1]-'0')); // Float32 -> 2*2=4 bytes Int64 -> 8 bytes
+
+	if (name.size() != 0)
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<name<<"\" NumberOfComponents=\""<< nbComp <<"\" Format=\"ascii\">" << std::endl;
+	else
+		fout << "<DataArray type=\""<< vtkType <<"\" Name=\""<<attrib.name()<<"\" NumberOfComponents=\""<< nbComp <<"\" Format=\"ascii\">" << std::endl;
+
+	for (typename std::vector<Dart>::iterator it = bufferTri.begin(); it != bufferTri.end(); ++it)
+	{
+		const T& a = attrib[*it];
+		for (unsigned int j=0;j<nbComp;++j)
+			fout << a[j]<< " ";
+		fout << std::endl;
+	}
+
+	for (typename std::vector<Dart>::iterator it = bufferQuad.begin(); it != bufferQuad.end(); ++it)
+	{
+		const T& a = attrib[*it];
+		for (unsigned int j=0;j<nbComp;++j)
+			fout << a[j]<< " ";
+		fout << std::endl;
+	}
+
+	for (typename std::vector<Dart>::iterator it = bufferOther.begin(); it != bufferOther.end(); ++it)
+	{
+		const T& a = attrib[*it];
+		for (unsigned int j=0;j<nbComp;++j)
+			fout << a[j]<< " ";
+		fout << std::endl;
+	}
+	fout << "    </DataArray>" << std::endl;
+
+}
+
+template <typename PFP>
+void VTUExporter<PFP>::endFaceAttributes()
+{
+	if (!noCellData)
+		fout << "</CellData>" << std::endl;
+
+	noCellData = true;
+}
+
+
+template <typename PFP>
+bool VTUExporter<PFP>::close()
+{
+	if (!noPointData)
+		endVertexAttributes();
+
+	if (!noCellData)
+		endFaceAttributes();
+
+	fout << "<Points>" << std::endl;
+	fout << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" Format=\"ascii\">" << std::endl;
+
+	for (unsigned int i = m_position.begin(); i != m_position.end(); m_position.next(i))
+	{
+		const VEC3& P = m_position[i];
+		fout << P[0]<< " " << P[1]<< " " << P[2] << std::endl;
+	}
+
+	fout << "</DataArray>" << std::endl;
+	fout << "</Points>" << std::endl;
+	fout << "<Cells>" << std::endl;
+	fout << "<DataArray type=\"Int32\" Name=\"connectivity\" Format=\"ascii\">" << std::endl;
+
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		fout << triangles[i]   << " " << triangles[i+1] << " " << triangles[i+2] << std::endl;
+	}
+
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		fout << quads[i]   << " " << quads[i+1] << " " << quads[i+2] << " " << quads[i+3]<< std::endl;
+	}
+
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		unsigned int beg = others_begin[i-1];
+		unsigned int end = others_begin[i];
+		for (unsigned int j=beg; j<end; ++j)
+		{
+			fout <<  others[j] << " ";
+		}
+		fout << std::endl;
+	}
+
+	fout << "</DataArray>" << std::endl;
+	fout << "<DataArray type=\"Int32\" Name=\"offsets\" Format=\"ascii\">" ;
+
+	unsigned int offset = 0;
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		offset += 3;
+		if (i%60 ==0)
+			fout << std::endl;
+		fout << " " << offset;
+	}
+
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		offset += 4;
+		if (i%80 ==0)
+			fout << std::endl;
+		fout << " "<< offset;
+	}
+
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		unsigned int length = others_begin[i] - others_begin[i-1];
+		offset += length;
+		if (i%20 ==0)
+			fout << std::endl;
+		fout << " "<< offset;
+	}
+
+	fout << std::endl << "</DataArray>" << std::endl;
+	fout << "<DataArray type=\"UInt8\" Name=\"types\" Format=\"ascii\">";
+	for (unsigned int i=0; i<triangles.size(); i+=3)
+	{
+		if (i%60 ==0)
+			fout << std::endl;
+		fout << " 5";
+	}
+	for (unsigned int i=0; i<quads.size(); i+=4)
+	{
+		if (i%80 ==0)
+			fout << std::endl;
+		fout << " 9";
+	}
+	for (unsigned int i=1; i<others_begin.size(); ++i)
+	{
+		if (i%20 ==0)
+			fout << std::endl;
+		fout << " 7";
+	}
+
+	fout << std::endl << "</DataArray>" << std::endl;
+	fout << "</Cells>" << std::endl;
+	fout << "</Piece>" << std::endl;
+	fout << "</UnstructuredGrid>" << std::endl;
+	fout << "</VTKFile>" << std::endl;
+
+	fout.close();
+	closed=true;
+	return true;
+}
+
+template <typename PFP>
+VTUExporter<PFP>::~VTUExporter()
+{
+	if (!closed)
+		close();
+	closed = true;
+}
 
 
 } // namespace Export
