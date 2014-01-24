@@ -106,6 +106,8 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 template <typename PFP>
 bool exportVTUCompressed(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
 
+template <typename PFP>
+bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
 
 template <typename PFP>
 class VTUExporter
@@ -133,6 +135,27 @@ protected:
 	std::vector<Dart> bufferQuad;
 	std::vector<Dart> bufferOther;
 
+	bool binaryMode;
+
+	std::ofstream f_tempoBin_out ;
+
+	template<typename T>
+	void addBinaryVertexAttributeScal(const VertexAttribute<T>& attrib, const std::string& vtkType, const std::string& name="");
+
+	template<typename T>
+	void addBinaryVertexAttributeVect(const VertexAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+
+	void endBinaryVertexAttributes();
+
+	template<typename T>
+	void addBinaryFaceAttributeScal(const FaceAttribute<T>& attrib, const std::string& vtkType, const std::string& name="");
+
+	template<typename T>
+	void addBinaryFaceAttributeVect(const FaceAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+
+	void endBinaryFaceAttributes();
+
+	bool binaryClose();
 
 public:
 
@@ -145,7 +168,7 @@ public:
 	 * @param filename
 	 * @return true if ok
 	 */
-	bool init(const char* filename);
+	bool init(const char* filename, bool bin=false);
 
 
 	/**
