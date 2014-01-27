@@ -33,7 +33,7 @@ namespace CGoGN
 namespace Utils
 {
 
-void zlibWriteCompressed( unsigned char* input, unsigned int nbBytes, std::ofstream& fout);
+void zlibVTUWriteCompressed( unsigned char* input, unsigned int nbBytes, std::ofstream& fout);
 
 }
 }
