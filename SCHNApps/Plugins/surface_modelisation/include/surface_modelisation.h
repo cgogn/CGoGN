@@ -83,9 +83,6 @@ protected:
 	void createEmptyMap();
     void createNewFace(MapHandlerGen* mhg);
     void addCube(MapHandlerGen* mhg);
-    void fillHole(MapHandlerGen* mhg);
-    void deleteCC(MapHandlerGen* mhg);
-    void revolution(MapHandlerGen* mhg);
     void mergeVolumes(MapHandlerGen* mhg);
     void splitSurface(MapHandlerGen* mhg);
     void extrudeRegion(MapHandlerGen* mhg);
@@ -112,9 +109,10 @@ protected:
 	Surface_Modelisation_DockTab* m_dockTab;
 	QHash<MapHandlerGen*, MapParameters> h_parameterSet;
     Utils::Drawer* m_drawer;
-    bool collect;
-    std::vector<PFP2::VEC3> collectedVertices;
 
+    std::vector<PFP2::VEC3> collectedVertices;
+    bool collect;
+    int mapNumber;
 };
 
 } // namespace SCHNApps

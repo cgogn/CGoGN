@@ -16,8 +16,7 @@ Surface_Modelisation_DockTab::Surface_Modelisation_DockTab(SCHNApps* s, Surface_
 {
 	setupUi(this);
 
-    generalOperations << "Create empty map" << "Create new face" << "Add cube" << "Fill hole" << "Delete connected component"
-                      << "Revolution" << "Merge volumes" << "Split surface" << "Extrude region";
+    generalOperations << "Create empty map" << "Create new face" << "Add cube" << "Merge volumes" << "Split surface" << "Extrude region";
     vertexOperations << "Split vertex" << "Delete vertex";
     edgeOperations << "Cut edge" << "Uncut edge" << "Collapse edge" << "Flip edge" << "Flip back edge";
     faceOperations << "Split face" << "Merge faces" << "Delete face" << "Sew faces" << "Unsew faces" << "Extrude face" << "Extrude face following a path";
@@ -26,7 +25,6 @@ Surface_Modelisation_DockTab::Surface_Modelisation_DockTab(SCHNApps* s, Surface_
 	connect(combo_vertexSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(vertexSelectorChanged(int)));
 	connect(combo_edgeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(edgeSelectorChanged(int)));
 	connect(combo_faceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(faceSelectorChanged(int)));
-    //connect(combo_operation, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(operationChanged(const QString&)));
     connect(button_applyGeneralOperation, SIGNAL(clicked()), this, SLOT(applyGeneralOperationButtonClicked()));
     connect(button_applyVertexOperation, SIGNAL(clicked()), this, SLOT(applyVertexOperationButtonClicked()));
     connect(button_applyEdgeOperation, SIGNAL(clicked()), this, SLOT(applyEdgeOperationButtonClicked()));
@@ -162,22 +160,13 @@ void Surface_Modelisation_DockTab::applyGeneralOperationButtonClicked()
                     case 2: // Add cube
                         m_plugin->addCube(map);
                         break;
-                    case 3: // Fill hole
-                        m_plugin->fillHole(map);
-                        break;
-                    case 4:  // Delete connected component
-                        m_plugin->deleteCC(map);
-                        break;
-                    case 5: // Revolution
-                        m_plugin->revolution(map);
-                        break;
-                    case 6: // Merge volumes
+                    case 3: // Merge volumes
                         m_plugin->mergeVolumes(map);
                         break;
-                    case 7: // Split surface
+                    case 4: // Split surface
                         m_plugin->splitSurface(map);
                         break;
-                    case 8 : // Extrude region
+                    case 5: // Extrude region
                         m_plugin->extrudeRegion(map);
                         break;
                 }
@@ -269,24 +258,6 @@ void Surface_Modelisation_DockTab::applyFaceOperationButtonClicked()
         }
     }
 }
-
-
-/*
-void Surface_Modelisation_DockTab::operationChanged(const QString& text)
-{
-    if(!b_updatingUI)
-    {
-        switch(operations.indexOf(text))
-        {
-            case 0: // Create empty map
-                break;
-            case 1: // Add cube
-                break;
-        }
-    }
-}
-*/
-
 /* -------------------------------- Clicks -----------------------------------------*/
 
 void Surface_Modelisation_DockTab::startButtonClicked()
@@ -304,7 +275,6 @@ void Surface_Modelisation_DockTab::cancelButtonClicked()
     m_plugin->collect = false;
     m_plugin->collectedVertices.clear();
 }
-
 /* -------------------------------- Updates -----------------------------------------*/
 
 void Surface_Modelisation_DockTab::updateMapParameters()
