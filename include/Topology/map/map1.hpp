@@ -224,7 +224,7 @@ inline unsigned int Map1::cycleDegree(Dart d)
 	unsigned int count = 0 ;
 	Dart it = d ;
 	do
-	{
+    {
 		++count ;
 		it = phi1(it) ;
 	} while (it != d) ;

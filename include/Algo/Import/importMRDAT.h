@@ -101,6 +101,7 @@ public:
 				unsigned int newEmb = vID[children[0]->indices[idx]] ;
 				if(oldEmb == EMBNULL)
 				{
+					//std::cout << "oldEmb == NULL"<< std::endl;
 					map.template setOrbitEmbedding<VERTEX>(dd, newEmb) ;
 					map.pushLevel() ;
 					for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
@@ -111,11 +112,16 @@ public:
 					map.popLevel() ;
 				}
 				else
+				{
+					//std::cout << "oldEmb != NULL"<< std::endl;
 					assert(oldEmb == newEmb) ;
+				}
+
 				map.decCurrentLevel() ;
 				it = next ;
 			} while(it != d) ;
 
+			//embed the 4 children (begin with the center child)
 			map.incCurrentLevel() ;
 			Dart d0 = map.phi2(map.phi1(d)) ;
 			children[0]->embed<PFP>(map, d0, vID) ;
@@ -155,6 +161,7 @@ public:
 	std::vector<QuadTreeNode*> roots ;
 	std::vector<Dart> darts ;
 	std::vector<unsigned int> verticesID ;
+	unsigned int depth;
 
 	~QuadTree()
 	{

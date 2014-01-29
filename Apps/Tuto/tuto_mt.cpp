@@ -36,7 +36,8 @@
 #include "Utils/GLSLShader.h"
 //#include "Algo/Geometry/area.h"
 #include "Algo/Geometry/normal.h"
-#include "Algo/Modelisation/polyhedron.h"
+//#include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Tiling/Surface/square.h"
 
 #include "Algo/Parallel/parallel_foreach.h"
 
@@ -298,9 +299,8 @@ int main(int argc, char **argv)
 	if (argc==2)
 		nbt = atoi(argv[1]);
  		// create a sphere
- 	Algo::Surface::Modelisation::Polyhedron<PFP> prim(myMap, position);
- 	prim.cylinder_topo(nbt,nbt, true, true);
- 	prim.embedSphere(20.0f);
+     Algo::Surface::Tilings::Square::Cylinder<PFP> prim(myMap, nbt, nbt, true, true);
+    prim.embedIntoSphere(position, 20.0f);
 
 
    //  bounding box

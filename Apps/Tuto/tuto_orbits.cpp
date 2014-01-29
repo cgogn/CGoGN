@@ -27,7 +27,7 @@
 #include <iostream>
 
 
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/subdivision.h"
 
@@ -200,10 +200,9 @@ void MyQT::initMap()
 	std::cout << "INIT MAP"<< std::endl;
 
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
-	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
-	int nb=2;
-	prim.hexaGrid_topo(nb,nb,nb);
-	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+    int nb=2;
+    Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
+    cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
 	m_att_orbits[0] = new AttributeHandler<int, VERTEX>(myMap.addAttribute<int, VERTEX>("vertex"));
 	m_att_orbits[1] = new AttributeHandler<int, EDGE>(myMap.addAttribute<int, EDGE>("edge"));

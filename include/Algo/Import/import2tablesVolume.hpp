@@ -48,15 +48,6 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 	case TET:
         return importTet(filename, attrNames);
 		break;
-	case NODE:
-    {
-        size_t pos = filename.rfind(".");
-        std::string fileEle = filename;
-        fileEle.erase(pos);
-        fileEle.append(".ele");
-        return importNodeWithELERegions(filename, fileEle, attrNames);
-		break;
-    }
     case OFF:
     {
         size_t pos = filename.rfind(".");
@@ -66,6 +57,18 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
         return importOFFWithELERegions(filename, fileEle, attrNames);
         break;
     }
+	case NODE:
+    {
+        size_t pos = filename.rfind(".");
+        std::string fileEle = filename;
+        fileEle.erase(pos);
+        fileEle.append(".ele");
+        return importNodeWithELERegions(filename, fileEle, attrNames);
+		break;
+    }
+    case TETMESH:
+        return importTetmesh(filename, attrNames);
+        break;
 	case TS:
         return importTs(filename, attrNames);
         break;
@@ -80,9 +83,6 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
         break;
     case VBGZ:
         //return importVBGZ>(filename, attrNames);
-        break;
-    case TETMESH:
-        return importTetmesh(filename, attrNames);
         break;
 //	case ImportVolumique::MOKA:
 //		return importMoka(filename,attrNames);
@@ -701,10 +701,146 @@ bool MeshTablesVolume<PFP>::importTs(const std::string& filename, std::vector<st
     return true;
 }
 
+template <typename PFP>
+bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<std::string>& attrNames)
+{
+    //
+    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+
+    if (!position.isValid())
+        position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
+
+    attrNames.push_back(position.name()) ;
+
+    //
+    AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
+
+    // open file
+    std::ifstream fp(filename.c_str(), std::ios::in);
+    if (!fp.good())
+    {
+        CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+        return false;
+    }
+
+    std::string ligne;
+    unsigned int nbv=0;
+    //read $NODE
+    std::getline (fp, ligne);
+
+    // reading number of vertices
+    std::getline (fp, ligne);
+    std::stringstream oss(ligne);
+    oss >> m_nbVertices;
+
+    std::map<unsigned int, unsigned int> verticesMapID;
+
+    for(unsigned int i = 0; i < m_nbVertices; ++i)
+    {
+        do
+        {
+            std::getline (fp, ligne);
+        } while (ligne.size() == 0);
+
+        std::stringstream oss(ligne);
+
+        unsigned int pipo;
+        float x,y,z;
+        oss >> pipo;
+        oss >> x;
+        oss >> y;
+        oss >> z;
+
+        VEC3 pos(x,y,z);
+
+        unsigned int id = container.insertLine();
+
+        position[id] = pos;
+        verticesMapID.insert(std::pair<unsigned int, unsigned int>(pipo,id));
+    }
+
+    // ENNODE
+    std::getline (fp, ligne);
+
+    // ELM
+    std::getline (fp, ligne);
+
+    // reading number of elements
+    std::getline (fp, ligne);
+    std::stringstream oss2(ligne);
+    oss2 >> m_nbVolumes;
+
+    //Read and embed all tetrahedrons
+    for(unsigned int i = 0; i < m_nbVolumes ; ++i)
+    {
+        do
+        {
+            std::getline(fp,ligne);
+        } while(ligne.size() == 0);
+
+        std::stringstream oss(ligne);
+
+        unsigned int pipo,type_elm,nb;
+        oss >> pipo;
+        oss >> type_elm;
+        oss >> pipo;
+        oss >> pipo;
+        oss >> nb;
+
+        if ((type_elm==4) && (nb==4))
+        {
+            m_nbFaces.push_back(4);
+
+            int s0,s1,s2,s3;
+
+            oss >> s0;
+            oss >> s1;
+            oss >> s2;
+            oss >> s3;
+
+            typename PFP::VEC3 P = position[verticesMapID[s0]];
+            typename PFP::VEC3 A = position[verticesMapID[s1]];
+            typename PFP::VEC3 B = position[verticesMapID[s2]];
+            typename PFP::VEC3 C = position[verticesMapID[s3]];
+
+            if(Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+            {
+                unsigned int ui= s0;
+                s0 = s3;
+                s3 = s2;
+                s2 = s1;
+                s1 = ui;
+            }
+
+            unsigned int nbe;
+            //if regions are defined use this number
+            oss >> nbe; //ignored here
+
+            m_emb.push_back(verticesMapID[s0]);
+            m_emb.push_back(verticesMapID[s1]);
+            m_emb.push_back(verticesMapID[s2]);
+            m_emb.push_back(verticesMapID[s3]);
+        }
+        else if((type_elm==5) && (nb==8))
+        {
+            m_nbFaces.push_back(8);
+        }
+        else
+        {
+            for (unsigned int j=0; j<nb; ++j)
+            {
+                unsigned int v;
+                fp >> v;
+            }
+        }
+
+    }
+}
+
 
 } // namespace Import
 
-}
+} // namespace Volume
 
 } // namespace Algo
 

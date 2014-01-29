@@ -1,0 +1,41 @@
+<html>
+<head>
+  <!--
+  Copyright 2013 Doxygraph project
+
+  This Source Code Form is subject to the terms of the Mozilla Public License,
+  version 2.0. If a copy of the MPL was not distributed with this file, You can
+  obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+  <title>Doxygraph</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <script src="doxyviz.js" type="text/javascript"></script>
+  <script src="bindviz.js" type="text/javascript"></script>
+  <script src="svgpan.js" type="text/javascript"></script>
+</head>
+<body>
+  <div id="svgarea"
+       style="position:absolute;
+              top:0px;left:0px;bottom:0px;right:320px">
+  </div>
+  <div id="ctrlarea"
+       style="position:absolute;
+              right:0px;top:56px;bottom:30px;width:320px;
+              overflow:scroll">
+  </div>
+  <div style="position:absolute;
+              top:0px;right:0px;width:320px;height:56px">
+    <form><p>
+      <button type="button" onclick="selectAll();">Select All</button>
+      <button type="button" onclick="selectNone();">Select None</button>
+      <button type="button" onclick="showDiagram();">Show Diagram</button>
+    </p></form>
+  </div>
+  <div style="position:absolute;
+              right:0px;bottom:0px;width:320px;height:28px">
+    Powered by <a href="http://code.google.com/p/doxygraph">
+      <img src="logo.png" alt="Doxygraph"/>
+    </a>
+  </div>
+</body>
+</html>

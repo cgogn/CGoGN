@@ -26,7 +26,7 @@
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/tetrahedralization.h"
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Geometry/normal.h"
 #include "Algo/Import/import.h"
@@ -262,15 +262,8 @@ void MyQT::createMap(int n)
     position = myMap.getAttribute<VEC3, VERTEX>("position");
     if (!position.isValid())
         position = myMap.addAttribute<VEC3, VERTEX>("position");
-    Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
-    prim.hexaGrid_topo(n,n,n);
-    prim.embedHexaGrid(1.0f,1.0f,1.0f);
-
-    //	Algo::Surface::Modelisation::Polyhedron<PFP> poly(myMap, position);
-    //	poly.cylinder_topo(6,1,true,true);
-    //	poly.embedCylinder(6.0,6.0,5.0);
-
-    myMap.closeMap();
+    Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, n, n, n);
+    cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
     //	Dart d = Algo::Surface::Modelisation::embedPrism<PFP>(myMap, position, 5, true,6.0,6.0,5.0);
     //	Dart d2 = Algo::Surface::Modelisation::embedPyramid<PFP>(myMap, position, 4, true,6.0,5.0);

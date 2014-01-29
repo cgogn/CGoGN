@@ -26,6 +26,7 @@
 #include "Utils/GLSLShader.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Tiling/Surface/square.h"
 
 SimpleGMap2::SimpleGMap2()
 {
@@ -41,11 +42,9 @@ SimpleGMap2::SimpleGMap2()
      myMap.cutEdge(d);
      position[myMap.phi1(d)] = mid;
 
-     Algo::Surface::Modelisation::Polyhedron<PFP> poly(myMap, position);
-
-     d = poly.cylinder_topo(5, 1, false, false);
-
-     poly.embedCylinder(10, 10, 5);
+     Algo::Surface::Tilings::Square::Cylinder<PFP> poly(myMap, 5 ,1, false, false);
+     d = poly.getDart();
+     poly.embedIntoCylinder(position, 10, 10, 5);
 
      d = myMap.phi1(d);
      Dart dd = myMap.beta2(d);

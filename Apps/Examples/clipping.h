@@ -57,7 +57,7 @@
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
 
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 
 #include <string>
 #include <sstream>
