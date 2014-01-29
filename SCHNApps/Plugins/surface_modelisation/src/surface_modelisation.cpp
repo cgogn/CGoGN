@@ -39,6 +39,8 @@ bool Surface_Modelisation_Plugin::enable()
     m_drawer = new Utils::Drawer();
     registerShader(m_drawer->getShader());
 
+    mapNumber = 1;
+
 	return true;
 }
 
@@ -73,7 +75,7 @@ void Surface_Modelisation_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 void Surface_Modelisation_Plugin::mousePress(View* view, QMouseEvent* event)
 {
-    if(collect)
+    if(collect && (event->button() == Qt::LeftButton))
     {
         qglviewer::Vec point(event->x(), event->y(), 0.5);
         qglviewer::Vec vertex = view->camera()->unprojectedCoordinatesOf(point);
@@ -207,16 +209,17 @@ void Surface_Modelisation_Plugin::changeFaceSelector(const QString& map, const Q
 
 void Surface_Modelisation_Plugin::createEmptyMap()
 {
-	MapHandlerGen* mhg = m_schnapps->addMap("map", 2);
+    QString mapName = "map_" + QString::number(mapNumber);
+    MapHandlerGen* mhg = m_schnapps->addMap(mapName, 2);
 	if(mhg)
 	{
 		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 
 		// add vertex position attribute
 		VertexAttribute<PFP2::VEC3> position = mh->addAttribute<PFP2::VEC3, VERTEX>("position");
-
 		// update corresponding VBO & emit attribute update signal
 		mh->notifyAttributeModification(position);
+        mapNumber++;
 	}
 }
 
@@ -241,7 +244,6 @@ void Surface_Modelisation_Plugin::createNewFace(MapHandlerGen* mhg)
 
             mh->notifyConnectivityModification();
             mh->notifyAttributeModification(position);
-
             mh->updateBB(position);
             collectedVertices.clear();
         }
@@ -258,11 +260,10 @@ void Surface_Modelisation_Plugin::addCube(MapHandlerGen *mhg)
     {
         VertexAttribute<PFP2::VEC3>& position = h_parameterSet[mhg].positionAttribute;
 
-        Algo::Surface::Modelisation::embedPrism<PFP2>(*map, position, 4, false, 0.7f, 0.7f, 1.0f);
+        Algo::Surface::Modelisation::embedPrism<PFP2>(*map, position, 4, true, 0.7f, 0.7f, 1.0f);
 
         mh->notifyAttributeModification(position);
         mh->notifyConnectivityModification();
-
         // compute map bounding box
         mh->updateBB(position);
     }
@@ -274,32 +275,61 @@ void Surface_Modelisation_Plugin::mergeVolumes(MapHandlerGen* mhg)
     PFP2::MAP* map = mh->getMap();
 
     const MapParameters& p = h_parameterSet[mhg];
-    if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty() && (p.edgeSelector->getSelectedCells().size() == 2))
+    if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty() && (p.edgeSelector->getSelectedCells().size() == 2) &&
+       p.faceSelector && !p.faceSelector->getSelectedCells().empty() && (p.faceSelector->getSelectedCells().size() == 2))
     {
         const std::vector<Dart>& selectedDarts = p.edgeSelector->getSelectedCells();
+        const std::vector<Dart>& selectedFaces = p.faceSelector->getSelectedCells();
 
-        Dart d = selectedDarts[0];
-        Dart e = selectedDarts[1];
-        int i = 1;
-        int j =1;
+        Dart d1 = selectedDarts[0];
+        Dart d2 = selectedDarts[1];
+        Dart f1 = selectedFaces[0];
+        Dart f2 = selectedFaces[1];
+        int i = 1, j = 1;
+        bool isWellSelected = true;
 
-        while(map->phi1(d) != selectedDarts[0])
+        if (!(map->sameFace(d1,f1) && (map->sameFace(d2,f2))))
         {
-            i++;
-            d = map->phi1(d);
-        }
-        while(map->phi1(e) != selectedDarts[1])
-        {
-            j++;
-            e = map->phi1(e);
+            if (!(map->sameFace(d1,f2) && (map->sameFace(d2,f1))))
+            {
+                if ((map->sameFace(map->phi2(d1),f1)) || (map->sameFace(map->phi2(d1),f2)))
+                    d1 = map->phi2(d1);
+
+                if ((map->sameFace(map->phi2(d2),f1)) || (map->sameFace(map->phi2(d2),f2)))
+                    d2 = map->phi2(d2);
+
+                if (map->sameFace(d1,d2) ||
+                    !((map->sameFace(d1,f1) && (map->sameFace(d2,f2))) ||
+                      (map->sameFace(d1,f2) && (map->sameFace(d2,f1)))))
+                    isWellSelected = false;
+            }
         }
 
-        if(d == e)
+        if(isWellSelected)
         {
-            map->mergeVolumes(selectedDarts[0], selectedDarts[1]);
-            mh->notifyConnectivityModification();
+            Dart it = map->phi1(d1);
+            do
+            {
+                it = map->phi1(it);
+                i++;
+            }
+            while(it != d1);
+
+            it = map->phi1(d2);
+            do
+            {
+                it = map->phi1(it);
+                j++;
+            }
+            while(it != d2);
+
+            if(i == j)
+            {
+                map->mergeVolumes(d1, d2);
+                mh->notifyConnectivityModification();
+            }
+            else QMessageBox::information(0, "Attention", "Selected faces should have the same number of edges");
         }
-        else QMessageBox::information(0, "Attention", "Selected faces should have the same number of edges");
     }
 }
 
@@ -308,17 +338,58 @@ void Surface_Modelisation_Plugin::splitSurface(MapHandlerGen* mhg)
     MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
     PFP2::MAP* map = mh->getMap();
 
-    const MapParameters& p = h_parameterSet[mhg];
+    MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
         std::vector<Dart> selectedDarts = p.edgeSelector->getSelectedCells();
+        std::vector<Dart> path = selectedDarts;
+        bool isPath = true;
+        unsigned int i = 0;
 
-        if(map->checkSimpleOrientedPath(selectedDarts))
+        if (!(map->sameVertex(path[0], map->phi1(path[path.size()-1])) ||
+              map->sameVertex(path[0], map->phi_1(path[path.size()-1]))))
         {
-            map->splitSurface(selectedDarts);
-            mh->notifyConnectivityModification();
+            if (map->sameVertex(map->phi2(path[0]), map->phi1(path[path.size()-1])) ||
+                map->sameVertex(map->phi2(path[0]), map->phi_1(path[path.size()-1])))
+                    path[0] = map->phi2(path[0]);
+            else isPath = false;
         }
-        else QMessageBox::information(0, "Attention", "To split surface you need to select edges in order and first edge should be connected with last one");
+
+        if (isPath)
+        {
+            for(std::vector<Dart>::iterator it = path.begin() ; it != path.end()-1; ++it)
+            {
+                if (isPath)
+                {
+                    CellMarker<VERTEX>* vm = new CellMarker<VERTEX>(*map);
+                    if(vm->isMarked(*it))
+                        isPath = false;
+                    vm->mark(*it);
+
+                    std::vector<Dart>::iterator next;
+                    next = it + 1 ;
+
+                    if (!map->sameVertex(map->phi1(*it), *next))
+                    {
+                        if (map->sameVertex(map->phi1(*it), map->phi2(*next)))
+                        {
+                            path[i+1] = map->phi2(*next);
+                        }
+                        else isPath = false;
+                    }
+                    i++;
+                }
+                else break;
+            }
+        }
+
+        if(isPath)
+        {
+            map->splitSurface(path);
+            mh->notifyConnectivityModification();
+            mh->notifyAttributeModification(p.positionAttribute);
+        }
+        else QMessageBox::information(0, "Attention", "To split surface you need to select edges in order without intersections and first edge should be connected with last one");
     }
 }
 
@@ -490,7 +561,6 @@ void Surface_Modelisation_Plugin::flipEdge(MapHandlerGen *mhg)
 	if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
 	{
 		const std::vector<Dart>& edge = p.edgeSelector->getSelectedCells();
-
         map->flipEdge(edge[0]);
         mh->notifyConnectivityModification();
 	}
@@ -672,41 +742,45 @@ void Surface_Modelisation_Plugin::pathExtrudeFace(MapHandlerGen *mhg)
     if(p.faceSelector && !p.faceSelector->getSelectedCells().empty())
     {
         const std::vector<Dart>& selectedDart = p.faceSelector->getSelectedCells();
-        std::vector<PFP2::VEC3> profile;
-        PFP2::VEC3 centerProfile;
-        Dart it = selectedDart[0];
-        int n = 0;
-        do
-        {
-            profile.push_back(position[it]);
-            centerProfile = centerProfile + position[it];
-            it = map->phi1(it);
-            n++;
-        } while (it != selectedDart[0]);
-        centerProfile = centerProfile / n;
-
-
-        std::vector<float> scalePath;
+        Dart d = selectedDart[0];
         for (unsigned int i = 0; i < collectedVertices.size(); i++)
         {
-            scalePath.push_back(1.0);
+            Dart it = d;
+            PFP2::VEC3 center;
+            int n = 0;
+            do
+            {
+                center += position[it];
+                it = map->phi1(it);
+                n++;
+            } while (it != d);
+            center = center / n;
+
+            std::vector<PFP2::VEC3> norms;
+            do
+            {
+                norms.push_back((center - position[it]));
+                it = map->phi1(it);
+            } while (it != d);
+
+            PFP2::REAL dist = 0;
+            dist = (collectedVertices[i] - center).norm();
+            d = Algo::Surface::Modelisation::extrudeFace<PFP2>(*map, position, d, dist);
+
+            it = d;
+            n = 0;
+            do
+            {
+                position[it] = collectedVertices[i] - norms[n];
+                it = map->phi1(it);
+                n++;
+            } while (it != d);
         }
 
-        PFP2::VEC3 normalProfile = Algo::Surface::Geometry::faceNormal<PFP2>(*map, selectedDart[0], position);
-
-        Algo::Surface::Modelisation::extrusion_scale<PFP2>(*map, position, profile, centerProfile, normalProfile, true, collectedVertices, true, scalePath);
         mh->notifyConnectivityModification();
         mh->notifyAttributeModification(position);
         mh->updateBB(position);
         collectedVertices.clear();
-
-
-        /*Dart d = selectedDart[0];
-        for(int i = 0; i < collectedVertices.size(); i++)
-        {
-            PFP2::VEC3 normal = collectedVertices[i];
-            d = Algo::Surface::Modelisation::extrudeFace<PFP2>(*map, p.positionAttribute, d, normal);
-        }*/
     }
 }
 

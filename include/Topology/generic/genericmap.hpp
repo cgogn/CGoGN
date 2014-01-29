@@ -432,7 +432,8 @@ inline void GenericMap::initCell(unsigned int i)
 template <unsigned int ORBIT>
 void GenericMap::initAllOrbitsEmbedding(bool realloc)
 {
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
+	if(!isOrbitEmbedded<ORBIT>())
+		addEmbedding<ORBIT>() ;
 	DartMarker mark(*this) ;
 	for(Dart d = begin(); d != end(); next(d))
 	{

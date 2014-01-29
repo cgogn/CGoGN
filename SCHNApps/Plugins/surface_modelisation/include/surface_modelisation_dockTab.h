@@ -4,10 +4,6 @@
 #include "ui_surface_modelisation.h"
 #include "QString"
 
-//#include "mapHandler.h"
-//#include "Utils/drawer.h"
-//#include "Topology/map/map2.h"
-
 namespace CGoGN
 {
 
@@ -43,8 +39,6 @@ private slots:
 	void vertexSelectorChanged(int index);
 	void edgeSelectorChanged(int index);
 	void faceSelectorChanged(int index);
-
-    //void operationChanged(const QString &text);
 
     void applyGeneralOperationButtonClicked();
     void applyVertexOperationButtonClicked();
