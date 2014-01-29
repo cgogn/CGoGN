@@ -281,7 +281,7 @@ public:
 	/**
 	 * duplicate darts from level-1 to level
 	 */
-	void duplicateDarts(unsigned int level);
+	void duplicateDarts(unsigned int newlevel);
 
 	/**
 	 * duplicate a dart starting from current level

@@ -68,7 +68,7 @@ public:
 	~Map2MR();
 
 	//if true : tri and quad else quad
-	void addNewLevel(bool triQuad = true) ;
+	void addNewLevel(bool triQuad = true, bool embedNewVertices = false) ;
 
 	void addNewLevelSqrt3();
 
@@ -84,6 +84,8 @@ public:
 	void synthesis() ;
 
 	void addLevelFront();
+
+	void import(Algo::Surface::Import::QuadTree& qt);
 } ;
 
 } // namespace Regular

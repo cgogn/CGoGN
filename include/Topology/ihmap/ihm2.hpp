@@ -314,6 +314,12 @@ inline void ImplicitHierarchicalMap2::setDartLevel(Dart d, unsigned int l)
 	m_dartLevel[d] = l ;
 }
 
+inline void ImplicitHierarchicalMap2::setMaxLevel(unsigned int l)
+{
+	m_maxLevel = l;
+}
+
+
 /***************************************************
  *             EDGE ID MANAGEMENT                  *
  ***************************************************/
@@ -331,6 +337,42 @@ inline unsigned int ImplicitHierarchicalMap2::getEdgeId(Dart d)
 inline void ImplicitHierarchicalMap2::setEdgeId(Dart d, unsigned int i)
 {
 	m_edgeId[d] = i ;
+}
+
+inline unsigned int ImplicitHierarchicalMap2::getTriRefinementEdgeId(Dart d)
+{
+	unsigned int dId = getEdgeId(phi_1(d));
+	unsigned int eId = getEdgeId(phi1(d));
+
+	unsigned int id = dId + eId;
+
+	if(id == 0)
+		return 1;
+	else if(id == 1)
+		return 2;
+	else if(id == 2)
+		if(dId == eId)
+			return 0;
+		else
+			return 1;
+	//else if(id == 3)
+	return 0;
+}
+
+inline unsigned int ImplicitHierarchicalMap2::getQuadRefinementEdgeId(Dart d)
+{
+	unsigned int eId = getEdgeId(phi1(d));
+
+	if(eId == 0)
+		return 1;
+
+	//else if(eId == 1)
+	return 0;
+}
+
+inline void ImplicitHierarchicalMap2::setTriRefinementEdgeId(Dart d)
+{
+
 }
 
 /***************************************************

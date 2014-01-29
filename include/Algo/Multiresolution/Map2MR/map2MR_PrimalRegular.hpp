@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Algo/Import/importMRDAT.h"
+
 namespace CGoGN
 {
 
@@ -62,7 +64,7 @@ Map2MR<PFP>::~Map2MR()
 }
 
 template <typename PFP>
-void Map2MR<PFP>::addNewLevel(bool triQuad)
+void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 {
 	m_map.pushLevel() ;
 
@@ -74,18 +76,22 @@ void Map2MR<PFP>::addNewLevel(bool triQuad)
 	TraversorE<typename PFP::MAP> travE(m_map) ;
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
-		//		if(!shareVertexEmbeddings)
-		//		{
-		//			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
-		//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
-		//			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
-		//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
-		//		}
+//		if(!shareVertexEmbeddings && embedNewVertices)
+//		{
+//			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+//			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
+//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+//		}
 
 		m_map.cutEdge(d) ;
 		travE.skip(d) ;
 		travE.skip(m_map.phi1(d)) ;
 
+		//std::cout << "is EMB NULL : " << ( m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL ? "true" : "false" ) << std::endl;
+
+		//if(embedNewVertices)
+		//	m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(m_map.phi1(d)) ;
 	}
 
 	// split faces
@@ -128,6 +134,9 @@ void Map2MR<PFP>::addNewLevel(bool triQuad)
 			Dart ne = m_map.phi2(m_map.phi_1(dd)) ;
 			m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
 			travF.skip(dd) ;
+
+			//if(embedNewVertices)
+			//		m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(m_map.phi1(ne)) ;
 
 			dd = m_map.phi1(m_map.phi1(next)) ;
 			while(dd != ne)				// turn around the face and insert new edges
@@ -340,6 +349,24 @@ void Map2MR<PFP>::addLevelFront()
 //			}
 //		}
 	}
+}
+
+template <typename PFP>
+void Map2MR<PFP>::import(Algo::Surface::Import::QuadTree& qt)
+{
+	std::cout << "  Create finer resolution levels.." << std::flush ;
+
+	for(unsigned int i = 0; i < qt.depth; ++i)
+		addNewLevel(true, false) ;
+
+	std::cout << "..done" << std::endl ;
+	std::cout << "  Embed finer resolution levels.." << std::flush ;
+
+	m_map.setCurrentLevel(0) ;
+	qt.embed<PFP>(m_map) ;
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+
+	std::cout << "..done" << std::endl ;
 }
 
 
