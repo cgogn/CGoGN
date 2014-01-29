@@ -56,6 +56,8 @@ public:
 		releaseOnDestruct(true)
 	{}
 
+
+
 	~CellMarkerGen()
 	{}
 
@@ -94,8 +96,18 @@ public:
 	 */
 	CellMarkerBase(GenericMap& map, unsigned int thread = 0) : CellMarkerGen(map, CELL, thread)
 	{
-		if(!map.isOrbitEmbedded<CELL>())
-			map.addEmbedding<CELL>() ;
+		if(!m_map.isOrbitEmbedded<CELL>())
+			m_map.addEmbedding<CELL>() ;
+		m_mark = m_map.getMarkerSet<CELL>(m_thread).getNewMark() ;
+		m_markVector = m_map.getMarkVector<CELL>(m_thread) ;
+		m_map.cellMarkers[m_thread].push_back(this) ;
+	}
+
+	CellMarkerBase(const GenericMap& map, unsigned int thread = 0) :
+		CellMarkerGen(const_cast<GenericMap&>(map), CELL, thread)
+	{
+		if(!m_map.isOrbitEmbedded<CELL>())
+			m_map.addEmbedding<CELL>() ;
 		m_mark = m_map.getMarkerSet<CELL>(m_thread).getNewMark() ;
 		m_markVector = m_map.getMarkVector<CELL>(m_thread) ;
 		m_map.cellMarkers[m_thread].push_back(this) ;
@@ -240,6 +252,10 @@ public:
 	CellMarker(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
 
+	CellMarker(const GenericMap& map, unsigned int thread = 0) :
+		CellMarkerBase<CELL>(map, thread)
+	{}
+
 	~CellMarker()
 	{
 		unmarkAll() ;
@@ -274,6 +290,10 @@ protected:
 
 public:
 	CellMarkerStore(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
+	{}
+
+	CellMarkerStore(const GenericMap& map, unsigned int thread = 0) :
+		CellMarkerBase<CELL>(map, thread)
 	{}
 
 	~CellMarkerStore()
@@ -324,6 +344,11 @@ protected:
 public:
 	CellMarkerMemo(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
+
+	CellMarkerMemo(const GenericMap& map, unsigned int thread = 0) :
+		CellMarkerBase<CELL>(map, thread)
+	{}
+
 
 	~CellMarkerMemo()
 	{
@@ -376,6 +401,11 @@ public:
 	CellMarkerNoUnmark(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
 
+	CellMarkerNoUnmark(const GenericMap& map, unsigned int thread = 0) :
+		CellMarkerBase<CELL>(map, thread)
+	{}
+
+
 	~CellMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked()) ;
@@ -409,6 +439,7 @@ protected:
 	const CellMarkerBase<CELL>& m_cmarker ;
 public:
 	SelectorCellMarked(const CellMarkerBase<CELL>& cm) : m_cmarker(cm) {}
+
 	inline bool operator()(Dart d) const
 	{
 		if (m_cmarker.isMarked(d))

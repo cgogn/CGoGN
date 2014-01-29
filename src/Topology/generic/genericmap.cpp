@@ -478,7 +478,7 @@ void GenericMap::removeThreadMarker(unsigned int nb)
  *             SAVE & LOAD              *
  ****************************************/
 
-bool GenericMap::saveMapBin(const std::string& filename)
+bool GenericMap::saveMapBin(const std::string& filename) const
 {
 	CGoGNostream fs(filename.c_str(), std::ios::out|std::ios::binary);
 	if (!fs)
