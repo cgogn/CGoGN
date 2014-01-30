@@ -351,10 +351,13 @@ inline unsigned int ImplicitHierarchicalMap2::getTriRefinementEdgeId(Dart d)
 	else if(id == 1)
 		return 2;
 	else if(id == 2)
+	{
 		if(dId == eId)
 			return 0;
 		else
 			return 1;
+	}
+
 	//else if(id == 3)
 	return 0;
 }
@@ -368,11 +371,6 @@ inline unsigned int ImplicitHierarchicalMap2::getQuadRefinementEdgeId(Dart d)
 
 	//else if(eId == 1)
 	return 0;
-}
-
-inline void ImplicitHierarchicalMap2::setTriRefinementEdgeId(Dart d)
-{
-
 }
 
 /***************************************************
