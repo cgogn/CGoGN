@@ -28,6 +28,8 @@
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
 
+#include "Utils/compress.h"
+
 namespace CGoGN
 {
 
@@ -1015,6 +1017,8 @@ bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::V
 	out.close() ;
 	return true ;
 }
+
+
 
 } // namespace Export
 

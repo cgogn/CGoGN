@@ -22,101 +22,21 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR1_H__
-#define __TRAVERSOR1_H__
+#ifndef _CGOGN_COMPRESS_H_
+#define _CGOGN_COMPRESS_H_
 
-#include "Topology/generic/dart.h"
-#include "Topology/generic/traversorGen.h"
+
+#include <fstream>
 
 namespace CGoGN
 {
-
-/*******************************************************************************
-					VERTEX CENTERED TRAVERSALS
-*******************************************************************************/
-
-// Traverse the edges incident to a given vertex
-template <typename MAP>
-class Traversor1VE: public Traversor
+namespace Utils
 {
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
 
-	Dart d2 ;
+void zlibVTUWriteCompressed( unsigned char* input, unsigned int nbBytes, std::ofstream& fout);
 
-public:
-	Traversor1VE(const MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the vertices adjacent to a given vertex through sharing a common edge
-template <typename MAP>
-class Traversor1VVaE: public Traversor
-{
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart d2 ;
-
-public:
-	Traversor1VVaE(const MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-/*******************************************************************************
-					EDGE CENTERED TRAVERSALS
-*******************************************************************************/
-
-// Traverse the vertices incident to a given edge
-template <typename MAP>
-class Traversor1EV: public Traversor
-{
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart d2 ;
-
-public:
-	Traversor1EV(const MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the edges adjacent to a given edge through sharing a common vertex
-template <typename MAP>
-class Traversor1EEaV: public Traversor
-{
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart d2 ;
-
-public:
-	Traversor1EEaV(const MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-} // namespace CGoGN
-
-#include "Topology/generic/traversor1.hpp"
+}
+}
 
 #endif
+

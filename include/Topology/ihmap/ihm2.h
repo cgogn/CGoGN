@@ -85,17 +85,17 @@ public:
 
 	virtual Dart newDart() ;
 
-	Dart phi1(Dart d) ;
+	Dart phi1(Dart d) const ;
 
-	Dart phi_1(Dart d) ;
+	Dart phi_1(Dart d) const ;
 
-	Dart phi2(Dart d) ;
+	Dart phi2(Dart d) const ;
 
-	Dart alpha0(Dart d) ;
+	Dart alpha0(Dart d) const ;
 
-	Dart alpha1(Dart d) ;
+	Dart alpha1(Dart d) const ;
 
-	Dart alpha_1(Dart d) ;
+	Dart alpha_1(Dart d) const ;
 
 	virtual Dart begin() const ;
 
@@ -103,17 +103,17 @@ public:
 
 	virtual void next(Dart& d) const ;
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) ;
+	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const;
 
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) ;
+	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) ;
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) ;
+	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0)  const;
 
-	virtual bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread = 0) ;
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) ;
+	virtual bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) ;
+	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) const ;
 
 	/***************************************************
 	 *               MAP MANIPULATION                  *

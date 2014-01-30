@@ -81,7 +81,7 @@ inline Dart ImplicitHierarchicalMap2::newDart()
 	return d ;
 }
 
-inline Dart ImplicitHierarchicalMap2::phi1(Dart d)
+inline Dart ImplicitHierarchicalMap2::phi1(Dart d) const
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
     bool finished = false ;
@@ -101,7 +101,7 @@ inline Dart ImplicitHierarchicalMap2::phi1(Dart d)
 	return it ;
 }
 
-inline Dart ImplicitHierarchicalMap2::phi_1(Dart d)
+inline Dart ImplicitHierarchicalMap2::phi_1(Dart d) const
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	bool finished = false ;
@@ -121,7 +121,7 @@ inline Dart ImplicitHierarchicalMap2::phi_1(Dart d)
 	return it ;
 }
 
-inline Dart ImplicitHierarchicalMap2::phi2(Dart d)
+inline Dart ImplicitHierarchicalMap2::phi2(Dart d) const
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	if(Map2::phi2(d) == d)
@@ -129,17 +129,17 @@ inline Dart ImplicitHierarchicalMap2::phi2(Dart d)
     return Map2::phi2(Map2::phi_1(phi1(d))) ;
 }
 
-inline Dart ImplicitHierarchicalMap2::alpha0(Dart d)
+inline Dart ImplicitHierarchicalMap2::alpha0(Dart d) const
 {
 	return phi2(d) ;
 }
 
-inline Dart ImplicitHierarchicalMap2::alpha1(Dart d)
+inline Dart ImplicitHierarchicalMap2::alpha1(Dart d) const
 {
 	return Map2::alpha1(d) ;
 }
 
-inline Dart ImplicitHierarchicalMap2::alpha_1(Dart d)
+inline Dart ImplicitHierarchicalMap2::alpha_1(Dart d) const
 {
 	return Map2::alpha_1(d) ;
 }
@@ -165,7 +165,7 @@ inline void ImplicitHierarchicalMap2::next(Dart& d) const
 	} while(d != Map2::end() && m_dartLevel[d] > m_curLevel) ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	Dart dNext = d;
 	do
@@ -177,7 +177,7 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FunctorType
  	return false;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	if (f(d))
 		return true;
@@ -189,7 +189,7 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FunctorType& 
 		return false;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int /*thread*/)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	Dart dNext = d ;
 	do
@@ -201,12 +201,12 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, Func
 	return false ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return foreach_dart_of_oriented_face(d, f, thread) ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
 	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
@@ -242,12 +242,12 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, Fu
 	return found;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
+inline bool ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return foreach_dart_of_oriented_volume(d, f, thread) ;
 }
@@ -351,10 +351,13 @@ inline unsigned int ImplicitHierarchicalMap2::getTriRefinementEdgeId(Dart d)
 	else if(id == 1)
 		return 2;
 	else if(id == 2)
+	{
 		if(dId == eId)
 			return 0;
 		else
 			return 1;
+	}
+
 	//else if(id == 3)
 	return 0;
 }
@@ -368,11 +371,6 @@ inline unsigned int ImplicitHierarchicalMap2::getQuadRefinementEdgeId(Dart d)
 
 	//else if(eId == 1)
 	return 0;
-}
-
-inline void ImplicitHierarchicalMap2::setTriRefinementEdgeId(Dart d)
-{
-
 }
 
 /***************************************************

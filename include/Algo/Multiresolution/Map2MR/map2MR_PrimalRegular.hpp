@@ -310,7 +310,6 @@ void Map2MR<PFP>::addLevelFront()
 			Dart fit1 = m_map.phi2(m_map.phi1(d));
 			//m_map.mergeFaces(fit1) ;
 
-
 //		Traversor2VE<typename PFP::MAP> tve(m_map, d);
 //		for(Dart eit = tve.begin() ; eit != tve.end() ; eit = tve.next())
 //		{

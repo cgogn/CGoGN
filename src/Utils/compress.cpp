@@ -22,101 +22,86 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR1_H__
-#define __TRAVERSOR1_H__
+#include <cassert>
+#include "Utils/compress.h"
+#include "zlib.h"
 
-#include "Topology/generic/dart.h"
-#include "Topology/generic/traversorGen.h"
+#include <iostream>
+#include <vector>
+#include <string.h>
 
 namespace CGoGN
 {
 
-/*******************************************************************************
-					VERTEX CENTERED TRAVERSALS
-*******************************************************************************/
-
-// Traverse the edges incident to a given vertex
-template <typename MAP>
-class Traversor1VE: public Traversor
+namespace Utils
 {
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
 
-	Dart d2 ;
-
-public:
-	Traversor1VE(const MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the vertices adjacent to a given vertex through sharing a common edge
-template <typename MAP>
-class Traversor1VVaE: public Traversor
+void zlibVTUWriteCompressed( unsigned char* input, unsigned int nbBytes, std::ofstream& fout)
 {
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
 
-	Dart d2 ;
+	std::cout << "Compressor Block " << std::endl;
 
-public:
-	Traversor1VVaE(const MAP& map, Dart dart) ;
+	const int CHUNK=1024*256;
+	int level = 6; // compression level 
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+	z_stream strm;
+	strm.zalloc = Z_NULL;
+	strm.zfree = Z_NULL;
+	strm.opaque = Z_NULL;
+	int ret = deflateInit(&strm, level);
+	assert(ret == Z_OK); 
 
-/*******************************************************************************
-					EDGE CENTERED TRAVERSALS
-*******************************************************************************/
+	unsigned char* bufferOut = new unsigned char[nbBytes];
+	unsigned char* ptrBufferOut = bufferOut;
 
-// Traverse the vertices incident to a given edge
-template <typename MAP>
-class Traversor1EV: public Traversor
-{
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
+	std::vector<unsigned int> header;
+	header.reserve(1024);
+	header.resize(3);
 
-	Dart d2 ;
+	unsigned char* ptrData = input;
+	int remain = nbBytes;
 
-public:
-	Traversor1EV(const MAP& map, Dart dart) ;
+	while (remain >0)
+	{
+		strm.avail_in = std::min(remain,CHUNK);	// taille buffer
+		strm.next_in = ptrData;					// ptr buffer
+		do
+		{
+			strm.avail_out = CHUNK;
+			strm.next_out = ptrBufferOut;
+			if (remain>= CHUNK)
+				ret = deflate(&strm, 0);
+			else
+				ret = deflate(&strm, 1);
+			assert(ret != Z_STREAM_ERROR); 
+			unsigned int have = CHUNK - strm.avail_out;
+			ptrBufferOut+=have;
+			header.push_back(have);
+		} while (strm.avail_out == 0);
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+		remain -= CHUNK;
+		ptrData += CHUNK;	
+	}
+	deflateEnd(&strm);
 
-// Traverse the edges adjacent to a given edge through sharing a common vertex
-template <typename MAP>
-class Traversor1EEaV: public Traversor
-{
-private:
-	const MAP& m ;
-	Dart start ;
-	Dart current ;
+	header[0] = header.size()-3;
+	header[1] = CHUNK;
+	if (remain != 0)
+		header[2] = remain +CHUNK;
+	else header[2] = 0;
 
-	Dart d2 ;
+	std::cout << "HEADER "<< std::endl;
+	for (unsigned int i=0; i<header.size(); ++i)
+		std::cout << header[i]<< std::endl;
 
-public:
-	Traversor1EEaV(const MAP& map, Dart dart) ;
+	fout.write((char*)&header[0], header.size()*sizeof(unsigned int));
+	fout.write((char*)bufferOut, ptrBufferOut - bufferOut);
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+	std::cout << "DATA "<<  ptrBufferOut - bufferOut << "bytes writen"<< std::endl;
 
-} // namespace CGoGN
+	delete[] bufferOut;
+}
 
-#include "Topology/generic/traversor1.hpp"
 
-#endif
+}
+}

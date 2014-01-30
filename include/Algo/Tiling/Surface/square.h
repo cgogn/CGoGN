@@ -59,8 +59,10 @@ public:
     }
 
     Grid(MAP& map, unsigned int x, unsigned int y):
-        Grid<PFP>(map,x,y,-1,true)
-    { }
+		Tiling<PFP>(map,x,y,-1)
+	{
+		grid(x,y,true);
+	}
 
     /*! @name Embedding Operators
      * Tiling creation
@@ -134,8 +136,14 @@ public:
     }
 
     Cylinder(MAP& map, unsigned int n, unsigned int z):
-        Cylinder<PFP>(map,n,z,true,true)
-    { }
+	  Tiling<PFP>(map, n, -1, z),
+	  m_top_closed(true),
+	  m_bottom_closed(true),
+	  m_top_triangulated(false),
+	  m_bottom_triangulated(false)
+	{
+		cylinder(n,z);
+	}
 
     /*! @name Embedding Operators
      * Tiling creation
@@ -181,13 +189,6 @@ public:
 
     //! Triangulate the bottom face with triangles fan
     void triangleBottom();
-
-    //! Create a subdivided 2D cone
-    /*! @param n nb of squares around circumference (must be >= 3)
-     *  @param z nb of squares in height (must be >= 1)
-     *  @param bottom_closed close the bottom (with triangles fan)
-     */
-    void cone(unsigned int x, unsigned int y);
 
 protected:
     //! Create a subdivided 2D cylinder
