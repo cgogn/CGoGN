@@ -22,10 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
+
 namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace MR
@@ -154,10 +158,8 @@ void IHM2<PFP>::addNewLevel(bool triQuad)
 template <typename PFP>
 void IHM2<PFP>::addLevelFront()
 {
-	std::vector<Dart> irregVertices;
-	irregVertices.reserve(1024);
-
-	//look for an irregular vertex
+	//1. look for an irregular vertex
+	Dart irregVertex = NIL;
 
 	TraversorV<typename PFP::MAP> tv(m_map);
 	bool found = false;
@@ -166,13 +168,13 @@ void IHM2<PFP>::addLevelFront()
 		if(m_map.vertexDegree(d) != 6)
 		{
 			found = true;
-			irregVertices.push_back(d);
+			irregVertex = d;
 		}
 	}
 
-	//found the number of levels
+	//2. found the number of levels
 	bool finished = false;
-	Dart dit = irregVertices[0];
+	Dart dit = irregVertex;
 	unsigned int nbSteps = 0;
 	do
 	{
@@ -191,10 +193,11 @@ void IHM2<PFP>::addLevelFront()
 		nbSteps /= 2 ;
 		++nbLevel ;
 	}
-	m_map.setMaxLevel(nbLevel);
 
+	m_map.setMaxLevel(nbLevel);
 	std::cout << "nb levels = " << nbLevel+1 << std::endl;
 
+	//3. construct the topology of the differents levels
 	unsigned int curLevel = nbLevel;
 
 	do
@@ -202,7 +205,9 @@ void IHM2<PFP>::addLevelFront()
 		m_map.setCurrentLevel(curLevel);
 
 		DartMarker md(m_map);
-		std::vector<Dart> visitedVertices(irregVertices);
+		std::vector<Dart> visitedVertices;
+		visitedVertices.reserve(1024);
+		visitedVertices.push_back(irregVertex);
 
 		std::cout << "getCurrentLevel = " << m_map.getCurrentLevel() << std::endl;
 
@@ -240,7 +245,7 @@ void IHM2<PFP>::addLevelFront()
 					m_map.setDartLevel(m_map.phi2(fit3), curLevel);
 					m_map.setDartLevel(m_map.phi1(m_map.phi2(fit3)), curLevel);
 
-					if(curLevel == maxLevel)
+					if(curLevel == m_map.getMaxLevel())
 					{
 						unsigned int id = m_map.getTriRefinementEdgeId(m_map.phi2(fit1));
 						m_map.setEdgeId(m_map.phi2(fit1), id);
@@ -256,31 +261,28 @@ void IHM2<PFP>::addLevelFront()
 					}
 					else
 					{
-
-					}
-//					if(curLevel == 2)
-//					{
 //						unsigned int id = m_map.getTriRefinementEdgeId(m_map.phi2(fit1));
 //						m_map.setEdgeId(m_map.phi2(fit1), id);
 //						m_map.setEdgeId(fit1, id);
-						//m_map.setEdgeId(fit1, id);
-//						/std::cout << "fit1 = " << fit1 << std::endl;
-						//std::cout << "m_map.phi2(fit1) = " << m_map.phi2(fit1) << std::endl;
+
+//						m_map.incCurrentLevel();
+//						m_map.setEdgeId(m_map.phi2(fit1), id);
+//						m_map.decCurrentLevel();
 
 //						id = m_map.getTriRefinementEdgeId(m_map.phi2(fit2));
 //						m_map.setEdgeId(m_map.phi2(fit2), id);
 //						m_map.setEdgeId(fit2, id);
-						//m_map.setEdgeId(fit2, id);
-						//std::cout << "fit2 = " << fit2 << std::endl;
-						//std::cout << "m_map.phi2(fit2) = " << m_map.phi2(fit2) << std::endl;
+//						m_map.incCurrentLevel();
+//						m_map.setEdgeId(m_map.phi2(fit2), id);
+//						m_map.decCurrentLevel();
 
 //						id = m_map.getTriRefinementEdgeId(m_map.phi2(fit3));
 //						m_map.setEdgeId(m_map.phi2(fit3), id);
 //						m_map.setEdgeId(fit3, id);
-						//m_map.setEdgeId(fit3, id);
-						//std::cout << "fit3 = " << fit3 << std::endl;
-						//std::cout << "m_map.phi2(fit3) = " << m_map.phi2(fit3) << std::endl;
-//					}
+//						m_map.incCurrentLevel();
+//						m_map.setEdgeId(m_map.phi2(fit3), id);
+//						m_map.decCurrentLevel();
+					}
 				}
 			}
 		}
@@ -316,11 +318,32 @@ void IHM2<PFP>::synthesis()
 	m_map.incCurrentLevel() ;
 }
 
+template <typename PFP>
+void IHM2<PFP>::import(Algo::Surface::Import::QuadTree& qt)
+{
+	std::cout << "  Create finer resolution levels.." << std::flush ;
+
+	for(unsigned int i = 0; i < qt.depth; ++i)
+		addNewLevel(true) ;
+
+	std::cout << "..done" << std::endl ;
+	std::cout << "  Embed finer resolution levels.." << std::flush ;
+
+	m_map.setCurrentLevel(0) ;
+	qt.embed<PFP>(m_map) ;
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+
+	std::cout << "..done" << std::endl ;
+}
+
+
 } // namespace Regular
 
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 

@@ -30,6 +30,8 @@
 #include "Topology/generic/traversor2.h"
 
 #include "Algo/Multiresolution/filter.h"
+#include "Algo/Import/importMRDAT.h"
+
 
 #include <cmath>
 
@@ -37,6 +39,9 @@ namespace CGoGN
 {
 
 namespace Algo
+{
+
+namespace Surface
 {
 
 namespace MR
@@ -77,13 +82,18 @@ public:
     void synthesis() ;
 
 	void addLevelFront();
+
+	void import(Algo::Surface::Import::QuadTree& qt);
+
 } ;
 
-} // namespace Adaptive
+} // namespace Regular
 
 } // namespace Primal
 
 } // namespace MR
+
+} // namespace Surface
 
 } // namespace Algo
 
