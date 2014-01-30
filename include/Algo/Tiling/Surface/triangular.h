@@ -59,8 +59,10 @@ public:
     }
 
     Grid(MAP& map, unsigned int x, unsigned int y):
-        Grid<PFP>(map,x,y,-1,true)
-    { }
+		Tiling<PFP>(map,x,y,-1)
+	{
+		grid(x,y,true);
+	}
 
     /*! @name Embedding Operators
      * Tiling creation
