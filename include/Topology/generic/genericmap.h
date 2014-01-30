@@ -175,7 +175,7 @@ public:
 
 	GenericMap() ;
 
-	~GenericMap() ;
+	virtual ~GenericMap() ;
 
 	virtual std::string mapTypeName() const = 0 ;
 

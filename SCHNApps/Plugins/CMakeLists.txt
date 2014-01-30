@@ -10,7 +10,7 @@ ADD_SUBDIRECTORY(surface_subdivision)
 ADD_SUBDIRECTORY(surface_selection)
 ADD_SUBDIRECTORY(surface_deformation)
 ADD_SUBDIRECTORY(surface_modelisation)
-ADD_SUBDIRECTORY(surface_tilings)
+#ADD_SUBDIRECTORY(surface_tilings)
 
 ADD_SUBDIRECTORY(volume_import)
 #ADD_SUBDIRECTORY(volume_render)
