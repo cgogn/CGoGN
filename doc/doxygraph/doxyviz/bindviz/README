@@ -1,0 +1,123 @@
+About
+=====
+
+http://code.google.com/p/doxygraph
+
+This is bindviz, an automated port of Graphviz to JavaScript using emscripten.
+This folder contains C++ source code, build instructions, and API documentation.
+A precompiled version of bindviz itself can be found in the sibling folder htdocs.
+
+API documentation
+=================
+
+For the most part, the bindviz JavaScript API mirrors the Graphviz C API, albeit
+a modest subset of it. Documentation for the Graphviz C API is provided in two
+PDF files. The following describes the ways in which the JavaScript API differs
+from this.
+
+The following functions are provided as methods on the Module object:
+
+Function		Remarks
+------------------------------------------------
+gvcVersion
+gvcBuildDate
+gvContext
+gvLayout
+gvRenderString		(1)
+gvFreeLayout
+gvFreeContext
+agopen			(2)
+agclose
+agread			(2)
+agconcat		(2)
+agnnodes
+agnedges
+agnode
+agidnode
+agfirstnode		(3)
+agnextnode		(3)
+agprevnode		(3)
+aglastnode		(3)
+agdelnode
+agdegree
+agedge
+agfirstedge		(3)
+agnextedge		(3)
+agfirstinedge		(3)
+agnextinedge		(3)
+agfirstoutedge		(3)
+agnextoutedge		(3)
+agdeledge
+aggraphget		(4)
+aggraphset		(4)
+agnodeget		(4)
+agnodeset		(4)
+agedgeget		(4)
+agedgeset		(4)
+
+(1) gvRenderString is a new function, not present in the C API. It is similar to
+    gvRender except that it returns its output as a string variable instead of
+    writing it to a file. It takes three parameters: a context object, a graph
+    object, and a string specifying the output format, typically "dot".
+
+(2) In C, some functions take an extra parameter of type Agdisc_t*. These
+    parameters do not exist in their JavaScript binding functions. In addition,
+    wherever a C function would expect a parameter of type FILE*, the JavaScript
+    binding function instead expects a string containing an URL.
+
+(3) Some functions have been given slightly more sensible names, for example
+    agfirstnode instead of agfstnode, and aglastnode instead of aglstnode.
+
+(4) The C functions agget and agset are type-unsafe and provide access to the
+    attributes of graphs, nodes, and edges alike, via a parameter of type void*.
+    The JavaScript API instead provides a set of type-safe functions, two for
+    accessing the attributes of graphs, two for the attributes of nodes, and two
+    for the attributes of edges.
+
+In all other respects these functions behave the same as in C. There should be
+sufficient example code in doxyviz.js to get to grips with.
+
+Compiling with Emscripten
+=========================
+
+A precompiled version of bindviz.js is provided, so this procedure is not
+required, but it should nevertheless bear documentation.
+
+Install Emscripten and run the tests as described here:
+https://github.com/kripken/emscripten/wiki/Tutorial
+
+Download and extract the Doxygen source code into the bindviz directory.
+In the newly extracted Doxygen source code directory, run the following
+commands:
+
+mkdir build
+cd build
+../configure
+cd lib/gvpr
+make mkdefs
+cd ../../..
+
+mkdir embuild
+cd embuild
+emconfigure ../configure --disable-shared
+cd lib/gvpr
+sed -i 's/\t\.\/mkdefs/\t..\/..\/..\/build\/lib\/gvpr\/mkdefs/' Makefile
+cd ../..
+emmake make
+cd ../..
+
+The following very long command is typed in all on one line:
+
+emcc --bind -O3 --closure 0 -s ASM_JS=0 -s ALLOW_MEMORY_GROWTH=1 -o ../../htdocs/bindviz.js ../bindviz.cpp -Ilib/{cgraph,gvc,cdt,common,pathplan} embuild/lib/{cgraph,gvc,cdt,common,pathplan,*gen,patchwork,osage}/*.o embuild/plugin/{*_layout,core}/*.o
+
+License
+=======
+
+Copyright 2013 Doxygraph project
+
+This Source Code Form is subject to the terms of the Mozilla Public License,
+version 2.0. If a copy of the MPL was not distributed with this file, You can
+obtain one at http://mozilla.org/MPL/2.0/.
+
+This copyright and license notice does not relate to the source code of
+Graphviz itself.

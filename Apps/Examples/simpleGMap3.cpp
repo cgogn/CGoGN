@@ -25,7 +25,7 @@
 #include "simpleGMap3.h"
 #include "Utils/GLSLShader.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Modelisation/subdivision3.h"
 
 SimpleGMap3::SimpleGMap3()
@@ -35,22 +35,21 @@ SimpleGMap3::SimpleGMap3()
 
     //	CellMarker<EDGE> mE(myMap);
 
-    Algo::Volume::Modelisation::Primitive3D<PFP> primCat(myMap,position);
-    Dart d = primCat.hexaGrid_topo(1,1,1);
-    primCat.embedHexaGrid(1,1,1);
+    Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, 1, 1, 1);
+    cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
     myMap.check();
 
-    Dart dp = Algo::Surface::Modelisation::createQuadrangularPyramid<PFP>(myMap);
+//    Dart dp = Algo::Surface::Modelisation::createQuadrangularPyramid<PFP>(myMap);
 
-    position[dp] = typename PFP::VEC3(0.5,0.5,-0.5);
-    position[myMap.phi1(dp)] = typename PFP::VEC3(0.5,0.5,0.5);
-    position[myMap.phi1(myMap.phi1(dp))] = typename PFP::VEC3(0.5,-0.5,0.5);
-    position[myMap.phi_1(dp)] = typename PFP::VEC3(0.5,-0.5,-0.5);
-    position[myMap.phi_1(myMap.phi2(dp))] = typename PFP::VEC3(1.5f, 0.0f, 0.0f);
+//    position[dp] = typename PFP::VEC3(0.5,0.5,-0.5);
+//    position[myMap.phi1(dp)] = typename PFP::VEC3(0.5,0.5,0.5);
+//    position[myMap.phi1(myMap.phi1(dp))] = typename PFP::VEC3(0.5,-0.5,0.5);
+//    position[myMap.phi_1(dp)] = typename PFP::VEC3(0.5,-0.5,-0.5);
+//    position[myMap.phi_1(myMap.phi2(dp))] = typename PFP::VEC3(1.5f, 0.0f, 0.0f);
 
-    Dart dtemp = myMap.beta1(myMap.beta0(myMap.beta1(myMap.beta2(myMap.beta1(myMap.beta0(myMap.beta1(myMap.beta2(d))))))));
+//    Dart dtemp = myMap.beta1(myMap.beta0(myMap.beta1(myMap.beta2(myMap.beta1(myMap.beta0(myMap.beta1(myMap.beta2(d))))))));
 
-    myMap.sewVolumes(dtemp,dp);
+//    myMap.sewVolumes(dtemp,dp);
 
     //	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
     //	Algo::Volume::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);

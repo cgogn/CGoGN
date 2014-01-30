@@ -24,7 +24,7 @@
 
 #include "tuto_oper2.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Tiling/Surface/square.h"
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
@@ -175,9 +175,8 @@ void MyQT::createMap(int n)
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
 	colorDarts = myMap.addAttribute<VEC3, DART>("color");
 
-	Algo::Surface::Modelisation::Polyhedron<PFP> grid(myMap,position);
-	grid.grid_topo(n,n);
-	grid.embedGrid(1.,1.,0.);
+    Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, n, n, true);
+    grid.embedIntoGrid(position, 1.,1.,0.);
 
     //  bounding box of scene
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;

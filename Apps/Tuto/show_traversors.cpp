@@ -25,7 +25,7 @@
 #include "show_traversors.h"
 #include <iostream>
 
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/subdivision.h"
 
@@ -613,9 +613,9 @@ int main(int argc, char **argv)
     {
         position = myMap.addAttribute<VEC3, VERTEX>( "position");
 
-        Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
-        dglobal = prim.hexaGrid_topo(3,3,3);
-        prim.embedHexaGrid(1.0f,1.0f,1.0f);
+        Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, 3, 3, 3);
+        cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
+        dglobal = NIL;
     }
     else
     {

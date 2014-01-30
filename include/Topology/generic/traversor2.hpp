@@ -505,11 +505,11 @@ template <typename MAP>
 Dart Traversor2FV<MAP>::next()
 {
 	if(m_QLT != NULL)
-	{
+    {
 		return *m_ItDarts++;
 	}
 	if(current != NIL)
-	{
+    {
 		current = m.phi1(current) ;
 		if(current == start)
 			current = NIL ;

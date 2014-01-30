@@ -94,65 +94,65 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 		Dart dd = map.phi1(old) ;
 		Dart e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;					// insert a new edge
-		//unsigned int id = map.getNewEdgeId() ;
-		//map.setEdgeId(map.phi_1(dd), id) ;		// set the edge id of the inserted
-		//map.setEdgeId(map.phi_1(e), id) ;		// edge to the next available id
+        unsigned int id = map.getNewEdgeId() ;
+        map.setEdgeId(map.phi_1(dd), id) ;		// set the edge id of the inserted
+        map.setEdgeId(map.phi_1(e), id) ;		// edge to the next available id
 
 		dd = e ;
 		e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;
-		//id = map.getNewEdgeId() ;
-		//map.setEdgeId(map.phi_1(dd), id) ;
-		//map.setEdgeId(map.phi_1(e), id) ;
+        id = map.getNewEdgeId() ;
+        map.setEdgeId(map.phi_1(dd), id) ;
+        map.setEdgeId(map.phi_1(e), id) ;
 
 		dd = e ;
 		e = map.phi1(map.phi1(dd)) ;
 		map.splitFace(dd, e) ;
-		//id = map.getNewEdgeId() ;
-		//map.setEdgeId(map.phi_1(dd), id) ;
-		//map.setEdgeId(map.phi_1(e), id) ;
+        id = map.getNewEdgeId() ;
+        map.setEdgeId(map.phi_1(dd), id) ;
+        map.setEdgeId(map.phi_1(e), id) ;
 
 
-		Dart stop = map.phi2(map.phi1(old));
-		Dart dit = stop;
-		do
-		{
-			unsigned int dId = map.getEdgeId(map.phi_1(map.phi2(dit)));
-			unsigned int eId = map.getEdgeId(map.phi1(map.phi2(dit)));
+//		Dart stop = map.phi2(map.phi1(old));
+//		Dart dit = stop;
+//		do
+//		{
+//			unsigned int dId = map.getEdgeId(map.phi_1(map.phi2(dit)));
+//			unsigned int eId = map.getEdgeId(map.phi1(map.phi2(dit)));
 
-			unsigned int t = dId + eId;
+//			unsigned int t = dId + eId;
 
-			if(t == 0)
-			{
-				map.setEdgeId(dit, 1);
-				map.setEdgeId(map.phi2(dit), 1);
-			}
-			else if(t == 1)
-			{
-				map.setEdgeId(dit, 2);
-				map.setEdgeId(map.phi2(dit), 2);
-			}
-			else if(t == 2)
-			{
-				if(dId == eId)
-				{
-					map.setEdgeId(dit, 0);
-					map.setEdgeId(map.phi2(dit), 0);
-				}
-				else
-				{
-					map.setEdgeId(dit, 1);
-					map.setEdgeId(map.phi2(dit), 1);
-				}
-			}
-			else if(t == 3)
-			{
-				map.setEdgeId(dit, 0);
-				map.setEdgeId(map.phi2(dit), 0);
-			}
+//			if(t == 0)
+//			{
+//				map.setEdgeId(dit, 1);
+//				map.setEdgeId(map.phi2(dit), 1);
+//			}
+//			else if(t == 1)
+//			{
+//				map.setEdgeId(dit, 2);
+//				map.setEdgeId(map.phi2(dit), 2);
+//			}
+//			else if(t == 2)
+//			{
+//				if(dId == eId)
+//				{
+//					map.setEdgeId(dit, 0);
+//					map.setEdgeId(map.phi2(dit), 0);
+//				}
+//				else
+//				{
+//					map.setEdgeId(dit, 1);
+//					map.setEdgeId(map.phi2(dit), 1);
+//				}
+//			}
+//			else if(t == 3)
+//			{
+//				map.setEdgeId(dit, 0);
+//				map.setEdgeId(map.phi2(dit), 0);
+//			}
 
-			dit = map.phi1(dit);
-		}while(dit != stop);
+//			dit = map.phi1(dit);
+//		}while(dit != stop);
 
 	}
 	else											// if subdividing a polygonal face
@@ -160,15 +160,15 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 		Dart dd = map.phi1(old) ;
 		map.splitFace(dd, map.phi1(map.phi1(dd))) ;	// insert a first edge
 		Dart ne = map.alpha1(dd) ;
-		//Dart ne2 = map.phi2(ne) ;
+        Dart ne2 = map.phi2(ne) ;
 
 		map.cutEdge(ne) ;							// cut the new edge to insert the central vertex
-		//unsigned int id = map.getNewEdgeId() ;
-		//map.setEdgeId(ne, id) ;
-		//map.setEdgeId(map.phi2(ne), id) ;			// set the edge id of the inserted
-		//id = map.getNewEdgeId() ;
-		//map.setEdgeId(ne2, id) ;					// edges to the next available ids
-		//map.setEdgeId(map.phi2(ne2), id) ;
+        unsigned int id = map.getNewEdgeId() ;
+        map.setEdgeId(ne, id) ;
+        map.setEdgeId(map.phi2(ne), id) ;			// set the edge id of the inserted
+        id = map.getNewEdgeId() ;
+        map.setEdgeId(ne2, id) ;					// edges to the next available ids
+        map.setEdgeId(map.phi2(ne2), id) ;
 
 		position[map.phi2(ne)] = p ;
 
@@ -177,30 +177,30 @@ void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 		{											// linked to the central vertex
 			Dart next = map.phi1(map.phi1(dd)) ;
 			map.splitFace(map.phi1(ne), dd) ;
-			//Dart nne = map.alpha1(dd) ;
-			//id = map.getNewEdgeId() ;
-			//map.setEdgeId(nne, id) ;
-			//map.setEdgeId(map.phi2(nne), id) ;
+            Dart nne = map.alpha1(dd) ;
+            id = map.getNewEdgeId() ;
+            map.setEdgeId(nne, id) ;
+            map.setEdgeId(map.phi2(nne), id) ;
 			dd = next ;
 		}
 
-		Dart dit = map.phi2(ne);
-		do
-		{
-			unsigned int eId = map.getEdgeId(map.phi1(dit));
-			if(eId == 0)
-			{
-				map.setEdgeId(dit, 1);
-				map.setEdgeId(map.phi2(dit), 1);
-			}
-			else if(eId == 1)
-			{
-				map.setEdgeId(dit, 0);
-				map.setEdgeId(map.phi2(dit), 0);
-			}
-			dit = map.phi2(map.phi_1(dit));
-		}
-		while(dit != map.phi2(ne));
+//		Dart dit = map.phi2(ne);
+//		do
+//		{
+//			unsigned int eId = map.getEdgeId(map.phi1(dit));
+//			if(eId == 0)
+//			{
+//				map.setEdgeId(dit, 1);
+//				map.setEdgeId(map.phi2(dit), 1);
+//			}
+//			else if(eId == 1)
+//			{
+//				map.setEdgeId(dit, 0);
+//				map.setEdgeId(map.phi2(dit), 0);
+//			}
+//			dit = map.phi2(map.phi_1(dit));
+//		}
+//		while(dit != map.phi2(ne));
 	}
 
 	map.setCurrentLevel(cur) ;

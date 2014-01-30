@@ -81,7 +81,7 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * @return true
 */
 template <typename PFP>
-bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename) ;
+bool exportOBJ(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename) ;
 
 /**
 * export the map into a Trian file

@@ -84,7 +84,7 @@ inline Dart ImplicitHierarchicalMap2::newDart()
 inline Dart ImplicitHierarchicalMap2::phi1(Dart d) const
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
-	bool finished = false ;
+    bool finished = false ;
 	unsigned int edgeId = m_edgeId[d] ;
 	Dart it = d ;
 	do
@@ -95,7 +95,7 @@ inline Dart ImplicitHierarchicalMap2::phi1(Dart d) const
 		else
 		{
 			while(m_edgeId[it] != edgeId)
-				it = Map2::alpha_1(it) ;
+                it = Map2::phi1(Map2::phi2(it)) ;
 		}
 	} while(!finished) ;
 	return it ;
@@ -126,7 +126,7 @@ inline Dart ImplicitHierarchicalMap2::phi2(Dart d) const
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	if(Map2::phi2(d) == d)
 		return d ;
-	return Map2::alpha1(phi1(d)) ;
+    return Map2::phi2(Map2::phi_1(phi1(d))) ;
 }
 
 inline Dart ImplicitHierarchicalMap2::alpha0(Dart d) const
@@ -314,6 +314,12 @@ inline void ImplicitHierarchicalMap2::setDartLevel(Dart d, unsigned int l)
 	m_dartLevel[d] = l ;
 }
 
+inline void ImplicitHierarchicalMap2::setMaxLevel(unsigned int l)
+{
+	m_maxLevel = l;
+}
+
+
 /***************************************************
  *             EDGE ID MANAGEMENT                  *
  ***************************************************/
@@ -333,9 +339,59 @@ inline void ImplicitHierarchicalMap2::setEdgeId(Dart d, unsigned int i)
 	m_edgeId[d] = i ;
 }
 
+inline unsigned int ImplicitHierarchicalMap2::getTriRefinementEdgeId(Dart d)
+{
+	unsigned int dId = getEdgeId(phi_1(d));
+	unsigned int eId = getEdgeId(phi1(d));
+
+	unsigned int id = dId + eId;
+
+	if(id == 0)
+		return 1;
+	else if(id == 1)
+		return 2;
+	else if(id == 2)
+		if(dId == eId)
+			return 0;
+		else
+			return 1;
+	//else if(id == 3)
+	return 0;
+}
+
+inline unsigned int ImplicitHierarchicalMap2::getQuadRefinementEdgeId(Dart d)
+{
+	unsigned int eId = getEdgeId(phi1(d));
+
+	if(eId == 0)
+		return 1;
+
+	//else if(eId == 1)
+	return 0;
+}
+
+inline void ImplicitHierarchicalMap2::setTriRefinementEdgeId(Dart d)
+{
+
+}
+
 /***************************************************
  *               CELLS INFORMATION                 *
  ***************************************************/
+
+inline unsigned int ImplicitHierarchicalMap2::faceDegree(Dart d)
+{
+    unsigned int count = 0 ;
+    Dart it = d ;
+    do
+    {
+        ++count ;
+        it = phi1(it) ;
+    } while (it != d) ;
+    return count ;
+}
+
+
 
 inline unsigned int ImplicitHierarchicalMap2::vertexInsertionLevel(Dart d)
 {
@@ -343,14 +399,14 @@ inline unsigned int ImplicitHierarchicalMap2::vertexInsertionLevel(Dart d)
 	return m_dartLevel[d] ;
 }
 
-inline unsigned int ImplicitHierarchicalMap2::edgeLevel(Dart d)
-{
-	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
-	unsigned int ld = m_dartLevel[d] ;
-//	unsigned int ldd = m_dartLevel[phi2(d)] ;	// the level of an edge is the maximum of the
-	unsigned int ldd = m_dartLevel[phi1(d)] ;
-	return ld < ldd ? ldd : ld ;				// insertion levels of its two darts
-}
+//inline unsigned int ImplicitHierarchicalMap2::edgeLevel(Dart d)
+//{
+//	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+//	unsigned int ld = m_dartLevel[d] ;
+////	unsigned int ldd = m_dartLevel[phi2(d)] ;	// the level of an edge is the maximum of the
+//	unsigned int ldd = m_dartLevel[phi1(d)] ;
+//	return ld < ldd ? ldd : ld ;				// insertion levels of its two darts
+//}
 
 /***************************************************
  *               ATTRIBUTE HANDLER                 *

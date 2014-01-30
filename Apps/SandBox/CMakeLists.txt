@@ -23,8 +23,12 @@ ENDIF(WIN32)
 
 #define exec to compile
 
-add_executable( multi_att multi_att.cpp)
-target_link_libraries( multi_att ${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
+add_executable(multi_att multi_att.cpp)
+target_link_libraries(multi_att ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+
+QT4_WRAP_CPP(tilings_moc tilings.h)
+add_executable(tilings tilings.cpp  ${tilings_moc})
+target_link_libraries(tilings ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
 
 # Example with Qt
 #

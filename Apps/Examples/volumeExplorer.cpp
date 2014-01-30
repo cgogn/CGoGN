@@ -26,7 +26,7 @@
 #include "volumeExplorer.h"
 #include <iostream>
 
-#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/volume.h"
@@ -214,7 +214,7 @@ void MyQT::cb_initGL()
 
 	// create the renders
     m_topo_render = new Algo::Render::GL2::Topo3Render();
-    m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,false);
+    m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,true);
 
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f);
@@ -440,10 +440,10 @@ int main(int argc, char **argv)
 	else
 	{
 		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
-		Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
+
 		int nb = 8;
-		prim.hexaGrid_topo(nb,nb,nb);
-		prim.embedHexaGrid(1.0f,1.0f,1.0f);
+        Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
+        cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
 		for (unsigned int i=position.begin(); i != position.end(); position.next(i))
 		{

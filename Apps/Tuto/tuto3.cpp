@@ -25,34 +25,34 @@
 #include "tuto3.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Selection/raySelector.h"
-#include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Tiling/Surface/square.h"
 
 using namespace CGoGN ;
 
 
 int main(int argc, char **argv)
 {
-	//	// interface
-	QApplication app(argc, argv);
-	MyQT sqt;
-	// copy output tout Qt console of application (shift enter)
-	CGoGNout.toConsole(&sqt);
+    //	// interface
+    QApplication app(argc, argv);
+    MyQT sqt;
+    // copy output tout Qt console of application (shift enter)
+    CGoGNout.toConsole(&sqt);
 
-	// example code itself
-	sqt.createMap();
+    // example code itself
+    sqt.createMap();
 
-	sqt.traverseMap();
+    sqt.traverseMap();
 
-	// set help message in menu
-	sqt.setHelpMsg("Tuto 3: \nUsage of DartMarker and CellMarker\nPick of dart with mouse");
-	// final show for redraw
-	sqt.show();
+    // set help message in menu
+    sqt.setHelpMsg("Tuto 3: \nUsage of DartMarker and CellMarker\nPick of dart with mouse");
+    // final show for redraw
+    sqt.show();
 
 
-	CGoGNout << "You can pick darts dans see it's id with left mouse button"<< CGoGNendl;
+    CGoGNout << "You can pick darts dans see it's id with left mouse button"<< CGoGNendl;
 
-	// and wait for the end
-	return app.exec();
+    // and wait for the end
+    return app.exec();
 }
 
 Dart xd1;
@@ -60,29 +60,29 @@ Dart xd1;
 
 void MyQT::traverseMap()
 {
-	DartMarker m1(myMap);
-	DartMarker m2(myMap);
-	myMap.rdfi(myMap.begin(),m1,m2);
+    DartMarker m1(myMap);
+    DartMarker m2(myMap);
+    myMap.rdfi(myMap.begin(),m1,m2);
 
-	m1.unmarkAll();
+    m1.unmarkAll();
 
-	m1.markOrbit<VOLUME>(xd1);
+    m1.markOrbit<VOLUME>(xd1);
 
-	// render the topo of the map without boundary darts
+    // render the topo of the map without boundary darts
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
+    m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
 
-	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-	{
-		if (m2.isMarked(d))
-		{
-			m_render_topo->setDartColor(d,1.0f,0.0f,0.0f);
-		}
-		if (m1.isMarked(d))
-		{
-			m_render_topo->setDartColor(d,0.0f,1.0f,0.0f);
-		}
-	}
+    for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+    {
+        if (m2.isMarked(d))
+        {
+            m_render_topo->setDartColor(d,1.0f,0.0f,0.0f);
+        }
+        if (m1.isMarked(d))
+        {
+            m_render_topo->setDartColor(d,0.0f,1.0f,0.0f);
+        }
+    }
 
 //
 //
@@ -152,11 +152,10 @@ void MyQT::createMap()
 
 //	Dart d2 = d1;
 
-	position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+    position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
-	Algo::Surface::Modelisation::Polyhedron<PFP> prim1(myMap, position);
-	prim1.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
-	prim1.embedSphere(2.0f);
+    Algo::Surface::Tilings::Square::Cylinder<PFP> prim1(myMap, 256,256,true,true);
+    prim1.embedIntoSphere(position, 2.0f);
 
 //	Dart d2 = d1;
 //	position[d2] = PFP::VEC3(1, 0, 0);
@@ -167,16 +166,16 @@ void MyQT::createMap()
 //	d2 = PHI<211>(d2);
 //	position[d2] = PFP::VEC3(0, 1, 2);
 
-	Algo::Surface::Modelisation::Polyhedron<PFP> prim2(myMap, position);
-	prim2.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
-	prim2.embedSphere(2.0f);
+    Algo::Surface::Tilings::Square::Cylinder<PFP> prim2(myMap, 256 ,256, true, true);
+    prim2.embedIntoSphere(position, 2.0f);
 
-	Geom::Matrix44f trf;
-	trf.identity();
-	Geom::translate<float>(5.0f, 0.0, 0.0, trf);
-	prim2.transform(trf);
 
-	xd1 = prim2.getDart();
+    Geom::Matrix44f trf;
+    trf.identity();
+    Geom::translate<float>(5.0f, 0.0, 0.0, trf);
+    prim2.transform(position, trf);
+
+    xd1 = prim2.getDart();
 
 //	xd1 = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
 //	Dart xd2 = xd1;
@@ -195,40 +194,40 @@ void MyQT::createMap()
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
     // send BB info to interface for centering on GL screen
-	setParamObject(lWidthObj, lPosObj.data());
+    setParamObject(lWidthObj, lPosObj.data());
 
-	// first show for be sure that GL context is binded
-	show();
+    // first show for be sure that GL context is binded
+    show();
 
-	// render the topo of the map without boundary darts
+    // render the topo of the map without boundary darts
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
+    m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
 }
 
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-	m_render_topo = new Algo::Render::GL2::TopoRender();
+    m_render_topo = new Algo::Render::GL2::TopoRender();
 }
 
 // redraw GL callback (clear and swap already done)
 void MyQT::cb_redraw()
 {
-	if (dart_selected != NIL)
-		m_render_topo->overdrawDart(dart_selected, 5, 1.0f,0.0f,0.0f);
-	m_render_topo->drawTopo();
+    if (dart_selected != NIL)
+        m_render_topo->overdrawDart(dart_selected, 5, 1.0f,0.0f,0.0f);
+    m_render_topo->drawTopo();
 }
 
 // mouse picking
 void MyQT::cb_mouseClick(int button, int x, int y)
 {
-	if (button == Qt::LeftButton)
-	{
-		Dart  d = m_render_topo->picking<PFP>(myMap, x, y);
-		if (d != NIL)
+    if (button == Qt::LeftButton)
+    {
+        Dart  d = m_render_topo->picking<PFP>(myMap, x, y);
+        if (d != NIL)
 
-			CGoGNout << "Dart "<< d <<  CGoGNendl;
-		dart_selected=d;
-		updateGL();
-	}
+            CGoGNout << "Dart "<< d <<  CGoGNendl;
+        dart_selected=d;
+        updateGL();
+    }
 }
