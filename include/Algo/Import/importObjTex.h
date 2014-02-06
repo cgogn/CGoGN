@@ -369,7 +369,13 @@ public:
 	 */
 	bool createGroupMatVBO_PTN( Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO);
 
-
+	/**
+	 * @brief add a dart by each face of group in a vector
+	 * @param groupId the group to add
+	 * @param dartFaces the vector in which we want to add
+	 * @return the number of faces added.
+	 */
+	unsigned int storeFacesOfGroup(unsigned int groupId, std::vector<Dart>& dartFaces);
 };
 
 

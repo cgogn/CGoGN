@@ -1395,6 +1395,22 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 
 }
 
+template <typename PFP>
+unsigned int OBJModel<PFP>::storeFacesOfGroup(unsigned int groupId, std::vector<Dart>& dartFaces)
+{
+	unsigned int nb=dartFaces.size();
+
+	TraversorF<typename PFP::MAP> traf(m_map);
+	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+	{
+		if (m_groups[d] == groupId)
+		{
+			dartFaces.push_back(d);
+		}
+	}
+
+	return dartFaces.size()-nb;
+}
 
 
 }
