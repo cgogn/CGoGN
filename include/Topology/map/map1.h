@@ -25,12 +25,13 @@
 #ifndef __MAP1_H__
 #define __MAP1_H__
 
-#include "Topology/generic/attribmap.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
 {
+
+class MapMono;
 
 /*! \brief The class of dual 1-dimensional combinatorial maps: set of oriented faces.
  *  - A dual 1-map is made of darts linked by the phi1 permutation.
@@ -40,13 +41,18 @@ namespace CGoGN
  *  - Faces with only one edge (sometime called loops) are accepted.
  *  - Degenerated faces with only two edges are accepted.
  */
-class Map1 : public AttribMap
+template <class MAP = MapMono>
+class Map1 : public MAP
 {
+<<<<<<< HEAD
 //protected:
 public:
 	AttributeMultiVector<Dart>* m_phi1 ;
 	AttributeMultiVector<Dart>* m_phi_1 ;
 
+=======
+protected:
+>>>>>>> debut grosse update classes de carte...
 	void init() ;
 
 public:

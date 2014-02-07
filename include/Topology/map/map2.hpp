@@ -27,36 +27,42 @@ namespace CGoGN
 
 /// INLINE FUNCTIONS
 
-inline void Map2::init()
+template <class MAP>
+inline void Map2<MAP>::init()
 {
-	m_phi2 = addRelation("phi2") ;
+	MAP::addInvolution() ;
 }
 
-inline Map2::Map2() : Map1()
+template <class MAP>
+inline Map2<MAP>::Map2() : Map1<MAP>()
 {
 	init() ;
 }
 
-inline std::string Map2::mapTypeName() const
+template <class MAP>
+inline std::string Map2<MAP>::mapTypeName() const
 {
 	return "Map2" ;
 }
 
-inline unsigned int Map2::dimension() const
+template <class MAP>
+inline unsigned int Map2<MAP>::dimension() const
 {
 	return 2 ;
 }
 
-inline void Map2::clear(bool removeAttrib)
+template <class MAP>
+inline void Map2<MAP>::clear(bool removeAttrib)
 {
-	Map1::clear(removeAttrib) ;
+	ParentMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-inline void Map2::update_topo_shortcuts()
+template <class MAP>
+inline void Map2<MAP>::update_topo_shortcuts()
 {
-	Map1::update_topo_shortcuts();
+	ParentMap::update_topo_shortcuts();
 	m_phi2 = getRelation("phi2");
 }
 
@@ -64,37 +70,40 @@ inline void Map2::update_topo_shortcuts()
  * Access and Modification
  *************************************************************************/
 
-inline Dart Map2::newDart()
+template <class MAP>
+inline Dart Map2<MAP>::newDart()
 {
 	Dart d = Map1::newDart() ;
 	(*m_phi2)[dartIndex(d)] = d ;
-	if(m_isMultiRes)
-	{
-		pushLevel() ;
-		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
-		{
-			setCurrentLevel(i) ;
-			(*m_phi2)[dartIndex(d)] = d ;
-		}
-		popLevel() ;
-	}
+//	if(m_isMultiRes)
+//	{
+//		pushLevel() ;
+//		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
+//		{
+//			setCurrentLevel(i) ;
+//			(*m_phi2)[dartIndex(d)] = d ;
+//		}
+//		popLevel() ;
+//	}
 	return d ;
 }
 
-inline Dart Map2::phi2(Dart d) const
+template <class MAP>
+inline Dart Map2<MAP>::phi2(Dart d) const
 {
-	return (*m_phi2)[dartIndex(d)] ;
+	return MAP::getInvolution<0>(d);
 }
 
+template <class MAP>
 template <int N>
-inline Dart Map2::phi(Dart d) const
+inline Dart Map2<MAP>::phi(Dart d) const
 {
 	assert( (N > 0) || !"negative parameters not allowed in template multi-phi");
 	if (N < 10)
 	{
 		switch(N)
 		{
-			case 1 : return phi1(d) ;
+			case 1 : return ParentMap::phi1(d) ;
 			case 2 : return phi2(d) ;
 			default : assert(!"Wrong multi-phi relation value") ; return d ;
 		}
@@ -107,47 +116,46 @@ inline Dart Map2::phi(Dart d) const
 	}
 }
 
-inline Dart Map2::alpha0(Dart d) const
+template <class MAP>
+inline Dart Map2<MAP>::alpha0(Dart d) const
 {
 	return phi2(d) ;
 }
 
-inline Dart Map2::alpha1(Dart d) const
+template <class MAP>
+inline Dart Map2<MAP>::alpha1(Dart d) const
 {
 	return phi2(phi_1(d)) ;
 }
 
-inline Dart Map2::alpha_1(Dart d) const
+template <class MAP>
+inline Dart Map2<MAP>::alpha_1(Dart d) const
 {
 	return phi1(phi2(d)) ;
 }
 
-inline Dart Map2::phi2_1(Dart d) const
+template <class MAP>
+inline Dart Map2<MAP>::phi2_1(Dart d) const
 {
 	return phi2(phi_1(d)) ;
 }
 
-inline Dart Map2::phi12(Dart d) const
+template <class MAP>
+inline Dart Map2<MAP>::phi12(Dart d) const
 {
 	return phi1(phi2(d)) ;
 }
 
-inline void Map2::phi2sew(Dart d, Dart e)
+template <class MAP>
+inline void Map2<MAP>::phi2sew(Dart d, Dart e)
 {
-	unsigned int d_index = dartIndex(d);
-	unsigned int e_index = dartIndex(e);
-	assert((*m_phi2)[d_index] == d) ;
-	assert((*m_phi2)[e_index] == e) ;
-	(*m_phi2)[d_index] = e ;
-	(*m_phi2)[e_index] = d ;
+	MAP::involutionSew<0>(d,e);
 }
 
-inline void Map2::phi2unsew(Dart d)
+template <class MAP>
+inline void Map2<MAP>::phi2unsew(Dart d)
 {
-	unsigned int d_index = dartIndex(d);
-	Dart e = (*m_phi2)[d_index] ;
-	(*m_phi2)[d_index] = d ;
-	(*m_phi2)[dartIndex(e)] = e ;
+	MAP::involutionUnsew<0>(d);
 }
 
 /*! @name Topological Queries

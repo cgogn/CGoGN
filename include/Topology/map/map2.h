@@ -45,16 +45,14 @@ namespace CGoGN
  *  - When every edge is phi2-linked, the map is closed. In this case
  *  some optimizations are enabled that speed up the processing of vertices.
  */
-class Map2 : public Map1
+template <class MAP>
+class Map2 : public Map1<MAP>
 {
-//protected:
-public:
-	AttributeMultiVector<Dart>* m_phi2 ;
-
+protected:
 	void init() ;
 
 public:
-	typedef Map1 ParentMap;
+	typedef Map1<MAP> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+5; }
 

@@ -47,20 +47,6 @@
 namespace CGoGN
 {
 
-/**
- * Class that allows to browse a map
- * This is a pure virtual class that can be overloaded in:
- * - a MapBrowserSelector
- * - a MapBrowserLinked (Attr or Auto)
- */
-//class MapBrowser
-//{
-//public:
-//	virtual Dart begin() const = 0;
-//	virtual Dart end() const = 0;
-//	virtual void next(Dart& d) const = 0;
-//};
-
 class AttributeHandlerGen ;
 class DartMarkerGen ;
 class CellMarkerGen ;
@@ -79,11 +65,6 @@ class GenericMap
 	template<unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
-
-	/**
-	 * @brief current MapBrowser used to traverse the map
-	 */
-//	MapBrowser* m_currentBrowser;
 
 	/**
 	 * Attributes Containers
@@ -181,7 +162,6 @@ public:
 
 	virtual unsigned int dimension() const = 0 ;
 
-//	static const unsigned int DIMENSION = 0 ;
 	/**
 	 * Clear the map
 	 * @param removeAttrib
@@ -195,12 +175,6 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
-
-//	/**
-//	 * @brief set the current MapBrowser
-//	 * @param mb pointer on MapBrowser to use (default is map itself)
-//	 */
-//	void setBrowser(MapBrowser* mb) { m_currentBrowser = mb; }
 
 	/****************************************
 	 *     RESOLUTION LEVELS MANAGEMENT     *
@@ -722,13 +696,6 @@ public:
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
 
-//	Dart realBegin() const;
-
-//	Dart realEnd() const;
-
-//	void realNext(Dart& d) const;
-
-
 	/**
 	 * Begin of map
 	 * @return the first dart of the map
@@ -820,8 +787,6 @@ public:
 
 protected:
 	/// boundary markers
-//	Mark m_boundaryMarker2 ;
-//	Mark m_boundaryMarker3 ;
 	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
 
 	/**

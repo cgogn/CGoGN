@@ -47,7 +47,8 @@ namespace CGoGN
  *  some optimizations are enable that speed up the processing of cells.
  *  @param DART the type of dart used in the class
  */
-class Map3 : public Map2
+template <class MAP>
+class Map3 : public Map2<MAP>
 {
 protected:
 	AttributeMultiVector<Dart>* m_phi3 ;
@@ -55,7 +56,7 @@ protected:
 	void init() ;
 
 public:
-	typedef Map2 ParentMap;
+	typedef Map2<MAP> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o){ return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
