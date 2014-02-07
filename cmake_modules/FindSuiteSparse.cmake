@@ -58,7 +58,8 @@ else( WIN32 )
            FIND_PATH( SUITESPARSE_LIBRARY_DIR
                       NAMES libcholmod.so 
                       PATHS /usr/lib 
-                            /usr/lib64 
+                            /usr/lib64
+                            /usr/lib/x86_64-linux-gnu
                             /usr/local/lib )
    ENDIF(APPLE)
 
