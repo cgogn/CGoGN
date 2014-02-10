@@ -44,15 +44,7 @@ class MapMono;
 template <class MAP = MapMono>
 class Map1 : public MAP
 {
-<<<<<<< HEAD
-//protected:
-public:
-	AttributeMultiVector<Dart>* m_phi1 ;
-	AttributeMultiVector<Dart>* m_phi_1 ;
-
-=======
 protected:
->>>>>>> debut grosse update classes de carte...
 	void init() ;
 
 public:
@@ -73,8 +65,6 @@ public:
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
-
-	virtual Dart newDart();
 
 	Dart phi1(Dart d) const;
 

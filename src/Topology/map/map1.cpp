@@ -27,7 +27,8 @@
 namespace CGoGN
 {
 
-void Map1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+template <class MAP>
+void Map1<MAP>::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 {
 	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
 	{
@@ -59,7 +60,8 @@ void Map1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
  *  To generate or delete faces in a 1-map
  *************************************************************************/
 
-Dart Map1::newCycle(unsigned int nbEdges)
+template <class MAP>
+Dart Map1<MAP>::newCycle(unsigned int nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = newDart() ;			// Create the first edge

@@ -85,9 +85,7 @@ protected:
 	 * (initialized by enableQuickTraversal function)
 	 */
 	AttributeMultiVector<Dart>* m_quickTraversal[NB_ORBITS] ;
-
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalIncidentTraversal[NB_ORBITS][NB_ORBITS] ;
-
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalAdjacentTraversal[NB_ORBITS][NB_ORBITS] ;
 
 	/**
@@ -98,7 +96,6 @@ protected:
 	/**
 	 * Direct access to the attributes that store Marks
 	 */
-
 	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD] ;
 
 	unsigned int m_nbThreads ;
@@ -112,44 +109,6 @@ protected:
 	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
 	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
 
-	/**
-	 * is map a multiresolution map
-	 */
-#ifndef CGoGN_FORCE_MR
-	static const bool m_isMultiRes = false ;
-#else
-	static const bool m_isMultiRes = true ;
-#endif
-
-	/**
-	 * container for multiresolution darts
-	 */
-	AttributeContainer m_mrattribs ;
-
-	/**
-	 * pointers to attributes of m_mrattribs that store indices in m_attribs[DART] (one for each level)
-	 */
-	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
-
-	/**
-	 * pointer to attribute of m_mrattribs that stores darts insertion levels
-	 */
-	AttributeMultiVector<unsigned int>* m_mrLevels ;
-
-	/**
-	 * vector that stores the number of darts inserted on each resolution level
-	 */
-	std::vector<unsigned int> m_mrNbDarts ;
-
-	/**
-	 * current level in multiresolution map
-	 */
-	unsigned int m_mrCurrentLevel ;
-
-	/**
-	 * stack for current level temporary storage
-	 */
-	std::vector<unsigned int> m_mrLevelStack ;
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
@@ -177,109 +136,6 @@ public:
 	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
 
 	/****************************************
-	 *     RESOLUTION LEVELS MANAGEMENT     *
-	 ****************************************/
-
-	void printMR() ;
-
-	/**
-	 * initialize the multiresolution attribute container
-	 */
-	void initMR() ;
-
-	/**
-	 * get the current resolution level (use only in MRMaps)
-	 */
-	unsigned int getCurrentLevel() ;
-
-	/**
-	 * set the current resolution level (use only in MRMaps)
-	 */
-	void setCurrentLevel(unsigned int l) ;
-
-	/**
-	 * increment the current resolution level (use only in MRMaps)
-	 */
-	void incCurrentLevel() ;
-
-	/**
-	 * decrement the current resolution level (use only in MRMaps)
-	 */
-	void decCurrentLevel() ;
-
-	/**
-	 * store current resolution level on a stack (use only in MRMaps)
-	 */
-	void pushLevel() ;
-
-	/**
-	 * set as current the resolution level of the top of the stack (use only in MRMaps)
-	 */
-	void popLevel() ;
-
-	/**
-	 * get the maximum resolution level (use only in MRMaps)
-	 */
-	unsigned int getMaxLevel() ;
-
-//private:
-//	/*
-//	 * add a resolution level
-//	 */
-//	AttributeMultiVector<unsigned int>* addLevel();
-
-	/**
-	 * add a resolution level in the back of the level table (use only in MRMaps)
-	 */
-	void addLevelBack() ;
-
-	/**
-	 * add a resolution level in the front of the level table (use only in MRMaps)
-	 */
-	void addLevelFront();
-
-	/**
-	 * remove last resolution level (use only in MRMaps)
-	 */
-	void removeLevelBack() ;
-
-	/**
-	 * remove first resolution level (use only in MRMaps)
-	 */
-	void removeLevelFront();
-
-	/**
-	 * copy MRDarts from level-1 to level
-	 */
-	void copyLevel(unsigned int level);
-
-	/**
-	 * duplicate darts from level-1 to level
-	 */
-	void duplicateDarts(unsigned int newlevel);
-
-	/**
-	 * duplicate a dart starting from current level
-	 */
-	void duplicateDart(Dart d) ;
-
-	void duplicateDartAtOneLevel(Dart d, unsigned int level) ;
-
-
-	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
-
-	void propagateDartRelation(Dart d, Dart e, AttributeMultiVector<Dart>* rel);
-
-	void propagateDartRelation(Dart d, Dart e, Dart f, AttributeMultiVector<Dart>* rel, AttributeMultiVector<Dart>* rel2);
-
-
-	template <unsigned int ORBIT>
-	void propagateDartEmbedding(Dart d) ;
-
-	template <unsigned int ORBIT>
-	void propagateOrbitEmbedding(Dart d) ;
-
-	/****************************************
 	 *           DARTS MANAGEMENT           *
 	 ****************************************/
 protected:
@@ -291,7 +147,7 @@ protected:
 	/**
 	 * Erase a dart of the map
 	 */
-	void deleteDart(Dart d) ;
+	virtual void deleteDart(Dart d) ;
 
 	/**
 	 * create a copy of a dart (based on its index in m_attribs[DART]) and returns its index
@@ -305,44 +161,16 @@ protected:
 
 public:
 	/**
-	 * get the index of dart in topological table
+	 * @brief dartIndex
+	 * @param d
+	 * @return index of dart (depends on map implementation)
 	 */
-	unsigned int dartIndex(Dart d) const;
-
-	/**
-	 * get the Dart of index in topological table
-	 */
-	Dart indexDart(unsigned int index) const;
-
-	/**
-	 * @brief are we in MR ?
-	 */
-	static bool isMultiRes() { return m_isMultiRes; }
-
-	/**
-	 * get the insertion level of a dart (use only in MRMaps)
-	 */
-	unsigned int getDartLevel(Dart d) const ;
-
-	/**
-	 *
-	 */
-	void incDartLevel(Dart d) const ;
-
-	/**
-	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
-	 */
-	unsigned int getNbInsertedDarts(unsigned int level) ;
-
-	/**
-	 * get the number of darts that define the map of the given leveldart (use only in MRMaps)
-	 */
-	unsigned int getNbDarts(unsigned int level) ;
+	virtual unsigned int dartIndex(Dart d) const ;
 
 	/**
 	 * @return the number of darts in the map
 	 */
-	unsigned int getNbDarts() ;
+	virtual unsigned int getNbDarts() ;
 
 	/**
 	 * return true if the dart d refers to a valid index
@@ -463,7 +291,6 @@ public:
 	template <unsigned int ORBIT>
 	void initAllOrbitsEmbedding(bool realloc = false) ;
 
-
 	/****************************************
 	 *     QUICK TRAVERSAL MANAGEMENT       *
 	 ****************************************/
@@ -541,18 +368,6 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector() ;
-
-	/**
-	 * get the MR attribute container
-	 */
-	AttributeContainer& getMRAttributeContainer() ;
-
-	/**
-	 * get the MR attribute container
-	 */
-	AttributeMultiVector<unsigned int>* getMRDartAttributeVector(unsigned int level) ;
-
-	AttributeMultiVector<unsigned int>* getMRLevelAttributeVector();
 
 	/**
 	 * swap two attribute containers
@@ -696,38 +511,21 @@ public:
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
 
-	/**
-	 * Begin of map
-	 * @return the first dart of the map
-	 */
-	Dart begin() const ;
+//	/**
+//	 * Apply a functor on each dart of the map
+//	 * @param f a ref to the functor obj
+//	 */
+//	bool foreach_dart(FunctorType& f) ;
 
-	/**
-	 * End of map
-	 * @return the end iterator (next of last) of the map
-	 */
-	Dart end() const ;
-
-	/**
-	 * allow to go from a dart to the next
-	 * in the order of storage
-	 * @param d reference to the dart to be modified
-	 */
-	void  next(Dart& d) const ;
-
-	/**
-	 * Apply a functor on each dart of the map
-	 * @param f a ref to the functor obj
-	 */
-	bool foreach_dart(FunctorType& f) ;
+	virtual Dart begin() const;
+	virtual Dart end() const;
+	virtual void next(Dart& d) const;
 
 	//! Apply a functor on every dart of an orbit
 	/*! @param dim dimension of orbit
 	 *  @param d a dart of the orbit
 	 *  @param f a functor obj
 	 */
-//	template <unsigned int ORBIT>
-//	bool foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread = 0) ;
 	template <unsigned int ORBIT>
 	bool foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread = 0) const;
 
@@ -745,38 +543,20 @@ public:
 	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 
-
-//	virtual bool foreach_dart_of_vertex(Dart d, FunctorConstType& f, unsigned int thread = 0) const = 0 ;
-//	virtual bool foreach_dart_of_edge(Dart d, FunctorConstType& f, unsigned int thread = 0) const = 0 ;
-//	virtual bool foreach_dart_of_face(Dart /*d*/, FunctorConstType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-//	virtual bool foreach_dart_of_volume(Dart /*d*/, FunctorConstType& /*f*/, unsigned /*int thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-//	virtual bool foreach_dart_of_cc(Dart /*d*/, FunctorConstType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-
-//	virtual bool foreach_dart_of_vertex1(Dart /*d*/, FunctorConstType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-//	virtual bool foreach_dart_of_edge1(Dart /*d*/, FunctorConstType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-
-//	virtual bool foreach_dart_of_vertex2(Dart /*d*/, FunctorConstType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-//	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorConstType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-//	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorConstType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-
-
 	/**
 	* execute functor for each orbit
 	* @param dim the dimension of the orbit
 	* @param f the functor
 	*/
-	template <unsigned int ORBIT>
+	template <typename MAP, unsigned int ORBIT>
 	bool foreach_orbit(FunctorType& f, unsigned int thread = 0) const;
-
-//	template <unsigned int ORBIT>
-//	bool foreach_orbit(FunctorConstType& f, unsigned int thread = 0) const;
 
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit
 	 * 	@return the number of orbits
 	 */
-	template <unsigned int ORBIT>
+	template <typename MAP, unsigned int ORBIT>
 	unsigned int getNbOrbits() const;
 
 	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
@@ -784,6 +564,10 @@ public:
 	 */
 	template <typename MAP, unsigned int ORBIT, unsigned int INCIDENT>
 	unsigned int degree(Dart d) const;
+
+	/****************************************
+	 *         BOUNDARY MANAGEMENT          *
+	 ****************************************/
 
 protected:
 	/// boundary markers

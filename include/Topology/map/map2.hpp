@@ -63,30 +63,12 @@ template <class MAP>
 inline void Map2<MAP>::update_topo_shortcuts()
 {
 	ParentMap::update_topo_shortcuts();
-	m_phi2 = getRelation("phi2");
+//	m_phi2 = getRelation("phi2");
 }
 
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
-
-template <class MAP>
-inline Dart Map2<MAP>::newDart()
-{
-	Dart d = Map1::newDart() ;
-	(*m_phi2)[dartIndex(d)] = d ;
-//	if(m_isMultiRes)
-//	{
-//		pushLevel() ;
-//		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
-//		{
-//			setCurrentLevel(i) ;
-//			(*m_phi2)[dartIndex(d)] = d ;
-//		}
-//		popLevel() ;
-//	}
-	return d ;
-}
 
 template <class MAP>
 inline Dart Map2<MAP>::phi2(Dart d) const
@@ -125,7 +107,7 @@ inline Dart Map2<MAP>::alpha0(Dart d) const
 template <class MAP>
 inline Dart Map2<MAP>::alpha1(Dart d) const
 {
-	return phi2(phi_1(d)) ;
+	return phi2(this->phi_1(d)) ;
 }
 
 template <class MAP>
@@ -137,7 +119,7 @@ inline Dart Map2<MAP>::alpha_1(Dart d) const
 template <class MAP>
 inline Dart Map2<MAP>::phi2_1(Dart d) const
 {
-	return phi2(phi_1(d)) ;
+	return phi2(this->phi_1(d)) ;
 }
 
 template <class MAP>
@@ -162,44 +144,50 @@ inline void Map2<MAP>::phi2unsew(Dart d)
  *  Return or set various topological information
  *************************************************************************/
 
-inline bool Map2::sameVertex(Dart d, Dart e) const
+template <class MAP>
+inline bool Map2<MAP>::sameVertex(Dart d, Dart e) const
 {
 	return sameOrientedVertex(d, e) ;
 }
 
-inline bool Map2::sameEdge(Dart d, Dart e) const
+template <class MAP>
+inline bool Map2<MAP>::sameEdge(Dart d, Dart e) const
 {
 	return d == e || phi2(d) == e ;
 }
 
-inline bool Map2::isBoundaryEdge(Dart d) const
+template <class MAP>
+inline bool Map2<MAP>::isBoundaryEdge(Dart d) const
 {
-	return isBoundaryMarked2(d) || isBoundaryMarked2(phi2(d));
+	return this->isBoundaryMarked2(d) || this->isBoundaryMarked2(phi2(d));
 }
 
-inline bool Map2::sameOrientedFace(Dart d, Dart e) const
+template <class MAP>
+inline bool Map2<MAP>::sameOrientedFace(Dart d, Dart e) const
 {
-	return Map1::sameCycle(d, e) ;
+	return ParentMap::sameCycle(d, e) ;
 }
 
-inline bool Map2::sameFace(Dart d, Dart e) const
+template <class MAP>
+inline bool Map2<MAP>::sameFace(Dart d, Dart e) const
 {
 	return sameOrientedFace(d, e) ;
 }
 
-inline unsigned int Map2::faceDegree(Dart d) const
+template <class MAP>
+inline unsigned int Map2<MAP>::faceDegree(Dart d) const
 {
-	return Map1::cycleDegree(d) ;
+	return ParentMap::cycleDegree(d) ;
 }
 
-
-inline int Map2::checkFaceDegree(Dart d, unsigned int le) const
+template <class MAP>
+inline int Map2<MAP>::checkFaceDegree(Dart d, unsigned int le) const
 {
-	return Map1::checkCycleDegree(d,le) ;
+	return ParentMap::checkCycleDegree(d,le) ;
 }
 
-
-inline bool Map2::sameVolume(Dart d, Dart e) const
+template <class MAP>
+inline bool Map2<MAP>::sameVolume(Dart d, Dart e) const
 {
 	return sameOrientedVolume(d, e) ;
 }
@@ -208,24 +196,28 @@ inline bool Map2::sameVolume(Dart d, Dart e) const
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool Map2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map2<MAP>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map1::foreach_dart_of_cc(d, f, thread);
+	return ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
-inline bool Map2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map2<MAP>::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return foreach_dart_of_cc(d, f, thread);
 }
 
-inline bool Map2::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map2<MAP>::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map1::foreach_dart_of_vertex(d,f,thread);
+	return ParentMap::foreach_dart_of_vertex(d,f,thread);
 }
 
-inline bool Map2::foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map2<MAP>::foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map1::foreach_dart_of_edge(d,f,thread);
+	return ParentMap::foreach_dart_of_edge(d,f,thread);
 }
 
 } // namespace CGoGN

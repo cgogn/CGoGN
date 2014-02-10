@@ -95,7 +95,7 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		}
 	}
 
-	for (unsigned int i=0; i<NB_THREAD; ++i)
+	for (unsigned int i = 0; i < NB_THREAD; ++i)
 	{
 		dartMarkers[i].reserve(16) ;
 		cellMarkers[i].reserve(16) ;
@@ -104,11 +104,6 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	// get & lock marker for boundary
 	m_boundaryMarkers[0] =  m_marksets[DART][0].getNewMark();
 	m_boundaryMarkers[1] =  m_marksets[DART][0].getNewMark();
-
-	if (m_isMultiRes)
-		initMR() ;
-
-//	m_currentBrowser = NULL;
 }
 
 GenericMap::~GenericMap()
@@ -127,7 +122,7 @@ GenericMap::~GenericMap()
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 
-	for (unsigned int i=0; i<NB_THREAD; ++i)
+	for (unsigned int i = 0; i < NB_THREAD; ++i)
 	{
 		for(std::vector<DartMarkerGen*>::iterator it = dartMarkers[i].begin(); it != dartMarkers[i].end(); ++it)
 			(*it)->setReleaseOnDestruct(false) ;
@@ -174,193 +169,6 @@ void GenericMap::clear(bool removeAttrib)
 	{
 		for(unsigned int i = 0; i < NB_ORBITS; ++i)
 			m_attribs[i].clear(false) ;
-	}
-
-	if (m_isMultiRes)
-		initMR() ;
-}
-
-/****************************************
- *           MULTIRES                   *
- ****************************************/
-
-void GenericMap::printMR()
-{
-	std::cout << std::endl ;
-
-	for(unsigned int j = 0; j < m_mrNbDarts.size(); ++j)
-		std::cout << m_mrNbDarts[j] << " / " ;
-	std::cout << std::endl << "==========" << std::endl ;
-
-	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-	{
-		std::cout << i << " : " << (*m_mrLevels)[i] << " / " ;
-		for(unsigned int j = 0; j < m_mrDarts.size(); ++j)
-			std::cout << (*m_mrDarts[j])[i] << " ; " ;
-		std::cout << std::endl ;
-	}
-}
-
-void GenericMap::initMR()
-{
-	m_mrattribs.clear(true) ;
-	m_mrattribs.setRegistry(m_attributes_registry_map) ;
-
-	m_mrDarts.clear() ;
-	m_mrDarts.reserve(16) ;
-	m_mrNbDarts.clear();
-	m_mrNbDarts.reserve(16);
-	m_mrLevelStack.clear() ;
-	m_mrLevelStack.reserve(16) ;
-
-	m_mrLevels = m_mrattribs.addAttribute<unsigned int>("MRLevel") ;
-
-	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>("MRdart_0") ;
-	m_mrDarts.push_back(newAttrib) ;
-	m_mrNbDarts.push_back(0) ;
-
-	setCurrentLevel(0) ;
-}
-
-//AttributeMultiVector<unsigned int>* GenericMap::addLevel()
-//{
-//	unsigned int newLevel = m_mrDarts.size() ;
-//	std::stringstream ss ;
-//	ss << "MRdart_"<< newLevel ;
-//	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
-//	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1];
-//
-//	// copy the indices of previous level into new level
-//	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
-//
-//	return newAttrib;
-//}
-
-void GenericMap::addLevelBack()
-{
-	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
-
-	unsigned int newLevel = m_mrDarts.size() ;
-	std::stringstream ss ;
-	ss << "MRdart_"<< newLevel ;
-	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
-
-	m_mrDarts.push_back(newAttrib) ;
-	m_mrNbDarts.push_back(0) ;
-
-	if(m_mrDarts.size() > 1 )
-	{
-		// copy the indices of previous level into new level
-		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1];
-		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
-	}
-}
-
-void GenericMap::addLevelFront()
-{
-	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
-
-	unsigned int newLevel = m_mrDarts.size() ;
-	std::stringstream ss ;
-	ss << "MRdart_"<< newLevel ;
-	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
-	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[0];
-
-	// copy the indices of previous level into new level
-	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
-
-	m_mrDarts.insert(m_mrDarts.begin(), newAttrib) ;
-	m_mrNbDarts.insert(m_mrNbDarts.begin(), 0) ;
-}
-
-void GenericMap::removeLevelBack()
-{
-	unsigned int maxL = getMaxLevel() ;
-	if(maxL > 0)
-	{
-		AttributeMultiVector<unsigned int>* maxMR = m_mrDarts[maxL] ;
-		AttributeMultiVector<unsigned int>* prevMR = m_mrDarts[maxL - 1] ;
-		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-		{
-			unsigned int idx = (*maxMR)[i] ;
-			if((*m_mrLevels)[i] == maxL)	// if the MRdart was introduced on the level we're removing
-			{
-				deleteDartLine(idx) ;		// delete the pointed dart line
-				m_mrattribs.removeLine(i) ;	// delete the MRdart line
-			}
-			else							// if the dart was introduced on a previous level
-			{
-				if(idx != (*prevMR)[i])		// delete the pointed dart line only if
-					deleteDartLine(idx) ;	// it is not shared with previous level
-			}
-		}
-
-		m_mrattribs.removeAttribute<unsigned int>(maxMR->getIndex()) ;
-		m_mrDarts.pop_back() ;
-		m_mrNbDarts.pop_back() ;
-
-		if(m_mrCurrentLevel == maxL)
-			--m_mrCurrentLevel ;
-	}
-}
-
-void GenericMap::removeLevelFront()
-{
-	unsigned int maxL = getMaxLevel() ;
-	if(maxL > 0) //must have at min 2 levels (0 and 1) to remove the front one
-	{
-		AttributeMultiVector<unsigned int>* minMR = m_mrDarts[0] ;
-//		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
-		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-		{
-//			unsigned int idx = (*minMR)[i] ;
-			if((*m_mrLevels)[i] != 0)	// if the MRdart was introduced after the level we're removing
-			{
-				--(*m_mrLevels)[i]; //decrement his level of insertion
-			}
-			else							// if the dart was introduced on a this level and not used after
-			{
-//				if(idx != (*firstMR)[i])		// delete the pointed dart line only if
-//					deleteDartLine(idx) ;	// it is not shared with next level
-			}
-		}
-
-		m_mrNbDarts[1] += m_mrNbDarts[0];
-
-		m_mrattribs.removeAttribute<unsigned int>(minMR->getIndex()) ;
-		m_mrDarts.erase(m_mrDarts.begin()) ;
-		m_mrNbDarts.erase(m_mrNbDarts.begin()) ;
-
-		--m_mrCurrentLevel ;
-	}
-}
-
-void GenericMap::copyLevel(unsigned int level)
-{
-	AttributeMultiVector<unsigned int>* newAttrib = m_mrDarts[level] ;
-	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[level - 1];
-
-	// copy the indices of previous level into new level
-	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
-}
-
-void GenericMap::duplicateDarts(unsigned int newlevel)
-{
-//	AttributeMultiVector<unsigned int>* attrib = m_mrDarts[level] ;  //is a copy of the mrDarts at level-1 or level+1
-
-//	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-//	{
-//		unsigned int oldi = (*attrib)[i] ;	// get the index of the dart in previous level
-//		(*attrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
-//	}
-
-	AttributeMultiVector<unsigned int>* attrib = m_mrDarts[newlevel] ;  //is a copy of the mrDarts at level-1 or level+1
-	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newlevel - 1] ;      // copy the indices of
-
-	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-	{
-		unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
-		(*attrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
 	}
 }
 
@@ -918,15 +726,15 @@ void GenericMap::compact()
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-bool GenericMap::foreach_dart(FunctorType& f)
-{
-	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (f(d))
-			return true;
-	}
-	return false;
-}
+//bool GenericMap::foreach_dart(FunctorType& f)
+//{
+//	for (Dart d = begin(); d != end(); next(d))
+//	{
+//		if (f(d))
+//			return true;
+//	}
+//	return false;
+//}
 
 } // namespace CGoGN
 

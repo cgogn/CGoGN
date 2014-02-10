@@ -30,56 +30,6 @@ namespace CGoGN
 {
 
 /****************************************
- *           MULTIRES                   *
- ****************************************/
-
-inline unsigned int GenericMap::getCurrentLevel()
-{
-	return m_mrCurrentLevel ;
-}
-
-inline void GenericMap::setCurrentLevel(unsigned int l)
-{
-	if(l < m_mrDarts.size())
-		m_mrCurrentLevel = l ;
-	else
-		CGoGNout << "setCurrentLevel : try to access nonexistent resolution level" << CGoGNendl ;
-}
-
-inline void GenericMap::incCurrentLevel()
-{
-	if(m_mrCurrentLevel < m_mrDarts.size() - 1)
-		++m_mrCurrentLevel ;
-	else
-		CGoGNout << "incCurrentLevel : already at maximum resolution level" << CGoGNendl ;
-}
-
-inline void GenericMap::decCurrentLevel()
-{
-	if(m_mrCurrentLevel > 0)
-		--m_mrCurrentLevel ;
-	else
-		CGoGNout << "decCurrentLevel : already at minimum resolution level" << CGoGNendl ;
-}
-
-inline void GenericMap::pushLevel()
-{
-	m_mrLevelStack.push_back(m_mrCurrentLevel) ;
-}
-
-inline void GenericMap::popLevel()
-{
-	m_mrCurrentLevel = m_mrLevelStack.back() ;
-	m_mrLevelStack.pop_back() ;
-}
-
-inline unsigned int GenericMap::getMaxLevel()
-{
-	return m_mrDarts.size() - 1 ;
-}
-
-
-/****************************************
  *           DARTS MANAGEMENT           *
  ****************************************/
 
@@ -88,76 +38,11 @@ inline Dart GenericMap::newDart()
 	unsigned int di = m_attribs[DART].insertLine();		// insert a new dart line
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
-		if (m_embeddings[i])								// set all its embeddings
-			(*m_embeddings[i])[di] = EMBNULL ;				// to EMBNULL
-	}
-
-	if (m_isMultiRes)
-	{
-		unsigned int mrdi = m_mrattribs.insertLine() ;		// insert a new MRdart line
-		(*m_mrLevels)[mrdi] = m_mrCurrentLevel ;			// set the introduction level of the dart
-		m_mrNbDarts[m_mrCurrentLevel]++ ;
-
-		for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)	// for all previous levels
-			(*m_mrDarts[i])[mrdi] = MRNULL ;					// this MRdart does not exist
-
-		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)	// for all levels from current to max
-  			(*m_mrDarts[i])[mrdi] = di ;									// make this MRdart point to the new dart line
-
-		return Dart::create(mrdi) ;
+		if (m_embeddings[i])							// set all its embeddings
+			(*m_embeddings[i])[di] = EMBNULL ;			// to EMBNULL
 	}
 
 	return Dart::create(di) ;
-}
-
-inline void GenericMap::deleteDart(Dart d)
-{
-	if(m_isMultiRes)
-	{
-		unsigned int index = (*m_mrDarts[m_mrCurrentLevel])[d.index] ;
-
-		if(getDartLevel(d) > m_mrCurrentLevel)
-		{
-			unsigned int di = (*m_mrDarts[m_mrCurrentLevel + 1])[d.index];
-			// si le brin de niveau i pointe sur le meme brin que le niveau i-1
-			if(di != index)
-			{
-				if(isDartValid(d))//index))
-					deleteDartLine(index) ;
-			}
-
-			(*m_mrDarts[m_mrCurrentLevel])[d.index] = MRNULL ;
-			return;
-		}
-
-		// a MRdart can only be deleted on its insertion level
-		if(getDartLevel(d) == m_mrCurrentLevel)
-		{
-			if(isDartValid(d))
-			{
-				deleteDartLine(index) ;
-				m_mrattribs.removeLine(d.index);
-				m_mrNbDarts[m_mrCurrentLevel]--;
-			}
-		}
-		else
-		{
-			unsigned int di = (*m_mrDarts[m_mrCurrentLevel - 1])[d.index];
-			// si le brin de niveau i pointe sur le meme brin que le niveau i-1
-			if(di != index)
-			{
-				if(isDartValid(d))//index))
-					deleteDartLine(index) ;
-			}
-
-			for(unsigned int i = m_mrCurrentLevel; i <= getMaxLevel(); ++i) // for all levels from current to max
-			{
-				(*m_mrDarts[i])[d.index] = di ; //copy the index from previous level
-			}
-		}
-	}
-	else
-		deleteDartLine(dartIndex(d)) ;
 }
 
 inline void GenericMap::deleteDartLine(unsigned int index)
@@ -165,7 +50,7 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 	m_attribs[DART].removeLine(index) ;	// free the dart line
 
 	for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear markers of
-		(*m_markTables[DART][t])[index].clear() ;		// the removed dart
+		(*m_markTables[DART][t])[index].clear() ;	// the removed dart
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
@@ -200,163 +85,8 @@ inline unsigned int GenericMap::copyDartLine(unsigned int index)
 	return newindex ;
 }
 
-inline void GenericMap::duplicateDart(Dart d)
-{
-	assert(getDartLevel(d) <= m_mrCurrentLevel || !"duplicateDart : called with a dart inserted after current level") ;
-
-	if(getDartLevel(d) == m_mrCurrentLevel)	// no need to duplicate
-		return ;								// a dart from its insertion level
-
-	unsigned int oldindex = dartIndex(d) ;
-
-	if(m_mrCurrentLevel > 0)
-	{
-		if((*m_mrDarts[m_mrCurrentLevel - 1])[d.index] != oldindex)	// no need to duplicate if the dart is already
-			return ;												// duplicated with respect to previous level
-	}
-
-	unsigned int newindex = copyDartLine(oldindex) ;
-
-	for(unsigned int i = m_mrCurrentLevel; i <= getMaxLevel(); ++i) // for all levels from current to max
-	{
-		assert((*m_mrDarts[i])[d.index] == oldindex || !"duplicateDart : dart was already duplicated on a greater level") ;
-		(*m_mrDarts[i])[d.index] = newindex ;						// make this MRdart points to the new dart line
-	}
-}
-
-inline void GenericMap::duplicateDartAtOneLevel(Dart d, unsigned int level)
-{
-	(*m_mrDarts[level])[d.index] = copyDartLine(dartIndex(d)) ;
-}
-
-
-inline void GenericMap::propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel)
-{
-	Dart dd = (*rel)[dartIndex(d)] ;
-	pushLevel() ;
-	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
-	{
-		setCurrentLevel(i) ;
-		(*rel)[dartIndex(d)] = dd ;
-	}
-	popLevel() ;
-}
-
-inline void GenericMap::propagateDartRelation(Dart d, Dart e, AttributeMultiVector<Dart>* rel)
-{
-	Dart dd = (*rel)[dartIndex(d)] ;
-	pushLevel() ;
-	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
-	{
-		setCurrentLevel(i) ;
-
-		while( (*rel)[dartIndex(d)] != e )
-			d = (*rel)[dartIndex(d)];
-
-		if(d != e)
-			duplicateDart(d);
-
-		(*rel)[dartIndex(d)] = dd ;
-	}
-	popLevel() ;
-}
-
-inline void GenericMap::propagateDartRelation(Dart d, Dart e, Dart f, AttributeMultiVector<Dart>* rel, AttributeMultiVector<Dart>* rel2)
-{
-	Dart dd = f ;
-	pushLevel() ;
-	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
-	{
-		setCurrentLevel(i) ;
-
-		while( (*rel)[dartIndex(e)] != dd )
-			dd = (*rel2)[dartIndex(dd)];
-
-		(*rel)[dartIndex(d)] = dd ;
-	}
-	popLevel() ;
-}
-
-template <unsigned int ORBIT>
-inline void GenericMap::propagateDartEmbedding(Dart d)
-{
-	   unsigned int emb = getEmbedding<ORBIT>(d) ;
-	   pushLevel() ;
-	   for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
-	   {
-			   setCurrentLevel(i) ;
-			   setDartEmbedding<ORBIT>(d, emb) ;
-	   }
-	   popLevel() ;
-}
-
-template <unsigned int ORBIT>
-inline void GenericMap::propagateOrbitEmbedding(Dart d)
-{
-	   unsigned int emb = getEmbedding<ORBIT>(d) ;
-	   pushLevel() ;
-	   for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
-	   {
-			   setCurrentLevel(i) ;
-			   setOrbitEmbedding<ORBIT>(d, emb) ;
-	   }
-	   popLevel() ;
-}
-
-
-
-inline unsigned int GenericMap::dartIndex(Dart d) const
-{
-	if (m_isMultiRes)
-		return (*m_mrDarts[m_mrCurrentLevel])[d.index] ;
-	return d.index;
-}
-
-inline Dart GenericMap::indexDart(unsigned int index) const
-{
-	if (m_isMultiRes)
-		return Dart( (*m_mrDarts[m_mrCurrentLevel])[index]) ;
-	return Dart(index);
-}
-
-
-inline unsigned int GenericMap::getDartLevel(Dart d) const
-{
-	return (*m_mrLevels)[d.index] ;
-}
-
-inline void GenericMap::incDartLevel(Dart d) const
-{
-	++((*m_mrLevels)[d.index]) ;
-}
-
-
-inline unsigned int GenericMap::getNbInsertedDarts(unsigned int level)
-{
-	if(level < m_mrDarts.size())
-		return m_mrNbDarts[level] ;
-	else
-		return 0 ;
-}
-
-inline unsigned int GenericMap::getNbDarts(unsigned int level)
-{
-	if(level < m_mrDarts.size())
-	{
-		unsigned int nb = 0 ;
-		for(unsigned int i = 0; i <= level; ++i)
-			nb += m_mrNbDarts[i] ;
-		return nb ;
-	}
-	else
-		return 0 ;
-}
-
 inline unsigned int GenericMap::getNbDarts()
 {
-	if(m_isMultiRes)
-		return getNbDarts(m_mrCurrentLevel) ;
-
 	return m_attribs[DART].size() ;
 }
 
@@ -503,7 +233,6 @@ inline void GenericMap::initCell(unsigned int i)
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	m_attribs[ORBIT].initLine(i) ;
 }
-
 
 template <unsigned int ORBIT>
 void GenericMap::initAllOrbitsEmbedding(bool realloc)
@@ -755,22 +484,6 @@ inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVect
 	return m_embeddings[ORBIT] ;
 }
 
-inline AttributeContainer& GenericMap::getMRAttributeContainer()
-{
-	return m_mrattribs ;
-}
-
-inline AttributeMultiVector<unsigned int>* GenericMap::getMRDartAttributeVector(unsigned int level)
-{
-	assert(level <= getMaxLevel() || !"Invalid parameter: level does not exist");
-	return m_mrDarts[level] ;
-}
-
-inline AttributeMultiVector<unsigned int>* GenericMap::getMRLevelAttributeVector()
-{
-	return m_mrLevels ;
-}
-
 template <typename R>
 bool GenericMap::registerAttribute(const std::string &nameType)
 {
@@ -812,120 +525,6 @@ void GenericMap::addEmbedding()
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-//inline Dart GenericMap::realBegin() const
-inline Dart GenericMap::begin() const
-{
-	if (m_isMultiRes)
-	{
-		unsigned int d = m_mrattribs.begin() ;
-		if(d != m_mrattribs.end())
-		{
-			while (getDartLevel(d) > m_mrCurrentLevel)
-				m_mrattribs.next(d) ;
-		}
-		return Dart::create(d) ;
-	}
-
-	return Dart::create(m_attribs[DART].begin()) ;
-}
-
-//inline Dart GenericMap::realEnd() const
-inline Dart GenericMap::end() const
-{
-	if (m_isMultiRes)
-		return Dart::create(m_mrattribs.end()) ;
-
-	return Dart::create(m_attribs[DART].end()) ;
-}
-
-//inline void GenericMap::realNext(Dart& d) const
-inline void GenericMap::next(Dart& d) const
-{
-	if (m_isMultiRes)
-	{
-		do
-		{
-			m_mrattribs.next(d.index) ;
-		} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
-	}
-	else
-	{
-		m_attribs[DART].next(d.index) ;
-	}
-}
-
-
-//inline Dart GenericMap::begin() const
-//{
-//	if (m_currentBrowser != NULL)
-//		return m_currentBrowser->begin();
-//	return GenericMap::realBegin();
-//}
-
-//inline Dart GenericMap::end() const
-//{
-//	if (m_currentBrowser != NULL)
-//		return m_currentBrowser->end();
-//	return GenericMap::realEnd();
-//}
-
-//inline void GenericMap::next(Dart& d) const
-//{
-//	if (m_currentBrowser != NULL)
-//		m_currentBrowser->next(d);
-//	else
-//		realNext(d);
-//}
-
-//inline Dart GenericMap::begin() const
-//{
-//	if (m_isMultiRes)
-//	{
-//		unsigned int d = m_mrattribs.begin() ;
-//		if(d != m_mrattribs.end())
-//		{
-//			while (getDartLevel(d) > m_mrCurrentLevel)
-//				m_mrattribs.next(d) ;
-//		}
-//		return Dart::create(d) ;
-//	}
-
-
-//	if (m_currentBrowser != NULL)
-//		return m_currentBrowser->begin();
-
-//	return Dart::create(m_attribs[DART].begin()) ;
-//}
-
-//inline Dart GenericMap::end() const
-//{
-//	if (m_isMultiRes)
-//		return Dart::create(m_mrattribs.end()) ;
-
-//	if (m_currentBrowser != NULL)
-//		return m_currentBrowser->end();
-
-//	return Dart::create(m_attribs[DART].end()) ;
-//}
-
-//inline void GenericMap::next(Dart& d) const
-//{
-//	if (m_isMultiRes)
-//	{
-//		do
-//		{
-//			m_mrattribs.next(d.index) ;
-//		} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
-//	}
-//	else
-//	{
-//		if (m_currentBrowser != NULL)
-//			return m_currentBrowser->next(d);
-//		else
-//			m_attribs[DART].next(d.index) ;
-//	}
-//}
-
 template <unsigned int ORBIT>
 bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread) const
 {
@@ -946,30 +545,10 @@ bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thre
 	return false;
 }
 
-//template <unsigned int ORBIT>
-//bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorConstType& f, unsigned int thread) const
-//{
-//	switch(ORBIT)
-//	{
-//		case DART:		return f(d);
-//		case VERTEX: 	return foreach_dart_of_vertex(d, f, thread);
-//		case EDGE: 		return foreach_dart_of_edge(d, f, thread);
-//		case FACE: 		return foreach_dart_of_face(d, f, thread);
-//		case VOLUME: 	return foreach_dart_of_volume(d, f, thread);
-//		case VERTEX1: 	return foreach_dart_of_vertex1(d, f, thread);
-//		case EDGE1: 	return foreach_dart_of_edge1(d, f, thread);
-//		case VERTEX2: 	return foreach_dart_of_vertex2(d, f, thread);
-//		case EDGE2:		return foreach_dart_of_edge2(d, f, thread);
-//		case FACE2:		return foreach_dart_of_face2(d, f, thread);
-//		default: 		assert(!"Cells of this dimension are not handled"); break;
-//	}
-//	return false;
-//}
-
-template <unsigned int ORBIT>
+template <typename MAP, unsigned int ORBIT>
 bool GenericMap::foreach_orbit(FunctorType& fonct, unsigned int thread) const
 {
-	TraversorCell<GenericMap, ORBIT> trav(*this, true, thread);
+	TraversorCell<MAP, ORBIT> trav(*this, true, thread);
 	bool found = false;
 
 	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
@@ -980,26 +559,11 @@ bool GenericMap::foreach_orbit(FunctorType& fonct, unsigned int thread) const
 	return found;
 }
 
-
-//template <unsigned int ORBIT>
-//bool GenericMap::foreach_orbit(FunctorConstType& fonct, unsigned int thread) const
-//{
-//	TraversorCell<GenericMap, ORBIT> trav(*this, true, thread);
-//	bool found = false;
-
-//	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
-//	{
-//		if ((fonct)(d))
-//			found = true;
-//	}
-//	return found;
-//}
-
-template <unsigned int ORBIT>
+template <typename MAP, unsigned int ORBIT>
 unsigned int GenericMap::getNbOrbits() const
 {
 	FunctorCount fcount;
-	foreach_orbit<ORBIT>(fcount);
+	foreach_orbit<MAP, ORBIT>(fcount);
 	return fcount.getNb();
 }
 
@@ -1013,9 +577,6 @@ unsigned int GenericMap::degree(Dart d) const
 	delete t ;
 	return fcount.getNb() ;
 }
-
-
-
 
 /****************************************
  *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *

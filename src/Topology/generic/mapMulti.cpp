@@ -1,0 +1,195 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
+#include "Topology/generic/mapMulti.h"
+
+/****************************************
+ *     RESOLUTION LEVELS MANAGEMENT     *
+ ****************************************/
+
+void MapMulti::printMR()
+{
+	std::cout << std::endl ;
+
+	for(unsigned int j = 0; j < m_mrNbDarts.size(); ++j)
+		std::cout << m_mrNbDarts[j] << " / " ;
+	std::cout << std::endl << "==========" << std::endl ;
+
+	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	{
+		std::cout << i << " : " << (*m_mrLevels)[i] << " / " ;
+		for(unsigned int j = 0; j < m_mrDarts.size(); ++j)
+			std::cout << (*m_mrDarts[j])[i] << " ; " ;
+		std::cout << std::endl ;
+	}
+}
+
+void MapMulti::initMR()
+{
+	m_mrattribs.clear(true) ;
+	m_mrattribs.setRegistry(m_attributes_registry_map) ;
+
+	m_mrDarts.clear() ;
+	m_mrDarts.reserve(16) ;
+	m_mrNbDarts.clear();
+	m_mrNbDarts.reserve(16);
+	m_mrLevelStack.clear() ;
+	m_mrLevelStack.reserve(16) ;
+
+	m_mrLevels = m_mrattribs.addAttribute<unsigned int>("MRLevel") ;
+
+	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>("MRdart_0") ;
+	m_mrDarts.push_back(newAttrib) ;
+	m_mrNbDarts.push_back(0) ;
+
+	setCurrentLevel(0) ;
+}
+
+void MapMulti::addLevelBack()
+{
+	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
+
+	unsigned int newLevel = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< newLevel ;
+	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+
+	m_mrDarts.push_back(newAttrib) ;
+	m_mrNbDarts.push_back(0) ;
+
+	if(m_mrDarts.size() > 1 )
+	{
+		// copy the indices of previous level into new level
+		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1];
+		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
+	}
+}
+
+void MapMulti::addLevelFront()
+{
+	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
+
+	unsigned int newLevel = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< newLevel ;
+	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[0];
+
+	// copy the indices of previous level into new level
+	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
+
+	m_mrDarts.insert(m_mrDarts.begin(), newAttrib) ;
+	m_mrNbDarts.insert(m_mrNbDarts.begin(), 0) ;
+}
+
+void MapMulti::removeLevelBack()
+{
+	unsigned int maxL = getMaxLevel() ;
+	if(maxL > 0)
+	{
+		AttributeMultiVector<unsigned int>* maxMR = m_mrDarts[maxL] ;
+		AttributeMultiVector<unsigned int>* prevMR = m_mrDarts[maxL - 1] ;
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int idx = (*maxMR)[i] ;
+			if((*m_mrLevels)[i] == maxL)	// if the MRdart was introduced on the level we're removing
+			{
+				deleteDartLine(idx) ;		// delete the pointed dart line
+				m_mrattribs.removeLine(i) ;	// delete the MRdart line
+			}
+			else							// if the dart was introduced on a previous level
+			{
+				if(idx != (*prevMR)[i])		// delete the pointed dart line only if
+					deleteDartLine(idx) ;	// it is not shared with previous level
+			}
+		}
+
+		m_mrattribs.removeAttribute<unsigned int>(maxMR->getIndex()) ;
+		m_mrDarts.pop_back() ;
+		m_mrNbDarts.pop_back() ;
+
+		if(m_mrCurrentLevel == maxL)
+			--m_mrCurrentLevel ;
+	}
+}
+
+void MapMulti::removeLevelFront()
+{
+	unsigned int maxL = getMaxLevel() ;
+	if(maxL > 0) //must have at min 2 levels (0 and 1) to remove the front one
+	{
+		AttributeMultiVector<unsigned int>* minMR = m_mrDarts[0] ;
+//		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+//			unsigned int idx = (*minMR)[i] ;
+			if((*m_mrLevels)[i] != 0)	// if the MRdart was introduced after the level we're removing
+			{
+				--(*m_mrLevels)[i]; //decrement his level of insertion
+			}
+			else							// if the dart was introduced on a this level and not used after
+			{
+//				if(idx != (*firstMR)[i])		// delete the pointed dart line only if
+//					deleteDartLine(idx) ;	// it is not shared with next level
+			}
+		}
+
+		m_mrNbDarts[1] += m_mrNbDarts[0];
+
+		m_mrattribs.removeAttribute<unsigned int>(minMR->getIndex()) ;
+		m_mrDarts.erase(m_mrDarts.begin()) ;
+		m_mrNbDarts.erase(m_mrNbDarts.begin()) ;
+
+		--m_mrCurrentLevel ;
+	}
+}
+
+void MapMulti::copyLevel(unsigned int level)
+{
+	AttributeMultiVector<unsigned int>* newAttrib = m_mrDarts[level] ;
+	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[level - 1];
+
+	// copy the indices of previous level into new level
+	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
+}
+
+void MapMulti::duplicateDarts(unsigned int newlevel)
+{
+//	AttributeMultiVector<unsigned int>* attrib = m_mrDarts[level] ;  //is a copy of the mrDarts at level-1 or level+1
+
+//	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+//	{
+//		unsigned int oldi = (*attrib)[i] ;	// get the index of the dart in previous level
+//		(*attrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+//	}
+
+	AttributeMultiVector<unsigned int>* attrib = m_mrDarts[newlevel] ;  //is a copy of the mrDarts at level-1 or level+1
+	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newlevel - 1] ;      // copy the indices of
+
+	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	{
+		unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
+		(*attrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+	}
+}

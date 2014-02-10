@@ -78,8 +78,6 @@ public:
 	 * Access and Modification
 	 *************************************************************************/
 
-	virtual Dart newDart();
-
 	Dart phi2(Dart d) const;
 
 	template <int N>

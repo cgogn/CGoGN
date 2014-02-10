@@ -63,35 +63,13 @@ template <class MAP>
 inline void Map1<MAP>::update_topo_shortcuts()
 {
 	MAP::update_topo_shortcuts();
-	m_phi1 = MAP::getRelation("phi1");
-	m_phi_1 = MAP::getRelation("phi_1");
+//	m_phi1 = MAP::getRelation("phi1");
+//	m_phi_1 = MAP::getRelation("phi_1");
 }
 
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
-
-template <class MAP>
-inline Dart Map1<MAP>::newDart()
-{
-	Dart d = GenericMap::newDart() ;
-	unsigned int d_index = MAP::dartIndex(d) ;
-	(*m_phi1)[d_index] = d ;
-	(*m_phi_1)[d_index] = d ;
-//	if(m_isMultiRes)
-//	{
-//		pushLevel() ;
-//		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
-//		{
-//			setCurrentLevel(i) ;
-//			unsigned int d_index = dartIndex(d) ;
-//			(*m_phi1)[d_index] = d ;
-//			(*m_phi_1)[d_index] = d ;
-//		}
-//		popLevel() ;
-//	}
-	return d ;
-}
 
 template <class MAP>
 inline Dart Map1<MAP>::phi1(Dart d) const
@@ -156,8 +134,8 @@ inline void Map1<MAP>::phi1unsew(Dart d)
 template <class MAP>
 inline Dart Map1<MAP>::cutEdge(Dart d)
 {
-	Dart e = newDart() ;	// Create a new dart
-	phi1sew(d, e) ;			// Insert dart e between d and phi1(d)
+	Dart e = MAP::newDart() ;	// Create a new dart
+	phi1sew(d, e) ;				// Insert dart e between d and phi1(d)
 
 	if (this->isBoundaryMarked2(d))
 		MAP::boundaryMark2(e);

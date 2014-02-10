@@ -32,91 +32,88 @@ namespace CGoGN
 
 class MapMono : public AttribMap
 {
+public:
+	MapMono()
+	{}
+
 protected:
 	std::vector<AttributeMultiVector<Dart>*> m_permutation;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation_inv;
 	std::vector<AttributeMultiVector<Dart>*> m_involution;
 
-	virtual Dart newDart()
-	{
+	/****************************************
+	 *          DARTS MANAGEMENT            *
+	 ****************************************/
 
+	inline virtual Dart newDart();
+
+	inline virtual void deleteDart(Dart d);
+
+	inline unsigned int dartIndex(Dart d) const
+	{
+		return d.index;
 	}
 
-	void addInvolution()
-	{
-		std::stringstream sstm;
-		sstm << "involution_" << m_involution.size();
-		m_involution.push_back(addRelation(sstm.str()));
-	}
+	/**
+	 * @return the number of darts in the map
+	 */
+	inline virtual unsigned int getNbDarts();
 
-	void addPermutation()
-	{
-		std::stringstream sstm;
-		sstm << "permutation_" << m_permutation.size();
-		m_permutation.push_back(addRelation(sstm.str()));
-		std::stringstream sstm2;
-		sstm2 << "permutation_inv_" << m_permutation_inv.size();
-		m_permutation_inv.push_back(addRelation(sstm2.str()));
-	}
+	/****************************************
+	 *        RELATIONS MANAGEMENT          *
+	 ****************************************/
 
-	template <int I>
-	Dart getInvolution(Dart d)
-	{
-		return (*m_involution[I])[d.index];
-	}
+	inline void addInvolution();
+
+	inline void addPermutation();
 
 	template <int I>
-	Dart getPermutation(Dart d)
-	{
-		return (*m_permutation[I])[d.index];
-	}
+	inline Dart getInvolution(Dart d) const;
 
 	template <int I>
-	Dart getPermutationInv(Dart d)
-	{
-		return (*m_permutation_inv[I])[d.index];
-	}
+	inline Dart getPermutation(Dart d) const;
 
 	template <int I>
-	void permutationSew(Dart d, Dart e)
-	{
-		Dart f = (*m_permutation[I])[d.index] ;
-		Dart g = (*m_permutation[I])[e.index] ;
-		(*m_permutation[I])[d.index] = g ;
-		(*m_permutation[I])[e.index] = f ;
-		(*m_permutation_inv[I])[g.index] = d ;
-		(*m_permutation_inv[I])[f.index] = e ;
-	}
+	inline Dart getPermutationInv(Dart d) const;
 
 	template <int I>
-	void permutationUnsew(Dart d)
-	{
-		Dart e = (*m_permutation[I])[d.index] ;
-		Dart f = (*m_permutation[I])[e.index] ;
-		(*m_permutation[I])[d.index] = f ;
-		(*m_permutation[I])[e.index] = e ;
-		(*m_permutation_inv[I])[f.index] = d ;
-		(*m_permutation_inv[I])[e.index] = e ;
-	}
+	inline void permutationSew(Dart d, Dart e);
 
 	template <int I>
-	void involutionSew(Dart d, Dart e)
-	{
-		assert((*m_phi2)[d.index] == d) ;
-		assert((*m_phi2)[e.index] == e) ;
-		(*m_involution[I])[d.index] = e ;
-		(*m_involution[I])[e.index] = d ;
-	}
+	inline void permutationUnsew(Dart d);
 
 	template <int I>
-	void involutionUnsew(Dart d)
-	{
-		Dart e = (*m_involution[I])[d.index] ;
-		(*m_involution[I])[d.index] = d ;
-		(*m_involution[I])[e.index] = e ;
-	}
+	inline void involutionSew(Dart d, Dart e);
+
+	template <int I>
+	inline void involutionUnsew(Dart d);
+
+	/****************************************
+	 *           DARTS TRAVERSALS           *
+	 ****************************************/
+
+	/**
+	 * Begin of map
+	 * @return the first dart of the map
+	 */
+	inline virtual Dart begin() const;
+
+	/**
+	 * End of map
+	 * @return the end iterator (next of last) of the map
+	 */
+	inline virtual Dart end() const;
+
+	/**
+	 * allow to go from a dart to the next
+	 * in the order of storage
+	 * @param d reference to the dart to be modified
+	 */
+	inline virtual void next(Dart& d) const;
 } ;
 
 } //namespace CGoGN
+
+#include "Topology/generic/mapMono.hpp"
 
 #endif
