@@ -127,6 +127,33 @@ inline void Map1<MAP>::phi1unsew(Dart d)
 	MAP::permutationUnsew<0>(d);
 }
 
+/*! @name Generator and Deletor
+ *  To generate or delete faces in a 1-map
+ *************************************************************************/
+
+template <class MAP>
+Dart Map1<MAP>::newCycle(unsigned int nbEdges)
+{
+	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
+	Dart d = this->newDart() ;	// Create the first edge
+	for (unsigned int i = 1 ; i < nbEdges ; ++i)
+		Map1<MAP>::cutEdge(d) ;		// Subdivide nbEdges-1 times this edge
+	return d ;
+}
+
+template <class MAP>
+void Map1<MAP>::deleteCycle(Dart d)
+{
+	Dart e = phi1(d) ;
+	while (e != d)
+	{
+		Dart f = phi1(e) ;
+		this->deleteDart(e) ;
+		e = f ;
+	}
+	this->deleteDart(d) ;
+}
+
 /*! @name Topological Operators
  *  Topological operations on 1-maps
  *************************************************************************/
@@ -134,14 +161,14 @@ inline void Map1<MAP>::phi1unsew(Dart d)
 template <class MAP>
 inline Dart Map1<MAP>::cutEdge(Dart d)
 {
-	Dart e = MAP::newDart() ;	// Create a new dart
+	Dart e = this->newDart() ;	// Create a new dart
 	phi1sew(d, e) ;				// Insert dart e between d and phi1(d)
 
 	if (this->isBoundaryMarked2(d))
-		MAP::boundaryMark2(e);
+		this->boundaryMark2(e);
 
-	if (MAP::isBoundaryMarked3(d))
-		MAP::boundaryMark3(e);
+	if (this->isBoundaryMarked3(d))
+		this->boundaryMark3(e);
 
 	return e ;
 }
@@ -151,14 +178,14 @@ inline void Map1<MAP>::uncutEdge(Dart d)
 {
 	Dart d1 = phi1(d) ;
 	phi1unsew(d) ;			// Dart d is linked to the successor of its successor
-	MAP::deleteDart(d1) ;	// Dart d1 is erased
+	this->deleteDart(d1) ;	// Dart d1 is erased
 }
 
 template <class MAP>
 inline void Map1<MAP>::collapseEdge(Dart d)
 {
 	phi1unsew(phi_1(d)) ;	// Dart before d is linked to its successor
-	MAP::deleteDart(d) ;	// Dart d is erased
+	this->deleteDart(d) ;	// Dart d is erased
 }
 
 template <class MAP>
@@ -182,6 +209,25 @@ inline void Map1<MAP>::linkCycles(Dart d, Dart e)
 	Map1<MAP>::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
 	Map1<MAP>::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
 	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
+}
+
+template <class MAP>
+void Map1<MAP>::reverseCycle(Dart d)
+{
+	Dart e = phi1(d) ;			// Dart e is the first edge of the new face
+	if (e == d) return ;		// Only one edge: nothing to do
+	if (phi1(e) == d) return ;	// Only two edges: nothing to do
+
+	phi1unsew(d) ;				// Detach e from the face of d
+
+	Dart dNext = phi1(d) ;		// While the face of d contains more than two edges
+	while (dNext != d)
+	{
+		phi1unsew(d) ;			// Unsew the edge after d
+		phi1sew(e, dNext) ;		// Sew it after e (thus in reverse order)
+		dNext = phi1(d) ;
+	}
+	phi1sew(e, d) ;				// Sew the last edge
 }
 
 /*! @name Topological Queries

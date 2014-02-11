@@ -88,6 +88,8 @@ protected:
 	template <int I>
 	inline void involutionUnsew(Dart d);
 
+	inline virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
+
 	/****************************************
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/

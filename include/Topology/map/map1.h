@@ -59,8 +59,6 @@ public:
 
 	virtual void update_topo_shortcuts();
 
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
-
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
@@ -106,12 +104,6 @@ public:
 	 *  @return return a dart of the face
 	 */
 	Dart newCycle(unsigned int nbEdges) ;
-
-	//! Create an new face for boundary (marked)
-	/*! @param nbEdges the number of edges
-	 *  @return return a dart of the face
-	 */
-//	Dart newBoundaryCycle(unsigned int nbEdges);
 
 	//! Delete an oriented face erasing all its darts
 	/*! @param d a dart of the face

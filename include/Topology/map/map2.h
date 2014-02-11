@@ -73,8 +73,6 @@ public:
 
 	virtual void update_topo_shortcuts();
 
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
-
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
@@ -116,8 +114,7 @@ protected:
 	void phi2unsew(Dart d);
 
 public:
-
-	void rdfi(Dart t, DartMarker& m1, DartMarker& m2);
+//	void rdfi(Dart t, DartMarker& m1, DartMarker& m2);
 
 
 	//void propagateDartRelation(Dart d) ;
@@ -352,12 +349,6 @@ public:
 	 */
 	Dart findBoundaryEdgeOfVertex(Dart d) const;
 
-	/**
-	 * find the dart of edge that belong to the boundary
-	 * return NIL if the face is not on the boundary
-	 */
-	Dart findBoundaryEdgeOfFace(Dart d) const;
-
 	//! Test if dart d and e belong to the same edge
 	/*! @param d a dart
 	 *  @param e a dart
@@ -397,6 +388,12 @@ public:
 	 * tell if the face of d is on the boundary of the map
 	 */
 	bool isBoundaryFace(Dart d) const;
+
+	/**
+	 * find the dart of edge that belong to the boundary
+	 * return NIL if the face is not on the boundary
+	 */
+	Dart findBoundaryEdgeOfFace(Dart d) const;
 
 	//! Test if dart d and e belong to the same oriented volume
 	/*! @param d a dart

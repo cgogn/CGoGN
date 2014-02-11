@@ -73,19 +73,39 @@ inline void GMap0<MAP>::update_topo_shortcuts()
 template <class MAP>
 inline Dart GMap0<MAP>::beta0(Dart d) const
 {
-	return MAP::getInvolution<0>(d);
+	return MAP::template getInvolution<0>(d);
 }
 
 template <class MAP>
 inline void GMap0<MAP>::beta0sew(Dart d, Dart e)
 {
-	MAP::involutionSew<0>(d,e);
+	MAP::template involutionSew<0>(d,e);
 }
 
 template <class MAP>
 inline void GMap0<MAP>::beta0unsew(Dart d)
 {
-	MAP::involutionUnsew<0>(d);
+	MAP::template involutionUnsew<0>(d);
+}
+
+/*! @name Constructors and Destructors
+ *  To generate or delete edges in a 0-G-map
+ *************************************************************************/
+
+template <class MAP>
+Dart GMap0<MAP>::newEdge()
+{
+	Dart d1 = this->newDart();
+	Dart d2 = this->newDart();
+	beta0sew(d1,d2);
+	return d1;
+}
+
+template <class MAP>
+void GMap0<MAP>::deleteEdge(Dart d)
+{
+	this->deleteDart(beta0(d));
+	this->deleteDart(d);
 }
 
 /*! @name Cell Functors

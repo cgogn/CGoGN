@@ -71,7 +71,7 @@ inline void GMap1<MAP>::update_topo_shortcuts()
 template <class MAP>
 inline Dart GMap1<MAP>::beta1(Dart d) const
 {
-	return MAP::getInvolution<1>(d);
+	return MAP::template getInvolution<1>(d);
 }
 
 template <class MAP>
@@ -105,7 +105,7 @@ inline Dart GMap1<MAP>::phi1(Dart d) const
 template <class MAP>
 inline Dart GMap1<MAP>::phi_1(Dart d) const
 {
-	return beta0(beta1(d)) ;
+	return this->beta0(beta1(d)) ;
 }
 
 template <class MAP>
@@ -143,13 +143,47 @@ inline Dart GMap1<MAP>::alpha_1(Dart d) const
 template <class MAP>
 inline void GMap1<MAP>::beta1sew(Dart d, Dart e)
 {
-	MAP::involutionSew<1>(d,e);
+	MAP::template involutionSew<1>(d,e);
 }
 
 template <class MAP>
 inline void GMap1<MAP>::beta1unsew(Dart d)
 {
-	MAP::involutionUnsew<1>(d);
+	MAP::template involutionUnsew<1>(d);
+}
+
+/*! @name Constructors and Destructors
+ *  To generate or delete faces in a 1-G-map
+ *************************************************************************/
+
+template <class MAP>
+Dart GMap1<MAP>::newCycle(unsigned int nbEdges)
+{
+	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
+
+	Dart d0 = ParentMap::newEdge();	// create the first edge
+	Dart dp = this->beta0(d0);		// store an extremity
+	for (unsigned int i = 1; i < nbEdges; ++i)
+	{
+		Dart di = ParentMap::newEdge();	// create the next edge
+		beta1sew(dp,di);
+		dp = this->beta0(di);	// change the preceding
+	}
+	beta1sew(dp,d0);	// sew the last with the first
+	return d0;
+}
+
+template <class MAP>
+void GMap1<MAP>::deleteCycle(Dart d)
+{
+	Dart e = phi1(d);
+	while (e != d)
+	{
+		Dart f = phi1(e);
+		this->deleteEdge(e);
+		e = f;
+	}
+	this->deleteEdge(d);
 }
 
 /*! @name Topological Operators

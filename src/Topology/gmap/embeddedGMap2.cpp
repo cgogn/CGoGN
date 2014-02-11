@@ -582,13 +582,13 @@ bool EmbeddedGMap2::check()
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 
-    std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
+	std::cout << "nb vertex orbits : " << getNbOrbits<EmbeddedGMap2, VERTEX>() << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
-    std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
+	std::cout << "nb edge orbits : " << getNbOrbits<EmbeddedGMap2, EDGE>() << std::endl ;
     std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
 
-    std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
+	std::cout << "nb face orbits : " << getNbOrbits<EmbeddedGMap2, FACE>() << std::endl ;
     std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 
 	return true ;

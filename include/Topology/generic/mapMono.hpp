@@ -126,6 +126,31 @@ inline void MapMono::involutionUnsew(Dart d)
 	(*m_involution[I])[e.index] = e ;
 }
 
+inline void MapMono::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		for (unsigned int j = 0; j < m_permutation.size(); ++j)
+		{
+			Dart d = (*m_permutation[j])[i];
+			if (d.index != oldnew[d.index])
+				(*m_permutation[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_permutation_inv.size(); ++j)
+		{
+			Dart d = (*m_permutation_inv[j])[i];
+			if (d.index != oldnew[d.index])
+				(*m_permutation_inv[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_involution.size(); ++j)
+		{
+			Dart d = (*m_involution[j])[i];
+			if (d.index != oldnew[d.index])
+				(*m_involution[j])[i] = Dart(oldnew[d.index]);
+		}
+	}
+}
+
 /****************************************
  *           DARTS TRAVERSALS           *
  ****************************************/
