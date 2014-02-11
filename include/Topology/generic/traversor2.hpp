@@ -530,12 +530,12 @@ Traversor2FFaV<MAP>::Traversor2FFaV(const MAP& map, Dart dart) : m(map),m_QLT(NU
 	else
 	{
 		start = m.phi2(m.phi_1(m.phi2(m.phi_1(dart)))) ;
-		current = start ;
-		if(start == dart)
+		while (start == dart)
 		{
-			stop = m.phi2(m.phi_1(dart)) ;
-			start = next() ;
+			dart = m.phi1(dart);
+			start = m.phi2(m.phi_1(m.phi2(m.phi_1(dart)))) ;
 		}
+		current = start ;
 		stop = dart ;
 		if(m.isBoundaryMarked2(start))
 			start = next() ;
@@ -577,12 +577,15 @@ Dart Traversor2FFaV<MAP>::next()
 			current = m.phi2(m.phi_1(m.phi2(m.phi_1(d)))) ;
 			if(current == d)
 			{
-				stop = m.phi2(m.phi_1(d)) ;
+				stop = m.phi1(d);
+				current = m.phi2(d);
 				return next() ;
 			}
 			stop = d ;
-			if(m.isBoundaryMarked2(current))
-				return next() ;
+		}
+		if(m.isBoundaryMarked2(current))
+		{
+			return next() ;
 		}
 		if(current == start)
 			current = NIL ;
