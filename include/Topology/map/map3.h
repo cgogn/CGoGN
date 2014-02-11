@@ -51,8 +51,6 @@ template <class MAP>
 class Map3 : public Map2<MAP>
 {
 protected:
-	AttributeMultiVector<Dart>* m_phi3 ;
-
 	void init() ;
 
 public:
@@ -73,8 +71,6 @@ public:
 
 	static const unsigned int DIMENSION = 3 ;
 
-
-
 	Map3();
 
 	virtual std::string mapTypeName() const;
@@ -90,8 +86,6 @@ public:
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
-
-	virtual Dart newDart();
 
 	Dart phi3(Dart d) const;
 

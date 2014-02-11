@@ -29,7 +29,7 @@ namespace CGoGN
  *          DARTS MANAGEMENT            *
  ****************************************/
 
-inline virtual Dart MapMono::newDart()
+inline Dart MapMono::newDart()
 {
 	Dart d = GenericMap::newDart() ;
 
@@ -70,19 +70,19 @@ inline void MapMono::addPermutation()
 }
 
 template <int I>
-inline Dart MapMono::getInvolution(Dart d)
+inline Dart MapMono::getInvolution(Dart d) const
 {
 	return (*m_involution[I])[d.index];
 }
 
 template <int I>
-inline Dart MapMono::getPermutation(Dart d)
+inline Dart MapMono::getPermutation(Dart d) const
 {
 	return (*m_permutation[I])[d.index];
 }
 
 template <int I>
-inline Dart MapMono::getPermutationInv(Dart d)
+inline Dart MapMono::getPermutationInv(Dart d) const
 {
 	return (*m_permutation_inv[I])[d.index];
 }
@@ -112,8 +112,8 @@ inline void MapMono::permutationUnsew(Dart d)
 template <int I>
 inline void MapMono::involutionSew(Dart d, Dart e)
 {
-	assert((*m_phi2)[d.index] == d) ;
-	assert((*m_phi2)[e.index] == e) ;
+	assert((*m_involution[I])[d.index] == d) ;
+	assert((*m_involution[I])[e.index] == e) ;
 	(*m_involution[I])[d.index] = e ;
 	(*m_involution[I])[e.index] = d ;
 }
@@ -130,17 +130,17 @@ inline void MapMono::involutionUnsew(Dart d)
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-inline virtual Dart MapMono::begin() const
+inline Dart MapMono::begin() const
 {
 	return Dart::create(m_attribs[DART].begin()) ;
 }
 
-inline virtual Dart MapMono::end() const
+inline Dart MapMono::end() const
 {
 	return Dart::create(m_attribs[DART].end()) ;
 }
 
-inline virtual void MapMono::next(Dart& d) const
+inline void MapMono::next(Dart& d) const
 {
 	m_attribs[DART].next(d.index) ;
 }

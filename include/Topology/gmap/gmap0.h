@@ -25,7 +25,7 @@
 #ifndef __GMAP0_H__
 #define __GMAP0_H__
 
-#include "Topology/generic/attribmap.h"
+#include "Topology/generic/mapMono.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 
@@ -36,15 +36,15 @@ namespace CGoGN
 * The class of 0-GMap
 * Warning here we use beta instead of classic alpha
 */
-class GMap0 : public AttribMap
+template <class MAP = MapMono>
+class GMap0 : public MAP
 {
 protected:
-	AttributeMultiVector<Dart>* m_beta0 ;
-
 	void init() ;
 
 public:
 	GMap0();
+
 	static const unsigned int DIMENSION = 0 ;
 
 	virtual std::string mapTypeName() const;
@@ -97,14 +97,12 @@ public:
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const;
-//	bool foreach_dart_of_vertex(Dart d, FunctorConstType& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on every dart of an edge
 	/*! @param d a dart of the edge
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const;
-//	bool foreach_dart_of_edge(Dart d, FunctorConstType& f, unsigned int thread = 0) const;
 
 //	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
 	//@}

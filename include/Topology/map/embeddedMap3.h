@@ -32,14 +32,12 @@ namespace CGoGN
 
 /*! Class of 3-dimensional maps with managed embeddings
  */
-class EmbeddedMap3 : public Map3
+class EmbeddedMap3 : public Map3<MapMono>
 {
 public:
 	typedef Map3 TOPO_MAP;
 
-	static const unsigned int DIMENSION = 3 ;
-
-
+	static const unsigned int DIMENSION = TOPO_MAP::DIMENSION ;
 
 	//!
 	/*!

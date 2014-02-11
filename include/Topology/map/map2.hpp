@@ -25,8 +25,6 @@
 namespace CGoGN
 {
 
-/// INLINE FUNCTIONS
-
 template <class MAP>
 inline void Map2<MAP>::init()
 {
@@ -85,7 +83,7 @@ inline Dart Map2<MAP>::phi(Dart d) const
 	{
 		switch(N)
 		{
-			case 1 : return ParentMap::phi1(d) ;
+			case 1 : return this->phi1(d) ;
 			case 2 : return phi2(d) ;
 			default : assert(!"Wrong multi-phi relation value") ; return d ;
 		}

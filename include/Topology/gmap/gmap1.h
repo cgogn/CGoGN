@@ -33,19 +33,16 @@ namespace CGoGN
 /**
 * The class of 1-GMap
 */
-class GMap1 : public GMap0
+template <class MAP>
+class GMap1 : public GMap0<MAP>
 {
 protected:
-	AttributeMultiVector<Dart>* m_beta1 ;
-
 	void init() ;
 
 public:
-	typedef GMap0 ParentMap;
+	typedef GMap0<MAP> ParentMap;
 
 	static const unsigned int DIMENSION = 1 ;
-
-
 
 	GMap1();
 
@@ -62,8 +59,6 @@ public:
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
-
-	virtual Dart newDart();
 
 	Dart beta1(const Dart d) const;
 
@@ -205,7 +200,6 @@ public:
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread=0) const;
-//	bool foreach_dart_of_vertex(Dart d, FunctorConstType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of an edge
@@ -213,7 +207,6 @@ public:
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread=0) const;
-//	bool foreach_dart_of_edge(Dart d, FunctorConstType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of an oriented cc (face)
@@ -221,14 +214,12 @@ public:
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread=0) const;
-//	bool foreach_dart_of_oriented_cc(Dart d, FunctorConstType& f, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a cc (face)
 	/*! @param d a dart of the cc
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0) const;
-//	bool foreach_dart_of_cc(Dart d, FunctorConstType& fonct, unsigned int thread=0);
 	//@}
 };
 

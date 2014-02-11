@@ -34,12 +34,12 @@ namespace CGoGN
 * Class of 2-dimensional maps
 * with managed embeddings
 */
-class EmbeddedMap2 : public Map2
+class EmbeddedMap2 : public Map2<MapMono>
 {
 public:
-	typedef Map2 TOPO_MAP;
+	typedef Map2<MapMono> TOPO_MAP;
 
-	static const unsigned int DIMENSION = 2 ;
+	static const unsigned int DIMENSION = TOPO_MAP::DIMENSION ;
 
 	/*
 	 */

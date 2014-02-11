@@ -27,101 +27,84 @@ namespace CGoGN
 
 /// INLINE FUNCTIONS
 
-inline void GMap0::init()
+template <class MAP>
+inline void GMap0<MAP>::init()
 {
-	m_beta0 = addRelation("beta0") ;
+	MAP::addInvolution() ;
 }
 
-inline GMap0::GMap0() : AttribMap()
+template <class MAP>
+inline GMap0<MAP>::GMap0() : MAP()
 {
 	init() ;
 }
 
-inline std::string GMap0::mapTypeName() const
+template <class MAP>
+inline std::string GMap0<MAP>::mapTypeName() const
 {
 	return "GMap0";
 }
 
-inline unsigned int GMap0::dimension() const
+template <class MAP>
+inline unsigned int GMap0<MAP>::dimension() const
 {
 	return 0;
 }
 
-inline void GMap0::clear(bool removeAttrib)
+template <class MAP>
+inline void GMap0<MAP>::clear(bool removeAttrib)
 {
-	AttribMap::clear(removeAttrib) ;
+	MAP::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-inline void GMap0::update_topo_shortcuts()
+template <class MAP>
+inline void GMap0<MAP>::update_topo_shortcuts()
 {
-	GenericMap::update_topo_shortcuts();
-	m_beta0 = getRelation("beta0");
+	MAP::update_topo_shortcuts();
+//	m_beta0 = getRelation("beta0");
 }
 
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
 
-inline Dart GMap0::newDart()
+template <class MAP>
+inline Dart GMap0<MAP>::beta0(Dart d) const
 {
-	Dart d = GenericMap::newDart() ;
-	(*m_beta0)[d.index] = d ;
-	return d ;
+	return MAP::getInvolution<0>(d);
 }
 
-inline Dart GMap0::beta0(Dart d) const
+template <class MAP>
+inline void GMap0<MAP>::beta0sew(Dart d, Dart e)
 {
-	return (*m_beta0)[d.index] ;
+	MAP::involutionSew<0>(d,e);
 }
 
-inline void GMap0::beta0sew(Dart d, Dart e)
+template <class MAP>
+inline void GMap0<MAP>::beta0unsew(Dart d)
 {
-	assert((*m_beta0)[d.index] == d) ;
-	assert((*m_beta0)[e.index] == e) ;
-	(*m_beta0)[d.index] = e ;
-	(*m_beta0)[e.index] = d ;
-}
-
-inline void GMap0::beta0unsew(Dart d)
-{
-	Dart e = (*m_beta0)[d.index] ;
-	(*m_beta0)[d.index] = d ;
-	(*m_beta0)[e.index] = e ;
+	MAP::involutionUnsew<0>(d);
 }
 
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap0::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <class MAP>
+inline bool GMap0<MAP>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	return f(d) ;
 }
 
-//inline bool GMap0::foreach_dart_of_vertex(Dart d, FunctorConstType& f, unsigned int /*thread*/) const
-//{
-//	return f(d) ;
-//}
-
-inline bool GMap0::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <class MAP>
+inline bool GMap0<MAP>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	if (f(d)) return true;
 	Dart d1 = beta0(d);
 	if (d1 != d) return f(d1);
 	return false;
 }
-
-
-//inline bool GMap0::foreach_dart_of_edge(Dart d, FunctorConstType& f, unsigned int /*thread*/)
-//{
-//	if (f(d)) return true;
-//	Dart d1 = beta0(d);
-//	if (d1 != d) return f(d1);
-//	return false;
-//}
-
-
 
 } // namespace CGoGN

@@ -25,175 +25,185 @@
 namespace CGoGN
 {
 
-inline void GMap2::init()
+template <class MAP>
+inline void GMap2<MAP>::init()
 {
-	m_beta2 = addRelation("beta2") ;
+	MAP::addInvolution() ;
 }
 
-inline GMap2::GMap2() : GMap1()
+template <class MAP>
+inline GMap2<MAP>::GMap2() : GMap1<MAP>()
 {
 	init() ;
 }
 
-inline std::string GMap2::mapTypeName() const
+template <class MAP>
+inline std::string GMap2<MAP>::mapTypeName() const
 {
 	return "GMap2";
 }
 
-inline unsigned int GMap2::dimension() const
+template <class MAP>
+inline unsigned int GMap2<MAP>::dimension() const
 {
 	return 2;
 }
 
-inline void GMap2::clear(bool removeAttrib)
+template <class MAP>
+inline void GMap2<MAP>::clear(bool removeAttrib)
 {
-	GMap1::clear(removeAttrib) ;
+	ParentMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-inline void GMap2::update_topo_shortcuts()
+template <class MAP>
+inline void GMap2<MAP>::update_topo_shortcuts()
 {
-	GMap1::update_topo_shortcuts();
-	m_beta2 = getRelation("beta2");
+	ParentMap::update_topo_shortcuts();
+//	m_beta2 = getRelation("beta2");
 }
 
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
 
-inline Dart GMap2::newDart()
+template <class MAP>
+inline Dart GMap2<MAP>::beta2(Dart d) const
 {
-	Dart d = GMap1::newDart() ;
-	(*m_beta2)[d.index] = d ;
-	return d ;
+	return MAP::getInvolution<2>(d);
 }
 
-inline Dart GMap2::beta2(Dart d) const
-{
-	return (*m_beta2)[d.index] ;
-}
-
+template <class MAP>
 template <int N>
-inline Dart GMap2::beta(const Dart d) const
+inline Dart GMap2<MAP>::beta(const Dart d) const
 {
 	assert( (N > 0) || !"negative parameters not allowed in template multi-beta");
 	if (N<10)
 	{
 		switch(N)
 		{
-		case 0 : return beta0(d) ;
-		case 1 : return beta1(d) ;
-		case 2 : return beta2(d) ;
-		default : assert(!"Wrong multi-beta relation value") ;
+			case 0 : return this->beta0(d) ;
+			case 1 : return this->beta1(d) ;
+			case 2 : return beta2(d) ;
+			default : assert(!"Wrong multi-beta relation value") ;
 		}
 	}
 	switch(N%10)
 	{
-	case 0 : return beta0(beta<N/10>(d)) ;
-	case 1 : return beta1(beta<N/10>(d)) ;
-	case 2 : return beta2(beta<N/10>(d)) ;
-	default : assert(!"Wrong multi-beta relation value") ;
+		case 0 : return beta0(beta<N/10>(d)) ;
+		case 1 : return beta1(beta<N/10>(d)) ;
+		case 2 : return beta2(beta<N/10>(d)) ;
+		default : assert(!"Wrong multi-beta relation value") ;
 	}
 }
 
-inline Dart GMap2::phi2(Dart d) const
+template <class MAP>
+inline Dart GMap2<MAP>::phi2(Dart d) const
 {
-	return beta2(beta0(d)) ;
+	return beta2(this->beta0(d)) ;
 }
 
+template <class MAP>
 template <int N>
-inline Dart GMap2::phi(Dart d) const
+inline Dart GMap2<MAP>::phi(Dart d) const
 {
 	assert( (N >0) || !"negative parameters not allowed in template multi-phi");
 	if (N<10)
 	{
 		switch(N)
 		{
-		case 1 : return phi1(d) ;
-		case 2 : return phi2(d) ;
-		default : assert(!"Wrong multi-phi relation value") ; return d ;
+			case 1 : return this->phi1(d) ;
+			case 2 : return phi2(d) ;
+			default : assert(!"Wrong multi-phi relation value") ; return d ;
 		}
 	}
 	switch(N%10)
 	{
-	case 1 : return phi1(phi<N/10>(d)) ;
-	case 2 : return phi2(phi<N/10>(d)) ;
-	default : assert(!"Wrong multi-phi relation value") ; return d ;
+		case 1 : return phi1(phi<N/10>(d)) ;
+		case 2 : return phi2(phi<N/10>(d)) ;
+		default : assert(!"Wrong multi-phi relation value") ; return d ;
 	}
 }
 
-inline Dart GMap2::alpha0(Dart d) const
+template <class MAP>
+inline Dart GMap2<MAP>::alpha0(Dart d) const
 {
-	return beta2(beta0(d)) ;
+	return beta2(this->beta0(d)) ;
 }
 
-inline Dart GMap2::alpha1(Dart d) const
+template <class MAP>
+inline Dart GMap2<MAP>::alpha1(Dart d) const
 {
-	return beta2(beta1(d)) ;
+	return beta2(this->beta1(d)) ;
 }
 
-inline Dart GMap2::alpha_1(Dart d) const
+template <class MAP>
+inline Dart GMap2<MAP>::alpha_1(Dart d) const
 {
 	return beta1(beta2(d)) ;
 }
 
-inline void GMap2::beta2sew(Dart d, Dart e)
+template <class MAP>
+inline void GMap2<MAP>::beta2sew(Dart d, Dart e)
 {
-	assert((*m_beta2)[d.index] == d) ;
-	assert((*m_beta2)[e.index] == e) ;
-	(*m_beta2)[d.index] = e ;
-	(*m_beta2)[e.index] = d ;
+	MAP::involutionSew<2>(d,e);
 }
 
-inline void GMap2::beta2unsew(Dart d)
+template <class MAP>
+inline void GMap2<MAP>::beta2unsew(Dart d)
 {
-	Dart e = (*m_beta2)[d.index] ;
-	(*m_beta2)[d.index] = d ;
-	(*m_beta2)[e.index] = e ;
+	MAP::involutionUnsew<2>(d);
 }
 
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
 
-inline bool GMap2::sameVertex(Dart d, Dart e) const
+template <class MAP>
+inline bool GMap2<MAP>::sameVertex(Dart d, Dart e) const
 {
 	return sameOrientedVertex(d, e) || sameOrientedVertex(beta2(d), e) ;
 }
 
-inline bool GMap2::sameEdge(Dart d, Dart e) const
+template <class MAP>
+inline bool GMap2<MAP>::sameEdge(Dart d, Dart e) const
 {
-	return d == e || beta2(d) == e || beta0(d) == e || beta2(beta0(d)) == e ;
+	return d == e || beta2(d) == e || this->beta0(d) == e || beta2(this->beta0(d)) == e ;
 }
 
-inline bool GMap2::isBoundaryEdge(Dart d) const
+template <class MAP>
+inline bool GMap2<MAP>::isBoundaryEdge(Dart d) const
 {
-	return isBoundaryMarked2(d) || isBoundaryMarked2(beta2(d));
+	return this->isBoundaryMarked2(d) || this->isBoundaryMarked2(beta2(d));
 }
 
-inline bool GMap2::sameOrientedFace(Dart d, Dart e) const
+template <class MAP>
+inline bool GMap2<MAP>::sameOrientedFace(Dart d, Dart e) const
 {
-	return GMap1::sameOrientedCycle(d, e) ;
+	return ParentMap::sameOrientedCycle(d, e) ;
 }
 
-inline bool GMap2::sameFace(Dart d, Dart e) const
+template <class MAP>
+inline bool GMap2<MAP>::sameFace(Dart d, Dart e) const
 {
-	return GMap1::sameCycle(d, e) ;
+	return ParentMap::sameCycle(d, e) ;
 }
 
-inline unsigned int GMap2::faceDegree(Dart d) const
+template <class MAP>
+inline unsigned int GMap2<MAP>::faceDegree(Dart d) const
 {
-	return GMap1::cycleDegree(d) ;
+	return ParentMap::cycleDegree(d) ;
 }
 
-inline int GMap2::checkFaceDegree(Dart d, unsigned int le) const
+template <class MAP>
+inline int GMap2<MAP>::checkFaceDegree(Dart d, unsigned int le) const
 {
-	return GMap1::checkCycleDegree(d,le) ;
+	return ParentMap::checkCycleDegree(d,le) ;
 }
 
-
-inline bool GMap2::sameVolume(Dart d, Dart e) const
+template <class MAP>
+inline bool GMap2<MAP>::sameVolume(Dart d, Dart e) const
 {
 	return sameOrientedVolume(d, e) || sameOrientedVolume(beta2(d), e) ;
 }
@@ -202,68 +212,40 @@ inline bool GMap2::sameVolume(Dart d, Dart e) const
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap2<MAP>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_oriented_vertex(d, f, thread) || GMap2::foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
+	return GMap2<MAP>::foreach_dart_of_oriented_vertex(d, f, thread) || GMap2<MAP>::foreach_dart_of_oriented_vertex(this->beta1(d), f, thread) ;
 }
 
-inline bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap2<MAP>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_oriented_cc(d, f, thread) || GMap2::foreach_dart_of_oriented_cc(beta0(d), f, thread) ;
+	return GMap2<MAP>::foreach_dart_of_oriented_cc(d, f, thread) || GMap2<MAP>::foreach_dart_of_oriented_cc(this->beta0(d), f, thread) ;
 }
 
-inline bool GMap2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap2<MAP>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap1::foreach_dart_of_cc(d, f, thread);
+	return ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
-inline bool GMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap2<MAP>::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap1::foreach_dart_of_oriented_cc(d, f, thread);
+	return ParentMap::foreach_dart_of_oriented_cc(d, f, thread);
 }
 
-inline bool GMap2::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap2<MAP>::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap1::foreach_dart_of_vertex(d,f,thread);
+	return ParentMap::foreach_dart_of_vertex(d,f,thread);
 }
 
-inline bool GMap2::foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap2<MAP>::foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap1::foreach_dart_of_edge(d,f,thread);
+	return ParentMap::foreach_dart_of_edge(d,f,thread);
 }
-
-// CONST VERSIONS
-//inline bool GMap2::foreach_dart_of_vertex(Dart d, FunctorConstType& f, unsigned int thread) const
-//{
-//	return GMap2::foreach_dart_of_oriented_vertex(d, f, thread) || GMap2::foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
-//}
-
-//inline bool GMap2::foreach_dart_of_cc(Dart d, FunctorConstType& f, unsigned int thread) const
-//{
-//	return GMap2::foreach_dart_of_oriented_cc(d, f, thread) || GMap2::foreach_dart_of_oriented_cc(beta0(d), f, thread) ;
-//}
-
-//inline bool GMap2::foreach_dart_of_face(Dart d, FunctorConstType& f, unsigned int thread) const
-//{
-//	return GMap1::foreach_dart_of_cc(d, f, thread);
-//}
-
-//inline bool GMap2::foreach_dart_of_oriented_face(Dart d, FunctorConstType& f, unsigned int thread) const
-//{
-//	return GMap1::foreach_dart_of_oriented_cc(d, f, thread);
-//}
-
-//inline bool GMap2::foreach_dart_of_vertex1(Dart d, FunctorConstType& f, unsigned int thread) const
-//{
-//	return GMap1::foreach_dart_of_vertex(d,f,thread);
-//}
-
-//inline bool GMap2::foreach_dart_of_edge1(Dart d, FunctorConstType& f, unsigned int thread) const
-//{
-//	return GMap1::foreach_dart_of_edge(d,f,thread);
-//}
-
-
-
 
 } // namespace CGoGN

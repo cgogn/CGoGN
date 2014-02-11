@@ -33,15 +33,14 @@ namespace CGoGN
 /**
 * The class of 3-GMap
 */
-class GMap3 : public GMap2
+template <class MAP>
+class GMap3 : public GMap2<MAP>
 {
 protected:
-	AttributeMultiVector<Dart>* m_beta3 ;
-
 	void init() ;
 
 public:
-	typedef GMap2 ParentMap;
+	typedef GMap2<MAP> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
@@ -73,8 +72,6 @@ public:
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
-
-	virtual Dart newDart();
 
 	Dart beta3(Dart d) const;
 
@@ -338,8 +335,6 @@ public:
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread = 0) const;
-
-
 
 	/**
 	* Apply a functor on each dart of a vertex

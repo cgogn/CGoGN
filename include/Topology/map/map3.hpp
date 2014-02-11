@@ -25,174 +25,169 @@
 namespace CGoGN
 {
 
-inline void Map3::init()
+template <class MAP>
+inline void Map3<MAP>::init()
 {
-	m_phi3 = addRelation("phi3") ;
+	MAP::addInvolution() ;
 }
 
-inline Map3::Map3() : Map2()
+template <class MAP>
+inline Map3<MAP>::Map3() : Map2<MAP>()
 {
 	init() ;
 }
 
-inline std::string Map3::mapTypeName() const
+template <class MAP>
+inline std::string Map3<MAP>::mapTypeName() const
 {
 	return "Map3";
 }
 
-inline unsigned int Map3::dimension() const
+template <class MAP>
+inline unsigned int Map3<MAP>::dimension() const
 {
 	return 3;
 }
 
-inline void Map3::clear(bool removeAttrib)
+template <class MAP>
+inline void Map3<MAP>::clear(bool removeAttrib)
 {
-	Map2::clear(removeAttrib) ;
+	ParentMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-inline void Map3::update_topo_shortcuts()
+template <class MAP>
+inline void Map3<MAP>::update_topo_shortcuts()
 {
-	Map2::update_topo_shortcuts();
-	m_phi3 = getRelation("phi3");
+	ParentMap::update_topo_shortcuts();
+//	m_phi3 = getRelation("phi3");
 }
 
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
 
-inline Dart Map3::newDart()
+template <class MAP>
+inline Dart Map3<MAP>::phi3(Dart d) const
 {
-	Dart d = Map2::newDart() ;
-	(*m_phi3)[dartIndex(d)] = d ;
-	if(m_isMultiRes)
-	{
-		pushLevel() ;
-		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
-		{
-			setCurrentLevel(i) ;
-			(*m_phi3)[dartIndex(d)] = d ;
-		}
-		popLevel() ;
-	}
-	return d ;
+	return MAP::getInvolution<1>(d);
 }
 
-inline Dart Map3::phi3(Dart d) const
-{
-	unsigned int d_index = dartIndex(d);
-	return (*m_phi3)[d_index] ;
-}
-
+template <class MAP>
 template <int N>
-inline Dart Map3::phi(Dart d) const
+inline Dart Map3<MAP>::phi(Dart d) const
 {
 	assert( (N >0) || !"negative parameters not allowed in template multi-phi");
 	if (N<10)
 	{
 		switch(N)
 		{
-		case 1 : return phi1(d) ;
-		case 2 : return phi2(d) ;
-		case 3 : return phi3(d) ;
-		default : assert(!"Wrong multi-phi relation value") ; return d ;
+			case 1 : return this->phi1(d) ;
+			case 2 : return this->phi2(d) ;
+			case 3 : return phi3(d) ;
+			default : assert(!"Wrong multi-phi relation value") ; return d ;
 		}
 	}
 	switch(N%10)
 	{
-	case 1 : return phi1(phi<N/10>(d)) ;
-	case 2 : return phi2(phi<N/10>(d)) ;
-	case 3 : return phi3(phi<N/10>(d)) ;
-	default : assert(!"Wrong multi-phi relation value") ; return d ;
+		case 1 : return phi1(phi<N/10>(d)) ;
+		case 2 : return phi2(phi<N/10>(d)) ;
+		case 3 : return phi3(phi<N/10>(d)) ;
+		default : assert(!"Wrong multi-phi relation value") ; return d ;
 	}
 }
 
-inline Dart Map3::alpha0(Dart d) const
+template <class MAP>
+inline Dart Map3<MAP>::alpha0(Dart d) const
 {
 	return phi3(d) ;
 }
 
-inline Dart Map3::alpha1(Dart d) const
+template <class MAP>
+inline Dart Map3<MAP>::alpha1(Dart d) const
 {
-	return phi3(phi_1(d)) ;
+	return phi3(this->phi_1(d)) ;
 }
 
-inline Dart Map3::alpha2(Dart d) const
+template <class MAP>
+inline Dart Map3<MAP>::alpha2(Dart d) const
 {
-	return phi3(phi2(d));
+	return phi3(this->phi2(d));
 }
 
-inline Dart Map3::alpha_2(Dart d) const
+template <class MAP>
+inline Dart Map3<MAP>::alpha_2(Dart d) const
 {
 	return phi2(phi3(d));
 }
 
-inline void Map3::phi3sew(Dart d, Dart e)
+template <class MAP>
+inline void Map3<MAP>::phi3sew(Dart d, Dart e)
 {
-	unsigned int d_index = dartIndex(d);
-	unsigned int e_index = dartIndex(e);
-	assert((*m_phi3)[d_index] == d) ;
-	assert((*m_phi3)[e_index] == e) ;
-	(*m_phi3)[d_index] = e ;
-	(*m_phi3)[e_index] = d ;
+	MAP::involutionSew<1>(d,e);
 }
 
-inline void Map3::phi3unsew(Dart d)
+template <class MAP>
+inline void Map3<MAP>::phi3unsew(Dart d)
 {
-	unsigned int d_index = dartIndex(d);
-	Dart e = (*m_phi3)[d_index] ;
-	(*m_phi3)[d_index] = d ;
-	unsigned int e_index = dartIndex(e);
-	(*m_phi3)[e_index] = e ;
+	MAP::involutionUnsew<1>(d);
 }
 
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
 
-inline bool Map3::sameEdge(Dart d, Dart e) const
+template <class MAP>
+inline bool Map3<MAP>::sameEdge(Dart d, Dart e) const
 {
-	return sameOrientedEdge(d, e) || sameOrientedEdge(phi2(d), e) ;
+	return ParentMap::sameOrientedEdge(d, e) || ParentMap::sameOrientedEdge(this->phi2(d), e) ;
 }
 
-inline bool Map3::sameFace(Dart d, Dart e) const
+template <class MAP>
+inline bool Map3<MAP>::sameFace(Dart d, Dart e) const
 {
-	return Map2::sameOrientedFace(d, e) || Map2::sameOrientedFace(phi3(d), e) ;
+	return ParentMap::sameOrientedFace(d, e) || ParentMap::sameOrientedFace(phi3(d), e) ;
 }
 
-inline bool Map3::isBoundaryFace(Dart d) const
+template <class MAP>
+inline bool Map3<MAP>::isBoundaryFace(Dart d) const
 {
-	return isBoundaryMarked3(d) || isBoundaryMarked3(phi3(d));
+	return this->isBoundaryMarked3(d) || this->isBoundaryMarked3(phi3(d));
 }
 
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool Map3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map3<MAP>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map2::foreach_dart_of_face(d, f, thread) || Map2::foreach_dart_of_face(phi3(d), f, thread);
+	return ParentMap::foreach_dart_of_face(d, f, thread) || ParentMap::foreach_dart_of_face(phi3(d), f, thread);
 }
 
-inline bool Map3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map3<MAP>::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map2::foreach_dart_of_cc(d, f, thread);
+	return ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
-inline bool Map3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map3<MAP>::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map2::foreach_dart_of_vertex(d, f, thread);
+	return ParentMap::foreach_dart_of_vertex(d, f, thread);
 }
 
-inline bool Map3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map3<MAP>::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map2::foreach_dart_of_edge(d, f, thread);
+	return ParentMap::foreach_dart_of_edge(d, f, thread);
 }
 
-inline bool Map3::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool Map3<MAP>::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return Map2::foreach_dart_of_face(d, f, thread);
+	return ParentMap::foreach_dart_of_face(d, f, thread);
 }
 
 } // namespace CGoGN

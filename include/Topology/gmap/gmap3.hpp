@@ -25,189 +25,201 @@
 namespace CGoGN
 {
 
-inline void GMap3::init()
+template <class MAP>
+inline void GMap3<MAP>::init()
 {
-	m_beta3 = addRelation("beta3") ;
+	MAP::addInvolution() ;
 }
 
-inline GMap3::GMap3() : GMap2()
+template <class MAP>
+inline GMap3<MAP>::GMap3() : GMap2<MAP>()
 {
 	init() ;
 }
 
-inline std::string GMap3::mapTypeName() const
+template <class MAP>
+inline std::string GMap3<MAP>::mapTypeName() const
 {
 	return "GMap3";
 }
 
-inline unsigned int GMap3::dimension() const
+template <class MAP>
+inline unsigned int GMap3<MAP>::dimension() const
 {
 	return 3;
 }
 
-inline void GMap3::clear(bool removeAttrib)
+template <class MAP>
+inline void GMap3<MAP>::clear(bool removeAttrib)
 {
-	GMap2::clear(removeAttrib) ;
+	ParentMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-inline void GMap3::update_topo_shortcuts()
+template <class MAP>
+inline void GMap3<MAP>::update_topo_shortcuts()
 {
-	GMap2::update_topo_shortcuts();
-	m_beta3 = getRelation("beta3");
+	ParentMap::update_topo_shortcuts();
+//	m_beta3 = getRelation("beta3");
 }
 
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
 
-inline Dart GMap3::newDart()
+template <class MAP>
+inline Dart GMap3<MAP>::beta3(Dart d) const
 {
-	Dart d = GMap2::newDart() ;
-	(*m_beta3)[d.index] = d ;
-	return d ;
+	return MAP::getInvolution<3>(d);
 }
 
-inline Dart GMap3::beta3(Dart d) const
-{
-	return (*m_beta3)[d.index] ;
-}
-
+template <class MAP>
 template <int N>
-inline Dart GMap3::beta(const Dart d) const
+inline Dart GMap3<MAP>::beta(const Dart d) const
 {
 	assert( (N > 0) || !"negative parameters not allowed in template multi-beta");
 	if (N<10)
 	{
 		switch(N)
 		{
-		case 0 : return beta0(d) ;
-		case 1 : return beta1(d) ;
-		case 2 : return beta2(d) ;
-		case 3 : return beta2(d) ;
-		default : assert(!"Wrong multi-beta relation value") ;
+			case 0 : return this->beta0(d) ;
+			case 1 : return this->beta1(d) ;
+			case 2 : return this->beta2(d) ;
+			case 3 : return beta3(d) ;
+			default : assert(!"Wrong multi-beta relation value") ;
 		}
 	}
 	switch(N%10)
 	{
-	case 0 : return beta0(beta<N/10>(d)) ;
-	case 1 : return beta1(beta<N/10>(d)) ;
-	case 2 : return beta2(beta<N/10>(d)) ;
-	case 3 : return beta3(beta<N/10>(d)) ;
-	default : assert(!"Wrong multi-beta relation value") ;
+		case 0 : return beta0(beta<N/10>(d)) ;
+		case 1 : return beta1(beta<N/10>(d)) ;
+		case 2 : return beta2(beta<N/10>(d)) ;
+		case 3 : return beta3(beta<N/10>(d)) ;
+		default : assert(!"Wrong multi-beta relation value") ;
 	}
 }
 
-inline Dart GMap3::phi3(Dart d) const
+template <class MAP>
+inline Dart GMap3<MAP>::phi3(Dart d) const
 {
-	return beta3(beta0(d)) ;
+	return beta3(this->beta0(d)) ;
 }
 
+template <class MAP>
 template <int N>
-inline Dart GMap3::phi(Dart d) const
+inline Dart GMap3<MAP>::phi(Dart d) const
 {
 	assert( (N >0) || !"negative parameters not allowed in template multi-phi");
 	if (N<10)
 	{
 		switch(N)
 		{
-		case 1 : return phi1(d) ;
-		case 2 : return phi2(d) ;
-		case 3 : return phi3(d) ;
-		default : assert(!"Wrong multi-phi relation value") ; return d ;
+			case 1 : return this->phi1(d) ;
+			case 2 : return this->phi2(d) ;
+			case 3 : return phi3(d) ;
+			default : assert(!"Wrong multi-phi relation value") ; return d ;
 		}
 	}
 	switch(N%10)
 	{
-	case 1 : return phi1(phi<N/10>(d)) ;
-	case 2 : return phi2(phi<N/10>(d)) ;
-	case 3 : return phi3(phi<N/10>(d)) ;
-	default : assert(!"Wrong multi-phi relation value") ; return d ;
+		case 1 : return phi1(phi<N/10>(d)) ;
+		case 2 : return phi2(phi<N/10>(d)) ;
+		case 3 : return phi3(phi<N/10>(d)) ;
+		default : assert(!"Wrong multi-phi relation value") ; return d ;
 	}
 }
 
-inline Dart GMap3::alpha0(Dart d) const
+template <class MAP>
+inline Dart GMap3<MAP>::alpha0(Dart d) const
 {
-	return beta3(beta0(d)) ;
+	return beta3(this->beta0(d)) ;
 }
 
-inline Dart GMap3::alpha1(Dart d) const
+template <class MAP>
+inline Dart GMap3<MAP>::alpha1(Dart d) const
 {
-	return beta3(beta1(d)) ;
+	return beta3(this->beta1(d)) ;
 }
 
-inline Dart GMap3::alpha2(Dart d) const
+template <class MAP>
+inline Dart GMap3<MAP>::alpha2(Dart d) const
 {
-	return beta3(beta2(d)) ;
+	return beta3(this->beta2(d)) ;
 }
 
-inline Dart GMap3::alpha_2(Dart d) const
+template <class MAP>
+inline Dart GMap3<MAP>::alpha_2(Dart d) const
 {
 	return beta2(beta3(d)) ;
 }
 
-inline void GMap3::beta3sew(Dart d, Dart e)
+template <class MAP>
+inline void GMap3<MAP>::beta3sew(Dart d, Dart e)
 {
-	assert((*m_beta3)[d.index] == d) ;
-	assert((*m_beta3)[e.index] == e) ;
-	(*m_beta3)[d.index] = e ;
-	(*m_beta3)[e.index] = d ;
+	MAP::involutionSew<3>(d,e);
 }
 
-inline void GMap3::beta3unsew(Dart d)
+template <class MAP>
+inline void GMap3<MAP>::beta3unsew(Dart d)
 {
-	Dart e = (*m_beta3)[d.index] ;
-	(*m_beta3)[d.index] = d ;
-	(*m_beta3)[e.index] = e ;
+	MAP::involutionUnsew<3>(d);
 }
 
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
 
-inline bool GMap3::sameFace(Dart d, Dart e) const
+template <class MAP>
+inline bool GMap3<MAP>::sameFace(Dart d, Dart e) const
 {
-	return GMap2::sameFace(d, e) || GMap2::sameFace(beta3(d), e) ;
+	return ParentMap::sameFace(d, e) || ParentMap::sameFace(beta3(d), e) ;
 }
 
-inline bool GMap3::isBoundaryFace(Dart d) const
+template <class MAP>
+inline bool GMap3<MAP>::isBoundaryFace(Dart d) const
 {
-	return isBoundaryMarked3(d) || isBoundaryMarked3(beta3(d));
+	return this->isBoundaryMarked3(d) || this->isBoundaryMarked3(beta3(d));
 }
 
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap3<MAP>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_face(d, f, thread) || GMap2::foreach_dart_of_face(beta3(d), f, thread);
+	return ParentMap::foreach_dart_of_face(d, f, thread) || ParentMap::foreach_dart_of_face(beta3(d), f, thread);
 }
 
-inline bool GMap3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap3<MAP>::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_cc(d, f, thread);
+	return ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
-inline bool GMap3::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap3<MAP>::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_oriented_cc(d, f, thread);
+	return ParentMap::foreach_dart_of_oriented_cc(d, f, thread);
 }
 
-inline bool GMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap3<MAP>::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_vertex(d, f, thread);
+	return ParentMap::foreach_dart_of_vertex(d, f, thread);
 }
 
-inline bool GMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap3<MAP>::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_edge(d, f, thread);
+	return ParentMap::foreach_dart_of_edge(d, f, thread);
 }
 
-inline bool GMap3::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread) const
+template <class MAP>
+inline bool GMap3<MAP>::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap2::foreach_dart_of_face(d, f, thread);
+	return ParentMap::foreach_dart_of_face(d, f, thread);
 }
 
 } // namespace CGoGN

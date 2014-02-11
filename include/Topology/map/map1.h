@@ -25,13 +25,12 @@
 #ifndef __MAP1_H__
 #define __MAP1_H__
 
+#include "Topology/generic/mapMono.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
 {
-
-class MapMono;
 
 /*! \brief The class of dual 1-dimensional combinatorial maps: set of oriented faces.
  *  - A dual 1-map is made of darts linked by the phi1 permutation.
