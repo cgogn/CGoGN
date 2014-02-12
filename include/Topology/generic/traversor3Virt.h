@@ -43,13 +43,14 @@ class VMarkerForTraversor
 {
 private:
 	MAP& m_map ;
-	DartMarkerStore* m_dmark ;
-	CellMarkerStore<ORBIT>* m_cmark ;
+	DartMarkerStore<MAP>* m_dmark ;
+	CellMarkerStore<MAP, ORBIT>* m_cmark ;
+
 public:
 	VMarkerForTraversor(MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~VMarkerForTraversor();
-	DartMarkerStore* dmark();
-	CellMarkerStore<ORBIT>* cmark();
+	DartMarkerStore<MAP>* dmark();
+	CellMarkerStore<MAP, ORBIT>* cmark();
 	void mark(Dart d);
 	void unmark(Dart d);
 	bool isMarked(Dart d);
@@ -65,8 +66,8 @@ class VTraversor3XY: public Traversor
 {
 private:
 	MAP& m_map ;
-	DartMarkerStore* m_dmark ;
-	CellMarkerStore<ORBY>* m_cmark ;
+	DartMarkerStore<MAP>* m_dmark ;
+	CellMarkerStore<MAP, ORBY>* m_cmark ;
 	Dart m_current ;
 	TraversorDartsOfOrbit<MAP, ORBX> m_tradoo;
 
@@ -79,6 +80,7 @@ public:
 	VTraversor3XY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) ;
 	VTraversor3XY(MAP& map, Dart dart, VMarkerForTraversor<MAP, ORBY>& tmo, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~VTraversor3XY();
+
 	Dart begin() ;
 	Dart end() ;
 	Dart next() ;
@@ -102,9 +104,7 @@ public:
 	VTraversor3XXaY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0);
 
 	Dart begin();
-
 	Dart end();
-
 	Dart next();
 };
 

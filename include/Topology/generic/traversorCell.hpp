@@ -30,7 +30,7 @@ TraversorCell<MAP, ORBIT>::TraversorCell(const MAP& map, bool forceDartMarker, u
 	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true)
 {
 	if(forceDartMarker)
-		dmark = new DartMarker(map, thread) ;
+		dmark = new DartMarker<MAP>(map, thread) ;
 	else
 	{
 		quickTraversal = map.template getQuickTraversal<ORBIT>() ;
@@ -42,9 +42,9 @@ TraversorCell<MAP, ORBIT>::TraversorCell(const MAP& map, bool forceDartMarker, u
 		else
 		{
 			if(map.template isOrbitEmbedded<ORBIT>())
-				cmark = new CellMarker<ORBIT>(map, thread) ;
+				cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
 			else
-				dmark = new DartMarker(map, thread) ;
+				dmark = new DartMarker<MAP>(map, thread) ;
 		}
 	}
 }

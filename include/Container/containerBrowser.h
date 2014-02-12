@@ -37,15 +37,16 @@ namespace CGoGN
  * Browser that traverses all darts and jumps over
  * those not selected by the selector
  */
+template <typename MAP>
 class DartContainerBrowserSelector : public ContainerBrowser
 {
 protected:
 	AttributeContainer* m_cont ;
 	const FunctorSelect* m_selector ;
-	AttribMap& m_map;
+	MAP& m_map;
 
 public:
-	DartContainerBrowserSelector(AttribMap& m, const FunctorSelect& fs);
+	DartContainerBrowserSelector(MAP& m, const FunctorSelect& fs);
 	~DartContainerBrowserSelector();
 	unsigned int begin() const;
 	unsigned int end() const;
@@ -53,6 +54,8 @@ public:
 	void enable();
 	void disable();
 } ;
+
+
 
 template <unsigned int CELL>
 class ContainerBrowserCellMarked : public ContainerBrowser

@@ -39,9 +39,9 @@ VMarkerForTraversor<MAP, ORBIT>::VMarkerForTraversor(MAP& map, bool forceDartMar
 	m_cmark(NULL)
 {
 	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT))
-		m_cmark = new CellMarkerStore<ORBIT>(map, thread) ;
+		m_cmark = new CellMarkerStore<MAP, ORBIT>(map, thread) ;
 	else
-		m_dmark = new DartMarkerStore(map, thread) ;
+		m_dmark = new DartMarkerStore<MAP>(map, thread) ;
 }
 
 template <typename MAP, unsigned int ORBIT>
@@ -80,13 +80,13 @@ bool VMarkerForTraversor<MAP, ORBIT>::isMarked(Dart d)
 }
 
 template <typename MAP, unsigned int ORBIT>
-CellMarkerStore<ORBIT>* VMarkerForTraversor<MAP, ORBIT>::cmark()
+CellMarkerStore<MAP, ORBIT>* VMarkerForTraversor<MAP, ORBIT>::cmark()
 {
 	return m_cmark;
 }
 
 template <typename MAP, unsigned int ORBIT>
-DartMarkerStore* VMarkerForTraversor<MAP, ORBIT>::dmark()
+DartMarkerStore<MAP>* VMarkerForTraversor<MAP, ORBIT>::dmark()
 {
 	return m_dmark;
 }
@@ -113,9 +113,9 @@ VTraversor3XY<MAP, ORBX, ORBY>::VTraversor3XY(MAP& map, Dart dart, bool forceDar
 	else
 	{
 		if(!forceDartMarker && map.isOrbitEmbedded(ORBY))
-			m_cmark = new CellMarkerStore<ORBY>(map, thread) ;
+			m_cmark = new CellMarkerStore<MAP, ORBY>(map, thread) ;
 		else
-			m_dmark = new DartMarkerStore(map, thread) ;
+			m_dmark = new DartMarkerStore<MAP>(map, thread) ;
 	}
 }
 

@@ -74,13 +74,13 @@ inline void Map1<MAP>::update_topo_shortcuts()
 template <class MAP>
 inline Dart Map1<MAP>::phi1(Dart d) const
 {
-	return MAP::getPermutation<0>(d);
+	return MAP::template getPermutation<0>(d);
 }
 
 template <class MAP>
 inline Dart Map1<MAP>::phi_1(Dart d) const
 {
-	return MAP::getPermutationInv<0>(d);
+	return MAP::template getPermutationInv<0>(d);
 }
 
 template <class MAP>
@@ -118,13 +118,13 @@ inline Dart Map1<MAP>::alpha_1(Dart d) const
 template <class MAP>
 inline void Map1<MAP>::phi1sew(Dart d, Dart e)
 {
-	MAP::permutationSew<0>(d,e);
+	MAP::template permutationSew<0>(d,e);
 }
 
 template <class MAP>
 inline void Map1<MAP>::phi1unsew(Dart d)
 {
-	MAP::permutationUnsew<0>(d);
+	MAP::template permutationUnsew<0>(d);
 }
 
 /*! @name Generator and Deletor

@@ -21,57 +21,44 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attribmap.h"
-
 
 namespace CGoGN
 {
 
-
-inline DartContainerBrowserSelector::DartContainerBrowserSelector(AttribMap& m, const FunctorSelect& fs):
+template <typename MAP>
+inline DartContainerBrowserSelector<MAP>::DartContainerBrowserSelector(MAP& m, const FunctorSelect& fs):
 	m_map(m)
 {
-	if (GenericMap::isMultiRes())
-	{
-		m_cont = &(m.getMRAttributeContainer());
-	}
-	else
-	{
-		m_cont = &(m.getAttributeContainer<DART>());
-	}
+	m_cont = &m.getDartContainer();
 	m_selector = fs.copy();
 }
 
-inline DartContainerBrowserSelector::~DartContainerBrowserSelector()
+template <typename MAP>
+inline DartContainerBrowserSelector<MAP>::~DartContainerBrowserSelector()
 {
 	delete m_selector;
 }
 
-inline unsigned int DartContainerBrowserSelector::begin() const
+template <typename MAP>
+inline unsigned int DartContainerBrowserSelector<MAP>::begin() const
 {
-	if (GenericMap::isMultiRes())
-	{
-		unsigned int it = m_cont->realBegin() ;
-		while ( (it != m_cont->realEnd()) && !m_selector->operator()(m_map.indexDart(it)) )
-			m_cont->realNext(it);
-		return it;
-	}
-	else
-	{
-		unsigned int it = m_cont->realBegin() ;
-		while ( (it != m_cont->realEnd()) && !m_selector->operator()(Dart(it)) )
-			m_cont->realNext(it);
-		return it;
-	}
+	unsigned int it = m_cont->realBegin() ;
+	while ( (it != m_cont->realEnd()) && !m_selector->operator()(m_map.indexDart(it)) )
+		m_cont->realNext(it);
+	return it;
 }
 
-inline unsigned int DartContainerBrowserSelector::end() const
+template <typename MAP>
+inline unsigned int DartContainerBrowserSelector<MAP>::end() const
 {
 	return m_cont->realEnd();
 }
 
-inline void DartContainerBrowserSelector::next(unsigned int& it) const
+template <typename MAP>
+inline void DartContainerBrowserSelector<MAP>::next(unsigned int& it) const
 {
 	do
 	{
@@ -80,39 +67,55 @@ inline void DartContainerBrowserSelector::next(unsigned int& it) const
 	while ( (it != m_cont->realEnd()) && !m_selector->operator()(Dart(it)) ) ;
 }
 
-
-inline void DartContainerBrowserSelector::enable()
+template <typename MAP>
+inline void DartContainerBrowserSelector<MAP>::enable()
 {
 	m_cont->setContainerBrowser(this);
 }
 
-inline void DartContainerBrowserSelector::disable()
+template <typename MAP>
+inline void DartContainerBrowserSelector<MAP>::disable()
 {
 	m_cont->setContainerBrowser(NULL);
 }
 
 
+
+
+
+
 inline ContainerBrowserLinked::ContainerBrowserLinked(AttribMap& m, unsigned int orbit):
-	autoAttribute(true), m_first(0xffffffff), m_end(0xffffffff)
+	autoAttribute(true),
+	m_first(0xffffffff),
+	m_end(0xffffffff)
 {
 	m_cont = &(m.getAttributeContainer(orbit));
 	m_links = m_cont->addAttribute<unsigned int>("Browser_Links") ;
 }
 
-
 inline ContainerBrowserLinked::ContainerBrowserLinked(AttributeContainer& c):
-	m_cont(&c), autoAttribute(true), m_first(0xffffffff), m_end(0xffffffff)
+	m_cont(&c),
+	autoAttribute(true),
+	m_first(0xffffffff),
+	m_end(0xffffffff)
 {
 	m_links = m_cont->addAttribute<unsigned int>("Browser_Links") ;
 }
 
 inline ContainerBrowserLinked::ContainerBrowserLinked(AttributeContainer& c, AttributeMultiVector<unsigned int>* links):
-	m_cont(&c), m_links(links), autoAttribute(false), m_first(0xffffffff), m_end(0xffffffff)
+	m_cont(&c),
+	m_links(links),
+	autoAttribute(false),
+	m_first(0xffffffff),
+	m_end(0xffffffff)
 {}
 
 
 inline ContainerBrowserLinked::ContainerBrowserLinked(ContainerBrowserLinked& cbl):
-	m_cont(cbl.m_cont), m_links(cbl.m_links), m_first(0xffffffff), m_end(0xffffffff)
+	m_cont(cbl.m_cont),
+	m_links(cbl.m_links),
+	m_first(0xffffffff),
+	m_end(0xffffffff)
 {}
 
 inline ContainerBrowserLinked::~ContainerBrowserLinked()
@@ -157,7 +160,6 @@ inline void ContainerBrowserLinked::pushBack(unsigned int it)
 	}
 }
 
-
 inline void ContainerBrowserLinked::enable()
 {
 	m_cont->setContainerBrowser(this);
@@ -181,12 +183,10 @@ inline ContainerBrowserCellMarked<CELL>::ContainerBrowserCellMarked(AttribMap& m
 	m_cont = &(m.getAttributeContainer<CELL>());
 }
 
-
 template <unsigned int CELL>
 inline ContainerBrowserCellMarked<CELL>::~ContainerBrowserCellMarked()
 {
 }
-
 
 template <unsigned int CELL>
 inline unsigned int ContainerBrowserCellMarked<CELL>::begin() const
@@ -225,6 +225,5 @@ inline void ContainerBrowserCellMarked<CELL>::disable()
 {
 	m_cont->setContainerBrowser(NULL);
 }
-
 
 } // namespace CGoGN

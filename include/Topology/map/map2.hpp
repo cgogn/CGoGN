@@ -71,7 +71,7 @@ inline void Map2<MAP>::update_topo_shortcuts()
 template <class MAP>
 inline Dart Map2<MAP>::phi2(Dart d) const
 {
-	return MAP::getInvolution<0>(d);
+	return MAP::template getInvolution<0>(d);
 }
 
 template <class MAP>
@@ -111,7 +111,7 @@ inline Dart Map2<MAP>::alpha1(Dart d) const
 template <class MAP>
 inline Dart Map2<MAP>::alpha_1(Dart d) const
 {
-	return phi1(phi2(d)) ;
+	return this->phi1(phi2(d)) ;
 }
 
 template <class MAP>
@@ -129,13 +129,13 @@ inline Dart Map2<MAP>::phi12(Dart d) const
 template <class MAP>
 inline void Map2<MAP>::phi2sew(Dart d, Dart e)
 {
-	MAP::involutionSew<0>(d,e);
+	MAP::template involutionSew<0>(d,e);
 }
 
 template <class MAP>
 inline void Map2<MAP>::phi2unsew(Dart d)
 {
-	MAP::involutionUnsew<0>(d);
+	MAP::template involutionUnsew<0>(d);
 }
 
 /*! @name Generator and Deletor
@@ -282,7 +282,7 @@ Dart Map2<MAP>::deleteVertex(Dart d)
 		if(res == NIL && this->phi1(this->phi1(d)) != d)
 			res = this->phi1(d) ;
 
-		Dart f = phi_1(phi2(vit)) ;
+		Dart f = this->phi_1(phi2(vit)) ;
 		this->phi1sew(vit, f) ;
 
 		vit = phi2(this->phi_1(vit)) ;
@@ -416,7 +416,7 @@ void Map2<MAP>::insertEdgeInVertex(Dart d, Dart e)
 {
 	assert(!sameVertex(d,e));
 	assert(phi2(e) == this->phi_1(e));
-	phi1sew(this->phi_1(d), this->phi_1(e));
+	this->phi1sew(this->phi_1(d), this->phi_1(e));
 }
 
 template <class MAP>

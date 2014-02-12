@@ -66,14 +66,12 @@ void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribut
 template<typename PFP>
 void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary)
 {
-	Map2* ptrMap2 = dynamic_cast<Map2*>(&map);
-	if (ptrMap2 != NULL)
+	if (map.mapTypeName()[0] == "M") // "Map2"
 	{
 		updateDataMap<PFP>(map, positions, ke, kf, withBoundary);
 		return;
 	}
-	GMap2* ptrGMap2 = dynamic_cast<GMap2*>(&map);
-	if (ptrGMap2 != NULL)
+	if (map.mapTypeName()[0] == "G") // "GMap2"
 	{
 		updateDataGMap<PFP>(map, positions, ke, kf, withBoundary);
 		return;

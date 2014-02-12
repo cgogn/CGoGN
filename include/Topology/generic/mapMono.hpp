@@ -48,6 +48,11 @@ inline void MapMono::deleteDart(Dart d)
 	deleteDartLine(d.index) ;
 }
 
+inline AttributeContainer& MapMono::getDartContainer()
+{
+	return m_attribs[DART];
+}
+
 /****************************************
  *        RELATIONS MANAGEMENT          *
  ****************************************/
@@ -168,6 +173,136 @@ inline Dart MapMono::end() const
 inline void MapMono::next(Dart& d) const
 {
 	m_attribs[DART].next(d.index) ;
+}
+
+/****************************************
+ *         EMBEDDING MANAGEMENT         *
+ ****************************************/
+
+template <unsigned int ORBIT>
+inline unsigned int MapMono::getEmbedding(Dart d) const
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int d_index = dartIndex(d);
+
+	if (ORBIT == DART)
+		return d_index;
+
+	return (*m_embeddings[ORBIT])[d_index] ;
+}
+
+template <unsigned int ORBIT>
+void MapMono::setDartEmbedding(Dart d, unsigned int emb)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int old = getEmbedding<ORBIT>(d);
+
+	if (old == emb)	// if same emb
+		return;		// nothing to do
+
+	if (old != EMBNULL)	// if different
+	{
+		if(m_attribs[ORBIT].unrefLine(old))	// then unref the old emb
+		{
+			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
+				(*m_markTables[ORBIT][t])[old].clear();		// last unref of the line
+		}
+	}
+
+	if (emb != EMBNULL)
+		m_attribs[ORBIT].refLine(emb);	// ref the new emb
+
+	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // finally affect the embedding to the dart
+}
+
+template <unsigned int ORBIT>
+void MapMono::initDartEmbedding(Dart d, unsigned int emb)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+	assert(getEmbedding<ORBIT>(d) == EMBNULL || !"initDartEmbedding called on already embedded dart");
+
+	if(emb != EMBNULL)
+		m_attribs[ORBIT].refLine(emb);	// ref the new emb
+	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // affect the embedding to the dart
+}
+
+template <unsigned int ORBIT>
+inline void MapMono::copyDartEmbedding(Dart dest, Dart src)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	setDartEmbedding<ORBIT>(dest, getEmbedding<ORBIT>(src));
+}
+
+template <unsigned int ORBIT>
+inline void MapMono::setOrbitEmbedding(Dart d, unsigned int em)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	FunctorSetEmb<MapMono, ORBIT> fsetemb(*this, em);
+	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+}
+
+template <unsigned int ORBIT>
+inline void MapMono::initOrbitEmbedding(Dart d, unsigned int em)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	FunctorInitEmb<MapMono, ORBIT> fsetemb(*this, em);
+	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+}
+
+template <unsigned int ORBIT>
+inline unsigned int MapMono::setOrbitEmbeddingOnNewCell(Dart d)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int em = newCell<ORBIT>();
+	setOrbitEmbedding<ORBIT>(d, em);
+	return em;
+}
+
+template <unsigned int ORBIT>
+inline unsigned int MapMono::initOrbitEmbeddingOnNewCell(Dart d)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int em = newCell<ORBIT>();
+	initOrbitEmbedding<ORBIT>(d, em);
+	return em;
+}
+
+template <unsigned int ORBIT>
+inline void MapMono::copyCell(Dart d, Dart e)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+	unsigned int dE = getEmbedding<ORBIT>(d) ;
+	unsigned int eE = getEmbedding<ORBIT>(e) ;
+	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
+	{
+		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
+			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+		copyCell<ORBIT>(dE, eE);	// copy the data
+	}
+}
+
+template <unsigned int ORBIT>
+void MapMono::initAllOrbitsEmbedding(bool realloc)
+{
+	if(!isOrbitEmbedded<ORBIT>())
+		addEmbedding<ORBIT>() ;
+	DartMarker<MapMono> mark(*this) ;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!mark.isMarked(d))
+		{
+			mark.markOrbit<ORBIT>(d) ;
+			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
+				setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+		}
+	}
 }
 
 } // namespace CGoGN

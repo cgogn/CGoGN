@@ -24,6 +24,9 @@
 
 #include "Topology/generic/mapMulti.h"
 
+namespace CGoGN
+{
+
 /****************************************
  *     RESOLUTION LEVELS MANAGEMENT     *
  ****************************************/
@@ -193,3 +196,181 @@ void MapMulti::duplicateDarts(unsigned int newlevel)
 		(*attrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
 	}
 }
+
+/****************************************
+ *             SAVE & LOAD              *
+ ****************************************/
+
+bool MapMulti::saveMapBin(const std::string& filename) const
+{
+	CGoGNostream fs(filename.c_str(), std::ios::out|std::ios::binary);
+	if (!fs)
+	{
+		CGoGNerr << "Unable to open file for writing: " << filename << CGoGNendl;
+		return false;
+	}
+
+	// Entete
+	char* buff = new char[256];
+	for (int i = 0; i < 256; ++i)
+		buff[i] = char(255);
+
+	memcpy(buff, "CGoGN_MRMap", 12);
+
+	std::string mt = mapTypeName();
+	const char* mtc = mt.c_str();
+	memcpy(buff+32, mtc, mt.size()+1);
+	unsigned int *buffi = reinterpret_cast<unsigned int*>(buff + 64);
+	*buffi = NB_ORBITS;
+	fs.write(reinterpret_cast<const char*>(buff), 256);
+	delete buff;
+
+	// save all attribs
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+		m_attribs[i].saveBin(fs, i);
+
+	m_mrattribs.saveBin(fs, 00);
+
+	fs.write(reinterpret_cast<const char*>(&m_mrCurrentLevel), sizeof(unsigned int));
+
+	unsigned int nb = m_mrNbDarts.size();
+	fs.write(reinterpret_cast<const char*>(&nb), sizeof(unsigned int));
+	fs.write(reinterpret_cast<const char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
+
+	return true;
+}
+
+bool MapMulti::loadMapBin(const std::string& filename)
+{
+	CGoGNistream fs(filename.c_str(), std::ios::in|std::ios::binary);
+	if (!fs)
+	{
+		CGoGNerr << "Unable to open file for loading" << CGoGNendl;
+		return false;
+	}
+
+	GenericMap::clear(true);
+
+	// read info
+	char* buff = new char[256];
+	fs.read(reinterpret_cast<char*>(buff), 256);
+
+	std::string buff_str(buff);
+	// Check file type
+	if (buff_str == "CGoGN_Map")
+	{
+		CGoGNerr << "Wrong binary file format, file is not a MR-Map" << CGoGNendl;
+		return false;
+	}
+	if (buff_str != "CGoGN_MRMap")
+	{
+		CGoGNerr << "Wrong binary file format" << CGoGNendl;
+		return false;
+	}
+
+	// Check map type
+	buff_str = std::string(buff + 32);
+
+	std::string localType = this->mapTypeName();
+
+	std::string fileType = buff_str;
+
+	if (fileType != localType)
+	{
+		CGoGNerr << "Not possible to load "<< fileType << " into " << localType << " object" << CGoGNendl;
+		return false;
+	}
+
+	// Check max nb orbit
+	unsigned int *ptr_nbo = reinterpret_cast<unsigned int*>(buff + 64);
+	unsigned int nbo = *ptr_nbo;
+	if (nbo != NB_ORBITS)
+	{
+		CGoGNerr << "Wrond max orbit number in file" << CGoGNendl;
+		return  false;
+	}
+
+	// load attrib container
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+	{
+		unsigned int id = AttributeContainer::loadBinId(fs);
+		m_attribs[id].loadBin(fs);
+	}
+
+	AttributeContainer::loadBinId(fs); // not used but need to read to skip
+	m_mrattribs.loadBin(fs);
+
+	fs.read(reinterpret_cast<char*>(&m_mrCurrentLevel), sizeof(unsigned int));
+	unsigned int nb;
+	fs.read(reinterpret_cast<char*>(&nb), sizeof(unsigned int));
+	m_mrNbDarts.resize(nb);
+	fs.read(reinterpret_cast<char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
+
+	// retrieve m_embeddings (from m_attribs)
+	update_m_emb_afterLoad();
+
+	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
+	update_topo_shortcuts();
+
+	// restore nbThreads
+	std::vector<std::string> typeMark;
+	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
+	m_nbThreads = 0;
+	for (unsigned int i = 0; i < nbatt0; ++i)
+	{
+		if (typeMark[i] == "Mark")
+			++m_nbThreads;
+	}
+
+	// restore quick traversals pointers if necessary (containers already ok)
+	for (unsigned int orb=0; orb<NB_ORBITS; ++orb)
+	{
+		m_quickTraversal[orb] = m_attribs[orb].getDataVector<Dart>("quick_traversal") ;
+		for(unsigned int j = 0; j < NB_ORBITS; ++j)
+		{
+			std::stringstream ss;
+			ss << "quickLocalIncidentTraversal_" << j;
+			m_quickLocalIncidentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+			std::stringstream ss2;
+			ss2 << "quickLocalAdjacentTraversal" << j;
+			m_quickLocalAdjacentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss2.str()) ;
+		}
+	}
+
+	return true;
+}
+
+bool MapMulti::copyFrom(const GenericMap& map)
+{
+	const MapMulti& mapMR = reinterpret_cast<const MapMulti&>(map);
+
+	if (mapTypeName() != map.mapTypeName())
+	{
+		CGoGNerr << "try to copy from incompatible type map" << CGoGNendl;
+		return false;
+	}
+
+	GenericMap::clear(true);
+
+	// load attrib container
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+		m_attribs[i].copyFrom(mapMR.m_attribs[i]);
+
+	m_mrattribs.copyFrom(mapMR.m_mrattribs);
+	m_mrCurrentLevel = mapMR.m_mrCurrentLevel;
+
+	unsigned int nb = mapMR.m_mrNbDarts.size();
+	m_mrNbDarts.resize(nb);
+	for (unsigned int i = 0; i < nb; ++i)
+		m_mrNbDarts[i] = mapMR.m_mrNbDarts[i];
+
+	// retrieve m_embeddings (from m_attribs)
+	update_m_emb_afterLoad();
+
+	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
+	update_topo_shortcuts();
+
+	return true;
+}
+
+} //namespace CGoGN

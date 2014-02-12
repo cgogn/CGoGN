@@ -25,13 +25,15 @@
 #ifndef __MAP_MULTI__
 #define __MAP_MULTI__
 
-#include "attribmap.h"
+#include "Topology/generic/attribmap.h"
 
 namespace CGoGN
 {
 
 class MapMulti : public AttribMap
 {
+	template<typename MAP> friend class DartMarkerTmpl ;
+
 public:
 	MapMulti()
 	{
@@ -83,7 +85,7 @@ protected:
 	/****************************************
 	 *          DARTS MANAGEMENT            *
 	 ****************************************/
-
+public:
 	inline virtual Dart newDart();
 
 	inline virtual void deleteDart(Dart d);
@@ -105,11 +107,14 @@ protected:
 	 */
 	virtual unsigned int getNbDarts() ;
 
+	inline AttributeContainer& getDartContainer();
+
 	/**
 	 * get the insertion level of a dart
 	 */
 	unsigned int getDartLevel(Dart d) const ;
 
+protected:
 	/**
 	 *
 	 */
@@ -156,7 +161,7 @@ protected:
 	/****************************************
 	 *      MR CONTAINER MANAGEMENT         *
 	 ****************************************/
-
+public:
 	/**
 	 * get the MR attribute container
 	 */
@@ -266,6 +271,97 @@ protected:
 	 * @param d reference to the dart to be modified
 	 */
 	inline virtual void next(Dart& d) const;
+
+	/****************************************
+	 *         EMBEDDING MANAGEMENT         *
+	 ****************************************/
+
+	/**
+	 * get the cell index of the given dimension associated to dart d
+	 * @return EMBNULL if the orbit of d is not attached to any cell
+	 */
+	template<unsigned int ORBIT>
+	inline unsigned int getEmbedding(Dart d) const;
+
+	/**
+	 * Set the cell index of the given dimension associated to dart d
+	 */
+	template <unsigned int ORBIT>
+	void setDartEmbedding(Dart d, unsigned int emb) ;
+
+	/**
+	 * Set the cell index of the given dimension associated to dart d
+	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding) !!! WARNING !!!
+	 */
+	template <unsigned int ORBIT>
+	void initDartEmbedding(Dart d, unsigned int emb) ;
+
+	/**
+	 * Copy the index of the cell associated to a dart over an other dart
+	 * @param orbit the id of orbit embedding
+	 * @param dest the dart to overwrite
+	 * @param src the dart to copy
+	 */
+	template <unsigned int ORBIT>
+	inline void copyDartEmbedding(Dart dest, Dart src) ;
+
+	/**
+	* Set the index of the associated cell to all the darts of an orbit
+	* @param orbit orbit to embed
+	* @param d a dart of the topological vertex
+	* @param em index of attribute to store as embedding
+	*/
+	template <unsigned int ORBIT>
+	void setOrbitEmbedding(Dart d, unsigned int em) ;
+
+	/**
+	 * Set the index of the associated cell to all the darts of an orbit
+	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
+	 */
+	template <unsigned int ORBIT>
+	void initOrbitEmbedding(Dart d, unsigned int em) ;
+
+	/**
+	* Associate an new cell to all darts of an orbit
+	* @param orbit orbit to embed
+	* @param d a dart of the topological cell
+	* @return index of the attribute in table
+	*/
+	template <unsigned int ORBIT>
+	unsigned int setOrbitEmbeddingOnNewCell(Dart d) ;
+
+	/**
+	 * Associate an new cell to all darts of an orbit
+	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
+	 */
+	template <unsigned int ORBIT>
+	unsigned int initOrbitEmbeddingOnNewCell(Dart d) ;
+
+	/**
+	 * Copy the cell associated to a dart over an other dart
+	 * @param orbit attribute orbit to use
+	 * @param d the dart to overwrite (dest)
+	 * @param e the dart to copy (src)
+	 */
+	template <unsigned int ORBIT>
+	void copyCell(Dart d, Dart e) ;
+
+	/**
+	 * Traverse the map and embed all orbits of the given dimension with a new cell
+	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
+	 */
+	template <unsigned int ORBIT>
+	void initAllOrbitsEmbedding(bool realloc = false) ;
+
+	/****************************************
+	 *             SAVE & LOAD              *
+	 ****************************************/
+
+	bool saveMapBin(const std::string& filename) const;
+
+	bool loadMapBin(const std::string& filename);
+
+	bool copyFrom(const GenericMap& map);
 } ;
 
 } //namespace CGoGN

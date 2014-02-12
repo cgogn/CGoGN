@@ -41,7 +41,6 @@ class CellMarkerGen
 	friend class GenericMap ;
 
 protected:
-	GenericMap& m_map ;
 	Mark m_mark ;
 	AttributeMultiVector<Mark>* m_markVector ;
 	unsigned int m_thread ;
@@ -49,14 +48,11 @@ protected:
 	bool releaseOnDestruct ;
 
 public:
-	CellMarkerGen(GenericMap& map, unsigned int cell, unsigned int thread = 0) :
-		m_map(map),
+	CellMarkerGen(unsigned int cell, unsigned int thread = 0) :
 		m_thread(thread),
 		m_cell(cell),
 		releaseOnDestruct(true)
 	{}
-
-
 
 	~CellMarkerGen()
 	{}
@@ -65,6 +61,11 @@ public:
 	unsigned int getCell() { return m_cell ; }
 
 	void updateMarkVector(AttributeMultiVector<Mark>* amv) { m_markVector = amv ; }
+
+protected:
+	// protected copy constructor to forbid its usage
+	CellMarkerGen(const CellMarkerGen& /*cm*/)
+	{}
 
 	/**
 	 * set if the mark has to be release on destruction or not
@@ -86,30 +87,36 @@ public:
  * generic class that allows the marking of cells
  * \warning no default constructor
  */
-template <unsigned int CELL>
+template <typename MAP, unsigned int CELL>
 class CellMarkerBase : public CellMarkerGen
 {
+protected:
+	MAP& m_map ;
+
 public:
 	/**
 	 * constructor
 	 * @param map the map on which we work
 	 */
-	CellMarkerBase(GenericMap& map, unsigned int thread = 0) : CellMarkerGen(map, CELL, thread)
+	CellMarkerBase(MAP& map, unsigned int thread = 0) :
+		CellMarkerGen(CELL, thread),
+		m_map(map)
 	{
-		if(!m_map.isOrbitEmbedded<CELL>())
-			m_map.addEmbedding<CELL>() ;
-		m_mark = m_map.getMarkerSet<CELL>(m_thread).getNewMark() ;
-		m_markVector = m_map.getMarkVector<CELL>(m_thread) ;
+		if(!m_map.template isOrbitEmbedded<CELL>())
+			m_map.template addEmbedding<CELL>() ;
+		m_mark = m_map.template getMarkerSet<CELL>(m_thread).getNewMark() ;
+		m_markVector = m_map.template getMarkVector<CELL>(m_thread) ;
 		m_map.cellMarkers[m_thread].push_back(this) ;
 	}
 
-	CellMarkerBase(const GenericMap& map, unsigned int thread = 0) :
-		CellMarkerGen(const_cast<GenericMap&>(map), CELL, thread)
+	CellMarkerBase(const MAP& map, unsigned int thread = 0) :
+		CellMarkerGen(CELL, thread),
+		m_map(const_cast<MAP&>(map))
 	{
-		if(!m_map.isOrbitEmbedded<CELL>())
-			m_map.addEmbedding<CELL>() ;
-		m_mark = m_map.getMarkerSet<CELL>(m_thread).getNewMark() ;
-		m_markVector = m_map.getMarkVector<CELL>(m_thread) ;
+		if(!m_map.template isOrbitEmbedded<CELL>())
+			m_map.template addEmbedding<CELL>() ;
+		m_mark = m_map.template getMarkerSet<CELL>(m_thread).getNewMark() ;
+		m_markVector = m_map.template getMarkVector<CELL>(m_thread) ;
 		m_map.cellMarkers[m_thread].push_back(this) ;
 	}
 
@@ -117,7 +124,7 @@ public:
 	{
 		if(releaseOnDestruct)
 		{
-			m_map.getMarkerSet<CELL>(m_thread).releaseMark(m_mark) ;
+			m_map.template getMarkerSet<CELL>(m_thread).releaseMark(m_mark) ;
 
 			std::vector<CellMarkerGen*>& cmg = m_map.cellMarkers[m_thread];
 			for(std::vector<CellMarkerGen*>::iterator it = cmg.begin(); it != cmg.end(); ++it)
@@ -134,7 +141,9 @@ public:
 
 protected:
 	// protected copy constructor to forbid its usage
-	CellMarkerBase(const CellMarkerGen& cm) : CellMarkerGen(cm.m_map, CELL)
+	CellMarkerBase(const CellMarkerBase<MAP, CELL>& cm) :
+		m_map(cm.m_map),
+		CellMarkerGen(CELL)
 	{}
 
 public:
@@ -143,7 +152,7 @@ public:
 	 */
 	inline void mark(Dart d)
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
@@ -157,7 +166,7 @@ public:
 	 */
 	inline void unmark(Dart d)
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
@@ -171,7 +180,7 @@ public:
 	 */
 	inline bool isMarked(Dart d) const
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
@@ -185,7 +194,7 @@ public:
 	 */
 	inline void mark(unsigned int em)
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		m_markVector->operator[](em).setMark(m_mark) ;
@@ -196,7 +205,7 @@ public:
 	 */
 	inline void unmark(unsigned int em)
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		m_markVector->operator[](em).unsetMark(m_mark) ;
@@ -207,7 +216,7 @@ public:
 	 */
 	inline bool isMarked(unsigned int em) const
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		if (em == EMBNULL)
@@ -220,20 +229,20 @@ public:
 	 */
 	inline void markAll()
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		AttributeContainer& cont = m_map.getAttributeContainer<CELL>() ;
+		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_markVector->operator[](i).setMark(m_mark) ;
 	}
 
 	inline bool isAllUnmarked()
 	{
-		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		AttributeContainer& cont = m_map.getAttributeContainer<CELL>() ;
+		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			if(m_markVector->operator[](i).testMark(m_mark))
 				return false ;
@@ -245,15 +254,15 @@ public:
  * class that allows the marking of cells
  * \warning no default constructor
  */
-template <unsigned int CELL>
-class CellMarker : public CellMarkerBase<CELL>
+template <typename MAP, unsigned int CELL>
+class CellMarker : public CellMarkerBase<MAP, CELL>
 {
 public:
-	CellMarker(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
+	CellMarker(MAP& map, unsigned int thread = 0) : CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	CellMarker(const GenericMap& map, unsigned int thread = 0) :
-		CellMarkerBase<CELL>(map, thread)
+	CellMarker(const MAP& map, unsigned int thread = 0) :
+		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
 	~CellMarker()
@@ -262,7 +271,8 @@ public:
 	}
 
 protected:
-	CellMarker(const CellMarker& cm) : CellMarkerBase<CELL>(cm)
+	CellMarker(const CellMarker& cm) :
+		CellMarkerBase<MAP, CELL>(cm)
 	{}
 
 public:
@@ -282,18 +292,19 @@ public:
  * the marked cells are stored to optimize the unmarking task at destruction
  * \warning no default constructor
  */
-template <unsigned int CELL>
-class CellMarkerStore: public CellMarkerBase<CELL>
+template <typename MAP, unsigned int CELL>
+class CellMarkerStore: public CellMarkerBase<MAP, CELL>
 {
 protected:
 	std::vector<unsigned int> m_markedCells ;
 
 public:
-	CellMarkerStore(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
+	CellMarkerStore(MAP& map, unsigned int thread = 0) :
+		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	CellMarkerStore(const GenericMap& map, unsigned int thread = 0) :
-		CellMarkerBase<CELL>(map, thread)
+	CellMarkerStore(const MAP& map, unsigned int thread = 0) :
+		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
 	~CellMarkerStore()
@@ -304,19 +315,20 @@ public:
 	}
 
 protected:
-	CellMarkerStore(const CellMarkerStore& cm) : CellMarkerBase<CELL>(cm)
+	CellMarkerStore(const CellMarkerStore& cm) :
+		CellMarkerBase<MAP, CELL>(cm)
 	{}
 
 public:
 	inline void mark(Dart d)
 	{
-		CellMarkerBase<CELL>::mark(d) ;
+		CellMarkerBase<MAP, CELL>::mark(d) ;
 		m_markedCells.push_back(this->m_map.template getEmbedding<CELL>(d)) ;
 	}
 
 	inline void mark(unsigned int em)
 	{
-		CellMarkerBase<CELL>::mark(em) ;
+		CellMarkerBase<MAP, CELL>::mark(em) ;
 		m_markedCells.push_back(em) ;
 	}
 
@@ -335,20 +347,20 @@ public:
  * the marked Darts are stored to optimize the unmarking task at destruction
  * \warning no default constructor
  */
-template <unsigned int CELL>
-class CellMarkerMemo: public CellMarkerBase<CELL>
+template <typename MAP, unsigned int CELL>
+class CellMarkerMemo: public CellMarkerBase<MAP, CELL>
 {
 protected:
 	std::vector<Dart> m_markedDarts ;
 
 public:
-	CellMarkerMemo(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
+	CellMarkerMemo(MAP& map, unsigned int thread = 0) :
+		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	CellMarkerMemo(const GenericMap& map, unsigned int thread = 0) :
-		CellMarkerBase<CELL>(map, thread)
+	CellMarkerMemo(const MAP& map, unsigned int thread = 0) :
+		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
-
 
 	~CellMarkerMemo()
 	{
@@ -358,7 +370,8 @@ public:
 	}
 
 protected:
-	CellMarkerMemo(const CellMarkerMemo& cm) : CellMarkerBase<CELL>(cm)
+	CellMarkerMemo(const CellMarkerMemo& cm) :
+		CellMarkerBase<MAP, CELL>(cm)
 	{}
 
 public:
@@ -366,7 +379,7 @@ public:
 	{
 		if(!this->isMarked(d))
 		{
-			CellMarkerBase<CELL>::mark(d) ;
+			CellMarkerBase<MAP, CELL>::mark(d) ;
 			m_markedDarts.push_back(d) ;
 		}
 	}
@@ -383,7 +396,7 @@ public:
 
 	}
 
-	inline std::vector<Dart> get_markedCells()
+	inline const std::vector<Dart>& get_markedCells()
 	{
 		return m_markedDarts;
 	}
@@ -394,17 +407,17 @@ public:
  * the markers are not unmarked at destruction
  * \warning no default constructor
  */
-template <unsigned int CELL>
-class CellMarkerNoUnmark: public CellMarkerBase<CELL>
+template <typename MAP, unsigned int CELL>
+class CellMarkerNoUnmark: public CellMarkerBase<MAP, CELL>
 {
 public:
-	CellMarkerNoUnmark(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
+	CellMarkerNoUnmark(MAP& map, unsigned int thread = 0) :
+		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	CellMarkerNoUnmark(const GenericMap& map, unsigned int thread = 0) :
-		CellMarkerBase<CELL>(map, thread)
+	CellMarkerNoUnmark(const MAP& map, unsigned int thread = 0) :
+		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
-
 
 	~CellMarkerNoUnmark()
 	{
@@ -413,7 +426,8 @@ public:
 	}
 
 protected:
-	CellMarkerNoUnmark(const CellMarkerNoUnmark& cm) : CellMarkerBase<CELL>(cm)
+	CellMarkerNoUnmark(const CellMarkerNoUnmark& cm) :
+		CellMarkerBase<MAP, CELL>(cm)
 	{}
 
 public:
@@ -428,17 +442,22 @@ public:
 	}
 };
 
+// Selector and count functors testing for marker existence
+/********************************************************/
 
 /**
  * selector that say if a dart has its cell marked
  */
-template <unsigned int CELL>
+template <typename MAP, unsigned int CELL>
 class SelectorCellMarked : public FunctorSelect
 {
 protected:
-	const CellMarkerBase<CELL>& m_cmarker ;
+	const CellMarkerBase<MAP, CELL>& m_cmarker ;
+
 public:
-	SelectorCellMarked(const CellMarkerBase<CELL>& cm) : m_cmarker(cm) {}
+	SelectorCellMarked(const CellMarkerBase<MAP, CELL>& cm) :
+		m_cmarker(cm)
+	{}
 
 	inline bool operator()(Dart d) const
 	{
@@ -449,44 +468,59 @@ public:
 	inline FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker); }
 };
 
-template <unsigned int CELL>
+template <typename MAP, unsigned int CELL>
 class SelectorCellUnmarked : public FunctorSelect
 {
 protected:
-	const CellMarkerBase<CELL>& m_cmarker ;
+	const CellMarkerBase<MAP, CELL>& m_cmarker ;
+
 public:
-	SelectorCellUnmarked(const CellMarkerBase<CELL>& cm) : m_cmarker(cm) {}
+	SelectorCellUnmarked(const CellMarkerBase<MAP, CELL>& cm) :
+		m_cmarker(cm)
+	{}
+
 	inline bool operator()(Dart d) const
 	{
 		if (!m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
-	inline FunctorSelect* copy() const { return new SelectorCellUnmarked(m_cmarker); }
+
+	inline FunctorSelect* copy() const
+	{
+		return new SelectorCellUnmarked(m_cmarker);
+	}
 };
 
 // Functor version (needed for use with foreach_xxx)
 
-template <unsigned int CELL>
+template <typename MAP, unsigned int CELL>
 class FunctorCellIsMarked : public FunctorType
 {
 protected:
-	CellMarkerBase<CELL>& m_marker;
+	CellMarkerBase<MAP, CELL>& m_marker;
+
 public:
-	FunctorCellIsMarked(CellMarkerBase<CELL>& cm) : m_marker(cm) {}
+	FunctorCellIsMarked(CellMarkerBase<MAP, CELL>& cm) :
+		m_marker(cm)
+	{}
+
 	inline bool operator()(Dart d)
 	{
 		return m_marker.isMarked(d);
 	}
 };
 
-template <unsigned int CELL>
+template <typename MAP, unsigned int CELL>
 class FunctorCellIsUnmarked : public FunctorType
 {
 protected:
-	CellMarkerBase<CELL>& m_marker;
+	CellMarkerBase<MAP, CELL>& m_marker;
 public:
-	FunctorCellIsUnmarked(CellMarkerBase<CELL>& cm) : m_marker(cm) {}
+	FunctorCellIsUnmarked(CellMarkerBase<MAP, CELL>& cm) :
+		m_marker(cm)
+	{}
+
 	inline bool operator()(Dart d)
 	{
 		return !m_marker.isMarked(d);

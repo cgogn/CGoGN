@@ -90,10 +90,10 @@ inline unsigned int GenericMap::getNbDarts()
 	return m_attribs[DART].size() ;
 }
 
-inline bool GenericMap::isDartValid(Dart d)
-{
-	return !d.isNil() && m_attribs[DART].used(dartIndex(d)) ;
-}
+//inline bool GenericMap::isDartValid(Dart d)
+//{
+//	return !d.isNil() && m_attribs[DART].used(dartIndex(d)) ;
+//}
 
 /****************************************
  *         EMBEDDING MANAGEMENT         *
@@ -111,113 +111,10 @@ inline bool GenericMap::isOrbitEmbedded(unsigned int orbit) const
 }
 
 template <unsigned int ORBIT>
-inline unsigned int GenericMap::getEmbedding(Dart d) const
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int d_index = dartIndex(d);
-
-	if (ORBIT == DART)
-		return d_index;
-
-	return (*m_embeddings[ORBIT])[d_index] ;
-}
-
-template <unsigned int ORBIT>
-void GenericMap::setDartEmbedding(Dart d, unsigned int emb)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int old = getEmbedding<ORBIT>(d);
-
-	if (old == emb)	// if same emb
-		return;		// nothing to do
-
-	if (old != EMBNULL)	// if different
-	{
-		if(m_attribs[ORBIT].unrefLine(old))	// then unref the old emb
-		{
-			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
-				(*m_markTables[ORBIT][t])[old].clear();		// last unref of the line
-		}
-	}
-
-	if (emb != EMBNULL)
-		m_attribs[ORBIT].refLine(emb);	// ref the new emb
-
-	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // finally affect the embedding to the dart
-}
-
-template <unsigned int ORBIT>
-void GenericMap::initDartEmbedding(Dart d, unsigned int emb)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	assert(getEmbedding<ORBIT>(d) == EMBNULL || !"initDartEmbedding called on already embedded dart");
-	if(emb != EMBNULL)
-		m_attribs[ORBIT].refLine(emb);	// ref the new emb
-	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // affect the embedding to the dart
-}
-
-template <unsigned int ORBIT>
-inline void GenericMap::copyDartEmbedding(Dart dest, Dart src)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	setDartEmbedding<ORBIT>(dest, getEmbedding<ORBIT>(src));
-}
-
-template <unsigned int ORBIT>
 inline unsigned int GenericMap::newCell()
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	return m_attribs[ORBIT].insertLine();
-}
-
-template <unsigned int ORBIT>
-inline void GenericMap::setOrbitEmbedding(Dart d, unsigned int em)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	FunctorSetEmb<GenericMap, ORBIT> fsetemb(*this, em);
-	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
-}
-
-template <unsigned int ORBIT>
-inline void GenericMap::initOrbitEmbedding(Dart d, unsigned int em)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	FunctorInitEmb<GenericMap, ORBIT> fsetemb(*this, em);
-	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
-}
-
-template <unsigned int ORBIT>
-inline unsigned int GenericMap::setOrbitEmbeddingOnNewCell(Dart d)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	unsigned int em = newCell<ORBIT>();
-	setOrbitEmbedding<ORBIT>(d, em);
-	return em;
-}
-
-template <unsigned int ORBIT>
-inline unsigned int GenericMap::initOrbitEmbeddingNewCell(Dart d)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	unsigned int em = newCell<ORBIT>();
-	initOrbitEmbedding<ORBIT>(d, em);
-	return em;
-}
-
-template <unsigned int ORBIT>
-inline void GenericMap::copyCell(Dart d, Dart e)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	unsigned int dE = getEmbedding<ORBIT>(d) ;
-	unsigned int eE = getEmbedding<ORBIT>(e) ;
-	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
-	{
-		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-		m_attribs[ORBIT].copyLine(dE, eE) ;	// copy the data
-	}
 }
 
 template <unsigned int ORBIT>
@@ -232,23 +129,6 @@ inline void GenericMap::initCell(unsigned int i)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	m_attribs[ORBIT].initLine(i) ;
-}
-
-template <unsigned int ORBIT>
-void GenericMap::initAllOrbitsEmbedding(bool realloc)
-{
-	if(!isOrbitEmbedded<ORBIT>())
-		addEmbedding<ORBIT>() ;
-	DartMarker mark(*this) ;
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(!mark.isMarked(d))
-		{
-			mark.markOrbit<ORBIT>(d) ;
-			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
-				setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-		}
-	}
 }
 
 /****************************************
@@ -352,7 +232,7 @@ inline void GenericMap::updateQuickIncidentTraversal()
 			buffer.push_back(e);
 		delete tra_loc;
 		buffer.push_back(NIL);
-		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+		std::vector<Dart>& vd = (*ptrVD)[MAP::getEmbedding<ORBIT>(d)];
 		vd.reserve(buffer.size());
 		vd.assign(buffer.begin(),buffer.end());
 	}
@@ -374,8 +254,6 @@ inline void GenericMap::disableQuickIncidentTraversal()
 		m_quickLocalIncidentTraversal[ORBIT][INCI] = NULL ;
 	}
 }
-
-
 
 template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
 inline void GenericMap::enableQuickAdjacentTraversal()
@@ -413,7 +291,7 @@ inline void GenericMap::updateQuickAdjacentTraversal()
 			buffer.push_back(e);
 		buffer.push_back(NIL);
 		delete tra_loc;
-		std::vector<Dart>& vd = (*ptrVD)[getEmbedding<ORBIT>(d)];
+		std::vector<Dart>& vd = (*ptrVD)[MAP::getEmbedding<ORBIT>(d)];
 		vd.reserve(buffer.size());
 		vd.assign(buffer.begin(),buffer.end());
 	}
@@ -548,7 +426,7 @@ bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thre
 template <typename MAP, unsigned int ORBIT>
 bool GenericMap::foreach_orbit(FunctorType& fonct, unsigned int thread) const
 {
-	TraversorCell<MAP, ORBIT> trav(*this, true, thread);
+	TraversorCell<MAP, ORBIT> trav(*reinterpret_cast<const MAP*>(this), true, thread);
 	bool found = false;
 
 	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())

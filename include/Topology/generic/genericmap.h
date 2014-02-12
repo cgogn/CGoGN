@@ -50,7 +50,7 @@ namespace CGoGN
 class AttributeHandlerGen ;
 class DartMarkerGen ;
 class CellMarkerGen ;
-template<unsigned int CELL> class CellMarkerBase ;
+//template<typename MAP, unsigned int CELL> class CellMarkerBase ;
 
 class GenericMap
 {
@@ -62,10 +62,9 @@ class GenericMap
 	template<typename T> friend class VolumeAutoAttribute ;
 	friend class DartMarkerGen ;
 	friend class CellMarkerGen ;
-	template<unsigned int CELL> friend class CellMarkerBase ;
+	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
-
 	/**
 	 * Attributes Containers
 	 */
@@ -108,7 +107,6 @@ protected:
 
 	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
 	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
-
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
@@ -165,17 +163,19 @@ public:
 	 * @param d
 	 * @return index of dart (depends on map implementation)
 	 */
-	virtual unsigned int dartIndex(Dart d) const ;
+//	virtual unsigned int dartIndex(Dart d) const = 0;
+
+	/**
+	 * get the Dart of index in topological table
+	 */
+//	virtual Dart indexDart(unsigned int index) const = 0;
 
 	/**
 	 * @return the number of darts in the map
 	 */
 	virtual unsigned int getNbDarts() ;
 
-	/**
-	 * return true if the dart d refers to a valid index
-	 */
-	bool isDartValid(Dart d) ;
+//	AttributeContainer& getDartContainer() = 0;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -190,82 +190,12 @@ public:
 	bool isOrbitEmbedded(unsigned int orbit) const ;
 
 	/**
-	 * get the cell index of the given dimension associated to dart d
-	 * @return EMBNULL if the orbit of d is not attached to any cell
-	 */
-	template<unsigned int ORBIT>
-	unsigned int getEmbedding(Dart d) const;
-
-	/**
-	 * Set the cell index of the given dimension associated to dart d
-	 */
-	template <unsigned int ORBIT>
-	void setDartEmbedding(Dart d, unsigned int emb) ;
-
-	/**
-	 * Set the cell index of the given dimension associated to dart d
-	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding) !!! WARNING !!!
-	 */
-	template <unsigned int ORBIT>
-	void initDartEmbedding(Dart d, unsigned int emb) ;
-
-	/**
-	 * Copy the index of the cell associated to a dart over an other dart
-	 * @param orbit the id of orbit embedding
-	 * @param dest the dart to overwrite
-	 * @param src the dart to copy
-	 */
-	template <unsigned int ORBIT>
-	void copyDartEmbedding(Dart dest, Dart src) ;
-
-	/**
 	 * Allocation of some place in attrib table
 	 * @param orbit the orbit of embedding
 	 * @return the index to use as embedding
 	 */
 	template <unsigned int ORBIT>
 	unsigned int newCell() ;
-
-	/**
-	* Set the index of the associated cell to all the darts of an orbit
-	* @param orbit orbit to embed
-	* @param d a dart of the topological vertex
-	* @param em index of attribute to store as embedding
-	*/
-	template <unsigned int ORBIT>
-	void setOrbitEmbedding(Dart d, unsigned int em) ;
-
-	/**
-	 * Set the index of the associated cell to all the darts of an orbit
-	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
-	 */
-	template <unsigned int ORBIT>
-	void initOrbitEmbedding(Dart d, unsigned int em) ;
-
-	/**
-	* Associate an new cell to all darts of an orbit
-	* @param orbit orbit to embed
-	* @param d a dart of the topological cell
-	* @return index of the attribute in table
-	*/
-	template <unsigned int ORBIT>
-	unsigned int setOrbitEmbeddingOnNewCell(Dart d) ;
-
-	/**
-	 * Associate an new cell to all darts of an orbit
-	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
-	 */
-	template <unsigned int ORBIT>
-	unsigned int initOrbitEmbeddingNewCell(Dart d) ;
-
-	/**
-	 * Copy the cell associated to a dart over an other dart
-	 * @param orbit attribute orbit to use
-	 * @param d the dart to overwrite (dest)
-	 * @param e the dart to copy (src)
-	 */
-	template <unsigned int ORBIT>
-	void copyCell(Dart d, Dart e) ;
 
 	/**
 	 * Line of attributes i is overwritten with line j
@@ -283,13 +213,6 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	void initCell(unsigned int i) ;
-
-	/**
-	 * Traverse the map and embed all orbits of the given dimension with a new cell
-	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
-	 */
-	template <unsigned int ORBIT>
-	void initAllOrbitsEmbedding(bool realloc = false) ;
 
 	/****************************************
 	 *     QUICK TRAVERSAL MANAGEMENT       *
@@ -440,14 +363,6 @@ public:
 	/****************************************
 	 *             SAVE & LOAD              *
 	 ****************************************/
-public:
-	/**
-	 * check if an xml node has a given name
-	 * @param node the xml node
-	 * @param name the name
-	 * @ return true if node has the good name
-	 */
-//	bool chechXmlNode(xmlNodePtr node, const std::string& name) ;
 
 	/**
 	 * update the pointer of embedding vector after loading
@@ -460,37 +375,23 @@ public:
 	virtual void update_topo_shortcuts();
 
 	/**
-	 * Save map in a XML file
-	 * @param filename the file name
-	 * @return true if OK
-	 */
-//	bool saveMapXml(const std::string& filename, bool compress = false) ;
-
-	 /**
-	 * Load map from a XML file
-	 * @param filename the file name
-	 * @return true if OK
-	 */
-//	bool loadMapXml(const std::string& filename, bool compress = false) ;
-
-	/**
 	 * Save map in a binary file
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool saveMapBin(const std::string& filename) const;
+	virtual bool saveMapBin(const std::string& filename) const = 0;
 
 	/**
 	 * Load map from a binary file
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool loadMapBin(const std::string& filename) ;
+	virtual bool loadMapBin(const std::string& filename) = 0 ;
 
 	/**
 	 * copy from another map (of same type)
 	 */
-	bool copyFrom(const GenericMap& map) ;
+	virtual bool copyFrom(const GenericMap& map) = 0 ;
 
 	/**
 	 * Dump attributes types and names per orbit
@@ -511,11 +412,11 @@ public:
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
 
-//	/**
-//	 * Apply a functor on each dart of the map
-//	 * @param f a ref to the functor obj
-//	 */
-//	bool foreach_dart(FunctorType& f) ;
+	/**
+	 * Apply a functor on each dart of the map
+	 * @param f a ref to the functor obj
+	 */
+	bool foreach_dart(FunctorType& f) ;
 
 	virtual Dart begin() const;
 	virtual Dart end() const;

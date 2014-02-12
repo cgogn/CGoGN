@@ -171,7 +171,6 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
-
 	/**
 	 * Precondition for deleting edge
 	 */
@@ -240,7 +239,6 @@ public:
 	//!! sewVolumes Pre-condition
 	bool sewVolumesPreCond(Dart d, Dart e);
 
-
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same degree
 	 *  @param d a dart of the first volume
@@ -264,16 +262,13 @@ public:
 
 	virtual bool mergeVolumes(Dart /*d*/, Dart /*e*/) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
 
-
 	//! Split a volume into two volumes along a edge path
 	/*! @param vd a vector of darts
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
 
-
 	//! Split a volume into two volumes along a edge path and add the given face between
 	virtual void splitVolumeWithFace(std::vector<Dart>& vd, Dart d);
-
 
 	//! Collapse a volume (that is deleted) possibly merging its vertices
 	/*! \warning
@@ -282,7 +277,6 @@ public:
 	 */
 	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
 	//@}
-
 
     //BROUILLON
     Dart faceToEdge(Dart d);
@@ -303,14 +297,12 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) const;
 
-
 	//! Check number of edges of the vertex of d with given parameter
 	/*! @param d a dart
 	 *	@param vd degree to compare with
 	 *  @return  negative/null/positive if vertex degree is less/equal/greater than given degree
 	 */
 	int checkVertexDegree(Dart d, unsigned int vd) const;
-
 
 	//! Compute the number of edges of the vertex of d on the boundary
 	/*!	@param d a dart

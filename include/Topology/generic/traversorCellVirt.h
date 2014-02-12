@@ -42,9 +42,9 @@ private:
 	const AttributeContainer* cont ;
 	unsigned int qCurrent ;
 
-	DartMarker* dmark ;
-	CellMarker<ORBIT>* cmark ;
-	const AttributeMultiVector<Dart>* quickTraversal ;
+	DartMarker<MAP>* dmark ;
+	CellMarker<MAP, ORBIT>* cmark ;
+	AttributeMultiVector<Dart>* quickTraversal ;
 
 	Dart current ;
 	bool firstTraversal ;

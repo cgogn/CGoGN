@@ -55,8 +55,8 @@ private:
 	const AttributeContainer* cont ;
 	unsigned int qCurrent ;
 
-	DartMarker* dmark ;
-	CellMarker<ORBIT>* cmark ;
+	DartMarker<MAP>* dmark ;
+	CellMarker<MAP, ORBIT>* cmark ;
 	const AttributeMultiVector<Dart>* quickTraversal ;
 
 	Dart current ;

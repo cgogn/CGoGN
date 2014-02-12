@@ -125,9 +125,6 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
-	Map3& map = dynamic_cast<Map3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3
-
-
 	if (m_attIndex.map() != &mapx)
 		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
 	if (!m_attIndex.isValid())
@@ -197,7 +194,7 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 
 			*positionDartBuf++ = PFP::toVec3f(P);
 			*positionDartBuf++ = PFP::toVec3f(PP);
-			if (map.isBoundaryMarked3(d))
+			if (mapx.isBoundaryMarked3(d))
 			{
 				*colorDartBuf++ = m_boundaryDartsColor;
 				*colorDartBuf++ = m_boundaryDartsColor;
@@ -216,8 +213,8 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 			*positionDartBuf++ = PFP::toVec3f(Q);
 			*positionDartBuf++ = PFP::toVec3f(QQ);
 
-			Dart dx = map.phi3(d);
-			if (map.isBoundaryMarked3(dx))
+			Dart dx = mapx.phi3(d);
+			if (mapx.isBoundaryMarked3(dx))
 			{
 				*colorDartBuf++ = m_boundaryDartsColor;
 				*colorDartBuf++ = m_boundaryDartsColor;
@@ -251,9 +248,9 @@ void Topo3PrimalRender::updateData(typename PFP::MAP& mapx, const EMBV& position
 
 	m_nbRel2=0;
 
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
 	{
-		Dart e = map.phi2(map.phi3(d));
+		Dart e = mapx.phi2(mapx.phi3(d));
 		//if (d < e)
 		{
 

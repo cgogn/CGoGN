@@ -29,7 +29,7 @@ namespace CGoGN
  *          DARTS MANAGEMENT            *
  ****************************************/
 
-inline virtual Dart MapMulti::newDart()
+inline Dart MapMulti::newDart()
 {
 	Dart d = GenericMap::newDart() ;
 
@@ -62,10 +62,10 @@ inline virtual Dart MapMulti::newDart()
 	return Dart::create(mrdi) ;
 }
 
-inline virtual void MapMulti::deleteDart(Dart d)
+inline void MapMulti::deleteDart(Dart d)
 {
-	unsigned int index = (*m_mrDarts[m_mrCurrentLevel])[d.index] ;
-
+	unsigned int index = dartIndex(d);
+/*
 	if(getDartLevel(d) > m_mrCurrentLevel)
 	{
 		unsigned int di = (*m_mrDarts[m_mrCurrentLevel + 1])[d.index];
@@ -79,35 +79,40 @@ inline virtual void MapMulti::deleteDart(Dart d)
 		(*m_mrDarts[m_mrCurrentLevel])[d.index] = MRNULL ;
 		return;
 	}
-
+*/
 	// a MRdart can only be deleted on its insertion level
 	if(getDartLevel(d) == m_mrCurrentLevel)
 	{
-		if(isDartValid(d))
-		{
+//		if(isDartValid(d))
+//		{
 			deleteDartLine(index) ;
 			m_mrattribs.removeLine(d.index);
 			m_mrNbDarts[m_mrCurrentLevel]--;
-		}
+//		}
 	}
 	else
 	{
 		unsigned int di = (*m_mrDarts[m_mrCurrentLevel - 1])[d.index];
-		// si le brin de niveau i pointe sur le meme brin que le niveau i-1
+		// si le brin de niveau i pointe sur un autre brin que le niveau i-1w
 		if(di != index)
 		{
-			if(isDartValid(d))//index))
+//			if(isDartValid(d))//index))
 				deleteDartLine(index) ;
 		}
 
 		for(unsigned int i = m_mrCurrentLevel; i <= getMaxLevel(); ++i) // for all levels from current to max
-			(*m_mrDarts[i])[d.index] = di ; //copy the index from previous level
+			(*m_mrDarts[i])[d.index] = di ; // copy the index from previous level
 	}
 }
 
-inline virtual unsigned int MapMulti::dartIndex(Dart d) const
+inline unsigned int MapMulti::dartIndex(Dart d) const
 {
 	return (*m_mrDarts[m_mrCurrentLevel])[d.index] ;
+}
+
+inline Dart MapMulti::indexDart(unsigned int index) const
+{
+	return Dart( (*m_mrDarts[m_mrCurrentLevel])[index] ) ;
 }
 
 inline unsigned int MapMulti::getNbInsertedDarts(unsigned int level)
@@ -175,6 +180,11 @@ inline void MapMulti::duplicateDartAtOneLevel(Dart d, unsigned int level)
 	(*m_mrDarts[level])[d.index] = copyDartLine(dartIndex(d)) ;
 }
 
+inline MapMulti::AttributeContainer& getDartContainer()
+{
+	return m_mrattribs;
+}
+
 /****************************************
  *        RELATIONS MANAGEMENT          *
  ****************************************/
@@ -197,19 +207,19 @@ inline void MapMulti::addPermutation()
 }
 
 template <int I>
-inline Dart MapMulti::getInvolution(Dart d)
+inline Dart MapMulti::getInvolution(Dart d) const
 {
 	return (*m_involution[I])[dartIndex(d)];
 }
 
 template <int I>
-inline Dart MapMulti::getPermutation(Dart d)
+inline Dart MapMulti::getPermutation(Dart d) const
 {
 	return (*m_permutation[I])[dartIndex(d)];
 }
 
 template <int I>
-inline Dart MapMulti::getPermutationInv(Dart d)
+inline Dart MapMulti::getPermutationInv(Dart d) const
 {
 	return (*m_permutation_inv[I])[dartIndex(d)];
 }
@@ -243,8 +253,8 @@ inline void MapMulti::permutationUnsew(Dart d)
 template <int I>
 inline void MapMulti::involutionSew(Dart d, Dart e)
 {
-	assert((*m_phi2)[dartIndex(d)] == d) ;
-	assert((*m_phi2)[dartIndex(e)] == e) ;
+	assert((*m_involution[I])[dartIndex(d)] == d) ;
+	assert((*m_involution[I])[dartIndex(e)] == e) ;
 	(*m_involution[I])[dartIndex(d)] = e ;
 	(*m_involution[I])[dartIndex(e)] = d ;
 }
@@ -331,7 +341,7 @@ inline unsigned int MapMulti::getMaxLevel()
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-inline virtual Dart begin() const
+inline Dart MapMulti::begin() const
 {
 	unsigned int d = m_mrattribs.begin() ;
 	if(d != m_mrattribs.end())
@@ -342,17 +352,147 @@ inline virtual Dart begin() const
 	return Dart::create(d) ;
 }
 
-inline virtual Dart end() const
+inline Dart MapMulti::end() const
 {
 	return Dart::create(m_mrattribs.end()) ;
 }
 
-inline virtual void next(Dart& d) const
+inline void MapMulti::next(Dart& d) const
 {
 	do
 	{
 		m_mrattribs.next(d.index) ;
 	} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
+}
+
+/****************************************
+ *         EMBEDDING MANAGEMENT         *
+ ****************************************/
+
+template <unsigned int ORBIT>
+inline unsigned int MapMulti::getEmbedding(Dart d) const
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int d_index = dartIndex(d);
+
+	if (ORBIT == DART)
+		return d_index;
+
+	return (*m_embeddings[ORBIT])[d_index] ;
+}
+
+template <unsigned int ORBIT>
+void MapMulti::setDartEmbedding(Dart d, unsigned int emb)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int old = getEmbedding<ORBIT>(d);
+
+	if (old == emb)	// if same emb
+		return;		// nothing to do
+
+	if (old != EMBNULL)	// if different
+	{
+		if(m_attribs[ORBIT].unrefLine(old))	// then unref the old emb
+		{
+			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
+				(*m_markTables[ORBIT][t])[old].clear();		// last unref of the line
+		}
+	}
+
+	if (emb != EMBNULL)
+		m_attribs[ORBIT].refLine(emb);	// ref the new emb
+
+	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // finally affect the embedding to the dart
+}
+
+template <unsigned int ORBIT>
+void MapMulti::initDartEmbedding(Dart d, unsigned int emb)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+	assert(getEmbedding<ORBIT>(d) == EMBNULL || !"initDartEmbedding called on already embedded dart");
+
+	if(emb != EMBNULL)
+		m_attribs[ORBIT].refLine(emb);	// ref the new emb
+	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // affect the embedding to the dart
+}
+
+template <unsigned int ORBIT>
+inline void MapMulti::copyDartEmbedding(Dart dest, Dart src)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	setDartEmbedding<ORBIT>(dest, getEmbedding<ORBIT>(src));
+}
+
+template <unsigned int ORBIT>
+inline void MapMulti::setOrbitEmbedding(Dart d, unsigned int em)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	FunctorSetEmb<MapMulti, ORBIT> fsetemb(*this, em);
+	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+}
+
+template <unsigned int ORBIT>
+inline void MapMulti::initOrbitEmbedding(Dart d, unsigned int em)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	FunctorInitEmb<MapMulti, ORBIT> fsetemb(*this, em);
+	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+}
+
+template <unsigned int ORBIT>
+inline unsigned int MapMulti::setOrbitEmbeddingOnNewCell(Dart d)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int em = newCell<ORBIT>();
+	setOrbitEmbedding<ORBIT>(d, em);
+	return em;
+}
+
+template <unsigned int ORBIT>
+inline unsigned int MapMulti::initOrbitEmbeddingNewCell(Dart d)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	unsigned int em = newCell<ORBIT>();
+	initOrbitEmbedding<ORBIT>(d, em);
+	return em;
+}
+
+template <unsigned int ORBIT>
+inline void MapMulti::copyCell(Dart d, Dart e)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+	unsigned int dE = getEmbedding<ORBIT>(d) ;
+	unsigned int eE = getEmbedding<ORBIT>(e) ;
+	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
+	{
+		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
+			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+		copyCell<ORBIT>(dE, eE);	// copy the data
+	}
+}
+
+template <unsigned int ORBIT>
+void MapMulti::initAllOrbitsEmbedding(bool realloc)
+{
+	if(!isOrbitEmbedded<ORBIT>())
+		addEmbedding<ORBIT>() ;
+	DartMarker<MapMulti> mark(*this) ;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!mark.isMarked(d))
+		{
+			mark.markOrbit<ORBIT>(d) ;
+			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
+				setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+		}
+	}
 }
 
 } // namespace CGoGN
