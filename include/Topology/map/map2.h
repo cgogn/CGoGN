@@ -45,14 +45,15 @@ namespace CGoGN
  *  - When every edge is phi2-linked, the map is closed. In this case
  *  some optimizations are enabled that speed up the processing of vertices.
  */
-template <class MAP>
-class Map2 : public Map1<MAP>
+template <typename MAP_IMPL>
+class Map2 : public Map1<MAP_IMPL>
 {
 protected:
 	void init() ;
 
 public:
-	typedef Map1<MAP> ParentMap;
+	typedef MAP_IMPL IMPL;
+	typedef Map1<MAP_IMPL> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+5; }
 
@@ -437,6 +438,12 @@ public:
 	 * Check if a serie of darts is an oriented simple close path
 	 */
 	virtual bool checkSimpleOrientedPath(std::vector<Dart>& vd);
+
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits()
+	{
+		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, Map2>();
+	}
 	//@}
 
 	/*! @name Cell Functors

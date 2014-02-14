@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _TOPO3_VBO_RENDER
-#define _TOPO3_VBO_RENDER
+#ifndef _TOPO3_VBO_RENDER_
+#define _TOPO3_VBO_RENDER_
 
 #include <vector>
 #include <list>
@@ -37,12 +37,8 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 
-
-
-
 #include "Utils/vbo_base.h"
 #include "Utils/svg.h"
-
 
 namespace CGoGN
 {
@@ -56,11 +52,10 @@ namespace Render
 namespace GL2
 {
 
-
+template <typename PFP>
 class Topo3Render
 {
 protected:
-
 	/**
 	* vbo buffers
 	* 0: vertices darts
@@ -123,8 +118,7 @@ protected:
 	/**
 	 * attribute index to get easy correspondence dart/color
 	 */
-	DartAttribute<unsigned int> m_attIndex;
-
+	DartAttribute<unsigned int, typename PFP::MAP> m_attIndex;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
@@ -158,9 +152,8 @@ public:
 	*/
 	~Topo3Render();
 
-
-	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1);}
-	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2);}
+	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
+	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
 
 	/**
 	 * set the with of line use to draw darts (default val is 2)
@@ -240,7 +233,6 @@ public:
 	/**
 	 * store darts in color for picking
 	 */
-	template<typename PFP>
 	void setDartsIdColor(typename PFP::MAP& map);
 
 	/**
@@ -252,9 +244,7 @@ public:
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
-	template<typename PFP>
 	Dart picking(typename PFP::MAP& map, int x, int y);
-
 
 	/**
 	 * compute dart from color (for picking)
@@ -266,7 +256,6 @@ public:
 	 */
 	void dartToCol(Dart d, float& r, float& g, float& b);
 
-
 	/**
 	* update all drawing buffers to render a dual map
 	* @param map the map
@@ -275,8 +264,7 @@ public:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP, typename EMBV>
-	void updateData(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, float kv);
 
 //	template<typename PFP>
 //	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
@@ -286,20 +274,17 @@ public:
 	* @param map the map
 	* @param colors  attribute of dart's colors
 	*/
-	template<typename PFP, typename EMBV>
-	void updateColorsGen(typename PFP::MAP& map, const EMBV& colors);
+//	template<typename PFP, typename EMBV>
+//	void updateColorsGen(typename PFP::MAP& map, const EMBV& colors);
 
-	template<typename PFP>
-	void updateColors(typename PFP::MAP& map, const VertexAttribute<Geom::Vec3f>& colors);
-
+	void updateColors(typename PFP::MAP& map, const VertexAttribute<Geom::Vec3f, typename PFP::MAP>& colors);
 
 	/**
 	 * Get back middle position of drawn darts
 	 * @param map the map
 	 * @param posExpl the output positions
 	 */
-	template<typename PFP>
-	void computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3>& posExpl);
+	void computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3, typename PFP::MAP>& posExpl);
 
 	/**
 	 * render to svg struct
@@ -311,11 +296,8 @@ public:
 	 */
 	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
 
-
-	template<typename PFP>
 	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
 
-	template<typename PFP>
 	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
 protected:
@@ -327,8 +309,7 @@ protected:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP, typename EMBV>
-	void updateDataMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
+	void updateDataMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, float kv);
 
 	/**
 	* update all drawing buffers to render a gmap
@@ -338,10 +319,8 @@ protected:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	template<typename PFP, typename EMBV>
-	void updateDataGMap3(typename PFP::MAP& map, const EMBV& positions, float ke, float kf, float kv);
+	void updateDataGMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, float kv);
 };
-
 
 }//end namespace GL2
 

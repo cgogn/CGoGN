@@ -27,42 +27,42 @@ namespace CGoGN
 
 /// INLINE FUNCTIONS
 
-template <class MAP>
-inline void Map1<MAP>::init()
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::init()
 {
-	MAP::addPermutation() ;
+	MAP_IMPL::addPermutation() ;
 }
 
-template <class MAP>
-inline Map1<MAP>::Map1() : MAP()
+template <typename MAP_IMPL>
+inline Map1<MAP_IMPL>::Map1() : MapCommon<MAP_IMPL>()
 {
 	init() ;
 }
 
-template <class MAP>
-inline std::string Map1<MAP>::mapTypeName() const
+template <typename MAP_IMPL>
+inline std::string Map1<MAP_IMPL>::mapTypeName() const
 {
 	return "Map1" ;
 }
 
-template <class MAP>
-inline unsigned int Map1<MAP>::dimension() const
+template <typename MAP_IMPL>
+inline unsigned int Map1<MAP_IMPL>::dimension() const
 {
 	return 1 ;
 }
 
-template <class MAP>
-inline void Map1<MAP>::clear(bool removeAttrib)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::clear(bool removeAttrib)
 {
-	MAP::clear(removeAttrib) ;
+	MAP_IMPL::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-template <class MAP>
-inline void Map1<MAP>::update_topo_shortcuts()
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::update_topo_shortcuts()
 {
-	MAP::update_topo_shortcuts();
+	MAP_IMPL::update_topo_shortcuts();
 //	m_phi1 = MAP::getRelation("phi1");
 //	m_phi_1 = MAP::getRelation("phi_1");
 }
@@ -71,21 +71,21 @@ inline void Map1<MAP>::update_topo_shortcuts()
  * Access and Modification
  *************************************************************************/
 
-template <class MAP>
-inline Dart Map1<MAP>::phi1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map1<MAP_IMPL>::phi1(Dart d) const
 {
-	return MAP::template getPermutation<0>(d);
+	return MAP_IMPL::template getPermutation<0>(d);
 }
 
-template <class MAP>
-inline Dart Map1<MAP>::phi_1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map1<MAP_IMPL>::phi_1(Dart d) const
 {
-	return MAP::template getPermutationInv<0>(d);
+	return MAP_IMPL::template getPermutationInv<0>(d);
 }
 
-template <class MAP>
+template <typename MAP_IMPL>
 template <int N>
-inline Dart Map1<MAP>::phi(Dart d) const
+inline Dart Map1<MAP_IMPL>::phi(Dart d) const
 {
 	assert((N > 0) || !"negative parameters not allowed in template multi-phi");
 	if (N < 10)
@@ -103,46 +103,46 @@ inline Dart Map1<MAP>::phi(Dart d) const
 	}
 }
 
-template <class MAP>
-inline Dart Map1<MAP>::alpha1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map1<MAP_IMPL>::alpha1(Dart d) const
 {
 	return phi1(d) ;
 }
 
-template <class MAP>
-inline Dart Map1<MAP>::alpha_1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map1<MAP_IMPL>::alpha_1(Dart d) const
 {
 	return phi_1(d) ;
 }
 
-template <class MAP>
-inline void Map1<MAP>::phi1sew(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::phi1sew(Dart d, Dart e)
 {
-	MAP::template permutationSew<0>(d,e);
+	MAP_IMPL::template permutationSew<0>(d,e);
 }
 
-template <class MAP>
-inline void Map1<MAP>::phi1unsew(Dart d)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::phi1unsew(Dart d)
 {
-	MAP::template permutationUnsew<0>(d);
+	MAP_IMPL::template permutationUnsew<0>(d);
 }
 
 /*! @name Generator and Deletor
  *  To generate or delete faces in a 1-map
  *************************************************************************/
 
-template <class MAP>
-Dart Map1<MAP>::newCycle(unsigned int nbEdges)
+template <typename MAP_IMPL>
+Dart Map1<MAP_IMPL>::newCycle(unsigned int nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = this->newDart() ;	// Create the first edge
 	for (unsigned int i = 1 ; i < nbEdges ; ++i)
-		Map1<MAP>::cutEdge(d) ;		// Subdivide nbEdges-1 times this edge
+		Map1<MAP_IMPL>::cutEdge(d) ;		// Subdivide nbEdges-1 times this edge
 	return d ;
 }
 
-template <class MAP>
-void Map1<MAP>::deleteCycle(Dart d)
+template <typename MAP_IMPL>
+void Map1<MAP_IMPL>::deleteCycle(Dart d)
 {
 	Dart e = phi1(d) ;
 	while (e != d)
@@ -158,61 +158,61 @@ void Map1<MAP>::deleteCycle(Dart d)
  *  Topological operations on 1-maps
  *************************************************************************/
 
-template <class MAP>
-inline Dart Map1<MAP>::cutEdge(Dart d)
+template <typename MAP_IMPL>
+inline Dart Map1<MAP_IMPL>::cutEdge(Dart d)
 {
 	Dart e = this->newDart() ;	// Create a new dart
 	phi1sew(d, e) ;				// Insert dart e between d and phi1(d)
 
-	if (this->isBoundaryMarked2(d))
-		this->boundaryMark2(e);
+	if (this->template isBoundaryMarked<2>(d))
+		this->template boundaryMark<2>(e);
 
-	if (this->isBoundaryMarked3(d))
-		this->boundaryMark3(e);
+	if (this->template isBoundaryMarked<3>(d))
+		this->template boundaryMark<3>(e);
 
 	return e ;
 }
 
-template <class MAP>
-inline void Map1<MAP>::uncutEdge(Dart d)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::uncutEdge(Dart d)
 {
 	Dart d1 = phi1(d) ;
 	phi1unsew(d) ;			// Dart d is linked to the successor of its successor
 	this->deleteDart(d1) ;	// Dart d1 is erased
 }
 
-template <class MAP>
-inline void Map1<MAP>::collapseEdge(Dart d)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::collapseEdge(Dart d)
 {
 	phi1unsew(phi_1(d)) ;	// Dart before d is linked to its successor
 	this->deleteDart(d) ;	// Dart d is erased
 }
 
-template <class MAP>
-inline void Map1<MAP>::splitCycle(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::splitCycle(Dart d, Dart e)
 {
 	assert(d != e && sameCycle(d, e)) ;
 	phi1sew(phi_1(d), phi_1(e)) ;
 }
 
-template <class MAP>
-inline void Map1<MAP>::mergeCycles(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::mergeCycles(Dart d, Dart e)
 {
 	assert(!sameCycle(d, e)) ;
 	phi1sew(phi_1(d), phi_1(e)) ;
 }
 
-template <class MAP>
-inline void Map1<MAP>::linkCycles(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void Map1<MAP_IMPL>::linkCycles(Dart d, Dart e)
 {
 	assert(d != e && !sameCycle(d, e)) ;
-	Map1<MAP>::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
-	Map1<MAP>::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
+	Map1<MAP_IMPL>::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
+	Map1<MAP_IMPL>::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
 	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
 }
 
-template <class MAP>
-void Map1<MAP>::reverseCycle(Dart d)
+template <typename MAP_IMPL>
+void Map1<MAP_IMPL>::reverseCycle(Dart d)
 {
 	Dart e = phi1(d) ;			// Dart e is the first edge of the new face
 	if (e == d) return ;		// Only one edge: nothing to do
@@ -234,8 +234,8 @@ void Map1<MAP>::reverseCycle(Dart d)
  *  Return or set various topological information
  *************************************************************************/
 
-template <class MAP>
-inline bool Map1<MAP>::sameCycle(Dart d, Dart e) const
+template <typename MAP_IMPL>
+inline bool Map1<MAP_IMPL>::sameCycle(Dart d, Dart e) const
 {
 	Dart it = d ;
 	do
@@ -247,8 +247,8 @@ inline bool Map1<MAP>::sameCycle(Dart d, Dart e) const
 	return false ;
 }
 
-template <class MAP>
-inline unsigned int Map1<MAP>::cycleDegree(Dart d) const
+template <typename MAP_IMPL>
+inline unsigned int Map1<MAP_IMPL>::cycleDegree(Dart d) const
 {
 	unsigned int count = 0 ;
 	Dart it = d ;
@@ -260,8 +260,8 @@ inline unsigned int Map1<MAP>::cycleDegree(Dart d) const
 	return count ;
 }
 
-template <class MAP>
-inline int Map1<MAP>::checkCycleDegree(Dart d, unsigned int degree) const
+template <typename MAP_IMPL>
+inline int Map1<MAP_IMPL>::checkCycleDegree(Dart d, unsigned int degree) const
 {
 	unsigned int count = 0 ;
 	Dart it = d ;
@@ -274,8 +274,8 @@ inline int Map1<MAP>::checkCycleDegree(Dart d, unsigned int degree) const
 	return count-degree;
 }
 
-template <class MAP>
-inline bool Map1<MAP>::isCycleTriangle(Dart d) const
+template <typename MAP_IMPL>
+inline bool Map1<MAP_IMPL>::isCycleTriangle(Dart d) const
 {
 	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
 }
@@ -284,20 +284,20 @@ inline bool Map1<MAP>::isCycleTriangle(Dart d) const
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-template <class MAP>
-inline bool Map1<MAP>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <typename MAP_IMPL>
+inline bool Map1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	return f(d) ;
 }
 
-template <class MAP>
-inline bool Map1<MAP>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <typename MAP_IMPL>
+inline bool Map1<MAP_IMPL>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	return f(d) ;
 }
 
-template <class MAP>
-inline bool Map1<MAP>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <typename MAP_IMPL>
+inline bool Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	Dart it = d ;
 	do

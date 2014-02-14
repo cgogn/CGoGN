@@ -169,7 +169,7 @@ public:
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		FunctorMark<MAP> fm(m_map, m_mark, m_markVector) ;
-		m_map.foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
+		m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
 	}
 
 	/**
@@ -291,14 +291,14 @@ public:
 	template <unsigned int ORBIT>
 	inline void markOrbit(Dart d)
 	{
-		assert(this->m_map.getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
+		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
 		FunctorMarkStore<MAP> fm(this->m_map, this->m_mark, this->m_markVector, m_markedDarts) ;
-		this->m_map.foreach_dart_of_orbit<ORBIT>(d, fm, this->m_thread) ;
+		this->m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, this->m_thread) ;
 	}
 
 	inline void unmarkAll()
 	{
-		assert(this->m_map.getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
+		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
 		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
 			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
 	}

@@ -33,14 +33,15 @@ namespace CGoGN
 /**
 * The class of 3-GMap
 */
-template <class MAP>
-class GMap3 : public GMap2<MAP>
+template <typename MAP_IMPL>
+class GMap3 : public GMap2<MAP_IMPL>
 {
 protected:
 	void init() ;
 
 public:
-	typedef GMap2<MAP> ParentMap;
+	typedef MAP_IMPL IMPL;
+	typedef GMap2<MAP_IMPL> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
@@ -274,6 +275,12 @@ public:
 	bool isBoundaryVolume(Dart d) const;
 
 	virtual bool check() const;
+
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits()
+	{
+		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, GMap3>();
+	}
 	//@}
 
 	/*! @name Cell Functors

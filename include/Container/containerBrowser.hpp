@@ -84,7 +84,63 @@ inline void DartContainerBrowserSelector<MAP>::disable()
 
 
 
-inline ContainerBrowserLinked::ContainerBrowserLinked(AttribMap& m, unsigned int orbit):
+
+template <typename MAP, unsigned int CELL>
+inline ContainerBrowserCellMarked<MAP, CELL>::ContainerBrowserCellMarked(GenericMap& m, CellMarker<MAP, CELL>& cm):
+	 m_marker(cm)
+{
+	m_cont = &(m.getAttributeContainer<CELL>());
+}
+
+template <typename MAP, unsigned int CELL>
+inline ContainerBrowserCellMarked<MAP, CELL>::~ContainerBrowserCellMarked()
+{
+}
+
+template <typename MAP, unsigned int CELL>
+inline unsigned int ContainerBrowserCellMarked<MAP, CELL>::begin() const
+{
+	unsigned int it = m_cont->realBegin() ;
+	while ( (it != m_cont->realEnd()) && !m_marker.isMarked(it) )
+		m_cont->realNext(it);
+
+	return it;
+}
+
+template <typename MAP, unsigned int CELL>
+inline unsigned int ContainerBrowserCellMarked<MAP, CELL>::end() const
+{
+	return m_cont->realEnd();
+}
+
+template <typename MAP, unsigned int CELL>
+inline void ContainerBrowserCellMarked<MAP, CELL>::next(unsigned int& it) const
+{
+	do
+	{
+		m_cont->realNext(it) ;
+	}
+	while ( (it != m_cont->realEnd()) && !m_marker.isMarked(it) );
+}
+
+template <typename MAP, unsigned int CELL>
+inline void ContainerBrowserCellMarked<MAP, CELL>::enable()
+{
+	m_cont->setContainerBrowser(this);
+}
+
+template <typename MAP, unsigned int CELL>
+inline void ContainerBrowserCellMarked<MAP, CELL>::disable()
+{
+	m_cont->setContainerBrowser(NULL);
+}
+
+
+
+
+
+
+inline ContainerBrowserLinked::ContainerBrowserLinked(GenericMap& m, unsigned int orbit):
 	autoAttribute(true),
 	m_first(0xffffffff),
 	m_end(0xffffffff)
@@ -166,62 +222,6 @@ inline void ContainerBrowserLinked::enable()
 }
 
 inline void ContainerBrowserLinked::disable()
-{
-	m_cont->setContainerBrowser(NULL);
-}
-
-
-
-
-
-
-
-template <unsigned int CELL>
-inline ContainerBrowserCellMarked<CELL>::ContainerBrowserCellMarked(AttribMap& m,  CellMarker<CELL>& cm):
-	 m_marker(cm)
-{
-	m_cont = &(m.getAttributeContainer<CELL>());
-}
-
-template <unsigned int CELL>
-inline ContainerBrowserCellMarked<CELL>::~ContainerBrowserCellMarked()
-{
-}
-
-template <unsigned int CELL>
-inline unsigned int ContainerBrowserCellMarked<CELL>::begin() const
-{
-	unsigned int it = m_cont->realBegin() ;
-	while ( (it != m_cont->realEnd()) && !m_marker.isMarked(it) )
-		m_cont->realNext(it);
-
-	return it;
-}
-
-template <unsigned int CELL>
-inline unsigned int ContainerBrowserCellMarked<CELL>::end() const
-{
-	return m_cont->realEnd();
-}
-
-template <unsigned int CELL>
-inline void ContainerBrowserCellMarked<CELL>::next(unsigned int& it) const
-{
-	do
-	{
-		m_cont->realNext(it) ;
-	}
-	while ( (it != m_cont->realEnd()) && !m_marker.isMarked(it) );
-}
-
-template <unsigned int CELL>
-inline void ContainerBrowserCellMarked<CELL>::enable()
-{
-	m_cont->setContainerBrowser(this);
-}
-
-template <unsigned int CELL>
-inline void ContainerBrowserCellMarked<CELL>::disable()
 {
 	m_cont->setContainerBrowser(NULL);
 }

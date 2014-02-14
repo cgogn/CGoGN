@@ -27,40 +27,40 @@
 namespace CGoGN
 {
 
-template <class MAP>
-inline void Map3<MAP>::init()
+template <typename MAP_IMPL>
+inline void Map3<MAP_IMPL>::init()
 {
-	MAP::addInvolution() ;
+	MAP_IMPL::addInvolution() ;
 }
 
-template <class MAP>
-inline Map3<MAP>::Map3() : Map2<MAP>()
+template <typename MAP_IMPL>
+inline Map3<MAP_IMPL>::Map3() : Map2<MAP_IMPL>()
 {
 	init() ;
 }
 
-template <class MAP>
-inline std::string Map3<MAP>::mapTypeName() const
+template <typename MAP_IMPL>
+inline std::string Map3<MAP_IMPL>::mapTypeName() const
 {
 	return "Map3";
 }
 
-template <class MAP>
-inline unsigned int Map3<MAP>::dimension() const
+template <typename MAP_IMPL>
+inline unsigned int Map3<MAP_IMPL>::dimension() const
 {
 	return 3;
 }
 
-template <class MAP>
-inline void Map3<MAP>::clear(bool removeAttrib)
+template <typename MAP_IMPL>
+inline void Map3<MAP_IMPL>::clear(bool removeAttrib)
 {
 	ParentMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-template <class MAP>
-inline void Map3<MAP>::update_topo_shortcuts()
+template <typename MAP_IMPL>
+inline void Map3<MAP_IMPL>::update_topo_shortcuts()
 {
 	ParentMap::update_topo_shortcuts();
 //	m_phi3 = getRelation("phi3");
@@ -70,15 +70,15 @@ inline void Map3<MAP>::update_topo_shortcuts()
  * Access and Modification
  *************************************************************************/
 
-template <class MAP>
-inline Dart Map3<MAP>::phi3(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map3<MAP_IMPL>::phi3(Dart d) const
 {
-	return MAP::template getInvolution<1>(d);
+	return MAP_IMPL::template getInvolution<1>(d);
 }
 
-template <class MAP>
+template <typename MAP_IMPL>
 template <int N>
-inline Dart Map3<MAP>::phi(Dart d) const
+inline Dart Map3<MAP_IMPL>::phi(Dart d) const
 {
 	assert( (N >0) || !"negative parameters not allowed in template multi-phi");
 	if (N<10)
@@ -100,58 +100,58 @@ inline Dart Map3<MAP>::phi(Dart d) const
 	}
 }
 
-template <class MAP>
-inline Dart Map3<MAP>::alpha0(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map3<MAP_IMPL>::alpha0(Dart d) const
 {
 	return phi3(d) ;
 }
 
-template <class MAP>
-inline Dart Map3<MAP>::alpha1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map3<MAP_IMPL>::alpha1(Dart d) const
 {
 	return phi3(this->phi_1(d)) ;
 }
 
-template <class MAP>
-inline Dart Map3<MAP>::alpha2(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map3<MAP_IMPL>::alpha2(Dart d) const
 {
 	return phi3(this->phi2(d));
 }
 
-template <class MAP>
-inline Dart Map3<MAP>::alpha_2(Dart d) const
+template <typename MAP_IMPL>
+inline Dart Map3<MAP_IMPL>::alpha_2(Dart d) const
 {
 	return this->phi2(phi3(d));
 }
 
-template <class MAP>
-inline void Map3<MAP>::phi3sew(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void Map3<MAP_IMPL>::phi3sew(Dart d, Dart e)
 {
-	MAP::template involutionSew<1>(d,e);
+	MAP_IMPL::template involutionSew<1>(d,e);
 }
 
-template <class MAP>
-inline void Map3<MAP>::phi3unsew(Dart d)
+template <typename MAP_IMPL>
+inline void Map3<MAP_IMPL>::phi3unsew(Dart d)
 {
-	MAP::template involutionUnsew<1>(d);
+	MAP_IMPL::template involutionUnsew<1>(d);
 }
 
 /*! @name Generator and Deletor
  *  To generate or delete volumes in a 3-map
  *************************************************************************/
 
-template <class MAP>
-void Map3<MAP>::deleteVolume(Dart d, bool withBoundary)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::deleteVolume(Dart d, bool withBoundary)
 {
 	if(withBoundary)
 	{
-		DartMarkerStore mark(*this);		// Lock a marker
+		DartMarkerStore<MAP_IMPL> mark(*this);		// Lock a marker
 
 		std::vector<Dart> visitedFaces;		// Faces that are traversed
 		visitedFaces.reserve(512);
 		visitedFaces.push_back(d);			// Start with the face of d
 
-		mark.markOrbit<FACE2>(d) ;
+		mark.template markOrbit<FACE2>(d) ;
 
 		for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 		{
@@ -166,7 +166,7 @@ void Map3<MAP>::deleteVolume(Dart d, bool withBoundary)
 				if(!mark.isMarked(ee)) // not already marked
 				{
 					visitedFaces.push_back(ee) ;
-					mark.markOrbit<FACE2>(ee) ;
+					mark.template markOrbit<FACE2>(ee) ;
 				}
 				e = this->phi1(e) ;
 			} while(e != visitedFaces[i]) ;
@@ -180,13 +180,13 @@ void Map3<MAP>::deleteVolume(Dart d, bool withBoundary)
 	}
 
 	//else remove the CC and create fixed points
-	DartMarkerStore mark(*this);		// Lock a marker
+	DartMarkerStore<MAP_IMPL> mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 
-	mark.markOrbit<FACE2>(d) ;
+	mark.template markOrbit<FACE2>(d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -205,7 +205,7 @@ void Map3<MAP>::deleteVolume(Dart d, bool withBoundary)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit<FACE2>(ee) ;
+				mark.template markOrbit<FACE2>(ee) ;
 			}
 			e = this->phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -214,18 +214,18 @@ void Map3<MAP>::deleteVolume(Dart d, bool withBoundary)
 	ParentMap::deleteCC(d) ; //deleting the volume
 }
 
-template <class MAP>
-void Map3<MAP>::fillHole(Dart d)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::fillHole(Dart d)
 {
 	assert(isBoundaryFace(d)) ;
 	Dart dd = d ;
-	if(!this->isBoundaryMarked3(dd))
+	if(!this->template isBoundaryMarked<3>(dd))
 		dd = phi3(dd) ;
 	this->template boundaryUnmarkOrbit<VOLUME,3>(dd) ;
 }
 
-template <class MAP>
-void Map3<MAP>::createHole(Dart d)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::createHole(Dart d)
 {
 	assert(!isBoundaryFace(d)) ;
 	this->template boundaryMarkOrbit<VOLUME,3>(d) ;
@@ -235,8 +235,8 @@ void Map3<MAP>::createHole(Dart d)
  *  Topological operations on 3-maps
  *************************************************************************/
 
-template <class MAP>
-Dart Map3<MAP>::splitVertex(std::vector<Dart>& vd)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::splitVertex(std::vector<Dart>& vd)
 {
 	//assert(checkPathAroundVertex(vd)) ;
 
@@ -286,8 +286,8 @@ Dart Map3<MAP>::splitVertex(std::vector<Dart>& vd)
 	return this->phi_1(this->phi2(this->phi_1(prev)));
 }
 
-template <class MAP>
-Dart Map3<MAP>::deleteVertex(Dart d)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::deleteVertex(Dart d)
 {
 	//if(isBoundaryVertex(d))
 	//	return NIL ;
@@ -302,12 +302,12 @@ Dart Map3<MAP>::deleteVertex(Dart d)
 	 // just one dart per face
 	std::vector<Dart> fstore;
 	fstore.reserve(128);
-	DartMarker mf(*this);
+	DartMarker<MAP_IMPL> mf(*this);
 	for(unsigned int i = 0; i < fstoretmp.size(); ++i)
 	{
 		if(!mf.isMarked(fstoretmp[i]))
 		{
-			mf.markOrbit<FACE>(fstoretmp[i]);
+			mf.template markOrbit<FACE>(fstoretmp[i]);
 			fstore.push_back(fstoretmp[i]);
 		}
 	}
@@ -369,8 +369,8 @@ Dart Map3<MAP>::deleteVertex(Dart d)
 	return res ;
 }
 
-template <class MAP>
-Dart Map3<MAP>::cutEdge(Dart d)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::cutEdge(Dart d)
 {
 	Dart prev = d;
 	Dart dd = this->alpha2(d);
@@ -397,8 +397,8 @@ Dart Map3<MAP>::cutEdge(Dart d)
 	return nd;
 }
 
-template <class MAP>
-bool Map3<MAP>::uncutEdge(Dart d)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::uncutEdge(Dart d)
 {
 	if(vertexDegree(this->phi1(d)) == 2)
 	{
@@ -422,16 +422,16 @@ bool Map3<MAP>::uncutEdge(Dart d)
 	return false;
 }
 
-template <class MAP>
-bool Map3<MAP>::deleteEdgePreCond(Dart d)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::deleteEdgePreCond(Dart d)
 {
 	unsigned int nb1 = vertexDegree(d);
 	unsigned int nb2 = vertexDegree(this->phi1(d));
 	return (nb1!=2) && (nb2!=2);
 }
 
-template <class MAP>
-Dart Map3<MAP>::deleteEdge(Dart d)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::deleteEdge(Dart d)
 {
 	assert(deleteEdgePreCond(d));
 
@@ -469,8 +469,8 @@ Dart Map3<MAP>::deleteEdge(Dart d)
 	return res ;
 }
 
-template <class MAP>
-Dart Map3<MAP>::collapseEdge(Dart d, bool delDegenerateVolumes)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::collapseEdge(Dart d, bool delDegenerateVolumes)
 {
 	Dart resV = NIL;
 	Dart dit = d;
@@ -503,14 +503,14 @@ Dart Map3<MAP>::collapseEdge(Dart d, bool delDegenerateVolumes)
 }
 
 
-template <class MAP>
-bool Map3<MAP>::splitFacePreCond(Dart d, Dart e)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::splitFacePreCond(Dart d, Dart e)
 {
 	return (d != e && this->sameOrientedFace(d, e)) ;
 }
 
-template <class MAP>
-void Map3<MAP>::splitFace(Dart d, Dart e)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::splitFace(Dart d, Dart e)
 {
 //	assert(d != e && sameOrientedFace(d, e)) ;
 	assert(splitFacePreCond(d,e));
@@ -525,8 +525,8 @@ void Map3<MAP>::splitFace(Dart d, Dart e)
 	phi3sew(this->phi_1(e), this->phi_1(dd));
 }
 
-template <class MAP>
-bool Map3<MAP>::mergeFaces(Dart d)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::mergeFaces(Dart d)
 {
 	assert(edgeDegree(d)==2);
 
@@ -540,21 +540,21 @@ bool Map3<MAP>::mergeFaces(Dart d)
 //	Map2::mergeFaces(d);
 	Dart e = this->phi2(d) ;
 	this->phi2unsew(d) ;
-	Map1<MAP>::mergeCycles(d, this->phi1(e)) ;
-	Map1<MAP>::splitCycle(e, this->phi1(d)) ;
-	Map1<MAP>::deleteCycle(d) ;
+	Map1<MAP_IMPL>::mergeCycles(d, this->phi1(e)) ;
+	Map1<MAP_IMPL>::splitCycle(e, this->phi1(d)) ;
+	Map1<MAP_IMPL>::deleteCycle(d) ;
 //	ParentMap::mergeFaces(dd);
 	e = this->phi2(dd) ;
 	this->phi2unsew(dd) ;
-	Map1<MAP>::mergeCycles(dd, this->phi1(e)) ;
-	Map1<MAP>::splitCycle(e, this->phi1(dd)) ;
-	Map1<MAP>::deleteCycle(dd);
+	Map1<MAP_IMPL>::mergeCycles(dd, this->phi1(e)) ;
+	Map1<MAP_IMPL>::splitCycle(e, this->phi1(dd)) ;
+	Map1<MAP_IMPL>::deleteCycle(dd);
 
 	return true;
 }
 
-template <class MAP>
-Dart Map3<MAP>::collapseFace(Dart d, bool delDegenerateVolumes)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::collapseFace(Dart d, bool delDegenerateVolumes)
 {
 	Dart resV = NIL;
 	Dart stop = this->phi_1(d);
@@ -575,8 +575,8 @@ Dart Map3<MAP>::collapseFace(Dart d, bool delDegenerateVolumes)
 	return resV;
 }
 
-template <class MAP>
-bool Map3<MAP>::collapseDegeneretedVolume(Dart d)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::collapseDegeneretedVolume(Dart d)
 {
 	Dart e1 = d;
 	Dart e2 = this->phi2(d);
@@ -608,14 +608,14 @@ bool Map3<MAP>::collapseDegeneretedVolume(Dart d)
 	return true;
 }
 
-template <class MAP>
-bool Map3<MAP>::sewVolumesPreCond(Dart d, Dart e)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::sewVolumesPreCond(Dart d, Dart e)
 {
 	return (this->faceDegree(d) == this->faceDegree(e));
 }
 
-template <class MAP>
-void Map3<MAP>::sewVolumes(Dart d, Dart e, bool withBoundary)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::sewVolumes(Dart d, Dart e, bool withBoundary)
 {
 	assert(sewVolumesPreCond(d,e));
 
@@ -667,14 +667,14 @@ void Map3<MAP>::sewVolumes(Dart d, Dart e, bool withBoundary)
 	} while(fitD != d) ;
 }
 
-template <class MAP>
-bool Map3<MAP>::unsewVolumesPreCond(Dart d)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::unsewVolumesPreCond(Dart d)
 {
 	return (!this->isBoundaryFace(d)) ;
 }
 
-template <class MAP>
-void Map3<MAP>::unsewVolumes(Dart d, bool withBoundary)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::unsewVolumes(Dart d, bool withBoundary)
 {
 	assert(unsewVolumesPreCond(d)) ;
 
@@ -723,10 +723,10 @@ void Map3<MAP>::unsewVolumes(Dart d, bool withBoundary)
 	} while(fitB1 != b1) ;
 }
 
-template <class MAP>
-bool Map3<MAP>::mergeVolumes(Dart d, bool deleteFace)
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::mergeVolumes(Dart d, bool deleteFace)
 {
-	if(!Map3<MAP>::isBoundaryFace(d))
+	if(!Map3<MAP_IMPL>::isBoundaryFace(d))
 	{
 		ParentMap::mergeVolumes(d, phi3(d), deleteFace); // merge the two volumes along common face
 		return true ;
@@ -734,8 +734,8 @@ bool Map3<MAP>::mergeVolumes(Dart d, bool deleteFace)
 	return false ;
 }
 
-template <class MAP>
-void Map3<MAP>::splitVolume(std::vector<Dart>& vd)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::splitVolume(std::vector<Dart>& vd)
 {
 	//assert(checkSimpleOrientedPath(vd)) ;
 
@@ -745,11 +745,11 @@ void Map3<MAP>::splitVolume(std::vector<Dart>& vd)
 	ParentMap::splitSurface(vd, true, true);
 
 	//sew the two connected components
-	Map3<MAP>::sewVolumes(this->phi2(e), this->phi2(e2), false);
+	Map3<MAP_IMPL>::sewVolumes(this->phi2(e), this->phi2(e2), false);
 }
 
-template <class MAP>
-void Map3<MAP>::splitVolumeWithFace(std::vector<Dart>& vd, Dart d)
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::splitVolumeWithFace(std::vector<Dart>& vd, Dart d)
 {
 	assert(vd.size() == this->faceDegree(d));
 
@@ -768,8 +768,8 @@ void Map3<MAP>::splitVolumeWithFace(std::vector<Dart>& vd, Dart d)
 	}
 }
 
-template <class MAP>
-Dart Map3<MAP>::collapseVolume(Dart d, bool delDegenerateVolumes)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::collapseVolume(Dart d, bool delDegenerateVolumes)
 {
 	Dart resV = NIL;
 	std::vector<Dart> vd;
@@ -787,13 +787,13 @@ Dart Map3<MAP>::collapseVolume(Dart d, bool delDegenerateVolumes)
 //	vd.pop_back();
 
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		resV = Map3<MAP>::collapseEdge(*it, delDegenerateVolumes);
+		resV = Map3<MAP_IMPL>::collapseEdge(*it, delDegenerateVolumes);
 
 	return resV;
 }
 
-template <class MAP>
-Dart Map3<MAP>::faceToEdge(Dart d)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::faceToEdge(Dart d)
 {
 	Dart dc = this->phi2(this->phi1(d));
 	Dart dc1 = this->phi_1(d);
@@ -814,10 +814,10 @@ Dart Map3<MAP>::faceToEdge(Dart d)
  *  Return or set various topological information
  *************************************************************************/
 
-template <class MAP>
-bool Map3<MAP>::sameVertex(Dart d, Dart e) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::sameVertex(Dart d, Dart e) const
 {
-	DartMarkerStore mv(*this);	// Lock a marker
+	DartMarkerStore<MAP_IMPL> mv(*this);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -848,24 +848,24 @@ bool Map3<MAP>::sameVertex(Dart d, Dart e) const
 	return false;
 }
 
-template <class MAP>
-unsigned int Map3<MAP>::vertexDegree(Dart d) const
+template <typename MAP_IMPL>
+unsigned int Map3<MAP_IMPL>::vertexDegree(Dart d) const
 {
 	unsigned int count = 0;
 
-	Traversor3VE<Map3<MAP> > trav3VE(*this, d);
+	Traversor3VE<Map3<MAP_IMPL> > trav3VE(*this, d);
 	for(Dart dit = trav3VE.begin() ; dit != trav3VE.end() ; dit = trav3VE.next())
 		++count;
 
 	return count;
 }
 
-template <class MAP>
-int Map3<MAP>::checkVertexDegree(Dart d, unsigned int vd) const
+template <typename MAP_IMPL>
+int Map3<MAP_IMPL>::checkVertexDegree(Dart d, unsigned int vd) const
 {
 	unsigned int count = 0;
 
-	Traversor3VE<Map3<MAP> > trav3VE(*this, d);
+	Traversor3VE<Map3<MAP_IMPL> > trav3VE(*this, d);
 	Dart dit = trav3VE.begin();
 	for( ; (count <= vd) && (dit != trav3VE.end()) ; dit = trav3VE.next())
 		++count;
@@ -873,17 +873,17 @@ int Map3<MAP>::checkVertexDegree(Dart d, unsigned int vd) const
 	return count - vd;
 }
 
-template <class MAP>
-unsigned int Map3<MAP>::vertexDegreeOnBoundary(Dart d) const
+template <typename MAP_IMPL>
+unsigned int Map3<MAP_IMPL>::vertexDegreeOnBoundary(Dart d) const
 {
 	assert(Map3::isBoundaryVertex(d));
 	return ParentMap::vertexDegree(d);
 }
 
-template <class MAP>
-bool Map3<MAP>::isBoundaryVertex(Dart d) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::isBoundaryVertex(Dart d) const
 {
-	DartMarkerStore mv(*this);	// Lock a marker
+	DartMarkerStore<MAP_IMPL> mv(*this);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -914,10 +914,10 @@ bool Map3<MAP>::isBoundaryVertex(Dart d) const
 	return false ;
 }
 
-template <class MAP>
-Dart Map3<MAP>::findBoundaryFaceOfVertex(Dart d) const
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::findBoundaryFaceOfVertex(Dart d) const
 {
-	DartMarkerStore mv(*this);	// Lock a marker
+	DartMarkerStore<MAP_IMPL> mv(*this);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -948,8 +948,8 @@ Dart Map3<MAP>::findBoundaryFaceOfVertex(Dart d) const
 	return NIL ;
 }
 
-template <class MAP>
-bool Map3<MAP>::sameOrientedEdge(Dart d, Dart e) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::sameOrientedEdge(Dart d, Dart e) const
 {
 	Dart it = d;
 	do
@@ -961,68 +961,68 @@ bool Map3<MAP>::sameOrientedEdge(Dart d, Dart e) const
 	return false;
 }
 
-template <class MAP>
-inline bool Map3<MAP>::sameEdge(Dart d, Dart e) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::sameEdge(Dart d, Dart e) const
 {
 	return sameOrientedEdge(d, e) || sameOrientedEdge(this->phi2(d), e) ;
 }
 
-template <class MAP>
-unsigned int Map3<MAP>::edgeDegree(Dart d) const
+template <typename MAP_IMPL>
+unsigned int Map3<MAP_IMPL>::edgeDegree(Dart d) const
 {
 	unsigned int deg = 0;
 	Dart it = d;
 	do
 	{
-		if(!this->isBoundaryMarked3(it))
+		if(!this->template isBoundaryMarked<3>(it))
 			++deg;
 		it = alpha2(it);
 	} while(it != d);
 	return deg;
 }
 
-template <class MAP>
-bool Map3<MAP>::isBoundaryEdge(Dart d) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::isBoundaryEdge(Dart d) const
 {
 	Dart it = d;
 	do
 	{
-		if(this->isBoundaryMarked3(it))
+		if(this->template isBoundaryMarked<3>(it))
 			return true ;
 		it = alpha2(it);
 	} while(it != d);
 	return false;
 }
 
-template <class MAP>
-Dart Map3<MAP>::findBoundaryFaceOfEdge(Dart d) const
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::findBoundaryFaceOfEdge(Dart d) const
 {
 	Dart it = d;
 	do
 	{
-		if (this->isBoundaryMarked3(it))
+		if (this->template isBoundaryMarked<3>(it))
 			return it ;
 		it = alpha2(it);
 	} while(it != d);
 	return NIL ;
 }
 
-template <class MAP>
-inline bool Map3<MAP>::sameFace(Dart d, Dart e) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::sameFace(Dart d, Dart e) const
 {
 	return ParentMap::sameOrientedFace(d, e) || ParentMap::sameOrientedFace(phi3(d), e) ;
 }
 
-template <class MAP>
-inline bool Map3<MAP>::isBoundaryFace(Dart d) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::isBoundaryFace(Dart d) const
 {
-	return this->isBoundaryMarked3(d) || this->isBoundaryMarked3(phi3(d));
+	return this->template isBoundaryMarked<3>(d) || this->template isBoundaryMarked<3>(phi3(d));
 }
 
-template <class MAP>
-bool Map3<MAP>::isBoundaryVolume(Dart d) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::isBoundaryVolume(Dart d) const
 {
-	Traversor3WF<Map3<MAP> > tra(*this, d);
+	Traversor3WF<Map3<MAP_IMPL> > tra(*this, d);
 	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
 	{
 		if(isBoundaryMarked3(phi3(dit)))
@@ -1031,10 +1031,10 @@ bool Map3<MAP>::isBoundaryVolume(Dart d) const
 	return false;
 }
 
-template <class MAP>
-bool Map3<MAP>::hasBoundaryEdge(Dart d) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::hasBoundaryEdge(Dart d) const
 {
-	Traversor3WE<Map3<MAP> > tra(*this, d);
+	Traversor3WE<Map3<MAP_IMPL> > tra(*this, d);
 	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
 	{
 		if(isBoundaryEdge(dit))
@@ -1044,11 +1044,11 @@ bool Map3<MAP>::hasBoundaryEdge(Dart d) const
 	return false;
 }
 
-template <class MAP>
-bool Map3<MAP>::check() const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::check() const
 {
 	std::cout << "Check: topology begin" << std::endl;
-	DartMarkerStore m(*this);
+	DartMarkerStore<MAP_IMPL> m(*this);
 	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
 	{
 		Dart d3 = phi3(d);
@@ -1060,7 +1060,7 @@ bool Map3<MAP>::check() const
 
 		if(this->phi1(d3) != phi3(this->phi_1(d)))
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - Check: phi3 , faces are not entirely sewn" << std::endl;
 			else
 				std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
@@ -1071,7 +1071,7 @@ bool Map3<MAP>::check() const
 		Dart d2 = this->phi2(d);
 		if (this->phi2(d2) != d) // phi2 involution ?
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: phi2 is not an involution" << std::endl;
 			return false;
@@ -1080,7 +1080,7 @@ bool Map3<MAP>::check() const
 		Dart d1 = this->phi1(d);
 		if (this->phi_1(d1) != d) // phi1 a une image correcte ?
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: unconsistent phi_1 link" << std::endl;
 			return false;
@@ -1088,7 +1088,7 @@ bool Map3<MAP>::check() const
 
 		if (m.isMarked(d1)) // phi1 a un seul antécédent ?
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: dart with two phi1 predecessors" << std::endl;
 			return false;
@@ -1097,28 +1097,28 @@ bool Map3<MAP>::check() const
 
 		if (d1 == d)
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: (warning) face loop (one edge)" << std::endl;
 		}
 
 		if (this->phi1(d1) == d)
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: (warning) face with only two edges" << std::endl;
 		}
 
 		if (this->phi2(d1) == d)
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: (warning) dandling edge (phi2)" << std::endl;
 		}
 
 		if (phi3(d1) == d)
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: (warning) dandling edge (phi3)" << std::endl;
 		}
@@ -1128,7 +1128,7 @@ bool Map3<MAP>::check() const
 	{
 		if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
 		{
-			if(this->isBoundaryMarked3(d))
+			if(this->template isBoundaryMarked<3>(d))
 				std::cout << "Boundary case - ";
 			std::cout << "Check: dart with no phi1 predecessor" << std::endl;
 			return false;
@@ -1144,10 +1144,10 @@ bool Map3<MAP>::check() const
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-template <class MAP>
-bool Map3<MAP>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread) const
 {
-	DartMarkerStore mv(*this, thread);	// Lock a marker
+	DartMarkerStore<MAP_IMPL> mv(*this, thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
 	std::vector<Dart> darts;	// Darts that are traversed
@@ -1178,8 +1178,8 @@ bool Map3<MAP>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thre
 	return found;
 }
 
-template <class MAP>
-bool Map3<MAP>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread) const
 {
 	Dart it = d;
 	do
@@ -1191,22 +1191,22 @@ bool Map3<MAP>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread
 	return false;
 }
 
-template <class MAP>
-inline bool Map3<MAP>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return ParentMap::foreach_dart_of_face(d, f, thread) || ParentMap::foreach_dart_of_face(phi3(d), f, thread);
 }
 
-template <class MAP>
-inline bool Map3<MAP>::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
-template <class MAP>
-bool Map3<MAP>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+bool Map3<MAP_IMPL>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
 {
-	DartMarkerStore mv(*this,thread);	// Lock a marker
+	DartMarkerStore<MAP_IMPL> mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
 	std::vector<Dart> darts;	// Darts that are traversed
@@ -1242,20 +1242,20 @@ bool Map3<MAP>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) 
 	return found;
 }
 
-template <class MAP>
-inline bool Map3<MAP>::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return ParentMap::foreach_dart_of_vertex(d, f, thread);
 }
 
-template <class MAP>
-inline bool Map3<MAP>::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return ParentMap::foreach_dart_of_edge(d, f, thread);
 }
 
-template <class MAP>
-inline bool Map3<MAP>::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+inline bool Map3<MAP_IMPL>::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread) const
 {
 	return ParentMap::foreach_dart_of_face(d, f, thread);
 }
@@ -1264,24 +1264,24 @@ inline bool Map3<MAP>::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned in
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
 
-template <class MAP>
-Dart Map3<MAP>::newBoundaryCycle(unsigned int nbE)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::newBoundaryCycle(unsigned int nbE)
 {
-	Dart d = Map1<MAP>::newCycle(nbE);
+	Dart d = Map1<MAP_IMPL>::newCycle(nbE);
 	this->template boundaryMarkOrbit<FACE,3>(d);
 	return d;
 }
 
-template <class MAP>
-unsigned int Map3<MAP>::closeHole(Dart d, bool forboundary)
+template <typename MAP_IMPL>
+unsigned int Map3<MAP_IMPL>::closeHole(Dart d, bool forboundary)
 {
 	assert(phi3(d) == d);		// Nothing to close
-	DartMarkerStore m(*this) ;
+	DartMarkerStore<MAP_IMPL> m(*this) ;
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-	m.markOrbit<FACE2>(d) ;
+	m.template markOrbit<FACE2>(d) ;
 
 	unsigned int count = 0 ;
 
@@ -1308,10 +1308,10 @@ unsigned int Map3<MAP>::closeHole(Dart d, bool forboundary)
 					if(!m.isMarked(e))
 					{
 						visitedFaces.push_back(e) ;
-						m.markOrbit<FACE2>(e) ;
+						m.template markOrbit<FACE2>(e) ;
 					}
 				}
-				else if(this->isBoundaryMarked3(e))
+				else if(this->template isBoundaryMarked<3>(e))
 				{
 					found = true ;
 					this->phi2sew(e, bit) ;
@@ -1329,8 +1329,8 @@ unsigned int Map3<MAP>::closeHole(Dart d, bool forboundary)
 	return count ;
 }
 
-template <class MAP>
-unsigned int Map3<MAP>::closeMap()
+template <typename MAP_IMPL>
+unsigned int Map3<MAP_IMPL>::closeMap()
 {
 	// Search the map for topological holes (fix points of phi3)
 	unsigned int nb = 0 ;
@@ -1349,22 +1349,22 @@ unsigned int Map3<MAP>::closeMap()
  * These functions compute the dual mesh
  *************************************************************************/
 
-template <class MAP>
-void Map3<MAP>::reverseOrientation()
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::reverseOrientation()
 {
 
 }
 
-template <class MAP>
-void Map3<MAP>::computeDual()
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::computeDual()
 {
-	DartAttribute<Dart> old_phi1 = this->template getAttribute<Dart, DART>("phi1") ;
-	DartAttribute<Dart> old_phi_1 = this->template getAttribute<Dart, DART>("phi_1") ;
-	DartAttribute<Dart> new_phi1 = this->template addAttribute<Dart, DART>("new_phi1") ;
-	DartAttribute<Dart> new_phi_1 = this->template addAttribute<Dart, DART>("new_phi_1") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi1 = this->template getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi_1 = this->template getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi1 = this->template addAttribute<Dart, DART>("new_phi1") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi_1 = this->template addAttribute<Dart, DART>("new_phi_1") ;
 
-	DartAttribute<Dart> old_phi2 = this->template getAttribute<Dart, DART>("phi2") ;
-	DartAttribute<Dart> new_phi2 = this->template addAttribute<Dart, DART>("new_phi2") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi2 = this->template getAttribute<Dart, DART>("phi2") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi2 = this->template addAttribute<Dart, DART>("new_phi2") ;
 
 	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
@@ -1528,14 +1528,14 @@ void Map3<MAP>::computeDual()
 	//std::cout << "Map closed (" << closeMap() <<" boundary faces)" << std::endl;
 }
 
-template <class MAP>
-Dart Map3<MAP>::explodBorderTopo(Dart d)
+template <typename MAP_IMPL>
+Dart Map3<MAP_IMPL>::explodBorderTopo(Dart d)
 {
 	std::vector<std::pair<Dart,Dart> > ve;
 	ve.reserve(1024);
 
 	//stocke un brin par face du bord
-	DartMarker me(*this);
+	DartMarker<MAP_IMPL> me(*this);
 	for(Dart dit = this->begin() ; dit != this->end() ; this->next(dit))
 	{
 		if(this->isBoundaryMarked3(dit) && !me.isMarked(dit))
@@ -1552,7 +1552,7 @@ Dart Map3<MAP>::explodBorderTopo(Dart d)
 	}
 
 	//triangule chaque face
-	DartMarker mf(*this);
+	DartMarker<MAP_IMPL> mf(*this);
 	for(std::vector<std::pair<Dart,Dart> >::iterator it = ve.begin() ; it != ve.end() ; ++it)
 	{
 		Dart first = (*it).first;
@@ -1641,7 +1641,7 @@ Dart Map3<MAP>::explodBorderTopo(Dart d)
 	{
 		Dart dit1 = this->phi2((*it).first);
 		Dart dit2 = this->phi2((*it).second);
-		Map3<MAP>::sewVolumes(dit1, dit2, false);
+		Map3<MAP_IMPL>::sewVolumes(dit1, dit2, false);
 	}
 
 	this->template setOrbitEmbeddingOnNewCell<VERTEX>(this->phi_1(this->phi2(ve.front().first)));
@@ -1649,8 +1649,8 @@ Dart Map3<MAP>::explodBorderTopo(Dart d)
 	return this->phi_1(this->phi2(ve.front().first));
 }
 
-template <class MAP>
-void Map3<MAP>::computeDualTest()
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::computeDualTest()
 {
 //		unsigned int count = 0;
 //		CellMarkerNoUnmark<VERTEX> cv(*this);
@@ -1669,13 +1669,13 @@ void Map3<MAP>::computeDualTest()
 
 //		std::cout << "boundary vertices : " << count << std::endl;
 
-	DartAttribute<Dart> old_phi1 = this->template getAttribute<Dart, DART>("phi1") ;
-	DartAttribute<Dart> old_phi_1 = this->template getAttribute<Dart, DART>("phi_1") ;
-	DartAttribute<Dart> new_phi1 = this->template addAttribute<Dart, DART>("new_phi1") ;
-	DartAttribute<Dart> new_phi_1 = this->template addAttribute<Dart, DART>("new_phi_1") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi1 = this->template getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi_1 = this->template getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi1 = this->template addAttribute<Dart, DART>("new_phi1") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi_1 = this->template addAttribute<Dart, DART>("new_phi_1") ;
 
-	DartAttribute<Dart> old_phi2 = this->template getAttribute<Dart, DART>("phi2") ;
-	DartAttribute<Dart> new_phi2 = this->template addAttribute<Dart, DART>("new_phi2") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi2 = this->template getAttribute<Dart, DART>("phi2") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi2 = this->template addAttribute<Dart, DART>("new_phi2") ;
 
 	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
@@ -1701,7 +1701,7 @@ void Map3<MAP>::computeDualTest()
 	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
 		if(this->isBoundaryMarked3(d))
-			Map3<MAP>::deleteVolume(d, false);
+			Map3<MAP_IMPL>::deleteVolume(d, false);
 	}
 
 	closeMap();

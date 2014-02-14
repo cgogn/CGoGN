@@ -47,14 +47,15 @@ namespace CGoGN
  *  some optimizations are enable that speed up the processing of cells.
  *  @param DART the type of dart used in the class
  */
-template <class MAP>
-class Map3 : public Map2<MAP>
+template <typename MAP_IMPL>
+class Map3 : public Map2<MAP_IMPL>
 {
 protected:
 	void init() ;
 
 public:
-	typedef Map2<MAP> ParentMap;
+	typedef MAP_IMPL IMPL;
+	typedef Map2<MAP_IMPL> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o){ return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
@@ -373,6 +374,12 @@ public:
 	/*! Test if phi3 and phi2 ares involutions and if phi1 is a permutation
 	 */
 	virtual bool check() const;
+
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits()
+	{
+		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, Map3>();
+	}
 	//@}
 
 	/*! @name Cell Functors

@@ -274,7 +274,7 @@ void ImplicitHierarchicalMap3::deleteVertexSubdividedFace(Dart d)
 
 void ImplicitHierarchicalMap3::initEdgeId()
 {
-	DartMarkerStore edgeMark(*this) ;
+	DartMarkerStore<Map3> edgeMark(*this) ;
 	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
 	{
 		if(!edgeMark.isMarked(d))
@@ -298,7 +298,7 @@ void ImplicitHierarchicalMap3::initEdgeId()
 
 void ImplicitHierarchicalMap3::initFaceId()
 {
-	DartMarkerStore faceMark(*this) ;
+	DartMarkerStore<Map3> faceMark(*this) ;
 	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
 	{
 		if(!faceMark.isMarked(d))
@@ -378,7 +378,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 	//First : the level of a volume is the
 	//minimum of the levels of its faces
 
-	DartMarkerStore mark(*this);		// Lock a marker
+	DartMarkerStore<Map3> mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(512);

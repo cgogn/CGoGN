@@ -79,7 +79,7 @@ void ImplicitHierarchicalMap2::initImplicitProperties()
 void ImplicitHierarchicalMap2::initEdgeId()
 {
 	m_idCount = 0 ;
-	DartMarker edgeMark(*this) ;
+	DartMarker<Map2> edgeMark(*this) ;
 	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
 		if(!edgeMark.isMarked(d))

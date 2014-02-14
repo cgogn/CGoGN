@@ -33,14 +33,15 @@ namespace CGoGN
 /**
 * The class of 1-GMap
 */
-template <class MAP>
-class GMap1 : public GMap0<MAP>
+template <typename MAP_IMPL>
+class GMap1 : public GMap0<MAP_IMPL>
 {
 protected:
 	void init() ;
 
 public:
-	typedef GMap0<MAP> ParentMap;
+	typedef MAP_IMPL IMPL;
+	typedef GMap0<MAP_IMPL> ParentMap;
 
 	static const unsigned int DIMENSION = 1 ;
 
@@ -179,6 +180,12 @@ public:
 	 * @return a boolean indicating if the face is a triangle
 	 */
 	bool isCycleTriangle(Dart d) const;
+
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits()
+	{
+		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, GMap1>();
+	}
 	//@}
 
 	/*! @name Cell Functors

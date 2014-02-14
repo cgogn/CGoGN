@@ -39,7 +39,6 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 
-
 namespace CGoGN
 {
 
@@ -52,6 +51,7 @@ namespace Render
 namespace GL2
 {
 
+template <typename PFP>
 class TopoRender
 {
 protected:
@@ -114,7 +114,7 @@ protected:
 	/**
 	 * attribut d'index dans le VBO
 	 */
-	DartAttribute<unsigned int> m_attIndex;
+	DartAttribute<unsigned int, typename PFP::MAP> m_attIndex;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
@@ -139,7 +139,6 @@ protected:
 	/**
 	 * affect a color to each dart
 	 */
-	template<typename PFP>
 	void setDartsIdColor(typename PFP::MAP& map, bool withBoundary);
 
 	/**
@@ -171,7 +170,7 @@ public:
 	void setDartWidth(float dw);
 
 	/**
-	 * set the with of line use to draw phi (default val is ")
+	 * set the with of line use to draw phi (default val is 3)
 	 * @param pw width
 	 */
 	void setRelationWidth(float pw);
@@ -234,7 +233,6 @@ public:
 	 */
 	void overdrawDart(Dart d, float width, float r, float g, float b);
 
-
 	/**
 	 * pick dart with color set by setDartsIdColor
 	 * Do not forget to apply same transformation to scene before picking than before drawing !
@@ -243,32 +241,22 @@ public:
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
-	template<typename PFP>
 	Dart picking(typename PFP::MAP& map, int x, int y, bool withBoundary=false);
 
-
-	template<typename PFP>
 	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
 
-	template<typename PFP>
 	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false);
 
+	void updateDataMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false);
 
-	template <typename PFP>
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
-
-	template <typename PFP>
-	void updateDataMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
-
-	template <typename PFP>
-	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, bool withBoundary = false);
+	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false);
 
 	/**
 	 * Special update function used to draw boundary of map3
 	 */
-	template<typename PFP>
-	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float ns);
+	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, float ns);
 
 	/**
 	 * render to svg struct
@@ -293,10 +281,6 @@ public:
 	void setBoundaryShift(float bs);
 };
 
-// just for compatibility with old code
-typedef TopoRender TopoRenderMapD;
-typedef TopoRender TopoRenderGMap;
-
 } // namespace GL2
 
 } // namespace Render
@@ -304,7 +288,6 @@ typedef TopoRender TopoRenderGMap;
 } // namespace Algo
 
 } // namespace CGoGN
-
 
 #include "Algo/Render/GL2/topoRender.hpp"
 

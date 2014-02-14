@@ -25,7 +25,7 @@
 #ifndef __GMAP0_H__
 #define __GMAP0_H__
 
-#include "Topology/generic/mapMono.h"
+#include "Topology/generic/mapCommon.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 
@@ -36,13 +36,15 @@ namespace CGoGN
 * The class of 0-GMap
 * Warning here we use beta instead of classic alpha
 */
-template <class MAP = MapMono>
-class GMap0 : public MAP
+template <typename MAP_IMPL>
+class GMap0 : public MapCommon<MAP_IMPL>
 {
 protected:
 	void init() ;
 
 public:
+	typedef MAP_IMPL IMPL;
+
 	GMap0();
 
 	static const unsigned int DIMENSION = 0 ;

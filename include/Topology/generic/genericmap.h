@@ -54,12 +54,12 @@ class CellMarkerGen ;
 
 class GenericMap
 {
-	template<typename T, unsigned int ORBIT> friend class AttributeHandler ;
-	template<typename T> friend class DartAutoAttribute ;
-	template<typename T> friend class VertexAutoAttribute ;
-	template<typename T> friend class EdgeAutoAttribute ;
-	template<typename T> friend class FaceAutoAttribute ;
-	template<typename T> friend class VolumeAutoAttribute ;
+	template<typename T, unsigned int ORBIT, typename MAP> friend class AttributeHandler ;
+	template<typename T, typename MAP> friend class DartAutoAttribute ;
+	template<typename T, typename MAP> friend class VertexAutoAttribute ;
+	template<typename T, typename MAP> friend class EdgeAutoAttribute ;
+	template<typename T, typename MAP> friend class FaceAutoAttribute ;
+	template<typename T, typename MAP> friend class VolumeAutoAttribute ;
 	friend class DartMarkerGen ;
 	friend class CellMarkerGen ;
 	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
@@ -107,6 +107,8 @@ protected:
 
 	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
 	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
+
+	void init();
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
@@ -157,30 +159,10 @@ protected:
 	 */
 	void deleteDartLine(unsigned int index) ;
 
-public:
-	/**
-	 * @brief dartIndex
-	 * @param d
-	 * @return index of dart (depends on map implementation)
-	 */
-//	virtual unsigned int dartIndex(Dart d) const = 0;
-
-	/**
-	 * get the Dart of index in topological table
-	 */
-//	virtual Dart indexDart(unsigned int index) const = 0;
-
-	/**
-	 * @return the number of darts in the map
-	 */
-	virtual unsigned int getNbDarts() ;
-
-//	AttributeContainer& getDartContainer() = 0;
-
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
 	 ****************************************/
-
+public:
 	/**
 	 * tell if an orbit is embedded or not
 	 */
@@ -218,10 +200,10 @@ public:
 	 *     QUICK TRAVERSAL MANAGEMENT       *
 	 ****************************************/
 
-	template <unsigned int ORBIT>
+	template <typename MAP, unsigned int ORBIT>
 	void enableQuickTraversal() ;
 
-	template <unsigned int ORBIT>
+	template <typename MAP, unsigned int ORBIT>
 	void updateQuickTraversal() ;
 
 	template <unsigned int ORBIT>
@@ -229,7 +211,6 @@ public:
 
 	template <unsigned int ORBIT>
 	void disableQuickTraversal() ;
-
 
 	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
 	void enableQuickIncidentTraversal();
@@ -444,28 +425,6 @@ public:
 	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 
-	/**
-	* execute functor for each orbit
-	* @param dim the dimension of the orbit
-	* @param f the functor
-	*/
-	template <typename MAP, unsigned int ORBIT>
-	bool foreach_orbit(FunctorType& f, unsigned int thread = 0) const;
-
-
-	//! Count the number of orbits of dimension dim in the map
-	/*! @param dim the dimension of the orbit
-	 * 	@return the number of orbits
-	 */
-	template <typename MAP, unsigned int ORBIT>
-	unsigned int getNbOrbits() const;
-
-	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
-	/*! @param d a dart
-	 */
-	template <typename MAP, unsigned int ORBIT, unsigned int INCIDENT>
-	unsigned int degree(Dart d) const;
-
 	/****************************************
 	 *         BOUNDARY MANAGEMENT          *
 	 ****************************************/
@@ -474,46 +433,7 @@ protected:
 	/// boundary markers
 	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
 
-	/**
-	 * mark a dart as  belonging to boundary
-	 */
-	template <unsigned int D>
-	void boundaryMark(Dart d) ;
-	void boundaryMark2(Dart d) ;
-	void boundaryMark3(Dart d) ;
-
-	/**
-	 * unmark a dart from the boundary
-	 */
-	template <unsigned int D>
-	void boundaryUnmark(Dart d) ;
-	void boundaryUnmark2(Dart d) ;
-	void boundaryUnmark3(Dart d) ;
-
-public:
-	/**
-	 * test if a dart belong to the boundary
-	 */
-	template <unsigned int D>
-	bool isBoundaryMarked(Dart d) const ;
-
-	bool isBoundaryMarked2(Dart d) const ;
-	bool isBoundaryMarked3(Dart d) const ;
-	bool isBoundaryMarkedCurrent(Dart d) const ;
-
 protected:
-	/**
-	 * mark an orbit of dart as belonging to boundary
-	 */
-	template <unsigned int ORBIT, unsigned int DIM>
-	void boundaryMarkOrbit(Dart d) ;
-
-	/**
-	 * unmark an orbit of dart from the boundary
-	 */
-	template <unsigned int ORBIT, unsigned int DIM>
-	void boundaryUnmarkOrbit(Dart d) ;
-
 	/**
 	 * clear all boundary markers
 	 */

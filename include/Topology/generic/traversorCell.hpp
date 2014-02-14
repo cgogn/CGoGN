@@ -85,7 +85,7 @@ Dart TraversorCell<MAP, ORBIT>::begin()
 		else
 		{
 			if(dmark)
-				dmark->markOrbit<ORBIT>(current) ;
+				dmark->template markOrbit<ORBIT>(current) ;
 			else
 				cmark->mark(current) ;
 		}
@@ -129,7 +129,7 @@ Dart TraversorCell<MAP, ORBIT>::next()
 					ismarked = dmark->isMarked(current) ;
 			}
 			if(current != NIL)
-				dmark->markOrbit<ORBIT>(current) ;
+				dmark->template markOrbit<ORBIT>(current) ;
 		}
 		else
 		{

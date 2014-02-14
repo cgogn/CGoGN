@@ -33,14 +33,15 @@ namespace CGoGN
 /**
 * The class of 2-GMap
 */
-template <class MAP>
-class GMap2 : public GMap1<MAP>
+template <typename MAP_IMPL>
+class GMap2 : public GMap1<MAP_IMPL>
 {
 protected:
 	void init() ;
 
 public:
-	typedef GMap1<MAP> ParentMap;
+	typedef MAP_IMPL IMPL;
+	typedef GMap1<MAP_IMPL> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+5; }
 
@@ -382,6 +383,12 @@ public:
 	 * Check if a serie of darts is an oriented simple close path
 	 */
 	virtual bool checkSimpleOrientedPath(std::vector<Dart>& vd);
+
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits()
+	{
+		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, GMap2>();
+	}
 	//@}
 
 	/*! @name Cell Functors

@@ -85,11 +85,6 @@ inline unsigned int GenericMap::copyDartLine(unsigned int index)
 	return newindex ;
 }
 
-inline unsigned int GenericMap::getNbDarts()
-{
-	return m_attribs[DART].size() ;
-}
-
 //inline bool GenericMap::isDartValid(Dart d)
 //{
 //	return !d.isNil() && m_attribs[DART].used(dartIndex(d)) ;
@@ -135,7 +130,7 @@ inline void GenericMap::initCell(unsigned int i)
  *     QUICK TRAVERSAL MANAGEMENT       *
  ****************************************/
 
-template <unsigned int ORBIT>
+template <typename MAP, unsigned int ORBIT>
 inline void GenericMap::enableQuickTraversal()
 {
 
@@ -145,33 +140,22 @@ inline void GenericMap::enableQuickTraversal()
 			addEmbedding<ORBIT>() ;
 		m_quickTraversal[ORBIT] = m_attribs[ORBIT].addAttribute<Dart>("quick_traversal") ;
 	}
-	updateQuickTraversal<ORBIT>() ;
+	updateQuickTraversal<MAP, ORBIT>() ;
 }
 
-template <unsigned int ORBIT>
+template <typename MAP, unsigned int ORBIT>
 inline void GenericMap::updateQuickTraversal()
 {
 	assert(m_quickTraversal[ORBIT] != NULL || !"updateQuickTraversal on a disabled orbit") ;
 
-//	CellMarker<ORBIT> cm(*this) ;
-//	for(Dart d = begin(); d != end(); next(d))
-//	{
-//		if ((!cm.isMarked(d)) && (!isBoundaryMarkedCurrent(d)))
-//		{
-//			cm.mark(d) ;
-//			(*m_quickTraversal[ORBIT])[getEmbedding<ORBIT>(d)] = d ;
-//		}
-//	}
-
-	// ensure that we do not try to use quick traversal in Traversors
-	AttributeMultiVector<Dart>* qt = m_quickTraversal[ORBIT];
-	m_quickTraversal[ORBIT] = NULL;
-
-	// fill the quick travsersal
-	TraversorCell<GenericMap,VOLUME> trav(*this);
-	for(Dart d = trav.begin(); d != trav.end(); d=trav.next())
+	CellMarker<MAP, ORBIT> cm(*this) ;
+	for(Dart d = begin(); d != end(); next(d))
 	{
-		(*qt)[getEmbedding<ORBIT>(d)] = d ;
+		if(!cm.isMarked(d))
+		{
+			cm.mark(d) ;
+			(*m_quickTraversal[ORBIT])[MAP::getEmbedding<ORBIT>(d)] = d ;
+		}
 	}
 
 	// restore ptr
@@ -194,7 +178,6 @@ inline void GenericMap::disableQuickTraversal()
 		m_quickTraversal[ORBIT] = NULL ;
 	}
 }
-
 
 template <typename MAP, unsigned int ORBIT, unsigned int INCI>
 inline void GenericMap::enableQuickIncidentTraversal()
@@ -423,39 +406,6 @@ bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thre
 	return false;
 }
 
-template <typename MAP, unsigned int ORBIT>
-bool GenericMap::foreach_orbit(FunctorType& fonct, unsigned int thread) const
-{
-	TraversorCell<MAP, ORBIT> trav(*reinterpret_cast<const MAP*>(this), true, thread);
-	bool found = false;
-
-	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
-	{
-		if ((fonct)(d))
-			found = true;
-	}
-	return found;
-}
-
-template <typename MAP, unsigned int ORBIT>
-unsigned int GenericMap::getNbOrbits() const
-{
-	FunctorCount fcount;
-	foreach_orbit<MAP, ORBIT>(fcount);
-	return fcount.getNb();
-}
-
-template <typename MAP, unsigned int ORBIT, unsigned int INCIDENT>
-unsigned int GenericMap::degree(Dart d) const
-{
-	assert(ORBIT != INCIDENT || !"degree does not manage adjacency counting") ;
-	Traversor* t = TraversorFactory<MAP>::createIncident(*(reinterpret_cast<MAP*>(this)), d, dimension(), ORBIT, INCIDENT) ;
-	FunctorCount fcount ;
-	t->applyFunctor(fcount) ;
-	delete t ;
-	return fcount.getNb() ;
-}
-
 /****************************************
  *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
  ****************************************/
@@ -479,79 +429,9 @@ inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& na
 	return amv ;
 }
 
-
 /**************************
  *  BOUNDARY MANAGEMENT   *
  **************************/
-
-template <unsigned int D>
-inline void GenericMap::boundaryMark(Dart d)
-{
-	m_markTables[DART][0]->operator[](dartIndex(d)).setMark(m_boundaryMarkers[D-2]);
-}
-
-template <unsigned int D>
-inline void GenericMap::boundaryUnmark(Dart d)
-{
-	m_markTables[DART][0]->operator[](dartIndex(d)).unsetMark(m_boundaryMarkers[D-2]);
-}
-
-template <unsigned int D>
-inline bool GenericMap::isBoundaryMarked(Dart d) const
-{
-	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarkers[D-2]);
-}
-
-
-inline bool GenericMap::isBoundaryMarkedCurrent(Dart d) const
-{
-	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarkers[this->dimension()-2]);
-}
-
-
-inline void GenericMap::boundaryMark2(Dart d)
-{
-	boundaryMark<2>(d);
-}
-
-inline void GenericMap::boundaryUnmark2(Dart d)
-{
-	boundaryUnmark<2>(d);
-}
-
-inline bool GenericMap::isBoundaryMarked2(Dart d) const
-{
-	return isBoundaryMarked<2>(d);
-}
-
-inline void GenericMap::boundaryMark3(Dart d)
-{
-	boundaryMark<3>(d);
-}
-
-inline void GenericMap::boundaryUnmark3(Dart d)
-{
-	boundaryUnmark<3>(d);
-}
-
-inline bool GenericMap::isBoundaryMarked3(Dart d) const
-{
-	return isBoundaryMarked<3>(d);
-}
-
-template <unsigned int ORBIT, unsigned int  DIM>
-void GenericMap::boundaryMarkOrbit(Dart d)
-{
-	FunctorMark<GenericMap> fm(*this, m_boundaryMarkers[DIM-2], m_markTables[DART][0]) ;
-	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
-}
-
-template <unsigned int ORBIT, unsigned int DIM>
-void GenericMap::boundaryUnmarkOrbit(Dart d)
-{
-	FunctorUnmark<GenericMap> fm(*this, m_boundaryMarkers[DIM-2], m_markTables[DART][0]) ;
-	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
-}
 
 template <unsigned int DIM>
 void GenericMap::boundaryUnmarkAll()

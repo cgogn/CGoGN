@@ -32,6 +32,8 @@ namespace CGoGN
 
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
+typedef EmbeddedMap2::IMPL EMap2_IMPL;
+
 class ImplicitHierarchicalMap2 : public EmbeddedMap2
 {
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
@@ -41,8 +43,8 @@ private:
 	unsigned int m_maxLevel ;
 	unsigned int m_idCount ;
 
-	DartAttribute<unsigned int> m_dartLevel ;
-	DartAttribute<unsigned int> m_edgeId ;
+	DartAttribute<unsigned int, EMap2_IMPL> m_dartLevel ;
+	DartAttribute<unsigned int, EMap2_IMPL> m_edgeId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
@@ -231,25 +233,25 @@ public:
 } ;
 
 template <typename T, unsigned int ORBIT>
-class AttributeHandler_IHM : public AttributeHandler<T, ORBIT>
+class AttributeHandler_IHM : public AttributeHandler<T, ORBIT, EMap2_IMPL>
 {
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler_IHM() : AttributeHandler<T, ORBIT>()
+	AttributeHandler_IHM() : AttributeHandler<T, ORBIT, EMap2_IMPL>()
 	{}
 
-	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT>(m, amv)
+	AttributeHandler_IHM(ImplicitHierarchicalMap2* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT, EMap2_IMPL>(m, amv)
 	{}
 
 	AttributeMultiVector<T>* getDataVector() const
 	{
-		return AttributeHandler<T, ORBIT>::getDataVector() ;
+		return AttributeHandler<T, ORBIT, EMap2_IMPL>::getDataVector() ;
 	}
 
 	bool isValid() const
 	{
-		return AttributeHandler<T, ORBIT>::isValid() ;
+		return AttributeHandler<T, ORBIT, EMap2_IMPL>::isValid() ;
 	}
 
 	T& operator[](Dart d) ;
@@ -258,12 +260,12 @@ public:
 
 	T& operator[](unsigned int a)
 	{
-		return AttributeHandler<T, ORBIT>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, EMap2_IMPL>::operator[](a) ;
 	}
 
 	const T& operator[](unsigned int a) const
 	{
-		return AttributeHandler<T, ORBIT>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, EMap2_IMPL>::operator[](a) ;
 	}
 } ;
 

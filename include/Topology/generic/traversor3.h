@@ -43,18 +43,18 @@ class MarkerForTraversor
 {
 private:
 	const MAP& m_map ;
-	DartMarkerStore* m_dmark ;
-	CellMarkerStore<ORBIT>* m_cmark ;
+	DartMarkerStore<MAP>* m_dmark ;
+	CellMarkerStore<MAP, ORBIT>* m_cmark ;
 public:
 	MarkerForTraversor(const MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~MarkerForTraversor();
-	DartMarkerStore* dmark();
-	CellMarkerStore<ORBIT>* cmark();
+
+	DartMarkerStore<MAP>* dmark();
+	CellMarkerStore<MAP, ORBIT>* cmark();
 	void mark(Dart d);
 	void unmark(Dart d);
 	bool isMarked(Dart d);
 } ;
-
 
 /**
  * Generic class Traversor (do not use directly)
@@ -65,8 +65,8 @@ class Traversor3XY//: public Traversor<MAP>
 {
 private:
 	const MAP& m_map ;
-	DartMarkerStore* m_dmark ;
-	CellMarkerStore<ORBY>* m_cmark ;
+	DartMarkerStore<MAP>* m_dmark ;
+	CellMarkerStore<MAP, ORBY>* m_cmark ;
 	Dart m_current ;
 	TraversorDartsOfOrbit<MAP, ORBX> m_tradoo;
 
@@ -102,12 +102,9 @@ public:
 	Traversor3XXaY(const MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0);
 
 	Dart begin();
-
 	Dart end();
-
 	Dart next();
 };
-
 
 /**
  * Traverse vertices incident to volume

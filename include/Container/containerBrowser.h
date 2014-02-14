@@ -57,15 +57,15 @@ public:
 
 
 
-template <unsigned int CELL>
+template <typename MAP, unsigned int CELL>
 class ContainerBrowserCellMarked : public ContainerBrowser
 {
 protected:
 	AttributeContainer* m_cont ;
-	CellMarker<CELL>& m_marker ;
+	CellMarker<MAP, CELL>& m_marker ;
 
 public:
-	ContainerBrowserCellMarked(AttribMap& m, CellMarker<CELL>& cm);
+	ContainerBrowserCellMarked(GenericMap& m, CellMarker<MAP, CELL>& cm);
 	~ContainerBrowserCellMarked();
 	unsigned int begin() const;
 	unsigned int end() const;
@@ -87,7 +87,7 @@ protected:
 	unsigned int m_end ;
 
 public:
-	ContainerBrowserLinked(AttribMap& m, unsigned int orbit);
+	ContainerBrowserLinked(GenericMap& m, unsigned int orbit);
 	ContainerBrowserLinked(AttributeContainer& c);
 	ContainerBrowserLinked(AttributeContainer& c, AttributeMultiVector<unsigned int>* links);
 	/**

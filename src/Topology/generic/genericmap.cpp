@@ -80,20 +80,14 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	{
 		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
-		m_embeddings[i] = NULL ;
-		m_quickTraversal[i] = NULL ;
 		for(unsigned int j = 0; j < NB_THREAD; ++j)
 		{
 			m_marksets[i][j].clear() ;
 			m_markTables[i][j] = NULL ;
 		}
-
-		for(unsigned int j = 0; j < NB_ORBITS; ++j)
-		{
-			m_quickLocalIncidentTraversal[i][j] = NULL ;
-			m_quickLocalAdjacentTraversal[i][j] = NULL ;
-		}
 	}
+
+	init();
 
 	for (unsigned int i = 0; i < NB_THREAD; ++i)
 	{
@@ -102,8 +96,8 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	}
 
 	// get & lock marker for boundary
-	m_boundaryMarkers[0] =  m_marksets[DART][0].getNewMark();
-	m_boundaryMarkers[1] =  m_marksets[DART][0].getNewMark();
+	m_boundaryMarkers[0] = m_marksets[DART][0].getNewMark();
+	m_boundaryMarkers[1] = m_marksets[DART][0].getNewMark();
 }
 
 GenericMap::~GenericMap()
@@ -145,26 +139,58 @@ GenericMap::~GenericMap()
 	}
 }
 
+void GenericMap::init()
+{
+	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	{
+		m_attribs[i].clear(true) ;
+		m_embeddings[i] = NULL ;
+		m_quickTraversal[i] = NULL;
+
+		for(unsigned int j = 0; j < NB_ORBITS; ++j)
+		{
+			m_quickLocalIncidentTraversal[i][j] = NULL ;
+			m_quickLocalAdjacentTraversal[i][j] = NULL ;
+		}
+
+		AttributeContainer& cont = m_attribs[i];
+		for (unsigned int t = 0; t < m_nbThreads; ++t)
+		{
+			std::stringstream ss ;
+			ss << "Mark_" << t ;
+			AttributeMultiVector<Mark>* amvMark = cont.addAttribute<Mark>(ss.str()) ;
+			for(unsigned int idx = cont.begin(); idx < cont.end(); cont.next(idx))
+				amvMark->operator[](idx).clear() ;
+			m_markTables[i][t] = amvMark ;
+		}
+	}
+
+	for (unsigned int j = 0; j < NB_THREAD; ++j)
+	{
+		std::vector<CellMarkerGen*>& cmg = cellMarkers[j];
+		for(unsigned int i = 0; i < cmg.size(); ++i)
+		{
+			CellMarkerGen* cm = cmg[i] ;
+			cm->updateMarkVector(m_markTables[cm->getCell()][cm->getThread()]) ;
+		}
+
+		std::vector<DartMarkerGen*>& dmg = dartMarkers[j];
+		for(unsigned int i = 0; i < dmg.size(); ++i)
+		{
+			DartMarkerGen* dm = dmg[i] ;
+			dm->updateMarkVector(m_markTables[DART][dm->getThread()]) ;
+		}
+	}
+
+	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
+		(*it).second->setInvalid() ;
+	attributeHandlers.clear() ;
+}
+
 void GenericMap::clear(bool removeAttrib)
 {
 	if (removeAttrib)
-	{
-		for(unsigned int i = 0; i < NB_ORBITS; ++i)
-		{
-			m_attribs[i].clear(true) ;
-			m_embeddings[i] = NULL ;
-			m_quickTraversal[i] = NULL;
-			for(unsigned int j = 0; j < NB_ORBITS; ++j)
-			{
-				m_quickLocalIncidentTraversal[i][j] = NULL ;
-				m_quickLocalAdjacentTraversal[i][j] = NULL ;
-			}
-		}
-
-		for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
-			(*it).second->setInvalid() ;
-		attributeHandlers.clear() ;
-	}
+		init();
 	else
 	{
 		for(unsigned int i = 0; i < NB_ORBITS; ++i)

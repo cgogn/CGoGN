@@ -25,7 +25,7 @@
 #ifndef __MAP1_H__
 #define __MAP1_H__
 
-#include "Topology/generic/mapMono.h"
+#include "Topology/generic/mapCommon.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 
@@ -40,13 +40,15 @@ namespace CGoGN
  *  - Faces with only one edge (sometime called loops) are accepted.
  *  - Degenerated faces with only two edges are accepted.
  */
-template <class MAP = MapMono>
-class Map1 : public MAP
+template <typename MAP_IMPL>
+class Map1 : public MapCommon<MAP_IMPL>
 {
 protected:
 	void init() ;
 
 public:
+	typedef MAP_IMPL IMPL;
+
 	Map1();
 
 	static const unsigned int DIMENSION = 1 ;
@@ -189,6 +191,12 @@ public:
 	 * @return a boolean indicating if the cycle is a triangle
 	 */
 	bool isCycleTriangle(Dart d) const;
+
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits()
+	{
+		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, Map1>();
+	}
 	//@}
 
 	/*! @name Cell Functors

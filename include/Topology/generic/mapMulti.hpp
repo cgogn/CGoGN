@@ -180,7 +180,7 @@ inline void MapMulti::duplicateDartAtOneLevel(Dart d, unsigned int level)
 	(*m_mrDarts[level])[d.index] = copyDartLine(dartIndex(d)) ;
 }
 
-inline MapMulti::AttributeContainer& getDartContainer()
+inline AttributeContainer& MapMulti::getDartContainer()
 {
 	return m_mrattribs;
 }
@@ -266,6 +266,31 @@ inline void MapMulti::involutionUnsew(Dart d)
 	Dart e = (*m_involution[I])[d_index] ;
 	(*m_involution[I])[d_index] = d ;
 	(*m_involution[I])[dartIndex(e)] = e ;
+}
+
+inline void MapMulti::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		for (unsigned int j = 0; j < m_permutation.size(); ++j)
+		{
+			Dart d = (*m_permutation[j])[i];
+			if (d.index != oldnew[d.index])
+				(*m_permutation[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_permutation_inv.size(); ++j)
+		{
+			Dart d = (*m_permutation_inv[j])[i];
+			if (d.index != oldnew[d.index])
+				(*m_permutation_inv[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_involution.size(); ++j)
+		{
+			Dart d = (*m_involution[j])[i];
+			if (d.index != oldnew[d.index])
+				(*m_involution[j])[i] = Dart(oldnew[d.index]);
+		}
+	}
 }
 
 /****************************************
@@ -363,136 +388,6 @@ inline void MapMulti::next(Dart& d) const
 	{
 		m_mrattribs.next(d.index) ;
 	} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
-}
-
-/****************************************
- *         EMBEDDING MANAGEMENT         *
- ****************************************/
-
-template <unsigned int ORBIT>
-inline unsigned int MapMulti::getEmbedding(Dart d) const
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int d_index = dartIndex(d);
-
-	if (ORBIT == DART)
-		return d_index;
-
-	return (*m_embeddings[ORBIT])[d_index] ;
-}
-
-template <unsigned int ORBIT>
-void MapMulti::setDartEmbedding(Dart d, unsigned int emb)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int old = getEmbedding<ORBIT>(d);
-
-	if (old == emb)	// if same emb
-		return;		// nothing to do
-
-	if (old != EMBNULL)	// if different
-	{
-		if(m_attribs[ORBIT].unrefLine(old))	// then unref the old emb
-		{
-			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
-				(*m_markTables[ORBIT][t])[old].clear();		// last unref of the line
-		}
-	}
-
-	if (emb != EMBNULL)
-		m_attribs[ORBIT].refLine(emb);	// ref the new emb
-
-	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // finally affect the embedding to the dart
-}
-
-template <unsigned int ORBIT>
-void MapMulti::initDartEmbedding(Dart d, unsigned int emb)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	assert(getEmbedding<ORBIT>(d) == EMBNULL || !"initDartEmbedding called on already embedded dart");
-
-	if(emb != EMBNULL)
-		m_attribs[ORBIT].refLine(emb);	// ref the new emb
-	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // affect the embedding to the dart
-}
-
-template <unsigned int ORBIT>
-inline void MapMulti::copyDartEmbedding(Dart dest, Dart src)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	setDartEmbedding<ORBIT>(dest, getEmbedding<ORBIT>(src));
-}
-
-template <unsigned int ORBIT>
-inline void MapMulti::setOrbitEmbedding(Dart d, unsigned int em)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	FunctorSetEmb<MapMulti, ORBIT> fsetemb(*this, em);
-	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
-}
-
-template <unsigned int ORBIT>
-inline void MapMulti::initOrbitEmbedding(Dart d, unsigned int em)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	FunctorInitEmb<MapMulti, ORBIT> fsetemb(*this, em);
-	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
-}
-
-template <unsigned int ORBIT>
-inline unsigned int MapMulti::setOrbitEmbeddingOnNewCell(Dart d)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int em = newCell<ORBIT>();
-	setOrbitEmbedding<ORBIT>(d, em);
-	return em;
-}
-
-template <unsigned int ORBIT>
-inline unsigned int MapMulti::initOrbitEmbeddingNewCell(Dart d)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int em = newCell<ORBIT>();
-	initOrbitEmbedding<ORBIT>(d, em);
-	return em;
-}
-
-template <unsigned int ORBIT>
-inline void MapMulti::copyCell(Dart d, Dart e)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	unsigned int dE = getEmbedding<ORBIT>(d) ;
-	unsigned int eE = getEmbedding<ORBIT>(e) ;
-	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
-	{
-		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-		copyCell<ORBIT>(dE, eE);	// copy the data
-	}
-}
-
-template <unsigned int ORBIT>
-void MapMulti::initAllOrbitsEmbedding(bool realloc)
-{
-	if(!isOrbitEmbedded<ORBIT>())
-		addEmbedding<ORBIT>() ;
-	DartMarker<MapMulti> mark(*this) ;
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(!mark.isMarked(d))
-		{
-			mark.markOrbit<ORBIT>(d) ;
-			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
-				setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-		}
-	}
 }
 
 } // namespace CGoGN

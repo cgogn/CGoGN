@@ -37,6 +37,7 @@ namespace CGoGN
 class EmbeddedGMap3 : public GMap3<MapMono>
 {
 public:
+	typedef MapMono IMPL;
 	typedef GMap3<MapMono> TOPO_MAP;
 
 	static const unsigned int DIMENSION = TOPO_MAP::DIMENSION ;

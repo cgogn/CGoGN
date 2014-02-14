@@ -25,40 +25,40 @@
 namespace CGoGN
 {
 
-template <class MAP>
-inline void GMap1<MAP>::init()
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::init()
 {
-	MAP::addInvolution() ;
+	MAP_IMPL::addInvolution() ;
 }
 
-template <class MAP>
-inline GMap1<MAP>::GMap1() : GMap0<MAP>()
+template <typename MAP_IMPL>
+inline GMap1<MAP_IMPL>::GMap1() : GMap0<MAP_IMPL>()
 {
 	init() ;
 }
 
-template <class MAP>
-inline std::string GMap1<MAP>::mapTypeName() const
+template <typename MAP_IMPL>
+inline std::string GMap1<MAP_IMPL>::mapTypeName() const
 {
 	return "GMap1";
 }
 
-template <class MAP>
-inline unsigned int GMap1<MAP>::dimension() const
+template <typename MAP_IMPL>
+inline unsigned int GMap1<MAP_IMPL>::dimension() const
 {
 	return 1;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::clear(bool removeAttrib)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::clear(bool removeAttrib)
 {
 	ParentMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::update_topo_shortcuts()
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::update_topo_shortcuts()
 {
 	ParentMap::update_topo_shortcuts();
 //	m_beta1 = getRelation("beta1");
@@ -68,15 +68,15 @@ inline void GMap1<MAP>::update_topo_shortcuts()
  * Access and Modification
  *************************************************************************/
 
-template <class MAP>
-inline Dart GMap1<MAP>::beta1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart GMap1<MAP_IMPL>::beta1(Dart d) const
 {
-	return MAP::template getInvolution<1>(d);
+	return MAP_IMPL::template getInvolution<1>(d);
 }
 
-template <class MAP>
+template <typename MAP_IMPL>
 template <int N>
-inline Dart GMap1<MAP>::beta(const Dart d) const
+inline Dart GMap1<MAP_IMPL>::beta(const Dart d) const
 {
 	assert( (N > 0) || !"negative parameters not allowed in template multi-beta");
 	if (N<10)
@@ -96,21 +96,21 @@ inline Dart GMap1<MAP>::beta(const Dart d) const
 	}
 }
 
-template <class MAP>
-inline Dart GMap1<MAP>::phi1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart GMap1<MAP_IMPL>::phi1(Dart d) const
 {
 	return beta1(this->beta0(d)) ;
 }
 
-template <class MAP>
-inline Dart GMap1<MAP>::phi_1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart GMap1<MAP_IMPL>::phi_1(Dart d) const
 {
 	return this->beta0(beta1(d)) ;
 }
 
-template <class MAP>
+template <typename MAP_IMPL>
 template <int N>
-inline Dart GMap1<MAP>::phi(Dart d) const
+inline Dart GMap1<MAP_IMPL>::phi(Dart d) const
 {
 	assert((N > 0) || !"negative parameters not allowed in template multi-phi");
 	if (N < 10)
@@ -128,36 +128,36 @@ inline Dart GMap1<MAP>::phi(Dart d) const
 	}
 }
 
-template <class MAP>
-inline Dart GMap1<MAP>::alpha1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart GMap1<MAP_IMPL>::alpha1(Dart d) const
 {
 	return beta1(this->beta0(d)) ;
 }
 
-template <class MAP>
-inline Dart GMap1<MAP>::alpha_1(Dart d) const
+template <typename MAP_IMPL>
+inline Dart GMap1<MAP_IMPL>::alpha_1(Dart d) const
 {
 	return beta0(beta1(d)) ;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::beta1sew(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::beta1sew(Dart d, Dart e)
 {
-	MAP::template involutionSew<1>(d,e);
+	MAP_IMPL::template involutionSew<1>(d,e);
 }
 
-template <class MAP>
-inline void GMap1<MAP>::beta1unsew(Dart d)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::beta1unsew(Dart d)
 {
-	MAP::template involutionUnsew<1>(d);
+	MAP_IMPL::template involutionUnsew<1>(d);
 }
 
 /*! @name Constructors and Destructors
  *  To generate or delete faces in a 1-G-map
  *************************************************************************/
 
-template <class MAP>
-Dart GMap1<MAP>::newCycle(unsigned int nbEdges)
+template <typename MAP_IMPL>
+Dart GMap1<MAP_IMPL>::newCycle(unsigned int nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 
@@ -173,8 +173,8 @@ Dart GMap1<MAP>::newCycle(unsigned int nbEdges)
 	return d0;
 }
 
-template <class MAP>
-void GMap1<MAP>::deleteCycle(Dart d)
+template <typename MAP_IMPL>
+void GMap1<MAP_IMPL>::deleteCycle(Dart d)
 {
 	Dart e = phi1(d);
 	while (e != d)
@@ -190,8 +190,8 @@ void GMap1<MAP>::deleteCycle(Dart d)
  *  Topological operations on 1-G-maps
  *************************************************************************/
 
-template <class MAP>
-inline Dart GMap1<MAP>::cutEdge(Dart d)
+template <typename MAP_IMPL>
+inline Dart GMap1<MAP_IMPL>::cutEdge(Dart d)
 {
 	Dart dd = this->beta0(d) ;
 	Dart e = this->newDart();
@@ -201,23 +201,23 @@ inline Dart GMap1<MAP>::cutEdge(Dart d)
 	this->beta0sew(e, d) ;
 	this->beta0sew(f, dd) ;
 
-	if (this->isBoundaryMarked2(d))
+	if (this->template isBoundaryMarked<2>(d))
 	{
-		this->boundaryMark2(e);
-		this->boundaryMark2(f);
+		this->template boundaryMark<2>(e);
+		this->template boundaryMark<2>(f);
 	}
 
-	if (this->isBoundaryMarked3(d))
+	if (this->template isBoundaryMarked<3>(d))
 	{
-		this->boundaryMark3(e);
-		this->boundaryMark3(f);
+		this->template boundaryMark<3>(e);
+		this->template boundaryMark<3>(f);
 	}
 
 	return f ;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::uncutEdge(Dart d)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::uncutEdge(Dart d)
 {
 	Dart d0 = this->beta0(d) ;
 	Dart d1 = phi1(d) ;
@@ -229,8 +229,8 @@ inline void GMap1<MAP>::uncutEdge(Dart d)
 	this->deleteDart(d1) ;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::collapseEdge(Dart d)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::collapseEdge(Dart d)
 {
 	Dart d1 = beta1(d) ;
 	Dart dd = this->beta0(d) ;
@@ -241,8 +241,8 @@ inline void GMap1<MAP>::collapseEdge(Dart d)
 	this->deleteEdge(d) ;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::splitCycle(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::splitCycle(Dart d, Dart e)
 {
 	assert(d != e && sameCycle(d, e)) ;
 
@@ -257,8 +257,8 @@ inline void GMap1<MAP>::splitCycle(Dart d, Dart e)
 	beta1sew(e, d1) ;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::mergeCycles(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::mergeCycles(Dart d, Dart e)
 {
 	assert(!sameCycle(d, e)) ;
 
@@ -270,8 +270,8 @@ inline void GMap1<MAP>::mergeCycles(Dart d, Dart e)
 	beta1sew(e, d1) ;
 }
 
-template <class MAP>
-inline void GMap1<MAP>::linkCycles(Dart d, Dart e)
+template <typename MAP_IMPL>
+inline void GMap1<MAP_IMPL>::linkCycles(Dart d, Dart e)
 {
 	assert(d != e && !sameCycle(d, e)) ;
 	Dart d1 = beta1(d) ;
@@ -290,8 +290,8 @@ inline void GMap1<MAP>::linkCycles(Dart d, Dart e)
  *  Return or set various topological information
  *************************************************************************/
 
-template <class MAP>
-inline bool GMap1<MAP>::sameOrientedCycle(Dart d, Dart e) const
+template <typename MAP_IMPL>
+inline bool GMap1<MAP_IMPL>::sameOrientedCycle(Dart d, Dart e) const
 {
 	Dart it = d ;
 	do
@@ -303,8 +303,8 @@ inline bool GMap1<MAP>::sameOrientedCycle(Dart d, Dart e) const
 	return false ;
 }
 
-template <class MAP>
-inline bool GMap1<MAP>::sameCycle(Dart d, Dart e) const
+template <typename MAP_IMPL>
+inline bool GMap1<MAP_IMPL>::sameCycle(Dart d, Dart e) const
 {
 	Dart it = d ;
 	do
@@ -319,8 +319,8 @@ inline bool GMap1<MAP>::sameCycle(Dart d, Dart e) const
 	return false ;
 }
 
-template <class MAP>
-inline unsigned int GMap1<MAP>::cycleDegree(Dart d) const
+template <typename MAP_IMPL>
+inline unsigned int GMap1<MAP_IMPL>::cycleDegree(Dart d) const
 {
 	unsigned int count = 0 ;
 	Dart it = d ;
@@ -332,8 +332,8 @@ inline unsigned int GMap1<MAP>::cycleDegree(Dart d) const
 	return count ;
 }
 
-template <class MAP>
-inline int GMap1<MAP>::checkCycleDegree(Dart d, unsigned int degree) const
+template <typename MAP_IMPL>
+inline int GMap1<MAP_IMPL>::checkCycleDegree(Dart d, unsigned int degree) const
 {
 	unsigned int count = 0 ;
 	Dart it = d ;
@@ -346,8 +346,8 @@ inline int GMap1<MAP>::checkCycleDegree(Dart d, unsigned int degree) const
 	return count-degree;
 }
 
-template <class MAP>
-inline bool GMap1<MAP>::isCycleTriangle(Dart d) const
+template <typename MAP_IMPL>
+inline bool GMap1<MAP_IMPL>::isCycleTriangle(Dart d) const
 {
 	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
 }
@@ -356,8 +356,8 @@ inline bool GMap1<MAP>::isCycleTriangle(Dart d) const
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-template <class MAP>
-inline bool GMap1<MAP>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <typename MAP_IMPL>
+inline bool GMap1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	if (f(d)) return true;
 	Dart d1 = beta1(d);
@@ -365,8 +365,8 @@ inline bool GMap1<MAP>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned 
 	return false;
 }
 
-template <class MAP>
-inline bool GMap1<MAP>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <typename MAP_IMPL>
+inline bool GMap1<MAP_IMPL>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	if (f(d)) return true;
 	Dart d1 = this->beta0(d);
@@ -374,8 +374,8 @@ inline bool GMap1<MAP>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned in
 	return false;
 }
 
-template <class MAP>
-inline bool GMap1<MAP>::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int /*thread*/) const
+template <typename MAP_IMPL>
+inline bool GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int /*thread*/) const
 {
 	Dart it = d ;
 	do
@@ -387,10 +387,10 @@ inline bool GMap1<MAP>::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsi
 	return false ;
 }
 
-template <class MAP>
-inline bool GMap1<MAP>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
+template <typename MAP_IMPL>
+inline bool GMap1<MAP_IMPL>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
 {
-	return GMap1::foreach_dart_of_oriented_cc(d, f, thread) || GMap1::foreach_dart_of_oriented_cc(this->beta0(d), f, thread) ;
+	return GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(d, f, thread) || GMap1::foreach_dart_of_oriented_cc(this->beta0(d), f, thread) ;
 }
 
 } // namespace CGoGN

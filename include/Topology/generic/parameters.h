@@ -23,12 +23,12 @@
 *******************************************************************************/
 
 
-#ifndef __PARAMETERS_
-#define __PARAMETERS_
+#ifndef __PARAMETERS__
+#define __PARAMETERS__
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
-#include "attributeHandler.h"
+#include "Topology/generic/attributeHandler.h"
 
 namespace CGoGN
 {
