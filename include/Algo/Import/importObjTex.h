@@ -294,6 +294,8 @@ public:
 
 	const Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) const { return m_groupBBs[i];}
 
+	Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) { return m_groupBBs[i];}
+
 	const std::string& objGroupName(unsigned int i) const { return m_groupNames[i];}
 
 	/**
