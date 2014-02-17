@@ -53,7 +53,8 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
-	virtual void update_topo_shortcuts();
+	virtual unsigned int getNbInvolutions() const;
+	virtual unsigned int getNbPermutations() const;
 
 	/*! @name Basic Topological Operators
 	 * Access and Modification

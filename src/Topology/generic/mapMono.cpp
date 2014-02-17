@@ -119,36 +119,9 @@ bool MapMono::loadMapBin(const std::string& filename)
 		m_attribs[id].loadBin(fs);
 	}
 
-	// retrieve m_embeddings (from m_attribs)
-	update_m_emb_afterLoad();
-
-	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
-	update_topo_shortcuts();
-
-	// restore nbThreads
-	std::vector<std::string> typeMark;
-	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
-	m_nbThreads = 0;
-	for (unsigned int i = 0; i < nbatt0; ++i)
-	{
-		if (typeMark[i] == "Mark")
-			++m_nbThreads;
-	}
-
-	// restore quick traversals pointers if necessary (containers  already ok)
-	for (unsigned int orb=0; orb<NB_ORBITS; ++orb)
-	{
-		m_quickTraversal[orb] = m_attribs[orb].getDataVector<Dart>("quick_traversal") ;
-		for(unsigned int j = 0; j < NB_ORBITS; ++j)
-		{
-			std::stringstream ss;
-			ss << "quickLocalIncidentTraversal_" << j;
-			m_quickLocalIncidentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
-			std::stringstream ss2;
-			ss2 << "quickLocalAdjacentTraversal" << j;
-			m_quickLocalAdjacentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss2.str()) ;
-		}
-	}
+	// restore shortcuts
+	GenericMap::restore_shortcuts();
+	restore_topo_shortcuts();
 
 	return true;
 }
@@ -169,13 +142,48 @@ bool MapMono::copyFrom(const GenericMap& map)
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_attribs[i].copyFrom(mapM.m_attribs[i]);
 
-	// retrieve m_embeddings (from m_attribs)
-	update_m_emb_afterLoad();
-
-	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
-	update_topo_shortcuts();
+	// restore shortcuts
+	GenericMap::restore_shortcuts();
+	restore_topo_shortcuts();
 
 	return true;
+}
+
+void MapMono::restore_topo_shortcuts()
+{
+	m_involution.clear();
+	m_permutation.clear();
+	m_permutation_inv.clear();
+
+	m_involution.resize(getNbInvolutions());
+	m_permutation.resize(getNbPermutations());
+	m_permutation_inv.resize(getNbPermutations());
+
+	std::vector<std::string> listeNames;
+	m_attribs[DART].getAttributesNames(listeNames);
+
+	for (unsigned int i = 0;  i < listeNames.size(); ++i)
+	{
+		std::string sub = listeNames[i].substr(0, listeNames[i].size() - 1);
+		if (sub == "involution_")
+		{
+			unsigned int relNum = listeNames[i][11] - '0';
+			AttributeMultiVector<Dart>* rel = getRelation(listeNames[i]);
+			m_involution[relNum] = rel;
+		}
+		else if (sub == "permutation_")
+		{
+			unsigned int relNum = listeNames[i][12] - '0';
+			AttributeMultiVector<Dart>* rel = getRelation(listeNames[i]);
+			m_permutation[relNum] = rel;
+		}
+		else if (sub == "permutation_inv_")
+		{
+			unsigned int relNum = listeNames[i][16] - '0';
+			AttributeMultiVector<Dart>* rel = getRelation(listeNames[i]);
+			m_permutation_inv[relNum] = rel;
+		}
+	}
 }
 
 } //namespace CGoGN

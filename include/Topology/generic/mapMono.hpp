@@ -108,6 +108,23 @@ inline Dart MapMono::getPermutationInv(Dart d) const
 }
 
 template <int I>
+inline void MapMono::involutionSew(Dart d, Dart e)
+{
+	assert((*m_involution[I])[d.index] == d) ;
+	assert((*m_involution[I])[e.index] == e) ;
+	(*m_involution[I])[d.index] = e ;
+	(*m_involution[I])[e.index] = d ;
+}
+
+template <int I>
+inline void MapMono::involutionUnsew(Dart d)
+{
+	Dart e = (*m_involution[I])[d.index] ;
+	(*m_involution[I])[d.index] = d ;
+	(*m_involution[I])[e.index] = e ;
+}
+
+template <int I>
 inline void MapMono::permutationSew(Dart d, Dart e)
 {
 	Dart f = (*m_permutation[I])[d.index] ;
@@ -127,23 +144,6 @@ inline void MapMono::permutationUnsew(Dart d)
 	(*m_permutation[I])[e.index] = e ;
 	(*m_permutation_inv[I])[f.index] = d ;
 	(*m_permutation_inv[I])[e.index] = e ;
-}
-
-template <int I>
-inline void MapMono::involutionSew(Dart d, Dart e)
-{
-	assert((*m_involution[I])[d.index] == d) ;
-	assert((*m_involution[I])[e.index] == e) ;
-	(*m_involution[I])[d.index] = e ;
-	(*m_involution[I])[e.index] = d ;
-}
-
-template <int I>
-inline void MapMono::involutionUnsew(Dart d)
-{
-	Dart e = (*m_involution[I])[d.index] ;
-	(*m_involution[I])[d.index] = d ;
-	(*m_involution[I])[e.index] = e ;
 }
 
 inline void MapMono::compactTopoRelations(const std::vector<unsigned int>& oldnew)

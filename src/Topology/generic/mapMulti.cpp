@@ -306,36 +306,9 @@ bool MapMulti::loadMapBin(const std::string& filename)
 	m_mrNbDarts.resize(nb);
 	fs.read(reinterpret_cast<char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
 
-	// retrieve m_embeddings (from m_attribs)
-	update_m_emb_afterLoad();
-
-	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
-	update_topo_shortcuts();
-
-	// restore nbThreads
-	std::vector<std::string> typeMark;
-	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
-	m_nbThreads = 0;
-	for (unsigned int i = 0; i < nbatt0; ++i)
-	{
-		if (typeMark[i] == "Mark")
-			++m_nbThreads;
-	}
-
-	// restore quick traversals pointers if necessary (containers already ok)
-	for (unsigned int orb=0; orb<NB_ORBITS; ++orb)
-	{
-		m_quickTraversal[orb] = m_attribs[orb].getDataVector<Dart>("quick_traversal") ;
-		for(unsigned int j = 0; j < NB_ORBITS; ++j)
-		{
-			std::stringstream ss;
-			ss << "quickLocalIncidentTraversal_" << j;
-			m_quickLocalIncidentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
-			std::stringstream ss2;
-			ss2 << "quickLocalAdjacentTraversal" << j;
-			m_quickLocalAdjacentTraversal[orb][j] = m_attribs[orb].getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss2.str()) ;
-		}
-	}
+	// restore shortcuts
+	GenericMap::restore_shortcuts();
+	restore_topo_shortcuts();
 
 	return true;
 }
@@ -364,13 +337,81 @@ bool MapMulti::copyFrom(const GenericMap& map)
 	for (unsigned int i = 0; i < nb; ++i)
 		m_mrNbDarts[i] = mapMR.m_mrNbDarts[i];
 
-	// retrieve m_embeddings (from m_attribs)
-	update_m_emb_afterLoad();
-
-	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
-	update_topo_shortcuts();
+	// restore shortcuts
+	GenericMap::restore_shortcuts();
+	restore_topo_shortcuts();
 
 	return true;
+}
+
+void MapMulti::restore_topo_shortcuts()
+{
+	m_involution.clear();
+	m_permutation.clear();
+	m_permutation_inv.clear();
+
+	m_involution.resize(getNbInvolutions());
+	m_permutation.resize(getNbPermutations());
+	m_permutation_inv.resize(getNbPermutations());
+
+	std::vector<std::string> listeNames;
+	m_attribs[DART].getAttributesNames(listeNames);
+
+	for (unsigned int i = 0;  i < listeNames.size(); ++i)
+	{
+		std::string sub = listeNames[i].substr(0, listeNames[i].size() - 1);
+		if (sub == "involution_")
+		{
+			unsigned int relNum = listeNames[i][11] - '0';
+			AttributeMultiVector<Dart>* rel = getRelation(listeNames[i]);
+			m_involution[relNum] = rel;
+		}
+		else if (sub == "permutation_")
+		{
+			unsigned int relNum = listeNames[i][12] - '0';
+			AttributeMultiVector<Dart>* rel = getRelation(listeNames[i]);
+			m_permutation[relNum] = rel;
+		}
+		else if (sub == "permutation_inv_")
+		{
+			unsigned int relNum = listeNames[i][16] - '0';
+			AttributeMultiVector<Dart>* rel = getRelation(listeNames[i]);
+			m_permutation_inv[relNum] = rel;
+		}
+	}
+
+	std::vector<std::string> names;
+	m_mrattribs.getAttributesNames(names);
+	m_mrDarts.resize(names.size() - 1);
+	for (unsigned int i = 0; i < m_mrDarts.size(); ++i)
+		m_mrDarts[i] = NULL;
+
+	for (unsigned int i = 0;  i < names.size(); ++i)
+	{
+		std::string sub = names[i].substr(0, 7);
+
+		if (sub == "MRLevel")
+			m_mrLevels = m_mrattribs.getDataVector<unsigned int>(i);
+
+		if (sub == "MRdart_")
+		{
+			sub = names[i].substr(7);	// compute number following MRDart_
+			unsigned int idx = 0;
+			for (unsigned int j = 0; j < sub.length(); j++)
+				idx = 10 * idx + (sub[j] - '0');
+			if (idx < names.size() - 1)
+				m_mrDarts[idx] = m_mrattribs.getDataVector<unsigned int>(i);
+			else
+				CGoGNerr << "Warning problem updating MR_DARTS" << CGoGNendl;
+		}
+	}
+
+	// check if all pointers are != NULL
+	for (unsigned int i = 0; i < m_mrDarts.size(); ++i)
+	{
+		if (m_mrDarts[i] == NULL)
+			CGoGNerr << "Warning problem MR_DARTS = NULL" << CGoGNendl;
+	}
 }
 
 } //namespace CGoGN

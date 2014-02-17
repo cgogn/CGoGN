@@ -344,17 +344,13 @@ public:
 	/****************************************
 	 *             SAVE & LOAD              *
 	 ****************************************/
-
+protected:
 	/**
-	 * update the pointer of embedding vector after loading
+	 * restore embedding / markers / quick traversal shortcuts
 	 */
-	void update_m_emb_afterLoad();
+	void restore_shortcuts();
 
-	/**
-	 * update the markTables and recursively from real type the topo shortcut pointers
-	 */
-	virtual void update_topo_shortcuts();
-
+public:
 	/**
 	 * Save map in a binary file
 	 * @param filename the file name
@@ -379,11 +375,13 @@ public:
 	 */
 	void dumpAttributesAndMarkers() ;
 
+protected:
 	/**
 	 * update topo relation after compacting the container:
 	 */
 	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew) = 0 ;
 
+public:
 	/**
 	 * compact the map
 	 */

@@ -33,6 +33,7 @@ namespace CGoGN
 class MapMulti : public GenericMap
 {
 	template<typename MAP> friend class DartMarkerTmpl ;
+	template<typename MAP> friend class DartMarkerStore ;
 
 public:
 	MapMulti()
@@ -137,6 +138,9 @@ protected:
 
 	inline void addPermutation();
 
+	virtual unsigned int getNbInvolutions() const = 0;
+	virtual unsigned int getNbPermutations() const = 0;
+
 	template <int I>
 	inline Dart getInvolution(Dart d) const;
 
@@ -147,16 +151,16 @@ protected:
 	inline Dart getPermutationInv(Dart d) const;
 
 	template <int I>
-	inline void permutationSew(Dart d, Dart e);
-
-	template <int I>
-	inline void permutationUnsew(Dart d);
-
-	template <int I>
 	inline void involutionSew(Dart d, Dart e);
 
 	template <int I>
 	inline void involutionUnsew(Dart d);
+
+	template <int I>
+	inline void permutationSew(Dart d, Dart e);
+
+	template <int I>
+	inline void permutationUnsew(Dart d);
 
 	inline virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
 
@@ -283,6 +287,8 @@ public:
 	bool loadMapBin(const std::string& filename);
 
 	bool copyFrom(const GenericMap& map);
+
+	void restore_topo_shortcuts();
 } ;
 
 } //namespace CGoGN

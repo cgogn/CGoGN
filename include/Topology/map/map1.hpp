@@ -60,11 +60,15 @@ inline void Map1<MAP_IMPL>::clear(bool removeAttrib)
 }
 
 template <typename MAP_IMPL>
-inline void Map1<MAP_IMPL>::update_topo_shortcuts()
+inline unsigned int Map1<MAP_IMPL>::getNbInvolutions() const
 {
-	MAP_IMPL::update_topo_shortcuts();
-//	m_phi1 = MAP::getRelation("phi1");
-//	m_phi_1 = MAP::getRelation("phi_1");
+	return 0;
+}
+
+template <typename MAP_IMPL>
+inline unsigned int Map1<MAP_IMPL>::getNbPermutations() const
+{
+	return 1;
 }
 
 /*! @name Basic Topological Operators

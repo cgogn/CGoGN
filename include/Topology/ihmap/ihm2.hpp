@@ -60,7 +60,7 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::getAttribute(const std:
 
 inline void ImplicitHierarchicalMap2::update_topo_shortcuts()
 {
-	Map2::update_topo_shortcuts();
+//	Map2::update_topo_shortcuts();
 	m_dartLevel = Map2::getAttribute<unsigned int, DART>("dartLevel") ;
 	m_edgeId = Map2::getAttribute<unsigned int, DART>("edgeId") ;
 

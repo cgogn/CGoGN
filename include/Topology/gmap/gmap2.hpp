@@ -58,10 +58,15 @@ inline void GMap2<MAP_IMPL>::clear(bool removeAttrib)
 }
 
 template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::update_topo_shortcuts()
+inline unsigned int GMap2<MAP_IMPL>::getNbInvolutions() const
 {
-	ParentMap::update_topo_shortcuts();
-//	m_beta2 = getRelation("beta2");
+	return 1 + ParentMap::getNbInvolutions();
+}
+
+template <typename MAP_IMPL>
+inline unsigned int GMap2<MAP_IMPL>::getNbPermutations() const
+{
+	return ParentMap::getNbPermutations();
 }
 
 /*! @name Basic Topological Operators

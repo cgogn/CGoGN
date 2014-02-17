@@ -324,8 +324,10 @@ void GenericMap::removeThreadMarker(unsigned int nb)
  *             SAVE & LOAD              *
  ****************************************/
 
-void GenericMap::update_m_emb_afterLoad()
+void GenericMap::restore_shortcuts()
 {
+	// EMBEDDING
+
 	// get container of dart orbit
 	AttributeContainer& cont = m_attribs[DART] ;
 
@@ -344,15 +346,28 @@ void GenericMap::update_m_emb_afterLoad()
 			m_embeddings[orb] = amv ;
 		}
 	}
-}
 
-void GenericMap::update_topo_shortcuts()
-{
+	// MARKERS & QUICK TRAVERSAL
+
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		AttributeContainer& cont = m_attribs[orbit];
 
-		// get the list of attributes of orbit container
+		// QUICK TRAVERSAL
+
+		m_quickTraversal[orbit] = cont.getDataVector<Dart>("quick_traversal") ;
+		for(unsigned int j = 0; j < NB_ORBITS; ++j)
+		{
+			std::stringstream ss;
+			ss << "quickLocalIncidentTraversal_" << j;
+			m_quickLocalIncidentTraversal[orbit][j] = cont.getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+			std::stringstream ss2;
+			ss2 << "quickLocalAdjacentTraversal" << j;
+			m_quickLocalAdjacentTraversal[orbit][j] = cont.getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss2.str()) ;
+		}
+
+		// MARKERS
+
 		std::vector<std::string> listeNames;
 		cont.getAttributesNames(listeNames);
 
@@ -362,18 +377,16 @@ void GenericMap::update_topo_shortcuts()
 			if (sub == "Mark_")
 			{
 				// get thread number
-				unsigned int thread = listeNames[i][5]-'0';
+				unsigned int thread = listeNames[i][5] - '0';
 				if (listeNames[i].size() > 6) 					// thread number is >9
-					thread = 10*thread + (listeNames[i][6]-'0');
+					thread = 10 * thread + (listeNames[i][6] - '0');
 
 				AttributeMultiVector<Mark>* amvMark = cont.getDataVector<Mark>(i);
 				m_markTables[orbit][thread] = amvMark ;
 
 				if ((orbit == DART) && (thread == 0))	// for Marker of dart of thread O keep the boundary marker
 				{
-			// TODO Verifier ce qu fait exactement ce unsetMark sur m.invert ??
-//					Mark m(m_boundaryMarker);
-					Mark m(m_boundaryMarkers[0]+m_boundaryMarkers[1]);
+					Mark m(m_boundaryMarkers[0] + m_boundaryMarkers[1]);
 					m.invert();
 					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 						amvMark->operator[](i).unsetMark(m);
@@ -387,39 +400,15 @@ void GenericMap::update_topo_shortcuts()
 		}
 	}
 
-	if (m_isMultiRes)
+	// NB THREADS
+
+	std::vector<std::string> typeMark;
+	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
+	m_nbThreads = 0;
+	for (unsigned int i = 0; i < nbatt0; ++i)
 	{
-		std::vector<std::string> names;
-		m_mrattribs.getAttributesNames(names);
-		m_mrDarts.resize(names.size() - 1);
-		for (unsigned int i = 0; i < m_mrDarts.size(); ++i)
-			m_mrDarts[i] = NULL;
-
-		for (unsigned int i = 0;  i < names.size(); ++i)
-		{
-			std::string sub = names[i].substr(0, 7);
-
-			if (sub == "MRLevel")
-				m_mrLevels = m_mrattribs.getDataVector<unsigned int>(i);
-
-			if (sub == "MRdart_")
-			{
-				sub = names[i].substr(7);	// compute number following MT_Dart_
-				unsigned int idx = 0;
-				for (unsigned int j = 0; j < sub.length(); j++)
-					idx = 10*idx + (sub[j]-'0');
-				if (idx < names.size() - 1)
-					m_mrDarts[idx] = m_mrattribs.getDataVector<unsigned int>(i);
-				else
-					CGoGNerr << "Warning problem updating MR_DARTS" << CGoGNendl;
-			}
-		}
-		// check if all pointers are != NULL
-		for (unsigned int i = 0; i < m_mrDarts.size(); ++i)
-		{
-			if (m_mrDarts[i] == NULL)
-				CGoGNerr << "Warning problem MR_DARTS = NULL" << CGoGNendl;
-		}
+		if (typeMark[i] == "Mark")
+			++m_nbThreads;
 	}
 }
 
