@@ -130,8 +130,8 @@ inline Dart GMap3<MAP_IMPL>::phi(Dart d) const
 	}
 	switch(N%10)
 	{
-		case 1 : return phi1(phi<N/10>(d)) ;
-		case 2 : return phi2(phi<N/10>(d)) ;
+		case 1 : return this->phi1(phi<N/10>(d)) ;
+		case 2 : return this->phi2(phi<N/10>(d)) ;
 		case 3 : return phi3(phi<N/10>(d)) ;
 		default : assert(!"Wrong multi-phi relation value") ; return d ;
 	}

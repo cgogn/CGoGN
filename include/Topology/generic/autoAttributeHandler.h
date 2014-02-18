@@ -33,7 +33,7 @@ namespace CGoGN
 /**
  *  shortcut class for Dart AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL = MapMono>
+template <typename T, typename MAP_IMPL>
 class DartAutoAttribute : public DartAttribute<T, MAP_IMPL>
 {
 public:
@@ -58,7 +58,7 @@ public:
 /**
  *  shortcut class for Vertex AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL = MapMono>
+template <typename T, typename MAP_IMPL>
 class VertexAutoAttribute : public VertexAttribute<T, MAP_IMPL>
 {
 public:
@@ -83,7 +83,7 @@ public:
 /**
  *  shortcut class for Edge AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL = MapMono>
+template <typename T, typename MAP_IMPL>
 class EdgeAutoAttribute : public EdgeAttribute<T, MAP_IMPL>
 {
 public:
@@ -108,7 +108,7 @@ public:
 /**
  *  shortcut class for Face AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL = MapMono>
+template <typename T, typename MAP_IMPL>
 class FaceAutoAttribute : public FaceAttribute<T, MAP_IMPL>
 {
 public:
@@ -133,7 +133,7 @@ public:
 /**
  *  shortcut class for Volume AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL = MapMono>
+template <typename T, typename MAP_IMPL>
 class VolumeAutoAttribute : public VolumeAttribute<T, MAP_IMPL>
 {
 public:

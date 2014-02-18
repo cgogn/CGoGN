@@ -32,13 +32,15 @@
 
 namespace CGoGN
 {
+
 namespace Algo
 {
+
 namespace Surface
 {
+
 namespace Import
 {
-
 
 class MaterialOBJ
 {
@@ -80,16 +82,16 @@ public:
 //	}
 };
 
-
-
 template <typename PFP>
 class OBJModel
 {
-	typedef  typename PFP::VEC3 VEC3;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef Geom::Vec2f VEC2;
 
 protected:
-	typename PFP::MAP& m_map;
+	MAP& m_map;
 
 	// infof of sub-groups (group/material)
 	std::vector<unsigned int> m_beginIndices;
@@ -129,30 +131,28 @@ protected:
 	unsigned int m_tagG ;
 	unsigned int m_tagF ;
 
-
 	void computeBB(const std::vector<Geom::Vec3f>& pos);
 
 public:
 
 	/// marker for special vertices (with several normals & tex coords)
-	CellMarker<VERTEX> m_specialVertices;
+	CellMarker<MAP, VERTEX> m_specialVertices;
 
 	/// marker for darts with phi2 reconstruction face
-	DartMarker m_dirtyEdges;
+	DartMarker<MAP> m_dirtyEdges;
 
 	/// Face Attribute for group ID storage
-	FaceAttribute<unsigned int> m_groups;
-	FaceAttribute<unsigned int> m_attMat;
+	FaceAttribute<unsigned int, MAP_IMPL> m_groups;
+	FaceAttribute<unsigned int, MAP_IMPL> m_attMat;
 
 	/// Vertex Attribute Handlers
-	VertexAttribute<VEC3> m_positions;
-	VertexAttribute<VEC3> m_normals;
-	VertexAttribute<Geom::Vec2f> m_texCoords;
+	VertexAttribute<VEC3, MAP_IMPL> m_positions;
+	VertexAttribute<VEC3, MAP_IMPL> m_normals;
+	VertexAttribute<Geom::Vec2f, MAP_IMPL> m_texCoords;
 
 	/// Vertex of face Attribute Handlers
-	AttributeHandler<VEC3,VERTEX1> m_normalsF;
-	AttributeHandler<Geom::Vec2f,VERTEX1> m_texCoordsF;
-
+	AttributeHandler<VEC3, VERTEX1, MAP_IMPL> m_normalsF;
+	AttributeHandler<Geom::Vec2f, VERTEX1, MAP_IMPL> m_texCoordsF;
 
 	/**
 	 * @brief Constructeur
@@ -172,26 +172,25 @@ public:
 	 * @brief set position attribute
 	 * @param position attribute
 	 */
-	void setPositionAttribute(VertexAttribute<Geom::Vec3f> position);
+	void setPositionAttribute(VertexAttribute<Geom::Vec3f, MAP_IMPL> position);
 
 	/**
 	 * @brief set position attribute
 	 * @param position attribute
 	 */
-	void setNormalAttribute(VertexAttribute<Geom::Vec3f> normal);
+	void setNormalAttribute(VertexAttribute<Geom::Vec3f, MAP_IMPL> normal);
 
 	/**
 	 * @brief set texture coordinate attribute
 	 * @param texcoord attribute
 	 */
-	void setTexCoordAttribute(VertexAttribute<Geom::Vec2f>texcoord);
+	void setTexCoordAttribute(VertexAttribute<Geom::Vec2f, MAP_IMPL>texcoord);
 
+	bool hasTexCoords() const { return m_tagVT != 0; }
 
-	bool hasTexCoords() const { return m_tagVT!=0; }
+	bool hasNormals() const { return m_tagVN != 0; }
 
-	bool hasNormals() const { return m_tagVN!=0; }
-
-	bool hasGroups() const { return m_tagG!=0; }
+	bool hasGroups() const { return m_tagG != 0; }
 
 	/**
 	 * @brief import
@@ -201,15 +200,13 @@ public:
 	 */
 	bool import(const std::string& filename, std::vector<std::string>& attrNames);
 
-
-
 	// Faire un handler ?
 	/**
 	 * @brief getNormal
 	 * @param d
 	 * @return
 	 */
-	typename PFP::VEC3 getNormal(Dart d);
+	VEC3 getNormal(Dart d);
 
 	/**
 	 * @brief getTexCoord
@@ -223,8 +220,7 @@ public:
 	 * @param d
 	 * @return
 	 */
-	typename PFP::VEC3 getPosition(Dart d);
-
+	VEC3 getPosition(Dart d);
 
 	/**
 	 * @brief Generate one browser per group
@@ -257,7 +253,6 @@ public:
 	 * @return the vector of MaterialObj*
 	 */
 	const std::vector<MaterialOBJ*>& getMaterials() const { return m_materials;}
-
 
 	/**
 	 * @brief nb group of indices created by createGroupMatVBO_XXX
@@ -325,7 +320,7 @@ public:
 //	unsigned int objGroup(unsigned int i) const { return m_objGroups[i]; }
 
 
-	const Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) const { return m_groupBBs[i];}
+	const Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) const { return m_groupBBs[i]; }
 
 	Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) { return m_groupBBs[i];}
 
@@ -355,7 +350,6 @@ public:
 	 */
 	unsigned int createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO);
 
-
 	/**
 	 * @brief create simple VBO for separated triangles
 	 * @param positionVBO
@@ -365,7 +359,6 @@ public:
 	 */
 	unsigned int createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO);
 
-
 	/**
 	 * @brief create VBOs with group by material
 	 * @param positionVBO
@@ -374,6 +367,7 @@ public:
 	 * @return
 	 */
 	bool createGroupMatVBO_P(Utils::VBO* positionVBO);
+
 	/**
 	 * @brief create VBOs with group by material
 	 * @param positionVBO
@@ -413,12 +407,14 @@ public:
 	unsigned int storeFacesOfGroup(unsigned int groupId, std::vector<Dart>& dartFaces);
 };
 
+} // namespace Import
 
-}
-}
-} // end namespaces
-}
+} // namepsace Surface
 
-#include "importObjTex.hpp"
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "Algo/Import/importObjTex.hpp"
 
 #endif // IMPORTOBJTEX_H

@@ -454,28 +454,6 @@ void GenericMap::dumpAttributesAndMarkers()
 
 void GenericMap::compact()
 {
-	// if MR compact the MR attrib container
-	std::vector<unsigned int> oldnewMR;
-	if (m_isMultiRes)
-		m_mrattribs.compact(oldnewMR);
-
-	// compacting the orbits attributes
-//	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-//	{
-//		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
-//		{
-//			m_attribs[orbit].compact(oldnew);
-//
-//			for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
-//			{
-//				unsigned int& idx = m_embeddings[orbit]->operator [](i);
-//				unsigned int jdx = oldnew[idx];
-//				if ((jdx != 0xffffffff) && (jdx != idx))
-//					idx = jdx;
-//			}
-//		}
-//	}
-
 	// compact embedding attribs
 	std::vector< std::vector<unsigned int>* > oldnews;
 	oldnews.resize(NB_ORBITS);
@@ -508,29 +486,8 @@ void GenericMap::compact()
 		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
 			delete[] oldnews[orbit];
 
-	//compacting the topo
-	std::vector<unsigned int> oldnew;
-	m_attribs[DART].compact(oldnew);
-
-	// update MR indices to attribs[DART]
-	if (m_isMultiRes)
-	{
-		unsigned int nbl = m_mrDarts.size();
-		for (unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-		{
-			for (unsigned int j=0; j<nbl; ++j)
-			{
-				unsigned int d_index = m_mrDarts[j]->operator[](i);
-				if (d_index != oldnew[d_index])
-					m_mrDarts[j]->operator[](i) = oldnew[d_index];
-			}
-		}
-	}
-
-	// update topo relations from real map
-	compactTopoRelations(oldnewMR);
-
-//	dumpAttributesAndMarkers();
+	// compact topo (depends on map implementation)
+	compactTopo();
 }
 
 /****************************************

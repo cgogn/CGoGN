@@ -154,16 +154,16 @@ protected:
 	void addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices) ;
 
 	template<typename PFP>
-	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position);
+	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position);
 
 	template<typename PFP>
 	float computeEarAngle(const typename PFP::VEC3& P1, const typename PFP::VEC3& P2, const typename PFP::VEC3& P3, const typename PFP::VEC3& normalPoly);
 
 	template<typename PFP>
-	bool computeEarIntersection(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly);
+	bool computeEarIntersection(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly);
 
 	template<typename PFP>
-	void recompute2Ears(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex);
+	void recompute2Ears(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex);
 
 	template<typename VEC3>
 	bool inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc);
@@ -174,9 +174,9 @@ public:
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initTriangles(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position, unsigned int thread = 0) ;
+	void initTriangles(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, unsigned int thread = 0) ;
 	template <typename PFP>
-	void initTrianglesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position, unsigned int thread = 0) ;
+	void initTrianglesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, unsigned int thread = 0) ;
 
 	/**
 	 * creation of indices table of lines (optimized order)
@@ -209,13 +209,13 @@ public:
 	void initPrimitives(typename PFP::MAP& map, int prim, bool optimized = true, unsigned int thread = 0) ;
 
 	template <typename PFP>
-	void initPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position, bool optimized = true, unsigned int thread = 0) ;
+	void initPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, bool optimized = true, unsigned int thread = 0) ;
 
 	/**
 	 * add primitives to the VBO of indices
 	 */
 	template <typename PFP>
-	void addPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position, bool optimized = true, unsigned int thread = 0);
+	void addPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, bool optimized = true, unsigned int thread = 0);
 
 	/**
 	 * initialization of the VBO indices primitives

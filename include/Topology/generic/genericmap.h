@@ -147,7 +147,7 @@ protected:
 	/**
 	 * Erase a dart of the map
 	 */
-	virtual void deleteDart(Dart d) ;
+	virtual void deleteDart(Dart d) = 0;
 
 	/**
 	 * create a copy of a dart (based on its index in m_attribs[DART]) and returns its index
@@ -377,9 +377,9 @@ public:
 
 protected:
 	/**
-	 * update topo relation after compacting the container:
+	 * compact topo relations
 	 */
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew) = 0 ;
+	virtual void compactTopo() = 0 ;
 
 public:
 	/**
@@ -397,9 +397,9 @@ public:
 	 */
 	bool foreach_dart(FunctorType& f) ;
 
-	virtual Dart begin() const;
-	virtual Dart end() const;
-	virtual void next(Dart& d) const;
+	virtual Dart begin() const = 0;
+	virtual Dart end() const = 0;
+	virtual void next(Dart& d) const = 0;
 
 	//! Apply a functor on every dart of an orbit
 	/*! @param dim dimension of orbit

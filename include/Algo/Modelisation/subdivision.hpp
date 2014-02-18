@@ -72,7 +72,7 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs)
 	TraversorF<typename PFP::MAP> t(map) ;
 	for (Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		EMB center = Geometry::faceCentroid<PFP,EMBV>(map, d, attributs);	// compute center
+		EMB center = Geometry::faceCentroid<PFP, EMBV>(map, d, attributs);	// compute center
 		Dart cd = trianguleFace<PFP>(map, d);	// triangule the face
 		attributs[cd] = center;					// affect the data to the central vertex
 		Dart fit = cd ;
@@ -93,8 +93,8 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs)
 template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3>& position,
-	const FaceAttribute<typename PFP::VEC3>& positionF
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positionF
 )
 {
 	TraversorF<typename PFP::MAP> t(map) ;
@@ -132,10 +132,11 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d)
 template <typename PFP, typename EMBV>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename PFP::MAP MAP;
 	typedef typename EMBV::DATA_TYPE EMB;
 
-	DartMarker me(map) ;
-	DartMarker mf(map) ;
+	DartMarker<MAP> me(map) ;
+	DartMarker<MAP> mf(map) ;
 
 	// first pass: cut the edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -162,7 +163,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 	{
 		if ( !map.isBoundaryMarked2(d) && !mf.isMarked(d))
 		{
-			EMB center = Geometry::faceCentroid<PFP,EMBV>(map, d, attributs);	// compute center
+			EMB center = Geometry::faceCentroid<PFP, EMBV>(map, d, attributs);	// compute center
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
 			attributs[cf] = center;					// affect the data to the central vertex
 			Dart e = cf;
@@ -184,14 +185,15 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 template <typename PFP, typename EMBV>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename PFP::MAP MAP;
 	typedef typename EMBV::DATA_TYPE EMB;
 
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
-	CellMarkerNoUnmark<VERTEX> m0(map);
-	DartMarkerNoUnmark mf(map);
-	DartMarkerNoUnmark me(map);
+	CellMarkerNoUnmark<MAP, VERTEX> m0(map);
+	DartMarkerNoUnmark<MAP> mf(map);
+	DartMarkerNoUnmark<MAP> me(map);
 
 	// first pass: cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -342,14 +344,15 @@ inline double betaF(unsigned int n)
 template <typename PFP, typename EMBV>
 void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename PFP::MAP MAP;
 	typedef typename EMBV::DATA_TYPE EMB;
 
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
-	CellMarkerNoUnmark<VERTEX> m0(map);
-	DartMarkerNoUnmark mv(map);
-	DartMarkerNoUnmark me(map);
+	CellMarkerNoUnmark<MAP, VERTEX> m0(map);
+	DartMarkerNoUnmark<MAP> mv(map);
+	DartMarkerNoUnmark<MAP> me(map);
 
 	// first pass cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -472,10 +475,11 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 template <typename PFP, typename EMBV>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 {
+	typedef typename PFP::MAP MAP;
 	typedef typename EMBV::DATA_TYPE EMB;
 
-	CellMarker<EDGE> m0(map);
-	CellMarker<FACE> m1(map);
+	CellMarker<MAP, EDGE> m0(map);
+	CellMarker<MAP, FACE> m1(map);
 
 	std::vector<Dart> dOrig;
 
@@ -511,7 +515,7 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 
 	CGoGNout << "nb orig : " << dOrig.size() << CGoGNendl;
 
-	DartMarkerNoUnmark mCorner(map);
+	DartMarkerNoUnmark<MAP> mCorner(map);
 //	//second pass create corner face
 	for (std::vector<Dart>::iterator it = dOrig.begin(); it != dOrig.end(); ++it)
 	{
@@ -546,9 +550,10 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 template <typename PFP, typename EMBV>
 void DooSabin(typename PFP::MAP& map, EMBV& position)
 {
+	typedef typename PFP::MAP MAP;
 	typedef typename EMBV::DATA_TYPE EMB;
 
-	DartMarker dm(map);
+	DartMarker<MAP> dm(map);
 	// storage of boundary of hole (missing vertex faces)
 	std::vector<Dart> fp;
 	fp.reserve(16384);
@@ -559,7 +564,7 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 
 
 	// create the edge faces
-	for(Dart d=map.begin(); d != map.end(); map.next(d))
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if (!dm.isMarked(d))
 		{
@@ -587,7 +592,7 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 				}
 				dm.markOrbit<EDGE1>(e);
 				e = map.phi1(e);
-			}while (e!=d);
+			} while (e!=d);
 		}
 	}
 	// fill (create) the new  vertex faces
@@ -625,10 +630,10 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 		}while (e != * di);
 
 		int N = buffer.size();
-		for (int i=0; i<N; ++i)
+		for (int i = 0; i < N; ++i)
 		{
 			EMB P(0);
-			for (int j=0; j<N; ++j)
+			for (int j = 0; j < N; ++j)
 			{
 				if (j==i)
 				{
@@ -719,12 +724,16 @@ inline double sqrt3_K(unsigned int n)
 //}
 
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3 ;
+
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<typename PFP::VEC3> positionF  = map.template getAttribute<typename PFP::VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP_IMPL> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
 	if(!positionF.isValid())
-		positionF = map.template addAttribute<typename PFP::VEC3, FACE>("position") ;
+		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 
 	// Compute Centroid for the faces
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
@@ -736,16 +745,21 @@ void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& po
 
 
 template <typename PFP>
-void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<typename PFP::VEC3> positionF  = map.template getAttribute<typename PFP::VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP_IMPL> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
 	if(!positionF.isValid())
-		positionF = map.template addAttribute<typename PFP::VEC3, FACE>("position") ;
+		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 
 	//Triangule boundary faces & compute for each new face the centroid
 	std::vector<Dart> boundsDart;
-	DartMarkerStore mf(map);
+	DartMarkerStore<MAP> mf(map);
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
 		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
@@ -757,7 +771,7 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 			map.splitFace(db, d1) ;
 			map.cutEdge(map.phi_1(db)) ;
 
-			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * typename PFP::REAL(0.5);
+			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * REAL(0.5);
 			mf.markOrbit<FACE>(dit);
 
 			Dart x = map.phi2(map.phi_1(db)) ;
@@ -767,12 +781,12 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 				Dart next = map.phi1(dd) ;
 				Dart prev = map.phi_1(dd);
 				map.splitFace(dd, map.phi1(x)) ;
-				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * typename PFP::REAL(0.5);
+				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * REAL(0.5);
 				mf.markOrbit<FACE>(prev);
 				dd = next ;
 			}
 
-			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * typename PFP::REAL(0.5);
+			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * REAL(0.5);
 			mf.markOrbit<FACE>(dprev);
 		}
 	}
@@ -802,16 +816,21 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 }
 
 template <typename PFP>
-void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<typename PFP::VEC3> positionF  = map.template getAttribute<typename PFP::VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP_IMPL> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
 	if(!positionF.isValid())
-		positionF = map.template 	addAttribute<typename PFP::VEC3, FACE>("position") ;
+		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 
 	//Triangule boundary faces & compute for each new face the centroid
 	std::vector<Dart> boundsDart;
-	DartMarkerStore mf(map);
+	DartMarkerStore<MAP> mf(map);
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
 		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
@@ -823,7 +842,7 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 			map.splitFace(db, d1) ;
 			map.cutEdge(map.phi_1(db)) ;
 
-			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * typename PFP::REAL(0.5);
+			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * REAL(0.5);
 			mf.markOrbit<FACE>(dit);
 
 			Dart x = map.phi2(map.phi_1(db)) ;
@@ -833,12 +852,12 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 				Dart next = map.phi1(dd) ;
 				Dart prev = map.phi_1(dd);
 				map.splitFace(dd, map.phi1(x)) ;
-				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * typename PFP::REAL(0.5);
+				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * REAL(0.5);
 				mf.markOrbit<FACE>(prev);
 				dd = next ;
 			}
 
-			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * typename PFP::REAL(0.5);
+			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * REAL(0.5);
 			mf.markOrbit<FACE>(dprev);
 		}
 	}
@@ -860,7 +879,7 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 	map.computeDual();
 
 	//Saving old position VertexAttribute to a FaceAttribute
-	FaceAttribute<typename PFP::VEC3> temp;
+	FaceAttribute<VEC3, MAP_IMPL> temp;
 	temp = position;
 	position = positionF ;
 	positionF = temp;

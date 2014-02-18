@@ -54,6 +54,10 @@ namespace GL2
 template <typename PFP>
 class TopoRender
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
 protected:
 	/**
 	* vbo buffers
@@ -114,7 +118,7 @@ protected:
 	/**
 	 * attribut d'index dans le VBO
 	 */
-	DartAttribute<unsigned int, typename PFP::MAP> m_attIndex;
+	DartAttribute<unsigned int, MAP_IMPL> m_attIndex;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
@@ -139,7 +143,7 @@ protected:
 	/**
 	 * affect a color to each dart
 	 */
-	void setDartsIdColor(typename PFP::MAP& map, bool withBoundary);
+	void setDartsIdColor(MAP& map, bool withBoundary);
 
 	/**
 	 * save colors before picking
@@ -241,22 +245,22 @@ public:
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
-	Dart picking(typename PFP::MAP& map, int x, int y, bool withBoundary=false);
+	Dart picking(MAP& map, int x, int y, bool withBoundary=false);
 
-	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
+	Dart coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
 
-	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
+	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
-	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false);
+	void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
 
-	void updateDataMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false);
+	void updateDataMap(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
 
-	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false);
+	void updateDataGMap(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
 
 	/**
 	 * Special update function used to draw boundary of map3
 	 */
-	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, float ns);
+	void updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float ns);
 
 	/**
 	 * render to svg struct

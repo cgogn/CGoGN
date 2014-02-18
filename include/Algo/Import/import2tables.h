@@ -60,11 +60,14 @@ template <typename PFP>
 class MeshTablesSurface
 {
 public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
     typedef typename PFP::VEC3 VEC3 ;
     typedef typename VEC3::DATA_TYPE DATA_TYPE ;
+	typedef typename PFP::REAL REAL ;
 
 private:
-	typename PFP::MAP& m_map;
+	MAP& m_map;
 
 	unsigned int m_nbVertices;
 
@@ -83,7 +86,7 @@ private:
 	std::vector<unsigned int> m_emb;
 
 #ifdef WITH_ASSIMP
-	void extractMeshRec(AttributeContainer& container, VertexAttribute<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
+	void extractMeshRec(AttributeContainer& container, VertexAttribute<VEC3, MAP_IMPL>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
 #endif
 
 	bool importTrian(const std::string& filename, std::vector<std::string>& attrNames);
@@ -131,7 +134,7 @@ public:
 
 	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
 
-	MeshTablesSurface(typename PFP::MAP& map):
+	MeshTablesSurface(MAP& map):
 		m_map(map)
     { }
 };
@@ -143,6 +146,7 @@ public:
 
 namespace Volume
 {
+
 namespace Import
 {
 
@@ -150,12 +154,14 @@ template <typename PFP>
 class MeshTablesVolume
 {
 public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
     typedef typename PFP::VEC3 VEC3 ;
     typedef typename VEC3::DATA_TYPE DATA_TYPE ;
     typedef typename PFP::REAL REAL;
 
 private:
-	typename PFP::MAP& m_map;
+	MAP& m_map;
 
 	unsigned int m_nbVertices;
 
@@ -216,7 +222,7 @@ public:
 
     bool importMesh(const std::string& filename, std::vector<std::string>& attrNames);
 
-	MeshTablesVolume(typename PFP::MAP& map):
+	MeshTablesVolume(MAP& map):
 		m_map(map)
     { }
 };

@@ -55,6 +55,10 @@ namespace GL2
 template <typename PFP>
 class Topo3PrimalRender
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
 protected:
 	/**
 	* vbo buffers
@@ -109,7 +113,7 @@ protected:
 	/**
 	 * attribute index to get easy correspondence dart/color
 	 */
-	DartAttribute<unsigned int, typename PFP::MAP> m_attIndex;
+	DartAttribute<unsigned int, MAP_IMPL> m_attIndex;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
@@ -215,7 +219,7 @@ public:
 	/**
 	 * store darts in color for picking
 	 */
-	void setDartsIdColor(typename PFP::MAP& map);
+	void setDartsIdColor(MAP& map);
 
 	/**
 	 * pick dart with color set bey setDartsIdColor
@@ -226,7 +230,7 @@ public:
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
-	Dart picking(typename PFP::MAP& map, int x, int y);
+	Dart picking(MAP& map, int x, int y);
 
 	/**
 	 * compute dart from color (for picking)
@@ -249,21 +253,21 @@ public:
 //	template<typename PFP>
 //	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf);
 
-	void updateData(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf);
+	void updateData(MAP& mapx, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf);
 
 	/**
 	* update color buffer with color attribute handler
 	* @param map the map
 	* @param colors  attribute of dart's colors
 	*/
-	void updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& colors);
+	void updateColors(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& colors);
 
 	/**
 	 * Get back middle position of drawn darts
 	 * @param map the map
 	 * @param posExpl the output positions
 	 */
-	void computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3, typename PFP::MAP>& posExpl);
+	void computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP_IMPL>& posExpl);
 
 	/**
 	 * render to svg struct
@@ -275,9 +279,9 @@ public:
 	 */
 	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
 
-	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
+	Dart coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
 
-	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
+	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
 protected:
 //	/**

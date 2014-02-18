@@ -235,7 +235,7 @@ Dart createOctahedron(typename PFP::MAP& map, bool withBoundary)
 }
 
 template <typename PFP>
-Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height)
+Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -306,11 +306,8 @@ Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 	return dres;
 }
 
-
-//VertexAttribute<typename PFP::VEC3>
-
 template <typename PFP>
-Dart embedPyramid(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, unsigned int n, bool withBoundary, float radius, float height)
+Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float radius, float height)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -368,9 +365,6 @@ Dart embedPyramid(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, V
 	return dres;
 }
 
-
-
-
 template <typename PFP>
 bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread)
 {
@@ -422,12 +416,8 @@ bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread)
 }
 
 
-
-
-
-
 template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename PFP::VEC3>& position)
+void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
 	map.unsewVertexUmbrella(d);
 	unsigned int newFaceDegree = map.closeHole(map.phi1(d));
@@ -506,53 +496,51 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename 
 	}
 }
 
-
 template <typename PFP>
 void quads2TrianglesCC(typename PFP::MAP& the_map, Dart primd)
 {
-DartMarker m(the_map);
+	DartMarker<typename PFP::MAP> m(the_map);
 
-// list of faces to process and processed(before pos iterator)
-std::list<Dart> ld;
-ld.push_back(primd);
-// current position in list
-typename std::list<Dart>::iterator pos = ld.begin();
-do
-{
-   Dart d = *pos;
+	// list of faces to process and processed(before pos iterator)
+	std::list<Dart> ld;
+	ld.push_back(primd);
+	// current position in list
+	typename std::list<Dart>::iterator pos = ld.begin();
+	do
+	{
+	   Dart d = *pos;
 
-   // cut the face of first dart of list
-   Dart d1 = the_map.phi1(d);
-   Dart e = the_map.phi1(d1);
-   Dart e1 = the_map.phi1(e);
-   Dart f = the_map.phi1(e1);
-   if (f==d) // quad
-   {
-	   the_map.splitFace(d,e);
-	   // mark the face
-	   m.markOrbit<FACE>(d);
-	   m.markOrbit<FACE>(e);
-   }
-   else m.markOrbit<FACE>(d);
+	   // cut the face of first dart of list
+	   Dart d1 = the_map.phi1(d);
+	   Dart e = the_map.phi1(d1);
+	   Dart e1 = the_map.phi1(e);
+	   Dart f = the_map.phi1(e1);
+	   if (f == d) // quad
+	   {
+		   the_map.splitFace(d,e);
+		   // mark the face
+		   m.template markOrbit<FACE>(d);
+		   m.template markOrbit<FACE>(e);
+	   }
+	   else m.template markOrbit<FACE>(d);
 
-   // and store neighbours faces in the list
-   d = the_map.phi2(d);
-   e = the_map.phi2(e);
-   d1 = the_map.phi1(the_map.phi2(d1));
-   e1 = the_map.phi1(the_map.phi2(e1));
+	   // and store neighbours faces in the list
+	   d = the_map.phi2(d);
+	   e = the_map.phi2(e);
+	   d1 = the_map.phi1(the_map.phi2(d1));
+	   e1 = the_map.phi1(the_map.phi2(e1));
 
-   if (!m.isMarked(d))
-	   ld.push_back(d);
-   if (!m.isMarked(e))
-	   ld.push_back(e);
-   if (!m.isMarked(d1))
-	   ld.push_back(d1);
-   if ((f==d) && (!m.isMarked(e1)))
-	   ld.push_back(e1);
-   pos++;
-}while (pos!=ld.end()); // stop when no more face to process
+	   if (!m.isMarked(d))
+		   ld.push_back(d);
+	   if (!m.isMarked(e))
+		   ld.push_back(e);
+	   if (!m.isMarked(d1))
+		   ld.push_back(d1);
+	   if ((f == d) && (!m.isMarked(e1)))
+		   ld.push_back(e1);
+	   pos++;
+	} while (pos!=ld.end()); // stop when no more face to process
 }
-
 
 } // namespace Modelisation
 

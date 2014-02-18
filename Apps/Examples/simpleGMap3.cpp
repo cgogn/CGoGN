@@ -132,10 +132,10 @@ void SimpleGMap3::cb_initGL()
     float gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
     setParamObject(gWidthObj, gPosObj.data());
 
-    m_render_topo = new Algo::Render::GL2::Topo3Render();
+	m_render_topo = new Algo::Render::GL2::Topo3Render<PFP>();
     m_render_topo->setDartWidth(2.0f);
     m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
-    m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.8f);
+	m_render_topo->updateData(myMap, position, 0.9f,0.9f,0.8f);
 }
 
 void SimpleGMap3::cb_redraw()

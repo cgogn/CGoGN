@@ -138,21 +138,21 @@ void Clipping::slot_drawFaces(bool b)
 void Clipping::slot_explodTopoPhi1(double c)
 {
 	m_coeffTopoExplod[0] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
 void Clipping::slot_explodTopoPhi2(double c)
 {
 	m_coeffTopoExplod[1] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
 void Clipping::slot_explodTopoPhi3(double c)
 {
 	m_coeffTopoExplod[2] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
@@ -814,7 +814,7 @@ void Clipping::importMesh(std::string& filename)
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 
-	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 
 	m_bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	gPosObj = m_bb.center() ;
@@ -843,7 +843,7 @@ void Clipping::cb_initGL()
 
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
-	m_render_topo = new Algo::Render::GL2::Topo3Render();
+	m_render_topo = new Algo::Render::GL2::Topo3Render<PFP>();
 
 	// create VBO for position
 	m_positionVBO = new Utils::VBO();

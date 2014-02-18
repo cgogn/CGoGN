@@ -180,7 +180,7 @@ public:
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		FunctorUnmark<MAP> fm(m_map, m_mark, m_markVector) ;
-		m_map.foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
+		m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
 	}
 
 	/**
@@ -335,7 +335,7 @@ protected:
 public:
 	inline void unmarkAll()
 	{
-		assert(this->m_map.getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
+		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
 			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;

@@ -146,8 +146,11 @@ inline void MapMono::permutationUnsew(Dart d)
 	(*m_permutation_inv[I])[e.index] = e ;
 }
 
-inline void MapMono::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+inline void MapMono::compactTopo()
 {
+	std::vector<unsigned int> oldnew;
+	m_attribs[DART].compact(oldnew);
+
 	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
 	{
 		for (unsigned int j = 0; j < m_permutation.size(); ++j)

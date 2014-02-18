@@ -95,7 +95,7 @@ inline Dart Map2<MAP_IMPL>::phi(Dart d) const
 	}
 	switch(N%10)
 	{
-		case 1 : return phi1(phi<N/10>(d)) ;
+		case 1 : return this->phi1(phi<N/10>(d)) ;
 		case 2 : return phi2(phi<N/10>(d)) ;
 		default : assert(!"Wrong multi-phi relation value") ; return d ;
 	}

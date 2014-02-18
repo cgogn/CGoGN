@@ -432,11 +432,11 @@ void TopoRender<PFP>::setBoundaryShift(float bs)
 }
 
 template<typename PFP>
-void TopoRender<PFP>::updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf,float ns)
+void TopoRender<PFP>::updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf,float ns)
 {
 	m_normalShift = ns;
-	SelectorDartBoundary<typename PFP::MAP> sdb(map);
-	DartContainerBrowserSelector<typename PFP::MAP> browser(map, sdb);
+	SelectorDartBoundary<MAP> sdb(map);
+	DartContainerBrowserSelector<MAP> browser(map, sdb);
 	browser.enable();
 	updateData(map, positions, ke, kf, true);
 	browser.disable();
@@ -444,7 +444,7 @@ void TopoRender<PFP>::updateDataBoundary(typename PFP::MAP& map, const VertexAtt
 }
 
 template<typename PFP>
-void TopoRender<PFP>::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary)
+void TopoRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary)
 {
 	if (map.mapTypeName()[0] == "M") // "Map2"
 	{
@@ -459,15 +459,9 @@ void TopoRender<PFP>::updateData(typename PFP::MAP& map, const VertexAttribute<t
 }
 
 template<typename PFP>
-void TopoRender<PFP>::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary)
+void TopoRender<PFP>::updateDataMap(MAP& mapx, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary)
 {
 	//Map2& map = reinterpret_cast<Map2&>(mapx);
-
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
-	typedef Geom::Vec3f VEC3F;
 
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(mapx.getNbDarts());  // no problem dart is int: no problem of memory
@@ -485,16 +479,16 @@ void TopoRender<PFP>::updateDataMap(typename PFP::MAP& mapx, const VertexAttribu
 	m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	DartAutoAttribute<VEC3, MAP> fv1(mapx);
+	DartAutoAttribute<VEC3, MAP_IMPL> fv1(mapx);
 	// fin phi1
-	DartAutoAttribute<VEC3, MAP> fv11(mapx);
+	DartAutoAttribute<VEC3, MAP_IMPL> fv11(mapx);
 	// phi2
-	DartAutoAttribute<VEC3, MAP> fv2(mapx);
+	DartAutoAttribute<VEC3, MAP_IMPL> fv2(mapx);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3F* colorDartBuf = reinterpret_cast<VEC3F*>(ColorDartsBuffer);
+	Geom::Vec3f* colorDartBuf = reinterpret_cast<Geom::Vec3f*>(ColorDartsBuffer);
 
 //	m_vbo0->bind();
 //	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -504,7 +498,7 @@ void TopoRender<PFP>::updateDataMap(typename PFP::MAP& mapx, const VertexAttribu
 	if (m_bufferDartPosition!=NULL)
 		delete m_bufferDartPosition;
 	m_bufferDartPosition = new Geom::Vec3f[2*m_nbDarts];
-	VEC3F* positionDartBuf = reinterpret_cast<VEC3F*>(m_bufferDartPosition);
+	Geom::Vec3f* positionDartBuf = reinterpret_cast<Geom::Vec3f*>(m_bufferDartPosition);
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
@@ -567,7 +561,6 @@ void TopoRender<PFP>::updateDataMap(typename PFP::MAP& mapx, const VertexAttribu
 			}
 			else if (withBoundary)
 			{
-
 				Dart dd = d;
 				do
 				{
@@ -658,15 +651,9 @@ void TopoRender<PFP>::updateDataMap(typename PFP::MAP& mapx, const VertexAttribu
 }
 
 template<typename PFP>
-void TopoRender<PFP>::updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary)
+void TopoRender<PFP>::updateDataGMap(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary)
 {
 //	GMap2& map = dynamic_cast<GMap2&>(mapx);
-
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
-	typedef Geom::Vec3f VEC3F;
 
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
@@ -686,21 +673,21 @@ void TopoRender<PFP>::updateDataGMap(typename PFP::MAP& map, const VertexAttribu
 	m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	DartAutoAttribute<VEC3, MAP> fv1(map);
+	DartAutoAttribute<VEC3, MAP_IMPL> fv1(map);
 	// fin phi1
-	DartAutoAttribute<VEC3, MAP> fv11(map);
+	DartAutoAttribute<VEC3, MAP_IMPL> fv11(map);
 	// phi2
-	DartAutoAttribute<VEC3, MAP> fv2(map);
+	DartAutoAttribute<VEC3, MAP_IMPL> fv2(map);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3F* colorDartBuf = reinterpret_cast<VEC3F*>(ColorDartsBuffer);
+	Geom::Vec3f* colorDartBuf = reinterpret_cast<Geom::Vec3f*>(ColorDartsBuffer);
 
 	m_vbo0->bind();
 	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
 	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3F* positionDartBuf = reinterpret_cast<VEC3F*>(PositionDartsBuffer);
+	Geom::Vec3f* positionDartBuf = reinterpret_cast<Geom::Vec3f*>(PositionDartsBuffer);
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
@@ -819,7 +806,7 @@ void TopoRender<PFP>::updateDataGMap(typename PFP::MAP& map, const VertexAttribu
 }
 
 template<typename PFP>
-void TopoRender<PFP>::setDartsIdColor(typename PFP::MAP& map, bool withBoundary)
+void TopoRender<PFP>::setDartsIdColor(MAP& map, bool withBoundary)
 {
 	m_vbo3->bind();
 	float* colorBuffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -862,7 +849,7 @@ void TopoRender<PFP>::setDartsIdColor(typename PFP::MAP& map, bool withBoundary)
 }
 
 template<typename PFP>
-Dart TopoRender<PFP>::picking(typename PFP::MAP& map,int x, int y, bool withBoundary)
+Dart TopoRender<PFP>::picking(MAP& map,int x, int y, bool withBoundary)
 {
 	pushColors();
 	setDartsIdColor(map,withBoundary);
@@ -873,7 +860,7 @@ Dart TopoRender<PFP>::picking(typename PFP::MAP& map,int x, int y, bool withBoun
 }
 
 template<typename PFP>
-Dart TopoRender<PFP>::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
+Dart TopoRender<PFP>::coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;
@@ -903,7 +890,7 @@ Dart TopoRender<PFP>::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& r
 }
 
 template<typename PFP>
-Dart TopoRender<PFP>::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
+Dart TopoRender<PFP>::raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;

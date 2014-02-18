@@ -42,7 +42,10 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-    VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
     unsigned nbf = mts.getNbFaces();
     int index = 0;
@@ -50,9 +53,9 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
     std::vector<unsigned int> edgesBuffer;
     edgesBuffer.reserve(16);
 
-    DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
-    FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(map);
+	FunctorInitEmb<MAP, VERTEX> fsetemb(map);
 
     // for each face of table
     for(unsigned int i = 0; i < nbf; ++i)
@@ -183,7 +186,10 @@ bool importVoxellisation(typename PFP::MAP& map, Algo::Surface::Modelisation::Vo
 template <typename PFP>
 bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-    VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
     unsigned nbf = mts.getNbFaces();
     int index = 0;
@@ -191,7 +197,7 @@ bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
     std::vector<unsigned int> edgesBuffer;
     edgesBuffer.reserve(16);
 
-    DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
     // for each face of table
     for(unsigned int i = 0; i < nbf; ++i)
@@ -222,7 +228,7 @@ bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
             {
                 unsigned int em = edgesBuffer[j];		// get embedding
 
-                FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
+				FunctorSetEmb<MAP, VERTEX> fsetemb(map, em);
                 map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT2>(d, fsetemb);
 
                 m.mark(d) ;								// mark on the fly to unmark on second loop
@@ -298,16 +304,20 @@ namespace Import
 template <typename PFP>
 bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float dist)
 {
-    VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
     unsigned nbf = mts.getNbFaces();
     int index = 0;
     // buffer for tempo faces (used to remove degenerated edges)
     std::vector<unsigned int> edgesBuffer;
     edgesBuffer.reserve(16);
 
-    DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
-    VertexAttribute<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP_IMPL> position = map.template getAttribute<VEC3, VERTEX>("position");
     std::vector<unsigned int > backEdgesBuffer(mts.getNbVertices(), EMBNULL);
 
     // for each face of table -> create a prism
@@ -334,7 +344,7 @@ bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<P
         nbe = edgesBuffer.size();
         if (nbe > 2)
         {
-            Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe,false);
+			Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe, false);
 
             //Embed the base faces
             for (unsigned int j = 0; j < nbe; ++j)
@@ -404,18 +414,22 @@ bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<P
 template <typename PFP>
 bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float scale, unsigned int nbStage)
 {
-    VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map);
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map);
     unsigned nbf = mts.getNbFaces();
     int index = 0;
     // buffer for tempo faces (used to remove degenerated edges)
     std::vector<unsigned int> edgesBuffer;
     edgesBuffer.reserve(16);
 
-    DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
     unsigned int nbVertices = mts.getNbVertices();
 
-    VertexAttribute<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP_IMPL> position = map.template getAttribute<VEC3, VERTEX>("position");
     std::vector<unsigned int > backEdgesBuffer(nbVertices*nbStage, EMBNULL);
 
     // for each face of table -> create a prism
@@ -533,7 +547,11 @@ bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurf
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 {
-    VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
     unsigned int nbv = mtv.getNbVolumes();
     int index = 0;
@@ -541,8 +559,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
     std::vector<unsigned int> edgesBuffer;
     edgesBuffer.reserve(16);
 
-    DartMarkerNoUnmark m(map) ;
-    FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(map);
+	DartMarkerNoUnmark<MAP> m(map) ;
+	FunctorInitEmb<MAP, VERTEX> fsetemb(map);
 
     //for each volume of table
     for(unsigned int i = 0 ; i < nbv ; ++i)
@@ -714,7 +732,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
             }
             else
             {
-                m.unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
+				m.template unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
                 ++nbBoundaryFaces;
             }
         }

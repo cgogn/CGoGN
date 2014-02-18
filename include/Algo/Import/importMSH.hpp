@@ -41,15 +41,17 @@ namespace Import
 template <typename PFP>
 bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VertexAttribute<VEC3> position = map.template addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbVolumes = 0;
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
 	//open file
 	std::ifstream fp(filename.c_str(), std::ios::in);
@@ -69,11 +71,9 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 	std::stringstream oss(ligne);
 	oss >> nbv;
 
-
 	//reading vertices
 //	std::vector<unsigned int> verticesID;
 	std::map<unsigned int, unsigned int> verticesMapID;
-
 
 //	verticesID.reserve(nbv);
 	for(unsigned int i = 0; i < nbv;++i)
@@ -104,7 +104,6 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 	std::getline (fp, ligne);
 
 	m_nbVertices = nbv;
-
 
 	// ELM
 	std::getline (fp, ligne);
@@ -268,10 +267,9 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	CGoGNout << "nb points = " << m_nbVertices ;
 
-
 	m_nbVolumes = 0;
 
-	DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
 	if (tet.size() > 0)
 	{
@@ -369,7 +367,6 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesMapID[pt[1]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesMapID[pt[1]]].push_back(dd); m.mark(dd);
 
-
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesMapID[pt[2]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
@@ -377,7 +374,6 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesMapID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesMapID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesMapID[pt[2]]].push_back(dd); m.mark(dd);
-
 
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesMapID[pt[3]]);
@@ -423,7 +419,6 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 			//end of hexa
 		}
 		CGoGNout << " / nb hexa = " << hexa.size()/2 << CGoGNendl;
-
 	}
 
 	//Association des phi3
@@ -470,7 +465,7 @@ bool importMSH(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 } // namespace Import
 
-}
+} // namespace Volume
 
 } // namespace Algo
 

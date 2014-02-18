@@ -46,18 +46,19 @@ namespace Import
 template <typename PFP>
 bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VertexAttribute<VEC3> position = map.template addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
 	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
 	xmlNodePtr vtu_node = xmlDocGetRootElement(doc);
-
 
 //	std::cout << " NAME "<<vtu_node->name << std::endl;
 
@@ -103,13 +104,11 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 		verticesID.push_back(id);
 	}
 
-
 	xmlNode* cell_node = piece_node->children;
 	while (strcmp((char*)(cell_node->name),(char*)"Cells")!=0)
 		cell_node = cell_node->next;
 
 	std::cout <<"CELL NODE = "<< cell_node->name << std::endl;
-
 
 	std::vector<unsigned char> typeVols;
 	typeVols.reserve(nbVolumes);
@@ -117,7 +116,6 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 	offsets.reserve(nbVolumes);
 	std::vector<unsigned int> indices;
 	indices.reserve(nbVolumes*4);
-
 
 	for (xmlNode* x_node = cell_node->children; x_node!=NULL; x_node = x_node->next)
 	{
@@ -176,14 +174,14 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	xmlFreeDoc(doc);
 
-	DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
 	unsigned int currentOffset = 0;
-	for (unsigned int i=0; i< nbVolumes; ++i)
+	for (unsigned int i = 0; i < nbVolumes; ++i)
 	{
 		if (typeVols[i]==12)
 		{
-			Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
+			Dart d = Surface::Modelisation::createHexahedron<PFP>(map, false);
 
 			unsigned int pt[8];
 			pt[0] = indices[currentOffset];
@@ -196,7 +194,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			typename PFP::VEC3 B = position[verticesID[indices[currentOffset+1]]];
 			typename PFP::VEC3 C = position[verticesID[indices[currentOffset+2]]];
 
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+			if (Geom::testOrientation3D<VEC3>(P,A,B,C) == Geom::OVER)
 			{
 
 				pt[0] = indices[currentOffset+3];
@@ -220,8 +218,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 				pt[7] = indices[currentOffset+7];
 			}
 
-
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[0]]);
+			FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesID[pt[0]]);
 
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 			Dart dd = d;
@@ -237,7 +234,6 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesID[pt[1]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[1]]].push_back(dd); m.mark(dd);
 
-
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesID[pt[2]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
@@ -245,7 +241,6 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[2]]].push_back(dd); m.mark(dd);
-
 
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesID[pt[3]]);
@@ -303,7 +298,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			typename PFP::VEC3 B = position[verticesID[pt[2]]];
 			typename PFP::VEC3 C = position[verticesID[pt[3]]];
 
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+			if (Geom::testOrientation3D<VEC3>(P,A,B,C) == Geom::OVER)
 			{
 				unsigned int ui=pt[1];
 				pt[1] = pt[2];
@@ -313,7 +308,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			// Embed three "base" vertices
 			for(unsigned int j = 0 ; j < 3 ; ++j)
 			{
-				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
+				FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
 				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 				//store darts per vertices to optimize reconstruction
@@ -331,7 +326,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 			//Embed the last "top" vertex
 			d = map.phi_1(map.phi2(d));
 
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
+			FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
@@ -346,7 +341,6 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 		}
 		currentOffset = offsets[i];
 	}
-
 
 	//Association des phi3
 	unsigned int nbBoundaryFaces = 0 ;
@@ -391,7 +385,7 @@ bool importVTU(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 } // namespace Import
 
-}
+} // namespace Volume
 
 } // namespace Algo
 

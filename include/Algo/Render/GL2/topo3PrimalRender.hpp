@@ -416,7 +416,7 @@ void Topo3PrimalRender<PFP>::updateColors(typename PFP::MAP& map, const VertexAt
 }
 
 template <typename PFP>
-Dart Topo3PrimalRender<PFP>::picking(typename PFP::MAP& map, int x, int y)
+Dart Topo3PrimalRender<PFP>::picking(MAP& map, int x, int y)
 {
 	pushColors();
 	setDartsIdColor(map);
@@ -432,12 +432,8 @@ Dart Topo3PrimalRender<PFP>::picking(typename PFP::MAP& map, int x, int y)
 //}
 
 template <typename PFP>
-void Topo3PrimalRender<PFP>::updateData(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf)
+void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf)
 {
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-	typedef Geom::Vec3f VEC3F;
-
 	if (m_attIndex.map() != &mapx)
 		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
 	if (!m_attIndex.isValid())
@@ -452,23 +448,23 @@ void Topo3PrimalRender<PFP>::updateData(typename PFP::MAP& mapx, const VertexAtt
 	m_nbDarts = mapx.getNbDarts();
 
 	// beta2/3
-	DartAutoAttribute<VEC3, typename PFP::MAP> fv2(mapx);
+	DartAutoAttribute<VEC3, MAP> fv2(mapx);
 
 	m_vbo2->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3F* colorDartBuf = reinterpret_cast<VEC3F*>(ColorDartsBuffer);
+	Geom::Vec3f* colorDartBuf = reinterpret_cast<Geom::Vec3f*>(ColorDartsBuffer);
 
 	if (m_bufferDartPosition!=NULL)
 		delete m_bufferDartPosition;
-	m_bufferDartPosition = new VEC3F[2*m_nbDarts];
-	VEC3F* positionDartBuf = reinterpret_cast<VEC3F*>(m_bufferDartPosition);
+	m_bufferDartPosition = new Geom::Vec3f[2*m_nbDarts];
+	Geom::Vec3f* positionDartBuf = reinterpret_cast<Geom::Vec3f*>(m_bufferDartPosition);
 
-	unsigned int posDBI=0;
+	unsigned int posDBI = 0;
 
-	int nbf=0;
+	int nbf = 0;
 	//traverse each face of each volume
-	TraversorF<typename PFP::MAP> traFace(mapx);
+	TraversorF<MAP> traFace(mapx);
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		std::vector<VEC3> vecPos;
@@ -556,7 +552,7 @@ void Topo3PrimalRender<PFP>::updateData(typename PFP::MAP& mapx, const VertexAtt
 
 	VEC3F* positionF2 = reinterpret_cast<VEC3F*>(PositionBuffer2);
 
-	m_nbRel2=0;
+	m_nbRel2 = 0;
 
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
 	{
@@ -576,16 +572,14 @@ void Topo3PrimalRender<PFP>::updateData(typename PFP::MAP& mapx, const VertexAtt
 }
 
 template <typename PFP>
-void Topo3PrimalRender<PFP>::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3, typename PFP::MAP>& posExpl)
+void Topo3PrimalRender<PFP>::computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP_IMPL>& posExpl)
 {
-	typedef Geom::Vec3f VEC3F;
-
 	m_vbo0->bind();
-	VEC3F* positionsPtr = reinterpret_cast<VEC3F*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
+	Geom::Vec3f* positionsPtr = reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		const VEC3F& v =(positionsPtr[m_attIndex[d]] + positionsPtr[m_attIndex[d]+1])*0.5f;
+		const Geom::Vec3f& v =(positionsPtr[m_attIndex[d]] + positionsPtr[m_attIndex[d]+1])*0.5f;
 		posExpl[d] = PFP::toVec3f(v);
 	}
 
@@ -594,7 +588,7 @@ void Topo3PrimalRender<PFP>::computeDartMiddlePositions(typename PFP::MAP& map, 
 }
 
 template <typename PFP>
-Dart Topo3PrimalRender<PFP>::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
+Dart Topo3PrimalRender<PFP>::coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;
@@ -624,7 +618,7 @@ Dart Topo3PrimalRender<PFP>::coneSelection(typename PFP::MAP& map, const Geom::V
 }
 
 template <typename PFP>
-Dart Topo3PrimalRender<PFP>::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
+Dart Topo3PrimalRender<PFP>::raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
 {
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;
@@ -637,11 +631,11 @@ Dart Topo3PrimalRender<PFP>::raySelection(typename PFP::MAP& map, const Geom::Ve
 		const Geom::Vec3f& P = m_bufferDartPosition[m_attIndex[d]];
 		const Geom::Vec3f& Q =m_bufferDartPosition[m_attIndex[d]+1];
 		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
-		if (ld2<dm2)
+		if (ld2 < dm2)
 		{
 			Geom::Vec3f V = (P+Q)/2.0f - rayA;
 			double d2 = double(V*V);
-			if (d2<dist2)
+			if (d2 < dist2)
 			{
 				dist2 = d2;
 				dFinal = d;

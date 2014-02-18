@@ -53,6 +53,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 MAP myMap;
@@ -103,7 +104,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-	VertexAttribute<VEC3> position = myMap.addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position") ;
 
 	// define the face extruded (here a cross)
 	std::vector<PFP::VEC3> objV;

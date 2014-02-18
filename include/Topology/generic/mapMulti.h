@@ -162,7 +162,7 @@ protected:
 	template <int I>
 	inline void permutationUnsew(Dart d);
 
-	inline virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
+	inline virtual void compactTopo();
 
 	/****************************************
 	 *      MR CONTAINER MANAGEMENT         *

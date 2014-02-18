@@ -297,9 +297,6 @@ inline void GenericMap::disableQuickAdjacentTraversal()
 	}
 }
 
-
-
-
 /****************************************
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/

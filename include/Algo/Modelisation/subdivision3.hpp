@@ -111,20 +111,24 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d)
 }
 
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl)
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, Dart d, Geom::Plane3D<typename PFP::REAL> pl)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
 	Dart dRes=NIL;
 	unsigned int nbInter = 0;
 	unsigned int nbVertices = 0;
-	CellMarkerStore<VERTEX> vs(map);			//marker for new vertices from edge cut
-	CellMarkerStore<FACE> cf(map);
+	CellMarkerStore<MAP, VERTEX> vs(map);			//marker for new vertices from edge cut
+	CellMarkerStore<MAP, FACE> cf(map);
 	Dart dPath;
 
-	MarkerForTraversor<typename PFP::MAP::ParentMap, EDGE > mte(map);
-	MarkerForTraversor<typename PFP::MAP::ParentMap, FACE > mtf(map);
+	MarkerForTraversor<typename MAP::ParentMap, EDGE> mte(map);
+	MarkerForTraversor<typename MAP::ParentMap, FACE> mtf(map);
 
 	//search edges and vertices crossing the plane
-	Traversor3WE<typename PFP::MAP::ParentMap > te(map,d);
+	Traversor3WE<typename MAP::ParentMap> te(map,d);
 	for(Dart dd = te.begin() ;dd != te.end() ; dd = te.next())
 	{
 		if(!mte.isMarked(dd))
@@ -137,15 +141,15 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 			}
 			else
 			{
-				typename PFP::VEC3 interP;
-				typename PFP::VEC3 vec(Surface::Geometry::vectorOutOfDart<PFP>(map,dd,position));
-				Geom::Intersection inter = Geom::intersectionLinePlane<typename PFP::VEC3, typename Geom::Plane3D<typename PFP::REAL > >(position[dd],vec,pl,interP);
+				VEC3 interP;
+				VEC3 vec(Surface::Geometry::vectorOutOfDart<PFP>(map,dd,position));
+				Geom::Intersection inter = Geom::intersectionLinePlane<VEC3, typename Geom::Plane3D<REAL> >(position[dd],vec,pl,interP);
 
 				if(inter==Geom::FACE_INTERSECTION)
 				{
 					Dart dOp = map.phi1(dd);
-					typename PFP::VEC3 v2(interP-position[dd]);
-					typename PFP::VEC3 v3(interP-position[dOp]);
+					VEC3 v2(interP-position[dd]);
+					VEC3 v3(interP-position[dOp]);
 					if(vec.norm2()>v2.norm2() && vec.norm2()>v3.norm2())
 					{
 						nbInter++;
@@ -172,7 +176,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 	//slice when at least two edges are concerned
 	if(nbInter>1)
 	{
-		Traversor3WF<typename PFP::MAP::ParentMap > tf(map,d);
+		Traversor3WF<typename MAP::ParentMap > tf(map,d);
 		for(Dart dd = tf.begin() ; dd != tf.end() ; dd = tf.next())
 		{
 			//for faces with a new vertex
@@ -235,23 +239,25 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 }
 
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit)
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, Dart d, CellMarker<typename PFP::MAP, EDGE>& edgesToCut, CellMarker<typename PFP::MAP, VERTEX>& verticesToSplit)
 {
+	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
 	Dart dRes;
 	unsigned int nbInter = 0;
 	unsigned int nbVertices = 0;
-	CellMarkerStore<VERTEX> vs(map);			//marker for new vertices from edge cut
-	CellMarkerStore<FACE> cf(map);
+	CellMarkerStore<MAP, VERTEX> vs(map);			//marker for new vertices from edge cut
+	CellMarkerStore<MAP, FACE> cf(map);
 	Dart dPath;
 
-	MarkerForTraversor<typename PFP::MAP::ParentMap, EDGE > mte(map);
-	MarkerForTraversor<typename PFP::MAP::ParentMap, FACE > mtf(map);
+	MarkerForTraversor<typename MAP::ParentMap, EDGE> mte(map);
+	MarkerForTraversor<typename MAP::ParentMap, FACE> mtf(map);
 
 	//search edges and vertices crossing the plane
-	Traversor3WE<typename PFP::MAP::ParentMap > te(map,d);
-	for(Dart dd = te.begin() ;dd != te.end() ; dd = te.next())
+	Traversor3WE<typename MAP::ParentMap > te(map,d);
+	for(Dart dd = te.begin(); dd != te.end(); dd = te.next())
 	{
 		if(!mte.isMarked(dd) && edgesToCut.isMarked(dd))
 		{
@@ -276,7 +282,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 	//at least two edges are concerned
 	assert(nbInter>1);
 
-	Traversor3WF<typename PFP::MAP::ParentMap > tf(map,d);
+	Traversor3WF<typename MAP::ParentMap > tf(map,d);
 	for(Dart dd = tf.begin() ; dd != tf.end() ; dd = tf.next())
 	{
 		//for faces with a new vertex
@@ -334,16 +340,19 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 }
 
 template <typename PFP>
-std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position,CellMarker<VOLUME>& volumesToCut, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit)
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, CellMarker<typename PFP::MAP, VOLUME>& volumesToCut, CellMarker<typename PFP::MAP, EDGE>& edgesToCut, CellMarker<typename PFP::MAP, VERTEX>& verticesToSplit)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
     std::vector<Dart> vRes;
 
-    typedef typename PFP::VEC3 VEC3;
-    CellMarker<VERTEX> localVerticesToSplit(map); //marker for new vertices from edge cut
+	CellMarker<MAP, VERTEX> localVerticesToSplit(map); //marker for new vertices from edge cut
 
     //Step 1: Cut the edges and mark the resulting vertices as vertices to be face-split
-    TraversorE<typename PFP::MAP> te(map);
-    CellMarkerStore<FACE> cf(map);
+	TraversorE<MAP> te(map);
+	CellMarkerStore<MAP, FACE> cf(map);
 
     for(Dart d = te.begin(); d != te.end(); d=te.next()) //cut all edges
     {
@@ -352,7 +361,7 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
             VEC3 p = (position[d]+position[map.phi1(d)])*0.5f;
 
             //turn around the edge and mark for future split face
-            Traversor3EF<typename PFP::MAP> t3ef(map,d);
+			Traversor3EF<MAP> t3ef(map,d);
             for(Dart dd = t3ef.begin() ; dd != t3ef.end() ; dd = t3ef.next())
             	cf.mark(dd);			//mark face to split
 
@@ -365,7 +374,7 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
     }
 
     //Step 2: Split faces with cut edges
-    TraversorF<typename PFP::MAP> tf(map);
+	TraversorF<MAP> tf(map);
     for(Dart d = tf.begin(); d != tf.end(); d=tf.next())
     {
         if(cf.isMarked(d))
@@ -400,12 +409,12 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
     }
 
     //Step 3 : Find path and split volumes
-    TraversorW<typename PFP::MAP> tw(map);
+	TraversorW<MAP> tw(map);
     for(Dart d = tw.begin(); d != tw.end(); d=tw.next()) //Parcours des volumes
     {
         if(volumesToCut.isMarked(d))
         {
-            Traversor3WV<typename PFP::MAP> t3wv(map,d);
+			Traversor3WV<MAP> t3wv(map,d);
             Dart dPath;
             bool found=false;
 
@@ -426,8 +435,7 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
             std::vector<Dart> vPath;
             vPath.reserve(32);
             vPath.push_back(dPath);
-            CellMarker<FACE> cmf(map);
-
+			CellMarker<MAP, FACE> cmf(map);
 
             //define the path to split for the whole volume
             bool pathFound=false;
@@ -460,19 +468,21 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typ
 template <typename PFP, typename EMBV>
 void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename EMBV::DATA_TYPE EMB;
 
 	//std::vector<Dart> l_centers;
 	std::vector<Dart> l_vertices;
 
 	//pre-computation : compute the centroid of all volume
-	VolumeAutoAttribute<EMB> attBary(map);
+	VolumeAutoAttribute<EMB, MAP_IMPL> attBary(map);
 	Volume::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary);
 
 	//subdivision
 	//1. cut edges
-	DartMarkerNoUnmark mv(map);
-	TraversorE<typename PFP::MAP> travE(map);
+	DartMarkerNoUnmark<MAP> mv(map);
+	TraversorE<MAP> travE(map);
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
 		//memorize each vertices per volumes
@@ -495,7 +505,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 	}
 
 	//2. split faces - quadrangule faces
-	TraversorF<typename PFP::MAP> travF(map) ;
+	TraversorF<MAP> travF(map) ;
 	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 	{
 		EMB center = Surface::Geometry::faceCentroid<PFP,EMBV>(map,d,attributs);
@@ -561,7 +571,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 
 		assert(vd2.size() == v.size());
 
-		map.PFP::MAP::ParentMap::splitSurface(v, true, false);
+		map.MAP::ParentMap::splitSurface(v, true, false);
 
 		// follow the edge path a second time to embed the vertex, edge and volume orbits
 		for(unsigned int i = 0; i < v.size(); ++i)
@@ -598,7 +608,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 
 		Dart dd = map.phi2(map.phi1(*it));
 		Dart next = map.phi1(map.phi1(dd)) ;
-		map.PFP::MAP::ParentMap::splitFace(dd, next);
+		map.MAP::ParentMap::splitFace(dd, next);
 
 		if (map.template isOrbitEmbedded<VERTEX>())
 		{
@@ -607,7 +617,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 		}
 
 		Dart ne = map.phi2(map.phi_1(dd));
-		map.PFP::MAP::ParentMap::cutEdge(ne);
+		map.MAP::ParentMap::cutEdge(ne);
 
 //		dd = map.phi1(map.phi1(next)) ;
 //		while(dd != ne)
@@ -681,26 +691,30 @@ inline double sqrt3_K(unsigned int n)
 }
 
 template <typename PFP>
-void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
-	DartMarkerStore m(map);
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
 
-	DartMarkerStore newBoundaryV(map);
+	DartMarkerStore<MAP> m(map);
+
+	DartMarkerStore<MAP> newBoundaryV(map);
 
 	//
 	// 1-4 flip of all tetrahedra
 	//
-	TraversorW<typename PFP::MAP> tW(map);
+	TraversorW<MAP> tW(map);
 	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
 	{
-		Traversor3WF<typename PFP::MAP> tWF(map, dit);
+		Traversor3WF<MAP> tWF(map, dit);
 		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
 		{
 			if(!map.isBoundaryFace(ditWF) && !m.isMarked(ditWF))
 				m.markOrbit<FACE>(ditWF);
 		}
 
-		typename PFP::VEC3 volCenter(0.0);
+		VEC3 volCenter(0.0);
 		volCenter += position[dit];
 		volCenter += position[map.phi1(dit)];
 		volCenter += position[map.phi_1(dit)];
@@ -714,7 +728,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//
 	// 2-3 swap of all old interior faces
 	//
-	TraversorF<typename PFP::MAP> tF(map);
+	TraversorF<MAP> tF(map);
 	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
 	{
 		if(m.isMarked(dit))
@@ -727,19 +741,19 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//
 	// 1-3 flip of all boundary tetrahedra
 	//
-	TraversorW<typename PFP::MAP> tWb(map);
+	TraversorW<MAP> tWb(map);
 	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
 	{
 		if(map.isBoundaryVolume(dit))
 		{
-			Traversor3WE<typename PFP::MAP> tWE(map, dit);
+			Traversor3WE<MAP> tWE(map, dit);
 			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
 			{
 				if(map.isBoundaryEdge(ditWE) && !m.isMarked(ditWE))
 					m.markOrbit<EDGE>(ditWE);
 			}
 
-			typename PFP::VEC3 faceCenter(0.0);
+			VEC3 faceCenter(0.0);
 			faceCenter += position[dit];
 			faceCenter += position[map.phi1(dit)];
 			faceCenter += position[map.phi_1(dit)];
@@ -888,9 +902,13 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 // solving Ax = b
 
 template <typename PFP>
-void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
-	VertexAttribute<unsigned int> indexV = map.template getAttribute<unsigned int, VERTEX>("indexV");
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
+	VertexAttribute<unsigned int, MAP_IMPL> indexV = map.template getAttribute<unsigned int, VERTEX>("indexV");
 	if(!indexV.isValid())
 		indexV = map.template addAttribute<unsigned int, VERTEX>("indexV");
 
@@ -912,7 +930,7 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 	{
 		std::cout << "coord " << coord << std::flush;
 		//setup variables
-		TraversorV<typename PFP::MAP> tv(map);
+		TraversorV<MAP> tv(map);
 		for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
 		{
 			nlSetVariable(indexV[dit], (position[dit])[coord]);
@@ -927,7 +945,7 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 
 		nlEnable(NL_NORMALIZE_ROWS) ;
 
-		TraversorV<typename PFP::MAP> tv2(map);
+		TraversorV<MAP> tv2(map);
 		for(Dart dit = tv2.begin() ; dit != tv2.end() ; dit = tv2.next())
 		{
 			if(!map.isBoundaryVertex(dit))
@@ -938,7 +956,7 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 				nlBegin(NL_ROW) ;
 
 				float sum = 0;
-				Traversor3VVaE<typename PFP::MAP> tvvae(map, dit);
+				Traversor3VVaE<MAP> tvvae(map, dit);
 				for(Dart ditvvae = tvvae.begin() ; ditvvae != tvvae.end() ; ditvvae = tvvae.next())
 				{
 					nlCoefficient(indexV[ditvvae], weight);
@@ -975,12 +993,16 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& pos
 }
 
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
 	// VolumeAttribute -> after dual new VertexAttribute
-	VolumeAttribute<typename PFP::VEC3> positionV  = map.template getAttribute<typename PFP::VEC3, VOLUME>("position") ;
+	VolumeAttribute<VEC3, MAP_IMPL> positionV  = map.template getAttribute<VEC3, VOLUME>("position") ;
 	if(!positionV.isValid())
-		positionV = map.template addAttribute<typename PFP::VEC3, VOLUME>("position") ;
+		positionV = map.template addAttribute<VEC3, VOLUME>("position") ;
 
 	// Compute Centroid for the volumes
 	Algo::Volume::Geometry::computeCentroidVolumes<PFP>(map, position, positionV) ;
@@ -990,7 +1012,6 @@ void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& po
 	position = positionV ;
 }
 
-
 } // namespace Modelisation
 
 } // namespace volume
@@ -998,4 +1019,3 @@ void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& po
 } // namespace Algo
 
 } // namespace CGoGN
-

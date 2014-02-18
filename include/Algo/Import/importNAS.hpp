@@ -64,19 +64,19 @@ inline float floatFromNas(std::string& s_v)
 	return x;
 }
 
-
 template <typename PFP>
 bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VertexAttribute<VEC3> position = map.template addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
-
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
 	//open file
 	std::ifstream fp(filename.c_str(), std::ios::in);
@@ -151,14 +151,14 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 			s_v = ligne.substr(16,8);
 			unsigned int ind8 = atoi(s_v.c_str());
 
-			typename PFP::VEC3 P = position[verticesMapID[ind5]];
-			typename PFP::VEC3 A = position[verticesMapID[ind1]];
-			typename PFP::VEC3 B = position[verticesMapID[ind2]];
-			typename PFP::VEC3 C = position[verticesMapID[ind3]];
+			VEC3 P = position[verticesMapID[ind5]];
+			VEC3 A = position[verticesMapID[ind1]];
+			VEC3 B = position[verticesMapID[ind2]];
+			VEC3 C = position[verticesMapID[ind3]];
 
 			Geom::Vec4ui v;
 
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+			if (Geom::testOrientation3D<VEC3>(P,A,B,C) == Geom::OVER)
 			{
 				v[0] = ind4;
 				v[1] = ind3;
@@ -196,14 +196,14 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 			s_v = ligne.substr(48,8);
 			unsigned int ind4 = atoi(s_v.c_str());
 
-			typename PFP::VEC3 P = position[verticesMapID[ind1]];
-			typename PFP::VEC3 A = position[verticesMapID[ind2]];
-			typename PFP::VEC3 B = position[verticesMapID[ind3]];
-			typename PFP::VEC3 C = position[verticesMapID[ind4]];
+			VEC3 P = position[verticesMapID[ind1]];
+			VEC3 A = position[verticesMapID[ind2]];
+			VEC3 B = position[verticesMapID[ind3]];
+			VEC3 C = position[verticesMapID[ind4]];
 
 			Geom::Vec4ui v;
 
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+			if (Geom::testOrientation3D<VEC3>(P,A,B,C) == Geom::OVER)
 			{
 				v[0] = ind4;
 				v[1] = ind3;
@@ -223,14 +223,11 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 		tag = ligne.substr(0,4);
 	} while (!fp.eof());
 
-
-
 	CGoGNout << "nb points = " << m_nbVertices ;
-
 
 	unsigned int m_nbVolumes = 0;
 
-	DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
 	if (tet.size() > 0)
 	{
@@ -250,11 +247,10 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 			Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
 
-
 			// Embed three "base" vertices
 			for(unsigned int j = 0 ; j < 3 ; ++j)
 			{
-				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesMapID[pt[2-j]]);
+				FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesMapID[pt[2-j]]);
 				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 				//store darts per vertices to optimize reconstruction
@@ -272,7 +268,7 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 			//Embed the last "top" vertex
 			d = map.phi_1(map.phi2(d));
 
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesMapID[pt[3]]);
+			FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesMapID[pt[3]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
@@ -287,12 +283,10 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 			//end of tetra
 		}
 		CGoGNout << " / nb tetra = " << tet.size() << CGoGNendl;
-
 	}
 
 	if (hexa.size() > 0)
 	{
-
 		m_nbVolumes += hexa.size()/2;
 
 		//Read and embed all tetrahedrons
@@ -312,7 +306,7 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 			Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
 
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesMapID[pt[0]]);
+			FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesMapID[pt[0]]);
 
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 			Dart dd = d;
@@ -328,7 +322,6 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesMapID[pt[1]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesMapID[pt[1]]].push_back(dd); m.mark(dd);
 
-
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesMapID[pt[2]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
@@ -336,7 +329,6 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 			vecDartsPerVertex[verticesMapID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesMapID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesMapID[pt[2]]].push_back(dd); m.mark(dd);
-
 
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesMapID[pt[3]]);
@@ -382,7 +374,6 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 			//end of hexa
 		}
 		CGoGNout << " / nb hexa = " << hexa.size()/2 << CGoGNendl;
-
 	}
 
 	//Association des phi3
@@ -429,7 +420,7 @@ bool importNAS(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 } // namespace Import
 
-}
+} // namespace Volume
 
 } // namespace Algo
 

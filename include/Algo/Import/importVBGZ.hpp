@@ -41,14 +41,16 @@ namespace Import
 template <typename PFP>
 bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VertexAttribute<VEC3> position = map.template addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
 	//open file
 	igzstream fs(filename.c_str(), std::ios::in|std::ios::binary);
@@ -57,7 +59,6 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
-
 
 	unsigned int numbers[3];
 
@@ -94,8 +95,7 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 	}
 	CGoGNout << "nb vertices = " << numbers[0];
 
-
-	DartMarkerNoUnmark m(map) ;
+	DartMarkerNoUnmark<MAP> m(map) ;
 
 	if (numbers[1] > 0)
 	{
@@ -114,7 +114,7 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 			// Embed three "base" vertices
 			for(unsigned int j = 0 ; j < 3 ; ++j)
 			{
-				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[j]]);
+				FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesID[pt[j]]);
 				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 				//store darts per vertices to optimize reconstruction
@@ -133,7 +133,7 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 			d = map.template phi<211>(d);
 			//d = map.phi_1(map.phi2(d));
 
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
+			FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 			//store darts per vertex to optimize reconstruction
@@ -153,7 +153,6 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 
 	if (numbers[2] > 0)
 	{
-
 		//Read and embed all tetrahedrons
 		for(unsigned int i = 0; i < numbers[2] ; ++i)
 		{
@@ -170,7 +169,7 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 
 			Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
 
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[0]]);
+			FunctorSetEmb<MAP, VERTEX> fsetemb(map, verticesID[pt[0]]);
 
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 			Dart dd = d;
@@ -186,7 +185,6 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 			vecDartsPerVertex[verticesID[pt[1]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[1]]].push_back(dd); m.mark(dd);
 
-
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesID[pt[2]]);
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
@@ -194,7 +192,6 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 			vecDartsPerVertex[verticesID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[2]]].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
 			vecDartsPerVertex[verticesID[pt[2]]].push_back(dd); m.mark(dd);
-
 
 			d = map.phi1(d);
 			fsetemb.changeEmb(verticesID[pt[3]]);
@@ -287,7 +284,7 @@ bool importVBGZ(typename PFP::MAP& map, const std::string& filename, std::vector
 
 } // namespace Import
 
-}
+} // namespace Volume
 
 } // namespace Algo
 
