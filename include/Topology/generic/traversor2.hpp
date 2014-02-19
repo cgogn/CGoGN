@@ -414,7 +414,8 @@ Dart Traversor2EEaV<MAP>::next()
 // Traversor2EEaF
 
 template <typename MAP>
-Traversor2EEaF<MAP>::Traversor2EEaF(const MAP& map, Dart dart) : m(map),m_QLT(NULL)
+Traversor2EEaF<MAP>::Traversor2EEaF(const MAP& map, Dart dart) :
+	m(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<EDGE,FACE>() ;
 	if (quickTraversal != NULL)
@@ -423,9 +424,12 @@ Traversor2EEaF<MAP>::Traversor2EEaF(const MAP& map, Dart dart) : m(map),m_QLT(NU
 	}
 	else
 	{
-		start = m.phi1(dart) ;
-		stop1 = dart ;
-		stop2 = m.phi2(dart) ;
+		if (m.isBoundaryMarked2(dart))
+			stop1 = m.phi2(dart);
+		else
+			stop1 = dart;
+		stop2 = m.phi2(stop1) ;
+		start = m.phi1(stop1);
 	}
 }
 
@@ -458,10 +462,16 @@ Dart Traversor2EEaF<MAP>::next()
 	if(current != NIL)
 	{
 		current = m.phi1(current) ;
-		if(current == stop1)
-			current = m.phi1(stop2) ;
-		else if(current == stop2)
+		if (current == stop1)
+		{
+			if (!m.isBoundaryMarked2(stop2))
+				current = m.phi1(stop2) ;
+			else
+				current=NIL;
+		}
+		else if (current == stop2)
 			current = NIL ;
+
 	}
 	return current ;
 }
