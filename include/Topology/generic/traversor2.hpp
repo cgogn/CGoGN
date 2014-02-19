@@ -471,7 +471,6 @@ Dart Traversor2EEaF<MAP>::next()
 		}
 		else if (current == stop2)
 			current = NIL ;
-
 	}
 	return current ;
 }
