@@ -24,17 +24,10 @@
 #ifndef __TUTO5_
 #define __TUTO5_
 
-
 #include <iostream>
 
-// #define WITH_GMAP 1
-
 #include "Topology/generic/parameters.h"
-#ifdef WITH_GMAP
-	#include "Topology/gmap/embeddedGMap3.h"
-#else
-	#include "Topology/map/embeddedMap3.h"
-#endif
+#include "Topology/map/embeddedMap3.h"
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -56,16 +49,14 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-#ifdef WITH_GMAP
-	typedef EmbeddedGMap3 MAP;
-#else
 	typedef EmbeddedMap3 MAP;
-#endif
 };
 
+typedef PFP::MAP MAP;
+typedef PFP::MAP::IMPL MAP_IMPL;
+typedef PFP::VEC3 VEC3;
 
 using namespace CGoGN ;
-
 
 /**
  * Utilisation de designer-qt4:
@@ -85,7 +76,7 @@ class MyQT: public Utils::QT::SimpleQT
     bool clip_volume;
     bool hide_clipping;
 
-	Algo::Render::GL2::Topo3Render* m_topo_render;
+	Algo::Render::GL2::Topo3RenderMap<PFP>* m_topo_render;
 	Algo::Render::GL2::ExplodeVolumeRender* m_explode_render;
 
 	float m_explode_factor;

@@ -117,7 +117,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
                     if (good_dart == map.phi2(good_dart))
                     {
                         map.sewFaces(d, good_dart, false);
-                        m.unmarkOrbit<EDGE>(d);
+						m.template unmarkOrbit<EDGE>(d);
                     }
                     else
                     {
@@ -132,7 +132,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
             if (good_dart == NIL)
             {
-                m.unmarkOrbit<EDGE>(d);
+				m.template unmarkOrbit<EDGE>(d);
                 ++nbBoundaryEdges;
             }
         }

@@ -221,7 +221,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			{
 				if ((!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
-					dmark->markOrbit<ORBIT>(d);
+					dmark->template markOrbit<ORBIT>(d);
 					vd[nb%nbth].push_back(d);
 					nb++;
 				}
@@ -315,7 +315,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			{
 				if ((!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
-					dmark->markOrbit<ORBIT>(d);
+					dmark->template markOrbit<ORBIT>(d);
 					tempo[nb%nbth].push_back(d);
 					nb++;
 				}

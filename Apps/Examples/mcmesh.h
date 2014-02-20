@@ -29,7 +29,6 @@
 #include "Utils/Qt/qtui.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
 #include "Topology/map/embeddedMap2.h"
 
 #include "Geometry/vector_gen.h"
@@ -66,7 +65,6 @@ class MCMesh : public Utils::QT::SimpleQT
 
 public:
 	MAP myMap ;
-	SelectorTrue allDarts ;
 
     Utils::QT::uiDockInterface dock ;
 

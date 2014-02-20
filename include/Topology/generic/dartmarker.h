@@ -56,7 +56,7 @@ public:
 		releaseOnDestruct(true)
 	{}
 
-	~DartMarkerGen()
+	virtual ~DartMarkerGen()
 	{}
 
 	inline unsigned int getThread() { return m_thread ; }
@@ -106,7 +106,7 @@ public:
 		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
-	~DartMarkerTmpl()
+	virtual ~DartMarkerTmpl()
 	{
 		if (releaseOnDestruct)
 		{
@@ -227,7 +227,7 @@ public:
 		DartMarkerTmpl<MAP>(map, thread)
 	{}
 
-	~DartMarker()
+	virtual ~DartMarker()
 	{
 		unmarkAll() ;
 	}
@@ -267,7 +267,7 @@ public:
 		DartMarkerTmpl<MAP>(map, thread)
 	{}
 
-	~DartMarkerStore()
+	virtual ~DartMarkerStore()
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked) ;
@@ -321,7 +321,7 @@ public:
 		DartMarkerTmpl<MAP>(map, thread)
 	{}
 
-	~DartMarkerNoUnmark()
+	virtual ~DartMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked) ;
 //		CGoGN_ASSERT(isAllUnmarked())

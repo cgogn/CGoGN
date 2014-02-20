@@ -446,12 +446,13 @@ void TopoRender<PFP>::updateDataBoundary(MAP& map, const VertexAttribute<VEC3, M
 template<typename PFP>
 void TopoRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary)
 {
-	if (map.mapTypeName()[0] == "M") // "Map2"
+	std::string typeName = map.mapTypeName();
+	if (typeName[0] == 'M') // "Map2"
 	{
 		updateDataMap(map, positions, ke, kf, withBoundary);
 		return;
 	}
-	if (map.mapTypeName()[0] == "G") // "GMap2"
+	if (typeName[0] == 'G') // "GMap2"
 	{
 		updateDataGMap(map, positions, ke, kf, withBoundary);
 		return;
@@ -486,7 +487,7 @@ void TopoRender<PFP>::updateDataMap(MAP& mapx, const VertexAttribute<VEC3, MAP_I
 	DartAutoAttribute<VEC3, MAP_IMPL> fv2(mapx);
 
 	m_vbo3->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	Geom::Vec3f* colorDartBuf = reinterpret_cast<Geom::Vec3f*>(ColorDartsBuffer);
 
@@ -605,22 +606,22 @@ void TopoRender<PFP>::updateDataMap(MAP& mapx, const VertexAttribute<VEC3, MAP_I
 	}
 
 	m_vbo0->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), m_bufferDartPosition, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), m_bufferDartPosition, GL_STREAM_DRAW);
 //	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	m_vbo3->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	m_vbo1->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer1 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	m_vbo2->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer2 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
-	VEC3F* positionF1 = reinterpret_cast<VEC3F*>(PositionBuffer1);
-	VEC3F* positionF2 = reinterpret_cast<VEC3F*>(PositionBuffer2);
+	Geom::Vec3f* positionF1 = reinterpret_cast<Geom::Vec3f*>(PositionBuffer1);
+	Geom::Vec3f* positionF2 = reinterpret_cast<Geom::Vec3f*>(PositionBuffer2);
 
 	m_nbRel2 =0;
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
@@ -680,12 +681,12 @@ void TopoRender<PFP>::updateDataGMap(MAP& map, const VertexAttribute<VEC3, MAP_I
 	DartAutoAttribute<VEC3, MAP_IMPL> fv2(map);
 
 	m_vbo3->bind();
-	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	Geom::Vec3f* colorDartBuf = reinterpret_cast<Geom::Vec3f*>(ColorDartsBuffer);
 
 	m_vbo0->bind();
-	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	Geom::Vec3f* positionDartBuf = reinterpret_cast<Geom::Vec3f*>(PositionDartsBuffer);
 
@@ -769,15 +770,15 @@ void TopoRender<PFP>::updateDataGMap(MAP& map, const VertexAttribute<VEC3, MAP_I
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	m_vbo1->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer1 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	m_vbo2->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer2 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
-	VEC3F* positionF1 = reinterpret_cast<VEC3F*>(PositionBuffer1);
-	VEC3F* positionF2 = reinterpret_cast<VEC3F*>(PositionBuffer2);
+	Geom::Vec3f* positionF1 = reinterpret_cast<Geom::Vec3f*>(PositionBuffer1);
+	Geom::Vec3f* positionF2 = reinterpret_cast<Geom::Vec3f*>(PositionBuffer2);
 
 	m_nbRel2 = 0;
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)

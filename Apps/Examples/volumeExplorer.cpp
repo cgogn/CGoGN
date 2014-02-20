@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #include "volumeExplorer.h"
 #include <iostream>
 
@@ -35,10 +34,9 @@
 
 #include "Algo/Export/exportVol.h"
 
-
-PFP::MAP myMap;
-VertexAttribute<PFP::VEC3> position ;
-VolumeAttribute<PFP::VEC3> color ;
+MAP myMap;
+VertexAttribute<VEC3, MAP_IMPL> position ;
+VolumeAttribute<VEC3, MAP_IMPL> color ;
 
 void MyQT::volumes_onoff(bool /*x*/)
 {
@@ -59,7 +57,7 @@ void MyQT::topo_onoff(bool /*x*/)
 	{
 //		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 		//TODO MapBrowser
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor);
+		m_topo_render->updateData(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor);
 	}
 
 	updateGL();
@@ -96,7 +94,6 @@ void MyQT::hide_onoff(bool /*x*/)
 	updateGL();
 }
 
-
 void MyQT::slider_explode(int x)
 {
 	m_explode_factor = 0.01f*(x+1)-0.0001f;
@@ -111,7 +108,6 @@ void MyQT::slider_explodeF(int x)
 	updateGL();
 }
 
-
 void MyQT::slider_pressed()
 {
 	render_topoTemp = render_topo;
@@ -119,10 +115,8 @@ void MyQT::slider_pressed()
 	updateGL();
 }
 
-
 void MyQT::slider_released()
 {
-
 	render_topo = render_topoTemp;
 	if (render_topo)
 	{
@@ -190,7 +184,7 @@ void MyQT::cb_Open()
 	}
 
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f);
+	m_topo_render->updateData(myMap, position,  0.8f, 0.8f, 0.8f);
 	m_explode_render->updateData<PFP>(myMap, position, color);
 
 	updateGL() ;
@@ -206,14 +200,13 @@ void MyQT::cb_Save()
 	Algo::Volume::Export::exportMesh<PFP>(myMap,position,filename);
 }
 
-
 void MyQT::cb_initGL()
 {
 	// choose to use GL version 2
 	Utils::GLSLShader::setCurrentOGLVersion(2);
 
 	// create the renders
-    m_topo_render = new Algo::Render::GL2::Topo3Render();
+	m_topo_render = new Algo::Render::GL2::Topo3RenderMap<PFP>();
     m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,true);
 
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);

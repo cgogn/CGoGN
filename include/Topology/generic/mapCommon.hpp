@@ -365,7 +365,7 @@ void MapCommon<MAP_IMPL>::bijectiveOrbitEmbedding()
 	{
 		if(!mark.isMarked(d))
 		{
-			mark.markOrbit<ORBIT>(d) ;
+			mark.template markOrbit<ORBIT>(d) ;
 			unsigned int emb = getEmbedding<ORBIT>(d) ;
 			if (emb != EMBNULL)
 			{

@@ -57,6 +57,7 @@ class TopoRender
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
 protected:
 	/**

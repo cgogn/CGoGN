@@ -268,7 +268,7 @@ public:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv);
+	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv) = 0;
 
 //	template<typename PFP>
 //	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
@@ -304,26 +304,46 @@ public:
 
 	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
-protected:
-	/**
-	* update all drawing buffers to render a dual map
-	* @param map the map
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
-	*/
-	void updateDataMap3(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv);
+//protected:
+//	/**
+//	* update all drawing buffers to render a dual map
+//	* @param map the map
+//	* @param positions  attribute of position vertices
+//	* @param ke exploding coef for edge
+//	* @param kf exploding coef for face
+// 	* @param kv exploding coef for face
+//	*/
+//	void updateDataMap3(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv);
 
-	/**
-	* update all drawing buffers to render a gmap
-	* @param map the map
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
-	*/
-	void updateDataGMap3(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv);
+//	/**
+//	* update all drawing buffers to render a gmap
+//	* @param map the map
+//	* @param positions  attribute of position vertices
+//	* @param ke exploding coef for edge
+//	* @param kf exploding coef for face
+// 	* @param kv exploding coef for face
+//	*/
+//	void updateDataGMap3(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv);
+};
+
+template <typename PFP>
+class Topo3RenderMap : public Topo3Render<PFP>
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL> &positions, float ke, float kf, float kv);
+};
+
+template <typename PFP>
+class Topo3RenderGMap : public Topo3Render<PFP>
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL> &positions, float ke, float kf, float kv);
 };
 
 }//end namespace GL2

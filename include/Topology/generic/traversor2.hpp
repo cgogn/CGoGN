@@ -90,7 +90,7 @@ Traversor2VF<MAP>::Traversor2VF(const MAP& map, Dart dart) : m(map), start(dart)
 	}
 	else
 	{
-		if(m.isBoundaryMarked2(start)) // jump over a boundary face
+		if(m.template isBoundaryMarked<2>(start)) // jump over a boundary face
 			start = m.phi2(m.phi_1(start)) ;
 	}
 }
@@ -124,7 +124,7 @@ Dart Traversor2VF<MAP>::next()
 	if(current != NIL)
 	{
 		current = m.phi2(m.phi_1(current)) ;
-		if(m.isBoundaryMarked2(current)) // jump over a boundary face
+		if(m.template isBoundaryMarked<2>(current)) // jump over a boundary face
 			current = m.phi2(m.phi_1(current)) ;
 		if(current == start)
 			current = NIL ;
@@ -546,7 +546,7 @@ Traversor2FFaV<MAP>::Traversor2FFaV(const MAP& map, Dart dart) : m(map),m_QLT(NU
 		}
 		current = start ;
 		stop = dart ;
-		if(m.isBoundaryMarked2(start))
+		if(m.template isBoundaryMarked<2>(start))
 			start = next() ;
 	}
 }

@@ -137,7 +137,7 @@ template <typename T, typename MAP_IMPL>
 class VolumeAutoAttribute : public VolumeAttribute<T, MAP_IMPL>
 {
 public:
-	VolumeAutoAttribute(MAP_IMPL& m, const std::string& nameAttr = "")
+	VolumeAutoAttribute(MapCommon<MAP_IMPL>& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
 		if(!m.template isOrbitEmbedded<VOLUME>())

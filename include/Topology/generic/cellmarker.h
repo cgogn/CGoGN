@@ -54,7 +54,7 @@ public:
 		releaseOnDestruct(true)
 	{}
 
-	~CellMarkerGen()
+	virtual ~CellMarkerGen()
 	{}
 
 	unsigned int getThread() { return m_thread ; }
@@ -120,7 +120,7 @@ public:
 		m_map.cellMarkers[m_thread].push_back(this) ;
 	}
 
-	/*virtual */~CellMarkerBase()
+	virtual ~CellMarkerBase()
 	{
 		if(releaseOnDestruct)
 		{
@@ -265,7 +265,7 @@ public:
 		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	~CellMarker()
+	virtual ~CellMarker()
 	{
 		unmarkAll() ;
 	}
@@ -307,7 +307,7 @@ public:
 		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	~CellMarkerStore()
+	virtual ~CellMarkerStore()
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked);
@@ -362,7 +362,7 @@ public:
 		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	~CellMarkerMemo()
+	virtual ~CellMarkerMemo()
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked);
@@ -419,7 +419,7 @@ public:
 		CellMarkerBase<MAP, CELL>(map, thread)
 	{}
 
-	~CellMarkerNoUnmark()
+	virtual ~CellMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked()) ;
 //		CGoGN_ASSERT(this->isAllUnmarked())

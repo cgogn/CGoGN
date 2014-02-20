@@ -138,23 +138,23 @@ void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const EMBV
 	}
 }
 
-
 //template<typename PFP>
 //void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX)
 //{
 //    updateSmoothGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map,positions,colorPerXXX);
 //}
 
-
 template<typename PFP, typename V_ATT, typename W_ATT>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& positions, const W_ATT& colorPerXXX)
 {
 	typedef typename V_ATT::DATA_TYPE VEC3;
 	typedef typename W_ATT::DATA_TYPE COL3;
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;
@@ -170,8 +170,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	std::vector<VEC3> vertices;
 	vertices.reserve(20);
 
-	
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
+	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -285,10 +284,12 @@ template<typename PFP, typename EMBV>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& positions)
 {
 	typedef typename EMBV::DATA_TYPE VEC3;
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef typename Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;
@@ -304,7 +305,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 	std::vector<VEC3> vertices;
 	bufferNormals.reserve(20);
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
+	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -431,10 +432,12 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 
     //typedef typename PFP::VEC3 VEC3;
 	typedef typename V_ATT::DATA_TYPE VEC3;
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;
@@ -444,7 +447,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
+	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -541,10 +544,12 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	}
 
 	typedef typename EMBV::DATA_TYPE VEC3;
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;
@@ -553,7 +558,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	std::vector<VEC3F> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map);
+	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{

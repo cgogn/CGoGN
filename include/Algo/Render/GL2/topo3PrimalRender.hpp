@@ -393,7 +393,7 @@ void Topo3PrimalRender<PFP>::setDartsIdColor(typename PFP::MAP& map)
 }
 
 template <typename PFP>
-void Topo3PrimalRender<PFP>::updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& colors)
+void Topo3PrimalRender<PFP>::updateColors(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& colors)
 {
 	m_vbo2->bind();
 	Geom::Vec3f* colorBuffer =  reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -543,14 +543,14 @@ void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, M
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	m_vbo0->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), m_bufferDartPosition, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), m_bufferDartPosition, GL_STREAM_DRAW);
 
 	// alpha2
 	m_vbo1->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3F), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
-	VEC3F* positionF2 = reinterpret_cast<VEC3F*>(PositionBuffer2);
+	Geom::Vec3f* positionF2 = reinterpret_cast<Geom::Vec3f*>(PositionBuffer2);
 
 	m_nbRel2 = 0;
 

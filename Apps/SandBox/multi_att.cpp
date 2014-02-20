@@ -50,6 +50,11 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
+typedef typename PFP::MAP MAP;
+typedef typename PFP::MAP::IMPL MAP_IMPL;
+typedef typename PFP::VEC3 VEC3;
+typedef typename PFP::VEC4 VEC4;
+
 /**
  * Simple example of function that work with generic type of attribute
  */
@@ -58,7 +63,6 @@ typename V_ATT::DATA_TYPE smooth(typename PFP::MAP& map, Dart d, const V_ATT& at
 {
 	typename V_ATT::DATA_TYPE res(0);
 	int count=0;
-
 
 	if (attributs.getOrbit() == VERTEX)
 	{
@@ -86,7 +90,6 @@ typename V_ATT::DATA_TYPE smooth(typename PFP::MAP& map, Dart d, const V_ATT& at
 	return res;
 }
 
-
 template <typename PFP, typename V_ATT>
 void applySmooth(typename PFP::MAP& map, const V_ATT& att_in, V_ATT& att_out)
 {
@@ -111,11 +114,6 @@ void applySmooth(typename PFP::MAP& map, const V_ATT& att_in, V_ATT& att_out)
 		CGoGNerr << "unsupported orbit"<< CGoGNendl;
 }
 
-
-
-
-
-
 int main(int argc, char **argv)
 {
 	if(argc != 3)
@@ -131,31 +129,30 @@ int main(int argc, char **argv)
 	iss >> nbSteps;
 
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
 	std::vector<std::string> attrNames ;
 	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 
 	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
-	VertexAttribute<PFP::VEC3> pos2 = myMap.addAttribute<PFP::VEC3, VERTEX>("pos2");
-	VertexAttribute<PFP::VEC4> vc = myMap.addAttribute<PFP::VEC4, VERTEX>("vertexColor");
-	VertexAttribute<PFP::VEC4> vc2 = myMap.addAttribute<PFP::VEC4, VERTEX>("vertexColor2");
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP_IMPL> pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2");
+	VertexAttribute<VEC4, MAP_IMPL> vc = myMap.addAttribute<VEC4, VERTEX>("vertexColor");
+	VertexAttribute<VEC4, MAP_IMPL> vc2 = myMap.addAttribute<VEC4, VERTEX>("vertexColor2");
 
 	// classic usage with simple vertex attributes
-	applySmooth<PFP>(myMap,position,pos2);
-
+	applySmooth<PFP>(myMap, position, pos2);
 
 	// multi attributes usage
-	Vertex2Attributes<PFP::VEC3, PFP::VEC4> pv_in(position,vc);
-	Vertex2Attributes<PFP::VEC3, PFP::VEC4> pv_out(pos2,vc2);
-	applySmooth<PFP>(myMap,pv_in,pv_out);
+	Vertex2Attributes<VEC3, VEC4, MAP_IMPL> pv_in(position, vc);
+	Vertex2Attributes<VEC3, VEC4, MAP_IMPL> pv_out(pos2, vc2);
+	applySmooth<PFP>(myMap, pv_in, pv_out);
 
 	// usage with with a face attribute
-	FaceAttribute<PFP::VEC4> fc = myMap.addAttribute<PFP::VEC4, FACE>("faceColor");
-	FaceAttribute<PFP::VEC4> fc2 = myMap.addAttribute<PFP::VEC4, FACE>("faceColor2");
-	applySmooth<PFP>(myMap,fc,fc2);
+	FaceAttribute<VEC4, MAP_IMPL> fc = myMap.addAttribute<VEC4, FACE>("faceColor");
+	FaceAttribute<VEC4, MAP_IMPL> fc2 = myMap.addAttribute<VEC4, FACE>("faceColor2");
+	applySmooth<PFP>(myMap, fc, fc2);
 
 
 ////	for(unsigned int i = 0; i < nbSteps; ++i)

@@ -843,7 +843,7 @@ void Clipping::cb_initGL()
 
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
-	m_render_topo = new Algo::Render::GL2::Topo3Render<PFP>();
+	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
 
 	// create VBO for position
 	m_positionVBO = new Utils::VBO();
