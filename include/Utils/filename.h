@@ -31,7 +31,12 @@ namespace CGoGN
 {
 namespace Utils
 {
-
+/**
+ * @brief checkFileNameExtension
+ * @param filename
+ * @param extension (with . example ".svg")
+ * @return the modified (or not) filename
+ */
 inline std::string checkFileNameExtension(const std::string &filename, const std::string extension)
 {
 	std::size_t found = filename.rfind(extension);
