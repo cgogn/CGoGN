@@ -165,7 +165,6 @@ void MyQT::traversors(int x)
 	}
 
 	updateGL();
-	dock.listTravers->setCurrentRow(-1);
 }
 
 void MyQT::createMap(int n)
