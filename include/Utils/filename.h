@@ -32,7 +32,7 @@ namespace CGoGN
 namespace Utils
 {
 /**
- * @brief checkFileNameExtension
+ * @brief check if filename has extension and add it if not
  * @param filename
  * @param extension (with . example ".svg")
  * @return the modified (or not) filename
@@ -44,10 +44,49 @@ inline std::string checkFileNameExtension(const std::string &filename, const std
 	{
 		if (filename[filename.size()-1]=='.')
 			return filename.substr(0,filename.size()-1) + extension;
+
 		return filename + extension;
 	}
 	return filename;
 }
+
+/**
+ * @brief extract the path from a file-name
+ * @param filename
+ * @return the path (with ending /) if there is a / (or \) in filename
+ */
+inline std::string extractPathFromFileName(const std::string &filename)
+{
+	std::size_t found = filename.rfind('/');
+
+	if (found == std::string::npos)
+		found = filename.rfind('\\'); // welcome on NTFS ;)
+
+	if (found == std::string::npos)
+		return "";
+
+	return filename.substr(0,found+1);
+}
+
+/**
+ * @brief extract the name from a file-name
+ * @param filename
+ * @return the name of file (string behind last / (or /))
+ */
+inline std::string extractNameFromFileName(const std::string &filename)
+{
+	std::size_t found = filename.rfind('/');
+
+	if (found == std::string::npos)
+		found = filename.rfind('\\'); // welcome on NTFS ;)
+
+	if (found == std::string::npos)
+		return filename;
+
+	return filename.substr(found+1);
+}
+
+
 
 }
 }
