@@ -631,22 +631,144 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 }
 
 
+
+
+
+
 template <typename PFP>
-bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
+bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 {
 	m_beginIndices.clear();
 	m_nbIndices.clear();
 
+	if (!m_normals.isValid())
+	{
+		CGoGNerr << "no normal attribute "<< CGoGNendl;
+		return false;
+	}
+	if (!m_texCoords.isValid())
+	{
+		CGoGNerr << "no tex coords attribute "<< CGoGNendl;
+		return false;
+	}
+
+
+	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
+	group_faces.reserve(16384);
+	m_groupIdx.reserve(16384);
+	m_sgMat.reserve(16384);
+
+	unsigned int c_sg=0;
+	group_faces.resize(1);
+
+	TraversorF<typename PFP::MAP> traf(m_map);
+	Dart d=traf.begin();
+
+	unsigned int c_grp = m_groups[d];
+	unsigned int c_mat = m_attMat[d];
+	m_sgMat.push_back(c_mat);
+
+	m_groupFirstSub.push_back(0);
+
+
+	if (m_tagG != 0)
+		m_groupIdx.push_back(c_grp);
+	else
+		m_groupIdx.push_back(0);
+
+
+	while (d!= traf.end())
+	{
+		if ((m_groups[d] != c_grp) || (m_attMat[d] != c_mat))
+		{
+			c_sg++;
+
+			if (m_groups[d] != c_grp)
+			{
+				m_groupNbSub.push_back(c_sg-m_groupFirstSub.back());
+				m_groupFirstSub.push_back(c_sg);
+			}
+
+			c_grp = m_groups[d];
+			c_mat = m_attMat[d];
+			m_sgMat.push_back(c_mat);
+
+			if (m_tagG != 0)
+				m_groupIdx.push_back(c_grp);
+			else
+				m_groupIdx.push_back(0);
+
+			group_faces.resize(c_sg+1);
+		}
+
+		group_faces[c_sg].push_back(d);
+		d = traf.next();
+	}
+
+	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
+
+
+	// merging same material sub-groups of same group
+	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
+	{
+		unsigned int fsg = m_groupFirstSub[g];
+		unsigned int lsg = m_groupFirstSub[g]+m_groupNbSub[g]-1;
+
+		for (unsigned int s=fsg; s<=lsg; ++s)
+		{
+			if (m_sgMat[s] != 0xffffffff)
+			{
+				for (unsigned ss=s+1; ss<=lsg; ++ss)
+				{
+					if (m_sgMat[ss] == m_sgMat[s])
+					{
+						group_faces[s].insert(group_faces[s].end(),group_faces[ss].begin(),group_faces[ss].end());
+						group_faces[ss].clear();
+						m_sgMat[ss] = 0xffffffff;
+					}
+				}
+			}
+		}
+	}
+
+	// compact group_faces/m_groupIdx/m_sgMat
+	unsigned int outSg=0;
+	for (unsigned int inSg=0; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_sgMat[inSg] != 0xffffffff)
+		{
+			if (outSg != inSg)
+			{
+				group_faces[outSg].swap(group_faces[inSg]);
+				m_groupIdx[outSg] = m_groupIdx[inSg];
+				m_sgMat[outSg] = m_sgMat[inSg];
+			}
+			outSg++;
+		}
+	}
+	group_faces.resize(outSg);
+	m_groupIdx.resize(outSg);
+	m_sgMat.resize(outSg);
+
+	// recreate m_groupFirstSub & m_groupNbSub
+	unsigned int outGr=0;
+	m_groupFirstSub[0] = m_groupIdx[0];
+	for (unsigned int inSg=1; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_groupIdx[inSg] != m_groupIdx[inSg-1])
+		{
+			m_groupNbSub[outGr] = inSg - m_groupFirstSub[outGr];
+			outGr++;
+			m_groupFirstSub[outGr] = inSg;
+		}
+	}
+	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+
+
+	// now create VBOs
+
 	std::vector<Geom::Vec3f> posBuff;
 	posBuff.reserve(16384);
-
-	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
-	TraversorF<typename PFP::MAP> traf(m_map);
-	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
-	{
-		unsigned int g = m_attMat[d];
-		group_faces[g].push_back(d);
-	}
 
 	unsigned int firstIndex = 0;
 
@@ -668,13 +790,17 @@ bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
 		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
 		{
 			Dart d = *id;
+
 			Dart e = m_map.phi1(d);
 			Dart f = m_map.phi1(e);
 			do
 			{
 				posBuff.push_back(m_positions[d]);
+
 				posBuff.push_back(m_positions[e]);
+
 				posBuff.push_back(m_positions[f]);
+
 				e=f;
 				f = m_map.phi1(e);
 				nbtris++;
@@ -682,39 +808,231 @@ bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
 		}
 		m_beginIndices[g] = firstIndex;
 		m_nbIndices[g] = 3*nbtris;
+
 		firstIndex += 3*nbtris;
 	}
+
 	positionVBO->setDataSize(3);
 	positionVBO->allocate(posBuff.size());
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
 
-	updateGroups();
+
+	// compute BBs ( TO DO: a method ?)
+	computeBB(posBuff);
 
 	return true;
 }
 
 
 
+
+//template <typename PFP>
+//bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
+//{
+//	m_beginIndices.clear();
+//	m_nbIndices.clear();
+
+//	std::vector<Geom::Vec3f> posBuff;
+//	posBuff.reserve(16384);
+
+//	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
+//	TraversorF<typename PFP::MAP> traf(m_map);
+//	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
+//	{
+//		unsigned int g = m_attMat[d];
+//		group_faces[g].push_back(d);
+//	}
+
+//	unsigned int firstIndex = 0;
+
+//	unsigned int sz = group_faces.size();
+//	m_beginIndices.resize(sz);
+//	m_nbIndices.resize(sz);
+//	m_groupIdx.resize(sz);
+
+//	for (unsigned int g=0; g<sz; ++g)
+//	{
+//		unsigned int nbtris = 0;
+//		std::vector<Dart>& traf = group_faces[g];
+
+//		if (m_tagG != 0)
+//			m_groupIdx[g] = m_groups[traf.front()];
+//		else
+//			m_groupIdx[g]=0;
+
+//		for (std::vector<Dart>::iterator id=traf.begin(); id!= traf.end(); ++id)
+//		{
+//			Dart d = *id;
+//			Dart e = m_map.phi1(d);
+//			Dart f = m_map.phi1(e);
+//			do
+//			{
+//				posBuff.push_back(m_positions[d]);
+//				posBuff.push_back(m_positions[e]);
+//				posBuff.push_back(m_positions[f]);
+//				e=f;
+//				f = m_map.phi1(e);
+//				nbtris++;
+//			}while (f!=d);
+//		}
+//		m_beginIndices[g] = firstIndex;
+//		m_nbIndices[g] = 3*nbtris;
+//		firstIndex += 3*nbtris;
+//	}
+//	positionVBO->setDataSize(3);
+//	positionVBO->allocate(posBuff.size());
+//	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
+//	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
+//	positionVBO->releasePtr();
+
+//	updateGroups();
+
+//	return true;
+//}
+
+
+
+
 template <typename PFP>
-bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO)
+bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
+											Utils::VBO* texcoordVBO)
 {
 	m_beginIndices.clear();
 	m_nbIndices.clear();
+
+	if (!m_normals.isValid())
+	{
+		CGoGNerr << "no normal attribute "<< CGoGNendl;
+		return false;
+	}
+	if (!m_texCoords.isValid())
+	{
+		CGoGNerr << "no tex coords attribute "<< CGoGNendl;
+		return false;
+	}
+
+
+	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
+	group_faces.reserve(16384);
+	m_groupIdx.reserve(16384);
+	m_sgMat.reserve(16384);
+
+	unsigned int c_sg=0;
+	group_faces.resize(1);
+
+	TraversorF<typename PFP::MAP> traf(m_map);
+	Dart d=traf.begin();
+
+	unsigned int c_grp = m_groups[d];
+	unsigned int c_mat = m_attMat[d];
+	m_sgMat.push_back(c_mat);
+
+	m_groupFirstSub.push_back(0);
+
+
+	if (m_tagG != 0)
+		m_groupIdx.push_back(c_grp);
+	else
+		m_groupIdx.push_back(0);
+
+
+	while (d!= traf.end())
+	{
+		if ((m_groups[d] != c_grp) || (m_attMat[d] != c_mat))
+		{
+			c_sg++;
+
+			if (m_groups[d] != c_grp)
+			{
+				m_groupNbSub.push_back(c_sg-m_groupFirstSub.back());
+				m_groupFirstSub.push_back(c_sg);
+			}
+
+			c_grp = m_groups[d];
+			c_mat = m_attMat[d];
+			m_sgMat.push_back(c_mat);
+
+			if (m_tagG != 0)
+				m_groupIdx.push_back(c_grp);
+			else
+				m_groupIdx.push_back(0);
+
+			group_faces.resize(c_sg+1);
+		}
+
+		group_faces[c_sg].push_back(d);
+		d = traf.next();
+	}
+
+	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
+
+
+	// merging same material sub-groups of same group
+	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
+	{
+		unsigned int fsg = m_groupFirstSub[g];
+		unsigned int lsg = m_groupFirstSub[g]+m_groupNbSub[g]-1;
+
+		for (unsigned int s=fsg; s<=lsg; ++s)
+		{
+			if (m_sgMat[s] != 0xffffffff)
+			{
+				for (unsigned ss=s+1; ss<=lsg; ++ss)
+				{
+					if (m_sgMat[ss] == m_sgMat[s])
+					{
+						group_faces[s].insert(group_faces[s].end(),group_faces[ss].begin(),group_faces[ss].end());
+						group_faces[ss].clear();
+						m_sgMat[ss] = 0xffffffff;
+					}
+				}
+			}
+		}
+	}
+
+	// compact group_faces/m_groupIdx/m_sgMat
+	unsigned int outSg=0;
+	for (unsigned int inSg=0; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_sgMat[inSg] != 0xffffffff)
+		{
+			if (outSg != inSg)
+			{
+				group_faces[outSg].swap(group_faces[inSg]);
+				m_groupIdx[outSg] = m_groupIdx[inSg];
+				m_sgMat[outSg] = m_sgMat[inSg];
+			}
+			outSg++;
+		}
+	}
+	group_faces.resize(outSg);
+	m_groupIdx.resize(outSg);
+	m_sgMat.resize(outSg);
+
+	// recreate m_groupFirstSub & m_groupNbSub
+	unsigned int outGr=0;
+	m_groupFirstSub[0] = m_groupIdx[0];
+	for (unsigned int inSg=1; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_groupIdx[inSg] != m_groupIdx[inSg-1])
+		{
+			m_groupNbSub[outGr] = inSg - m_groupFirstSub[outGr];
+			outGr++;
+			m_groupFirstSub[outGr] = inSg;
+		}
+	}
+	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+
+
+	// now create VBOs
 
 	std::vector<Geom::Vec3f> posBuff;
 	std::vector<Geom::Vec2f> TCBuff;
 	posBuff.reserve(16384);
 	TCBuff.reserve(16384);
 
-	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
-	TraversorF<typename PFP::MAP> traf(m_map);
-	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
-	{
-		unsigned int g = m_attMat[d];
-		group_faces[g].push_back(d);
-	}
 
 	unsigned int firstIndex = 0;
 
@@ -742,22 +1060,29 @@ bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* te
 			do
 			{
 				posBuff.push_back(m_positions[d]);
-				if (m_specialVertices.isMarked(d))
+
+				if (hasTexCoords())
 					TCBuff.push_back(m_texCoordsF[d]);
 				else
 					TCBuff.push_back(m_texCoords[d]);
 
+
 				posBuff.push_back(m_positions[e]);
-				if (m_specialVertices.isMarked(e))
+
+				if (hasTexCoords())
 					TCBuff.push_back(m_texCoordsF[e]);
 				else
 					TCBuff.push_back(m_texCoords[e]);
 
+
 				posBuff.push_back(m_positions[f]);
-				if (m_specialVertices.isMarked(f))
+
+				if (hasTexCoords())
 					TCBuff.push_back(m_texCoordsF[f]);
 				else
 					TCBuff.push_back(m_texCoords[f]);
+
+
 				e=f;
 				f = m_map.phi1(e);
 				nbtris++;
@@ -765,6 +1090,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* te
 		}
 		m_beginIndices[g] = firstIndex;
 		m_nbIndices[g] = 3*nbtris;
+
 		firstIndex += 3*nbtris;
 	}
 
@@ -780,7 +1106,8 @@ bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* te
 	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
 	texcoordVBO->releasePtr();
 
-	updateGroups();
+	// compute BBs ( TO DO: a method ?)
+	computeBB(posBuff);
 
 	return true;
 }
@@ -789,25 +1116,139 @@ bool OBJModel<PFP>::createGroupMatVBO_PT(Utils::VBO* positionVBO, Utils::VBO* te
 
 
 
-
 template <typename PFP>
-bool OBJModel<PFP>::createGroupMatVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO)
+bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
+											Utils::VBO* normalVBO)
 {
 	m_beginIndices.clear();
 	m_nbIndices.clear();
 
+	if (!m_normals.isValid())
+	{
+		CGoGNerr << "no normal attribute "<< CGoGNendl;
+		return false;
+	}
+
+
+	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
+	group_faces.reserve(16384);
+	m_groupIdx.reserve(16384);
+	m_sgMat.reserve(16384);
+
+	unsigned int c_sg=0;
+	group_faces.resize(1);
+
+	TraversorF<typename PFP::MAP> traf(m_map);
+	Dart d=traf.begin();
+
+	unsigned int c_grp = m_groups[d];
+	unsigned int c_mat = m_attMat[d];
+	m_sgMat.push_back(c_mat);
+
+	m_groupFirstSub.push_back(0);
+
+
+	if (m_tagG != 0)
+		m_groupIdx.push_back(c_grp);
+	else
+		m_groupIdx.push_back(0);
+
+
+	while (d!= traf.end())
+	{
+		if ((m_groups[d] != c_grp) || (m_attMat[d] != c_mat))
+		{
+			c_sg++;
+
+			if (m_groups[d] != c_grp)
+			{
+				m_groupNbSub.push_back(c_sg-m_groupFirstSub.back());
+				m_groupFirstSub.push_back(c_sg);
+			}
+
+			c_grp = m_groups[d];
+			c_mat = m_attMat[d];
+			m_sgMat.push_back(c_mat);
+
+			if (m_tagG != 0)
+				m_groupIdx.push_back(c_grp);
+			else
+				m_groupIdx.push_back(0);
+
+			group_faces.resize(c_sg+1);
+		}
+
+		group_faces[c_sg].push_back(d);
+		d = traf.next();
+	}
+
+	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
+
+
+	// merging same material sub-groups of same group
+	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
+	{
+		unsigned int fsg = m_groupFirstSub[g];
+		unsigned int lsg = m_groupFirstSub[g]+m_groupNbSub[g]-1;
+
+		for (unsigned int s=fsg; s<=lsg; ++s)
+		{
+			if (m_sgMat[s] != 0xffffffff)
+			{
+				for (unsigned ss=s+1; ss<=lsg; ++ss)
+				{
+					if (m_sgMat[ss] == m_sgMat[s])
+					{
+						group_faces[s].insert(group_faces[s].end(),group_faces[ss].begin(),group_faces[ss].end());
+						group_faces[ss].clear();
+						m_sgMat[ss] = 0xffffffff;
+					}
+				}
+			}
+		}
+	}
+
+	// compact group_faces/m_groupIdx/m_sgMat
+	unsigned int outSg=0;
+	for (unsigned int inSg=0; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_sgMat[inSg] != 0xffffffff)
+		{
+			if (outSg != inSg)
+			{
+				group_faces[outSg].swap(group_faces[inSg]);
+				m_groupIdx[outSg] = m_groupIdx[inSg];
+				m_sgMat[outSg] = m_sgMat[inSg];
+			}
+			outSg++;
+		}
+	}
+	group_faces.resize(outSg);
+	m_groupIdx.resize(outSg);
+	m_sgMat.resize(outSg);
+
+	// recreate m_groupFirstSub & m_groupNbSub
+	unsigned int outGr=0;
+	m_groupFirstSub[0] = m_groupIdx[0];
+	for (unsigned int inSg=1; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_groupIdx[inSg] != m_groupIdx[inSg-1])
+		{
+			m_groupNbSub[outGr] = inSg - m_groupFirstSub[outGr];
+			outGr++;
+			m_groupFirstSub[outGr] = inSg;
+		}
+	}
+	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+
+
+	// now create VBOs
+
 	std::vector<Geom::Vec3f> posBuff;
-	std::vector<Geom::Vec2f> normalBuff;
+	std::vector<Geom::Vec3f> normalBuff;
 	posBuff.reserve(16384);
 	normalBuff.reserve(16384);
 
-	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
-	TraversorF<typename PFP::MAP> traf(m_map);
-	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
-	{
-		unsigned int g = m_attMat[d];
-		group_faces[g].push_back(d);
-	}
 
 	unsigned int firstIndex = 0;
 
@@ -835,34 +1276,29 @@ bool OBJModel<PFP>::createGroupMatVBO_PN(Utils::VBO* positionVBO, Utils::VBO* no
 			do
 			{
 				posBuff.push_back(m_positions[d]);
-				if (m_specialVertices.isMarked(d))
-				{
+
+				if (hasNormals())
 					normalBuff.push_back(m_normalsF[d]);
-				}
 				else
-				{
 					normalBuff.push_back(m_normals[d]);
-				}
+
 
 				posBuff.push_back(m_positions[e]);
-				if (m_specialVertices.isMarked(e))
-				{
+
+				if (hasNormals())
 					normalBuff.push_back(m_normalsF[e]);
-				}
 				else
-				{
 					normalBuff.push_back(m_normals[e]);
-				}
+
 
 				posBuff.push_back(m_positions[f]);
-				if (m_specialVertices.isMarked(f))
-				{
+
+				if (hasNormals())
 					normalBuff.push_back(m_normalsF[f]);
-				}
 				else
-				{
 					normalBuff.push_back(m_normals[f]);
-				}
+
+
 				e=f;
 				f = m_map.phi1(e);
 				nbtris++;
@@ -870,6 +1306,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PN(Utils::VBO* positionVBO, Utils::VBO* no
 		}
 		m_beginIndices[g] = firstIndex;
 		m_nbIndices[g] = 3*nbtris;
+
 		firstIndex += 3*nbtris;
 	}
 
@@ -885,10 +1322,12 @@ bool OBJModel<PFP>::createGroupMatVBO_PN(Utils::VBO* positionVBO, Utils::VBO* no
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
 
-	updateGroups();
+	// compute BBs ( TO DO: a method ?)
+	computeBB(posBuff);
 
 	return true;
 }
+
 
 
 
@@ -912,6 +1351,121 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 		return false;
 	}
 
+
+	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
+	group_faces.reserve(16384);
+	m_groupIdx.reserve(16384);
+	m_sgMat.reserve(16384);
+
+	unsigned int c_sg=0;
+	group_faces.resize(1);
+
+	TraversorF<typename PFP::MAP> traf(m_map);
+	Dart d=traf.begin();
+
+	unsigned int c_grp = m_groups[d];
+	unsigned int c_mat = m_attMat[d];
+	m_sgMat.push_back(c_mat);
+
+	m_groupFirstSub.push_back(0);
+
+
+	if (m_tagG != 0)
+		m_groupIdx.push_back(c_grp);
+	else
+		m_groupIdx.push_back(0);
+
+
+	while (d!= traf.end())
+	{
+		if ((m_groups[d] != c_grp) || (m_attMat[d] != c_mat))
+		{
+			c_sg++;
+
+			if (m_groups[d] != c_grp)
+			{
+				m_groupNbSub.push_back(c_sg-m_groupFirstSub.back());
+				m_groupFirstSub.push_back(c_sg);
+			}
+
+			c_grp = m_groups[d];
+			c_mat = m_attMat[d];
+			m_sgMat.push_back(c_mat);
+
+			if (m_tagG != 0)
+				m_groupIdx.push_back(c_grp);
+			else
+				m_groupIdx.push_back(0);
+
+			group_faces.resize(c_sg+1);
+		}
+
+		group_faces[c_sg].push_back(d);
+		d = traf.next();
+	}
+
+	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
+
+
+	// merging same material sub-groups of same group
+	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
+	{
+		unsigned int fsg = m_groupFirstSub[g];
+		unsigned int lsg = m_groupFirstSub[g]+m_groupNbSub[g]-1;
+
+		for (unsigned int s=fsg; s<=lsg; ++s)
+		{
+			if (m_sgMat[s] != 0xffffffff)
+			{
+				for (unsigned ss=s+1; ss<=lsg; ++ss)
+				{
+					if (m_sgMat[ss] == m_sgMat[s])
+					{
+						group_faces[s].insert(group_faces[s].end(),group_faces[ss].begin(),group_faces[ss].end());
+						group_faces[ss].clear();
+						m_sgMat[ss] = 0xffffffff;
+					}
+				}
+			}
+		}
+	}
+
+	// compact group_faces/m_groupIdx/m_sgMat
+	unsigned int outSg=0;
+	for (unsigned int inSg=0; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_sgMat[inSg] != 0xffffffff)
+		{
+			if (outSg != inSg)
+			{
+				group_faces[outSg].swap(group_faces[inSg]);
+				m_groupIdx[outSg] = m_groupIdx[inSg];
+				m_sgMat[outSg] = m_sgMat[inSg];
+			}
+			outSg++;
+		}
+	}
+	group_faces.resize(outSg);
+	m_groupIdx.resize(outSg);
+	m_sgMat.resize(outSg);
+
+	// recreate m_groupFirstSub & m_groupNbSub
+	unsigned int outGr=0;
+	m_groupFirstSub[0] = m_groupIdx[0];
+	for (unsigned int inSg=1; inSg<m_sgMat.size(); ++inSg)
+	{
+		if (m_groupIdx[inSg] != m_groupIdx[inSg-1])
+		{
+			m_groupNbSub[outGr] = inSg - m_groupFirstSub[outGr];
+			outGr++;
+			m_groupFirstSub[outGr] = inSg;
+		}
+	}
+	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+
+
+	// now create VBOs
+
 	std::vector<Geom::Vec3f> posBuff;
 	std::vector<Geom::Vec2f> TCBuff;
 	std::vector<Geom::Vec3f> normalBuff;
@@ -920,20 +1474,11 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 	normalBuff.reserve(16384);
 
 
-	std::vector< std::vector<Dart> > group_faces(m_materialNames.size());
-	TraversorF<typename PFP::MAP> traf(m_map);
-	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
-	{
-		unsigned int g = m_attMat[d];
-		group_faces[g].push_back(d);
-	}
-
 	unsigned int firstIndex = 0;
 
 	unsigned int sz = group_faces.size();
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
-
 	m_groupIdx.resize(sz);
 
 	for (unsigned int g=0; g<sz; ++g)
@@ -955,58 +1500,40 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 			do
 			{
 				posBuff.push_back(m_positions[d]);
-//				if (m_specialVertices.isMarked(d))
-				{
-					if (hasTexCoords())
-						TCBuff.push_back(m_texCoordsF[d]);
-					else
-						TCBuff.push_back(m_texCoords[d]);
-					if (hasNormals())
-						normalBuff.push_back(m_normalsF[d]);
-					else
-						normalBuff.push_back(m_normals[d]);
-				}
-//				else
-//				{
-//					TCBuff.push_back(m_texCoords[d]);
-//					normalBuff.push_back(m_normals[d]);
-//				}
+
+				if (hasTexCoords())
+					TCBuff.push_back(m_texCoordsF[d]);
+				else
+					TCBuff.push_back(m_texCoords[d]);
+				if (hasNormals())
+					normalBuff.push_back(m_normalsF[d]);
+				else
+					normalBuff.push_back(m_normals[d]);
+
 
 				posBuff.push_back(m_positions[e]);
-//				if (m_specialVertices.isMarked(e))
-				{
-					if (hasTexCoords())
-						TCBuff.push_back(m_texCoordsF[e]);
-					else
-						TCBuff.push_back(m_texCoords[e]);
-					if (hasNormals())
-						normalBuff.push_back(m_normalsF[e]);
-					else
-						normalBuff.push_back(m_normals[e]);
-				}
-//				else
-//				{
-//					TCBuff.push_back(m_texCoords[e]);
-//					normalBuff.push_back(m_normals[e]);
-//				}
+
+				if (hasTexCoords())
+					TCBuff.push_back(m_texCoordsF[e]);
+				else
+					TCBuff.push_back(m_texCoords[e]);
+				if (hasNormals())
+					normalBuff.push_back(m_normalsF[e]);
+				else
+					normalBuff.push_back(m_normals[e]);
+
 
 				posBuff.push_back(m_positions[f]);
-//				if (m_specialVertices.isMarked(f))
-				{
-					if (hasTexCoords())
-						TCBuff.push_back(m_texCoordsF[f]);
-					else
-						TCBuff.push_back(m_texCoords[f]);
-					if (hasNormals())
-						normalBuff.push_back(m_normalsF[f]);
-					else
-						normalBuff.push_back(m_normals[f]);
-				}
-//				else
-//				{
-//					TCBuff.push_back(m_texCoords[f]);
-//					normalBuff.push_back(m_normals[f]);
-//				}
+
+				if (hasTexCoords())
+					TCBuff.push_back(m_texCoordsF[f]);
+				else
+					TCBuff.push_back(m_texCoords[f]);
+				if (hasNormals())
+					normalBuff.push_back(m_normalsF[f]);
+				else
+					normalBuff.push_back(m_normals[f]);
+
 
 				e=f;
 				f = m_map.phi1(e);
@@ -1037,38 +1564,37 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
 
-	updateGroups(posBuff);
+
+	// compute BBs ( TO DO: a method ?)
+	computeBB(posBuff);
 
 	return true;
 }
 
 
 
+
 template <typename PFP>
-void OBJModel<PFP>::updateGroups(const std::vector<Geom::Vec3f>& pos)
+void OBJModel<PFP>::computeBB(const std::vector<Geom::Vec3f>& pos)
 {
-	unsigned int sz = m_beginIndices.size();
-	unsigned int i=0;
-	do
+	m_groupBBs.resize(nbObjGroups());
+
+	for (unsigned int i=0; i<nbObjGroups(); ++i )
 	{
-		m_objGroups.push_back(i);
-		m_groupBBs.resize(m_objGroups.size());
-		Geom::BoundingBox<VEC3>& bb = m_groupBBs.back();
+		Geom::BoundingBox<VEC3>& bb = m_groupBBs[i];
+		bb.reset();
 
-		unsigned int grp = m_groupIdx[i];
-		while ((i<sz) && (m_groupIdx[i]==grp))
+		unsigned int begInd = beginIndex(i,0);
+		unsigned int endInd = begInd;
+		for (unsigned int j= 0; j< nbSubGroup(i); ++j)
+			endInd += nbIndices(i,j);
+
+		for (unsigned int j=begInd; j<endInd; ++j )
 		{
-			// update BB
-			unsigned int beg = m_beginIndices[i];
-			unsigned int end = m_beginIndices[i] + m_nbIndices[i];
-			for (unsigned int j=beg; j!=end; ++j )
-				bb.addPoint(pos[j]);
-			++i;
+			bb.addPoint(pos[j]);
 		}
-		bb.centeredScale(1.1);
-	}while (i<sz);
+	}
 
-	m_objGroups.push_back(sz);
 }
 
 
@@ -1195,7 +1721,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> > > vecNormIndPerVertex(m_map, "incidentsN");
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> > > vecTCIndPerVertex(m_map, "incidentsTC");
 
-	unsigned int currentGroup = 0;
+	int currentGroup = -1;
 	unsigned int currentMat = 0;
 	unsigned int nextMat = 0;
 
@@ -1269,6 +1795,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		if ( (tag == std::string("g")) || (tag == std::string("o")) )
 		{
 			std::string name = ligne.substr(1);
+			if (name[name.size()-1]==13)
+				name = name.substr(0,name.size()-1);
+
 			m_groupNames.push_back(name);
 			currentGroup++;
 		}
@@ -1281,7 +1810,11 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 
 			Dart d = m_map.newFace(nbe, false);
 			if (m_tagG!=0)
+			{
+				if (currentGroup == -1)
+					currentGroup = 0;
 				m_groups[d] = currentGroup;
+			}
 
 			m_attMat[d] = currentMat;
 			

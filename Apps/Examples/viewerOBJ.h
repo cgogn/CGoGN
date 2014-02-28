@@ -30,6 +30,7 @@
 //#include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtQGLV.h"
 #include "Utils/textures.h"
+#include "Utils/drawer.h"
 #include "Utils/Shaders/shaderSimpleTexture.h"
 #include "Utils/Shaders/shaderPhongTexture.h"
 #include "Utils/Shaders/shaderPhong.h"
@@ -65,6 +66,10 @@ public:
 
 	MAP myMap ;
 	Algo::Surface::Import::OBJModel<PFP> m_obj;
+
+	Utils::Drawer* m_dr;
+	unsigned int m_currentGroupDrawn;
+	void drawBB( const Geom::BoundingBox<VEC3>& bb);
 
 	// VBO
 	Utils::VBO* m_positionVBO;
