@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DockWidget</class>
+ <widget class="QDockWidget" name="DockWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>209</width>
+    <height>418</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>150</width>
+    <height>250</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Interface</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>150</width>
+     <height>200</height>
+    </size>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="margin">
+     <number>2</number>
+    </property>
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QListWidget" name="listTravers">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>Traversor2VVaE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2VVaF</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2EEaV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2EEaF</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2FFaV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2FFaE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2FV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traverosr2FE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2EV</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2EF</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2VE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Traversor2VF</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="withBoundary">
+        <property name="text">
+         <string>with boundary</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="widthSlider">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+        <property name="value">
+         <number>5</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="svg">
+        <property name="text">
+         <string>SnapshotSVG</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

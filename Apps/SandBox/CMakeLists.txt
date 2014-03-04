@@ -30,6 +30,17 @@ QT4_WRAP_CPP(tilings_moc tilings.h)
 add_executable(tilings tilings.cpp  ${tilings_moc})
 target_link_libraries(tilings ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
 
+QT4_WRAP_UI( test_traversor2_ui test_traversor2.ui )
+QT4_WRAP_CPP(test_traversor2_moc test_traversor2.h)
+add_executable(test_traversor2 test_traversor2.cpp  ${test_traversor2_ui} ${test_traversor2_moc})
+target_link_libraries(test_traversor2 ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+
+
+QT4_WRAP_UI( testPlaneCutting_ui testPlaneCutting.ui )
+QT4_WRAP_CPP(testPlaneCutting_moc testPlaneCutting.h)
+add_executable(testPlaneCutting testPlaneCutting.cpp  ${testPlaneCutting_ui} ${testPlaneCutting_moc})
+target_link_libraries(testPlaneCutting ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+
 # Example with Qt
 #
 #QT4_WRAP_CPP(tuto1_moc tuto1.h)

@@ -21,83 +21,96 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef _TEXTURE_EXAMPLE_
-#define _TEXTURE_EXAMPLE_
 
-#include <iostream>
+#ifndef _TEST_TRAVERSOR2_
+#define _TEST_TRAVERSOR2_
 
+//#define USE_GMAP
 
-//#include "Utils/Qt/qtSimple.h"
-#include "Utils/Qt/qtQGLV.h"
-#include "Utils/textures.h"
-#include "Utils/drawer.h"
-#include "Utils/Shaders/shaderSimpleTexture.h"
-#include "Utils/Shaders/shaderPhongTexture.h"
-#include "Utils/Shaders/shaderPhong.h"
+//#define PRIMAL_TOPO 1
+
 #include "Topology/generic/parameters.h"
+
+#include "Topology/gmap/embeddedGMap2.h"
 #include "Topology/map/embeddedMap2.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Import/importObjTex.h"
 
+#include "Algo/Render/GL2/topoRender.h"
 
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Utils { class VBO; } }
+#include "ui_test_traversor2.h"
+#include "Utils/Qt/qtui.h"
+#include "Utils/Qt/qtSimple.h"
+#include "Utils/cgognStream.h"
+
 
 using namespace CGoGN ;
 
+/**
+ * Struct that contains some informations about the types of the manipulated objects
+ * Mainly here to be used by the algorithms that are parameterized by it
+ */
 struct PFP: public PFP_STANDARD
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP ;
+	// definition of the type of the map
+#ifdef USE_GMAP
+	typedef EmbeddedGMap2 MAP;
+#else
+	typedef EmbeddedMap2 MAP;
+#endif
 };
+
 
 typedef PFP::MAP MAP ;
 typedef PFP::VEC3 VEC3 ;
-/**
- * A class for a little interface and rendering
- */
 
-//class ObjView: public Utils::QT::SimpleQT
-class ObjView: public Utils::QT::SimpleQGLV
+
+class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
+	MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f) {}
 
-	MAP myMap ;
-	Algo::Surface::Import::OBJModel<PFP> m_obj;
-
-	Utils::Drawer* m_dr;
-	unsigned int m_currentGroupDrawn;
-	void drawBB( const Geom::BoundingBox<VEC3>& bb);
-
-	// VBO
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_normalVBO;
-	Utils::VBO* m_texcoordVBO;
-
-
-	// shader simple texture
-	Utils::ShaderSimpleTexture* m_shader;
-	Utils::ShaderPhongTexture* m_shader2;
-	Utils::ShaderPhong* m_phongShader;
-
-	int m_RenderStyle;
-
-	ObjView();
-
-	~ObjView();
-
-	void init(const std::string& fnm);
-
-	// callbacks of simpleQT to overdefine:
 	void cb_redraw();
-
 	void cb_initGL();
+	void cb_mousePress(int button, int x, int y);
+	void cb_keyPress(int code);
+	void cb_Open();
+	void cb_Save();
 
-	void cb_keyPress(int k);
+	Utils::QT::uiDockInterface dock;
 
+protected:
+	// declaration of the map
+	MAP myMap;
 
+	VertexAttribute<VEC3> position;
+	DartAttribute<VEC3> colorDarts;
+
+	// render (for the topo)
+    Algo::Render::GL2::TopoRender* m_render_topo;
+
+	Dart m_selected;
+	Dart m_selected2;
+	DartMarker dm;
+	float m_shift;
+
+	// just for more compact writing
+	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
+	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
+	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
+	template<int X>
+	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+
+public:
+	// example of simple map creation
+	void createMap(int n);
+//	void updateMap();
+	void importMesh(std::string& filename);
+
+public slots:
+	void traversors(int x);
+	void svg();
+	void updateMap();
+	void width(int w);
 };
 
 #endif
