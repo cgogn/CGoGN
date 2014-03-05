@@ -24,17 +24,10 @@
 #ifndef __TUTO5_
 #define __TUTO5_
 
-
 #include <iostream>
 
-//#define WITH_GMAP 1
-
 #include "Topology/generic/parameters.h"
-#ifdef WITH_GMAP
-	#include "Topology/gmap/embeddedGMap3.h"
-#else
-	#include "Topology/map/embeddedMap3.h"
-#endif
+#include "Topology/map/embeddedMap3.h"
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -52,7 +45,6 @@
 
 #include "Algo/Render/GL2/explodeVolumeRender.h"
 
-
 #include "Utils/Qt/qtSimple.h"
 
 #include "ui_tuto_orbits.h"
@@ -65,16 +57,13 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-#ifdef WITH_GMAP
-	typedef EmbeddedGMap3 MAP;
-#else
 	typedef EmbeddedMap3 MAP;
-#endif
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
+typedef PFP::REAL REAL ;
 
 /**
  * Utilisation de designer-qt4:
@@ -93,7 +82,7 @@ class MyQT: public Utils::QT::SimpleQT
     bool render_topo;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
 
 	Utils::VBO* m_positionVBO;
 	Utils::VBO* m_dataVBO;
@@ -109,7 +98,6 @@ class MyQT: public Utils::QT::SimpleQT
 
 	QTimer *m_timer;
 	unsigned int current_orbit;
-
 	
 public:
 	MyQT():
@@ -136,7 +124,7 @@ public:
 
 protected:
 	template <unsigned int ORBIT>
-	void storeVerticesInfo(const AttributeHandler<int, ORBIT>* attrib);
+	void storeVerticesInfo(const AttributeHandler<int, ORBIT, MAP_IMPL>* attrib);
 
 	void storeVerticesInfoGen(unsigned int orb, const AttributeHandlerGen* attrib);
 

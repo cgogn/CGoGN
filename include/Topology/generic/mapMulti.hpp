@@ -25,6 +25,18 @@
 namespace CGoGN
 {
 
+inline void MapMulti::clear(bool removeAttrib)
+{
+	GenericMap::clear(removeAttrib);
+	if (removeAttrib)
+	{
+		m_permutation.clear();
+		m_permutation_inv.clear();
+		m_involution.clear();
+	}
+	initMR();
+}
+
 /****************************************
  *          DARTS MANAGEMENT            *
  ****************************************/
@@ -204,6 +216,30 @@ inline void MapMulti::addPermutation()
 	std::stringstream sstm2;
 	sstm2 << "permutation_inv_" << m_permutation_inv.size();
 	m_permutation_inv.push_back(addRelation(sstm2.str()));
+}
+
+inline AttributeMultiVector<Dart>* MapMulti::getInvolutionAttribute(unsigned int i)
+{
+	if (i < m_involution.size())
+		return m_involution[i];
+	else
+		return NULL;
+}
+
+inline AttributeMultiVector<Dart>* MapMulti::getPermutationAttribute(unsigned int i)
+{
+	if (i < m_permutation.size())
+		return m_permutation[i];
+	else
+		return NULL;
+}
+
+inline AttributeMultiVector<Dart>* MapMulti::getPermutationInvAttribute(unsigned int i)
+{
+	if (i < m_permutation_inv.size())
+		return m_permutation_inv[i];
+	else
+		return NULL;
 }
 
 template <int I>
@@ -405,6 +441,16 @@ inline void MapMulti::next(Dart& d) const
 	{
 		m_mrattribs.next(d.index) ;
 	} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
+}
+
+inline bool MapMulti::foreach_dart(FunctorType& f)
+{
+	for (Dart d = begin(); d != end(); next(d))
+	{
+		if (f(d))
+			return true;
+	}
+	return false;
 }
 
 } // namespace CGoGN

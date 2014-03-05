@@ -41,16 +41,12 @@ public:
 		initMR();
 	}
 
-	virtual void clear(bool removeAttrib)
-	{
-		GenericMap::clear(removeAttrib);
-		initMR();
-	}
+	inline virtual void clear(bool removeAttrib);
 
 protected:
+	std::vector<AttributeMultiVector<Dart>*> m_involution;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation_inv;
-	std::vector<AttributeMultiVector<Dart>*> m_involution;
 
 	/**
 	 * container for multiresolution darts
@@ -86,11 +82,12 @@ protected:
 	/****************************************
 	 *          DARTS MANAGEMENT            *
 	 ****************************************/
-public:
+
 	inline virtual Dart newDart();
 
 	inline virtual void deleteDart(Dart d);
 
+public:
 	inline unsigned int dartIndex(Dart d) const;
 
 	inline Dart indexDart(unsigned int index) const;
@@ -135,8 +132,11 @@ protected:
 	 ****************************************/
 
 	inline void addInvolution();
-
 	inline void addPermutation();
+
+	inline AttributeMultiVector<Dart>* getInvolutionAttribute(unsigned int i);
+	inline AttributeMultiVector<Dart>* getPermutationAttribute(unsigned int i);
+	inline AttributeMultiVector<Dart>* getPermutationInvAttribute(unsigned int i);
 
 	virtual unsigned int getNbInvolutions() const = 0;
 	virtual unsigned int getNbPermutations() const = 0;
@@ -263,20 +263,26 @@ public:
 	 * Begin of map
 	 * @return the first dart of the map
 	 */
-	inline virtual Dart begin() const;
+	inline Dart begin() const;
 
 	/**
 	 * End of map
 	 * @return the end iterator (next of last) of the map
 	 */
-	inline virtual Dart end() const;
+	inline Dart end() const;
 
 	/**
 	 * allow to go from a dart to the next
 	 * in the order of storage
 	 * @param d reference to the dart to be modified
 	 */
-	inline virtual void next(Dart& d) const;
+	inline void next(Dart& d) const;
+
+	/**
+	 * Apply a functor on each dart of the map
+	 * @param f a ref to the functor obj
+	 */
+	bool foreach_dart(FunctorType& f) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *

@@ -48,6 +48,7 @@ protected:
 
 public:
 	typedef MAP_IMPL IMPL;
+	typedef MapCommon<MAP_IMPL> ParentMap;
 
 	Map1();
 

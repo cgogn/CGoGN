@@ -38,9 +38,9 @@
 
 #include "Algo/Render/GL2/drawerCells.h"
 
-
 MAP myMap;
-VertexAttribute<VEC3> position ;
+
+VertexAttribute<VEC3, MAP_IMPL> position ;
 Dart dglobal;
 
 void MyQT::cb_checkTopo(bool b)
@@ -112,16 +112,15 @@ void MyQT::cb_explode(int x)
         traverse3();
 }
 
-
 void MyQT::cb_initGL()
 {
     // choose to use GL version 2
     Utils::GLSLShader::setCurrentOGLVersion(2);
 
-    m_render_topo = new Algo::Render::GL2::Topo3Render();
+	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
 
-    m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f);
-    m_dm_topo = new DartMarker(myMap);
+	m_render_topo->updateData(myMap, position,  0.95f, 0.9f, 0.8f);
+	m_dm_topo = new DartMarker<MAP>(myMap);
 }
 
 void MyQT::cb_redraw()
@@ -146,7 +145,7 @@ void MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
     if (Shift())
     {
-        Dart d = m_render_topo->picking<PFP>(myMap, x, y);
+		Dart d = m_render_topo->picking(myMap, x, y);
         if (d != Dart::nil())
         {
             CGoGNout << "Dart " << d << " clicked" << CGoGNendl;
@@ -162,7 +161,6 @@ void  MyQT::cb_Save()
 
     std::string filename1 = filename + std::string("Drawer") + std::string(".svg");
     std::string filename2 = filename + std::string("Topo") + std::string(".svg");
-
 
     //	std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
     //	Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
@@ -188,12 +186,7 @@ void  MyQT::cb_Save()
 //    anim.add(&svg1);
 //    anim.add(&svg2);
 
-
-
 //    anim.write(filename, 2.0f);
-
-
-
 }
 
 template <unsigned int ORBIT>
@@ -240,12 +233,10 @@ void MyQT::traverse2()
     m_drawer.endList();
 
     //	SelectorMarked sm(*m_dm_topo);
-    m_render_topo->updateData<PFP>(myMap, position, 0.95f, 0.9f, 0.8f);
+	m_render_topo->updateData(myMap, position, 0.95f, 0.9f, 0.8f);
 
     updateGL();
 }
-
-
 
 void MyQT::dynamicMarkOrbit(unsigned int orb)
 {
@@ -300,7 +291,7 @@ void MyQT::traverse3()
 
         Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap, m_affDarts, position, m_expl);
 
-        m_render_topo->updateData<PFP>(myMap, position, 0.95f, 0.9f, 0.8f); //sm
+		m_render_topo->updateData(myMap, position, 0.95f, 0.9f, 0.8f); //sm
 
         for (std::vector<Dart>::iterator id = m_affDarts.begin(); id != m_affDarts.end(); ++id)
             m_render_topo->setDartColor(*id,0.7f,0.0f,0.0f);
@@ -321,7 +312,7 @@ void MyQT::traverse3()
 
         Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,m_expl);
 
-        m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f); //sm
+		m_render_topo->updateData(myMap, position,  0.95f, 0.9f, 0.8f); //sm
         for (std::vector<Dart>::iterator id=m_affDarts.begin(); id != m_affDarts.end(); ++id)
             m_render_topo->setDartColor(*id,0.7f,0.0f,0.0f);
         m_render_topo->setDartColor(m_selected,0.0f,0.7f,0.0f);

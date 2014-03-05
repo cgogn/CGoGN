@@ -46,6 +46,10 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
+typedef PFP::VEC3 VEC3 ;
+
 int main(int argc, char **argv)
 {
 	if(argc != 3)
@@ -61,13 +65,13 @@ int main(int argc, char **argv)
 	iss >> nbSteps;
 
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
 	std::vector<std::string> attrNames ;
 	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
 
 	for(unsigned int i = 0; i < nbSteps; ++i)
 		Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position);

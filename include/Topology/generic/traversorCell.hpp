@@ -154,7 +154,7 @@ template <typename MAP, unsigned int ORBIT>
 void TraversorCell<MAP, ORBIT>::skip(Dart d)
 {
 	if(dmark)
-		dmark->markOrbit<ORBIT>(d) ;
+		dmark->template markOrbit<ORBIT>(d) ;
 	else
 		cmark->mark(d) ;
 }

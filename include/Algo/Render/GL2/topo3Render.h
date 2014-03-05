@@ -333,6 +333,7 @@ class Topo3RenderMap : public Topo3Render<PFP>
 	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
+public:
 	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL> &positions, float ke, float kf, float kv);
 };
 
@@ -343,6 +344,7 @@ class Topo3RenderGMap : public Topo3Render<PFP>
 	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
+public:
 	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL> &positions, float ke, float kf, float kv);
 };
 

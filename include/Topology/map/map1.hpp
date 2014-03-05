@@ -25,8 +25,6 @@
 namespace CGoGN
 {
 
-/// INLINE FUNCTIONS
-
 template <typename MAP_IMPL>
 inline void Map1<MAP_IMPL>::init()
 {
@@ -54,7 +52,7 @@ inline unsigned int Map1<MAP_IMPL>::dimension() const
 template <typename MAP_IMPL>
 inline void Map1<MAP_IMPL>::clear(bool removeAttrib)
 {
-	MAP_IMPL::clear(removeAttrib) ;
+	ParentMap::clear(removeAttrib) ;
 	if (removeAttrib)
 		init() ;
 }

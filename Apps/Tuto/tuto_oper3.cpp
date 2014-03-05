@@ -340,11 +340,11 @@ void MyQT::createMapTets()
 void MyQT::updateMap()
 {
 #ifdef PRIMAL_TOPO
-    m_render_topo->updateData<PFP>(myMap, position, m_ex1, m_ex2);
+	m_render_topo->updateData(myMap, position, m_ex1, m_ex2);
 #else
-    m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3);
+	m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
-    m_render_topo_boundary->updateDataBoundary<PFP>(myMap,position,m_ex1,m_ex2,m_shift);
+	m_render_topo_boundary->updateDataBoundary(myMap,position,m_ex1,m_ex2,m_shift);
 }
 
 // initialization GL callback
@@ -353,11 +353,11 @@ void MyQT::cb_initGL()
     glClearColor(1.0f,1.0f,1.0f,1.0f);
 
 #ifdef PRIMAL_TOPO
-    m_render_topo = new Algo::Render::GL2::Topo3PrimalRender() ;
+	m_render_topo = new Algo::Render::GL2::Topo3PrimalRender<PFP>() ;
 #else
-    m_render_topo = new Algo::Render::GL2::Topo3Render() ;
+	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>() ;
 #endif
-    m_render_topo_boundary = new Algo::Render::GL2::TopoRender();
+	m_render_topo_boundary = new Algo::Render::GL2::TopoRenderMap<PFP>();
     m_render_topo_boundary->setInitialDartsColor(0.0f,0.9f,0.0f);
 
     m_PlanePick = new Utils::Pickable(Utils::Pickable::GRID,1);
@@ -424,7 +424,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
     if (Shift())
     {
-        Dart d = m_render_topo->picking<PFP>(myMap, x,y/*,nb*/);
+		Dart d = m_render_topo->picking(myMap, x,y/*,nb*/);
         if (button == Qt::LeftButton)
         {
             if (d != Dart::nil())
@@ -471,7 +471,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
     {
         if (button == Qt::LeftButton)
         {
-            Dart d = m_render_topo_boundary->picking<PFP>(myMap, x,y,true);
+			Dart d = m_render_topo_boundary->picking(myMap, x,y,true);
             if (d != Dart::nil())
             {
                 Dart e = myMap.phi2(d);
@@ -480,7 +480,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
         }
         if (button == Qt::RightButton)
         {
-            Dart d = m_render_topo->picking<PFP>(myMap, x,y/*, nb*/);
+			Dart d = m_render_topo->picking(myMap, x,y/*, nb*/);
             if (d != Dart::nil())
             {
                 m_selecteds.push_back(d);
@@ -489,9 +489,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
             }
         }
 
-
         updateGL();
-
     }
 }
 
@@ -676,9 +674,9 @@ void MyQT::cb_keyPress(int keycode)
             m_ex1 = 0.99f;
             m_ex2 = 0.99f;
 #ifdef PRIMAL_TOPO
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1, m_ex2);
+			m_render_topo->updateData(myMap, position, m_ex1, m_ex2);
 #else
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3);
+			m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
             updateGL();
             break;
@@ -686,9 +684,9 @@ void MyQT::cb_keyPress(int keycode)
             m_ex1 = 0.95f;
             m_ex2 = 0.95f;
 #ifdef PRIMAL_TOPO
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1, m_ex2);
+			m_render_topo->updateData(myMap, position, m_ex1, m_ex2);
 #else
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3);
+			m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
             updateGL();
             break;
@@ -698,9 +696,9 @@ void MyQT::cb_keyPress(int keycode)
             else
                 m_ex1 -= 0.05f;
 #ifdef PRIMAL_TOPO
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1, m_ex2);
+			m_render_topo->updateData(myMap, position, m_ex1, m_ex2);
 #else
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3);
+			m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
             updateGL();
             break;
@@ -710,9 +708,9 @@ void MyQT::cb_keyPress(int keycode)
             else
                 m_ex1 += 0.05f;
 #ifdef PRIMAL_TOPO
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1, m_ex2);
+			m_render_topo->updateData(myMap, position, m_ex1, m_ex2);
 #else
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3);
+			m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
             updateGL();
             break;
@@ -735,9 +733,9 @@ void MyQT::cb_keyPress(int keycode)
             myMap.splitVolume(m_selecteds);
 
 #ifdef PRIMAL_TOPO
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1, m_ex2);
+			m_render_topo->updateData(myMap, position, m_ex1, m_ex2);
 #else
-            m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3);
+			m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
             updateGL();
         }
@@ -874,9 +872,9 @@ void MyQT::width(int w)
 {
     m_ex3 = 0.9f - 0.025f*w;
 #ifdef PRIMAL_TOPO
-    m_render_topo->updateData<PFP>(myMap, position, m_ex1, m_ex2);
+	m_render_topo->updateData(myMap, position, m_ex1, m_ex2);
 #else
-    m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3);
+	m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
     updateGL();
 }

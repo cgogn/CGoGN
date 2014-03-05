@@ -38,16 +38,20 @@ namespace PMesh
 
 template <typename PFP>
 ProgressiveMesh<PFP>::ProgressiveMesh(
-		MAP& map, DartMarker& inactive,
-		Algo::Surface::Decimation::SelectorType s, Algo::Surface::Decimation::ApproximatorType a,
-		VertexAttribute<typename PFP::VEC3>& position
+		MAP& map,
+		DartMarker<MAP>& inactive,
+		Algo::Surface::Decimation::SelectorType s,
+		Algo::Surface::Decimation::ApproximatorType a,
+		VertexAttribute<VEC3, MAP_IMPL>& pos
 	) :
-	m_map(map), positionsTable(position), inactiveMarker(inactive)
+	m_map(map),
+	position(pos),
+	inactiveMarker(inactive)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 
-	std::vector<VertexAttribute< typename PFP::VEC3>* > pos_v ;
-	pos_v.push_back(&positionsTable) ;
+	std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos_v ;
+	pos_v.push_back(&position) ;
 	switch(a)
 	{
 		case Algo::Surface::Decimation::A_QEM : {
@@ -57,22 +61,22 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v)) ;
 			break ; }
 		case Algo::Surface::Decimation::A_hHalfCollapse : {
-			Algo::Surface::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Surface::Decimation::Predictor_HalfCollapse<PFP>(m_map, positionsTable) ;
+			Algo::Surface::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Surface::Decimation::Predictor_HalfCollapse<PFP>(m_map, position) ;
 			m_predictors.push_back(pred) ;
 			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 		case Algo::Surface::Decimation::A_CornerCutting : {
-			Algo::Surface::Decimation::Predictor_CornerCutting<PFP>* pred = new Algo::Surface::Decimation::Predictor_CornerCutting<PFP>(m_map, positionsTable) ;
+			Algo::Surface::Decimation::Predictor_CornerCutting<PFP>* pred = new Algo::Surface::Decimation::Predictor_CornerCutting<PFP>(m_map, position) ;
 			m_predictors.push_back(pred) ;
 			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_CornerCutting<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 		case Algo::Surface::Decimation::A_TangentPredict1 : {
-			Algo::Surface::Decimation::Predictor_TangentPredict1<PFP>* pred = new Algo::Surface::Decimation::Predictor_TangentPredict1<PFP>(m_map, positionsTable) ;
+			Algo::Surface::Decimation::Predictor_TangentPredict1<PFP>* pred = new Algo::Surface::Decimation::Predictor_TangentPredict1<PFP>(m_map, position) ;
 			m_predictors.push_back(pred) ;
 			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 		case Algo::Surface::Decimation::A_TangentPredict2 : {
-			Algo::Surface::Decimation::Predictor_TangentPredict2<PFP>* pred = new Algo::Surface::Decimation::Predictor_TangentPredict2<PFP>(m_map, positionsTable) ;
+			Algo::Surface::Decimation::Predictor_TangentPredict2<PFP>* pred = new Algo::Surface::Decimation::Predictor_TangentPredict2<PFP>(m_map, position) ;
 			m_predictors.push_back(pred) ;
 			m_approximators.push_back(new Algo::Surface::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
 			break ; }
@@ -241,8 +245,8 @@ void ProgressiveMesh<PFP>::edgeCollapse(VSplit<PFP>* vs)
 	Dart d = vs->getEdge() ;
 	Dart dd = m_map.phi2(d) ;
 
-	inactiveMarker.markOrbit<FACE>(d) ;
-	inactiveMarker.markOrbit<FACE>(dd) ;
+	inactiveMarker.template markOrbit<FACE>(d) ;
+	inactiveMarker.template markOrbit<FACE>(dd) ;
 
 	m_map.extractTrianglePair(d) ;
 }
@@ -257,8 +261,8 @@ void ProgressiveMesh<PFP>::vertexSplit(VSplit<PFP>* vs)
 
 	m_map.insertTrianglePair(d, d2, dd2) ;
 
-	inactiveMarker.unmarkOrbit<FACE>(d) ;
-	inactiveMarker.unmarkOrbit<FACE>(dd) ;
+	inactiveMarker.template unmarkOrbit<FACE>(d) ;
+	inactiveMarker.template unmarkOrbit<FACE>(dd) ;
 }
 
 template <typename PFP>
@@ -318,16 +322,16 @@ void ProgressiveMesh<PFP>::refine()
 	typename PFP::MATRIX33 invLocalFrame ;
 	if(m_localFrameDetailVectors)
 	{
-		typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
+		typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, position) ;
 		localFrame.invert(invLocalFrame) ;
 	}
 
 	vertexSplit(vs) ; // split vertex
 
-	m_map.template setOrbitEmbedding<VERTEX>(d, v1) ;		// embed the
+	m_map.template setOrbitEmbedding<VERTEX>(d, v1) ;	// embed the
 	m_map.template setOrbitEmbedding<VERTEX>(dd, v2) ;	// new vertices
 	m_map.template setOrbitEmbedding<EDGE>(d1, e1) ;
-	m_map.template setOrbitEmbedding<EDGE>(d2, e2) ;		// and new edges
+	m_map.template setOrbitEmbedding<EDGE>(d2, e2) ;	// and new edges
 	m_map.template setOrbitEmbedding<EDGE>(dd1, e3) ;
 	m_map.template setOrbitEmbedding<EDGE>(dd2, e4) ;
 
@@ -360,7 +364,7 @@ void ProgressiveMesh<PFP>::refine()
 template <typename PFP>
 void ProgressiveMesh<PFP>::gotoLevel(unsigned int l)
 {
-	if(l == m_cur || l > m_splits.size() || l < 0)
+	if(l == m_cur || l > m_splits.size())
 		return ;
 
 	if(l > m_cur)
@@ -415,7 +419,7 @@ void ProgressiveMesh<PFP>::localizeDetailVectors()
 		{
 			Dart d = m_splits[m_cur-1]->getEdge() ;
 			Dart dd2 = m_splits[m_cur-1]->getRightEdge() ;
-			typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
+			typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, position) ;
 			VEC3 det = m_positionApproximator->getDetail(d) ;
 			det = localFrame * det ;
 			m_positionApproximator->setDetail(d, det) ;
@@ -446,7 +450,7 @@ void ProgressiveMesh<PFP>::globalizeDetailVectors()
 		{
 			Dart d = m_splits[m_cur-1]->getEdge() ;
 			Dart dd2 = m_splits[m_cur-1]->getRightEdge() ;
-			typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, positionsTable) ;
+			typename PFP::MATRIX33 localFrame = Algo::Geometry::vertexLocalFrame<PFP>(m_map, dd2, position) ;
 			typename PFP::MATRIX33 invLocalFrame ;
 			localFrame.invert(invLocalFrame) ;
 			VEC3 det = m_positionApproximator->getDetail(d) ;
@@ -610,6 +614,9 @@ void ProgressiveMesh<PFP>::calculCourbeDebitDistortion()
 */
 
 } // namespace PMesh
+
 } // namespace Surface
+
 } // namespace Algo
+
 } // namespace CGoGN

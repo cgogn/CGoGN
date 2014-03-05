@@ -528,7 +528,7 @@ bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurf
             if (good_dart != NIL)
             {
                 map.sewVolumes(map.phi2(d), map.phi2(good_dart), false);
-                m.unmarkOrbit<EDGE>(d);
+				m.template unmarkOrbit<EDGE>(d);
             }
             else
             {
@@ -747,7 +747,6 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
     return true;
 }
 
-
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
 {
@@ -773,12 +772,9 @@ bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, st
     return importMeshSurfToVol<PFP>(map, mts, scale, nbStage);
 }
 
-
-
 } // namespace Import
 
 } // namespace Volume
-
 
 } // namespace Algo
 

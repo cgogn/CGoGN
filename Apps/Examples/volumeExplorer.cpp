@@ -122,11 +122,10 @@ void MyQT::slider_released()
 	{
 //		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 		//TODO MapBrowser
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor );
+		m_topo_render->updateData(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor );
 	}
 	updateGL();
 }
-
 
 void MyQT::cb_Open()
 {
@@ -210,7 +209,7 @@ void MyQT::cb_initGL()
     m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,true);
 
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f);
+	m_topo_render->updateData(myMap, position,  0.8f, 0.8f, 0.8f);
 	m_explode_render->updateData<PFP>(myMap, position, color);
 	m_explode_render->setExplodeVolumes(0.8f);
 	m_explode_render->setExplodeFaces(0.9f);

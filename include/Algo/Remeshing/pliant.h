@@ -38,11 +38,14 @@ namespace Remeshing
 {
 
 template <typename PFP>
-void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal) ;
+void pliantRemeshing(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal) ;
 
 } // namespace Remeshing
 
-}
+} // namespace Surface
 
 } // namespace Algo
 

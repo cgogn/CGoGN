@@ -448,7 +448,7 @@ void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, M
 	m_nbDarts = mapx.getNbDarts();
 
 	// beta2/3
-	DartAutoAttribute<VEC3, MAP> fv2(mapx);
+	DartAutoAttribute<VEC3, MAP_IMPL> fv2(mapx);
 
 	m_vbo2->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
@@ -501,7 +501,7 @@ void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, M
 
 			*positionDartBuf++ = PFP::toVec3f(P);
 			*positionDartBuf++ = PFP::toVec3f(PP);
-			if (mapx.isBoundaryMarked3(d))
+			if (mapx.template isBoundaryMarked<3>(d))
 			{
 				*colorDartBuf++ = m_boundaryDartsColor;
 				*colorDartBuf++ = m_boundaryDartsColor;
@@ -520,7 +520,7 @@ void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, M
 			*positionDartBuf++ = PFP::toVec3f(QQ);
 
 			Dart dx = mapx.phi3(d);
-			if (mapx.isBoundaryMarked3(dx))
+			if (mapx.template isBoundaryMarked<3>(dx))
 			{
 				*colorDartBuf++ = m_boundaryDartsColor;
 				*colorDartBuf++ = m_boundaryDartsColor;

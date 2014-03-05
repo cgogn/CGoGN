@@ -160,7 +160,7 @@ public:
 	/**
 	* Constructor
 	* @param bs shift for boundary drawing
-	*/	
+	*/
 	TopoRender(float bs = 0.01f);
 
 	/**
@@ -252,11 +252,7 @@ public:
 
 	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
-	void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
-
-	void updateDataMap(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
-
-	void updateDataGMap(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
+	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false) = 0;
 
 	/**
 	 * Special update function used to draw boundary of map3
@@ -284,6 +280,32 @@ public:
 	 * @param ns distance shift
 	 */
 	void setBoundaryShift(float bs);
+};
+
+template <typename PFP>
+class TopoRenderMap : public TopoRender<PFP>
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+public:
+	TopoRenderMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
+};
+
+template <typename PFP>
+class TopoRenderGMap : public TopoRender<PFP>
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+public:
+	TopoRenderGMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
 };
 
 } // namespace GL2

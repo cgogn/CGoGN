@@ -35,7 +35,7 @@ namespace Decimation
 {
 
 template <typename PFP, typename T, unsigned int ORBIT>
-Approximator<PFP,T,ORBIT>::Approximator(MAP& m, std::vector<VertexAttribute<T>* > va, Predictor<PFP, T> * predictor) :
+Approximator<PFP,T,ORBIT>::Approximator(MAP& m, std::vector<VertexAttribute<T, MAP_IMPL>* > va, Predictor<PFP, T> * predictor) :
 	ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(va)
 {
 	const unsigned int& size = m_attrV.size() ;
@@ -117,14 +117,14 @@ Approximator<PFP,T,ORBIT>::getApprox(Dart d, unsigned int index) const
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-const VertexAttribute<T>&
+const VertexAttribute<T, typename PFP::MAP::IMPL>&
 Approximator<PFP,T,ORBIT>::getAttr(unsigned int index) const
 {
 	return *(m_attrV[index]) ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-VertexAttribute<T>&
+VertexAttribute<T, typename PFP::MAP::IMPL>&
 Approximator<PFP,T,ORBIT>::getAttr(unsigned int index)
 {
 	return *(m_attrV[index]) ;
@@ -214,10 +214,10 @@ Approximator<PFP,T,ORBIT>::addDetail(Dart d, double amount, bool sign, typename 
 	}
 }
 
-} //namespace Decimation
+} // namespace Decimation
 
-} // namespace surface
+} // namespace Surface
 
-} //namespace Algo
+} // namespace Algo
 
-} //namespace CGoGN
+} // namespace CGoGN

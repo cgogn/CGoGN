@@ -95,7 +95,6 @@ class MyQT: public Utils::QT::SimpleQT
 	Utils::ClippingShader* m_sh1;
 	Utils::ClippingShader* m_sh2;
 
-
 public:
 	float m_WidthObj;
 	Geom::Vec3f m_PosObj;

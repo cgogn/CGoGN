@@ -1543,10 +1543,10 @@ Dart Map3<MAP_IMPL>::explodBorderTopo(Dart d)
 	DartMarker<MAP_IMPL> me(*this);
 	for(Dart dit = this->begin() ; dit != this->end() ; this->next(dit))
 	{
-		if(this->isBoundaryMarked3(dit) && !me.isMarked(dit))
+		if(this->template isBoundaryMarked<3>(dit) && !me.isMarked(dit))
 		{
 			ve.push_back(std::make_pair(dit, this->phi2(dit)));
-			me.markOrbit<EDGE>(dit);
+			me.template markOrbit<EDGE>(dit);
 		}
 	}
 
@@ -1577,14 +1577,14 @@ Dart Map3<MAP_IMPL>::explodBorderTopo(Dart d)
 				dnf = this->phi_1(dnf);
 			} while(dit != first);
 
-			mf.markOrbit<FACE>(first);
+			mf.template markOrbit<FACE>(first);
 
 			Dart db = dnf;
 			Dart d1 = this->phi1(db);
 			ParentMap::splitFace(db, d1) ;
 			ParentMap::cutEdge(this->phi_1(db)) ;
 
-			Dart x = phi2(this->phi_1(db)) ;
+			Dart x = this->phi2(this->phi_1(db)) ;
 			Dart dd = this->phi1(this->phi1(this->phi1(x)));
 			while(dd != x)
 			{
@@ -1603,7 +1603,7 @@ Dart Map3<MAP_IMPL>::explodBorderTopo(Dart d)
 
 		if(!mf.isMarked(second))
 		{
-			mf.markOrbit<FACE>(second);
+			mf.template markOrbit<FACE>(second);
 			unsigned int degf = ParentMap::faceDegree(second);
 
 			Dart dnf = ParentMap::newFace(degf, false);
@@ -1616,7 +1616,7 @@ Dart Map3<MAP_IMPL>::explodBorderTopo(Dart d)
 				dnf = this->phi_1(dnf);
 			} while(dit != second);
 
-			mf.markOrbit<FACE>(second);
+			mf.template markOrbit<FACE>(second);
 
 			Dart db = dnf;
 			Dart d1 = this->phi1(db);

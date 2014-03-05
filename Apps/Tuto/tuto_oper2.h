@@ -25,17 +25,10 @@
 #ifndef _TUTO_OPER2_
 #define _TUTO_OPER2_
 
-//#define USE_GMAP
-
 //#define PRIMAL_TOPO 1
 
 #include "Topology/generic/parameters.h"
-
-#ifdef USE_GMAP
-	#include "Topology/gmap/embeddedGMap2.h"
-#else
-	#include "Topology/map/embeddedMap2.h"
-#endif
+#include "Topology/map/embeddedMap2.h"
 
 #ifdef PRIMAL_TOPO
     #include "Algo/Render/GL2/topoPrimalRender.h"
@@ -58,22 +51,25 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the type of the map
-#ifdef USE_GMAP
-	typedef EmbeddedGMap2 MAP;
-#else
 	typedef EmbeddedMap2 MAP;
-#endif
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
 
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
+
 public:
-	MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f) {}
+	MyQT():
+		m_render_topo(NULL),
+		m_selected(NIL),
+		m_selected2(NIL),
+		dm(myMap),
+		m_shift(0.01f)
+	{}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -88,26 +84,26 @@ protected:
 	// declaration of the map
 	MAP myMap;
 
-	VertexAttribute<VEC3> position;
-	DartAttribute<VEC3> colorDarts;
+	VertexAttribute<VEC3, MAP_IMPL> position;
+	DartAttribute<VEC3, MAP_IMPL> colorDarts;
 
 	// render (for the topo)
 #ifdef PRIMAL_TOPO
-    Algo::Render::GL2::TopoPrimalRender* m_render_topo;
+	Algo::Render::GL2::TopoPrimalRender<PFP>* m_render_topo;
 #else
-    Algo::Render::GL2::TopoRender* m_render_topo;
+	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
 #endif
 	Dart m_selected;
 	Dart m_selected2;
-	DartMarker dm;
+	DartMarker<MAP> dm;
 	float m_shift;
 
 	// just for more compact writing
-	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
-	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
-	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
+	inline Dart PHI1(Dart d)	{ return myMap.phi1(d); }
+	inline Dart PHI_1(Dart d)	{ return myMap.phi_1(d); }
+	inline Dart PHI2(Dart d)	{ return myMap.phi2(d); }
 	template<int X>
-	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+	Dart PHI(Dart d)			{ return myMap.phi<X>(d); }
 
 public:
 	// example of simple map creation

@@ -28,7 +28,6 @@
 
 using namespace CGoGN ;
 
-
 int main(int argc, char **argv)
 {
 	//	// interface
@@ -60,7 +59,7 @@ void MyQT::cb_mouseClick(int button, int x, int y)
 
 	if (button == Qt::LeftButton)
 	{
-		Dart  d = m_render_topo->picking<PFP>(myMap,x,y);
+		Dart  d = m_render_topo->picking(myMap,x,y);
 		if (d != NIL)
 		{
 			dart_selected.clear();
@@ -151,13 +150,13 @@ void MyQT::createMap()
 
 	// first show for be sure that GL context is binded
 	show();
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
+	m_render_topo->updateData(myMap, position, 0.9f, 0.9f);
 }
 
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-	m_render_topo = new Algo::Render::GL2::TopoRender() ;
+	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>() ;
 }
 
 // redraw GL callback (clear and swap already done)

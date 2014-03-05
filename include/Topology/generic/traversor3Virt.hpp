@@ -59,7 +59,7 @@ void VMarkerForTraversor<MAP, ORBIT>::mark(Dart d)
 	if (m_cmark)
 		m_cmark->mark(d);
 	else
-		m_dmark->markOrbit<ORBIT>(d);
+		m_dmark->template markOrbit<ORBIT>(d);
 }
 
 template <typename MAP, unsigned int ORBIT>
@@ -68,7 +68,7 @@ void VMarkerForTraversor<MAP, ORBIT>::unmark(Dart d)
 	if (m_cmark)
 		m_cmark->unmark(d);
 	else
-		m_dmark->unmarkOrbit<ORBIT>(d);
+		m_dmark->template unmarkOrbit<ORBIT>(d);
 }
 
 template <typename MAP, unsigned int ORBIT>
@@ -179,7 +179,7 @@ Dart VTraversor3XY<MAP, ORBX, ORBY>::begin()
 
 	if ((ORBY == VOLUME) && (m_current != NIL))
 	{
-		if(m_map.isBoundaryMarked3(m_current))
+		if(m_map.template isBoundaryMarked<3>(m_current))
 			m_current = next();
 	}
 
@@ -208,7 +208,7 @@ Dart VTraversor3XY<MAP, ORBX, ORBY>::next()
 			m_current = m_tradoo.next();
 			if(ORBY == VOLUME)
 			{
-				if(m_map.isBoundaryMarked3(m_current))
+				if(m_map.template isBoundaryMarked<3>(m_current))
 					m_cmark->mark(m_current);
 			}
 			while ((m_current != NIL) && m_cmark->isMarked(m_current))
@@ -220,27 +220,27 @@ Dart VTraversor3XY<MAP, ORBX, ORBY>::next()
 			{
 				// if allocated we are in a local traversal of volume so we can mark only darts of volume
 				if (m_allocated)
-					m_dmark->markOrbit<ORBY + MAP::IN_PARENT>(m_current);
+					m_dmark->template markOrbit<ORBY + MAP::IN_PARENT>(m_current);
 				else
-					m_dmark->markOrbit<ORBY>(m_current); // here we need to mark all the darts
+					m_dmark->template markOrbit<ORBY>(m_current); // here we need to mark all the darts
 			}
 			else
-				m_dmark->markOrbit<ORBY>(m_current);
+				m_dmark->template markOrbit<ORBY>(m_current);
 			m_current = m_tradoo.next();
 			if(ORBY == VOLUME)
 			{
-				if(m_map.isBoundaryMarked3(m_current))
+				if(m_map.template isBoundaryMarked<3>(m_current))
 				{
 					if (ORBX == VOLUME)
 					{
 						// if allocated we are in a local traversal of volume so we can mark only darts of volume
 						if (m_allocated)
-							m_dmark->markOrbit<ORBY + MAP::IN_PARENT>(m_current);
+							m_dmark->template markOrbit<ORBY + MAP::IN_PARENT>(m_current);
 						else
-							m_dmark->markOrbit<ORBY>(m_current); // here we need to mark all the darts
+							m_dmark->template markOrbit<ORBY>(m_current); // here we need to mark all the darts
 					}
 					else
-						m_dmark->markOrbit<ORBY>(m_current);
+						m_dmark->template markOrbit<ORBY>(m_current);
 				}
 			}
 			while ((m_current != NIL) && m_dmark->isMarked(m_current))

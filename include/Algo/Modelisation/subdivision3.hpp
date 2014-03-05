@@ -489,7 +489,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 		if( !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
-			mv.markOrbit<PFP::MAP::VERTEX_OF_PARENT>(d);
+			mv.template markOrbit<PFP::MAP::VERTEX_OF_PARENT>(d);
 		}
 
 		Dart f = map.phi1(d);

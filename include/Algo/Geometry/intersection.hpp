@@ -44,7 +44,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
+bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -90,13 +90,15 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttr
 }
 
 template <typename PFP>
-bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
+bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
 {
-	typename PFP::VEC3 dir = PB - PA;
+	typedef typename PFP::VEC3 VEC3 ;
+
+	VEC3 dir = PB - PA;
 	if (intersectionLineConvexFace(map, d, position, PA, dir, Inter))
 	{
-		typename PFP::VEC3 dirA = PA - Inter;
-		typename PFP::VEC3 dirB = PB - Inter;
+		VEC3 dirA = PA - Inter;
+		VEC3 dirB = PB - Inter;
 
 		if (dirA * dirB < 0)
 			return true;
@@ -105,7 +107,7 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexA
 }
 
 template <typename PFP>
-bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const VertexAttribute<typename PFP::VEC3>& position)
+bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -231,13 +233,13 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 }
 
 template <typename PFP>
-bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::REAL& alpha)
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, typename PFP::REAL& alpha)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	const typename PFP::VEC3& p1 = position[d];
-	const typename PFP::VEC3& p2 = position[map.phi1(d)];
+	const VEC3& p1 = position[d];
+	const VEC3& p2 = position[map.phi1(d)];
 	if(Geom::isPointInSphere(p1, center, radius) && !Geom::isPointInSphere(p2, center, radius))
 	{
 		VEC3 p = p1 - center;

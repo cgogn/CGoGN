@@ -24,17 +24,10 @@
 #ifndef __SHOW_TRAVERSORS_
 #define __SHOW_TRAVERSORS_
 
-
 #include <iostream>
 
-//#define WITH_GMAP 1
-
 #include "Topology/generic/parameters.h"
-#ifdef WITH_GMAP
-	#include "Topology/gmap/embeddedGMap3.h"
-#else
-	#include "Topology/map/embeddedMap3.h"
-#endif
+#include "Topology/map/embeddedMap3.h"
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -51,7 +44,6 @@
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
 
-
 #include "Utils/Qt/qtSimple.h"
 
 #include "ui_show_traversors.h"
@@ -64,16 +56,12 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-#ifdef WITH_GMAP
-	typedef EmbeddedGMap3 MAP;
-#else
 	typedef EmbeddedMap3 MAP;
-#endif
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
 
 /**
  * Utilisation de designer-qt4:
@@ -86,7 +74,7 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
 	bool m_showTopo;
 
 	unsigned int m_first3;
@@ -118,7 +106,7 @@ public:
 
 	Utils::Drawer m_drawer;
 
-	DartMarker* m_dm_topo;
+	DartMarker<MAP>* m_dm_topo;
 
 protected:
     void storeVerticesInfo();

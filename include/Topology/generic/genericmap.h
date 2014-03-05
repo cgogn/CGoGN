@@ -42,8 +42,6 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
 
-
-
 namespace CGoGN
 {
 
@@ -97,6 +95,11 @@ protected:
 	 */
 	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD] ;
 
+	/**
+	 * Reserved boundary markers
+	 */
+	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
+
 	unsigned int m_nbThreads ;
 
 	/**
@@ -108,8 +111,6 @@ protected:
 	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
 	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
 
-	void init();
-
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
@@ -117,6 +118,10 @@ public:
 
 	virtual ~GenericMap() ;
 
+protected:
+	void init();
+
+public:
 	virtual std::string mapTypeName() const = 0 ;
 
 	virtual unsigned int dimension() const = 0 ;
@@ -197,47 +202,7 @@ public:
 	void initCell(unsigned int i) ;
 
 	/****************************************
-	 *     QUICK TRAVERSAL MANAGEMENT       *
-	 ****************************************/
-
-	template <typename MAP, unsigned int ORBIT>
-	void enableQuickTraversal() ;
-
-	template <typename MAP, unsigned int ORBIT>
-	void updateQuickTraversal() ;
-
-	template <unsigned int ORBIT>
-	const AttributeMultiVector<Dart>* getQuickTraversal() const;
-
-	template <unsigned int ORBIT>
-	void disableQuickTraversal() ;
-
-	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
-	void enableQuickIncidentTraversal();
-
-	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
-	void updateQuickIncidentTraversal();
-
-	template <unsigned int ORBIT, unsigned int INCI>
-	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickIncidentTraversal() const;
-
-	template <unsigned int ORBIT, unsigned int INCI>
-	void disableQuickIncidentTraversal();
-
-	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
-	void enableQuickAdjacentTraversal();
-
-	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
-	void updateQuickAdjacentTraversal();
-
-	template <unsigned int ORBIT, unsigned int INCI>
-	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickAdjacentTraversal() const;
-
-	template <unsigned int ORBIT, unsigned int ADJ>
-	void disableQuickAdjacentTraversal();
-
-	/****************************************
-	 *        ATTRIBUTES MANAGEMENT         *
+	 *   ATTRIBUTES CONTAINERS MANAGEMENT   *
 	 ****************************************/
 
 	/**
@@ -323,7 +288,7 @@ protected:
 	 ****************************************/
 public:
 	/**
-	 * add  threads (a table of Marker per orbit for each thread)
+	 * add threads (a table of Marker per orbit for each thread)
 	 * to allow MT
 	 * @param nb thread to add
 	 */
@@ -388,18 +353,8 @@ public:
 	void compact() ;
 
 	/****************************************
-	 *           DARTS TRAVERSALS           *
+	 *          ORBITS TRAVERSALS           *
 	 ****************************************/
-
-	/**
-	 * Apply a functor on each dart of the map
-	 * @param f a ref to the functor obj
-	 */
-	bool foreach_dart(FunctorType& f) ;
-
-	virtual Dart begin() const = 0;
-	virtual Dart end() const = 0;
-	virtual void next(Dart& d) const = 0;
 
 	//! Apply a functor on every dart of an orbit
 	/*! @param dim dimension of orbit
@@ -408,7 +363,6 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	bool foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread = 0) const;
-
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
 	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
@@ -422,21 +376,6 @@ public:
 	virtual bool foreach_dart_of_vertex2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-
-	/****************************************
-	 *         BOUNDARY MANAGEMENT          *
-	 ****************************************/
-
-protected:
-	/// boundary markers
-	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
-
-protected:
-	/**
-	 * clear all boundary markers
-	 */
-	template<unsigned int DIM>
-	void boundaryUnmarkAll() ;
 } ;
 
 //

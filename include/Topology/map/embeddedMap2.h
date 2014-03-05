@@ -26,6 +26,7 @@
 #define __EMBEDDED_MAP2_H__
 
 #include "Topology/map/map2.h"
+#include "Topology/generic/mapMono.h"
 
 namespace CGoGN
 {

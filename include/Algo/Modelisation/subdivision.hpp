@@ -141,7 +141,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 	// first pass: cut the edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked2(d) && !me.isMarked(d))
+		if ( !map.template isBoundaryMarked<2>(d) && !me.isMarked(d))
 		{
 			Dart f = map.phi1(d);
 			Dart e = map.cutEdge(d);
@@ -152,16 +152,16 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit<EDGE>(d);
-			me.markOrbit<EDGE>(e);
-			mf.markOrbit<VERTEX>(e);
+			me.template markOrbit<EDGE>(d);
+			me.template markOrbit<EDGE>(e);
+			mf.template markOrbit<VERTEX>(e);
 		}
 	}
 
 	// second pass: quandrangule faces
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked2(d) && !mf.isMarked(d))
+		if ( !map.template isBoundaryMarked<2>(d) && !mf.isMarked(d))
 		{
 			EMB center = Geometry::faceCentroid<PFP, EMBV>(map, d, attributs);	// compute center
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
@@ -169,7 +169,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 			Dart e = cf;
 			do
 			{
-				mf.markOrbit<FACE>(e);
+				mf.template markOrbit<FACE>(e);
 				e = map.phi2_1(e);
 			} while (e != cf);
 		}
@@ -198,7 +198,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	// first pass: cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked2(d) && !me.isMarked(d))
+		if ( !map.template isBoundaryMarked<2>(d) && !me.isMarked(d))
 		{
 			if (!m0.isMarked(d))
 			{
@@ -219,8 +219,8 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit<EDGE>(d);
-			me.markOrbit<EDGE>(e);
+			me.template markOrbit<EDGE>(d);
+			me.template markOrbit<EDGE>(e);
 
 			mf.mark(d) ;
 			mf.mark(map.phi2(e)) ;
@@ -232,22 +232,22 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	// second pass: quandrangule faces
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked2(d) && mf.isMarked(d)) // for each face not subdivided
+		if ( !map.template isBoundaryMarked<2>(d) && mf.isMarked(d)) // for each face not subdivided
 		{
 			// compute center skip darts of new vertices non embedded
 //			EMB center = AttribOps::zero<EMB,PFP>();
 			EMB center(0.0);
 			unsigned int count = 0 ;
-			mf.unmarkOrbit<FACE>(d) ;
+			mf.template unmarkOrbit<FACE>(d) ;
 			Dart it = d;
 			do
 			{
 				center += attributs[it];
 				++count ;
-				me.unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
+				me.template unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
 
 				it = map.phi1(it) ;
-				me.unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
+				me.template unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
 				it = map.phi1(it) ;
 			} while(it != d) ;
 			center /= double(count);
@@ -357,7 +357,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	// first pass cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked2(d) && !me.isMarked(d))
+		if ( !map.template isBoundaryMarked<2>(d) && !me.isMarked(d))
 		{
 			if (!m0.isMarked(d))
 			{
@@ -377,10 +377,10 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit<EDGE>(d);
-			me.markOrbit<EDGE>(e);
+			me.template markOrbit<EDGE>(d);
+			me.template markOrbit<EDGE>(e);
 
-			mv.markOrbit<VERTEX>(e);
+			mv.template markOrbit<VERTEX>(e);
 
 			l_middles.push_back(e);
 		}
@@ -447,8 +447,8 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		if (mv.isMarked(d))
 		{
 			// unmark the darts of the face
-			me.unmarkOrbit<FACE>(d) ;
-			mv.unmarkOrbit<FACE>(d) ;
+			me.template unmarkOrbit<FACE>(d) ;
+			mv.template unmarkOrbit<FACE>(d) ;
 
 			Dart dd = d;
 			Dart e = map.template phi<11>(dd) ;

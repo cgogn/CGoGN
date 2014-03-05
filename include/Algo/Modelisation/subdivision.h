@@ -84,8 +84,8 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d);
 template <typename PFP, typename EMBV, typename EMB>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
-template <typename PFP>
-void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+//template <typename PFP>
+//void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 /**
  * Catmull-Clark subdivision scheme

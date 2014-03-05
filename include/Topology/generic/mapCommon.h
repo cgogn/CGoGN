@@ -25,13 +25,12 @@
 #ifndef __MAP_COMMON__
 #define __MAP_COMMON__
 
-#include "Topology/generic/mapMono.h"
 #include "Topology/generic/attributeHandler.h"
 
 namespace CGoGN
 {
 
-template <typename MAP_IMPL = MapMono>
+template <typename MAP_IMPL>
 class MapCommon : public MAP_IMPL
 {
 	typedef MAP_IMPL IMPL;
@@ -149,13 +148,13 @@ protected:
 	/**
 	 * mark a dart as  belonging to boundary
 	 */
-	template <unsigned int D>
+	template <unsigned int DIM>
 	void boundaryMark(Dart d) ;
 
 	/**
 	 * unmark a dart from the boundary
 	 */
-	template <unsigned int D>
+	template <unsigned int DIM>
 	void boundaryUnmark(Dart d) ;
 
 	/**
@@ -170,12 +169,19 @@ protected:
 	template <unsigned int ORBIT, unsigned int DIM>
 	void boundaryUnmarkOrbit(Dart d) ;
 
+	/**
+	 * clear all boundary markers
+	 */
+	template<unsigned int DIM>
+	void boundaryUnmarkAll() ;
+
 public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
 	template <unsigned int D>
 	bool isBoundaryMarked(Dart d) const ;
+
 	bool isBoundaryMarkedCurrent(Dart d) const ;
 
 	/****************************************
@@ -233,6 +239,61 @@ public:
 	 */
 	template <typename T, unsigned int ORBIT>
 	bool copyAttribute(AttributeHandler<T, ORBIT, MAP_IMPL>& dst, AttributeHandler<T, ORBIT, MAP_IMPL>& src) ;
+
+	/**
+	 * get a DartAttribute to an involution of the map
+	 */
+	inline DartAttribute<Dart, MAP_IMPL> getInvolution(unsigned int i);
+
+	/**
+	 * get a DartAttribute to a permutation of the map
+	 */
+	inline DartAttribute<Dart, MAP_IMPL> getPermutation(unsigned int i);
+
+	/**
+	 * get a DartAttribute to a permutation of the map
+	 */
+	inline DartAttribute<Dart, MAP_IMPL> getPermutationInv(unsigned int i);
+
+	/****************************************
+	 *     QUICK TRAVERSAL MANAGEMENT       *
+	 ****************************************/
+
+	template <unsigned int ORBIT>
+	void enableQuickTraversal() ;
+
+	template <unsigned int ORBIT>
+	void updateQuickTraversal() ;
+
+	template <unsigned int ORBIT>
+	const AttributeMultiVector<Dart>* getQuickTraversal() const;
+
+	template <unsigned int ORBIT>
+	void disableQuickTraversal() ;
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	void enableQuickIncidentTraversal();
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	void updateQuickIncidentTraversal();
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickIncidentTraversal() const;
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	void disableQuickIncidentTraversal();
+
+	template <unsigned int ORBIT, unsigned int ADJ>
+	void enableQuickAdjacentTraversal();
+
+	template <unsigned int ORBIT, unsigned int ADJ>
+	void updateQuickAdjacentTraversal();
+
+	template <unsigned int ORBIT, unsigned int INCI>
+	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* getQuickAdjacentTraversal() const;
+
+	template <unsigned int ORBIT, unsigned int ADJ>
+	void disableQuickAdjacentTraversal();
 
 	/****************************************
 	 *               UTILITIES              *

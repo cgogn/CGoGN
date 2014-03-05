@@ -45,6 +45,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 class SimpleMap3 : public Utils::QT::SimpleQT
@@ -55,11 +56,11 @@ public:
 	MAP myMap ;
 	SelectorTrue allDarts ;
 
-	VertexAttribute<VEC3> position ;
+	VertexAttribute<VEC3, MAP_IMPL> position ;
 
-	Algo::Render::GL2::Topo3Render* m_render_topo;
-	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
-    Algo::Render::GL2::Topo3PrimalRender* m_render_topo_primal;
+	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
+	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo_boundary;
+	Algo::Render::GL2::Topo3PrimalRender<PFP>* m_render_topo_primal;
 
 	SimpleMap3() ;
 
@@ -69,4 +70,3 @@ public:
 	void cb_redraw() ;
     void cb_keyPress(int code);
 };
-

@@ -159,8 +159,8 @@ void GenericMap::init()
 			std::stringstream ss ;
 			ss << "Mark_" << t ;
 			AttributeMultiVector<Mark>* amvMark = cont.addAttribute<Mark>(ss.str()) ;
-			for(unsigned int idx = cont.begin(); idx < cont.end(); cont.next(idx))
-				amvMark->operator[](idx).clear() ;
+//			for(unsigned int idx = cont.begin(); idx < cont.end(); cont.next(idx))
+//				amvMark->operator[](idx).clear() ;
 			m_markTables[i][t] = amvMark ;
 		}
 	}
@@ -224,7 +224,7 @@ void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit
 		m_marksets[orbit2][t] = ms ;
 	}
 
-	for (unsigned int i=0; i<NB_THREAD; ++i)
+	for (unsigned int i = 0; i < NB_THREAD; ++i)
 	{
 		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
 		{
@@ -488,20 +488,6 @@ void GenericMap::compact()
 
 	// compact topo (depends on map implementation)
 	compactTopo();
-}
-
-/****************************************
- *           DARTS TRAVERSALS           *
- ****************************************/
-
-bool GenericMap::foreach_dart(FunctorType& f)
-{
-	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (f(d))
-			return true;
-	}
-	return false;
 }
 
 } // namespace CGoGN

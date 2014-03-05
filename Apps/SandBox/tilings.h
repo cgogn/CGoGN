@@ -44,7 +44,6 @@
 #include "Algo/Tiling/Surface/square.h"
 #include "Algo/Tiling/Surface/triangular.h"
 
-
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL1 { class MapRender; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
@@ -67,8 +66,6 @@ public:
 
     Utils::ShaderSimpleColor* m_shader;
     Utils::ShaderVectorPerVertex* m_lines;
-
-
 
     MyQT():
         m_render(NULL),
@@ -93,10 +90,6 @@ protected:
     void threadAttrib();
 
     void threadStorage();
-
-
-
 };
-
 
 #endif // TUTO_TILINGS_H

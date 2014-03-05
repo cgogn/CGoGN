@@ -514,7 +514,7 @@ void Topo3Render<PFP>::setDartsIdColor(typename PFP::MAP& map)
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if ( !map.isBoundaryMarked3(d)) // topo3 Render do not traverse boundary
+		if ( !map.template isBoundaryMarked<3>(d)) // topo3 Render do not traverse boundary
 		{
 			if (nb < m_nbDarts)
 			{

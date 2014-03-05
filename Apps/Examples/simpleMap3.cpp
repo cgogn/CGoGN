@@ -106,20 +106,20 @@ void SimpleMap3::cb_initGL()
 	float gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
 	setParamObject(gWidthObj, gPosObj.data());
 
-	m_render_topo = new Algo::Render::GL2::Topo3Render();
+	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
 	m_render_topo->setDartWidth(2.0f);
 	m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
-    m_render_topo->updateData<PFP>(myMap, position, 0.9f,0.9f,0.8f);
+	m_render_topo->updateData(myMap, position, 0.9f,0.9f,0.8f);
 
-	m_render_topo_boundary = new Algo::Render::GL2::TopoRender();
+	m_render_topo_boundary = new Algo::Render::GL2::TopoRenderMap<PFP>();
 	m_render_topo_boundary->setDartWidth(2.0f);
 	m_render_topo_boundary->setInitialDartsColor(0.4f,0.8f,0.4f);
-	m_render_topo_boundary->updateDataBoundary<PFP>(myMap, position, 0.9f,0.9f,bb.maxSize()/50.0f);
+	m_render_topo_boundary->updateDataBoundary(myMap, position, 0.9f,0.9f,bb.maxSize()/50.0f);
 
-    m_render_topo_primal = new Algo::Render::GL2::Topo3PrimalRender();
+	m_render_topo_primal = new Algo::Render::GL2::Topo3PrimalRender<PFP>();
     m_render_topo_primal->setDartWidth(2.0f);
     m_render_topo_primal->setInitialDartsColor(1.0f,1.0f,1.0f);
-    m_render_topo_primal->updateData<PFP>(myMap, position, 0.95f,0.85f);
+	m_render_topo_primal->updateData(myMap, position, 0.95f,0.85f);
 }
 
 void SimpleMap3::cb_keyPress(int code)

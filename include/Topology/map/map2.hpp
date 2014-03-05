@@ -128,7 +128,7 @@ inline Dart Map2<MAP_IMPL>::phi2_1(Dart d) const
 template <typename MAP_IMPL>
 inline Dart Map2<MAP_IMPL>::phi12(Dart d) const
 {
-	return phi1(phi2(d)) ;
+	return this->phi1(phi2(d)) ;
 }
 
 template <typename MAP_IMPL>
@@ -1154,20 +1154,22 @@ void Map2<MAP_IMPL>::reverseOrientation()
 		for(Dart d = this->begin(); d != this->end(); this->next(d))
 			new_emb0[d] = emb0[this->phi1(d)] ;
 
-		this->template swapAttributes<unsigned int>(emb0, new_emb0) ;
+		this->swapAttributes(emb0, new_emb0) ;
 		this->removeAttribute(new_emb0) ;
 	}
 
-	DartAttribute<Dart, MAP_IMPL> n_phi1 = this->template getAttribute<Dart, DART>("phi1") ;
-	DartAttribute<Dart, MAP_IMPL> n_phi_1 = this->template getAttribute<Dart, DART>("phi_1") ;
-	this->template swapAttributes<Dart>(n_phi1, n_phi_1) ;
+	DartAttribute<Dart, MAP_IMPL> n_phi1 = this->getPermutation(0) ;
+	DartAttribute<Dart, MAP_IMPL> n_phi_1 = this->getPermutationInv(0) ;
+
+	this->swapAttributes(n_phi1, n_phi_1) ;
 }
 
 template <typename MAP_IMPL>
 void Map2<MAP_IMPL>::computeDual()
 {
-	DartAttribute<Dart, MAP_IMPL> old_phi1 = this->template getAttribute<Dart, DART>("phi1");
-	DartAttribute<Dart, MAP_IMPL> old_phi_1 = this->template getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi1 = this->getPermutation(0) ;
+	DartAttribute<Dart, MAP_IMPL> old_phi_1 = this->getPermutationInv(0) ;
+
 	DartAttribute<Dart, MAP_IMPL> new_phi1 = this->template addAttribute<Dart, DART>("new_phi1") ;
 	DartAttribute<Dart, MAP_IMPL> new_phi_1 = this->template addAttribute<Dart, DART>("new_phi_1") ;
 
@@ -1179,8 +1181,8 @@ void Map2<MAP_IMPL>::computeDual()
 		new_phi_1[dd] = d ;
 	}
 
-	this->template swapAttributes<Dart>(old_phi1, new_phi1) ;
-	this->template swapAttributes<Dart>(old_phi_1, new_phi_1) ;
+	this->swapAttributes(old_phi1, new_phi1) ;
+	this->swapAttributes(old_phi_1, new_phi_1) ;
 
 	this->removeAttribute(new_phi1) ;
 	this->removeAttribute(new_phi_1) ;
@@ -1192,7 +1194,7 @@ void Map2<MAP_IMPL>::computeDual()
 	// boundary management
 	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
-		if(this->isBoundaryMarked2(d))
+		if(this->template isBoundaryMarked<2>(d))
 			this->template boundaryMarkOrbit<FACE,2>(deleteVertex(phi2(d)));
 	}
 }
