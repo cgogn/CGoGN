@@ -25,11 +25,11 @@ struct MapParameters
 		faceSelector(NULL)
 	{}
 
-	VertexAttribute<PFP2::VEC3> positionAttribute;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> positionAttribute;
 
-	CellSelector<VERTEX>* vertexSelector;
-	CellSelector<EDGE>* edgeSelector;
-	CellSelector<FACE>* faceSelector;
+	CellSelector<PFP2::MAP, VERTEX>* vertexSelector;
+	CellSelector<PFP2::MAP, EDGE>* edgeSelector;
+	CellSelector<PFP2::MAP, FACE>* faceSelector;
 };
 
 class Surface_Modelisation_Plugin : public PluginInteraction

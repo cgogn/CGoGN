@@ -31,7 +31,10 @@ void Surface_Selection_DockTab::positionAttributeChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+		}
 	}
 }
 
@@ -41,7 +44,10 @@ void Surface_Selection_DockTab::normalAttributeChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].normalAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_normalAttribute->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].normalAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_normalAttribute->currentText());
+		}
 	}
 }
 

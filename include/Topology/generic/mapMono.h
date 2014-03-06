@@ -59,7 +59,7 @@ public:
 
 	inline Dart indexDart(unsigned int index) const;
 
-	inline virtual unsigned int getNbDarts();
+	inline virtual unsigned int getNbDarts() const;
 
 	inline AttributeContainer& getDartContainer();
 

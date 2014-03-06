@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #ifndef _BOUND_EMBD_H
 #define _BOUND_EMBD_H
 
@@ -50,8 +51,10 @@ Dart newFaceEmb(typename PFP::MAP& map, unsigned int n)
 	return d;
 }
 
-}
-}
-}
+} // namespace Modelisation
+
+} // namespace Algo
+
+} // namespace CGoGN
 
 #endif

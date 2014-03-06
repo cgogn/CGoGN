@@ -44,15 +44,17 @@ public:
 	* @param dim the dimension of the orbit
 	* @param f the functor
 	*/
-	template <unsigned int ORBIT, typename MAP>
+	template <unsigned int ORBIT>
 	bool foreach_orbit(FunctorType& f, unsigned int thread = 0);
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit
 	 * 	@return the number of orbits
 	 */
-	template <unsigned int ORBIT, typename MAP>
-	unsigned int getNbOrbits();
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits() const;
+
+	unsigned int getNbOrbits(unsigned int orbit) const;
 
 	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
 	/*! @param d a dart
@@ -179,10 +181,12 @@ public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
-	template <unsigned int D>
-	bool isBoundaryMarked(Dart d) const ;
+	template <unsigned int DIM>
+	inline bool isBoundaryMarked(Dart d) const ;
 
-	bool isBoundaryMarkedCurrent(Dart d) const ;
+	inline bool isBoundaryMarkedCurrent(Dart d) const ;
+
+	inline bool isBoundaryMarked(unsigned int dim, Dart d) const ;
 
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *
@@ -211,14 +215,6 @@ public:
 	*/
 	template <typename T, unsigned int ORBIT>
 	inline AttributeHandler<T, ORBIT, MAP_IMPL> getAttribute(const std::string& nameAttr) ;
-
-	/**
-	 * @brief get a generic pointer to an existing attribute multi vector
-	 * @param orbit the concerned orbit
-	 * @param nameAttr attribute name
-	 * @return a pointer to an AttributeMultiVectorGen
-	 */
-	inline AttributeMultiVectorGen* getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
 	* check if an attribute exist ( get, test if valid and add if necessary)

@@ -29,6 +29,8 @@ template <typename MAP, unsigned int ORBIT>
 TraversorCell<MAP, ORBIT>::TraversorCell(const MAP& map, bool forceDartMarker, unsigned int thread) :
 	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true)
 {
+	dimension = map.dimension();
+
 	if(forceDartMarker)
 		dmark = new DartMarker<MAP>(map, thread) ;
 	else
@@ -77,7 +79,7 @@ Dart TraversorCell<MAP, ORBIT>::begin()
 		}
 
 		current = m.begin() ;
-		while(current != m.end() && (m.template isBoundaryMarked<MAP::DIMENSION>(current) ))
+		while(current != m.end() && (m.template isBoundaryMarked(dimension, current) ))
 			m.next(current) ;
 
 		if(current == m.end())
@@ -120,7 +122,7 @@ Dart TraversorCell<MAP, ORBIT>::next()
 		if(dmark)
 		{
 			bool ismarked = dmark->isMarked(current) ;
-			while(current != NIL && (ismarked || m.template isBoundaryMarked<MAP::DIMENSION>(current)))
+			while(current != NIL && (ismarked || m.template isBoundaryMarked(dimension, current)))
 			{
 				m.next(current) ;
 				if(current == m.end())
@@ -134,7 +136,7 @@ Dart TraversorCell<MAP, ORBIT>::next()
 		else
 		{
 			bool ismarked = cmark->isMarked(current) ;
-			while(current != NIL && (ismarked || m.template isBoundaryMarked<MAP::DIMENSION>(current) ))
+			while(current != NIL && (ismarked || m.template isBoundaryMarked(dimension, current) ))
 			{
 				m.next(current) ;
 				if(current == m.end())

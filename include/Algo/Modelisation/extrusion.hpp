@@ -409,12 +409,12 @@ Dart extrudeRegion(
 
    /*----------- find borders of the region -----------*/
    std::vector<std::vector<Dart> > contours; // border
-   for (int i = 0; i < borderDarts.size(); i++)
+   for (unsigned int i = 0; i < borderDarts.size(); i++)
    {
 	   bool used = false;
-	   for (int j = 0; j < contours.size(); j++)
+	   for (unsigned int j = 0; j < contours.size(); j++)
 	   {
-		   for (int k = 0; k < contours[j].size(); k++)
+		   for (unsigned int k = 0; k < contours[j].size(); k++)
 		   {
 			   if (borderDarts[i] == contours[j][k])
 			   {
@@ -444,16 +444,16 @@ Dart extrudeRegion(
 
    /*----------- calculate the height of the extrusion -----------*/
    typename PFP::REAL dist = 0;
-   for(int i = 0; i < (contours.size()); i++)
+   for(unsigned int i = 0; i < (contours.size()); i++)
    {
-	   for(int j = 0; j < contours[i].size()-1; j++)
+	   for(unsigned int j = 0; j < contours[i].size()-1; j++)
 	   {
 		   dist = dist + (position[contours[i][j]] - position[contours[i][j+1]]).norm();
 	   }
 	   dist = dist + (position[contours[i][contours[i].size()-1]] - position[contours[i][0]]).norm();
    }
    int size = 0;
-   for (int i = 0; i < contours.size(); i++)
+   for (unsigned int i = 0; i < contours.size(); i++)
    {
 	   size = size + contours[i].size();
    }
@@ -463,7 +463,7 @@ Dart extrudeRegion(
    pile.clear();
    pile.push_back(contours[0][0]);
    typename PFP::VEC3 normal;
-   CellMarker<MAP, FACE>* fm(the_map);
+   CellMarker<MAP, FACE> fm(the_map);
    int faceNb = 0;
    while(!pile.empty())
    {
@@ -484,10 +484,10 @@ Dart extrudeRegion(
    normal = normal / faceNb * dist;
 
    /*----------- add new faces -----------*/
-   for (int i = 0; i < contours.size(); i++)
+   for (unsigned int i = 0; i < contours.size(); i++)
    {
 	   Dart prev;
-	   for(int j = 0; j < contours[i].size(); j++)
+	   for(unsigned int j = 0; j < contours[i].size(); j++)
 	   {
 		   d = the_map.newFace(4);
 		   Dart e = the_map.phi2(contours[i][j]);
@@ -505,7 +505,7 @@ Dart extrudeRegion(
    /*----------- fix positions of vertices of the region -----------*/
    pile.clear();
    pile.push_back(contours[0][0]);
-   CellMarker<MAP, VERTEX>* vm(the_map);
+   CellMarker<MAP, VERTEX> vm(the_map);
 
    while(!pile.empty())
    {

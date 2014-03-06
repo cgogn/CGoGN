@@ -34,17 +34,20 @@ namespace LinearSolving
 template <typename PFP, typename ATTR_TYPE>
 class FunctorMeshToSolver_Scalar : public FunctorType
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const CellMarker<VERTEX>& freeMarker ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const CellMarker<MAP, VERTEX>& freeMarker ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 	bool lockedVertices ;
 
 public:
 	FunctorMeshToSolver_Scalar(
-		const VertexAttribute<unsigned int>& index,
-		const CellMarker<VERTEX>& fm,
-		const VertexAttribute<ATTR_TYPE>& attr
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const CellMarker<MAP, VERTEX>& fm,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr
 	) :	indexTable(index), freeMarker(fm), attrTable(attr), lockedVertices(false)
 	{}
 
@@ -65,18 +68,21 @@ public:
 template <typename PFP, typename ATTR_TYPE>
 class FunctorMeshToSolver_Vector : public FunctorType
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const CellMarker<VERTEX>& freeMarker ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const CellMarker<MAP, VERTEX>& freeMarker ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 	unsigned int coord ;
 	bool lockedVertices ;
 
 public:
 	FunctorMeshToSolver_Vector(
-		const VertexAttribute<unsigned int>& index,
-		const CellMarker<VERTEX>& fm,
-		const VertexAttribute<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const CellMarker<MAP, VERTEX>& fm,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
 		unsigned int c
 	) :	indexTable(index), freeMarker(fm), attrTable(attr), coord(c), lockedVertices(false)
 	{}
@@ -98,14 +104,17 @@ public:
 template <typename PFP, typename ATTR_TYPE>
 class FunctorSolverToMesh_Scalar : public FunctorType
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 
 public:
 	FunctorSolverToMesh_Scalar(
-		const VertexAttribute<unsigned int>& index,
-		VertexAttribute<ATTR_TYPE>& attr
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr
 	) :	indexTable(index), attrTable(attr)
 	{}
 
@@ -119,15 +128,18 @@ public:
 template <typename PFP, typename ATTR_TYPE>
 class FunctorSolverToMesh_Vector : public FunctorType
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 	unsigned int coord ;
 
 public:
 	FunctorSolverToMesh_Vector(
-		const VertexAttribute<unsigned int>& index,
-		VertexAttribute<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
 		unsigned int c
 	) :	indexTable(index), attrTable(attr), coord(c)
 	{}

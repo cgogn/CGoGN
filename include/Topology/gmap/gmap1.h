@@ -181,12 +181,6 @@ public:
 	 * @return a boolean indicating if the face is a triangle
 	 */
 	bool isCycleTriangle(Dart d) const;
-
-	template <unsigned int ORBIT>
-	unsigned int getNbOrbits()
-	{
-		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, GMap1>();
-	}
 	//@}
 
 	/*! @name Cell Functors

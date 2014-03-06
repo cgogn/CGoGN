@@ -51,6 +51,7 @@ class TraversorCell //: public Traversor<MAP>
 {
 private:
 	const MAP& m ;
+	unsigned int dimension ;
 
 	const AttributeContainer* cont ;
 	unsigned int qCurrent ;

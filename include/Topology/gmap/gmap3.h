@@ -276,12 +276,6 @@ public:
 	bool isBoundaryVolume(Dart d) const;
 
 	virtual bool check() const;
-
-	template <unsigned int ORBIT>
-	unsigned int getNbOrbits()
-	{
-		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, GMap3>();
-	}
 	//@}
 
 	/*! @name Cell Functors

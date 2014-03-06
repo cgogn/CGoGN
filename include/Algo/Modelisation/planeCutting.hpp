@@ -129,18 +129,24 @@ void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 */
 
 template <typename PFP>
-void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmf_over, bool keepTriangles=false, bool with_unsew = true)
+void planeCut(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const Geom::Plane3D<typename PFP::REAL>& plane,
+	CellMarker<typename PFP::MAP, FACE>& cmf_over,
+	bool keepTriangles = false,
+	bool with_unsew = true)
 {
+	typedef typename PFP::MAP MAP;
 	typedef typename PFP::REAL REAL;
 
 	//marker for vertices on the plane
-	CellMarker<VERTEX> cmv(map);
+	CellMarker<MAP, VERTEX> cmv(map);
 	// marker for vertices over the plane
-	CellMarker<VERTEX> cmv_over(map);
+	CellMarker<MAP, VERTEX> cmv_over(map);
 
-	TraversorE<typename PFP::MAP> traEdg(map);
-	for (Dart d=traEdg.begin(); d!=traEdg.end();d=traEdg.next())
+	TraversorE<MAP> traEdg(map);
+	for (Dart d = traEdg.begin(); d != traEdg.end(); d = traEdg.next())
 	{
 		Dart dd = map.phi1(d);
 
@@ -192,29 +198,29 @@ void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		triangulator = new Algo::Surface::Modelisation::EarTriangulation<PFP>(map);
 	}
 
-	TraversorF<typename PFP::MAP> traFac(map);
-	for (Dart d=traFac.begin(); d!=traFac.end();d=traFac.next())
+	TraversorF<MAP> traFac(map);
+	for (Dart d = traFac.begin(); d != traFac.end(); d = traFac.next())
 	{
 		// turn in the face to search if there are 2 vertices marked as on the plane
-		Traversor2FV<typename PFP::MAP> traV(map,d);
+		Traversor2FV<MAP> traV(map,d);
 		Dart e=traV.begin();
-		while ((e!=traV.end())&&(!cmv.isMarked(e)))
-			e=traV.next();
+		while ((e != traV.end()) && (!cmv.isMarked(e)))
+			e = traV.next();
 
-		Dart V1=NIL;
-		if (e!=traV.end())
+		Dart V1 = NIL;
+		if (e != traV.end())
 			V1 = e;
 
-		e=traV.next();
-		while ((e!=traV.end())&&(!cmv.isMarked(e)))
-			e=traV.next();
+		e = traV.next();
+		while ((e != traV.end()) && (!cmv.isMarked(e)))
+			e = traV.next();
 
-		Dart V2=NIL;
-		if (e!=traV.end())
+		Dart V2 = NIL;
+		if (e != traV.end())
 			V2 = e;
 
 		// is there 2 vertices in the plane (but not consecutive)
-		if ((V1!=NIL) && (V2!=NIL) && (V2!=map.phi1(V1)) && (V1!=map.phi1(V2)))
+		if ((V1 != NIL) && (V2 != NIL) && (V2 != map.phi1(V1)) && (V1 != map.phi1(V2)))
 		{
 			map.splitFace(V1,V2);
 			if (with_unsew)
@@ -253,22 +259,28 @@ void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 }
 
 template <typename PFP>
-void planeCut2(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmf_over, bool with_unsew)
+void planeCut2(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const Geom::Plane3D<typename PFP::REAL>& plane,
+	CellMarker<FACE>& cmf_over,
+	bool with_unsew)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 
 	//marker for vertices on the plane
-	CellMarker<VERTEX> cmv(map);
+	CellMarker<MAP, VERTEX> cmv(map);
 	// marker for vertices over the plane
-	CellMarker<VERTEX> cmv_over(map);
+	CellMarker<MAP, VERTEX> cmv_over(map);
 
-	EdgeAutoAttribute<VEC3> positionEdge(map);
+	EdgeAutoAttribute<VEC3, MAP_IMPL> positionEdge(map);
 
-	CellMarker<EDGE> cme(map);
+	CellMarker<MAP, EDGE> cme(map);
 
-	TraversorE<typename PFP::MAP> traEdg(map);
-	for (Dart d=traEdg.begin(); d!=traEdg.end();d=traEdg.next())
+	TraversorE<MAP> traEdg(map);
+	for (Dart d = traEdg.begin(); d != traEdg.end(); d = traEdg.next())
 	{
 		Dart dd = map.phi1(d);
 
@@ -309,11 +321,11 @@ void planeCut2(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi
 		}
 	}
 
-	TraversorF<typename PFP::MAP> traFac(map);
-	for (Dart d=traFac.begin(); d!=traFac.end();d=traFac.next())
+	TraversorF<MAP> traFac(map);
+	for (Dart d = traFac.begin(); d != traFac.end(); d = traFac.next())
 	{
 		// turn in the face to search if there are 2 edges marked as intersecting the plane
-		Traversor2FE<typename PFP::MAP> traFE(map,d);
+		Traversor2FE<MAP> traFE(map,d);
 		Dart e=traFE.begin();
 		while ((e!=traFE.end())&&(!cme.isMarked(e)))
 			e=traFE.next();
@@ -359,7 +371,7 @@ void planeCut2(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi
 		}
 	}
 
-	for (Dart d=traEdg.begin(); d!=traEdg.end();d=traEdg.next())
+	for (Dart d = traEdg.begin(); d != traEdg.end(); d = traEdg.next())
 	{
 		if(cme.isMarked(d))
 		{
@@ -380,7 +392,6 @@ void planeCut2(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi
 
 }
 
-
 } // namespace Modelisation
 
 } // namespace Surface
@@ -392,18 +403,25 @@ namespace Modelisation
 {
 
 template <typename PFP>
-void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmf_over, bool keepTetrahedra=false, bool with_unsew = true)
+void planeCut(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const Geom::Plane3D<typename PFP::REAL>& plane,
+	CellMarker<FACE>& cmf_over,
+	bool keepTetrahedra=false,
+	bool with_unsew = true)
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 
 	//marker for vertices on the plane
-	CellMarker<VERTEX> cmv(map);
+	CellMarker<MAP, VERTEX> cmv(map);
 	// marker for vertices over the plane
-	CellMarker<VERTEX> cmv_over(map);
+	CellMarker<MAP, VERTEX> cmv_over(map);
 
-	TraversorE<typename PFP::MAP> traEdg(map);
-	for (Dart d=traEdg.begin(); d!=traEdg.end();d=traEdg.next())
+	TraversorE<MAP> traEdg(map);
+	for (Dart d = traEdg.begin(); d != traEdg.end(); d = traEdg.next())
 	{
 		Dart dd = map.phi1(d);
 
@@ -449,8 +467,8 @@ void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		}
 	}
 
-	TraversorW<typename PFP::MAP> traVol(map);
-	for (Dart d=traVol.begin(); d!=traVol.end();d=traVol.next())
+	TraversorW<MAP> traVol(map);
+	for (Dart d = traVol.begin(); d != traVol.end(); d = traVol.next())
 	{
 		// turn in the volume to search if there are ? vertices marked as on the plane
 

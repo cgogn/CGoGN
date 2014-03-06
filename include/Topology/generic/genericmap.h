@@ -152,7 +152,7 @@ protected:
 	/**
 	 * Erase a dart of the map
 	 */
-	virtual void deleteDart(Dart d) = 0;
+	virtual void deleteDart(Dart d) = 0 ;
 
 	/**
 	 * create a copy of a dart (based on its index in m_attribs[DART]) and returns its index
@@ -164,10 +164,45 @@ protected:
 	 */
 	void deleteDartLine(unsigned int index) ;
 
+public:
+	virtual unsigned int getNbDarts() const = 0 ;
+
+	/****************************************
+	 *          ORBITS TRAVERSALS           *
+	 ****************************************/
+
+	//! Apply a functor on every dart of an orbit
+	/*! @param dim dimension of orbit
+	 *  @param d a dart of the orbit
+	 *  @param f a functor obj
+	 */
+	template <unsigned int ORBIT>
+	bool foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+
+	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
+	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
+	virtual bool foreach_dart_of_face(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual bool foreach_dart_of_volume(Dart /*d*/, FunctorType& /*f*/, unsigned /*int thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual bool foreach_dart_of_cc(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+
+	virtual bool foreach_dart_of_vertex1(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual bool foreach_dart_of_edge1(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+
+	virtual bool foreach_dart_of_vertex2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+
+	/**
+	 * @brief getNbOrbits
+	 * @param orbit
+	 * @return the number of orbits in the map
+	 */
+	virtual unsigned int getNbOrbits(unsigned int orbit) const = 0 ;
+
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
 	 ****************************************/
-public:
+
 	/**
 	 * tell if an orbit is embedded or not
 	 */
@@ -224,6 +259,14 @@ public:
 	AttributeContainer& getAttributeContainer(unsigned int orbit) ;
 
 	const AttributeContainer& getAttributeContainer(unsigned int orbit) const;
+
+	/**
+	 * @brief get a generic pointer to an existing attribute multi vector
+	 * @param orbit the concerned orbit
+	 * @param nameAttr attribute name
+	 * @return a pointer to an AttributeMultiVectorGen
+	 */
+	inline AttributeMultiVectorGen* getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
 	 * get a multi vector of mark attribute (direct access with [i])
@@ -351,31 +394,6 @@ public:
 	 * compact the map
 	 */
 	void compact() ;
-
-	/****************************************
-	 *          ORBITS TRAVERSALS           *
-	 ****************************************/
-
-	//! Apply a functor on every dart of an orbit
-	/*! @param dim dimension of orbit
-	 *  @param d a dart of the orbit
-	 *  @param f a functor obj
-	 */
-	template <unsigned int ORBIT>
-	bool foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread = 0) const;
-
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
-	virtual bool foreach_dart_of_face(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_volume(Dart /*d*/, FunctorType& /*f*/, unsigned /*int thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_cc(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-
-	virtual bool foreach_dart_of_vertex1(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_edge1(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-
-	virtual bool foreach_dart_of_vertex2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 } ;
 
 //

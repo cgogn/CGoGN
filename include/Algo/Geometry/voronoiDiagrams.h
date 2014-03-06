@@ -17,15 +17,18 @@ namespace Algo
 namespace Surface
 {
 
-
 namespace Geometry
 {
 
 template <typename PFP>
-class VoronoiDiagram {
-protected :
+class VoronoiDiagram
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
+protected :
 	typedef struct
 	{
 		typename std::multimap<float,Dart>::iterator it ;
@@ -34,26 +37,27 @@ protected :
 		Dart pathOrigin;
 		static std::string CGoGNnameOfType() { return "VoronoiVertexInfo" ; }
 	} VoronoiVertexInfo ;
+
 	typedef NoTypeNameAttribute<VoronoiVertexInfo> VertexInfo ;
 
-	typename PFP::MAP& map;
-	const EdgeAttribute<REAL>& edgeCost; // weights on the graph edges
-	VertexAttribute<unsigned int>& regions; // region labels
+	MAP& map;
+	const EdgeAttribute<REAL, MAP_IMPL>& edgeCost; // weights on the graph edges
+	VertexAttribute<unsigned int, MAP_IMPL>& regions; // region labels
 	std::vector<Dart> border;
 	std::vector<Dart> seeds;
 
-	VertexAttribute<VertexInfo> vertexInfo;
+	VertexAttribute<VertexInfo, MAP_IMPL> vertexInfo;
 	std::multimap<float,Dart> front ;
-	CellMarker<VERTEX> vmReached;
+	CellMarker<MAP, VERTEX> vmReached;
 
 public :
-	VoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r);
+	VoronoiDiagram (MAP& m, const EdgeAttribute<REAL, MAP_IMPL>& c, VertexAttribute<unsigned int, MAP_IMPL>& r);
 	~VoronoiDiagram ();
 
-	const std::vector<Dart>& getSeeds (){return seeds;}
+	const std::vector<Dart>& getSeeds () { return seeds; }
 	virtual void setSeeds_fromVector (const std::vector<Dart>&);
 	virtual void setSeeds_random (unsigned int nbseeds);
-	const std::vector<Dart>& getBorder (){return border;}
+	const std::vector<Dart>& getBorder () { return border; }
 	void setCost (const EdgeAttribute<REAL>& c);
 
 	Dart computeDiagram ();
@@ -68,27 +72,31 @@ protected :
 	void updateVertexInFront(Dart f, float d);
 };
 
-
 template <typename PFP>
-class CentroidalVoronoiDiagram : public VoronoiDiagram<PFP> {
-private :
-	typedef typename PFP::REAL REAL;
+class CentroidalVoronoiDiagram : public VoronoiDiagram<PFP>
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
+private :
 	double globalEnergy;
 	std::vector<VEC3> energyGrad; // gradient of the region energy at seed
 
-	VertexAttribute<REAL>& distances; // distances from the seed
-	VertexAttribute<Dart>& pathOrigins; // previous vertex on the shortest path from origin
-	VertexAttribute<REAL>& areaElts; // area element attached to each vertex
+	VertexAttribute<REAL, MAP_IMPL>& distances; // distances from the seed
+	VertexAttribute<Dart, MAP_IMPL>& pathOrigins; // previous vertex on the shortest path from origin
+	VertexAttribute<REAL, MAP_IMPL>& areaElts; // area element attached to each vertex
 
 public :
-	CentroidalVoronoiDiagram (typename PFP::MAP& m,
-			const EdgeAttribute<REAL>& c,
-			VertexAttribute<unsigned int>& r,
-			VertexAttribute<REAL>& d,
-			VertexAttribute<Dart>& o,
-			VertexAttribute<REAL>& a);
+	CentroidalVoronoiDiagram (
+			MAP& m,
+			const EdgeAttribute<REAL, MAP_IMPL>& c,
+			VertexAttribute<unsigned int, MAP_IMPL>& r,
+			VertexAttribute<REAL, MAP_IMPL>& d,
+			VertexAttribute<Dart, MAP_IMPL>& o,
+			VertexAttribute<REAL, MAP_IMPL>& a);
+
 	~CentroidalVoronoiDiagram ();
 
 	void setSeeds_fromVector (const std::vector<Dart>&);
@@ -102,7 +110,7 @@ public :
 	// move each seed along one edge according to the energy gradient + check that the energy decreases
 	unsigned int moveSeedsToMedioid(); // returns the number of seeds that did move
 	// move each seed to the medioid of its region
-	REAL getGlobalEnergy() {return globalEnergy;}
+	REAL getGlobalEnergy() { return globalEnergy; }
 
 protected :
 	void clear();
@@ -113,12 +121,11 @@ protected :
 //	unsigned int moveSeed(unsigned int numSeed);
 };
 
+} // namespace Geometry
+} // namespace Surface
+} // namespace Algo
+} // namespace CGoGN
 
-}// end namespace Geometry
-}// end namespace Surface
-}// end namespace Algo
-}// end namespace CGoGN
-
-#include "voronoiDiagrams.hpp"
+#include "Algo/Geometry/voronoiDiagrams.hpp"
 
 #endif

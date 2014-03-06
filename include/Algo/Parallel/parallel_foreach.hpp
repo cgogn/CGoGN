@@ -67,7 +67,6 @@ public:
 	}
 };
 
-
 /// internal functor for boost call
 template<typename MAP>
 class ThreadFunction
@@ -100,12 +99,10 @@ public:
 	}
 };
 
-
 inline unsigned int nbThreads()
 {
 	return boost::thread::hardware_concurrency();
 }
-
 
 inline unsigned int optimalNbThreads(NbParam p)
 {
@@ -123,8 +120,6 @@ inline unsigned int optimalNbThreads(NbParam p)
 	return nb;
 
 }
-
-
 
 template <typename MAP, unsigned int ORBIT>
 void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers)
@@ -351,8 +346,6 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 		delete dmark;
 }
 
-
-
 template <typename MAP>
 void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers)
 {
@@ -383,7 +376,6 @@ void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bo
 		for (unsigned int i = 0; i < nbth; ++i)
 			delete funcs[i];
 }
-
 
 template <typename MAP>
 void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*> funcs, bool needMarkers)
@@ -463,7 +455,6 @@ void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*> funcs, bool ne
 	delete threads;
 	delete tempo;
 }
-
 
 // TODO same modification for transparent usage of dart marker / cell marker / quick traversal ??
 
@@ -611,8 +602,6 @@ void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFro
 	delete[] vd;
 }
 
-
-
 template <typename MAP, unsigned int CELL>
 void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapThreaded<MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, bool needMarkers)
 {
@@ -648,9 +637,6 @@ void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapT
 		for (unsigned int i = 0; i < 2*nbth; ++i)
 			delete funcs[i];
 }
-
-
-
 
 template <typename MAP, unsigned int ORBIT>
 void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers)

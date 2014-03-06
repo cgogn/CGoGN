@@ -364,28 +364,28 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 				break;
 			}
 			case VERTEX : {
-				unsigned int nb = m->getNbOrbits<VERTEX>();
+				unsigned int nb = m->getNbOrbits(VERTEX);
 				label_vertexNbOrbits->setText(QString::number(nb));
 				label_vertexNbCells->setText(QString::number(nbc));
 				selectorList = list_vertexSelectors;
 				break;
 			}
 			case EDGE : {
-				unsigned int nb = m->getNbOrbits<EDGE>();
+				unsigned int nb = m->getNbOrbits(EDGE);
 				label_edgeNbOrbits->setText(QString::number(nb));
 				label_edgeNbCells->setText(QString::number(nbc));
 				selectorList = list_edgeSelectors;
 				break;
 			}
 			case FACE : {
-				unsigned int nb = m->getNbOrbits<FACE>();
+				unsigned int nb = m->getNbOrbits(FACE);
 				label_faceNbOrbits->setText(QString::number(nb));
 				label_faceNbCells->setText(QString::number(nbc));
 				selectorList = list_faceSelectors;
 				break;
 			}
 			case VOLUME : {
-				unsigned int nb = m->getNbOrbits<VOLUME>();
+				unsigned int nb = m->getNbOrbits(VOLUME);
 				label_volumeNbOrbits->setText(QString::number(nb));
 				label_volumeNbCells->setText(QString::number(nbc));
 				selectorList = list_volumeSelectors;

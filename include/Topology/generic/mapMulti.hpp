@@ -127,7 +127,7 @@ inline Dart MapMulti::indexDart(unsigned int index) const
 	return Dart( (*m_mrDarts[m_mrCurrentLevel])[index] ) ;
 }
 
-inline unsigned int MapMulti::getNbInsertedDarts(unsigned int level)
+inline unsigned int MapMulti::getNbInsertedDarts(unsigned int level) const
 {
 	if(level < m_mrDarts.size())
 		return m_mrNbDarts[level] ;
@@ -135,7 +135,7 @@ inline unsigned int MapMulti::getNbInsertedDarts(unsigned int level)
 		return 0 ;
 }
 
-inline unsigned int MapMulti::getNbDarts(unsigned int level)
+inline unsigned int MapMulti::getNbDarts(unsigned int level) const
 {
 	if(level < m_mrDarts.size())
 	{
@@ -148,7 +148,7 @@ inline unsigned int MapMulti::getNbDarts(unsigned int level)
 		return 0 ;
 }
 
-inline unsigned int MapMulti::getNbDarts()
+inline unsigned int MapMulti::getNbDarts() const
 {
 	return getNbDarts(m_mrCurrentLevel) ;
 }

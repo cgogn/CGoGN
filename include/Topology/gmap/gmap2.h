@@ -384,12 +384,6 @@ public:
 	 * Check if a serie of darts is an oriented simple close path
 	 */
 	virtual bool checkSimpleOrientedPath(std::vector<Dart>& vd);
-
-	template <unsigned int ORBIT>
-	unsigned int getNbOrbits()
-	{
-		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, GMap2>();
-	}
 	//@}
 
 	/*! @name Cell Functors

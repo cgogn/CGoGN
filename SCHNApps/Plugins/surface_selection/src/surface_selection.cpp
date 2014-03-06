@@ -586,7 +586,8 @@ void Surface_Selection_Plugin::changePositionAttribute(const QString& map, const
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(m)
 	{
-		h_parameterSet[m].positionAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
+		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m);
+		h_parameterSet[m].positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(name);
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
@@ -597,7 +598,8 @@ void Surface_Selection_Plugin::changeNormalAttribute(const QString& map, const Q
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(m)
 	{
-		h_parameterSet[m].normalAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
+		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m);
+		h_parameterSet[m].normalAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(name);
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}

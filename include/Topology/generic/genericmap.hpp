@@ -157,6 +157,11 @@ inline const AttributeContainer& GenericMap::getAttributeContainer(unsigned int 
 	return m_attribs[orbit] ;
 }
 
+inline AttributeMultiVectorGen* GenericMap::getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr)
+{
+	return m_attribs[orbit].getVirtualDataVector(nameAttr) ;
+}
+
 template <unsigned int ORBIT>
 inline AttributeMultiVector<Mark>* GenericMap::getMarkVector(unsigned int thread)
 {

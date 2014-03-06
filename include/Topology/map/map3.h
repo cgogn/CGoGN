@@ -375,12 +375,6 @@ public:
 	/*! Test if phi3 and phi2 ares involutions and if phi1 is a permutation
 	 */
 	virtual bool check() const;
-
-	template <unsigned int ORBIT>
-	unsigned int getNbOrbits()
-	{
-		return MapCommon<MAP_IMPL>::template getNbOrbits<ORBIT, Map3>();
-	}
 	//@}
 
 	/*! @name Cell Functors

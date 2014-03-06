@@ -95,24 +95,24 @@ public:
 	/**
 	 * get the number of darts inserted in the given leveldart
 	 */
-	unsigned int getNbInsertedDarts(unsigned int level) ;
+	unsigned int getNbInsertedDarts(unsigned int level) const;
 
 	/**
 	 * get the number of darts that define the map of the given leveldart
 	 */
-	virtual unsigned int getNbDarts(unsigned int level) ;
+	unsigned int getNbDarts(unsigned int level) const;
 
 	/**
 	 * @return the number of darts in the map
 	 */
-	virtual unsigned int getNbDarts() ;
+	virtual unsigned int getNbDarts() const;
 
 	inline AttributeContainer& getDartContainer();
 
 	/**
 	 * get the insertion level of a dart
 	 */
-	unsigned int getDartLevel(Dart d) const ;
+	unsigned int getDartLevel(Dart d) const;
 
 protected:
 	/**

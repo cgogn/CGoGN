@@ -69,7 +69,7 @@ inline Dart MapMono::indexDart(unsigned int index) const
 	return Dart(index);
 }
 
-inline unsigned int MapMono::getNbDarts()
+inline unsigned int MapMono::getNbDarts() const
 {
 	return m_attribs[DART].size() ;
 }

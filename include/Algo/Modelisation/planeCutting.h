@@ -48,12 +48,23 @@ namespace Modelisation
 /**
 */
 template <typename PFP>
-void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmf_over, bool keepTriangles=false, bool with_unsew = true);
+void planeCut(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const Geom::Plane3D<typename PFP::REAL>& plane,
+	CellMarker<typename PFP::MAP, FACE>& cmf_over,
+	bool keepTriangles = false,
+	bool with_unsew = true
+);
 
 template <typename PFP>
-void planeCut2(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmf_over, bool with_unsew);
+void planeCut2(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3>& position,
+	const Geom::Plane3D<typename PFP::REAL>& plane,
+	CellMarker<FACE>& cmf_over,
+	bool with_unsew
+);
 
 } // namespace Modelisation
 
@@ -66,8 +77,14 @@ namespace Modelisation
 {
 
 template <typename PFP>
-void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmv_over, bool keepTetrahedra=false, bool with_unsew = true);
+void planeCut(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3>& position,
+	const Geom::Plane3D<typename PFP::REAL>& plane,
+	CellMarker<FACE>& cmv_over,
+	bool keepTetrahedra = false,
+	bool with_unsew = true
+);
 
 } // namespace Modelisation
 

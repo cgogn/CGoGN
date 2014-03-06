@@ -41,7 +41,10 @@ void Surface_Modelisation_DockTab::positionAttributeChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+		}
 	}
 }
 
@@ -51,7 +54,10 @@ void Surface_Modelisation_DockTab::vertexSelectorChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].vertexSelector = map->getCellSelector<VERTEX>(combo_vertexSelector->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].vertexSelector = mh->getCellSelector<VERTEX>(combo_vertexSelector->currentText());
+		}
 	}
 }
 
@@ -61,7 +67,10 @@ void Surface_Modelisation_DockTab::edgeSelectorChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].edgeSelector = map->getCellSelector<EDGE>(combo_edgeSelector->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].edgeSelector = mh->getCellSelector<EDGE>(combo_edgeSelector->currentText());
+		}
 	}
 }
 
@@ -71,7 +80,10 @@ void Surface_Modelisation_DockTab::faceSelectorChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].faceSelector = map->getCellSelector<FACE>(combo_faceSelector->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].faceSelector = mh->getCellSelector<FACE>(combo_faceSelector->currentText());
+		}
 	}
 }
 

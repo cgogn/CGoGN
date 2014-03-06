@@ -30,10 +30,10 @@ namespace CGoGN
  ****************************************/
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT, typename MAP>
+template <unsigned int ORBIT>
 bool MapCommon<MAP_IMPL>::foreach_orbit(FunctorType& fonct, unsigned int thread)
 {
-	TraversorCell<MAP, ORBIT> trav(*static_cast<MAP*>(this), true, thread);
+	TraversorCell<MapCommon<MAP_IMPL>, ORBIT> trav(*this, true, thread);
 	bool found = false;
 
 	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
@@ -45,12 +45,36 @@ bool MapCommon<MAP_IMPL>::foreach_orbit(FunctorType& fonct, unsigned int thread)
 }
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT, typename MAP>
-unsigned int MapCommon<MAP_IMPL>::getNbOrbits()
+template <unsigned int ORBIT>
+unsigned int MapCommon<MAP_IMPL>::getNbOrbits() const
 {
-	FunctorCount fcount;
-	foreach_orbit<ORBIT, MAP>(fcount);
-	return fcount.getNb();
+	unsigned int cpt = 0;
+	TraversorCell<MapCommon<MAP_IMPL>, ORBIT> trav(*this, true);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		++cpt;
+	}
+	return cpt;
+}
+
+template <typename MAP_IMPL>
+unsigned int MapCommon<MAP_IMPL>::getNbOrbits(unsigned int orbit) const
+{
+	switch(orbit)
+	{
+		case DART:		return getNbOrbits<DART>();
+		case VERTEX: 	return getNbOrbits<VERTEX>();
+		case EDGE: 		return getNbOrbits<EDGE>();
+		case FACE: 		return getNbOrbits<FACE>();
+		case VOLUME: 	return getNbOrbits<VOLUME>();
+		case VERTEX1: 	return getNbOrbits<VERTEX1>();
+		case EDGE1: 	return getNbOrbits<EDGE1>();
+		case VERTEX2: 	return getNbOrbits<VERTEX2>();
+		case EDGE2:		return getNbOrbits<EDGE2>();
+		case FACE2:		return getNbOrbits<FACE2>();
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+	return 0;
 }
 
 template <typename MAP_IMPL>
@@ -58,7 +82,7 @@ template <unsigned int ORBIT, unsigned int INCIDENT>
 unsigned int MapCommon<MAP_IMPL>::degree(Dart d) const
 {
 	assert(ORBIT != INCIDENT || !"degree does not manage adjacency counting") ;
-	Traversor* t = TraversorFactory<MAP_IMPL>::createIncident(*this, d, this->dimension(), ORBIT, INCIDENT) ;
+	Traversor* t = TraversorFactory<MapCommon<MAP_IMPL> >::createIncident(*this, d, this->dimension(), ORBIT, INCIDENT) ;
 	FunctorCount fcount ;
 	t->applyFunctor(fcount) ;
 	delete t ;
@@ -254,6 +278,17 @@ inline bool MapCommon<MAP_IMPL>::isBoundaryMarkedCurrent(Dart d) const
 }
 
 template <typename MAP_IMPL>
+inline bool MapCommon<MAP_IMPL>::isBoundaryMarked(unsigned int dim, Dart d) const
+{
+	switch(dim)
+	{
+		case 2 : return isBoundaryMarked<2>(d) ; break ;
+		case 3 : return isBoundaryMarked<3>(d) ; break ;
+		default : return false ; break ;
+	}
+}
+
+template <typename MAP_IMPL>
 template <unsigned int DIM>
 void MapCommon<MAP_IMPL>::boundaryUnmarkAll()
 {
@@ -300,12 +335,6 @@ inline AttributeHandler<T ,ORBIT, MAP_IMPL> MapCommon<MAP_IMPL>::getAttribute(co
 {
 	AttributeMultiVector<T>* amv = this->m_attribs[ORBIT].template getDataVector<T>(nameAttr) ;
 	return AttributeHandler<T, ORBIT, MAP_IMPL>(this, amv) ;
-}
-
-template <typename MAP_IMPL>
-inline AttributeMultiVectorGen* MapCommon<MAP_IMPL>::getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr)
-{
-	return this->m_attribs[orbit].getVirtualDataVector(nameAttr) ;
 }
 
 template <typename MAP_IMPL>
@@ -411,7 +440,7 @@ inline void MapCommon<MAP_IMPL>::disableQuickTraversal()
 {
 	if(this->m_quickTraversal[ORBIT] != NULL)
 	{
-		this->m_attribs[ORBIT].removeAttribute(this->m_quickTraversal[ORBIT]->getIndex()) ;
+		this->m_attribs[ORBIT].removeAttribute<Dart>(this->m_quickTraversal[ORBIT]->getIndex()) ;
 		this->m_quickTraversal[ORBIT] = NULL ;
 	}
 }

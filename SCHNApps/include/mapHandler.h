@@ -85,12 +85,6 @@ public:
 	 * MANAGE ATTRIBUTES
 	 *********************************************************/
 
-	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT> getAttribute(const QString& nameAttr, bool onlyRegistered = true) const;
-
-	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT> addAttribute(const QString& nameAttr, bool registerAttr = true);
-
 	inline void registerAttribute(const AttributeHandlerGen& ah);
 
 	inline QString getAttributeTypeName(unsigned int orbit, const QString& nameAttr) const;
@@ -153,7 +147,7 @@ public slots:
 	 * MANAGE CELL SELECTORS
 	 *********************************************************/
 
-	CellSelectorGen* addCellSelector(unsigned int orbit, const QString& name);
+	virtual CellSelectorGen* addCellSelector(unsigned int orbit, const QString& name) = 0;
 	void removeCellSelector(unsigned int orbit, const QString& name);
 
 	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
@@ -163,9 +157,6 @@ private slots:
 	void selectedCellsChanged();
 
 public:
-	template <unsigned int ORBIT>
-	CellSelector<ORBIT>* getCellSelector(const QString& name) const;
-
 	void updateMutuallyExclusiveSelectors(unsigned int orbit);
 
 	/*********************************************************
@@ -220,6 +211,10 @@ protected:
 template <typename PFP>
 class MapHandler : public MapHandlerGen
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::VEC3 VEC3;
+
 public:
 	MapHandler(const QString& name, SCHNApps* s, typename PFP::MAP* map) :
 		MapHandlerGen(name, s, map)
@@ -231,18 +226,39 @@ public:
 			delete m_map;
 	}
 
-	inline typename PFP::MAP* getMap() { return static_cast<typename PFP::MAP*>(m_map); }
+	inline MAP* getMap() { return static_cast<MAP*>(m_map); }
+
+	/*********************************************************
+	 * MANAGE ATTRIBUTES
+	 *********************************************************/
+
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT, MAP_IMPL> getAttribute(const QString& nameAttr, bool onlyRegistered = true) const;
+
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT, MAP_IMPL> addAttribute(const QString& nameAttr, bool registerAttr = true);
+
+	/*********************************************************
+	 * MANAGE DRAWING
+	 *********************************************************/
 
 	void draw(Utils::GLSLShader* shader, int primitive);
 	void drawBB();
 
-	void updateBB(const VertexAttribute<typename PFP::VEC3>& position);
+	void updateBB(const VertexAttribute<VEC3, MAP_IMPL>& position);
 	void updateBBDrawer();
 
-	CellSelectorGen* addPrimitiveSelector(unsigned int orbit, const QString& name);
+	/*********************************************************
+	 * MANAGE CELL SELECTORS
+	 *********************************************************/
+
+	virtual CellSelectorGen* addCellSelector(unsigned int orbit, const QString& name);
+
+	template <unsigned int ORBIT>
+	CellSelector<MAP, ORBIT>* getCellSelector(const QString& name) const;
 
 protected:
-	Geom::BoundingBox<typename PFP::VEC3> m_bb;
+	Geom::BoundingBox<VEC3> m_bb;
 };
 
 } // namespace SCHNApps
