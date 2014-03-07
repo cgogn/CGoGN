@@ -91,11 +91,18 @@ class OBJModel
 protected:
 	typename PFP::MAP& m_map;
 
+	// infof of sub-groups (group/material)
 	std::vector<unsigned int> m_beginIndices;
 	std::vector<unsigned int> m_nbIndices;
 	std::vector<unsigned int> m_groupIdx;
+	std::vector<unsigned int> m_sgMat;
 
 	std::vector<unsigned int> m_objGroups;
+
+
+	std::vector<unsigned int> m_groupFirstSub;
+	std::vector<unsigned int> m_groupNbSub;
+
 	std::vector<std::string> m_groupNames;
 	std::vector< Geom::BoundingBox<VEC3> > m_groupBBs;
 
@@ -123,7 +130,7 @@ protected:
 	unsigned int m_tagF ;
 
 
-	void updateGroups(const std::vector<Geom::Vec3f>& pos);
+	void computeBB(const std::vector<Geom::Vec3f>& pos);
 
 public:
 
@@ -256,43 +263,71 @@ public:
 	 * @brief nb group of indices created by createGroupMatVBO_XXX
 	 * @return
 	 */
-	unsigned int nbMatGroups() { return m_beginIndices.size(); }
+//	unsigned int nbMatGroups() { return m_beginIndices.size(); }
 
 	/**
-	 * @brief get the begin index of each group in VBOs (for glDrawArrays)
+	 * @brief number of sub-group in group
+	 * @param grp id of group
+	 * @return
+	 */
+	inline unsigned int nbSubGroup(unsigned int grp) const { return m_groupNbSub[grp];}
+
+	/**
+	 * @brief get the begin index of a sub-group in VBOs (for glDrawArrays)
 	 * @param i id of group
+	 * @param j id of subgroup in group
 	 * @return begin index
 	 */
-	unsigned int beginIndex(unsigned int i) const { return m_beginIndices[i]; }
+	inline unsigned int beginIndex(unsigned int i, unsigned int j) const { return m_beginIndices[ m_groupFirstSub[i]+j ]; }
 
 	/**
-	 * @brief get the number of indices of each group in VBOs (for glDrawArrays)
+	 * @brief get the number of indices of a sub-group in VBOs (for glDrawArrays)
 	 * @param i id of group
+	 * @param j id of subgroup in group
 	 * @return number of indices
 	 */
-	unsigned int nbIndices(unsigned int i) const { return m_nbIndices[i]; }
+	inline unsigned int nbIndices(unsigned int i, unsigned int j) const { return m_nbIndices[ m_groupFirstSub[i]+j ]; }
 
 	/**
-	 * @brief get the id of group in OBJ file
+	 * @brief material id of a sub-group
 	 * @param i id of group
+	 * @param j id of subgroup in group
+	 * @return id of material
+	 */
+	inline unsigned int materialIdOf(unsigned int i, unsigned int j) const { return m_sgMat[ m_groupFirstSub[i]+j ]; }
+
+	/**
+	 * @brief material of a sub-group
+	 * @param i id of group
+	 * @param j id of subgroup in group
+	 * @return material ptr
+	 */
+	inline const MaterialOBJ* materialOf(unsigned int i, unsigned int j) const { return m_materials[materialIdOf(i,j)]; }
+
+	/**
+	 * @brief get the id of group in OBJ file os sub-group
+	 * @param i id of sub-group
 	 * @return obj group index
 	 */
-	unsigned int groupIdx(unsigned int i) const { return m_groupIdx[i]; }
+	inline unsigned int groupIdx(unsigned int i) const { return m_groupIdx[i]; }
 
 	/**
 	 * @brief get the number of groups in OBJ file
 	 * @return number of groups
 	 */
-	unsigned int nbObjGroups() { return m_objGroups.size()-1; }
+	unsigned int nbObjGroups() { return m_groupFirstSub.size(); }
 
 	/**
 	 * @brief get the index of first group mat of obj
 	 * @param i id of obj group
 	 * @return id of first group mat
 	 */
-	unsigned int objGroup(unsigned int i) const { return m_objGroups[i]; }
+//	unsigned int objGroup(unsigned int i) const { return m_objGroups[i]; }
+
 
 	const Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) const { return m_groupBBs[i];}
+
+	Geom::BoundingBox<VEC3>& getGroupBB(unsigned int i) { return m_groupBBs[i];}
 
 	const std::string& objGroupName(unsigned int i) const { return m_groupNames[i];}
 
@@ -369,7 +404,13 @@ public:
 	 */
 	bool createGroupMatVBO_PTN( Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO);
 
-
+	/**
+	 * @brief add a dart by each face of group in a vector
+	 * @param groupId the group to add
+	 * @param dartFaces the vector in which we want to add
+	 * @return the number of faces added.
+	 */
+	unsigned int storeFacesOfGroup(unsigned int groupId, std::vector<Dart>& dartFaces);
 };
 
 
