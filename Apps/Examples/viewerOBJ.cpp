@@ -35,7 +35,8 @@ ObjView::ObjView():
 	m_texcoordVBO(NULL),
 	m_shader(NULL),
 	m_shader2(NULL),
-	m_RenderStyle(2)
+	m_RenderStyle(2),
+	m_currentGroupDrawn(0xffffffff)
 {}
 
 ObjView::~ObjView()
@@ -69,6 +70,23 @@ void ObjView::cb_keyPress(int k)
 		case 't':
 			m_RenderStyle=2;
 			break;
+
+	case 'o':
+		m_currentGroupDrawn=0xffffffff;
+		break;
+	case 'O':
+		m_currentGroupDrawn=0;
+		std::cout << "Group "<< m_obj.objGroupName(m_currentGroupDrawn)<< std::endl;
+		break;
+	case '-':
+		m_currentGroupDrawn--;
+		std::cout << "Group "<< m_obj.objGroupName(m_currentGroupDrawn)<< std::endl;
+		break;
+	case '+':
+		m_currentGroupDrawn++;
+		std::cout << "Group "<< m_obj.objGroupName(m_currentGroupDrawn)<< std::endl;
+		break;
+
 		default:
 			break;
 	}
@@ -80,6 +98,8 @@ void ObjView::cb_initGL()
 {
 	// choose to use GL version 2
 	Utils::GLSLShader::setCurrentOGLVersion(2);
+
+	m_dr = new Utils::Drawer;
 
 	// create VBO for position
 	m_positionVBO = new Utils::VBO;
@@ -105,56 +125,100 @@ void ObjView::cb_initGL()
 	m_obj.createGroupMatVBO_PTN(m_positionVBO,m_texcoordVBO,m_normalVBO);
 }
 
+void ObjView::drawBB( const Geom::BoundingBox<VEC3>& bb)
+{
+	const VEC3& mi = bb.min();
+	const VEC3& ma = bb.max();
+
+	m_dr->newList(GL_COMPILE_AND_EXECUTE);
+	m_dr->lineWidth(3.0f);
+	m_dr->begin(GL_LINE_LOOP);
+	m_dr->color3f(1.0f,1.0f,0.0f);
+	m_dr->vertex3f(mi[0],mi[1],mi[2]);
+	m_dr->vertex3f(ma[0],mi[1],mi[2]);
+	m_dr->vertex3f(ma[0],ma[1],mi[2]);
+	m_dr->vertex3f(mi[0],ma[1],mi[2]);
+	m_dr->end();
+	m_dr->begin(GL_LINE_LOOP);
+	m_dr->color3f(1.0f,1.0f,0.0f);
+	m_dr->vertex3f(mi[0],mi[1],ma[2]);
+	m_dr->vertex3f(ma[0],mi[1],ma[2]);
+	m_dr->vertex3f(ma[0],ma[1],ma[2]);
+	m_dr->vertex3f(mi[0],ma[1],ma[2]);
+	m_dr->end();
+	m_dr->begin(GL_LINES);
+	m_dr->color3f(1.0f,1.0f,0.0f);
+	m_dr->vertex3f(mi[0],mi[1],mi[2]);
+	m_dr->vertex3f(mi[0],mi[1],ma[2]);
+	m_dr->vertex3f(mi[0],ma[1],mi[2]);
+	m_dr->vertex3f(mi[0],ma[1],ma[2]);
+	m_dr->vertex3f(ma[0],ma[1],mi[2]);
+	m_dr->vertex3f(ma[0],ma[1],ma[2]);
+	m_dr->vertex3f(ma[0],mi[1],mi[2]);
+	m_dr->vertex3f(ma[0],mi[1],ma[2]);
+	m_dr->end();
+	m_dr->endList();
+
+}
 
 
 void ObjView::cb_redraw()
 {
+
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	unsigned int nb = m_obj.nbMatGroups();
-	const std::vector<Algo::Surface::Import::MaterialOBJ*>& mats = m_obj.getMaterials();
+	unsigned int nb = m_obj.nbObjGroups();
+//	const std::vector<Algo::Surface::Import::MaterialOBJ*>& mats = m_obj.getMaterials();
 
 
-	for (unsigned int i=0; i<nb; ++i)
+	if (m_currentGroupDrawn<(nb-1))
 	{
+		std::cout <<  "Draw Object "<< m_currentGroupDrawn << std::endl;
+		unsigned int i = m_currentGroupDrawn;
+		drawBB(m_obj.getGroupBB(i));
+		std::cout << "BB drawn" << std::endl;
 		switch(m_RenderStyle)
 		{
 			case 0: // MONO
-				{
+			for (unsigned int j=0; j<m_obj.nbSubGroup(i);++j)
+			{
 					Geom::Vec4f v(0.2f,1.0f,0.4f,0.0f); // color here green
 					m_phongShader->setAmbiant(0.2f*v) ;
 					m_phongShader->setDiffuse(v) ;
-		//			v[0] = 1.0f; v[1] = 1.0f; v[2] = 1.0f; v[3] = 0.0f; // use this for specular effected
 					m_phongShader->setSpecular(v) ;
 					m_phongShader->setShininess(10000.0) ;
 					m_phongShader->enableVertexAttribs();
-					glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i), m_obj.nbIndices(i));
+					glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
 					m_phongShader->disableVertexAttribs();
 				}
 				break;
 			case 1: // COLOR
-				{
-					Geom::Vec4f v(mats[i]->diffuseColor[0],mats[i]->diffuseColor[1],mats[i]->diffuseColor[2],0.0f);
+			for (unsigned int j=0; j<m_obj.nbSubGroup(i);++j)
+			{
+				const Algo::Surface::Import::MaterialOBJ* mat = m_obj.materialOf(i,j);
+					Geom::Vec4f v(mat->diffuseColor[0],mat->diffuseColor[1],mat->diffuseColor[2],0.0f);
 					m_phongShader->setAmbiant(0.2f*v) ;
 					m_phongShader->setDiffuse(v) ;
-		//			v[0] = 1.0f; v[1] = 1.0f; v[2] = 1.0f; v[3] = 0.0f; // use this for specular effected
 					m_phongShader->setSpecular(v) ;
 					m_phongShader->setShininess(10000.0) ;
 					m_phongShader->enableVertexAttribs();
-					glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i), m_obj.nbIndices(i));
+					glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
 					m_phongShader->disableVertexAttribs();
 
 				}
 			default:
-				{
-					if (mats[i]->textureDiffuse != NULL)
+			for (unsigned int j=0; j<m_obj.nbSubGroup(i);++j)
+			{
+				const Algo::Surface::Import::MaterialOBJ* mat = m_obj.materialOf(i,j);
+					if (mat->textureDiffuse != NULL)
 					{
-						m_shader2->setTexture(mats[i]->textureDiffuse);
-						m_shader2->setShininess(mats[i]->shininess);
+						m_shader2->setTexture(mat->textureDiffuse);
+						m_shader2->setShininess(mat->shininess);
 						m_shader2->setAmbient(0.8f);
 						m_shader2->activeTexture();
 						m_shader2->enableVertexAttribs();
-						glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i), m_obj.nbIndices(i));
+						glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
 						m_shader2->disableVertexAttribs();
 					}
 					else
@@ -162,13 +226,83 @@ void ObjView::cb_redraw()
 						Geom::Vec4f v;
 						v[0] = 0.5f; v[1] = 0.5f; v[2] = 0.5f; v[3] = 0.0f;
 						m_phongShader->setAmbiant(v) ;
-						v[0] = mats[i]->diffuseColor[0]; v[1] = mats[i]->diffuseColor[1]; v[2] = mats[i]->diffuseColor[2]; v[3] = 0.0f;
+						v[0] = mat->diffuseColor[0]; v[1] = mat->diffuseColor[1]; v[2] = mat->diffuseColor[2]; v[3] = 0.0f;
 						m_phongShader->setDiffuse(v) ;
-						v[0] = mats[i]->specularColor[0]; v[1] = mats[i]->specularColor[1]; v[2] = mats[i]->specularColor[2]; v[3] = 0.0f;
+						v[0] = mat->specularColor[0]; v[1] = mat->specularColor[1]; v[2] = mat->specularColor[2]; v[3] = 0.0f;
 						m_phongShader->setSpecular(v) ;
-						m_phongShader->setShininess(mats[i]->shininess) ;
+						m_phongShader->setShininess(mat->shininess) ;
 						m_phongShader->enableVertexAttribs();
-						glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i), m_obj.nbIndices(i));
+						glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
+						m_phongShader->disableVertexAttribs();
+					}
+				}
+		}
+	}
+	else
+	for (unsigned int i=0; i<nb; ++i)
+	{
+
+		drawBB(m_obj.getGroupBB(i));
+
+		switch(m_RenderStyle)
+		{
+			case 0: // MONO
+			for (unsigned int j=0; j<m_obj.nbSubGroup(i);++j)
+			{
+					Geom::Vec4f v(0.2f,1.0f,0.4f,0.0f); // color here green
+					m_phongShader->setAmbiant(0.2f*v) ;
+					m_phongShader->setDiffuse(v) ;
+		//			v[0] = 1.0f; v[1] = 1.0f; v[2] = 1.0f; v[3] = 0.0f; // use this for specular effected
+					m_phongShader->setSpecular(v) ;
+					m_phongShader->setShininess(10000.0) ;
+					m_phongShader->enableVertexAttribs();
+					glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
+					m_phongShader->disableVertexAttribs();
+				}
+				break;
+			case 1: // COLOR
+			for (unsigned int j=0; j<m_obj.nbSubGroup(i);++j)
+			{
+				const Algo::Surface::Import::MaterialOBJ* mat = m_obj.materialOf(i,j);
+
+					Geom::Vec4f v(mat->diffuseColor[0],mat->diffuseColor[1],mat->diffuseColor[2],0.0f);
+					m_phongShader->setAmbiant(0.2f*v) ;
+					m_phongShader->setDiffuse(v) ;
+		//			v[0] = 1.0f; v[1] = 1.0f; v[2] = 1.0f; v[3] = 0.0f; // use this for specular effected
+					m_phongShader->setSpecular(v) ;
+					m_phongShader->setShininess(10000.0) ;
+					m_phongShader->enableVertexAttribs();
+					glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
+					m_phongShader->disableVertexAttribs();
+
+				}
+			default:
+			for (unsigned int j=0; j<m_obj.nbSubGroup(i);++j)
+			{
+				const Algo::Surface::Import::MaterialOBJ* mat = m_obj.materialOf(i,j);
+
+					if (mat->textureDiffuse != NULL)
+					{
+						m_shader2->setTexture(mat->textureDiffuse);
+						m_shader2->setShininess(mat->shininess);
+						m_shader2->setAmbient(0.8f);
+						m_shader2->activeTexture();
+						m_shader2->enableVertexAttribs();
+						glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
+						m_shader2->disableVertexAttribs();
+					}
+					else
+					{
+						Geom::Vec4f v;
+						v[0] = 0.5f; v[1] = 0.5f; v[2] = 0.5f; v[3] = 0.0f;
+						m_phongShader->setAmbiant(v) ;
+						v[0] = mat->diffuseColor[0]; v[1] = mat->diffuseColor[1]; v[2] = mat->diffuseColor[2]; v[3] = 0.0f;
+						m_phongShader->setDiffuse(v) ;
+						v[0] = mat->specularColor[0]; v[1] = mat->specularColor[1]; v[2] = mat->specularColor[2]; v[3] = 0.0f;
+						m_phongShader->setSpecular(v) ;
+						m_phongShader->setShininess(mat->shininess) ;
+						m_phongShader->enableVertexAttribs();
+						glDrawArrays(GL_TRIANGLES, m_obj.beginIndex(i,j), m_obj.nbIndices(i,j));
 						m_phongShader->disableVertexAttribs();
 					}
 				}

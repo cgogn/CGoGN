@@ -56,9 +56,10 @@ else( WIN32 )
               	      PATH_SUFFIXES cholmod/ CHOLMOD/ )
    	
            FIND_PATH( SUITESPARSE_LIBRARY_DIR
-                      NAMES libcholmod.so 
+                      NAMES libcholmod.so libcholmod.a
                       PATHS /usr/lib 
-                            /usr/lib64 
+                            /usr/lib64
+                            /usr/lib/x86_64-linux-gnu
                             /usr/local/lib )
    ENDIF(APPLE)
 

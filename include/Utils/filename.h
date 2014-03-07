@@ -21,83 +21,78 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef _TEXTURE_EXAMPLE_
-#define _TEXTURE_EXAMPLE_
 
-#include <iostream>
+#ifndef _CGOGN_FILENAME_H_
+#define _CGOGN_FILENAME_H_
 
+#include <fstream>
 
-//#include "Utils/Qt/qtSimple.h"
-#include "Utils/Qt/qtQGLV.h"
-#include "Utils/textures.h"
-#include "Utils/drawer.h"
-#include "Utils/Shaders/shaderSimpleTexture.h"
-#include "Utils/Shaders/shaderPhongTexture.h"
-#include "Utils/Shaders/shaderPhong.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Import/importObjTex.h"
-
-
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Utils { class VBO; } }
-
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP ;
-};
-
-typedef PFP::MAP MAP ;
-typedef PFP::VEC3 VEC3 ;
+namespace Utils
+{
 /**
- * A class for a little interface and rendering
+ * @brief check if filename has extension and add it if not
+ * @param filename
+ * @param extension (with . example ".svg")
+ * @return the modified (or not) filename
  */
-
-//class ObjView: public Utils::QT::SimpleQT
-class ObjView: public Utils::QT::SimpleQGLV
+inline std::string checkFileNameExtension(const std::string &filename, const std::string extension)
 {
-	Q_OBJECT
-public:
+	std::size_t found = filename.rfind(extension);
+	if  ( (found==std::string::npos) || ((found+extension.length()) != filename.length()) )
+	{
+		if (filename[filename.size()-1]=='.')
+			return filename.substr(0,filename.size()-1) + extension;
 
-	MAP myMap ;
-	Algo::Surface::Import::OBJModel<PFP> m_obj;
+		return filename + extension;
+	}
+	return filename;
+}
 
-	Utils::Drawer* m_dr;
-	unsigned int m_currentGroupDrawn;
-	void drawBB( const Geom::BoundingBox<VEC3>& bb);
+/**
+ * @brief extract the path from a file-name
+ * @param filename
+ * @return the path (with ending /) if there is a / (or \) in filename
+ */
+inline std::string extractPathFromFileName(const std::string &filename)
+{
+	std::size_t found = filename.rfind('/');
 
-	// VBO
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_normalVBO;
-	Utils::VBO* m_texcoordVBO;
+	if (found == std::string::npos)
+		found = filename.rfind('\\'); // welcome on NTFS ;)
+
+	if (found == std::string::npos)
+		return "";
+
+	return filename.substr(0,found+1);
+}
+
+/**
+ * @brief extract the name from a file-name
+ * @param filename
+ * @return the name of file (string behind last / (or /))
+ */
+inline std::string extractNameFromFileName(const std::string &filename)
+{
+	std::size_t found = filename.rfind('/');
+
+	if (found == std::string::npos)
+		found = filename.rfind('\\'); // welcome on NTFS ;)
+
+	if (found == std::string::npos)
+		return filename;
+
+	return filename.substr(found+1);
+}
 
 
-	// shader simple texture
-	Utils::ShaderSimpleTexture* m_shader;
-	Utils::ShaderPhongTexture* m_shader2;
-	Utils::ShaderPhong* m_phongShader;
 
-	int m_RenderStyle;
-
-	ObjView();
-
-	~ObjView();
-
-	void init(const std::string& fnm);
-
-	// callbacks of simpleQT to overdefine:
-	void cb_redraw();
-
-	void cb_initGL();
-
-	void cb_keyPress(int k);
+}
+}
 
 
-};
+
 
 #endif
+

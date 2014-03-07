@@ -21,83 +21,61 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef _TEXTURE_EXAMPLE_
-#define _TEXTURE_EXAMPLE_
 
-#include <iostream>
+#ifndef __ALGO_GEOMETRY_DISTANCE_H__
+#define __ALGO_GEOMETRY_DISTANCE_H__
 
-
-//#include "Utils/Qt/qtSimple.h"
-#include "Utils/Qt/qtQGLV.h"
-#include "Utils/textures.h"
-#include "Utils/drawer.h"
-#include "Utils/Shaders/shaderSimpleTexture.h"
-#include "Utils/Shaders/shaderPhongTexture.h"
-#include "Utils/Shaders/shaderPhong.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Import/importObjTex.h"
-
-
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Utils { class VBO; } }
-
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP ;
-};
 
-typedef PFP::MAP MAP ;
-typedef PFP::VEC3 VEC3 ;
+namespace Algo
+{
+
+namespace Geometry
+{
+
 /**
- * A class for a little interface and rendering
- */
+* compute squared distance from point to the plane of a planar face
+* @param map the map
+* @param d a dart of the face
+* @param P the point
+* @return the squared distance to tha plane
+*/
+template <typename PFP>
+typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const VEC3& P) ;
 
-//class ObjView: public Utils::QT::SimpleQT
-class ObjView: public Utils::QT::SimpleQGLV
-{
-	Q_OBJECT
-public:
-
-	MAP myMap ;
-	Algo::Surface::Import::OBJModel<PFP> m_obj;
-
-	Utils::Drawer* m_dr;
-	unsigned int m_currentGroupDrawn;
-	void drawBB( const Geom::BoundingBox<VEC3>& bb);
-
-	// VBO
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_normalVBO;
-	Utils::VBO* m_texcoordVBO;
-
-
-	// shader simple texture
-	Utils::ShaderSimpleTexture* m_shader;
-	Utils::ShaderPhongTexture* m_shader2;
-	Utils::ShaderPhong* m_phongShader;
-
-	int m_RenderStyle;
-
-	ObjView();
-
-	~ObjView();
-
-	void init(const std::string& fnm);
-
-	// callbacks of simpleQT to overdefine:
-	void cb_redraw();
-
-	void cb_initGL();
-
-	void cb_keyPress(int k);
+/**
+* compute squared distance from point to face (assuming face is convex)
+* Algo: min  distance of each subtriangle of face (not optimum ?)
+* @param map the map
+* @param d a dart of the face
+* @param P the point
+* @return the squared distance
+*/
+template <typename PFP>
+typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const VEC3& P) ;
 
 
-};
+/**
+* compute squared distance from point to an edge
+* @param map the map
+* @param d a dart of the edge
+* @param P the point
+* @return the squared distance
+*/
+template <typename PFP>
+typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const VEC3& P) ;
+
+template <typename PFP>
+bool isPlanar(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position);
+
+
+} // namespace Geometry
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "Algo/Geometry/distances.hpp"
 
 #endif
