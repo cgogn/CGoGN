@@ -423,7 +423,7 @@ VTraversor2EEaF<MAP>::VTraversor2EEaF(const MAP& map, Dart dart) : m(map),m_QLT(
 	}
 	else
 	{
-		if (m.isBoundaryMarked2(dart))
+		if (m.template isBoundaryMarked<2>(dart))
 			stop1 = m.phi2(dart);
 		else
 			stop1 = dart;
@@ -463,7 +463,7 @@ Dart VTraversor2EEaF<MAP>::next()
 		current = m.phi1(current) ;
 		if (current == stop1)
 		{
-			if (!m.isBoundaryMarked2(stop2))
+			if (!m.template isBoundaryMarked<2>(stop2))
 				current = m.phi1(stop2) ;
 			else
 				current=NIL;

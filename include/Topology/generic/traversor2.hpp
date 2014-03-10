@@ -316,7 +316,7 @@ Traversor2EF<MAP>::Traversor2EF(const MAP& map, Dart dart) : m(map), start(dart)
 	}
 	else
 	{
-		if(m.isBoundaryMarked2(start))
+		if(m.template isBoundaryMarked<2>(start))
 			start = m.phi2(start) ;
 	}
 }
@@ -350,7 +350,7 @@ Dart Traversor2EF<MAP>::next()
 	if(current != NIL)
 	{
 		current = m.phi2(current) ;
-		if(current == start || m.isBoundaryMarked2(current)) // do not consider a boundary face
+		if(current == start || m.template isBoundaryMarked<2>(current)) // do not consider a boundary face
 			current = NIL ;
 	}
 	return current ;
@@ -424,7 +424,7 @@ Traversor2EEaF<MAP>::Traversor2EEaF(const MAP& map, Dart dart) :
 	}
 	else
 	{
-		if (m.isBoundaryMarked2(dart))
+		if (m.template isBoundaryMarked<2>(dart))
 			stop1 = m.phi2(dart);
 		else
 			stop1 = dart;
@@ -464,7 +464,7 @@ Dart Traversor2EEaF<MAP>::next()
 		current = m.phi1(current) ;
 		if (current == stop1)
 		{
-			if (!m.isBoundaryMarked2(stop2))
+			if (!m.template isBoundaryMarked<2>(stop2))
 				current = m.phi1(stop2) ;
 			else
 				current=NIL;
@@ -615,7 +615,7 @@ Traversor2FFaE<MAP>::Traversor2FFaE(const MAP& map, Dart dart) : m(map),m_QLT(NU
 	else
 	{
 		start = m.phi2(dart) ;
-		while(start != NIL && m.isBoundaryMarked2(start))
+		while(start != NIL && m.template isBoundaryMarked<2>(start))
 		{
 			start = m.phi2(m.phi1(m.phi2(start))) ;
 			if(start == m.phi2(dart))
@@ -655,7 +655,7 @@ Dart Traversor2FFaE<MAP>::next()
 		do
 		{
 			current = m.phi2(m.phi1(m.phi2(current))) ;
-		} while(m.isBoundaryMarked2(current)) ;
+		} while(m.template isBoundaryMarked<2>(current)) ;
 		if(current == start)
 			current = NIL ;
 	}
