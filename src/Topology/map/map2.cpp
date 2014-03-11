@@ -66,6 +66,24 @@ void Map2::rdfi(Dart t, DartMarker& m1, DartMarker& m2)
 	}
 }
 
+//void Map2::propagateDartRelation(Dart d)
+//{
+//	pushLevel() ;
+//	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+//	{
+//		Dart d1 = (*m_phi1)[dartIndex(d)];
+//		Dart d_1 = (*m_phi_1)[dartIndex(d)];
+//		Dart d2 = (*m_phi2)[dartIndex(d)];
+
+//		setCurrentLevel(i) ;
+
+//		(*m_phi1)[dartIndex(d)] = d1;
+//		(*m_phi_1)[dartIndex(d)] = d_1;
+//		(*m_phi2)[dartIndex(d)] = d2;
+//	}
+//	popLevel() ;
+//}
+
 void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 {
 	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))

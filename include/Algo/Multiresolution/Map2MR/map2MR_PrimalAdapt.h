@@ -123,7 +123,7 @@ public:
 	bool faceIsSubdividedOnce(Dart d) ;
 
 
-protected:
+//protected:
 	/**
 	 *
 	 */
@@ -158,6 +158,8 @@ public:
 	 * subdivide the face of d to the next level
 	 */
 	unsigned int subdivideFace(Dart d, bool triQuad = true, bool OneLevelDifference = true);
+
+	unsigned int subdivideFace2(Dart d, bool triQuad = true, bool OneLevelDifference = true);
 
 	/**
 	 *

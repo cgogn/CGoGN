@@ -106,6 +106,8 @@ void MyQT::squareTiling(int code)
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
 			g.embedIntoGrid(position,50,50);
 
+			g.exportPositions(position, "grid.bs");
+
 			break;
 		}
 		case 2:
@@ -114,13 +116,17 @@ void MyQT::squareTiling(int code)
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
 			g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
 
+			g.exportPositions(position, "gridtwisted.bs");
+
 			break;
 		}
 		case 3:
 		{
-			std::cout << "square grid helocoid tiling" << std::endl;
+			std::cout << "square grid helicoid tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,20,20,true);
 			g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
+
+			g.exportPositions(position, "gridhelicoid.bs");
 
 			break;
 		}
@@ -129,6 +135,8 @@ void MyQT::squareTiling(int code)
 			std::cout << "square cylinder tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
 			c.embedIntoCylinder(position,0.5,0.7,5.0);
+
+			c.exportPositions(position, "cylinder.bs");
 
 			break;
 		}
@@ -168,14 +176,17 @@ void MyQT::squareTiling(int code)
 			Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
 			c.embedIntoCube(position,5.0,5.0, 5.0);
 
+			c.exportPositions(position, "cube.bs");
+
 			break;
 		}
 		case 9:
 		{
-			std::cout << "square cylinder cone tiling" << std::endl;
+			std::cout << "square tore tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
 			c.embedIntoTore(position,5.0,2.0);
 
+			c.exportPositions(position, "tore.bs");
 			break;
 		}
 
@@ -184,6 +195,8 @@ void MyQT::squareTiling(int code)
 			break;
 		}
 	}
+
+	myMap.check();
 }
 
 // mouse picking

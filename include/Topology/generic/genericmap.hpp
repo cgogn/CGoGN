@@ -229,6 +229,82 @@ inline void GenericMap::duplicateDartAtOneLevel(Dart d, unsigned int level)
 	(*m_mrDarts[level])[d.index] = copyDartLine(dartIndex(d)) ;
 }
 
+
+inline void GenericMap::propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel)
+{
+	Dart dd = (*rel)[dartIndex(d)] ;
+	pushLevel() ;
+	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	{
+		setCurrentLevel(i) ;
+		(*rel)[dartIndex(d)] = dd ;
+	}
+	popLevel() ;
+}
+
+inline void GenericMap::propagateDartRelation(Dart d, Dart e, AttributeMultiVector<Dart>* rel)
+{
+	Dart dd = (*rel)[dartIndex(d)] ;
+	pushLevel() ;
+	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	{
+		setCurrentLevel(i) ;
+
+		while( (*rel)[dartIndex(d)] != e )
+			d = (*rel)[dartIndex(d)];
+
+		if(d != e)
+			duplicateDart(d);
+
+		(*rel)[dartIndex(d)] = dd ;
+	}
+	popLevel() ;
+}
+
+inline void GenericMap::propagateDartRelation(Dart d, Dart e, Dart f, AttributeMultiVector<Dart>* rel, AttributeMultiVector<Dart>* rel2)
+{
+	Dart dd = f ;
+	pushLevel() ;
+	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	{
+		setCurrentLevel(i) ;
+
+		while( (*rel)[dartIndex(e)] != dd )
+			dd = (*rel2)[dartIndex(dd)];
+
+		(*rel)[dartIndex(d)] = dd ;
+	}
+	popLevel() ;
+}
+
+template <unsigned int ORBIT>
+inline void GenericMap::propagateDartEmbedding(Dart d)
+{
+	   unsigned int emb = getEmbedding<ORBIT>(d) ;
+	   pushLevel() ;
+	   for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	   {
+			   setCurrentLevel(i) ;
+			   setDartEmbedding<ORBIT>(d, emb) ;
+	   }
+	   popLevel() ;
+}
+
+template <unsigned int ORBIT>
+inline void GenericMap::propagateOrbitEmbedding(Dart d)
+{
+	   unsigned int emb = getEmbedding<ORBIT>(d) ;
+	   pushLevel() ;
+	   for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	   {
+			   setCurrentLevel(i) ;
+			   setOrbitEmbedding<ORBIT>(d, emb) ;
+	   }
+	   popLevel() ;
+}
+
+
+
 inline unsigned int GenericMap::dartIndex(Dart d) const
 {
 	if (m_isMultiRes)

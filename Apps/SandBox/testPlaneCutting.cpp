@@ -57,18 +57,18 @@ Viewer::Viewer() :
 
 void Viewer::initGUI()
 {
-    setDock(&dock) ;
+	setDock(&dock) ;
 
-    dock.check_drawVertices->setChecked(false) ;
-    dock.check_drawEdges->setChecked(false) ;
-    dock.check_drawFaces->setChecked(true) ;
-    dock.check_drawNormals->setChecked(false) ;
+	dock.check_drawVertices->setChecked(false) ;
+	dock.check_drawEdges->setChecked(false) ;
+	dock.check_drawFaces->setChecked(true) ;
+	dock.check_drawNormals->setChecked(false) ;
 
-    dock.slider_verticesSize->setVisible(false) ;
-    dock.slider_normalsSize->setVisible(false) ;
+	dock.slider_verticesSize->setVisible(false) ;
+	dock.slider_normalsSize->setVisible(false) ;
 
-    dock.slider_verticesSize->setSliderPosition(50) ;
-    dock.slider_normalsSize->setSliderPosition(50) ;
+	dock.slider_verticesSize->setSliderPosition(50) ;
+	dock.slider_normalsSize->setSliderPosition(50) ;
 
 	setCallBack( dock.check_drawVertices, SIGNAL(toggled(bool)), SLOT(slot_drawVertices(bool)) ) ;
 	setCallBack( dock.slider_verticesSize, SIGNAL(valueChanged(int)), SLOT(slot_verticesSize(int)) ) ;
@@ -196,75 +196,113 @@ void Viewer::cb_Save()
 
 void Viewer::cb_keyPress(int keycode)
 {
-    switch(keycode)
-    {
-    	case 'c' :
-    		myMap.check();
-    		break;
-
-	case 'p':
+	switch(keycode)
 	{
+		case 'c' :
+			myMap.check();
+			break;
 
-		std::cout << "PlaneCut"<< std::endl;
-		Geom::Vec3f n(0.1,0.1,1.0);
-		Geom::Vec3f o = bb.center();
-
-		Geom::Plane3D<PFP::REAL> plan(n,o);
-
-		CellMarker<FACE> over(myMap);
-		Algo::Surface::Modelisation::planeCut<PFP>(myMap, position, plan, over, false,true);
-
-		std::cout << "PlaneCut Ok"<< std::endl;
-		n *= bb.diagSize()/20.0f;
-
-		TraversorV<PFP::MAP> trav(myMap);
-		for (Dart d=trav.begin(); d!=trav.end(); d=trav.next())
+		case 'p':
 		{
-			if (over.isMarked(d))
-				position[d]+= n;
+
+			std::cout << "PlaneCut"<< std::endl;
+			Geom::Vec3f n(0.1,0.1,1.0);
+			Geom::Vec3f o = bb.center();
+
+			Geom::Plane3D<PFP::REAL> plan(n,o);
+
+			CellMarker<FACE> over(myMap);
+			Algo::Surface::Modelisation::planeCut<PFP>(myMap, position, plan, over, true, true);
+
+			std::cout << "PlaneCut Ok"<< std::endl;
+			n *= bb.diagSize()/20.0f;
+
+			TraversorV<PFP::MAP> trav(myMap);
+			for (Dart d=trav.begin(); d!=trav.end(); d=trav.next())
+			{
+				if (over.isMarked(d))
+					position[d]+= n;
+			}
+
+
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
+
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+			m_positionVBO->updateData(position) ;
+			m_normalVBO->updateData(normal) ;
+
+			m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+			updateGL();
+
+			break;
+		}
+		case 'P':
+		{
+
+			std::cout << "PlaneCut"<< std::endl;
+			Geom::Vec3f n(0.1,0.1,1.0);
+			Geom::Vec3f o = bb.center();
+
+			Geom::Plane3D<PFP::REAL> plan(n,o);
+
+			CellMarker<FACE> over(myMap);
+			Algo::Surface::Modelisation::planeCut2<PFP>(myMap, position, plan, over, true);
+
+			std::cout << "PlaneCut Ok"<< std::endl;
+			n *= bb.diagSize()/20.0f;
+
+			TraversorV<PFP::MAP> trav(myMap);
+			for (Dart d=trav.begin(); d!=trav.end(); d=trav.next())
+			{
+				if (over.isMarked(d))
+					position[d]+= n;
+			}
+
+
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
+			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
+
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+			m_positionVBO->updateData(position) ;
+			m_normalVBO->updateData(normal) ;
+
+			m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+			updateGL();
+
+			break;
+		}
+
+		case 'd':
+		{
+			Utils::Chrono ch;
+			ch.start();
+			VEC3 P(0.6f,0.55f,0.51f);
+			float dist = 10000.0f;
+			TraversorF<PFP::MAP> trav(myMap);
+			unsigned int nb=0;
+			for (Dart d=trav.begin(); d != trav.end(); d=trav.next())
+			{
+				nb++;
+				float d2 = Algo::Geometry::squaredDistancePoint2Face<PFP>(myMap,d,position,P);
+				if (d2<dist)
+					dist = d2;
+
+			}
+			std::cout << "Dist="<< sqrt(dist) << " of "<< nb << "faces in "<< ch.elapsed()<< " ms"<< std::endl;
+
+			break;
 		}
 
 
-		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
-		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
-		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
-		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-		m_positionVBO->updateData(position) ;
-		m_normalVBO->updateData(normal) ;
 
-		m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
-		updateGL();
 
+		default:
+			break;
 	}
-		break;
-
-	case 'd':
-	{
-		Utils::Chrono ch;
-		ch.start();
-		VEC3 P(0.6f,0.55f,0.51f);
-		float dist = 10000.0f;
-		TraversorF<PFP::MAP> trav(myMap);
-		unsigned int nb=0;
-		for (Dart d=trav.begin(); d != trav.end(); d=trav.next())
-		{
-			nb++;
-			float d2 = Algo::Geometry::squaredDistancePoint2Face<PFP>(myMap,d,position,P);
-			if (d2<dist)
-				dist = d2;
-
-		}
-		std::cout << "Dist="<< sqrt(dist) << " of "<< nb << "faces in "<< ch.elapsed()<< " ms"<< std::endl;
-	}
-		break;
-
-
-
-
-    	default:
-    		break;
-    }
 }
 
 void Viewer::importMesh(std::string& filename)
@@ -290,7 +328,7 @@ void Viewer::importMesh(std::string& filename)
 		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 	}
 
-//	myMap.enableQuickTraversal<VERTEX>() ;
+	//	myMap.enableQuickTraversal<VERTEX>() ;
 
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
@@ -300,7 +338,7 @@ void Viewer::importMesh(std::string& filename)
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
-//	vertexBaseSize = normalBaseSize / 5.0f ;
+	//	vertexBaseSize = normalBaseSize / 5.0f ;
 
 	normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
 	if(!normal.isValid())
@@ -407,7 +445,7 @@ int main(int argc, char **argv)
 
 	Viewer sqt ;
 	sqt.setGeometry(0, 0, 1000, 800) ;
- 	sqt.show() ;
+	sqt.show() ;
 
 	if(argc >= 2)
 	{

@@ -106,6 +106,26 @@ void Tiling<PFP>::mark(CellMarker<VERTEX>& m)
     }
 }
 
+template <typename PFP>
+bool Tiling<PFP>::exportPositions(const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+{
+	// open file
+	std::ofstream out ;
+	out.open(filename, std::ios::out) ;
+
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+	for(std::vector<Dart>::iterator it = m_tableVertDarts.begin() ; it != m_tableVertDarts.end() ; ++it)
+	{
+		out << position[*it];
+	}
+
+}
+
 
 } // namespace Tilings
 

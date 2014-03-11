@@ -155,6 +155,15 @@ void IHM2<PFP>::addNewLevel(bool triQuad)
 	m_map.setCurrentLevel(cur) ;
 }
 
+//template <typename PFP>
+//void IHM2<PFP>::checkTagging(unsigned int level)
+//{
+//	if(level != m_map.getMaxLevel())
+//	{
+
+//	}
+//}
+
 template <typename PFP>
 void IHM2<PFP>::addLevelFront()
 {
@@ -172,33 +181,11 @@ void IHM2<PFP>::addLevelFront()
 		}
 	}
 
-	//2. found the number of levels
-	bool finished = false;
-	Dart dit = irregVertex;
-	unsigned int nbSteps = 0;
-	do
-	{
-		dit = m_map.phi1(m_map.phi2(m_map.phi1(m_map.phi2(m_map.phi1(dit)))));
-		++nbSteps;
+	if(!found)
+		irregVertex = tv.begin();
 
-		if(m_map.vertexDegree(m_map.phi1(dit)) != 6)
-			finished = true;
-	}while(!finished);
-
-	++nbSteps;
-
-	unsigned int nbLevel = 0;
-	while(nbSteps > 1)
-	{
-		nbSteps /= 2 ;
-		++nbLevel ;
-	}
-
-	m_map.setMaxLevel(nbLevel);
-	std::cout << "nb levels = " << nbLevel+1 << std::endl;
-
-	//3. construct the topology of the differents levels
-	unsigned int curLevel = nbLevel;
+	//2. construct the topology of the differents levels
+	unsigned int curLevel = 0;
 
 	do
 	{
@@ -221,17 +208,29 @@ void IHM2<PFP>::addLevelFront()
 				//coarse all faces around the vertex
 				if(!md.isMarked(eit))
 				{
-					Dart fit1 = m_map.phi2(m_map.phi1(eit));
-					Dart fit2 = m_map.phi1(fit1);
-					Dart fit3 = m_map.phi1(fit2);
+					Dart fit1 = eit;
+					Dart fit2 = m_map.phi2(m_map.phi1(fit1));
+					Dart fit3 = m_map.phi_1(m_map.phi2(m_map.phi1(fit1)));
+					Dart fit4 = m_map.phi_1(m_map.phi2(m_map.phi_1(fit1)));
 
 					md.markOrbit<FACE>(fit1);
-					md.markOrbit<FACE>(m_map.phi2(fit2));
-					md.markOrbit<FACE>(m_map.phi2(fit3));
-					md.markOrbit<FACE>(eit);
+					md.markOrbit<FACE>(fit2);
+					md.markOrbit<FACE>(fit3);
+					md.markOrbit<FACE>(fit4);
 
-					visitedVertices.push_back(m_map.phi_1(m_map.phi2(fit2)));
-					visitedVertices.push_back(m_map.phi_1(m_map.phi2(fit3)));
+					visitedVertices.push_back(m_map.phi1(m_map.phi2(fit2)));
+					visitedVertices.push_back(m_map.phi1(m_map.phi2(fit3)));
+
+					//Tag edges
+
+
+//					checkTagging();
+
+
+//					increaseTriangleLevel(eit);
+//					increaseTriangleLevel(fit1);
+//					increaseTriangleLevel(fit2);
+
 
 					m_map.setDartLevel(fit1, curLevel);
 					m_map.setDartLevel(m_map.phi2(fit1), curLevel);
@@ -244,6 +243,7 @@ void IHM2<PFP>::addLevelFront()
 					m_map.setDartLevel(fit3, curLevel);
 					m_map.setDartLevel(m_map.phi2(fit3), curLevel);
 					m_map.setDartLevel(m_map.phi1(m_map.phi2(fit3)), curLevel);
+
 
 					if(curLevel == m_map.getMaxLevel())
 					{
@@ -259,39 +259,19 @@ void IHM2<PFP>::addLevelFront()
 						m_map.setEdgeId(m_map.phi2(fit3), id);
 						m_map.setEdgeId(fit3, id);
 					}
-					else
-					{
-//						unsigned int id = m_map.getTriRefinementEdgeId(m_map.phi2(fit1));
-//						m_map.setEdgeId(m_map.phi2(fit1), id);
-//						m_map.setEdgeId(fit1, id);
-
-//						m_map.incCurrentLevel();
-//						m_map.setEdgeId(m_map.phi2(fit1), id);
-//						m_map.decCurrentLevel();
-
-//						id = m_map.getTriRefinementEdgeId(m_map.phi2(fit2));
-//						m_map.setEdgeId(m_map.phi2(fit2), id);
-//						m_map.setEdgeId(fit2, id);
-//						m_map.incCurrentLevel();
-//						m_map.setEdgeId(m_map.phi2(fit2), id);
-//						m_map.decCurrentLevel();
-
-//						id = m_map.getTriRefinementEdgeId(m_map.phi2(fit3));
-//						m_map.setEdgeId(m_map.phi2(fit3), id);
-//						m_map.setEdgeId(fit3, id);
-//						m_map.incCurrentLevel();
-//						m_map.setEdgeId(m_map.phi2(fit3), id);
-//						m_map.decCurrentLevel();
-					}
 				}
 			}
 		}
 
 		curLevel = curLevel - 1;
 
-	}while(curLevel > 1);
+	}while(curLevel > 2);
 
-	m_map.setCurrentLevel(nbLevel); //m_maxLevel
+
+//	m_map.setMaxLevel(curLevel);
+//	std::cout << "nb levels = " << nbLevel+1 << std::endl;
+
+//	m_map.setCurrentLevel(nbLevel); //m_maxLevel
 }
 
 

@@ -99,6 +99,21 @@ public:
         */
     Dart getDart() { return m_dart; }
 
+	bool exportPositions(const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
+
+
+	//	/**
+	//	* mark all embedded vertices of the Polyhedron
+	//	* @param m the marker to use
+	//	*/
+	////	void markEmbVertices(Mark m);
+
+	//	/**
+	//	* test if a vertex is in the Polyhedron
+	//	* @param d a dart of the vertex to test
+	//	*/
+	//	bool containVertex(Dart d);
+
 };
 
 } // namespace Tilings
