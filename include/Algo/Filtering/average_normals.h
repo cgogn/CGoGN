@@ -44,12 +44,12 @@ namespace Filtering
 template <typename PFP>
 void computeNewPositionsFromFaceNormals(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3>& position,
-	VertexAttribute<typename PFP::VEC3>& position2,
-	const FaceAttribute<typename PFP::REAL>& faceArea,
-	const FaceAttribute<typename PFP::VEC3>& faceCentroid,
-	const FaceAttribute<typename PFP::VEC3>& faceNormal,
-	const FaceAttribute<typename PFP::VEC3>& faceNewNormal)
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2,
+	const FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& faceArea,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& faceCentroid,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& faceNormal,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& faceNewNormal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -77,20 +77,21 @@ void computeNewPositionsFromFaceNormals(
 }
 
 template <typename PFP>
-void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2)
+void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2)
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
-	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
-	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
+	FaceAutoAttribute<REAL, MAP_IMPL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
 	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
-	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
 	TraversorF<typename PFP::MAP> tf(map) ;
@@ -120,20 +121,21 @@ void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename
 }
 
 template <typename PFP>
-void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2)
+void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2)
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
-	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
-	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
+	FaceAutoAttribute<REAL, MAP_IMPL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
 	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
-	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
 	TraversorF<typename PFP::MAP> tf(map) ;
@@ -204,20 +206,21 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typ
 }
 
 template <typename PFP>
-void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2)
+void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2)
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
-	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
-	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
+	FaceAutoAttribute<REAL, MAP_IMPL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
 	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
-	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
 	long nbTot = 0 ;
@@ -322,22 +325,23 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 }
 
 template <typename PFP>
-void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal)
+void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal)
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
-	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
-	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
+	FaceAutoAttribute<REAL, MAP_IMPL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Surface::Geometry::computeAreaFaces<PFP>(map, position, faceArea) ;
 	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, faceNormal) ;
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid) ;
 
-	VertexAutoAttribute<REAL> vertexArea(map, "vertexArea") ;
-	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
-	VertexAutoAttribute<VEC3> vertexNewNormal(map, "vertexNewNormal") ;
+	VertexAutoAttribute<REAL, MAP_IMPL> vertexArea(map, "vertexArea") ;
+	FaceAutoAttribute<VEC3, MAP_IMPL> faceNewNormal(map, "faceNewNormal") ;
+	VertexAutoAttribute<VEC3, MAP_IMPL> vertexNewNormal(map, "vertexNewNormal") ;
 
 	long nbTot = 0 ;
 	long nbAdapt = 0 ;
@@ -458,10 +462,10 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 //	CGoGNout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<CGoGNendl;
 }
 
-} //namespace Filtering
+} // namespace Filtering
 
-}
+} // namespace Surface
 
-} //namespace Algo
+} // namespace Algo
 
-} //namespace CGoGN
+} // namespace CGoGN

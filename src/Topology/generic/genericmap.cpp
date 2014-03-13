@@ -362,7 +362,7 @@ void GenericMap::restore_shortcuts()
 			ss << "quickLocalIncidentTraversal_" << j;
 			m_quickLocalIncidentTraversal[orbit][j] = cont.getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 			std::stringstream ss2;
-			ss2 << "quickLocalAdjacentTraversal" << j;
+			ss2 << "quickLocalAdjacentTraversal_" << j;
 			m_quickLocalAdjacentTraversal[orbit][j] = cont.getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss2.str()) ;
 		}
 

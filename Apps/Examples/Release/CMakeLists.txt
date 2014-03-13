@@ -73,5 +73,4 @@ target_link_libraries( concave_rendering ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP( viewerOBJ_moc ../viewerOBJ.h )
 add_executable( viewerOBJ ../viewerOBJ.cpp ${viewerOBJ_moc} )
-target_link_libraries( viewerOBJ ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS}  )
-
+target_link_libraries( viewerOBJ ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )

@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include "Topology/generic/dart.h"
-#include "Topology/generic/attribmap.h"
 
 namespace CGoGN
 {

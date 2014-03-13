@@ -517,7 +517,6 @@ public:
 	unsigned int closeMap(bool forboundary = true);
 	//@}
 
-
 	/*! @name Compute dual
 	 * These functions compute the dual mesh
 	 *************************************************************************/

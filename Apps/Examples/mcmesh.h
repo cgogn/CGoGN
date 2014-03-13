@@ -31,6 +31,8 @@
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
 
+#include "Algo/MC/marchingcube.h"
+
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
@@ -39,8 +41,6 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/vbo.h"
 #include "Algo/Geometry/boundingbox.h"
-
-#include "Algo/MC/marchingcube.h"
 
 
 using namespace CGoGN ;

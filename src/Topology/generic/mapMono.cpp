@@ -108,7 +108,7 @@ bool MapMono::loadMapBin(const std::string& filename)
 	unsigned int nbo = *ptr_nbo;
 	if (nbo != NB_ORBITS)
 	{
-		CGoGNerr << "Wrond max orbit number in file" << CGoGNendl;
+		CGoGNerr << "Wrong max orbit number in file" << CGoGNendl;
 		return  false;
 	}
 

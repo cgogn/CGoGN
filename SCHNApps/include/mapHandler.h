@@ -9,7 +9,6 @@
 #include "cellSelector.h"
 
 #include "Topology/generic/genericmap.h"
-#include "Topology/generic/attribmap.h"
 #include "Topology/generic/functor.h"
 #include "Topology/generic/attributeHandler.h"
 
