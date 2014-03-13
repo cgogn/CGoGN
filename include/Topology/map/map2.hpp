@@ -791,7 +791,7 @@ Dart Map2<MAP_IMPL>::findBoundaryEdgeOfFace(Dart d) const
 	Dart it = d ;
 	do
 	{
-		if (this->isBoundaryMarked2(phi2(it)))
+		if (this->template isBoundaryMarked<2>(phi2(it)))
 			return phi2(it) ;
 		it = this->phi1(it) ;
 	} while (it != d) ;

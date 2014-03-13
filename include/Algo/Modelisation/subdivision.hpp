@@ -762,7 +762,7 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 	DartMarkerStore<MAP> mf(map);
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
-		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		if(!mf.isMarked(dit) && map.template isBoundaryMarked<2>(dit))
 		{
 			boundsDart.push_back(dit);
 			Dart db = dit;
@@ -772,7 +772,7 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 			map.cutEdge(map.phi_1(db)) ;
 
 			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * REAL(0.5);
-			mf.markOrbit<FACE>(dit);
+			mf.template markOrbit<FACE>(dit);
 
 			Dart x = map.phi2(map.phi_1(db)) ;
 			Dart dd = map.phi1(map.phi1(map.phi1(x)));
@@ -782,12 +782,12 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 				Dart prev = map.phi_1(dd);
 				map.splitFace(dd, map.phi1(x)) ;
 				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * REAL(0.5);
-				mf.markOrbit<FACE>(prev);
+				mf.template markOrbit<FACE>(prev);
 				dd = next ;
 			}
 
 			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * REAL(0.5);
-			mf.markOrbit<FACE>(dprev);
+			mf.template markOrbit<FACE>(dprev);
 		}
 	}
 
@@ -797,10 +797,10 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 	// Fill the holes
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
-		if(mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		if(mf.isMarked(dit) && map.template isBoundaryMarked<2>(dit))
 		{
 			map.fillHole(dit);
-			mf.unmarkOrbit<FACE>(dit);
+			mf.template unmarkOrbit<FACE>(dit);
 		}
 	}
 
@@ -833,7 +833,7 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 	DartMarkerStore<MAP> mf(map);
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
-		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		if(!mf.isMarked(dit) && map.template isBoundaryMarked<2>(dit))
 		{
 			boundsDart.push_back(dit);
 			Dart db = dit;
@@ -843,7 +843,7 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 			map.cutEdge(map.phi_1(db)) ;
 
 			positionF[dit] = (position[dit] + position[map.phi2(dit)]) * REAL(0.5);
-			mf.markOrbit<FACE>(dit);
+			mf.template markOrbit<FACE>(dit);
 
 			Dart x = map.phi2(map.phi_1(db)) ;
 			Dart dd = map.phi1(map.phi1(map.phi1(x)));
@@ -853,12 +853,12 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 				Dart prev = map.phi_1(dd);
 				map.splitFace(dd, map.phi1(x)) ;
 				positionF[prev] = (position[prev] + position[map.phi1(prev)]) * REAL(0.5);
-				mf.markOrbit<FACE>(prev);
+				mf.template markOrbit<FACE>(prev);
 				dd = next ;
 			}
 
 			positionF[dprev] = (position[dprev] + position[map.phi1(dprev)]) * REAL(0.5);
-			mf.markOrbit<FACE>(dprev);
+			mf.template markOrbit<FACE>(dprev);
 		}
 	}
 
@@ -868,10 +868,10 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 	// Fill the holes
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
-		if(mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		if(mf.isMarked(dit) && map.template isBoundaryMarked<2>(dit))
 		{
 			map.fillHole(dit);
-			mf.unmarkOrbit<FACE>(dit);
+			mf.template unmarkOrbit<FACE>(dit);
 		}
 	}
 
@@ -893,12 +893,12 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 	// Manage old vertices with new FaceAttribute
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
-		if(!mf.isMarked(dit) && map.isBoundaryMarked2(dit))
+		if(!mf.isMarked(dit) && map.template isBoundaryMarked<2>(dit))
 		{
 			Dart nd = map.cutEdge(dit);
 			position[nd] = positionF[map.phi2(dit)];
-			mf.markOrbit<EDGE>(dit);
-			mf.markOrbit<EDGE>(nd);
+			mf.template markOrbit<EDGE>(dit);
+			mf.template markOrbit<EDGE>(nd);
 		}
 	}
 }
