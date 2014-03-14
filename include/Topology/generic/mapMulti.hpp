@@ -49,29 +49,22 @@ inline Dart MapMulti::newDart()
 	(*m_mrLevels)[mrdi] = m_mrCurrentLevel ;		// set the introduction level of the dart
 	m_mrNbDarts[m_mrCurrentLevel]++ ;
 
+	Dart mrd = Dart::create(mrdi);
+
+	for (unsigned int i = 0; i < m_permutation.size(); ++i)
+		(*m_permutation[i])[d.index] = mrd ;
+	for (unsigned int i = 0; i < m_permutation_inv.size(); ++i)
+		(*m_permutation_inv[i])[d.index] = mrd ;
+	for (unsigned int i = 0; i < m_involution.size(); ++i)
+		(*m_involution[i])[d.index] = mrd ;
+
 	for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)	// for all previous levels
 		(*m_mrDarts[i])[mrdi] = MRNULL ;				// this MRdart does not exist
 
 	for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)	// for all levels from current to max
 		(*m_mrDarts[i])[mrdi] = d.index ;								// make this MRdart point to the new dart line
 
-	pushLevel() ;
-	for(unsigned int i = m_mrCurrentLevel;  i < m_mrDarts.size(); ++i)
-	{
-		setCurrentLevel(i) ;
-
-		unsigned int d_index = dartIndex(d) ;
-
-		for (unsigned int i = 0; i < m_permutation.size(); ++i)
-			(*m_permutation[i])[d_index] = d ;
-		for (unsigned int i = 0; i < m_permutation_inv.size(); ++i)
-			(*m_permutation_inv[i])[d_index] = d ;
-		for (unsigned int i = 0; i < m_involution.size(); ++i)
-			(*m_involution[i])[d_index] = d ;
-	}
-	popLevel() ;
-
-	return Dart::create(mrdi) ;
+	return mrd ;
 }
 
 inline void MapMulti::deleteDart(Dart d)

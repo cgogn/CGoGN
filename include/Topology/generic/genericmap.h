@@ -147,7 +147,7 @@ protected:
 	/**
 	 * Add a dart to the map
 	 */
-	virtual Dart newDart() ;
+	Dart newDart() ;
 
 	/**
 	 * Erase a dart of the map

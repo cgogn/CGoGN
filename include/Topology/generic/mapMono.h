@@ -50,7 +50,7 @@ protected:
 	 *          DARTS MANAGEMENT            *
 	 ****************************************/
 
-	inline virtual Dart newDart();
+	inline Dart newDart();
 
 	inline virtual void deleteDart(Dart d);
 
