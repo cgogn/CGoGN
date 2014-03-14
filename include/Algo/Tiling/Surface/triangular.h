@@ -111,6 +111,97 @@ protected:
 
 };
 
+/*! \brief The class of regular cylinder square tiling or subdivided sphere (with pole)
+ */
+template <typename PFP>
+class Cylinder : public Tiling<PFP>
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+private:
+	bool m_top_closed, m_bottom_closed;
+	bool m_top_triangulated, m_bottom_triangulated;
+	Dart m_topVertDart, m_bottomVertDart;
+
+public:
+	Cylinder(MAP& map, unsigned int n, unsigned int z, bool close_top, bool close_bottom):
+		Tiling<PFP>(map, n, -1, z),
+		m_top_closed(close_top),
+		m_bottom_closed(close_bottom),
+		m_top_triangulated(false),
+		m_bottom_triangulated(false)
+	{
+		cylinder(n,z);
+	}
+
+	Cylinder(MAP& map, unsigned int n, unsigned int z):
+	  Tiling<PFP>(map, n, -1, z),
+	  m_top_closed(true),
+	  m_bottom_closed(true),
+	  m_top_triangulated(false),
+	  m_bottom_triangulated(false)
+	{
+		cylinder(n,z);
+	}
+
+	/*! @name Embedding Operators
+	 * Tiling creation
+	 *************************************************************************/
+
+	//@{
+	//! Embed a topological cylinder
+	/*! @param position Attribute used to store vertices positions
+	 *  @param bottom_radius
+	 *  @param top_radius
+	 *  @param height
+	 */
+	void embedIntoCylinder(VertexAttribute<VEC3>& position, float bottom_radius, float top_radius, float height);
+
+	//! Embed a topological sphere
+	/*! @param position Attribute used to store vertices positions
+	 *  @param radius
+	 *  @param height
+	 */
+	void embedIntoSphere(VertexAttribute<VEC3>& position, float radius);
+
+	//! Embed a topological cone
+	/*! @param position Attribute used to store vertices positions
+	 *  @param radius
+	 *  @param height
+	 */
+	void embedIntoCone(VertexAttribute<VEC3>& position, float radius, float height);
+	//@}
+
+	/*! @name Topological Operators
+	 * Tiling creation
+	 *************************************************************************/
+
+	//@{
+	//! Close the top with a n-sided face
+	void closeTop();
+
+	//! Triangulate the top face with triangles fan
+	void triangleTop();
+
+	//! Close the bottom with a n-sided face
+	void closeBottom();
+
+	//! Triangulate the bottom face with triangles fan
+	void triangleBottom();
+
+protected:
+	//! Create a subdivided 2D cylinder
+	/*! @param n nb of squares around circumference
+	 *  @param z nb of squares in height
+	 *  @param top_closed close the top (with triangles fan)
+	 *  @param bottom_closed close the bottom (with triangles fan)
+	 */
+	//square -> cylinder -> grid + finish sewing -> open or closed (closeHole) -> triangule face ?
+	void cylinder(unsigned int n, unsigned int z);
+	//@}
+};
+
 } // namespace Triangular
 
 } // namespace Tilings
