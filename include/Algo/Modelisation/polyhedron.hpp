@@ -506,66 +506,53 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename 
 	}
 }
 
-// template <typename PFP>
-// void quads2TrianglesCC(typename PFP::MAP& the_map, Dart primd)
-// {
-// 	DartMarker m(the_map);
 
-// 	// list of faces to process and processed(before pos iterator)
-// 	std::list<Dart> ld;
-// 	ld.push_back(primd);
-// 	// current position in list
-// 	typename std::list<Dart>::iterator pos = ld.begin();
-// 	do
-// 	{
-// 		Dart d = *pos;
+template <typename PFP>
+void quads2TrianglesCC(typename PFP::MAP& the_map, Dart primd)
+{
+DartMarker m(the_map);
 
-// 		// cut the face of first dart of list
-// 		Dart d1 = the_map.phi1(d);
-// 		Dart e = the_map.phi1(d1);
-// 		Dart e1 = the_map.phi1(e);
-// 		Dart f = the_map.phi1(e1);
-// 		if (f==d) // quad
-// 		{
-// 			the_map.splitFace(d,e);
-// 			// mark the face
-// 			m.markOrbit<FACE>(d);
-// 			m.markOrbit<FACE>(e);
-// 		}
-// 		else m.markOrbit<FACE>(d);
+// list of faces to process and processed(before pos iterator)
+std::list<Dart> ld;
+ld.push_back(primd);
+// current position in list
+typename std::list<Dart>::iterator pos = ld.begin();
+do
+{
+   Dart d = *pos;
 
-// 		// and store neighbours faces in the list
-// 		d = the_map.phi2(d);
-// 		e = the_map.phi2(e);
-// 		d1 = the_map.phi1(the_map.phi2(d1));
-// 		e1 = the_map.phi1(the_map.phi2(e1));
+   // cut the face of first dart of list
+   Dart d1 = the_map.phi1(d);
+   Dart e = the_map.phi1(d1);
+   Dart e1 = the_map.phi1(e);
+   Dart f = the_map.phi1(e1);
+   if (f==d) // quad
+   {
+	   the_map.splitFace(d,e);
+	   // mark the face
+	   m.markOrbit<FACE>(d);
+	   m.markOrbit<FACE>(e);
+   }
+   else m.markOrbit<FACE>(d);
 
-// 		if (!m.isMarked(d))
-// 			ld.push_back(d);
-// 		if (!m.isMarked(e))
-// 			ld.push_back(e);
-// 		if (!m.isMarked(d1))
-// 			ld.push_back(d1);
-// 		if ((f==d) && (!m.isMarked(e1)))
-// 			ld.push_back(e1);
-// 		pos++;
-// 	}while (pos!=ld.end()); // stop when no more face to process
-// }
+   // and store neighbours faces in the list
+   d = the_map.phi2(d);
+   e = the_map.phi2(e);
+   d1 = the_map.phi1(the_map.phi2(d1));
+   e1 = the_map.phi1(the_map.phi2(e1));
 
-// template <typename PFP>
-// Dart triangleFan_topo(typename PFP::MAP& the_map, int n)
-// {
-// 	Dart d = the_map.newFace(3,false);
-// 	Dart e = the_map.phi1(d);
-// 	for(int i=1;i<n;++i)
-// 	{
-// 		Dart f = the_map.newFace(3,false);
-// 		the_map.sewFaces(the_map.phi_1(f),e);
-// 		e = the_map.phi1(f);
-// 	}
-// 	the_map.sewFaces(the_map.phi_1(d),e);
-// 	return d;
-// }
+   if (!m.isMarked(d))
+	   ld.push_back(d);
+   if (!m.isMarked(e))
+	   ld.push_back(e);
+   if (!m.isMarked(d1))
+	   ld.push_back(d1);
+   if ((f==d) && (!m.isMarked(e1)))
+	   ld.push_back(e1);
+   pos++;
+}while (pos!=ld.end()); // stop when no more face to process
+}
+
 
 } // namespace Modelisation
 
