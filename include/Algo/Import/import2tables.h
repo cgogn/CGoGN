@@ -102,8 +102,6 @@ private:
 
 	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
-
 #ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	
@@ -130,6 +128,8 @@ public:
     bool importMesh(const std::string& filename, std::vector<std::string>& attrNames);
 
     bool importVoxellisation(Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames);
+
+	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
 
 	MeshTablesSurface(typename PFP::MAP& map):
 		m_map(map)

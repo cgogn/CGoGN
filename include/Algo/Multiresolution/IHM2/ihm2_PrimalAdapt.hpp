@@ -72,6 +72,7 @@ unsigned int IHM2<PFP>::faceLevel(Dart d)
     if(m_map.getCurrentLevel() == 0)
         return 0 ;
 
+// Methode 1
 //	unsigned int cur = m_curLevel ;
 //	Dart it = d ;
 //	Dart end = d ;
@@ -112,6 +113,7 @@ unsigned int IHM2<PFP>::faceLevel(Dart d)
 //	unsigned int fLevel = m_curLevel ;
 //	m_curLevel = cur ;
 
+//Methode 2
     Dart it = d ;
     Dart old = it ;
     unsigned int l_old = m_map.getDartLevel(old) ;
@@ -350,6 +352,8 @@ unsigned int IHM2<PFP>::subdivideFace(Dart d, bool triQuad, bool OneLevelDiffere
     unsigned int fLevel = faceLevel(d) ;
     Dart old = faceOldestDart(d) ;
 
+	std::cout << "faceLevel = " << fLevel << std::endl;
+
 	unsigned int cur = m_map.getCurrentLevel() ;
 	m_map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 
@@ -363,7 +367,7 @@ unsigned int IHM2<PFP>::subdivideFace(Dart d, bool triQuad, bool OneLevelDiffere
         {
             Dart nf = m_map.phi2(it) ;
             if(faceLevel(nf) == fLevel - 1)	// check if neighboring faces have to be subdivided first
-                subdivideFace(nf) ;
+				subdivideFace(nf,triQuad) ;
         }
 
         if(!edgeIsSubdivided(it))
@@ -374,7 +378,7 @@ unsigned int IHM2<PFP>::subdivideFace(Dart d, bool triQuad, bool OneLevelDiffere
 	m_map.setCurrentLevel(fLevel + 1) ;	// go to the next level to perform face subdivision
 
 
-    if((degree == 3) && triQuad)					// if subdividing a triangle
+	if(triQuad && (degree == 3))					// if subdividing a triangle
     {
         Dart dd = m_map.phi1(old) ;
         Dart e = m_map.phi1(dd) ;

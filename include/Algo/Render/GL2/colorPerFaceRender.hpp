@@ -131,9 +131,9 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 			bufferNormals.push_back(PFP::toVec3f(normals[d]));
 			bufferColors.push_back(PFP::toVec3f(colorPerXXX[d]));
 			buffer.push_back(PFP::toVec3f(positions[b]));
-			bufferNormals.push_back(PFP::toVec3f(normals[b]);
+			bufferNormals.push_back(PFP::toVec3f(normals[b]));
 			bufferColors.push_back(PFP::toVec3f(colorPerXXX[b]));
-			buffer.push_back(PFP::toVec3f(positions[c]);
+			buffer.push_back(PFP::toVec3f(positions[c]));
 			bufferNormals.push_back(PFP::toVec3f(normals[c]));
 			bufferColors.push_back(PFP::toVec3f(colorPerXXX[c]));
 			b = c;

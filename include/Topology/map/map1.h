@@ -42,7 +42,8 @@ namespace CGoGN
  */
 class Map1 : public AttribMap
 {
-protected:
+//protected:
+public:
 	AttributeMultiVector<Dart>* m_phi1 ;
 	AttributeMultiVector<Dart>* m_phi_1 ;
 

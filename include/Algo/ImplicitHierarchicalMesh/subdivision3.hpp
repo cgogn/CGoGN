@@ -85,8 +85,8 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	unsigned int cur = map.getCurrentLevel() ;
 	map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 
-	unsigned int vLevel = map.volumeLevel(old);
 	//one level of subdivision in the neighbordhood
+//	unsigned int vLevel = map.volumeLevel(old);
 //	Traversor3VW<typename PFP::MAP> trav3EW(map, old);
 //	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
 //	{
@@ -114,7 +114,6 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 
 	map.setCurrentLevel(fLevel + 1) ;			// go to the next level to perform face subdivision
 
-	Dart res;
 
     if(degree == 3 && sType == IHM::S_TRI)	//subdiviser une face triangulaire
     {
@@ -145,47 +144,6 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 
         map.setFaceId(dd, idface, FACE) ;
         map.setFaceId(e, idface, FACE) ;
-
-//        Dart stop = map.phi2(map.phi1(old));
-//        Dart dit = stop;
-//        do
-//        {
-//            unsigned int dId = map.getEdgeId(map.phi_1(map.phi2(dit)));
-//            unsigned int eId = map.getEdgeId(map.phi1(map.phi2(dit)));
-
-//            unsigned int t = dId + eId;
-
-//            if(t == 0)
-//            {
-//                map.setEdgeId(dit, 1, EDGE) ;
-//                map.setEdgeId(map.phi2(dit), 1, EDGE) ;
-//            }
-//            else if(t == 1)
-//            {
-//                map.setEdgeId(dit, 2, EDGE) ;
-//                map.setEdgeId(map.phi2(dit), 2, EDGE) ;
-//            }
-//            else if(t == 2)
-//            {
-//                if(dId == eId)
-//                {
-//                    map.setEdgeId(dit, 0, EDGE) ;
-//                    map.setEdgeId(map.phi2(dit), 0, EDGE) ;
-//                }
-//                else
-//                {
-//                    map.setEdgeId(dit, 1, EDGE) ;
-//                    map.setEdgeId(map.phi2(dit), 1, EDGE) ;
-//                }
-//            }
-//            else if(t == 3)
-//            {
-//                map.setEdgeId(dit, 0, EDGE) ;
-//                map.setEdgeId(map.phi2(dit), 0, EDGE) ;
-//            }
-
-//            dit = map.phi1(dit);
-//        }while(dit != stop);
 
     }
     else

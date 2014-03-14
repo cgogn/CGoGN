@@ -31,6 +31,7 @@
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversorCell.h"
 #include "Algo/Modelisation/triangulation.h"
+#include "Algo/Modelisation/subdivision.h"
 
 namespace CGoGN
 {
@@ -50,10 +51,27 @@ template <typename PFP>
 void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
 			  CellMarker<FACE>& cmf_over, bool keepTriangles=false, bool with_unsew = true);
 
+template <typename PFP>
+void planeCut2(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
+			  CellMarker<FACE>& cmf_over, bool with_unsew);
 
 } // namespace Modelisation
 
 } // namespace Surface
+
+namespace Volume
+{
+
+namespace Modelisation
+{
+
+template <typename PFP>
+void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
+			  CellMarker<FACE>& cmv_over, bool keepTetrahedra=false, bool with_unsew = true);
+
+} // namespace Modelisation
+
+} // namespace Volume
 
 } // namespace Algo
 

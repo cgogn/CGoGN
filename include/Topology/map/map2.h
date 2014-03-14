@@ -47,7 +47,8 @@ namespace CGoGN
  */
 class Map2 : public Map1
 {
-protected:
+//protected:
+public:
 	AttributeMultiVector<Dart>* m_phi2 ;
 
 	void init() ;
@@ -120,6 +121,9 @@ protected:
 public:
 
 	void rdfi(Dart t, DartMarker& m1, DartMarker& m2);
+
+
+	//void propagateDartRelation(Dart d) ;
 
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map

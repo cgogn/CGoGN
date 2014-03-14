@@ -153,6 +153,9 @@ public:
 	 */
 	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 
+	/**
+	 *
+	 */
 	virtual bool check() ;
 } ;
 

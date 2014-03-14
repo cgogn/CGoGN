@@ -22,13 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __DECIMATOR_VOLUMES_H__
-#define __DECIMATOR_VOLUMES_H__
 
-#include "Algo/DecimationVolumes/edgeSelector.h"
-#include "Algo/DecimationVolumes/geometryApproximator.h"
-#include "Algo/DecimationVolumes/operator.h"
-
+#ifndef __UNIFORM_ORIENTATION__
+#define __UNIFORM_ORIENTATION__
 
 namespace CGoGN
 {
@@ -36,29 +32,23 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Volume
+namespace Topo
 {
 
-namespace Decimation
-{
+/**
+ * @brief Restore an uniform orientation on a mesh that has been imported from set of triangle with non uniform orientation
+ * @param map a Map2 or inherited
+ * @param faceSeed a dart of a face of the CC to process.
+ */
+template <typename MAP>
+void uniformOrientationCC(MAP& map, Dart faceSeed);
 
-template <typename PFP>
-void decimate(
-	typename PFP::MAP& map,
-	SelectorType s,
-	ApproximatorType a,
-	VertexAttribute<typename PFP::VEC3>& position,
-	unsigned int percentWantedVertices
-);
+} // namespace Topo
 
-} //namespace Decimation
+} // namespace Algo
 
-} //namesapce Volume
+} // namespace CGoGN
 
-} //namespace Algo
-
-} //namespace CGoGN
-
-#include "Algo/DecimationVolumes/decimator.hpp"
+#include "uniformOrientation.hpp"
 
 #endif

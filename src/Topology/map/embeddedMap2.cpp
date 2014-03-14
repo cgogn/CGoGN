@@ -652,6 +652,18 @@ bool EmbeddedMap2::check()
 	if (!topo)
 		return false ;
 
+	CGoGNout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << CGoGNendl ;
+	if (isOrbitEmbedded<VERTEX>())
+		CGoGNout << "nb vertex cells : " << m_attribs[VERTEX].size() << CGoGNendl ;
+
+	CGoGNout << "nb edge orbits : " << getNbOrbits<EDGE>() << CGoGNendl ;
+	if (isOrbitEmbedded<EDGE>())
+		CGoGNout << "nb edge cells : " << m_attribs[EDGE].size() << CGoGNendl ;
+
+	CGoGNout << "nb face orbits : " << getNbOrbits<FACE>() << CGoGNendl ;
+	if (isOrbitEmbedded<FACE>())
+		CGoGNout << "nb face cells : " << m_attribs[FACE].size() << CGoGNendl ;
+
 	CGoGNout << "Check: embedding begin" << CGoGNendl ;
 	for(Dart d = begin(); d != end(); next(d))
 	{
@@ -693,18 +705,6 @@ bool EmbeddedMap2::check()
 	}
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
-
-    std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
-	if (isOrbitEmbedded<VERTEX>())
-		std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
-
-    std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
-	if (isOrbitEmbedded<EDGE>())
-		std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
-
-    std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
-	if (isOrbitEmbedded<FACE>())
-		std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 
 	return true ;
 }

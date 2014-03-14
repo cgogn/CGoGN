@@ -291,6 +291,20 @@ public:
 
 	void duplicateDartAtOneLevel(Dart d, unsigned int level) ;
 
+
+	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
+
+	void propagateDartRelation(Dart d, Dart e, AttributeMultiVector<Dart>* rel);
+
+	void propagateDartRelation(Dart d, Dart e, Dart f, AttributeMultiVector<Dart>* rel, AttributeMultiVector<Dart>* rel2);
+
+
+	template <unsigned int ORBIT>
+	void propagateDartEmbedding(Dart d) ;
+
+	template <unsigned int ORBIT>
+	void propagateOrbitEmbedding(Dart d) ;
+
 	/****************************************
 	 *           DARTS MANAGEMENT           *
 	 ****************************************/
