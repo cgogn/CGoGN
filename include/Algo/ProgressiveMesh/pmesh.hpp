@@ -42,7 +42,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		Algo::Surface::Decimation::SelectorType s, Algo::Surface::Decimation::ApproximatorType a,
 		VertexAttribute<typename PFP::VEC3>& position
 	) :
-	m_map(map), positionsTable(position), inactiveMarker(inactive), dartSelect(inactiveMarker)
+	m_map(map), positionsTable(position), inactiveMarker(inactive)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 
@@ -83,28 +83,62 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	switch(s)
 	{
 		case Algo::Surface::Decimation::S_MapOrder : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_MapOrder<PFP>(m_map, positionsTable, m_approximators, dartSelect) ;
+			m_selector = new Algo::Surface::Decimation::EdgeSelector_MapOrder<PFP>(m_map, positionsTable, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_Random : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_Random<PFP>(m_map, positionsTable, m_approximators, dartSelect) ;
+			m_selector = new Algo::Surface::Decimation::EdgeSelector_Random<PFP>(m_map, positionsTable, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_EdgeLength : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_Length<PFP>(m_map, positionsTable, m_approximators, dartSelect) ;
+			m_selector = new Algo::Surface::Decimation::EdgeSelector_Length<PFP>(m_map, positionsTable, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_QEM : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_QEM<PFP>(m_map, positionsTable, m_approximators, dartSelect) ;
+			m_selector = new Algo::Surface::Decimation::EdgeSelector_QEM<PFP>(m_map, positionsTable, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_MinDetail : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, positionsTable, m_approximators, dartSelect) ;
+			m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, positionsTable, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_Curvature : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, positionsTable, m_approximators, dartSelect) ;
+			m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, positionsTable, m_approximators) ;
 			break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
 	m_initOk = true ;
 
+	CGoGNout << "  initializing approximators.." << CGoGNflush ;
+	for(typename std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+	{
+		if(! (*it)->init())
+			m_initOk = false ;
+		if((*it)->getApproximatedAttributeName() == "position")
+			m_positionApproximator = reinterpret_cast<Algo::Surface::Decimation::Approximator<PFP, VEC3, EDGE>*>(*it) ;
+	}
+	CGoGNout << "..done" << CGoGNendl ;
+
+	CGoGNout << "  initializing predictors.." << CGoGNflush ;
+	for(typename std::vector<Algo::Surface::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
+		if(! (*it)->init())
+			m_initOk = false ;
+	CGoGNout << "..done" << CGoGNendl ;
+
+	CGoGNout << "  initializing selector.." << CGoGNflush ;
+	m_initOk = m_selector->init() ;
+	CGoGNout << "..done" << CGoGNendl ;
+
+	m_detailAmount = REAL(1) ;
+	m_localFrameDetailVectors = false ;
+	quantizationInitialized = false ;
+	quantizationApplied = false ;
+}
+
+template <typename PFP>
+ProgressiveMesh<PFP>::ProgressiveMesh(
+		MAP& map, DartMarker& inactive,
+		Algo::Surface::Decimation::Selector<PFP>* selector, std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>& approximators,
+		VertexAttribute<typename PFP::VEC3>& position
+	) :
+	m_map(map), m_selector(selector), m_approximators(approximators), positionsTable(position), inactiveMarker(inactive)
+{
 	CGoGNout << "  initializing approximators.." << CGoGNflush ;
 	for(typename std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 	{

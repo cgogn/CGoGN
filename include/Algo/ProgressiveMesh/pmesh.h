@@ -60,9 +60,8 @@ private:
 	VertexAttribute<typename PFP::VEC3>& positionsTable ;
 
 	DartMarker& inactiveMarker ;
-	SelectorUnmarked dartSelect ;
 
-	Algo::Surface::Decimation::EdgeSelector<PFP>* m_selector ;
+	Algo::Surface::Decimation::Selector<PFP>* m_selector ;
 	std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*> m_approximators ;
 	std::vector<Algo::Surface::Decimation::PredictorGen<PFP>*> m_predictors ;
 	std::vector<VSplit<PFP>*> m_splits ;
@@ -85,6 +84,10 @@ public:
 		Algo::Surface::Decimation::SelectorType s, Algo::Surface::Decimation::ApproximatorType a,
 		VertexAttribute<typename PFP::VEC3>& position
 	) ;
+	ProgressiveMesh(
+			MAP& map, DartMarker& inactive,
+			Algo::Surface::Decimation::Selector<PFP>* selector, std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>& approximators,
+			VertexAttribute<typename PFP::VEC3>& position) ;
 	~ProgressiveMesh() ;
 
 	bool initOk() { return m_initOk ; }
@@ -92,7 +95,7 @@ public:
 	void createPM(unsigned int percentWantedVertices) ;
 
 	std::vector<VSplit<PFP>*>& splits() { return m_splits ; }
-	Algo::Surface::Decimation::EdgeSelector<PFP>* selector() { return m_selector ; }
+	Algo::Surface::Decimation::Selector<PFP>* selector() { return m_selector ; }
 	std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>& approximators() { return m_approximators ; }
 	std::vector<Algo::Surface::Decimation::PredictorGen<PFP>*>& predictors() { return m_predictors ; }
 
