@@ -36,7 +36,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isPlanar(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
+bool isPlanar(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
 	if (map.phi<111>(d)==d)
 		return true;
@@ -53,10 +53,8 @@ bool isPlanar(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP
 	}
 }
 
-
-
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
 {
 	const typename PFP::VEC3& A = position[d];
 	d = map.phi1(d);
@@ -66,9 +64,8 @@ typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Dart d
 	return Geom::squaredDistancePoint2TrianglePlane(P,A,B,C);
 }
 
-
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
 {
 	typedef typename PFP::REAL REAL;
 	const typename PFP::VEC3& A = position[d];
@@ -90,9 +87,8 @@ typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Dart d, con
 	return dist2;
 }
 
-
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
 {
 	const typename PFP::VEC3& A = position[d];
 	typename PFP::VEC3& AB = position[map.phi1(d)]-A;
@@ -100,11 +96,8 @@ typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Dart d, con
 	return Geom::squaredDistanceSeg2Point(A,AB,AB2,P) ;
 }
 
-
-
 } // namespace Geometry
 
 } // namespace Algo
 
 } // namespace CGoGN
-

@@ -151,6 +151,11 @@ inline unsigned int MapMulti::getDartLevel(Dart d) const
 	return (*m_mrLevels)[d.index] ;
 }
 
+inline AttributeContainer& MapMulti::getDartContainer()
+{
+	return m_mrattribs;
+}
+
 inline void MapMulti::incDartLevel(Dart d) const
 {
 	++((*m_mrLevels)[d.index]) ;
@@ -183,11 +188,6 @@ inline void MapMulti::duplicateDart(Dart d)
 inline void MapMulti::duplicateDartAtOneLevel(Dart d, unsigned int level)
 {
 	(*m_mrDarts[level])[d.index] = copyDartLine(dartIndex(d)) ;
-}
-
-inline AttributeContainer& MapMulti::getDartContainer()
-{
-	return m_mrattribs;
 }
 
 /****************************************

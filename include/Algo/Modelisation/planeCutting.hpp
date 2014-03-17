@@ -263,7 +263,7 @@ void planeCut2(
 	typename PFP::MAP& map,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 	const Geom::Plane3D<typename PFP::REAL>& plane,
-	CellMarker<FACE>& cmf_over,
+	CellMarker<typename PFP::MAP, FACE>& cmf_over,
 	bool with_unsew)
 {
 	typedef typename PFP::MAP MAP;
@@ -407,7 +407,7 @@ void planeCut(
 	typename PFP::MAP& map,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 	const Geom::Plane3D<typename PFP::REAL>& plane,
-	CellMarker<FACE>& cmf_over,
+	CellMarker<typename PFP::MAP, FACE>& cmf_over,
 	bool keepTetrahedra=false,
 	bool with_unsew = true)
 {

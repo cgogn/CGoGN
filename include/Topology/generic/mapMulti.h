@@ -95,37 +95,37 @@ public:
 	/**
 	 * get the number of darts inserted in the given leveldart
 	 */
-	unsigned int getNbInsertedDarts(unsigned int level) const;
+	inline unsigned int getNbInsertedDarts(unsigned int level) const;
 
 	/**
 	 * get the number of darts that define the map of the given leveldart
 	 */
-	unsigned int getNbDarts(unsigned int level) const;
+	inline unsigned int getNbDarts(unsigned int level) const;
 
 	/**
 	 * @return the number of darts in the map
 	 */
-	virtual unsigned int getNbDarts() const;
+	inline virtual unsigned int getNbDarts() const;
 
 	inline AttributeContainer& getDartContainer();
 
 	/**
 	 * get the insertion level of a dart
 	 */
-	unsigned int getDartLevel(Dart d) const;
+	inline unsigned int getDartLevel(Dart d) const;
 
 protected:
 	/**
 	 *
 	 */
-	void incDartLevel(Dart d) const ;
+	inline void incDartLevel(Dart d) const ;
 
 	/**
 	 * duplicate a dart starting from current level
 	 */
-	void duplicateDart(Dart d) ;
+	inline void duplicateDart(Dart d) ;
 
-	void duplicateDartAtOneLevel(Dart d, unsigned int level) ;
+	inline void duplicateDartAtOneLevel(Dart d, unsigned int level) ;
 
 	/****************************************
 	 *        RELATIONS MANAGEMENT          *

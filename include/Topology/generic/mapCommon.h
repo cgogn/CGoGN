@@ -198,7 +198,7 @@ public:
 	* @return an AttributeHandler
 	*/
 	template <typename T, unsigned int ORBIT>
-	inline AttributeHandler<T, ORBIT, MAP_IMPL> addAttribute(const std::string& nameAttr) ;
+	inline AttributeHandler<T, ORBIT, MAP_IMPL> addAttribute(const std::string& nameAttr = "") ;
 
 	/**
 	 * remove an attribute
