@@ -326,6 +326,17 @@ void GenericMap::removeThreadMarker(unsigned int nb)
 
 void GenericMap::restore_shortcuts()
 {
+	// NB THREADS
+
+	std::vector<std::string> typeMark;
+	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
+	m_nbThreads = 0;
+	for (unsigned int i = 0; i < nbatt0; ++i)
+	{
+		if (typeMark[i] == "Mark")
+			++m_nbThreads;
+	}
+
 	// EMBEDDING
 
 	// get container of dart orbit
@@ -384,14 +395,14 @@ void GenericMap::restore_shortcuts()
 				AttributeMultiVector<Mark>* amvMark = cont.getDataVector<Mark>(i);
 				m_markTables[orbit][thread] = amvMark ;
 
-				if ((orbit == DART) && (thread == 0))	// for Marker of dart of thread O keep the boundary marker
-				{
+				if ((orbit == DART) && (thread == 0))	// for Dart Marker of thread O
+				{										// clear all marks expect boundary marks
 					Mark m(m_boundaryMarkers[0] + m_boundaryMarkers[1]);
 					m.invert();
 					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 						amvMark->operator[](i).unsetMark(m);
 				}
-				else								// for others clear all
+				else									// for others clear all
 				{
 					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 						amvMark->operator[](i).clear();
@@ -400,16 +411,13 @@ void GenericMap::restore_shortcuts()
 		}
 	}
 
-	// NB THREADS
+	// restore mark vectors in Dart & Cell Markers
+	for (std::vector<DartMarkerGen*>::iterator it = dartMarkers.begin(); it != dartMarkers.end(); ++it)
+		(*it)->updateMarkVector(m_markTables[DART][(*it)->getThread()]);
 
-	std::vector<std::string> typeMark;
-	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
-	m_nbThreads = 0;
-	for (unsigned int i = 0; i < nbatt0; ++i)
-	{
-		if (typeMark[i] == "Mark")
-			++m_nbThreads;
-	}
+	for (std::vector<CellMarkerGen*>::iterator it = cellMarkers.begin(); it != cellMarkers.end(); ++it)
+		(*it)->updateMarkVector(m_markTables[(*it)->getCell()][(*it)->getThread()]);
+
 }
 
 void GenericMap::dumpAttributesAndMarkers()
