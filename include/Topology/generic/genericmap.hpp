@@ -559,7 +559,7 @@ inline void GenericMap::updateQuickTraversal()
 	m_quickTraversal[ORBIT] = NULL;
 
 	// fill the quick travsersal
-	TraversorCell<GenericMap,VOLUME> trav(*this);
+	TraversorCell<GenericMap,ORBIT> trav(*this);
 	for(Dart d = trav.begin(); d != trav.end(); d=trav.next())
 	{
 		(*qt)[getEmbedding<ORBIT>(d)] = d ;
