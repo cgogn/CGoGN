@@ -2,7 +2,8 @@
 #define _CAMERA_H_
 
 #include "view.h"
-#include "QGLViewer/camera.h"
+#include <QGLViewer/camera.h>
+#include <QGLViewer/manipulatedCameraFrame.h>
 
 namespace CGoGN
 {

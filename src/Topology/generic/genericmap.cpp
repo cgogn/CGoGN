@@ -412,12 +412,19 @@ void GenericMap::restore_shortcuts()
 	}
 
 	// restore mark vectors in Dart & Cell Markers
-	for (std::vector<DartMarkerGen*>::iterator it = dartMarkers.begin(); it != dartMarkers.end(); ++it)
-		(*it)->updateMarkVector(m_markTables[DART][(*it)->getThread()]);
+	for (unsigned int j = 0; j < NB_THREAD; ++j)
+	{
+		for (std::vector<DartMarkerGen*>::iterator it = dartMarkers[j].begin(); it != dartMarkers[j].end(); ++it)
+			(*it)->updateMarkVector(m_markTables[DART][(*it)->getThread()]);
 
-	for (std::vector<CellMarkerGen*>::iterator it = cellMarkers.begin(); it != cellMarkers.end(); ++it)
-		(*it)->updateMarkVector(m_markTables[(*it)->getCell()][(*it)->getThread()]);
+		for (std::vector<CellMarkerGen*>::iterator it = cellMarkers[j].begin(); it != cellMarkers[j].end(); ++it)
+			(*it)->updateMarkVector(m_markTables[(*it)->getCell()][(*it)->getThread()]);
+	}
 
+	// set Attribute handlers invalid
+	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
+		(*it).second->setInvalid() ;
+	attributeHandlers.clear() ;
 }
 
 void GenericMap::dumpAttributesAndMarkers()
