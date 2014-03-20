@@ -403,6 +403,204 @@ void Cylinder<PFP>::embedIntoCone(VertexAttribute<VEC3>& position, float radius,
 
 }
 
+/*! Cube
+ *************************************************************************/
+
+template <typename PFP>
+void Cube<PFP>::cube(unsigned int x, unsigned int y, unsigned int z)
+{
+    this->m_nx = x;
+    this->m_ny = y;
+    this->m_nz = z;
+
+    int nb = 2*(x+y)*(z+1) + 2*(x-1)*(y-1);
+    this->m_tableVertDarts.reserve(nb);
+
+    // we now have the 4 sides, just need to create store and sew top & bottom
+    // the top
+    Grid<PFP> gtop(this->m_map,x,y,false);
+    std::vector<Dart>& tableTop = gtop.getVertexDarts();
+
+    int index_side = 2*(x+y)*(z-1);
+    for(unsigned int i = 0; i < x; ++i)
+    {
+        Dart d = this->m_tableVertDarts[index_side++];
+        d = this->m_map.phi_1(this->m_map.phi2(this->m_map.phi1(d)));
+        Dart e = tableTop[i];
+        this->m_map.sewFaces(d, e, false);
+    }
+    for(unsigned int i = 0; i < y; ++i)
+    {
+        Dart d = this->m_tableVertDarts[index_side++];
+        d = this->m_map.phi_1(this->m_map.phi2(this->m_map.phi1(d)));
+        Dart e = tableTop[x+i*(x+1)];
+        this->m_map.sewFaces(d, e, false);
+    }
+    for(unsigned int i = 0; i < x; ++i)
+    {
+        Dart d = this->m_tableVertDarts[index_side++];
+        d = this->m_map.phi_1(this->m_map.phi2(this->m_map.phi1(d)));
+        Dart e = tableTop[(x+1)*(y+1) - 2 - i];
+        e = this->m_map.phi_1(this->m_map.phi2(this->m_map.phi_1(e)));
+        this->m_map.sewFaces(d, e, false);
+    }
+    for(unsigned int i = 0; i < y; ++i)
+    {
+        Dart d = this->m_tableVertDarts[index_side++];
+        d = this->m_map.phi_1(this->m_map.phi2(this->m_map.phi1(d)));
+        Dart e = tableTop[(y-1-i)*(x+1)];
+        e = this->m_map.phi_1(e);
+        this->m_map.sewFaces(d, e, false);
+    }
+
+    // the bottom
+    Grid<PFP> gBottom(this->m_map,x,y,false);
+    std::vector<Dart>& tableBottom = gBottom.getVertexDarts();
+
+    index_side = 3*(x+y)+(x-1);
+    for(unsigned int i = 0; i < x; ++i)
+    {
+        Dart d = this->m_tableVertDarts[(index_side--)%(2*(x+y))];
+        Dart e = tableBottom[i];
+        this->m_map.sewFaces(d, e, false);
+    }
+    for(unsigned int i = 0; i < y; ++i)
+    {
+        Dart d = this->m_tableVertDarts[(index_side--)%(2*(x+y))];
+        Dart e = tableBottom[x+i*(x+1)];
+        this->m_map.sewFaces(d, e, false);
+    }
+    for(unsigned int i = 0; i < x; ++i)
+    {
+        Dart d = this->m_tableVertDarts[(index_side--)%(2*(x+y))];
+        Dart e = tableBottom[(x+1)*(y+1) - 2 - i];
+        e = this->m_map.phi_1(this->m_map.phi2(this->m_map.phi_1(e)));
+        this->m_map.sewFaces(d, e, false);
+    }
+    for(unsigned int i = 0; i < y; ++i)
+    {
+        Dart d = this->m_tableVertDarts[(index_side--)%(2*(x+y))];
+        Dart e = tableBottom[(y-1-i)*(x+1)];
+        e = this->m_map.phi_1(e);
+        this->m_map.sewFaces(d, e, false);
+    }
+
+    // and add new vertex in m_tableVertDarts
+    //top  first
+    for(unsigned int i = 1; i < y; ++i)
+    {
+        for(unsigned int j = 1; j < x; ++j)
+            this->m_tableVertDarts.push_back(tableTop[i*(x+1)+j]);
+    }
+
+    // then bottom
+    for(unsigned int i = 1; i < y; ++i)
+    {
+        for(unsigned int j = 1; j < x; ++j)
+            this->m_tableVertDarts.push_back(tableBottom[i*(x+1)+j]);
+    }
+
+}
+
+template <typename PFP>
+void Cube<PFP>::embedIntoCube(VertexAttribute<VEC3>& position, float sx, float sy, float sz)
+{
+    float dz = sz/float(this->m_nz);
+    float dy = sy/float(this->m_ny);
+    float dx = sx/float(this->m_nx);
+
+    // first embedding the sides
+    int index = 0;
+    for (unsigned int k = 0; k <= this->m_nz; ++k)
+    {
+        float z = float(k)*dz - sz/2.0f;
+        for (unsigned int i = 0; i < this->m_nx; ++i)
+        {
+            float x = float(i)*dx - sx/2.0f;
+            position[this->m_tableVertDarts[ index++ ] ] = VEC3(x, -sy/2.0f, z);
+        }
+        for (unsigned int i = 0; i < this->m_ny; ++i)
+        {
+            float y = float(i)*dy - sy/2.0f;
+            position[this->m_tableVertDarts[ index++ ] ] = VEC3(sx/2.0f, y, z);
+        }
+        for (unsigned int i = 0; i < this->m_nx; ++i)
+        {
+            float x = sx/2.0f-float(i)*dx;
+            position[this->m_tableVertDarts[ index++ ] ] = VEC3(x, sy/2.0f, z);
+        }
+        for (unsigned int i = 0; i < this->m_ny ;++i)
+        {
+            float y = sy/2.0f - float(i)*dy;
+            position[this->m_tableVertDarts[ index++ ] ] = VEC3(-sx/2.0f, y, z);
+        }
+    }
+
+    // the top
+    for(unsigned int i = 1; i  < this->m_ny; ++i)
+    {
+        for(unsigned int j = 1; j < this->m_nx; ++j)
+        {
+            VEC3 pos(-sx/2.0f+float(j)*dx, -sy/2.0f+float(i)*dy, sz/2.0f);
+            position[this->m_tableVertDarts[ index++ ] ] = pos;
+        }
+    }
+
+    // the bottom
+    for(unsigned int i = 1; i < this->m_ny; ++i)
+    {
+        for(unsigned int j = 1; j < this->m_nx; ++j)
+        {
+            VEC3 pos(-sx/2.0f+float(j)*dx, sy/2.0f-float(i)*dy, -sz/2.0f);
+            position[this->m_tableVertDarts[ index++ ] ] = pos;
+        }
+    }
+}
+
+/*! Tore
+ *************************************************************************/
+
+template <typename PFP>
+void Tore<PFP>::tore(unsigned int n, unsigned int m)
+{
+    //this->cylinder(n, m);
+    this->m_nx = n;
+    this->m_ny = m;
+    this->m_nz = -1;
+
+    // just finish to sew
+    for(unsigned int i = 0; i < n; ++i)
+    {
+        Dart d = this->m_tableVertDarts[i];
+        Dart e = this->m_tableVertDarts[(m-1)*n+i];
+        e = this->m_map.phi_1(this->m_map.phi2(this->m_map.phi1(e)));
+        this->m_map.sewFaces(d, e);
+    }
+
+    // remove the last n vertex darts that are no more necessary (sewed with n first)
+    // memory not freed (but will be when destroy the Polyhedron), not important ??
+    this->m_tableVertDarts.resize(m*n);
+}
+
+template <typename PFP>
+void Tore<PFP>::embedIntoTore(VertexAttribute<VEC3>& position, float big_radius, float small_radius)
+{
+    float alpha = float(2.0*M_PI/this->m_nx);
+    float beta = float(2.0*M_PI/this->m_ny);
+
+    for (unsigned int i = 0; i < this->m_nx; ++i)
+    {
+        for(unsigned int j = 0; j < this->m_ny; ++j)
+        {
+            float z = small_radius*sin(beta*float(j));
+            float r = big_radius + small_radius*cos(beta*float(j));
+            float x = r*cos(alpha*float(i));
+            float y = r*sin(alpha*float(i));
+            position[this->m_tableVertDarts[j*(this->m_nx)+i] ] = VEC3(x, y, z);
+        }
+    }
+}
+
 } // namespace Triangular
 
 } // namespace Tilings

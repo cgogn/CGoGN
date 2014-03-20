@@ -130,7 +130,7 @@ void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 
 template <typename PFP>
 void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmf_over, bool keepTriangles=false, bool with_unsew = true)
+			  CellMarker<FACE>& cmf_over, bool keepTriangles, bool with_unsew)
 {
 	typedef typename PFP::REAL REAL;
 
@@ -393,7 +393,7 @@ namespace Modelisation
 
 template <typename PFP>
 void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const Geom::Plane3D<typename PFP::REAL>& plane,
-			  CellMarker<FACE>& cmf_over, bool keepTetrahedra=false, bool with_unsew = true)
+			  CellMarker<FACE>& cmf_over, bool keepTetrahedra, bool with_unsew)
 {
 	typedef typename PFP::REAL REAL;
 
