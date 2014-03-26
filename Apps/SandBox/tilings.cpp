@@ -196,8 +196,8 @@ void MyQT::squareTiling(int code)
 		}
 		case 8:
 		{
-			std::cout << "square cylinder cone tiling" << std::endl;
-			Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
+            std::cout << "square cube tiling" << std::endl;
+            Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,1,1,2);
 			c.embedIntoCube(position,1.0, 1.0, 1.0);
 
 			Geom::Matrix44f trf;
@@ -297,17 +297,17 @@ void MyQT::triangularTiling(int code)
 		}
 		case 8:
 		{
-//			std::cout << "triangle cylinder cone tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
-//			c.embedIntoCube(position,5.0,5.0, 5.0);
+            std::cout << "triangle cube tiling" << std::endl;
+            Algo::Surface::Tilings::Triangular::Cube<PFP> c(myMap,4,4,4);
+            c.embedIntoCube(position,5.0,5.0, 5.0);
 
 			break;
 		}
 		case 9:
 		{
-//			std::cout << "triangle cylinder cone tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
-//			c.embedIntoTore(position,5.0,2.0);
+            std::cout << "triangle tore tiling" << std::endl;
+            Algo::Surface::Tilings::Triangular::Tore<PFP> c(myMap,20,10);
+            c.embedIntoTore(position,5.0,2.0);
 
 			break;
 		}
@@ -341,7 +341,7 @@ int main(int argc, char **argv)
 		else if(argv[1][0] == 'T')
 			sqt.triangularTiling(atoi(argv[2]));
 	}
-
+    myMap.check();
 
 	//  bounding box
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

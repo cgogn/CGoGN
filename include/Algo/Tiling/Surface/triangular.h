@@ -202,6 +202,94 @@ protected:
 	//@}
 };
 
+/*! \brief The class of regular cube square tiling
+ */
+template <typename PFP>
+class Cube : public Cylinder<PFP>
+{
+    typedef typename PFP::MAP MAP;
+    typedef typename PFP::VEC3 VEC3;
+
+public:
+    Cube(MAP& map, unsigned int x, unsigned int y, unsigned int z):
+        Cylinder<PFP>(map,2*(x+y),z, false, false)
+    {
+        cube(x,y,z);
+    }
+
+    /*! @name Embedding Operators
+     * Tiling creation
+     *************************************************************************/
+
+    //@{
+    //! Embed a topological cube
+    /*! @param position Attribute used to store vertices positions
+     *  @param x
+     *  @param y
+     *  @param z
+     */
+    void embedIntoCube(VertexAttribute<VEC3>& position, float x, float y, float z);
+    //@}
+
+protected:
+    /*! @name Topological Operators
+     * Tiling creation
+     *************************************************************************/
+
+    //@{
+    //! Create a subdivided 2D cube
+    /*! @param x nb of squares in x
+     *  @param y nb of squares in y
+     *  @param z nb of squares un z
+     */
+    void cube(unsigned int x, unsigned int y, unsigned int z);
+    //@}
+
+};
+
+/*! \brief The class of regular tore square tiling
+ */
+template <typename PFP>
+class Tore : public Cylinder<PFP>
+{
+    typedef typename PFP::MAP MAP;
+    typedef typename PFP::VEC3 VEC3;
+
+public:
+    Tore(MAP& map, unsigned int n, unsigned int m):
+        Cylinder<PFP>(map,n,m)
+    {
+        tore(n,m);
+    }
+
+    /*! @name Embedding Operators
+     * Tiling creation
+     *************************************************************************/
+
+    //@{
+    //! Embed a topological tore
+    /*! @param position Attribute used to store vertices positions
+     *  @param big_radius
+     *  @param small_radius
+     */
+    void embedIntoTore(VertexAttribute<VEC3>& position, float big_radius, float small_radius);
+    //@}
+
+    /*! @name Topological Operators
+     * Tiling creation
+     *************************************************************************/
+
+    //@{
+protected:
+    //! Create a subdivided 2D tore
+    /*! @param n nb of squares around big circumference
+     *  @param m nb of squares around small circumference
+     */
+    //square -> tore -> cylinder + finish sewing
+    void tore(unsigned int n, unsigned int m);
+    //@}
+};
+
 } // namespace Triangular
 
 } // namespace Tilings
