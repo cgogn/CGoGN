@@ -145,8 +145,8 @@ void MyQT::cb_Open()
 
 	std::vector<std::string> attrNames ;
 
-    //size_t pos = filename.rfind(".");    // position of "." in filename
-    //std::string extension = filename.substr(pos);
+    size_t pos = filename.rfind(".");    // position of "." in filename
+    std::string extension = filename.substr(pos);
 
 //	if(extension == std::string(".off"))
 //	{
@@ -161,8 +161,19 @@ void MyQT::cb_Open()
 //			myMap.closeMap();
 //		}
 //	}
-//	else
-//	{
+/*
+    if(extension == std::string(".msh"))
+    {
+        if(!Algo::Volume::Import::importMSH<PFP>(myMap,filename, attrNames))
+        {
+           std::cerr << "could not import " << filename << std::endl ;
+           return;
+        }
+        else
+            position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]);
+    }
+    else
+    {*/
 		if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
 			std::cerr << "could not import " << filename << std::endl ;
@@ -170,7 +181,7 @@ void MyQT::cb_Open()
 		}
 		else
 			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
-//	}
+    //}
 
 	color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
 
@@ -387,8 +398,8 @@ int main(int argc, char **argv)
 	{
 		std::vector<std::string> attrNames ;
 		std::string filename(argv[1]);
-//		size_t pos = filename.rfind(".");    // position of "." in filename
-//		std::string extension = filename.substr(pos);
+        size_t pos = filename.rfind(".");    // position of "." in filename
+        std::string extension = filename.substr(pos);
 /*
 		if(extension == std::string(".off"))
 		{
@@ -405,14 +416,28 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-*/			if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
+
+        if(extension == std::string(".nas"))
+        {
+            if(!Algo::Volume::Import::importNAS<PFP>(myMap,filename, attrNames))
+            {
+               std::cerr << "could not import " << filename << std::endl ;
+               return 1;
+            }
+            else
+                position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]);
+        }
+        else
+        {
+        */
+        if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
 			{
 				std::cerr << "could not import " << filename << std::endl ;
 				return 1;
 			}
 			else
 				position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
-//		}
+        //}
 
 		color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
 

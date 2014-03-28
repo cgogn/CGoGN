@@ -118,8 +118,8 @@ bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::ve
  * TODO ADD TO MeshTablesVolume
  */
 
-template <typename PFP>
-bool importMSH(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+//template <typename PFP>
+//bool importMSH(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 template <typename PFP>
 bool importVTU(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
@@ -144,7 +144,7 @@ bool importVBGZ(typename PFP::MAP& the_map, const std::string& filename, std::ve
 #include "Algo/Import/importChoupi.hpp"
 
 
-#include "Algo/Import/importMSH.hpp"
+//#include "Algo/Import/importMSH.hpp"
 #include "Algo/Import/importVTU.hpp"
 #include "Algo/Import/importNAS.hpp"
 #include "Algo/Import/importVBGZ.hpp"

@@ -73,13 +73,13 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
         return importTs(filename, attrNames);
         break;
     case MSH:
-        //return importMSH(filename, attrNames);
+        return importMSH(filename, attrNames);
         break;
     case VTU:
         //return importVTU(filename, attrNames);
         break;
     case NAS:
-        //return importNAS(filename, attrNames);
+        return importNAS(filename, attrNames);
         break;
     case VBGZ:
         //return importVBGZ>(filename, attrNames);
@@ -130,7 +130,7 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
     oss2 >> m_nbVolumes;
 
 	//reading vertices
-	std::vector<unsigned int> verticesID;
+    std::vector<unsigned int> verticesID;
     verticesID.reserve(m_nbVertices);
 
     for(unsigned int i = 0; i < m_nbVertices; ++i)
@@ -152,10 +152,10 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 		unsigned int id = container.insertLine();
         position[id] = pos;
 
-		verticesID.push_back(id);
+        verticesID.push_back(id);
 	}
 
-    // reading tetrahedra
+    // reading volumes
     m_nbFaces.reserve(m_nbVolumes*4);
     m_emb.reserve(m_nbVolumes*12);
 
@@ -168,34 +168,148 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 
 		std::stringstream oss(ligne);
 		int n;
-		oss >> n; // nb de faces d'un volume ?
+        oss >> n; // type of volumes
 
-        m_nbFaces.push_back(4);
-
-        int s0,s1,s2,s3;
-
-		oss >> s0;
-		oss >> s1;
-		oss >> s2;
-		oss >> s3;
-
-        typename PFP::VEC3 P = position[verticesID[s0]];
-        typename PFP::VEC3 A = position[verticesID[s1]];
-        typename PFP::VEC3 B = position[verticesID[s2]];
-        typename PFP::VEC3 C = position[verticesID[s3]];
-
-        if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+        //tetrahedron
+        if(n == 4)
         {
-            int ui = s1;
-            s1 = s2;
-            s2 = ui;
+            m_nbFaces.push_back(4);
+
+            int s0,s1,s2,s3;
+
+            oss >> s0;
+            oss >> s1;
+            oss >> s2;
+            oss >> s3;
+
+            typename PFP::VEC3 P = position[verticesID[s0]];
+            typename PFP::VEC3 A = position[verticesID[s1]];
+            typename PFP::VEC3 B = position[verticesID[s2]];
+            typename PFP::VEC3 C = position[verticesID[s3]];
+
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+            {
+                int ui = s1;
+                s1 = s2;
+                s2 = ui;
+            }
+
+            m_emb.push_back(verticesID[s0]);
+            m_emb.push_back(verticesID[s1]);
+            m_emb.push_back(verticesID[s2]);
+            m_emb.push_back(verticesID[s3]);
+        }
+        //pyramid
+        else if(n == 5)
+        {
+            m_nbFaces.push_back(5);
+
+            int s0,s1,s2,s3,s4;
+
+            oss >> s0;
+            oss >> s1;
+            oss >> s2;
+            oss >> s3;
+            oss >> s4;
+
+            m_emb.push_back(verticesID[s0]);
+            m_emb.push_back(verticesID[s1]);
+            m_emb.push_back(verticesID[s2]);
+            m_emb.push_back(verticesID[s3]);
+            m_emb.push_back(verticesID[s4]);
+        }
+        //prism
+        else if(n == 6)
+        {
+            m_nbFaces.push_back(6);
+
+            int s0,s1,s2,s3,s4,s5;
+
+            oss >> s0;
+            oss >> s1;
+            oss >> s2;
+            oss >> s3;
+            oss >> s4;
+            oss >> s5;
+
+            typename PFP::VEC3 P = position[verticesID[s4]];
+            typename PFP::VEC3 A = position[verticesID[s0]];
+            typename PFP::VEC3 B = position[verticesID[s1]];
+            typename PFP::VEC3 C = position[verticesID[s2]];
+
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+            {
+                int ui = s0;
+                s0 = s4;
+                s4 = ui;
+
+                ui = s1;
+                s1 = s5;
+                s5 = ui;
+
+                ui = s2;
+                s2 = s3;
+                s3 = ui;
+            }
+
+            m_emb.push_back(verticesID[s0]);
+            m_emb.push_back(verticesID[s1]);
+            m_emb.push_back(verticesID[s2]);
+            m_emb.push_back(verticesID[s3]);
+            m_emb.push_back(verticesID[s4]);
+            m_emb.push_back(verticesID[s5]);
+        }
+        //hexahedron
+        else if(n == 8)
+        {
+            m_nbFaces.push_back(8);
+
+            int s0,s1,s2,s3,s4,s5,s6,s7;
+
+            oss >> s0;
+            oss >> s1;
+            oss >> s2;
+            oss >> s3;
+            oss >> s4;
+            oss >> s5;
+            oss >> s6;
+            oss >> s7;
+
+            typename PFP::VEC3 P = position[verticesID[s4]];
+            typename PFP::VEC3 A = position[verticesID[s0]];
+            typename PFP::VEC3 B = position[verticesID[s1]];
+            typename PFP::VEC3 C = position[verticesID[s2]];
+
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+            {
+                int ui = s0;
+                s0 = s3;
+                s3 = ui;
+
+                ui = s1;
+                s1 = s2;
+                s2 = ui;
+
+                ui = s4;
+                s4 = s7;
+                s7 = ui;
+
+                ui = s5;
+                s5 = s6;
+                s6 = ui;
+            }
+
+            m_emb.push_back(verticesID[s0]);
+            m_emb.push_back(verticesID[s1]);
+            m_emb.push_back(verticesID[s2]);
+            m_emb.push_back(verticesID[s3]);
+            m_emb.push_back(verticesID[s4]);
+            m_emb.push_back(verticesID[s5]);
+            m_emb.push_back(verticesID[s6]);
+            m_emb.push_back(verticesID[s7]);
         }
 
-        m_emb.push_back(verticesID[s0]);
-        m_emb.push_back(verticesID[s1]);
-        m_emb.push_back(verticesID[s2]);
-        m_emb.push_back(verticesID[s3]);
-	}
+    }
 
 	fp.close();
 	return true;
@@ -701,10 +815,212 @@ bool MeshTablesVolume<PFP>::importTs(const std::string& filename, std::vector<st
     return true;
 }
 
+/*
+inline float floatFromNas(std::string& s_v)
+{
+    float x = 0.0f;
+
+    std::size_t pos1 = s_v.find_last_of('-');
+    if ((pos1!=std::string::npos) && (pos1!=0))
+    {
+        std::string res = s_v.substr(0,pos1) + "e" + s_v.substr(pos1,8-pos1);
+        x = atof(res.c_str());
+    }
+    else
+    {
+        std::size_t pos2 = s_v.find_last_of('+');
+        if ((pos2!=std::string::npos) && (pos2!=0))
+        {
+            std::string res = s_v.substr(0,pos2) + "e" + s_v.substr(pos2,8-pos2);
+            x = atof(res.c_str());
+        }
+        else
+        {
+            x = atof(s_v.c_str());
+        }
+    }
+    return x;
+}
+*/
+template <typename PFP>
+bool MeshTablesVolume<PFP>::importNAS(const std::string& filename, std::vector<std::string>& attrNames)
+{
+/*    //
+    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+
+    if (!position.isValid())
+        position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
+
+    attrNames.push_back(position.name()) ;
+
+    //
+    AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
+
+    // open file
+    std::ifstream fp(filename.c_str(), std::ios::in);
+    if (!fp.good())
+    {
+        CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+        return false;
+    }
+
+    std::string ligne;
+    std::string tag;
+
+    std::getline (fp, ligne);
+    do
+    {
+        std::getline (fp, ligne);
+        tag = ligne.substr(0,4);
+    } while (tag !="GRID");
+
+    unsigned int m_nbVertices = 0;
+    //reading vertices
+    std::map<unsigned int, unsigned int> verticesMapID;
+    do
+    {
+        std::string s_v = ligne.substr(8,8);
+        unsigned int ind = atoi(s_v.c_str());
+
+        s_v = ligne.substr(24,8);
+        float x = floatFromNas(s_v);
+        s_v = ligne.substr(32,8);
+        float y = floatFromNas(s_v);
+        s_v = ligne.substr(40,8);
+        float z = floatFromNas(s_v);
+
+        VEC3 pos(x,y,z);
+        unsigned int id = container.insertLine();
+        position[id] = pos;
+        verticesMapID.insert(std::pair<unsigned int, unsigned int>(ind,id));
+//		std::cout << "P: "<< ind << "   "<<x<<", "<<y<<", "<<z << std::endl;
+        std::getline (fp, ligne);
+        tag = ligne.substr(0,4);
+        m_nbVertices++;
+    } while (tag =="GRID");
+
+    do
+    {
+        std::string s_v = ligne.substr(0,6);
+
+        if (s_v == "CHEXA ")
+        {
+            m_nbFaces.push_back(8);
+
+            s_v = ligne.substr(24,8);
+            unsigned int ind1 = atoi(s_v.c_str());
+            s_v = ligne.substr(32,8);
+            unsigned int ind2 = atoi(s_v.c_str());
+            s_v = ligne.substr(40,8);
+            unsigned int ind3 = atoi(s_v.c_str());
+            s_v = ligne.substr(48,8);
+            unsigned int ind4 = atoi(s_v.c_str());
+            s_v = ligne.substr(56,8);
+            unsigned int ind5 = atoi(s_v.c_str());
+            s_v = ligne.substr(64,8);
+            unsigned int ind6 = atoi(s_v.c_str());
+
+            std::getline (fp, ligne);
+            s_v = ligne.substr(8,8);
+            unsigned int ind7 = atoi(s_v.c_str());
+            s_v = ligne.substr(16,8);
+            unsigned int ind8 = atoi(s_v.c_str());
+
+            typename PFP::VEC3 P = position[verticesMapID[ind5]];
+            typename PFP::VEC3 A = position[verticesMapID[ind1]];
+            typename PFP::VEC3 B = position[verticesMapID[ind2]];
+            typename PFP::VEC3 C = position[verticesMapID[ind3]];
+
+            Geom::Vec4ui v1,v2;
+
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+            {
+                v1[0] = ind4;
+                v1[1] = ind3;
+                v1[2] = ind2;
+                v1[3] = ind1;
+                //hexa.push_back(v);
+                v2[0] = ind8;
+                v2[1] = ind7;
+                v2[2] = ind6;
+                v2[3] = ind5;
+                //hexa.push_back(v);
+            }
+            else
+            {
+                v1[0] = ind1;
+                v1[1] = ind2;
+                v1[2] = ind3;
+                v1[3] = ind4;
+                //hexa.push_back(v);
+                v2[0] = ind5;
+                v2[1] = ind6;
+                v2[2] = ind7;
+                v2[3] = ind8;
+                //hexa.push_back(v);
+            }
+
+            m_emb.push_back(verticesMapID[v1[0]]);
+            m_emb.push_back(verticesMapID[v1[1]]);
+            m_emb.push_back(verticesMapID[v1[2]]);
+            m_emb.push_back(verticesMapID[v1[3]]);
+            m_emb.push_back(verticesMapID[v2[0]]);
+            m_emb.push_back(verticesMapID[v2[1]]);
+            m_emb.push_back(verticesMapID[v2[2]]);
+            m_emb.push_back(verticesMapID[v2[3]]);
+        }
+        if (s_v == "CTETRA")
+        {
+            m_nbFaces.push_back(4);
+
+            s_v = ligne.substr(24,8);
+            unsigned int ind1 = atoi(s_v.c_str());
+            s_v = ligne.substr(32,8);
+            unsigned int ind2 = atoi(s_v.c_str());
+            s_v = ligne.substr(40,8);
+            unsigned int ind3 = atoi(s_v.c_str());
+            s_v = ligne.substr(48,8);
+            unsigned int ind4 = atoi(s_v.c_str());
+
+            typename PFP::VEC3 P = position[verticesMapID[ind1]];
+            typename PFP::VEC3 A = position[verticesMapID[ind2]];
+            typename PFP::VEC3 B = position[verticesMapID[ind3]];
+            typename PFP::VEC3 C = position[verticesMapID[ind4]];
+
+            Geom::Vec4ui v;
+
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+            {
+                v[0] = ind4;
+                v[1] = ind3;
+                v[2] = ind2;
+                v[3] = ind1;
+            }
+            else
+            {
+                v[0] = ind1;
+                v[1] = ind2;
+                v[2] = ind3;
+                v[3] = ind4;
+            }
+            //tet.push_back(v);
+            m_emb.push_back(verticesMapID[v[0]]);
+            m_emb.push_back(verticesMapID[v[1]]);
+            m_emb.push_back(verticesMapID[v[2]]);
+            m_emb.push_back(verticesMapID[v[3]]);
+        }
+        std::getline (fp, ligne);
+        tag = ligne.substr(0,4);
+    } while (!fp.eof());
+
+    fp.close();
+*/
+    return true;
+}
+
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<std::string>& attrNames)
 {
-    //
     VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
     if (!position.isValid())
@@ -731,11 +1047,15 @@ bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<s
     // reading number of vertices
     std::getline (fp, ligne);
     std::stringstream oss(ligne);
-    oss >> m_nbVertices;
+    oss >> nbv;
 
+    //reading vertices
+//	std::vector<unsigned int> verticesID;
     std::map<unsigned int, unsigned int> verticesMapID;
 
-    for(unsigned int i = 0; i < m_nbVertices; ++i)
+
+//	verticesID.reserve(nbv);
+    for(unsigned int i = 0; i < nbv;++i)
     {
         do
         {
@@ -743,100 +1063,223 @@ bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<s
         } while (ligne.size() == 0);
 
         std::stringstream oss(ligne);
-
         unsigned int pipo;
         float x,y,z;
         oss >> pipo;
         oss >> x;
         oss >> y;
         oss >> z;
-
+        // TODO : if required read other vertices attributes here
         VEC3 pos(x,y,z);
 
         unsigned int id = container.insertLine();
-
         position[id] = pos;
+
         verticesMapID.insert(std::pair<unsigned int, unsigned int>(pipo,id));
+//		verticesID.push_back(id);
     }
 
     // ENNODE
     std::getline (fp, ligne);
+
+    m_nbVertices = nbv;
 
     // ELM
     std::getline (fp, ligne);
 
     // reading number of elements
     std::getline (fp, ligne);
+    unsigned int nbe=0;
     std::stringstream oss2(ligne);
-    oss2 >> m_nbVolumes;
+    oss2 >> nbe;
 
-    //Read and embed all tetrahedrons
-    for(unsigned int i = 0; i < m_nbVolumes ; ++i)
+    bool invertVol = false;
+
+    for(unsigned int i=0; i<nbe; ++i)
     {
-        do
-        {
-            std::getline(fp,ligne);
-        } while(ligne.size() == 0);
-
-        std::stringstream oss(ligne);
-
         unsigned int pipo,type_elm,nb;
-        oss >> pipo;
-        oss >> type_elm;
-        oss >> pipo;
-        oss >> pipo;
-        oss >> nb;
+        fp >> pipo;
+        fp >> type_elm;
+        fp >> pipo;
+        fp >> pipo;
+        fp >> nb;
 
         if ((type_elm==4) && (nb==4))
         {
+            Geom::Vec4ui v;
+
             m_nbFaces.push_back(4);
 
-            int s0,s1,s2,s3;
 
-            oss >> s0;
-            oss >> s1;
-            oss >> s2;
-            oss >> s3;
-
-            typename PFP::VEC3 P = position[verticesMapID[s0]];
-            typename PFP::VEC3 A = position[verticesMapID[s1]];
-            typename PFP::VEC3 B = position[verticesMapID[s2]];
-            typename PFP::VEC3 C = position[verticesMapID[s3]];
-
-            if(Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+            // test orientation of first tetra
+            if (i==0)
             {
-                unsigned int ui= s0;
-                s0 = s3;
-                s3 = s2;
-                s2 = s1;
-                s1 = ui;
+                fp >> v[0];
+                fp >> v[1];
+                fp >> v[2];
+                fp >> v[3];
+
+                typename PFP::VEC3 P = position[verticesMapID[v[0]]];
+                typename PFP::VEC3 A = position[verticesMapID[v[1]]];
+                typename PFP::VEC3 B = position[verticesMapID[v[2]]];
+                typename PFP::VEC3 C = position[verticesMapID[v[3]]];
+
+                if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+                {
+                    invertVol=true;
+                    unsigned int ui=v[0];
+                    v[0] = v[3];
+                    v[3] = v[2];
+                    v[2] = v[1];
+                    v[1] = ui;
+                }
             }
+            else
+            {
+                if (invertVol)
+                {
+                    fp >> v[1];
+                    fp >> v[2];
+                    fp >> v[3];
+                    fp >> v[0];
+                }
+                else
+                {
+                    fp >> v[0];
+                    fp >> v[1];
+                    fp >> v[2];
+                    fp >> v[3];
+                }
+            }
+            m_emb.push_back(verticesMapID[v[0]]);
+            m_emb.push_back(verticesMapID[v[1]]);
+            m_emb.push_back(verticesMapID[v[2]]);
+            m_emb.push_back(verticesMapID[v[3]]);
 
-            unsigned int nbe;
-            //if regions are defined use this number
-            oss >> nbe; //ignored here
-
-            m_emb.push_back(verticesMapID[s0]);
-            m_emb.push_back(verticesMapID[s1]);
-            m_emb.push_back(verticesMapID[s2]);
-            m_emb.push_back(verticesMapID[s3]);
-        }
-        else if((type_elm==5) && (nb==8))
-        {
-            m_nbFaces.push_back(8);
         }
         else
         {
-            for (unsigned int j=0; j<nb; ++j)
+            if ((type_elm==5) && (nb==8))
             {
-                unsigned int v;
-                fp >> v;
+                Geom::Vec4ui v;
+
+                m_nbFaces.push_back(8);
+
+                if (i==0)
+                {
+                    unsigned int last;
+                    fp >> v[0];
+                    fp >> v[1];
+                    fp >> v[2];
+                    fp >> v[3];
+                    fp >> last;
+
+                    typename PFP::VEC3 P = position[verticesMapID[last]];
+                    typename PFP::VEC3 A = position[verticesMapID[v[0]]];
+                    typename PFP::VEC3 B = position[verticesMapID[v[1]]];
+                    typename PFP::VEC3 C = position[verticesMapID[v[2]]];
+
+                    if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+                    {
+
+                        invertVol=true;
+                        unsigned int ui = v[3];
+                        v[3] = v[0];
+                        v[0] = ui;
+                        ui = v[2];
+                        v[2] = v[1];
+                        v[1] = ui;
+                       // hexa.push_back(v);
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                        v[3] = last;
+                        fp >> v[2];
+                        fp >> v[1];
+                        fp >> v[0];
+                        //hexa.push_back(v);
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                    }
+                    else
+                    {
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                        //hexa.push_back(v);
+                        v[0] = last;
+                        fp >> v[1];
+                        fp >> v[2];
+                        fp >> v[3];
+                        //hexa.push_back(v);
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                    }
+                }
+                else
+                {
+                    if (invertVol)
+                    {
+                        fp >> v[3];
+                        fp >> v[2];
+                        fp >> v[1];
+                        fp >> v[0];
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                        //hexa.push_back(v);
+                        fp >> v[3];
+                        fp >> v[2];
+                        fp >> v[1];
+                        fp >> v[0];
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                        //hexa.push_back(v);
+
+                    }
+                    else
+                    {
+                        fp >> v[0];
+                        fp >> v[1];
+                        fp >> v[2];
+                        fp >> v[3];
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                        //hexa.push_back(v);
+                        fp >> v[0];
+                        fp >> v[1];
+                        fp >> v[2];
+                        fp >> v[3];
+                        m_emb.push_back(verticesMapID[v[0]]);
+                        m_emb.push_back(verticesMapID[v[1]]);
+                        m_emb.push_back(verticesMapID[v[2]]);
+                        m_emb.push_back(verticesMapID[v[3]]);
+                        //hexa.push_back(v);
+                    }
+                }
+            }
+            else
+            {
+                for (unsigned int j=0; j<nb; ++j)
+                {
+                    unsigned int v;
+                    fp >> v;
+                }
             }
         }
-
     }
 }
-
 
 } // namespace Import
 

@@ -189,7 +189,7 @@ private:
 
     bool importTs(const std::string& filename, std::vector<std::string>& attrNames);
 
-    //
+    //TODO Hexahedra : not working yet
 
     bool importMSH(const std::string& filename, std::vector<std::string>& attrNames);
 

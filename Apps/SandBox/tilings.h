@@ -43,7 +43,7 @@
 
 #include "Algo/Tiling/Surface/square.h"
 #include "Algo/Tiling/Surface/triangular.h"
-
+#include "Algo/Tiling/Surface/hexagonal.h"
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL1 { class MapRender; } } } }
@@ -79,8 +79,8 @@ public:
     {}
 
 	void squareTiling(int code);
-
 	void triangularTiling(int code);
+    void hexagonalTiling(int code);
 
 protected:
 
