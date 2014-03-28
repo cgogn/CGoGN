@@ -199,13 +199,13 @@ private:
 
     bool importVBGZ(const std::string& filename, std::vector<std::string>& attrNames);
 
+	//TODO Moka / OVM not working
+
     //bool importMoka(const std::string& filename, std::vector<std::string>& attrNames);
 
     //bool importOVM(const std::string& filename, std::vector<std::string>& attrNames);
 
 public:
-    //static ImportType getFileType(const std::string& filename);
-
     inline unsigned getNbVertices() const { return m_nbVertices; }
 
     inline unsigned getNbVolumes() const { return m_nbVolumes; }

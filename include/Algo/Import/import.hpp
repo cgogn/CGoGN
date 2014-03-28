@@ -546,7 +546,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
     //for each volume of table
     for(unsigned int i = 0 ; i < nbv ; ++i)
-    {
+    {		
         // store volume in buffer, removing degenated faces
         unsigned int nbf = mtv.getNbFacesVolume(i);
 
@@ -563,7 +563,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
         }
 
         if(nbf == 4) //tetrahedral case
-        {
+        {			
             Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
 
             // Embed three "base" vertices
@@ -603,7 +603,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
         }
         else if(nbf == 5) //pyramidal case
-        {
+        {			
             Dart d = Surface::Modelisation::createQuadrangularPyramid<PFP>(map,false);
 
             // 1.
@@ -657,7 +657,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
             vecDartsPerVertex[em].push_back(dd); m.mark(dd);
         }
         else if(nbf == 6) //prism case
-        {
+        {			
             Dart d = Surface::Modelisation::createTriangularPrism<PFP>(map,false);
 
             // 1.
@@ -721,7 +721,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
         }
         else if(nbf == 8) //hexahedral case
-        {
+        {			
             Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
 
             // 1.
@@ -806,7 +806,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
         }  //end of hexa
     }
 
-std::cout << " elements created " << std::endl;
+	std::cout << " elements created " << std::endl;
+
     //reconstruct neighbourhood
     unsigned int nbBoundaryFaces = 0 ;
     for (Dart d = map.begin(); d != map.end(); map.next(d))
