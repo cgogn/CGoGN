@@ -273,11 +273,35 @@ bool GLSLShader::loadGeometryShader(const std::string& filename )
 	return flag;
 }
 
+bool GLSLShader::logError(GLuint handle, const std::string& nameSrc, const char *src)
+{
+	char *info_log;
+	info_log = getInfoLog( handle );
+	if (info_log!=NULL)
+	{
+		CGoGNerr << "============================================================================" << CGoGNendl;
+		CGoGNerr << "Error in " << nameSrc << CGoGNendl;
+		CGoGNerr << "----------------------------------------------------------------------------" << CGoGNendl;
+		char line[256];
+		int ln=1;
+		std::stringstream ss(src);
+		do
+		{
+			ss.getline(line,256);
+			std::cout << ln++ << ": "<< line<< std::endl;
+		}while (!ss.eof());
+		CGoGNerr << "----------------------------------------------------------------------------" << CGoGNendl;
+		CGoGNerr << info_log;
+		CGoGNerr << "============================================================================" << CGoGNendl;
+		delete [] info_log;
+		return false;
+	}
+	return true;
+}
+
+
 bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source )
 {
-//	int		status;
-	char	*info_log;
-
 	if (*m_vertex_shader_object==0)
 	{
 		glDeleteShader(*m_vertex_shader_object);
@@ -309,26 +333,8 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	/*** compile shader object ***/
 	glCompileShader( *m_vertex_shader_object );
 
-//	glGetProgramiv( *m_vertex_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
-//	if( !status )
-//	{
-//		CGoGNerr << "ERROR - GLshader::loadVertexShader() - error occured while compiling shader " << m_nameVS<< CGoGNendl;
-//		info_log = getInfoLog( *m_vertex_shader_object );
-//				CGoGNerr << info_log << CGoGNendl;
-//		delete [] info_log;
-
-//		glDeleteShader( *m_vertex_shader_object );
-//		*m_vertex_shader_object = 0;
-
-//		return false;
-//	}
-	info_log = getInfoLog( *m_vertex_shader_object );
-	if (info_log!=NULL)
+	if (!logError(*m_vertex_shader_object, m_nameVS, vertex_shader_source))
 	{
-		CGoGNerr << "ERROR - GLshader::loadVertexShader() - error occured while compiling shader " << m_nameVS<< CGoGNendl;
-		CGoGNerr << vertex_shader_source << CGoGNendl;
-		CGoGNerr << "----------------------------------------------------------------------------" << CGoGNendl;
-		delete [] info_log;
 		glDeleteShader( *m_vertex_shader_object );
 		*m_vertex_shader_object = 0;
 		return false;
@@ -340,9 +346,6 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 
 bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_source )
 {
-//	int		status;
-	char	*info_log;
-
 	if (*m_fragment_shader_object==0)
 	{
 		glDeleteShader(*m_fragment_shader_object);
@@ -374,30 +377,13 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	/*** compile shader object ***/
 	glCompileShader( *m_fragment_shader_object );
 
-//	glGetProgramiv( *m_fragment_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
-//	if( !status )
-//	{
-//		CGoGNerr << "ERROR - GLshader::loadFragmentShader() - error occured while compiling shader " <<  m_nameFS << CGoGNendl;
-//		info_log = getInfoLog( *m_fragment_shader_object );
-//		CGoGNerr << info_log << CGoGNendl;
-//		delete [] info_log;
-
-//		glDeleteShader( *m_fragment_shader_object );
-//		*m_fragment_shader_object = 0;
-
-//		return false;
-//	}
-	info_log = getInfoLog( *m_vertex_shader_object );
-	if (info_log!=NULL)
+	if (!logError(*m_fragment_shader_object, m_nameFS, fragment_shader_source))
 	{
-		CGoGNerr << "ERROR - GLshader::loadFragmentShader() - error occured while compiling shader " << m_nameFS<< CGoGNendl;
-		CGoGNerr << fragment_shader_source << CGoGNendl;
-		CGoGNerr << "----------------------------------------------------------------------------" << CGoGNendl;
-		delete [] info_log;
 		glDeleteShader( *m_fragment_shader_object );
 		*m_fragment_shader_object = 0;
 		return false;
 	}
+
 
 	/*** termination ***/
 	return true;
@@ -405,9 +391,6 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 
 bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source )
 {
-//	int		status;
-	char	*info_log;
-
 	if (*m_geom_shader_object==0)
 	{
 		glDeleteShader(*m_geom_shader_object);
@@ -438,29 +421,13 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	/*** compile shader object ***/
 	glCompileShader( *m_geom_shader_object );
 
-//	glGetProgramiv( *m_geom_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
-//	if( !status )
-//	{
-//		CGoGNerr << "ERROR - GLshader::loadGeometryShader() - error occured while compiling shader "<< m_nameGS << CGoGNendl;
-//		info_log = getInfoLog( *m_geom_shader_object );
-//		CGoGNerr << info_log << CGoGNendl;
-//		delete [] info_log;
-
-//		glDeleteShader( *m_geom_shader_object );
-//		*m_geom_shader_object = 0;
-
-//		return false;
-//	}
-	info_log = getInfoLog( *m_geom_shader_object );
-	if (info_log!=NULL)
+	if (!logError(*m_geom_shader_object, m_nameGS, geom_shader_source))
 	{
-		CGoGNerr << "ERROR - GLshader::loadGeometryShader() - error occured while compiling shader " << m_nameGS<< CGoGNendl;
-		CGoGNerr << info_log << CGoGNendl;
-		delete [] info_log;
 		glDeleteShader( *m_geom_shader_object );
 		*m_geom_shader_object = 0;
 		return false;
 	}
+
 
 	/*** termination ***/
 	return true;
