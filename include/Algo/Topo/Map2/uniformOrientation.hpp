@@ -204,7 +204,8 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 	{
 		Dart d = *id++;
 		Dart e = *id;
-		map.sewFaces(d,e);
+		if (cmf.isMarked(d) || cmf.isMarked(e))
+			map.sewFaces(d,e);
 	}
 
 }
