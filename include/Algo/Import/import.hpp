@@ -828,8 +828,42 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
             if (good_dart != NIL)
             {
-                map.sewVolumes(d, good_dart, false);
-                m.template unmarkOrbit<FACE>(d);
+                unsigned int degD = map.faceDegree(d);
+                unsigned int degGD = map.faceDegree(good_dart);
+
+                if(degD < degGD)
+                {
+                    Dart dt = map.phi1(good_dart);
+                    map.PFP::MAP::ParentMap::splitFace(dt,map.phi_1(good_dart));
+
+                    //map.template initDartEmbedding<VERTEX>(map.phi_1(map.phi_1(good_dart)), map.template getEmbedding<VERTEX>(dt)) ;
+                    //map.template initDartEmbedding<VERTEX>(map.phi_1(dt), map.template getEmbedding<VERTEX>(map.phi_1(good_dart))) ;
+
+                    //unsigned int emb2 = map.template getEmbedding<VERTEX>(map.phi_1(d));
+                    //vecDartsPerVertex[emb2].push_back(map.phi2(map.phi1(good_dart)));
+
+                //    map.sewVolumes(d,good_dart,false);
+                //    m.unmarkOrbit<FACE>(d);
+                }
+                else if(degD > degGD)
+                {
+                    Dart dt = map.phi1(map.phi1(d));
+                    map.PFP::MAP::ParentMap::splitFace(d,dt);
+
+                    //map.template initDartEmbedding<VERTEX>(map.phi_1(dt), map.template getEmbedding<VERTEX>(d)) ;
+                    //map.template initDartEmbedding<VERTEX>(map.phi_1(d), map.template getEmbedding<VERTEX>(dt)) ;
+
+                    //unsigned int emb1 = map.template getEmbedding<VERTEX>(d);
+                    //vecDartsPerVertex[emb1].push_back(map.phi2(map.phi_1(d)));
+
+                //    map.sewVolumes(d,good_dart,false);
+                //    m.unmarkOrbit<FACE>(d);
+                }
+                //else
+                //{
+                    map.sewVolumes(d, good_dart, false);
+                    m.unmarkOrbit<FACE>(d);
+                //}
             }
             else
             {
