@@ -307,7 +307,7 @@ inline AttributeHandler<T, ORBIT, MAP_IMPL> MapCommon<MAP_IMPL>::addAttribute(co
 {
 	if(!this->template isOrbitEmbedded<ORBIT>())
 		this->template addEmbedding<ORBIT>() ;
-	AttributeMultiVector<T>* amv = this->m_attribs[ORBIT].addAttribute<T>(nameAttr) ;
+	AttributeMultiVector<T>* amv = this->m_attribs[ORBIT].template addAttribute<T>(nameAttr) ;
 	return AttributeHandler<T, ORBIT, MAP_IMPL>(this, amv) ;
 }
 
@@ -405,7 +405,7 @@ inline void MapCommon<MAP_IMPL>::enableQuickTraversal()
 	{
 		if(!this->template isOrbitEmbedded<ORBIT>())
 			this->template addEmbedding<ORBIT>() ;
-		this->m_quickTraversal[ORBIT] = this->m_attribs[ORBIT].addAttribute<Dart>("quick_traversal") ;
+		this->m_quickTraversal[ORBIT] = this->m_attribs[ORBIT].template addAttribute<Dart>("quick_traversal") ;
 	}
 	updateQuickTraversal<ORBIT>() ;
 }
@@ -440,7 +440,7 @@ inline void MapCommon<MAP_IMPL>::disableQuickTraversal()
 {
 	if(this->m_quickTraversal[ORBIT] != NULL)
 	{
-		this->m_attribs[ORBIT].removeAttribute<Dart>(this->m_quickTraversal[ORBIT]->getIndex()) ;
+		this->m_attribs[ORBIT].template removeAttribute<Dart>(this->m_quickTraversal[ORBIT]->getIndex()) ;
 		this->m_quickTraversal[ORBIT] = NULL ;
 	}
 }
@@ -455,7 +455,7 @@ inline void MapCommon<MAP_IMPL>::enableQuickIncidentTraversal()
 			this->template addEmbedding<ORBIT>() ;
 		std::stringstream ss;
 		ss << "quickLocalIncidentTraversal_" << INCI;
-		this->m_quickLocalIncidentTraversal[ORBIT][INCI] = this->m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+		this->m_quickLocalIncidentTraversal[ORBIT][INCI] = this->m_attribs[ORBIT].template addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
 	updateQuickIncidentTraversal<ORBIT,INCI>() ;
 }
@@ -517,7 +517,7 @@ inline void MapCommon<MAP_IMPL>::enableQuickAdjacentTraversal()
 			this->template addEmbedding<ORBIT>() ;
 		std::stringstream ss;
 		ss << "quickLocalAdjacentTraversal" << ADJ;
-		this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] = this->m_attribs[ORBIT].addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
+		this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] = this->m_attribs[ORBIT].template addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
 	updateQuickAdjacentTraversal<ORBIT, ADJ>() ;
 }
@@ -564,7 +564,7 @@ inline void MapCommon<MAP_IMPL>::disableQuickAdjacentTraversal()
 {
 	if(this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL)
 	{
-		this->m_attribs[ORBIT].removeAttribute<Dart>(this->m_quickLocalAdjacentTraversal[ORBIT][ADJ]->getIndex()) ;
+		this->m_attribs[ORBIT].template removeAttribute<Dart>(this->m_quickLocalAdjacentTraversal[ORBIT][ADJ]->getIndex()) ;
 		this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] = NULL ;
 	}
 }

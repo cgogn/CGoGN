@@ -29,19 +29,19 @@ AttributeHandler<T, ORBIT, typename PFP::MAP::IMPL> MapHandler<PFP>::getAttribut
 	if(onlyRegistered)
 	{
 		if(m_attribs[ORBIT].contains(nameAttr))
-			return static_cast<MAP*>(m_map)->getAttribute<T, ORBIT>(nameAttr.toStdString());
+			return static_cast<MAP*>(m_map)->template getAttribute<T, ORBIT>(nameAttr.toStdString());
 		else
 			return AttributeHandler<T, ORBIT, MAP_IMPL>();
 	}
 	else
-		return static_cast<MAP*>(m_map)->getAttribute<T, ORBIT>(nameAttr.toStdString());
+		return static_cast<MAP*>(m_map)->template getAttribute<T, ORBIT>(nameAttr.toStdString());
 }
 
 template <typename PFP>
 template <typename T, unsigned int ORBIT>
 AttributeHandler<T, ORBIT, typename PFP::MAP::IMPL> MapHandler<PFP>::addAttribute(const QString& nameAttr, bool registerAttr)
 {
-	AttributeHandler<T, ORBIT, MAP_IMPL> ah = static_cast<MAP*>(m_map)->addAttribute<T, ORBIT>(nameAttr.toStdString());
+	AttributeHandler<T, ORBIT, MAP_IMPL> ah = static_cast<MAP*>(m_map)->template addAttribute<T, ORBIT>(nameAttr.toStdString());
 	if(ah.isValid() && registerAttr)
 	{
 		registerAttribute(ah);
