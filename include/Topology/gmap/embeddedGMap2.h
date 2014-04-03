@@ -26,6 +26,7 @@
 #define __EMBEDDED_GMAP2_H__
 
 #include "Topology/gmap/gmap2.h"
+#include "Topology/generic/mapMono.h"
 
 namespace CGoGN
 {
@@ -34,12 +35,13 @@ namespace CGoGN
 * Class of 2-dimensional G-maps
 * with managed embeddings
 */
-class EmbeddedGMap2 : public GMap2
+class EmbeddedGMap2 : public GMap2<MapMono>
 {
 public:
-	typedef GMap2 TOPO_MAP;
+	typedef MapMono IMPL;
+	typedef GMap2<MapMono> TOPO_MAP;
 
-	static const unsigned int DIMENSION = 2 ;
+	static const unsigned int DIMENSION = TOPO_MAP::DIMENSION ;
 
 	/**
 	 *	create a new face with managed embeddings

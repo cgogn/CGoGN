@@ -47,16 +47,18 @@ struct Coeff
 template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_PerVertexWeight_Scalar : public FunctorType
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
-	const VertexAttribute<typename PFP::REAL>& weightTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
+	const VertexAttribute<typename PFP::REAL, MAP_IMPL>& weightTable ;
 
 public:
 	FunctorEquality_PerVertexWeight_Scalar(
-		const VertexAttribute<unsigned int>& index,
-		const VertexAttribute<ATTR_TYPE>& attr,
-		const VertexAttribute<typename PFP::REAL>& weight
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
+		const VertexAttribute<typename PFP::REAL, MAP_IMPL>& weight
 	) :	indexTable(index), attrTable(attr), weightTable(weight)
 	{}
 
@@ -74,15 +76,17 @@ public:
 template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_UniformWeight_Scalar : public FunctorType
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 	float weight ;
 
 public:
 	FunctorEquality_UniformWeight_Scalar(
-		const VertexAttribute<unsigned int>& index,
-		const VertexAttribute<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
 		float w
 	) :	indexTable(index), attrTable(attr), weight(w)
 	{}
@@ -105,17 +109,19 @@ public:
 template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_PerVertexWeight_Vector : public FunctorType
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
-	const VertexAttribute<typename PFP::REAL>& weightTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
+	const VertexAttribute<typename PFP::REAL, MAP_IMPL>& weightTable ;
 	unsigned int coord ;
 
 public:
 	FunctorEquality_PerVertexWeight_Vector(
-		const VertexAttribute<unsigned int>& index,
-		const VertexAttribute<ATTR_TYPE>& attr,
-		const VertexAttribute<typename PFP::REAL>& weight,
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
+		const VertexAttribute<typename PFP::REAL, MAP_IMPL>& weight,
 		unsigned int c
 	) :	indexTable(index), attrTable(attr), weightTable(weight), coord(c)
 	{}
@@ -134,16 +140,18 @@ public:
 template<typename PFP, typename ATTR_TYPE>
 class FunctorEquality_UniformWeight_Vector : public FunctorType
 {
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 	float weight ;
 	unsigned int coord ;
 
 public:
 	FunctorEquality_UniformWeight_Vector(
-		const VertexAttribute<unsigned int>& index,
-		const VertexAttribute<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
 		float w,
 		unsigned int c
 	) :	indexTable(index), attrTable(attr), weight(w), coord(c)
@@ -167,16 +175,17 @@ public:
 template<typename PFP>
 class FunctorLaplacianTopo : public FunctorMap<typename PFP::MAP>
 {
-protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-
-public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL ;
 
+protected:
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+
+public:
 	FunctorLaplacianTopo(
 		MAP& m,
-		const VertexAttribute<unsigned int>& index
+		const VertexAttribute<unsigned int, MAP_IMPL>& index
 	) :	FunctorMap<MAP>(m), indexTable(index)
 	{}
 
@@ -185,7 +194,7 @@ public:
 		nlRowParameterd(NL_RIGHT_HAND_SIDE, 0) ;
 		nlBegin(NL_ROW);
 		REAL aii = 0 ;
-		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		Traversor2VE<MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
@@ -205,18 +214,19 @@ public:
 template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianTopoRHS_Scalar : public FunctorMap<typename PFP::MAP>
 {
-protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
-
-public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL ;
 
+protected:
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
+
+public:
 	FunctorLaplacianTopoRHS_Scalar(
 		MAP& m,
-		const VertexAttribute<unsigned int>& index,
-		const VertexAttribute<ATTR_TYPE>& attr
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr
 	) :	FunctorMap<MAP>(m), indexTable(index), attrTable(attr)
 	{}
 
@@ -227,7 +237,7 @@ public:
 
 		REAL norm2 = 0 ;
 		REAL aii = 0 ;
-		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		Traversor2VE<MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
@@ -255,19 +265,20 @@ public:
 template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianTopoRHS_Vector : public FunctorMap<typename PFP::MAP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::REAL REAL ;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 	unsigned int coord ;
 
 public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::REAL REAL ;
-
 	FunctorLaplacianTopoRHS_Vector(
 		MAP& m,
-		const VertexAttribute<unsigned int>& index,
-		const VertexAttribute<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
 		unsigned int c
 	) :	FunctorMap<MAP>(m), indexTable(index), attrTable(attr), coord(c)
 	{}
@@ -279,7 +290,7 @@ public:
 
 		REAL norm2 = 0 ;
 		REAL aii = 0 ;
-		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		Traversor2VE<MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
@@ -307,20 +318,21 @@ public:
 template<typename PFP>
 class FunctorLaplacianCotan : public FunctorMap<typename PFP::MAP>
 {
-protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
-	const VertexAttribute<typename PFP::REAL>& vertexArea ;
-
-public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL ;
 
+protected:
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const EdgeAttribute<typename PFP::REAL, MAP_IMPL>& edgeWeight ;
+	const VertexAttribute<typename PFP::REAL, MAP_IMPL>& vertexArea ;
+
+public:
 	FunctorLaplacianCotan(
 		MAP& m,
-		const VertexAttribute<unsigned int>& index,
-		const EdgeAttribute<typename PFP::REAL>& eWeight,
-		const VertexAttribute<typename PFP::REAL>& vArea
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const EdgeAttribute<typename PFP::REAL, MAP_IMPL>& eWeight,
+		const VertexAttribute<typename PFP::REAL, MAP_IMPL>& vArea
 	) :	FunctorMap<MAP>(m), indexTable(index), edgeWeight(eWeight), vertexArea(vArea)
 	{}
 
@@ -330,7 +342,7 @@ public:
 		nlBegin(NL_ROW);
 		REAL vArea = vertexArea[d] ;
 		REAL aii = 0 ;
-		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		Traversor2VE<MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;
@@ -351,22 +363,23 @@ public:
 template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianCotanRHS_Scalar : public FunctorMap<typename PFP::MAP>
 {
-protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
-	const VertexAttribute<typename PFP::REAL>& vertexArea ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
-
-public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL ;
 
+protected:
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const EdgeAttribute<typename PFP::REAL, MAP_IMPL>& edgeWeight ;
+	const VertexAttribute<typename PFP::REAL, MAP_IMPL>& vertexArea ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
+
+public:
 	FunctorLaplacianCotanRHS_Scalar(
 		MAP& m,
-		const VertexAttribute<unsigned int>& index,
-		const EdgeAttribute<typename PFP::REAL>& eWeight,
-		const VertexAttribute<typename PFP::REAL>& vArea,
-		const VertexAttribute<ATTR_TYPE>& attr
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const EdgeAttribute<typename PFP::REAL, MAP_IMPL>& eWeight,
+		const VertexAttribute<typename PFP::REAL, MAP_IMPL>& vArea,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr
 	) :	FunctorMap<MAP>(m), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr)
 	{}
 
@@ -378,7 +391,7 @@ public:
 		REAL vArea = vertexArea[d] ;
 		REAL norm2 = 0 ;
 		REAL aii = 0 ;
-		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		Traversor2VE<MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;
@@ -406,23 +419,24 @@ public:
 template<typename PFP, typename ATTR_TYPE>
 class FunctorLaplacianCotanRHS_Vector : public FunctorMap<typename PFP::MAP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::REAL REAL ;
+
 protected:
-	const VertexAttribute<unsigned int>& indexTable ;
-	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
-	const VertexAttribute<typename PFP::REAL>& vertexArea ;
-	const VertexAttribute<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int, MAP_IMPL>& indexTable ;
+	const EdgeAttribute<typename PFP::REAL, MAP_IMPL>& edgeWeight ;
+	const VertexAttribute<typename PFP::REAL, MAP_IMPL>& vertexArea ;
+	const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attrTable ;
 	unsigned int coord ;
 
 public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::REAL REAL ;
-
 	FunctorLaplacianCotanRHS_Vector(
 		MAP& m,
-		const VertexAttribute<unsigned int>& index,
-		const EdgeAttribute<typename PFP::REAL>& eWeight,
-		const VertexAttribute<typename PFP::REAL>& vArea,
-		const VertexAttribute<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int, MAP_IMPL>& index,
+		const EdgeAttribute<typename PFP::REAL, MAP_IMPL>& eWeight,
+		const VertexAttribute<typename PFP::REAL, MAP_IMPL>& vArea,
+		const VertexAttribute<ATTR_TYPE, MAP_IMPL>& attr,
 		unsigned int c
 	) :	FunctorMap<MAP>(m), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr), coord(c)
 	{}
@@ -435,7 +449,7 @@ public:
 		REAL vArea = vertexArea[d] ;
 		REAL norm2 = 0 ;
 		REAL aii = 0 ;
-		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		Traversor2VE<MAP> t(this->m_map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;

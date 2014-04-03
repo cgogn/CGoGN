@@ -80,7 +80,7 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd);
  *
  */
 template <typename PFP>
-bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
+bool isTetrahedron(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
 
 //!
 /*!
@@ -174,10 +174,6 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d);
 
 
 
-
-
-
-
 //namespace Tetgen
 //{
 
@@ -196,7 +192,6 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d);
 //             bool add_steiner_points_on_interior_boundary, double max_volume, double max_shape);
 
 //} //namespace Tetgen
-
 
 
 

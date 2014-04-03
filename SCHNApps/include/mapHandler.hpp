@@ -5,32 +5,6 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-template <typename T, unsigned int ORBIT>
-AttributeHandler<T, ORBIT> MapHandlerGen::getAttribute(const QString& nameAttr, bool onlyRegistered) const
-{
-	if(onlyRegistered)
-	{
-		if(m_attribs[ORBIT].contains(nameAttr))
-			return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toStdString());
-		else
-			return AttributeHandler<T, ORBIT>();
-	}
-	else
-		return static_cast<AttribMap*>(m_map)->getAttribute<T,ORBIT>(nameAttr.toStdString());
-}
-
-template <typename T, unsigned int ORBIT>
-AttributeHandler<T, ORBIT> MapHandlerGen::addAttribute(const QString& nameAttr, bool registerAttr)
-{
-	AttributeHandler<T,ORBIT> ah = static_cast<AttribMap*>(m_map)->addAttribute<T,ORBIT>(nameAttr.toStdString());
-	if(ah.isValid() && registerAttr)
-	{
-		registerAttribute(ah);
-		emit(attributeAdded(ORBIT, nameAttr));
-	}
-	return ah;
-}
-
 inline void MapHandlerGen::registerAttribute(const AttributeHandlerGen& ah)
 {
 	m_attribs[ah.getOrbit()].insert(QString::fromStdString(ah.name()), QString::fromStdString(ah.typeName()));
@@ -44,18 +18,37 @@ inline QString MapHandlerGen::getAttributeTypeName(unsigned int orbit, const QSt
 		return "";
 }
 
-template <unsigned int ORBIT>
-CellSelector<ORBIT>* MapHandlerGen::getCellSelector(const QString& name) const
+
+
+
+
+template <typename PFP>
+template <typename T, unsigned int ORBIT>
+AttributeHandler<T, ORBIT, typename PFP::MAP::IMPL> MapHandler<PFP>::getAttribute(const QString& nameAttr, bool onlyRegistered) const
 {
-	if (m_cellSelectors[ORBIT].contains(name))
-		return static_cast<CellSelector<ORBIT>*>(m_cellSelectors[ORBIT][name]);
+	if(onlyRegistered)
+	{
+		if(m_attribs[ORBIT].contains(nameAttr))
+			return static_cast<MAP*>(m_map)->getAttribute<T, ORBIT>(nameAttr.toStdString());
+		else
+			return AttributeHandler<T, ORBIT, MAP_IMPL>();
+	}
 	else
-		return NULL;
+		return static_cast<MAP*>(m_map)->getAttribute<T, ORBIT>(nameAttr.toStdString());
 }
 
-
-
-
+template <typename PFP>
+template <typename T, unsigned int ORBIT>
+AttributeHandler<T, ORBIT, typename PFP::MAP::IMPL> MapHandler<PFP>::addAttribute(const QString& nameAttr, bool registerAttr)
+{
+	AttributeHandler<T, ORBIT, MAP_IMPL> ah = static_cast<MAP*>(m_map)->addAttribute<T, ORBIT>(nameAttr.toStdString());
+	if(ah.isValid() && registerAttr)
+	{
+		registerAttribute(ah);
+		emit(attributeAdded(ORBIT, nameAttr));
+	}
+	return ah;
+}
 
 template <typename PFP>
 void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
@@ -64,7 +57,7 @@ void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 		m_render = new Algo::Render::GL2::MapRender();
 
 	if(!m_render->isPrimitiveUpToDate(primitive))
-		m_render->initPrimitives<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), primitive) ;
+		m_render->initPrimitives<PFP>(*(static_cast<MAP*>(m_map)), primitive) ;
 
 	glPushMatrix();
 	glMultMatrixd(m_frame->matrix());
@@ -89,9 +82,9 @@ void MapHandler<PFP>::drawBB()
 }
 
 template <typename PFP>
-void MapHandler<PFP>::updateBB(const VertexAttribute<typename PFP::VEC3>& position)
+void MapHandler<PFP>::updateBB(const VertexAttribute<VEC3, MAP_IMPL>& position)
 {
-	m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<typename PFP::MAP*>(m_map)), position);
+	m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<MAP*>(m_map)), position);
 	m_bbMin = qglviewer::Vec(m_bb.min()[0], m_bb.min()[1], m_bb.min()[2]);
 	m_bbMax = qglviewer::Vec(m_bb.max()[0], m_bb.max()[1], m_bb.max()[2]);
 	m_bbDiagSize = (m_bbMax - m_bbMin).norm();
@@ -136,6 +129,45 @@ void MapHandler<PFP>::updateBBDrawer()
 	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
 	m_bbDrawer->end();
 	m_bbDrawer->endList();
+}
+
+template <typename PFP>
+CellSelectorGen* MapHandler<PFP>::addCellSelector(unsigned int orbit, const QString& name)
+{
+	if(m_cellSelectors[orbit].contains(name))
+		return NULL;
+
+	CellSelectorGen* cs = NULL;
+	MAP *m = static_cast<MAP*>(m_map);
+
+	switch(orbit)
+	{
+		case DART: cs = new CellSelector<MAP, DART>(*m, name); break;
+		case VERTEX: cs = new CellSelector<MAP, VERTEX>(*m, name); break;
+		case EDGE: cs = new CellSelector<MAP, EDGE>(*m, name); break;
+		case FACE: cs = new CellSelector<MAP, FACE>(*m, name); break;
+		case VOLUME: cs = new CellSelector<MAP, VOLUME>(*m, name); break;
+	}
+
+	if(!cs)
+		return NULL;
+
+	m_cellSelectors[orbit].insert(name, cs);
+	emit(cellSelectorAdded(orbit, name));
+
+	connect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));
+
+	return cs;
+}
+
+template <typename PFP>
+template <unsigned int ORBIT>
+CellSelector<typename PFP::MAP, ORBIT>* MapHandler<PFP>::getCellSelector(const QString& name) const
+{
+	if (m_cellSelectors[ORBIT].contains(name))
+		return static_cast<CellSelector<MAP, ORBIT>*>(m_cellSelectors[ORBIT][name]);
+	else
+		return NULL;
 }
 
 } // namespace SCHNApps

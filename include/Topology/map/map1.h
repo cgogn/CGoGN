@@ -25,7 +25,7 @@
 #ifndef __MAP1_H__
 #define __MAP1_H__
 
-#include "Topology/generic/attribmap.h"
+#include "Topology/generic/mapCommon.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 
@@ -40,16 +40,16 @@ namespace CGoGN
  *  - Faces with only one edge (sometime called loops) are accepted.
  *  - Degenerated faces with only two edges are accepted.
  */
-class Map1 : public AttribMap
+template <typename MAP_IMPL>
+class Map1 : public MapCommon<MAP_IMPL>
 {
-//protected:
-public:
-	AttributeMultiVector<Dart>* m_phi1 ;
-	AttributeMultiVector<Dart>* m_phi_1 ;
-
+protected:
 	void init() ;
 
 public:
+	typedef MAP_IMPL IMPL;
+	typedef MapCommon<MAP_IMPL> ParentMap;
+
 	Map1();
 
 	static const unsigned int DIMENSION = 1 ;
@@ -60,15 +60,12 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
-	virtual void update_topo_shortcuts();
-
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
+	virtual unsigned int getNbInvolutions() const;
+	virtual unsigned int getNbPermutations() const;
 
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
-
-	virtual Dart newDart();
 
 	Dart phi1(Dart d) const;
 
@@ -111,12 +108,6 @@ public:
 	 *  @return return a dart of the face
 	 */
 	Dart newCycle(unsigned int nbEdges) ;
-
-	//! Create an new face for boundary (marked)
-	/*! @param nbEdges the number of edges
-	 *  @return return a dart of the face
-	 */
-//	Dart newBoundaryCycle(unsigned int nbEdges);
 
 	//! Delete an oriented face erasing all its darts
 	/*! @param d a dart of the face

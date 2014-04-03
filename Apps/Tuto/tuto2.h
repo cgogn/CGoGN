@@ -27,7 +27,6 @@
 
 //#define USE_GMAP
 
-
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/cgognStream.h"
 #include "Topology/generic/parameters.h"
@@ -61,8 +60,8 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
 
 class MyQT: public Utils::QT::SimpleQT
 {

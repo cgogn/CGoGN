@@ -40,10 +40,10 @@ void Surface_RenderTopo_DockTab::positionAttributeChanged(int index)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(view && map)
 		{
-			if(index == 0)
-				;
-			else
-				m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+//			if(index == 0)
+//				;
+//			else
+//				m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
 			view->updateGL();
 		}
 	}

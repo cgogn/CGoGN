@@ -43,6 +43,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 class SimpleGMap3 : public Utils::QT::SimpleQT
@@ -52,10 +53,10 @@ class SimpleGMap3 : public Utils::QT::SimpleQT
 public:
 	MAP myMap ;
 
-	VertexAttribute<VEC3> position ;
-	VolumeAttribute<VEC3> volume ;
+	VertexAttribute<VEC3, MAP_IMPL> position ;
+	VolumeAttribute<VEC3, MAP_IMPL> volume ;
 
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::Topo3Render<PFP>* m_render_topo;
 
 	SimpleGMap3() ;
 

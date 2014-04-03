@@ -197,7 +197,6 @@ void MCMesh::sphere()
 	myImg = new SAlgo::MC::Image<DATATYPE>(img,128,128,128,1.0f,1.0f,1.0f,false);
 }
 
-
 /**********************************************************************************************
  *                                      MAIN FUNCTION                                         *
  **********************************************************************************************/
@@ -210,7 +209,7 @@ int main(int argc, char **argv)
 	sqt.setGeometry(0, 0, 1000, 800);
  	sqt.show();
 
-	sqt.valLabel=DATATYPE(0);
+	sqt.valLabel = DATATYPE(0);
 
 	if(argc == 2)
 	{

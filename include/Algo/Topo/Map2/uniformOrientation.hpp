@@ -104,7 +104,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 	propag_inv.reserve(1024);
 	face2invert.reserve(1024);
 
-	DartMarker cmf(map);
+	DartMarker<MAP> cmf(map);
 
 	cmf.markOrbit<FACE>(faceSeed);
 	propag.push_back(faceSeed);

@@ -25,17 +25,10 @@
 #ifndef _TUTO_OPER3_
 #define _TUTO_OPER3_
 
-//#define USE_GMAP
-
 //#define PRIMAL_TOPO 1
 
 #include "Topology/generic/parameters.h"
-
-#ifdef USE_GMAP
-	#include "Topology/gmap/embeddedGMap3.h"
-#else
-	#include "Topology/map/embeddedMap3.h"
-#endif
+#include "Topology/map/embeddedMap3.h"
 
 #ifdef PRIMAL_TOPO
     #include "Algo/Render/GL2/topo3PrimalRender.h"
@@ -52,7 +45,6 @@
 #include "Utils/cgognStream.h"
 #include "Utils/frameManipulator.h"
 
-
 using namespace CGoGN ;
 
 /**
@@ -62,22 +54,29 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the type of the map
-#ifdef USE_GMAP
-	typedef EmbeddedGMap3 MAP;
-#else
 	typedef EmbeddedMap3 MAP;
-#endif
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
 
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
+
 public:
-    MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f), clip_volume(true) , hide_clipping(false) {}
+	MyQT() :
+		m_render_topo(NULL),
+		m_selected(NIL),
+		m_selected2(NIL),
+		m_shift(0.01f),
+		m_ex1(0.9f),
+		m_ex2(0.9f),
+		m_ex3(0.9f),
+		clip_volume(true),
+		hide_clipping(false)
+	{}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -94,19 +93,19 @@ protected:
 	// declaration of the map
 	MAP myMap;
 
-	VertexAttribute<VEC3> position;
+	VertexAttribute<VEC3, MAP_IMPL> position;
 
-//	SelectorDartNoBoundary<PFP::MAP> nb;
+//	SelectorDartNoBoundary<MAP> nb;
 
-	Geom::BoundingBox<PFP::VEC3> bb;
+	Geom::BoundingBox<VEC3> bb;
 
 	// render (for the topo)
 #ifdef PRIMAL_TOPO
-    Algo::Render::GL2::Topo3PrimalRender* m_render_topo;
+	Algo::Render::GL2::Topo3PrimalRender<PFP>* m_render_topo;
 #else
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
 #endif
-	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
+	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo_boundary;
 	Dart m_selected;
 	Dart m_selected2;
 	std::vector<Dart> m_selecteds;
@@ -124,12 +123,12 @@ protected:
 	int m_begY;
 
 	// just for more compact writing
-	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
-	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
-	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
-	inline Dart PHI3(Dart d)	{return myMap.phi3(d);}
+	inline Dart PHI1(Dart d)	{ return myMap.phi1(d); }
+	inline Dart PHI_1(Dart d)	{ return myMap.phi_1(d); }
+	inline Dart PHI2(Dart d)	{ return myMap.phi2(d); }
+	inline Dart PHI3(Dart d)	{ return myMap.phi3(d); }
 	template<int X>
-	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+	Dart PHI(Dart d)			{ return myMap.phi<X>(d); }
 
 	int clip_id1;
 	int clip_id2;
@@ -139,8 +138,6 @@ protected:
 	Utils::ClippingShader* m_sh2;
 	Utils::ClippingShader* m_sh3;
 	Utils::ClippingShader* m_sh4;
-
-
 
 public:
 	// example of simple map creation

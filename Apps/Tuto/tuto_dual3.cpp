@@ -47,6 +47,10 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap3 MAP;
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
+typedef PFP::VEC3 VEC3 ;
+
 int main(int argc, char **argv)
 {
 	if(argc != 2)
@@ -61,7 +65,7 @@ int main(int argc, char **argv)
 	std::string extension = filename.substr(pos);
 
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
 	std::vector<std::string> attrNames ;
 
@@ -71,33 +75,32 @@ int main(int argc, char **argv)
 		Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
 
 	// Les faces vont devenir des aretes -> echange de FACE ET EDGE
 
-	VolumeAttribute<PFP::VEC3> positionV = myMap.getAttribute<PFP::VEC3, VOLUME>("position") ;
+	VolumeAttribute<VEC3, MAP_IMPL> positionV = myMap.getAttribute<VEC3, VOLUME>("position") ;
 	if(!positionV.isValid())
-		positionV = myMap.addAttribute<PFP::VEC3, VOLUME>("position") ;
+		positionV = myMap.addAttribute<VEC3, VOLUME>("position") ;
 
 	Algo::Volume::Geometry::computeCentroidVolumes<PFP>(myMap, position, positionV) ;
 
 	Dart dsave = NIL;
 	for(Dart d = myMap.begin() ; d != myMap.end() ; myMap.next(d))
 	{
-		if(myMap.isBoundaryMarked3(d))
+		if(myMap.isBoundaryMarked<3>(d))
 		{
 			dsave = d;
 			break;
 		}
 	}
 
-
 	Dart dcenter = myMap.explodBorderTopo(dsave);
 
-	DartMarker mf(myMap);
+	DartMarker<MAP> mf(myMap);
 	for(Dart dit = myMap.begin() ; dit != myMap.end() ; myMap.next(dit))
 	{
-		if(myMap.isBoundaryMarked3(dit) && !mf.isMarked(dit))
+		if(myMap.isBoundaryMarked<3>(dit) && !mf.isMarked(dit))
 		{
 			mf.markOrbit<FACE>(dit);
 			positionV[dit] = Algo::Surface::Geometry::faceCentroid<PFP>(myMap,dit,position);
@@ -106,7 +109,7 @@ int main(int argc, char **argv)
 
 	for(Dart dit = myMap.begin() ; dit != myMap.end() ; myMap.next(dit))
 	{
-		if(myMap.isBoundaryMarked3(dit))
+		if(myMap.isBoundaryMarked<3>(dit))
 		{
 			myMap.fillHole(dit);
 		}
@@ -115,13 +118,13 @@ int main(int argc, char **argv)
 	//
 	//Compute Dual Test -- begin
 	//
-	DartAttribute<Dart> old_phi1 = myMap.getAttribute<Dart, DART>("phi1") ;
-	DartAttribute<Dart> old_phi_1 = myMap.getAttribute<Dart, DART>("phi_1") ;
-	DartAttribute<Dart> new_phi1 = myMap.addAttribute<Dart, DART>("new_phi1") ;
-	DartAttribute<Dart> new_phi_1 = myMap.addAttribute<Dart, DART>("new_phi_1") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi1 = myMap.getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi_1 = myMap.getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi1 = myMap.addAttribute<Dart, DART>("new_phi1") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi_1 = myMap.addAttribute<Dart, DART>("new_phi_1") ;
 
-	DartAttribute<Dart> old_phi2 = myMap.getAttribute<Dart, DART>("phi2") ;
-	DartAttribute<Dart> new_phi2 = myMap.addAttribute<Dart, DART>("new_phi2") ;
+	DartAttribute<Dart, MAP_IMPL> old_phi2 = myMap.getAttribute<Dart, DART>("phi2") ;
+	DartAttribute<Dart, MAP_IMPL> new_phi2 = myMap.addAttribute<Dart, DART>("new_phi2") ;
 
 	for(Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
@@ -150,7 +153,7 @@ int main(int argc, char **argv)
 
 	myMap.createHole(dcenter);
 
-	VolumeAttribute<PFP::VEC3> del;
+	VolumeAttribute<VEC3, MAP_IMPL> del;
 	del = position;
 	position = positionV ;
 

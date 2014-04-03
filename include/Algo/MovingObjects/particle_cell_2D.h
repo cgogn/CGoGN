@@ -35,8 +35,9 @@ class ParticleCell2D : public Algo::MovingObjects::ParticleBase<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef VertexAttribute<VEC3> TAB_POS ;
+	typedef VertexAttribute<VEC3, MAP_IMPL> TAB_POS ;
 
 	MAP& m ;
 
@@ -116,11 +117,14 @@ public:
 	}
 } ;
 
-} //MovingObjects
-} //Surface
-} //Algo
-} //CGoGN
+} // namespace MovingObjects
 
-#include "particle_cell_2D.hpp"
+} // namespace Surface
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "Algo/MovingObjects/particle_cell_2D.hpp"
 
 #endif

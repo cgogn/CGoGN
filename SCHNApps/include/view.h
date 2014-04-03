@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <QGLViewer/qglviewer.h>
+#include <QGLViewer/manipulatedFrame.h>
 
 #include "schnapps.h"
 #include "Utils/gl_matrices.h"

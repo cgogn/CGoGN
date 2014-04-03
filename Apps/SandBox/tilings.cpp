@@ -48,11 +48,15 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
+typedef PFP::MAP MAP;
+typedef PFP::MAP::IMPL MAP_IMPL;
+typedef PFP::VEC3 VEC3;
 
 PFP::MAP myMap;
-VertexAttribute<PFP::VEC3> position;
-VertexAttribute<PFP::VEC3> position2;
-VertexAttribute<PFP::VEC3> normal;
+
+VertexAttribute<VEC3, MAP_IMPL> position;
+VertexAttribute<VEC3, MAP_IMPL> position2;
+VertexAttribute<VEC3, MAP_IMPL> normal;
 
 void MyQT::cb_initGL()
 {
@@ -71,7 +75,6 @@ void MyQT::cb_initGL()
 	m_shader->setAttributePosition(m_positionVBO);
 	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
 
-
 	m_lines = new Utils::ShaderVectorPerVertex();
 	m_lines->setAttributePosition(m_positionVBO);
 	m_lines->setAttributeVector(m_normalVBO);
@@ -87,7 +90,6 @@ void MyQT::cb_initGL()
 	registerShader(m_lines);
 
 	m_normalVBO->updateData(normal);
-
 }
 
 void MyQT::cb_redraw()
@@ -313,7 +315,6 @@ int main(int argc, char **argv)
 			sqt.triangularTiling(atoi(argv[2]));
 	}
 
-
 	//  bounding box
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
@@ -327,7 +328,5 @@ int main(int argc, char **argv)
 
 	sqt.show();
 
-
 	return app.exec();
 }
-

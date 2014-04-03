@@ -50,6 +50,7 @@ class PredictorGen
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -74,15 +75,16 @@ class Predictor : public PredictorGen<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<T>& m_attrV ;	// vertex attribute to be predicted
+	VertexAttribute<T, MAP_IMPL>& m_attrV ;	// vertex attribute to be predicted
 	std::vector<T> m_predict ;		// prediction results
 
 public:
-	Predictor(MAP& m, VertexAttribute<T>& p) :
+	Predictor(MAP& m, VertexAttribute<T, MAP_IMPL>& p) :
 		PredictorGen<PFP>(m), m_attrV(p)
 	{}
 
@@ -107,12 +109,12 @@ public:
 	}
 } ;
 
-} //namespace Decimation
+} // namespace Decimation
 
-}
+} // namespace Surface
 
-} //namespace Algo
+} // namespace Algo
 
-} //namespace CGoGN
+} // namespace CGoGN
 
 #endif

@@ -37,7 +37,10 @@ void Surface_Deformation_DockTab::positionAttributeChanged(int index)
 			if(index == 0)
 				;
 			else
-				m_plugin->h_parameterSet[map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+			{
+				MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+				m_plugin->h_parameterSet[map].positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+			}
 		}
 	}
 }
@@ -48,7 +51,10 @@ void Surface_Deformation_DockTab::handleSelectorChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].handleSelector = map->getCellSelector<VERTEX>(combo_handleSelector->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].handleSelector = mh->getCellSelector<VERTEX>(combo_handleSelector->currentText());
+		}
 	}
 }
 
@@ -58,7 +64,10 @@ void Surface_Deformation_DockTab::freeSelectorChanged(int index)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(map)
-			m_plugin->h_parameterSet[map].freeSelector = map->getCellSelector<VERTEX>(combo_freeSelector->currentText());
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+			m_plugin->h_parameterSet[map].freeSelector = mh->getCellSelector<VERTEX>(combo_freeSelector->currentText());
+		}
 	}
 }
 

@@ -197,6 +197,7 @@ namespace Tetrahedralization
 /************************************************************************************************
  * 									Collapse / Split Operators
  ************************************************************************************************/
+
 template <typename PFP>
 Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd)
 {
@@ -236,12 +237,12 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd)
  *************************************************************************************************/
 
 template <typename PFP>
-bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread)
+bool isTetrahedron(typename PFP::MAP& map, Dart d, unsigned int thread)
 {
     unsigned int nbFaces = 0;
 
     //Test the number of faces end its valency
-    Traversor3WF<typename PFP::MAP> travWF(the_map, d, false, thread);
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
     for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
     {
         //increase the number of faces
@@ -250,7 +251,7 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread)
             return false;
 
         //test the valency of this face
-        if(the_map.faceDegree(dit) != 3)
+		if(map.faceDegree(dit) != 3)
             return false;
     }
 
@@ -410,7 +411,6 @@ void swapGen3To2(typename PFP::MAP& map, Dart d)
 {
     unsigned int n = map.edgeDegree(d);
 
-
     if(n >= 4)
     {
         Dart dit = d;
@@ -420,9 +420,6 @@ void swapGen3To2(typename PFP::MAP& map, Dart d)
         }
         Tetrahedralization::swap4To4<PFP>(map,  map.alpha2(dit));
     }
-
-
-
 
 //	if(n >= 4)
 //	{
@@ -453,7 +450,6 @@ void swapGen3To2(typename PFP::MAP& map, Dart d)
 //	{
 //		Tetrahedralization::swap2To2<PFP>(map, d);
 //	}
-
 }
 
 template <typename PFP>
@@ -464,9 +460,6 @@ void swapGen2To3(typename PFP::MAP& map, Dart d)
 //- a single 2-3 swap, followed by n − 3 3-2 swaps, or
 //- a single 4-4 swap, followed by n − 4 3-2 swaps.
 }
-
-
-
 
 /************************************************************************************************
  *										Flip Functions 											*
@@ -560,7 +553,6 @@ Dart flip1To3(typename PFP::MAP& map, Dart d)
     return x;
 }
 
-
 /************************************************************************************************
  *                				 Bisection Functions                                            *
  ************************************************************************************************/
@@ -598,8 +590,6 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d)
 
     return e;
 }
-
-
 
 //namespace Tetgen
 //{
@@ -802,8 +792,6 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d)
 
 
 
-
-
 ///**
 // * generate tetrahedra based on an surface mesh object
 // * -INT_MAX for surf/vol-id inherits from the mesh
@@ -822,9 +810,6 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d)
 //    int *elements, *surfaces;
 //    int i, j, n, *ele, *tet;
 //    char params [512];
-
-
-
 
 
 //    // memory initialization
@@ -853,33 +838,6 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d)
 //}
 
 //} //namespace Tetgen
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1129,9 +1087,9 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d)
 
 } // namespace Tetrahedralization
 
-}
-
 } // namespace Modelisation
+
+} // namespace Volume
 
 } // namespace Algo
 

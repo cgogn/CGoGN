@@ -70,7 +70,6 @@ enum ApproximatorType
 template <typename PFP>
 class ApproximatorGen
 {
-public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -95,7 +94,6 @@ public:
 	virtual void addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform) = 0 ;
 } ;
 
-
 /*!
  * \class Approximator
  * \brief Generic class for approximators
@@ -103,29 +101,29 @@ public:
 template <typename PFP, typename T, unsigned int ORBIT>
 class Approximator : public ApproximatorGen<PFP>
 {
-public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
 	Predictor<PFP, T>* m_predictor ;
 
-	std::vector<VertexAttribute<T>* > m_attrV ;	// vertex attributes to be approximated
-	std::vector<AttributeHandler<T,ORBIT> > m_approx ;	// attributes to store approximation result
-	std::vector<AttributeHandler<T,ORBIT> > m_detail ;	// attributes to store detail information for reconstruction
+	std::vector<VertexAttribute<T, MAP_IMPL>* > m_attrV ;	// vertex attributes to be approximated
+	std::vector<AttributeHandler<T, ORBIT, MAP_IMPL> > m_approx ;	// attributes to store approximation result
+	std::vector<AttributeHandler<T, ORBIT, MAP_IMPL> > m_detail ;	// attributes to store detail information for reconstruction
 	std::vector<T> m_app ;
 
 public:
-	Approximator(MAP& m, std::vector<VertexAttribute<T>* > va, Predictor<PFP, T> * predictor) ;
+	Approximator(MAP& m, std::vector<VertexAttribute<T, MAP_IMPL>* > va, Predictor<PFP, T>* predictor) ;
 	virtual ~Approximator() ;
 	const std::string& getApproximatedAttributeName(unsigned int index = 0) const ;
 	unsigned int getNbApproximated() const ;
 	void saveApprox(Dart d) ;
 	void affectApprox(Dart d) ;
 	const T& getApprox(Dart d, unsigned int index = 0) const ;
-	const VertexAttribute<T>& getAttr(unsigned int index = 0) const ;
-	VertexAttribute<T>& getAttr(unsigned int index = 0) ;
+	const VertexAttribute<T, MAP_IMPL>& getAttr(unsigned int index = 0) const ;
+	VertexAttribute<T, MAP_IMPL>& getAttr(unsigned int index = 0) ;
 	std::vector<T> getAllApprox(Dart d) const ;
 	const Predictor<PFP, T>* getPredictor() const ;
 	const T& getDetail(Dart d, unsigned int index = 0) const ;

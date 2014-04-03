@@ -100,7 +100,7 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<std::string>& attrNames)
 {
-    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
     if (!position.isValid())
         position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
@@ -204,7 +204,7 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importOFFWithELERegions(const std::string& filenameOFF, const std::string& filenameELE, std::vector<std::string>& attrNames)
 {
-    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
     if (!position.isValid())
         position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
@@ -345,7 +345,7 @@ bool MeshTablesVolume<PFP>::importOFFWithELERegions(const std::string& filenameO
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importNodeWithELERegions(const std::string& filenameNode, const std::string& filenameELE, std::vector<std::string>& attrNames)
 {
-    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
     if (!position.isValid())
         position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
@@ -480,7 +480,7 @@ bool MeshTablesVolume<PFP>::importNodeWithELERegions(const std::string& filename
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importTetmesh(const std::string& filename, std::vector<std::string>& attrNames)
 {
-    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
     if (!position.isValid())
         position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
@@ -592,7 +592,7 @@ template <typename PFP>
 bool MeshTablesVolume<PFP>::importTs(const std::string& filename, std::vector<std::string>& attrNames)
 {
     //
-    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
     if (!position.isValid())
         position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
@@ -600,7 +600,7 @@ bool MeshTablesVolume<PFP>::importTs(const std::string& filename, std::vector<st
     attrNames.push_back(position.name()) ;
 
     //
-    VertexAttribute<REAL> scalar = m_map.template getAttribute<REAL, VERTEX>("scalar");
+	VertexAttribute<REAL, MAP_IMPL> scalar = m_map.template getAttribute<REAL, VERTEX>("scalar");
 
     if (!scalar.isValid())
         scalar = m_map.template addAttribute<REAL, VERTEX>("scalar") ;
@@ -705,7 +705,7 @@ template <typename PFP>
 bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<std::string>& attrNames)
 {
     //
-    VertexAttribute<VEC3> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP_IMPL> position =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
     if (!position.isValid())
         position = m_map.template addAttribute<VEC3, VERTEX>("position") ;
@@ -836,7 +836,6 @@ bool MeshTablesVolume<PFP>::importMSH(const std::string& filename, std::vector<s
 
     }
 }
-
 
 } // namespace Import
 

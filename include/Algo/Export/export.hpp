@@ -43,7 +43,7 @@ namespace Export
 {
 
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, bool binary)
+bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const char* filename, bool binary)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -72,7 +72,7 @@ bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	vertices.reserve(nbDarts/6) ;
 
 	// Go over all faces
-	CellMarker<VERTEX> markV(map) ;
+	CellMarker<MAP, VERTEX> markV(map) ;
 	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
@@ -170,9 +170,10 @@ bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 }
 
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3>*>& attributeHandlers, const char* filename, bool binary)
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>*>& attributeHandlers, const char* filename, bool binary)
 {
 	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 	// open file
@@ -199,14 +200,14 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 	vertices.reserve(nbDarts/6) ;
 
 	// Go over all faces
-	CellMarker<VERTEX> markV(map) ;
+	CellMarker<MAP, VERTEX> markV(map) ;
 	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		std::vector<unsigned int> fidx ;
 		fidx.reserve(8) ;
 		unsigned int degree = 0 ;
-		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		Traversor2FV<MAP> tfv(map, d) ;
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
 			++degree ;
@@ -246,7 +247,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 	out << "comment or contact : cgogn@unistra.fr" << std::endl ;
 	// Vertex elements
 	out << "element vertex " << vertices.size() << std::endl ;
-	for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+	for (typename std::vector<VertexAttribute<VEC3, MAP_IMPL>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 	{
 		if ((*attrHandler)->isValid() && ((*attrHandler)->getOrbit() == VERTEX) )
 		{
@@ -287,7 +288,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
 		{
-			for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<VEC3, MAP_IMPL>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 					out << (*(*attrHandler))[vertices[i]] ;
 			out << std::endl ;
@@ -306,10 +307,10 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 	{
 		// binary vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<VertexAttribute<typename PFP::VEC3>*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<VEC3, MAP_IMPL>*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 				{
-					const typename PFP::VEC3& v = (*(*attrHandler))[vertices[i]] ;
+					const VEC3& v = (*(*attrHandler))[vertices[i]] ;
 					out.write((char*)(&(v[0])), sizeof(v)) ;
 				}
 
@@ -328,7 +329,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 }
 
 template <typename PFP>
-bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -350,7 +351,7 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	std::vector<unsigned int> vertices ;
 	vertices.reserve(nbDarts/6) ;
 
-	CellMarker<VERTEX> markV(map) ;
+	CellMarker<MAP, VERTEX> markV(map) ;
 	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
@@ -986,7 +987,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
 */
 
 template <typename PFP>
-bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename)
+bool exportChoupi(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -1000,13 +1001,13 @@ bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::V
 
 	out << map.template getNbOrbits<VERTEX>() << " " << map.template getNbOrbits<EDGE>() << std::endl;
 
-	TraversorV<typename PFP::MAP> travV(map);
+	TraversorV<MAP> travV(map);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
 	{
 		out << map.template getEmbedding<VERTEX>(dit) << " " << position[dit] << std::endl;
 	}
 
-	TraversorE<typename PFP::MAP> travE(map);
+	TraversorE<MAP> travE(map);
 	unsigned int indexE = 0;
 	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
 	{
@@ -1018,11 +1019,9 @@ bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::V
 	return true ;
 }
 
-
-
 } // namespace Export
 
-}
+} // namespace Surface
 
 } // namespace Algo
 

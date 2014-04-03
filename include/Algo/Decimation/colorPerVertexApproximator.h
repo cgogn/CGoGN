@@ -44,17 +44,18 @@ class Approximator_ColorNaive : public Approximator<PFP, typename PFP::VEC3, EDG
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<VEC3> m_position ;
-	EdgeAttribute<VEC3> m_approxposition ;
+	VertexAttribute<VEC3, MAP_IMPL> m_position ;
+	EdgeAttribute<VEC3, MAP_IMPL> m_approxposition ;
 
-	VertexAttribute<VEC3> *m_color ;
+	VertexAttribute<VEC3, MAP_IMPL> *m_color ;
 
 public:
-	Approximator_ColorNaive(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_ColorNaive(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*>& attr, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
 	{
 		m_color = this->m_attrV[0] ;
@@ -88,17 +89,18 @@ class Approximator_ColorQEMext : public Approximator<PFP, typename PFP::VEC3, ED
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef Geom::Vector<6,REAL> VEC6 ;
 
 protected:
-	VertexAttribute<Utils::QuadricNd<REAL,6> > m_quadric ;
-	VertexAttribute<VEC3> *m_position ;
-	VertexAttribute<VEC3> *m_color ;
+	VertexAttribute<Utils::QuadricNd<REAL,6>, MAP_IMPL> m_quadric ;
+	VertexAttribute<VEC3, MAP_IMPL> *m_position ;
+	VertexAttribute<VEC3, MAP_IMPL> *m_color ;
 
 public:
-	Approximator_ColorQEMext(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_ColorQEMext(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*>& attr, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
 	{
 		assert(attr.size() > 1 || !"Approximator_ColorQEMext: there are not sufficient attributes provided") ;
@@ -125,16 +127,17 @@ class Approximator_GeomColOpt : public Approximator<PFP, typename PFP::VEC3, EDG
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
 
 protected:
-	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
-	VertexAttribute<VEC3> *m_position ;
-	VertexAttribute<VEC3> *m_color ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP_IMPL> m_quadric ;
+	VertexAttribute<VEC3, MAP_IMPL> *m_position ;
+	VertexAttribute<VEC3, MAP_IMPL> *m_color ;
 
 public:
-	Approximator_GeomColOpt(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_GeomColOpt(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*>& attr, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
 	{
 		assert(attr.size() > 1 || !"Approximator_GeomColOpt: there are not sufficient attributes provided") ;
@@ -157,13 +160,13 @@ public:
 } ;
 
 
-} //namespace Decimation
+} // namespace Decimation
 
 } // namespace Surface
 
-} //namespace Algo
+} // namespace Algo
 
-} //namespace CGoGN
+} // namespace CGoGN
 
 #include "Algo/Decimation/colorPerVertexApproximator.hpp"
 

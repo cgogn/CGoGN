@@ -64,7 +64,7 @@ void Surface_Subdivision_Plugin::loopSubdivision(
 	if(mh == NULL)
 		return;
 
-	VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
 	if(!position.isValid())
 		return;
 
@@ -86,7 +86,7 @@ void Surface_Subdivision_Plugin::CCSubdivision(
 	if(mh == NULL)
 		return;
 
-	VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
 	if(!position.isValid())
 		return;
 
@@ -108,7 +108,7 @@ void Surface_Subdivision_Plugin::trianguleFaces(
 	if(mh == NULL)
 		return;
 
-	VertexAttribute<PFP2::VEC3> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
 	if(!position.isValid())
 		return;
 

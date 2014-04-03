@@ -41,20 +41,20 @@ Dart EmbeddedGMap2::newFace(unsigned int nbEdges, bool withBoundary)
 		{
 			Traversor2FV<EmbeddedGMap2> t(*this, d);
 			for(Dart it = t.begin(); it != t.end(); it = t.next())
-				initOrbitEmbeddingNewCell<VERTEX>(it) ;
+				initOrbitEmbeddingOnNewCell<VERTEX>(it) ;
 		}
 
 		if(isOrbitEmbedded<EDGE>())
 		{
 			Traversor2FE<EmbeddedGMap2> t(*this, d);
 			for(Dart it = t.begin(); it != t.end(); it = t.next())
-				initOrbitEmbeddingNewCell<EDGE>(it) ;
+				initOrbitEmbeddingOnNewCell<EDGE>(it) ;
 		}
 
 		if(isOrbitEmbedded<FACE>())
 		{
-			initOrbitEmbeddingNewCell<FACE>(d) ;
-			initOrbitEmbeddingNewCell<FACE>(phi2(d)) ;
+			initOrbitEmbeddingOnNewCell<FACE>(d) ;
+			initOrbitEmbeddingOnNewCell<FACE>(phi2(d)) ;
 		}
 	}
 
@@ -95,7 +95,7 @@ void EmbeddedGMap2::splitVertex(Dart d, Dart e)
 
 	if(isOrbitEmbedded<EDGE>())
 	{
-		initOrbitEmbeddingNewCell<EDGE>(phi1(dd)) ;
+		initOrbitEmbeddingOnNewCell<EDGE>(phi1(dd)) ;
 	}
 
 	if(isOrbitEmbedded<FACE>())
@@ -128,7 +128,7 @@ Dart EmbeddedGMap2::cutEdge(Dart d)
 
 	if(isOrbitEmbedded<VERTEX>())
 	{
-		initOrbitEmbeddingNewCell<VERTEX>(nd) ;
+		initOrbitEmbeddingOnNewCell<VERTEX>(nd) ;
 	}
 
 	if (isOrbitEmbedded<EDGE>())
@@ -353,7 +353,7 @@ void EmbeddedGMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 		GMap2::sewFaces(d, e, false) ;
 		if(isOrbitEmbedded<EDGE>())
 		{
-			initOrbitEmbeddingNewCell<EDGE>(d) ;
+			initOrbitEmbeddingOnNewCell<EDGE>(d) ;
 		}
 		return ;
 	}
@@ -440,7 +440,7 @@ void EmbeddedGMap2::splitFace(Dart d, Dart e)
 
 	if(isOrbitEmbedded<EDGE>())
 	{
-		initOrbitEmbeddingNewCell<EDGE>(beta1(d)) ;
+		initOrbitEmbeddingOnNewCell<EDGE>(beta1(d)) ;
 	}
 
 	if (isOrbitEmbedded<FACE>())
@@ -537,7 +537,7 @@ unsigned int EmbeddedGMap2::closeHole(Dart d, bool forboundary)
 
 	if(isOrbitEmbedded<FACE>())
 	{
-		initOrbitEmbeddingNewCell<FACE>(dd) ;
+		initOrbitEmbeddingOnNewCell<FACE>(dd) ;
 	}
 
 	return nbE ;
@@ -582,13 +582,13 @@ bool EmbeddedGMap2::check()
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 
-    std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
+	std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
-    std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
+	std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
     std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
 
-    std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
+	std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
     std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 
 	return true ;

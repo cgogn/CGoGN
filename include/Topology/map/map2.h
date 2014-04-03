@@ -45,24 +45,24 @@ namespace CGoGN
  *  - When every edge is phi2-linked, the map is closed. In this case
  *  some optimizations are enabled that speed up the processing of vertices.
  */
-class Map2 : public Map1
+template <typename MAP_IMPL>
+class Map2 : public Map1<MAP_IMPL>
 {
-//protected:
-public:
-	AttributeMultiVector<Dart>* m_phi2 ;
-
+protected:
 	void init() ;
 
 public:
-	typedef Map1 ParentMap;
+	typedef MAP_IMPL IMPL;
+	typedef Map1<MAP_IMPL> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o) { return o+5; }
 
 	static const unsigned int IN_PARENT = 5 ;
-	static const unsigned int DIMENSION = 2 ;
 
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT = EDGE+5;
+
+	static const unsigned int DIMENSION = 2 ;
 
 	Map2();
 
@@ -72,15 +72,12 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
-	virtual void update_topo_shortcuts();
-
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
+	virtual unsigned int getNbInvolutions() const;
+	virtual unsigned int getNbPermutations() const;
 
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
-
-	virtual Dart newDart();
 
 	Dart phi2(Dart d) const;
 
@@ -119,8 +116,7 @@ protected:
 	void phi2unsew(Dart d);
 
 public:
-
-	void rdfi(Dart t, DartMarker& m1, DartMarker& m2);
+//	void rdfi(Dart t, DartMarker& m1, DartMarker& m2);
 
 
 	//void propagateDartRelation(Dart d) ;
@@ -355,12 +351,6 @@ public:
 	 */
 	Dart findBoundaryEdgeOfVertex(Dart d) const;
 
-	/**
-	 * find the dart of edge that belong to the boundary
-	 * return NIL if the face is not on the boundary
-	 */
-	Dart findBoundaryEdgeOfFace(Dart d) const;
-
 	//! Test if dart d and e belong to the same edge
 	/*! @param d a dart
 	 *  @param e a dart
@@ -400,6 +390,12 @@ public:
 	 * tell if the face of d is on the boundary of the map
 	 */
 	bool isBoundaryFace(Dart d) const;
+
+	/**
+	 * find the dart of edge that belong to the boundary
+	 * return NIL if the face is not on the boundary
+	 */
+	Dart findBoundaryEdgeOfFace(Dart d) const;
 
 	//! Test if dart d and e belong to the same oriented volume
 	/*! @param d a dart
@@ -520,7 +516,6 @@ public:
 	 */
 	unsigned int closeMap(bool forboundary = true);
 	//@}
-
 
 	/*! @name Compute dual
 	 * These functions compute the dual mesh

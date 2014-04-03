@@ -46,6 +46,10 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
+typedef PFP::VEC3 VEC3 ;
+
 int main(int argc, char **argv)
 {
 	if(argc != 2)
@@ -57,23 +61,22 @@ int main(int argc, char **argv)
 	std::string filename(argv[1]);
 
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
 	std::vector<std::string> attrNames ;
 	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
 
-	FaceAttribute<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP_IMPL> positionF = myMap.getAttribute<VEC3, FACE>("position") ;
 	if(!positionF.isValid())
-		positionF = myMap.addAttribute<PFP::VEC3, FACE>("position") ;
+		positionF = myMap.addAttribute<VEC3, FACE>("position") ;
 
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
 
 	myMap.computeDual();
 	position = positionF ;
-
 
 	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "result.off");
 	std::cout << "Exported" << std::endl;

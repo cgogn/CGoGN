@@ -63,6 +63,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 
@@ -99,11 +100,11 @@ public:
 	bool m_drawTopo ;
 	bool m_drawBoundaryTopo;
 
-	VertexAttribute<VEC3> position ;
-	VertexAttribute<VEC3> normal ;
+	VertexAttribute<VEC3, MAP_IMPL> position ;
+	VertexAttribute<VEC3, MAP_IMPL> normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
-	Algo::Render::GL2::TopoRender* m_topoRender ;
+	Algo::Render::GL2::TopoRenderMap<PFP>* m_topoRender ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::VBO* m_normalVBO;

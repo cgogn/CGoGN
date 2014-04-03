@@ -50,7 +50,9 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
+
 /**
  * A class for a little interface and rendering
  */

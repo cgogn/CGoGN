@@ -85,12 +85,11 @@ void TexView::cb_initGL()
 	m_shader2->setSpecular(Geom::Vec4f(0.5));
 	registerShader(m_shader2);
 
-
 	glEnable(GL_TEXTURE_2D);
 
 	if (!m_obj.hasNormals())
 	{
-		VertexAttribute<Geom::Vec3f> normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
+		VertexAttribute<Geom::Vec3f, MAP_IMPL> normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
 		if(!normal.isValid())
 			normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
 
@@ -99,7 +98,6 @@ void TexView::cb_initGL()
 	}
 
 	m_nbIndices = m_obj.createSimpleVBO_PTN(m_positionVBO,m_texcoordVBO,m_normalVBO);
-
 }
 
 void TexView::cb_redraw()
@@ -120,8 +118,6 @@ void TexView::cb_redraw()
 		glDrawArrays(GL_TRIANGLES, 0, m_nbIndices);
 		m_shader->disableVertexAttribs();
 	}
-
-
 }
 
 void TexView::cb_keyPress(int code)
@@ -152,7 +148,6 @@ void TexView::cb_keyPress(int code)
 		m_shader2->setShininess(1.0f);
 		m_shader2->setSpecular(Geom::Vec4f(0));
 		break;
-
 	}
 	updateGL();
 }
@@ -179,9 +174,7 @@ void TexView::init(const std::string& fnm, const std::string& fnt)
 
 	// send BB info to interface for centering on GL screen
 	setParamObject(lWidthObj, lPosObj.data());
-
 }
-
 
 void TexView::computeImage()
 {
@@ -213,8 +206,8 @@ void TexView::computeTore()
 {
 #define NB 96
 
-	VertexAttribute<VEC3> position = myMap.addAttribute<VEC3, VERTEX>("position");
-	VertexAttribute<Geom::Vec2f> texcoord = myMap.addAttribute<Geom::Vec2f, VERTEX>("texcoord");
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<Geom::Vec2f, MAP_IMPL> texcoord = myMap.addAttribute<Geom::Vec2f, VERTEX>("texcoord");
     //Algo::Surface::Modelisation::Polyhedron<PFP> prim(myMap, position);
     Algo::Surface::Tilings::Square::Tore<PFP> prim(myMap, NB, NB);
     prim.embedIntoTore(position, 40.0f,20.0f);
@@ -245,9 +238,6 @@ void TexView::computeTore()
 	m_obj.setTexCoordAttribute(texcoord);
 }
 
-
-
-
 int main(int argc, char**argv)
 {
 	// interface:
@@ -267,9 +257,7 @@ int main(int argc, char**argv)
 		tv.init("","x");
 	}
 
-
 	tv.show();
-
 
 	// et on attend la fin.
 	return app.exec();

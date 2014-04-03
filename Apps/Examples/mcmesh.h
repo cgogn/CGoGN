@@ -29,8 +29,9 @@
 #include "Utils/Qt/qtui.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
 #include "Topology/map/embeddedMap2.h"
+
+#include "Algo/MC/marchingcube.h"
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -40,8 +41,6 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/vbo.h"
 #include "Algo/Geometry/boundingbox.h"
-
-#include "Algo/MC/marchingcube.h"
 
 
 using namespace CGoGN ;
@@ -55,6 +54,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 typedef unsigned char DATATYPE;
@@ -65,7 +65,6 @@ class MCMesh : public Utils::QT::SimpleQT
 
 public:
 	MAP myMap ;
-	SelectorTrue allDarts ;
 
     Utils::QT::uiDockInterface dock ;
 
@@ -76,7 +75,7 @@ public:
 	bool m_drawEdges ;
 	bool m_drawFaces ;
 
-	VertexAttribute<VEC3> position ;
+	VertexAttribute<VEC3, MAP_IMPL> position ;
 
 	Algo::Render::GL2::MapRender* m_render ;
 

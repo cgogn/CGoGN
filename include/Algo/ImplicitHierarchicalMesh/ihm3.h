@@ -40,15 +40,15 @@ namespace Volume
 namespace IHM
 {
 
-
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
+
+typedef EmbeddedMap3::IMPL EMap3_IMPL;
 
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
 
 public:
-
 	FunctorType* vertexVertexFunctor ;
 	FunctorType* edgeVertexFunctor ;
 	FunctorType* faceVertexFunctor ;
@@ -59,9 +59,9 @@ public:
 	unsigned int m_edgeIdCount ;
 	unsigned int m_faceIdCount;
 
-	DartAttribute<unsigned int> m_dartLevel ;
-	DartAttribute<unsigned int> m_edgeId ;
-	DartAttribute<unsigned int> m_faceId ;
+	DartAttribute<unsigned int, EMap3_IMPL> m_dartLevel ;
+	DartAttribute<unsigned int, EMap3_IMPL> m_edgeId ;
+	DartAttribute<unsigned int, EMap3_IMPL> m_faceId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
@@ -404,25 +404,25 @@ public:
 } ;
 
 template <typename T, unsigned int ORBIT>
-class AttributeHandler_IHM : public AttributeHandler<T, ORBIT>
+class AttributeHandler_IHM : public AttributeHandler<T, ORBIT, EMap3_IMPL>
 {
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler_IHM() : AttributeHandler<T, ORBIT>()
+	AttributeHandler_IHM() : AttributeHandler<T, ORBIT, EMap3_IMPL>()
 	{}
 
-	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT>(m, amv)
+	AttributeHandler_IHM(ImplicitHierarchicalMap3* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT, EMap3_IMPL>(m, amv)
 	{}
 
 	AttributeMultiVector<T>* getDataVector() const
 	{
-		return AttributeHandler<T, ORBIT>::getDataVector() ;
+		return AttributeHandler<T, ORBIT, EMap3_IMPL>::getDataVector() ;
 	}
 
 	bool isValid() const
 	{
-		return AttributeHandler<T, ORBIT>::isValid() ;
+		return AttributeHandler<T, ORBIT, EMap3_IMPL>::isValid() ;
 	}
 
 	virtual T& operator[](Dart d) ;
@@ -431,12 +431,12 @@ public:
 
 	T& operator[](unsigned int a)
 	{
-		return AttributeHandler<T, ORBIT>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, EMap3_IMPL>::operator[](a) ;
 	}
 
 	const T& operator[](unsigned int a) const
 	{
-		return AttributeHandler<T, ORBIT>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, EMap3_IMPL>::operator[](a) ;
 	}
 
 } ;
@@ -447,14 +447,16 @@ class VertexAttribute_IHM : public IHM::AttributeHandler_IHM<T, VERTEX>
 public:
 	VertexAttribute_IHM() : IHM::AttributeHandler_IHM<T, VERTEX>() {}
 	VertexAttribute_IHM(const IHM::AttributeHandler_IHM<T, VERTEX>& ah) : IHM::AttributeHandler_IHM<T, VERTEX>(ah) {}
-	VertexAttribute_IHM<T>& operator=(const IHM::AttributeHandler_IHM<T, VERTEX>& ah) { this->IHM::AttributeHandler_IHM<T, VERTEX>::operator=(ah); return *this; }
+//	VertexAttribute_IHM<T>& operator=(const IHM::AttributeHandler_IHM<T, VERTEX>& ah) { this->IHM::AttributeHandler_IHM<T, VERTEX>::operator=(ah); return *this; }
 };
 
-} //namespace IHM
-} // Volume
-} //namespace Algo
+} // namespace IHM
 
-} //namespace CGoGN
+} // namespace Volume
+
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/ImplicitHierarchicalMesh/ihm3.hpp"
 
@@ -464,4 +466,3 @@ public:
 ///*!
 // */
 //bool faceIsSubdividedOnce(Dart d);
-

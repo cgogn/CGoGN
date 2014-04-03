@@ -80,16 +80,17 @@ class Selector
 {
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
+	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
 	std::vector<ApproximatorGen<PFP>*>& m_approximators ;
 
 public:
-	Selector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	Selector(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		m_map(m), m_position(pos), m_approximators(approx)
 	{}
 	virtual ~Selector()
@@ -101,7 +102,7 @@ public:
 	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
 	virtual void updateWithoutCollapse() = 0;
 
-	virtual void getEdgeErrors(EdgeAttribute<typename PFP::REAL>* /*errors*/) const
+	virtual void getEdgeErrors(EdgeAttribute<REAL, MAP_IMPL>* /*errors*/) const
 	{
 		std::cout << "WARNING:: getEdgeErrors was not overridden" << std::endl ;
 	}

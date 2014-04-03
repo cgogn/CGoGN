@@ -42,9 +42,9 @@ private:
 	const AttributeContainer* cont ;
 	unsigned int qCurrent ;
 
-	DartMarker* dmark ;
-	CellMarker<ORBIT>* cmark ;
-	const AttributeMultiVector<Dart>* quickTraversal ;
+	DartMarker<MAP>* dmark ;
+	CellMarker<MAP, ORBIT>* cmark ;
+	AttributeMultiVector<Dart>* quickTraversal ;
 
 	Dart current ;
 	bool firstTraversal ;
@@ -62,38 +62,6 @@ public:
 
 	void skip(Dart d);
 } ;
-
-
-template <unsigned int ORBIT>
-class VTraversorCell<GenericMap,ORBIT> : public Traversor
-{
-private:
-	const GenericMap& m ;
-
-	const AttributeContainer* cont ;
-	unsigned int qCurrent ;
-
-	DartMarker* dmark ;
-	CellMarker<ORBIT>* cmark ;
-	const AttributeMultiVector<Dart>* quickTraversal ;
-
-	Dart current ;
-	bool firstTraversal ;
-
-public:
-	VTraversorCell(const GenericMap& map, bool forceDartMarker = false, unsigned int thread = 0) ;
-
-	~VTraversorCell() ;
-
-	Dart begin() ;
-
-	Dart end() ;
-
-	Dart next() ;
-
-	void skip(Dart d);
-} ;
-
 
 //template <typename MAP>
 //class TraversorV : public VTraversorCell<MAP, VERTEX>

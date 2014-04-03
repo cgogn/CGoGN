@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #ifndef __PARALLEL_FOREACH__
 #define __PARALLEL_FOREACH__
 
@@ -37,7 +36,7 @@ namespace Algo
 namespace Parallel
 {
 
-static unsigned int NBCORES=0;
+static unsigned int NBCORES = 0;
 
 /// enum for optimalNbThreads parameter
 enum NbParam {NB_HIGHMEMORY, NB_HIGHCOMPUTE, NB_VERYHIGHMEMORY};
@@ -60,7 +59,6 @@ unsigned int optimalNbThreads( NbParam p=NB_HIGHMEMORY);
  * impossible to automatically determine the number of cores so ...
  */
 void setNbCore(unsigned int nb);
-
 
 //
 //template <typename MAP>
@@ -95,8 +93,6 @@ void setNbCore(unsigned int nb);
 //	void traverseEachDart(bool needMarkers = false, unsigned int currentThread = 0);
 //};
 
-
-
 /**
  * Traverse cells of a map in parallel. Use quick traversal, cell markers or dart markers if available !
  * Use this version if you need to have acces to each functors after the traversal (to compute a sum or an average for example)
@@ -118,7 +114,6 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 template <typename MAP, unsigned int ORBIT>
 void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false);
 
-
 /**
  * Traverse cells of a map and apply differents functors in //
  * Use this version if you need to have acces to each functors after the traversal (to compute a sum or an average for example)
@@ -130,7 +125,6 @@ void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0
 template <typename MAP, unsigned int ORBIT>
 void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false);
 
-
 /**
  * Traverse darts of a map in parallel
  * Use this version if you need to have acces to each functors after the traversal (to compute a sum or an average for example)
@@ -141,7 +135,6 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 template <typename MAP>
 void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs,  unsigned int nbth, bool needMarkers = false);
 
-
 /**
  * Traverse darts of a map in parallel
  * @param map the map
@@ -151,7 +144,6 @@ void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs,  unsig
  */
 template <typename MAP>
 void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false);
-
 
 /**
  * Traverse all elements of an attribute container (attribute handler is placed in FunctorAttribThreaded)
@@ -167,7 +159,6 @@ void foreach_attrib(AttributeContainer& attr_cont, std::vector<FunctorAttribThre
  * @param nbth number of thread to use for computation 0 for let the system choose
  */
 void foreach_attrib(AttributeContainer& attr_cont, FunctorAttribThreaded& func, unsigned int nbth = 0);
-
 
 /**
  * Optimized version for // foreach with to pass (2 functors), with several loops
@@ -192,7 +183,6 @@ void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFro
  */
 template <typename MAP, unsigned int CELL>
 void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapThreaded<MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, bool needMarkers = false);
-
 
 } // namespace Parallel
 

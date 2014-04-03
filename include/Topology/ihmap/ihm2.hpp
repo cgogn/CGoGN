@@ -36,7 +36,7 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::addAttribute(const std:
 	if(!isOrbitEmbedded<ORBIT>())
 		addNextLevelCell = true ;
 
-	AttributeHandler<T, ORBIT> h = Map2::addAttribute<T, ORBIT>(nameAttr) ;
+	AttributeHandler<T, ORBIT, EMap2_IMPL> h = Map2::addAttribute<T, ORBIT>(nameAttr) ;
 
 	if(addNextLevelCell)
 	{
@@ -53,14 +53,14 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::addAttribute(const std:
 template <typename T, unsigned int ORBIT>
 AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::getAttribute(const std::string& nameAttr)
 {
-	AttributeHandler<T, ORBIT> h = Map2::getAttribute<T, ORBIT>(nameAttr) ;
+	AttributeHandler<T, ORBIT, EMap2_IMPL> h = Map2::getAttribute<T, ORBIT>(nameAttr) ;
 	return AttributeHandler_IHM<T, ORBIT>(this, h.getDataVector()) ;
 }
 
 
 inline void ImplicitHierarchicalMap2::update_topo_shortcuts()
 {
-	Map2::update_topo_shortcuts();
+//	Map2::update_topo_shortcuts();
 	m_dartLevel = Map2::getAttribute<unsigned int, DART>("dartLevel") ;
 	m_edgeId = Map2::getAttribute<unsigned int, DART>("edgeId") ;
 
@@ -208,7 +208,7 @@ inline bool ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, FunctorType& 
 
 inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread) const
 {
-	DartMarkerStore mark(*this, thread);	// Lock a marker
+	DartMarkerStore<Map2> mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed

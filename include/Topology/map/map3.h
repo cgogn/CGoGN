@@ -47,15 +47,15 @@ namespace CGoGN
  *  some optimizations are enable that speed up the processing of cells.
  *  @param DART the type of dart used in the class
  */
-class Map3 : public Map2
+template <typename MAP_IMPL>
+class Map3 : public Map2<MAP_IMPL>
 {
 protected:
-	AttributeMultiVector<Dart>* m_phi3 ;
-
 	void init() ;
 
 public:
-	typedef Map2 ParentMap;
+	typedef MAP_IMPL IMPL;
+	typedef Map2<MAP_IMPL> ParentMap;
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o){ return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
@@ -72,8 +72,6 @@ public:
 
 	static const unsigned int DIMENSION = 3 ;
 
-
-
 	Map3();
 
 	virtual std::string mapTypeName() const;
@@ -82,15 +80,12 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
-	virtual void update_topo_shortcuts();
-
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
+	virtual unsigned int getNbInvolutions() const;
+	virtual unsigned int getNbPermutations() const;
 
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
-
-	virtual Dart newDart();
 
 	Dart phi3(Dart d) const;
 
@@ -178,7 +173,6 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
-
 	/**
 	 * Precondition for deleting edge
 	 */
@@ -247,7 +241,6 @@ public:
 	//!! sewVolumes Pre-condition
 	bool sewVolumesPreCond(Dart d, Dart e);
 
-
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same degree
 	 *  @param d a dart of the first volume
@@ -271,16 +264,13 @@ public:
 
 	virtual bool mergeVolumes(Dart /*d*/, Dart /*e*/) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
 
-
 	//! Split a volume into two volumes along a edge path
 	/*! @param vd a vector of darts
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
 
-
 	//! Split a volume into two volumes along a edge path and add the given face between
 	virtual void splitVolumeWithFace(std::vector<Dart>& vd, Dart d);
-
 
 	//! Collapse a volume (that is deleted) possibly merging its vertices
 	/*! \warning
@@ -289,7 +279,6 @@ public:
 	 */
 	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
 	//@}
-
 
     //BROUILLON
     Dart faceToEdge(Dart d);
@@ -310,14 +299,12 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) const;
 
-
 	//! Check number of edges of the vertex of d with given parameter
 	/*! @param d a dart
 	 *	@param vd degree to compare with
 	 *  @return  negative/null/positive if vertex degree is less/equal/greater than given degree
 	 */
 	int checkVertexDegree(Dart d, unsigned int vd) const;
-
 
 	//! Compute the number of edges of the vertex of d on the boundary
 	/*!	@param d a dart

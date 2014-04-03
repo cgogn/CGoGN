@@ -46,6 +46,7 @@ template <typename PFP>
 class Tiling
 {
     typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
     typedef typename PFP::VEC3 VEC3;
 
 protected:
@@ -73,12 +74,12 @@ public:
     Tiling(MAP& map, unsigned int x, unsigned int y, unsigned int z):
         m_map(map),
         m_nx(x), m_ny(y), m_nz(z)
-    { }
+	{}
 
     Tiling(MAP& map) :
         m_map(map),
         m_nx(-1), m_ny(-1), m_nz(-1)
-    { }
+	{}
 
     Tiling(const Tiling<PFP>& t1, const Tiling<PFP> t2);
 
@@ -87,20 +88,19 @@ public:
     */
     std::vector<Dart>& getVertexDarts() { return m_tableVertDarts; }
 
-    void computeCenter(VertexAttribute<VEC3>& position);
+	void computeCenter(VertexAttribute<VEC3, MAP_IMPL>& position);
 
     //void Polyhedron<PFP>::transform(float* matrice)
-    void transform(VertexAttribute<VEC3>& position, const Geom::Matrix44f& matrice);
+	void transform(VertexAttribute<VEC3, MAP_IMPL>& position, const Geom::Matrix44f& matrice);
 
-    void mark(CellMarker<VERTEX>& m);
+	void mark(CellMarker<MAP, VERTEX>& m);
 
     /*
-        * get the reference dart
-        */
+	* get the reference dart
+	*/
     Dart getDart() { return m_dart; }
 
-	bool exportPositions(const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
-
+	bool exportPositions(const VertexAttribute<VEC3, MAP_IMPL>& position, const char* filename);
 
 	//	/**
 	//	* mark all embedded vertices of the Polyhedron
@@ -113,7 +113,6 @@ public:
 	//	* @param d a dart of the vertex to test
 	//	*/
 	//	bool containVertex(Dart d);
-
 };
 
 } // namespace Tilings

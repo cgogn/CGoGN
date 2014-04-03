@@ -24,22 +24,14 @@
 #ifndef __TUTO5_
 #define __TUTO5_
 
-
 #include <iostream>
 
-//#define WITH_GMAP 0
-
 #include "Topology/generic/parameters.h"
-#ifdef WITH_GMAP
-	#include "Topology/gmap/embeddedGMap3.h"
-#else
-	#include "Topology/map/embeddedMap3.h"
-#endif
+#include "Topology/map/embeddedMap3.h"
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-
 
 #include "Algo/Render/GL2/topo3Render.h"
 
@@ -50,8 +42,6 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
-
-
 
 #include "Utils/Qt/qtSimple.h"
 
@@ -65,16 +55,12 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-#ifdef WITH_GMAP
-	typedef EmbeddedGMap3 MAP;
-#else
 	typedef EmbeddedMap3 MAP;
-#endif
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
 
 /**
  * Utilisation de designer-qt4:
@@ -93,7 +79,7 @@ class MyQT: public Utils::QT::SimpleQT
     bool render_topo;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
 
 	Utils::VBO* m_positionVBO;
 	Utils::VBO* m_dataVBO;

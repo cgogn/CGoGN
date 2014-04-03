@@ -58,16 +58,22 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
-
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
 
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
+
 public:
-	MyQT():m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f) {}
+	MyQT() :
+		m_render_topo(NULL),
+		m_selected(NIL),
+		m_selected2(NIL),
+		dm(myMap),
+		m_shift(0.01f)
+	{}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -82,15 +88,19 @@ protected:
 	// declaration of the map
 	MAP myMap;
 
-	VertexAttribute<VEC3> position;
-	DartAttribute<VEC3> colorDarts;
+	VertexAttribute<VEC3, MAP_IMPL> position;
+	DartAttribute<VEC3, MAP_IMPL> colorDarts;
 
 	// render (for the topo)
-    Algo::Render::GL2::TopoRender* m_render_topo;
+#ifdef USE_GMAP
+	Algo::Render::GL2::TopoRenderGMap<PFP>* m_render_topo;
+#else
+	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
+#endif
 
 	Dart m_selected;
 	Dart m_selected2;
-	DartMarker dm;
+	DartMarker<MAP> dm;
 	float m_shift;
 
 	// just for more compact writing

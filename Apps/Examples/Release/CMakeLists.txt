@@ -31,6 +31,10 @@ QT4_WRAP_CPP( texturesExample_moc ../texturesExample.h )
 add_executable( texturesExample ../texturesExample.cpp ${texturesExample_moc} )
 target_link_libraries( texturesExample ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS}  )
 
+QT4_WRAP_CPP(simpleMap3_moc ../simpleMap3.h)
+add_executable( simpleMap3 ../simpleMap3.cpp ${simpleMap3_moc} )
+target_link_libraries( simpleMap3 ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
+
 QT4_WRAP_CPP( simpleGMap2_moc ../simpleGMap2.h )
 add_executable( simpleGMap2 ../simpleGMap2.cpp ${simpleGMap2_moc} )
 target_link_libraries( simpleGMap2 ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
@@ -58,10 +62,10 @@ QT4_WRAP_CPP( volumeExplorer_moc ../volumeExplorer.h )
 add_executable( volumeExplorer ../volumeExplorer.cpp ${volumeExplorer_ui} ${volumeExplorer_moc} )
 target_link_libraries( volumeExplorer ${CGoGN_LIBS_R}  ${CGoGN_EXT_LIBS} )
 
-QT4_WRAP_UI( mcmesh_ui ../mcmesh.ui )
-QT4_WRAP_CPP( mcmesh_moc ../mcmesh.h )
-add_executable( mcmesh ../mcmesh.cpp ${mcmesh_moc} ${mcmesh_ui} )
-target_link_libraries( mcmesh ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
+#QT4_WRAP_UI( mcmesh_ui ../mcmesh.ui )
+#QT4_WRAP_CPP( mcmesh_moc ../mcmesh.h )
+#add_executable( mcmesh ../mcmesh.cpp ${mcmesh_moc} ${mcmesh_ui} )
+#target_link_libraries( mcmesh ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP( concave_rendering_moc ../concave_rendering.h )
 add_executable( concave_rendering ../concave_rendering.cpp ${concave_rendering_moc} ${concave_rendering_ui} )
@@ -69,5 +73,4 @@ target_link_libraries( concave_rendering ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP( viewerOBJ_moc ../viewerOBJ.h )
 add_executable( viewerOBJ ../viewerOBJ.cpp ${viewerOBJ_moc} )
-target_link_libraries( viewerOBJ ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS}  )
-
+target_link_libraries( viewerOBJ ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
