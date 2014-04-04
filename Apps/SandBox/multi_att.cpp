@@ -50,10 +50,10 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
-typedef typename PFP::MAP MAP;
-typedef typename PFP::MAP::IMPL MAP_IMPL;
-typedef typename PFP::VEC3 VEC3;
-typedef typename PFP::VEC4 VEC4;
+typedef PFP::MAP MAP;
+typedef PFP::MAP::IMPL MAP_IMPL;
+typedef PFP::VEC3 VEC3;
+typedef PFP::VEC4 VEC4;
 
 /**
  * Simple example of function that work with generic type of attribute
