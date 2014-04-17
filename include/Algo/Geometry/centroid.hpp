@@ -28,6 +28,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor3.h"
 #include "Algo/Parallel/parallel_foreach.h"
+#include "Topology/generic/cells.h"
 
 namespace CGoGN
 {
@@ -42,14 +43,20 @@ namespace Geometry
 {
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs, unsigned int thread)
+typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Vol d, const V_ATT& attributs, unsigned int thread)
 {
 	typename V_ATT::DATA_TYPE center(0.0);
 	unsigned int count = 0 ;
-	Traversor3WV<typename PFP::MAP> tra(map,d,false,thread);
-	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+//	Traversor3WV<typename PFP::MAP> tra(map,d,false,thread);
+//	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+//	{
+//		center += attributs[d];
+//		++count;
+//	}
+
+	foreachIncident3MT(VOLUME,d,VERTEX,e,typename PFP::MAP,map,thread)
 	{
-		center += attributs[d];
+		center += attributs[e];
 		++count;
 	}
 
@@ -58,14 +65,16 @@ typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Dart d, const V
 }
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Dart d, const V_ATT& attributs, unsigned int thread)
+typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Vol d, const V_ATT& attributs, unsigned int thread)
 {
 	typedef typename V_ATT::DATA_TYPE EMB;
 	EMB center(0.0);
 
 	double count=0.0;
-	Traversor3WE<typename PFP::MAP> t(map, d,false,thread) ;
-	for(Dart it = t.begin(); it != t.end();it = t.next())
+//	Traversor3WE<typename PFP::MAP> t(map, d,false,thread) ;
+//	for(Dart it = t.begin(); it != t.end();it = t.next())
+
+	foreachIncident3MT(VOLUME,d,EDGE,it,typename PFP::MAP,map,thread)
 	{
 		EMB e1 = attributs[it];
 		EMB e2 = attributs[map.phi1(it)];
@@ -78,12 +87,14 @@ typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Dart d, cons
 }
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs)
+typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Face d, const V_ATT& attributs)
 {
 	typename V_ATT::DATA_TYPE center(0.0);
 	unsigned int count = 0 ;
-	Traversor2FV<typename PFP::MAP> t(map, d) ;
-	for(Dart it = t.begin(); it != t.end(); it = t.next())
+
+//	Traversor2FV<typename PFP::MAP> t(map, d) ;
+//	for(Dart it = t.begin(); it != t.end(); it = t.next())
+	foreachIncident2(FACE,d,VERTEX,it,typename PFP::MAP,map)
 	{
 		center += attributs[it];
 		++count ;
@@ -93,14 +104,16 @@ typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Dart d, const V_A
 }
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Dart d, const V_ATT& attributs)
+typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Face d, const V_ATT& attributs)
 {
 	typedef typename V_ATT::DATA_TYPE EMB;
 
 	EMB center(0.0);
 	double count=0.0;
-	Traversor2FE<typename PFP::MAP> t(map, d) ;
-	for(Dart it = t.begin(); it != t.end(); it = t.next())
+
+//	Traversor2FE<typename PFP::MAP> t(map, d) ;
+//	for(Dart it = t.begin(); it != t.end(); it = t.next())
+	foreachIncident2(FACE,d,EDGE,it,typename PFP::MAP,map)
 	{
 		EMB e1 = attributs[it];
 		EMB e2 = attributs[map.phi1(it)];
@@ -113,13 +126,14 @@ typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Dart d, const 
 }
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs)
+typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Vertex d, const V_ATT& attributs)
 {
 	typename V_ATT::DATA_TYPE center(0.0);
 
 	unsigned int count = 0 ;
-	Traversor2VVaE<typename PFP::MAP> t(map, d) ;
-	for(Dart it = t.begin(); it != t.end(); it = t.next())
+//	Traversor2VVaE<typename PFP::MAP> t(map, d) ;
+//	for(Dart it = t.begin(); it != t.end(); it = t.next())
+	foreachAdjacent2(VERTEX,EDGE,d,it,typename PFP::MAP,map)
 	{
 		center += attributs[it];
 		++count ;
@@ -131,24 +145,27 @@ typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Dar
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid, unsigned int thread)
 {
-	TraversorF<typename PFP::MAP> t(map,thread) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
+//	TraversorF<typename PFP::MAP> t(map,thread) ;
+//	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	foreachCellMT(FACE,d,typename PFP::MAP,map ,thread)
 		face_centroid[d] = faceCentroid<PFP,V_ATT>(map, d, position) ;
 }
 
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidELWFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid, unsigned int thread)
 {
-	TraversorF<typename PFP::MAP> t(map,thread) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
+//	TraversorF<typename PFP::MAP> t(map,thread) ;
+//	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	foreachCellMT(FACE,d,typename PFP::MAP,map ,thread)
 		face_centroid[d] = faceCentroidELW<PFP,V_ATT>(map, d, position) ;
 }
 
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid, unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map, thread) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
+//	TraversorV<typename PFP::MAP> t(map, thread) ;
+//	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	foreachCellMT(VERTEX,d,typename PFP::MAP,map ,thread)
 		vertex_centroid[d] = vertexNeighborhoodCentroid<PFP,V_ATT>(map, d, position) ;
 }
 
@@ -247,12 +264,13 @@ namespace Geometry
 {
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs)
+typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Vertex d, const V_ATT& attributs, unsigned int thread)
 {
 	typename V_ATT::DATA_TYPE  center(0.0);
 	unsigned int count = 0 ;
-	Traversor3VVaE<typename PFP::MAP> t(map, d) ;
-	for(Dart it = t.begin(); it != t.end(); it = t.next())
+//	Traversor3VVaE<typename PFP::MAP> t(map, d) ;
+//	for(Dart it = t.begin(); it != t.end(); it = t.next())
+	foreachAdjacent3MT(VERTEX,EDGE,d,it,typename PFP::MAP,map,thread)
 	{
 		center += attributs[it];
 		++count ;
@@ -264,24 +282,27 @@ typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Dar
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid, unsigned int thread)
 {
-	TraversorW<typename PFP::MAP> t(map, thread) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
+//	TraversorW<typename PFP::MAP> t(map, thread) ;
+//	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	foreachCellMT(VOLUME,d,typename PFP::MAP,map ,thread)
 		vol_centroid[d] = Surface::Geometry::volumeCentroid<PFP,V_ATT>(map, d, position,thread) ;
 }
 
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidELWVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid, unsigned int thread)
 {
-	TraversorW<typename PFP::MAP> t(map,thread) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
+//	TraversorW<typename PFP::MAP> t(map,thread) ;
+//	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	foreachCellMT(VOLUME,d,typename PFP::MAP,map ,thread)
 		vol_centroid[d] = Surface::Geometry::volumeCentroidELW<PFP,V_ATT>(map, d, position,thread) ;
 }
 
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid, unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map, thread) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
+//	TraversorV<typename PFP::MAP> t(map, thread) ;
+//	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	foreachCellMT(VERTEX,d,typename PFP::MAP,map ,thread)
 		vertex_centroid[d] = Volume::Geometry::vertexNeighborhoodCentroid<PFP,V_ATT>(map, d, position) ;
 }
 

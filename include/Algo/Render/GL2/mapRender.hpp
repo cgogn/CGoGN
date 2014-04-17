@@ -308,16 +308,18 @@ void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& table
 {
 	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
-	TraversorF<typename PFP::MAP> trav(map, thread);
+//	TraversorF<typename PFP::MAP> trav(map, thread);
 
 	if(position == NULL)
 	{
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		foreachCellMT(VERTEX,d,typename PFP::MAP,map,thread)
 			addTri<PFP>(map, d, tableIndices);
 	}
 	else
 	{
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		foreachCellMT(VERTEX,d,typename PFP::MAP,map,thread)
 		{
 			if(map.faceDegree(d) == 3)
 				addTri<PFP>(map, d, tableIndices);
@@ -408,8 +410,9 @@ void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndi
 {
 	tableIndices.reserve(map.getNbDarts());
 
-	TraversorE<typename PFP::MAP> trav(map, thread);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//	TraversorE<typename PFP::MAP> trav(map, thread);
+//	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	foreachCellMT(EDGE,d,typename PFP::MAP,map,thread)
 	{
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(d));
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(d)));
@@ -421,8 +424,9 @@ void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tabl
 {
 	tableIndices.reserve(map.getNbDarts()); //TODO optimisation ?
 
-	TraversorE<typename PFP::MAP> trav(map, thread);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//	TraversorE<typename PFP::MAP> trav(map, thread);
+//	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	foreachCellMT(EDGE,d,typename PFP::MAP,map,thread)
 	{
 		if (map.isBoundaryEdge(d))
 		{
@@ -484,8 +488,9 @@ void MapRender::initPoints(typename PFP::MAP& map, std::vector<GLuint>& tableInd
 {
 	tableIndices.reserve(map.getNbDarts() / 5);
 
-	TraversorV<typename PFP::MAP> trav(map, thread);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+//	TraversorV<typename PFP::MAP> trav(map, thread);
+//	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	foreachCellMT(VERTEX,d,typename PFP::MAP,map,thread)
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(d));
 }
 
