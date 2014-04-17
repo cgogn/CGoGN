@@ -259,6 +259,122 @@ public:
 	inline Dart next() ;
 } ;
 
+
+template <typename MAP, unsigned int F, unsigned int T>
+class IncidentTrav2
+{
+public:
+	IncidentTrav2(const MAP&, Dart) {}
+};
+
+
+template <typename MAP>
+class IncidentTrav2<MAP,VERTEX,EDGE>
+{
+public:
+	Traversor2VE<MAP> t;
+	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class IncidentTrav2<MAP,VERTEX,FACE>
+{
+public:
+	Traversor2VF<MAP> t;
+	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class IncidentTrav2<MAP,EDGE,VERTEX>
+{
+public:
+	Traversor2EV<MAP> t;
+	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class IncidentTrav2<MAP,EDGE,FACE>
+{
+public:
+	Traversor2EF<MAP> t;
+	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class IncidentTrav2<MAP,FACE,VERTEX>
+{
+public:
+	Traversor2FV<MAP> t;
+	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class IncidentTrav2<MAP,FACE,EDGE>
+{
+public:
+	Traversor2FE<MAP> t;
+	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+
+
+template <typename MAP, unsigned int F, unsigned int T>
+class AdjacentTrav2
+{
+public:
+	AdjacentTrav2(const MAP&, Dart) {}
+};
+
+
+template <typename MAP>
+class AdjacentTrav2<MAP,VERTEX,EDGE>
+{
+public:
+	Traversor2VVaE<MAP> t;
+	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class AdjacentTrav2<MAP,VERTEX,FACE>
+{
+public:
+	Traversor2VVaF<MAP> t;
+	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class AdjacentTrav2<MAP,EDGE,VERTEX>
+{
+public:
+	Traversor2EEaV<MAP> t;
+	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class AdjacentTrav2<MAP,EDGE,FACE>
+{
+public:
+	Traversor2EEaF<MAP> t;
+	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class AdjacentTrav2<MAP,FACE,VERTEX>
+{
+public:
+	Traversor2FFaV<MAP> t;
+	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+template <typename MAP>
+class AdjacentTrav2<MAP,FACE,EDGE>
+{
+public:
+	Traversor2FFaE<MAP> t;
+	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
+};
+
+
 } // namespace CGoGN
 
 #include "Topology/generic/traversor2.hpp"
