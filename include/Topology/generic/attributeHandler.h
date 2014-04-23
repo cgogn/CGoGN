@@ -31,6 +31,7 @@
 #include "Topology/generic/genericmap.h"
 #include "Container/attributeContainer.h"
 #include "Container/fakeAttribute.h"
+#include "Topology/generic/cells.h"
 
 namespace CGoGN
 {
@@ -189,14 +190,14 @@ public:
 	unsigned int nbElements() const;
 
 	/**
-	 * [] operator with dart parameter
+	 * [] operator with cell parameter
 	 */
-	T& operator[](Dart d) ;
+	T& operator[](Cell<ORBIT> c) ;
 
 	/**
-	 * const [] operator with dart parameter
+	 * const [] operator with cell parameter
 	 */
-	const T& operator[](Dart d) const ;
+	const T& operator[](Cell<ORBIT> c) const ;
 
 	/**
 	 * at operator (same as [] but with index parameter)

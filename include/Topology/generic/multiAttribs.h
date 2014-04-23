@@ -25,6 +25,8 @@
 #ifndef __MULTI2ATTRIBS_H_
 #define __MULTI2ATTRIBS_H_
 
+#include "Topology/generic/cells.h"
+
 namespace CGoGN
 {
 
@@ -114,7 +116,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	RefCompo2Type<T1,T2> operator[](Dart d)
+	RefCompo2Type<T1,T2> operator[](Vertex d)
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -124,7 +126,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	const RefCompo2Type<T1,T2> operator[](Dart d) const
+	const RefCompo2Type<T1,T2> operator[](Vertex d) const
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -149,7 +151,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	RefCompo2Type<T1,T2> operator[](Dart d)
+	RefCompo2Type<T1,T2> operator[](Edge d)
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -159,7 +161,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	const RefCompo2Type<T1,T2> operator[](Dart d) const
+	const RefCompo2Type<T1,T2> operator[](Edge d) const
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -184,7 +186,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	RefCompo2Type<T1,T2> operator[](Dart d)
+	RefCompo2Type<T1,T2> operator[](Face d)
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -194,7 +196,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	const RefCompo2Type<T1,T2> operator[](Dart d) const
+	const RefCompo2Type<T1,T2> operator[](Face d) const
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -219,7 +221,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	RefCompo2Type<T1,T2> operator[](Dart d)
+	RefCompo2Type<T1,T2> operator[](Vol d)
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
@@ -229,7 +231,7 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	const RefCompo2Type<T1,T2> operator[](Dart d) const
+	const RefCompo2Type<T1,T2> operator[](Vol d) const
 	{
 		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
 	}
