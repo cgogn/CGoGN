@@ -28,7 +28,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor3.h"
 #include "Algo/Parallel/parallel_foreach.h"
-#include "Topology/generic/cells.h"
+#include "Topology/generic/cells_macros.h"
 
 namespace CGoGN
 {
@@ -76,7 +76,7 @@ typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Vol d, const
 
 	foreachIncident3MT(VOLUME,d,EDGE,it,typename PFP::MAP,map,thread)
 	{
-		EMB e1 = attributs[it];
+		EMB e1 = attributs[it.dart];
 		EMB e2 = attributs[map.phi1(it)];
 		double l = (e2-e1).norm();
 		center += (e1+e2)*l;
@@ -115,7 +115,7 @@ typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Face d, const 
 //	for(Dart it = t.begin(); it != t.end(); it = t.next())
 	foreachIncident2(FACE,d,EDGE,it,typename PFP::MAP,map)
 	{
-		EMB e1 = attributs[it];
+		EMB e1 = attributs[it.dart];
 		EMB e2 = attributs[map.phi1(it)];
 		double l = (e2-e1).norm();
 		center += (e1+e2)*l;

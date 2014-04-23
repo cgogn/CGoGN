@@ -27,7 +27,7 @@
 
 //#include "Topology/generic/traversorCell.h"
 //#include "Topology/generic/traversor2.h"
-#include "Topology/generic/cells.h"
+#include "Topology/generic/cells_macros.h"
 #include "Topology/generic/autoAttributeHandler.h"
 
 namespace CGoGN
@@ -45,7 +45,7 @@ namespace Geometry
 template <typename PFP>
 typename PFP::REAL triangleArea(typename PFP::MAP& map, Face d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
-	typename PFP::VEC3 p1 = position[d] ;
+	typename PFP::VEC3 p1 = position[d.dart] ;
 	typename PFP::VEC3 p2 = position[map.phi1(d)] ;
 	typename PFP::VEC3 p3 = position[map.phi_1(d)] ;
 

@@ -25,7 +25,7 @@
 #ifndef __ALGO_GEOMETRY_AREA_H__
 #define __ALGO_GEOMETRY_AREA_H__
 
-#include "Topology/generic/cells.h"
+#include "Topology/generic/cells_macros.h"
 
 namespace CGoGN
 {

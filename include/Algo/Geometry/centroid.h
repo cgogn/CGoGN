@@ -26,7 +26,7 @@
 #define __ALGO_GEOMETRY_CENTROID_H__
 
 #include "Geometry/basic.h"
-#include "Topology/generic/cells.h"
+#include "Topology/generic/cells_macros.h"
 
 namespace CGoGN
 {
