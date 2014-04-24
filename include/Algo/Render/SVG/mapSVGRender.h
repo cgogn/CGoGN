@@ -30,7 +30,7 @@
 #include <sstream>
 
 #include "Utils/svg.h"
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 namespace CGoGN
 {

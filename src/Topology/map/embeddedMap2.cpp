@@ -26,14 +26,15 @@
 #include <algorithm>
 
 #include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversor2.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
 
 Dart EmbeddedMap2::newPolyLine(unsigned int nbEdges)
 {
-	Dart d = Map2::newPolyLine(nbEdges) ;
+	Dart d = TOPO_MAP::newPolyLine(nbEdges) ;
 
 	if (isOrbitEmbedded<VERTEX>())
 	{
@@ -59,43 +60,34 @@ Dart EmbeddedMap2::newPolyLine(unsigned int nbEdges)
 	{
 		initOrbitEmbeddingOnNewCell<FACE>(d) ;
 	}
+
 	return d ;
 }
 
 Dart EmbeddedMap2::newFace(unsigned int nbEdges, bool withBoundary)
 {
-	Dart d = Map2::newFace(nbEdges, withBoundary);
+	Dart d = TOPO_MAP::newFace(nbEdges, withBoundary);
 
 	if(withBoundary)
 	{
 		if (isOrbitEmbedded<VERTEX>())
 		{
-/*
-			Traversor2FV<EmbeddedMap2> t(*this, d);
-			for(Dart it = t.begin(); it != t.end(); it = t.next())
-				initOrbitEmbeddingOnNewCell<VERTEX>(it) ;
-*/
 			Dart e = d;
 			do
 			{
 				initOrbitEmbeddingOnNewCell<VERTEX>(e) ;
 				e = this->phi1(e);
-			} while (d!=e);
+			} while (d != e);
 		}
 
 		if(isOrbitEmbedded<EDGE>())
 		{
-/*
-			Traversor2FE<EmbeddedMap2> t(*this, d);
-			for(Dart it = t.begin(); it != t.end(); it = t.next())
-				initOrbitEmbeddingOnNewCell<EDGE>(it) ;
-*/
 			Dart e = d;
 			do
 			{
 				initOrbitEmbeddingOnNewCell<EDGE>(e) ;
 				e = this->phi1(e);
-			} while (d!=e);
+			} while (d != e);
 		}
 
 		if(isOrbitEmbedded<FACE>())
@@ -106,24 +98,8 @@ Dart EmbeddedMap2::newFace(unsigned int nbEdges, bool withBoundary)
 	}
 //	else
 //	{
-//		if (isOrbitEmbedded<VERTEX>())
-//		{
-///*
-//			Traversor2FV<EmbeddedMap2> t(*this, d);
-//			for(Dart it = t.begin(); it != t.end(); it = t.next())
-//				initOrbitEmbeddingOnNewCell<VERTEX>(it) ;
-//*/
-//			Dart e = d;
-//			do
-//			{
-//				initDartEmbedding<VERTEX>(e,newCell<VERTEX>());
-//				e = this->phi1(e);
-//			} while (d!=e);
-//		}
-//
-//		if(isOrbitEmbedded<FACE>())
-//			initOrbitEmbeddingOnNewCell<FACE>(d) ;
-//
+//		do not set embedding when creating a face without boundary
+//		-> usually called from import which manages embedding on its own
 //	}
 	return d ;
 }
@@ -339,7 +315,9 @@ void EmbeddedMap2::swapEdges(Dart d, Dart e)
 	}
 
 	if(isOrbitEmbedded<VOLUME>())
+	{
 		setOrbitEmbeddingOnNewCell<VOLUME>(d);
+	}
 }
 
 void EmbeddedMap2::insertEdgeInVertex(Dart d, Dart e)
@@ -652,15 +630,15 @@ bool EmbeddedMap2::check()
 	if (!topo)
 		return false ;
 
-	CGoGNout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << CGoGNendl ;
+	CGoGNout << "nb vertex orbits : " << Algo::Topo::getNbOrbits<VERTEX>(*this) << CGoGNendl ;
 	if (isOrbitEmbedded<VERTEX>())
 		CGoGNout << "nb vertex cells : " << m_attribs[VERTEX].size() << CGoGNendl ;
 
-	CGoGNout << "nb edge orbits : " << getNbOrbits<EDGE>() << CGoGNendl ;
+	CGoGNout << "nb edge orbits : " << Algo::Topo::getNbOrbits<EDGE>(*this) << CGoGNendl ;
 	if (isOrbitEmbedded<EDGE>())
 		CGoGNout << "nb edge cells : " << m_attribs[EDGE].size() << CGoGNendl ;
 
-	CGoGNout << "nb face orbits : " << getNbOrbits<FACE>() << CGoGNendl ;
+	CGoGNout << "nb face orbits : " << Algo::Topo::getNbOrbits<FACE>(*this) << CGoGNendl ;
 	if (isOrbitEmbedded<FACE>())
 		CGoGNout << "nb face cells : " << m_attribs[FACE].size() << CGoGNendl ;
 
@@ -706,15 +684,15 @@ bool EmbeddedMap2::check()
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 
-	std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
+	std::cout << "nb vertex orbits : " << Algo::Topo::getNbOrbits<VERTEX>(*this) << std::endl ;
 	if (isOrbitEmbedded<VERTEX>())
 		std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
-	std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
+	std::cout << "nb edge orbits : " << Algo::Topo::getNbOrbits<EDGE>(*this) << std::endl ;
 	if (isOrbitEmbedded<EDGE>())
 		std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
 
-	std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
+	std::cout << "nb face orbits : " << Algo::Topo::getNbOrbits<FACE>(*this) << std::endl ;
 	if (isOrbitEmbedded<FACE>())
 		std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 

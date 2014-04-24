@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversor2.h"
 #include "Algo/Geometry/intersection.h"
 #include <queue>
 

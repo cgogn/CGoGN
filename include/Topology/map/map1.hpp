@@ -271,8 +271,7 @@ inline int Map1<MAP_IMPL>::checkCycleDegree(Dart d, unsigned int degree) const
 	{
 		++count ;
 		it = phi1(it) ;
-	} while ((count<=degree) && (it != d)) ;
-
+	} while ((count <= degree) && (it != d)) ;
 	return count-degree;
 }
 
@@ -310,6 +309,5 @@ inline bool Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned 
 	} while (it != d) ;
 	return false ;
 }
-
 
 } // namespace CGoGN

@@ -261,6 +261,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversor2.hpp"
+#include "Topology/generic/traversor/traversor2.hpp"
 
 #endif

@@ -24,8 +24,8 @@
 
 #include "Geometry/basic.h"
 #include "Algo/Geometry/centroid.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 namespace CGoGN
 {

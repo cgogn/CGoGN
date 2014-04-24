@@ -26,7 +26,7 @@
 #define __VTraversor2_VIRT_H__
 
 #include "Topology/generic/dart.h"
-#include "Topology/generic/traversorGen.h"
+#include "Topology/generic/traversor/traversorGen.h"
 
 namespace CGoGN
 {
@@ -260,6 +260,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversor2Virt.hpp"
+#include "Topology/generic/traversor/traversor2Virt.hpp"
 
 #endif

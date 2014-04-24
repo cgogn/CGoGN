@@ -23,8 +23,8 @@
 *******************************************************************************/
 
 #include "Topology/generic/dartmarker.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversorFactory.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversorFactory.h"
 
 namespace CGoGN
 {
@@ -198,18 +198,19 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 template <unsigned int ORBIT>
 void GenericMap::addEmbedding()
 {
-	assert(!isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit already embedded") ;
+	if (!isOrbitEmbedded<ORBIT>())
+	{
+		std::ostringstream oss;
+		oss << "EMB_" << ORBIT;
 
-	std::ostringstream oss;
-	oss << "EMB_" << ORBIT;
+		AttributeContainer& dartCont = m_attribs[DART] ;
+		AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
+		m_embeddings[ORBIT] = amv ;
 
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[ORBIT] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		(*amv)[i] = EMBNULL ;
+		// set new embedding to EMBNULL for all the darts of the map
+		for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
+			(*amv)[i] = EMBNULL ;
+	}
 }
 
 /****************************************

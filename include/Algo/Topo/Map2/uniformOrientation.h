@@ -49,6 +49,6 @@ void uniformOrientationCC(MAP& map, Dart faceSeed);
 
 } // namespace CGoGN
 
-#include "uniformOrientation.hpp"
+#include "Algo/Topo/Map2/uniformOrientation.hpp"
 
 #endif

@@ -59,7 +59,7 @@ public:
 
 	inline Dart indexDart(unsigned int index) const;
 
-	inline virtual unsigned int getNbDarts() const;
+	inline unsigned int getNbDarts() const;
 
 	inline AttributeContainer& getDartContainer();
 
@@ -145,6 +145,6 @@ public:
 
 } //namespace CGoGN
 
-#include "Topology/generic/mapMono.hpp"
+#include "Topology/generic/mapImpl/mapMono.hpp"
 
 #endif

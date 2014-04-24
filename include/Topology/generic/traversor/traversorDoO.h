@@ -22,62 +22,55 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSORFACTORY_H__
-#define __TRAVERSORFACTORY_H__
+#ifndef __TRAVERSOR_DOO_H__
+#define __TRAVERSOR_DOO_H__
+
+#include "Topology/generic/dart.h"
+#include "Topology/generic/traversor/traversorGen.h"
 
 namespace CGoGN
 {
 
-template <typename MAP>
-class TraversorFactory
+template <typename MAP, unsigned int ORBIT>
+class TraversorDartsOfOrbit //: public Traversor<MAP>
 {
+private:
+	std::vector<Dart>::iterator m_current ;
+	std::vector<Dart> m_vd ;
+
 public:
+	TraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread = 0) ;
 
-	/**
-	 * Factory of incident traversors creation
-	 * @param map the map in which we work
-	 * @param dart the initial dart of traversal
-	 * @param dim the dimension of traversal (2 or 3)
-	 * @param orbX incident from cell
-	 * @param orbY incident to cell
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor* createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
+	Dart begin() ;
 
-	/**
-	 * Factory of adjacent traversors creation
-	 * @param map the map in which we work
-	 * @param dart the initial dart of traversal
-	 * @param dim the dimension of traversal (2 or 3)
-	 * @param orbX incident from cell
-	 * @param orbY incident to cell
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor* createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
+	Dart end() ;
 
-	/**
-	 * Factory of darts of orbit traversors creation
-	 * @param map the map in which we work
-	 * @param dart the initial dart of traversal
-	 * @param orb the orbit
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor* createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb);
+	Dart next() ;
+} ;
 
-	/**
-	 * Factory of incident traversors creation
-	 * @param map the map in which we work
-	 * @param forceDartMarker (default value false)
-	 * @param thread (default value 0)
-	 * @return a ptr on Generic Traversor
-	 */
-	static Traversor* createCell(MAP& map, unsigned int orb, bool forceDartMarker = false, unsigned int thread = 0);
-};
+
+
+template <typename MAP, unsigned int ORBIT>
+class VTraversorDartsOfOrbit : public Traversor
+{
+private:
+	std::vector<Dart>::iterator m_current ;
+	std::vector<Dart> m_vd ;
+
+public:
+	VTraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread = 0) ;
+
+	Dart begin() ;
+
+	Dart end() ;
+
+	Dart next() ;
+} ;
+
+
 
 } // namespace CGoGN
 
-
-#include "Topology/generic/traversorFactory.hpp"
+#include "Topology/generic/traversor/traversorDoO.hpp"
 
 #endif
-

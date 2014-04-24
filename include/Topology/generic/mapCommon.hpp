@@ -30,54 +30,6 @@ namespace CGoGN
  ****************************************/
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-bool MapCommon<MAP_IMPL>::foreach_orbit(FunctorType& fonct, unsigned int thread)
-{
-	TraversorCell<MapCommon<MAP_IMPL>, ORBIT> trav(*this, true, thread);
-	bool found = false;
-
-	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
-	{
-		if ((fonct)(d))
-			found = true;
-	}
-	return found;
-}
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-unsigned int MapCommon<MAP_IMPL>::getNbOrbits() const
-{
-	unsigned int cpt = 0;
-	TraversorCell<MapCommon<MAP_IMPL>, ORBIT> trav(*this, true);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	{
-		++cpt;
-	}
-	return cpt;
-}
-
-template <typename MAP_IMPL>
-unsigned int MapCommon<MAP_IMPL>::getNbOrbits(unsigned int orbit) const
-{
-	switch(orbit)
-	{
-		case DART:		return getNbOrbits<DART>();
-		case VERTEX: 	return getNbOrbits<VERTEX>();
-		case EDGE: 		return getNbOrbits<EDGE>();
-		case FACE: 		return getNbOrbits<FACE>();
-		case VOLUME: 	return getNbOrbits<VOLUME>();
-		case VERTEX1: 	return getNbOrbits<VERTEX1>();
-		case EDGE1: 	return getNbOrbits<EDGE1>();
-		case VERTEX2: 	return getNbOrbits<VERTEX2>();
-		case EDGE2:		return getNbOrbits<EDGE2>();
-		case FACE2:		return getNbOrbits<FACE2>();
-		default: 		assert(!"Cells of this dimension are not handled"); break;
-	}
-	return 0;
-}
-
-template <typename MAP_IMPL>
 template <unsigned int ORBIT, unsigned int INCIDENT>
 unsigned int MapCommon<MAP_IMPL>::degree(Dart d) const
 {
@@ -170,8 +122,8 @@ inline void MapCommon<MAP_IMPL>::initOrbitEmbedding(Dart d, unsigned int em)
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
-	FunctorInitEmb<MapCommon<MAP_IMPL>, ORBIT> fsetemb(*this, em);
-	this->template foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+	FunctorInitEmb<MapCommon<MAP_IMPL>, ORBIT> finitemb(*this, em);
+	this->template foreach_dart_of_orbit<ORBIT>(d, finitemb);
 }
 
 template <typename MAP_IMPL>
@@ -209,24 +161,6 @@ inline void MapCommon<MAP_IMPL>::copyCell(Dart d, Dart e)
 			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 		this->m_attribs[ORBIT].copyLine(dE, eE) ;	// copy the data
 //		copyCell<ORBIT>(dE, eE);
-	}
-}
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-void MapCommon<MAP_IMPL>::initAllOrbitsEmbedding(bool realloc)
-{
-	if(!this->template isOrbitEmbedded<ORBIT>())
-		this->template addEmbedding<ORBIT>() ;
-	DartMarker<MapCommon<MAP_IMPL> > mark(*this) ;
-	for(Dart d = this->begin(); d != this->end(); this->next(d))
-	{
-		if(!mark.isMarked(d))
-		{
-			mark.markOrbit<ORBIT>(d) ;
-			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
-				setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-		}
 	}
 }
 
@@ -454,7 +388,7 @@ inline void MapCommon<MAP_IMPL>::enableQuickIncidentTraversal()
 		if(!this->template isOrbitEmbedded<ORBIT>())
 			this->template addEmbedding<ORBIT>() ;
 		std::stringstream ss;
-		ss << "quickLocalIncidentTraversal_" << INCI;
+		ss << "quickIncidentTraversal_" << INCI;
 		this->m_quickLocalIncidentTraversal[ORBIT][INCI] = this->m_attribs[ORBIT].template addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
 	updateQuickIncidentTraversal<ORBIT,INCI>() ;
@@ -502,7 +436,7 @@ inline void MapCommon<MAP_IMPL>::disableQuickIncidentTraversal()
 {
 	if(this->m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL)
 	{
-		this->m_attribs[ORBIT].removeAttribute(this->m_quickLocalIncidentTraversal[ORBIT][INCI]->getIndex()) ;
+		this->m_attribs[ORBIT].removeAttribute<Dart>(this->m_quickLocalIncidentTraversal[ORBIT][INCI]->getIndex()) ;
 		this->m_quickLocalIncidentTraversal[ORBIT][INCI] = NULL ;
 	}
 }
@@ -516,7 +450,7 @@ inline void MapCommon<MAP_IMPL>::enableQuickAdjacentTraversal()
 		if(!this->template isOrbitEmbedded<ORBIT>())
 			this->template addEmbedding<ORBIT>() ;
 		std::stringstream ss;
-		ss << "quickLocalAdjacentTraversal" << ADJ;
+		ss << "quickAdjacentTraversal" << ADJ;
 		this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] = this->m_attribs[ORBIT].template addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
 	updateQuickAdjacentTraversal<ORBIT, ADJ>() ;
@@ -567,52 +501,6 @@ inline void MapCommon<MAP_IMPL>::disableQuickAdjacentTraversal()
 		this->m_attribs[ORBIT].template removeAttribute<Dart>(this->m_quickLocalAdjacentTraversal[ORBIT][ADJ]->getIndex()) ;
 		this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] = NULL ;
 	}
-}
-
-/****************************************
- *               UTILITIES              *
- ****************************************/
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-unsigned int MapCommon<MAP_IMPL>::computeIndexCells(AttributeHandler<unsigned int, ORBIT, MAP_IMPL>& idx)
-{
-	AttributeContainer& cont = this->m_attribs[ORBIT] ;
-	unsigned int cpt = 0 ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		idx[i] = cpt++ ;
-	return cpt ;
-}
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-void MapCommon<MAP_IMPL>::bijectiveOrbitEmbedding()
-{
-	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
-
-	AttributeHandler<int, ORBIT, MAP_IMPL> counter = addAttribute<int, ORBIT>("tmpCounter") ;
-	counter.setAllValues(int(0)) ;
-
-	DartMarker<MAP_IMPL> mark(*this) ;
-	for(Dart d = this->begin(); d != this->end(); this->next(d))
-	{
-		if(!mark.isMarked(d))
-		{
-			mark.template markOrbit<ORBIT>(d) ;
-			unsigned int emb = getEmbedding<ORBIT>(d) ;
-			if (emb != EMBNULL)
-			{
-				if (counter[d] > 0)
-				{
-					unsigned int newEmb = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-					copyCell<ORBIT>(newEmb, emb) ;
-				}
-				counter[d]++ ;
-			}
-		}
-	}
-
-	removeAttribute(counter) ;
 }
 
 } // namespace CGoGN

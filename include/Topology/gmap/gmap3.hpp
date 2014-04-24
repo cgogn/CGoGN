@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/traversor3.h"
+#include "Topology/generic/traversor/traversor3.h"
 
 namespace CGoGN
 {

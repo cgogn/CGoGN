@@ -26,12 +26,11 @@
 #define _IHM2MR_PRIMAL_REGULAR_
 
 #include "Topology/ihmap/ihm2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 #include "Algo/Multiresolution/filter.h"
 #include "Algo/Import/importMRDAT.h"
-
 
 #include <cmath>
 
@@ -84,7 +83,6 @@ public:
 	void addLevelFront();
 
 	void import(Algo::Surface::Import::QuadTree& qt);
-
 } ;
 
 } // namespace Regular

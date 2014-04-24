@@ -116,11 +116,6 @@ protected:
 	void phi2unsew(Dart d);
 
 public:
-//	void rdfi(Dart t, DartMarker& m1, DartMarker& m2);
-
-
-	//void propagateDartRelation(Dart d) ;
-
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
 	 *************************************************************************/
@@ -130,37 +125,37 @@ public:
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	virtual Dart newPolyLine(unsigned int nbEdges) ;
+	Dart newPolyLine(unsigned int nbEdges) ;
 
 	//! Create an new face of nbEdges
 	/*! @param nbEdges the number of edges
 	 *  @param withBoundary create the face and its boundary (default true)
 	 *  @return return a dart of the face
 	 */
-	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
+	Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
 
 	//! Delete the face of d
 	/*! @param d a dart of the face
 	 *  @param withBoundary create or extend boundary face instead of fixed points (default true)
 	 */
-	virtual void deleteFace(Dart d, bool withBoundary = true) ;
+	void deleteFace(Dart d) ;
 
 	//! Delete a connected component of the map
 	/*! @param d a dart of the connected component
 	 */
-	virtual void deleteCC(Dart d) ;
+	void deleteCC(Dart d) ;
 
 	//! Fill a hole with a face
 	/*! \pre Dart d is boundary marked
 	 *  @param d a dart of the face to fill
 	 */
-	virtual void fillHole(Dart d) ;
+	void fillHole(Dart d) ;
 
 	//! Open the mesh Transforming a face in a hole
 	/*! \pre Dart d is NOT boundary marked
 	 *  @param d a dart of the face filled
 	 */
-	virtual void createHole(Dart d) ;
+	void createHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators
@@ -173,7 +168,7 @@ public:
 	 *  @param d first dart in vertex v
 	 *  @param e second dart in vertex v
 	 */
-	virtual void splitVertex(Dart d, Dart e);
+	void splitVertex(Dart d, Dart e);
 
 	//! Delete the vertex of d (works only for internal vertices)
 	/*! Does not create a hole -> all the faces
@@ -181,31 +176,29 @@ public:
 	 *  @param d a dart of the vertex to delete
 	 *  @return a dart of the resulting face (NIL if the deletion has not been executed)
 	 */
-	virtual Dart deleteVertex(Dart d);
+	Dart deleteVertex(Dart d);
 
 	//! Cut the edge of d by inserting a new vertex
 	/*! @param d a dart of the edge to cut
 	 *  @return a dart of the new vertex
 	 */
-	virtual Dart cutEdge(Dart d);
+	Dart cutEdge(Dart d);
 
 	//! Undo the cut of the edge of d
 	/*! @param d a dart of the edge to uncut
 	 *  @return true if the uncut has been executed, false otherwise
 	 */
-	virtual bool uncutEdge(Dart d);
+	bool uncutEdge(Dart d);
 
-	//! Collapse an edge (that is deleted) possibly merging its vertices
+	//! Collapse an edge (that is deleted) by merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
 	 *  faces are built (faces with less than 3 edges). If it occurs the faces
 	 *  are deleted and the adjacencies are updated (see collapseDegeneratedFace).
-	 *  \warning This may produce two distinct vertices if the edge
-	 *  was the only link between two border faces
 	 *  @param d a dart in the deleted edge
 	 *  @param delDegenerateFaces a boolean (default to true)
 	 *  @return a dart of the resulting vertex
 	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
+	Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
 
 	/**
 	 * Flip the edge of d (rotation in phi1 order)
@@ -213,7 +206,7 @@ public:
 	 * @param d a dart of the edge to flip
 	 * @return true if the flip has been executed, false otherwise
 	 */
-	virtual bool flipEdge(Dart d);
+	bool flipEdge(Dart d);
 
 	/**
 	 * Flip the edge of d (rotation in phi_1 order)
@@ -221,7 +214,7 @@ public:
 	 * @param d a dart of the edge to flip
 	 * @return true if the flipBack has been executed, false otherwise
 	 */
-	virtual bool flipBackEdge(Dart d);
+	bool flipBackEdge(Dart d);
 
 	//!
 	/*!
@@ -232,14 +225,14 @@ public:
 	 //	 *  @param d dart of the vertex
 	 //	 *  @param e dart of the edge
 	 //	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
+	void insertEdgeInVertex(Dart d, Dart e);
 	 //
 	 //	//! Remove an edge from a vertex orbit
 	 //	/*! \pre Dart d must be phi2 sewed
 	 //	 *  @param d the dart of the edge to remove from the vertex
 	 //	 * @return true if the removal has been executed, false otherwise
 	 //	 */
-	virtual bool removeEdgeFromVertex(Dart d);
+	bool removeEdgeFromVertex(Dart d);
 
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Edges of darts d & e MUST be boundary edges
@@ -247,7 +240,7 @@ public:
 	 *  @param e a dart of the second face
 	 *  @param withBoundary: if false, faces must have phi2 fixed points (only for construction: import/primitives)
 	 */
-	virtual void sewFaces(Dart d, Dart e, bool withBoundary = true);
+	void sewFaces(Dart d, Dart e, bool withBoundary = true);
 
 	//! Unsew two oriented faces
 	/*! \pre Edge of dart d MUST NOT be a boundary edge
@@ -268,7 +261,7 @@ public:
 	 *  @param d first dart in face f
 	 *  @param e second dart in face f
 	 */
-	virtual void splitFace(Dart d, Dart e);
+	void splitFace(Dart d, Dart e);
 
 	//! Merge the two faces incident to the edge of d.
 	/*! Works only for non-boundary edges.
@@ -276,7 +269,7 @@ public:
 	 *  @param d a dart in the first face
 	 *  @return true if the merge has been executed, false otherwise
 	 */
-	virtual bool mergeFaces(Dart d);
+	bool mergeFaces(Dart d);
 
 	/**
 	 * Extract a pair of sewed triangles and sew their adjacent faces
@@ -301,14 +294,14 @@ public:
 	 *  @param e a dart of the second face
 	 *  @return true if the merge has been executed, false otherwise
 	 */
-	virtual bool mergeVolumes(Dart d, Dart e, bool deleteFace = true);
+	bool mergeVolumes(Dart d, Dart e, bool deleteFace = true);
 
 	//! Split a surface into two disconnected surfaces along a edge path
 	/*! @param vd a vector of darts
 	 *  @param firstSideOpen : if false, one of the 2 sides of the surface remains closed (no hole)
 	 *  @param secondSideOpen : if false, the other side of the surface remains closed (no hole)
 	 */
-	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
+	void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 	//@}
 
 	/*! @name Topological Queries

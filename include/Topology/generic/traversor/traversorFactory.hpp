@@ -22,11 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/traversor1.h"
-#include "Topology/generic/traversor2Virt.h"
-#include "Topology/generic/traversor3Virt.h"
-#include "Topology/generic/traversorCellVirt.h"
-#include "Topology/generic/traversorDoO.h"
+#include "Topology/generic/traversor/traversor1.h"
+#include "Topology/generic/traversor/traversor2Virt.h"
+#include "Topology/generic/traversor/traversor3Virt.h"
+#include "Topology/generic/traversor/traversorCellVirt.h"
+#include "Topology/generic/traversor/traversorDoO.h"
 
 namespace CGoGN
 {

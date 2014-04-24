@@ -28,7 +28,7 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
-#include "Topology/generic/traversorGen.h"
+#include "Topology/generic/traversor/traversorGen.h"
 
 namespace CGoGN
 {
@@ -113,6 +113,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversorCell.hpp"
+#include "Topology/generic/traversor/traversorCell.hpp"
 
 #endif

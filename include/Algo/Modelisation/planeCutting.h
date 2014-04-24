@@ -29,7 +29,7 @@
 #include <vector>
 #include "Geometry/plane_3d.h"
 #include "Topology/generic/cellmarker.h"
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 #include "Algo/Modelisation/triangulation.h"
 #include "Algo/Modelisation/subdivision.h"
 

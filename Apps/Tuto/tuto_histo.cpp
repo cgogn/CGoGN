@@ -29,7 +29,7 @@
 #include "Algo/Geometry/area.h"
 
 
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 #include <cmath>
 #include <sstream>

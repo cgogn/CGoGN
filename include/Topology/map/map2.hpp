@@ -184,37 +184,26 @@ Dart Map2<MAP_IMPL>::newFace(unsigned int nbEdges, bool withBoundary)
 }
 
 template <typename MAP_IMPL>
-void Map2<MAP_IMPL>::deleteFace(Dart d, bool withBoundary)
+void Map2<MAP_IMPL>::deleteFace(Dart d)
 {
 	assert(!this->template isBoundaryMarked<2>(d)) ;
-	if (withBoundary)
-	{
-		Dart it = d ;
-		do
-		{
-			if(!isBoundaryEdge(it))
-				unsewFaces(it) ;
-			it = this->phi1(it) ;
-		} while(it != d) ;
-		Dart dd = phi2(d) ;
-		ParentMap::deleteCycle(d) ;
-		ParentMap::deleteCycle(dd) ;
-		return;
-	}
-	//else with remove the face and create fixed points
+
 	Dart it = d ;
 	do
 	{
-		phi2unsew(it);
+		if(!isBoundaryEdge(it))
+			unsewFaces(it) ;
 		it = this->phi1(it) ;
 	} while(it != d) ;
-	ParentMap::deleteCycle(d);
+	Dart dd = phi2(d) ;
+	ParentMap::deleteCycle(d) ;
+	ParentMap::deleteCycle(dd) ;
 }
 
 template <typename MAP_IMPL>
 void Map2<MAP_IMPL>::deleteCC(Dart d)
 {
-	DartMarkerStore<MAP_IMPL> mark(*this);
+	DartMarkerNoUnmark<MAP_IMPL> mark(*this);
 
 	std::vector<Dart> visited;
 	visited.reserve(1024) ;
@@ -245,10 +234,9 @@ template <typename MAP_IMPL>
 void Map2<MAP_IMPL>::fillHole(Dart d)
 {
 	assert(isBoundaryEdge(d)) ;
-	Dart dd = d ;
-	if(!this->template isBoundaryMarked<2>(dd))
-		dd = phi2(dd) ;
-	this->template boundaryUnmarkOrbit<FACE,2>(dd) ;
+	if(!this->template isBoundaryMarked<2>(d))
+		d = phi2(d) ;
+	this->template boundaryUnmarkOrbit<FACE,2>(d) ;
 }
 
 template <typename MAP_IMPL>
@@ -368,7 +356,7 @@ Dart Map2<MAP_IMPL>::collapseEdge(Dart d, bool delDegenerateFaces)
 template <typename MAP_IMPL>
 bool Map2<MAP_IMPL>::flipEdge(Dart d)
 {
-	if (!isBoundaryEdge(d))
+	if (!isBoundaryEdge(d)) // cannot flip a boundary edge
 	{
 		Dart e = phi2(d);
 		Dart dNext = this->phi1(d);
@@ -381,30 +369,30 @@ bool Map2<MAP_IMPL>::flipEdge(Dart d)
 		this->phi1sew(e, eNext);	// new vertices after flip
 		return true ;
 	}
-	return false ; // cannot flip a border edge
+	return false ;
 }
 
 template <typename MAP_IMPL>
 bool Map2<MAP_IMPL>::flipBackEdge(Dart d)
 {
-	if (!isBoundaryEdge(d))
+	if (!isBoundaryEdge(d)) // cannot flip a boundary edge
 	{
 		Dart e = phi2(d);
 		Dart dPrev = this->phi_1(d);
 		Dart ePrev = this->phi_1(e);
-		this->phi1sew(d, ePrev);		// Detach the two
-		this->phi1sew(e, dPrev);		// vertices of the edge
+		this->phi1sew(d, ePrev);				// Detach the two
+		this->phi1sew(e, dPrev);				// vertices of the edge
 		this->phi1sew(e, this->phi_1(dPrev));	// Insert the edge in its
 		this->phi1sew(d, this->phi_1(ePrev));	// new vertices after flip
 		return true ;
 	}
-	return false ; // cannot flip a border edge
+	return false ;
 }
 
 template <typename MAP_IMPL>
 void Map2<MAP_IMPL>::swapEdges(Dart d, Dart e)
 {
-	assert(!Map2::isBoundaryEdge(d) && !Map2::isBoundaryEdge(e));
+	assert(!isBoundaryEdge(d) && !isBoundaryEdge(e));
 
 	Dart d2 = phi2(d);
 	Dart e2 = phi2(e);
@@ -589,7 +577,7 @@ bool Map2<MAP_IMPL>::mergeVolumes(Dart d, Dart e, bool deleteFace)
 {
 	assert(!this->template isBoundaryMarked<2>(d) && !this->template isBoundaryMarked<2>(e)) ;
 
-	if (Map2<MAP_IMPL>::isBoundaryFace(d) || Map2<MAP_IMPL>::isBoundaryFace(e))
+	if (isBoundaryFace(d) || isBoundaryFace(e))
 		return false;
 
 	// First traversal of both faces to check the face sizes
@@ -654,10 +642,10 @@ void Map2<MAP_IMPL>::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, b
 	}
 
 	if(firstSideClosed)
-		Map2<MAP_IMPL>::fillHole(e) ;
+		fillHole(e) ;
 
 	if(secondSideClosed)
-		Map2<MAP_IMPL>::fillHole(e2) ;
+		fillHole(e2) ;
 }
 
 /*! @name Topological Queries
