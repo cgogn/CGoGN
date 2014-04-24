@@ -247,6 +247,8 @@ void Viewer::importMesh(std::string& filename)
 
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
+
+	std::cout << "#vertices -> " << Algo::Topo::getNbOrbits<VERTEX>(myMap) << std::endl;
 }
 
 void Viewer::exportMesh(std::string& filename, bool askExportMode)

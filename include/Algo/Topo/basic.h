@@ -38,26 +38,10 @@ namespace Topo
 {
 
 template <unsigned int ORBIT, typename MAP>
-bool foreach_orbit(const MAP& map, FunctorType& fonct, unsigned int thread = 0)
-{
-	TraversorCell<MAP, ORBIT> trav(map, true, thread);
-	bool found = false;
-
-	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
-	{
-		if ((fonct)(d))
-			found = true;
-	}
-	return found;
-}
-
-template <unsigned int ORBIT, typename MAP>
 unsigned int getNbOrbits(const MAP& map)
 {
 	unsigned int cpt = 0;
-	TraversorCell<MAP, ORBIT> trav(map, true);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		++cpt;
+	foreach_cell<ORBIT>(map, [&] (Dart) { ++cpt; }, true);
 	return cpt;
 }
 
@@ -91,12 +75,11 @@ void initAllOrbitsEmbedding(MAP& map, bool realloc = false)
 	if(!map.template isOrbitEmbedded<ORBIT>())
 		map.template addEmbedding<ORBIT>() ;
 
-	TraversorCell<MAP, ORBIT> trav(map, true);
-	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	foreach_cell<ORBIT>(map, [&] (Dart d)
 	{
 		if(realloc || map.template getEmbedding<ORBIT>(d) == EMBNULL)
 			map.template setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-	}
+	});
 }
 
 /**
@@ -125,8 +108,7 @@ void bijectiveOrbitEmbedding(MAP& map)
 	AttributeHandler<int, ORBIT, typename MAP::IMPL> counter = map.template addAttribute<int, ORBIT>("tmpCounter") ;
 	counter.setAllValues(int(0)) ;
 
-	TraversorCell<MAP, ORBIT> trav(map, true);
-	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	foreach_cell<ORBIT>(map, [&] (Dart d)
 	{
 		unsigned int emb = map.template getEmbedding<ORBIT>(d) ;
 		if (emb != EMBNULL)
@@ -138,7 +120,8 @@ void bijectiveOrbitEmbedding(MAP& map)
 			}
 			counter[d]++ ;
 		}
-	}
+	},
+	true);
 
 	map.removeAttribute(counter) ;
 }

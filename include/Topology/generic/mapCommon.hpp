@@ -66,12 +66,10 @@ inline unsigned int MapCommon<MAP_IMPL>::getEmbedding(Dart d) const
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
-	unsigned int d_index = this->dartIndex(d);
-
 	if (ORBIT == DART)
-		return d_index;
+		return this->dartIndex(d);
 
-	return (*this->m_embeddings[ORBIT])[d_index] ;
+	return (*this->m_embeddings[ORBIT])[this->dartIndex(d)] ;
 }
 
 template <typename MAP_IMPL>

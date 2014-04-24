@@ -30,21 +30,10 @@
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversor/traversorGen.h"
 
+#include <functional>
+
 namespace CGoGN
 {
-
-/// Macro for simple syntax traversal (can be nested)
-/// parameters:
-///   - cell type
-///   - name of iterator variable (automatically declared)
-///   - map type
-///   - map used
-///
-/// Ex: FOR_ALL_CELLS(VERTEX, di, myMap) { ... }
-///
-#define FOR_ALL_CELLS(ORBIT, NAME_ITER, MAP_TYPE, MAP_PARAM) TraversorCell<MAP_TYPE, (ORBIT)>  NAME_ITER_TraversalMacroLocalLoop(MAP_PARAM); \
-	for (Dart NAME_ITER = NAME_ITER_TraversalMacroLocalLoop.begin(); NAME_ITER != NAME_ITER_TraversalMacroLocalLoop.end(); NAME_ITER = NAME_ITER_TraversalMacroLocalLoop.next())
-
 
 template <typename MAP, unsigned int ORBIT>
 class TraversorCell //: public Traversor<MAP>
@@ -75,7 +64,29 @@ public:
 	inline Dart next() ;
 
 	inline void skip(Dart d);
+
+	inline void apply(std::function<bool (Dart)> f)
+	{
+		for (Dart d = begin(); d != end(); d = next())
+			if (f(d))
+				return;
+	}
+
+	inline void apply(std::function<void (Dart)> f)
+	{
+		for (Dart d = begin(); d != end(); d = next())
+			f(d);
+	}
 } ;
+
+
+
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+inline void foreach_cell(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
+{
+	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
+	trav.apply(f);
+}
 
 
 
