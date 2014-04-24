@@ -25,12 +25,10 @@
 #ifndef CELLS_H_
 #define CELLS_H_
 
-#include "dart.h"
-
+#include "Topology/generic/dart.h"
 
 namespace CGoGN
 {
-
 
 /**
  * class for cellular typing
@@ -44,23 +42,28 @@ class Cell
 {
 public:
 	Dart dart;
-	/// emoty construtor
+
+	/// empty construtor
 	Cell(): dart() {}
+
 	/// construtor from Dart
 	inline Cell(Dart d): dart(d) {}
+
 	/// copy constructor
 	inline Cell(const Cell<ORBIT>& c): dart(c.dart) {}
+
 	/// Dart cast operator
-	inline operator Dart() const {return dart;}
+	inline operator Dart() const { return dart; }
+
 	friend std::ostream& operator<<( std::ostream &out, const Cell<ORBIT>& fa ) { return out << fa.dart; }
-	inline bool valid() const { return !dart.isNil();}
+
+	inline bool valid() const { return !dart.isNil(); }
 };
 
 typedef Cell<VERTEX> Vertex;
 typedef Cell<EDGE>   Edge;
 typedef Cell<FACE>   Face;
 typedef Cell<VOLUME> Vol;  // not Volume because of the namespace Volume
-
 
 }
 

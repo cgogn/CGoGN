@@ -48,7 +48,6 @@ namespace CGoGN
 class AttributeHandlerGen ;
 class DartMarkerGen ;
 class CellMarkerGen ;
-//template<typename MAP, unsigned int CELL> class CellMarkerBase ;
 
 class GenericMap
 {
@@ -165,8 +164,6 @@ protected:
 	void deleteDartLine(unsigned int index) ;
 
 public:
-//	virtual unsigned int getNbDarts() const = 0 ;
-
 	/****************************************
 	 *          ORBITS TRAVERSALS           *
 	 ****************************************/
@@ -182,7 +179,7 @@ public:
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
 	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
 	virtual bool foreach_dart_of_face(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_volume(Dart /*d*/, FunctorType& /*f*/, unsigned /*int thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual bool foreach_dart_of_volume(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 	virtual bool foreach_dart_of_cc(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 
 	virtual bool foreach_dart_of_vertex1(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }

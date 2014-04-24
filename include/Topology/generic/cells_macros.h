@@ -22,15 +22,13 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CELLS_MACRO_H_
-#define __CELLS_MACRO_H_
+#ifndef __CELLS_MACRO_H__
+#define __CELLS_MACRO_H__
 
-#include "cells.h"
-#include "traversor2.h"
-#include "traversor3.h"
-#include "traversorCell.h"
-
-
+#include "Topology/generic/cells.h"
+#include "Topology/generic/traversor/traversor2.h"
+#include "Topology/generic/traversor/traversor3.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 namespace CGoGN
 {

@@ -34,7 +34,7 @@
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Algo/Render/SVG/mapSVGRender.h"
 
-#include "Topology/generic/traversorFactory.h"
+#include "Topology/generic/traversor/traversorFactory.h"
 
 #include "Algo/Render/GL2/drawerCells.h"
 
