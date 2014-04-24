@@ -22,8 +22,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
 #include "Algo/Geometry/basic.h"
 
 namespace CGoGN

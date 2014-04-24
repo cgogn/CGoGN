@@ -22,11 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR2_H__
-#define __TRAVERSOR2_H__
+#ifndef __VTraversor2_VIRT_H__
+#define __VTraversor2_VIRT_H__
 
 #include "Topology/generic/dart.h"
-//#include "Topology/generic/traversorGen.h"
+#include "Topology/generic/traversor/traversorGen.h"
 
 namespace CGoGN
 {
@@ -37,7 +37,7 @@ namespace CGoGN
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor2VE//: public Traversor<MAP>
+class VTraversor2VE: public Traversor
 {
 private:
 	const MAP& m ;
@@ -46,16 +46,16 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2VE(const MAP& map, Dart dart) ;
+	VTraversor2VE(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 // Traverse the faces incident to a given vertex
 template <typename MAP>
-class Traversor2VF //: public Traversor<MAP>
+class VTraversor2VF : public Traversor
 {
 private:
 	const MAP& m ;
@@ -64,16 +64,16 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2VF(const MAP& map, Dart dart) ;
+	VTraversor2VF(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
 template <typename MAP>
-class Traversor2VVaE //: public Traversor<MAP>
+class VTraversor2VVaE : public Traversor
 {
 private:
 	const MAP& m ;
@@ -82,16 +82,16 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2VVaE(const MAP& map, Dart dart) ;
+	VTraversor2VVaE(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 // Traverse the vertices adjacent to a given vertex through sharing a common face
 template <typename MAP>
-class Traversor2VVaF //: public Traversor<MAP>
+class VTraversor2VVaF : public Traversor
 {
 private:
 	const MAP& m ;
@@ -102,11 +102,11 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2VVaF(const MAP& map, Dart dart) ;
+	VTraversor2VVaF(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 /*******************************************************************************
@@ -115,7 +115,7 @@ public:
 
 // Traverse the vertices incident to a given edge
 template <typename MAP>
-class Traversor2EV //: public Traversor<MAP>
+class VTraversor2EV : public Traversor
 {
 private:
 	const MAP& m ;
@@ -124,16 +124,16 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2EV(const MAP& map, Dart dart) ;
+	VTraversor2EV(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 // Traverse the faces incident to a given edge
 template <typename MAP>
-class Traversor2EF //: public Traversor<MAP>
+class VTraversor2EF : public Traversor
 {
 private:
 	const MAP& m ;
@@ -142,16 +142,16 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2EF(const MAP& map, Dart dart) ;
+	VTraversor2EF(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
 template <typename MAP>
-class Traversor2EEaV //: public Traversor<MAP>
+class VTraversor2EEaV : public Traversor
 {
 private:
 	const MAP& m ;
@@ -162,16 +162,16 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2EEaV(const MAP& map, Dart dart) ;
+	VTraversor2EEaV(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 // Traverse the edges adjacent to a given edge through sharing a common face
 template <typename MAP>
-class Traversor2EEaF //: public Traversor<MAP>
+class VTraversor2EEaF : public Traversor
 {
 private:
 	const MAP& m ;
@@ -182,11 +182,11 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2EEaF(const MAP& map, Dart dart) ;
+	VTraversor2EEaF(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 /*******************************************************************************
@@ -195,7 +195,7 @@ public:
 
 // Traverse the vertices incident to a given face
 template <typename MAP>
-class Traversor2FV //: public Traversor<MAP>
+class VTraversor2FV : public Traversor
 {
 private:
 	const MAP& m ;
@@ -204,25 +204,25 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2FV(const MAP& map, Dart dart) ;
+	VTraversor2FV(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 
 // Traverse the edges incident to a given face (equivalent to vertices)
 template <typename MAP>
-class Traversor2FE: public Traversor2FV<MAP>
+class VTraversor2FE: public VTraversor2FV<MAP>
 {
 public:
-	Traversor2FE(const MAP& map, Dart dart):Traversor2FV<MAP>(map,dart){}
+	VTraversor2FE(const MAP& map, Dart dart):VTraversor2FV<MAP>(map,dart){}
 } ;
 
 // Traverse the faces adjacent to a given face through sharing a common vertex
 template <typename MAP>
-class Traversor2FFaV //: public Traversor<MAP>
+class VTraversor2FFaV : public Traversor
 {
 private:
 	const MAP& m ;
@@ -233,17 +233,16 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2FFaV(const MAP& map, Dart dart) ;
+	VTraversor2FFaV(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
 
 // Traverse the faces adjacent to a given face through sharing a common edge
-// Warning mult-incidence is not managed (some faces can be send several times)
 template <typename MAP>
-class Traversor2FFaE //: public Traversor<MAP>
+class VTraversor2FFaE : public Traversor
 {
 private:
 	const MAP& m ;
@@ -252,131 +251,15 @@ private:
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
 public:
-	Traversor2FFaE(const MAP& map, Dart dart) ;
+	VTraversor2FFaE(const MAP& map, Dart dart) ;
 
-	inline Dart begin() ;
-	inline Dart end() ;
-	inline Dart next() ;
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
 } ;
-
-
-template <typename MAP, unsigned int F, unsigned int T>
-class IncidentTrav2
-{
-public:
-	IncidentTrav2(const MAP&, Dart) {}
-};
-
-
-template <typename MAP>
-class IncidentTrav2<MAP,VERTEX,EDGE>
-{
-public:
-	Traversor2VE<MAP> t;
-	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class IncidentTrav2<MAP,VERTEX,FACE>
-{
-public:
-	Traversor2VF<MAP> t;
-	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class IncidentTrav2<MAP,EDGE,VERTEX>
-{
-public:
-	Traversor2EV<MAP> t;
-	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class IncidentTrav2<MAP,EDGE,FACE>
-{
-public:
-	Traversor2EF<MAP> t;
-	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class IncidentTrav2<MAP,FACE,VERTEX>
-{
-public:
-	Traversor2FV<MAP> t;
-	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class IncidentTrav2<MAP,FACE,EDGE>
-{
-public:
-	Traversor2FE<MAP> t;
-	IncidentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-
-
-template <typename MAP, unsigned int F, unsigned int T>
-class AdjacentTrav2
-{
-public:
-	AdjacentTrav2(const MAP&, Dart) {}
-};
-
-
-template <typename MAP>
-class AdjacentTrav2<MAP,VERTEX,EDGE>
-{
-public:
-	Traversor2VVaE<MAP> t;
-	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class AdjacentTrav2<MAP,VERTEX,FACE>
-{
-public:
-	Traversor2VVaF<MAP> t;
-	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class AdjacentTrav2<MAP,EDGE,VERTEX>
-{
-public:
-	Traversor2EEaV<MAP> t;
-	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class AdjacentTrav2<MAP,EDGE,FACE>
-{
-public:
-	Traversor2EEaF<MAP> t;
-	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class AdjacentTrav2<MAP,FACE,VERTEX>
-{
-public:
-	Traversor2FFaV<MAP> t;
-	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
-template <typename MAP>
-class AdjacentTrav2<MAP,FACE,EDGE>
-{
-public:
-	Traversor2FFaE<MAP> t;
-	AdjacentTrav2(const MAP& m, Dart d):t(m,d) {}
-};
-
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversor2.hpp"
+#include "Topology/generic/traversor/traversor2Virt.hpp"
 
 #endif

@@ -24,7 +24,7 @@
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"

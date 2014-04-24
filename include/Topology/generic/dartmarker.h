@@ -197,7 +197,7 @@ public:
 	/**
 	 * unmark all darts
 	 */
-	virtual void unmarkAll() = 0 ;
+//	virtual void unmarkAll() = 0 ;
 
 	inline bool isAllUnmarked()
 	{

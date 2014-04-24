@@ -221,19 +221,21 @@ void ControlDock_MapTab::removeSelector()
 
 void ControlDock_MapTab::mapAdded(MapHandlerGen* m)
 {
-	b_updatingUI = true;
 	QListWidgetItem* item = new QListWidgetItem(m->getName(), list_maps);
+	b_updatingUI = true;
 	item->setCheckState(Qt::Unchecked);
 	b_updatingUI = false;
 }
 
 void ControlDock_MapTab::mapRemoved(MapHandlerGen* m)
 {
-	b_updatingUI = true;
-	QList<QListWidgetItem*> items = list_maps->selectedItems();
+	QList<QListWidgetItem*> items = list_maps->findItems(m->getName(), Qt::MatchExactly);
 	if(!items.empty())
+	{
+		b_updatingUI = true;
 		delete items[0];
-	b_updatingUI = false;
+		b_updatingUI = false;
+	}
 }
 
 void ControlDock_MapTab::selectedViewChanged(View* prev, View* cur)
@@ -357,35 +359,35 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 		switch(orbit)
 		{
 			case DART : {
-				unsigned int nb = m->getNbDarts();
+				unsigned int nb = m_selectedMap->getNbDarts();
 				label_dartNbOrbits->setText(QString::number(nb));
 				label_dartNbCells->setText(QString::number(nbc));
 				selectorList = list_dartSelectors;
 				break;
 			}
 			case VERTEX : {
-				unsigned int nb = m->getNbOrbits(VERTEX);
+				unsigned int nb = m_selectedMap->getNbOrbits(VERTEX);
 				label_vertexNbOrbits->setText(QString::number(nb));
 				label_vertexNbCells->setText(QString::number(nbc));
 				selectorList = list_vertexSelectors;
 				break;
 			}
 			case EDGE : {
-				unsigned int nb = m->getNbOrbits(EDGE);
+				unsigned int nb = m_selectedMap->getNbOrbits(EDGE);
 				label_edgeNbOrbits->setText(QString::number(nb));
 				label_edgeNbCells->setText(QString::number(nbc));
 				selectorList = list_edgeSelectors;
 				break;
 			}
 			case FACE : {
-				unsigned int nb = m->getNbOrbits(FACE);
+				unsigned int nb = m_selectedMap->getNbOrbits(FACE);
 				label_faceNbOrbits->setText(QString::number(nb));
 				label_faceNbCells->setText(QString::number(nbc));
 				selectorList = list_faceSelectors;
 				break;
 			}
 			case VOLUME : {
-				unsigned int nb = m->getNbOrbits(VOLUME);
+				unsigned int nb = m_selectedMap->getNbOrbits(VOLUME);
 				label_volumeNbOrbits->setText(QString::number(nb));
 				label_volumeNbCells->setText(QString::number(nbc));
 				selectorList = list_volumeSelectors;

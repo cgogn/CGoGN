@@ -17,6 +17,8 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Geometry/boundingbox.h"
 
+#include "Algo/Topo/basic.h"
+
 #include "Utils/vbo.h"
 
 namespace CGoGN
@@ -79,6 +81,13 @@ public:
 	virtual void drawBB() = 0;
 
 	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
+
+	/*********************************************************
+	 * MANAGE TOPOLOGICAL QUERIES
+	 *********************************************************/
+
+	virtual unsigned int getNbDarts() = 0;
+	virtual unsigned int getNbOrbits(unsigned int orbit) = 0;
 
 	/*********************************************************
 	 * MANAGE ATTRIBUTES
@@ -226,6 +235,13 @@ public:
 	}
 
 	inline MAP* getMap() { return static_cast<MAP*>(m_map); }
+
+	/*********************************************************
+	 * MANAGE TOPOLOGICAL QUERIES
+	 *********************************************************/
+
+	unsigned int getNbDarts();
+	unsigned int getNbOrbits(unsigned int orbit);
 
 	/*********************************************************
 	 * MANAGE ATTRIBUTES

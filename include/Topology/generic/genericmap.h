@@ -147,7 +147,7 @@ protected:
 	/**
 	 * Add a dart to the map
 	 */
-	Dart newDart() ;
+	virtual Dart newDart() ;
 
 	/**
 	 * Erase a dart of the map
@@ -165,7 +165,7 @@ protected:
 	void deleteDartLine(unsigned int index) ;
 
 public:
-	virtual unsigned int getNbDarts() const = 0 ;
+//	virtual unsigned int getNbDarts() const = 0 ;
 
 	/****************************************
 	 *          ORBITS TRAVERSALS           *
@@ -191,13 +191,6 @@ public:
 	virtual bool foreach_dart_of_vertex2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
 	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-
-	/**
-	 * @brief getNbOrbits
-	 * @param orbit
-	 * @return the number of orbits in the map
-	 */
-	virtual unsigned int getNbOrbits(unsigned int orbit) const = 0 ;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -299,7 +292,6 @@ public:
 
 	void printDartsTable();
 
-protected:
 	/****************************************
 	 *   EMBEDDING ATTRIBUTES MANAGEMENT    *
 	 ****************************************/
@@ -309,6 +301,7 @@ protected:
 	template <unsigned int ORBIT>
 	void addEmbedding() ;
 
+protected:
 	/****************************************
 	 *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
 	 ****************************************/

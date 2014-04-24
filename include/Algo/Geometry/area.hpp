@@ -25,8 +25,6 @@
 #include "Geometry/basic.h"
 #include "Algo/Geometry/centroid.h"
 
-//#include "Topology/generic/traversorCell.h"
-//#include "Topology/generic/traversor2.h"
 #include "Topology/generic/cells_macros.h"
 #include "Topology/generic/autoAttributeHandler.h"
 

@@ -22,11 +22,11 @@
  *                                                                              *
  *******************************************************************************/
 
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor3.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor3.h"
 #include "Algo/Parallel/parallel_foreach.h"
 #include "Topology/generic/cells_macros.h"
 

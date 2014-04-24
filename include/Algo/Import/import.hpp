@@ -26,6 +26,7 @@
 #include "Topology/generic/autoAttributeHandler.h"
 #include "Container/fakeAttribute.h"
 #include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
@@ -147,7 +148,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
     if (needBijectiveCheck)
     {
         // ensure bijection between topo and embedding
-        map.template bijectiveOrbitEmbedding<VERTEX>();
+		Algo::Topo::bijectiveOrbitEmbedding<VERTEX>(map);
     }
 
     return true ;

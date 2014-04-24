@@ -26,7 +26,7 @@
 #define __EMBEDDED_MAP2_H__
 
 #include "Topology/map/map2.h"
-#include "Topology/generic/mapMono.h"
+#include "Topology/generic/mapImpl/mapMono.h"
 
 namespace CGoGN
 {
@@ -45,31 +45,31 @@ public:
 
 	/*
 	 */
-	virtual Dart newPolyLine(unsigned int nbEdges) ;
+	Dart newPolyLine(unsigned int nbEdges) ;
 
 	/*
 	 */
-	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
+	Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
 
 	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
 	 */
-	virtual void splitVertex(Dart d, Dart e) ;
+	void splitVertex(Dart d, Dart e) ;
 
 	/**
 	 * The attributes attached to the face of d are kept on the resulting face
 	 */
-	virtual Dart deleteVertex(Dart d) ;
+	Dart deleteVertex(Dart d) ;
 
 	/**
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
-	virtual Dart cutEdge(Dart d) ;
+	Dart cutEdge(Dart d) ;
 
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
-	virtual bool uncutEdge(Dart d) ;
+	bool uncutEdge(Dart d) ;
 
 	/**
 	 * Check if the edge of d can be collapsed or not based on some topological conditions
@@ -83,40 +83,40 @@ public:
 	 * See 'collapseDegeneratedFace' to see what can happen to edges attributes
 	 * Nothing has to be done for the faces (some degenerate ones can be deleted)
 	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true) ;
+	Dart collapseEdge(Dart d, bool delDegenerateFaces = true) ;
 
 	/**
 	 * No cell is created or deleted
 	 */
-	virtual bool flipEdge(Dart d) ;
+	bool flipEdge(Dart d) ;
 
 	/**
 	 * No cell is created or deleted
 	 */
-	virtual bool flipBackEdge(Dart d) ;
+	bool flipBackEdge(Dart d) ;
 
 	/*
 	 *
 	 */
-	virtual void swapEdges(Dart d, Dart e);
+	void swapEdges(Dart d, Dart e);
 
 	/**
 	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
 	 * The attributes attached to the face of dart d are overwritten on the face of dart e
 	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
+	void insertEdgeInVertex(Dart d, Dart e);
 
 	/**
 	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
 	 * The attributes attached to the face of dart d are overwritten on the face of dart e
 	 */
-	virtual bool removeEdgeFromVertex(Dart d);
+	bool removeEdgeFromVertex(Dart d);
 
 	/**
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
-	virtual void sewFaces(Dart d, Dart e, bool withBoundary = true) ;
+	void sewFaces(Dart d, Dart e, bool withBoundary = true) ;
 
 	/**
 	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
@@ -132,33 +132,33 @@ public:
 	/**
 	 * The attributes attached to the old face are duplicated on both resulting faces
 	 */
-	virtual void splitFace(Dart d, Dart e) ;
+	void splitFace(Dart d, Dart e) ;
 
 	/**
 	 * The attributes attached to the face of dart d are kept on the resulting face
 	 */
-	virtual bool mergeFaces(Dart d) ;
+	bool mergeFaces(Dart d) ;
 
 	/**
 	 * The attributes attached to the vertices of the face of d are kept on the resulting vertices
 	 * The attributes attached to the edges of the face of d are kept on the resulting edges
 	 */
-	virtual bool mergeVolumes(Dart d, Dart e, bool deleteFace = true) ;
+	bool mergeVolumes(Dart d, Dart e, bool deleteFace = true) ;
 
 	/**
 	 *
 	 */
-	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
+	void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 
 	/**
 	 *
 	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+	unsigned int closeHole(Dart d, bool forboundary = true);
 
 	/**
 	 *
 	 */
-	virtual bool check() ;
+	bool check() ;
 } ;
 
 } // namespace CGoGN

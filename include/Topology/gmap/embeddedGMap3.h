@@ -26,7 +26,7 @@
 #define __EMBEDDED_GMAP3_H__
 
 #include "Topology/gmap/gmap3.h"
-#include "Topology/generic/mapMono.h"
+#include "Topology/generic/mapImpl/mapMono.h"
 
 namespace CGoGN
 {

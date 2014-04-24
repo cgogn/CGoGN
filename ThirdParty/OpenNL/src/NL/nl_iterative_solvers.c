@@ -72,13 +72,13 @@ NLuint nlSolve_CG() {
     NLdouble *g = NL_NEW_ARRAY(NLdouble, N) ;
     NLdouble *r = NL_NEW_ARRAY(NLdouble, N) ; 
     NLdouble *p = NL_NEW_ARRAY(NLdouble, N) ;
-    NLuint its=0;
+	NLuint its = 0;
     NLint i;
     NLdouble t, tau, sig, rho, gam;
-    NLdouble b_square=ddot(N,b,1,b,1);
-    NLdouble err=eps*eps*b_square;
-    NLdouble accu =0.0;
-    NLdouble * Ax=NL_NEW_ARRAY(NLdouble,nlCurrentContext->n);
+	NLdouble b_square = ddot(N,b,1,b,1);
+	NLdouble err = eps*eps*b_square;
+	NLdouble accu = 0.0;
+	NLdouble * Ax = NL_NEW_ARRAY(NLdouble,nlCurrentContext->n);
     NLdouble curr_err;
     
     nlCurrentContext->matrix_vector_prod(x,g);
@@ -86,9 +86,9 @@ NLuint nlSolve_CG() {
     dscal(N,-1.,g,1);
     dcopy(N,g,1,r,1);
     curr_err = ddot(N,g,1,g,1);
-    while ( curr_err >err && its < max_iter) {
+	while ( curr_err > err && its < max_iter) {
 	    if(!(its % 100)) {
-	        printf ( "%d : %.10e -- %.10e\n", its, curr_err, err ) ;
+//	        printf ( "%d : %.10e -- %.10e\n", its, curr_err, err ) ;
 	    }
         nlCurrentContext->matrix_vector_prod(r,p);
         rho=ddot(N,p,1,p,1);
@@ -101,12 +101,12 @@ NLuint nlSolve_CG() {
         dscal(N,gam,r,1);
         daxpy(N,1.,g,1,r,1);
         ++its;
-        curr_err = ddot(N,g,1,g,1); 
-    }
+		curr_err = ddot(N,g,1,g,1);
+	}
     nlCurrentContext->matrix_vector_prod(x,Ax);
     for(i = 0 ; i < N ; ++i)
         accu+=(Ax[i]-b[i])*(Ax[i]-b[i]);
-    printf("in OpenNL : ||Ax-b||/||b|| = %e\n",sqrt(accu)/sqrt(b_square));
+//    printf("in OpenNL : ||Ax-b||/||b|| = %e\n",sqrt(accu)/sqrt(b_square));
     NL_DELETE_ARRAY(Ax);
     NL_DELETE_ARRAY(g) ;
     NL_DELETE_ARRAY(r) ;

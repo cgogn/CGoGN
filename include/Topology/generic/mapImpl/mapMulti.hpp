@@ -415,11 +415,11 @@ inline unsigned int MapMulti::getMaxLevel()
 inline Dart MapMulti::begin() const
 {
 	unsigned int d = m_mrattribs.begin() ;
-	if(d != m_mrattribs.end())
-	{
-		while (getDartLevel(d) > m_mrCurrentLevel)
-			m_mrattribs.next(d) ;
-	}
+//	if(d != m_mrattribs.end())
+//	{
+//		while (getDartLevel(d) > m_mrCurrentLevel)
+//			m_mrattribs.next(d) ;
+//	}
 	return Dart::create(d) ;
 }
 
@@ -430,10 +430,13 @@ inline Dart MapMulti::end() const
 
 inline void MapMulti::next(Dart& d) const
 {
-	do
-	{
-		m_mrattribs.next(d.index) ;
-	} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
+//	do
+//	{
+//		m_mrattribs.next(d.index) ;
+//	} while (d.index != m_mrattribs.end() && getDartLevel(d) > m_mrCurrentLevel) ;
+	m_mrattribs.next(d.index);
+	if(getDartLevel(d) > m_mrCurrentLevel)
+		d.index = m_mrattribs.end();
 }
 
 inline bool MapMulti::foreach_dart(FunctorType& f)

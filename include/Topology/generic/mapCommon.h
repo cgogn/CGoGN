@@ -40,22 +40,6 @@ class MapCommon : public MAP_IMPL
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
 public:
-	/**
-	* execute functor for each orbit
-	* @param dim the dimension of the orbit
-	* @param f the functor
-	*/
-	template <unsigned int ORBIT>
-	bool foreach_orbit(FunctorType& f, unsigned int thread = 0);
-
-	//! Count the number of orbits of dimension dim in the map
-	/*! @param dim the dimension of the orbit
-	 * 	@return the number of orbits
-	 */
-	template <unsigned int ORBIT>
-	unsigned int getNbOrbits() const;
-
-	unsigned int getNbOrbits(unsigned int orbit) const;
 
 	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
 	/*! @param d a dart
@@ -140,13 +124,6 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	void copyCell(Dart d, Dart e) ;
-
-	/**
-	 * Traverse the map and embed all orbits of the given dimension with a new cell
-	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
-	 */
-	template <unsigned int ORBIT>
-	void initAllOrbitsEmbedding(bool realloc = false) ;
 
 	/****************************************
 	 *         BOUNDARY MANAGEMENT          *
@@ -295,23 +272,6 @@ public:
 
 	template <unsigned int ORBIT, unsigned int ADJ>
 	void disableQuickAdjacentTraversal();
-
-	/****************************************
-	 *               UTILITIES              *
-	 ****************************************/
-
-	/**
-	 * use the given attribute to store the indices of the cells of the corresponding orbit
-	 * @return the number of cells of the orbit
-	 */
-	template <unsigned int ORBIT>
-	unsigned int computeIndexCells(AttributeHandler<unsigned int, ORBIT, MAP_IMPL>& idx) ;
-
-	/**
-	 * ensure that each orbit as one embedding and that each embedding is handle by only one orbit
-	 */
-	template <unsigned int ORBIT>
-	void bijectiveOrbitEmbedding();
 };
 
 } //namespace CGoGN

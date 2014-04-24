@@ -30,7 +30,7 @@
 #include "Topology/map/map3.h"
 #include "Topology/gmap/gmap3.h"
 
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 #include "Algo/Geometry/centroid.h"
 
 #include "Geometry/distances.h"

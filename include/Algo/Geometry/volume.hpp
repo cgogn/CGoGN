@@ -22,7 +22,7 @@
  *                                                                              *
  *******************************************************************************/
 
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Modelisation/tetrahedralization.h"
 

@@ -28,6 +28,7 @@
 #include "NL/nl.h"
 #include "Algo/LinearSolving/variablesSetup.h"
 #include "Algo/LinearSolving/matrixSetup.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
@@ -46,8 +47,14 @@ void setupVariables(
 	const CellMarker<typename PFP::MAP, VERTEX>& fm,
 	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
+//	TraversorV<MAP> t(m);
+//	for (Dart d = t.begin(); d != t.end(); d = t.next())
+//	{
+
+//	}
+
 	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE> fmts(index, fm, attr) ;
-	m.template foreach_orbit<VERTEX>(fmts) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fmts) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
@@ -59,7 +66,7 @@ void setupVariables(
 	unsigned int coord)
 {
 	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE> fmts(index, fm, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(fmts) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fmts) ;
 }
 
 /*******************************************************************************
@@ -75,7 +82,7 @@ void addRowsRHS_Equality(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_PerVertexWeight_Scalar<PFP, ATTR_TYPE> feq(index, attr, weight) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -88,7 +95,7 @@ void addRowsRHS_Equality(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_UniformWeight_Scalar<PFP, ATTR_TYPE> feq(index, attr, weight) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -102,7 +109,7 @@ void addRowsRHS_Equality(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_PerVertexWeight_Vector<PFP, ATTR_TYPE> feq(index, attr, weight, coord) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -116,7 +123,7 @@ void addRowsRHS_Equality(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_UniformWeight_Vector<PFP, ATTR_TYPE> feq(index, attr, weight, coord) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -131,7 +138,7 @@ void addRows_Laplacian_Topo(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianTopo<PFP> flt(m, index) ;
-	m.template foreach_orbit<VERTEX>(flt) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -143,7 +150,7 @@ void addRowsRHS_Laplacian_Topo(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianTopoRHS_Scalar<PFP, ATTR_TYPE> flt(m, index, attr) ;
-	m.template foreach_orbit<VERTEX>(flt) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -156,7 +163,7 @@ void addRowsRHS_Laplacian_Topo(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianTopoRHS_Vector<PFP, ATTR_TYPE> flt(m, index, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(flt) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -173,7 +180,7 @@ void addRows_Laplacian_Cotan(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotan<PFP> flc(m, index, edgeWeight, vertexArea) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -187,7 +194,7 @@ void addRowsRHS_Laplacian_Cotan(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotanRHS_Scalar<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -202,7 +209,7 @@ void addRowsRHS_Laplacian_Cotan(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -217,7 +224,7 @@ void addRowsRHS_Laplacian_Cotan_NL(
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -232,7 +239,7 @@ void getResult(
 	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
 	FunctorSolverToMesh_Scalar<PFP, ATTR_TYPE> fstm(index, attr) ;
-	m.template foreach_orbit<VERTEX>(fstm) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fstm) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
@@ -243,7 +250,7 @@ void getResult(
 	unsigned int coord)
 {
 	FunctorSolverToMesh_Vector<PFP, ATTR_TYPE> fstm(index, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(fstm) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fstm) ;
 }
 
 } // namespace LinearSolving

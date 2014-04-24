@@ -180,6 +180,6 @@ private: // private constants
 
 } // namespace CGoGN
 
-#include "colourConverter.hpp"
+#include "Utils/colourConverter.hpp"
 
 #endif // __COLOURCONVERTER_H__

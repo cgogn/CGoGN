@@ -105,7 +105,7 @@ public:
 	/**
 	 * @return the number of darts in the map
 	 */
-	inline virtual unsigned int getNbDarts() const;
+	inline unsigned int getNbDarts() const;
 
 	inline AttributeContainer& getDartContainer();
 
@@ -299,6 +299,6 @@ public:
 
 } //namespace CGoGN
 
-#include "Topology/generic/mapMulti.hpp"
+#include "Topology/generic/mapImpl/mapMulti.hpp"
 
 #endif

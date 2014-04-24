@@ -23,6 +23,18 @@ inline QString MapHandlerGen::getAttributeTypeName(unsigned int orbit, const QSt
 
 
 template <typename PFP>
+unsigned int MapHandler<PFP>::getNbDarts()
+{
+	return static_cast<MAP*>(m_map)->getNbDarts();
+}
+
+template <typename PFP>
+unsigned int MapHandler<PFP>::getNbOrbits(unsigned int orbit)
+{
+	return Algo::Topo::getNbOrbits(*static_cast<MAP*>(m_map), orbit);
+}
+
+template <typename PFP>
 template <typename T, unsigned int ORBIT>
 AttributeHandler<T, ORBIT, typename PFP::MAP::IMPL> MapHandler<PFP>::getAttribute(const QString& nameAttr, bool onlyRegistered) const
 {

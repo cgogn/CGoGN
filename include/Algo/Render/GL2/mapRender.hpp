@@ -25,7 +25,7 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 //#include "Utils/vbo.h"
 
