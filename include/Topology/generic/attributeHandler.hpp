@@ -185,7 +185,7 @@ inline unsigned int AttributeHandler<T, ORBIT, MAP_IMPL>::nbElements() const
 }
 
 template <typename T, unsigned int ORBIT, typename MAP_IMPL>
-inline T& AttributeHandler<T, ORBIT, MAP_IMPL>::operator[](Dart d)
+inline T& AttributeHandler<T, ORBIT, MAP_IMPL>::operator[](Cell<ORBIT> d)
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	unsigned int a = m_map->template getEmbedding<ORBIT>(d) ;
@@ -197,7 +197,7 @@ inline T& AttributeHandler<T, ORBIT, MAP_IMPL>::operator[](Dart d)
 }
 
 template <typename T, unsigned int ORBIT, typename MAP_IMPL>
-inline const T& AttributeHandler<T, ORBIT, MAP_IMPL>::operator[](Dart d) const
+inline const T& AttributeHandler<T, ORBIT, MAP_IMPL>::operator[](Cell<ORBIT> d) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	unsigned int a = m_map->template getEmbedding<ORBIT>(d) ;

@@ -26,6 +26,7 @@
 #define __MAP_COMMON__
 
 #include "Topology/generic/attributeHandler.h"
+#include "Topology/generic/cells.h"
 
 namespace CGoGN
 {
@@ -61,6 +62,10 @@ public:
 	 */
 	template <unsigned int ORBIT, unsigned int INCIDENT>
 	unsigned int degree(Dart d) const;
+
+	template <unsigned int ORBIT>
+	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread=0) const;
+
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *

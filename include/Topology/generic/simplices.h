@@ -22,76 +22,44 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/genericmap.h"
-#include "Topology/generic/functor.h"
+#ifndef __SIMPLICES_H_
+#define __SIMPLICES_H_
+
+#include <iostream>
+#include "cells.h"
+#include "Algo/Topo/Generic/simplex.h"
 
 namespace CGoGN
 {
 
-template <typename MAP, unsigned int ORBIT>
-TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread)
+
+template <unsigned int ORBIT>
+class Simplex
 {
-	m_vd.reserve(16);
-	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
-//	const_cast<MAP&>(map).template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	m_vd.push_back(NIL);
+public:
+	Dart dart;
+	/// emoty construtor
+	Simplex(): dart() {}
+	/// construtor from Dart
+	inline Simplex(Dart d): dart(d) {}
+
+	inline Simplex(Cell<ORBIT> c): dart(c.dart) {}
+	/// copy constructor
+	inline Simplex(const Simplex<ORBIT>& c): dart(c.dart) {}
+	/// Cell cast operator
+	inline operator Cell<ORBIT>() {return Cell<ORBIT>(dart);}
+	/// Dart cast operator
+	inline operator Dart() {return dart;}
+	/// check if this simplex is really a simplex
+	template <typename MAP>
+	bool check(const MAP& map) const { return Algo::Topo::isSimplex<MAP,ORBIT>(map,dart);}
+};
+
+
+typedef Simplex<FACE>   Triangle;
+typedef Simplex<VOLUME> Tetra;
+
+
 }
 
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::begin()
-{
-	m_current = m_vd.begin();
-	return *m_current;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::end()
-{
-	return NIL;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::next()
-{
-	if (*m_current != NIL)
-		m_current++;
-	return *m_current;
-}
-
-
-
-
-template <typename MAP, unsigned int ORBIT>
-VTraversorDartsOfOrbit<MAP, ORBIT>::VTraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread)
-{
-	m_vd.reserve(16);
-	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
-	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	m_vd.push_back(NIL);
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::begin()
-{
-	m_current = m_vd.begin();
-	return *m_current;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::end()
-{
-	return NIL;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::next()
-{
-	if (*m_current != NIL)
-		m_current++;
-	return *m_current;
-}
-
-
-
-} // namespace CGoGN
+#endif /* __SIMPLICES_H_ */

@@ -22,76 +22,65 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/genericmap.h"
-#include "Topology/generic/functor.h"
 
-namespace CGoGN
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Algo/Tiling/Surface/square.h"
+#include "Topology/generic/cells_macros.h"
+
+
+using namespace CGoGN ;
+
+/**
+ * Struct that contains some informations about the types of the manipulated objects
+ * Mainly here to be used by the algorithms that are parameterized by it
+ */
+struct PFP: public PFP_STANDARD
+{
+	// definition of the type of the map
+	typedef EmbeddedMap2 MAP;
+};
+
+// some typedef shortcuts
+typedef PFP::MAP MAP ;				// map type
+typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
+typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
+
+
+int main()
 {
 
-template <typename MAP, unsigned int ORBIT>
-TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread)
-{
-	m_vd.reserve(16);
-	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
-//	const_cast<MAP&>(map).template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	m_vd.push_back(NIL);
+	Vertex v;
+	findCell(VERTEX,v,MAP,myMap, position[v] == VEC3(0,0,0) );
+	if (! v.valid())
+		std::cerr << "could not find a vertex with position (0,0,0)" << std::endl;
+
+
+	// WITH TRAVERSORS:
+	
+	// find incident faces to vertex
+	Traversor2VF<MAP> trvf(myMap,v.dart);
+	for (Dart e = trvf.begin(); e != trvf.end(); e = trvf.next())
+	{
+		std::cout << "Face of dart "<<e<< " incident to vertex of dart " << v.dart<< std::endl;
+	}
+
+	// find adjacent vertices thru a face
+	Traversor2VVaF<MAP> trvvaf(myMap,d);
+	for (Dart e = trvvaf.begin(); e != trvvaf.end(); e = trvvaf.next())
+	{
+		std::cout << "vertex of dart "<<e<< " adjacent to vertex of dart " << v.dart<< " by a face" << std::endl;
+	}
+
+	// WITH FOREACH MACRO
+
+	// find incident faces to vertex
+	foreachIncident2(VERTEX,v,FACE,f,MAP,myMap)
+		std::cout << "Face of dart "<<e<< " incident to vertex of dart " << v.dart<< std::endl;
+
+	// find adjacent vertices thru a face
+	foreachAdjacent2(VERTEX,FACE,v,e, MAP, myMap)
+		std::cout << "vertex of dart "<<e<< " adjacent to vertex of dart " << v.dart<< " by a face" << std::endl;
+
+	return 0;
 }
-
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::begin()
-{
-	m_current = m_vd.begin();
-	return *m_current;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::end()
-{
-	return NIL;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::next()
-{
-	if (*m_current != NIL)
-		m_current++;
-	return *m_current;
-}
-
-
-
-
-template <typename MAP, unsigned int ORBIT>
-VTraversorDartsOfOrbit<MAP, ORBIT>::VTraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread)
-{
-	m_vd.reserve(16);
-	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
-	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	m_vd.push_back(NIL);
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::begin()
-{
-	m_current = m_vd.begin();
-	return *m_current;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::end()
-{
-	return NIL;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::next()
-{
-	if (*m_current != NIL)
-		m_current++;
-	return *m_current;
-}
-
-
-
-} // namespace CGoGN

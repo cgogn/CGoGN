@@ -374,7 +374,8 @@ public:
 	FunctorStoreNotBoundary(const MAP& map, std::vector<Dart>& vec) : FunctorConstMap<MAP>(map), m_vec(vec) {}
 	bool operator()(Dart d)
 	{
-		if (!this->m_map.template isBoundaryMarked<MAP::DIMENSION>(d))
+//		if (!this->m_map.template isBoundaryMarked<MAP::DIMENSION>(d))
+		if (!this->m_map.template isBoundaryMarkedCurrent(d))
 			m_vec.push_back(d);
 		return false;
 	}

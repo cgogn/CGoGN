@@ -22,76 +22,46 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/genericmap.h"
-#include "Topology/generic/functor.h"
+#ifndef CELLS_H_
+#define CELLS_H_
+
+#include "dart.h"
+
 
 namespace CGoGN
 {
 
-template <typename MAP, unsigned int ORBIT>
-TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread)
+
+/**
+ * class for cellular typing
+ *
+ * warning to automatic conversion
+ * cell -> Dart (or const Dart&) ok
+ * Dart -> Cell (or const Cell&) ok
+ */
+template <unsigned int ORBIT>
+class Cell
 {
-	m_vd.reserve(16);
-	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
-//	const_cast<MAP&>(map).template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	m_vd.push_back(NIL);
+public:
+	Dart dart;
+	/// emoty construtor
+	Cell(): dart() {}
+	/// construtor from Dart
+	inline Cell(Dart d): dart(d) {}
+	/// copy constructor
+	inline Cell(const Cell<ORBIT>& c): dart(c.dart) {}
+	/// Dart cast operator
+	inline operator Dart() const {return dart;}
+	friend std::ostream& operator<<( std::ostream &out, const Cell<ORBIT>& fa ) { return out << fa.dart; }
+	inline bool valid() const { return !dart.isNil();}
+};
+
+typedef Cell<VERTEX> Vertex;
+typedef Cell<EDGE>   Edge;
+typedef Cell<FACE>   Face;
+typedef Cell<VOLUME> Vol;  // not Volume because of the namespace Volume
+
+
 }
 
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::begin()
-{
-	m_current = m_vd.begin();
-	return *m_current;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::end()
-{
-	return NIL;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart TraversorDartsOfOrbit<MAP, ORBIT>::next()
-{
-	if (*m_current != NIL)
-		m_current++;
-	return *m_current;
-}
-
-
-
-
-template <typename MAP, unsigned int ORBIT>
-VTraversorDartsOfOrbit<MAP, ORBIT>::VTraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread)
-{
-	m_vd.reserve(16);
-	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
-	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
-	m_vd.push_back(NIL);
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::begin()
-{
-	m_current = m_vd.begin();
-	return *m_current;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::end()
-{
-	return NIL;
-}
-
-template <typename MAP, unsigned int ORBIT>
-Dart VTraversorDartsOfOrbit<MAP, ORBIT>::next()
-{
-	if (*m_current != NIL)
-		m_current++;
-	return *m_current;
-}
-
-
-
-} // namespace CGoGN
+#endif /* CELLS_H_ */
