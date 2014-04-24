@@ -67,7 +67,7 @@ struct Dart
 
 	Dart(unsigned int v): index(v) {}
 
-	bool isNil() { return index == 0xffffffff ; }
+	bool isNil() const { return index == 0xffffffff ; }
 
 	/**
 	 * affectation operator

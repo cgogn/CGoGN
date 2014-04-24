@@ -101,6 +101,17 @@ for (Cell<ORBIT> Cell_ITER ( Cell_ITER##_TraversalMacroLocalLoop##LNN.begin()), 
 #define foreachCellMT(ORBIT, Cell_ITER, MAP_TYPE, MAP_PARAM, THREAD) XforeachCellMT(ORBIT, Cell_ITER, MAP_TYPE, MAP_PARAM, THREAD,__LINE__)
 
 
+#define YfindCell(ORBIT, Cell_ITER, MAP_TYPE, MAP_PARAM, COND, LNN)\
+TraversorCell<MAP_TYPE,ORBIT> Cell_ITER##_TraversalMacroLocalLoop##LNN(MAP_PARAM);\
+Dart Cell_ITER##_endTMLoop = Cell_ITER##_TraversalMacroLocalLoop##LNN.end();\
+Cell_ITER =  Cell_ITER##_TraversalMacroLocalLoop##LNN.begin(); \
+while( (Cell_ITER.dart != Cell_ITER##_endTMLoop) && (!(COND)) )\
+Cell_ITER.dart = Cell_ITER##_TraversalMacroLocalLoop##LNN.next();
+
+#define XfindCell(ORBIT, Cell_ITER, MAP_TYPE, MAP_PARAM, COND, LNN)  YfindCell(ORBIT, Cell_ITER, MAP_TYPE, MAP_PARAM,COND,LNN)
+#define findCell(ORBIT, Cell_ITER, MAP_TYPE, MAP_PARAM, COND)  XfindCell(ORBIT, Cell_ITER, MAP_TYPE, MAP_PARAM,COND,__LINE__)
+
+
 }
 
 #endif /* __CELLS_MACRO_H_ */

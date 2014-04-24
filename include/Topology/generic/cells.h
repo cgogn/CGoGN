@@ -52,6 +52,8 @@ public:
 	inline Cell(const Cell<ORBIT>& c): dart(c.dart) {}
 	/// Dart cast operator
 	inline operator Dart() const {return dart;}
+	friend std::ostream& operator<<( std::ostream &out, const Cell<ORBIT>& fa ) { return out << fa.dart; }
+	inline bool valid() const { return !dart.isNil();}
 };
 
 typedef Cell<VERTEX> Vertex;

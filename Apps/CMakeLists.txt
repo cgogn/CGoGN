@@ -34,3 +34,5 @@ IF (WITH_QT)
 ENDIF (WITH_QT)
 
 add_subdirectory(Examples/Tests)
+
+add_subdirectory(Tuto/Traversals)
