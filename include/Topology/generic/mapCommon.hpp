@@ -62,14 +62,14 @@ bool MapCommon<MAP_IMPL>::sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
-inline unsigned int MapCommon<MAP_IMPL>::getEmbedding(Dart d) const
+inline unsigned int MapCommon<MAP_IMPL>::getEmbedding(Cell<ORBIT> c) const
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
 	if (ORBIT == DART)
-		return this->dartIndex(d);
+		return this->dartIndex(c.dart);
 
-	return (*this->m_embeddings[ORBIT])[this->dartIndex(d)] ;
+	return (*this->m_embeddings[ORBIT])[this->dartIndex(c.dart)] ;
 }
 
 template <typename MAP_IMPL>
@@ -121,38 +121,38 @@ inline void MapCommon<MAP_IMPL>::copyDartEmbedding(Dart dest, Dart src)
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
-inline void MapCommon<MAP_IMPL>::setOrbitEmbedding(Dart d, unsigned int em)
+inline void MapCommon<MAP_IMPL>::setOrbitEmbedding(Cell<ORBIT> c, unsigned int em)
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
 	FunctorSetEmb<MapCommon<MAP_IMPL>, ORBIT> fsetemb(*this, em);
-	this->template foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+	this->template foreach_dart_of_orbit<ORBIT>(c.dart, fsetemb);
 }
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
-inline void MapCommon<MAP_IMPL>::initOrbitEmbedding(Dart d, unsigned int em)
+inline void MapCommon<MAP_IMPL>::initOrbitEmbedding(Cell<ORBIT> c, unsigned int em)
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
 	FunctorInitEmb<MapCommon<MAP_IMPL>, ORBIT> finitemb(*this, em);
-	this->template foreach_dart_of_orbit<ORBIT>(d, finitemb);
+	this->template foreach_dart_of_orbit<ORBIT>(c.dart, finitemb);
 }
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
-inline unsigned int MapCommon<MAP_IMPL>::setOrbitEmbeddingOnNewCell(Dart d)
+inline unsigned int MapCommon<MAP_IMPL>::setOrbitEmbeddingOnNewCell(Cell<ORBIT> c)
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
 	unsigned int em = this->template newCell<ORBIT>();
-	setOrbitEmbedding<ORBIT>(d, em);
+	setOrbitEmbedding<ORBIT>(c, em);
 	return em;
 }
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
-inline unsigned int MapCommon<MAP_IMPL>::initOrbitEmbeddingOnNewCell(Dart d)
+inline unsigned int MapCommon<MAP_IMPL>::initOrbitEmbeddingOnNewCell(Cell<ORBIT> d)
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
@@ -163,7 +163,7 @@ inline unsigned int MapCommon<MAP_IMPL>::initOrbitEmbeddingOnNewCell(Dart d)
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
-inline void MapCommon<MAP_IMPL>::copyCell(Dart d, Dart e)
+inline void MapCommon<MAP_IMPL>::copyCellAttributes(Cell<ORBIT> d, Cell<ORBIT> e)
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	unsigned int dE = getEmbedding<ORBIT>(d) ;
@@ -173,7 +173,6 @@ inline void MapCommon<MAP_IMPL>::copyCell(Dart d, Dart e)
 		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
 			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 		this->m_attribs[ORBIT].copyLine(dE, eE) ;	// copy the data
-//		copyCell<ORBIT>(dE, eE);
 	}
 }
 

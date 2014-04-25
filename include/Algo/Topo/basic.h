@@ -41,7 +41,7 @@ template <unsigned int ORBIT, typename MAP>
 unsigned int getNbOrbits(const MAP& map)
 {
 	unsigned int cpt = 0;
-	foreach_cell<ORBIT>(map, [&] (Dart) { ++cpt; }, true);
+	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT>) { ++cpt; }, true);
 	return cpt;
 }
 
@@ -75,10 +75,10 @@ void initAllOrbitsEmbedding(MAP& map, bool realloc = false)
 	if(!map.template isOrbitEmbedded<ORBIT>())
 		map.template addEmbedding<ORBIT>() ;
 
-	foreach_cell<ORBIT>(map, [&] (Dart d)
+	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT> c)
 	{
-		if(realloc || map.template getEmbedding<ORBIT>(d) == EMBNULL)
-			map.template setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+		if(realloc || map.template getEmbedding<ORBIT>(c) == EMBNULL)
+			map.template setOrbitEmbeddingOnNewCell<ORBIT>(c) ;
 	});
 }
 
@@ -108,7 +108,7 @@ void bijectiveOrbitEmbedding(MAP& map)
 	AttributeHandler<int, ORBIT, typename MAP::IMPL> counter = map.template addAttribute<int, ORBIT>("tmpCounter") ;
 	counter.setAllValues(int(0)) ;
 
-	foreach_cell<ORBIT>(map, [&] (Dart d)
+	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT> d)
 	{
 		unsigned int emb = map.template getEmbedding<ORBIT>(d) ;
 		if (emb != EMBNULL)
@@ -117,6 +117,7 @@ void bijectiveOrbitEmbedding(MAP& map)
 			{
 				unsigned int newEmb = map.template setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 				map.template copyCell<ORBIT>(newEmb, emb) ;
+//				map.template getAttributeContainer<ORBIT>().copyLine(newEmb, emb) ;
 			}
 			counter[d]++ ;
 		}

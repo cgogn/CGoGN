@@ -150,7 +150,7 @@ public:
 	/**
 	 * mark the cell of dart
 	 */
-	inline void mark(Dart d)
+	inline void mark(Cell<CELL> d)
 	{
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -164,7 +164,7 @@ public:
 	/**
 	 * unmark the cell of dart
 	 */
-	inline void unmark(Dart d)
+	inline void unmark(Cell<CELL> d)
 	{
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -178,7 +178,7 @@ public:
 	/**
 	 * test if cell of dart is marked
 	 */
-	inline bool isMarked(Dart d) const
+	inline bool isMarked(Cell<CELL> d) const
 	{
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
@@ -320,7 +320,7 @@ protected:
 	{}
 
 public:
-	inline void mark(Dart d)
+	inline void mark(Cell<CELL> d)
 	{
 		CellMarkerBase<MAP, CELL>::mark(d) ;
 		m_markedCells.push_back(this->m_map.template getEmbedding<CELL>(d)) ;
@@ -375,12 +375,12 @@ protected:
 	{}
 
 public:
-	inline void mark(Dart d)
+	inline void mark(Cell<CELL> c)
 	{
-		if(!this->isMarked(d))
+		if(!this->isMarked(c))
 		{
-			CellMarkerBase<MAP, CELL>::mark(d) ;
-			m_markedDarts.push_back(d) ;
+			CellMarkerBase<MAP, CELL>::mark(c) ;
+			m_markedDarts.push_back(c.dart) ;
 		}
 	}
 
@@ -459,12 +459,13 @@ public:
 		m_cmarker(cm)
 	{}
 
-	inline bool operator()(Dart d) const
+	inline bool operator()(Cell<CELL> d) const
 	{
 		if (m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
+
 	inline FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker); }
 };
 
@@ -479,7 +480,7 @@ public:
 		m_cmarker(cm)
 	{}
 
-	inline bool operator()(Dart d) const
+	inline bool operator()(Cell<CELL> d) const
 	{
 		if (!m_cmarker.isMarked(d))
 			return true ;
@@ -505,7 +506,7 @@ public:
 		m_marker(cm)
 	{}
 
-	inline bool operator()(Dart d)
+	inline bool operator()(Cell<CELL> d)
 	{
 		return m_marker.isMarked(d);
 	}
@@ -521,7 +522,7 @@ public:
 		m_marker(cm)
 	{}
 
-	inline bool operator()(Dart d)
+	inline bool operator()(Cell<CELL> d)
 	{
 		return !m_marker.isMarked(d);
 	}

@@ -48,8 +48,7 @@ public:
 	unsigned int degree(Dart d) const;
 
 	template <unsigned int ORBIT>
-	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread=0) const;
-
+	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread = 0) const;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -60,7 +59,7 @@ public:
 	 * @return EMBNULL if the orbit of d is not attached to any cell
 	 */
 	template<unsigned int ORBIT>
-	inline unsigned int getEmbedding(Dart d) const;
+	inline unsigned int getEmbedding(Cell<ORBIT> d) const;
 
 	/**
 	 * Set the cell index of the given dimension associated to dart d
@@ -91,14 +90,14 @@ public:
 	* @param em index of attribute to store as embedding
 	*/
 	template <unsigned int ORBIT>
-	void setOrbitEmbedding(Dart d, unsigned int em) ;
+	void setOrbitEmbedding(Cell<ORBIT> d, unsigned int em) ;
 
 	/**
 	 * Set the index of the associated cell to all the darts of an orbit
 	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
 	 */
 	template <unsigned int ORBIT>
-	void initOrbitEmbedding(Dart d, unsigned int em) ;
+	void initOrbitEmbedding(Cell<ORBIT> d, unsigned int em) ;
 
 	/**
 	* Associate an new cell to all darts of an orbit
@@ -107,14 +106,14 @@ public:
 	* @return index of the attribute in table
 	*/
 	template <unsigned int ORBIT>
-	unsigned int setOrbitEmbeddingOnNewCell(Dart d) ;
+	unsigned int setOrbitEmbeddingOnNewCell(Cell<ORBIT> d) ;
 
 	/**
 	 * Associate an new cell to all darts of an orbit
 	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
 	 */
 	template <unsigned int ORBIT>
-	unsigned int initOrbitEmbeddingOnNewCell(Dart d) ;
+	unsigned int initOrbitEmbeddingOnNewCell(Cell<ORBIT> d) ;
 
 	/**
 	 * Copy the cell associated to a dart over an other dart
@@ -123,7 +122,7 @@ public:
 	 * @param e the dart to copy (src)
 	 */
 	template <unsigned int ORBIT>
-	void copyCell(Dart d, Dart e) ;
+	void copyCellAttributes(Cell<ORBIT> d, Cell<ORBIT> e) ;
 
 	/****************************************
 	 *         BOUNDARY MANAGEMENT          *

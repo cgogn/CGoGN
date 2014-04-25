@@ -249,6 +249,8 @@ void Viewer::importMesh(std::string& filename)
 	updateGLMatrices() ;
 
 	std::cout << "#vertices -> " << Algo::Topo::getNbOrbits<VERTEX>(myMap) << std::endl;
+	Vertex v(myMap.begin());
+	unsigned int e = myMap.getEmbedding(v);
 }
 
 void Viewer::exportMesh(std::string& filename, bool askExportMode)

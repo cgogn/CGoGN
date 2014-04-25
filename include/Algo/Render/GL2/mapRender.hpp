@@ -414,7 +414,7 @@ void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndi
 //	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	foreachCellMT(EDGE,d,typename PFP::MAP,map,thread)
 	{
-		tableIndices.push_back(map.template getEmbedding<VERTEX>(d));
+		tableIndices.push_back(map.template getEmbedding<VERTEX>(d.dart));
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(d)));
 	}
 }
@@ -430,7 +430,7 @@ void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tabl
 	{
 		if (map.isBoundaryEdge(d))
 		{
-			tableIndices.push_back(map.template getEmbedding<VERTEX>(d));
+			tableIndices.push_back(map.template getEmbedding<VERTEX>(d.dart));
 			tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(d)));
 		}
 	}

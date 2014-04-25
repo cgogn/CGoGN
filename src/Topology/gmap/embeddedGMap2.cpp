@@ -91,7 +91,7 @@ void EmbeddedGMap2::splitVertex(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(beta0(dd), vEmb) ;
 
 		setOrbitEmbeddingOnNewCell<VERTEX>(e) ;
-		copyCell<VERTEX>(e, d) ;
+		copyCellAttributes<VERTEX>(e, d) ;
 	}
 
 	if(isOrbitEmbedded<EDGE>())
@@ -138,7 +138,7 @@ Dart EmbeddedGMap2::cutEdge(Dart d)
 		setDartEmbedding<EDGE>(phi2(d), eEmb) ;
 		setDartEmbedding<EDGE>(beta0(d), eEmb) ;
 		setOrbitEmbeddingOnNewCell<EDGE>(nd) ;
-		copyCell<EDGE>(nd, d) ;
+		copyCellAttributes<EDGE>(nd, d) ;
 	}
 
 	if(isOrbitEmbedded<FACE>())
@@ -383,7 +383,7 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 		if(!sameVertex(d,e))
 		{
 			setOrbitEmbeddingOnNewCell<VERTEX>(e);
-			copyCell<VERTEX>(e, d);
+			copyCellAttributes<VERTEX>(e, d);
 		}
 
 		d = beta0(d);
@@ -392,14 +392,14 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 		if(!sameVertex(d,e))
 		{
 			setOrbitEmbeddingOnNewCell<VERTEX>(e);
-			copyCell<VERTEX>(e, d);
+			copyCellAttributes<VERTEX>(e, d);
 		}
 	}
 
 	if (isOrbitEmbedded<EDGE>())
 	{
 		setOrbitEmbeddingOnNewCell<EDGE>(e);
-		copyCell<EDGE>(e, d);
+		copyCellAttributes<EDGE>(e, d);
 	}
 }
 
@@ -450,7 +450,7 @@ void EmbeddedGMap2::splitFace(Dart d, Dart e)
 		setDartEmbedding<FACE>(phi_1(d), fEmb) ;
 		setDartEmbedding<FACE>(beta1(phi_1(d)), fEmb) ;
 		setOrbitEmbeddingOnNewCell<FACE>(e) ;
-		copyCell<FACE>(e, d) ;
+		copyCellAttributes<FACE>(e, d) ;
 	}
 }
 

@@ -26,6 +26,7 @@
 #define __TRAVERSOR_CELL_H__
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/cells.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversor/traversorGen.h"
@@ -49,7 +50,7 @@ private:
 	CellMarker<MAP, ORBIT>* cmark ;
 	const AttributeMultiVector<Dart>* quickTraversal ;
 
-	Dart current ;
+	Cell<ORBIT> current ;
 	bool firstTraversal ;
 
 public:
@@ -57,25 +58,25 @@ public:
 
 	~TraversorCell() ;
 
-	inline Dart begin() ;
+	inline Cell<ORBIT> begin() ;
 
-	inline Dart end() ;
+	inline Cell<ORBIT> end() ;
 
-	inline Dart next() ;
+	inline Cell<ORBIT> next() ;
 
-	inline void skip(Dart d);
+	inline void skip(Cell<ORBIT> c);
 
-	inline void apply(std::function<bool (Dart)> f)
+	inline void apply(std::function<bool (Cell<ORBIT>)> f)
 	{
-		for (Dart d = begin(); d != end(); d = next())
-			if (f(d))
+		for (Cell<ORBIT> c = begin(), e = end(); c.dart != e.dart; c = next())
+			if (f(c))
 				return;
 	}
 
-	inline void apply(std::function<void (Dart)> f)
+	inline void apply(std::function<void (Cell<ORBIT>)> f)
 	{
-		for (Dart d = begin(); d != end(); d = next())
-			f(d);
+		for (Cell<ORBIT> c = begin(), e = end(); c.dart != e.dart; c = next())
+			f(c);
 	}
 } ;
 
