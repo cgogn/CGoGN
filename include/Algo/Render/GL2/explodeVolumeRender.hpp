@@ -175,7 +175,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	{
 		// compute normals
 		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d.dart, positions);
-		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
+		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map, d.dart, positions);
 		
 		computeFace<PFP>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
 		

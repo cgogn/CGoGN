@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "viewer.h"
+#include "Utils/chrono.h"
 
 Viewer::Viewer() :
 	m_renderStyle(FLAT),
@@ -240,7 +241,10 @@ void Viewer::importMesh(std::string& filename)
 	if(!normal.isValid())
 		normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
 
+	Utils::Chrono c;
+	c.start();
 	Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+	std::cout << "compute normals -> " << c.elapsed() << std::endl;
 
 	m_positionVBO->updateData(position) ;
 	m_normalVBO->updateData(normal) ;
@@ -249,8 +253,6 @@ void Viewer::importMesh(std::string& filename)
 	updateGLMatrices() ;
 
 	std::cout << "#vertices -> " << Algo::Topo::getNbOrbits<VERTEX>(myMap) << std::endl;
-	Vertex v(myMap.begin());
-	unsigned int e = myMap.getEmbedding(v);
 }
 
 void Viewer::exportMesh(std::string& filename, bool askExportMode)
