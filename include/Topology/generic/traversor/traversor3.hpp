@@ -96,7 +96,7 @@ DartMarkerStore<MAP>* MarkerForTraversor<MAP, ORBIT>::dmark()
 //**************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Dart dart, bool forceDartMarker, unsigned int thread) :
+Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> dart, bool forceDartMarker, unsigned int thread) :
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL),
@@ -120,7 +120,7 @@ Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Dart dart, bool forc
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Dart dart, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
+Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> dart, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
 	m_map(map),
 	m_tradoo(map, dart, thread),
 	m_QLT(NULL),
@@ -144,7 +144,7 @@ Traversor3XY<MAP, ORBX, ORBY>::~Traversor3XY()
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
+Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -167,17 +167,17 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
 	{
 		if (m_cmark)
 		{
-			while ((m_current != NIL) && m_cmark->isMarked(m_current))
+			while ((m_current.dart != NIL) && m_cmark->isMarked(m_current))
 				m_current = m_tradoo.next();
 		}
 		else
 		{
-			while ((m_current != NIL) && m_dmark->isMarked(m_current))
+			while ((m_current.dart != NIL) && m_dmark->isMarked(m_current))
 				m_current = m_tradoo.next();
 		}
 	}
 
-	if ((ORBY == VOLUME) && (m_current != NIL))
+	if ((ORBY == VOLUME) && (m_current.dart != NIL))
 	{
 		if(m_map.template isBoundaryMarked<3>(m_current))
 			m_current = next();
@@ -187,31 +187,31 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XY<MAP, ORBX, ORBY>::end()
+Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XY<MAP, ORBX, ORBY>::next()
+Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
 
-	if(m_current != NIL)
+	if(m_current.dart != NIL)
 	{
 		if (m_cmark)
 		{
 			m_cmark->mark(m_current);
 			m_current = m_tradoo.next();
-			if(ORBY == VOLUME && m_current != NIL)
+			if(ORBY == VOLUME && m_current.dart != NIL)
 			{
 				if(m_map.template isBoundaryMarked<3>(m_current))
 					m_cmark->mark(m_current);
 			}
-			while ((m_current != NIL) && m_cmark->isMarked(m_current))
+			while ((m_current.dart != NIL) && m_cmark->isMarked(m_current))
 				m_current = m_tradoo.next();
 		}
 		else
@@ -243,7 +243,7 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 						m_dmark->template markOrbit<ORBY>(m_current);
 				}
 			}
-			while ((m_current != NIL) && m_dmark->isMarked(m_current))
+			while ((m_current.dart != NIL) && m_dmark->isMarked(m_current))
 				m_current = m_tradoo.next();
 		}
 	}
@@ -255,7 +255,7 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 //*********************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Dart dart, bool forceDartMarker, unsigned int thread):
+Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Cell<ORBX> dart, bool forceDartMarker, unsigned int thread):
 	m_map(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal =  map.template getQuickAdjacentTraversal<ORBX,ORBY>() ;
@@ -280,7 +280,7 @@ Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Dart dart, bool 
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XXaY<MAP, ORBX, ORBY>::begin()
+Cell<ORBX> Traversor3XXaY<MAP, ORBX, ORBY>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -293,13 +293,13 @@ Dart Traversor3XXaY<MAP, ORBX, ORBY>::begin()
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XXaY<MAP, ORBX, ORBY>::end()
+Cell<ORBX> Traversor3XXaY<MAP, ORBX, ORBY>::end()
 {
 	return NIL;
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Dart Traversor3XXaY<MAP, ORBX, ORBY>::next()
+Cell<ORBX> Traversor3XXaY<MAP, ORBX, ORBY>::next()
 {
 	if(m_QLT != NULL)
 	{

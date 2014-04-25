@@ -74,31 +74,34 @@ typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Vol d, const
 //	Traversor3WE<typename PFP::MAP> t(map, d,false,thread) ;
 //	for(Dart it = t.begin(); it != t.end();it = t.next())
 
-	foreachIncident3MT(VOLUME,d,EDGE,it,typename PFP::MAP,map,thread)
+//	foreachIncident3MT(VOLUME,d,EDGE,it,typename PFP::MAP,map,thread)
+	foreach_incident3<EDGE>(map,d, [&] (Edge it)
 	{
 		EMB e1 = attributs[it.dart];
 		EMB e2 = attributs[map.phi1(it)];
 		double l = (e2-e1).norm();
 		center += (e1+e2)*l;
 		count += 2.0*l ;
-	}
+	},false,thread);
 	center /= double(count);	
 	return center ;
 }
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Face d, const V_ATT& attributs)
+typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Face f, const V_ATT& attributs)
 {
 	typename V_ATT::DATA_TYPE center(0.0);
 	unsigned int count = 0 ;
 
 //	Traversor2FV<typename PFP::MAP> t(map, d) ;
 //	for(Dart it = t.begin(); it != t.end(); it = t.next())
-	foreachIncident2(FACE,d,VERTEX,it,typename PFP::MAP,map)
+//	foreachIncident2(FACE,d,VERTEX,it,typename PFP::MAP,map)
+
+	foreach_incident2<VERTEX>(map, f, [&](Vertex it)
 	{
 		center += attributs[it];
 		++count ;
-	}
+	});
 	center /= double(count);
 	return center ;
 }

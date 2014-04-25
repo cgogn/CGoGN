@@ -32,22 +32,22 @@ namespace CGoGN
 // Traversor2VE
 
 template <typename MAP>
-Traversor2VE<MAP>::Traversor2VE(const MAP& map, Dart dart) : m(map), start(dart),m_QLT(NULL)
+Traversor2VE<MAP>::Traversor2VE(const MAP& map, Vertex dart) : m(map), start(dart),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickIncidentTraversal<VERTEX,EDGE>() ;
 	if (quickTraversal != NULL)
 	{
-		m_QLT  = &(quickTraversal->operator[](map.template getEmbedding<VERTEX>(dart)));
+		m_QLT  = &(quickTraversal->operator[](map.getEmbedding(dart)));
 	}
 }
 
 template <typename MAP>
-Dart Traversor2VE<MAP>::begin()
+Edge Traversor2VE<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
 		m_ItDarts = m_QLT->begin();
-		return *m_ItDarts++;
+		return Edge(*m_ItDarts++);
 	}
 
 	current = start ;
@@ -55,24 +55,24 @@ Dart Traversor2VE<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2VE<MAP>::end()
+Edge Traversor2VE<MAP>::end()
 {
-	return NIL ;
+	return Edge(NIL) ;
 }
 
 template <typename MAP>
-Dart Traversor2VE<MAP>::next()
+Edge Traversor2VE<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
-		return *m_ItDarts++;
+		return Edge(*m_ItDarts++);
 	}
 
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 //		current = m.alpha1(current) ;
-		current = m.phi2(m.phi_1(current)) ;
-		if(current == start)
+		current = Edge(m.phi2(m.phi_1(current.dart))) ;
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -81,7 +81,7 @@ Dart Traversor2VE<MAP>::next()
 // Traversor2VF
 
 template <typename MAP>
-Traversor2VF<MAP>::Traversor2VF(const MAP& map, Dart dart) : m(map), start(dart),m_QLT(NULL)
+Traversor2VF<MAP>::Traversor2VF(const MAP& map, Vertex dart) : m(map), start(dart),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickIncidentTraversal<VERTEX,FACE>() ;
 	if (quickTraversal != NULL)
@@ -96,12 +96,12 @@ Traversor2VF<MAP>::Traversor2VF(const MAP& map, Dart dart) : m(map), start(dart)
 }
 
 template <typename MAP>
-Dart Traversor2VF<MAP>::begin()
+Face Traversor2VF<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
 		m_ItDarts = m_QLT->begin();
-		return *m_ItDarts++;
+		return Face(*m_ItDarts++);
 	}
 
 	current = start ;
@@ -109,24 +109,24 @@ Dart Traversor2VF<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2VF<MAP>::end()
+Face Traversor2VF<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2VF<MAP>::next()
+Face Traversor2VF<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
-		return *m_ItDarts++;
+		return Face(*m_ItDarts++);
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi2(m.phi_1(current)) ;
 		if(m.template isBoundaryMarked<2>(current)) // jump over a boundary face
 			current = m.phi2(m.phi_1(current)) ;
-		if(current == start)
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -135,7 +135,7 @@ Dart Traversor2VF<MAP>::next()
 // Traversor2VVaE
 
 template <typename MAP>
-Traversor2VVaE<MAP>::Traversor2VVaE(const MAP& map, Dart dart) : m(map),m_QLT(NULL)
+Traversor2VVaE<MAP>::Traversor2VVaE(const MAP& map, Vertex dart) : m(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<VERTEX,EDGE>() ;
 	if (quickTraversal != NULL)
@@ -149,7 +149,7 @@ Traversor2VVaE<MAP>::Traversor2VVaE(const MAP& map, Dart dart) : m(map),m_QLT(NU
 }
 
 template <typename MAP>
-Dart Traversor2VVaE<MAP>::begin()
+Vertex Traversor2VVaE<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -162,22 +162,22 @@ Dart Traversor2VVaE<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2VVaE<MAP>::end()
+Vertex Traversor2VVaE<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2VVaE<MAP>::next()
+Vertex Traversor2VVaE<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
-		return *m_ItDarts++;
+		return Vertex(*m_ItDarts++);
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi_1(m.phi2(current)) ;
-		if(current == start)
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -186,7 +186,7 @@ Dart Traversor2VVaE<MAP>::next()
 // Traversor2VVaF
 
 template <typename MAP>
-Traversor2VVaF<MAP>::Traversor2VVaF(const MAP& map, Dart dart) : m(map),m_QLT(NULL)
+Traversor2VVaF<MAP>::Traversor2VVaF(const MAP& map, Vertex dart) : m(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<VERTEX,FACE>() ;
 	if (quickTraversal != NULL)
@@ -198,19 +198,19 @@ Traversor2VVaF<MAP>::Traversor2VVaF(const MAP& map, Dart dart) : m(map),m_QLT(NU
 		if(m.template isBoundaryMarked<2>(dart))
 			dart = m.phi2(m.phi_1(dart)) ;
 		start = m.phi1(m.phi1(dart)) ;
-		if(start == dart)
+		if(start.dart == dart.dart)
 			start = m.phi1(dart) ;
 		stop = dart ;
 	}
 }
 
 template <typename MAP>
-Dart Traversor2VVaF<MAP>::begin()
+Vertex Traversor2VVaF<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
 		m_ItDarts = m_QLT->begin();
-		return *m_ItDarts++;
+		return Vertex(*m_ItDarts++);
 	}
 
 	current = start ;
@@ -218,22 +218,22 @@ Dart Traversor2VVaF<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2VVaF<MAP>::end()
+Vertex Traversor2VVaF<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2VVaF<MAP>::next()
+Vertex Traversor2VVaF<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi1(current) ;
-		if(current == stop)
+		if(current.dart == stop.dart)
 		{
 			Dart d = m.phi2(m.phi_1(current)) ;
 			if(m.template isBoundaryMarked<2>(d)) // jump over a boundary face
@@ -243,11 +243,11 @@ Dart Traversor2VVaF<MAP>::next()
 			}
 			else
 				current = m.phi1(m.phi1(d)) ;
-			if(current == d)
+			if(current.dart == d)
 				current = m.phi1(d) ;
 			stop = d ;
 		}
-		if(current == start)
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -260,7 +260,7 @@ Dart Traversor2VVaF<MAP>::next()
 // Traversor2EV
 
 template <typename MAP>
-Traversor2EV<MAP>::Traversor2EV(const MAP& map, Dart dart) : m(map), start(dart),m_QLT(NULL)
+Traversor2EV<MAP>::Traversor2EV(const MAP& map, Edge dart) : m(map), start(dart),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickIncidentTraversal<EDGE,VERTEX>() ;
 	if (quickTraversal != NULL)
@@ -270,7 +270,7 @@ Traversor2EV<MAP>::Traversor2EV(const MAP& map, Dart dart) : m(map), start(dart)
 }
 
 template <typename MAP>
-Dart Traversor2EV<MAP>::begin()
+Vertex Traversor2EV<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -283,22 +283,22 @@ Dart Traversor2EV<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2EV<MAP>::end()
+Vertex Traversor2EV<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2EV<MAP>::next()
+Vertex Traversor2EV<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi2(current) ;
-		if(current == start)
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -307,7 +307,7 @@ Dart Traversor2EV<MAP>::next()
 // Traversor2EF
 
 template <typename MAP>
-Traversor2EF<MAP>::Traversor2EF(const MAP& map, Dart dart) : m(map), start(dart),m_QLT(NULL)
+Traversor2EF<MAP>::Traversor2EF(const MAP& map, Edge dart) : m(map), start(dart),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickIncidentTraversal<EDGE,FACE>() ;
 	if (quickTraversal != NULL)
@@ -322,7 +322,7 @@ Traversor2EF<MAP>::Traversor2EF(const MAP& map, Dart dart) : m(map), start(dart)
 }
 
 template <typename MAP>
-Dart Traversor2EF<MAP>::begin()
+Face Traversor2EF<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -335,22 +335,22 @@ Dart Traversor2EF<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2EF<MAP>::end()
+Face Traversor2EF<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2EF<MAP>::next()
+Face Traversor2EF<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi2(current) ;
-		if(current == start || m.template isBoundaryMarked<2>(current)) // do not consider a boundary face
+		if(current.dart == start.dart || m.template isBoundaryMarked<2>(current)) // do not consider a boundary face
 			current = NIL ;
 	}
 	return current ;
@@ -359,7 +359,7 @@ Dart Traversor2EF<MAP>::next()
 // Traversor2EEaV
 
 template <typename MAP>
-Traversor2EEaV<MAP>::Traversor2EEaV(const MAP& map, Dart dart) : m(map),m_QLT(NULL)
+Traversor2EEaV<MAP>::Traversor2EEaV(const MAP& map, Edge dart) : m(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<EDGE,VERTEX>() ;
 	if (quickTraversal != NULL)
@@ -375,7 +375,7 @@ Traversor2EEaV<MAP>::Traversor2EEaV(const MAP& map, Dart dart) : m(map),m_QLT(NU
 }
 
 template <typename MAP>
-Dart Traversor2EEaV<MAP>::begin()
+Edge Traversor2EEaV<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -388,24 +388,24 @@ Dart Traversor2EEaV<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2EEaV<MAP>::end()
+Edge Traversor2EEaV<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2EEaV<MAP>::next()
+Edge Traversor2EEaV<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi2(m.phi_1(current)) ;
-		if(current == stop1)
+		if(current.dart == stop1.dart)
 			current = m.phi2(m.phi_1(stop2)) ;
-		else if(current == stop2)
+		else if(current.dart == stop2.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -414,7 +414,7 @@ Dart Traversor2EEaV<MAP>::next()
 // Traversor2EEaF
 
 template <typename MAP>
-Traversor2EEaF<MAP>::Traversor2EEaF(const MAP& map, Dart dart) :
+Traversor2EEaF<MAP>::Traversor2EEaF(const MAP& map, Edge dart) :
 	m(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<EDGE,FACE>() ;
@@ -434,7 +434,7 @@ Traversor2EEaF<MAP>::Traversor2EEaF(const MAP& map, Dart dart) :
 }
 
 template <typename MAP>
-Dart Traversor2EEaF<MAP>::begin()
+Edge Traversor2EEaF<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -447,29 +447,29 @@ Dart Traversor2EEaF<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2EEaF<MAP>::end()
+Edge Traversor2EEaF<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2EEaF<MAP>::next()
+Edge Traversor2EEaF<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi1(current) ;
-		if (current == stop1)
+		if (current.dart == stop1.dart)
 		{
 			if (!m.template isBoundaryMarked<2>(stop2))
 				current = m.phi1(stop2) ;
 			else
 				current=NIL;
 		}
-		else if (current == stop2)
+		else if (current.dart == stop2.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -479,10 +479,11 @@ Dart Traversor2EEaF<MAP>::next()
 					FACE CENTERED TRAVERSALS
 *******************************************************************************/
 
+
 // Traversor2FV
 
 template <typename MAP>
-Traversor2FV<MAP>::Traversor2FV(const MAP& map, Dart dart) : m(map), start(dart),m_QLT(NULL)
+Traversor2FV<MAP>::Traversor2FV(const MAP& map, Face dart) : m(map), start(dart),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickIncidentTraversal<FACE,VERTEX>() ;
 	if (quickTraversal != NULL)
@@ -492,7 +493,7 @@ Traversor2FV<MAP>::Traversor2FV(const MAP& map, Dart dart) : m(map), start(dart)
 }
 
 template <typename MAP>
-Dart Traversor2FV<MAP>::begin()
+Vertex Traversor2FV<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -505,22 +506,70 @@ Dart Traversor2FV<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2FV<MAP>::end()
+Vertex Traversor2FV<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2FV<MAP>::next()
+Vertex Traversor2FV<MAP>::next()
+{
+	if(m_QLT != NULL)
+	{
+		return *m_ItDarts++;
+	}
+	if(current.dart != NIL)
+	{
+		current = m.phi1(current) ;
+		if(current.dart == start.dart)
+			current = NIL ;
+	}
+	return current ;
+}
+
+
+// Traversor2FE
+
+template <typename MAP>
+Traversor2FE<MAP>::Traversor2FE(const MAP& map, Face dart) : m(map), start(dart),m_QLT(NULL)
+{
+	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickIncidentTraversal<FACE,VERTEX>() ;
+	if (quickTraversal != NULL)
+	{
+		m_QLT  = &(quickTraversal->operator[](map.template getEmbedding<FACE>(dart)));
+	}
+}
+
+template <typename MAP>
+Edge Traversor2FE<MAP>::begin()
+{
+	if(m_QLT != NULL)
+	{
+		m_ItDarts = m_QLT->begin();
+		return *m_ItDarts++;
+	}
+
+	current = start ;
+	return current ;
+}
+
+template <typename MAP>
+Edge Traversor2FE<MAP>::end()
+{
+	return NIL ;
+}
+
+template <typename MAP>
+Edge Traversor2FE<MAP>::next()
 {
 	if(m_QLT != NULL)
     {
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
     {
 		current = m.phi1(current) ;
-		if(current == start)
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -529,7 +578,7 @@ Dart Traversor2FV<MAP>::next()
 // Traversor2FFaV
 
 template <typename MAP>
-Traversor2FFaV<MAP>::Traversor2FFaV(const MAP& map, Dart dart) : m(map),m_QLT(NULL)
+Traversor2FFaV<MAP>::Traversor2FFaV(const MAP& map, Face dart) : m(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<FACE,VERTEX>() ;
 	if (quickTraversal != NULL)
@@ -539,7 +588,7 @@ Traversor2FFaV<MAP>::Traversor2FFaV(const MAP& map, Dart dart) : m(map),m_QLT(NU
 	else
 	{
 		start = m.phi2(m.phi_1(m.phi2(m.phi_1(dart)))) ;
-		while (start == dart)
+		while (start.dart == dart.dart)
 		{
 			dart = m.phi1(dart);
 			start = m.phi2(m.phi_1(m.phi2(m.phi_1(dart)))) ;
@@ -552,7 +601,7 @@ Traversor2FFaV<MAP>::Traversor2FFaV(const MAP& map, Dart dart) : m(map),m_QLT(NU
 }
 
 template <typename MAP>
-Dart Traversor2FFaV<MAP>::begin()
+Face Traversor2FFaV<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -565,26 +614,26 @@ Dart Traversor2FFaV<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2FFaV<MAP>::end()
+Face Traversor2FFaV<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2FFaV<MAP>::next()
+Face Traversor2FFaV<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		current = m.phi2(m.phi_1(current)) ;
-		if(current == stop)
+		if(current.dart == stop.dart)
 		{
 			Dart d = m.phi1(current) ;
 			current = m.phi2(m.phi_1(m.phi2(m.phi_1(d)))) ;
-			if(current == d)
+			if(current.dart == d)
 			{
 				stop = m.phi1(d);
 				current = m.phi2(d);
@@ -596,7 +645,7 @@ Dart Traversor2FFaV<MAP>::next()
 		if(m.template isBoundaryMarked<2>(current))
 			return next() ;
 
-		if(current == start)
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
@@ -605,7 +654,7 @@ Dart Traversor2FFaV<MAP>::next()
 // Traversor2FFaE
 
 template <typename MAP>
-Traversor2FFaE<MAP>::Traversor2FFaE(const MAP& map, Dart dart) : m(map),m_QLT(NULL)
+Traversor2FFaE<MAP>::Traversor2FFaE(const MAP& map, Face dart) : m(map),m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickAdjacentTraversal<FACE,EDGE>() ;
 	if (quickTraversal != NULL)
@@ -615,17 +664,17 @@ Traversor2FFaE<MAP>::Traversor2FFaE(const MAP& map, Dart dart) : m(map),m_QLT(NU
 	else
 	{
 		start = m.phi2(dart) ;
-		while(start != NIL && m.template isBoundaryMarked<2>(start))
+		while(start.dart != NIL && m.template isBoundaryMarked<2>(start))
 		{
 			start = m.phi2(m.phi1(m.phi2(start))) ;
-			if(start == m.phi2(dart))
+			if(start.dart == m.phi2(dart))
 				start = NIL ;
 		}
 	}
 }
 
 template <typename MAP>
-Dart Traversor2FFaE<MAP>::begin()
+Face Traversor2FFaE<MAP>::begin()
 {
 	if(m_QLT != NULL)
 	{
@@ -638,25 +687,25 @@ Dart Traversor2FFaE<MAP>::begin()
 }
 
 template <typename MAP>
-Dart Traversor2FFaE<MAP>::end()
+Face Traversor2FFaE<MAP>::end()
 {
 	return NIL ;
 }
 
 template <typename MAP>
-Dart Traversor2FFaE<MAP>::next()
+Face Traversor2FFaE<MAP>::next()
 {
 	if(m_QLT != NULL)
 	{
 		return *m_ItDarts++;
 	}
-	if(current != NIL)
+	if(current.dart != NIL)
 	{
 		do
 		{
 			current = m.phi2(m.phi1(m.phi2(current))) ;
 		} while(m.template isBoundaryMarked<2>(current)) ;
-		if(current == start)
+		if(current.dart == start.dart)
 			current = NIL ;
 	}
 	return current ;
