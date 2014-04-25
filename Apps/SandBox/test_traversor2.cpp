@@ -29,7 +29,6 @@
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
 
-#include "Topology/generic/cells_macros.h"
 using namespace CGoGN ;
 
 int main(int argc, char **argv)
@@ -84,31 +83,18 @@ void MyQT::traversors(int x)
 	{
 	case 0:
 	{
-//		TRAVERSE2_ADJACENT(VERTEX,EDGE,m_selected, b, MAP, myMap)
-//			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
-
-		Vertex v(m_selected);
-		Edge e(m_selected);
-		fonct(v);
-		fonct2(e);
-		fonct(m_selected);
-		v = m_selected;
-/*
 		Traversor2VVaE<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
 			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
-*/
+
 	}
 		break;
 	case 1:
 	{
-		foreachAdjacent2(VERTEX,FACE,m_selected, b, MAP, myMap)
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
-/*
+
 		Traversor2VVaF<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
 			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
-*/
 	}
 		break;
 	case 2:
@@ -177,13 +163,9 @@ void MyQT::traversors(int x)
 		break;
 	case 11:
 	{
-/*		Traversor2VF<MAP> trav(myMap,m_selected);
+		Traversor2VF<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
 			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
-*/
-		foreachIncident2(VERTEX,m_selected, FACE, b, MAP, myMap)
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
-
 	}
 		break;
 	default:

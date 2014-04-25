@@ -313,19 +313,22 @@ void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& table
 	if(position == NULL)
 	{
 //		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		foreachCellMT(VERTEX,d,typename PFP::MAP,map,thread)
-			addTri<PFP>(map, d, tableIndices);
+//		foreachCellMT(VERTEX,d,typename PFP::MAP,map,thread)
+		foreach_cell<VERTEX>(map, [&] (Vertex v)
+		{
+			addTri<PFP>(map, v, tableIndices);
+		},false,thread);
 	}
 	else
 	{
 //		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		foreachCellMT(VERTEX,d,typename PFP::MAP,map,thread)
+		foreach_cell<VERTEX>(map, [&] (Vertex v)
 		{
-			if(map.faceDegree(d) == 3)
-				addTri<PFP>(map, d, tableIndices);
+			if(map.faceDegree(v) == 3)
+				addTri<PFP>(map, v, tableIndices);
 			else
-				addEarTri<PFP>(map, d, tableIndices, position);
-		}
+				addEarTri<PFP>(map, v, tableIndices, position);
+		},false,thread);
 	}
 }
 
@@ -411,12 +414,12 @@ void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndi
 	tableIndices.reserve(map.getNbDarts());
 
 //	TraversorE<typename PFP::MAP> trav(map, thread);
-//	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	foreachCellMT(EDGE,d,typename PFP::MAP,map,thread)
+	foreach_cell<EDGE>(map, [&] (Edge e)
 	{
-		tableIndices.push_back(map.template getEmbedding<VERTEX>(d.dart));
-		tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(d)));
+		tableIndices.push_back(map.template getEmbedding<VERTEX>(e.dart));
+		tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(e)));
 	}
+	,false,thread);
 }
 
 template<typename PFP>
@@ -426,14 +429,15 @@ void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tabl
 
 //	TraversorE<typename PFP::MAP> trav(map, thread);
 //	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	foreachCellMT(EDGE,d,typename PFP::MAP,map,thread)
+	foreach_cell<EDGE>(map, [&] (Edge e)
 	{
-		if (map.isBoundaryEdge(d))
+		if (map.isBoundaryEdge(e))
 		{
-			tableIndices.push_back(map.template getEmbedding<VERTEX>(d.dart));
-			tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(d)));
+			tableIndices.push_back(map.template getEmbedding<VERTEX>(e.dart));
+			tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(e)));
 		}
 	}
+	,false,thread);
 }
 
 template<typename PFP>
@@ -489,9 +493,11 @@ void MapRender::initPoints(typename PFP::MAP& map, std::vector<GLuint>& tableInd
 	tableIndices.reserve(map.getNbDarts() / 5);
 
 //	TraversorV<typename PFP::MAP> trav(map, thread);
-//	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	foreachCellMT(VERTEX,d,typename PFP::MAP,map,thread)
-		tableIndices.push_back(map.template getEmbedding<VERTEX>(d));
+	foreach_cell<VERTEX>(map, [&] (Vertex v)
+	{
+		tableIndices.push_back(map.getEmbedding(v));
+	}
+	,false,thread);
 }
 
 template<typename PFP>

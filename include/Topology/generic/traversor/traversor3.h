@@ -347,8 +347,8 @@ public:
 };
 
 
-template < unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP>
-inline void foreach_incident3(MAP& map, Cell<ORBIT_FROM> c, std::function<void (Cell<ORBIT_TO>)> f, bool forceDartMarker = false, unsigned int thread = 0)
+template < unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP, typename FUNC>
+inline void foreach_incident3(MAP& map, Cell<ORBIT_FROM> c, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
 	Traversor3XY<MAP,ORBIT_FROM,ORBIT_TO> trav(const_cast<const MAP&>(map),c,forceDartMarker,thread);
 	for (Cell<ORBIT_TO> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
@@ -356,8 +356,8 @@ inline void foreach_incident3(MAP& map, Cell<ORBIT_FROM> c, std::function<void (
 }
 
 
-template <unsigned int THRU, unsigned int ORBIT, typename MAP>
-inline void foreach_adjacent2( MAP& map, Cell<ORBIT> c, std::function<void (Cell<ORBIT>)> f, bool forceDartMarker = false, unsigned int thread = 0)
+template <unsigned int THRU, unsigned int ORBIT, typename MAP, typename FUNC>
+inline void foreach_adjacent3( MAP& map, Cell<ORBIT> c, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
 	Traversor3XXaY<MAP,ORBIT,THRU> trav(const_cast<const MAP&>(map),c,forceDartMarker,thread);
 	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())

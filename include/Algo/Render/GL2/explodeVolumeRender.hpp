@@ -171,8 +171,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	vertices.reserve(20);
 
 //	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
-//	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
-	foreachCell(MAP::FACE_OF_PARENT,d,MAP,map)
+	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> d)
 	{
 		// compute normals
 		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d.dart, positions);
@@ -229,8 +228,8 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 				bufferColors.push_back(volCol);
 			}
 		}
-	}
-
+	});
+//	,false,thread); ????
 
 	m_nbTris = buffer.size()/4;
 
@@ -255,13 +254,13 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	buffer.clear();
 
 //	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
-//	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
-	foreachCell(MAP::EDGE_OF_PARENT,d,MAP,map)
+	foreach_cell<PFP::MAP::EDGE_OF_PARENT>(map, [&] (Cell<PFP::MAP::EDGE_OF_PARENT> c)
 	{
-			buffer.push_back(PFP::toVec3f(centerVolumes[d.dart]));
-			buffer.push_back(PFP::toVec3f(positions[d.dart]));
-			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
-	}
+			buffer.push_back(PFP::toVec3f(centerVolumes[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
+	});
+	//	,false,thread); ????
 
 	m_nbLines = buffer.size()/3;
 
@@ -308,7 +307,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 
 //	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
 //	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
-	foreachCell(MAP::FACE_OF_PARENT,d,MAP,map)
+	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> d)
 	{
 		// compute normals
 		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
@@ -363,7 +362,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 				bufferColors.push_back(m_globalColor);
 			}
 		}
-	}
+	}); // false,thread) ???
 	
 	m_nbTris = buffer.size()/4;
 
@@ -389,12 +388,12 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 
 //	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 //	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
-	foreachCell(MAP::EDGE_OF_PARENT,d,MAP,map)
+	foreach_cell<MAP::EDGE_OF_PARENT>(map, [&] (Cell<MAP::EDGE_OF_PARENT> c)
 	{
-			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
-			buffer.push_back(PFP::toVec3f(positions[d]));
-			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
-	}
+			buffer.push_back(PFP::toVec3f(centerVolumes[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(c.dart)]));
+	});
 
 	m_nbLines = buffer.size()/3;
 
@@ -450,8 +449,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 	bufferColors.reserve(16384);
 
 //	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
-//	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
-	foreachCell(MAP::FACE_OF_PARENT,d,MAP,map)
+	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> d)
 	{
 		VEC3F centerFace = PFP::toVec3f(Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d.dart, positions));
 		VEC3F volColor = PFP::toVec3f(colorPerXXX[d.dart]);
@@ -493,7 +491,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 				c = map.phi1(b);
 			} while (b != d);
 		}
-	}
+	});
 
 	m_nbTris = buffer.size()/4;
 
@@ -513,12 +511,11 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 
 //	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
 //	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
-	foreachCell(MAP::EDGE_OF_PARENT,d,MAP,map)
-	{
-			buffer.push_back(PFP::toVec3f(centerVolumes[d.dart]));
-			buffer.push_back(PFP::toVec3f(positions[d.dart]));
-			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
-	}
+	foreach_cell<MAP::EDGE_OF_PARENT>(map, [&] (Cell<MAP::EDGE_OF_PARENT> c)
+	{			buffer.push_back(PFP::toVec3f(centerVolumes[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
+	}); // false,thread ???
 
 	m_nbLines = buffer.size()/3;
 
@@ -562,8 +559,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	bufferColors.reserve(16384);
 
 //	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
-//	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
-	foreachCell(MAP::FACE_OF_PARENT,d,MAP,map)
+	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> d)
 	{
 		VEC3F centerFace = PFP::toVec3f(Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions));
 
@@ -604,7 +600,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 				c = map.phi1(b);
 			} while (b != d);
 		}
-	}
+	});
 
 
 	m_nbTris = buffer.size()/4;
@@ -624,13 +620,12 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	buffer.clear();
 
 //	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map);
-//	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
-	foreachCell(MAP::EDGE_OF_PARENT,d,MAP,map)
+	foreach_cell<MAP::EDGE_OF_PARENT>(map, [&] (Cell<MAP::EDGE_OF_PARENT> c)
 	{
-			buffer.push_back(PFP::toVec3f(centerVolumes[d]));
-			buffer.push_back(PFP::toVec3f(positions[d]));
-			buffer.push_back(PFP::toVec3f(positions[map.phi1(d)]));
-	}
+			buffer.push_back(PFP::toVec3f(centerVolumes[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[c.dart]));
+			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
+	});
 
 	m_nbLines = buffer.size()/3;
 

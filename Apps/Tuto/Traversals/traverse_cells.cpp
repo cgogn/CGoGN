@@ -26,7 +26,6 @@
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
 #include "Algo/Tiling/Surface/square.h"
-#include "Topology/generic/cells_macros.h"
 
 
 using namespace CGoGN ;
@@ -102,9 +101,12 @@ int main()
 	std::cout <<  std::endl;
 
 
-	//using foreach macro
-	foreachCell(VERTEX,v,MAP,myMap)	// for each Vertex v of the MAP myMap
+	//using foreach function (C++11 lambda expression)
+	foreach_cell<VERTEX>(myMap,[&](Vertex v) // for each Vertex v of the MAP myMap
+	{
 		std::cout << v << " : " << position[v]<< " / ";
+	});
+
 	std::cout <<  std::endl;
 	// warning here v is a Vertex and not a Dart (but can cast automatically into)
 

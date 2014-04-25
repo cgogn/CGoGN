@@ -26,7 +26,6 @@
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
 #include "Algo/Tiling/Surface/square.h"
-#include "Topology/generic/cells_macros.h"
 
 
 using namespace CGoGN ;
@@ -60,7 +59,12 @@ int main()
 
 	// easy way to find the central vertex of the grid	
 	Vertex v;
-	findCell(VERTEX,v,MAP,myMap, position[v] == VEC3(0,0,0) );
+//	findCell(VERTEX,v,MAP,myMap, position[v] == VEC3(0,0,0) );
+	find_cell<VERTEX>(myMap,v, [&](Vertex v)
+	{
+		return position[v] == VEC3(0,0,0);
+	});
+
 	// must test of find ok (if not v.dart is NIL)
 	if (! v.valid())
 		std::cerr << "could not find a vertex with position (0,0,0)" << std::endl;
@@ -82,15 +86,19 @@ int main()
 		std::cout << "vertex of dart "<<e<< " adjacent to vertex of dart " << v.dart<< " by a face" << std::endl;
 	}
 
-// WITH FOREACH MACRO
+// WITH FOREACH FUNCTION (C++11 lambda expression)
 
 	// find incident faces to vertex
-	foreachIncident2(VERTEX,v,FACE,f,MAP,myMap)
+	foreach_incident2<FACE>(myMap,v,[&](Face f)
+	{
 		std::cout << "Face of dart "<<f<< " incident to vertex of dart " << v.dart<< std::endl;
+	});
 
 	// find adjacent vertices thru a face
-	foreachAdjacent2(VERTEX,FACE,v,x, MAP, myMap)
-		std::cout << "vertex of dart "<<x<< " adjacent to vertex of dart " << v.dart<< " by a face" << std::endl;
+	foreach_adjacent2<FACE>(myMap,v,[&](Vertex x)
+	{
+		std::cout << "vertex of dart "<<x<< " adjacent to vertex of dart " << v.dart<< " by a face" << std::endl;	
+	});
 
 	return 0;
 }

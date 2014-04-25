@@ -90,6 +90,18 @@ inline void foreach_cell(const MAP& map, FUNC f, bool forceDartMarker = false, u
 }
 
 
+template <unsigned int ORBIT, typename MAP >
+inline void find_cell(const MAP& map, Cell<ORBIT> c, std::function<bool (Cell<ORBIT>)> cond, bool forceDartMarker = false, unsigned int thread = 0)
+{
+	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
+	c = trav.begin();
+	Cell<ORBIT> e = trav.end();
+	while ((c.dart != e.dart) && (!cond(c)))
+		c = trav.next();
+}
+
+
+
 
 template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>

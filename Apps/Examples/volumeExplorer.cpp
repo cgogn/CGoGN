@@ -493,6 +493,14 @@ int main(int argc, char **argv)
 
 	Utils::Chrono ch;
 
+
+
+	Vertex v(myMap.begin());
+	VEC3 p = Algo::Volume::Geometry::vertexNeighborhoodCentroid<PFP>(myMap,v,position);
+
+	Vol w(myMap.begin());
+	VEC3 q = Algo::Surface::Geometry::volumeCentroid<PFP>(myMap,w,position);
+
 	std::cout << "Compute Volume ->"<< std::endl;
 	ch.start();
 	float vol = Algo::Geometry::totalVolume<PFP>(myMap, position);
