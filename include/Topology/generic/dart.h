@@ -65,7 +65,7 @@ struct Dart
 
 	static Dart create(unsigned int i) { Dart d; d.index = i; return d; }
 
-	Dart(unsigned int v): index(v) {}
+	explicit Dart(unsigned int v): index(v) {}
 
 	bool isNil() const { return index == 0xffffffff ; }
 
