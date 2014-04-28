@@ -448,7 +448,7 @@ inline void MapCommon<MAP_IMPL>::disableQuickIncidentTraversal()
 {
 	if(this->m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL)
 	{
-		this->m_attribs[ORBIT].removeAttribute<Dart>(this->m_quickLocalIncidentTraversal[ORBIT][INCI]->getIndex()) ;
+		this->m_attribs[ORBIT].template removeAttribute<Dart>(this->m_quickLocalIncidentTraversal[ORBIT][INCI]->getIndex()) ;
 		this->m_quickLocalIncidentTraversal[ORBIT][INCI] = NULL ;
 	}
 }
