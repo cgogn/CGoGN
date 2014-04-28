@@ -397,7 +397,7 @@ public:
 };
 
 
-template < unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP, typename FUNC>
+template <unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP, typename FUNC>
 inline void foreach_incident2(MAP& map, Cell<ORBIT_FROM> c,FUNC f)
 {
 	IncidentTrav2<MAP,ORBIT_FROM,ORBIT_TO> trav(const_cast<const MAP&>(map),c);
@@ -406,7 +406,7 @@ inline void foreach_incident2(MAP& map, Cell<ORBIT_FROM> c,FUNC f)
 }
 
 template <unsigned int THRU, unsigned int ORBIT, typename MAP, typename FUNC>
-inline void foreach_adjacent2( MAP& map, Cell<ORBIT> c, FUNC f)
+inline void foreach_adjacent2(MAP& map, Cell<ORBIT> c, FUNC f)
 {
 	AdjacentTrav2<MAP,ORBIT,THRU> trav(const_cast<const MAP&>(map),c);
 	for (Cell<ORBIT> c = trav.t.begin(), e = trav.t.end(); c.dart != e.dart; c = trav.t.next())

@@ -35,7 +35,8 @@ public:
 	virtual void select(Dart d, bool emitSignal = true) = 0;
 	virtual void unselect(Dart d, bool emitSignal = true) = 0;
 
-	inline void select(const std::vector<Dart>& d)
+	template <unsigned int ORBIT>
+	inline void select(const std::vector<Cell<ORBIT> >& d)
 	{
 		for(unsigned int i = 0; i < d.size(); ++i)
 			select(d[i], false);
@@ -47,7 +48,8 @@ public:
 		}
 	}
 
-	inline void unselect(const std::vector<Dart>& d)
+	template <unsigned int ORBIT>
+	inline void unselect(const std::vector<Cell<ORBIT> >& d)
 	{
 		for(unsigned int i = 0; i < d.size(); ++i)
 			unselect(d[i], false);
