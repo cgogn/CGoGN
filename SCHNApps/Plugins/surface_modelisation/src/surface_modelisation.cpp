@@ -279,8 +279,8 @@ void Surface_Modelisation_Plugin::mergeVolumes(MapHandlerGen* mhg)
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty() && (p.edgeSelector->getSelectedCells().size() == 2) &&
        p.faceSelector && !p.faceSelector->getSelectedCells().empty() && (p.faceSelector->getSelectedCells().size() == 2))
     {
-        const std::vector<Dart>& selectedDarts = p.edgeSelector->getSelectedCells();
-        const std::vector<Dart>& selectedFaces = p.faceSelector->getSelectedCells();
+		const std::vector<Edge>& selectedDarts = p.edgeSelector->getSelectedCells();
+		const std::vector<Face>& selectedFaces = p.faceSelector->getSelectedCells();
 
         Dart d1 = selectedDarts[0];
         Dart d2 = selectedDarts[1];
@@ -342,8 +342,11 @@ void Surface_Modelisation_Plugin::splitSurface(MapHandlerGen* mhg)
     MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
-        std::vector<Dart> selectedDarts = p.edgeSelector->getSelectedCells();
-        std::vector<Dart> path = selectedDarts;
+		std::vector<Edge> selectedDarts = p.edgeSelector->getSelectedCells();
+		std::vector<Dart> path;
+		for (std::vector<Edge>::iterator it = selectedDarts.begin(); it != selectedDarts.end(); ++it)
+			path.push_back((*it).dart);
+
         bool isPath = true;
         unsigned int i = 0;
 
@@ -360,7 +363,7 @@ void Surface_Modelisation_Plugin::splitSurface(MapHandlerGen* mhg)
 
         if (isPath)
         {
-            for(std::vector<Dart>::iterator it = path.begin() ; it != path.end()-1; ++it)
+			for(std::vector<Dart>::iterator it = path.begin() ; it != path.end()-1; ++it)
             {
                 if (isPath)
 				{
@@ -368,7 +371,7 @@ void Surface_Modelisation_Plugin::splitSurface(MapHandlerGen* mhg)
                         isPath = false;
 					vm.mark(*it);
 
-                    std::vector<Dart>::iterator next;
+					std::vector<Dart>::iterator next;
                     next = it + 1 ;
 
                     if (!map->sameVertex(map->phi1(*it), *next))
@@ -403,7 +406,7 @@ void Surface_Modelisation_Plugin::extrudeRegion(MapHandlerGen *mhg)
     MapParameters& p = h_parameterSet[mhg];
     if(p.faceSelector && !p.faceSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& selectedDarts = p.faceSelector->getSelectedCells();
+		const std::vector<Face>& selectedDarts = p.faceSelector->getSelectedCells();
         Algo::Surface::Modelisation::extrudeRegion<PFP2>(*map, p.positionAttribute, selectedDarts[0], p.faceSelector->getMarker());
 
         mh->notifyConnectivityModification();
@@ -422,13 +425,13 @@ void Surface_Modelisation_Plugin::splitVertex(MapHandlerGen *mhg)
     MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty() && (p.edgeSelector->getSelectedCells().size() == 2))
     {
-        const std::vector<Dart>& selectedEdges = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& selectedEdges = p.edgeSelector->getSelectedCells();
 
         Dart d0, d1;
-        unsigned int v00 =  map->getEmbedding<VERTEX>(selectedEdges[0]);
-        unsigned int v01 =  map->getEmbedding<VERTEX>(map->phi2(selectedEdges[0]));
-        unsigned int v10 =  map->getEmbedding<VERTEX>(selectedEdges[1]);
-        unsigned int v11 =  map->getEmbedding<VERTEX>(map->phi2(selectedEdges[1]));
+		unsigned int v00 = map->getEmbedding<VERTEX>(selectedEdges[0].dart);
+		unsigned int v01 = map->getEmbedding<VERTEX>(map->phi2(selectedEdges[0].dart));
+		unsigned int v10 = map->getEmbedding<VERTEX>(selectedEdges[1].dart);
+		unsigned int v11 = map->getEmbedding<VERTEX>(map->phi2(selectedEdges[1].dart));
 
         if (v00 == v10)
         {
@@ -497,7 +500,7 @@ void Surface_Modelisation_Plugin::deleteVertex(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.vertexSelector && !p.vertexSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& darts = p.vertexSelector->getSelectedCells();
+		const std::vector<Vertex>& darts = p.vertexSelector->getSelectedCells();
         map->deleteVertex(darts[0]);
         mh->notifyAttributeModification(p.positionAttribute);
         mh->notifyConnectivityModification();
@@ -514,10 +517,10 @@ void Surface_Modelisation_Plugin::cutEdge(MapHandlerGen *mhg)
     MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& edge = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& edge = p.edgeSelector->getSelectedCells();
         map->cutEdge(edge[0]);
 
-        p.positionAttribute[map->phi1(edge[0])] = (p.positionAttribute[edge[0]] + p.positionAttribute[map->phi1(map->phi1(edge[0]))]) / 2;
+		p.positionAttribute[map->phi1(edge[0].dart)] = (p.positionAttribute[edge[0].dart] + p.positionAttribute[map->phi1(map->phi1(edge[0].dart))]) / 2;
         mh->notifyAttributeModification(p.positionAttribute);
         mh->notifyConnectivityModification();
     }
@@ -531,7 +534,7 @@ void Surface_Modelisation_Plugin::uncutEdge(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& edge = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& edge = p.edgeSelector->getSelectedCells();
         if (!map->uncutEdge(edge[0]))
             map->uncutEdge(map->phi2(edge[0]));
         mh->notifyAttributeModification(p.positionAttribute);
@@ -547,7 +550,7 @@ void Surface_Modelisation_Plugin::collapseEdge(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& edge = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& edge = p.edgeSelector->getSelectedCells();
         map->collapseEdge(edge[0]);
         mh->notifyAttributeModification(p.positionAttribute);
         mh->notifyConnectivityModification();
@@ -562,7 +565,7 @@ void Surface_Modelisation_Plugin::flipEdge(MapHandlerGen *mhg)
 	const MapParameters& p = h_parameterSet[mhg];
 	if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
 	{
-		const std::vector<Dart>& edge = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& edge = p.edgeSelector->getSelectedCells();
         map->flipEdge(edge[0]);
         mh->notifyConnectivityModification();
 	}
@@ -576,7 +579,7 @@ void Surface_Modelisation_Plugin::flipBackEdge(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& edge = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& edge = p.edgeSelector->getSelectedCells();
         map->flipBackEdge(edge[0]);
         mh->notifyConnectivityModification();
     }
@@ -592,7 +595,7 @@ void Surface_Modelisation_Plugin::splitFace(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.vertexSelector && !p.vertexSelector->getSelectedCells().empty() && (p.vertexSelector->getSelectedCells().size() == 2))
     {
-        const std::vector<Dart>& selectedDarts = p.vertexSelector->getSelectedCells();
+		const std::vector<Vertex>& selectedDarts = p.vertexSelector->getSelectedCells();
         bool sameFace = false;
 
         Dart d = selectedDarts[0];
@@ -633,7 +636,7 @@ void Surface_Modelisation_Plugin::mergeFaces(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& edge = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& edge = p.edgeSelector->getSelectedCells();
         map->mergeFaces(edge[0]);
         mh->notifyConnectivityModification();
     }
@@ -647,7 +650,7 @@ void Surface_Modelisation_Plugin::deleteFace(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.faceSelector && !p.faceSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& dart = p.faceSelector->getSelectedCells();
+		const std::vector<Face>& dart = p.faceSelector->getSelectedCells();
         map->deleteFace(dart[0]);
         mh->notifyConnectivityModification();
     }
@@ -661,7 +664,7 @@ void Surface_Modelisation_Plugin::sewFaces(MapHandlerGen *mhg)
     const MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty() && (p.edgeSelector->getSelectedCells().size() == 2))
     {
-        const std::vector<Dart>& selectedDarts = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& selectedDarts = p.edgeSelector->getSelectedCells();
         Dart d = selectedDarts[0];
         Dart e = selectedDarts[1];
 
@@ -683,7 +686,7 @@ void Surface_Modelisation_Plugin::unsewFaces(MapHandlerGen *mhg)
     MapParameters& p = h_parameterSet[mhg];
     if(p.edgeSelector && !p.edgeSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& dart = p.edgeSelector->getSelectedCells();
+		const std::vector<Edge>& dart = p.edgeSelector->getSelectedCells();
         if (!map->isBoundaryEdge(dart[0]))
         {
             Dart d = dart[0];
@@ -713,7 +716,7 @@ void Surface_Modelisation_Plugin::extrudeFace(MapHandlerGen *mhg)
     MapParameters& p = h_parameterSet[mhg];
     if(p.faceSelector && !p.faceSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& selectedDart = p.faceSelector->getSelectedCells();
+		const std::vector<Face>& selectedDart = p.faceSelector->getSelectedCells();
 
         Dart d = selectedDart[0];
         PFP2::REAL dist = 0;
@@ -743,7 +746,7 @@ void Surface_Modelisation_Plugin::pathExtrudeFace(MapHandlerGen *mhg)
 	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL>& position = p.positionAttribute;
     if(p.faceSelector && !p.faceSelector->getSelectedCells().empty())
     {
-        const std::vector<Dart>& selectedDart = p.faceSelector->getSelectedCells();
+		const std::vector<Face>& selectedDart = p.faceSelector->getSelectedCells();
         Dart d = selectedDart[0];
         for (unsigned int i = 0; i < collectedVertices.size(); i++)
         {

@@ -88,7 +88,6 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 			CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
 			if(selector)
 			{
-				const std::vector<Dart>& selectedCells = selector->getSelectedCells();
 				unsigned int nbCells = map->getGenericMap()->getNbCells(orbit);
 				switch(orbit)
 				{
@@ -99,10 +98,10 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
 
 						m_pointSprite->enableVertexAttribs();
-						glDrawArrays(GL_POINTS, 0, selectedCells.size());
+						glDrawArrays(GL_POINTS, 0, selector->getNbSelectedCells());
 						m_pointSprite->disableVertexAttribs();
 
-						if(m_selecting && m_selectingVertex != NIL)
+						if(m_selecting && m_selectingVertex.valid())
 						{
 							std::vector<PFP2::VEC3> selectionPoint;
 							selectionPoint.push_back(p.positionAttribute[m_selectingVertex]);
@@ -137,7 +136,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 					case EDGE : {
 						m_selectedEdgesDrawer->callList();
 
-						if(m_selecting && m_selectingEdge != NIL)
+						if(m_selecting && m_selectingEdge.valid())
 						{
 							switch(p.selectionMethod)
 							{
@@ -148,15 +147,15 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									m_selectingCellDrawer->lineWidth(6.0f);
 									m_selectingCellDrawer->color3f(0.0f, 0.0f, 1.0f);
 									m_selectingCellDrawer->begin(GL_LINES);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m_selectingEdge]);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi1(m_selectingEdge)]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m_selectingEdge.dart]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi1(m_selectingEdge.dart)]);
 									m_selectingCellDrawer->end();
 									m_selectingCellDrawer->endList();
 									break;
 								}
 								case WithinSphere : {
 									std::vector<PFP2::VEC3> selectionPoint;
-									selectionPoint.push_back(p.positionAttribute[m_selectingEdge]);
+									selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
@@ -179,7 +178,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 					case FACE : {
 						m_selectedFacesDrawer->callList();
 
-						if(m_selecting && m_selectingFace != NIL)
+						if(m_selecting && m_selectingFace.valid())
 						{
 							switch(p.selectionMethod)
 							{
@@ -189,16 +188,16 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									m_selectingCellDrawer->newList(GL_COMPILE_AND_EXECUTE);
 									m_selectingCellDrawer->color3f(0.0f, 0.0f, 1.0f);
 									m_selectingCellDrawer->begin(GL_TRIANGLES);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m_selectingFace]);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi1(m_selectingFace)]);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi_1(m_selectingFace)]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m_selectingFace.dart]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi1(m_selectingFace.dart)]);
+									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi_1(m_selectingFace.dart)]);
 									m_selectingCellDrawer->end();
 									m_selectingCellDrawer->endList();
 									break;
 								}
 								case WithinSphere : {
 									std::vector<PFP2::VEC3> selectionPoint;
-									selectionPoint.push_back(p.positionAttribute[m_selectingFace]);
+									selectionPoint.push_back(p.positionAttribute[m_selectingFace.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
@@ -261,24 +260,25 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 				switch(orbit)
 				{
 					case VERTEX : {
-						if(m_selectingVertex != NIL)
+						CellSelector<PFP2::MAP, VERTEX>* cs = static_cast<CellSelector<PFP2::MAP, VERTEX>*>(selector);
+						if(m_selectingVertex.valid())
 						{
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
 									if(event->button() == Qt::LeftButton)
-										selector->select(m_selectingVertex);
+										cs->select(m_selectingVertex);
 									else if(event->button() == Qt::RightButton)
-										selector->unselect(m_selectingVertex);
+										cs->unselect(m_selectingVertex);
 									break;
 								}
 								case WithinSphere : {
 									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
 									neigh.collectAll(m_selectingVertex);
 									if(event->button() == Qt::LeftButton)
-										selector->select(neigh.getInsideVertices());
+										cs->select(neigh.getInsideVertices());
 									else if(event->button() == Qt::RightButton)
-										selector->unselect(neigh.getInsideVertices());
+										cs->unselect(neigh.getInsideVertices());
 									break;
 								}
 								case NormalAngle : {
@@ -287,9 +287,9 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
 										neigh.collectAll(m_selectingVertex);
 										if(event->button() == Qt::LeftButton)
-											selector->select(neigh.getInsideVertices());
+											cs->select(neigh.getInsideVertices());
 										else if(event->button() == Qt::RightButton)
-											selector->unselect(neigh.getInsideVertices());
+											cs->unselect(neigh.getInsideVertices());
 									}
 									break;
 								}
@@ -299,24 +299,25 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 						break;
 					}
 					case EDGE : {
-						if(m_selectingEdge != NIL)
+						CellSelector<PFP2::MAP, EDGE>* cs = static_cast<CellSelector<PFP2::MAP, EDGE>*>(selector);
+						if(m_selectingEdge.valid())
 						{
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
 									if(event->button() == Qt::LeftButton)
-										selector->select(m_selectingEdge);
+										cs->select(m_selectingEdge);
 									else if(event->button() == Qt::RightButton)
-										selector->unselect(m_selectingEdge);
+										cs->unselect(m_selectingEdge);
 									break;
 								}
 								case WithinSphere : {
 									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
 									neigh.collectAll(m_selectingEdge);
 									if(event->button() == Qt::LeftButton)
-										selector->select(neigh.getInsideEdges());
+										cs->select(neigh.getInsideEdges());
 									else if(event->button() == Qt::RightButton)
-										selector->unselect(neigh.getInsideEdges());
+										cs->unselect(neigh.getInsideEdges());
 									break;
 								}
 								case NormalAngle : {
@@ -325,9 +326,9 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
 										neigh.collectAll(m_selectingEdge);
 										if(event->button() == Qt::LeftButton)
-											selector->select(neigh.getInsideEdges());
+											cs->select(neigh.getInsideEdges());
 										else if(event->button() == Qt::RightButton)
-											selector->unselect(neigh.getInsideEdges());
+											cs->unselect(neigh.getInsideEdges());
 									}
 									break;
 								}
@@ -337,24 +338,25 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 						break;
 					}
 					case FACE : {
-						if(m_selectingFace != NIL)
+						CellSelector<PFP2::MAP, FACE>* cs = static_cast<CellSelector<PFP2::MAP, FACE>*>(selector);
+						if(m_selectingFace.valid())
 						{
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
 									if(event->button() == Qt::LeftButton)
-										selector->select(m_selectingFace);
+										cs->select(m_selectingFace);
 									else if(event->button() == Qt::RightButton)
-										selector->unselect(m_selectingFace);
+										cs->unselect(m_selectingFace);
 									break;
 								}
 								case WithinSphere : {
 									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
 									neigh.collectAll(m_selectingFace);
 									if(event->button() == Qt::LeftButton)
-										selector->select(neigh.getInsideFaces());
+										cs->select(neigh.getInsideFaces());
 									else if(event->button() == Qt::RightButton)
-										selector->unselect(neigh.getInsideFaces());
+										cs->unselect(neigh.getInsideFaces());
 									break;
 								}
 								case NormalAngle : {
@@ -363,9 +365,9 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 										Algo::Surface::Selection::Collector_NormalAngle<PFP2> neigh(*map, p.normalAttribute, m_normalAngleThreshold);
 										neigh.collectAll(m_selectingFace);
 										if(event->button() == Qt::LeftButton)
-											selector->select(neigh.getInsideFaces());
+											cs->select(neigh.getInsideFaces());
 										else if(event->button() == Qt::RightButton)
-											selector->unselect(neigh.getInsideFaces());
+											cs->unselect(neigh.getInsideFaces());
 									}
 									break;
 								}
@@ -496,27 +498,31 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 	{
 		unsigned int orbit = m_schnapps->getCurrentOrbit();
 		CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
-		const std::vector<Dart>& selectedCells = selector->getSelectedCells();
 		switch(orbit)
 		{
 			case VERTEX : {
+				CellSelector<PFP2::MAP, VERTEX>* cs = static_cast<CellSelector<PFP2::MAP, VERTEX>*>(selector);
+				const std::vector<Vertex>& selectedCells = cs->getSelectedCells();
 				std::vector<PFP2::VEC3> selectedPoints;
-				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
-					selectedPoints.push_back(p.positionAttribute[*it]);
+				for(std::vector<Vertex>::const_iterator v = selectedCells.begin(); v != selectedCells.end(); ++v)
+					selectedPoints.push_back(p.positionAttribute[*v]);
 				m_selectedVerticesVBO->updateData(selectedPoints);
 				break;
 			}
 			case EDGE : {
 				PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 
+				CellSelector<PFP2::MAP, EDGE>* cs = static_cast<CellSelector<PFP2::MAP, EDGE>*>(selector);
+				const std::vector<Edge>& selectedCells = cs->getSelectedCells();
+
 				m_selectedEdgesDrawer->newList(GL_COMPILE);
 				m_selectedEdgesDrawer->lineWidth(3.0f);
 				m_selectedEdgesDrawer->color3f(1.0f, 0.0f, 0.0f);
 				m_selectedEdgesDrawer->begin(GL_LINES);
-				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
+				for(std::vector<Edge>::const_iterator e = selectedCells.begin(); e != selectedCells.end(); ++e)
 				{
-					m_selectedEdgesDrawer->vertex(p.positionAttribute[*it]);
-					m_selectedEdgesDrawer->vertex(p.positionAttribute[m->phi1(*it)]);
+					m_selectedEdgesDrawer->vertex(p.positionAttribute[(*e).dart]);
+					m_selectedEdgesDrawer->vertex(p.positionAttribute[m->phi1((*e).dart)]);
 				}
 				m_selectedEdgesDrawer->end();
 				m_selectedEdgesDrawer->endList();
@@ -525,14 +531,17 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 			case FACE : {
 				PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 
+				CellSelector<PFP2::MAP, FACE>* cs = static_cast<CellSelector<PFP2::MAP, FACE>*>(selector);
+				const std::vector<Face>& selectedCells = cs->getSelectedCells();
+
 				m_selectedFacesDrawer->newList(GL_COMPILE);
 				m_selectedFacesDrawer->color3f(1.0f, 0.0f, 0.0f);
 				m_selectedFacesDrawer->begin(GL_TRIANGLES);
-				for(std::vector<Dart>::const_iterator it = selectedCells.begin(); it != selectedCells.end(); ++it)
+				for(std::vector<Face>::const_iterator f = selectedCells.begin(); f != selectedCells.end(); ++f)
 				{
-					m_selectedFacesDrawer->vertex(p.positionAttribute[*it]);
-					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi1(*it)]);
-					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi_1(*it)]);
+					m_selectedFacesDrawer->vertex(p.positionAttribute[(*f).dart]);
+					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi1((*f).dart)]);
+					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi_1((*f).dart)]);
 				}
 				m_selectedFacesDrawer->end();
 				m_selectedFacesDrawer->endList();

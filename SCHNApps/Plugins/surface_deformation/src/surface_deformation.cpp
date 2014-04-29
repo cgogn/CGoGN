@@ -187,12 +187,12 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
 
 		MapParameters& p = h_parameterSet[mh];
-		const std::vector<Dart>& handle = p.handleSelector->getSelectedCells();
+		const std::vector<Vertex>& handle = p.handleSelector->getSelectedCells();
 
 		if(!m_draginit)
 		{
 			m_dragZ = 0;
-			for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 			{
 				const PFP2::VEC3& pp = p.positionAttribute[*it];
 				qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(pp[0],pp[1],pp[2]));
@@ -212,7 +212,7 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 
 			qglviewer::Vec vec = qq - m_dragPrevious;
 			PFP2::VEC3 t(vec.x, vec.y, vec.z);
-			for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 				p.positionAttribute[*it] += t;
 
 			m_dragPrevious = qq;

@@ -10,8 +10,8 @@ unsigned int CellSelectorGen::selectorCount = 0;
 
 CellSelectorGen::CellSelectorGen(const QString& name) :
 	m_name(name),
-	m_selectionChanged(false),
-	m_isMutuallyExclusive(false)
+	m_isMutuallyExclusive(false),
+	m_selectionChanged(false)
 {
 	++selectorCount;
 }

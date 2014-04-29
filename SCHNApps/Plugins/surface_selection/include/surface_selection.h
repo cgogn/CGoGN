@@ -83,9 +83,9 @@ protected:
 	bool m_selecting;
 
 	// cell under the mouse when selecting
-	Dart m_selectingVertex;
-	Dart m_selectingEdge;
-	Dart m_selectingFace;
+	Vertex m_selectingVertex;
+	Edge m_selectingEdge;
+	Face m_selectingFace;
 
 	// selecting & selected cells drawing
 	Utils::PointSprite* m_pointSprite;
