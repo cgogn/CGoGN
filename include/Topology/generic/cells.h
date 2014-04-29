@@ -46,7 +46,7 @@ public:
 	/// empty construtor
 	Cell(): dart() {}
 
-	/// construtor from Dart
+	/// constructor from Dart
 	inline Cell(Dart d): dart(d) {}
 
 	/// copy constructor

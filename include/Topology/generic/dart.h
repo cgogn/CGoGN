@@ -26,6 +26,7 @@
 #define DART_H_
 
 #include <iostream>
+#include <string>
 
 namespace CGoGN
 {
@@ -40,6 +41,7 @@ const unsigned int NB_THREAD = 16;
 const unsigned int NB_ORBITS	= 11;
 
 const unsigned int DART			= 0;
+
 const unsigned int VERTEX		= 1;
 const unsigned int EDGE			= 2;
 const unsigned int FACE			= 3;
@@ -52,8 +54,6 @@ const unsigned int EDGE1		= 7;
 const unsigned int VERTEX2		= 8;
 const unsigned int EDGE2		= 9;
 const unsigned int FACE2		= 10;
-
-
 
 struct Dart
 {
@@ -113,6 +113,50 @@ struct Dart
 };
 
 const Dart NIL = Dart::nil();
+
+inline std::string orbitName(unsigned int orbit)
+{
+	switch(orbit)
+	{
+	case DART:
+		return "DART";
+		break;
+	case VERTEX:
+		return "VERTEX";
+		break;
+	case EDGE:
+		return "EDGE";
+		break;
+	case FACE:
+		return "FACE";
+		break;
+	case VOLUME:
+		return "VOLUME";
+		break;
+	case CC:
+		return "CC";
+		break;
+	case VERTEX1:
+		return "VERTEX1";
+		break;
+	case EDGE1:
+		return "EDGE1";
+		break;
+	case VERTEX2:
+		return "VERTEX2";
+		break;
+	case EDGE2:
+		return "EDGE2";
+		break;
+	case FACE2:
+		return "FACE2";
+	default:
+		break;
+
+	}
+	return "UNKNOWN";
+}
+
 
 }
 

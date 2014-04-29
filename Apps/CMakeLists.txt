@@ -36,3 +36,4 @@ ENDIF (WITH_QT)
 add_subdirectory(Examples/Tests)
 
 add_subdirectory(Tuto/Traversals)
+add_subdirectory(Tuto/Attributes)
