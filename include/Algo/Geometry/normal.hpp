@@ -44,167 +44,71 @@ namespace Surface
 namespace Geometry
 {
 
-//template <typename PFP>
-//typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
-//{
-//	typename PFP::VEC3 N = Geom::triangleNormal(position[d], position[map.phi1(d)], position[map.phi_1(d)]) ;
-//	N.normalize() ;
-//	return N ;
-//}
-
-//template<typename PFP>
-//typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
-//{
-//	typename PFP::VEC3 N(0);
-
-//	Traversor2FV<typename PFP::MAP> t(map, d) ;
-//	for(Dart it = t.begin(); it != t.end(); it = t.next())
-//	{
-//		const typename PFP::VEC3& P = position[it];
-//		const typename PFP::VEC3& Q = position[map.phi1(it)];
-//		N[0] += (P[1] - Q[1]) * (P[2] + Q[2]);
-//		N[1] += (P[2] - Q[2]) * (P[0] + Q[0]);
-//		N[2] += (P[0] - Q[0]) * (P[1] + Q[1]);
-//	}
-
-//	N.normalize();
-//	return N;
-//}
-
-//template <typename PFP>
-//typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
-//{
-//	if(map.faceDegree(d) == 3)
-//		return triangleNormal<PFP>(map, d, position) ;
-//	else
-//		return newellNormal<PFP>(map, d, position) ;
-//}
-
-
-//template <typename PFP>
-//typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
-//{
-//	typedef typename PFP::VEC3 VEC3 ;
-
-//	VEC3 N(0) ;
-
-//	Traversor2VF<typename PFP::MAP> t(map, d) ;
-//	for(Dart it = t.begin(); it != t.end(); it = t.next())
-//	{
-//		VEC3 n = faceNormal<PFP>(map, it, position) ;
-//		if(!n.hasNan())
-//		{
-//			VEC3 v1 = vectorOutOfDart<PFP>(map, it, position) ;
-//			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(it), position) ;
-//			n *= convexFaceArea<PFP>(map, it, position) / (v1.norm2() * v2.norm2()) ;
-//			N += n ;
-//		}
-//	}
-
-//	N.normalize() ;
-//	return N ;
-//}
-
-
-//template <typename PFP>
-//typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
-//{
-//	assert(map.dimension() == 3);
-
-//	typedef typename PFP::VEC3 VEC3 ;
-
-//	VEC3 N(0) ;
-//	std::vector<Dart> faces;
-//	CellMarker<FACE> f(map);
-
-//	FunctorStore fs(faces);
-//	map.foreach_dart_of_vertex(d,fs);
-
-//	for(std::vector<Dart>::iterator it = faces.begin() ; it != faces.end() ; ++it)
-//	{
-//		if(!f.isMarked(*it) && map.isBoundaryFace(*it))
-//		{
-//			f.mark(*it);
-//			VEC3 n = faceNormal<PFP>(map, *it, position);
-//			if(!n.hasNan())
-//			{
-//				VEC3 v1 = vectorOutOfDart<PFP>(map, *it, position);
-//				VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(*it), position);
-//				n *= convexFaceArea<PFP>(map, *it, position) / (v1.norm2() * v2.norm2());
-//				N += n ;
-//			}
-//		}
-//	}
-
-//	N.normalize() ;
-//	return N ;
-//}
-
-
 template<typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE triangleNormal(typename PFP::MAP& map, Dart d, const V_ATT& position)
+typename V_ATT::DATA_TYPE triangleNormal(typename PFP::MAP& map, Face f, const V_ATT& position)
 {
-	typename V_ATT::DATA_TYPE N = Geom::triangleNormal(position[d], position[map.phi1(d)], position[map.phi_1(d)]) ;
+	typename V_ATT::DATA_TYPE N = Geom::triangleNormal(
+		position[f.dart],
+		position[map.phi1(f)],
+		position[map.phi_1(f)]
+	) ;
 	N.normalize() ;
 	return N ;
 }
 
 template<typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE newellNormal(typename PFP::MAP& map, Dart d, const V_ATT& position)
+typename V_ATT::DATA_TYPE newellNormal(typename PFP::MAP& map, Face f, const V_ATT& position)
 {
 	typedef typename V_ATT::DATA_TYPE VEC3;
-    VEC3 N(0);
+	VEC3 N(0);
 
-    Traversor2FV<typename PFP::MAP> t(map, d) ;
-    for(Dart it = t.begin(); it != t.end(); it = t.next())
-    {
-        const VEC3& P = position[it];
-        const VEC3& Q = position[map.phi1(it)];
-        N[0] += (P[1] - Q[1]) * (P[2] + Q[2]);
-        N[1] += (P[2] - Q[2]) * (P[0] + Q[0]);
-        N[2] += (P[0] - Q[0]) * (P[1] + Q[1]);
-    }
+	foreach_incident2<VERTEX>(map, f, [&] (Vertex v)
+	{
+		const VEC3& P = position[v];
+		const VEC3& Q = position[map.phi1(v)];
+		N[0] += (P[1] - Q[1]) * (P[2] + Q[2]);
+		N[1] += (P[2] - Q[2]) * (P[0] + Q[0]);
+		N[2] += (P[0] - Q[0]) * (P[1] + Q[1]);
+	});
 
-    N.normalize();
-    return N;
+	N.normalize();
+	return N;
 }
 
 template<typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE faceNormal(typename PFP::MAP& map, Dart d, const V_ATT& position)
+typename V_ATT::DATA_TYPE faceNormal(typename PFP::MAP& map, Face f, const V_ATT& position)
 {
-	if(map.faceDegree(d) == 3)
-		return triangleNormal<PFP>(map, d, position) ;
+	if(map.faceDegree(f) == 3)
+		return triangleNormal<PFP>(map, f, position) ;
 	else
-		return newellNormal<PFP>(map, d, position) ;
+		return newellNormal<PFP>(map, f, position) ;
 }
 
-
 template<typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Dart d, const V_ATT& position)
+typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
 {
 	typedef typename V_ATT::DATA_TYPE VEC3 ;
 
 	VEC3 N(0) ;
 
-	Traversor2VF<typename PFP::MAP> t(map, d) ;
-	for(Dart it = t.begin(); it != t.end(); it = t.next())
+	foreach_incident2<FACE>(map, v, [&] (Face f)
 	{
-		VEC3 n = faceNormal<PFP>(map, it, position) ;
+		VEC3 n = faceNormal<PFP>(map, f, position) ;
 		if(!n.hasNan())
 		{
-			VEC3 v1 = vectorOutOfDart<PFP>(map, it, position) ;
-			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(it), position) ;
-			n *= convexFaceArea<PFP>(map, it, position) / (v1.norm2() * v2.norm2()) ;
+			VEC3 v1 = vectorOutOfDart<PFP>(map, f.dart, position) ;
+			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(f), position) ;
+			n *= convexFaceArea<PFP>(map, f, position) / (v1.norm2() * v2.norm2()) ;
 			N += n ;
 		}
-	}
+	});
 
 	N.normalize() ;
 	return N ;
 }
 
 template<typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Dart d, const V_ATT& position)
+typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
 {
 	assert(map.dimension() == 3);
 
@@ -215,7 +119,7 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Dart d, con
 	CellMarker<typename PFP::MAP, FACE> f(map);
 
 	FunctorStore fs(faces);
-	map.foreach_dart_of_vertex(d,fs);
+	map.foreach_dart_of_vertex(v, fs);
 
 	for(std::vector<Dart>::iterator it = faces.begin() ; it != faces.end() ; ++it)
 	{
@@ -240,17 +144,21 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Dart d, con
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal, unsigned int thread)
 {
-	TraversorF<typename PFP::MAP> trav(map, thread);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		face_normal[d] = faceNormal<PFP>(map, d, position) ;
+	foreach_cell<FACE>(map, [&] (Face f)
+	{
+		face_normal[f] = faceNormal<PFP>(map, f, position) ;
+	},
+	false, thread);
 }
 
 template <typename PFP, typename V_ATT>
 void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> trav(map, thread);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		normal[d] = vertexNormal<PFP>(map, d, position) ;
+	foreach_cell<VERTEX>(map, [&] (Vertex v)
+	{
+		normal[v] = vertexNormal<PFP>(map, v, position) ;
+	},
+	false, thread);
 }
 
 
@@ -259,16 +167,16 @@ namespace Parallel
 {
 
 template <typename PFP, typename V_ATT>
-class FunctorComputeNormalVertices: public FunctorMapThreaded<typename PFP::MAP >
+class FunctorComputeNormalVertices : public FunctorMapThreaded<typename PFP::MAP>
 {
-	 const V_ATT& m_position;
-	 V_ATT& m_normal;
+	const V_ATT& m_position;
+	V_ATT& m_normal;
 public:
-	 FunctorComputeNormalVertices<PFP,V_ATT>(	typename PFP::MAP& map, const V_ATT& position, V_ATT& normal):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
-	 { }
+	FunctorComputeNormalVertices<PFP,V_ATT>(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal):
+		FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
+	{ }
 
-	void run(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int /*threadID*/)
 	{
 		m_normal[d] = vertexNormal<PFP>(this->m_map, d, m_position) ;
 	}
@@ -277,20 +185,19 @@ public:
 template <typename PFP, typename V_ATT>
 void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int nbth)
 {
-	FunctorComputeNormalVertices<PFP,V_ATT> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false);
+	FunctorComputeNormalVertices<PFP,V_ATT> funct(map, position, normal);
+	Algo::Parallel::foreach_cell<typename PFP::MAP, VERTEX>(map, funct, nbth, false);
 }
 
-
 template <typename PFP, typename V_ATT, typename F_ATT>
-class FunctorComputeNormalFaces: public FunctorMapThreaded<typename PFP::MAP >
+class FunctorComputeNormalFaces : public FunctorMapThreaded<typename PFP::MAP>
 {
-	 const V_ATT& m_position;
-	 F_ATT& m_normal;
+	const V_ATT& m_position;
+	F_ATT& m_normal;
 public:
-	 FunctorComputeNormalFaces<PFP,V_ATT,F_ATT>( typename PFP::MAP& map, const V_ATT& position, F_ATT& normal):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
-	 { }
+	FunctorComputeNormalFaces<PFP,V_ATT,F_ATT>(typename PFP::MAP& map, const V_ATT& position, F_ATT& normal):
+		FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
+	{ }
 
 	void run(Dart d, unsigned int /*threadID*/)
 	{
@@ -301,27 +208,26 @@ public:
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& normal, unsigned int nbth)
 {
-	FunctorComputeNormalFaces<PFP,V_ATT,F_ATT> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false);
+	FunctorComputeNormalFaces<PFP,V_ATT,F_ATT> funct(map, position, normal);
+	Algo::Parallel::foreach_cell<typename PFP::MAP, FACE>(map, funct, nbth, false);
 }
 
-
 template <typename PFP, typename V_ATT, typename E_ATT>
-class FunctorComputeAngleBetweenNormalsOnEdge: public FunctorMapThreaded<typename PFP::MAP >
+class FunctorComputeAngleBetweenNormalsOnEdge: public FunctorMapThreaded<typename PFP::MAP>
 {
-	 const V_ATT& m_position;
-	 E_ATT& m_angles;
+	const V_ATT& m_position;
+	E_ATT& m_angles;
+
 public:
-	 FunctorComputeAngleBetweenNormalsOnEdge<PFP,V_ATT,E_ATT>( typename PFP::MAP& map, const V_ATT& position, E_ATT& angles):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_angles(angles)
-	 { }
+	FunctorComputeAngleBetweenNormalsOnEdge<PFP,V_ATT,E_ATT>( typename PFP::MAP& map, const V_ATT& position, E_ATT& angles):
+		FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_angles(angles)
+	{ }
 
 	void run(Dart d, unsigned int threadID)
 	{
 		m_angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(this->m_map, d, m_position) ;
 	}
 };
-
 
 template <typename PFP, typename V_ATT, typename E_ATT>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int nbth)
@@ -330,24 +236,25 @@ void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& pos
 	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, funct, nbth, false);
 }
 
-} // endnamespace Parallel
+} // namespace Parallel
 
 
 
 template <typename PFP, typename V_ATT>
-typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, const V_ATT& position)
+typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Edge e, const V_ATT& position)
 {
 	typedef typename V_ATT::DATA_TYPE VEC3 ;
 
-	if(map.isBoundaryEdge(d))
+	if(map.isBoundaryEdge(e))
 		return 0 ;
 
-	Dart dd = map.phi2(d) ;
-	const VEC3 n1 = faceNormal<PFP>(map, d, position) ;
-	const VEC3 n2 = faceNormal<PFP>(map, dd, position) ;
-	VEC3 e = position[dd] - position[d] ;
-	e.normalize() ;
-	typename PFP::REAL s = e * (n1 ^ n2) ;
+	Vertex v1(e.dart);
+	Vertex v2 = map.phi2(e) ;
+	const VEC3 n1 = faceNormal<PFP>(map, Face(v1), position) ;
+	const VEC3 n2 = faceNormal<PFP>(map, Face(v2), position) ;
+	VEC3 edge = position[v2] - position[v1] ;
+	edge.normalize() ;
+	typename PFP::REAL s = edge * (n1 ^ n2) ;
 	typename PFP::REAL c = n1 * n2 ;
 	typename PFP::REAL a(0) ;
 
@@ -359,23 +266,26 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 		if (s >= 0) a = acos(c) ;
 		else a = -acos(c) ;
 	}
-//	if (isnan(a))
+	//	if (isnan(a))
 	if(a != a)
-		std::cerr<< "Warning : computeAngleBetweenNormalsOnEdge returns NaN on edge " << d << "-" << dd << std::endl ;
+		std::cerr<< "Warning : computeAngleBetweenNormalsOnEdge returns NaN on edge " << v1 << "-" << v2 << std::endl ;
+
 	return a ;
 }
 
 template <typename PFP, typename V_ATT, typename E_ATT>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int thread)
 {
-	TraversorE<typename PFP::MAP> trav(map, thread);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(map, d, position) ;
+	foreach_cell<EDGE>(map, [&] (Edge e)
+	{
+		angles[e] = computeAngleBetweenNormalsOnEdge<PFP>(map, e, position) ;
+	},
+	false, thread);
 }
 
 } // namespace Geometry
 
-}
+} // namespace Surface
 
 } // namespace Algo
 

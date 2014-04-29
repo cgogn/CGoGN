@@ -451,7 +451,7 @@ public:
 
 /**
  * Functor class for parallel::foreach_orbit/cell/dart
- * Overload  run
+ * Overload run
  * Overload duplicate if necessary (no sharing of functors)
  */
 template<typename MAP>
@@ -468,7 +468,7 @@ public:
 	/**
 	 * @return a pointer on a copy of the object.
 	 */
-	virtual FunctorMapThreaded<MAP>* duplicate() const { return NULL;}
+	virtual FunctorMapThreaded<MAP>* duplicate() const { return NULL; }
 
 	/**
 	 * insert your code here:
