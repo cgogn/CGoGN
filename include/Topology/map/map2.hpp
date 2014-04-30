@@ -537,7 +537,7 @@ void Map2<MAP_IMPL>::extractTrianglePair(Dart d)
 {
 	Dart e = phi2(d) ;
 
-	assert(!isBoundaryFace(d) && !isBoundaryFace(e)) ;
+	assert(!isBoundaryAdjacentFace(d) && !isBoundaryAdjacentFace(e)) ;
 	assert(faceDegree(d) == 3 && faceDegree(e) == 3) ;
 
 	Dart d1 = phi2(this->phi1(d)) ;
@@ -577,7 +577,7 @@ bool Map2<MAP_IMPL>::mergeVolumes(Dart d, Dart e, bool deleteFace)
 {
 	assert(!this->template isBoundaryMarked<2>(d) && !this->template isBoundaryMarked<2>(e)) ;
 
-	if (isBoundaryFace(d) || isBoundaryFace(e))
+	if (isBoundaryAdjacentFace(d) || isBoundaryAdjacentFace(e))
 		return false;
 
 	// First traversal of both faces to check the face sizes
@@ -761,7 +761,7 @@ inline int Map2<MAP_IMPL>::checkFaceDegree(Dart d, unsigned int le) const
 }
 
 template <typename MAP_IMPL>
-bool Map2<MAP_IMPL>::isBoundaryFace(Dart d) const
+bool Map2<MAP_IMPL>::isBoundaryAdjacentFace(Dart d) const
 {
 	Dart it = d ;
 	do

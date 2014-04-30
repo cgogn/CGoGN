@@ -338,9 +338,9 @@ public:
 	int checkFaceDegree(Dart d, unsigned int le) const;
 
 	/**
-	 * tell if the face of d is on the boundary of the map
+	 * tell if the face of d is adjacent to the boundary of the map
 	 */
-	bool isBoundaryFace(Dart d) const;
+	bool isBoundaryAdjacentFace(Dart d) const;
 
 	//! Test if dart d and e belong to the same oriented volume
 	/*! @param d a dart

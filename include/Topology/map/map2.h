@@ -380,9 +380,9 @@ public:
 	int checkFaceDegree(Dart d, unsigned int le) const;
 
 	/**
-	 * tell if the face of d is on the boundary of the map
+	 * tell if the face of d is adjacent to the boundary of the map
 	 */
-	bool isBoundaryFace(Dart d) const;
+	bool isBoundaryAdjacentFace(Dart d) const;
 
 	/**
 	 * find the dart of edge that belong to the boundary
