@@ -28,9 +28,9 @@ public:
 
 	inline const QString& getName() { return m_name; }
 
-	virtual inline unsigned int getOrbit() const = 0;
+	virtual unsigned int getOrbit() const = 0;
 
-	virtual inline unsigned int getNbSelectedCells() const = 0;
+	virtual unsigned int getNbSelectedCells() const = 0;
 
 	virtual void rebuild() = 0;
 
@@ -45,7 +45,7 @@ public:
 
 	inline void setMutuallyExclusive(bool b) { m_isMutuallyExclusive = b; }
 	inline bool isMutuallyExclusive() const { return m_isMutuallyExclusive; }
-	virtual inline void setMutuallyExclusiveSet(const QList<CellSelectorGen*>& mex) = 0;
+	virtual void setMutuallyExclusiveSet(const QList<CellSelectorGen*>& mex) = 0;
 
 signals:
 	void selectedCellsChanged();

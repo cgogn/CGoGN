@@ -65,19 +65,6 @@ public:
 	inline Cell<ORBIT> next() ;
 
 	inline void skip(Cell<ORBIT> c);
-
-	inline void apply(std::function<bool (Cell<ORBIT>)> f)
-	{
-		for (Cell<ORBIT> c = begin(), e = end(); c.dart != e.dart; c = next())
-			if (f(c))
-				return;
-	}
-
-	inline void apply(std::function<void (Cell<ORBIT>)> f)
-	{
-		for (Cell<ORBIT> c = begin(), e = end(); c.dart != e.dart; c = next())
-			f(c);
-	}
 } ;
 
 
@@ -86,20 +73,19 @@ template <unsigned int ORBIT, typename MAP, typename FUNC>
 inline void foreach_cell(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
 	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
-	trav.apply(f);
+	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+		f(c);
 }
 
 
-template <unsigned int ORBIT, typename MAP >
-inline void find_cell(const MAP& map, Cell<ORBIT> c, std::function<bool (Cell<ORBIT>)> cond, bool forceDartMarker = false, unsigned int thread = 0)
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+inline void foreach_cell_until(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
 	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
-	c = trav.begin();
-	Cell<ORBIT> e = trav.end();
-	while ((c.dart != e.dart) && (!cond(c)))
-		c = trav.next();
+	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+		if (!f(c))
+			break;
 }
-
 
 
 
