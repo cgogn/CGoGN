@@ -26,6 +26,7 @@
 #define __TETRAHEDRALIZATION_H__
 
 //#include "tetgen/tetgen.h"
+#include "Algo/Geometry/normal.h"
 
 namespace CGoGN
 {

@@ -643,7 +643,31 @@ template <typename PFP>
 Dart swapGen3To2(typename PFP::MAP& map, Dart d)
 {
 	Dart stop = map.phi1(map.phi2(map.phi_1(d)));
-	map.deleteEdge(d);
+	if(map.deleteEdge(d) == NIL)
+	{
+		std::cout << "boundary" << std::endl;
+
+		std::vector<Dart> edges;
+		Dart dbegin = map.findBoundaryFaceOfEdge(d);
+		Traversor3EW<typename PFP::MAP> t(map, d);
+		for(Dart dit = t.begin() ; dit != t.end() ; dit = t.next())
+			edges.push_back(dit);
+
+		for(unsigned int i = 0 ; i < edges.size() ; ++i)
+			map.mergeVolumes(edges[i]);
+
+		Dart d  = dbegin;
+		Dart e = map.phi2(d);
+		map.flipBackEdge(d);
+		map.template copyDartEmbedding<VERTEX>(d, map.phi1(e)) ;
+		map.template copyDartEmbedding<VERTEX>(e, map.phi1(d)) ;
+
+		d  = map.phi3(dbegin);
+		e = map.phi2(d);
+		map.flipEdge(d);
+		map.template copyDartEmbedding<VERTEX>(d, map.phi1(e)) ;
+		map.template copyDartEmbedding<VERTEX>(e, map.phi1(d)) ;
+	}
 
 	std::vector<Dart> edges;
 	Dart dit = stop;
@@ -688,10 +712,32 @@ Dart swapGen3To2(typename PFP::MAP& map, Dart d)
 template <typename PFP>
 std::vector<Dart> swapGen3To2Optimized(typename PFP::MAP& map, Dart d)
 {
-	std::vector<Dart> resTets;
-
 	Dart stop = map.phi1(map.phi2(map.phi_1(d)));
-	map.deleteEdge(d);
+	if(map.deleteEdge(d) == NIL)
+	{
+		std::cout << "boundary" << std::endl;
+
+		std::vector<Dart> edges;
+		Dart dbegin = map.findBoundaryFaceOfEdge(d);
+		Traversor3EW<typename PFP::MAP> t(map, d);
+		for(Dart dit = t.begin() ; dit != t.end() ; dit = t.next())
+			edges.push_back(dit);
+
+		for(unsigned int i = 0 ; i < edges.size() ; ++i)
+			map.mergeVolumes(edges[i]);
+
+		Dart d  = dbegin;
+		Dart e = map.phi2(d);
+		map.flipBackEdge(d);
+		map.template copyDartEmbedding<VERTEX>(d, map.phi1(e)) ;
+		map.template copyDartEmbedding<VERTEX>(e, map.phi1(d)) ;
+
+		d  = map.phi3(dbegin);
+		e = map.phi2(d);
+		map.flipEdge(d);
+		map.template copyDartEmbedding<VERTEX>(d, map.phi1(e)) ;
+		map.template copyDartEmbedding<VERTEX>(e, map.phi1(d)) ;
+	}
 
 	std::vector<Dart> edges;
 	Dart dit = stop;
