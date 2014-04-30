@@ -32,21 +32,15 @@
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-
-#include "Algo/Render/GL2/topo3Render.h"
-
+#include "Algo/Render/GL2/topoRender.h"
 #include "Topology/generic/cellmarker.h"
-#include "Utils/text3d.h"
 
-#include "Utils/pointSprite.h"
-#include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
 
 #include "Utils/Qt/qtSimple.h"
 
-#include "ui_show_traversors.h"
+#include "ui_show_traversors2.h"
 // inclure qtui.h juste après le ui_xxx.h
 #include "Utils/Qt/qtui.h"
 
@@ -56,7 +50,7 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-	typedef EmbeddedMap3 MAP;
+	typedef EmbeddedMap2 MAP;
 };
 
 typedef PFP::MAP MAP ;
@@ -74,12 +68,10 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
-	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
+	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
 	bool m_showTopo;
 
-	unsigned int m_first3;
-	unsigned int m_ajd_or_inci3;
-	unsigned int m_second3;
+
 	unsigned int m_first2;
 	unsigned int m_ajd_or_inci2;
 	unsigned int m_second2;
@@ -89,9 +81,6 @@ public:
 	MyQT():
 		m_render_topo(NULL),
 		m_showTopo(true),
-		m_first3(0),
-		m_ajd_or_inci3(0),
-		m_second3(1),
 		m_first2(0),
 		m_ajd_or_inci2(0),
 		m_second2(1),
@@ -108,6 +97,14 @@ public:
 
 	DartMarker<MAP>* m_dm_topo;
 
+	MAP myMap;
+
+	VertexAttribute<VEC3, MAP_IMPL> position ;
+
+	Dart dglobal;
+
+	void init(char *fname);
+
 protected:
     void storeVerticesInfo();
 
@@ -123,20 +120,14 @@ protected:
 	void colorizeCell(Dart d, float r,float g, float b);
 
 	void traverse2();
-	void traverse3();
-
 	void dynamicMarkOrbit(unsigned int orb);
-//	void dyn_trav3XXaY(unsigned int first, unsigned int second);
 
 // slots locaux
 public slots:
-	void cb_combo1(int x);
-	void cb_combo2(int x);
-	void cb_combo3(int x);
-
 	void cb_combo4(int x);
 	void cb_combo5(int x);
 	void cb_combo6(int x);
+
 	void cb_checkTopo(bool b);
 	void cb_explode(int x);
 };

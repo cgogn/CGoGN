@@ -197,6 +197,141 @@ void Viewer::cb_keyPress(int keycode)
     	case 'c' :
     		myMap.check();
     		break;
+
+
+	case 'a':
+	{
+		Utils::Chrono ch;
+		ch.start();
+		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
+		if(!pos2.isValid())
+			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
+
+		for (int i=0; i< 10; ++i)
+		{
+			TraversorV<MAP> trav(myMap);
+			for (Dart d=trav.begin(), d_end = trav.end(); d!=d_end ; d = trav.next())
+			{
+				pos2[d] = VEC3(0,0,0);
+				int nb=0;
+				Traversor2VVaF<MAP> trf(myMap,d);
+				for (Dart e = trf.begin(),e_end =trf.end() ; e != e_end; e = trf.next())
+				{
+					pos2[d] += position[e];
+					nb++;
+				}
+				pos2[d]/=nb;
+			}
+			myMap.swapAttributes(position,pos2);
+		}
+		std::cout << "Traversor "<< ch.elapsed()<< " ms "<< std::endl;
+		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+		m_positionVBO->updateData(position) ;
+		m_normalVBO->updateData(normal) ;
+		updateGL();
+	}
+		break;
+
+	case 'b':
+	{
+		Utils::Chrono ch;
+		ch.start();
+
+		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
+		if(!pos2.isValid())
+			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
+
+		for (int i=0; i< 10; ++i)
+		{
+			foreach_cell<VERTEX>(myMap, [&] (Vertex d)
+			{
+				pos2[d] = VEC3(0,0,0);
+				int nb=0;
+				foreach_adjacent2<FACE>(myMap,d,[&](Vertex e)
+				{
+					pos2[d] += position[e];
+					nb++;
+				});
+				pos2[d]/=nb;
+			});
+			myMap.swapAttributes(position,pos2);
+		}
+		std::cout << "Lambda "<< ch.elapsed()<< " ms "<< std::endl;
+		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+		m_positionVBO->updateData(position) ;
+		m_normalVBO->updateData(normal) ;
+		updateGL();
+	}
+		break;
+
+
+	case 'e':
+	{
+		Utils::Chrono ch;
+		ch.start();
+		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
+		if(!pos2.isValid())
+			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
+
+		for (int i=0; i< 10; ++i)
+		{
+			TraversorV<MAP> trav(myMap);
+			for (Dart d=trav.begin(), d_end = trav.end(); d!=d_end ; d = trav.next())
+			{
+				pos2[d] = VEC3(0,0,0);
+				int nb=0;
+				Traversor2VE<MAP> trf(myMap,d);
+				for (Dart e = trf.begin(),e_end =trf.end() ; e != e_end; e = trf.next())
+				{
+					pos2[d] += position[myMap.phi1(e)];
+					nb++;
+				}
+				pos2[d]/=nb;
+			}
+			myMap.swapAttributes(position,pos2);
+		}
+		std::cout << "Traversor "<< ch.elapsed()<< " ms "<< std::endl;
+		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+		m_positionVBO->updateData(position) ;
+		m_normalVBO->updateData(normal) ;
+		updateGL();
+	}
+		break;
+
+	case 'f':
+	{
+		Utils::Chrono ch;
+		ch.start();
+
+		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
+		if(!pos2.isValid())
+			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
+
+		for (int i=0; i< 10; ++i)
+		{
+			foreach_cell<VERTEX>(myMap, [&] (Vertex d)
+			{
+				pos2[d] = VEC3(0,0,0);
+				int nb=0;
+				foreach_incident2<EDGE>(myMap,d,[&](Edge e)
+				{
+					pos2[d] += position[myMap.phi1(e)];
+					nb++;
+				});
+				pos2[d]/=nb;
+			});
+			myMap.swapAttributes(position,pos2);
+		}
+		std::cout << "Lambda "<< ch.elapsed()<< " ms "<< std::endl;
+		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+		m_positionVBO->updateData(position) ;
+		m_normalVBO->updateData(normal) ;
+		updateGL();
+	}
+		break;
+
+
+
     	default:
     		break;
     }
