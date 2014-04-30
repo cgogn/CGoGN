@@ -744,7 +744,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typena
 	TraversorW<MAP> tWb(map);
 	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
 	{
-		if(map.isBoundaryVolume(dit))
+		if(map.isBoundaryAdjacentVolume(dit))
 		{
 			Traversor3WE<MAP> tWE(map, dit);
 			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())

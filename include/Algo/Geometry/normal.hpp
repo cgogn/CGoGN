@@ -123,7 +123,7 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, c
 
 	for(std::vector<Dart>::iterator it = faces.begin() ; it != faces.end() ; ++it)
 	{
-		if(!f.isMarked(*it) && map.isBoundaryFace(*it))
+		if(!f.isMarked(*it) && map.isBoundaryIncidentFace(*it))
 		{
 			f.mark(*it);
 			VEC3 n = faceNormal<PFP>(map, *it, position);
