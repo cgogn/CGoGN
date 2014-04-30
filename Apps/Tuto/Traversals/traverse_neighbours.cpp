@@ -59,10 +59,14 @@ int main()
 
 	// easy way to find the central vertex of the grid	
 	Vertex v;
-//	findCell(VERTEX,v,MAP,myMap, position[v] == VEC3(0,0,0) );
-	find_cell<VERTEX>(myMap,v, [&](Vertex v)
+	foreach_cell_until<VERTEX>(myMap, [&] (Vertex it)
 	{
-		return position[v] == VEC3(0,0,0);
+		if (position[it] == VEC3(0,0,0))
+		{
+			v = it;
+			return true;
+		}
+		return false;
 	});
 
 	// must test of find ok (if not v.dart is NIL)
@@ -73,14 +77,14 @@ int main()
 // WITH TRAVERSORS:
 	
 	// find incident faces to vertex
-	Traversor2VF<MAP> trvf(myMap,v.dart);
+	Traversor2VF<MAP> trvf(myMap, v.dart);
 	for (Dart e = trvf.begin(); e != trvf.end(); e = trvf.next())
 	{
 		std::cout << "Face of dart "<<e<< " incident to vertex of dart " << v.dart<< std::endl;
 	}
 
 	// find adjacent vertices thru a face
-	Traversor2VVaF<MAP> trvvaf(myMap,v.dart);
+	Traversor2VVaF<MAP> trvvaf(myMap, v.dart);
 	for (Dart e = trvvaf.begin(); e != trvvaf.end(); e = trvvaf.next())
 	{
 		std::cout << "vertex of dart "<<e<< " adjacent to vertex of dart " << v.dart<< " by a face" << std::endl;
@@ -88,16 +92,16 @@ int main()
 
 // WITH FOREACH FUNCTION (C++11 lambda expression)
 
-	// find incident faces to vertex
-	foreach_incident2<FACE>(myMap,v,[&](Face f)
+	// find faces incident to vertex v
+	foreach_incident2<FACE>(myMap, v, [&](Face f)
 	{
-		std::cout << "Face of dart "<<f<< " incident to vertex of dart " << v.dart<< std::endl;
+		std::cout << "Face of dart " << f << " incident to vertex of dart " << v.dart << std::endl;
 	});
 
-	// find adjacent vertices thru a face
-	foreach_adjacent2<FACE>(myMap,v,[&](Vertex x)
+	// find vertices adjacent to vertex v thru a face
+	foreach_adjacent2<FACE>(myMap, v, [&](Vertex x)
 	{
-		std::cout << "vertex of dart "<<x<< " adjacent to vertex of dart " << v.dart<< " by a face" << std::endl;	
+		std::cout << "vertex of dart " << x << " adjacent to vertex of dart " << v.dart << " by a face" << std::endl;
 	});
 
 	return 0;
