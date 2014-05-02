@@ -398,7 +398,7 @@ public:
 
 
 template <unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP, typename FUNC>
-inline void foreach_incident2(MAP& map, Cell<ORBIT_FROM> c,FUNC f)
+inline void foreach_incident2(MAP& map, Cell<ORBIT_FROM> c, FUNC f)
 {
 	IncidentTrav2<MAP,ORBIT_FROM,ORBIT_TO> trav(const_cast<const MAP&>(map),c);
 	for (Cell<ORBIT_TO> c = trav.t.begin(), e = trav.t.end(); c.dart != e.dart; c = trav.t.next())
