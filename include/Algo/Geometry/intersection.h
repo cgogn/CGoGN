@@ -49,7 +49,7 @@ namespace Geometry
  * @return true if segment intersects the face
  */
 template <typename PFP>
-bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter) ;
+bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter) ;
 
 /**
  * test the intersection between a segment and a n-sided face (n>=3)
@@ -63,7 +63,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttr
  * @return true if segment intersects the face
  */
 template <typename PFP>
-bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter) ;
+bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter) ;
 
 /**
  * test if two triangles intersect
@@ -73,7 +73,7 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexA
  * @param a dart of the second triangle
  */
 template <typename PFP>
-bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const VertexAttribute<typename PFP::VEC3>& position) ;
+bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 /**
  * alpha = coef d'interpolation dans [0 ,1] tel que v = (1-alpha)*pin + alpha*pout
@@ -82,7 +82,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
  * avec pout = position[phi1(d)] à l'extérieur de la sphère
  */
 template <typename PFP>
-bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::REAL& alpha) ;
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, typename PFP::REAL& alpha) ;
 
 } // namespace Geometry
 

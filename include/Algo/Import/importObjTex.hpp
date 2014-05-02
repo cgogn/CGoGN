@@ -28,16 +28,17 @@
 #include <fstream>
 #include <algorithm>
 
-
 namespace CGoGN
 {
+
 namespace Algo
 {
+
 namespace Surface
 {
+
 namespace Import 
 {
-
 
 template <typename PFP>
 OBJModel<PFP>::OBJModel(typename PFP::MAP& map):
@@ -47,7 +48,6 @@ OBJModel<PFP>::OBJModel(typename PFP::MAP& map):
 {
 }
 
-
 template <typename PFP>
 OBJModel<PFP>::~OBJModel()
 {
@@ -55,23 +55,17 @@ OBJModel<PFP>::~OBJModel()
 		delete *it;
 }
 
-
-
-
 template <typename PFP>
 inline void OBJModel<PFP>::setMaxTextureSize(unsigned int mts)
 {
 	m_maxTextureSize = mts;
 }
 
-
 template <typename PFP>
 inline typename PFP::VEC3 OBJModel<PFP>::getPosition(Dart d)
 {
 	return m_positions[d];
 }
-
-
 
 template <typename PFP>
 inline typename PFP::VEC3 OBJModel<PFP>::getNormal(Dart d)
@@ -81,7 +75,6 @@ inline typename PFP::VEC3 OBJModel<PFP>::getNormal(Dart d)
 	return m_normals[d];
 }
 
-
 template <typename PFP>
 inline Geom::Vec2f OBJModel<PFP>::getTexCoord(Dart d)
 {
@@ -90,30 +83,23 @@ inline Geom::Vec2f OBJModel<PFP>::getTexCoord(Dart d)
 	return m_texCoords[d];
 }
 
-
 template <typename PFP>
-void OBJModel<PFP>::setPositionAttribute(VertexAttribute<Geom::Vec3f> position)
+void OBJModel<PFP>::setPositionAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP::IMPL> position)
 {
 	m_positions = position;
 }
 
 template <typename PFP>
-void OBJModel<PFP>::setNormalAttribute(VertexAttribute<Geom::Vec3f> normal)
+void OBJModel<PFP>::setNormalAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP::IMPL> normal)
 {
 	m_normals = normal;
 }
 
 template <typename PFP>
-void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f>texcoord)
+void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f, typename PFP::MAP::IMPL>texcoord)
 {
 	m_texCoords = texcoord;
 }
-
-
-
-
-
-
 
 template <typename PFP>
 void OBJModel<PFP>::readMaterials(const std::string& filename)
@@ -270,7 +256,6 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 
 }
 
-
 template <typename PFP>
 unsigned int OBJModel<PFP>::getMaterialIndex(const std::string& name) const
 {
@@ -279,7 +264,6 @@ unsigned int OBJModel<PFP>::getMaterialIndex(const std::string& name) const
 		return it->second;
 	return 0xffffffff;
 }
-
 
 //template <typename PFP>
 //bool OBJModel<PFP>::generateBrowsers(std::vector<ContainerBrowser*>& browsers)
@@ -306,10 +290,6 @@ unsigned int OBJModel<PFP>::getMaterialIndex(const std::string& name) const
 //	}
 //	return true;
 //}
-
-
-
-
 	
 template <typename PFP>
 short OBJModel<PFP>::readObjLine(std::stringstream& oss, std::vector<unsigned int>& indices)
@@ -359,7 +339,6 @@ short OBJModel<PFP>::readObjLine(std::stringstream& oss, std::vector<unsigned in
 	return nb;
 }
 
-
 template <typename PFP>
 unsigned int OBJModel<PFP>::createSimpleVBO_P(Utils::VBO* positionVBO)
 {
@@ -391,7 +370,6 @@ unsigned int OBJModel<PFP>::createSimpleVBO_P(Utils::VBO* positionVBO)
 
 	return 3*nbtris;
 }
-
 
 template <typename PFP>
 unsigned int OBJModel<PFP>::createSimpleVBO_PT(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO)
@@ -446,10 +424,6 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PT(Utils::VBO* positionVBO, Utils::V
 
 	return 3*nbtris;
 }
-
-
-
-
 
 template <typename PFP>
 unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::VBO* normalVBO )
@@ -518,8 +492,6 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::V
 	return 3*nbtris;
 }
 
-
-
 template <typename PFP>
 unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::VBO* texcoordVBO, Utils::VBO* normalVBO )
 {
@@ -533,7 +505,6 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 		CGoGNerr << "no tex coords attribute "<< CGoGNendl;
 		return 0;
 	}
-
 
 	TraversorF<typename PFP::MAP> traf(m_map);
 	std::vector<Geom::Vec3f> posBuff;
@@ -630,11 +601,6 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 	return 3*nbtris;
 }
 
-
-
-
-
-
 template <typename PFP>
 bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 {
@@ -651,7 +617,6 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 		CGoGNerr << "no tex coords attribute "<< CGoGNendl;
 		return false;
 	}
-
 
 	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
 	group_faces.reserve(16384);
@@ -670,12 +635,10 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 
 	m_groupFirstSub.push_back(0);
 
-
 	if (m_tagG != 0)
 		m_groupIdx.push_back(c_grp);
 	else
 		m_groupIdx.push_back(0);
-
 
 	while (d!= traf.end())
 	{
@@ -706,7 +669,6 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 	}
 
 	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
-
 
 	// merging same material sub-groups of same group
 	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
@@ -763,7 +725,6 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 		}
 	}
 	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
-
 
 	// now create VBOs
 
@@ -824,9 +785,6 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 
 	return true;
 }
-
-
-
 
 //template <typename PFP>
 //bool OBJModel<PFP>::createGroupMatVBO_P(Utils::VBO* positionVBO)
@@ -892,9 +850,6 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 //	return true;
 //}
 
-
-
-
 template <typename PFP>
 bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 											Utils::VBO* texcoordVBO)
@@ -913,7 +868,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 		return false;
 	}
 
-
 	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
 	group_faces.reserve(16384);
 	m_groupIdx.reserve(16384);
@@ -931,12 +885,10 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 
 	m_groupFirstSub.push_back(0);
 
-
 	if (m_tagG != 0)
 		m_groupIdx.push_back(c_grp);
 	else
 		m_groupIdx.push_back(0);
-
 
 	while (d!= traf.end())
 	{
@@ -967,7 +919,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 	}
 
 	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
-
 
 	// merging same material sub-groups of same group
 	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
@@ -1025,14 +976,12 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 	}
 	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
 
-
 	// now create VBOs
 
 	std::vector<Geom::Vec3f> posBuff;
 	std::vector<Geom::Vec2f> TCBuff;
 	posBuff.reserve(16384);
 	TCBuff.reserve(16384);
-
 
 	unsigned int firstIndex = 0;
 
@@ -1112,10 +1061,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 	return true;
 }
 
-
-
-
-
 template <typename PFP>
 bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 											Utils::VBO* normalVBO)
@@ -1128,7 +1073,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 		CGoGNerr << "no normal attribute "<< CGoGNendl;
 		return false;
 	}
-
 
 	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
 	group_faces.reserve(16384);
@@ -1147,12 +1091,10 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 
 	m_groupFirstSub.push_back(0);
 
-
 	if (m_tagG != 0)
 		m_groupIdx.push_back(c_grp);
 	else
 		m_groupIdx.push_back(0);
-
 
 	while (d!= traf.end())
 	{
@@ -1183,7 +1125,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 	}
 
 	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
-
 
 	// merging same material sub-groups of same group
 	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
@@ -1240,7 +1181,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 		}
 	}
 	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
-
 
 	// now create VBOs
 
@@ -1328,14 +1268,11 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 	return true;
 }
 
-
-
-
-
 template <typename PFP>
-bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
-											Utils::VBO* texcoordVBO,
-											Utils::VBO* normalVBO)
+bool OBJModel<PFP>::createGroupMatVBO_PTN(
+	Utils::VBO* positionVBO,
+	Utils::VBO* texcoordVBO,
+	Utils::VBO* normalVBO)
 {
 	m_beginIndices.clear();
 	m_nbIndices.clear();
@@ -1351,7 +1288,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 		return false;
 	}
 
-
 	std::vector< std::vector<Dart> > group_faces; //(m_materialNames.size());
 	group_faces.reserve(16384);
 	m_groupIdx.reserve(16384);
@@ -1369,12 +1305,10 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 
 	m_groupFirstSub.push_back(0);
 
-
 	if (m_tagG != 0)
 		m_groupIdx.push_back(c_grp);
 	else
 		m_groupIdx.push_back(0);
-
 
 	while (d!= traf.end())
 	{
@@ -1405,7 +1339,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 	}
 
 	m_groupNbSub.push_back(c_sg+1-m_groupFirstSub.back()); // nb sub-group of last group
-
 
 	// merging same material sub-groups of same group
 	for (unsigned int g=0; g<m_groupNbSub.size(); ++g)
@@ -1463,7 +1396,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 	}
 	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
 
-
 	// now create VBOs
 
 	std::vector<Geom::Vec3f> posBuff;
@@ -1472,7 +1404,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 	posBuff.reserve(16384);
 	TCBuff.reserve(16384);
 	normalBuff.reserve(16384);
-
 
 	unsigned int firstIndex = 0;
 
@@ -1570,9 +1501,6 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN( Utils::VBO* positionVBO,
 
 	return true;
 }
-
-
-
 
 template <typename PFP>
 void OBJModel<PFP>::computeBB(const std::vector<Geom::Vec3f>& pos)
@@ -1594,15 +1522,13 @@ void OBJModel<PFP>::computeBB(const std::vector<Geom::Vec3f>& pos)
 			bb.addPoint(pos[j]);
 		}
 	}
-
 }
-
-
-
 
 template <typename PFP>
 bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string>& attrNames)
 {
+	typedef  typename PFP::MAP MAP;
+	typedef  typename PFP::MAP::IMPL MAP_IMPL;
 	typedef  typename PFP::VEC3 VEC3;
 	typedef Geom::Vec2f VEC2;
 
@@ -1643,16 +1569,12 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		}
 		tag.clear();
 
-	}while (!fp.eof());
-
-
+	} while (!fp.eof());
 
 	m_positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
 	if (!m_positions.isValid())
 		m_positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(m_positions.name()) ;
-
-
 
 	m_texCoords =  m_map.template getAttribute<VEC2, VERTEX>("texCoord") ;
 	if (!m_texCoords.isValid())
@@ -1677,7 +1599,6 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		if (!m_normalsF.isValid())
 			m_normalsF = m_map.template addAttribute<VEC3, VERTEX1>("normalF") ;
 	}
-
 	
 //	if (m_tagG != 0) always use group even if not in the file
 	{
@@ -1712,21 +1633,19 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	std::vector<unsigned int> texCoordsID;
 	texCoordsID.reserve(m_tagV);
 	
-
 	std::vector<unsigned int> localIndices;
 	localIndices.reserve(64*3);
 	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(m_map);
 
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> > > vecDartsPerVertex(m_map, "incidents");
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> > > vecNormIndPerVertex(m_map, "incidentsN");
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> > > vecTCIndPerVertex(m_map, "incidentsTC");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(m_map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> >, MAP_IMPL> vecNormIndPerVertex(m_map, "incidentsN");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> >, MAP_IMPL> vecTCIndPerVertex(m_map, "incidentsTC");
 
 	int currentGroup = -1;
 	unsigned int currentMat = 0;
 	unsigned int nextMat = 0;
 
-
-	DartMarkerNoUnmark mk(m_map) ;
+	DartMarkerNoUnmark<MAP> mk(m_map) ;
 	unsigned int i = 0;
 	fp >> tag;
 	std::getline(fp, ligne);
@@ -1858,7 +1777,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 					m_map.sewFaces(d, good_dart, false);
 				else
 					m_dirtyEdges.mark(d);
-				mk.unmarkOrbit<EDGE>(d);
+				mk.template unmarkOrbit<EDGE>(d);
 			}
 			else
 			{
@@ -1872,7 +1791,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 
 	// A SIMPLIFIER ???
 
-	TraversorV<typename PFP::MAP> tra(m_map);
+	TraversorV<MAP> tra(m_map);
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
 		std::vector<Dart>& vec			= vecDartsPerVertex[d];
@@ -1921,11 +1840,9 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 //		}
 	}
 
-
 	readMaterials();
 
 	return true;
-
 }
 
 template <typename PFP>
@@ -1945,8 +1862,10 @@ unsigned int OBJModel<PFP>::storeFacesOfGroup(unsigned int groupId, std::vector<
 	return dartFaces.size()-nb;
 }
 
+} // namespace Import
 
-}
-}
-} // end namespaces
-}
+} // namespace Surface
+
+} // namespace Algo
+
+} // namespace CGoGN

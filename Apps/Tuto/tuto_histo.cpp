@@ -29,7 +29,7 @@
 #include "Algo/Geometry/area.h"
 
 
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 #include <cmath>
 #include <sstream>
@@ -73,23 +73,23 @@ void MyQT::createMap(const std::string& filename)
 		CGoGNerr << "could not import " << filename << CGoGNendl ;
 		return;
 	}
-	VertexAttribute<VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 
 	// attribute on which we make the histogram
-	VertexAttribute<float> area = myMap.addAttribute<float, VERTEX>("area");
+	VertexAttribute<float, MAP_IMPL> area = myMap.addAttribute<float, VERTEX>("area");
 
 	// attribute color to generate from histo
-	VertexAttribute<VEC3> colorF = myMap.addAttribute<PFP::VEC3, VERTEX>("colorF");
+	VertexAttribute<VEC3, MAP_IMPL> colorF = myMap.addAttribute<VEC3, VERTEX>("colorF");
 
 	// compute the area attribute
 	Algo::Surface::Geometry::computeOneRingAreaVertices<PFP>(myMap,position,area);
 
 	// just some tricks to obtain relatives value
-	float amax=0;
-	for (unsigned int i=area.begin(); i != area.end(); area.next(i))
+	float amax = 0;
+	for (unsigned int i = area.begin(); i != area.end(); area.next(i))
 		if (area[i] > amax) amax = area[i];
-	for (unsigned int i=area.begin(); i != area.end(); area.next(i))
-		area[i] -= amax/4;
+	for (unsigned int i = area.begin(); i != area.end(); area.next(i))
+		area[i] -= amax / 4;
 
 
 	// create a colormap class for histogram coloring
@@ -97,7 +97,6 @@ void MyQT::createMap(const std::string& filename)
 
 	// create the histogram
 	l_histo = new Algo::Histogram::Histogram(*l_cm);
-
 
 	// init data with specific conversion (direction init  is: l_histo->initData(area);)
 	AttConv ac(area);
@@ -274,22 +273,21 @@ void MyQT::cb_redraw()
 	glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
-
 void MyQT::clickHisto(unsigned int i,unsigned int j)
 {
-	std::cout << "CLICK on column Histo: "<< i << " / Quantiles: "<< j <<std::endl;
+	std::cout << "CLICK on column Histo: " << i << " / Quantiles: " << j <<std::endl;
 
 	if (i != Utils::QT::RenderHistogram::NONE)
 	{
 		std::vector<unsigned int > vc;
 		l_histo->cellsOfHistogramColumn(i,vc);
 		std::cout << "Cells of histo: "<< std::endl;
-		for (unsigned int k=0; k <vc.size(); ++k)
-			std::cout << vc[k]<<"/";
+		for (unsigned int k = 0; k < vc.size(); ++k)
+			std::cout << vc[k] << "/";
 		std::cout << std::endl;
 
-		CellMarker<VERTEX> cm(myMap);
-		std::cout << l_histo->markCellsOfHistogramColumn(i,cm) << " marked cells"<< std::endl;
+		CellMarker<MAP, VERTEX> cm(myMap);
+		std::cout << l_histo->markCellsOfHistogramColumn(i,cm) << " marked cells" << std::endl;
 	}
 
 	if (j != Utils::QT::RenderHistogram::NONE)
@@ -301,9 +299,7 @@ void MyQT::clickHisto(unsigned int i,unsigned int j)
 			std::cout << vc[k]<<"/";
 		std::cout << std::endl;
 	}
-
 }
-
 
 void MyQT::cb_Save()
 {

@@ -3,6 +3,8 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
 
+#include "Algo/Topo/basic.h"
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 
@@ -25,12 +27,14 @@ MapParameters::~MapParameters()
 		nlDeleteContext(nlContext);
 }
 
-void MapParameters::start(MapHandlerGen* mh)
+void MapParameters::start(MapHandlerGen* mhg)
 {
 	if(!initialized)
 	{
 		if(positionAttribute.isValid() && handleSelector && freeSelector)
 		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
+
 			positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit", false);
 			if(!positionInit.isValid())
 				positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit", false);
@@ -60,7 +64,7 @@ void MapParameters::start(MapHandlerGen* mh)
 			for(unsigned int i = vertexRotationMatrix.begin(); i != vertexRotationMatrix.end(); vertexRotationMatrix.next(i))
 				vertexRotationMatrix[i] = Eigen::Matrix3f::Identity();
 
-			nb_vertices = static_cast<AttribMap*>(map)->computeIndexCells<VERTEX>(vIndex);
+			nb_vertices = Algo::Topo::computeIndexCells<VERTEX>(*map, vIndex);
 
 			if(nlContext)
 				nlDeleteContext(nlContext);
@@ -258,6 +262,7 @@ void Surface_Deformation_Plugin::mapRemoved(MapHandlerGen* map)
 void Surface_Deformation_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+
 	if(orbit == VERTEX && map->isSelectedMap())
 		m_dockTab->addVertexAttribute(name);
 }
@@ -317,7 +322,8 @@ void Surface_Deformation_Plugin::changePositionAttribute(const QString& map, con
 		MapParameters& p = h_parameterSet[m];
 		if(!p.initialized)
 		{
-			p.positionAttribute = m->getAttribute<PFP2::VEC3, VERTEX>(name);
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m);
+			p.positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(name);
 			if(m->isSelectedMap())
 				m_dockTab->updateMapParameters();
 		}
@@ -332,7 +338,8 @@ void Surface_Deformation_Plugin::changeHandleSelector(const QString& map, const 
 		MapParameters& p = h_parameterSet[m];
 		if(!p.initialized)
 		{
-			p.handleSelector = m->getCellSelector<VERTEX>(name);
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m);
+			p.handleSelector = mh->getCellSelector<VERTEX>(name);
 			if(m->isSelectedMap())
 				m_dockTab->updateMapParameters();
 		}
@@ -347,7 +354,8 @@ void Surface_Deformation_Plugin::changeFreeSelector(const QString& map, const QS
 		MapParameters& p = h_parameterSet[m];
 		if(!p.initialized)
 		{
-			p.freeSelector = m->getCellSelector<VERTEX>(name);
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m);
+			p.freeSelector = mh->getCellSelector<VERTEX>(name);
 			if(m->isSelectedMap())
 				m_dockTab->updateMapParameters();
 		}
@@ -406,7 +414,7 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 
 	if(p.initialized)
 	{
-		CellMarkerNoUnmark<VERTEX> m(*map) ;
+		CellMarkerNoUnmark<PFP2::MAP, VERTEX> m(*map) ;
 
 		for(Dart d = map->begin(); d != map->end(); map->next(d))
 		{

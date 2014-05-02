@@ -29,7 +29,6 @@
 
 using namespace CGoGN ;
 
-
 int main(int argc, char **argv)
 {
     //	// interface
@@ -48,8 +47,7 @@ int main(int argc, char **argv)
     // final show for redraw
     sqt.show();
 
-
-    CGoGNout << "You can pick darts dans see it's id with left mouse button"<< CGoGNendl;
+	CGoGNout << "You can pick darts and see its id with left mouse button"<< CGoGNendl;
 
     // and wait for the end
     return app.exec();
@@ -57,12 +55,11 @@ int main(int argc, char **argv)
 
 Dart xd1;
 
-
 void MyQT::traverseMap()
 {
-    DartMarker m1(myMap);
-    DartMarker m2(myMap);
-    myMap.rdfi(myMap.begin(),m1,m2);
+	DartMarker<MAP> m1(myMap);
+	DartMarker<MAP> m2(myMap);
+//  myMap.rdfi(myMap.begin(),m1,m2);
 
     m1.unmarkAll();
 
@@ -70,7 +67,7 @@ void MyQT::traverseMap()
 
     // render the topo of the map without boundary darts
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-    m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
+	m_render_topo->updateData(myMap, position, 0.9f, 0.9f); // nb
 
     for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
     {
@@ -201,13 +198,13 @@ void MyQT::createMap()
 
     // render the topo of the map without boundary darts
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-    m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
+	m_render_topo->updateData(myMap, position, 0.9f, 0.9f); // nb
 }
 
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-    m_render_topo = new Algo::Render::GL2::TopoRender();
+	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>();
 }
 
 // redraw GL callback (clear and swap already done)
@@ -223,11 +220,10 @@ void MyQT::cb_mouseClick(int button, int x, int y)
 {
     if (button == Qt::LeftButton)
     {
-        Dart  d = m_render_topo->picking<PFP>(myMap, x, y);
+		Dart  d = m_render_topo->picking(myMap, x, y);
         if (d != NIL)
-
             CGoGNout << "Dart "<< d <<  CGoGNendl;
-        dart_selected=d;
+		dart_selected = d;
         updateGL();
     }
 }

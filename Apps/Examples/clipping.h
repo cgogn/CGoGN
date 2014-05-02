@@ -70,18 +70,18 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap3 MAP;
 };
 
+typedef PFP::MAP MAP;
+typedef PFP::MAP::IMPL MAP_IMPL;
+typedef PFP::VEC3 VEC3;
 
 class Clipping: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
 public:
-	typedef PFP::MAP MAP;
-	typedef PFP::VEC3 VEC3;
-
 	//Manip Carte
 	MAP myMap ;
-	VertexAttribute<VEC3> position;
+	VertexAttribute<VEC3, MAP_IMPL> position;
 	Dart dglobal;
 
 	//Render
@@ -91,7 +91,7 @@ public:
 	bool m_drawTopo;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::Topo3Render<PFP>* m_render_topo;
 
 	Geom::BoundingBox<PFP::VEC3> m_bb;
 

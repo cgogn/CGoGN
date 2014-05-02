@@ -25,8 +25,8 @@
 #include "Algo/Geometry/basic.h"
 #include "Algo/Geometry/area.h"
 
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 #include "Algo/Parallel/parallel_foreach.h"
 
@@ -212,7 +212,7 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Dart d, con
 
 	VEC3 N(0) ;
 	std::vector<Dart> faces;
-	CellMarker<FACE> f(map);
+	CellMarker<typename PFP::MAP, FACE> f(map);
 
 	FunctorStore fs(faces);
 	map.foreach_dart_of_vertex(d,fs);
@@ -236,8 +236,6 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Dart d, con
 	N.normalize() ;
 	return N ;
 }
-
-
 
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal, unsigned int thread)

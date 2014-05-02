@@ -93,13 +93,13 @@ void MyQT::createMap()
 
 	// render the topo of the map without boundary darts
 	m_render_topo->setInitialBoundaryDartsColor(0,1,0);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true);
+	m_render_topo->updateData(myMap, position, 0.9f, 0.9f,true);
 }
 
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-	m_render_topo = new Algo::Render::GL2::TopoRender() ;
+	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>() ;
 }
 
 // redraw GL callback (clear and swap already done)

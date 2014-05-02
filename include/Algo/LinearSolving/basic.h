@@ -28,6 +28,7 @@
 #include "NL/nl.h"
 #include "Algo/LinearSolving/variablesSetup.h"
 #include "Algo/LinearSolving/matrixSetup.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
@@ -42,24 +43,30 @@ namespace LinearSolving
 template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int>& index,
-	const CellMarker<VERTEX>& fm,
-	const VertexAttribute<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const CellMarker<typename PFP::MAP, VERTEX>& fm,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
+//	TraversorV<MAP> t(m);
+//	for (Dart d = t.begin(); d != t.end(); d = t.next())
+//	{
+
+//	}
+
 	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE> fmts(index, fm, attr) ;
-	m.template foreach_orbit<VERTEX>(fmts) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fmts) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int>& index,
-	const CellMarker<VERTEX>& fm,
-	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const CellMarker<typename PFP::MAP, VERTEX>& fm,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
 	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE> fmts(index, fm, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(fmts) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fmts) ;
 }
 
 /*******************************************************************************
@@ -69,54 +76,54 @@ void setupVariables(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int>& index,
-	const VertexAttribute<ATTR_TYPE>& attr,
-	const VertexAttribute<typename PFP::REAL>& weight)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& weight)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_PerVertexWeight_Scalar<PFP, ATTR_TYPE> feq(index, attr, weight) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int>& index,
-	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	float weight)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_UniformWeight_Scalar<PFP, ATTR_TYPE> feq(index, attr, weight) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int>& index,
-	const VertexAttribute<ATTR_TYPE>& attr,
-	const VertexAttribute<typename PFP::REAL>& weight,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& weight,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_PerVertexWeight_Vector<PFP, ATTR_TYPE> feq(index, attr, weight, coord) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int>& index,
-	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	float weight,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorEquality_UniformWeight_Vector<PFP, ATTR_TYPE> feq(index, attr, weight, coord) ;
-	m.template foreach_orbit<VERTEX>(feq) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -127,36 +134,36 @@ void addRowsRHS_Equality(
 template <typename PFP>
 void addRows_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianTopo<PFP> flt(m, index) ;
-	m.template foreach_orbit<VERTEX>(flt) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	const VertexAttribute<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianTopoRHS_Scalar<PFP, ATTR_TYPE> flt(m, index, attr) ;
-	m.template foreach_orbit<VERTEX>(flt) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianTopoRHS_Vector<PFP, ATTR_TYPE> flt(m, index, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(flt) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -167,57 +174,57 @@ void addRowsRHS_Laplacian_Topo(
 template <typename PFP>
 void addRows_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL>& vertexArea)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotan<PFP> flc(m, index, edgeWeight, vertexArea) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotanRHS_Scalar<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Cotan_NL(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
+	const VertexAttribute<typename PFP::REA, typename PFP::MAP::IMPLL>& vertexArea,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(flc) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -228,22 +235,22 @@ void addRowsRHS_Laplacian_Cotan_NL(
 template <typename PFP, typename ATTR_TYPE>
 void getResult(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	VertexAttribute<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
 	FunctorSolverToMesh_Scalar<PFP, ATTR_TYPE> fstm(index, attr) ;
-	m.template foreach_orbit<VERTEX>(fstm) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fstm) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void getResult(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int> index,
-	VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
 	FunctorSolverToMesh_Vector<PFP, ATTR_TYPE> fstm(index, attr, coord) ;
-	m.template foreach_orbit<VERTEX>(fstm) ;
+	Algo::Topo::foreach_orbit<VERTEX>(m, fstm) ;
 }
 
 } // namespace LinearSolving

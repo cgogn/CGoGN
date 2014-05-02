@@ -55,10 +55,8 @@ typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Dart d, const V_A
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Dart d, const V_ATT& position) ;
 
-
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal, unsigned int thread = 0) ;
-
 
 /**
  * compute normals of  vertices
@@ -74,9 +72,9 @@ void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT&
 
 namespace Parallel
 {
+
 template <typename PFP,typename V_ATT>
 void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int nbth = 0) ;
-
 
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal, unsigned int nbth = 0) ;
@@ -89,7 +87,6 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 
 template <typename PFP, typename V_ATT, typename E_ATT>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int thread = 0) ;
-
 
 } // namespace Geometry
 

@@ -42,7 +42,6 @@ class DartMarkerGen
 	friend class GenericMap ;
 
 protected:
-	GenericMap& m_map ;
 	Mark m_mark ;
 	AttributeMultiVector<Mark>* m_markVector ;
 	unsigned int m_thread ;
@@ -51,29 +50,67 @@ protected:
 public:
 	/**
 	 * constructor
+	 */
+	DartMarkerGen(unsigned int thread = 0) :
+		m_thread(thread),
+		releaseOnDestruct(true)
+	{}
+
+	virtual ~DartMarkerGen()
+	{}
+
+	inline unsigned int getThread() { return m_thread ; }
+
+	inline void updateMarkVector(AttributeMultiVector<Mark>* amv) {	m_markVector = amv ; }
+
+protected:
+	// protected copy constructor to forbid its usage
+	DartMarkerGen(const DartMarkerGen& /*dm*/)
+	{}
+
+	/**
+	 * set if the mark has to be release on destruction or not
+	 */
+	inline void setReleaseOnDestruct(bool b)
+	{
+		releaseOnDestruct = b ;
+	}
+} ;
+
+template <typename MAP>
+class DartMarkerTmpl : public DartMarkerGen
+{
+protected:
+	MAP& m_map ;
+
+public:
+	/**
+	 * constructor
 	 * @param map the map on which we work
 	 */
-	DartMarkerGen(GenericMap& map, unsigned int thread = 0) :
-		m_map(map), m_thread(thread), releaseOnDestruct(true)
+	DartMarkerTmpl(MAP& map, unsigned int thread = 0) :
+		DartMarkerGen(thread),
+		m_map(map)
 	{
-		m_mark = m_map.getMarkerSet<DART>(m_thread).getNewMark() ;
+		m_mark = m_map.template getMarkerSet<DART>(m_thread).getNewMark() ;
 		m_markVector = m_map.getMarkVector<DART>(m_thread) ;
 		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
-	DartMarkerGen(const GenericMap& map, unsigned int thread = 0) :
-		m_map(const_cast<GenericMap&>(map)), m_thread(thread), releaseOnDestruct(true)
+	DartMarkerTmpl(const MAP& map, unsigned int thread = 0) :
+		DartMarkerGen(thread),
+		m_map(const_cast<MAP&>(map))
 	{
-		m_mark = m_map.getMarkerSet<DART>(m_thread).getNewMark() ;
-		m_markVector = m_map.getMarkVector<DART>(m_thread) ;
+		m_mark = m_map.template getMarkerSet<DART>(m_thread).getNewMark() ;
+		m_markVector = m_map.template getMarkVector<DART>(m_thread) ;
 		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
-	~DartMarkerGen()
+	virtual ~DartMarkerTmpl()
 	{
 		if (releaseOnDestruct)
 		{
-			m_map.getMarkerSet<DART>(m_thread).releaseMark(m_mark) ;
+			m_map.template getMarkerSet<DART>(m_thread).releaseMark(m_mark) ;
 			std::vector<DartMarkerGen*>& dmg = m_map.dartMarkers[m_thread] ;
 			for (std::vector<DartMarkerGen*>::iterator it = dmg.begin(); it != dmg.end(); ++it)
 			{
@@ -87,30 +124,11 @@ public:
 		}
 	}
 
-	inline unsigned int getThread()
-	{
-		return m_thread ;
-	}
-
-	inline void updateMarkVector(AttributeMultiVector<Mark>* amv)
-	{
-		m_markVector = amv ;
-	}
-
 protected:
 	// protected copy constructor to forbid its usage
-	DartMarkerGen(const DartMarkerGen& dm) :
+	DartMarkerTmpl(const DartMarkerTmpl<MAP>& dm) :
 		m_map(dm.m_map)
-	{
-	}
-
-	/**
-	 * set if the mark has to be release on destruction or not
-	 */
-	inline void setReleaseOnDestruct(bool b)
-	{
-		releaseOnDestruct = b ;
-	}
+	{}
 
 public:
 	/**
@@ -118,7 +136,7 @@ public:
 	 */
 	inline void mark(Dart d)
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
 		m_markVector->operator[](d_index).setMark(m_mark) ;
 	}
@@ -128,7 +146,7 @@ public:
 	 */
 	inline void unmark(Dart d)
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
 		m_markVector->operator[](d_index).unsetMark(m_mark) ;
 	}
@@ -138,7 +156,7 @@ public:
 	 */
 	inline bool isMarked(Dart d) const
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
 		return m_markVector->operator[](d_index).testMark(m_mark) ;
 	}
@@ -149,9 +167,9 @@ public:
 	template <unsigned int ORBIT>
 	inline void markOrbit(Dart d)
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
-		FunctorMark<GenericMap> fm(m_map, m_mark, m_markVector) ;
-		m_map.foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
+		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
+		FunctorMark<MAP> fm(m_map, m_mark, m_markVector) ;
+		m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
 	}
 
 	/**
@@ -160,40 +178,18 @@ public:
 	template <unsigned int ORBIT>
 	inline void unmarkOrbit(Dart d)
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
-		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_markVector) ;
-		m_map.foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
+		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
+		FunctorUnmark<MAP> fm(m_map, m_mark, m_markVector) ;
+		m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
 	}
-
-//	/**
-//	 * mark the darts of the given orbit of d in the parent map
-//	 */
-//	template <typename MAP>
-//	void markOrbitInParent(unsigned int orbit, Dart d)
-//	{
-//		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-//		FunctorMark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
-//		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
-//	}
-//
-//	/**
-//	 * unmark the darts of the given orbit of d in the parent map
-//	 */
-//	template <typename MAP>
-//	void unmarkOrbitInParent(unsigned int orbit, Dart d)
-//	{
-//		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-//		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
-//		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
-//	}
 
 	/**
 	 * mark all darts
 	 */
 	inline void markAll()
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
-		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
+		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
+		AttributeContainer& cont = m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_markVector->operator[](i).setMark(m_mark) ;
 	}
@@ -205,51 +201,49 @@ public:
 
 	inline bool isAllUnmarked()
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
+		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
+		AttributeContainer& cont = m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			if (m_markVector->operator[](i).testMark(m_mark)) return false ;
 		return true ;
 	}
-} ;
+};
 
 /**
  * class that allows the marking of darts
  * \warning no default constructor
  */
-class DartMarker : public DartMarkerGen
+template <typename MAP>
+class DartMarker : public DartMarkerTmpl<MAP>
 {
 public:
+	DartMarker(const MAP& map) :
+		DartMarkerTmpl<MAP>(map)
+	{}
 
-	DartMarker(const GenericMap& map) :
-		DartMarkerGen(map)
-	{ }
+	DartMarker(const MAP& map, unsigned int thread) :
+		DartMarkerTmpl<MAP>(map, thread)
+	{}
 
-	DartMarker(const GenericMap& map, unsigned int thread) :
-		DartMarkerGen(map, thread)
-	{
-	}
-
-	~DartMarker()
+	virtual ~DartMarker()
 	{
 		unmarkAll() ;
 	}
 
 protected:
 	DartMarker(const DartMarker& dm) :
-		DartMarkerGen(dm)
-	{
-	}
+		DartMarkerTmpl<MAP>(dm)
+	{}
 
 public:
 	inline void unmarkAll()
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
-		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
+		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
+		AttributeContainer& cont = this->m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
-			m_markVector->operator[](i).unsetMark(m_mark) ;
+			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;
 	}
 } ;
 
@@ -258,23 +252,22 @@ public:
  * the marked darts are stored to optimize the unmarking task at destruction
  * \warning no default constructor
  */
-class DartMarkerStore : public DartMarkerGen
+template <typename MAP>
+class DartMarkerStore : public DartMarkerTmpl<MAP>
 {
 protected:
 	std::vector<unsigned int> m_markedDarts ;
 
 public:
-	DartMarkerStore(const GenericMap& map) :
-		DartMarkerGen(map)
-	{ }
+	DartMarkerStore(const MAP& map) :
+		DartMarkerTmpl<MAP>(map)
+	{}
 
+	DartMarkerStore(const MAP& map, unsigned int thread) :
+		DartMarkerTmpl<MAP>(map, thread)
+	{}
 
-	DartMarkerStore(const GenericMap& map, unsigned int thread) :
-		DartMarkerGen(map, thread)
-	{ }
-
-
-	~DartMarkerStore()
+	virtual ~DartMarkerStore()
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked) ;
@@ -283,45 +276,31 @@ public:
 
 protected:
 	DartMarkerStore(const DartMarkerStore& dm) :
-		DartMarkerGen(dm), m_markedDarts(dm.m_markedDarts)
-	{
-	}
+		DartMarkerTmpl<MAP>(dm),
+		m_markedDarts(dm.m_markedDarts)
+	{}
 
 public:
 	inline void mark(Dart d)
 	{
-		DartMarkerGen::mark(d) ;
-		unsigned int d_index = m_map.dartIndex(d) ;
+		DartMarkerTmpl<MAP>::mark(d) ;
+		unsigned int d_index = this->m_map.dartIndex(d) ;
 		m_markedDarts.push_back(d_index) ;
 	}
 
 	template <unsigned int ORBIT>
 	inline void markOrbit(Dart d)
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
-		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_markVector, m_markedDarts) ;
-		m_map.foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
+		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
+		FunctorMarkStore<MAP> fm(this->m_map, this->m_mark, this->m_markVector, m_markedDarts) ;
+		this->m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, this->m_thread) ;
 	}
-
-//	template <typename MAP>
-//	void markOrbitInParent(unsigned int orbit, Dart d)
-//	{
-//		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-//		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread), m_markedDarts) ;
-//		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
-//	}
-
-//	void mark(unsigned int d)
-//	{
-//		DartMarkerGen::mark(d) ;
-//		m_markedDarts.push_back(d) ;
-//	}
 
 	inline void unmarkAll()
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
+		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
 		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
-			m_markVector->operator[](*it).unsetMark(m_mark) ;
+			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
 	}
 } ;
 
@@ -330,19 +309,19 @@ public:
  * the markers are not unmarked at destruction
  * \warning no default constructor
  */
-class DartMarkerNoUnmark : public DartMarkerGen
+template <typename MAP>
+class DartMarkerNoUnmark : public DartMarkerTmpl<MAP>
 {
 public:
-	DartMarkerNoUnmark(const GenericMap& map) :
-		DartMarkerGen(map)
-	{ }
+	DartMarkerNoUnmark(const MAP& map) :
+		DartMarkerTmpl<MAP>(map)
+	{}
 
+	DartMarkerNoUnmark(const MAP& map, unsigned int thread) :
+		DartMarkerTmpl<MAP>(map, thread)
+	{}
 
-	DartMarkerNoUnmark(const GenericMap& map, unsigned int th) :
-		DartMarkerGen(map, th)
-	{ }
-
-	~DartMarkerNoUnmark()
+	virtual ~DartMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked) ;
 //		CGoGN_ASSERT(isAllUnmarked())
@@ -350,55 +329,60 @@ public:
 
 protected:
 	DartMarkerNoUnmark(const DartMarkerNoUnmark& dm) :
-		DartMarkerGen(dm)
-	{
-	}
+		DartMarkerTmpl<MAP>(dm)
+	{}
 
 public:
 	inline void unmarkAll()
 	{
-		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
-		AttributeContainer& cont = m_map.getAttributeContainer<DART>() ;
+		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
+		AttributeContainer& cont = this->m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
-			m_markVector->operator[](i).unsetMark(m_mark) ;
+			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;
 	}
 } ;
 
 // Selector and count functors testing for marker existence
 /********************************************************/
 
+template <typename MAP>
 class SelectorMarked : public FunctorSelect
 {
 protected:
-	DartMarkerGen& m_marker ;
+	DartMarkerTmpl<MAP>& m_marker ;
+
 public:
-	SelectorMarked(DartMarkerGen& m) :
+	SelectorMarked(DartMarkerTmpl<MAP>& m) :
 		m_marker(m)
-	{
-	}
+	{}
+
 	inline bool operator()(Dart d) const
 	{
 		return m_marker.isMarked(d) ;
 	}
+
 	inline FunctorSelect* copy() const
 	{
 		return new SelectorMarked(m_marker) ;
 	}
 } ;
 
+template <typename MAP>
 class SelectorUnmarked : public FunctorSelect
 {
 protected:
-	DartMarkerGen& m_marker ;
+	DartMarkerTmpl<MAP>& m_marker ;
+
 public:
-	SelectorUnmarked(DartMarkerGen& m) :
+	SelectorUnmarked(DartMarkerTmpl<MAP>& m) :
 		m_marker(m)
-	{
-	}
+	{}
+
 	inline bool operator()(Dart d) const
 	{
 		return !m_marker.isMarked(d) ;
 	}
+
 	inline FunctorSelect* copy() const
 	{
 		return new SelectorUnmarked(m_marker) ;
@@ -407,30 +391,34 @@ public:
 
 // Functor version (needed for use with foreach_xxx)
 
+template <typename MAP>
 class FunctorIsMarked : public FunctorType
 {
 protected:
-	DartMarkerGen& m_marker ;
+	DartMarkerTmpl<MAP>& m_marker ;
+
 public:
-	FunctorIsMarked(DartMarkerGen& dm) :
+	FunctorIsMarked(DartMarkerTmpl<MAP>& dm) :
 		m_marker(dm)
-	{
-	}
+	{}
+
 	inline bool operator()(Dart d)
 	{
 		return m_marker.isMarked(d) ;
 	}
 } ;
 
+template <typename MAP>
 class FunctorIsUnmarked : public FunctorType
 {
 protected:
-	DartMarkerGen& m_marker ;
+	DartMarkerTmpl<MAP>& m_marker ;
+
 public:
-	FunctorIsUnmarked(DartMarkerGen& dm) :
+	FunctorIsUnmarked(DartMarkerTmpl<MAP>& dm) :
 		m_marker(dm)
-	{
-	}
+	{}
+
 	inline bool operator()(Dart d)
 	{
 		return !m_marker.isMarked(d) ;

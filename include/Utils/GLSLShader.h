@@ -126,6 +126,16 @@ protected:
 
 	static std::vector<std::string> m_pathes;
 
+
+	/**
+	 * @brief log compile error
+	 * @param handle handle of shader
+	 * @param nameSrc name of shader
+	 * @param src source of shader
+	 * @return true if ok false if not
+	 */
+	bool logError(GLuint handle, const std::string& nameSrc, const char *src);
+
 	/**
 	 * load vertex shader
 	 * @param vertex_shader_source src text shader

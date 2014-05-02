@@ -29,10 +29,7 @@
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
 
-
 using namespace CGoGN ;
-
-
 
 int main(int argc, char **argv)
 {
@@ -40,14 +37,13 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-
     sqt.setDock(& sqt.dock);
 	sqt.setCallBack( sqt.dock.listTravers, SIGNAL(currentRowChanged(int)), SLOT(traversors(int)) );
 	sqt.setCallBack( sqt.dock.withBoundary, SIGNAL(clicked()), SLOT(updateMap()) );
     sqt.setCallBack( sqt.dock.svg, SIGNAL(clicked()), SLOT(svg()) );
     sqt.setCallBack( sqt.dock.widthSlider, SIGNAL(valueChanged(int)), SLOT(width(int)) );
-	int n=3;
-	if (argc==2)
+	int n = 3;
+	if (argc == 2)
 		n = atoi(argv[1]);
 
 	// example code itself
@@ -62,7 +58,6 @@ int main(int argc, char **argv)
 	// and wait for the end
 	return app.exec();
 }
-
 
 void MyQT::traversors(int x)
 {
@@ -189,11 +184,11 @@ void MyQT::createMap(int n)
 	m_render_topo->setInitialDartsColor(0.5f,0.5f,0.5f);
 	m_render_topo->setInitialBoundaryDartsColor(0.3f,0.3f,0.3f);
 
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
+	m_render_topo->updateData(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
 
-	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
 		{
 			colorDarts[d] =  Geom::Vec3f(0.5f,0.5f,0.5f);
 			m_render_topo->setDartColor(d,0.5f,0.5f,0.5f);
@@ -204,10 +199,10 @@ void MyQT::createMap(int n)
 void MyQT::updateMap()
 {
 	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
-	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+	m_render_topo->updateData(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
 		{
 			const Geom::Vec3f& C = colorDarts[d];
 			if (C*C != 0.0f)
@@ -221,7 +216,11 @@ void MyQT::updateMap()
 void MyQT::cb_initGL()
 {
 	glClearColor(1.0f,1.0f,1.0f,1.0f);
-    m_render_topo = new Algo::Render::GL2::TopoRender(0.01f) ;
+#ifdef USE_GMAP
+	m_render_topo = new Algo::Render::GL2::TopoRenderGMap<PFP>(0.01f) ;
+#else
+	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>(0.01f) ;
+#endif
 }
 
 // redraw GL callback (clear and swap already done)
@@ -245,16 +244,14 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y); // nb
+		Dart d = m_render_topo->picking(myMap, x,y); // nb
 		if (button == Qt::LeftButton)
 		{
 			if (d != Dart::nil())
 				m_selected = d;
 
 			if (d != Dart::nil())
-				std::cout << "DART="<<d.index << std::endl;
-
-
+				std::cout << "DART=" << d.index << std::endl;
 		}
 		if (button == Qt::RightButton)
 		{
@@ -269,11 +266,10 @@ void MyQT::cb_keyPress(int keycode)
 {
 	switch(keycode)
 	{
-
 	case 'c':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked2(d))
+			if (!myMap.isBoundaryMarked<2>(d))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
@@ -295,7 +291,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'h':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked2(d))
+			if (!myMap.isBoundaryMarked<2>(d))
 			{
 				colorDarts[d] =  Geom::Vec3f(0.0f,0.0f,0.0f);
 				m_render_topo->setDartColor(d,0.0f,0.0f,0.0f);
@@ -387,9 +383,9 @@ void MyQT::importMesh(std::string& filename)
 	if (!colorDarts.isValid())
 	{
 		colorDarts = myMap.addAttribute<VEC3, DART>("color");
-		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
+			if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
@@ -412,11 +408,9 @@ void MyQT::importMesh(std::string& filename)
 	updateGLMatrices() ;
 }
 
-
 void MyQT::width(int w)
 {
 	m_render_topo->setDartWidth(w);
 	m_render_topo->setRelationWidth(w);
 	updateGL();
 }
-

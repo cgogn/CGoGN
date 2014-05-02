@@ -105,7 +105,7 @@ void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
 }
 
 template <typename PFP>
-void Grid<PFP>::embedIntoGrid(VertexAttribute<VEC3>& position, float x, float y, float z)
+void Grid<PFP>::embedIntoGrid(VertexAttribute<VEC3, MAP_IMPL>& position, float x, float y, float z)
 {
 	float dx = x / float(this->m_nx);
 	float dy = y / float(this->m_ny);

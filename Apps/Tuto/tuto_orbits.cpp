@@ -35,12 +35,11 @@
 #include "Algo/Render/SVG/mapSVGRender.h"
 
 #include "Algo/Import/import.h"
-#include "Topology/generic/traversorFactory.h"
+#include "Topology/generic/traversor/traversorFactory.h"
 
 MAP myMap;
-VertexAttribute<VEC3> position ;
-DartAttribute<VEC3> middleDarts;
-
+VertexAttribute<VEC3, MAP_IMPL> position ;
+DartAttribute<VEC3, MAP_IMPL> middleDarts;
 
 void MyQT::text_onoff(bool /*x*/)
 {
@@ -58,12 +57,11 @@ void MyQT::slider_text(int x)
 void MyQT::orbit_list(int x)
 {
 	current_orbit = x;
-	unsigned int orbs[9] = {VERTEX,EDGE,FACE,VOLUME,PFP::MAP::ORBIT_IN_PARENT(VERTEX),PFP::MAP::ORBIT_IN_PARENT(EDGE),PFP::MAP::ORBIT_IN_PARENT(FACE),PFP::MAP::ORBIT_IN_PARENT2(VERTEX),PFP::MAP::ORBIT_IN_PARENT2(EDGE)};
+	unsigned int orbs[9] = {VERTEX,EDGE,FACE,VOLUME,MAP::ORBIT_IN_PARENT(VERTEX),MAP::ORBIT_IN_PARENT(EDGE),MAP::ORBIT_IN_PARENT(FACE),MAP::ORBIT_IN_PARENT2(VERTEX),MAP::ORBIT_IN_PARENT2(EDGE)};
 	storeVerticesInfoGen(orbs[current_orbit], m_att_orbits[x]);
 
 	if (m_clicked != Dart::nil())
 	{
-
 		m_selected.clear();
 
 		// easy way to traverse darts of orbit
@@ -77,10 +75,10 @@ void MyQT::orbit_list(int x)
 }
 
 template< unsigned int ORBIT>
-void MyQT::storeVerticesInfo(const AttributeHandler<int, ORBIT>* attrib)
+void MyQT::storeVerticesInfo(const AttributeHandler<int, ORBIT, MAP_IMPL>* attrib)
 {
-	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->computeDartMiddlePositions<PFP>(myMap, middleDarts/*, nb*/);
+	SelectorDartNoBoundary<MAP> nb(myMap);
+	m_render_topo->computeDartMiddlePositions(myMap, middleDarts/*, nb*/);
 
 	m_strings->clear();
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
@@ -95,54 +93,47 @@ void MyQT::storeVerticesInfo(const AttributeHandler<int, ORBIT>* attrib)
     m_strings->sendToVBO();
 }
 
-
-
-
-
-
 void MyQT::storeVerticesInfoGen(unsigned int orb, const AttributeHandlerGen* attrib)
 {
 	switch(orb)
 	{
 	case VERTEX:
-		storeVerticesInfo<VERTEX>(static_cast< const AttributeHandler<int, VERTEX>* >(attrib));
+		storeVerticesInfo<VERTEX>(static_cast< const AttributeHandler<int, VERTEX, MAP_IMPL>* >(attrib));
 		break;
 	case EDGE:
-		storeVerticesInfo<EDGE>(static_cast< const AttributeHandler<int, EDGE>* >(attrib));
+		storeVerticesInfo<EDGE>(static_cast< const AttributeHandler<int, EDGE, MAP_IMPL>* >(attrib));
 		break;
 	case FACE:
-		storeVerticesInfo<FACE>(static_cast< const AttributeHandler<int, FACE>* >(attrib));
+		storeVerticesInfo<FACE>(static_cast< const AttributeHandler<int, FACE, MAP_IMPL>* >(attrib));
 		break;
 	case VOLUME:
-		storeVerticesInfo<VOLUME>(static_cast< const AttributeHandler<int, VOLUME>* >(attrib));
+		storeVerticesInfo<VOLUME>(static_cast< const AttributeHandler<int, VOLUME, MAP_IMPL>* >(attrib));
 		break;
-	case PFP::MAP::VERTEX_OF_PARENT:
-		storeVerticesInfo<PFP::MAP::VERTEX_OF_PARENT>(static_cast< const AttributeHandler<int, PFP::MAP::VERTEX_OF_PARENT>* >(attrib));
+	case MAP::VERTEX_OF_PARENT:
+		storeVerticesInfo<MAP::VERTEX_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::VERTEX_OF_PARENT, MAP_IMPL>* >(attrib));
 		break;
-	case PFP::MAP::EDGE_OF_PARENT:
-		storeVerticesInfo<PFP::MAP::EDGE_OF_PARENT>(static_cast< const AttributeHandler<int, PFP::MAP::EDGE_OF_PARENT>* >(attrib));
+	case MAP::EDGE_OF_PARENT:
+		storeVerticesInfo<MAP::EDGE_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::EDGE_OF_PARENT, MAP_IMPL>* >(attrib));
 		break;
-	case PFP::MAP::FACE_OF_PARENT:
-		storeVerticesInfo<PFP::MAP::FACE_OF_PARENT>(static_cast< const AttributeHandler<int, PFP::MAP::FACE_OF_PARENT>* >(attrib));
+	case MAP::FACE_OF_PARENT:
+		storeVerticesInfo<MAP::FACE_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::FACE_OF_PARENT, MAP_IMPL>* >(attrib));
 		break;
-	case PFP::MAP::VERTEX_OF_PARENT2:
-		storeVerticesInfo<PFP::MAP::VERTEX_OF_PARENT2>(static_cast< const AttributeHandler<int, PFP::MAP::VERTEX_OF_PARENT2>* >(attrib));
+	case MAP::VERTEX_OF_PARENT2:
+		storeVerticesInfo<MAP::VERTEX_OF_PARENT2>(static_cast< const AttributeHandler<int, MAP::VERTEX_OF_PARENT2, MAP_IMPL>* >(attrib));
 		break;
-	case PFP::MAP::EDGE_OF_PARENT2:
-		storeVerticesInfo<PFP::MAP::EDGE_OF_PARENT2>(static_cast< const AttributeHandler<int, PFP::MAP::EDGE_OF_PARENT2>* >(attrib));
+	case MAP::EDGE_OF_PARENT2:
+		storeVerticesInfo<MAP::EDGE_OF_PARENT2>(static_cast< const AttributeHandler<int, MAP::EDGE_OF_PARENT2, MAP_IMPL>* >(attrib));
 		break;
 	}
 }
-
-
 
 void MyQT::cb_initGL()
 {
 	// choose to use GL version 2
 	Utils::GLSLShader::setCurrentOGLVersion(2);
 
-    m_render_topo = new Algo::Render::GL2::Topo3Render();
-	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.8f, 0.8f);
+	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
+	m_render_topo->updateData(myMap, position,  0.9f, 0.8f, 0.8f);
 
     m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
 	registerShader(m_strings);
@@ -154,7 +145,7 @@ void MyQT::cb_redraw()
 {
 	m_render_topo->drawTopo();
 
-	for (unsigned int i=0; i< m_selected.size(); ++i)
+	for (unsigned int i = 0; i < m_selected.size(); ++i)
 		m_render_topo->overdrawDart(m_selected[i], 7, 1.0f, 0.0f, 1.0f);
 
 	if (render_text)
@@ -166,10 +157,10 @@ void MyQT::cb_mousePress(int /*button*/, int x, int y)
 {
 	if (Shift())
 	{
-		m_clicked = m_render_topo->picking<PFP>(myMap, x,y);
+		m_clicked = m_render_topo->picking(myMap, x,y);
 		if (m_clicked != Dart::nil())
 		{
-			unsigned int orbs[9] = {VERTEX,EDGE,FACE,VOLUME,PFP::MAP::VERTEX_OF_PARENT,PFP::MAP::EDGE_OF_PARENT,PFP::MAP::FACE_OF_PARENT,PFP::MAP::VERTEX_OF_PARENT2,PFP::MAP::EDGE_OF_PARENT2};
+			unsigned int orbs[9] = {VERTEX,EDGE,FACE,VOLUME,MAP::VERTEX_OF_PARENT,MAP::EDGE_OF_PARENT,MAP::FACE_OF_PARENT,MAP::VERTEX_OF_PARENT2,MAP::EDGE_OF_PARENT2};
 			m_selected.clear();
 
 			// easy way to traverse darts of orbit
@@ -187,12 +178,10 @@ void MyQT::init_att_orb(AttributeHandlerGen* attg)
 	unsigned int i = 0;
 	TraversorCell<MAP,ORB> tra(myMap);
 
-	AttributeHandler<int,ORB>* att = static_cast< AttributeHandler<int,ORB>* >(attg);
+	AttributeHandler<int, ORB, MAP_IMPL>* att = static_cast< AttributeHandler<int, ORB, MAP_IMPL>* >(attg);
 
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
-	{
 		(*att)[d] = i++;
-	}
 }
 
 void MyQT::initMap()
@@ -200,29 +189,29 @@ void MyQT::initMap()
 	std::cout << "INIT MAP"<< std::endl;
 
 	position = myMap.addAttribute<VEC3, VERTEX>("position");
-    int nb=2;
+	int nb = 2;
     Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
     cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
-	m_att_orbits[0] = new AttributeHandler<int, VERTEX>(myMap.addAttribute<int, VERTEX>("vertex"));
-	m_att_orbits[1] = new AttributeHandler<int, EDGE>(myMap.addAttribute<int, EDGE>("edge"));
-	m_att_orbits[2] = new AttributeHandler<int, FACE>(myMap.addAttribute<int, FACE>("face"));
-	m_att_orbits[3] = new AttributeHandler<int, VOLUME>(myMap.addAttribute<int, VOLUME>("volume"));
-	m_att_orbits[4] = new AttributeHandler<int, PFP::MAP::VERTEX_OF_PARENT>(myMap.addAttribute<int, PFP::MAP::VERTEX_OF_PARENT>("vertex2"));
-	m_att_orbits[5] = new AttributeHandler<int, PFP::MAP::EDGE_OF_PARENT>(myMap.addAttribute<int, PFP::MAP::EDGE_OF_PARENT>("edge2"));
-	m_att_orbits[6] = new AttributeHandler<int, PFP::MAP::FACE_OF_PARENT>(myMap.addAttribute<int, PFP::MAP::FACE_OF_PARENT>("face2"));
-	m_att_orbits[7] = new AttributeHandler<int, PFP::MAP::VERTEX_OF_PARENT2>(myMap.addAttribute<int, PFP::MAP::VERTEX_OF_PARENT2>("vertex1"));
-	m_att_orbits[8] = new AttributeHandler<int, PFP::MAP::EDGE_OF_PARENT2>(myMap.addAttribute<int, PFP::MAP::EDGE_OF_PARENT2>("face1"));
+	m_att_orbits[0] = new AttributeHandler<int, VERTEX, MAP_IMPL>(myMap.addAttribute<int, VERTEX>("vertex"));
+	m_att_orbits[1] = new AttributeHandler<int, EDGE, MAP_IMPL>(myMap.addAttribute<int, EDGE>("edge"));
+	m_att_orbits[2] = new AttributeHandler<int, FACE, MAP_IMPL>(myMap.addAttribute<int, FACE>("face"));
+	m_att_orbits[3] = new AttributeHandler<int, VOLUME, MAP_IMPL>(myMap.addAttribute<int, VOLUME>("volume"));
+	m_att_orbits[4] = new AttributeHandler<int, MAP::VERTEX_OF_PARENT, MAP_IMPL>(myMap.addAttribute<int, MAP::VERTEX_OF_PARENT>("vertex2"));
+	m_att_orbits[5] = new AttributeHandler<int, MAP::EDGE_OF_PARENT, MAP_IMPL>(myMap.addAttribute<int, MAP::EDGE_OF_PARENT>("edge2"));
+	m_att_orbits[6] = new AttributeHandler<int, MAP::FACE_OF_PARENT, MAP_IMPL>(myMap.addAttribute<int, MAP::FACE_OF_PARENT>("face2"));
+	m_att_orbits[7] = new AttributeHandler<int, MAP::VERTEX_OF_PARENT2, MAP_IMPL>(myMap.addAttribute<int, MAP::VERTEX_OF_PARENT2>("vertex1"));
+	m_att_orbits[8] = new AttributeHandler<int, MAP::EDGE_OF_PARENT2, MAP_IMPL>(myMap.addAttribute<int, MAP::EDGE_OF_PARENT2>("face1"));
 
 	init_att_orb<VERTEX>(m_att_orbits[0]);
 	init_att_orb<EDGE>(m_att_orbits[1]);
 	init_att_orb<FACE>(m_att_orbits[2]);
 	init_att_orb<VOLUME>(m_att_orbits[3]);
-	init_att_orb<PFP::MAP::VERTEX_OF_PARENT>(m_att_orbits[4]);
-	init_att_orb<PFP::MAP::EDGE_OF_PARENT>(m_att_orbits[5]);
-	init_att_orb<PFP::MAP::FACE_OF_PARENT>(m_att_orbits[6]);
-	init_att_orb<PFP::MAP::VERTEX_OF_PARENT2>(m_att_orbits[7]);
-	init_att_orb<PFP::MAP::EDGE_OF_PARENT2>(m_att_orbits[8]);
+	init_att_orb<MAP::VERTEX_OF_PARENT>(m_att_orbits[4]);
+	init_att_orb<MAP::EDGE_OF_PARENT>(m_att_orbits[5]);
+	init_att_orb<MAP::FACE_OF_PARENT>(m_att_orbits[6]);
+	init_att_orb<MAP::VERTEX_OF_PARENT2>(m_att_orbits[7]);
+	init_att_orb<MAP::EDGE_OF_PARENT2>(m_att_orbits[8]);
 
 	middleDarts = myMap.addAttribute<VEC3, DART>("middle");
 }
@@ -243,9 +232,9 @@ int main(int argc, char **argv)
 	sqt.initMap();
 
 	//  bounding box
-    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+	Geom::BoundingBox<VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	float lWidthObj = std::max<REAL>(std::max<REAL>(bb.size(0), bb.size(1)), bb.size(2));
+	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / REAL(2);
 
     // envoit info BB a l'interface
 	sqt.setParamObject(lWidthObj, lPosObj.data());

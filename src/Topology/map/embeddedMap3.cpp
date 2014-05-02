@@ -21,10 +21,12 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #include <vector>
 #include <algorithm>
 #include "Topology/map/embeddedMap3.h"
-#include "Topology/generic/traversor3.h"
+#include "Topology/generic/traversor/traversor3.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
@@ -45,16 +47,12 @@ Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 	}
 
 	if(isOrbitEmbedded<EDGE>())
-	{
-		initOrbitEmbeddingNewCell<EDGE>(dres) ; // TODO : check if dres is a dart of the new edge
-	}
+		initOrbitEmbeddingOnNewCell<EDGE>(dres) ; // TODO : check if dres is a dart of the new edge
 
 	if(isOrbitEmbedded<VOLUME>())
 	{
 		for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		{
 			setOrbitEmbedding<VOLUME>( *it, getEmbedding<VOLUME>(*it)) ;
-		}
 	}
 
 	return dres;
@@ -168,7 +166,7 @@ bool EmbeddedMap3::edgeCanCollapse(Dart d)
 //	if(isBoundaryEdge(d))
 //		return false;
 
-	CellMarkerStore<VERTEX> mv(*this);
+	CellMarkerStore<EmbeddedMap3, VERTEX> mv(*this);
 
 	Traversor3VVaE<TOPO_MAP> t3VVaE_v1(*this,d);
 	for(Dart dit = t3VVaE_v1.begin() ; dit != t3VVaE_v1.end() ; dit = t3VVaE_v1.next())
@@ -563,7 +561,7 @@ unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
 {
 	unsigned int nbF = Map3::closeHole(d, forboundary) ;
 
-	DartMarkerStore mark(*this);	// Lock a marker
+	DartMarkerStore<EmbeddedMap3> mark(*this);	// Lock a marker
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
@@ -606,18 +604,17 @@ unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
 
 bool EmbeddedMap3::check()
 {
-    std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
+	std::cout << "nb vertex orbits : " << Algo::Topo::getNbOrbits<VERTEX>(*this) << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
-    std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
+	std::cout << "nb edge orbits : " << Algo::Topo::getNbOrbits<EDGE>(*this) << std::endl ;
     std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
 
-    std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
+	std::cout << "nb face orbits : " << Algo::Topo::getNbOrbits<FACE>(*this) << std::endl ;
     std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 
-    std::cout << "nb volume orbits : " << getNbOrbits<VOLUME>() << std::endl ;
+	std::cout << "nb volume orbits : " << Algo::Topo::getNbOrbits<VOLUME>(*this) << std::endl ;
     std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
-
 
 	bool topo = Map3::check() ;
 	if (!topo)

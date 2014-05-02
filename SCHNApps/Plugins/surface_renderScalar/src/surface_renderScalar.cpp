@@ -159,7 +159,8 @@ void Surface_RenderScalar_Plugin::attributeModified(unsigned int orbit, QString 
 			MapParameters& mapParam = viewParamSet[map];
 			if(mapParam.scalarVBO && nameAttr == QString::fromStdString(mapParam.scalarVBO->name()))
 			{
-				const VertexAttribute<PFP2::REAL>& attr = map->getAttribute<PFP2::REAL, VERTEX>(nameAttr);
+				MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
+				const VertexAttribute<PFP2::REAL, PFP2::MAP::IMPL>& attr = mh->getAttribute<PFP2::REAL, VERTEX>(nameAttr);
 				mapParam.scalarMin = std::numeric_limits<float>::max();
 				mapParam.scalarMax = std::numeric_limits<float>::min();
 				for(unsigned int i = attr.begin(); i != attr.end(); attr.next(i))
@@ -205,7 +206,8 @@ void Surface_RenderScalar_Plugin::changeScalarVBO(const QString& view, const QSt
 
 		if(vbuf)
 		{
-			const VertexAttribute<PFP2::REAL>& attr = m->getAttribute<PFP2::REAL, VERTEX>(QString::fromStdString(vbuf->name()));
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m);
+			const VertexAttribute<PFP2::REAL, PFP2::MAP::IMPL>& attr = mh->getAttribute<PFP2::REAL, VERTEX>(QString::fromStdString(vbuf->name()));
 			p.scalarMin = std::numeric_limits<float>::max();
 			p.scalarMax = std::numeric_limits<float>::min();
 			for(unsigned int i = attr.begin(); i != attr.end(); attr.next(i))

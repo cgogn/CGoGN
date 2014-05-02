@@ -33,9 +33,9 @@
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Algo/Render/SVG/mapSVGRender.h"
 
-
 MAP myMap;
-VertexAttribute<VEC3> position ;
+
+VertexAttribute<VEC3, MAP_IMPL> position ;
 Dart dglobal;
 
 void MyQT::balls_onoff(bool /*x*/)
@@ -95,7 +95,7 @@ void MyQT::animate()
 
 void MyQT::storeVerticesInfo()
 {
-	CellMarker<VERTEX> mv(myMap);
+	CellMarker<MAP, VERTEX> mv(myMap);
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
 		if (!mv.isMarked(d))
@@ -116,7 +116,7 @@ void MyQT::cb_initGL()
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
 
-    m_render_topo = new Algo::Render::GL2::Topo3Render();
+	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
 
  	// create VBO for position
 	m_positionVBO = new Utils::VBO();
@@ -163,7 +163,7 @@ void MyQT::cb_initGL()
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f); // nb
+	m_render_topo->updateData(myMap, position,  0.9f, 0.9f, 0.9f); // nb
 
 	// timer example for animation
 	m_timer = new QTimer( this );
@@ -216,7 +216,7 @@ void MyQT::cb_mousePress(int /*button*/, int x, int y)
 	if (Shift())
 	{
 //		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y); // nb
+		Dart d = m_render_topo->picking(myMap, x,y); // nb
 		if (d != Dart::nil())
 		{
 			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
@@ -264,7 +264,7 @@ void MyQT::cb_keyPress(int code)
 		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
 		m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
 
-		m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, 0.9f);
+		m_render_topo->updateData(myMap, position, 0.9f, 0.9f, 0.9f);
 	}
 }
 

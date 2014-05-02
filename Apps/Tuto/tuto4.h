@@ -45,14 +45,14 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
 
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
-	MyQT():m_render_topo(NULL){}
+	MyQT() : m_render_topo(NULL) {}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -63,10 +63,10 @@ protected:
 	MAP myMap;
 
 	// attribute handler on position;
-	VertexAttribute<VEC3> position;
+	VertexAttribute<VEC3, MAP_IMPL> position;
 
 	// render (for the topo)
-	Algo::Render::GL2::TopoRender* m_render_topo;
+	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
 
 	// selected dart (mouse click)
 	std::vector<Dart> dart_selected;

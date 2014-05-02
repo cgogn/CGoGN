@@ -40,7 +40,7 @@ namespace Adaptive
 {
 
 template <typename PFP>
-IHM2<PFP>::IHM2(typename PFP::MAP& map) :
+IHM2<PFP>::IHM2(MAP& map) :
 	m_map(map),
 	shareVertexEmbeddings(true),
 	vertexVertexFunctor(NULL),

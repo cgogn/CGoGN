@@ -56,13 +56,15 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
+typedef PFP::VEC3 VEC3 ;
+typedef PFP::REAL REAL ;
 
-PFP::MAP myMap;
-VertexAttribute<PFP::VEC3> position;
-VertexAttribute<PFP::VEC3> position2;
-VertexAttribute<PFP::VEC3> normal;
-
-
+MAP myMap;
+VertexAttribute<VEC3, MAP_IMPL> position;
+VertexAttribute<VEC3, MAP_IMPL> position2;
+VertexAttribute<VEC3, MAP_IMPL> normal;
 
 void MyQT::cb_initGL()
 {
@@ -140,11 +142,14 @@ template <typename XXX>
 class UnshrinkFunctor : public FunctorAttribThreaded
 {
 protected:
-	VertexAttribute<typename XXX::VEC3>& m_positions;
-	VertexAttribute<typename XXX::VEC3>& m_positions2;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions2;
+
 public:
-	UnshrinkFunctor( VertexAttribute<typename XXX::VEC3>& pos, VertexAttribute<typename XXX::VEC3>& pos2):
-		FunctorAttribThreaded(),m_positions(pos),m_positions2(pos2)
+	UnshrinkFunctor(
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos,
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos2
+	) : FunctorAttribThreaded(), m_positions(pos), m_positions2(pos2)
 	{}
 
 	void run(unsigned int i, unsigned int /*threadID*/)
@@ -166,7 +171,6 @@ void MyQT::threadAttrib()
 }
 
 
-
 //
 // Simple thread that traverse a map
 //
@@ -174,20 +178,25 @@ template <typename XXX>
 class ShrinkFunctor : public FunctorMapThreaded<typename XXX::MAP >
 {
 protected:
-	VertexAttribute<typename XXX::VEC3>& m_positions;
-	VertexAttribute<typename XXX::VEC3>& m_positions2;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions2;
+
 public:
-	ShrinkFunctor( typename XXX::MAP& map, VertexAttribute<typename XXX::VEC3>& pos, VertexAttribute<typename XXX::VEC3>& pos2):
-		FunctorMapThreaded< typename XXX::MAP>(map),
-		m_positions(pos),m_positions2(pos2)
+	ShrinkFunctor(
+		typename XXX::MAP& map,
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos,
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos2
+	) : FunctorMapThreaded<typename XXX::MAP>(map),
+		m_positions(pos),
+		m_positions2(pos2)
 	{}
 
 	void run(Dart d, unsigned int /*threadID*/)
 	{
 		typename XXX::VEC3 Q(0,0,0);
 		int nb=0;
-		Traversor2VVaE<typename XXX::MAP> trav(this->m_map,d);
-		for (Dart e=trav.begin(); e!=trav.end(); e = trav.next())
+		Traversor2VVaE<typename XXX::MAP> trav(this->m_map, d);
+		for (Dart e = trav.begin(); e != trav.end(); e = trav.next())
 		{
 			Q += m_positions[e];
 			nb++;
@@ -200,18 +209,14 @@ public:
 
 void MyQT::threadSimple()
 {
-	ShrinkFunctor<PFP> funct(myMap,position,position2);
+	ShrinkFunctor<PFP> funct(myMap, position, position2);
 	Algo::Parallel::foreach_cell<PFP::MAP,VERTEX>(myMap, funct);
 
-	myMap.swapAttributes(position,position2);
+	myMap.swapAttributes(position, position2);
 	m_positionVBO->updateData(position);
 	m_lines->setAttributePosition(m_positionVBO);
 	updateGL();
 }
-
-
-
-
 
 
 // Thread foreach with storage (computing average length of edges)
@@ -220,13 +225,18 @@ template <typename XXX>
 class LengthEdgeFunctor : public FunctorMapThreaded<typename XXX::MAP >
 {
 protected:
-	VertexAttribute<typename XXX::VEC3>& m_positions;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions;
 	double m_length;
 	unsigned int m_nb;
+
 public:
-	LengthEdgeFunctor( typename XXX::MAP& map, VertexAttribute<typename XXX::VEC3>& pos):
-		FunctorMapThreaded< typename XXX::MAP>(map),
-		m_positions(pos), m_length(0.0), m_nb(0)
+	LengthEdgeFunctor(
+		typename XXX::MAP& map,
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos
+	) : FunctorMapThreaded<typename XXX::MAP>(map),
+		m_positions(pos),
+		m_length(0.0),
+		m_nb(0)
 	{}
 
 	double getLength() { return m_length;}
@@ -244,20 +254,22 @@ public:
 	// no need to duplicate here, we create 1 functor by thread (see bellow)
 };
 
+
+
 void MyQT::threadStorage()
 {
 	// functor need storage so we need one per thread
 	std::vector<FunctorMapThreaded<PFP::MAP>*> functs;
 	unsigned int nbthreads = Algo::Parallel::optimalNbThreads();
 
-	for (unsigned int i=0; i<nbthreads; ++i)
+	for (unsigned int i = 0; i < nbthreads; ++i)
 	{
-		LengthEdgeFunctor<PFP>* lef = new LengthEdgeFunctor<PFP>(myMap,position);
+		LengthEdgeFunctor<PFP>* lef = new LengthEdgeFunctor<PFP>(myMap, position);
 		functs.push_back(lef);
 	}
 
 	CGoGNout << "using "<< nbthreads << " threads"<< CGoGNendl;
-	Algo::Parallel::foreach_cell<PFP::MAP,EDGE>(myMap, functs);
+	Algo::Parallel::foreach_cell<MAP, EDGE>(myMap, functs);
 
 	//compute average length from each thread result and delete functors
 	double average = 0;
@@ -272,9 +284,7 @@ void MyQT::threadStorage()
 	average /= all;
 
 	CGoGNout << "AVERAGE LENGTH "<< average << CGoGNendl;
-
 }
-
 
 int main(int argc, char **argv)
 {
@@ -282,30 +292,28 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-
  	sqt.statusMsg("Neww to create a sphere or Load for a mesh file");
  	CGoGNStream::allToConsole(&sqt);
 
  	if (!position.isValid())
- 		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+		position = myMap.addAttribute<VEC3, VERTEX>("position");
 
 	if (!position2.isValid())
- 		position2 = myMap.addAttribute<PFP::VEC3, VERTEX>("position2");
+		position2 = myMap.addAttribute<VEC3, VERTEX>("position2");
 
 	if (!normal.isValid())
- 		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
+		normal = myMap.addAttribute<VEC3, VERTEX>("normal");
 
 	unsigned int nbt = 64;
-	if (argc==2)
+	if (argc == 2)
 		nbt = atoi(argv[1]);
  		// create a sphere
-     Algo::Surface::Tilings::Square::Cylinder<PFP> prim(myMap, nbt, nbt, true, true);
+	Algo::Surface::Tilings::Square::Cylinder<PFP> prim(myMap, nbt, nbt, true, true);
     prim.embedIntoSphere(position, 20.0f);
 
-
    //  bounding box
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+	Geom::BoundingBox<VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	float lWidthObj = std::max<REAL>(std::max<REAL>(bb.size(0), bb.size(1)), bb.size(2));
 	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 	CGoGNout << "lPosObj=" << lPosObj << CGoGNendl;
 	CGoGNout << "lWidthObj=" << lWidthObj << CGoGNendl;
@@ -315,7 +323,6 @@ int main(int argc, char **argv)
 //	myMap.enableQuickTraversal<VERTEX>() ;
 
 	sqt.show();
-
 
 	return app.exec();
 }

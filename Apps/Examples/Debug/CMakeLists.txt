@@ -63,19 +63,17 @@ target_link_libraries( clippingD ${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 QT4_WRAP_UI( volumeExplorer_ui ../volumeExplorer.ui )
 QT4_WRAP_CPP( volumeExplorer_moc ../volumeExplorer.h )
 add_executable( volumeExplorerD ../volumeExplorer.cpp ${volumeExplorer_ui} ${volumeExplorer_moc})
-target_link_libraries( volumeExplorerD ${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )	
+target_link_libraries( volumeExplorerD ${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
 	
 QT4_WRAP_UI( mcmesh_ui ../mcmesh.ui )
 QT4_WRAP_CPP( mcmesh_moc ../mcmesh.h )
 add_executable( mcmeshD ../mcmesh.cpp ${mcmesh_moc}	${mcmesh_ui} )
-target_link_libraries( mcmeshD ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+target_link_libraries( mcmeshD ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP( concave_rendering_moc ../concave_rendering.h )
 add_executable( concave_renderingD ../concave_rendering.cpp ${concave_rendering_moc}	${concave_rendering_ui} )
-target_link_libraries( concave_renderingD ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+target_link_libraries( concave_renderingD ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP( viewerOBJ_moc ../viewerOBJ.h )
 add_executable( viewerOBJD ../viewerOBJ.cpp ${viewerOBJ_moc} )
-target_link_libraries( viewerOBJD ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS}  )
-
-
+target_link_libraries( viewerOBJD ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )

@@ -92,11 +92,11 @@ protected:
 	QList<CellSelectorGen*> m_mutuallyExclusive;
 };
 
-template <unsigned int ORBIT>
+template <typename MAP, unsigned int ORBIT>
 class CellSelector : public CellSelectorGen
 {
 public:
-	CellSelector(GenericMap& map, const QString& name, unsigned int thread = 0) :
+	CellSelector(MAP& map, const QString& name, unsigned int thread = 0) :
 		CellSelectorGen(name),
 		m_map(map),
 		m_cm(map, thread)
@@ -107,7 +107,7 @@ public:
 
 	inline unsigned int getOrbit() { return ORBIT; }
 
-	inline const CellMarker<ORBIT>& getMarker() { return m_cm; }
+	inline const CellMarker<MAP, ORBIT>& getMarker() { return m_cm; }
 
 	inline void select(Dart d, bool emitSignal = true)
 	{
@@ -131,12 +131,12 @@ public:
 	{
 		if(m_cm.isMarked(d))
 		{
-			unsigned int v = m_map.getEmbedding<ORBIT>(d);
+			unsigned int v = m_map.template getEmbedding<ORBIT>(d);
 			bool found = false;
 			unsigned int i;
 			for(i = 0; i < m_cells.size() && !found; ++i)
 			{
-				if(m_map.getEmbedding<ORBIT>(m_cells[i]) == v)
+				if(m_map.template getEmbedding<ORBIT>(m_cells[i]) == v)
 					found = true ;
 			}
 			if(found)
@@ -160,7 +160,7 @@ public:
 	void rebuild()
 	{
 		m_cells.clear();
-		TraversorCell<GenericMap, ORBIT> t(m_map, true);
+		TraversorCell<MAP, ORBIT> t(m_map, true);
 		for(Dart d = t.begin(); d != t.end(); d = t.next())
 		{
 			if(m_cm.isMarked(d))
@@ -170,8 +170,8 @@ public:
 	}
 
 private:
-	GenericMap& m_map;
-	CellMarker<ORBIT> m_cm;
+	MAP& m_map;
+	CellMarker<MAP, ORBIT> m_cm;
 };
 
 } // namespace SCHNApps

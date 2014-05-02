@@ -128,12 +128,13 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 // declaration of the map
 MAP myMap;
 // and attribute of position
-VertexAttribute<VEC3> position;
+VertexAttribute<VEC3, MAP_IMPL> position;
 
 unsigned int nb_ears;
 

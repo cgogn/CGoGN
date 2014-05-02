@@ -144,10 +144,10 @@ public:
 	Vector<DIM, T> normalized() const;
 
 	// dot product
-	T operator*(const Vector<DIM, T> v) const ;
+	T operator*(const Vector<DIM, T>& v) const ;
 
 	// cross product
-	Vector<DIM, T> operator^(const Vector<DIM, T> v) const ;
+	Vector<DIM, T> operator^(const Vector<DIM, T>& v) const ;
 
 	// Equal
 	bool operator==(const Vector<DIM, T>& v) const ;
@@ -256,6 +256,6 @@ typedef Vector<4, unsigned char> Vec4uc ;
 
 }
 
-#include "vector_gen.hpp"
+#include "Geometry/vector_gen.hpp"
 
 #endif

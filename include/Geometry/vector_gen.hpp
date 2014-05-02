@@ -275,7 +275,7 @@ inline Vector<DIM, T> Vector<DIM, T>::normalized() const
 }
 
 template <unsigned int DIM, typename T>
-inline T Vector<DIM, T>::operator*(const Vector<DIM, T> v) const
+inline T Vector<DIM, T>::operator*(const Vector<DIM, T>& v) const
 {
 	T d(0) ;
 	for (unsigned int i = 0; i < DIM; ++i)
@@ -284,7 +284,7 @@ inline T Vector<DIM, T>::operator*(const Vector<DIM, T> v) const
 }
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM, T> Vector<DIM, T>::operator^(const Vector<DIM, T> v) const
+inline Vector<DIM, T> Vector<DIM, T>::operator^(const Vector<DIM, T>& v) const
 {
 	CGoGN_STATIC_ASSERT(DIM == 3, incompatible_Vector_cross_product_dimension) ;
 	Vector<DIM, T> c ;

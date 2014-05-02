@@ -64,7 +64,7 @@ struct FaceInter
 template<typename PFP>
 void facesRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		std::vector<Dart>& vecFaces,
@@ -138,7 +138,7 @@ void facesRaySelection(
 template<typename PFP>
 void facesRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		std::vector<Dart>& vecFaces)
@@ -157,7 +157,7 @@ void facesRaySelection(
 template<typename PFP>
 void faceRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		Dart& face)
@@ -187,7 +187,7 @@ void faceRaySelection(
 template<typename PFP>
 void edgesRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		std::vector<Dart>& vecEdges,
@@ -250,7 +250,7 @@ void edgesRaySelection(
 template<typename PFP>
 void edgeRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		Dart& edge)
@@ -300,7 +300,7 @@ void edgeRaySelection(
 template<typename PFP>
 void verticesRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		std::vector<Dart>& vecVertices,
@@ -359,7 +359,7 @@ void verticesRaySelection(
 template<typename PFP>
 void vertexRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		Dart& vertex)
@@ -401,7 +401,7 @@ void vertexRaySelection(
 template<typename PFP>
 void volumesRaySelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		std::vector<Dart>& vecVolumes)
@@ -470,7 +470,7 @@ void volumesRaySelection(
  * @param vecDarts (out) vector to store dart of intersected darts
  */
 //template<typename PFP>
-//void dartsRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecDarts)
+//void dartsRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecDarts)
 //{
 //	// recuperation des brins intersectes
 //	vecDarts.clear();
@@ -505,7 +505,7 @@ void volumesRaySelection(
 template<typename PFP>
 void facesPlanSelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename Geom::Plane3D<typename PFP::VEC3::DATA_TYPE>& plan,
 		std::vector<Dart>& vecDarts)
 {
@@ -535,7 +535,7 @@ void facesPlanSelection(
 template<typename PFP>
 void verticesConeSelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		float angle,
@@ -596,7 +596,7 @@ void verticesConeSelection(
 template<typename PFP>
 void edgesConeSelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		float angle,
@@ -655,7 +655,7 @@ void edgesConeSelection(
 template<typename PFP>
 Dart verticesBubbleSelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& cursor,
 		typename PFP::REAL radiusMax)
 {
@@ -680,7 +680,7 @@ Dart verticesBubbleSelection(
 template<typename PFP>
 Dart edgesBubbleSelection(
 		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& cursor,
 		typename PFP::REAL radiusMax)
 {
@@ -711,7 +711,7 @@ Dart edgesBubbleSelection(
 //{
 //
 //template<typename PFP>
-//void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces, unsigned int nbth=0, unsigned int current_thread=0)
+//void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces, unsigned int nbth=0, unsigned int current_thread=0)
 //{
 //	if (nbth==0)
 ////		nbth = Algo::Parallel::optimalNbThreads();
@@ -748,7 +748,7 @@ Dart edgesBubbleSelection(
 //}
 //
 //template<typename PFP>
-//void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float dist, unsigned int nbth=0, unsigned int current_thread=0)
+//void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float dist, unsigned int nbth=0, unsigned int current_thread=0)
 //{
 //	typename PFP::REAL dist2 = dist * dist;
 //	typename PFP::REAL AB2 = rayAB * rayAB;
@@ -788,7 +788,7 @@ Dart edgesBubbleSelection(
 //
 //
 //template<typename PFP>
-//void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist , unsigned int nbth=0, unsigned int current_thread=0)
+//void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist , unsigned int nbth=0, unsigned int current_thread=0)
 //{
 //	typename PFP::REAL dist2 = dist * dist;
 //	typename PFP::REAL AB2 = rayAB * rayAB;
@@ -829,7 +829,7 @@ Dart edgesBubbleSelection(
 //}
 //
 //template<typename PFP>
-//void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, unsigned int nbth=0, unsigned int current_thread=0)
+//void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, unsigned int nbth=0, unsigned int current_thread=0)
 //{
 //	std::vector<Dart> vecFaces;
 //	vecFaces.reserve(100);

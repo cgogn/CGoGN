@@ -29,10 +29,7 @@
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
 
-
 using namespace CGoGN ;
-
-
 
 int main(int argc, char **argv)
 {
@@ -62,7 +59,6 @@ int main(int argc, char **argv)
 	return app.exec();
 }
 
-
 void MyQT::operation(int x)
 {
 	switch(x)
@@ -85,7 +81,7 @@ void MyQT::operation(int x)
 		if (m_selected != NIL)
 		{
 			dm.markAll();
-			m_selected=myMap.deleteVertex(m_selected);
+			m_selected = myMap.deleteVertex(m_selected);
 			updateMap();
 		}
 		break;
@@ -195,14 +191,14 @@ void MyQT::createMap(int n)
 	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
 
 #ifdef PRIMAL_TOPO
-    m_render_topo->updateData<PFP>(myMap, position, 0.9);
+	m_render_topo->updateData(myMap, position, 0.9);
 #else
-   m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true);
+   m_render_topo->updateData(myMap, position, 0.9f, 0.9f,true);
 #endif
 
-	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
 		{
 			int n = rand();
 			float r = float(n&0x7f)/255.0f + 0.25f;
@@ -218,14 +214,14 @@ void MyQT::updateMap()
 {
 	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
 #ifdef PRIMAL_TOPO
-    m_render_topo->updateData<PFP>(myMap, position, 0.9);
+	m_render_topo->updateData(myMap, position, 0.9);
 #else
-    m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,true);
+	m_render_topo->updateData(myMap, position, 0.9f, 0.9f,true);
 #endif
 
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
 		{
 			const Geom::Vec3f& C = colorDarts[d];
 			if (C*C != 0.0f)
@@ -239,9 +235,9 @@ void MyQT::cb_initGL()
 {
 	glClearColor(1.0f,1.0f,1.0f,1.0f);
 #ifdef PRIMAL_TOPO
-    m_render_topo = new Algo::Render::GL2::TopoPrimalRender() ;
+	m_render_topo = new Algo::Render::GL2::TopoPrimalRender<PFP>() ;
 #else
-    m_render_topo = new Algo::Render::GL2::TopoRender(0.01f) ;
+	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>(0.01f) ;
 #endif
 }
 
@@ -266,7 +262,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y); // nb
+		Dart d = m_render_topo->picking(myMap, x,y); // nb
 		if (button == Qt::LeftButton)
 		{
 			if (d != Dart::nil())
@@ -288,7 +284,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'c':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked2(d))
+			if (!myMap.isBoundaryMarked<2>(d))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
@@ -302,7 +298,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'g':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked2(d))
+			if (!myMap.isBoundaryMarked<2>(d))
 			{
 				colorDarts[d] =  Geom::Vec3f(0.5f,0.5f,0.5f);
 				m_render_topo->setDartColor(d,0.5f,0.5f,0.5f);
@@ -313,7 +309,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'b':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked2(d))
+			if (!myMap.isBoundaryMarked<2>(d))
 			{
 				colorDarts[d] =  Geom::Vec3f(0.0f,0.0f,0.0f);
 				m_render_topo->setDartColor(d,0.0f,0.0f,0.0f);
@@ -404,7 +400,7 @@ void MyQT::importMesh(std::string& filename)
 		colorDarts = myMap.addAttribute<VEC3, DART>("color");
 		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 		{
-			if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
+			if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
@@ -427,11 +423,9 @@ void MyQT::importMesh(std::string& filename)
 	updateGLMatrices() ;
 }
 
-
 void MyQT::width(int w)
 {
 	m_render_topo->setDartWidth(w);
 	m_render_topo->setRelationWidth(w);
 	updateGL();
 }
-

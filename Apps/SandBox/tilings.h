@@ -68,8 +68,6 @@ public:
     Utils::ShaderSimpleColor* m_shader;
     Utils::ShaderVectorPerVertex* m_lines;
 
-
-
     MyQT():
         m_render(NULL),
         m_positionVBO(NULL),
@@ -93,10 +91,6 @@ protected:
     void threadAttrib();
 
     void threadStorage();
-
-
-
 };
-
 
 #endif // TUTO_TILINGS_H

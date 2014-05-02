@@ -85,7 +85,7 @@ void Viewer::cb_initGL()
 	Utils::GLSLShader::setCurrentOGLVersion(2) ;
 
 	m_render = new Algo::Render::GL2::MapRender() ;
-	m_topoRender = new Algo::Render::GL2::TopoRender() ;
+	m_topoRender = new Algo::Render::GL2::TopoRenderMap<PFP>() ;
 
 	m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
 
@@ -211,7 +211,7 @@ void Viewer::cb_keyPress(int keycode)
 
 			Geom::Plane3D<PFP::REAL> plan(n,o);
 
-			CellMarker<FACE> over(myMap);
+			CellMarker<MAP, FACE> over(myMap);
 			Algo::Surface::Modelisation::planeCut<PFP>(myMap, position, plan, over, true, true);
 
 			std::cout << "PlaneCut Ok"<< std::endl;
@@ -224,7 +224,6 @@ void Viewer::cb_keyPress(int keycode)
 					position[d]+= n;
 			}
 
-
 			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
 			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
@@ -233,7 +232,7 @@ void Viewer::cb_keyPress(int keycode)
 			m_positionVBO->updateData(position) ;
 			m_normalVBO->updateData(normal) ;
 
-			m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+			m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
 			updateGL();
 
 			break;
@@ -247,13 +246,13 @@ void Viewer::cb_keyPress(int keycode)
 
             Geom::Plane3D<PFP::REAL> plan(n,o);
 
-			CellMarker<FACE> over(myMap);
+			CellMarker<MAP, FACE> over(myMap);
 			Algo::Surface::Modelisation::planeCut2<PFP>(myMap, position, plan, over, true);
 
 			std::cout << "PlaneCut Ok"<< std::endl;
 			n *= bb.diagSize()/20.0f;
 
-			TraversorV<PFP::MAP> trav(myMap);
+			TraversorV<MAP> trav(myMap);
 			for (Dart d=trav.begin(); d!=trav.end(); d=trav.next())
 			{
 				if (over.isMarked(d))
@@ -268,7 +267,7 @@ void Viewer::cb_keyPress(int keycode)
 			m_positionVBO->updateData(position) ;
 			m_normalVBO->updateData(normal) ;
 
-			m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+			m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
 			updateGL();
 
 			break;
@@ -305,10 +304,6 @@ void Viewer::cb_keyPress(int keycode)
 			break;
 		}
 
-
-
-
-
 		default:
 			break;
 	}
@@ -343,7 +338,7 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
-	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+	m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
@@ -375,7 +370,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 		if (askExportMode)
 			Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
 
-		std::vector<VertexAttribute<VEC3>*> attributes ;
+		std::vector<VertexAttribute<VEC3, MAP_IMPL>*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii) ;
 	}

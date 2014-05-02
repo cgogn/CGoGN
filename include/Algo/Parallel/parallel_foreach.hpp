@@ -67,7 +67,6 @@ public:
 	}
 };
 
-
 /// internal functor for boost call
 template<typename MAP>
 class ThreadFunction
@@ -100,12 +99,10 @@ public:
 	}
 };
 
-
 inline unsigned int nbThreads()
 {
 	return boost::thread::hardware_concurrency();
 }
-
 
 inline unsigned int optimalNbThreads(NbParam p)
 {
@@ -123,8 +120,6 @@ inline unsigned int optimalNbThreads(NbParam p)
 	return nb;
 
 }
-
-
 
 template <typename MAP, unsigned int ORBIT>
 void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers)
@@ -169,8 +164,8 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 		vd[i].reserve(SIZE_BUFFER_THREAD);
 
 	AttributeContainer* cont = NULL;
-	DartMarker* dmark = NULL;
-	CellMarker<ORBIT>* cmark = NULL;
+	DartMarker<MAP>* dmark = NULL;
+	CellMarker<MAP, ORBIT>* cmark = NULL;
 	const AttributeMultiVector<Dart>* quickTraversal = map.template getQuickTraversal<ORBIT>() ;
 
 	// fill each vd buffers with SIZE_BUFFER_THREAD darts
@@ -197,7 +192,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 	{
 		if(map.template isOrbitEmbedded<ORBIT>())
 		{
-			cmark = new CellMarker<ORBIT>(map) ;
+			cmark = new CellMarker<MAP, ORBIT>(map) ;
 
 			d = map.begin();
 			unsigned int nb = 0;
@@ -214,14 +209,14 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 		}
 		else
 		{
-			dmark = new DartMarker(map) ;
+			dmark = new DartMarker<MAP>(map) ;
 			d = map.begin();
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
 				if ((!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
-					dmark->markOrbit<ORBIT>(d);
+					dmark->template markOrbit<ORBIT>(d);
 					vd[nb%nbth].push_back(d);
 					nb++;
 				}
@@ -315,7 +310,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			{
 				if ((!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
 				{
-					dmark->markOrbit<ORBIT>(d);
+					dmark->template markOrbit<ORBIT>(d);
 					tempo[nb%nbth].push_back(d);
 					nb++;
 				}
@@ -351,8 +346,6 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 		delete dmark;
 }
 
-
-
 template <typename MAP>
 void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers)
 {
@@ -383,7 +376,6 @@ void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bo
 		for (unsigned int i = 0; i < nbth; ++i)
 			delete funcs[i];
 }
-
 
 template <typename MAP>
 void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*> funcs, bool needMarkers)
@@ -464,7 +456,6 @@ void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*> funcs, bool ne
 	delete tempo;
 }
 
-
 // TODO same modification for transparent usage of dart marker / cell marker / quick traversal ??
 
 template <typename MAP, unsigned int CELL>
@@ -486,7 +477,7 @@ void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFro
 			map.addThreadMarker(nbth+1-nbth_prec);
 	}
 
-	CellMarkerNoUnmark<CELL> cm(map); // for 2 pass front mark / back unmark
+	CellMarkerNoUnmark<MAP, CELL> cm(map); // for 2 pass front mark / back unmark
 
 	boost::barrier sync1(nbth+1);
 	boost::barrier sync2(nbth+1);
@@ -611,8 +602,6 @@ void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFro
 	delete[] vd;
 }
 
-
-
 template <typename MAP, unsigned int CELL>
 void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapThreaded<MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, bool needMarkers)
 {
@@ -649,9 +638,6 @@ void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapT
 			delete funcs[i];
 }
 
-
-
-
 template <typename MAP, unsigned int ORBIT>
 void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers)
 {
@@ -663,8 +649,8 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 	vd.reserve(SIZE_BUFFER_THREAD);
 
 	AttributeContainer* cont = NULL;
-	DartMarker* dmark = NULL;
-	CellMarker<ORBIT>* cmark = NULL;
+	DartMarker<MAP>* dmark = NULL;
+	CellMarker<MAP, ORBIT>* cmark = NULL;
 	AttributeMultiVector<Dart>* quickTraversal = map.template getQuickTraversal<ORBIT>() ;
 
 	// fill each vd buffers with SIZE_BUFFER_THREAD darts
@@ -688,7 +674,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 	{
 		if(map.template isOrbitEmbedded<ORBIT>())
 		{
-			cmark = new CellMarker<ORBIT>(map) ;
+			cmark = new CellMarker<MAP, ORBIT>(map) ;
 			d = map.begin();
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )
@@ -704,7 +690,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 		}
 		else
 		{
-			dmark = new DartMarker(map) ;
+			dmark = new DartMarker<MAP>(map) ;
 			d = map.begin();
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )
@@ -817,13 +803,6 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 	if (dmark != NULL)
 		delete dmark;
 }
-
-
-
-
-
-
-
 
 } // namespace Parallel
 

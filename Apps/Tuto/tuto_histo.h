@@ -46,10 +46,10 @@ struct PFP: public PFP_STANDARD
 {
 	typedef EmbeddedMap2 MAP;
 };
+
 typedef PFP::MAP MAP ;
+typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
-
-
 
 /*
  * color map class for histogram color
@@ -57,9 +57,8 @@ typedef PFP::VEC3 VEC3 ;
 class ColMap : public Algo::Histogram::HistoColorMap
 {
 public:
-	Geom::Vec3f color(double f) const { return Utils::color_map_BCGYR(float(f));}
+	Geom::Vec3f color(double f) const { return Utils::color_map_BCGYR(float(f)); }
 };
-
 
 /*
  * Attribute conversion to double
@@ -83,21 +82,28 @@ public:
 //	double operator[](unsigned int i) const { return double(m_va[i])*0.33;}
 //};
 
-class AttConv: public Algo::Histogram::AttributeConvert< VertexAttribute<float> >
+class AttConv: public Algo::Histogram::AttributeConvert<VertexAttribute<float, MAP_IMPL> >
 {
 public:
 	/// constructor with attribute reference
-	AttConv(VertexAttribute<float>& va): Algo::Histogram::AttributeConvert< VertexAttribute<float> >(va){}
-	double operator[](unsigned int i) const { return double(attrib[i])*0.33;}
+	AttConv(VertexAttribute<float, MAP_IMPL>& va): Algo::Histogram::AttributeConvert<VertexAttribute<float, MAP_IMPL> >(va){}
+	double operator[](unsigned int i) const { return double(attrib[i]) * 0.33; }
 };
-
-
 
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
+
 public:
-	MyQT(): m_render(NULL), m_positionVBO(NULL), m_shader2(NULL),l_cm(NULL),l_histo(NULL),l_popup(NULL),l_histodraw(NULL) {}
+	MyQT():
+		m_render(NULL),
+		m_positionVBO(NULL),
+		m_shader2(NULL),
+		l_cm(NULL),
+		l_histo(NULL),
+		l_popup(NULL),
+		l_histodraw(NULL)
+	{}
 
 	void cb_redraw();
 	void cb_initGL();
@@ -110,7 +116,6 @@ protected:
 	Utils::VBO* m_positionVBO;	// position 3D
 	Utils::VBO* m_colorVBO2;	// color per vertex for edge drawing
 	Utils::ShaderColorPerVertex* m_shader2;
-
 
 	// some ptr
 	ColMap*  l_cm;
@@ -131,12 +136,8 @@ public:
 
 	void cb_keyPress(int keycode);
 
-
 public slots:
-	void clickHisto(unsigned int i,unsigned int j);
+	void clickHisto(unsigned int i, unsigned int j);
 };
-
-
-
 
 #endif

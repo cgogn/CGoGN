@@ -54,11 +54,13 @@ namespace Selection
 template <typename PFP>
 class Collector
 {
-protected:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	typename PFP::MAP& map;
+protected:
+	MAP& map;
 	unsigned int m_thread;
 
 	Dart centerDart;
@@ -71,7 +73,7 @@ protected:
 	std::vector<Dart> border;
 
 public:
-	Collector(typename PFP::MAP& m, unsigned int thread =0);
+	Collector(MAP& m, unsigned int thread = 0);
 
 	inline void init(Dart d)
 	{
@@ -99,7 +101,7 @@ public:
 		std::sort(border.begin(), border.end());
 	}
 
-	inline typename PFP::MAP& getMap() { return map; }
+	inline MAP& getMap() { return map; }
 
 	inline Dart getCenterDart() const { return centerDart; }
 
@@ -116,13 +118,12 @@ public:
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
 
-	virtual REAL computeArea (const VertexAttribute<VEC3>& /*pos*/) {
+	virtual REAL computeArea (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/) {
 		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
 		return 0.0;
 	}
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& /*pos*/, const EdgeAttribute<REAL>& /*edgeangle*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& /*pos*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
-
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/, const EdgeAttribute<REAL, MAP_IMPL>& /*edgeangle*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
 };
 
 /*********************************************************
@@ -139,19 +140,21 @@ public:
 template <typename PFP>
 class Collector_OneRing : public Collector<PFP>
 {
-protected:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 public:
-	Collector_OneRing(typename PFP::MAP& m, unsigned int thread=0):
-		Collector<PFP>(m, thread) {}
+	Collector_OneRing(MAP& m, unsigned int thread = 0) :
+		Collector<PFP>(m, thread)
+	{}
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	REAL computeArea(const VertexAttribute<VEC3>& pos);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>&edgeangle, typename PFP::MATRIX33&);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&);
+	REAL computeArea(const VertexAttribute<VEC3, MAP_IMPL>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>& edgeangle, typename PFP::MATRIX33&);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, typename PFP::MATRIX33&);
 };
 
 /*********************************************************
@@ -170,21 +173,22 @@ public:
 template <typename PFP>
 class Collector_OneRing_AroundEdge : public Collector<PFP>
 {
-protected:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 public:
-	Collector_OneRing_AroundEdge(typename PFP::MAP& m, unsigned int thread=0):
-		Collector<PFP>(m, thread) {}
+	Collector_OneRing_AroundEdge(MAP& m, unsigned int thread = 0) :
+		Collector<PFP>(m, thread)
+	{}
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	REAL computeArea(const VertexAttribute<VEC3>& pos);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>&edgeangle, typename PFP::MATRIX33&);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&);
+	REAL computeArea(const VertexAttribute<VEC3, MAP_IMPL>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>&edgeangle, typename PFP::MATRIX33&);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, typename PFP::MATRIX33&);
 };
-
 
 /*********************************************************
  * Collector Within Sphere
@@ -199,29 +203,31 @@ public:
 template <typename PFP>
 class Collector_WithinSphere : public Collector<PFP>
 {
-protected:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	const VertexAttribute<VEC3>& position;
+protected:
+	const VertexAttribute<VEC3, MAP_IMPL>& position;
 	REAL radius;
 
 public:
-	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<VEC3>& p, REAL r = 0, unsigned int thread=0) :
+	Collector_WithinSphere(MAP& m, const VertexAttribute<VEC3, MAP_IMPL>& p, REAL r = 0, unsigned int thread = 0) :
 		Collector<PFP>(m, thread),
 		position(p),
 		radius(r)
 	{}
 	inline void setRadius(REAL r) { radius = r; }
 	inline REAL getRadius() const { return radius; }
-	inline const VertexAttribute<VEC3>& getPosition() const { return position; }
+	inline const VertexAttribute<VEC3, MAP_IMPL>& getPosition() const { return position; }
 
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	REAL computeArea(const VertexAttribute<VEC3>& pos);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, typename PFP::MATRIX33&);
+	REAL computeArea(const VertexAttribute<VEC3, MAP_IMPL>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>& edgeangle, typename PFP::MATRIX33&);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, typename PFP::MATRIX33&);
 };
 
 /*********************************************************
@@ -237,26 +243,30 @@ public:
 template <typename PFP>
 class Collector_NormalAngle : public Collector<PFP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 protected:
-	const VertexAttribute<typename PFP::VEC3>& normal ;
-	typename PFP::REAL angleThreshold ;
+	const VertexAttribute<VEC3, MAP_IMPL>& normal ;
+	REAL angleThreshold ;
 
 public:
 	Collector_NormalAngle(
-		typename PFP::MAP& m,
-		const VertexAttribute<typename PFP::VEC3>& n,
-		typename PFP::REAL a,
-		unsigned int thread=0
-	) :	Collector<PFP>(m,thread), normal(n), angleThreshold(a)
+		MAP& m,
+		const VertexAttribute<VEC3, MAP_IMPL>& n,
+		REAL a,
+		unsigned int thread = 0
+	) :	Collector<PFP>(m, thread), normal(n), angleThreshold(a)
 	{}
-	inline void setAngleThreshold(typename PFP::REAL a) { angleThreshold = a; }
-	inline typename PFP::REAL getAngleThreshold() const { return angleThreshold; }
-	inline const VertexAttribute<typename PFP::VEC3>& getNormal() const { return normal ; }
+	inline void setAngleThreshold(REAL a) { angleThreshold = a; }
+	inline REAL getAngleThreshold() const { return angleThreshold; }
+	inline const VertexAttribute<VEC3, MAP_IMPL>& getNormal() const { return normal ; }
 
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
 };
-
 
 /*********************************************************
  * Collector Normal Angle (Triangles)
@@ -271,26 +281,30 @@ public:
 template <typename PFP>
 class Collector_NormalAngle_Triangles : public Collector<PFP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 protected:
-	const FaceAttribute<typename PFP::VEC3>& normal ;
-	typename PFP::REAL angleThreshold ;
+	const FaceAttribute<VEC3, MAP_IMPL>& normal ;
+	REAL angleThreshold ;
 
 public:
 	Collector_NormalAngle_Triangles(
-		typename PFP::MAP& m,
-		const FaceAttribute<typename PFP::VEC3>& n,
-		typename PFP::REAL a,
-		unsigned int thread=0
-	) :	Collector<PFP>(m,thread), normal(n), angleThreshold(a)
+		MAP& m,
+		const FaceAttribute<VEC3, MAP_IMPL>& n,
+		REAL a,
+		unsigned int thread = 0
+	) :	Collector<PFP>(m, thread), normal(n), angleThreshold(a)
 	{}
-	inline void setAngleThreshold(typename PFP::REAL a) { angleThreshold = a; }
-	inline typename PFP::REAL getAngleThreshold() const { return angleThreshold; }
-	inline const VertexAttribute<typename PFP::VEC3>& getNormal() const { return normal ; }
+	inline void setAngleThreshold(REAL a) { angleThreshold = a; }
+	inline REAL getAngleThreshold() const { return angleThreshold; }
+	inline const VertexAttribute<VEC3, MAP_IMPL>& getNormal() const { return normal ; }
 
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
 };
-
 
 /*********************************************************
  * Collector Criterions
@@ -305,69 +319,83 @@ public :
 	virtual bool isInside(Dart d) = 0;
 };
 
+// tests if the angle between vertex normals is below some threshold
 template <typename PFP>
 class CollectorCriterion_VertexNormalAngle : public CollectorCriterion
-{ // tests if the angle between vertex normals is below some threshold
-private :
+{
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	const VertexAttribute<VEC3>& vertexNormals;
+private :
+	const VertexAttribute<VEC3, MAP_IMPL>& vertexNormals;
 	REAL threshold;
 	VEC3 centerNormal;
-public :
-	CollectorCriterion_VertexNormalAngle(const VertexAttribute<VEC3>& n, REAL th) :
-		vertexNormals(n), threshold(th), centerNormal(0) {}
 
-	void init (Dart center) {centerNormal = vertexNormals[center];}
+public :
+	CollectorCriterion_VertexNormalAngle(const VertexAttribute<VEC3, MAP_IMPL>& n, REAL th) :
+		vertexNormals(n), threshold(th), centerNormal(0)
+	{}
+
+	void init (Dart center) { centerNormal = vertexNormals[center]; }
 	bool isInside (Dart d)
 	{
-		return ( Geom::angle(centerNormal, vertexNormals[d]) < threshold);
+		return ( Geom::angle(centerNormal, vertexNormals[d]) < threshold );
 	}
 };
 
+// tests if the angle between vertex normals is below some threshold
 template <typename PFP>
 class CollectorCriterion_TriangleNormalAngle : public CollectorCriterion
-{ // tests if the angle between vertex normals is below some threshold
-private :
+{
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	const FaceAttribute<VEC3>& faceNormals;
+private :
+	const FaceAttribute<VEC3, MAP_IMPL>& faceNormals;
 	REAL threshold;
 	VEC3 centerNormal;
-public :
-	CollectorCriterion_TriangleNormalAngle(const FaceAttribute<VEC3>& n, REAL th) :
-		faceNormals(n), threshold(th), centerNormal(0) {}
 
-	void init (Dart center) {centerNormal = faceNormals[center];}
+public :
+	CollectorCriterion_TriangleNormalAngle(const FaceAttribute<VEC3, MAP_IMPL>& n, REAL th) :
+		faceNormals(n), threshold(th), centerNormal(0)
+	{}
+
+	void init (Dart center) { centerNormal = faceNormals[center]; }
 	bool isInside (Dart d)
 	{
-		return ( Geom::angle(centerNormal, faceNormals[d]) < threshold);
+		return ( Geom::angle(centerNormal, faceNormals[d]) < threshold );
 	}
 };
 
+// tests if the distance between vertices is below some threshold
 template <typename PFP>
 class CollectorCriterion_VertexWithinSphere : public CollectorCriterion
-{ // tests if the distance between vertices is below some threshold
-private :
+{
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	const VertexAttribute<VEC3>& vertexPositions;
+private :
+	const VertexAttribute<VEC3, MAP_IMPL>& vertexPositions;
 	REAL threshold;
 	VEC3 centerPosition;
-public :
-	CollectorCriterion_VertexWithinSphere(const VertexAttribute<VEC3>& p, REAL th) :
-		vertexPositions(p), threshold(th), centerPosition(0) {}
 
-	void init (Dart center) {centerPosition = vertexPositions[center];}
+public :
+	CollectorCriterion_VertexWithinSphere(const VertexAttribute<VEC3, MAP_IMPL>& p, REAL th) :
+		vertexPositions(p), threshold(th), centerPosition(0)
+	{}
+
+	void init (Dart center) { centerPosition = vertexPositions[center]; }
 	bool isInside (Dart d)
 	{
 		return (vertexPositions[d] - centerPosition).norm() < threshold ;
 	}
 };
-
 
 /*********************************************************
  * Collector Vertices
@@ -381,11 +409,16 @@ public :
 template <typename PFP>
 class Collector_Vertices : public Collector<PFP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
 protected:
 	CollectorCriterion & crit;
 
 public:
-	Collector_Vertices(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread=0) :
+	Collector_Vertices(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread = 0) :
 		Collector<PFP>(m, thread),
 		crit(c)
 	{}
@@ -393,7 +426,6 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 };
-
 
 /*********************************************************
  * Collector Triangles
@@ -406,18 +438,22 @@ public:
 template <typename PFP>
 class Collector_Triangles : public Collector<PFP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
 protected:
 	CollectorCriterion & crit;
 
 public:
-	Collector_Triangles(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread=0) :
+	Collector_Triangles(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread = 0) :
 		Collector<PFP>(m,thread), crit(c)
 	{}
 
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
 };
-
 
 /*********************************************************
  * Collector Dijkstra_Vertices
@@ -432,9 +468,14 @@ public:
 template <typename PFP>
 class Collector_Dijkstra_Vertices : public Collector<PFP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
 protected:
-	const EdgeAttribute<typename PFP::REAL>& edge_cost;
-	typename PFP::REAL maxDist;
+	const EdgeAttribute<REAL, MAP_IMPL>& edge_cost;
+	REAL maxDist;
 
 	typedef struct
 	{
@@ -444,13 +485,13 @@ protected:
 	} DijkstraVertexInfo ;
 	typedef NoTypeNameAttribute<DijkstraVertexInfo> VertexInfo ;
 
-	VertexAttribute<VertexInfo> vertexInfo ;
+	VertexAttribute<VertexInfo, MAP_IMPL> vertexInfo ;
 
-	std::multimap<float,Dart> front ;
+	std::multimap<float, Dart> front ;
 
 public:
-	Collector_Dijkstra_Vertices(typename PFP::MAP& m, const EdgeAttribute<typename PFP::REAL>& c, typename PFP::REAL d = 0, unsigned int thread=0) :
-		Collector<PFP>(m,thread),
+	Collector_Dijkstra_Vertices(MAP& m, const EdgeAttribute<REAL, MAP_IMPL>& c, REAL d = 0, unsigned int thread = 0) :
+		Collector<PFP>(m, thread),
 		edge_cost(c),
 		maxDist(d)
 	{
@@ -460,14 +501,13 @@ public:
 	{
 		this->map.removeAttribute(vertexInfo);
 	}
-	inline void init (Dart d) {Collector<PFP>::init(d); front.clear();}
-	inline void setMaxDistance(typename PFP::REAL d) { maxDist = d; }
-	inline typename PFP::REAL getMaxDist() const { return maxDist; }
+	inline void init (Dart d) { Collector<PFP>::init(d); front.clear(); }
+	inline void setMaxDistance(REAL d) { maxDist = d; }
+	inline REAL getMaxDist() const { return maxDist; }
 
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 };
-
 
 /*********************************************************
  * Collector Dijkstra
@@ -480,24 +520,29 @@ public:
 template <typename PFP>
 class Collector_Dijkstra : public Collector<PFP>
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
 protected:
-	const VertexAttribute<typename PFP::VEC3>& position;
-	typename PFP::REAL maxDist;
+	const VertexAttribute<VEC3, MAP_IMPL>& position;
+	REAL maxDist;
 
 	typedef struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<float, Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
 	typedef NoTypeNameAttribute<DijkstraVertexInfo> VertexInfo ;
 
-	VertexAttribute<VertexInfo> vertexInfo ;
+	VertexAttribute<VertexInfo, MAP_IMPL> vertexInfo ;
 
-	std::multimap<float,Dart> front ;
+	std::multimap<float, Dart> front ;
 
 public:
-	Collector_Dijkstra(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL d = 0, unsigned int thread=0) :
+	Collector_Dijkstra(MAP& m, const VertexAttribute<VEC3, MAP_IMPL>& p, REAL d = 0, unsigned int thread=0) :
 		Collector<PFP>(m,thread),
 		position(p),
 		maxDist(d)
@@ -508,10 +553,10 @@ public:
 	{
 		this->map.removeAttribute(vertexInfo);
 	}
-	inline void init (Dart d) {Collector<PFP>::init(d); front.clear();}
-	inline void setMaxDistance(typename PFP::REAL d) { maxDist = d; }
-	inline typename PFP::REAL getMaxDist() const { return maxDist; }
-	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position; }
+	inline void init (Dart d) { Collector<PFP>::init(d); front.clear(); }
+	inline void setMaxDistance(REAL d) { maxDist = d; }
+	inline REAL getMaxDist() const { return maxDist; }
+	inline const VertexAttribute<VEC3, MAP_IMPL>& getPosition() const { return position; }
 
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
@@ -521,11 +566,12 @@ private :
 //	inline Dart oppositeVertex (Dart d);
 };
 
-
-
 } // namespace Selection
-} // surface
+
+} // namespace Surface
+
 } // namespace Algo
+
 } // namespace CGoGN
 
 #include "Algo/Selection/collector.hpp"

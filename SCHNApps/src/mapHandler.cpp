@@ -61,7 +61,7 @@ Utils::VBO* MapHandlerGen::createVBO(const AttributeHandlerGen& attr)
 
 Utils::VBO* MapHandlerGen::createVBO(const QString& name)
 {
-	return createVBO(static_cast<AttribMap*>(m_map)->getAttributeVectorGen(VERTEX, name.toUtf8().constData()));
+	return createVBO(m_map->getAttributeVectorGen(VERTEX, name.toUtf8().constData()));
 }
 
 void MapHandlerGen::updateVBO(const AttributeMultiVectorGen* attr)
@@ -81,7 +81,7 @@ void MapHandlerGen::updateVBO(const AttributeHandlerGen& attr)
 
 void MapHandlerGen::updateVBO(const QString& name)
 {
-	updateVBO(static_cast<AttribMap*>(m_map)->getAttributeVectorGen(VERTEX, name.toUtf8().constData()));
+	updateVBO(m_map->getAttributeVectorGen(VERTEX, name.toUtf8().constData()));
 }
 
 Utils::VBO* MapHandlerGen::getVBO(const QString& name) const
@@ -106,33 +106,6 @@ void MapHandlerGen::deleteVBO(const QString& name)
 /*********************************************************
  * MANAGE CELL SELECTORS
  *********************************************************/
-
-CellSelectorGen* MapHandlerGen::addCellSelector(unsigned int orbit, const QString& name)
-{
-	if(m_cellSelectors[orbit].contains(name))
-		return NULL;
-
-	CellSelectorGen* cs = NULL;
-
-	switch(orbit)
-	{
-		case DART: cs = new CellSelector<DART>(*m_map, name); break;
-		case VERTEX: cs = new CellSelector<VERTEX>(*m_map, name); break;
-		case EDGE: cs = new CellSelector<EDGE>(*m_map, name); break;
-		case FACE: cs = new CellSelector<FACE>(*m_map, name); break;
-		case VOLUME: cs = new CellSelector<VOLUME>(*m_map, name); break;
-	}
-
-	if(!cs)
-		return NULL;
-
-	m_cellSelectors[orbit].insert(name, cs);
-	emit(cellSelectorAdded(orbit, name));
-
-	connect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));
-
-	return cs;
-}
 
 void MapHandlerGen::removeCellSelector(unsigned int orbit, const QString& name)
 {

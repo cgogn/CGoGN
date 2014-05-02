@@ -28,8 +28,7 @@
 #include "Geometry/basic.h"
 #include "Geometry/bounding_box.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/traversorCell.h"
-
+#include "Topology/generic/traversor/traversorCell.h"
 
 namespace CGoGN
 {
@@ -41,7 +40,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position)
+Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
 	Geom::BoundingBox<typename PFP::VEC3> bb ;
 	TraversorV<typename PFP::MAP> t(map) ;
