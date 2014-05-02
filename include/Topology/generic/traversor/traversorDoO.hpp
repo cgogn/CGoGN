@@ -33,7 +33,8 @@ TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(const MAP& map, Dart d,
 {
 	m_vd.reserve(16);
 	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
-	const_cast<MAP&>(map).template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
+//	const_cast<MAP&>(map).template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
+	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
 	m_vd.push_back(NIL);
 }
 

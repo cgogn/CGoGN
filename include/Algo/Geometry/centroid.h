@@ -50,7 +50,7 @@ namespace Geometry
 * @param attributs the vector of attribute or cell
 */
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs, unsigned int thread = 0);
+typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Vol d, const V_ATT& attributs, unsigned int thread = 0);
 
 /**
 * Compute volume centroid weighted by edge length (generic version)
@@ -63,7 +63,7 @@ typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Dart d, const V
 * @param attributs the vector of attribute or cell
 */
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Dart d, const V_ATT& attributs, unsigned int thread = 0);
+typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Vol d, const V_ATT& attributs, unsigned int thread = 0);
 
 /**
  * Compute face centroid (generic version)
@@ -75,7 +75,7 @@ typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Dart d, cons
  * @param attributs the vector of attribute or cell
  */
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs);
+typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Face d, const V_ATT& attributs);
 
 /**
  * Compute face centroid weighted by edge length (generic version)
@@ -87,7 +87,7 @@ typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Dart d, const V_A
  * @param attributs the vector of attribute or cell
  */
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Dart d, const V_ATT& attributs);
+typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Face d, const V_ATT& attributs);
 
 /**
  * Compute vertex neighbours centroid (generic version)
@@ -99,7 +99,7 @@ typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Dart d, const 
  * @param position the vector of attribute or cell
  */
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs);
+typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Vertex d, const V_ATT& attributs);
 
 /**
  * Compute centroid of all faces
@@ -195,7 +195,7 @@ namespace Geometry
  * @param position the vector of attribute or cell
  */
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const V_ATT& attributs);
+typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Vertex d, const V_ATT& attributs, unsigned int thread = 0);
 
 /**
  * compute centroid of all volumes

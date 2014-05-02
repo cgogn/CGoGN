@@ -301,25 +301,6 @@ public:
 	void changeEmb(unsigned int e) { emb = e; }
 };
 
-// Functor Check Embedding : to check the embeddings of the given map
-
-template <typename MAP>
-class FunctorCheckEmbedding : public FunctorConstMap<MAP>
-{
-protected:
-	unsigned int orbit;
-	unsigned int emb;
-public:
-	FunctorCheckEmbedding(const MAP& map, unsigned int orb, unsigned int e) : FunctorConstMap<MAP>(map), orbit(orb), emb(e)
-	{}
-
-	bool operator()(Dart d)
-	{
-		return (this->m_map.getEmbedding(orbit, d) != emb);
-	}
-};
-
-
 // Search Functor: look for a given dart when applied
 /********************************************************/
 
@@ -374,7 +355,8 @@ public:
 	FunctorStoreNotBoundary(const MAP& map, std::vector<Dart>& vec) : FunctorConstMap<MAP>(map), m_vec(vec) {}
 	bool operator()(Dart d)
 	{
-		if (!this->m_map.template isBoundaryMarked<MAP::DIMENSION>(d))
+//		if (!this->m_map.template isBoundaryMarked<MAP::DIMENSION>(d))
+		if (!this->m_map.template isBoundaryMarkedCurrent(d))
 			m_vec.push_back(d);
 		return false;
 	}
@@ -469,7 +451,7 @@ public:
 
 /**
  * Functor class for parallel::foreach_orbit/cell/dart
- * Overload  run
+ * Overload run
  * Overload duplicate if necessary (no sharing of functors)
  */
 template<typename MAP>
@@ -486,7 +468,7 @@ public:
 	/**
 	 * @return a pointer on a copy of the object.
 	 */
-	virtual FunctorMapThreaded<MAP>* duplicate() const { return NULL;}
+	virtual FunctorMapThreaded<MAP>* duplicate() const { return NULL; }
 
 	/**
 	 * insert your code here:

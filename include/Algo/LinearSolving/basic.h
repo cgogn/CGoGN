@@ -26,15 +26,22 @@
 #define __LINEAR_SOLVING_BASIC__
 
 #include "NL/nl.h"
-#include "Algo/LinearSolving/variablesSetup.h"
-#include "Algo/LinearSolving/matrixSetup.h"
-#include "Algo/Topo/basic.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 namespace CGoGN
 {
 
 namespace LinearSolving
 {
+
+template <typename CoeffType>
+struct Coeff
+{
+	unsigned int index;
+	CoeffType value;
+	Coeff(unsigned int i, CoeffType v) : index(i), value(v)
+	{}
+} ;
 
 /*******************************************************************************
  * VARIABLES SETUP
@@ -44,29 +51,31 @@ template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
 	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const CellMarker<typename PFP::MAP, VERTEX>& fm,
+	const CellMarker<typename PFP::MAP, VERTEX>& freeMarker,
 	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
-//	TraversorV<MAP> t(m);
-//	for (Dart d = t.begin(); d != t.end(); d = t.next())
-//	{
-
-//	}
-
-	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE> fmts(index, fm, attr) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, fmts) ;
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlSetVariable(index[d], attr[d]);
+		if(!freeMarker.isMarked(d))
+			nlLockVariable(index[d]);
+	});
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
 	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const CellMarker<typename PFP::MAP, VERTEX>& fm,
+	const CellMarker<typename PFP::MAP, VERTEX>& freeMarker,
 	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
-	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE> fmts(index, fm, attr, coord) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, fmts) ;
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlSetVariable(index[d], (attr[d])[coord]);
+		if(!freeMarker.isMarked(d))
+			nlLockVariable(index[d]);
+	});
 }
 
 /*******************************************************************************
@@ -81,8 +90,16 @@ void addRowsRHS_Equality(
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& weight)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorEquality_PerVertexWeight_Scalar<PFP, ATTR_TYPE> feq(index, attr, weight) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attr[d]) ;
+		nlRowParameterd(NL_ROW_SCALING, weight[d]) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(index[d], 1) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -94,8 +111,16 @@ void addRowsRHS_Equality(
 	float weight)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorEquality_UniformWeight_Scalar<PFP, ATTR_TYPE> feq(index, attr, weight) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attr[d]) ;
+		nlRowParameterd(NL_ROW_SCALING, weight) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(index[d], 1) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -108,8 +133,16 @@ void addRowsRHS_Equality(
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorEquality_PerVertexWeight_Vector<PFP, ATTR_TYPE> feq(index, attr, weight, coord) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attr[d])[coord]) ;
+		nlRowParameterd(NL_ROW_SCALING, weight[d]) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(index[d], 1) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -122,8 +155,16 @@ void addRowsRHS_Equality(
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorEquality_UniformWeight_Vector<PFP, ATTR_TYPE> feq(index, attr, weight, coord) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, feq) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attr[d])[coord]) ;
+		nlRowParameterd(NL_ROW_SCALING, weight) ;
+		nlBegin(NL_ROW) ;
+		nlCoefficient(index[d], 1) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -134,36 +175,99 @@ void addRowsRHS_Equality(
 template <typename PFP>
 void addRows_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index)
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorLaplacianTopo<PFP> flt(m, index) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, 0) ;
+		nlBegin(NL_ROW);
+		typename PFP::REAL aii = 0 ;
+		Traversor2VE<typename PFP::MAP> t(m, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
+		{
+			typename PFP::REAL aij = 1 ;
+			aii += aij ;
+			nlCoefficient(index[m.phi1(it)], aij) ;
+		}
+		nlCoefficient(index[d], -aii) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
 	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorLaplacianTopoRHS_Scalar<PFP, ATTR_TYPE> flt(m, index, attr) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		std::vector<Coeff<typename PFP::REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
+		typename PFP::REAL norm2 = 0 ;
+		typename PFP::REAL aii = 0 ;
+		Traversor2VE<typename PFP::MAP> t(m, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
+		{
+			typename PFP::REAL aij = 1 ;
+			aii += aij ;
+			coeffs.push_back(Coeff<typename PFP::REAL>(index[m.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
+		}
+		coeffs.push_back(Coeff<typename PFP::REAL>(index[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attr[d] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
 	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorLaplacianTopoRHS_Vector<PFP, ATTR_TYPE> flt(m, index, attr, coord) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, flt) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		std::vector<Coeff<typename PFP::REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
+		typename PFP::REAL norm2 = 0 ;
+		typename PFP::REAL aii = 0 ;
+		Traversor2VE<typename PFP::MAP> t(m, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
+		{
+			typename PFP::REAL aij = 1 ;
+			aii += aij ;
+			coeffs.push_back(Coeff<typename PFP::REAL>(index[m.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
+		}
+		coeffs.push_back(Coeff<typename PFP::REAL>(index[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attr[d])[coord] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -174,57 +278,108 @@ void addRowsRHS_Laplacian_Topo(
 template <typename PFP>
 void addRows_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
 	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorLaplacianCotan<PFP> flc(m, index, edgeWeight, vertexArea) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, 0) ;
+		nlBegin(NL_ROW);
+		typename PFP::REAL vArea = vertexArea[d] ;
+		typename PFP::REAL aii = 0 ;
+		Traversor2VE<typename PFP::MAP> t(m, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
+		{
+			typename PFP::REAL aij = edgeWeight[it] / vArea ;
+			aii += aij ;
+			nlCoefficient(index[m.phi1(it)], aij) ;
+		}
+		nlCoefficient(index[d], -aii) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
 	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
 	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorLaplacianCotanRHS_Scalar<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
+
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		std::vector<Coeff<typename PFP::REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
+		typename PFP::REAL vArea = vertexArea[d] ;
+		typename PFP::REAL norm2 = 0 ;
+		typename PFP::REAL aii = 0 ;
+		Traversor2VE<typename PFP::MAP> t(m, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
+		{
+			typename PFP::REAL aij = edgeWeight[it] / vArea ;
+			aii += aij ;
+			coeffs.push_back(Coeff<typename PFP::REAL>(index[m.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
+		}
+		coeffs.push_back(Coeff<typename PFP::REAL>(index[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, attr[d] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
 	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
 	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr, coord) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
-	nlDisable(NL_NORMALIZE_ROWS) ;
-}
 
-template <typename PFP, typename ATTR_TYPE>
-void addRowsRHS_Laplacian_Cotan_NL(
-	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
-	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
-	const VertexAttribute<typename PFP::REA, typename PFP::MAP::IMPLL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
-	unsigned int coord)
-{
-	nlEnable(NL_NORMALIZE_ROWS) ;
-	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE> flc(m, index, edgeWeight, vertexArea, attr, coord) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, flc) ;
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		std::vector<Coeff<typename PFP::REAL> > coeffs ;
+		coeffs.reserve(12) ;
+
+		typename PFP::REAL vArea = vertexArea[d] ;
+		typename PFP::REAL norm2 = 0 ;
+		typename PFP::REAL aii = 0 ;
+		Traversor2VE<typename PFP::MAP> t(m, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
+		{
+			typename PFP::REAL aij = edgeWeight[it] / vArea ;
+			aii += aij ;
+			coeffs.push_back(Coeff<typename PFP::REAL>(index[m.phi1(it)], aij)) ;
+			norm2 += aij * aij ;
+		}
+		coeffs.push_back(Coeff<typename PFP::REAL>(index[d], -aii)) ;
+		norm2 += aii * aii ;
+
+		nlRowParameterd(NL_RIGHT_HAND_SIDE, (attr[d])[coord] * sqrt(norm2)) ;
+		nlBegin(NL_ROW);
+		for(unsigned int i = 0; i < coeffs.size(); ++i)
+			nlCoefficient(coeffs[i].index, coeffs[i].value) ;
+		nlEnd(NL_ROW) ;
+	});
+
 	nlDisable(NL_NORMALIZE_ROWS) ;
 }
 
@@ -235,22 +390,26 @@ void addRowsRHS_Laplacian_Cotan_NL(
 template <typename PFP, typename ATTR_TYPE>
 void getResult(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
 	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
 {
-	FunctorSolverToMesh_Scalar<PFP, ATTR_TYPE> fstm(index, attr) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, fstm) ;
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		attr[d] = nlGetVariable(index[d]) ;
+	});
 }
 
 template <typename PFP, typename ATTR_TYPE>
 void getResult(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL> index,
+	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
 	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
 	unsigned int coord)
 {
-	FunctorSolverToMesh_Vector<PFP, ATTR_TYPE> fstm(index, attr, coord) ;
-	Algo::Topo::foreach_orbit<VERTEX>(m, fstm) ;
+	foreach_cell<VERTEX>(m, [&] (Dart d)
+	{
+		(attr[d])[coord] = nlGetVariable(index[d]) ;
+	});
 }
 
 } // namespace LinearSolving

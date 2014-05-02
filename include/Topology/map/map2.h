@@ -309,110 +309,110 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Test if dart d and e belong to the same oriented vertex
-	/*! @param d a dart
-	 *  @param e a dart
+	//! Test if vertices v1 and v2 represent the same oriented vertex
+	/*! @param v1 a vertex
+	 *  @param v2 a vertex
 	 */
-	bool sameOrientedVertex(Dart d, Dart e) const;
+	bool sameOrientedVertex(Vertex v1, Vertex v2) const;
 
-	//! Test if dart d and e belong to the same vertex
-	/*! @param d a dart
-	 *  @param e a dart
+	//! Test if vertices v1 and v2 represent the same vertex
+	/*! @param v1 a vertex
+	 *  @param v2 a vertex
 	 */
-	bool sameVertex(Dart d, Dart e) const;
+	bool sameVertex(Vertex v1, Vertex v2) const;
 
-	//! Compute the number of edges of the vertex of d
-	/*! @param d a dart
+	//! Compute the number of edges of the vertex v
+	/*! @param v a vertex
 	 */
-	unsigned int vertexDegree(Dart d) const;
+	unsigned int vertexDegree(Vertex v) const;
 
-	//! Check number of edges of the vertex of d with given parameter
-	/*! @param d a dart
+	//! Check number of edges of the vertex v with given parameter
+	/*! @param v a vertex
 	 *	@param vd degree to compare with
-	 *  @return  negative/null/positive if vertex degree is less/equal/greater than given degree
+	 *  @return negative/null/positive if vertex degree is less/equal/greater than given degree
 	 */
-	int checkVertexDegree(Dart d, unsigned int vd) const;
+	int checkVertexDegree(Vertex v, unsigned int vd) const;
 
-	//! Tell if the vertex of d is on the boundary of the map
-	/*! @param d a dart
+	//! Tell if the vertex v is on the boundary of the map
+	/*! @param v a vertex
 	 */
-	bool isBoundaryVertex(Dart d) const;
+	bool isBoundaryVertex(Vertex v) const;
 
 	/**
-	 * find the dart of vertex that belong to the boundary
+	 * find the dart of vertex v that belongs to the boundary
 	 * return NIL if the vertex is not on the boundary
 	 */
-	Dart findBoundaryEdgeOfVertex(Dart d) const;
+	Dart findBoundaryEdgeOfVertex(Vertex v) const;
 
-	//! Test if dart d and e belong to the same edge
-	/*! @param d a dart
-	 *  @param e a dart
+	//! Test if edges e1 and e2 represent the same edge
+	/*! @param e1 an edge
+	 *  @param e2 an edge
 	 */
-	bool sameEdge(Dart d, Dart e) const;
+	bool sameEdge(Edge e1, Edge e2) const;
 
 	/**
-	 * tell if the edge of d is on the boundary of the map
+	 * tell if the edge e is on the boundary of the map
 	 */
-	bool isBoundaryEdge(Dart d) const;
+	bool isBoundaryEdge(Edge e) const;
 
-	//! Test if dart d and e belong to the same oriented face
-	/*! @param d a dart
-	 *  @param e a dart
+	//! Test if faces f1 and f2 represent the same oriented face
+	/*! @param f1 a face
+	 *  @param f2 a face
 	 */
-	bool sameOrientedFace(Dart d, Dart e) const;
+	bool sameOrientedFace(Face f1, Face f2) const;
 
-	//! Test if dart d and e belong to the same face
-	/*! @param d a dart
-	 *  @param e a dart
+	//! Test if faces f1 and f2 represent the same face
+	/*! @param f1 a face
+	 *  @param f2 a face
 	 */
-	bool sameFace(Dart d, Dart e) const;
+	bool sameFace(Face f1, Face f2) const;
 
 	/**
-	 * compute the number of edges of the face of d
+	 * compute the number of edges of the face f
 	 */
-	unsigned int faceDegree(Dart d) const;
+	unsigned int faceDegree(Face f) const;
 
-	//! Check number of edges of the face of d with given parameter
+	//! Check number of edges of the face f with given parameter
+	/*! @param f a face
+	 *	@param fd degree to compare with
+	 *  @return negative/null/positive if face degree is less/equal/greater than given degree
+	 */
+	int checkFaceDegree(Face f, unsigned int fd) const;
+
+	/**
+	 * tell if the face f is incident to the boundary of the map
+	 */
+	bool isFaceIncidentToBoundary(Face f) const;
+
+	/**
+	 * find the dart of face f that belongs to the boundary
+	 * return NIL if the face is not incident to the boundary
+	 */
+	Dart findBoundaryEdgeOfFace(Face f) const;
+
+	//! Test if volumes v1 and v2 represent the same oriented volume
 	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedVolume(Vol v1, Vol v2) const;
+
+	//! Test if volumes v1 and v2 represent the same volume
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameVolume(Vol v1, Vol v2) const;
+
+	//! Compute the number of faces in the volume v
+	/*! @param d a dart
+	 */
+	unsigned int volumeDegree(Vol v) const;
+
+	//! Check number of faces of the volume v with given parameter
+	/*! @param v a volume
 	 *	@param vd degree to compare with
-	 *  @return  negative/null/positive if vertex degree is less/equal/greater than given degree
+	 *  @return negative/null/positive if volume degree is less/equal/greater than given degree
 	 */
-	int checkFaceDegree(Dart d, unsigned int le) const;
-
-	/**
-	 * tell if the face of d is on the boundary of the map
-	 */
-	bool isBoundaryFace(Dart d) const;
-
-	/**
-	 * find the dart of edge that belong to the boundary
-	 * return NIL if the face is not on the boundary
-	 */
-	Dart findBoundaryEdgeOfFace(Dart d) const;
-
-	//! Test if dart d and e belong to the same oriented volume
-	/*! @param d a dart
-	 *  @param e a dart
-	 */
-	bool sameOrientedVolume(Dart d, Dart e) const;
-
-	//! Test if dart d and e belong to the same volume
-	/*! @param d a dart
-	 *  @param e a dart
-	 */
-	bool sameVolume(Dart d, Dart e) const;
-
-	//! Compute the number of faces in the volume of d
-	/*! @param d a dart
-	 */
-	unsigned int volumeDegree(Dart d) const;
-
-	//! Check number of faces of the volume of d with given parameter
-	/*! @param d a dart
-	 *	@param vd degree to compare with
-	 *  @return  negative/null/positive if volume degree is less/equal/greater than given degree
-	 */
-	int checkVolumeDegree(Dart d, unsigned int volDeg)const;
+	int checkVolumeDegree(Vol v, unsigned int vd) const;
 
 	// TODO a mettre en algo
 	/**

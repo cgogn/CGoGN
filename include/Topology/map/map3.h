@@ -364,7 +364,7 @@ public:
 	//! Tell if a face of the volume is on the boundary
 	/*  @param d a dart
 	 */
-	bool isBoundaryVolume(Dart d) const;
+	bool isBoundaryAdjacentVolume(Dart d) const;
 
 	//! Tell if an edge of the volume is on the boundary
 	/*	@param d a dart

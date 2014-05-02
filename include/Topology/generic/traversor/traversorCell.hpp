@@ -61,12 +61,12 @@ TraversorCell<MAP, ORBIT>::~TraversorCell()
 }
 
 template <typename MAP, unsigned int ORBIT>
-Dart TraversorCell<MAP, ORBIT>::begin()
+Cell<ORBIT> TraversorCell<MAP, ORBIT>::begin()
 {
 	if(quickTraversal != NULL)
 	{
 		qCurrent = cont->begin() ;
-		current = (*quickTraversal)[qCurrent] ;
+		current.dart = (*quickTraversal)[qCurrent] ;
 	}
 	else
 	{
@@ -78,16 +78,16 @@ Dart TraversorCell<MAP, ORBIT>::begin()
 				cmark->unmarkAll() ;
 		}
 
-		current = m.begin() ;
-		while(current != m.end() && (m.isBoundaryMarked(dimension, current) ))
-			m.next(current) ;
+		current.dart = m.begin() ;
+		while(current.dart != m.end() && (m.isBoundaryMarked(dimension, current.dart) ))
+			m.next(current.dart) ;
 
-		if(current == m.end())
-			current = NIL ;
+		if(current.dart == m.end())
+			current.dart = NIL ;
 		else
 		{
 			if(dmark)
-				dmark->template markOrbit<ORBIT>(current) ;
+				dmark->template markOrbit<ORBIT>(current.dart) ;
 			else
 				cmark->mark(current) ;
 		}
@@ -99,52 +99,52 @@ Dart TraversorCell<MAP, ORBIT>::begin()
 }
 
 template <typename MAP, unsigned int ORBIT>
-Dart TraversorCell<MAP, ORBIT>::end()
+Cell<ORBIT> TraversorCell<MAP, ORBIT>::end()
 {
-	return NIL ;
+	return Cell<ORBIT>(NIL) ;
 }
 
 template <typename MAP, unsigned int ORBIT>
-Dart TraversorCell<MAP, ORBIT>::next()
+Cell<ORBIT> TraversorCell<MAP, ORBIT>::next()
 {
-	assert(current != NIL);
-//	if(current != NIL)
+	assert(current.dart != NIL);
+//	if(current.dart != NIL)
 //	{
 	if(quickTraversal != NULL)
 	{
 		cont->next(qCurrent) ;
 		if (qCurrent != cont->end())
-			current = (*quickTraversal)[qCurrent] ;
-		else current = NIL;
+			current.dart = (*quickTraversal)[qCurrent] ;
+		else current.dart = NIL;
 	}
 	else
 	{
 		if(dmark)
 		{
-			bool ismarked = dmark->isMarked(current) ;
-			while(current != NIL && (ismarked || m.isBoundaryMarked(dimension, current)))
+			bool ismarked = dmark->isMarked(current.dart) ;
+			while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart)))
 			{
-				m.next(current) ;
-				if(current == m.end())
-					current = NIL ;
+				m.next(current.dart) ;
+				if(current.dart == m.end())
+					current.dart = NIL ;
 				else
-					ismarked = dmark->isMarked(current) ;
+					ismarked = dmark->isMarked(current.dart) ;
 			}
-			if(current != NIL)
-				dmark->template markOrbit<ORBIT>(current) ;
+			if(current.dart != NIL)
+				dmark->template markOrbit<ORBIT>(current.dart) ;
 		}
 		else
 		{
 			bool ismarked = cmark->isMarked(current) ;
-			while(current != NIL && (ismarked || m.isBoundaryMarked(dimension, current) ))
+			while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart) ))
 			{
-				m.next(current) ;
-				if(current == m.end())
-					current = NIL ;
+				m.next(current.dart) ;
+				if(current.dart == m.end())
+					current.dart = NIL ;
 				else
 					ismarked = cmark->isMarked(current) ;
 			}
-			if(current != NIL)
+			if(current.dart != NIL)
 				cmark->mark(current) ;
 		}
 	}
@@ -153,12 +153,12 @@ Dart TraversorCell<MAP, ORBIT>::next()
 }
 
 template <typename MAP, unsigned int ORBIT>
-void TraversorCell<MAP, ORBIT>::skip(Dart d)
+void TraversorCell<MAP, ORBIT>::skip(Cell<ORBIT> c)
 {
 	if(dmark)
-		dmark->template markOrbit<ORBIT>(d) ;
+		dmark->template markOrbit<ORBIT>(c.dart) ;
 	else
-		cmark->mark(d) ;
+		cmark->mark(c) ;
 }
 
 } // namespace CGoGN

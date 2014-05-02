@@ -44,7 +44,7 @@ namespace Selection
  * @param position the vertex attribute storing positions
  * @param rayA first point of ray (user side)
  * @param rayAB direction of ray (directed to the scene)
- * @param vecFaces (out) vector to store the darts of intersected faces
+ * @param vecFaces (out) vector to store the intersected faces
  * @param iPoints (out) vector to store the intersection points
  */
 template<typename PFP>
@@ -53,7 +53,7 @@ void facesRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		std::vector<Dart>& vecFaces,
+		std::vector<Face>& vecFaces,
 		std::vector<typename PFP::VEC3>& iPoints);
 
 /**
@@ -62,7 +62,7 @@ void facesRaySelection(
  * @param position the vertex attribute storing positions
  * @param rayA first point of ray (user side)
  * @param rayAB direction of ray (directed to the scene)
- * @param vecFaces (out) vector to store the darts of intersected faces
+ * @param vecFaces (out) vector to store the intersected faces
  */
 template<typename PFP>
 void facesRaySelection(
@@ -70,7 +70,7 @@ void facesRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		std::vector<Dart>& vecFaces);
+		std::vector<Face>& vecFaces);
 
 /**
  * Function that does the selection of one face
@@ -78,7 +78,7 @@ void facesRaySelection(
  * @param position the vertex attribute storing positions
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param face (out) dart of selected vertex (set to NIL if no face selected)
+ * @param face (out) selected face (set to NIL if no face selected)
  */
 template<typename PFP>
 void faceRaySelection(
@@ -86,7 +86,7 @@ void faceRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		Dart& face);
+		Face& face);
 
 /**
  * Function that does the selection of edges, returned darts are sorted from closest to farthest
@@ -94,8 +94,8 @@ void faceRaySelection(
  * @param position the vertex attribute storing positions
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param vecEdges (out) vector to store dart of intersected edges
- * @param dist radius of the cylinder of selection
+ * @param vecEdges (out) vector to store intersected edges
+ * @param distMax radius of the cylinder of selection
  */
 template<typename PFP>
 void edgesRaySelection(
@@ -103,7 +103,7 @@ void edgesRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		std::vector<Dart>& vecEdges,
+		std::vector<Edge>& vecEdges,
 		float distMax);
 
 /**
@@ -112,7 +112,7 @@ void edgesRaySelection(
  * @param position the vertex attribute storing positions
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param edge (out) dart of selected vertex (set to NIL if no edge selected)
+ * @param edge (out) selected edge (set to NIL if no edge selected)
  */
 template<typename PFP>
 void edgeRaySelection(
@@ -120,7 +120,7 @@ void edgeRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		Dart& edge);
+		Edge& edge);
 
 /**
  * Function that does the selection of vertices, returned darts are sorted from closest to farthest
@@ -128,7 +128,7 @@ void edgeRaySelection(
  * @param position the vertex attribute storing positions
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param vecVertices (out) vector to store dart of intersected vertices
+ * @param vecVertices (out) vector to store intersected vertices
  * @param dist radius of the cylinder of selection
  */
 template<typename PFP>
@@ -137,7 +137,8 @@ void verticesRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		std::vector<Dart>& vecVertices);
+		std::vector<Vertex>& vecVertices,
+		float dist);
 
 /**
  * Function that does the selection of one vertex
@@ -145,7 +146,7 @@ void verticesRaySelection(
  * @param position the vertex attribute storing positions
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
+ * @param vertex (out) selected vertex (set to NIL if no vertex selected)
  */
 template<typename PFP>
 void vertexRaySelection(
@@ -153,7 +154,7 @@ void vertexRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		Dart& vertex);
+		Vertex& vertex);
 
 /**
  * Volume selection, not yet functional
@@ -164,14 +165,14 @@ void volumesRaySelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		std::vector<Dart>& vecVolumes);
+		std::vector<Vol>& vecVolumes);
 
 template<typename PFP>
 void facesPlanSelection(
 		typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename Geom::Plane3D<typename PFP::VEC3::DATA_TYPE>& plan,
-		std::vector<Dart>& vecDartss);
+		std::vector<Face>& vecFaces);
 
 /**
  * Function that does the selection of vertices in a cone, returned darts are sorted from closest to farthest
@@ -179,8 +180,8 @@ void facesPlanSelection(
  * @param position the position attribute
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param angle angle of the code in degree.
- * @param vecVertices (out) vector to store dart of intersected vertices
+ * @param angle angle of the cone in degree.
+ * @param vecVertices (out) vector to store intersected vertices
  */
 template<typename PFP>
 void verticesConeSelection(
@@ -188,7 +189,8 @@ void verticesConeSelection(
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
-		float angle, std::vector<Dart>& vecVertices);
+		float angle,
+		std::vector<Vertex>& vecVertices);
 
 /**
  * Function that does the selection of edges, returned darts are sorted from closest to farthest
@@ -197,7 +199,7 @@ void verticesConeSelection(
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
  * @param angle radius of the cylinder of selection
- * @param vecEdges (out) vector to store dart of intersected edges
+ * @param vecEdges (out) vector to store intersected edges
  */
 template<typename PFP>
 void edgesConeSelection(
@@ -206,7 +208,7 @@ void edgesConeSelection(
 		const typename PFP::VEC3& rayA,
 		const typename PFP::VEC3& rayAB,
 		float angle,
-		std::vector<Dart>& vecEdges);
+		std::vector<Edge>& vecEdges);
 
 /**
  * Function that select the closest vertex in the bubble
@@ -216,7 +218,7 @@ void edgesConeSelection(
  * @param radiusMax max radius of selection
  */
 template<typename PFP>
-Dart verticesBubbleSelection(
+Vertex verticesBubbleSelection(
 		typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& cursor,
@@ -230,7 +232,7 @@ Dart verticesBubbleSelection(
  * @param radiusMax max radius of selection
  */
 template<typename PFP>
-Dart edgesBubbleSelection(
+Edge edgesBubbleSelection(
 		typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
 		const typename PFP::VEC3& cursor,

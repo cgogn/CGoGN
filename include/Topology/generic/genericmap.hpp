@@ -248,7 +248,7 @@ inline AttributeMultiVector<Dart>* GenericMap::addRelation(const std::string& na
 
 	// set new relation to fix point for all the darts of the map
 	for(unsigned int i = cont.begin(); i < cont.end(); cont.next(i))
-		(*amv)[i] = i ;
+		(*amv)[i] = Dart(i) ;
 
 	return amv ;
 }

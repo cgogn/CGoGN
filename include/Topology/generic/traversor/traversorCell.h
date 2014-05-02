@@ -26,25 +26,15 @@
 #define __TRAVERSOR_CELL_H__
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/cells.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversor/traversorGen.h"
 
+#include <functional>
+
 namespace CGoGN
 {
-
-/// Macro for simple syntax traversal (can be nested)
-/// parameters:
-///   - cell type
-///   - name of iterator variable (automatically declared)
-///   - map type
-///   - map used
-///
-/// Ex: FOR_ALL_CELLS(VERTEX, di, myMap) { ... }
-///
-#define FOR_ALL_CELLS(ORBIT, NAME_ITER, MAP_TYPE, MAP_PARAM) TraversorCell<MAP_TYPE, (ORBIT)>  NAME_ITER_TraversalMacroLocalLoop(MAP_PARAM); \
-	for (Dart NAME_ITER = NAME_ITER_TraversalMacroLocalLoop.begin(); NAME_ITER != NAME_ITER_TraversalMacroLocalLoop.end(); NAME_ITER = NAME_ITER_TraversalMacroLocalLoop.next())
-
 
 template <typename MAP, unsigned int ORBIT>
 class TraversorCell //: public Traversor<MAP>
@@ -60,7 +50,7 @@ private:
 	CellMarker<MAP, ORBIT>* cmark ;
 	const AttributeMultiVector<Dart>* quickTraversal ;
 
-	Dart current ;
+	Cell<ORBIT> current ;
 	bool firstTraversal ;
 
 public:
@@ -68,14 +58,34 @@ public:
 
 	~TraversorCell() ;
 
-	inline Dart begin() ;
+	inline Cell<ORBIT> begin() ;
 
-	inline Dart end() ;
+	inline Cell<ORBIT> end() ;
 
-	inline Dart next() ;
+	inline Cell<ORBIT> next() ;
 
-	inline void skip(Dart d);
+	inline void skip(Cell<ORBIT> c);
 } ;
+
+
+
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+inline void foreach_cell(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
+{
+	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
+	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+		f(c);
+}
+
+
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+inline void foreach_cell_until(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
+{
+	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
+	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+		if (!f(c))
+			break;
+}
 
 
 

@@ -34,3 +34,9 @@ IF (WITH_QT)
 ENDIF (WITH_QT)
 
 add_subdirectory(Examples/Tests)
+
+add_subdirectory(Tuto/Traversals)
+add_subdirectory(Tuto/Attributes)
+add_subdirectory(Tuto/Markers)
+add_subdirectory(Tuto/Boundary)
+add_subdirectory(Tuto/Modelling)

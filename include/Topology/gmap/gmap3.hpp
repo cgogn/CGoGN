@@ -847,7 +847,7 @@ inline bool GMap3<MAP_IMPL>::isBoundaryFace(Dart d) const
 }
 
 template <typename MAP_IMPL>
-bool GMap3<MAP_IMPL>::isBoundaryVolume(Dart d) const
+bool GMap3<MAP_IMPL>::isBoundaryAdjacentVolume(Dart d) const
 {
 	DartMarkerStore<MAP_IMPL> mark(*this);	// Lock a marker
 

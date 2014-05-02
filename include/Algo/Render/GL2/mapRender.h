@@ -151,10 +151,10 @@ protected:
 	 * @param tableIndices the indices table
 	 */
 	template <typename PFP>
-	void addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices) ;
+	void addTri(typename PFP::MAP& map, Face f, std::vector<GLuint>& tableIndices) ;
 
 	template<typename PFP>
-	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position);
+	inline void addEarTri(typename PFP::MAP& map, Face f, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position);
 
 	template<typename PFP>
 	float computeEarAngle(const typename PFP::VEC3& P1, const typename PFP::VEC3& P2, const typename PFP::VEC3& P3, const typename PFP::VEC3& normalPoly);
@@ -166,7 +166,7 @@ protected:
 	void recompute2Ears(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex);
 
 	template<typename VEC3>
-	bool inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc);
+	bool inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc);
 
 public:
 	/**
