@@ -119,12 +119,14 @@ bool Tiling<PFP>::exportPositions(const VertexAttribute<VEC3, MAP_IMPL>& positio
 
 	out << (m_nx + 1) << " ";
 	out << (m_ny + 1) << " ";
+	out << (m_nz + 1) << " ";
 
 	for(std::vector<Dart>::iterator it = m_tableVertDarts.begin() ; it != m_tableVertDarts.end() ; ++it)
 	{
 		out << position[*it];
 	}
 
+	return true;
 }
 
 } // namespace Tilings

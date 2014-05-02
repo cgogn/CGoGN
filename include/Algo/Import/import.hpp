@@ -555,196 +555,397 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(map, "incidents");
 
-	unsigned int nbv = mtv.getNbVolumes();
-	int index = 0;
-	// buffer for tempo faces (used to remove degenerated edges)
-	std::vector<unsigned int> edgesBuffer;
+    unsigned int nbv = mtv.getNbVolumes();
+    unsigned int index = 0;
+    // buffer for tempo faces (used to remove degenerated edges)
+    std::vector<unsigned int> edgesBuffer;
 	edgesBuffer.reserve(16);
 
 	DartMarkerNoUnmark<MAP> m(map) ;
 	FunctorInitEmb<MAP, VERTEX> fsetemb(map);
 
-	//for each volume of table
-	for(unsigned int i = 0 ; i < nbv ; ++i)
-	{
-		// store volume in buffer, removing degenated faces
-		unsigned int nbf = mtv.getNbFacesVolume(i);
+    //for each volume of table
+    for(unsigned int i = 0 ; i < nbv ; ++i)
+    {		
+        // store volume in buffer, removing degenated faces
+        unsigned int nbf = mtv.getNbFacesVolume(i);
 
-		edgesBuffer.clear();
-		unsigned int prec = EMBNULL;
-		for (unsigned int j = 0; j < nbf; ++j)
-		{
-			unsigned int em = mtv.getEmbIdx(index++);
-			if (em != prec)
-			{
-				prec = em;
-				edgesBuffer.push_back(em);
-			}
+        edgesBuffer.clear();
+        unsigned int prec = EMBNULL;
+        for (unsigned int j = 0; j < nbf; ++j)
+        {
+            unsigned int em = mtv.getEmbIdx(index++);
+            if (em != prec)
+            {
+                prec = em;
+                edgesBuffer.push_back(em);
+            }
+        }
+
+        if(nbf == 4) //tetrahedral case
+        {			
+            Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
+
+            // Embed three "base" vertices
+            for(unsigned int j = 0 ; j < 3 ; ++j)
+            {
+                unsigned int em = edgesBuffer[j];		// get embedding
+                fsetemb.changeEmb(em) ;
+                map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+
+                //store darts per vertices to optimize reconstruction
+                Dart dd = d;
+                do
+                {
+                    m.mark(dd) ;
+                    vecDartsPerVertex[em].push_back(dd);
+                    dd = map.phi1(map.phi2(dd));
+                } while(dd != d);
+
+                d = map.phi1(d);
+            }
+
+            //Embed the last "top" vertex
+            d = map.phi_1(map.phi2(d));
+
+            unsigned int em = edgesBuffer[3];		// get embedding
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+
+            //store darts per vertices to optimize reconstruction
+            Dart dd = d;
+            do
+            {
+                m.mark(dd) ;
+                vecDartsPerVertex[em].push_back(dd);
+                dd = map.phi1(map.phi2(dd));
+            } while(dd != d);
+
 		}
+        else if(nbf == 5) //pyramidal case
+        {			
+            Dart d = Surface::Modelisation::createQuadrangularPyramid<PFP>(map,false);
 
-		if(nbf == 4) //tetrahedral case
-		{
-			Dart d = Surface::Modelisation::createTetrahedron<PFP>(map,false);
+            // 1.
+            unsigned int em = edgesBuffer[0];		// get embedding
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            Dart dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// Embed three "base" vertices
-			for(unsigned int j = 0 ; j < 3 ; ++j)
-			{
-				unsigned int em = edgesBuffer[j];		// get embedding
-				fsetemb.changeEmb(em) ;
-				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            // 2.
+            d = map.phi1(d);
+            em = edgesBuffer[1];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-				//store darts per vertices to optimize reconstruction
-				Dart dd = d;
-				do
-				{
-					m.mark(dd) ;
-					vecDartsPerVertex[em].push_back(dd);
-					dd = map.phi1(map.phi2(dd));
-				} while(dd != d);
+            // 3.
+            d = map.phi1(d);
+            em = edgesBuffer[2];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-				d = map.phi1(d);
-			}
+            // 4.
+            d = map.phi1(d);
+            em = edgesBuffer[3];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			//Embed the last "top" vertex
-			d = map.phi_1(map.phi2(d));
+            // 5.
+            d = map.phi_1(map.phi2(d));
+            em = edgesBuffer[4];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+        }
+		else
+		if(nbf == 6) //prism case
+        {			
+            Dart d = Surface::Modelisation::createTriangularPrism<PFP>(map,false);			
 
-			unsigned int em = edgesBuffer[3];		// get embedding
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            // 1.
+            unsigned int em = edgesBuffer[0];		// get embedding
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            Dart dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			//store darts per vertices to optimize reconstruction
-			Dart dd = d;
-			do
-			{
-				m.mark(dd) ;
-				vecDartsPerVertex[em].push_back(dd);
-				dd = map.phi1(map.phi2(dd));
-			} while(dd != d);
+            // 2.
+            d = map.phi1(d);
+            em = edgesBuffer[1];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+
+            // 3.
+            d = map.phi1(d);
+            em = edgesBuffer[2];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+
+            // 5.
+            d = map.template phi<2112>(d);
+            em = edgesBuffer[3];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+
+            // 6.
+            d = map.phi_1(d);
+            em = edgesBuffer[4];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+
+            // 7.
+            d = map.phi_1(d);
+            em = edgesBuffer[5];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
 		}
-		else if(nbf == 6) //hexahedral case
-		{
-			Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
+		else if(nbf == 8) //hexahedral case
+        {			
+            Dart d = Surface::Modelisation::createHexahedron<PFP>(map,false);
 
-			// 1.
-			unsigned int em = edgesBuffer[0];		// get embedding
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			Dart dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 1.
+            unsigned int em = edgesBuffer[0];		// get embedding
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            Dart dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// 2.
-			d = map.phi1(d);
-			em = edgesBuffer[1];
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 2.
+            d = map.phi1(d);
+            em = edgesBuffer[1];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// 3.
-			d = map.phi1(d);
-			em = edgesBuffer[2];
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 3.
+            d = map.phi1(d);
+            em = edgesBuffer[2];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// 4.
-			d = map.phi1(d);
-			em = edgesBuffer[3];
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 4.
+            d = map.phi1(d);
+            em = edgesBuffer[3];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// 5.
-			d = map.template phi<2112>(d);
-			em = edgesBuffer[4];
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 5.
+            d = map.template phi<2112>(d);
+            em = edgesBuffer[4];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// 6.
-			d = map.phi_1(d);
-			em = edgesBuffer[5];
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 6.
+            d = map.phi_1(d);
+            em = edgesBuffer[5];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// 7.
-			d = map.phi_1(d);
-			em = edgesBuffer[6];
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 7.
+            d = map.phi_1(d);
+            em = edgesBuffer[6];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
-			// 8.
-			d = map.phi_1(d);
-			em = edgesBuffer[7];
-			fsetemb.changeEmb(em) ;
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
-			dd = d;
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
-			vecDartsPerVertex[em].push_back(dd); m.mark(dd);
+            // 8.
+            d = map.phi_1(d);
+            em = edgesBuffer[7];
+            fsetemb.changeEmb(em) ;
+            map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+            dd = d;
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd); dd = map.phi1(map.phi2(dd));
+            vecDartsPerVertex[em].push_back(dd); m.mark(dd);
 
 		}  //end of hexa
+
+    }
+
+	std	::cout << " elements created " << std::endl;
+
+    //reconstruct neighbourhood
+    unsigned int nbBoundaryFaces = 0 ;
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+        if (m.isMarked(d))
+        {
+            std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+
+            Dart good_dart = NIL;
+            for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
+            {
+                if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
+				   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi1(map.phi1(d))))
+                {
+                    good_dart = *it ;
+                }
+            }
+
+            if (good_dart != NIL)
+            {
+                unsigned int degD = map.faceDegree(d);
+                unsigned int degGD = map.faceDegree(good_dart);
+
+//				std::cout << "degD = " << degD << std::endl;
+//				std::cout << "degGD = " << degGD << std::endl << std::endl;
+
+                if(degD < degGD)
+                {
+					Dart dt = map.phi1(good_dart);
+					map.PFP::MAP::ParentMap::splitFace(dt,map.phi_1(good_dart));
+
+					map.template initDartEmbedding<VERTEX>(map.phi1(good_dart), map.template getEmbedding<VERTEX>(dt)) ;
+					map.template initDartEmbedding<VERTEX>(map.phi_1(dt), map.template getEmbedding<VERTEX>(map.phi_1(good_dart))) ;
+
+					m.mark(map.phi1(good_dart));
+					m.mark(map.phi2(map.phi1(good_dart)));
+
+					unsigned int emb2 = map.template getEmbedding<VERTEX>(map.phi1(map.phi1(d)));
+					vecDartsPerVertex[emb2].push_back(map.phi2(map.phi1(good_dart)));
+
+					unsigned int emb1 = map.template getEmbedding<VERTEX>(d);
+					vecDartsPerVertex[emb1].push_back(map.phi1(good_dart));
+
+					//m.unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
+					//m.unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(good_dart);
+                }
+                else if(degD > degGD)
+                {					
+					Dart dt = map.phi1(map.phi1(d));
+					map.PFP::MAP::ParentMap::splitFace(d,dt);
+
+					map.template initDartEmbedding<VERTEX>(map.phi_1(dt), map.template getEmbedding<VERTEX>(d)) ;
+					map.template initDartEmbedding<VERTEX>(map.phi_1(d), map.template getEmbedding<VERTEX>(dt)) ;
+
+					m.mark(map.phi_1(d));
+					m.mark(map.phi2(map.phi_1(d)));
+
+					//ne change rien sur l'exemple test
+					unsigned int emb1 = map.template getEmbedding<VERTEX>(map.phi1(map.phi1(good_dart)));
+					vecDartsPerVertex[emb1].push_back(map.phi2(map.phi_1(d)));
+
+					unsigned int emb2 = map.template getEmbedding<VERTEX>(good_dart);
+					vecDartsPerVertex[emb2].push_back(map.phi_1(d));
+
+					//m.unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
+					//m.unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(good_dart);
+                }
+				else if(degD == degGD)
+				{
+					map.sewVolumes(d, good_dart, false);
+					m.template unmarkOrbit<FACE>(d);
+				}
+//				else if(degD > 3 && degGD > 3)
+//				{
+//					if(map.template getEmbedding<VERTEX>(map.phi1(map.phi1(good_dart))) != map.template getEmbedding<VERTEX>(map.phi_1(d)))
+//					{
+//						std::cout << "2 faces quad" << std::endl;
+//						Dart dtgd = map.phi1(good_dart);
+//						map.PFP::MAP::ParentMap::splitFace(dtgd,map.phi_1(good_dart));
+
+//						map.template initDartEmbedding<VERTEX>(map.phi1(good_dart), map.template getEmbedding<VERTEX>(dtgd)) ;
+//						map.template initDartEmbedding<VERTEX>(map.phi_1(dtgd), map.template getEmbedding<VERTEX>(map.phi_1(good_dart))) ;
+
+
+//						Dart dt = map.phi1(map.phi1(d));
+//						map.PFP::MAP::ParentMap::splitFace(d,dt);
+
+//						map.template initDartEmbedding<VERTEX>(map.phi_1(dt), map.template getEmbedding<VERTEX>(d)) ;
+//						map.template initDartEmbedding<VERTEX>(map.phi_1(d), map.template getEmbedding<VERTEX>(dt)) ;
+//					}
+//				}
+
+//				map.sewVolumes(d, good_dart, false);
+//				m.unmarkOrbit<FACE>(d);
+            }
+            else
+            {
+				m.template unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
+                ++nbBoundaryFaces;
+            }
+        }
 	}
 
-
-	//reconstruct neighbourhood
-	unsigned int nbBoundaryFaces = 0 ;
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if (m.isMarked(d))
 		{
-			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
-
-			Dart good_dart = NIL;
-			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
-			{
-				if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
-						map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi_1(d)))
-				{
-					good_dart = *it ;
-				}
-			}
-
-			if (good_dart != NIL)
-			{
-				map.sewVolumes(d, good_dart, false);
-				m.template unmarkOrbit<FACE>(d);
-			}
-			else
-			{
-				m.template unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
-				++nbBoundaryFaces;
-			}
+			std::cout << "marked " << std::endl;
 		}
 	}
 
-	if (nbBoundaryFaces > 0)
-	{
+    if (nbBoundaryFaces > 0)
+    {
 		unsigned int nbH =  map.closeMap();
-		CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces / " << nbH << " holes)" << CGoGNendl;
-	}
+        CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces / " << nbH << " holes)" << CGoGNendl;
+    }
 
 	return true;
 }

@@ -138,8 +138,8 @@ void MyQT::cb_Open()
 
 	std::vector<std::string> attrNames ;
 
-    //size_t pos = filename.rfind(".");    // position of "." in filename
-    //std::string extension = filename.substr(pos);
+    size_t pos = filename.rfind(".");    // position of "." in filename
+    std::string extension = filename.substr(pos);
 
 //	if(extension == std::string(".off"))
 //	{
@@ -163,7 +163,7 @@ void MyQT::cb_Open()
 		}
 		else
 			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
-//	}
+    //}
 
 	color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
 
@@ -379,8 +379,8 @@ int main(int argc, char **argv)
 	{
 		std::vector<std::string> attrNames ;
 		std::string filename(argv[1]);
-//		size_t pos = filename.rfind(".");    // position of "." in filename
-//		std::string extension = filename.substr(pos);
+        size_t pos = filename.rfind(".");    // position of "." in filename
+        std::string extension = filename.substr(pos);
 /*
 		if(extension == std::string(".off"))
 		{
@@ -397,7 +397,8 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-*/			if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
+*/
+			if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
 			{
 				std::cerr << "could not import " << filename << std::endl ;
 				return 1;

@@ -244,7 +244,7 @@ void Viewer::cb_keyPress(int keycode)
 			Geom::Vec3f n(0.1,0.1,1.0);
 			Geom::Vec3f o = bb.center();
 
-			Geom::Plane3D<PFP::REAL> plan(n,o);
+            Geom::Plane3D<PFP::REAL> plan(n,o);
 
 			CellMarker<MAP, FACE> over(myMap);
 			Algo::Surface::Modelisation::planeCut2<PFP>(myMap, position, plan, over, true);
@@ -259,7 +259,6 @@ void Viewer::cb_keyPress(int keycode)
 					position[d]+= n;
 			}
 
-
 			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
 			m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
@@ -273,6 +272,16 @@ void Viewer::cb_keyPress(int keycode)
 
 			break;
 		}
+        case 'S':
+        {
+            Geom::Vec3f p1(0.0,1.0,0.0);
+            Geom::Vec3f p2(1.0,0.0,0.0);
+            Geom::Vec3f p3(1.0,1.0,0.0);
+
+            Geom::Plane3D<PFP::REAL> plan(p1, p2, p3);
+
+
+        }
 
 		case 'd':
 		{
