@@ -301,8 +301,7 @@ Dart Map3<MAP_IMPL>::deleteVertex(Dart d)
 	// (one dart per face should be enough)
 	std::vector<Dart> fstoretmp;
 	fstoretmp.reserve(128);
-	FunctorStore fs(fstoretmp);
-	foreach_dart_of_vertex(d, fs);
+	foreach_dart_of_vertex(d, [&] (Dart it) { fstoretmp.push_back(it); });
 
 	 // just one dart per face
 	std::vector<Dart> fstore;

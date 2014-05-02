@@ -118,14 +118,17 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3)
 {
 	L_DART d = m_map->newFace(3,false);
-		
-	FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(*m_map, e1);
+
+	unsigned int vemb = e1;
+
+	auto fsetemb = [&] (Dart d) { m_map->template setDartEmbedding<VERTEX>(d, vemb); };
+
 	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 	d = m_map->phi1(d);
-	fsetemb.changeEmb(e2);
+	vemb = e2;
 	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 	d = m_map->phi1(d);
-	fsetemb.changeEmb(e3);
+	vemb = e3;
 	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 	d = m_map->phi1(d);
 
@@ -136,7 +139,7 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 {
 	// create the mesh if needed
-	if (m_map==NULL)
+	if (m_map == NULL)
 	{
 		m_map = new L_MAP();
 	}

@@ -115,11 +115,12 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, c
 	typedef typename V_ATT::DATA_TYPE VEC3 ;
 
 	VEC3 N(0) ;
-	std::vector<Dart> faces;
-	CellMarker<typename PFP::MAP, FACE> f(map);
 
-	FunctorStore fs(faces);
-	map.foreach_dart_of_vertex(v, fs);
+	std::vector<Dart> faces;
+	faces.reserve(16);
+	map.foreach_dart_of_vertex(v, [&] (Dart d) { faces.push_back(d); });
+
+	CellMarker<typename PFP::MAP, FACE> f(map);
 
 	for(std::vector<Dart>::iterator it = faces.begin() ; it != faces.end() ; ++it)
 	{
