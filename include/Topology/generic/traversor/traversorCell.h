@@ -69,6 +69,9 @@ public:
 
 
 
+/*
+ * Executes function f on each ORBIT
+ */
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 inline void foreach_cell(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
@@ -77,7 +80,9 @@ inline void foreach_cell(const MAP& map, FUNC f, bool forceDartMarker = false, u
 		f(c);
 }
 
-
+/*
+ * Executes function f on each ORBIT until f returns false
+ */
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 inline void foreach_cell_until(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {

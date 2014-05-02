@@ -141,16 +141,16 @@ protected:
 	void boundaryUnmark(Dart d) ;
 
 	/**
-	 * mark an orbit of dart as belonging to boundary
+	 * mark an orbit as belonging to boundary
 	 */
-	template <unsigned int ORBIT, unsigned int DIM>
-	void boundaryMarkOrbit(Dart d) ;
+	template <unsigned int DIM, unsigned int ORBIT>
+	void boundaryMarkOrbit(Cell<ORBIT> c) ;
 
 	/**
-	 * unmark an orbit of dart from the boundary
+	 * unmark an orbit from the boundary
 	 */
-	template <unsigned int ORBIT, unsigned int DIM>
-	void boundaryUnmarkOrbit(Dart d) ;
+	template <unsigned int DIM, unsigned int ORBIT>
+	void boundaryUnmarkOrbit(Cell<ORBIT> c) ;
 
 	/**
 	 * clear all boundary markers

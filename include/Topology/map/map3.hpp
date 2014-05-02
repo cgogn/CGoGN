@@ -226,14 +226,14 @@ void Map3<MAP_IMPL>::fillHole(Dart d)
 	Dart dd = d ;
 	if(!this->template isBoundaryMarked<3>(dd))
 		dd = phi3(dd) ;
-	this->template boundaryUnmarkOrbit<VOLUME,3>(dd) ;
+	this->template boundaryUnmarkOrbit<3,VOLUME>(dd) ;
 }
 
 template <typename MAP_IMPL>
 void Map3<MAP_IMPL>::createHole(Dart d)
 {
 	assert(!isBoundaryFace(d)) ;
-	this->template boundaryMarkOrbit<VOLUME,3>(d) ;
+	this->template boundaryMarkOrbit<3,VOLUME>(d) ;
 }
 
 /*! @name Topological Operators
@@ -1150,17 +1150,16 @@ bool Map3<MAP_IMPL>::check() const
  *************************************************************************/
 
 template <typename MAP_IMPL>
-bool Map3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread) const
+void Map3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
 	DartMarkerStore<MAP_IMPL> mv(*this, thread);	// Lock a marker
-	bool found = false;					// Last functor return value
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
 	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
-	for(unsigned int i = 0; !found && i < darts.size(); ++i)
+	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
 		// add phi21 and phi23 successor if they are not marked yet
 		Dart d2 = this->phi2(darts[i]);
@@ -1178,48 +1177,45 @@ bool Map3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int
 			mv.mark(d23);
 		}
 
-		found = f(darts[i]);
+		f(darts[i]);
 	}
-	return found;
 }
 
 template <typename MAP_IMPL>
-bool Map3<MAP_IMPL>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
 	Dart it = d;
 	do
 	{
-		if (ParentMap::foreach_dart_of_edge(it, f, thread))
-			return true;
+		ParentMap::foreach_dart_of_edge(it, f, thread);
 		it = alpha2(it);
 	} while (it != d);
-	return false;
 }
 
 template <typename MAP_IMPL>
-inline bool Map3<MAP_IMPL>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return ParentMap::foreach_dart_of_face(d, f, thread) || ParentMap::foreach_dart_of_face(phi3(d), f, thread);
+	ParentMap::foreach_dart_of_face(d, f, thread);
+	ParentMap::foreach_dart_of_face(phi3(d), f, thread);
 }
 
 template <typename MAP_IMPL>
-inline bool Map3<MAP_IMPL>::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return ParentMap::foreach_dart_of_cc(d, f, thread);
+	ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-bool Map3<MAP_IMPL>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
+void Map3<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
 	DartMarkerStore<MAP_IMPL> mv(*this,thread);	// Lock a marker
-	bool found = false;					// Last functor return value
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(1024);
 	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
-	for(unsigned int i = 0; !found && i < darts.size(); ++i)
+	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
 		// add all successors if they are not marked yet
 		Dart d2 = this->phi1(darts[i]); // turn in face
@@ -1242,27 +1238,26 @@ bool Map3<MAP_IMPL>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thr
 			mv.mark(d4);
 		}
 
-		found = f(darts[i]);
+		f(darts[i]);
 	}
-	return found;
 }
 
 template <typename MAP_IMPL>
-inline bool Map3<MAP_IMPL>::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_vertex2(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return ParentMap::foreach_dart_of_vertex(d, f, thread);
+	ParentMap::foreach_dart_of_vertex(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-inline bool Map3<MAP_IMPL>::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_edge2(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return ParentMap::foreach_dart_of_edge(d, f, thread);
+	ParentMap::foreach_dart_of_edge(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-inline bool Map3<MAP_IMPL>::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_face2(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return ParentMap::foreach_dart_of_face(d, f, thread);
+	ParentMap::foreach_dart_of_face(d, f, thread);
 }
 
 /*! @name Close map after import or creation
@@ -1273,7 +1268,7 @@ template <typename MAP_IMPL>
 Dart Map3<MAP_IMPL>::newBoundaryCycle(unsigned int nbE)
 {
 	Dart d = Map1<MAP_IMPL>::newCycle(nbE);
-	this->template boundaryMarkOrbit<FACE,3>(d);
+	this->template boundaryMarkOrbit<3,FACE>(d);
 	return d;
 }
 
@@ -1503,7 +1498,7 @@ void Map3<MAP_IMPL>::computeDual()
 //	{
 //		if(isBoundaryMarked3(d))
 //		{
-//			boundaryMarkOrbit<VOLUME,3>(d);
+//			boundaryMarkOrbit<3,VOLUME>(d);
 //		}
 //	}
 
@@ -1715,7 +1710,7 @@ void Map3<MAP_IMPL>::computeDualTest()
 //
 //		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
 //		{
-//			boundaryUnmarkOrbit<VOLUME,3>(*it);
+//			boundaryUnmarkOrbit<3,VOLUME>(*it);
 //		}
 //
 //		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
@@ -1740,10 +1735,10 @@ void Map3<MAP_IMPL>::computeDualTest()
 //			//else
 //			//{
 //			//	std::cout << "gooooooooooooooooooooood" << std::endl;
-//			//	boundaryMarkOrbit<VOLUME,3>(dit);
+//			//	boundaryMarkOrbit<3,VOLUME>(dit);
 //			//	return;
 //			//}
-//			//boundaryUnmarkOrbit<VOLUME,3>(d);
+//			//boundaryUnmarkOrbit<3,VOLUME>(d);
 //			//deleteVolume(d);
 //		}
 //	}
