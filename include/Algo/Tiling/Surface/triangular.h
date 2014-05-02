@@ -118,6 +118,7 @@ template <typename PFP>
 class Cylinder : public Tiling<PFP>
 {
 	typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 private:
@@ -157,21 +158,21 @@ public:
 	 *  @param top_radius
 	 *  @param height
 	 */
-	void embedIntoCylinder(VertexAttribute<VEC3>& position, float bottom_radius, float top_radius, float height);
+	void embedIntoCylinder(VertexAttribute<VEC3, MAP_IMPL>& position, float bottom_radius, float top_radius, float height);
 
 	//! Embed a topological sphere
 	/*! @param position Attribute used to store vertices positions
 	 *  @param radius
 	 *  @param height
 	 */
-	void embedIntoSphere(VertexAttribute<VEC3>& position, float radius);
+	void embedIntoSphere(VertexAttribute<VEC3, MAP_IMPL>& position, float radius);
 
 	//! Embed a topological cone
 	/*! @param position Attribute used to store vertices positions
 	 *  @param radius
 	 *  @param height
 	 */
-	void embedIntoCone(VertexAttribute<VEC3>& position, float radius, float height);
+	void embedIntoCone(VertexAttribute<VEC3, MAP_IMPL>& position, float radius, float height);
 	//@}
 
 	/*! @name Topological Operators
@@ -209,6 +210,7 @@ template <typename PFP>
 class Cube : public Cylinder<PFP>
 {
     typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
     typedef typename PFP::VEC3 VEC3;
 
 public:
@@ -229,7 +231,7 @@ public:
      *  @param y
      *  @param z
      */
-    void embedIntoCube(VertexAttribute<VEC3>& position, float x, float y, float z);
+	void embedIntoCube(VertexAttribute<VEC3, MAP_IMPL>& position, float x, float y, float z);
     //@}
 
 protected:
@@ -254,6 +256,7 @@ template <typename PFP>
 class Tore : public Cylinder<PFP>
 {
     typedef typename PFP::MAP MAP;
+	typedef typename PFP::MAP::IMPL MAP_IMPL;
     typedef typename PFP::VEC3 VEC3;
 
 public:
@@ -273,7 +276,7 @@ public:
      *  @param big_radius
      *  @param small_radius
      */
-    void embedIntoTore(VertexAttribute<VEC3>& position, float big_radius, float small_radius);
+	void embedIntoTore(VertexAttribute<VEC3, MAP_IMPL>& position, float big_radius, float small_radius);
     //@}
 
     /*! @name Topological Operators

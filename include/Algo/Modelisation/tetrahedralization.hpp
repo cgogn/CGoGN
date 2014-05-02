@@ -797,7 +797,6 @@ std::vector<Dart> swapGen3To2Optimized(typename PFP::MAP& map, Dart d)
 //	{
 //		Tetrahedralization::swap2To2<PFP>(map, d);
 //	}
-}
 
 template <typename PFP>
 void swapGen2To3(typename PFP::MAP& map, Dart d)

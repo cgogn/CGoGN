@@ -120,7 +120,7 @@ void Grid<PFP>::embedIntoGrid(VertexAttribute<VEC3, MAP_IMPL>& position, float x
 }
 
 template <typename PFP>
-void Grid<PFP>::embedIntoTwistedStrip(VertexAttribute<VEC3>& position, float radius_min, float radius_max, float turns)
+void Grid<PFP>::embedIntoTwistedStrip(VertexAttribute<VEC3, MAP_IMPL>& position, float radius_min, float radius_max, float turns)
 {
 	float alpha = float(2.0*M_PI/this->m_ny);
 	float beta = turns/float(this->m_ny);
@@ -142,7 +142,7 @@ void Grid<PFP>::embedIntoTwistedStrip(VertexAttribute<VEC3>& position, float rad
 }
 
 template <typename PFP>
-void Grid<PFP>::embedIntoHelicoid(VertexAttribute<VEC3>& position, float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient)
+void Grid<PFP>::embedIntoHelicoid(VertexAttribute<VEC3, MAP_IMPL>& position, float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient)
 {
 	float alpha = float(2.0*M_PI/this->m_nx)*nbTurn;
 	float hS = maxHeight/this->m_nx;
@@ -301,7 +301,7 @@ void Cylinder<PFP>::triangleBottom()
 }
 
 template <typename PFP>
-void Cylinder<PFP>::embedIntoCylinder(VertexAttribute<VEC3>& position, float bottom_radius, float top_radius, float height)
+void Cylinder<PFP>::embedIntoCylinder(VertexAttribute<VEC3, MAP_IMPL>& position, float bottom_radius, float top_radius, float height)
 {
 	float alpha = float(2.0*M_PI/this->m_nx);
 	float dz = height/float(this->m_nz);
@@ -335,7 +335,7 @@ void Cylinder<PFP>::embedIntoCylinder(VertexAttribute<VEC3>& position, float bot
 }
 
 template <typename PFP>
-void Cylinder<PFP>::embedIntoSphere(VertexAttribute<VEC3>& position, float radius)
+void Cylinder<PFP>::embedIntoSphere(VertexAttribute<VEC3, MAP_IMPL>& position, float radius)
 {
 	float alpha = float(2.0*M_PI/this->m_nx);
 	float beta = float(M_PI/(this->m_nz+2));
@@ -370,7 +370,7 @@ void Cylinder<PFP>::embedIntoSphere(VertexAttribute<VEC3>& position, float radiu
 }
 
 template <typename PFP>
-void Cylinder<PFP>::embedIntoCone(VertexAttribute<VEC3>& position, float radius, float height)
+void Cylinder<PFP>::embedIntoCone(VertexAttribute<VEC3, MAP_IMPL>& position, float radius, float height)
 {
 	if(m_top_closed && m_top_triangulated)
 	{
@@ -503,7 +503,7 @@ void Cube<PFP>::cube(unsigned int x, unsigned int y, unsigned int z)
 }
 
 template <typename PFP>
-void Cube<PFP>::embedIntoCube(VertexAttribute<VEC3>& position, float sx, float sy, float sz)
+void Cube<PFP>::embedIntoCube(VertexAttribute<VEC3, MAP_IMPL>& position, float sx, float sy, float sz)
 {
     float dz = sz/float(this->m_nz);
     float dy = sy/float(this->m_ny);
@@ -583,7 +583,7 @@ void Tore<PFP>::tore(unsigned int n, unsigned int m)
 }
 
 template <typename PFP>
-void Tore<PFP>::embedIntoTore(VertexAttribute<VEC3>& position, float big_radius, float small_radius)
+void Tore<PFP>::embedIntoTore(VertexAttribute<VEC3, MAP_IMPL>& position, float big_radius, float small_radius)
 {
     float alpha = float(2.0*M_PI/this->m_nx);
     float beta = float(2.0*M_PI/this->m_ny);

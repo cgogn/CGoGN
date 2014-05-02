@@ -900,7 +900,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 				else if(degD == degGD)
 				{
 					map.sewVolumes(d, good_dart, false);
-					m.unmarkOrbit<FACE>(d);
+					m.template unmarkOrbit<FACE>(d);
 				}
 //				else if(degD > 3 && degGD > 3)
 //				{
