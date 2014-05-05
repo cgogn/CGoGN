@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP2_H__
-#define __EMBEDDED_MAP2_H__
+#ifndef __EMBEDDED_MAP2_MR_H__
+#define __EMBEDDED_MAP2_MR_H__
 
 #include "Topology/map/map2.h"
 #include "Topology/generic/mapImpl/mapMulti.h"
