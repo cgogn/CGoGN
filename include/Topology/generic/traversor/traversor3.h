@@ -347,7 +347,7 @@ public:
 };
 
 
-template < unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP, typename FUNC>
+template <unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP, typename FUNC>
 inline void foreach_incident3(MAP& map, Cell<ORBIT_FROM> c, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
 	Traversor3XY<MAP,ORBIT_FROM,ORBIT_TO> trav(const_cast<const MAP&>(map),c,forceDartMarker,thread);

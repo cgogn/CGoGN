@@ -193,27 +193,27 @@ public:
 	* @param d a dart of the vertex
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread=0) const;
+	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread=0) const;
 
 	/**
 	* Apply a functor on each dart of an edge
 	* @param d a dart of the edge
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread=0) const;
+	void foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread=0) const;
 
 	/**
 	* Apply a functor on each dart of an oriented cc (face)
 	* @param d a dart of the oriented cc
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread=0) const;
+	void foreach_dart_of_oriented_cc(Dart d, std::function<void (Dart)> f, unsigned int thread=0) const;
 
 	//! Apply a functor on every dart of a cc (face)
 	/*! @param d a dart of the cc
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0) const;
+	void foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread=0) const;
 	//@}
 };
 

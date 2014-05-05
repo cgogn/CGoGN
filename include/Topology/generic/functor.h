@@ -267,39 +267,39 @@ public:
 // Embedding Functors
 /********************************************************/
 
-template <typename MAP, unsigned int ORBIT>
-class FunctorSetEmb : public FunctorMap<MAP>
-{
-protected:
-	unsigned int emb;
-public:
-	FunctorSetEmb(MAP& map, unsigned int e) : FunctorMap<MAP>(map), emb(e)
-	{}
-	bool operator()(Dart d)
-	{
-		this->m_map.template setDartEmbedding<ORBIT>(d, emb);
-		return false;
-	}
-	void changeEmb(unsigned int e) { emb = e; }
-};
+//template <typename MAP, unsigned int ORBIT>
+//class FunctorSetEmb : public FunctorMap<MAP>
+//{
+//protected:
+//	unsigned int emb;
+//public:
+//	FunctorSetEmb(MAP& map, unsigned int e) : FunctorMap<MAP>(map), emb(e)
+//	{}
+//	bool operator()(Dart d)
+//	{
+//		this->m_map.template setDartEmbedding<ORBIT>(d, emb);
+//		return false;
+//	}
+//	void changeEmb(unsigned int e) { emb = e; }
+//};
 
-template <typename MAP, unsigned int ORBIT>
-class FunctorInitEmb : public FunctorMap<MAP>
-{
-protected:
-	unsigned int emb;
-public:
-	FunctorInitEmb(MAP& map) : FunctorMap<MAP>(map), emb(EMBNULL)
-	{}
-	FunctorInitEmb(MAP& map, unsigned int e) : FunctorMap<MAP>(map), emb(e)
-	{}
-	bool operator()(Dart d)
-	{
-		this->m_map.template initDartEmbedding<ORBIT>(d, emb);
-		return false;
-	}
-	void changeEmb(unsigned int e) { emb = e; }
-};
+//template <typename MAP, unsigned int ORBIT>
+//class FunctorInitEmb : public FunctorMap<MAP>
+//{
+//protected:
+//	unsigned int emb;
+//public:
+//	FunctorInitEmb(MAP& map) : FunctorMap<MAP>(map), emb(EMBNULL)
+//	{}
+//	FunctorInitEmb(MAP& map, unsigned int e) : FunctorMap<MAP>(map), emb(e)
+//	{}
+//	bool operator()(Dart d)
+//	{
+//		this->m_map.template initDartEmbedding<ORBIT>(d, emb);
+//		return false;
+//	}
+//	void changeEmb(unsigned int e) { emb = e; }
+//};
 
 // Search Functor: look for a given dart when applied
 /********************************************************/
@@ -332,18 +332,18 @@ public:
 // Functor Store: to store the traversed darts in a given vector
 /********************************************************/
 
-class FunctorStore : public FunctorType
-{
-protected:
-	std::vector<Dart>& m_vec;
-public:
-	FunctorStore(std::vector<Dart>& vec) : m_vec(vec) {}
-	bool operator()(Dart d)
-	{
-		m_vec.push_back(d);
-		return false;
-	}
-};
+//class FunctorStore : public FunctorType
+//{
+//protected:
+//	std::vector<Dart>& m_vec;
+//public:
+//	FunctorStore(std::vector<Dart>& vec) : m_vec(vec) {}
+//	bool operator()(Dart d)
+//	{
+//		m_vec.push_back(d);
+//		return false;
+//	}
+//};
 
 
 template <typename MAP>

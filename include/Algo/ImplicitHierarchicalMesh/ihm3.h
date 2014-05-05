@@ -379,24 +379,23 @@ public:
 
 	virtual void next(Dart& d) const ;
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
 
-	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) const;
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
 
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread = 0) const;
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
 
+	void foreach_dart_of_vertex2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
 
-	virtual bool foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
 
-	virtual bool foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread = 0) const;
-
-	virtual bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0) const;
+	void foreach_dart_of_face2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
 	//@}
 
     template <unsigned int ORBIT>

@@ -168,91 +168,78 @@ inline void ImplicitHierarchicalMap2::next(Dart& d) const
 		d = TOPO_MAP::end() ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
 {
 	Dart dNext = d;
 	do
 	{
-		if (f(dNext))
-			return true;
+		f(dNext);
 		dNext = alpha1(dNext);
- 	} while (dNext != d);
- 	return false;
+	} while (dNext != d);
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
 {
-	if (f(d))
-		return true;
-
+	f(d);
 	Dart d2 = phi2(d);
 	if (d2 != d)
-		return f(d2);
-	else
-		return false;
+		f(d2);
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
 {
 	Dart dNext = d ;
 	do
 	{
-		if (f(dNext))
-			return true ;
+		f(dNext);
 		dNext = phi1(dNext) ;
 	} while (dNext != d) ;
-	return false ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return foreach_dart_of_oriented_face(d, f, thread) ;
+	foreach_dart_of_oriented_face(d, f, thread) ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
 	DartMarkerStore<Map2> mark(*this, thread);	// Lock a marker
-	bool found = false;				// Last functor return value
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.push_back(d);		// Start with the face of d
 	std::list<Dart>::iterator face;
 
 	// For every face added to the list
-	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
 		if (!mark.isMarked(*face))		// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			found = foreach_dart_of_oriented_face(*face, f, thread);
+			foreach_dart_of_oriented_face(*face, f, thread);
 
-			// If functor returns false then mark visited darts (current face)
+			// mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face
-			if (!found)
+			Dart dNext = *face ;
+			do
 			{
-				Dart dNext = *face ;
-				do
-				{
-					mark.mark(dNext);					// Mark
-					Dart adj = phi2(dNext);				// Get adjacent face
-					if (adj != dNext && !mark.isMarked(adj))
-						visitedFaces.push_back(adj);	// Add it
-					dNext = phi1(dNext);
-				} while(dNext != *face);
-			}
+				mark.mark(dNext);					// Mark
+				Dart adj = phi2(dNext);				// Get adjacent face
+				if (adj != dNext && !mark.isMarked(adj))
+					visitedFaces.push_back(adj);	// Add it
+				dNext = phi1(dNext);
+			} while(dNext != *face);
 		}
 	}
-	return found;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return foreach_dart_of_oriented_volume(d, f, thread) ;
+	foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
-inline bool ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread) const
 {
-	return foreach_dart_of_oriented_volume(d, f, thread) ;
+	foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
 /***************************************************
