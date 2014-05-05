@@ -65,6 +65,12 @@ typedef Cell<EDGE>   Edge;
 typedef Cell<FACE>   Face;
 typedef Cell<VOLUME> Vol;  // not Volume because of the namespace Volume
 
+
+namespace Parallel
+{
+const unsigned int SIZE_BUFFER_THREAD = 8192;
+}
+
 }
 
 #endif /* CELLS_H_ */

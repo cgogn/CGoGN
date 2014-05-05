@@ -26,7 +26,7 @@
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
 #include "Algo/Tiling/Surface/square.h"
-
+#include "Algo/Geometry/area.h"
 
 using namespace CGoGN ;
 
@@ -55,13 +55,11 @@ int main()
 	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
 
 	// create a topo grid of 2x2 squares
-	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 2, 2, true);
+	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 4, 4, true);
 
 	// and embed it using position attribute
     grid.embedIntoGrid(position, 1.,1.,0.);
 
-
-	
 	// ALGO:
 	// foreach vertex of the map
 	//    print position of the vertex
@@ -106,9 +104,41 @@ int main()
 	{
 		std::cout << v << " : " << position[v]<< " / ";
 	});
+	// warning here v is a Vertex and not a Dart (but can cast automatically into)
 
 	std::cout <<  std::endl;
-	// warning here v is a Vertex and not a Dart (but can cast automatically into)
+
+
+	// example of parallel traversal of cells
+	Parallel::foreach_cell<VERTEX>(myMap,[&](Vertex v, unsigned int thread) // for each Vertex v of the MAP myMap
+	{
+		position[v] += VEC3(0.0,0.0,PFP::REAL(thread)*0.1f);
+		// WARNING thread vary here from 1 to 4 (and not from 0 to 3) !!!!
+	},4,false); // 4:4 thread, false for no need for markers in threaded code.
+
+
+	std::cout << "After // processing"<< std::endl;
+	foreach_cell<VERTEX>(myMap,[&](Vertex v) // for each Vertex v of the MAP myMap
+	{
+		std::cout << position[v]<< " / ";
+	});
+	std::cout <<  std::endl;
+
+
+	// Example with // accumulation
+	// computing the sum of area faces
+	// init nbthread values with 0
+	float surf[4]={0.0f,0.0f,0.0f,0.0f};
+	// traverse face in //
+	Parallel::foreach_cell<FACE>(myMap,[&](Face f, unsigned int thr)
+	{
+		// for each face add surface to accumulator (-1 because counter between 1-4 not 0-3)
+		surf[thr-1] += Algo::Surface::Geometry::convexFaceArea<PFP>(myMap,f,position);
+	},4,false);
+
+	std::cout << surf[0]<< "/"<< surf[1]<< "/"<< surf[2]<< "/"<< surf[3]<< "/"<< std::endl;
+	std::cout << "Total="<<surf[0]+surf[1]+surf[2]+surf[3]<< std::endl;
+
 
 	return 0;
 }

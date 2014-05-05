@@ -470,12 +470,12 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd)
  *************************************************************************************************/
 
 template <typename PFP>
-bool isTetrahedron(typename PFP::MAP& map, Dart d, unsigned int thread)
+bool isTetrahedron(typename PFP::MAP& map, Vol v, unsigned int thread)
 {
     unsigned int nbFaces = 0;
 
     //Test the number of faces end its valency
-	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	Traversor3WF<typename PFP::MAP> travWF(map, v, false, thread);
     for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
     {
         //increase the number of faces
@@ -484,7 +484,7 @@ bool isTetrahedron(typename PFP::MAP& map, Dart d, unsigned int thread)
             return false;
 
         //test the valency of this face
-		if(map.faceDegree(dit) != 3)
+		if(!map.isCycleTriangle(dit))
             return false;
     }
 

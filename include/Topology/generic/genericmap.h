@@ -39,6 +39,7 @@
 #include "Container/fakeAttribute.h"
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/cells.h"
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
 
@@ -168,26 +169,28 @@ public:
 	 *          ORBITS TRAVERSALS           *
 	 ****************************************/
 
-	//! Apply a functor on every dart of an orbit
-	/*! @param dim dimension of orbit
-	 *  @param d a dart of the orbit
-	 *  @param f a functor obj
+	//! Apply a function on every dart of an orbit
+	/*! @param c a cell
+	 *  @param f a function
 	 */
 	template <unsigned int ORBIT>
-	void foreach_dart_of_orbit(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	void foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)> f, unsigned int thread = 0) const ;
 
-	virtual void foreach_dart_of_vertex(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_edge(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_face(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_volume(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_cc(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	template <unsigned int ORBIT>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
-	virtual void foreach_dart_of_vertex1(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_edge1(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_vertex(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_edge(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_face(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_volume(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_cc(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
-	virtual void foreach_dart_of_vertex2(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_edge2(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_face2(Dart /*d*/, std::function<void (Dart)> /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_vertex1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_edge1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+
+	virtual void foreach_dart_of_vertex2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_edge2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_face2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *

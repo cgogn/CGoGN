@@ -39,7 +39,7 @@ private:
 	std::vector<Dart> m_vd ;
 
 public:
-	TraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread = 0) ;
+	TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
 
 	Dart begin() ;
 
@@ -47,8 +47,6 @@ public:
 
 	Dart next() ;
 } ;
-
-
 
 template <typename MAP, unsigned int ORBIT>
 class VTraversorDartsOfOrbit : public Traversor
@@ -58,7 +56,7 @@ private:
 	std::vector<Dart> m_vd ;
 
 public:
-	VTraversorDartsOfOrbit(const MAP& map, Dart d, unsigned int thread = 0) ;
+	VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
 
 	Dart begin() ;
 
@@ -66,8 +64,6 @@ public:
 
 	Dart next() ;
 } ;
-
-
 
 } // namespace CGoGN
 

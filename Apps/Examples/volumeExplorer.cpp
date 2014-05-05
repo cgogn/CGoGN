@@ -508,8 +508,14 @@ int main(int argc, char **argv)
 	std::cout << "Compute Volume ->"<< std::endl;
 	ch.start();
 	float vol = Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
+	ch.start();
 	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
+	ch.start();
 	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
+	ch.start();
 	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
 	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
 

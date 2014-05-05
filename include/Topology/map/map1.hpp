@@ -286,19 +286,19 @@ inline bool Map1<MAP_IMPL>::isCycleTriangle(Dart d) const
  *************************************************************************/
 
 template <typename MAP_IMPL>
-inline void Map1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void Map1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline void Map1<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void Map1<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline void Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	Dart it = d ;
 	do

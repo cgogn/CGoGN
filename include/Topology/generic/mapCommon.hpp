@@ -35,17 +35,17 @@ unsigned int MapCommon<MAP_IMPL>::degree(Dart d) const
 {
 	assert(ORBIT != INCIDENT || !"degree does not manage adjacency counting") ;
 	Traversor* t = TraversorFactory<MapCommon<MAP_IMPL> >::createIncident(*this, d, this->dimension(), ORBIT, INCIDENT) ;
-	FunctorCount fcount ;
-	t->applyFunctor(fcount) ;
+	unsigned int cpt = 0;
+	t->apply([&] (Dart) { ++cpt; }) ;
 	delete t ;
-	return fcount.getNb() ;
+	return cpt;
 }
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
 bool MapCommon<MAP_IMPL>::sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread) const
 {
-	TraversorDartsOfOrbit<MapCommon<MAP_IMPL>, ORBIT> tradoo(*this, c1.dart, thread);
+	TraversorDartsOfOrbit<MapCommon<MAP_IMPL>, ORBIT> tradoo(*this, c1, thread);
 	for (Dart x = tradoo.begin(); x != tradoo.end(); x = tradoo.next())
 	{
 		if (x == c2.dart)
@@ -123,10 +123,7 @@ inline void MapCommon<MAP_IMPL>::setOrbitEmbedding(Cell<ORBIT> c, unsigned int e
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
-	this->template foreach_dart_of_orbit<ORBIT>(c.dart, [&] (Dart d)
-	{
-		this->setDartEmbedding<ORBIT>(d, em);
-	});
+	this->foreach_dart_of_orbit(c, [&] (Dart d) { this->setDartEmbedding<ORBIT>(d, em); });
 }
 
 template <typename MAP_IMPL>
@@ -135,10 +132,7 @@ inline void MapCommon<MAP_IMPL>::initOrbitEmbedding(Cell<ORBIT> c, unsigned int 
 {
 	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
-	this->template foreach_dart_of_orbit<ORBIT>(c.dart, [&] (Dart d)
-	{
-		this->initDartEmbedding<ORBIT>(d, em);
-	});
+	this->foreach_dart_of_orbit(c, [&] (Dart d) { this->initDartEmbedding<ORBIT>(d, em); });
 }
 
 template <typename MAP_IMPL>
@@ -200,20 +194,14 @@ template <typename MAP_IMPL>
 template <unsigned int DIM, unsigned int ORBIT>
 void MapCommon<MAP_IMPL>::boundaryMarkOrbit(Cell<ORBIT> c)
 {
-	this->template foreach_dart_of_orbit<ORBIT>(c.dart, [&] (Dart d)
-	{
-		this->boundaryMark<DIM>(d);
-	});
+	this->foreach_dart_of_orbit(c, [&] (Dart d) { this->boundaryMark<DIM>(d); });
 }
 
 template <typename MAP_IMPL>
 template <unsigned int DIM, unsigned int ORBIT>
 void MapCommon<MAP_IMPL>::boundaryUnmarkOrbit(Cell<ORBIT> c)
 {
-	this->template foreach_dart_of_orbit<ORBIT>(c.dart, [&] (Dart d)
-	{
-		this->boundaryUnmark<DIM>(d);
-	});
+	this->foreach_dart_of_orbit(c, [&] (Dart d)	{ this->boundaryUnmark<DIM>(d);	});
 }
 
 template <typename MAP_IMPL>

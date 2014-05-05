@@ -45,15 +45,16 @@ private:
 	const MAP& m_map ;
 	DartMarkerStore<MAP>* m_dmark ;
 	CellMarkerStore<MAP, ORBIT>* m_cmark ;
+
 public:
 	MarkerForTraversor(const MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~MarkerForTraversor();
 
 	DartMarkerStore<MAP>* dmark();
 	CellMarkerStore<MAP, ORBIT>* cmark();
-	void mark(Dart d);
-	void unmark(Dart d);
-	bool isMarked(Dart d);
+	void mark(Cell<ORBIT> c);
+	void unmark(Cell<ORBIT> c);
+	bool isMarked(Cell<ORBIT> c);
 } ;
 
 /**
@@ -75,10 +76,12 @@ private:
 
 	bool m_allocated;
 	bool m_first;
+
 public:
-	Traversor3XY(const MAP& map, Cell<ORBX> dart, bool forceDartMarker = false, unsigned int thread = 0) ;
-	Traversor3XY(const MAP& map, Cell<ORBX> dart, MarkerForTraversor<MAP, ORBY>& tmo, bool forceDartMarker = false, unsigned int thread = 0) ;
+	Traversor3XY(const MAP& map, Cell<ORBX> c, bool forceDartMarker = false, unsigned int thread = 0) ;
+	Traversor3XY(const MAP& map, Cell<ORBX> c, MarkerForTraversor<MAP, ORBY>& tmo, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~Traversor3XY();
+
 	Cell<ORBY> begin() ;
 	Cell<ORBY> end() ;
 	Cell<ORBY> next() ;
@@ -98,8 +101,9 @@ private:
 
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
+
 public:
-	Traversor3XXaY(const MAP& map, Cell<ORBX> dart, bool forceDartMarker = false, unsigned int thread = 0);
+	Traversor3XXaY(const MAP& map, Cell<ORBX> c, bool forceDartMarker = false, unsigned int thread = 0);
 
 	Cell<ORBX> begin();
 	Cell<ORBX> end();

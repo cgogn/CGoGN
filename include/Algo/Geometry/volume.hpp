@@ -36,85 +36,87 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	VEC3 p1 = position[d] ;
-	VEC3 p2 = position[map.phi1(d)] ;
-	VEC3 p3 = position[map.phi_1(d)] ;
-	VEC3 p4 = position[map.phi_1(map.phi2(d))] ;
+	VEC3 p1 = position[v.dart] ;
+	VEC3 p2 = position[map.phi1(v)] ;
+	VEC3 p3 = position[map.phi_1(v)] ;
+	VEC3 p4 = position[map.phi_1(map.phi2(v))] ;
 
 	return Geom::tetraSignedVolume(p1, p2, p3, p4) ;
 }
 
 template <typename PFP>
-typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	VEC3 p1 = position[d] ;
-	VEC3 p2 = position[map.phi1(d)] ;
-	VEC3 p3 = position[map.phi_1(d)] ;
-	VEC3 p4 = position[map.phi_1(map.phi2(d))] ;
+	VEC3 p1 = position[v.dart] ;
+	VEC3 p2 = position[map.phi1(v)] ;
+	VEC3 p3 = position[map.phi_1(v)] ;
+	VEC3 p4 = position[map.phi_1(map.phi2(v))] ;
 
 	return Geom::tetraVolume(p1, p2, p3, p4) ;
 }
 
 template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
+typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
 
-	if (Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map,d,thread))
-		return tetrahedronVolume<PFP>(map,d,position) ;
+	if (Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, v, thread))
+		return tetrahedronVolume<PFP>(map, v, position) ;
 	else
 	{
 		typename PFP::REAL vol = 0 ;
-		VEC3 vCentroid = Algo::Surface::Geometry::volumeCentroid<PFP>(map, d, position, thread) ;
+		VEC3 vCentroid = Algo::Surface::Geometry::volumeCentroid<PFP>(map, v, position, thread) ;
 
-		DartMarkerStore<MAP> mark(map,thread);		// Lock a marker
+		DartMarkerStore<MAP> mark(map, thread) ;	// Lock a marker
 
-		std::vector<Dart> visitedFaces ;
+		std::vector<Face> visitedFaces ;
 		visitedFaces.reserve(100) ;
 
-		visitedFaces.push_back(d) ;
-		mark.template markOrbit<FACE>(d) ;
+		Face f(v.dart) ;
+		visitedFaces.push_back(f) ;
+		mark.markOrbit(f) ;
 
-		for(unsigned int  iface = 0; iface != visitedFaces.size(); ++iface)
+		for(unsigned int iface = 0; iface != visitedFaces.size(); ++iface)
 		{
-			Dart e = visitedFaces[iface] ;
-			if(map.isCycleTriangle(e))
+			f = visitedFaces[iface] ;
+			if(map.isCycleTriangle(f))
 			{
-				VEC3 p1 = position[e] ;
-				VEC3 p2 = position[map.phi1(e)] ;
-				VEC3 p3 = position[map.phi_1(e)] ;
+				VEC3 p1 = position[f.dart] ;
+				VEC3 p2 = position[map.phi1(f)] ;
+				VEC3 p3 = position[map.phi_1(f)] ;
 				vol += Geom::tetraVolume(p1, p2, p3, vCentroid) ;
 			}
 			else
 			{
-				VEC3 fCentroid = Algo::Surface::Geometry::faceCentroid<PFP>(map, e, position) ;
-				Dart f = e ;
+				VEC3 fCentroid = Algo::Surface::Geometry::faceCentroid<PFP>(map, f, position) ;
+				Dart d = f.dart ;
 				do
 				{
-					VEC3 p1 = position[f] ;
-					VEC3 p2 = position[map.phi1(f)] ;
+					VEC3 p1 = position[d] ;
+					VEC3 p2 = position[map.phi1(d)] ;
 					vol += Geom::tetraVolume(p1, p2, fCentroid, vCentroid) ;
-					f = map.phi1(f) ;
-				} while(f != e) ;
+					d = map.phi1(d) ;
+				} while(d != f.dart) ;
 			}
-			Dart currentFace = e;
+			Dart d = f.dart;
 			do	// add all face neighbours to the table
 			{
-				Dart ee = map.phi2(e) ;
-				if(!mark.isMarked(ee)) // not already marked
+				Dart dd = map.phi2(d) ;
+				if(!mark.isMarked(dd)) // not already marked
 				{
-					visitedFaces.push_back(ee) ;
-					mark.template markOrbit<FACE>(ee) ;
+					Face ff(dd);
+					visitedFaces.push_back(ff) ;
+					mark.markOrbit(ff) ;
 				}
-				e = map.phi1(e) ;
-			} while(e != currentFace) ;
+				d = map.phi1(d) ;
+			} while(d != f.dart) ;
 		}
 
 		return vol ;

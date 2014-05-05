@@ -324,6 +324,23 @@ assert(sizeof(FROM_T) == sizeof(TO_T));
 ::new(p) TO_T(); // use of placement new
 }
 
+/**
+ * apply function on each element of attribute
+ * Warning attr must also be captured by lambda funct
+ */
+template <typename ATTR, typename FUNC>
+inline void foreach_attribute(ATTR& attr, FUNC func)
+{
+	for (unsigned int id=attr.begin(); id != attr.end(); attr.next(id))
+		func(id);
+}
+
+namespace Parallel
+{
+template <typename ATTR, typename FUNC>
+void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbth=0);
+}
+
 } // namespace CGoGN
 
 #include "Topology/generic/attributeHandler.hpp"

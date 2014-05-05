@@ -22,35 +22,65 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSORGEN_H__
-#define __TRAVERSORGEN_H__
 
-#include "Topology/generic/dart.h"
-#include "Topology/generic/functor.h"
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Algo/Tiling/Surface/square.h"
 
-namespace CGoGN
+using namespace CGoGN ;
+
+/**
+ * Struct that contains some informations about the types of the manipulated objects
+ * Mainly here to be used by the algorithms that are parameterized by it
+ */
+struct PFP: public PFP_STANDARD
 {
-
-class Traversor
-{
-public:
-	virtual ~Traversor() {}
-	virtual Dart begin() = 0;
-	virtual Dart end() = 0;
-	virtual Dart next() = 0;
-
-	template <typename FUNC>
-	bool apply(FUNC f)
-	{
-		for (Dart d = begin(); d != end(); d = next())
-		{
-				if (f(d))
-					return true;
-		}
-		return false;
-	}
+	// definition of the type of the map
+	typedef EmbeddedMap2 MAP;
 };
 
-} // namespace CGoGN
+// some typedef shortcuts
+typedef PFP::MAP MAP ;				// map type
+typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
+typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 
-#endif
+
+int main()
+{
+	// declare a map to handle the mesh
+	MAP myMap;
+
+	// add position attribute on vertices and get handler on it
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+
+	// create a topo grid of 2x2 squares
+	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 4, 4, true);
+
+	// and embed it using position attribute
+    grid.embedIntoGrid(position, 1.,1.,0.);
+
+	
+	// traversal with begin/end/next on attribute handler
+	for (unsigned int id=position.begin(); id !=position.end(); position.next(id))
+	{
+		std::cout << id << " : " << position[id]<< " / ";
+	};
+	std::cout << std::endl;
+
+	//using foreach function (C++11 lambda expression)
+	foreach_attribute(position,[&](unsigned int id) // for each element of position
+	{
+		std::cout << id << " : " << position[id]<< " / ";
+	});
+
+	// using parallel foreach
+	// parameter position must be captured explicitly even if it used as first parameter of foreach !
+	Parallel::foreach_attribute(position,[&position](unsigned int id, unsigned int thread) // for each elt of the position attribute
+	{
+		position[id] *= 2.0f;
+	},4); // 4:4 thread, false for no need for markers in threaded code.
+
+
+
+	return 0;
+}

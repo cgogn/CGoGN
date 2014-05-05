@@ -364,7 +364,7 @@ public:
 	//! Tell if a face of the volume is on the boundary
 	/*  @param d a dart
 	 */
-	bool isBoundaryAdjacentVolume(Dart d) const;
+	bool isVolumeIncidentToBoundary(Dart d) const;
 
 	//! Tell if an edge of the volume is on the boundary
 	/*	@param d a dart
@@ -386,49 +386,49 @@ public:
 	/*! @param d a dart of the vertex
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of an edge
 	/*! @param d a dart of the oriented edge
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of a face
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of a face
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of a cc
 	/*! @param d a dart of the cc
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of a vertex
 	/*! @param d a dart of the vertex
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_vertex2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of an edge
 	/*! @param d a dart of the oriented edge
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_edge2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of an oriented face
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_face2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_face2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//@}
 

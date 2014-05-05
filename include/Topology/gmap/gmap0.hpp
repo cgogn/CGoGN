@@ -118,13 +118,13 @@ void GMap0<MAP_IMPL>::deleteEdge(Dart d)
  *************************************************************************/
 
 template <typename MAP_IMPL>
-inline void GMap0<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void GMap0<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline void GMap0<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void GMap0<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	f(d);
 	Dart d1 = beta0(d);
