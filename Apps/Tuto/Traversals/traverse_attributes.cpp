@@ -22,55 +22,65 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef CELLS_H_
-#define CELLS_H_
 
-#include "Topology/generic/dart.h"
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Algo/Tiling/Surface/square.h"
 
-namespace CGoGN
-{
+using namespace CGoGN ;
 
 /**
- * class for cellular typing
- *
- * warning to automatic conversion
- * cell -> Dart (or const Dart&) ok
- * Dart -> Cell (or const Cell&) ok
+ * Struct that contains some informations about the types of the manipulated objects
+ * Mainly here to be used by the algorithms that are parameterized by it
  */
-template <unsigned int ORBIT>
-class Cell
+struct PFP: public PFP_STANDARD
 {
-public:
-	Dart dart;
-
-	/// empty construtor
-	Cell(): dart() {}
-
-	/// constructor from Dart
-	inline Cell(Dart d): dart(d) {}
-
-	/// copy constructor
-	inline Cell(const Cell<ORBIT>& c): dart(c.dart) {}
-
-	/// Dart cast operator
-	inline operator Dart() const { return dart; }
-
-	friend std::ostream& operator<<( std::ostream &out, const Cell<ORBIT>& fa ) { return out << fa.dart; }
-
-	inline bool valid() const { return !dart.isNil(); }
+	// definition of the type of the map
+	typedef EmbeddedMap2 MAP;
 };
 
-typedef Cell<VERTEX> Vertex;
-typedef Cell<EDGE>   Edge;
-typedef Cell<FACE>   Face;
-typedef Cell<VOLUME> Vol;  // not Volume because of the namespace Volume
+// some typedef shortcuts
+typedef PFP::MAP MAP ;				// map type
+typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
+typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 
 
-namespace Parallel
+int main()
 {
-const unsigned int SIZE_BUFFER_THREAD = 8192;
-}
+	// declare a map to handle the mesh
+	MAP myMap;
 
-}
+	// add position attribute on vertices and get handler on it
+	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-#endif /* CELLS_H_ */
+	// create a topo grid of 2x2 squares
+	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 4, 4, true);
+
+	// and embed it using position attribute
+    grid.embedIntoGrid(position, 1.,1.,0.);
+
+	
+	// traversal with begin/end/next on attribute handler
+	for (unsigned int id=position.begin(); id !=position.end(); position.next(id))
+	{
+		std::cout << id << " : " << position[id]<< " / ";
+	};
+	std::cout << std::endl;
+
+	//using foreach function (C++11 lambda expression)
+	foreach_attribute(position,[&](unsigned int id) // for each element of position
+	{
+		std::cout << id << " : " << position[id]<< " / ";
+	});
+
+	// using parallel foreach
+	// parameter position must be captured explicitly even if it used as first parameter of foreach !
+	Parallel::foreach_attribute(position,[&position](unsigned int id, unsigned int thread) // for each elt of the position attribute
+	{
+		position[id] *= 2.0f;
+	},4); // 4:4 thread, false for no need for markers in threaded code.
+
+
+
+	return 0;
+}
