@@ -399,7 +399,7 @@ public:
 	//@}
 
     template <unsigned int ORBIT>
-	unsigned int getEmbedding(Dart d) const;
+	unsigned int getEmbedding(Cell<ORBIT> c) const;
 } ;
 
 template <typename T, unsigned int ORBIT>

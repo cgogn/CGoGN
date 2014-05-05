@@ -95,13 +95,13 @@ public:
 	/*! @param d a dart of the vertex
 	 *  @param f the functor to apply
 	 */
-	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on every dart of an edge
 	/*! @param d a dart of the edge
 	 *  @param f the functor to apply
 	 */
-	void foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 	//@}
 };
 

@@ -106,17 +106,17 @@ public:
 
 	inline void next(Dart& d) const ;
 
-	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
-	void foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	void foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
-	void foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
-	void foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread = 0)  const;
+	void foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0)  const;
 
-	void foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
-	void foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	void foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
-	void foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	void foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
 	/***************************************************
 	 *               MAP MANIPULATION                  *

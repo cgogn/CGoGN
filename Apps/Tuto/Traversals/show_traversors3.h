@@ -115,7 +115,7 @@ protected:
 	void cb_mousePress(int button, int x, int y);
 
 	template <unsigned int ORBIT>
-	void colorizeCell(Dart d, float r,float g, float b);
+	void colorizeCell(Cell<ORBIT> c, float r,float g, float b);
 
 	void traverse2();
 	void traverse3();

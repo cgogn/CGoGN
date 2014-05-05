@@ -76,6 +76,7 @@ private:
 
 	bool m_allocated;
 	bool m_first;
+
 public:
 	VTraversor3XY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) ;
 	VTraversor3XY(MAP& map, Dart dart, VMarkerForTraversor<MAP, ORBY>& tmo, bool forceDartMarker = false, unsigned int thread = 0) ;
@@ -100,6 +101,7 @@ private:
 
 	const std::vector<Dart>* m_QLT;
 	std::vector<Dart>::const_iterator m_ItDarts;
+
 public:
 	VTraversor3XXaY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0);
 

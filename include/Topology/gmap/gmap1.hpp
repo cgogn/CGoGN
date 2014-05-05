@@ -362,7 +362,7 @@ inline bool GMap1<MAP_IMPL>::isCycleTriangle(Dart d) const
  *************************************************************************/
 
 template <typename MAP_IMPL>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	f(d);
 	Dart d1 = beta1(d);
@@ -371,7 +371,7 @@ inline void GMap1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (
 }
 
 template <typename MAP_IMPL>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	f(d);
 	Dart d1 = this->beta0(d);
@@ -380,7 +380,7 @@ inline void GMap1<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Da
 }
 
 template <typename MAP_IMPL>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	Dart it = d ;
 	do
@@ -391,7 +391,7 @@ inline void GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, std::function<v
 }
 
 template <typename MAP_IMPL>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(d, f, thread);
 	GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(this->beta0(d), f, thread);

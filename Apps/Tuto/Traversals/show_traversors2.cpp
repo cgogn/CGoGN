@@ -139,11 +139,9 @@ void  MyQT::cb_Save()
 }
 
 template <unsigned int ORBIT>
-void MyQT::colorizeCell(Dart d, float r,float g, float b)
+void MyQT::colorizeCell(Cell<ORBIT> c, float r, float g, float b)
 {
-    TraversorDartsOfOrbit<PFP::MAP, ORBIT>doo (myMap, d);
-    for (Dart e = doo.begin(); e != doo.end(); e = doo.next())
-        m_render_topo->setDartColor(e, r, g, b);
+	myMap.foreach_dart_of_orbit(c, [&] (Dart d) { m_render_topo->setDartColor(d, r, g, b); });
 }
 
 void MyQT::traverse2()

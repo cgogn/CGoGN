@@ -54,29 +54,29 @@ MarkerForTraversor<MAP, ORBIT>::~MarkerForTraversor()
 }
 
 template <typename MAP, unsigned int ORBIT>
-void MarkerForTraversor<MAP, ORBIT>::mark(Dart d)
+void MarkerForTraversor<MAP, ORBIT>::mark(Cell<ORBIT> c)
 {
 	if (m_cmark)
-		m_cmark->mark(d);
+		m_cmark->mark(c);
 	else
-		m_dmark->template markOrbit<ORBIT>(d);
+		m_dmark->markOrbit(c);
 }
 
 template <typename MAP, unsigned int ORBIT>
-void MarkerForTraversor<MAP, ORBIT>::unmark(Dart d)
+void MarkerForTraversor<MAP, ORBIT>::unmark(Cell<ORBIT> c)
 {
 	if (m_cmark)
-		m_cmark->unmark(d);
+		m_cmark->unmark(c);
 	else
-		m_dmark->template unmarkOrbit<ORBIT>(d);
+		m_dmark->unmarkOrbit(c);
 }
 
 template <typename MAP, unsigned int ORBIT>
-bool MarkerForTraversor<MAP, ORBIT>::isMarked(Dart d)
+bool MarkerForTraversor<MAP, ORBIT>::isMarked(Cell<ORBIT> c)
 {
 	if (m_cmark)
-		return m_cmark->isMarked(d);
-	return m_dmark->isMarked(d);
+		return m_cmark->isMarked(c);
+	return m_dmark->isMarked(c);
 }
 
 template <typename MAP, unsigned int ORBIT>
@@ -96,11 +96,11 @@ DartMarkerStore<MAP>* MarkerForTraversor<MAP, ORBIT>::dmark()
 //**************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> dart, bool forceDartMarker, unsigned int thread) :
+Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> c, bool forceDartMarker, unsigned int thread) :
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL),
-	m_tradoo(map, dart, thread),
+	m_tradoo(map, c, thread),
 	m_QLT(NULL),
 	m_allocated(true),
 	m_first(true)
@@ -108,7 +108,7 @@ Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> dart, boo
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal = map.template getQuickIncidentTraversal<ORBX,ORBY>() ;
 	if (quickTraversal != NULL)
 	{
-		m_QLT  = &(quickTraversal->operator[](map.template getEmbedding<ORBX>(dart)));
+		m_QLT = &(quickTraversal->operator[](map.getEmbedding(c)));
 	}
 	else
 	{
@@ -120,9 +120,9 @@ Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> dart, boo
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> dart, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
+Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> c, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
 	m_map(map),
-	m_tradoo(map, dart, thread),
+	m_tradoo(map, c, thread),
 	m_QLT(NULL),
 	m_allocated(false),
 	m_first(true)
@@ -179,7 +179,7 @@ Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::begin()
 
 	if ((ORBY == VOLUME) && (m_current.dart != NIL))
 	{
-		if(m_map.template isBoundaryMarked<3>(m_current))
+		if(m_map.template isBoundaryMarked<3>(m_current.dart))
 			m_current = next();
 	}
 
@@ -208,7 +208,7 @@ Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::next()
 			m_current = m_tradoo.next();
 			if(ORBY == VOLUME && m_current.dart != NIL)
 			{
-				if(m_map.template isBoundaryMarked<3>(m_current))
+				if(m_map.template isBoundaryMarked<3>(m_current.dart))
 					m_cmark->mark(m_current);
 			}
 			while ((m_current.dart != NIL) && m_cmark->isMarked(m_current))
@@ -220,27 +220,27 @@ Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::next()
 			{
 				// if allocated we are in a local traversal of volume so we can mark only darts of volume
 				if (m_allocated)
-					m_dmark->template markOrbit<ORBY + MAP::IN_PARENT>(m_current);
+					m_dmark->template markOrbit<ORBY + MAP::IN_PARENT>(m_current.dart);
 				else
-					m_dmark->template markOrbit<ORBY>(m_current); // here we need to mark all the darts
+					m_dmark->markOrbit(m_current); // here we need to mark all the darts
 			}
 			else
-				m_dmark->template markOrbit<ORBY>(m_current);
+				m_dmark->markOrbit(m_current);
 			m_current = m_tradoo.next();
 			if(ORBY == VOLUME)
 			{
-				if(m_map.template isBoundaryMarked<3>(m_current))
+				if(m_map.template isBoundaryMarked<3>(m_current.dart))
 				{
 					if (ORBX == VOLUME)
 					{
 						// if allocated we are in a local traversal of volume so we can mark only darts of volume
 						if (m_allocated)
-							m_dmark->template markOrbit<ORBY + MAP::IN_PARENT>(m_current);
+							m_dmark->template markOrbit<ORBY + MAP::IN_PARENT>(m_current.dart);
 						else
-							m_dmark->template markOrbit<ORBY>(m_current); // here we need to mark all the darts
+							m_dmark->markOrbit(m_current); // here we need to mark all the darts
 					}
 					else
-						m_dmark->template markOrbit<ORBY>(m_current);
+						m_dmark->markOrbit(m_current);
 				}
 			}
 			while ((m_current.dart != NIL) && m_dmark->isMarked(m_current))
@@ -255,20 +255,21 @@ Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::next()
 //*********************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Cell<ORBX> dart, bool forceDartMarker, unsigned int thread):
-	m_map(map),m_QLT(NULL)
+Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Cell<ORBX> c, bool forceDartMarker, unsigned int thread):
+	m_map(map),
+	m_QLT(NULL)
 {
 	const AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* quickTraversal =  map.template getQuickAdjacentTraversal<ORBX,ORBY>() ;
 	if (quickTraversal != NULL)
 	{
-		m_QLT  = &(quickTraversal->operator[](map.template getEmbedding<ORBX>(dart)));
+		m_QLT  = &(quickTraversal->operator[](map.getEmbedding(c)));
 	}
 	else
 	{
 		MarkerForTraversor<MAP, ORBX> mk(map, forceDartMarker, thread);
-		mk.mark(dart);
+		mk.mark(c.dart);
 
-		Traversor3XY<MAP, ORBX, ORBY> traAdj(map, dart, forceDartMarker, thread);
+		Traversor3XY<MAP, ORBX, ORBY> traAdj(map, c, forceDartMarker, thread);
 		for (Dart d = traAdj.begin(); d != traAdj.end(); d = traAdj.next())
 		{
 			Traversor3XY<MAP, ORBY, ORBX> traInci(map, d, mk, forceDartMarker, thread);

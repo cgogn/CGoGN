@@ -579,10 +579,10 @@ inline unsigned int ImplicitHierarchicalMap3::edgeLevel(Dart d)
 }
 
 template <unsigned int ORBIT>
-inline unsigned int ImplicitHierarchicalMap3::getEmbedding(Dart d) const
+inline unsigned int ImplicitHierarchicalMap3::getEmbedding(Cell<ORBIT> c) const
 {
-    unsigned int nbSteps = m_curLevel - vertexInsertionLevel(d);
-    unsigned int index = EmbeddedMap3::getEmbedding<ORBIT>(d);
+	unsigned int nbSteps = m_curLevel - vertexInsertionLevel(c.dart);
+	unsigned int index = EmbeddedMap3::getEmbedding(c);
 
     unsigned int step = 0;
     while(step < nbSteps)
@@ -602,9 +602,9 @@ inline bool ImplicitHierarchicalMap3::isWellEmbedded()
 	//std::cout << "yeahhh ? " << std::endl;
 	TraversorV<ImplicitHierarchicalMap3> tv(*this);
 
-	for(Dart dv = tv.begin() ; dv != tv.end() ; dv = tv.next())
+	for(Vertex dv = tv.begin() ; dv.dart != tv.end() ; dv = tv.next())
 	{
-		unsigned int curem = this->getEmbedding<VERTEX>(dv);
+		unsigned int curem = this->getEmbedding(dv);
 		//std::cout << "current emb = " << curem << std::endl;
 
 		unsigned int count = 0;

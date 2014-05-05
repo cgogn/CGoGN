@@ -25,7 +25,6 @@
 #ifndef RAYSELECTOR_H_
 #define RAYSELECTOR_H_
 
-
 #include <vector>
 #include "Algo/Selection/raySelectFunctor.hpp"
 

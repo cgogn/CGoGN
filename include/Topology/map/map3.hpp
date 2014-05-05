@@ -301,7 +301,7 @@ Dart Map3<MAP_IMPL>::deleteVertex(Dart d)
 	// (one dart per face should be enough)
 	std::vector<Dart> fstoretmp;
 	fstoretmp.reserve(128);
-	foreach_dart_of_vertex(d, [&] (Dart it) { fstoretmp.push_back(it); });
+	this->template foreach_dart_of_orbit<VERTEX>(d, [&] (Dart it) { fstoretmp.push_back(it); });
 
 	 // just one dart per face
 	std::vector<Dart> fstore;
@@ -1149,7 +1149,7 @@ bool Map3<MAP_IMPL>::check() const
  *************************************************************************/
 
 template <typename MAP_IMPL>
-void Map3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+void Map3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	DartMarkerStore<MAP_IMPL> mv(*this, thread);	// Lock a marker
 
@@ -1181,7 +1181,7 @@ void Map3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f
 }
 
 template <typename MAP_IMPL>
-inline void Map3<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	Dart it = d;
 	do
@@ -1192,20 +1192,20 @@ inline void Map3<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dar
 }
 
 template <typename MAP_IMPL>
-inline void Map3<MAP_IMPL>::foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_face(d, f, thread);
 	ParentMap::foreach_dart_of_face(phi3(d), f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void Map3<MAP_IMPL>::foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-void Map3<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+void Map3<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	DartMarkerStore<MAP_IMPL> mv(*this,thread);	// Lock a marker
 
@@ -1242,19 +1242,19 @@ void Map3<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, un
 }
 
 template <typename MAP_IMPL>
-inline void Map3<MAP_IMPL>::foreach_dart_of_vertex2(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_vertex2(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_vertex(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void Map3<MAP_IMPL>::foreach_dart_of_edge2(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_edge2(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_edge(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void Map3<MAP_IMPL>::foreach_dart_of_face2(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void Map3<MAP_IMPL>::foreach_dart_of_face2(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_face(d, f, thread);
 }

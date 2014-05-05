@@ -45,20 +45,18 @@ public:
 } ;
 
 template <typename PFP>
-unsigned int vertexLevel(typename PFP::MAP& map, Dart d)
+unsigned int vertexLevel(typename PFP::MAP& map, Vertex v)
 {
-	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"edgeLevel : called with a dart inserted after current level") ;
+	assert(map.getDartLevel(v.dart) <= map.getCurrentLevel() || !"vertexLevel : called with a dart inserted after current level") ;
 
 	unsigned int level = map.getMaxLevel();
 
-	TraversorDartsOfOrbit<typename PFP::MAP,VERTEX> tv(map,d);
-
-	for(Dart dit = tv.begin() ; dit != tv.end() ; dit = tv.next())
+	map.foreach_dart_of_orbit(v, [&] (Dart d)
 	{
-		unsigned int ldit = map.getDartLevel(dit) ;
+		unsigned int ldit = map.getDartLevel(d) ;
 		if(ldit < level)
 			level = ldit;
-	}
+	});
 
 //	Dart dit = d;
 //	do

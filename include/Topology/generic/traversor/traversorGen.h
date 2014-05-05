@@ -39,7 +39,8 @@ public:
 	virtual Dart end() = 0;
 	virtual Dart next() = 0;
 
-	bool applyFunctor(FunctorType& f)
+	template <typename FUNC>
+	bool apply(FUNC f)
 	{
 		for (Dart d = begin(); d != end(); d = next())
 		{
@@ -48,16 +49,6 @@ public:
 		}
 		return false;
 	}
-
-//	bool applyFunctor(FunctorConstType& f)
-//	{
-//		for (Dart d = begin(); d != end(); d = next())
-//		{
-//				if (f(d))
-//					return true;
-//		}
-//		return false;
-//	}
 };
 
 } // namespace CGoGN

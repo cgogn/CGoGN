@@ -71,10 +71,7 @@ protected:
 	/**
 	 * set if the mark has to be release on destruction or not
 	 */
-	inline void setReleaseOnDestruct(bool b)
-	{
-		releaseOnDestruct = b ;
-	}
+	inline void setReleaseOnDestruct(bool b) { releaseOnDestruct = b ; }
 } ;
 
 template <typename MAP>
@@ -93,7 +90,7 @@ public:
 		m_map(map)
 	{
 		m_mark = m_map.template getMarkerSet<DART>(m_thread).getNewMark() ;
-		m_markVector = m_map.getMarkVector<DART>(m_thread) ;
+		m_markVector = m_map.template getMarkVector<DART>(m_thread) ;
 		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
@@ -138,7 +135,7 @@ public:
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
-		m_markVector->operator[](d_index).setMark(m_mark) ;
+		(*m_markVector)[d_index].setMark(m_mark) ;
 	}
 
 	/**
@@ -148,7 +145,7 @@ public:
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
-		m_markVector->operator[](d_index).unsetMark(m_mark) ;
+		(*m_markVector)[d_index].unsetMark(m_mark) ;
 	}
 
 	/**
@@ -158,29 +155,35 @@ public:
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
-		return m_markVector->operator[](d_index).testMark(m_mark) ;
+		return (*m_markVector)[d_index].testMark(m_mark) ;
 	}
 
 	/**
-	 * mark the darts of the given orbit of d
+	 * mark the darts of the given cell
 	 */
 	template <unsigned int ORBIT>
-	inline void markOrbit(Dart d)
+	inline void markOrbit(Cell<ORBIT> c)
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
-		FunctorMark<MAP> fm(m_map, m_mark, m_markVector) ;
-		m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
+		m_map.foreach_dart_of_orbit(c, [&] (Dart d)
+		{
+			(*m_markVector)[m_map.dartIndex(d)].setMark(m_mark);
+		}
+		, m_thread) ;
 	}
 
 	/**
-	 * unmark the darts of the given orbit of d
+	 * unmark the darts of the given cell
 	 */
 	template <unsigned int ORBIT>
-	inline void unmarkOrbit(Dart d)
+	inline void unmarkOrbit(Cell<ORBIT> c)
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
-		FunctorUnmark<MAP> fm(m_map, m_mark, m_markVector) ;
-		m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, m_thread) ;
+		m_map.foreach_dart_of_orbit(c, [&] (Dart d)
+		{
+			(*m_markVector)[m_map.dartIndex(d)].unsetMark(m_mark);
+		}
+		, m_thread) ;
 	}
 
 	/**
@@ -191,7 +194,7 @@ public:
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_markVector->operator[](i).setMark(m_mark) ;
+			(*m_markVector)[i].setMark(m_mark) ;
 	}
 
 	/**
@@ -203,10 +206,10 @@ public:
 	{
 		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
-
 		AttributeContainer& cont = m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			if (m_markVector->operator[](i).testMark(m_mark)) return false ;
+			if ((*m_markVector)[i].testMark(m_mark))
+				return false ;
 		return true ;
 	}
 };
@@ -243,7 +246,7 @@ public:
 		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<DART>() ;
 		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
-			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;
+			(*this->m_markVector)[i].unsetMark(this->m_mark) ;
 	}
 } ;
 
@@ -261,11 +264,15 @@ protected:
 public:
 	DartMarkerStore(const MAP& map) :
 		DartMarkerTmpl<MAP>(map)
-	{}
+	{
+		m_markedDarts.reserve(128);
+	}
 
 	DartMarkerStore(const MAP& map, unsigned int thread) :
 		DartMarkerTmpl<MAP>(map, thread)
-	{}
+	{
+		m_markedDarts.reserve(128);
+	}
 
 	virtual ~DartMarkerStore()
 	{
@@ -289,18 +296,23 @@ public:
 	}
 
 	template <unsigned int ORBIT>
-	inline void markOrbit(Dart d)
+	inline void markOrbit(Cell<ORBIT> c)
 	{
 		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
-		FunctorMarkStore<MAP> fm(this->m_map, this->m_mark, this->m_markVector, m_markedDarts) ;
-		this->m_map.template foreach_dart_of_orbit<ORBIT>(d, fm, this->m_thread) ;
+		this->m_map.foreach_dart_of_orbit(c, [&] (Dart d)
+		{
+			unsigned int dindex = this->m_map.dartIndex(d);
+			(*this->m_markVector)[dindex].setMark(this->m_mark);
+			m_markedDarts.push_back(dindex);
+		}
+		, this->m_thread) ;
 	}
 
 	inline void unmarkAll()
 	{
 		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
 		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
-			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
+			(*this->m_markVector)[*it].unsetMark(this->m_mark) ;
 	}
 } ;
 

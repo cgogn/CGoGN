@@ -168,7 +168,7 @@ inline void ImplicitHierarchicalMap2::next(Dart& d) const
 		d = TOPO_MAP::end() ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	Dart dNext = d;
 	do
@@ -178,7 +178,7 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, std::functi
 	} while (dNext != d);
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	f(d);
 	Dart d2 = phi2(d);
@@ -186,7 +186,7 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, std::function
 		f(d2);
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)> f, unsigned int /*thread*/) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	Dart dNext = d ;
 	do
@@ -196,12 +196,12 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, std:
 	} while (dNext != d) ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	foreach_dart_of_oriented_face(d, f, thread) ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	DartMarkerStore<Map2> mark(*this, thread);	// Lock a marker
 
@@ -232,12 +232,12 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, st
 	}
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	foreach_dart_of_oriented_volume(d, f, thread) ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread) const
+inline void ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
 {
 	foreach_dart_of_oriented_volume(d, f, thread) ;
 }
