@@ -163,66 +163,15 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 	for (unsigned int i = 0; i < nbth; ++i)
 		vd[i].reserve(SIZE_BUFFER_THREAD);
 
-	AttributeContainer* cont = NULL;
-	DartMarker<MAP>* dmark = NULL;
-	CellMarker<MAP, ORBIT>* cmark = NULL;
-	const AttributeMultiVector<Dart>* quickTraversal = map.template getQuickTraversal<ORBIT>() ;
-
-	// fill each vd buffers with SIZE_BUFFER_THREAD darts
-	Dart d;
-	unsigned int di=0;
-
-	if(quickTraversal != NULL)
+	unsigned int nb=0;
+	TraversorCell<MAP, ORBIT> trav(map);
+	Cell<ORBIT> cell = trav.begin();
+	Cell<ORBIT> c_end = trav.end();
+	while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
 	{
-		cont = &(map.template getAttributeContainer<ORBIT>()) ;
-
-		di = cont->begin();
-		unsigned int nb = 0;
-		while ((di != cont->end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
-		{
-			d = quickTraversal->operator[](di);
-
-			vd[nb%nbth].push_back(d);
-			nb++;
-
-			cont->next(di);
-		}
-	}
-	else
-	{
-		if(map.template isOrbitEmbedded<ORBIT>())
-		{
-			cmark = new CellMarker<MAP, ORBIT>(map) ;
-
-			d = map.begin();
-			unsigned int nb = 0;
-			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
-			{
-				if ((!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!cmark->isMarked(d)))
-				{
-					cmark->mark(d);
-					vd[nb%nbth].push_back(d);
-					nb++;
-				}
-				map.next(d);
-			}
-		}
-		else
-		{
-			dmark = new DartMarker<MAP>(map) ;
-			d = map.begin();
-			unsigned int nb = 0;
-			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
-			{
-				if ((!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
-				{
-					dmark->template markOrbit<ORBIT>(d);
-					vd[nb%nbth].push_back(d);
-					nb++;
-				}
-				map.next(d);
-			}
-		}
+		vd[nb%nbth].push_back(cell.dart);
+		nb++;
+		cell = trav.next();
 	}
 
 	boost::barrier sync1(nbth+1);
@@ -244,8 +193,6 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 		tfs[i] = new ThreadFunction<MAP>(funcs[i], vd[i],sync1,sync2, finished,1+i);
 		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
 	}
-//		threads[i] = new boost::thread(ThreadFunction<MAP>(funcs[i], vd[i],sync1,sync2, finished,1+i));
-
 
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
@@ -253,79 +200,27 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 	for (unsigned int i = 0; i < nbth; ++i)
 		tempo[i].reserve(SIZE_BUFFER_THREAD);
 
-
-	if (cont)
+	while (cell.dart != c_end.dart)
 	{
-		while (di != cont->end())
-		{
-			for (unsigned int i = 0; i < nbth; ++i)
-				tempo[i].clear();
-			unsigned int nb = 0;
-			while ((di != cont->end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
-			{
-				d = quickTraversal->operator[](di);
+		for (unsigned int i = 0; i < nbth; ++i)
+			tempo[i].clear();
+		nb = 0;
 
-				tempo[nb%nbth].push_back(d);
-				nb++;
-
-				cont->next(di);
-			}
-			sync1.wait();
-			for (unsigned int i = 0; i < nbth; ++i)
-				vd[i].swap(tempo[i]);
-			sync2.wait();
-		}
-	}
-	else if (cmark)
-	{
-		while (d != map.end())
+		while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
 		{
-			for (unsigned int i = 0; i < nbth; ++i)
-				tempo[i].clear();
-			unsigned int nb = 0;
-			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
-			{
-				if (!map.template isBoundaryMarked<MAP::DIMENSION>(d) && !cmark->isMarked(d))
-				{
-					cmark->mark(d);
-					tempo[nb%nbth].push_back(d);
-					nb++;
-				}
-				map.next(d);
-			}
-			sync1.wait();
-			for (unsigned int i = 0; i < nbth; ++i)
-				vd[i].swap(tempo[i]);
-			sync2.wait();
+			tempo[nb%nbth].push_back(cell);
+			nb++;
+			cell = trav.next();
 		}
-	}
-	else
-	{
-		while (d != map.end())
-		{
-			for (unsigned int i = 0; i < nbth; ++i)
-				tempo[i].clear();
-			unsigned int nb = 0;
-			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
-			{
-				if ((!map.template isBoundaryMarked<MAP::DIMENSION>(d)) && (!dmark->isMarked(d)))
-				{
-					dmark->template markOrbit<ORBIT>(d);
-					tempo[nb%nbth].push_back(d);
-					nb++;
-				}
-				map.next(d);
-			}
-			sync1.wait();
-			for (unsigned int i = 0; i < nbth; ++i)
-				vd[i].swap(tempo[i]);
-			sync2.wait();
-		}
+		sync1.wait(); // wait for all thread to finish its vector
+		for (unsigned int i = 0; i < nbth; ++i)
+			vd[i].swap(tempo[i]);
+		sync2.wait(); // everybody refilled then go
 	}
 
-	sync1.wait();
-	finished = true;
-	sync2.wait();
+	sync1.wait();// wait for all thread to finish its vector
+	finished = true; // say finsih to everyone
+	sync2.wait(); //wait to everybody to say finished !
 
 	//wait for all theads to be finished
 	for (unsigned int i = 0; i < nbth; ++i)
@@ -338,12 +233,6 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 	delete[] threads;
 	delete[] vd;
 	delete[] tempo;
-
-	if (cmark != NULL)
-		delete cmark;
-
-	if (dmark != NULL)
-		delete dmark;
 }
 
 template <typename MAP>

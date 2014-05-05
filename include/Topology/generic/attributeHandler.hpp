@@ -22,6 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
+#include <boost/thread.hpp>
+#include <boost/thread/barrier.hpp>
+#include <vector>
+
 namespace CGoGN
 {
 
@@ -261,6 +265,118 @@ inline void AttributeHandler<T, ORBIT, MAP_IMPL>::next(unsigned int& iter) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	m_map->template getAttributeContainer<ORBIT>().next(iter) ;
+}
+
+
+namespace Parallel
+{
+
+template <typename FUNC>
+class ThreadFunctionAttrib
+{
+protected:
+	std::vector<unsigned int>& m_ids;
+	boost::barrier& m_sync1;
+	boost::barrier& m_sync2;
+	bool& m_finished;
+	unsigned int m_id;
+	FUNC m_lambda;
+public:
+	ThreadFunctionAttrib(FUNC func, std::vector<unsigned int>& vid, boost::barrier& s1, boost::barrier& s2, bool& finished, unsigned int id):
+		m_ids(vid), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func)
+	{
+	}
+
+	ThreadFunctionAttrib(const ThreadFunctionAttrib& tf):
+		m_ids(tf.m_ids), m_sync1(tf.m_sync1), m_sync2(tf.m_sync2), m_finished(tf.m_finished), m_id(tf.m_id), m_lambda(tf.m_lambda){}
+
+	void operator()()
+	{
+		while (!m_finished)
+		{
+			for (std::vector<unsigned int>::const_iterator it = m_ids.begin(); it != m_ids.end(); ++it)
+				m_lambda(*it,m_id);
+			m_sync1.wait();
+			m_sync2.wait();
+		}
+	}
+};
+
+
+
+template <typename ATTR, typename FUNC>
+void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbth)
+{
+	if (nbth==0)
+		nbth = boost::thread::hardware_concurrency();
+
+	std::vector< unsigned int >* vd = new std::vector< unsigned int >[nbth];
+
+	for (unsigned int i = 0; i < nbth; ++i)
+		vd[i].reserve(SIZE_BUFFER_THREAD);
+
+	unsigned int nb = 0;
+	unsigned int attIdx = attribute.begin();
+	while ((attIdx != attribute.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
+	{
+		vd[nb%nbth].push_back(attIdx);
+		nb++;
+		attribute.next(attIdx);
+	}
+	boost::barrier sync1(nbth+1);
+	boost::barrier sync2(nbth+1);
+	bool finished=false;
+
+
+	boost::thread** threads = new boost::thread*[nbth];
+	ThreadFunctionAttrib<FUNC>** tfs = new ThreadFunctionAttrib<FUNC>*[nbth];
+
+	for (unsigned int i = 0; i < nbth; ++i)
+	{
+		tfs[i] = new ThreadFunctionAttrib<FUNC>(func, vd[i], sync1,sync2,finished,1+i);
+		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
+	}
+
+	// and continue to traverse the map
+	std::vector< unsigned int >* tempo = new std::vector< unsigned int >[nbth];
+	for (unsigned int i = 0; i < nbth; ++i)
+		tempo[i].reserve(SIZE_BUFFER_THREAD);
+
+	while (attIdx != attribute.end())
+	{
+		for (unsigned int i = 0; i < nbth; ++i)
+			tempo[i].clear();
+		unsigned int nb = 0;
+
+		while ((attIdx != attribute.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
+		{
+			tempo[nb%nbth].push_back(attIdx);
+			nb++;
+			attribute.next(attIdx);
+		}
+		sync1.wait();// wait for all thread to finish its vector
+		for (unsigned int i = 0; i < nbth; ++i)
+			vd[i].swap(tempo[i]);
+		sync2.wait();// everybody refilled then go
+	}
+
+	sync1.wait();// wait for all thread to finish its vector
+	finished = true;// say finsih to everyone
+	sync2.wait(); // just wait for last barrier wait !
+
+	//wait for all theads to be finished
+	for (unsigned int i = 0; i < nbth; ++i)
+	{
+		threads[i]->join();
+		delete threads[i];
+		delete tfs[i];
+	}
+	delete[] tfs;
+	delete[] threads;
+	delete[] vd;
+	delete[] tempo;
+}
+
 }
 
 } //namespace CGoGN

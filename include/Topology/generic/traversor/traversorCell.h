@@ -92,7 +92,11 @@ inline void foreach_cell_until(const MAP& map, FUNC f, bool forceDartMarker = fa
 			break;
 }
 
-
+namespace Parallel
+{
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+void foreach_cell(MAP& map, FUNC func, unsigned int nbth=0, bool needMarkers=true);
+}
 
 template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>
@@ -125,6 +129,9 @@ public:
 	TraversorW(const MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, false, thread)
 	{}
 };
+
+
+
 
 } // namespace CGoGN
 
