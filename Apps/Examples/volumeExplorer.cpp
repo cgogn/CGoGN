@@ -171,16 +171,19 @@ void MyQT::cb_Open()
 	float maxV = 0.0f;
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
-		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
-		color[d] = PFP::VEC3(v,0,0);
-		if (v>maxV)
-			maxV=v;
+//		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
+//		color[d] = PFP::VEC3(v,0,0);
+//		if (v>maxV)
+//			maxV=v;
+
+		if(myMap.isBoundaryAdjacentVolume(d))
+			color[d] = PFP::VEC3(0,0,0);
 	}
-	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
-	{
-		color[i][0] /= maxV;
-		color[i][2] = 1.0f - color[i][0];
-	}
+//	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
+//	{
+//		color[i][0] /= maxV;
+//		color[i][2] = 1.0f - color[i][0];
+//	}
 
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_topo_render->updateData(myMap, position,  0.8f, 0.8f, 0.8f);
@@ -414,20 +417,20 @@ int main(int argc, char **argv)
 		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 		{
 			float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
-			color[d] = PFP::VEC3(v,0,0);
-			if (v>maxV)
-				maxV=v;
+//			color[d] = PFP::VEC3(v,0,0);
+//			if (v>maxV)
+//				maxV=v;
+
+			if(myMap.isBoundaryAdjacentVolume(d))
+				color[d] = PFP::VEC3(0,0,0);
+			else
+				color[d] = PFP::VEC3(v,0,0);
 		}
-		for (unsigned int i = color.begin(); i != color.end(); color.next(i))
-		{
-			color[i][0] /= maxV;
-			color[i][2] = 1.0f - color[i][0];
-		}
-//		Algo::Volume::Export::exportNAS<PFP>(myMap,position,"/tmp/test2.nas");
-//		Algo::Volume::Export::exportMSH<PFP>(myMap,position,"/tmp/test2.msh");
-//		Algo::Volume::Export::exportTet<PFP>(myMap,position,"/tmp/test2.tet");
-//		Algo::Volume::Export::exportNodeEle<PFP>(myMap,position,"/tmp/test2");
-//		Algo::Volume::Export::exportVTU<PFP>(myMap,position,"/tmp/test4.vtu");
+//		for (unsigned int i = color.begin(); i != color.end(); color.next(i))
+//		{
+//			color[i][0] /= maxV;
+//			color[i][2] = 1.0f - color[i][0];
+//		}
 
 	}
 	else
