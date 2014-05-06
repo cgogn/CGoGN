@@ -1024,12 +1024,12 @@ inline bool Map3<MAP_IMPL>::isBoundaryFace(Dart d) const
 }
 
 template <typename MAP_IMPL>
-bool Map3<MAP_IMPL>::isBoundaryAdjacentVolume(Dart d) const
+bool Map3<MAP_IMPL>::isVolumeIncidentToBoundary(Dart d) const
 {
 	Traversor3WF<Map3<MAP_IMPL> > tra(*this, d);
 	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
 	{
-		if(isBoundaryMarked3(phi3(dit)))
+		if(this->template isBoundaryMarked<3>(phi3(dit)))
 			return true ;
 	}
 	return false;

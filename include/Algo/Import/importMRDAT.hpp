@@ -196,6 +196,9 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 	VertexAutoAttribute<NoTypeNameAttribute<std::vector<Dart> >, typename PFP::MAP::IMPL> vecDartsPerVertex(map, "incidents") ;
 	DartMarkerNoUnmark<typename PFP::MAP> m(map) ;
 
+	unsigned int vemb = EMBNULL;
+	auto fsetemb = [&] (Dart d) { map.template setDartEmbedding<VERTEX>(d, vemb); };
+
 	unsigned nbf = qt.roots.size() ;
 
 	// for each root face
@@ -206,13 +209,12 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		for (unsigned int j = 0; j < 3; ++j)
 		{
 			unsigned int idx = qt.roots[i]->indices[j] ;
-			unsigned int emb = qt.verticesID[idx] ;
+			vemb = qt.verticesID[idx] ;
 
-			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, emb) ;
 			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb) ;
 
 			m.mark(d) ;								// mark on the fly to unmark on second loop
-			vecDartsPerVertex[emb].push_back(d) ;	// store incident darts for fast adjacency reconstruction
+			vecDartsPerVertex[vemb].push_back(d) ;	// store incident darts for fast adjacency reconstruction
 			d = map.phi1(d) ;
 		}
 	}

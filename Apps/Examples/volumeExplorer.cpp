@@ -29,6 +29,7 @@
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/volume.h"
+#include "Algo/Geometry/area.h"
 
 #include "Utils/chrono.h"
 
@@ -171,16 +172,19 @@ void MyQT::cb_Open()
 	float maxV = 0.0f;
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
-		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
-		color[d] = PFP::VEC3(v,0,0);
-		if (v>maxV)
-			maxV=v;
+//		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
+//		color[d] = PFP::VEC3(v,0,0);
+//		if (v>maxV)
+//			maxV=v;
+
+		if(myMap.isVolumeIncidentToBoundary(d))
+			color[d] = PFP::VEC3(0,0,0);
 	}
-	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
-	{
-		color[i][0] /= maxV;
-		color[i][2] = 1.0f - color[i][0];
-	}
+//	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
+//	{
+//		color[i][0] /= maxV;
+//		color[i][2] = 1.0f - color[i][0];
+//	}
 
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_topo_render->updateData(myMap, position,  0.8f, 0.8f, 0.8f);
@@ -417,17 +421,17 @@ int main(int argc, char **argv)
 			color[d] = PFP::VEC3(v,0,0);
 			if (v>maxV)
 				maxV=v;
+
+//			if(myMap.isVolumeIncidentToBoundary(d))
+//				color[d] = PFP::VEC3(0,0,0);
+//			else
+				color[d] = PFP::VEC3(v,0,0);
 		}
 		for (unsigned int i = color.begin(); i != color.end(); color.next(i))
 		{
 			color[i][0] /= maxV;
 			color[i][2] = 1.0f - color[i][0];
 		}
-//		Algo::Volume::Export::exportNAS<PFP>(myMap,position,"/tmp/test2.nas");
-//		Algo::Volume::Export::exportMSH<PFP>(myMap,position,"/tmp/test2.msh");
-//		Algo::Volume::Export::exportTet<PFP>(myMap,position,"/tmp/test2.tet");
-//		Algo::Volume::Export::exportNodeEle<PFP>(myMap,position,"/tmp/test2");
-//		Algo::Volume::Export::exportVTU<PFP>(myMap,position,"/tmp/test4.vtu");
 
 	}
 	else
@@ -502,26 +506,28 @@ int main(int argc, char **argv)
 	Vol w(myMap.begin());
 	VEC3 q = Algo::Surface::Geometry::volumeCentroid<PFP>(myMap,w,position);
 
-	std::cout << "Compute Volume ->"<< std::endl;
 	ch.start();
-	float vol = Algo::Geometry::totalVolume<PFP>(myMap, position);
-	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
-	ch.start();
-	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
-	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
-	ch.start();
-	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
-	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
-	ch.start();
-	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
-	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
-
-	ch.start();
-	vol = Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
+	float vol = Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
 	vol += Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
 	vol += Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
 	vol += Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
 	std::cout << ch.elapsed()<< " ms //  val="<<vol<< std::endl;
+
+
+
+	std::cout << "Compute Volume ->"<< std::endl;
+	ch.start();
+	vol = Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
+	ch.start();
+	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
+	ch.start();
+	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
+	ch.start();
+	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
 
 
 	// et on attend la fin.

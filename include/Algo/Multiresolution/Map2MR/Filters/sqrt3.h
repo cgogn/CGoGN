@@ -133,7 +133,7 @@ public:
 			p1 *= 1.0 / 3.0 ;
 			p2 *= 1.0 / 3.0 ;
 
-			if(m_map.isBoundaryFace(d))
+			if(m_map.isFaceIncidentToBoundary(d))
 			{
 				Dart df = m_map.findBoundaryEdgeOfFace(d);
 				m_map.incCurrentLevel() ;

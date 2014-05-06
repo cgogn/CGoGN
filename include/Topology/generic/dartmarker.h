@@ -301,9 +301,9 @@ public:
 		assert(this->m_map.template getMarkerSet<DART>(this->m_thread).testMark(this->m_mark));
 		this->m_map.foreach_dart_of_orbit(c, [&] (Dart d)
 		{
-			unsigned int dindex = this->m_map.dartIndex(d);
-			(*this->m_markVector)[dindex].setMark(this->m_mark);
-			m_markedDarts.push_back(dindex);
+			unsigned int d_index = this->m_map.dartIndex(d);
+			(*this->m_markVector)[d_index].setMark(this->m_mark);
+			m_markedDarts.push_back(d_index);
 		}
 		, this->m_thread) ;
 	}
