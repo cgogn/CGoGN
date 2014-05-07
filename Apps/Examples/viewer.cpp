@@ -241,7 +241,7 @@ void Viewer::cb_keyPress(int keycode)
 		if(!pos2.isValid())
 			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
 
-		for (int i=0; i< 10; ++i)
+		for (int i=0; i< 6; ++i)
 		{
 			foreach_cell<VERTEX>(myMap, [&] (Vertex d)
 			{
@@ -263,7 +263,46 @@ void Viewer::cb_keyPress(int keycode)
 		updateGL();
 	}
 		break;
+	case 'B':
+	{
+		Utils::Chrono ch;
+		ch.start();
 
+		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
+		if(!pos2.isValid())
+			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
+
+		foreach_cell_EvenOddd<VERTEX>(myMap, [&] (Vertex d)
+		{
+			pos2[d] = VEC3(0,0,0);
+			int nb=0;
+			foreach_adjacent2<FACE>(myMap,d,[&](Vertex e)
+			{
+				pos2[d] += position[e];
+				nb++;
+			});
+			pos2[d]/=nb;
+		},
+		[&] (Vertex d)
+		{
+			position[d] = VEC3(0,0,0);
+			int nb=0;
+			foreach_adjacent2<FACE>(myMap,d,[&](Vertex e)
+			{
+				position[d] += pos2[e];
+				nb++;
+			});
+			position[d]/=nb;
+		},
+		3);
+
+		std::cout << "Even/Odd "<< ch.elapsed()<< " ms "<< std::endl;
+		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+		m_positionVBO->updateData(position) ;
+		m_normalVBO->updateData(normal) ;
+		updateGL();
+	}
+		break;
 
 	case 'e':
 	{
@@ -330,6 +369,49 @@ void Viewer::cb_keyPress(int keycode)
 	}
 		break;
 
+	case'A':
+	{
+		Utils::Chrono ch;
+		ch.start();
+
+		TraversorCell<MAP, VERTEX> trav(myMap,true);
+		for(unsigned int i=0; i<10; ++i)
+		{
+			for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+			{
+//				normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap, v, position) ;
+				normal[v][0] = 0.0f;
+			}
+		}
+		std::cout << "Timing 10 traversors "<< ch.elapsed()<< " ms "<< std::endl;
+	}
+		break;
+
+	case'Z':
+	{
+		Utils::Chrono ch;
+		ch.start();
+
+		TraversorCell<MAP, VERTEX> trav(myMap,true);
+		TraversorCellEven<MAP, VERTEX> tr1(trav);
+		TraversorCellOdd<MAP, VERTEX> tr2(trav);
+
+		for(unsigned int i=0; i<5; ++i)
+		{
+			for (Cell<VERTEX> v = tr1.begin(), e = tr1.end(); v.dart != e.dart; v = tr1.next())
+			{
+//				normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap, v, position) ;
+				normal[v][0] = 0.0f;
+			}
+			for (Cell<VERTEX> v = tr2.begin(), e = tr2.end(); v.dart != e.dart; v = tr2.next())
+			{
+//				normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap, v, position) ;
+				normal[v][0] = 0.0f;
+			}
+		}
+		std::cout << "Timing 5 traversors even/odd "<< ch.elapsed()<< " ms "<< std::endl;
+	}
+		break;
 
 
     	default:
@@ -360,7 +442,7 @@ void Viewer::importMesh(std::string& filename)
 		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 	}
 
-	myMap.enableQuickTraversal<VERTEX>() ;
+//	myMap.enableQuickTraversal<VERTEX>() ;
 
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
