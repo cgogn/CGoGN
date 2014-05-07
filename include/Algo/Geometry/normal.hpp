@@ -159,7 +159,7 @@ void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT&
 	{
 		normal[v] = vertexNormal<PFP>(map, v, position) ;
 	},
-	false, thread);
+	FORCE_CELL_MARKING, thread);
 }
 
 

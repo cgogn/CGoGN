@@ -152,7 +152,7 @@ void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP
 	{
 		face_area[f] = convexFaceArea<PFP>(map, f, position) ;
 	}
-	,false,thread);
+	,AUTO,thread);
 
 }
 
@@ -170,7 +170,7 @@ void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<ty
 			vertex_area[v] += areas[f];
 		});
 	}
-	,false,thread);
+	,FORCE_CELL_MARKING,thread);
 }
 
 
@@ -182,7 +182,7 @@ void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribut
 	{
 		vertex_area[v] = vertexBarycentricArea<PFP>(map, v, position) ;
 	}
-	,false,thread);
+	,FORCE_CELL_MARKING,thread);
 }
 
 template <typename PFP>
@@ -193,7 +193,7 @@ void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<ty
 	{
 		vertex_area[v] = vertexVoronoiArea<PFP>(map, v, position) ;
 	}
-	,false,thread);
+	,FORCE_CELL_MARKING,thread);
 }
 
 

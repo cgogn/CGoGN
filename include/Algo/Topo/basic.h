@@ -41,7 +41,7 @@ template <unsigned int ORBIT, typename MAP>
 unsigned int getNbOrbits(const MAP& map)
 {
 	unsigned int cpt = 0;
-	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT>) { ++cpt; }, true);
+	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT>) { ++cpt; }, FORCE_DART_MARKING);
 	return cpt;
 }
 
@@ -122,7 +122,7 @@ void bijectiveOrbitEmbedding(MAP& map)
 			counter[d]++ ;
 		}
 	},
-	true);
+	FORCE_DART_MARKING);
 
 	map.removeAttribute(counter) ;
 }

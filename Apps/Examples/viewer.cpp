@@ -371,19 +371,87 @@ void Viewer::cb_keyPress(int keycode)
 
 	case'A':
 	{
+		myMap.disableQuickTraversal<VERTEX>() ;
+#define NBLOOP 5
 		Utils::Chrono ch;
 		ch.start();
-
-		TraversorCell<MAP, VERTEX> trav(myMap,true);
-		for(unsigned int i=0; i<10; ++i)
 		{
-			for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+			TraversorCell<MAP, VERTEX,FORCE_CELL_MARKING> trav(myMap,true);
+			for(unsigned int i=0; i<NBLOOP; ++i)
 			{
-//				normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap, v, position) ;
-				normal[v][0] = 0.0f;
+				for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+				{
+					normal[v][0] = 0.0f;
+				}
 			}
+			std::cout << "FORCE_CELL_MARKING "<< ch.elapsed()<< " ms "<< std::endl;
 		}
-		std::cout << "Timing 10 traversors "<< ch.elapsed()<< " ms "<< std::endl;
+
+		ch.start();
+		{
+			TraversorCell<MAP, VERTEX> trav(myMap);
+			for(unsigned int i=0; i<NBLOOP; ++i)
+			{
+				for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+				{
+					normal[v][0] = 0.0f;
+				}
+			}
+			std::cout << "auto "<< ch.elapsed()<< " ms "<< std::endl;
+		}
+
+		ch.start();
+		{
+			TraversorCell<MAP, VERTEX> trav(myMap,true);
+			for(unsigned int i=0; i<NBLOOP; ++i)
+			{
+				for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+				{
+					normal[v][0] = 0.0f;
+				}
+			}
+			std::cout << "auto forcedart "<< ch.elapsed()<< " ms "<< std::endl;
+		}
+
+		ch.start();
+		{
+			TraversorCell<MAP, VERTEX,FORCE_DART_MARKING> trav(myMap,true);
+			for(unsigned int i=0; i<NBLOOP; ++i)
+			{
+				for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+				{
+					normal[v][0] = 0.0f;
+				}
+			}
+			std::cout << "FORCE_DART_MARKING "<< ch.elapsed()<< " ms "<< std::endl;
+		}
+		myMap.enableQuickTraversal<VERTEX>() ;
+		ch.start();
+		{
+			TraversorCell<MAP, VERTEX> trav(myMap);
+			for(unsigned int i=0; i<NBLOOP; ++i)
+			{
+				for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+				{
+					normal[v][0] = 0.0f;
+				}
+			}
+			std::cout << "auto (quick) "<< ch.elapsed()<< " ms "<< std::endl;
+		}
+
+		ch.start();
+		{
+			TraversorCell<MAP, VERTEX,FORCE_QUICK_TRAVERSAL> trav(myMap);
+			for(unsigned int i=0; i<NBLOOP; ++i)
+			{
+				for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+				{
+					normal[v][0] = 0.0f;
+				}
+			}
+			std::cout << "FORCE_QUICK_TRAVERSAL "<< ch.elapsed()<< " ms "<< std::endl;
+		}
+
 	}
 		break;
 
@@ -400,12 +468,10 @@ void Viewer::cb_keyPress(int keycode)
 		{
 			for (Cell<VERTEX> v = tr1.begin(), e = tr1.end(); v.dart != e.dart; v = tr1.next())
 			{
-//				normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap, v, position) ;
 				normal[v][0] = 0.0f;
 			}
 			for (Cell<VERTEX> v = tr2.begin(), e = tr2.end(); v.dart != e.dart; v = tr2.next())
 			{
-//				normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap, v, position) ;
 				normal[v][0] = 0.0f;
 			}
 		}

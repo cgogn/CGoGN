@@ -142,7 +142,7 @@ void computeCentroidFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& 
 	{
 		face_centroid[f] = faceCentroid<PFP,V_ATT>(map, f, position) ;
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 template <typename PFP, typename V_ATT, typename F_ATT>
@@ -152,7 +152,7 @@ void computeCentroidELWFaces(typename PFP::MAP& map, const V_ATT& position, F_AT
 	{
 		face_centroid[f] = faceCentroidELW<PFP,V_ATT>(map, f, position) ;
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 template <typename PFP, typename V_ATT>
@@ -162,7 +162,7 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& po
 	{
 		vertex_centroid[v] = vertexNeighborhoodCentroid<PFP,V_ATT>(map, v, position) ;
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 
@@ -287,7 +287,7 @@ void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT
 	{
 		vol_centroid[v] = Surface::Geometry::volumeCentroid<PFP,V_ATT>(map, v, position,thread) ;
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 template <typename PFP, typename V_ATT, typename W_ATT>
@@ -300,7 +300,7 @@ void computeCentroidELWVolumes(typename PFP::MAP& map, const V_ATT& position, W_
 	{
 		vol_centroid[v] = Surface::Geometry::volumeCentroidELW<PFP,V_ATT>(map, v, position,thread) ;
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 template <typename PFP, typename V_ATT>
@@ -313,7 +313,7 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& po
 	{
 		vertex_centroid[v] = Volume::Geometry::vertexNeighborhoodCentroid<PFP,V_ATT>(map, v, position) ;
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 
