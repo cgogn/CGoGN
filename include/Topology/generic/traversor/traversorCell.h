@@ -114,14 +114,6 @@ public:
 /*
  * Executes function f on each ORBIT
  */
-//template <unsigned int ORBIT, typename MAP, typename FUNC>
-//inline void foreach_cell(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
-//{
-//	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
-//	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-//		f(c);
-//}
-
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt = AUTO, unsigned int thread = 0)
 {
@@ -163,15 +155,6 @@ inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt = AUTO, unsi
 /*
  * Executes function f on each ORBIT until f returns false
  */
-//template <unsigned int ORBIT, typename MAP, typename FUNC>
-//inline void foreach_cell_until(const MAP& map, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
-//{
-//	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
-//	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-//		if (!f(c))
-//			break;
-//}
-
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt = AUTO, unsigned int thread = 0)
 {
@@ -213,7 +196,11 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt = AUTO
 	}
 }
 
-
+/*
+ * Executes function f on each ORBIT, then
+ * execute function g on each ORBIT
+ * Optimization on marking (even pass marking, odd pass unmarking)
+ */
 template <unsigned int ORBIT, typename MAP, typename FUNC, typename FUNC2>
 inline void foreach_cell_EvenOddd(const MAP& map, FUNC f, FUNC2 g, unsigned int nbpasses=1, TraversalOptim opt = AUTO, unsigned int thread = 0)
 {
@@ -280,9 +267,7 @@ inline void foreach_cell_EvenOddd(const MAP& map, FUNC f, FUNC2 g, unsigned int 
 		}
 	}
 	break;
-
 	}
-
 }
 
 
@@ -290,10 +275,10 @@ inline void foreach_cell_EvenOddd(const MAP& map, FUNC f, FUNC2 g, unsigned int 
 namespace Parallel
 {
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, unsigned int nbth=0, bool needMarkers=true);
+void foreach_cell(MAP& map, FUNC func, unsigned int nbth=0, bool needMarkers=true, TraversalOptim opt=AUTO);
 
-template <unsigned int ORBIT, typename MAP, typename FUNC_E, typename FUNC_O>
-void foreach_cell_EO(MAP& map, FUNC_E funcEven, FUNC_O funcOdd,unsigned int nbth=0, bool needMarkers=true);
+//template <unsigned int ORBIT, typename MAP, typename FUNC_E, typename FUNC_O>
+//void foreach_cell_EO(MAP& map, FUNC_E funcEven, FUNC_O funcOdd,unsigned int nbth=0, bool needMarkers=true, TraversalOptim opt = AUTO);
 
 
 }

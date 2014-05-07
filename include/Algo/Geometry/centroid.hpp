@@ -264,9 +264,6 @@ typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Ver
 {
 	typename V_ATT::DATA_TYPE  center(0.0);
 	unsigned int count = 0 ;
-//	Traversor3VVaE<typename PFP::MAP> t(map, d) ;
-//	for(Dart it = t.begin(); it != t.end(); it = t.next())
-//	foreachAdjacent3MT(VERTEX,EDGE,d,it,typename PFP::MAP,map,thread)
 	foreach_adjacent3<EDGE>(map, v, [&](Vertex it)
 	{
 		center += attributs[it];
@@ -280,9 +277,6 @@ typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Ver
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid, unsigned int thread)
 {
-//	TraversorW<typename PFP::MAP> t(map, thread) ;
-//	for(Dart d = t.begin(); d != t.end(); d = t.next())
-//	foreachCellMT(VOLUME,d,typename PFP::MAP,map ,thread)
 	foreach_cell<VOLUME>(map, [&] (Vol v)
 	{
 		vol_centroid[v] = Surface::Geometry::volumeCentroid<PFP,V_ATT>(map, v, position,thread) ;
@@ -293,9 +287,6 @@ void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidELWVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid, unsigned int thread)
 {
-//	TraversorW<typename PFP::MAP> t(map,thread) ;
-//	for(Dart d = t.begin(); d != t.end(); d = t.next())
-//	foreachCellMT(VOLUME,d,typename PFP::MAP,map ,thread)
 	foreach_cell<VOLUME>(map, [&] (Vol v)
 	{
 		vol_centroid[v] = Surface::Geometry::volumeCentroidELW<PFP,V_ATT>(map, v, position,thread) ;
@@ -306,9 +297,6 @@ void computeCentroidELWVolumes(typename PFP::MAP& map, const V_ATT& position, W_
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid, unsigned int thread)
 {
-//	TraversorV<typename PFP::MAP> t(map, thread) ;
-//	for(Dart d = t.begin(); d != t.end(); d = t.next())
-//	foreachCellMT(VERTEX,d,typename PFP::MAP,map ,thread)
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		vertex_centroid[v] = Volume::Geometry::vertexNeighborhoodCentroid<PFP,V_ATT>(map, v, position) ;
@@ -349,7 +337,6 @@ class FunctorComputeCentroidELWVolumes: public FunctorMapThreaded<typename PFP::
 {
 	 const V_ATT& m_position;
 	 W_ATT& m_vol_centroid;
-//	 VolumeAttribute<typename PFP::VEC3>& m_vol_centroid;
 
 public:
 	 FunctorComputeCentroidELWVolumes<PFP,V_ATT,W_ATT>( typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid):

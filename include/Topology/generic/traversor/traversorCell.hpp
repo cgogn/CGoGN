@@ -501,8 +501,8 @@ public:
 };
 
 
-template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, unsigned int nbth, bool needMarkers)
+template <TraversalOptim OPT, unsigned int ORBIT, typename MAP, typename FUNC>
+void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth, bool needMarkers)
 {
 	if (nbth==0)
 		nbth = boost::thread::hardware_concurrency();
@@ -514,7 +514,7 @@ void foreach_cell(MAP& map, FUNC func, unsigned int nbth, bool needMarkers)
 
 	//    TraversorCell<MAP, ORBIT> trav(map,false,th_orig);
 	unsigned int nb = 0;
-	TraversorCell<MAP, ORBIT> trav(map);
+	TraversorCell<MAP, ORBIT, OPT> trav(map);
 	Cell<ORBIT> cell = trav.begin();
 	Cell<ORBIT> c_end = trav.end();
 	while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
@@ -584,7 +584,30 @@ void foreach_cell(MAP& map, FUNC func, unsigned int nbth, bool needMarkers)
 	delete[] tempo;
 }
 
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+void foreach_cell(MAP& map, FUNC func, unsigned int nbth, bool needMarkers, TraversalOptim opt)
+{
+	switch(opt)
+	{
+	case FORCE_DART_MARKING:
+		foreach_cell_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC>(map,func,nbth,needMarkers);
+	break;
+	case FORCE_CELL_MARKING:
+		foreach_cell_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC>(map,func,nbth,needMarkers);
+	break;
+	case FORCE_QUICK_TRAVERSAL:
+		foreach_cell_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC>(map,func,nbth,needMarkers);
+	break;
+	case AUTO:
+	default:
+		foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,nbth,needMarkers);
+	break;
+
+	}
+
 }
+
+}// namespace Parallel
 
 
 } // namespace CGoGN
