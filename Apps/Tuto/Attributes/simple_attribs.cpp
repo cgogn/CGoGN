@@ -46,10 +46,11 @@ typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 
 /**
- * @brief get attribute
- * @param map
+ * @brief test if map has a Vertex Attribute of VEC3 named name
+ * @param map  the map
+ * @param name name of attribute
  */
-void byNames(MAP& map, const std::string& name)
+void testVAbyNames(MAP& map, const std::string& name)
 {
 	VertexAttribute<VEC3, MAP_IMPL> testPos = map.getAttribute<VEC3, VERTEX>(name);
 	if (testPos.isValid())
@@ -60,6 +61,7 @@ void byNames(MAP& map, const std::string& name)
 
 /**
  * @brief computeLengthEdges
+ * Demonstrate usage of 2 attributes on 2 differents orbits.
  * @param map the map
  * @param pos attribute handler of position of vertices
  * @param len attribute handler of length of edges
@@ -76,10 +78,12 @@ void computeLengthEdges(MAP& map,const VertexAttribute<VEC3, MAP_IMPL>& pos, Edg
 	});
 }
 
-
+/**
+ * @brief computeNewPositions Demonstrate  the usage of AutoAttributes
+ */
 void computeNewPositions(MAP& map, VertexAttribute<VEC3, MAP_IMPL>& pos)
 {
-	// here we need new and old positions simultaneously so create temporary position
+	// here we need new and old positions simultaneously so create temporary attribute position
 
 	VertexAutoAttribute<VEC3, MAP_IMPL> pos2(map);
 
@@ -96,7 +100,10 @@ void computeNewPositions(MAP& map, VertexAttribute<VEC3, MAP_IMPL>& pos)
 	});
 
 	// swap attribute position with temporary (constant complexity !)
+	// only possible with same type and same orbit attribute.
 	map.swapAttributes(pos,pos2);
+
+	// destruction of VertexAutoAttribute handller remove the attribute from the map.
 }
 
 /**
@@ -134,6 +141,8 @@ int main()
 	grid.embedIntoGrid(positionAtt, 1.,1.,0.);
 
 
+	// ATTRIBUTE DECLARATION
+
 	// add an attribute of type float on orbit EDGE
 	EdgeAttribute<float, MAP_IMPL> lengthAtt = myMap.addAttribute<float, EDGE>("length");
 	if (!lengthAtt.isValid())
@@ -157,6 +166,9 @@ int main()
 	// define a face from a dart
 	Face f(d);
 
+
+	// ATTRIBUTE ACCESS
+
 	// [] operator can take a dart, a cell (only same off attribute), or an unsigned inf
 	// access to any attributes with darts
 	std::cout << positionAtt[d]<< std::endl;
@@ -173,10 +185,14 @@ int main()
 	// access to FaceAttribute with a Face
 	std::cout << nameAtt[f]<< std::endl;
 
-// following line does not compile because of wrong cell type
-//	std::cout << positionAtt[f]<< std::endl;
-//  possible to bypass using dart access
+	// following line does not compile because of wrong cell type
+	//	std::cout << positionAtt[f]<< std::endl;
+	//  possible to bypass using dart access
 	std::cout << positionAtt[f.dart]<< std::endl;
+
+	// access with unsigned int is dangerous, index must be obtain with begin/end/next (see dumpAttribute)
+
+	// COPY, REMOVE, SWAP
 
 	// possible to have any number of attribute a same ORBIT
 	VertexAttribute<VEC3, MAP_IMPL> position2Att = myMap.addAttribute<VEC3, VERTEX>("other_position");
@@ -187,14 +203,16 @@ int main()
 	positionAtt[v] += VEC3(0,0,1);
 
 	computeNewPositions(myMap,positionAtt);
-
 	dumpAttribute(positionAtt);
 
-	byNames(myMap,"position");
+	//check if there is a Vertex Attribute of VEC3 named position => yes
+	testVAbyNames(myMap,"position");
 
-	myMap.removeAttribute<VEC3, VERTEX>(positionAtt);
+	// remove the attribute
+	myMap.removeAttribute(positionAtt);
 
-	byNames(myMap,"position");
+	//check if there is a Vertex Attribute of VEC3 named position => no
+	testVAbyNames(myMap,"position");
 
 
 	return 0;
