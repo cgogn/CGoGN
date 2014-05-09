@@ -170,70 +170,24 @@ namespace Parallel
 {
 
 template <typename PFP, typename V_ATT, typename F_ATT>
-class FunctorComputeCentroidFaces: public FunctorMapThreaded<typename PFP::MAP>
-{
-	 const V_ATT& m_position;
-	 F_ATT& m_fcentroid;
-
-public:
-	 FunctorComputeCentroidFaces<PFP,V_ATT,F_ATT>( typename PFP::MAP& map, const V_ATT& position, F_ATT& fcentroid):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_fcentroid(fcentroid)
-	 { }
-
-	void run(Dart d, unsigned int /*threadID*/)
-	{
-		m_fcentroid[d] = faceCentroid<PFP>(this->m_map, d, m_position) ;
-	}
-};
-
-template <typename PFP, typename V_ATT, typename F_ATT>
-class FunctorComputeCentroidELWFaces: public FunctorMapThreaded<typename PFP::MAP>
-{
-	const V_ATT& m_position;
-	F_ATT& m_fcentroid;
-
-public:
-	 FunctorComputeCentroidELWFaces<PFP,V_ATT,F_ATT>( typename PFP::MAP& map, const V_ATT& position, F_ATT& fcentroid):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_fcentroid(fcentroid)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
-	{
-		m_fcentroid[d] = faceCentroidELW<PFP>(this->m_map, d, m_position) ;
-	}
-};
-
-template <typename PFP, typename V_ATT>
-class FunctorComputeNeighborhoodCentroidVertices: public FunctorMapThreaded<typename PFP::MAP >
-{
-	 const V_ATT& m_position;
-	 V_ATT& m_vcentroid;
-
-public:
-	 FunctorComputeNeighborhoodCentroidVertices<PFP,V_ATT>( typename PFP::MAP& map, const V_ATT& position, V_ATT& vcentroid):
-		 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vcentroid(vcentroid)
-	 { }
-
-	void run(Dart d, unsigned int /*threadID*/)
-	{
-		m_vcentroid[d] = vertexNeighborhoodCentroid<PFP>(this->m_map, d, m_position) ;
-	}
-};
-
-template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid,
-		unsigned int nbth, unsigned int current_thread)
+		unsigned int nbth)
 {
-	FunctorComputeCentroidFaces<PFP,V_ATT,F_ATT> funct(map,position,face_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, current_thread);
+	CGoGN::Parallel::foreach_cell<FACE>(map,[&](Face f, unsigned int thr)
+	{
+		face_centroid[f] = faceCentroid<PFP>(map, f, position) ;
+	},nbth,false,AUTO);
 }
 
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidELWFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid,
 		unsigned int nbth, unsigned int current_thread)
 {
-	FunctorComputeCentroidELWFaces<PFP,V_ATT,F_ATT> funct(map,position,face_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, current_thread);
+	CGoGN::Parallel::foreach_cell<FACE>(map,[&](Face f, unsigned int thr)
+	{
+		face_centroid[f] = faceCentroidELW<PFP>(map, f, position) ;
+	},nbth,false,AUTO);
+
 }
 
 template <typename PFP, typename V_ATT>
@@ -241,8 +195,10 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const V_ATT& position, V_ATT& vertex_centroid,
 		unsigned int nbth, unsigned int current_thread)
 {
-	FunctorComputeNeighborhoodCentroidVertices<PFP,V_ATT> funct(map,position,vertex_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false);
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int thr)
+	{
+		vertex_centroid[v] = vertexNeighborhoodCentroid<PFP>(map, v, position) ;
+	},nbth,false,FORCE_CELL_MARKING);
 }
 
 } // namespace Parallel
@@ -309,78 +265,34 @@ namespace Parallel
 {
 
 template <typename PFP, typename V_ATT, typename W_ATT>
-class FunctorComputeCentroidVolumes: public FunctorMapThreaded<typename PFP::MAP >
-{
-	 const V_ATT& m_position;
-	 W_ATT& m_vol_centroid;
-
-public:
-	 FunctorComputeCentroidVolumes<PFP,V_ATT,W_ATT>( typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol_centroid(vol_centroid)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
-	{
-		m_vol_centroid[d] = Surface::Geometry::volumeCentroid<PFP,V_ATT,W_ATT>(this->m_map, d, m_position,threadID) ;
-	}
-};
-
-template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid,	unsigned int nbth)
 {
-	FunctorComputeCentroidVolumes<PFP,V_ATT,W_ATT> funct(map,position,vol_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true);
-}
-
-template <typename PFP, typename V_ATT, typename W_ATT>
-class FunctorComputeCentroidELWVolumes: public FunctorMapThreaded<typename PFP::MAP >
-{
-	 const V_ATT& m_position;
-	 W_ATT& m_vol_centroid;
-
-public:
-	 FunctorComputeCentroidELWVolumes<PFP,V_ATT,W_ATT>( typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid):
-		 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol_centroid(vol_centroid)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
+	CGoGN::Parallel::foreach_cell<VOLUME>(map,[&](Vol v, unsigned int thr)
 	{
-		m_vol_centroid[d] = Surface::Geometry::volumeCentroidELW<PFP,V_ATT>(this->m_map, d, m_position, threadID) ;
-	}
-};
+		vol_centroid[v] = Surface::Geometry::volumeCentroid<PFP,V_ATT,W_ATT>(map, v, position, thr) ;
+	},nbth,true,AUTO);
+}
 
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidELWVolumes(typename PFP::MAP& map,
 		const V_ATT& position, W_ATT& vol_centroid,
 		unsigned int nbth)
 {
-	FunctorComputeCentroidELWVolumes<PFP,V_ATT,W_ATT> funct(map,position,vol_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true);
+	CGoGN::Parallel::foreach_cell<VOLUME>(map,[&](Vol v, unsigned int thr)
+	{
+		vol_centroid[v] = Surface::Geometry::volumeCentroidELW<PFP,V_ATT>(map, v, position, thr) ;
+	},nbth,true,AUTO);
 }
 
-template <typename PFP, typename V_ATT>
-class FunctorComputeNeighborhoodCentroidVertices: public FunctorMapThreaded<typename PFP::MAP >
-{
-	 const V_ATT& m_position;
-	 V_ATT& m_vcentroid;
-
-public:
-	 FunctorComputeNeighborhoodCentroidVertices<PFP,V_ATT>( typename PFP::MAP& map, const V_ATT& position, V_ATT& vcentroid):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vcentroid(vcentroid)
-	 { }
-
-	void run(Dart d, unsigned int /*threadID*/)
-	{
-		m_vcentroid[d] = vertexNeighborhoodCentroid<PFP,V_ATT>(this->m_map, d, m_position) ;
-	}
-};
 
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid,
 		unsigned int nbth)
 {
-	FunctorComputeNeighborhoodCentroidVertices<PFP,V_ATT> funct(map,position,vertex_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false);
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int thr)
+	{
+		vertex_centroid[v] = Volume::Geometry::vertexNeighborhoodCentroid<PFP,V_ATT>(map, v, position,thr) ;
+	},nbth,true,FORCE_CELL_MARKING);
 }
 
 } // namespace Parallel

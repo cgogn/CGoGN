@@ -163,84 +163,6 @@ void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT&
 }
 
 
-
-namespace Parallel
-{
-
-template <typename PFP, typename V_ATT>
-class FunctorComputeNormalVertices : public FunctorMapThreaded<typename PFP::MAP>
-{
-	const V_ATT& m_position;
-	V_ATT& m_normal;
-public:
-	FunctorComputeNormalVertices<PFP,V_ATT>(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal):
-		FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
-	{ }
-
-	void run(Dart d, unsigned int /*threadID*/)
-	{
-		m_normal[d] = vertexNormal<PFP>(this->m_map, d, m_position) ;
-	}
-};
-
-template <typename PFP, typename V_ATT>
-void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int nbth)
-{
-	FunctorComputeNormalVertices<PFP,V_ATT> funct(map, position, normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP, VERTEX>(map, funct, nbth, false);
-}
-
-template <typename PFP, typename V_ATT, typename F_ATT>
-class FunctorComputeNormalFaces : public FunctorMapThreaded<typename PFP::MAP>
-{
-	const V_ATT& m_position;
-	F_ATT& m_normal;
-public:
-	FunctorComputeNormalFaces<PFP,V_ATT,F_ATT>(typename PFP::MAP& map, const V_ATT& position, F_ATT& normal):
-		FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
-	{ }
-
-	void run(Dart d, unsigned int /*threadID*/)
-	{
-		m_normal[d] = faceNormal<PFP>(this->m_map, d, m_position) ;
-	}
-};
-
-template <typename PFP, typename V_ATT, typename F_ATT>
-void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& normal, unsigned int nbth)
-{
-	FunctorComputeNormalFaces<PFP,V_ATT,F_ATT> funct(map, position, normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP, FACE>(map, funct, nbth, false);
-}
-
-template <typename PFP, typename V_ATT, typename E_ATT>
-class FunctorComputeAngleBetweenNormalsOnEdge: public FunctorMapThreaded<typename PFP::MAP>
-{
-	const V_ATT& m_position;
-	E_ATT& m_angles;
-
-public:
-	FunctorComputeAngleBetweenNormalsOnEdge<PFP,V_ATT,E_ATT>( typename PFP::MAP& map, const V_ATT& position, E_ATT& angles):
-		FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_angles(angles)
-	{ }
-
-	void run(Dart d, unsigned int threadID)
-	{
-		m_angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(this->m_map, d, m_position) ;
-	}
-};
-
-template <typename PFP, typename V_ATT, typename E_ATT>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int nbth)
-{
-	FunctorComputeAngleBetweenNormalsOnEdge<PFP,V_ATT,E_ATT> funct(map,position,angles);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, funct, nbth, false);
-}
-
-} // namespace Parallel
-
-
-
 template <typename PFP, typename V_ATT>
 typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Edge e, const V_ATT& position)
 {
@@ -283,6 +205,42 @@ void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& pos
 	},
 	false, thread);
 }
+
+
+
+namespace Parallel
+{
+
+template <typename PFP, typename V_ATT>
+void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int nbth)
+{
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int thr)
+	{
+		normal[v] = vertexNormal<PFP>(map, v, position) ;
+	},nbth,true,FORCE_CELL_MARKING);
+}
+
+template <typename PFP, typename V_ATT, typename F_ATT>
+void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& normal, unsigned int nbth)
+{
+	CGoGN::Parallel::foreach_cell<FACE>(map,[&](Face f, unsigned int thr)
+	{
+		normal[f] = faceNormal<PFP>(map, f, position) ;
+	},nbth,true,AUTO);
+}
+
+
+template <typename PFP, typename V_ATT, typename E_ATT>
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int nbth)
+{
+	CGoGN::Parallel::foreach_cell<EDGE>(map,[&](Edge e, unsigned int thr)
+	{
+		angles[e] = computeAngleBetweenNormalsOnEdge<PFP>(map, e, position) ;
+	},nbth,true,AUTO);
+}
+
+} // namespace Parallel
+
 
 } // namespace Geometry
 

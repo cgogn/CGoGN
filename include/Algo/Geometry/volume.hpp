@@ -139,49 +139,28 @@ namespace Parallel
 {
 
 template <typename PFP>
-class FunctorTotalVolume: public FunctorMapThreaded<typename PFP::MAP >
-{
-	 const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& m_position;
-	 double m_vol;
-
-public:
-	 FunctorTotalVolume<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol(0.0)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
-	{
-		m_vol += convexPolyhedronVolume<PFP>(this->m_map, d, m_position, threadID) ;
-	}
-
-	double getVol() const
-	{
-		return m_vol;
-	}
-};
-
-template <typename PFP>
 typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int nbth)
 {
+	// get number of thread of processor if needed
 	if (nbth == 0)
-		nbth = Algo::Parallel::optimalNbThreads();
+		nbth = boost::thread::hardware_concurrency();
 
-	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
-	for (unsigned int i = 0; i < nbth; ++i)
+	// allocate a vector of 1 accumulator for each thread
+	std::vector<typename PFP::REAL> vols(nbth,0.0);
+
+	// foreach volume
+	CGoGN::Parallel::foreach_cell<VOLUME>(map,[&](Vol v, unsigned int thr)
 	{
-		functs.push_back(new FunctorTotalVolume<PFP>(map,position));
-	}
+		// add volume to the thread accumulator
+		vols[thr-1] += convexPolyhedronVolume<PFP>(map, v, position, thr) ;
+	},nbth);
 
-	double total = 0.0;
+	// compute the sum of volumes
+	typename PFP::REAL total(0);
+	for (unsigned int i=0; i< nbth; ++i )
+		total += vols[i];
 
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, true);
-
-	for (unsigned int i=0; i < nbth; ++i)
-	{
-		total += reinterpret_cast<FunctorTotalVolume<PFP>*>(functs[i])->getVol();
-		delete functs[i];
-	}
-	return typename PFP::REAL(total);
+	return total;
 }
 
 } // namespace Parallel

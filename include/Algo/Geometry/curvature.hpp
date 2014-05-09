@@ -602,54 +602,6 @@ void normalCycles_ProjectTensor(Geom::Matrix<3,3,typename PFP::REAL>& tensor, co
 
 namespace Parallel
 {
-
-template <typename PFP>
-class FunctorComputeCurvatureVertices_NormalCycles: public FunctorMapThreaded<typename PFP::MAP >
-{
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
-	REAL m_radius;
-	const VertexAttribute<VEC3, MAP_IMPL>& m_position;
-	const VertexAttribute<VEC3, MAP_IMPL>& m_normal;
-	const EdgeAttribute<REAL, MAP_IMPL>& m_edgeangle;
-	VertexAttribute<REAL, MAP_IMPL>& m_kmax;
-	VertexAttribute<REAL, MAP_IMPL>& m_kmin;
-	VertexAttribute<VEC3, MAP_IMPL>& m_Kmax;
-	VertexAttribute<VEC3, MAP_IMPL>& m_Kmin;
-	VertexAttribute<VEC3, MAP_IMPL>& m_Knormal;
-public:
-	 FunctorComputeCurvatureVertices_NormalCycles(
-		MAP& map,
-		REAL radius,
-		const VertexAttribute<VEC3, MAP_IMPL>& position,
-		const VertexAttribute<VEC3, MAP_IMPL>& normal,
-		const EdgeAttribute<REAL, MAP_IMPL>& edgeangle,
-		VertexAttribute<REAL, MAP_IMPL>& kmax,
-		VertexAttribute<REAL, MAP_IMPL>& kmin,
-		VertexAttribute<VEC3, MAP_IMPL>& Kmax,
-		VertexAttribute<VEC3, MAP_IMPL>& Kmin,
-		VertexAttribute<VEC3, MAP_IMPL>& Knormal):
-	  FunctorMapThreaded<MAP>(map),
-	  m_radius(radius),
-	  m_position(position),
-	  m_normal(normal),
-	  m_edgeangle(edgeangle),
-	  m_kmax(kmax),
-	  m_kmin(kmin),
-	  m_Kmax(Kmax),
-	  m_Kmin(Kmin),
-	  m_Knormal(Knormal)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
-	{
-		computeCurvatureVertex_NormalCycles<PFP>(this->m_map, d, m_radius, m_position, m_normal, m_edgeangle, m_kmax, m_kmin, m_Kmax, m_Kmin, m_Knormal, threadID) ;
-	}
-};
-
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles(
 	typename PFP::MAP& map,
@@ -681,49 +633,12 @@ void computeCurvatureVertices_NormalCycles(
 		map.template initAllOrbitsEmbedding<FACE>();
 	}
 
-	FunctorComputeCurvatureVertices_NormalCycles<PFP> funct(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true);
+	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	{
+		computeCurvatureVertex_NormalCycles<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
+	},nbth,true,FORCE_CELL_MARKING);
 }
 
-
-
-template <typename PFP>
-class FunctorComputeCurvatureVertices_QuadraticFitting: public FunctorMapThreaded<typename PFP::MAP >
-{
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
-	const VertexAttribute<VEC3, MAP_IMPL>& m_position;
-	const VertexAttribute<VEC3, MAP_IMPL>& m_normal;
-	VertexAttribute<REAL, MAP_IMPL>& m_kmax;
-	VertexAttribute<REAL, MAP_IMPL>& m_kmin;
-	VertexAttribute<VEC3, MAP_IMPL>& m_Kmax;
-	VertexAttribute<VEC3, MAP_IMPL>& m_Kmin;
-public:
-	 FunctorComputeCurvatureVertices_QuadraticFitting(
-		MAP& map,
-		const VertexAttribute<VEC3, MAP_IMPL>& position,
-		const VertexAttribute<VEC3, MAP_IMPL>& normal,
-		VertexAttribute<REAL, MAP_IMPL>& kmax,
-		VertexAttribute<REAL, MAP_IMPL>& kmin,
-		VertexAttribute<VEC3, MAP_IMPL>& Kmax,
-		VertexAttribute<VEC3, MAP_IMPL>& Kmin):
-	  FunctorMapThreaded<MAP>(map),
-	  m_position(position),
-	  m_normal(normal),
-	  m_kmax(kmax),
-	  m_kmin(kmin),
-	  m_Kmax(Kmax),
-	  m_Kmin(Kmin)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
-	{
-		computeCurvatureVertex_QuadraticFitting<PFP>(this->m_map, d, m_position, m_normal, m_kmax, m_kmin, m_Kmax, m_Kmin) ;
-	}
-};
 
 template <typename PFP>
 void computeCurvatureVertices_QuadraticFitting(
@@ -736,8 +651,11 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
 	unsigned int nbth)
 {
-	FunctorComputeCurvatureVertices_QuadraticFitting<PFP> funct(map, position, normal, kmax, kmin, Kmax, Kmin);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true);
+	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	{
+		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin, threadID) ;
+	},nbth,true,FORCE_CELL_MARKING);
+
 }
 
 } // namespace Parallel

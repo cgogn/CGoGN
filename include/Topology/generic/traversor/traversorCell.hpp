@@ -74,9 +74,8 @@ TraversorCell<MAP, ORBIT,OPT>::TraversorCell(const MAP& map, bool forceDartMarke
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
 TraversorCell<MAP, ORBIT,OPT>::TraversorCell(const TraversorCell<MAP, ORBIT,OPT>& tc) :
-	m(tc.m), dmark(tc.dmark), cmark(tc.cmark),
-	quickTraversal(tc.quickTraversal), current(tc.current), firstTraversal(tc.firstTraversal),
-	dimension(tc.dimension)
+	m(tc.m), dimension(tc.dimension), cont( tc.cont), qCurrent(tc.qCurrent), dmark(tc.dmark), cmark(tc.cmark),
+	quickTraversal(tc.quickTraversal), current(tc.current), firstTraversal(tc.firstTraversal)
 {
 }
 
@@ -464,6 +463,159 @@ Cell<ORBIT> TraversorCellOdd<MAP, ORBIT,OPT>::next()
 
 
 
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt, unsigned int thread)
+{
+	switch(opt)
+	{
+	case FORCE_DART_MARKING:
+	{
+		TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			f(c);
+	}
+	break;
+	case FORCE_CELL_MARKING:
+	{
+		TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			f(c);
+	}
+	break;
+	case FORCE_QUICK_TRAVERSAL:
+	{
+		TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			f(c);
+	}
+	break;
+	case AUTO:
+	default:
+	{
+		TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			f(c);
+	}
+	break;
+
+	}
+}
+
+template <unsigned int ORBIT, typename MAP, typename FUNC>
+inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsigned int thread)
+{
+	switch(opt)
+	{
+	case FORCE_DART_MARKING:
+	{
+		TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			if (!f(c))
+				break;
+	}
+	break;
+	case FORCE_CELL_MARKING:
+	{
+		TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			if (!f(c))
+				break;
+	}
+	break;
+	case FORCE_QUICK_TRAVERSAL:
+	{
+		TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			if (!f(c))
+				break;
+	}
+	break;
+	case AUTO:
+	default:
+	{
+		TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			if (!f(c))
+				break;
+	}
+	break;
+	}
+}
+
+
+//template <unsigned int ORBIT, typename MAP, typename FUNC, typename FUNC2>
+//inline void foreach_cell_EvenOdd(const MAP& map, FUNC f, FUNC2 g, unsigned int nbpasses, TraversalOptim opt, unsigned int thread)
+//{
+//	switch(opt)
+//	{
+//	case FORCE_DART_MARKING:
+//	{
+//		TraversorCell<MAP,ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+//		TraversorCellEven<MAP,ORBIT,FORCE_DART_MARKING> tr1(trav);
+//		TraversorCellOdd<MAP,ORBIT,FORCE_DART_MARKING> tr2(trav);
+
+//		for (unsigned int i=0; i<nbpasses; ++i)
+//		{
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				f(c);
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				g(c);
+//		}
+//	}
+//	break;
+//	case FORCE_CELL_MARKING:
+//	{
+//		TraversorCell<MAP,ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+//		TraversorCellEven<MAP,ORBIT,FORCE_CELL_MARKING> tr1(trav);
+//		TraversorCellOdd<MAP,ORBIT, FORCE_CELL_MARKING> tr2(trav);
+
+//		for (unsigned int i=0; i<nbpasses; ++i)
+//		{
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				f(c);
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				g(c);
+//		}
+//	}
+//	break;
+//	case FORCE_QUICK_TRAVERSAL:
+//	{
+//		TraversorCell<MAP,ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+//		TraversorCellEven<MAP,ORBIT,FORCE_QUICK_TRAVERSAL> tr1(trav);
+//		TraversorCellOdd<MAP,ORBIT,FORCE_QUICK_TRAVERSAL> tr2(trav);
+
+//		for (unsigned int i=0; i<nbpasses; ++i)
+//		{
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				f(c);
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				g(c);
+//		}
+//	}
+//	break;
+//	case AUTO:
+//	default:
+//	{
+//		TraversorCell<MAP,ORBIT,AUTO> trav(map, false, thread);
+//		TraversorCellEven<MAP,ORBIT,AUTO> tr1(trav);
+//		TraversorCellOdd<MAP,ORBIT,AUTO> tr2(trav);
+
+//		for (unsigned int i=0; i<nbpasses; ++i)
+//		{
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				f(c);
+//			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+//				g(c);
+//		}
+//	}
+//	break;
+//	}
+//}
+
+
+
+
+
 namespace Parallel
 {
 
@@ -494,6 +646,7 @@ public:
 		{
 			for (typename std::vector<CELL>::const_iterator it = m_cells.begin(); it != m_cells.end(); ++it)
 				m_lambda(*it,m_id);
+			m_cells.clear();
 			m_sync1.wait(); // wait every body has finished
 			m_sync2.wait(); // wait vectors has been refilled
 		}
@@ -584,6 +737,129 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth, bool needMarkers)
 	delete[] tempo;
 }
 
+
+//template <TraversalOptim OPT,unsigned int ORBIT, typename MAP, typename FUNC_E, typename FUNC_O>
+//void foreach_cell_EO_tmpl(MAP& map, FUNC_E funcEven, FUNC_O funcOdd, unsigned int nbPasses, unsigned int nbth, bool needMarkers=true)
+//{
+//	if (nbth==0)
+//		nbth = boost::thread::hardware_concurrency();
+
+//	std::vector< Cell<ORBIT> >* vd = new std::vector< Cell<ORBIT> >[nbth];
+
+//	for (unsigned int i = 0; i < nbth; ++i)
+//		vd[i].reserve(SIZE_BUFFER_THREAD);
+
+//	bool finished_even=false;
+//	bool finished_odd=false;
+//	// lauch threads
+//	if (needMarkers)
+//	{
+//		unsigned int nbth_prec = map.getNbThreadMarkers();
+//		if (nbth_prec < nbth+1)
+//			map.addThreadMarker(nbth+1-nbth_prec);
+//	}
+
+//	boost::thread** threads = new boost::thread*[2*nbth];
+//	ThreadFunction<ORBIT,FUNC_E>** tfse = new ThreadFunction<ORBIT,FUNC_E>*[nbth];
+//	ThreadFunction<ORBIT,FUNC_O>** tfso = new ThreadFunction<ORBIT,FUNC_O>*[nbth];
+
+//	boost::barrier sync1(nbth+1);
+//	boost::barrier sync2(nbth+1);
+//	boost::barrier sync3(nbth+1);
+//	boost::barrier sync4(nbth+1);
+
+//	for (unsigned int i = 0; i < nbth; ++i)
+//	{
+//		tfse[i] = new ThreadFunction<ORBIT,FUNC_E>(funcEven, vd[i],sync1,sync2, finished_even,1+i);
+//		threads[i] = new boost::thread( boost::ref( *(tfse[i]) ) );
+
+//		tfso[i] = new ThreadFunction<ORBIT,FUNC_O>(funcOdd, vd[i],sync3,sync4, finished_odd,1+i);
+//		threads[nbth+i] = new boost::thread( boost::ref( *(tfso[i]) ) );
+//	}
+
+//	// and continue to traverse the map
+//	std::vector< Cell<ORBIT> >* tempo = new std::vector< Cell<ORBIT> >[nbth];
+//	for (unsigned int i = 0; i < nbth; ++i)
+//		tempo[i].reserve(SIZE_BUFFER_THREAD);
+
+//	TraversorCell<MAP, ORBIT, OPT> trav(map);
+
+//	for (unsigned i=0; i<nbPasses; ++i)
+//	{
+//		Cell<ORBIT> cell = trav.begin();
+//		Cell<ORBIT> c_end = trav.end();
+//		while (cell.dart != c_end.dart)
+//		{
+//			for (unsigned int i = 0; i < nbth; ++i)
+//				tempo[i].clear();
+
+//			unsigned int nb = 0;
+//			while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
+//			{
+//				tempo[nb%nbth].push_back(cell);
+//				nb++;
+//				cell = trav.next();
+//			}
+//			sync1.wait();// wait for all thread to finish its vector
+//			for (unsigned int i = 0; i < nbth; ++i)
+//				vd[i].swap(tempo[i]);
+//			sync2.wait();// everybody refilled then go
+//		}
+//		sync1.wait();// wait for all thread to finish its vector
+//		sync2.wait(); // just wait for last barrier wait !
+
+//		cell = trav.begin();
+//		c_end = trav.end();
+//		while (cell.dart != c_end.dart)
+//		{
+//			for (unsigned int i = 0; i < nbth; ++i)
+//				tempo[i].clear();
+//			unsigned int nb = 0;
+
+//			while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
+//			{
+//				tempo[nb%nbth].push_back(cell);
+//				nb++;
+//				cell = trav.next();
+//			}
+//			sync3.wait();// wait for all thread to finish its vector
+//			for (unsigned int i = 0; i < nbth; ++i)
+//				vd[i].swap(tempo[i]);
+//			sync4.wait();// everybody refilled then go
+//		}
+//		sync3.wait();// wait for all thread to finish its vector
+//		sync4.wait(); // just wait for last barrier wait !
+//	}
+
+//	sync1.wait();// wait for all thread to finish its vector
+//	finished_even = true;// say finsih to everyone
+//	sync2.wait(); // just wait for last barrier wait !
+//	sync3.wait();// wait for all thread to finish its vector
+//	finished_odd = true;// say finsih to everyone
+//	sync4.wait(); // just wait for last barrier wait !
+
+//	//wait for all theads to be finished
+//	for (unsigned int i = 0; i < nbth; ++i)
+//	{
+//		threads[i]->join();
+//		delete threads[i];
+//		delete tfse[i];
+//		threads[i+nbth]->join();
+//		delete threads[i+nbth];
+//		delete tfso[i];
+//	}
+
+//	delete[] tfse;
+//	delete[] tfso;
+//	delete[] threads;
+//	delete[] vd;
+//	delete[] tempo;
+//}
+
+
+
+
+
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 void foreach_cell(MAP& map, FUNC func, unsigned int nbth, bool needMarkers, TraversalOptim opt)
 {
@@ -602,10 +878,32 @@ void foreach_cell(MAP& map, FUNC func, unsigned int nbth, bool needMarkers, Trav
 	default:
 		foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,nbth,needMarkers);
 	break;
-
 	}
-
 }
+
+
+//template <unsigned int ORBIT, typename MAP, typename FUNC_E, typename FUNC_O>
+//void foreach_cell_EO(MAP& map, FUNC_E funcEven, FUNC_O funcOdd, unsigned int nbPasses, unsigned int nbth, bool needMarkers, TraversalOptim opt)
+//{
+//	switch(opt)
+//	{
+//	case FORCE_DART_MARKING:
+//		foreach_cell_EO_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC_E,FUNC_O>(map,funcEven,funcOdd,nbPasses,nbth,needMarkers);
+//	break;
+//	case FORCE_CELL_MARKING:
+//		foreach_cell_EO_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC_E,FUNC_O>(map,funcEven,funcOdd,nbPasses,nbth,needMarkers);
+//	break;
+//	case FORCE_QUICK_TRAVERSAL:
+//		foreach_cell_EO_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC_E,FUNC_O>(map,funcEven,funcOdd,nbPasses,nbth,needMarkers);
+//	break;
+//	case AUTO:
+//	default:
+//		foreach_cell_EO_tmpl<AUTO,ORBIT,MAP,FUNC_E,FUNC_O>(map,funcEven,funcOdd,nbPasses,nbth,needMarkers);
+//	break;
+//	}
+//}
+
+
 
 }// namespace Parallel
 
