@@ -439,7 +439,19 @@ inline void MapMulti::next(Dart& d) const
 		d.index = m_mrattribs.end();
 }
 
-inline bool MapMulti::foreach_dart(FunctorType& f)
+template <typename FUNC>
+inline void MapMulti::foreach_dart(FUNC f)
+{
+	for (Dart d = begin(); d != end(); next(d))
+	{
+		if (f(d))
+			return true;
+	}
+	return false;
+}
+
+template <typename FUNC>
+inline void MapMulti::foreach_dart(FUNC& f)
 {
 	for (Dart d = begin(); d != end(); next(d))
 	{
