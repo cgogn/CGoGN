@@ -118,18 +118,18 @@ void GMap0<MAP_IMPL>::deleteEdge(Dart d)
  *************************************************************************/
 
 template <typename MAP_IMPL>
-inline bool GMap0<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void GMap0<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
-	return f(d) ;
+	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline bool GMap0<MAP_IMPL>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void GMap0<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
-	if (f(d)) return true;
+	f(d);
 	Dart d1 = beta0(d);
-	if (d1 != d) return f(d1);
-	return false;
+	if (d1 != d)
+		f(d1);
 }
 
 } // namespace CGoGN

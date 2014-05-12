@@ -271,8 +271,7 @@ inline int Map1<MAP_IMPL>::checkCycleDegree(Dart d, unsigned int degree) const
 	{
 		++count ;
 		it = phi1(it) ;
-	} while ((count<=degree) && (it != d)) ;
-
+	} while ((count <= degree) && (it != d)) ;
 	return count-degree;
 }
 
@@ -287,29 +286,26 @@ inline bool Map1<MAP_IMPL>::isCycleTriangle(Dart d) const
  *************************************************************************/
 
 template <typename MAP_IMPL>
-inline bool Map1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void Map1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
-	return f(d) ;
+	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline bool Map1<MAP_IMPL>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void Map1<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
-	return f(d) ;
+	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline bool Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int /*thread*/) const
+inline void Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
 {
 	Dart it = d ;
 	do
 	{
-		if (f(it))
-			return true ;
+		f(it);
 		it = phi1(it) ;
 	} while (it != d) ;
-	return false ;
 }
-
 
 } // namespace CGoGN

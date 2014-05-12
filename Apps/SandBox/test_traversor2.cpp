@@ -59,6 +59,17 @@ int main(int argc, char **argv)
 	return app.exec();
 }
 
+void fonct(const Cell<VERTEX>& v)
+{
+	std::cout << v.dart << std::endl;
+}
+
+void fonct2(Dart d)
+{
+	std::cout << d << std::endl;
+}
+
+
 void MyQT::traversors(int x)
 {
 	// update all color to grey
@@ -75,10 +86,12 @@ void MyQT::traversors(int x)
 		Traversor2VVaE<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
 			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+
 	}
 		break;
 	case 1:
 	{
+
 		Traversor2VVaF<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
 			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);

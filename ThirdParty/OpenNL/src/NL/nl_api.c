@@ -229,7 +229,7 @@ void nlGetDoublev(NLenum pname, NLdouble* params) {
     }
 }
 
-void nlGetIntergerv(NLenum pname, NLint* params) {
+void nlGetIntegerv(NLenum pname, NLint* params) {
     switch(pname) {
     case NL_SOLVER: {
         *params = (NLint)(nlCurrentContext->solver) ;

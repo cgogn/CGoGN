@@ -109,7 +109,7 @@ class Plane3D
 
 	private:
 		Vector<3,T> m_normal ;
-		T m_d ;
+        T m_d ;
 } ;
 
 } // namespace Geom

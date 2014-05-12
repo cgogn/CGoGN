@@ -26,7 +26,8 @@
 #include <algorithm>
 
 #include "Topology/gmap/embeddedGMap2.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversor2.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
@@ -90,7 +91,7 @@ void EmbeddedGMap2::splitVertex(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(beta0(dd), vEmb) ;
 
 		setOrbitEmbeddingOnNewCell<VERTEX>(e) ;
-		copyCell<VERTEX>(e, d) ;
+		copyCellAttributes<VERTEX>(e, d) ;
 	}
 
 	if(isOrbitEmbedded<EDGE>())
@@ -101,11 +102,11 @@ void EmbeddedGMap2::splitVertex(Dart d, Dart e)
 	if(isOrbitEmbedded<FACE>())
 	{
 		unsigned int f1Emb = getEmbedding<FACE>(dd) ;
-		copyDartEmbedding<FACE>(phi1(dd), f1Emb) ;
-		copyDartEmbedding<FACE>(beta0(phi1(dd)), f1Emb) ;
+		setDartEmbedding<FACE>(phi1(dd), f1Emb) ;
+		setDartEmbedding<FACE>(beta0(phi1(dd)), f1Emb) ;
 		unsigned int f2Emb = getEmbedding<FACE>(ee) ;
-		copyDartEmbedding<FACE>(phi1(ee), f2Emb) ;
-		copyDartEmbedding<FACE>(beta0(phi1(ee)), f2Emb) ;
+		setDartEmbedding<FACE>(phi1(ee), f2Emb) ;
+		setDartEmbedding<FACE>(beta0(phi1(ee)), f2Emb) ;
 	}
 }
 
@@ -137,7 +138,7 @@ Dart EmbeddedGMap2::cutEdge(Dart d)
 		setDartEmbedding<EDGE>(phi2(d), eEmb) ;
 		setDartEmbedding<EDGE>(beta0(d), eEmb) ;
 		setOrbitEmbeddingOnNewCell<EDGE>(nd) ;
-		copyCell<EDGE>(nd, d) ;
+		copyCellAttributes<EDGE>(nd, d) ;
 	}
 
 	if(isOrbitEmbedded<FACE>())
@@ -382,7 +383,7 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 		if(!sameVertex(d,e))
 		{
 			setOrbitEmbeddingOnNewCell<VERTEX>(e);
-			copyCell<VERTEX>(e, d);
+			copyCellAttributes<VERTEX>(e, d);
 		}
 
 		d = beta0(d);
@@ -391,14 +392,14 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 		if(!sameVertex(d,e))
 		{
 			setOrbitEmbeddingOnNewCell<VERTEX>(e);
-			copyCell<VERTEX>(e, d);
+			copyCellAttributes<VERTEX>(e, d);
 		}
 	}
 
 	if (isOrbitEmbedded<EDGE>())
 	{
 		setOrbitEmbeddingOnNewCell<EDGE>(e);
-		copyCell<EDGE>(e, d);
+		copyCellAttributes<EDGE>(e, d);
 	}
 }
 
@@ -449,7 +450,7 @@ void EmbeddedGMap2::splitFace(Dart d, Dart e)
 		setDartEmbedding<FACE>(phi_1(d), fEmb) ;
 		setDartEmbedding<FACE>(beta1(phi_1(d)), fEmb) ;
 		setOrbitEmbeddingOnNewCell<FACE>(e) ;
-		copyCell<FACE>(e, d) ;
+		copyCellAttributes<FACE>(e, d) ;
 	}
 }
 
@@ -582,13 +583,13 @@ bool EmbeddedGMap2::check()
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 
-	std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
+	std::cout << "nb vertex orbits : " << Algo::Topo::getNbOrbits<VERTEX>(*this) << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
-	std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
+	std::cout << "nb edge orbits : " << Algo::Topo::getNbOrbits<EDGE>(*this) << std::endl ;
     std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
 
-	std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
+	std::cout << "nb face orbits : " << Algo::Topo::getNbOrbits<FACE>(*this) << std::endl ;
     std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 
 	return true ;

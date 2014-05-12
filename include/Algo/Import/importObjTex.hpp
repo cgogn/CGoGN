@@ -1635,7 +1635,10 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	
 	std::vector<unsigned int> localIndices;
 	localIndices.reserve(64*3);
-	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(m_map);
+
+	unsigned int vemb = EMBNULL;
+	auto fsetemb = [&] (Dart d) { m_map.template initDartEmbedding<VERTEX>(d, vemb); };
+//	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(m_map);
 
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(m_map, "incidents");
 	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> >, MAP_IMPL> vecNormIndPerVertex(m_map, "incidentsN");
@@ -1739,13 +1742,12 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			
 			for (short j = 0; j < nbe; ++j)
 			{
-				unsigned int em = localIndices[3*j]-1;		// get embedding
-				fsetemb.changeEmb(em) ;
+				vemb = localIndices[3*j]-1;		// get embedding
 				m_map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 				mk.mark(d) ;								// mark on the fly to unmark on second loop
-				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
-				vecTCIndPerVertex[em].push_back(localIndices[3*j+1]-1);
-				vecNormIndPerVertex[em].push_back(localIndices[3*j+2]-1);
+				vecDartsPerVertex[vemb].push_back(d);		// store incident darts for fast adjacency reconstruction
+				vecTCIndPerVertex[vemb].push_back(localIndices[3*j+1]-1);
+				vecNormIndPerVertex[vemb].push_back(localIndices[3*j+2]-1);
 				d = m_map.phi1(d);
 			}
 		}

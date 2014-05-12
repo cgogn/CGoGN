@@ -31,7 +31,8 @@
 #include "Utils/GLSLShader.h"
 //#include "Algo/Geometry/area.h"
 #include "Algo/Geometry/normal.h"
-
+#include "Geometry/matrix.h"
+#include "Geometry/transfo.h"
 
 #include "Utils/cgognStream.h"
 #include "Utils/chrono.h"
@@ -106,7 +107,12 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square grid tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
-			g.embedIntoGrid(position,50,50);
+			g.embedIntoGrid(position,1.0,1.0, 0.0);
+
+			Geom::Matrix44f trf;
+			trf.identity();
+			Geom::translate<float>(0.5,0.5,0.0,trf);
+			g.transform(position, trf);
 
 			g.exportPositions(position, "grid.bs");
 
@@ -116,7 +122,13 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square grid twisted strip tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
-			g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
+			g.embedIntoTwistedStrip(position, 0.2, 0.7, 5);
+
+			Geom::Matrix44f trf;
+			trf.identity();
+			Geom::translate<float>(0.5,0.5,0.0,trf);
+			g.transform(position, trf);
+
 
 			g.exportPositions(position, "gridtwisted.bs");
 
@@ -126,7 +138,13 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square grid helicoid tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,20,20,true);
-			g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
+			g.embedIntoHelicoid(position, 0.2,  0.3, 0.8, 2.0);
+
+//			Geom::Matrix44f trf;
+//			trf.identity();
+//			Geom::translate<float>(0.5,0.5,0.0,trf);
+//			g.transform(position, trf);
+
 
 			g.exportPositions(position, "gridhelicoid.bs");
 
@@ -136,7 +154,13 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square cylinder tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-			c.embedIntoCylinder(position,0.5,0.7,5.0);
+			c.embedIntoCylinder(position,0.5,0.7,1.0);
+
+			Geom::Matrix44f trf;
+			trf.identity();
+			Geom::translate<float>(0.5,0.5,0.0,trf);
+			c.transform(position, trf);
+
 
 			c.exportPositions(position, "cylinder.bs");
 
@@ -148,7 +172,7 @@ void MyQT::squareTiling(int code)
 			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
 			c.triangleBottom();
 			c.triangleTop();
-			c.embedIntoCylinder(position,0.5,0.7,5.0);
+			c.embedIntoCylinder(position,0.5,0.7,1.0);
 
 			break;
 		}
@@ -168,15 +192,20 @@ void MyQT::squareTiling(int code)
 			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
 			c.triangleTop();
 			c.triangleBottom();
-			c.embedIntoCone(position,0.5, 5.0);
+			c.embedIntoCone(position,0.5, 1.0);
 
 			break;
 		}
 		case 8:
 		{
-			std::cout << "square cylinder cone tiling" << std::endl;
-			Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
-			c.embedIntoCube(position,5.0,5.0, 5.0);
+            std::cout << "square cube tiling" << std::endl;
+            Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,1,1,2);
+			c.embedIntoCube(position,1.0, 1.0, 1.0);
+
+			Geom::Matrix44f trf;
+			trf.identity();
+			Geom::translate<float>(0.5,0.5,0.5,trf);
+			c.transform(position, trf);
 
 			c.exportPositions(position, "cube.bs");
 
@@ -186,7 +215,7 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square tore tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
-			c.embedIntoTore(position,5.0,2.0);
+			c.embedIntoTore(position, 0.9, 0.5);
 
 			c.exportPositions(position, "tore.bs");
 			break;
@@ -208,79 +237,79 @@ void MyQT::triangularTiling(int code)
 	{
 		case 1:
 		{
-			std::cout << "square grid tiling" << std::endl;
-			Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,10,10,true);
-			g.embedIntoGrid(position,50,50);
+			std::cout << "triangle grid tiling" << std::endl;
+            Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,1,5,true);
+			g.embedIntoGrid(position,1,1);
 
 			break;
 		}
 		case 2:
 		{
-//			std::cout << "square grid twisted strip tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
-//			g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
+			std::cout << "triangle grid twisted strip tiling" << std::endl;
+			Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,10,10,true);
+			g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
 
 			break;
 		}
 		case 3:
 		{
-//			std::cout << "square grid helocoid tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,20,20,true);
-//			g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
+			std::cout << "triangle grid helocoid tiling" << std::endl;
+			Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,20,20,true);
+			g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
 
 			break;
 		}
 		case 4:
 		{
-//			std::cout << "square cylinder tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-//			c.embedIntoCylinder(position,0.5,0.7,5.0);
+			std::cout << "triangle cylinder tiling" << std::endl;
+			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+			c.embedIntoCylinder(position,0.5,0.7,5.0);
 
 			break;
 		}
 		case 5:
 		{
-//			std::cout << "square cylinder tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-//			c.triangleBottom();
-//			c.triangleTop();
-//			c.embedIntoCylinder(position,0.5,0.7,5.0);
+			std::cout << "triangle cylinder tiling" << std::endl;
+			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+			c.triangleBottom();
+			c.triangleTop();
+			c.embedIntoCylinder(position,0.5,0.7,5.0);
 
 			break;
 		}
 		case 6:
 		{
-//			std::cout << "square cylinder sphere tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-//			c.triangleTop();
-//			c.triangleBottom();
-//			c.embedIntoSphere(position,0.5);
+			std::cout << "triangle cylinder sphere tiling" << std::endl;
+			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+			c.triangleTop();
+			c.triangleBottom();
+			c.embedIntoSphere(position,0.5);
 
 			break;
 		}
 		case 7:
 		{
-//			std::cout << "square cylinder cone tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-//			c.triangleTop();
-//			c.triangleBottom();
-//			c.embedIntoCone(position,0.5, 5.0);
+			std::cout << "triangle cylinder cone tiling" << std::endl;
+			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+			c.triangleTop();
+			c.triangleBottom();
+			c.embedIntoCone(position,0.5, 5.0);
 
 			break;
 		}
 		case 8:
 		{
-//			std::cout << "square cylinder cone tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Cube<PFP> c(myMap,20,20,20);
-//			c.embedIntoCube(position,5.0,5.0, 5.0);
+            std::cout << "triangle cube tiling" << std::endl;
+            Algo::Surface::Tilings::Triangular::Cube<PFP> c(myMap,4,4,4);
+            c.embedIntoCube(position,5.0,5.0, 5.0);
 
 			break;
 		}
 		case 9:
 		{
-//			std::cout << "square cylinder cone tiling" << std::endl;
-//			Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
-//			c.embedIntoTore(position,5.0,2.0);
+            std::cout << "triangle tore tiling" << std::endl;
+            Algo::Surface::Tilings::Triangular::Tore<PFP> c(myMap,20,10);
+            c.embedIntoTore(position,5.0,2.0);
 
 			break;
 		}
@@ -292,6 +321,96 @@ void MyQT::triangularTiling(int code)
 	}
 }
 
+
+void MyQT::hexagonalTiling(int code)
+{
+    switch(code)
+    {
+        case 1:
+        {
+            std::cout << "hexagonal grid tiling" << std::endl;
+            Algo::Surface::Tilings::Hexagonal::Grid<PFP> g(myMap,10,6,true);
+            g.embedIntoGrid(position,1,1);
+
+            break;
+        }
+        case 2:
+        {
+//            std::cout << "hexagonal grid twisted strip tiling" << std::endl;
+//            Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,10,10,true);
+//            g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
+
+            break;
+        }
+        case 3:
+        {
+//            std::cout << "hexagonal grid helocoid tiling" << std::endl;
+//            Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,20,20,true);
+//            g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
+
+            break;
+        }
+        case 4:
+        {
+//            std::cout << "hexagonal cylinder tiling" << std::endl;
+//            Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+//            c.embedIntoCylinder(position,0.5,0.7,5.0);
+
+            break;
+        }
+        case 5:
+        {
+//            std::cout << "hexagonal cylinder tiling" << std::endl;
+//            Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+//            c.triangleBottom();
+//            c.triangleTop();
+//            c.embedIntoCylinder(position,0.5,0.7,5.0);
+
+            break;
+        }
+        case 6:
+        {
+//			std::cout << "hexagonal cylinder sphere tiling" << std::endl;
+//			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+//			c.triangleTop();
+//			c.triangleBottom();
+//			c.embedIntoSphere(position,0.5);
+
+            break;
+        }
+        case 7:
+        {
+//			std::cout << "hexagonal cylinder cone tiling" << std::endl;
+//			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
+//			c.triangleTop();
+//			c.triangleBottom();
+//			c.embedIntoCone(position,0.5, 5.0);
+
+            break;
+        }
+        case 8:
+        {
+//            std::cout << "hexagonal cube tiling" << std::endl;
+//            Algo::Surface::Tilings::Triangular::Cube<PFP> c(myMap,4,4,4);
+//            c.embedIntoCube(position,5.0,5.0, 5.0);
+
+            break;
+        }
+        case 9:
+        {
+//            std::cout << "hexagonal tore tiling" << std::endl;
+//            Algo::Surface::Tilings::Triangular::Tore<PFP> c(myMap,20,10);
+//            c.embedIntoTore(position,5.0,2.0);
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+}
 int main(int argc, char **argv)
 {
 	// interface:
@@ -313,7 +432,12 @@ int main(int argc, char **argv)
 			sqt.squareTiling(atoi(argv[2]));
 		else if(argv[1][0] == 'T')
 			sqt.triangularTiling(atoi(argv[2]));
+        else if(argv[1][0] == 'H')
+            sqt.hexagonalTiling(atoi(argv[2]));
+        else
+            return -1;
 	}
+	myMap.check();
 
 	//  bounding box
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

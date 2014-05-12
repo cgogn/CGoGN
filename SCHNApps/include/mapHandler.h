@@ -17,6 +17,8 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Geometry/boundingbox.h"
 
+#include "Algo/Topo/basic.h"
+
 #include "Utils/vbo.h"
 
 namespace CGoGN
@@ -81,6 +83,13 @@ public:
 	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
 	/*********************************************************
+	 * MANAGE TOPOLOGICAL QUERIES
+	 *********************************************************/
+
+	virtual unsigned int getNbDarts() = 0;
+	virtual unsigned int getNbOrbits(unsigned int orbit) = 0;
+
+	/*********************************************************
 	 * MANAGE ATTRIBUTES
 	 *********************************************************/
 
@@ -90,39 +99,11 @@ public:
 
 	const AttributeSet& getAttributeSet(unsigned int orbit) const { return m_attribs[orbit]; }
 
-	void notifyAttributeModification(const AttributeHandlerGen& attr)
-	{
-		QString nameAttr = QString::fromStdString(attr.name());
-		if(m_vbo.contains(nameAttr))
-			m_vbo[nameAttr]->updateData(attr);
+	void notifyAttributeModification(const AttributeHandlerGen& attr);
 
-		emit(attributeModified(attr.getOrbit(), nameAttr));
+	void notifyConnectivityModification();
 
-		foreach(View* view, l_views)
-			view->updateGL();
-	}
-
-	void notifyConnectivityModification()
-	{
-		if (m_render)
-		{
-			m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
-			m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
-			m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
-			m_render->setPrimitiveDirty(Algo::Render::GL2::BOUNDARY);
-		}
-
-		for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-		{
-			foreach (CellSelectorGen* cs, m_cellSelectors[orbit])
-				cs->rebuild();
-		}
-
-		emit(connectivityModified());
-
-		foreach(View* view, l_views)
-			view->updateGL();
-	}
+	void clear(bool removeAttrib);
 
 	/*********************************************************
 	 * MANAGE VBOs
@@ -175,6 +156,7 @@ signals:
 
 	void attributeAdded(unsigned int orbit, const QString& nameAttr);
 	void attributeModified(unsigned int orbit, QString nameAttr);
+	void attributeRemoved(unsigned int orbit, const QString& nameAttr);
 
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
@@ -226,6 +208,13 @@ public:
 	}
 
 	inline MAP* getMap() { return static_cast<MAP*>(m_map); }
+
+	/*********************************************************
+	 * MANAGE TOPOLOGICAL QUERIES
+	 *********************************************************/
+
+	unsigned int getNbDarts();
+	unsigned int getNbOrbits(unsigned int orbit);
 
 	/*********************************************************
 	 * MANAGE ATTRIBUTES

@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/mapMono.h"
+#include "Topology/generic/mapImpl/mapMono.h"
 
 namespace CGoGN
 {

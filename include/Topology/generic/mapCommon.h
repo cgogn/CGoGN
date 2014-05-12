@@ -26,6 +26,7 @@
 #define __MAP_COMMON__
 
 #include "Topology/generic/attributeHandler.h"
+#include "Topology/generic/cells.h"
 
 namespace CGoGN
 {
@@ -39,28 +40,15 @@ class MapCommon : public MAP_IMPL
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
 public:
-	/**
-	* execute functor for each orbit
-	* @param dim the dimension of the orbit
-	* @param f the functor
-	*/
-	template <unsigned int ORBIT>
-	bool foreach_orbit(FunctorType& f, unsigned int thread = 0);
-
-	//! Count the number of orbits of dimension dim in the map
-	/*! @param dim the dimension of the orbit
-	 * 	@return the number of orbits
-	 */
-	template <unsigned int ORBIT>
-	unsigned int getNbOrbits() const;
-
-	unsigned int getNbOrbits(unsigned int orbit) const;
 
 	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
 	/*! @param d a dart
 	 */
 	template <unsigned int ORBIT, unsigned int INCIDENT>
 	unsigned int degree(Dart d) const;
+
+	template <unsigned int ORBIT>
+	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread = 0) const;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -71,7 +59,7 @@ public:
 	 * @return EMBNULL if the orbit of d is not attached to any cell
 	 */
 	template<unsigned int ORBIT>
-	inline unsigned int getEmbedding(Dart d) const;
+	inline unsigned int getEmbedding(Cell<ORBIT> d) const;
 
 	/**
 	 * Set the cell index of the given dimension associated to dart d
@@ -102,14 +90,14 @@ public:
 	* @param em index of attribute to store as embedding
 	*/
 	template <unsigned int ORBIT>
-	void setOrbitEmbedding(Dart d, unsigned int em) ;
+	void setOrbitEmbedding(Cell<ORBIT> d, unsigned int em) ;
 
 	/**
 	 * Set the index of the associated cell to all the darts of an orbit
 	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
 	 */
 	template <unsigned int ORBIT>
-	void initOrbitEmbedding(Dart d, unsigned int em) ;
+	void initOrbitEmbedding(Cell<ORBIT> d, unsigned int em) ;
 
 	/**
 	* Associate an new cell to all darts of an orbit
@@ -118,14 +106,14 @@ public:
 	* @return index of the attribute in table
 	*/
 	template <unsigned int ORBIT>
-	unsigned int setOrbitEmbeddingOnNewCell(Dart d) ;
+	unsigned int setOrbitEmbeddingOnNewCell(Cell<ORBIT> d) ;
 
 	/**
 	 * Associate an new cell to all darts of an orbit
 	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
 	 */
 	template <unsigned int ORBIT>
-	unsigned int initOrbitEmbeddingOnNewCell(Dart d) ;
+	unsigned int initOrbitEmbeddingOnNewCell(Cell<ORBIT> d) ;
 
 	/**
 	 * Copy the cell associated to a dart over an other dart
@@ -134,14 +122,7 @@ public:
 	 * @param e the dart to copy (src)
 	 */
 	template <unsigned int ORBIT>
-	void copyCell(Dart d, Dart e) ;
-
-	/**
-	 * Traverse the map and embed all orbits of the given dimension with a new cell
-	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
-	 */
-	template <unsigned int ORBIT>
-	void initAllOrbitsEmbedding(bool realloc = false) ;
+	void copyCellAttributes(Cell<ORBIT> d, Cell<ORBIT> e) ;
 
 	/****************************************
 	 *         BOUNDARY MANAGEMENT          *
@@ -160,16 +141,16 @@ protected:
 	void boundaryUnmark(Dart d) ;
 
 	/**
-	 * mark an orbit of dart as belonging to boundary
+	 * mark an orbit as belonging to boundary
 	 */
-	template <unsigned int ORBIT, unsigned int DIM>
-	void boundaryMarkOrbit(Dart d) ;
+	template <unsigned int DIM, unsigned int ORBIT>
+	void boundaryMarkOrbit(Cell<ORBIT> c) ;
 
 	/**
-	 * unmark an orbit of dart from the boundary
+	 * unmark an orbit from the boundary
 	 */
-	template <unsigned int ORBIT, unsigned int DIM>
-	void boundaryUnmarkOrbit(Dart d) ;
+	template <unsigned int DIM, unsigned int ORBIT>
+	void boundaryUnmarkOrbit(Cell<ORBIT> c) ;
 
 	/**
 	 * clear all boundary markers
@@ -290,23 +271,6 @@ public:
 
 	template <unsigned int ORBIT, unsigned int ADJ>
 	void disableQuickAdjacentTraversal();
-
-	/****************************************
-	 *               UTILITIES              *
-	 ****************************************/
-
-	/**
-	 * use the given attribute to store the indices of the cells of the corresponding orbit
-	 * @return the number of cells of the orbit
-	 */
-	template <unsigned int ORBIT>
-	unsigned int computeIndexCells(AttributeHandler<unsigned int, ORBIT, MAP_IMPL>& idx) ;
-
-	/**
-	 * ensure that each orbit as one embedding and that each embedding is handle by only one orbit
-	 */
-	template <unsigned int ORBIT>
-	void bijectiveOrbitEmbedding();
 };
 
 } //namespace CGoGN

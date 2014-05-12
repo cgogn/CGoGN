@@ -3,6 +3,8 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
 
+#include "Algo/Topo/basic.h"
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 
@@ -62,7 +64,7 @@ void MapParameters::start(MapHandlerGen* mhg)
 			for(unsigned int i = vertexRotationMatrix.begin(); i != vertexRotationMatrix.end(); vertexRotationMatrix.next(i))
 				vertexRotationMatrix[i] = Eigen::Matrix3f::Identity();
 
-			nb_vertices = map->computeIndexCells<VERTEX>(vIndex);
+			nb_vertices = Algo::Topo::computeIndexCells<VERTEX>(*map, vIndex);
 
 			if(nlContext)
 				nlDeleteContext(nlContext);
@@ -185,12 +187,12 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
 
 		MapParameters& p = h_parameterSet[mh];
-		const std::vector<Dart>& handle = p.handleSelector->getSelectedCells();
+		const std::vector<Vertex>& handle = p.handleSelector->getSelectedCells();
 
 		if(!m_draginit)
 		{
 			m_dragZ = 0;
-			for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 			{
 				const PFP2::VEC3& pp = p.positionAttribute[*it];
 				qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(pp[0],pp[1],pp[2]));
@@ -210,7 +212,7 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 
 			qglviewer::Vec vec = qq - m_dragPrevious;
 			PFP2::VEC3 t(vec.x, vec.y, vec.z);
-			for(std::vector<Dart>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 				p.positionAttribute[*it] += t;
 
 			m_dragPrevious = qq;
@@ -260,6 +262,7 @@ void Surface_Deformation_Plugin::mapRemoved(MapHandlerGen* map)
 void Surface_Deformation_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+
 	if(orbit == VERTEX && map->isSelectedMap())
 		m_dockTab->addVertexAttribute(name);
 }

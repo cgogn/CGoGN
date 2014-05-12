@@ -167,7 +167,7 @@ void Map2MR<PFP>::addNewLevelSqrt3()
 	for (Dart dit = t.begin(); dit != t.end(); dit = t.next())
 	{
 		//if it is an even level (triadic refinement) and a boundary face
-		if((m_map.getCurrentLevel()%2 == 0) && m_map.isBoundaryFace(dit))
+		if((m_map.getCurrentLevel()%2 == 0) && m_map.isFaceIncidentToBoundary(dit))
 		{
 			//find the boundary edge
 			Dart df = m_map.findBoundaryEdgeOfFace(dit);

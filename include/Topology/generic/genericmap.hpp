@@ -23,8 +23,8 @@
 *******************************************************************************/
 
 #include "Topology/generic/dartmarker.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversorFactory.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversorFactory.h"
 
 namespace CGoGN
 {
@@ -198,18 +198,19 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 template <unsigned int ORBIT>
 void GenericMap::addEmbedding()
 {
-	assert(!isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit already embedded") ;
+	if (!isOrbitEmbedded<ORBIT>())
+	{
+		std::ostringstream oss;
+		oss << "EMB_" << ORBIT;
 
-	std::ostringstream oss;
-	oss << "EMB_" << ORBIT;
+		AttributeContainer& dartCont = m_attribs[DART] ;
+		AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
+		m_embeddings[ORBIT] = amv ;
 
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[ORBIT] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		(*amv)[i] = EMBNULL ;
+		// set new embedding to EMBNULL for all the darts of the map
+		for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
+			(*amv)[i] = EMBNULL ;
+	}
 }
 
 /****************************************
@@ -217,23 +218,41 @@ void GenericMap::addEmbedding()
  ****************************************/
 
 template <unsigned int ORBIT>
-bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread) const
+void GenericMap::foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)> f, unsigned int thread) const
 {
 	switch(ORBIT)
 	{
-		case DART:		return f(d);
-		case VERTEX: 	return foreach_dart_of_vertex(d, f, thread);
-		case EDGE: 		return foreach_dart_of_edge(d, f, thread);
-		case FACE: 		return foreach_dart_of_face(d, f, thread);
-		case VOLUME: 	return foreach_dart_of_volume(d, f, thread);
-		case VERTEX1: 	return foreach_dart_of_vertex1(d, f, thread);
-		case EDGE1: 	return foreach_dart_of_edge1(d, f, thread);
-		case VERTEX2: 	return foreach_dart_of_vertex2(d, f, thread);
-		case EDGE2:		return foreach_dart_of_edge2(d, f, thread);
-		case FACE2:		return foreach_dart_of_face2(d, f, thread);
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		case VERTEX2: 	foreach_dart_of_vertex2(c, f, thread); break;
+		case EDGE2:		foreach_dart_of_edge2(c, f, thread); break;
+		case FACE2:		foreach_dart_of_face2(c, f, thread); break;
 		default: 		assert(!"Cells of this dimension are not handled"); break;
 	}
-	return false;
+}
+
+template <unsigned int ORBIT>
+void GenericMap::foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)>& f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		case VERTEX2: 	foreach_dart_of_vertex2(c, f, thread); break;
+		case EDGE2:		foreach_dart_of_edge2(c, f, thread); break;
+		case FACE2:		foreach_dart_of_face2(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
 }
 
 /****************************************
@@ -247,7 +266,7 @@ inline AttributeMultiVector<Dart>* GenericMap::addRelation(const std::string& na
 
 	// set new relation to fix point for all the darts of the map
 	for(unsigned int i = cont.begin(); i < cont.end(); cont.next(i))
-		(*amv)[i] = i ;
+		(*amv)[i] = Dart(i) ;
 
 	return amv ;
 }

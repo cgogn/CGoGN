@@ -30,7 +30,7 @@
 #include "Topology/map/map3.h"
 #include "Topology/gmap/gmap3.h"
 
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 #include "Algo/Geometry/centroid.h"
 
 #include "Geometry/distances.h"
@@ -600,7 +600,7 @@ void Topo3RenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP_
 	CellMarker<MAP, VOLUME> cmv(mapx);
 	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(mapx, "centerVolumes");
 
-	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(mapx, positions, centerVolumes,3);
+	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(mapx, positions, centerVolumes);
 
 	// debut phi1
 	DartAutoAttribute<VEC3, MAP_IMPL> fv1(mapx);

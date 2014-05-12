@@ -33,6 +33,7 @@ namespace CGoGN
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
 typedef EmbeddedMap2::IMPL EMap2_IMPL;
+typedef EmbeddedMap2::TOPO_MAP TOPO_MAP;
 
 class ImplicitHierarchicalMap2 : public EmbeddedMap2
 {
@@ -85,37 +86,37 @@ public:
 	 *                 MAP TRAVERSAL                   *
 	 ***************************************************/
 
-	virtual Dart newDart() ;
+	inline Dart newDart() ;
 
-	Dart phi1(Dart d) const ;
+	inline Dart phi1(Dart d) const ;
 
-	Dart phi_1(Dart d) const ;
+	inline Dart phi_1(Dart d) const ;
 
-	Dart phi2(Dart d) const ;
+	inline Dart phi2(Dart d) const ;
 
-	Dart alpha0(Dart d) const ;
+	inline Dart alpha0(Dart d) const ;
 
-	Dart alpha1(Dart d) const ;
+	inline Dart alpha1(Dart d) const ;
 
-	Dart alpha_1(Dart d) const ;
+	inline Dart alpha_1(Dart d) const ;
 
-	virtual Dart begin() const ;
+	inline Dart begin() const ;
 
-	virtual Dart end() const ;
+	inline Dart end() const ;
 
-	virtual void next(Dart& d) const ;
+	inline void next(Dart& d) const ;
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
 
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) const ;
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0)  const;
+	void foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0)  const;
 
-	virtual bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread = 0) const ;
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
 	/***************************************************
 	 *               MAP MANIPULATION                  *

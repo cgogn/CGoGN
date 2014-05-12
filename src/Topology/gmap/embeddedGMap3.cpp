@@ -26,7 +26,8 @@
 #include <algorithm>
 
 #include "Topology/gmap/embeddedGMap3.h"
-#include "Topology/generic/traversor3.h"
+#include "Topology/generic/traversor/traversor3.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
@@ -61,7 +62,7 @@ Dart EmbeddedGMap3::cutEdge(Dart d)
 
 		// embed a new cell for the new edge and copy the attributes' line (c) Lionel
 		setOrbitEmbeddingOnNewCell<EDGE>(phi1(d)) ;
-		copyCell<EDGE>(phi1(d), d) ;
+		copyCellAttributes<EDGE>(phi1(d), d) ;
 	}
 
 	if(isOrbitEmbedded<FACE>())
@@ -171,7 +172,7 @@ void EmbeddedGMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<FACE>(beta0(beta1(ee)), fEmb) ;
 		setDartEmbedding<FACE>(beta1(beta0(beta1(ee))), fEmb) ;
 		setOrbitEmbeddingOnNewCell<FACE>(e);
-		copyCell<FACE>(e, d);
+		copyCellAttributes<FACE>(e, d);
 	}
 
 	if(isOrbitEmbedded<VOLUME>())
@@ -250,7 +251,7 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 			{
 				setOrbitEmbedding<VERTEX>(dit, getEmbedding<VERTEX>(dit)) ;
 				setOrbitEmbeddingOnNewCell<VERTEX>(dd);
-				copyCell<VERTEX>(dd, dit);
+				copyCellAttributes<VERTEX>(dd, dit);
 			}
 			else
 			{
@@ -267,7 +268,7 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 			{
 				setOrbitEmbedding<EDGE>(dit, getEmbedding<EDGE>(dit)) ;
 				setOrbitEmbeddingOnNewCell<EDGE>(dd);
-				copyCell<EDGE>(dd, dit);
+				copyCellAttributes<EDGE>(dd, dit);
 			}
 			else
 			{
@@ -288,7 +289,7 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 	if (isOrbitEmbedded<FACE>())
 	{
 		setOrbitEmbeddingOnNewCell<FACE>(dd);
-		copyCell<FACE>(dd, d);
+		copyCellAttributes<FACE>(dd, d);
 	}
 }
 
@@ -350,7 +351,7 @@ void EmbeddedGMap3::splitVolume(std::vector<Dart>& vd)
 		Dart v = vd.front() ;
 		Dart v23 = alpha2(v) ;
 		setOrbitEmbeddingOnNewCell<VOLUME>(v23) ;
-		copyCell<VOLUME>(v23, v) ;
+		copyCellAttributes<VOLUME>(v23, v) ;
 	}
 }
 
@@ -461,16 +462,16 @@ bool EmbeddedGMap3::check()
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 
-	std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
+	std::cout << "nb vertex orbits : " << Algo::Topo::getNbOrbits<VERTEX>(*this) << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
-	std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
+	std::cout << "nb edge orbits : " << Algo::Topo::getNbOrbits<EDGE>(*this) << std::endl ;
     std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
 
-	std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
+	std::cout << "nb face orbits : " << Algo::Topo::getNbOrbits<FACE>(*this) << std::endl ;
     std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 
-	std::cout << "nb volume orbits : " << getNbOrbits<VOLUME>() << std::endl ;
+	std::cout << "nb volume orbits : " << Algo::Topo::getNbOrbits<VOLUME>(*this) << std::endl ;
     std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
 
 	return true ;

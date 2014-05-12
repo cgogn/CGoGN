@@ -43,7 +43,7 @@ namespace Geometry
 //! @param position
 //! @return
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+typename PFP::REAL triangleArea(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 //! \brief Compute convex polygonal face area
 //! @param map
@@ -51,7 +51,7 @@ typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const VertexAttr
 //! @param position
 //! @return
 template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 //! \brief Compute the total area of a mesh by summing all face areas.
 //! @param map
@@ -66,25 +66,40 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const VertexAttribute<typen
 //! @param position
 //! @return
 template <typename PFP>
-typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 template <typename PFP>
-typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 template <typename PFP>
-typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& face_area) ;
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& face_area, unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertex_area) ;
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertex_area, unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertex_area) ;
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertex_area, unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertex_area) ;
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertex_area, unsigned int thread = 0) ;
+
+namespace Parallel
+{
+template <typename PFP>
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& area);
+
+template <typename PFP>
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& area);
+
+template <typename PFP>
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertex_area);
+
+template <typename PFP>
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP>& area);
+} // namespace Parallel
 
 } // namespace Geometry
 

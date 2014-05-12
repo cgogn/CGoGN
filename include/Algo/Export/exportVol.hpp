@@ -24,8 +24,8 @@
 
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/autoAttributeHandler.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
 #include "Topology/generic/cellmarker.h"
 #include "Algo/Import/importFileTypes.h"
 

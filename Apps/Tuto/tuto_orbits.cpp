@@ -35,7 +35,7 @@
 #include "Algo/Render/SVG/mapSVGRender.h"
 
 #include "Algo/Import/import.h"
-#include "Topology/generic/traversorFactory.h"
+#include "Topology/generic/traversor/traversorFactory.h"
 
 MAP myMap;
 VertexAttribute<VEC3, MAP_IMPL> position ;

@@ -39,16 +39,40 @@
 #include "Container/fakeAttribute.h"
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/cells.h"
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
+
+#include <boost/thread.hpp>
 
 namespace CGoGN
 {
 
+namespace Parallel
+{
+/**
+ * @brief Number of threads used for // traversal foreach
+ */
+extern int NumberOfThreads;
+
+/**
+ * @brief get number of cores of computer (threads, /2 if hyperthreading)
+ * @param hyperthreading
+ * @return nb of core
+ */
+inline int getSystemNumberOfCores(bool hyperthreading=false)
+{
+	if (hyperthreading)
+		return boost::thread::hardware_concurrency()/2;
+	return boost::thread::hardware_concurrency();
+}
+
+}
+
+
 class AttributeHandlerGen ;
 class DartMarkerGen ;
 class CellMarkerGen ;
-//template<typename MAP, unsigned int CELL> class CellMarkerBase ;
 
 class GenericMap
 {
@@ -147,7 +171,7 @@ protected:
 	/**
 	 * Add a dart to the map
 	 */
-	Dart newDart() ;
+	virtual Dart newDart() ;
 
 	/**
 	 * Erase a dart of the map
@@ -165,39 +189,32 @@ protected:
 	void deleteDartLine(unsigned int index) ;
 
 public:
-	virtual unsigned int getNbDarts() const = 0 ;
-
 	/****************************************
 	 *          ORBITS TRAVERSALS           *
 	 ****************************************/
 
-	//! Apply a functor on every dart of an orbit
-	/*! @param dim dimension of orbit
-	 *  @param d a dart of the orbit
-	 *  @param f a functor obj
+	//! Apply a function on every dart of an orbit
+	/*! @param c a cell
+	 *  @param f a function
 	 */
 	template <unsigned int ORBIT>
-	bool foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)> f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) const = 0 ;
-	virtual bool foreach_dart_of_face(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_volume(Dart /*d*/, FunctorType& /*f*/, unsigned /*int thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_cc(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	template <unsigned int ORBIT>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
 
-	virtual bool foreach_dart_of_vertex1(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_edge1(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual void foreach_dart_of_vertex(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_edge(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_face(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_volume(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_cc(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
-	virtual bool foreach_dart_of_vertex2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_edge2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
-	virtual bool foreach_dart_of_face2(Dart /*d*/, FunctorType& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; return false; }
+	virtual void foreach_dart_of_vertex1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_edge1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
-	/**
-	 * @brief getNbOrbits
-	 * @param orbit
-	 * @return the number of orbits in the map
-	 */
-	virtual unsigned int getNbOrbits(unsigned int orbit) const = 0 ;
+	virtual void foreach_dart_of_vertex2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_edge2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+	virtual void foreach_dart_of_face2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -299,7 +316,6 @@ public:
 
 	void printDartsTable();
 
-protected:
 	/****************************************
 	 *   EMBEDDING ATTRIBUTES MANAGEMENT    *
 	 ****************************************/
@@ -309,6 +325,7 @@ protected:
 	template <unsigned int ORBIT>
 	void addEmbedding() ;
 
+protected:
 	/****************************************
 	 *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
 	 ****************************************/
@@ -395,6 +412,8 @@ public:
 	 */
 	void compact() ;
 } ;
+
+
 
 //
 //template <typename MAP>

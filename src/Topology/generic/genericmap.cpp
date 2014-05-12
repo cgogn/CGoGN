@@ -24,7 +24,7 @@
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -32,6 +32,12 @@
 
 namespace CGoGN
 {
+
+namespace Parallel
+{
+//int NumberOfThreads=1;
+int NumberOfThreads = getSystemNumberOfCores();
+}
 
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;

@@ -150,43 +150,43 @@ public:
 	/**
 	 * mark the cell of dart
 	 */
-	inline void mark(Dart d)
+	inline void mark(Cell<CELL> c)
 	{
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		unsigned int a = m_map.template getEmbedding<CELL>(d) ;
+		unsigned int a = m_map.getEmbedding(c) ;
 		if (a == EMBNULL)
-			a = m_map.template setOrbitEmbeddingOnNewCell<CELL>(d) ;
-		m_markVector->operator[](a).setMark(m_mark) ;
+			a = m_map.setOrbitEmbeddingOnNewCell(c) ;
+		(*m_markVector)[a].setMark(m_mark) ;
 	}
 
 	/**
 	 * unmark the cell of dart
 	 */
-	inline void unmark(Dart d)
+	inline void unmark(Cell<CELL> c)
 	{
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		unsigned int a = m_map.template getEmbedding<CELL>(d) ;
+		unsigned int a = m_map.getEmbedding(c) ;
 		if (a == EMBNULL)
-			a = m_map.template setOrbitEmbeddingOnNewCell<CELL>(d) ;
-		m_markVector->operator[](a).unsetMark(m_mark) ;
+			a = m_map.setOrbitEmbeddingOnNewCell(c) ;
+		(*m_markVector)[a].unsetMark(m_mark) ;
 	}
 
 	/**
 	 * test if cell of dart is marked
 	 */
-	inline bool isMarked(Dart d) const
+	inline bool isMarked(Cell<CELL> c) const
 	{
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		unsigned int a = m_map.template getEmbedding<CELL>(d) ;
+		unsigned int a = m_map.getEmbedding(c) ;
 		if (a == EMBNULL)
 			return false ;
-		return m_markVector->operator[](a).testMark(m_mark) ;
+		return (*m_markVector)[a].testMark(m_mark) ;
 	}
 
 	/**
@@ -197,7 +197,7 @@ public:
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		m_markVector->operator[](em).setMark(m_mark) ;
+		(*m_markVector)[em].setMark(m_mark) ;
 	}
 
 	/**
@@ -208,7 +208,7 @@ public:
 		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
-		m_markVector->operator[](em).unsetMark(m_mark) ;
+		(*m_markVector)[em].unsetMark(m_mark) ;
 	}
 
 	/**
@@ -221,7 +221,7 @@ public:
 
 		if (em == EMBNULL)
 			return false ;
-		return m_markVector->operator[](em).testMark(m_mark) ;
+		return (*m_markVector)[em].testMark(m_mark) ;
 	}
 
 	/**
@@ -234,7 +234,7 @@ public:
 
 		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_markVector->operator[](i).setMark(m_mark) ;
+			(*m_markVector)[i].setMark(m_mark) ;
 	}
 
 	inline bool isAllUnmarked()
@@ -244,7 +244,7 @@ public:
 
 		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			if(m_markVector->operator[](i).testMark(m_mark))
+			if((*m_markVector)[i].testMark(m_mark))
 				return false ;
 		return true ;
 	}
@@ -301,11 +301,15 @@ protected:
 public:
 	CellMarkerStore(MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
-	{}
+	{
+		m_markedCells.reserve(128);
+	}
 
 	CellMarkerStore(const MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
-	{}
+	{
+		m_markedCells.reserve(128);
+	}
 
 	virtual ~CellMarkerStore()
 	{
@@ -320,7 +324,7 @@ protected:
 	{}
 
 public:
-	inline void mark(Dart d)
+	inline void mark(Cell<CELL> d)
 	{
 		CellMarkerBase<MAP, CELL>::mark(d) ;
 		m_markedCells.push_back(this->m_map.template getEmbedding<CELL>(d)) ;
@@ -356,11 +360,15 @@ protected:
 public:
 	CellMarkerMemo(MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
-	{}
+	{
+		m_markedDarts.reserve(128);
+	}
 
 	CellMarkerMemo(const MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
-	{}
+	{
+		m_markedDarts.reserve(128);
+	}
 
 	virtual ~CellMarkerMemo()
 	{
@@ -375,12 +383,12 @@ protected:
 	{}
 
 public:
-	inline void mark(Dart d)
+	inline void mark(Cell<CELL> c)
 	{
-		if(!this->isMarked(d))
+		if(!this->isMarked(c))
 		{
-			CellMarkerBase<MAP, CELL>::mark(d) ;
-			m_markedDarts.push_back(d) ;
+			CellMarkerBase<MAP, CELL>::mark(c) ;
+			m_markedDarts.push_back(c.dart) ;
 		}
 	}
 
@@ -459,12 +467,13 @@ public:
 		m_cmarker(cm)
 	{}
 
-	inline bool operator()(Dart d) const
+	inline bool operator()(Cell<CELL> d) const
 	{
 		if (m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
+
 	inline FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker); }
 };
 
@@ -479,7 +488,7 @@ public:
 		m_cmarker(cm)
 	{}
 
-	inline bool operator()(Dart d) const
+	inline bool operator()(Cell<CELL> d) const
 	{
 		if (!m_cmarker.isMarked(d))
 			return true ;
@@ -505,7 +514,7 @@ public:
 		m_marker(cm)
 	{}
 
-	inline bool operator()(Dart d)
+	inline bool operator()(Cell<CELL> d)
 	{
 		return m_marker.isMarked(d);
 	}
@@ -521,7 +530,7 @@ public:
 		m_marker(cm)
 	{}
 
-	inline bool operator()(Dart d)
+	inline bool operator()(Cell<CELL> d)
 	{
 		return !m_marker.isMarked(d);
 	}

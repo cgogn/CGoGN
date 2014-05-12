@@ -67,9 +67,9 @@ protected:
 
 	bool isInsideCollected;
 
-	std::vector<Dart> insideVertices;
-	std::vector<Dart> insideEdges;
-	std::vector<Dart> insideFaces;
+	std::vector<Vertex> insideVertices;
+	std::vector<Edge> insideEdges;
+	std::vector<Face> insideFaces;
 	std::vector<Dart> border;
 
 public:
@@ -105,9 +105,9 @@ public:
 
 	inline Dart getCenterDart() const { return centerDart; }
 
-	inline const std::vector<Dart>& getInsideVertices() const { assert(isInsideCollected || !"getInsideVertices: inside cells have not been collected.") ; return insideVertices; }
-	inline const std::vector<Dart>& getInsideEdges() const { assert(isInsideCollected || !"getInsideEdges: inside cells have not been collected.") ; return insideEdges; }
-	inline const std::vector<Dart>& getInsideFaces() const { assert(isInsideCollected || !"getInsideFaces: inside cells have not been collected.") ; return insideFaces; }
+	inline const std::vector<Vertex>& getInsideVertices() const { assert(isInsideCollected || !"getInsideVertices: inside cells have not been collected.") ; return insideVertices; }
+	inline const std::vector<Edge>& getInsideEdges() const { assert(isInsideCollected || !"getInsideEdges: inside cells have not been collected.") ; return insideEdges; }
+	inline const std::vector<Face>& getInsideFaces() const { assert(isInsideCollected || !"getInsideFaces: inside cells have not been collected.") ; return insideFaces; }
 	inline const std::vector<Dart>& getBorder() const { return border; }
 
 	inline unsigned int getNbInsideVertices() const { assert(isInsideCollected || !"getNbInsideVertices: inside cells have not been collected.") ; return insideVertices.size(); }
@@ -118,12 +118,19 @@ public:
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
 
-	virtual REAL computeArea (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/) {
+	virtual REAL computeArea (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/)
+	{
 		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
 		return 0.0;
 	}
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/, const EdgeAttribute<REAL, MAP_IMPL>& /*edgeangle*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/, const EdgeAttribute<REAL, MAP_IMPL>& /*edgeangle*/, typename PFP::MATRIX33&)
+	{
+		assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes");
+	}
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& /*pos*/, typename PFP::MATRIX33&)
+	{
+		assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes");
+	}
 };
 
 /*********************************************************
@@ -186,8 +193,9 @@ public:
 	void collectBorder(Dart d);
 
 	REAL computeArea(const VertexAttribute<VEC3, MAP_IMPL>& pos);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>&edgeangle, typename PFP::MATRIX33&);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>& edgeangle, typename PFP::MATRIX33&);
 	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, typename PFP::MATRIX33&);
+
 };
 
 /*********************************************************
@@ -345,7 +353,7 @@ public :
 	}
 };
 
-// tests if the angle between vertex normals is below some threshold
+// tests if the angle between triangle normals is below some threshold
 template <typename PFP>
 class CollectorCriterion_TriangleNormalAngle : public CollectorCriterion
 {
@@ -422,7 +430,6 @@ public:
 		Collector<PFP>(m, thread),
 		crit(c)
 	{}
-
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 };
@@ -450,7 +457,6 @@ public:
 	Collector_Triangles(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread = 0) :
 		Collector<PFP>(m,thread), crit(c)
 	{}
-
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
 };
