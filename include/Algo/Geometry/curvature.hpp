@@ -47,7 +47,8 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmax,
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin)
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
+	unsigned int thread)
 {
 
 	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
@@ -60,7 +61,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	{
 		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin) ;
 	}
-	,FORCE_CELL_MARKING,thread);
+	, FORCE_CELL_MARKING, thread);
 
 //	TraversorV<typename PFP::MAP> t(map) ;
 //	for(Vertex v = t.begin(); v != t.end(); v = t.next())
@@ -639,6 +640,7 @@ void normalCycles_ProjectTensor(Geom::Matrix<3,3,typename PFP::REAL>& tensor, co
 
 namespace Parallel
 {
+
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles(
 	typename PFP::MAP& map,
@@ -654,27 +656,19 @@ void computeCurvatureVertices_NormalCycles(
 {
 	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
 	if (!map.template isOrbitEmbedded<VERTEX>())
-	{
-		CellMarkerNoUnmark<typename PFP::MAP, VERTEX> cm(map);
-		map.template initAllOrbitsEmbedding<VERTEX>();
-	}
-	if (!map.template isOrbitEmbedded<EDGE>())
-	{
-		CellMarkerNoUnmark<typename PFP::MAP, EDGE> cm(map);
-		map.template initAllOrbitsEmbedding<EDGE>();
-	}
-	if (!map.template isOrbitEmbedded<FACE>())
-	{
-		CellMarkerNoUnmark<typename PFP::MAP, FACE> cm(map);
-		map.template initAllOrbitsEmbedding<FACE>();
-	}
+		Algo::Topo::initAllOrbitsEmbedding<VERTEX>(map);
 
-	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	if (!map.template isOrbitEmbedded<EDGE>())
+		Algo::Topo::initAllOrbitsEmbedding<EDGE>(map);
+
+	if (!map.template isOrbitEmbedded<FACE>())
+		Algo::Topo::initAllOrbitsEmbedding<FACE>(map);
+
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
 	},true,FORCE_CELL_MARKING);
 }
-
 
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles_Projected(
@@ -689,24 +683,17 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal)
 {
-	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
+//	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
 	if (!map.template isOrbitEmbedded<VERTEX>())
-	{
-		CellMarkerNoUnmark<typename PFP::MAP, VERTEX> cm(map);
-		map.template initAllOrbitsEmbedding<VERTEX>();
-	}
-	if (!map.template isOrbitEmbedded<EDGE>())
-	{
-		CellMarkerNoUnmark<typename PFP::MAP, EDGE> cm(map);
-		map.template initAllOrbitsEmbedding<EDGE>();
-	}
-	if (!map.template isOrbitEmbedded<FACE>())
-	{
-		CellMarkerNoUnmark<typename PFP::MAP, FACE> cm(map);
-		map.template initAllOrbitsEmbedding<FACE>();
-	}
+		Algo::Topo::initAllOrbitsEmbedding<VERTEX>(map);
 
-	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	if (!map.template isOrbitEmbedded<EDGE>())
+		Algo::Topo::initAllOrbitsEmbedding<EDGE>(map);
+
+	if (!map.template isOrbitEmbedded<FACE>())
+		Algo::Topo::initAllOrbitsEmbedding<FACE>(map);
+
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
 	},true,FORCE_CELL_MARKING);
@@ -724,7 +711,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin)
 {
-	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin, threadID) ;
 	},true,FORCE_CELL_MARKING);

@@ -58,7 +58,8 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmax,
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
+	unsigned int thread = 0) ;
 
 template <typename PFP>
 void computeCurvatureVertex_QuadraticFitting(
