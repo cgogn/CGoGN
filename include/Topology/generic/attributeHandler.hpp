@@ -195,7 +195,7 @@ inline T& AttributeHandler<T, ORBIT, MAP_IMPL>::operator[](Cell<ORBIT> c)
 	unsigned int a = m_map->getEmbedding(c) ;
 
 	if (a == EMBNULL)
-		a = m_map->template setOrbitEmbeddingOnNewCell(c) ;
+		a = m_map->setOrbitEmbeddingOnNewCell(c) ;
 
 	return m_attrib->operator[](a) ;
 }

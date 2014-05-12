@@ -27,6 +27,7 @@
 
 //#include "tetgen/tetgen.h"
 #include "Algo/Geometry/normal.h"
+#include <set>
 
 namespace CGoGN
 {
@@ -57,7 +58,7 @@ protected:
 	class VertexPoly;
 
 	// multiset typedef for simple writing
-	typedef std::multiset< VertexPoly,VertexPoly> VPMS;
+	typedef std::multiset<VertexPoly,VertexPoly> VPMS;
 	typedef typename VPMS::iterator VMPSITER;
 	typedef NoTypeNameAttribute<VMPSITER> EarAttr ;
 
