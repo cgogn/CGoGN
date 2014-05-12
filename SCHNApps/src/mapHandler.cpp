@@ -30,6 +30,96 @@ MapHandlerGen::~MapHandlerGen()
 }
 
 /*********************************************************
+ * MANAGE ATTRIBUTES
+ *********************************************************/
+
+void MapHandlerGen::notifyAttributeModification(const AttributeHandlerGen& attr)
+{
+	QString nameAttr = QString::fromStdString(attr.name());
+	if(m_vbo.contains(nameAttr))
+		m_vbo[nameAttr]->updateData(attr);
+
+	emit(attributeModified(attr.getOrbit(), nameAttr));
+
+	foreach(View* view, l_views)
+		view->updateGL();
+}
+
+void MapHandlerGen::notifyConnectivityModification()
+{
+	if (m_render)
+	{
+		m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::BOUNDARY);
+	}
+
+	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		foreach (CellSelectorGen* cs, m_cellSelectors[orbit])
+			cs->rebuild();
+	}
+
+	emit(connectivityModified());
+
+	foreach(View* view, l_views)
+		view->updateGL();
+}
+
+void MapHandlerGen::clear(bool removeAttrib)
+{
+	if (m_render)
+	{
+		m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
+		m_render->setPrimitiveDirty(Algo::Render::GL2::BOUNDARY);
+	}
+
+	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		foreach (CellSelectorGen* cs, m_cellSelectors[orbit])
+			cs->rebuild();
+	}
+
+	std::vector<std::string> attrs[NB_ORBITS];
+
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		if(m_map->isOrbitEmbedded(orbit))
+		{
+			AttributeContainer& cont = m_map->getAttributeContainer(orbit);
+			cont.getAttributesNames(attrs[orbit]);
+		}
+	}
+
+	m_map->clear(removeAttrib);
+
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		for (unsigned int i = 0; i < attrs[orbit].size(); ++i)
+		{
+			QString name = QString::fromStdString(attrs[orbit][i]);
+			if (removeAttrib)
+			{
+				if (orbit == VERTEX)
+					deleteVBO(name);
+				emit(attributeRemoved(orbit, name));
+			}
+			else
+			{
+				if (orbit == VERTEX)
+					updateVBO(name);
+				emit(attributeModified(orbit, name));
+			}
+		}
+	}
+
+	emit(connectivityModified());
+}
+
+/*********************************************************
  * MANAGE VBOs
  *********************************************************/
 
