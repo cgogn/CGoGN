@@ -232,7 +232,7 @@ namespace Parallel
 template <typename PFP, typename V_ATT>
 void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal)
 {
-	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int thr)
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int /*thr*/)
 	{
 		normal[v] = vertexNormal<PFP>(map, v, position) ;
 	},true,FORCE_CELL_MARKING);
