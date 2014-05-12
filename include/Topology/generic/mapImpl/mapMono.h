@@ -126,9 +126,13 @@ public:
 
 	/**
 	 * Apply a functor on each dart of the map
-	 * @param f a ref to the functor obj
+	 * @param f a callable taking a Dart parameter
 	 */
-	bool foreach_dart(FunctorType& f) ;
+	template <typename FUNC>
+	void foreach_dart(FUNC f) ;
+
+	template <typename FUNC>
+	void foreach_dart(FUNC& f) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *

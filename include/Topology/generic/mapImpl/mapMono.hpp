@@ -228,7 +228,19 @@ inline void MapMono::next(Dart& d) const
 	m_attribs[DART].next(d.index) ;
 }
 
-inline bool MapMono::foreach_dart(FunctorType& f)
+template <typename FUNC>
+inline void MapMono::foreach_dart(FUNC f)
+{
+	for (Dart d = begin(); d != end(); next(d))
+	{
+		if (f(d))
+			return true;
+	}
+	return false;
+}
+
+template <typename FUNC>
+inline void MapMono::foreach_dart(FUNC& f)
 {
 	for (Dart d = begin(); d != end(); next(d))
 	{
