@@ -49,9 +49,22 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
-	for(Vertex v = t.begin(); v != t.end(); v = t.next())
+
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeCurvatureVertices_QuadraticFitting<PFP>(map, position, normal, kmax, kmin, Kmax, Kmin);
+		return;
+	}
+
+	foreach_cell<VERTEX>(map, [&] (Vertex v)
+	{
 		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin) ;
+	}
+	,FORCE_CELL_MARKING,thread);
+
+//	TraversorV<typename PFP::MAP> t(map) ;
+//	for(Vertex v = t.begin(); v != t.end(); v = t.next())
+//		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin) ;
 }
 
 template <typename PFP>
@@ -300,9 +313,21 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal,
 	unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
-	for(Vertex v = t.begin(); v != t.end(); v = t.next())
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeCurvatureVertices_NormalCycles<PFP>(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
+		return;
+	}
+
+	foreach_cell<VERTEX>(map, [&] (Vertex v)
+	{
 		computeCurvatureVertex_NormalCycles<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
+	}
+	,FORCE_CELL_MARKING,thread);
+
+//	TraversorV<typename PFP::MAP> t(map) ;
+//	for(Vertex v = t.begin(); v != t.end(); v = t.next())
+//		computeCurvatureVertex_NormalCycles<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
 }
 
 template <typename PFP>
@@ -365,9 +390,21 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal,
 	unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
-	for(Vertex v = t.begin(); v.dart != t.end(); v = t.next())
-		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, thread) ;
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeCurvatureVertices_NormalCycles_Projected<PFP>(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
+		return;
+	}
+
+	foreach_cell<VERTEX>(map, [&] (Vertex v)
+	{
+		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
+	}
+	,FORCE_CELL_MARKING,thread);
+
+//	TraversorV<typename PFP::MAP> t(map) ;
+//	for(Vertex v = t.begin(); v.dart != t.end(); v = t.next())
+//		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, thread) ;
 }
 
 template <typename PFP>
@@ -613,8 +650,7 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal,
-	unsigned int nbth)
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal)
 {
 	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
 	if (!map.template isOrbitEmbedded<VERTEX>())
@@ -636,8 +672,46 @@ void computeCurvatureVertices_NormalCycles(
 	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
-	},nbth,true,FORCE_CELL_MARKING);
+	},true,FORCE_CELL_MARKING);
 }
+
+
+template <typename PFP>
+void computeCurvatureVertices_NormalCycles_Projected(
+	typename PFP::MAP& map,
+	typename PFP::REAL radius,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeangle,
+	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmax,
+	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal)
+{
+	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
+	if (!map.template isOrbitEmbedded<VERTEX>())
+	{
+		CellMarkerNoUnmark<typename PFP::MAP, VERTEX> cm(map);
+		map.template initAllOrbitsEmbedding<VERTEX>();
+	}
+	if (!map.template isOrbitEmbedded<EDGE>())
+	{
+		CellMarkerNoUnmark<typename PFP::MAP, EDGE> cm(map);
+		map.template initAllOrbitsEmbedding<EDGE>();
+	}
+	if (!map.template isOrbitEmbedded<FACE>())
+	{
+		CellMarkerNoUnmark<typename PFP::MAP, FACE> cm(map);
+		map.template initAllOrbitsEmbedding<FACE>();
+	}
+
+	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	{
+		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
+	},true,FORCE_CELL_MARKING);
+}
+
 
 
 template <typename PFP>
@@ -648,13 +722,12 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmax,
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
-	unsigned int nbth)
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin)
 {
 	Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin, threadID) ;
-	},nbth,true,FORCE_CELL_MARKING);
+	},true,FORCE_CELL_MARKING);
 
 }
 

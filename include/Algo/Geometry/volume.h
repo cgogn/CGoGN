@@ -52,7 +52,7 @@ namespace Parallel
 {
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int nbth = 0) ;
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
 
 }
 

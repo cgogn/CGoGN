@@ -46,7 +46,6 @@ typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Vol d, const V_
 {
 	typename V_ATT::DATA_TYPE center(0.0);
 	unsigned int count = 0 ;
-//	Traversor3WV<typename PFP::MAP> tra(map,d,false,thread);
 
 	foreach_incident3<VERTEX>(map,d, [&] (Vertex v)
 	{
@@ -66,7 +65,6 @@ typename V_ATT::DATA_TYPE volumeCentroidELW(typename PFP::MAP& map, Vol d, const
 	EMB center(0.0);
 
 	double count=0.0;
-//	Traversor3WE<typename PFP::MAP> t(map, d,false,thread) ;
 
 	foreach_incident3<EDGE>(map,d, [&] (Edge it)
 	{
@@ -86,8 +84,6 @@ typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Face f, const V_A
 	typename V_ATT::DATA_TYPE center(0.0);
 	unsigned int count = 0 ;
 
-//	Traversor2FV<typename PFP::MAP> t(map, d) ;
-
 	foreach_incident2<VERTEX>(map, f, [&](Vertex it)
 	{
 		center += attributs[it];
@@ -104,8 +100,6 @@ typename V_ATT::DATA_TYPE faceCentroidELW(typename PFP::MAP& map, Face f, const 
 
 	EMB center(0.0);
 	double count=0.0;
-
-//	Traversor2FE<typename PFP::MAP> t(map, d) ;
 
 	foreach_incident2<EDGE>(map, f, [&](Edge it)
 	{
@@ -138,6 +132,12 @@ typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Ver
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid, unsigned int thread)
 {
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeCentroidFaces<PFP,V_ATT,F_ATT>(map,position,face_centroid);
+		return;
+	}
+
 	foreach_cell<FACE>(map, [&] (Face f)
 	{
 		face_centroid[f] = faceCentroid<PFP,V_ATT>(map, f, position) ;
@@ -148,6 +148,12 @@ void computeCentroidFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& 
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidELWFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid, unsigned int thread)
 {
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeCentroidELWFaces<PFP,V_ATT,F_ATT>(map,position,face_centroid);
+		return;
+	}
+
 	foreach_cell<FACE>(map, [&] (Face f)
 	{
 		face_centroid[f] = faceCentroidELW<PFP,V_ATT>(map, f, position) ;
@@ -158,6 +164,12 @@ void computeCentroidELWFaces(typename PFP::MAP& map, const V_ATT& position, F_AT
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid, unsigned int thread)
 {
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeNeighborhoodCentroidVertices<PFP,V_ATT>(map,position,vertex_centroid);
+		return;
+	}
+
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		vertex_centroid[v] = vertexNeighborhoodCentroid<PFP,V_ATT>(map, v, position) ;
@@ -170,35 +182,32 @@ namespace Parallel
 {
 
 template <typename PFP, typename V_ATT, typename F_ATT>
-void computeCentroidFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid,
-		unsigned int nbth)
+void computeCentroidFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid)
 {
 	CGoGN::Parallel::foreach_cell<FACE>(map,[&](Face f, unsigned int thr)
 	{
 		face_centroid[f] = faceCentroid<PFP>(map, f, position) ;
-	},nbth,false,AUTO);
+	},false,AUTO);
 }
 
 template <typename PFP, typename V_ATT, typename F_ATT>
-void computeCentroidELWFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid,
-		unsigned int nbth, unsigned int current_thread)
+void computeCentroidELWFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_centroid)
 {
 	CGoGN::Parallel::foreach_cell<FACE>(map,[&](Face f, unsigned int thr)
 	{
 		face_centroid[f] = faceCentroidELW<PFP>(map, f, position) ;
-	},nbth,false,AUTO);
+	},false,AUTO);
 
 }
 
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
-		const V_ATT& position, V_ATT& vertex_centroid,
-		unsigned int nbth, unsigned int current_thread)
+		const V_ATT& position, V_ATT& vertex_centroid)
 {
 	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int thr)
 	{
 		vertex_centroid[v] = vertexNeighborhoodCentroid<PFP>(map, v, position) ;
-	},nbth,false,FORCE_CELL_MARKING);
+	},false,FORCE_CELL_MARKING);
 }
 
 } // namespace Parallel
@@ -233,6 +242,12 @@ typename V_ATT::DATA_TYPE vertexNeighborhoodCentroid(typename PFP::MAP& map, Ver
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid, unsigned int thread)
 {
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeCentroidVolumes<PFP,V_ATT,W_ATT>(map,position,vol_centroid);
+		return;
+	}
+
 	foreach_cell<VOLUME>(map, [&] (Vol v)
 	{
 		vol_centroid[v] = Surface::Geometry::volumeCentroid<PFP,V_ATT>(map, v, position,thread) ;
@@ -243,6 +258,12 @@ void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidELWVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid, unsigned int thread)
 {
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeCentroidELWVolumes<PFP,V_ATT,W_ATT>(map,position,vol_centroid);
+		return;
+	}
+
 	foreach_cell<VOLUME>(map, [&] (Vol v)
 	{
 		vol_centroid[v] = Surface::Geometry::volumeCentroidELW<PFP,V_ATT>(map, v, position,thread) ;
@@ -253,6 +274,12 @@ void computeCentroidELWVolumes(typename PFP::MAP& map, const V_ATT& position, W_
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid, unsigned int thread)
 {
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	{
+		Parallel::computeNeighborhoodCentroidVertices<PFP,V_ATT>(map,position,vertex_centroid);
+		return;
+	}
+
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		vertex_centroid[v] = Volume::Geometry::vertexNeighborhoodCentroid<PFP,V_ATT>(map, v, position) ;
@@ -265,34 +292,31 @@ namespace Parallel
 {
 
 template <typename PFP, typename V_ATT, typename W_ATT>
-void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid,	unsigned int nbth)
+void computeCentroidVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid)
 {
 	CGoGN::Parallel::foreach_cell<VOLUME>(map,[&](Vol v, unsigned int thr)
 	{
-		vol_centroid[v] = Surface::Geometry::volumeCentroid<PFP,V_ATT,W_ATT>(map, v, position, thr) ;
-	},nbth,true,AUTO);
+		vol_centroid[v] = Surface::Geometry::volumeCentroid<PFP,V_ATT>(map, v, position, thr) ;
+	},true,AUTO);
 }
 
 template <typename PFP, typename V_ATT, typename W_ATT>
-void computeCentroidELWVolumes(typename PFP::MAP& map,
-		const V_ATT& position, W_ATT& vol_centroid,
-		unsigned int nbth)
+void computeCentroidELWVolumes(typename PFP::MAP& map, const V_ATT& position, W_ATT& vol_centroid)
 {
 	CGoGN::Parallel::foreach_cell<VOLUME>(map,[&](Vol v, unsigned int thr)
 	{
 		vol_centroid[v] = Surface::Geometry::volumeCentroidELW<PFP,V_ATT>(map, v, position, thr) ;
-	},nbth,true,AUTO);
+	},true,AUTO);
 }
 
 
 template <typename PFP, typename V_ATT>
-void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid,
-		unsigned int nbth)
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& vertex_centroid)
 {
 	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int thr)
 	{
 		vertex_centroid[v] = Volume::Geometry::vertexNeighborhoodCentroid<PFP,V_ATT>(map, v, position,thr) ;
-	},nbth,true,FORCE_CELL_MARKING);
+	},true,FORCE_CELL_MARKING);
 }
 
 } // namespace Parallel

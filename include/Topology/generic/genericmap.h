@@ -43,8 +43,32 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
 
+#include <boost/thread.hpp>
+
 namespace CGoGN
 {
+
+namespace Parallel
+{
+/**
+ * @brief Number of threads used for // traversal foreach
+ */
+extern int NumberOfThreads;
+
+/**
+ * @brief get number of cores of computer (threads, /2 if hyperthreading)
+ * @param hyperthreading
+ * @return nb of core
+ */
+inline int getSystemNumberOfCores(bool hyperthreading=false)
+{
+	if (hyperthreading)
+		return boost::thread::hardware_concurrency()/2;
+	return boost::thread::hardware_concurrency();
+}
+
+}
+
 
 class AttributeHandlerGen ;
 class DartMarkerGen ;
@@ -388,6 +412,8 @@ public:
 	 */
 	void compact() ;
 } ;
+
+
 
 //
 //template <typename MAP>

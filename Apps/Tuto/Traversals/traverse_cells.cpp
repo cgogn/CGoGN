@@ -114,7 +114,7 @@ int main()
 	{
 		position[v] += VEC3(0.0,0.0,PFP::REAL(thread)*0.1f);
 		// WARNING thread vary here from 1 to 4 (and not from 0 to 3) !!!!
-	},4,false); // 4:4 thread, false for no need for markers in threaded code.
+	},false); // 4:4 thread, false for no need for markers in threaded code.
 
 
 	std::cout << "After // processing"<< std::endl;
@@ -127,17 +127,22 @@ int main()
 
 	// Example with // accumulation
 	// computing the sum of area faces
+
+
+	// force number of threads to 4 (0 for traverse, 1,2,3 for computation)
+	CGoGN::Parallel::NumberOfThreads = 4;
+
 	// init nbthread values with 0
-	float surf[4]={0.0f,0.0f,0.0f,0.0f};
+	float surf[3]={0.0f,0.0f,0.0f};
 	// traverse face in //
 	Parallel::foreach_cell<FACE>(myMap,[&](Face f, unsigned int thr)
 	{
-		// for each face add surface to accumulator (-1 because counter between 1-4 not 0-3)
+		// for each face add surface to accumulator (-1 because counter between 1-3 not 0-3)
 		surf[thr-1] += Algo::Surface::Geometry::convexFaceArea<PFP>(myMap,f,position);
-	},4,false);
+	},false);
 
-	std::cout << surf[0]<< "/"<< surf[1]<< "/"<< surf[2]<< "/"<< surf[3]<< "/"<< std::endl;
-	std::cout << "Total="<<surf[0]+surf[1]+surf[2]+surf[3]<< std::endl;
+	std::cout << surf[0]<< "/"<< surf[1]<< "/"<< surf[2]<< "/"<< std::endl;
+	std::cout << "Total="<<surf[0]+surf[1]+surf[2]<< std::endl;
 
 
 	TraversorV<MAP>   tv0(myMap);

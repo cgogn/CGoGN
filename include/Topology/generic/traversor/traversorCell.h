@@ -124,22 +124,19 @@ inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt = AUTO, unsi
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt = AUTO, unsigned int thread = 0);
 
-/*
- * Executes function f on each ORBIT, then
- * execute function g on each ORBIT
- * Optimization on marking (even pass marking, odd pass unmarking)
- */
-//template <unsigned int ORBIT, typename MAP, typename FUNC, typename FUNC2>
-//void foreach_cell_EvenOddd(const MAP& map, FUNC f, FUNC2 g, unsigned int nbpasses=1, TraversalOptim opt = AUTO, unsigned int thread = 0);
-
 
 namespace Parallel
 {
+/**
+ * @brief foreach_cell
+ * @param map
+ * @param func function to apply on cells
+ * @param needMarkers func need markers ?
+ * @param opt optimization param of traversal
+ * @param nbth number of used thread (0:for traversal, [1,nbth-1] for func computing
+*/
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, unsigned int nbth=0, bool needMarkers=true, TraversalOptim opt=AUTO);
-
-//template <unsigned int ORBIT, typename MAP, typename FUNC_E, typename FUNC_O>
-//void foreach_cell_EO(MAP& map, FUNC_E funcEven, FUNC_O funcOdd, unsigned int nbPasses=1, unsigned int nbth=0, bool needMarkers=true, TraversalOptim opt = AUTO);
+void foreach_cell(MAP& map, FUNC func, bool needMarkers=true, TraversalOptim opt=AUTO, unsigned int nbth=NumberOfThreads);
 
 }
 

@@ -305,13 +305,12 @@ public:
 
 
 template <typename ATTR, typename FUNC>
-void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbth)
+void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbthread)
 {
-	if (nbth==0)
-		nbth = boost::thread::hardware_concurrency();
+	// thread 0 is for attribute traversal
+	unsigned int nbth = nbthread -1;
 
 	std::vector< unsigned int >* vd = new std::vector< unsigned int >[nbth];
-
 	for (unsigned int i = 0; i < nbth; ++i)
 		vd[i].reserve(SIZE_BUFFER_THREAD);
 

@@ -260,8 +260,20 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal,
-	unsigned int nbth = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal) ;
+
+template <typename PFP>
+void computeCurvatureVertices_NormalCycles_Projected(
+	typename PFP::MAP& map,
+	typename PFP::REAL radius,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeangle,
+	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmax,
+	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Knormal) ;
 
 template <typename PFP>
 void computeCurvatureVertices_QuadraticFitting(
@@ -271,8 +283,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmax,
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmax,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin,
-	unsigned int nbth = 0);
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& Kmin);
 
 } // namespace Parallel
 
