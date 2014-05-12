@@ -140,36 +140,30 @@ namespace Parallel
  * @param map the map
  * @param position position vertex attribute
  * @param face_centroid centroid face attribute
- * @param nbth the number of threads
  */
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidFaces(typename PFP::MAP& map,
-		const V_ATT& position, F_ATT& face_centroid,
-		unsigned int nbth = 0) ;
+		const V_ATT& position, F_ATT& face_centroid) ;
 
 /**
  * Compute centroid of all faces (Edge Length Weighted)
  * @param map the map
  * @param position position vertex attribute
  * @param face_centroid centroid face attribute
- * @param nbth the number of threads
  */
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeCentroidELWFaces(typename PFP::MAP& map,
-		const V_ATT& position, F_ATT& face_centroid,
-		unsigned int nbth = 0) ;
+		const V_ATT& position, F_ATT& face_centroid) ;
 
 /**
  * Compute neighborhood centroid of all vertices (in parallel)
  * @param map the map
  * @param position position vertex attribute
  * @param vertex_centroid centroid vertex attribute
- * @param nbth the number of threads
  */
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
-		const V_ATT& position, V_ATT& vertex_centroid,
-		unsigned int nbth = 0) ;
+		const V_ATT& position, V_ATT& vertex_centroid) ;
 
 } // namespace Parallel
 
@@ -224,20 +218,17 @@ namespace Parallel
 
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidVolumes(typename PFP::MAP& map,
-		const V_ATT& position, W_ATT& vol_centroid,
-		unsigned int nbth = 0) ;
+		const V_ATT& position, W_ATT& vol_centroid) ;
 
 
 template <typename PFP, typename V_ATT, typename W_ATT>
 void computeCentroidELWVolumes(typename PFP::MAP& map,
-		const V_ATT& position, W_ATT& vol_centroid,
-		unsigned int nbth = 0) ;
+		const V_ATT& position, W_ATT& vol_centroid) ;
 
 		
 template <typename PFP, typename V_ATT>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
-		const V_ATT& position, V_ATT& vertex_centroid,
-		unsigned int nbth = 0) ;
+		const V_ATT& position, V_ATT& vertex_centroid) ;
 
 } // namespace Parallel
 

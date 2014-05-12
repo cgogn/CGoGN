@@ -33,6 +33,12 @@
 namespace CGoGN
 {
 
+namespace Parallel
+{
+//int NumberOfThreads=1;
+int NumberOfThreads = getSystemNumberOfCores();
+}
+
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;
 

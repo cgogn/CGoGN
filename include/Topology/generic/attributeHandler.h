@@ -338,7 +338,7 @@ inline void foreach_attribute(ATTR& attr, FUNC func)
 namespace Parallel
 {
 template <typename ATTR, typename FUNC>
-void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbth=0);
+void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbth=NumberOfThreads);
 }
 
 } // namespace CGoGN

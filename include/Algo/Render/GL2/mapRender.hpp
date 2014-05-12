@@ -311,7 +311,7 @@ void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& table
 		foreach_cell<FACE>(map, [&] (Face f)
 		{
 			addTri<PFP>(map, f, tableIndices);
-		}, false, thread);
+		}, AUTO, thread);
 	}
 	else
 	{
@@ -321,7 +321,7 @@ void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& table
 				addTri<PFP>(map, f, tableIndices);
 			else
 				addEarTri<PFP>(map, f, tableIndices, position);
-		}, false, thread);
+		}, AUTO, thread);
 	}
 }
 
@@ -412,7 +412,7 @@ void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndi
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(e.dart));
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(e)));
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 template<typename PFP>
@@ -430,7 +430,7 @@ void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tabl
 			tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(e)));
 		}
 	}
-	,false,thread);
+	,AUTO,thread);
 }
 
 template<typename PFP>
@@ -490,7 +490,7 @@ void MapRender::initPoints(typename PFP::MAP& map, std::vector<GLuint>& tableInd
 	{
 		tableIndices.push_back(map.getEmbedding(v));
 	}
-	,false,thread);
+	,FORCE_CELL_MARKING,thread); //
 }
 
 template<typename PFP>

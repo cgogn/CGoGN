@@ -498,8 +498,6 @@ int main(int argc, char **argv)
 
 	Utils::Chrono ch;
 
-
-
 	Vertex v(myMap.begin());
 	VEC3 p = Algo::Volume::Geometry::vertexNeighborhoodCentroid<PFP>(myMap,v,position);
 
@@ -528,7 +526,6 @@ int main(int argc, char **argv)
 	ch.start();
 	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
 	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
-
 
 	// et on attend la fin.
 	return app.exec();
