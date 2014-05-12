@@ -140,5 +140,28 @@ int main()
 	std::cout << "Total="<<surf[0]+surf[1]+surf[2]+surf[3]<< std::endl;
 
 
+	TraversorV<MAP>   tv0(myMap);
+	TraversorCellEven<MAP,VERTEX> tv1(tv0);
+	TraversorCellOdd<MAP,VERTEX>  tv2(tv0);
+
+	std::cout << "PAIR:";
+	for (Dart d=tv1.begin(); d!=tv1.end(); d=tv1.next())// traverse all vertices (d one dart of each vertex)
+		std::cout << d << " / ";
+	std::cout << std::endl;
+
+	std::cout << "IMPPAIR:";
+	for (Dart d=tv2.begin(); d!=tv2.end(); d=tv2.next())// traverse all vertices (d one dart of each vertex)
+		std::cout << d << " / ";
+	std::cout <<  std::endl;
+
+	std::cout << "PAIR:";
+	for (Dart d=tv1.begin(); d!=tv1.end(); d=tv1.next())// traverse all vertices (d one dart of each vertex)
+		std::cout << d << " / ";
+	std::cout << std::endl;
+
+	std::cout << "IMPPAIR:";
+	for (Dart d=tv2.begin(); d!=tv2.end(); d=tv2.next())// traverse all vertices (d one dart of each vertex)
+		std::cout << d << " / ";
+	std::cout <<  std::endl;
 	return 0;
 }

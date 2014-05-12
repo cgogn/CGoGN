@@ -22,44 +22,66 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SIMPLICES_H_
-#define __SIMPLICES_H_
 
-#include <iostream>
-#include "cells.h"
-#include "Algo/Topo/simplex.h"
+#ifndef __SIMPLEX__
+#define __SIMPLEX__
+
+#include "Topology/generic/cells.h"
 
 namespace CGoGN
 {
 
-
-template <unsigned int ORBIT>
-class Simplex
+namespace Algo
 {
-public:
-	Dart dart;
-	/// emoty construtor
-	Simplex(): dart() {}
-	/// construtor from Dart
-	inline Simplex(Dart d): dart(d) {}
 
-	inline Simplex(Cell<ORBIT> c): dart(c.dart) {}
-	/// copy constructor
-	inline Simplex(const Simplex<ORBIT>& c): dart(c.dart) {}
-	/// Cell cast operator
-	inline operator Cell<ORBIT>() {return Cell<ORBIT>(dart);}
-	/// Dart cast operator
-	inline operator Dart() {return dart;}
-	/// check if this simplex is really a simplex
-	template <typename MAP>
-	bool check(const MAP& map) const { return Algo::Topo::isSimplex<MAP,ORBIT>(map,dart);}
-};
+namespace Topo
+{
 
 
-typedef Simplex<FACE>   Triangle;
-typedef Simplex<VOLUME> Tetra;
+template <typename MAP, unsigned int ORBIT>
+bool isSimplex(const MAP& map, Dart d)
+{
+	if (ORBIT==VOLUME)
+	{
+		Dart d1 = map.phi2(d);
+		Dart e = map.phi1(d);
+		Dart d2 = map.phi2(e);
+		e = map.phi1(e);
+		Dart d3 = map.phi2(d);
 
+		if (map.phi1(e) != d)  // check that face of d is a triangle
+			return false;
 
+		if (map.phi_1(d1) != map.template phi<12>(d2))
+			return false;
+		if (map.phi_1(d2) != map.template phi<12>(d3))
+			return false;
+		if (map.phi_1(d3) != map.template phi<12>(d1))
+			return false;
+
+		if (! map.isCycleTriangle(d1))
+			return false;
+		if (! map.isCycleTriangle(d2))
+			return false;
+		if (! map.isCycleTriangle(d3))
+			return false;
+
+		return true;
+	}
+	if (ORBIT==FACE)
+	{
+		return map.isCycleTriangle(d);
+	}
+
+	return true;
 }
 
-#endif /* __SIMPLICES_H_ */
+
+} // namespace Topo
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+
+#endif

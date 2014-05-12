@@ -50,7 +50,13 @@ typedef PFP::VEC4 VEC4;
 
 
 /**
- * Example of function that work with any kin of Vertex Attribute
+ * Example of function that work with any kind of Vertex Attribute (normal/2/3/4)
+ *
+ * operators on multi-attribute are limited to:
+ *   affectation
+ *   +, -, +=, -=
+ *   *(double) /(double) *=(double) /=(double)
+ *
  */
 template <typename MAP, typename ATT>
 typename ATT::DATA_TYPE smooth(MAP& map, Vertex v, const ATT& attributs)

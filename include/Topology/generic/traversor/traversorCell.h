@@ -39,7 +39,7 @@ namespace CGoGN
 template <typename MAP, unsigned int ORBIT>
 class TraversorCell //: public Traversor<MAP>
 {
-private:
+protected:
 	const MAP& m ;
 	unsigned int dimension ;
 
@@ -53,6 +53,9 @@ private:
 	Cell<ORBIT> current ;
 	bool firstTraversal ;
 
+	// just for odd/even versions
+	TraversorCell(const TraversorCell<MAP, ORBIT>& tc);
+
 public:
 	TraversorCell(const MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 
@@ -65,7 +68,37 @@ public:
 	inline Cell<ORBIT> next() ;
 
 	inline void skip(Cell<ORBIT> c);
+
+	inline unsigned int nbCells();
 } ;
+
+
+
+
+template <typename MAP, unsigned int ORBIT>
+class TraversorCellEven : public TraversorCell<MAP,ORBIT>
+{
+public:
+	TraversorCellEven(const TraversorCell<MAP,ORBIT>& tra):
+		TraversorCell<MAP,ORBIT>(tra) {}
+	~TraversorCellEven() { this->cmark = NULL; this->dmark=NULL; }
+	inline Cell<ORBIT> begin() ;
+} ;
+
+
+template <typename MAP, unsigned int ORBIT>
+class TraversorCellOdd : public TraversorCell<MAP,ORBIT>
+{
+public:
+	TraversorCellOdd(const TraversorCell<MAP,ORBIT>& tra):
+		TraversorCell<MAP,ORBIT>(tra) {}
+	~TraversorCellOdd() {this->cmark = NULL; this->dmark=NULL; }
+	inline Cell<ORBIT> begin() ;
+	inline Cell<ORBIT> next() ;
+} ;
+
+
+
 
 
 
@@ -92,10 +125,34 @@ inline void foreach_cell_until(const MAP& map, FUNC f, bool forceDartMarker = fa
 			break;
 }
 
+
+template <unsigned int ORBIT, typename MAP, typename FUNC, typename FUNC2>
+inline void foreach_cell_EvenOddd(const MAP& map, FUNC f, FUNC2 g, unsigned int nbpasses=1, bool forceDartMarker = false, unsigned int thread = 0)
+{
+	TraversorCell<MAP, ORBIT> trav(map, forceDartMarker, thread);
+	TraversorCellEven<MAP, VERTEX> tr1(trav);
+	TraversorCellOdd<MAP, VERTEX> tr2(trav);
+
+	for (unsigned int i=0; i<nbpasses; ++i)
+	{
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			f(c);
+		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+			g(c);
+	}
+}
+
+
+
 namespace Parallel
 {
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 void foreach_cell(MAP& map, FUNC func, unsigned int nbth=0, bool needMarkers=true);
+
+template <unsigned int ORBIT, typename MAP, typename FUNC_E, typename FUNC_O>
+void foreach_cell_EO(MAP& map, FUNC_E funcEven, FUNC_O funcOdd,unsigned int nbth=0, bool needMarkers=true);
+
+
 }
 
 template <typename MAP>

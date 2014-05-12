@@ -55,6 +55,25 @@ TraversorCell<MAP, ORBIT>::TraversorCell(const MAP& map, bool forceDartMarker, u
 }
 
 template <typename MAP, unsigned int ORBIT>
+unsigned int TraversorCell<MAP, ORBIT>::nbCells()
+{
+	return m.template getAttributeContainer<ORBIT>().size();
+}
+
+
+
+template <typename MAP, unsigned int ORBIT>
+TraversorCell<MAP, ORBIT>::TraversorCell(const TraversorCell<MAP, ORBIT>& tc) :
+	m(tc.m), dmark(tc.dmark), cmark(tc.cmark),
+	quickTraversal(tc.quickTraversal), current(tc.current), firstTraversal(tc.firstTraversal),
+	dimension(tc.dimension)
+{
+}
+
+
+
+
+template <typename MAP, unsigned int ORBIT>
 TraversorCell<MAP, ORBIT>::~TraversorCell()
 {
 	if(dmark)
@@ -163,6 +182,94 @@ void TraversorCell<MAP, ORBIT>::skip(Cell<ORBIT> c)
 	else
 		cmark->mark(c) ;
 }
+
+
+
+
+template <typename MAP, unsigned int ORBIT>
+Cell<ORBIT> TraversorCellEven<MAP, ORBIT>::begin()
+{
+	Cell<ORBIT> c = TraversorCell<MAP, ORBIT>::begin();
+	this->firstTraversal = true;
+	return c;
+}
+
+
+
+template <typename MAP, unsigned int ORBIT>
+Cell<ORBIT> TraversorCellOdd<MAP, ORBIT>::begin()
+{
+	if(this->quickTraversal != NULL)
+	{
+		this->qCurrent = this->cont->begin() ;
+		this->current.dart = this->quickTraversal->operator[](this->qCurrent);
+	}
+	else
+	{
+		this->current.dart = this->m.begin() ;
+		while(this->current.dart != this->m.end() && (this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+			this->m.next(this->current.dart) ;
+
+		if(this->current.dart == this->m.end())
+			this->current.dart = NIL ;
+		else
+		{
+			if(this->dmark)
+				this->dmark->template unmarkOrbit<ORBIT>(this->current.dart) ;
+			else
+				this->cmark->unmark(this->current) ;
+		}
+	}
+	return this->current ;
+}
+
+
+template <typename MAP, unsigned int ORBIT>
+Cell<ORBIT> TraversorCellOdd<MAP, ORBIT>::next()
+{
+	assert(this->current.dart != NIL);
+
+	if(this->quickTraversal != NULL)
+	{
+		this->cont->next(this->qCurrent) ;
+		if (this->qCurrent != this->cont->end())
+			this->current.dart = this->quickTraversal->operator[](this->qCurrent) ;
+		else this->current.dart = NIL;
+	}
+	else
+	{
+		if(this->dmark)
+		{
+			bool ismarked = this->dmark->isMarked(this->current.dart) ;
+			while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension,this->current.dart)))
+			{
+				this->m.next(this->current.dart) ;
+				if(this->current.dart == this->m.end())
+					this->current.dart = NIL ;
+				else
+					ismarked = this->dmark->isMarked(this->current.dart) ;
+			}
+			if(this->current.dart != NIL)
+				this->dmark->template unmarkOrbit<ORBIT>(this->current.dart) ;
+		}
+		else
+		{
+			bool ismarked = this->cmark->isMarked(this->current) ;
+			while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+			{
+				this->m.next(this->current.dart) ;
+				if(this->current.dart == this->m.end())
+					this->current.dart = NIL ;
+				else
+					ismarked = this->cmark->isMarked(this->current) ;
+			}
+			if(this->current.dart != NIL)
+				this->cmark->unmark(this->current) ;
+		}
+	}
+	return this->current ;
+}
+
 
 
 
