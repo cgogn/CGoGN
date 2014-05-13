@@ -83,7 +83,7 @@ unsigned int AttributeContainer::getAttributeIndex(const std::string& attribName
 		return index - 1 ;
 }
 
-const std::string& AttributeContainer::getAttributeName(unsigned int index)
+const std::string& AttributeContainer::getAttributeName(unsigned int index) const
 {
 	assert(index < m_tableAttribs.size() || !"getAttributeName: attribute index out of bounds");
 	assert(m_tableAttribs[index] != NULL || !"getAttributeName: attribute does not exist");
@@ -102,7 +102,7 @@ unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrInd
 	return atm->getBlocksPointers(vect_ptr, byteBlockSize);
 }
 
-unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names)
+unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names) const
 {
 	names.clear() ;
 	names.reserve(m_nbAttributes) ;
@@ -752,7 +752,6 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 		{
 			RegisteredBaseAttribute* ra = itAtt->second;
 			AttributeMultiVectorGen* amvg = ra->addAttribute(*this, nameAtt);
-//			CGoGNout << "loading attribute " << nameAtt << " : " << typeAtt << CGoGNendl;
 			amvg->loadBin(fs);
 		}
 	}
@@ -790,6 +789,12 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 	for (unsigned int i = 0; i < sz; ++i)
 		m_holesBlocks[i] = new HoleBlockRef(*(cont.m_holesBlocks[i]));
 
+	//  free indices
+	sz = cont.m_freeIndices.size();
+	m_freeIndices.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_freeIndices[i] = cont.m_freeIndices[i];
+
 	// blocks with free
 	sz = cont.m_tableBlocksWithFree.size();
 	m_tableBlocksWithFree.resize(sz);
@@ -809,17 +814,24 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 	{
 		if (cont.m_tableAttribs[i] != NULL)
 		{
-			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
-			ptr->setName(cont.m_tableAttribs[i]->getName());
-			ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
-			ptr->setIndex(m_tableAttribs.size());
-			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
-			ptr->copy(cont.m_tableAttribs[i]);
-	//			if (cont.m_tableAttribs[i]->toProcess())
-	//				ptr->toggleProcess();
-	//			else
-	//				ptr->toggleNoProcess();
-			m_tableAttribs.push_back(ptr);
+			std::string sub = cont.m_tableAttribs[i]->getName().substr(0, 5);
+			if (sub != "Mark_") // Mark leaved by
+			{
+				AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
+				ptr->setName(cont.m_tableAttribs[i]->getName());
+				ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
+				ptr->setIndex(m_tableAttribs.size());
+				ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+				ptr->copy(cont.m_tableAttribs[i]);
+				m_tableAttribs.push_back(ptr);
+			}
+			else
+			{
+				// Mark always the first !
+				AttributeMultiVectorGen* ptr = m_tableAttribs[i];
+				ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+				ptr->copy(cont.m_tableAttribs[i]);
+			}
 		}
 	}
 }

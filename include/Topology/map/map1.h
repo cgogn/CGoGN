@@ -44,6 +44,9 @@ template <typename MAP_IMPL>
 class Map1 : public MapCommon<MAP_IMPL>
 {
 protected:
+	// protected copy constructor to prevent the copy of map
+	Map1(const Map1<MAP_IMPL>& m):MapCommon<MAP_IMPL>(m) {}
+
 	void init() ;
 
 public:

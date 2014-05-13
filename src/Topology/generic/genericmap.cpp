@@ -405,13 +405,13 @@ void GenericMap::restore_shortcuts()
 				{										// clear all marks expect boundary marks
 					Mark m(m_boundaryMarkers[0] + m_boundaryMarkers[1]);
 					m.invert();
-					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-						amvMark->operator[](i).unsetMark(m);
+					for (unsigned int k = cont.begin(); k != cont.end(); cont.next(k))
+						amvMark->operator[](k).unsetMark(m);
 				}
 				else									// for others clear all
 				{
-					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-						amvMark->operator[](i).clear();
+					for (unsigned int k = cont.begin(); k != cont.end(); cont.next(k))
+						amvMark->operator[](k).clear();
 				}
 			}
 		}

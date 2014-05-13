@@ -87,6 +87,9 @@ class GenericMap
 	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
+	// protected copy constructor to prevent the copy of map
+	GenericMap(const GenericMap& ) {}
+
 	/**
 	 * Attributes Containers
 	 */

@@ -273,7 +273,7 @@ public:
 	/**
 	 * get the name of an attribute, given its index in the container
 	 */
-	const std::string& getAttributeName(unsigned int attrIndex);
+	const std::string& getAttributeName(unsigned int attrIndex) const;
 
 	/**
 	 * fill a vector with pointers to the blocks of the given attribute
@@ -290,7 +290,7 @@ public:
 	 * @param names vector of names
 	 * @return number of attributes
 	 */
-	unsigned int getAttributesNames(std::vector<std::string>& names);
+	unsigned int getAttributesNames(std::vector<std::string>& names) const;
 
 	/**
 	 * fill a vector with attribute type names
