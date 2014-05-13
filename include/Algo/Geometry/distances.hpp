@@ -23,8 +23,6 @@
 *******************************************************************************/
 
 #include "Geometry/distances.h"
-#include "Algo/Geometry/normal.h"
-#include <limits>
 
 namespace CGoGN
 {
@@ -36,64 +34,50 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isPlanar(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
 {
-	if (map.phi<111>(d)==d)
-		return true;
+	Vertex v(f.dart);
+	const typename PFP::VEC3& A = position[v];
+	v.dart = map.phi1(v.dart);
+	const typename PFP::VEC3& B = position[v];
+	v.dart = map.phi1(v.dart);
+	const typename PFP::VEC3& C = position[v];
 
-	typename PFP::VEC3 No = Algo::Surface::Geometry::triangleNormal(map, d, position) ;
-
-	Dart e = map.phi<11>(d);
-	while (e != d)
-	{
-		typename PFP::VEC3 n = Algo::Surface::Geometry::triangleNormal(map, e, position) ;
-		e = map.phi1(e);
-		if (e!=d)
-			e = map.phi1(e);
-	}
+	return Geom::squaredDistancePoint2TrianglePlane(P, A, B, C);
 }
 
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
-{
-	const typename PFP::VEC3& A = position[d];
-	d = map.phi1(d);
-	const typename PFP::VEC3& B = position[d];
-	d = map.phi1(d);
-	const typename PFP::VEC3& C = position[d];
-	return Geom::squaredDistancePoint2TrianglePlane(P,A,B,C);
-}
-
-template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
 {
 	typedef typename PFP::REAL REAL;
-	const typename PFP::VEC3& A = position[d];
 
+	const typename PFP::VEC3& A = position[f.dart];
+
+	Dart d = map.phi1(f.dart);
 	Dart e = map.phi1(d);
-	Dart f = map.phi1(e);
-	REAL dist2 = Geom::squaredDistancePoint2Triangle(P,A,position[e],position[f]);
-	e = f;
-	f = map.phi1(e);
+	REAL dist2 = Geom::squaredDistancePoint2Triangle(P, A, position[d], position[e]);
+	d = e;
+	e = map.phi1(d);
 
-	while (f != d)
+	while (e != f.dart)
 	{
-		REAL d2 = Geom::squaredDistancePoint2Triangle(P,A,position[e],position[f]);
+		REAL d2 = Geom::squaredDistancePoint2Triangle(P, A, position[d], position[e]);
 		if (d2 < dist2)
 			dist2 = d2;
-		e = f;
-		f = map.phi1(e);
+		d = e;
+		e = map.phi1(d);
 	}
+
 	return dist2;
 }
 
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
 {
-	const typename PFP::VEC3& A = position[d];
-	typename PFP::VEC3& AB = position[map.phi1(d)]-A;
-	typename PFP::REAL AB2 = AB*AB;
-	return Geom::squaredDistanceSeg2Point(A,AB,AB2,P) ;
+	const typename PFP::VEC3& A = position[e.dart];
+	typename PFP::VEC3 AB = position[map.phi1(e.dart)] - A;
+	typename PFP::REAL AB2 = AB * AB;
+	return Geom::squaredDistanceSeg2Point(A, AB, AB2, P) ;
 }
 
 } // namespace Geometry
