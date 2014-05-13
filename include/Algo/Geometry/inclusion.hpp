@@ -42,12 +42,11 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isConvex(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, bool CCW, unsigned int thread)
+bool isConvex(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, bool CCW, unsigned int thread)
 {
 	//get all the dart of the volume
 	std::vector<Dart> vStore;
-	FunctorStore fs(vStore);
-	map.foreach_dart_of_volume(d, fs, thread);
+	map.foreach_dart_of_orbit(v, [&] (Dart d) { vStore.push_back(d); }, thread);
 
 	bool convex = true;
 
