@@ -33,6 +33,7 @@
 #include "Algo/Export/export.h"
 
 #include "Algo/Modelisation/subdivision.h"
+#include "Algo/Geometry/normal.h"
 
 using namespace CGoGN ;
 
@@ -78,6 +79,7 @@ int main(int argc, char **argv)
 	MAP myMap2;
 	// for copying the initial mesh
 	myMap2.copyFrom(myMap);
+
 	// AttributeHandler are linked to the map, need a new one
 	VertexAttribute<VEC3, MAP_IMPL> position2 = myMap2.getAttribute<VEC3, VERTEX>(attrNames[0]);
 
@@ -94,6 +96,7 @@ int main(int argc, char **argv)
 
 	// and export to file (using map2/position2)
 	Algo::Surface::Export::exportOFF<PFP>(myMap2, position2, "resultCC.off");
+
 
 
     return 0;

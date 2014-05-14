@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include "Container/attributeContainer.h"
+#include "Topology/generic/dart.h"
 
 namespace CGoGN
 {
@@ -827,13 +828,88 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 			}
 			else
 			{
-				// Mark always the first !
-				AttributeMultiVectorGen* ptr = m_tableAttribs[i];
+				// get id of thread
+				const std::string& str = cont.m_tableAttribs[i]->getName();
+				unsigned int thId = (unsigned int)(str[5]-'0');
+				if (str.size()==7)
+					thId = 10*thId +  (unsigned int)(sub[6]-'0');
+				// Mark always at the begin, because called after clear
+				AttributeMultiVectorGen* ptr = m_tableAttribs[thId];
 				ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
 				ptr->copy(cont.m_tableAttribs[i]);
 			}
 		}
 	}
 }
+
+void AttributeContainer::dumpCSV() const
+{
+	CGoGNout << "Container of "<<orbitName(this->getOrbit())<< CGoGNendl;
+
+	CGoGNout << "Name ; ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << m_tableAttribs[i]->getName() << " ; ";
+		}
+	}
+	CGoGNout << CGoGNendl;
+	CGoGNout << "Type  ; ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << m_tableAttribs[i]->getTypeName() << " ; ";
+		}
+	}
+	CGoGNout << CGoGNendl;
+	CGoGNout << "line ; refs ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << "value;";
+		}
+	}
+	CGoGNout << CGoGNendl;
+
+	for (unsigned int l=this->begin(); l!= this->end(); this->next(l))
+	{
+		CGoGNout << l << " ; "<< this->getNbRefs(l)<< " ; ";
+		for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+		{
+			if (m_tableAttribs[i] != NULL)
+			{
+				m_tableAttribs[i]->dump(l);
+				CGoGNout << " ; ";
+			}
+		}
+		CGoGNout << CGoGNendl;
+	}
+}
+
+void AttributeContainer::dumpByLines() const
+{
+	CGoGNout << "Container of "<<orbitName(this->getOrbit())<< CGoGNendl;
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << "Name: "<< m_tableAttribs[i]->getName();
+			CGoGNout << " / Type: "<< m_tableAttribs[i]->getTypeName();
+			for (unsigned int l=this->begin(); l!= this->end(); this->next(l))
+			{
+				CGoGNout << l << " ; ";
+				m_tableAttribs[i]->dump(l);
+				CGoGNout << CGoGNendl;
+			}
+
+		}
+
+	}
+}
+
+
 
 }

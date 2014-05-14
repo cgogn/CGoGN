@@ -407,4 +407,11 @@ inline bool AttributeMultiVectorGen::skipLoadBin(CGoGNistream& fs)
 	return true;
 }
 
+
+template <typename T>
+void AttributeMultiVector<T>::dump(unsigned int i) const
+{
+	CGoGNout << this->operator[](i);
+}
+
 } // namespace CGoGN

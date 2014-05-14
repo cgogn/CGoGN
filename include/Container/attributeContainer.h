@@ -138,7 +138,8 @@ public:
 
 	~AttributeContainer();
 
-	unsigned int getOrbit();
+	unsigned int getOrbit() const;
+
 	void setOrbit(unsigned int orbit);
 
 	void setRegistry(std::map<std::string, RegisteredBaseAttribute*>* re);
@@ -364,7 +365,7 @@ public:
 	* @param index index of the line
 	* @return number of refs of the line
 	*/
-	unsigned int getNbRefs(unsigned int index);
+	unsigned int getNbRefs(unsigned int index) const;
 
 	/**
 	* set the number of refs of the given line
@@ -472,6 +473,14 @@ public:
 	 * TODO a version that compact on the fly ?
 	 */
 	void copyFrom(const AttributeContainer& cont);
+
+	/**
+	 * dump the container in CSV format (; separated columns)
+	 */
+	void dumpCSV() const;
+
+	void dumpByLines() const;
+
 
 };
 

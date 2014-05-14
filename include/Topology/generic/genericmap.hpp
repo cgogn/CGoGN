@@ -49,7 +49,7 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 {
 	m_attribs[DART].removeLine(index) ;	// free the dart line
 
-	for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear markers of
+	for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)	// clear markers of
 		(*m_markTables[DART][t])[index].clear() ;	// the removed dart
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
@@ -61,7 +61,7 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 			{
 				if(m_attribs[orbit].unrefLine(emb))					// unref the pointed embedding line
 				{
-					for (unsigned int t = 0; t < m_nbThreads; ++t)	// and clear its markers if it was
+					for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)	// and clear its markers if it was
 						(*m_markTables[orbit][t])[emb].clear() ;	// its last unref (and was thus freed)
 				}
 			}

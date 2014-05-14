@@ -127,7 +127,7 @@ protected:
 	 */
 	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
 
-	unsigned int m_nbThreads ;
+	unsigned int m_nbThreadMarkers ;
 
 	/**
 	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
@@ -361,7 +361,7 @@ public:
 	 * return allowed threads
 	 * @return the number of threads (including principal)
 	 */
-	unsigned int getNbThreadMarkers() ;
+	unsigned int getNbThreadMarkers() const;
 
 	/**
 	 * Remove some added threads
@@ -414,6 +414,11 @@ public:
 	 * compact the map
 	 */
 	void compact() ;
+
+	/**
+	 * @brief dump all attributes of map in CSV format  (; separated columns)
+	 */
+	void dumpCSV() const;
 } ;
 
 
