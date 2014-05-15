@@ -71,7 +71,7 @@ public:
 	*/
 	template<typename PFP, unsigned int ORBIT>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX) ;
+            const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT,typename PFP::MAP::IMPL>& colorPerXXX) ;
 
 	/**
 	* update drawing buffers
@@ -85,7 +85,7 @@ public:
 	*/
 	template<typename PFP, unsigned int ORBIT>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX) ;
+            const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normals, const AttributeHandler<typename PFP::VEC3,ORBIT,typename PFP::MAP::IMPL>& colorPerXXX) ;
 
 
 	/**
