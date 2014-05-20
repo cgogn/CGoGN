@@ -727,7 +727,7 @@ template <typename PFP>
 void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+    typedef typename MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 
 	// Face Attribute -> after dual new Vertex Attribute
