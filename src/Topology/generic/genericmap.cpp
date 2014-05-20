@@ -42,7 +42,7 @@ int NumberOfThreads = getSystemNumberOfCores();
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;
 
-GenericMap::GenericMap() : m_nbThreads(1)
+GenericMap::GenericMap() : m_nbThreadMarkers(1)
 {
 	if(m_attributes_registry_map == NULL)
 	{
@@ -160,7 +160,7 @@ void GenericMap::init()
 		}
 
 		AttributeContainer& cont = m_attribs[i];
-		for (unsigned int t = 0; t < m_nbThreads; ++t)
+		for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)
 		{
 			std::stringstream ss ;
 			ss << "Mark_" << t ;
@@ -219,7 +219,7 @@ void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit
 
 	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
 
-	for(unsigned int t = 0; t < m_nbThreads; ++t)
+	for(unsigned int t = 0; t < m_nbThreadMarkers; ++t)
 	{
 		AttributeMultiVector<Mark>* m = m_markTables[orbit1][t] ;
 		m_markTables[orbit1][t] = m_markTables[orbit2][t] ;
@@ -289,8 +289,8 @@ void GenericMap::addThreadMarker(unsigned int nb)
 
 	for (unsigned int j = 0; j < nb; ++j)
 	{
-		th = m_nbThreads ;
-		m_nbThreads++ ;
+		th = m_nbThreadMarkers ;
+		m_nbThreadMarkers++ ;
 
 		for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		{
@@ -303,17 +303,17 @@ void GenericMap::addThreadMarker(unsigned int nb)
 	}
 }
 
-unsigned int GenericMap::getNbThreadMarkers()
+unsigned int GenericMap::getNbThreadMarkers() const
 {
-	return m_nbThreads;
+	return m_nbThreadMarkers;
 }
 
 void GenericMap::removeThreadMarker(unsigned int nb)
 {
 	unsigned int th = 0;
-	while ((m_nbThreads > 1) && (nb > 0))
+	while ((m_nbThreadMarkers > 1) && (nb > 0))
 	{
-		th = --m_nbThreads ;
+		th = --m_nbThreadMarkers ;
 		--nb;
 		for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		{
@@ -336,11 +336,11 @@ void GenericMap::restore_shortcuts()
 
 	std::vector<std::string> typeMark;
 	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
-	m_nbThreads = 0;
+	m_nbThreadMarkers = 0;
 	for (unsigned int i = 0; i < nbatt0; ++i)
 	{
 		if (typeMark[i] == "Mark")
-			++m_nbThreads;
+			++m_nbThreadMarkers;
 	}
 
 	// EMBEDDING
@@ -405,13 +405,13 @@ void GenericMap::restore_shortcuts()
 				{										// clear all marks expect boundary marks
 					Mark m(m_boundaryMarkers[0] + m_boundaryMarkers[1]);
 					m.invert();
-					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-						amvMark->operator[](i).unsetMark(m);
+					for (unsigned int k = cont.begin(); k != cont.end(); cont.next(k))
+						amvMark->operator[](k).unsetMark(m);
 				}
 				else									// for others clear all
 				{
-					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-						amvMark->operator[](i).clear();
+					for (unsigned int k = cont.begin(); k != cont.end(); cont.next(k))
+						amvMark->operator[](k).clear();
 				}
 			}
 		}
@@ -509,6 +509,15 @@ void GenericMap::compact()
 
 	// compact topo (depends on map implementation)
 	compactTopo();
+}
+
+void GenericMap::dumpCSV() const
+{
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		m_attribs[orbit].dumpCSV();
+	}
+	CGoGNout << CGoGNendl;
 }
 
 } // namespace CGoGN

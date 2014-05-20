@@ -137,8 +137,10 @@ bool MapMono::copyFrom(const GenericMap& map)
 	}
 
 	GenericMap::clear(true);
+	// add same thread markers than in map (1 in clear)
+	addThreadMarker(map.getNbThreadMarkers()-1);
 
-	// load attrib container
+	// copy attrib containers
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_attribs[i].copyFrom(mapM.m_attribs[i]);
 

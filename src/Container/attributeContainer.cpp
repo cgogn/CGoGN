@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include "Container/attributeContainer.h"
+#include "Topology/generic/dart.h"
 
 namespace CGoGN
 {
@@ -83,7 +84,7 @@ unsigned int AttributeContainer::getAttributeIndex(const std::string& attribName
 		return index - 1 ;
 }
 
-const std::string& AttributeContainer::getAttributeName(unsigned int index)
+const std::string& AttributeContainer::getAttributeName(unsigned int index) const
 {
 	assert(index < m_tableAttribs.size() || !"getAttributeName: attribute index out of bounds");
 	assert(m_tableAttribs[index] != NULL || !"getAttributeName: attribute does not exist");
@@ -102,7 +103,7 @@ unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrInd
 	return atm->getBlocksPointers(vect_ptr, byteBlockSize);
 }
 
-unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names)
+unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names) const
 {
 	names.clear() ;
 	names.reserve(m_nbAttributes) ;
@@ -752,7 +753,6 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 		{
 			RegisteredBaseAttribute* ra = itAtt->second;
 			AttributeMultiVectorGen* amvg = ra->addAttribute(*this, nameAtt);
-//			CGoGNout << "loading attribute " << nameAtt << " : " << typeAtt << CGoGNendl;
 			amvg->loadBin(fs);
 		}
 	}
@@ -790,6 +790,12 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 	for (unsigned int i = 0; i < sz; ++i)
 		m_holesBlocks[i] = new HoleBlockRef(*(cont.m_holesBlocks[i]));
 
+	//  free indices
+	sz = cont.m_freeIndices.size();
+	m_freeIndices.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_freeIndices[i] = cont.m_freeIndices[i];
+
 	// blocks with free
 	sz = cont.m_tableBlocksWithFree.size();
 	m_tableBlocksWithFree.resize(sz);
@@ -809,19 +815,101 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 	{
 		if (cont.m_tableAttribs[i] != NULL)
 		{
-			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
-			ptr->setName(cont.m_tableAttribs[i]->getName());
-			ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
-			ptr->setIndex(m_tableAttribs.size());
-			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
-			ptr->copy(cont.m_tableAttribs[i]);
-	//			if (cont.m_tableAttribs[i]->toProcess())
-	//				ptr->toggleProcess();
-	//			else
-	//				ptr->toggleNoProcess();
-			m_tableAttribs.push_back(ptr);
+			std::string sub = cont.m_tableAttribs[i]->getName().substr(0, 5);
+			if (sub != "Mark_") // Mark leaved by
+			{
+				AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
+				ptr->setName(cont.m_tableAttribs[i]->getName());
+				ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
+				ptr->setIndex(m_tableAttribs.size());
+				ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+				ptr->copy(cont.m_tableAttribs[i]);
+				m_tableAttribs.push_back(ptr);
+			}
+			else
+			{
+				// get id of thread
+				const std::string& str = cont.m_tableAttribs[i]->getName();
+				unsigned int thId = (unsigned int)(str[5]-'0');
+				if (str.size()==7)
+					thId = 10*thId +  (unsigned int)(sub[6]-'0');
+				// Mark always at the begin, because called after clear
+				AttributeMultiVectorGen* ptr = m_tableAttribs[thId];
+				ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+				ptr->copy(cont.m_tableAttribs[i]);
+			}
 		}
 	}
 }
+
+void AttributeContainer::dumpCSV() const
+{
+	CGoGNout << "Container of "<<orbitName(this->getOrbit())<< CGoGNendl;
+
+	CGoGNout << "Name ; ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << m_tableAttribs[i]->getName() << " ; ";
+		}
+	}
+	CGoGNout << CGoGNendl;
+	CGoGNout << "Type  ; ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << m_tableAttribs[i]->getTypeName() << " ; ";
+		}
+	}
+	CGoGNout << CGoGNendl;
+	CGoGNout << "line ; refs ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << "value;";
+		}
+	}
+	CGoGNout << CGoGNendl;
+
+	for (unsigned int l=this->begin(); l!= this->end(); this->next(l))
+	{
+		CGoGNout << l << " ; "<< this->getNbRefs(l)<< " ; ";
+		for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+		{
+			if (m_tableAttribs[i] != NULL)
+			{
+				m_tableAttribs[i]->dump(l);
+				CGoGNout << " ; ";
+			}
+		}
+		CGoGNout << CGoGNendl;
+	}
+}
+
+void AttributeContainer::dumpByLines() const
+{
+	CGoGNout << "Container of "<<orbitName(this->getOrbit())<< CGoGNendl;
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << "Name: "<< m_tableAttribs[i]->getName();
+			CGoGNout << " / Type: "<< m_tableAttribs[i]->getTypeName();
+			for (unsigned int l=this->begin(); l!= this->end(); this->next(l))
+			{
+				CGoGNout << l << " ; ";
+				m_tableAttribs[i]->dump(l);
+				CGoGNout << CGoGNendl;
+			}
+
+		}
+
+	}
+}
+
+
 
 }
