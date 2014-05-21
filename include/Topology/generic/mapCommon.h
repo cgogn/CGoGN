@@ -36,6 +36,12 @@ class MapCommon : public MAP_IMPL
 {
 	typedef MAP_IMPL IMPL;
 
+protected:
+	// protected copy constructor to prevent the copy of map
+	MapCommon(const MapCommon<MAP_IMPL>& m) : MAP_IMPL(m) {}
+public:
+	MapCommon() {}
+
 	/****************************************
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
@@ -127,7 +133,10 @@ public:
 	/****************************************
 	 *         BOUNDARY MANAGEMENT          *
 	 ****************************************/
+
 protected:
+
+
 	/**
 	 * mark a dart as  belonging to boundary
 	 */

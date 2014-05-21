@@ -42,6 +42,9 @@ public:
 	inline virtual void clear(bool removeAttrib);
 
 protected:
+	// protected copy constructor to prevent the copy of map
+	MapMono(const MapMono& m): GenericMap(m){}
+
 	std::vector<AttributeMultiVector<Dart>*> m_involution;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation_inv;

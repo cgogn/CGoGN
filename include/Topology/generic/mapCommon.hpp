@@ -85,7 +85,7 @@ void MapCommon<MAP_IMPL>::setDartEmbedding(Dart d, unsigned int emb)
 	{
 		if(this->m_attribs[ORBIT].unrefLine(old))	// then unref the old emb
 		{
-			for (unsigned int t = 0; t < this->m_nbThreads; ++t)	// clear the markers if it was the
+			for (unsigned int t = 0; t < this->m_nbThreadMarkers; ++t)	// clear the markers if it was the
 				(*this->m_markTables[ORBIT][t])[old].clear();		// last unref of the line
 		}
 	}

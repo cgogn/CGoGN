@@ -37,6 +37,9 @@ template <typename MAP_IMPL>
 class GMap2 : public GMap1<MAP_IMPL>
 {
 protected:
+	// protected copy constructor to prevent the copy of map
+	GMap2(const GMap2<MAP_IMPL>& m):GMap1<MAP_IMPL>(m) {}
+
 	void init() ;
 
 public:
