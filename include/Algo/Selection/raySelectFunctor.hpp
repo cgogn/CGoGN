@@ -46,12 +46,11 @@ template <typename PFP>
 class FuncVertexInter: public FunctorMapThreaded<typename PFP::MAP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	const VertexAttribute<VEC3, MAP_IMPL>& m_positions;
+	const VertexAttribute<VEC3, MAP>& m_positions;
 	const VEC3& m_A;
 	const VEC3& m_AB;
 	float m_AB2;
@@ -59,7 +58,7 @@ protected:
 	std::vector<std::pair<REAL, Dart> > m_vd;
 
 public:
-	FuncVertexInter(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& position, const VEC3& A, const VEC3& AB, REAL AB2, REAL dm2):
+	FuncVertexInter(MAP& map, const VertexAttribute<VEC3, MAP>& position, const VEC3& A, const VEC3& AB, REAL AB2, REAL dm2):
 		FunctorMapThreaded<typename PFP::MAP>(map),
 		m_positions(position),
 		m_A(A),
@@ -87,12 +86,11 @@ template <typename PFP>
 class FuncEdgeInter: public FunctorMapThreaded<typename PFP::MAP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	const VertexAttribute<VEC3, MAP_IMPL>& m_positions;
+	const VertexAttribute<VEC3, MAP>& m_positions;
 	const VEC3& m_A;
 	const VEC3& m_AB;
 	float m_AB2;
@@ -100,7 +98,7 @@ protected:
 	std::vector<std::pair<REAL, Dart> > m_ed;
 
 public:
-	FuncEdgeInter(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& position, const VEC3& A, const VEC3& AB, REAL AB2, REAL dm2):
+	FuncEdgeInter(MAP& map, const VertexAttribute<VEC3, MAP>& position, const VEC3& A, const VEC3& AB, REAL AB2, REAL dm2):
 		FunctorMapThreaded<typename PFP::MAP>(map),
 		m_positions(position),
 		m_A(A),
@@ -132,18 +130,17 @@ template <typename PFP>
 class FuncFaceInter: public FunctorMapThreaded<typename PFP::MAP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	const VertexAttribute<VEC3, MAP_IMPL>& m_positions;
+	const VertexAttribute<VEC3, MAP>& m_positions;
 	const VEC3& m_A;
 	const VEC3& m_AB;
 	std::vector<std::pair<REAL, Dart> > m_fd;
 
 public:
-	FuncFaceInter(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& position, const VEC3& A, const VEC3& AB):
+	FuncFaceInter(MAP& map, const VertexAttribute<VEC3, MAP>& position, const VEC3& A, const VEC3& AB):
 		FunctorMapThreaded<typename PFP::MAP>(map),
 		m_positions(position),
 		m_A(A),

@@ -386,7 +386,7 @@ void TopoPrimalRender<PFP>::setDartsIdColor(typename PFP::MAP& map)
 }
 
 template <typename PFP>
-void TopoPrimalRender<PFP>::updateColors(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& colors)
+void TopoPrimalRender<PFP>::updateColors(MAP& map, const VertexAttribute<VEC3, MAP>& colors)
 {
 	m_vbo2->bind();
 	Geom::Vec3f* colorBuffer = reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -419,7 +419,7 @@ Dart TopoPrimalRender<PFP>::picking(MAP& map, int x, int y)
 }
 
 template <typename PFP>
-void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke)
+void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke)
 {
 	if (m_attIndex.map() != &map)
 		m_attIndex  = map.template getAttribute<unsigned int, DART>("dart_index");
@@ -433,7 +433,7 @@ void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP
 //	}
 	m_nbDarts = map.getNbDarts();
 
-	DartAutoAttribute<VEC3, MAP_IMPL> fv1(map);
+	DartAutoAttribute<VEC3, MAP> fv1(map);
 
 	m_vbo2->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -534,7 +534,7 @@ void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP
 }
 
 template <typename PFP>
-void TopoPrimalRender<PFP>::computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP_IMPL>& posExpl)
+void TopoPrimalRender<PFP>::computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP>& posExpl)
 {
 	m_vbo0->bind();
 	VEC3* positionsPtr = reinterpret_cast<VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));

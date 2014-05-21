@@ -93,8 +93,8 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs)
 template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positionF
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& positionF
 )
 {
 	TraversorF<typename PFP::MAP> t(map) ;
@@ -724,14 +724,13 @@ inline double sqrt3_K(unsigned int n)
 //}
 
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<VEC3, MAP_IMPL> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
 	if(!positionF.isValid())
 		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 
@@ -745,15 +744,15 @@ void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typ
 
 
 template <typename PFP>
-void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<VEC3, MAP_IMPL> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
 	if(!positionF.isValid())
 		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 
@@ -816,15 +815,15 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 }
 
 template <typename PFP>
-void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
+	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<VEC3, MAP_IMPL> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
 	if(!positionF.isValid())
 		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 
@@ -879,7 +878,7 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 	map.computeDual();
 
 	//Saving old position VertexAttribute to a FaceAttribute
-	FaceAttribute<VEC3, MAP_IMPL> temp;
+	FaceAttribute<VEC3, MAP> temp;
 	temp = position;
 	position = positionF ;
 	positionF = temp;

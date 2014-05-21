@@ -42,7 +42,6 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 
 
@@ -52,7 +51,7 @@ int main()
 	MAP myMap;
 
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	// create a topo grid of 2x2 squares
 	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 3, 3, true);
@@ -71,7 +70,7 @@ int main()
 
 
 	// traverse all vertices of mesh and test if they belong to the boundary
-	foreach_cell<VERTEX>(myMap,[&myMap](Vertex v) // for all edge e of map do
+	foreach_cell<VERTEX>(myMap, [&myMap] (Vertex v) // for all edge e of map do
 	{
 		if (myMap.isBoundaryVertex(v))
 			std::cout << "vertex of boundary"<< std::endl;

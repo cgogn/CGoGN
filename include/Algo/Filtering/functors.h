@@ -68,19 +68,18 @@ public:
 template <typename PFP, typename T>
 class FunctorAverageOnSphereBorder : public FunctorMap<typename PFP::MAP>
 {
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
-	const VertexAttribute<T, MAP_IMPL>& attr ;
-	const VertexAttribute<VEC3, MAP_IMPL>& position ;
+	const VertexAttribute<T, MAP>& attr ;
+	const VertexAttribute<VEC3, MAP>& position ;
 	VEC3 center;
 	typename PFP::REAL radius;
 	T sum ;
 	unsigned int count ;
 
 public:
-	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const VertexAttribute<T, MAP_IMPL>& a, const VertexAttribute<VEC3, MAP_IMPL>& p) :
+	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const VertexAttribute<T, MAP>& a, const VertexAttribute<VEC3, MAP>& p) :
 		FunctorMap<typename PFP::MAP>(map), attr(a), position(p), sum(0), count(0)
 	{
 		center = VEC3(0);

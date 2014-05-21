@@ -72,7 +72,7 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, Windo
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3, L_MAP_IMPL>& position, Windowing<DataType> wind, bool boundRemoved):
+MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3, L_MAP>& position, Windowing<DataType> wind, bool boundRemoved):
 	m_Image(img),
 	m_windowFunc(wind),
 	m_Buffer(NULL),
@@ -121,15 +121,15 @@ Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsi
 
 	unsigned int vemb = e1;
 
-	auto fsetemb = [&] (Dart d) { m_map->template setDartEmbedding<VERTEX>(d, vemb); };
+//	auto fsetemb = [&] (Dart d) { m_map->template setDartEmbedding<VERTEX>(d, vemb); };
 
-	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, [&] (Dart dd) { m_map->template setDartEmbedding<VERTEX>(dd, vemb); });
 	d = m_map->phi1(d);
 	vemb = e2;
-	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, [&] (Dart dd) { m_map->template setDartEmbedding<VERTEX>(dd, vemb); });
 	d = m_map->phi1(d);
 	vemb = e3;
-	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, [&] (Dart dd) { m_map->template setDartEmbedding<VERTEX>(dd, vemb); });
 	d = m_map->phi1(d);
 
 	return d;
@@ -1154,7 +1154,7 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(VertexAttribute<unsigned char, L_MAP_IMPL>& boundVertices, unsigned int frameWidth)
+void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(VertexAttribute<unsigned char, L_MAP>& boundVertices, unsigned int frameWidth)
 {
 	float xmin = frameWidth;
 	float xmax = m_Image->getWidthX() - frameWidth -1;

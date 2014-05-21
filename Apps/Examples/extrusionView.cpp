@@ -53,7 +53,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 MAP myMap;
@@ -104,7 +103,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position") ;
 
 	// define the face extruded (here a cross)
 	std::vector<PFP::VEC3> objV;
@@ -134,7 +133,7 @@ int main(int argc, char **argv)
 	}
 
 	// extrusion
-	Algo::Surface::Modelisation::extrusion_scale<PFP>(myMap, position, objV, PFP::VEC3(0.0,0.0,0.0), PFP::VEC3(0.0,1.0,0.0),true, pathV, false, pathRadius);
+	Algo::Surface::Modelisation::extrusion_scale<PFP>(myMap, position, objV, PFP::VEC3(0.0,0.0,0.0), PFP::VEC3(0.0,1.0,0.0), true, pathV, false, pathRadius);
 
     //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

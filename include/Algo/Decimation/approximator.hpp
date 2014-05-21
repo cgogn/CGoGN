@@ -35,7 +35,7 @@ namespace Decimation
 {
 
 template <typename PFP, typename T, unsigned int ORBIT>
-Approximator<PFP,T,ORBIT>::Approximator(MAP& m, std::vector<VertexAttribute<T, MAP_IMPL>* > va, Predictor<PFP, T> * predictor) :
+Approximator<PFP,T,ORBIT>::Approximator(MAP& m, std::vector<VertexAttribute<T, MAP>* > va, Predictor<PFP, T> * predictor) :
 	ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(va)
 {
 	const unsigned int& size = m_attrV.size() ;

@@ -127,6 +127,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt = AUTO
 
 namespace Parallel
 {
+
 /**
  * @brief foreach_cell
  * @param map
@@ -136,9 +137,12 @@ namespace Parallel
  * @param nbth number of used thread (0:for traversal, [1,nbth-1] for func computing
 */
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, bool needMarkers=true, TraversalOptim opt=AUTO, unsigned int nbth=NumberOfThreads);
+void foreach_cell(MAP& map, FUNC func, bool needMarkers = true, TraversalOptim opt = AUTO, unsigned int nbth = NumberOfThreads);
 
-}
+} // namespace Parallel
+
+
+
 
 
 template <typename MAP, TraversalOptim OPT=AUTO>

@@ -58,7 +58,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 class MyQT: public Utils::QT::SimpleQT
@@ -93,7 +92,7 @@ protected:
 	// declaration of the map
 	MAP myMap;
 
-	VertexAttribute<VEC3, MAP_IMPL> position;
+	VertexAttribute<VEC3, MAP> position;
 
 //	SelectorDartNoBoundary<MAP> nb;
 

@@ -32,7 +32,6 @@ namespace CGoGN
 
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
-typedef EmbeddedMap2::IMPL EMap2_IMPL;
 typedef EmbeddedMap2::TOPO_MAP TOPO_MAP;
 
 class ImplicitHierarchicalMap2 : public EmbeddedMap2
@@ -44,8 +43,8 @@ private:
 	unsigned int m_maxLevel ;
 	unsigned int m_idCount ;
 
-	DartAttribute<unsigned int, EMap2_IMPL> m_dartLevel ;
-	DartAttribute<unsigned int, EMap2_IMPL> m_edgeId ;
+	DartAttribute<unsigned int, ImplicitHierarchicalMap2> m_dartLevel ;
+	DartAttribute<unsigned int, ImplicitHierarchicalMap2> m_edgeId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
@@ -106,17 +105,37 @@ public:
 
 	inline void next(Dart& d) const ;
 
-	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread = 0) const ;
 
-	void foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+	template <typename FUNC>
+	void foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	void foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
-	void foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0)  const;
+	template <typename FUNC>
+	void foreach_dart_of_edge(Dart d, FUNC& f, unsigned int thread = 0) const ;
 
-	void foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
-	void foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+	template <typename FUNC>
+	void foreach_dart_of_oriented_face(Dart d, FUNC& f, unsigned int thread = 0) const ;
 
-	void foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+	template <typename FUNC>
+	void foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread = 0)  const;
+
+	template <typename FUNC>
+	void foreach_dart_of_oriented_volume(Dart d, FUNC& f, unsigned int thread = 0) const ;
+
+	template <typename FUNC>
+	void foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread = 0) const ;
+
+	template <typename FUNC>
+	void foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	template <typename FUNC>
+	void foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	template <typename FUNC>
+	void foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread = 0) const ;
 
 	/***************************************************
 	 *               MAP MANIPULATION                  *
@@ -234,25 +253,25 @@ public:
 } ;
 
 template <typename T, unsigned int ORBIT>
-class AttributeHandler_IHM : public AttributeHandler<T, ORBIT, EMap2_IMPL>
+class AttributeHandler_IHM : public AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2>
 {
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler_IHM() : AttributeHandler<T, ORBIT, EMap2_IMPL>()
+	AttributeHandler_IHM() : AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2>()
 	{}
 
-	AttributeHandler_IHM(ImplicitHierarchicalMap2* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT, EMap2_IMPL>(m, amv)
+	AttributeHandler_IHM(ImplicitHierarchicalMap2* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2>(m, amv)
 	{}
 
 	AttributeMultiVector<T>* getDataVector() const
 	{
-		return AttributeHandler<T, ORBIT, EMap2_IMPL>::getDataVector() ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2>::getDataVector() ;
 	}
 
 	bool isValid() const
 	{
-		return AttributeHandler<T, ORBIT, EMap2_IMPL>::isValid() ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2>::isValid() ;
 	}
 
 	T& operator[](Dart d) ;
@@ -261,12 +280,12 @@ public:
 
 	T& operator[](unsigned int a)
 	{
-		return AttributeHandler<T, ORBIT, EMap2_IMPL>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2>::operator[](a) ;
 	}
 
 	const T& operator[](unsigned int a) const
 	{
-		return AttributeHandler<T, ORBIT, EMap2_IMPL>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2>::operator[](a) ;
 	}
 } ;
 

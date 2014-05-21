@@ -286,19 +286,48 @@ inline bool Map1<MAP_IMPL>::isCycleTriangle(Dart d) const
  *************************************************************************/
 
 template <typename MAP_IMPL>
-inline void Map1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <unsigned int ORBIT, typename FUNC>
+void Map1<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <unsigned int ORBIT, typename FUNC>
+void Map1<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void Map1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline void Map1<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <typename FUNC>
+inline void Map1<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	f(d) ;
 }
 
 template <typename MAP_IMPL>
-inline void Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <typename FUNC>
+inline void Map1<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	Dart it = d ;
 	do

@@ -36,7 +36,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -49,7 +49,7 @@ typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const 
 }
 
 template <typename PFP>
-typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -62,7 +62,7 @@ typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const Vertex
 }
 
 template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
+typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int thread)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -124,7 +124,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const V
 }
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int thread)
 {
 	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
 	{
@@ -145,7 +145,7 @@ namespace Parallel
 {
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	// allocate a vector of 1 accumulator for each thread
 	std::vector<typename PFP::REAL> vols(CGoGN::Parallel::NumberOfThreads-1,0.0);

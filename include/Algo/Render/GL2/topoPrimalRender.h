@@ -56,7 +56,6 @@ template <typename PFP>
 class TopoPrimalRender
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
@@ -113,7 +112,7 @@ protected:
 	/**
 	 * attribute index to get easy correspondence dart/color
 	 */
-	DartAttribute<unsigned int, MAP_IMPL> m_attIndex;
+	DartAttribute<unsigned int, MAP> m_attIndex;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
@@ -246,14 +245,14 @@ public:
 	* @param positions  attribute of position vertices
 	* @param ke exploding coef for edge
 	*/
-	void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke);
+	void updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke);
 
 	/**
 	* update color buffer with color attribute handler
 	* @param map the map
 	* @param colors  attribute of dart's colors
 	*/
-	void updateColors(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& colors);
+	void updateColors(MAP& map, const VertexAttribute<VEC3, MAP>& colors);
 
 	/**
 	 * Get back middle position of drawn darts
@@ -261,7 +260,7 @@ public:
 	 * @param posExpl the output positions
 	 */
 	template<typename VEC3>
-	void computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP_IMPL>& posExpl);
+	void computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP>& posExpl);
 
 	/**
 	 * render to svg struct

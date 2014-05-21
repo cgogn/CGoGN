@@ -140,7 +140,7 @@ void Collector_OneRing<PFP>::collectBorder(Dart d)
 }
 
 template <typename PFP>
-typename PFP::REAL Collector_OneRing<PFP>::computeArea(const VertexAttribute<VEC3, MAP_IMPL>& pos)
+typename PFP::REAL Collector_OneRing<PFP>::computeArea(const VertexAttribute<VEC3, MAP>& pos)
 {
 	assert(this->isInsideCollected || !"computeArea: inside cells have not been collected.") ;
 
@@ -153,7 +153,7 @@ typename PFP::REAL Collector_OneRing<PFP>::computeArea(const VertexAttribute<VEC
 }
 
 template <typename PFP>
-void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>& edgeangle, typename PFP::MATRIX33& tensor)
+void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, typename PFP::MATRIX33& tensor)
 {
 	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
 
@@ -179,7 +179,7 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 }
 
 template <typename PFP>
-void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, typename PFP::MATRIX33& tensor)
+void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, typename PFP::MATRIX33& tensor)
 {
 	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
 
@@ -266,7 +266,7 @@ void Collector_OneRing_AroundEdge<PFP>::collectBorder(Dart d)
 }
 
 template <typename PFP>
-typename PFP::REAL Collector_OneRing_AroundEdge<PFP>::computeArea(const VertexAttribute<VEC3, MAP_IMPL>& pos)
+typename PFP::REAL Collector_OneRing_AroundEdge<PFP>::computeArea(const VertexAttribute<VEC3, MAP>& pos)
 {
 	assert(this->isInsideCollected || !"computeArea: inside cells have not been collected.") ;
 
@@ -279,7 +279,7 @@ typename PFP::REAL Collector_OneRing_AroundEdge<PFP>::computeArea(const VertexAt
 }
 
 template <typename PFP>
-void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>& edgeangle, typename PFP::MATRIX33& tensor)
+void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, typename PFP::MATRIX33& tensor)
 {
 	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
 
@@ -305,7 +305,7 @@ void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexA
 }
 
 template <typename PFP>
-void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP_IMPL>& pos, typename PFP::MATRIX33& tensor)
+void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, typename PFP::MATRIX33& tensor)
 {
 	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
 
@@ -444,7 +444,7 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 
 
 template <typename PFP>
-typename PFP::REAL Collector_WithinSphere<PFP>::computeArea(const VertexAttribute<VEC3, MAP_IMPL>& pos)
+typename PFP::REAL Collector_WithinSphere<PFP>::computeArea(const VertexAttribute<VEC3, MAP>& pos)
 {
 	assert(this->isInsideCollected || !"computeArea: inside cells have not been collected.") ;
 
@@ -477,7 +477,7 @@ typename PFP::REAL Collector_WithinSphere<PFP>::computeArea(const VertexAttribut
 }
 
 template <typename PFP>
-void Collector_WithinSphere<PFP>::computeNormalCyclesTensor(const VertexAttribute<VEC3, MAP_IMPL>& pos, const EdgeAttribute<REAL, MAP_IMPL>& edgeangle, typename PFP::MATRIX33& tensor)
+void Collector_WithinSphere<PFP>::computeNormalCyclesTensor(const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, typename PFP::MATRIX33& tensor)
 {
 	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
 
@@ -503,7 +503,7 @@ void Collector_WithinSphere<PFP>::computeNormalCyclesTensor(const VertexAttribut
 }
 
 template <typename PFP>
-void Collector_WithinSphere<PFP>::computeNormalCyclesTensor(const VertexAttribute<VEC3, MAP_IMPL>& pos, typename PFP::MATRIX33& tensor)
+void Collector_WithinSphere<PFP>::computeNormalCyclesTensor(const VertexAttribute<VEC3, MAP>& pos, typename PFP::MATRIX33& tensor)
 {
 	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
 

@@ -63,7 +63,7 @@ void MyQT::createMap()
 {
 	// creation of a new attribute on vertices of type 3D vector for position.
 	// a handler to this attribute is returned
-	position = myMap.addAttribute<VEC3, VERTEX>("position");
+	position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	// creation of 2 new faces: 1 triangle and 1 square
 	Dart d1 = myMap.newFace(3);

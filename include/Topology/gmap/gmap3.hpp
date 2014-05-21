@@ -180,7 +180,7 @@ inline void GMap3<MAP_IMPL>::beta3unsew(Dart d)
 template <typename MAP_IMPL>
 void GMap3<MAP_IMPL>::deleteVolume(Dart d)
 {
-	DartMarkerStore<MAP_IMPL> mark(*this);	// Lock a marker
+	DartMarkerStore<GMap3<MAP_IMPL> > mark(*this);	// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(512);
@@ -219,7 +219,7 @@ void GMap3<MAP_IMPL>::fillHole(Dart d)
 	Dart dd = d ;
 	if(!this->template isBoundaryMarked<3>(dd))
 		dd = phi3(dd) ;
-	this->template boundaryUnmarkOrbit<3,VOLUME>(dd) ;
+	Algo::Topo::boundaryUnmarkOrbit<3,VOLUME>(*this, dd) ;
 }
 
 /*! @name Topological Operators
@@ -241,7 +241,7 @@ Dart GMap3<MAP_IMPL>::deleteVertex(Dart d)
 	// just one dart per face
 	std::vector<Dart> fstore;
 	fstore.reserve(128);
-	DartMarker<MAP_IMPL> mf(*this);
+	DartMarker<GMap3<MAP_IMPL> > mf(*this);
 	for(unsigned int i = 0; i < fstoretmp.size(); ++i)
 	{
 		if(!mf.isMarked(fstoretmp[i]))
@@ -579,7 +579,7 @@ void GMap3<MAP_IMPL>::splitVolume(std::vector<Dart>& vd)
 template <typename MAP_IMPL>
 bool GMap3<MAP_IMPL>::sameOrientedVertex(Dart d, Dart e) const
 {
-	DartMarkerStore<MAP_IMPL> mv(*this);	// Lock a marker
+	DartMarkerStore<GMap3<MAP_IMPL> > mv(*this);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -613,7 +613,7 @@ bool GMap3<MAP_IMPL>::sameOrientedVertex(Dart d, Dart e) const
 template <typename MAP_IMPL>
 bool GMap3<MAP_IMPL>::sameVertex(Dart d, Dart e) const
 {
-	DartMarkerStore<MAP_IMPL> mv(*this);	// Lock a marker
+	DartMarkerStore<GMap3<MAP_IMPL> > mv(*this);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -723,7 +723,7 @@ int GMap3<MAP_IMPL>::checkVertexDegree(Dart d, unsigned int vd) const
 template <typename MAP_IMPL>
 bool GMap3<MAP_IMPL>::isBoundaryVertex(Dart d) const
 {
-	DartMarkerStore<MAP_IMPL> mv(*this);	// Lock a marker
+	DartMarkerStore<GMap3<MAP_IMPL> > mv(*this);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -848,7 +848,7 @@ inline bool GMap3<MAP_IMPL>::isBoundaryFace(Dart d) const
 template <typename MAP_IMPL>
 bool GMap3<MAP_IMPL>::isBoundaryAdjacentVolume(Dart d) const
 {
-	DartMarkerStore<MAP_IMPL> mark(*this);	// Lock a marker
+	DartMarkerStore<GMap3<MAP_IMPL> > mark(*this);	// Lock a marker
 
 	std::vector<Dart> visitedFaces ;
 	visitedFaces.reserve(128) ;
@@ -879,7 +879,7 @@ template <typename MAP_IMPL>
 bool GMap3<MAP_IMPL>::check() const
 {
 	CGoGNout << "Check: topology begin" << CGoGNendl;
-	DartMarker<MAP_IMPL> m(*this);
+	DartMarker<GMap3<MAP_IMPL> > m(*this);
 	m.unmarkAll();
 	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
@@ -960,9 +960,50 @@ bool GMap3<MAP_IMPL>::check() const
  *************************************************************************/
 
 template <typename MAP_IMPL>
-void GMap3<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <unsigned int ORBIT, typename FUNC>
+void GMap3<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread) const
 {
-	DartMarkerStore<MAP_IMPL> mv(*this, thread);	// Lock a marker
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		case VERTEX2: 	foreach_dart_of_vertex2(c, f, thread); break;
+		case EDGE2:		foreach_dart_of_edge2(c, f, thread); break;
+		case FACE2:		foreach_dart_of_face2(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <unsigned int ORBIT, typename FUNC>
+void GMap3<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		case VERTEX2: 	foreach_dart_of_vertex2(c, f, thread); break;
+		case EDGE2:		foreach_dart_of_edge2(c, f, thread); break;
+		case FACE2:		foreach_dart_of_face2(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+void GMap3<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, FUNC& f, unsigned int thread) const
+{
+	DartMarkerStore<GMap3<MAP_IMPL> > mv(*this, thread);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -992,9 +1033,10 @@ void GMap3<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, std::function<void
 }
 
 template <typename MAP_IMPL>
-void GMap3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+void GMap3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread) const
 {
-	DartMarkerStore<MAP_IMPL> mv(*this, thread);	// Lock a marker
+	DartMarkerStore<GMap3<MAP_IMPL> > mv(*this, thread);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(256);
@@ -1027,7 +1069,8 @@ void GMap3<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>&
 }
 
 template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, FUNC& f, unsigned int thread) const
 {
 	Dart it = d;
 	do
@@ -1038,7 +1081,8 @@ inline void GMap3<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, std::function
 }
 
 template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int thread) const
 {
 	Dart it = d;
 	do
@@ -1049,28 +1093,67 @@ inline void GMap3<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Da
 }
 
 template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_face(d, f, thread);
 	ParentMap::foreach_dart_of_face(beta3(d), f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_oriented_volume(Dart d, FUNC& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_oriented_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-void GMap3<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread) const
 {
-	DartMarkerStore<MAP_IMPL> mv(*this, thread);	// Lock a marker
+	ParentMap::ParentMap::foreach_dart_of_vertex(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread) const
+{
+	ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_vertex2(Dart d, FUNC& f, unsigned int thread) const
+{
+	ParentMap::foreach_dart_of_vertex(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_edge2(Dart d, FUNC& f, unsigned int thread) const
+{
+	ParentMap::foreach_dart_of_edge(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void GMap3<MAP_IMPL>::foreach_dart_of_face2(Dart d, FUNC& f, unsigned int thread) const
+{
+	ParentMap::foreach_dart_of_face(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+void GMap3<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread) const
+{
+	DartMarkerStore<GMap3<MAP_IMPL> > mv(*this, thread);	// Lock a marker
 
 	std::vector<Dart> darts;	// Darts that are traversed
 	darts.reserve(1024);
@@ -1108,24 +1191,6 @@ void GMap3<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, 
 	}
 }
 
-template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_vertex2(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
-{
-	ParentMap::foreach_dart_of_vertex(d, f, thread);
-}
-
-template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_edge2(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
-{
-	ParentMap::foreach_dart_of_edge(d, f, thread);
-}
-
-template <typename MAP_IMPL>
-inline void GMap3<MAP_IMPL>::foreach_dart_of_face2(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
-{
-	ParentMap::foreach_dart_of_face(d, f, thread);
-}
-
 /*! @name Close map after import or creation
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
@@ -1134,7 +1199,7 @@ template <typename MAP_IMPL>
 Dart GMap3<MAP_IMPL>::newBoundaryCycle(unsigned int nbE)
 {
 	Dart d = GMap1<MAP_IMPL>::newCycle(nbE);
-	this->template boundaryMarkOrbit<3,FACE>(d);
+	Algo::Topo::boundaryMarkOrbit<3,FACE>(*this, d);
 	return d;
 }
 
@@ -1142,7 +1207,7 @@ template <typename MAP_IMPL>
 unsigned int GMap3<MAP_IMPL>::closeHole(Dart d, bool forboundary)
 {
 	assert(beta3(d) == d);		// Nothing to close
-	DartMarkerStore<MAP_IMPL> m(*this) ;
+	DartMarkerStore<GMap3<MAP_IMPL> > m(*this) ;
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;

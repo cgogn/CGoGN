@@ -30,8 +30,8 @@
 
 SimpleGMap3::SimpleGMap3()
 {
-    position = myMap.addAttribute<VEC3, VERTEX>("position");
-    volume = myMap.addAttribute<VEC3, VOLUME>("volume");
+	position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
+	volume = myMap.addAttribute<VEC3, VOLUME, MAP>("volume");
 
     //	CellMarker<EDGE> mE(myMap);
 

@@ -57,14 +57,13 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 typedef PFP::REAL REAL ;
 
 MAP myMap;
-VertexAttribute<VEC3, MAP_IMPL> position;
-VertexAttribute<VEC3, MAP_IMPL> position2;
-VertexAttribute<VEC3, MAP_IMPL> normal;
+VertexAttribute<VEC3, MAP> position;
+VertexAttribute<VEC3, MAP> position2;
+VertexAttribute<VEC3, MAP> normal;
 
 void MyQT::cb_initGL()
 {
@@ -142,13 +141,13 @@ template <typename XXX>
 class UnshrinkFunctor : public FunctorAttribThreaded
 {
 protected:
-	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions;
-	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions2;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& m_positions;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& m_positions2;
 
 public:
 	UnshrinkFunctor(
-		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos,
-		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos2
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& pos,
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& pos2
 	) : FunctorAttribThreaded(), m_positions(pos), m_positions2(pos2)
 	{}
 
@@ -178,14 +177,14 @@ template <typename XXX>
 class ShrinkFunctor : public FunctorMapThreaded<typename XXX::MAP >
 {
 protected:
-	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions;
-	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions2;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& m_positions;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& m_positions2;
 
 public:
 	ShrinkFunctor(
 		typename XXX::MAP& map,
-		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos,
-		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos2
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& pos,
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& pos2
 	) : FunctorMapThreaded<typename XXX::MAP>(map),
 		m_positions(pos),
 		m_positions2(pos2)
@@ -225,14 +224,14 @@ template <typename XXX>
 class LengthEdgeFunctor : public FunctorMapThreaded<typename XXX::MAP >
 {
 protected:
-	VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& m_positions;
+	VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& m_positions;
 	double m_length;
 	unsigned int m_nb;
 
 public:
 	LengthEdgeFunctor(
 		typename XXX::MAP& map,
-		VertexAttribute<typename XXX::VEC3, typename XXX::MAP::IMPL>& pos
+		VertexAttribute<typename XXX::VEC3, typename XXX::MAP>& pos
 	) : FunctorMapThreaded<typename XXX::MAP>(map),
 		m_positions(pos),
 		m_length(0.0),
@@ -296,13 +295,13 @@ int main(int argc, char **argv)
  	CGoGNStream::allToConsole(&sqt);
 
  	if (!position.isValid())
-		position = myMap.addAttribute<VEC3, VERTEX>("position");
+		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	if (!position2.isValid())
-		position2 = myMap.addAttribute<VEC3, VERTEX>("position2");
+		position2 = myMap.addAttribute<VEC3, VERTEX, MAP>("position2");
 
 	if (!normal.isValid())
-		normal = myMap.addAttribute<VEC3, VERTEX>("normal");
+		normal = myMap.addAttribute<VEC3, VERTEX, MAP>("normal");
 
 	unsigned int nbt = 64;
 	if (argc == 2)

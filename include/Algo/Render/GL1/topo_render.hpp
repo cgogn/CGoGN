@@ -40,17 +40,16 @@ namespace GL1
 {
 
 template <typename PFP>
-void renderTopoMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, bool drawPhi1, bool drawPhi2, float ke, float kf)
+void renderTopoMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool drawPhi1, bool drawPhi2, float ke, float kf)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 	
-	DartAutoAttribute<VEC3, MAP_IMPL> fv1(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> fv11(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> fv2(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> vert(map);
+	DartAutoAttribute<VEC3, MAP> fv1(map);
+	DartAutoAttribute<VEC3, MAP> fv11(map);
+	DartAutoAttribute<VEC3, MAP> fv2(map);
+	DartAutoAttribute<VEC3, MAP> vert(map);
 
 	glLineWidth(2.0f);
 	glColor3f(0.9f,0.9f,0.9f);
@@ -140,18 +139,17 @@ void renderTopoMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 }
 
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv)
+void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	DartAutoAttribute<VEC3, MAP_IMPL> fv1(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> fv11(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> fv2(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> fv2x(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> vert(map);
+	DartAutoAttribute<VEC3, MAP> fv1(map);
+	DartAutoAttribute<VEC3, MAP> fv11(map);
+	DartAutoAttribute<VEC3, MAP> fv2(map);
+	DartAutoAttribute<VEC3, MAP> fv2x(map);
+	DartAutoAttribute<VEC3, MAP> vert(map);
 
 	int m_nbDarts = 0;
 
@@ -311,16 +309,15 @@ void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, t
 }
 
 template <typename PFP>
-void renderTopoGMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float kd, float ke, float kf)
+void renderTopoGMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float kd, float ke, float kf)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	DartAutoAttribute<VEC3, MAP_IMPL> posBeta1(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> posBeta2(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> vert(map);
+	DartAutoAttribute<VEC3, MAP> posBeta1(map);
+	DartAutoAttribute<VEC3, MAP> posBeta2(map);
+	DartAutoAttribute<VEC3, MAP> vert(map);
 
 	glLineWidth(2.0f);
 	glColor3f(0.9f,0.9f,0.9f);
@@ -422,16 +419,15 @@ void renderTopoGMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 }
 
 template <typename PFP>
-void renderTopoGMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv)
+void renderTopoGMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	DartAutoAttribute<VEC3, MAP_IMPL> posBeta1(map);
-	DartAutoAttribute<VEC3, MAP_IMPL> posBeta2(map); //beta 3 link is represented at the same location as beta2
-	DartAutoAttribute<VEC3, MAP_IMPL> vert(map);
+	DartAutoAttribute<VEC3, MAP> posBeta1(map);
+	DartAutoAttribute<VEC3, MAP> posBeta2(map); //beta 3 link is represented at the same location as beta2
+	DartAutoAttribute<VEC3, MAP> vert(map);
 
 	// table of face (one dart of each)
 	std::vector<Dart> vecDartFaces;

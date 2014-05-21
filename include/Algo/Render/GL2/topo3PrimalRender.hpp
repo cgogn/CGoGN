@@ -393,7 +393,7 @@ void Topo3PrimalRender<PFP>::setDartsIdColor(typename PFP::MAP& map)
 }
 
 template <typename PFP>
-void Topo3PrimalRender<PFP>::updateColors(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& colors)
+void Topo3PrimalRender<PFP>::updateColors(MAP& map, const VertexAttribute<VEC3, MAP>& colors)
 {
 	m_vbo2->bind();
 	Geom::Vec3f* colorBuffer =  reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -432,12 +432,12 @@ Dart Topo3PrimalRender<PFP>::picking(MAP& map, int x, int y)
 //}
 
 template <typename PFP>
-void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf)
+void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf)
 {
 	if (m_attIndex.map() != &mapx)
-		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template getAttribute<unsigned int, DART, MAP>("dart_index");
 	if (!m_attIndex.isValid())
-		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART, MAP>("dart_index");
 
 //	m_nbDarts = 0;
 //	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -448,7 +448,7 @@ void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, M
 	m_nbDarts = mapx.getNbDarts();
 
 	// beta2/3
-	DartAutoAttribute<VEC3, MAP_IMPL> fv2(mapx);
+	DartAutoAttribute<VEC3, MAP> fv2(mapx);
 
 	m_vbo2->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
@@ -572,7 +572,7 @@ void Topo3PrimalRender<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, M
 }
 
 template <typename PFP>
-void Topo3PrimalRender<PFP>::computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP_IMPL>& posExpl)
+void Topo3PrimalRender<PFP>::computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP>& posExpl)
 {
 	m_vbo0->bind();
 	Geom::Vec3f* positionsPtr = reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));

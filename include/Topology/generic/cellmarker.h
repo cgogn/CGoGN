@@ -28,6 +28,8 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/functor.h"
+#include "Algo/Topo/embedding.h"
+
 #include "Utils/static_assert.h"
 
 namespace CGoGN
@@ -156,8 +158,10 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding(c) ;
+
 		if (a == EMBNULL)
-			a = m_map.setOrbitEmbeddingOnNewCell(c) ;
+			a = Algo::Topo::setOrbitEmbeddingOnNewCell(m_map, c) ;
+
 		(*m_markVector)[a].setMark(m_mark) ;
 	}
 
@@ -170,8 +174,10 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding(c) ;
+
 		if (a == EMBNULL)
-			a = m_map.setOrbitEmbeddingOnNewCell(c) ;
+			a = Algo::Topo::setOrbitEmbeddingOnNewCell(m_map, c) ;
+
 		(*m_markVector)[a].unsetMark(m_mark) ;
 	}
 
@@ -184,8 +190,10 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding(c) ;
+
 		if (a == EMBNULL)
 			return false ;
+
 		return (*m_markVector)[a].testMark(m_mark) ;
 	}
 

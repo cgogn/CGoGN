@@ -43,7 +43,6 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 
 
@@ -53,7 +52,7 @@ int main()
 	MAP myMap;
 
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	// create a triangle
 	Face f1 = myMap.newFace(3);
