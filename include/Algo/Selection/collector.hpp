@@ -119,7 +119,7 @@ void Collector_OneRing<PFP>::collectAll(Dart d)
 
 	this->insideVertices.push_back(d);
 
-	foreach_incident2<EDGE>(this->map, d, [&] (Edge e)
+	foreach_incident2<EDGE>(this->map, Vertex(d), [&] (Edge e)
 	{
 		this->insideEdges.push_back(e);
 		this->insideFaces.push_back(e.dart);
@@ -133,7 +133,7 @@ void Collector_OneRing<PFP>::collectBorder(Dart d)
 	this->init(d);
 	this->border.reserve(12);
 
-	foreach_incident2<FACE>(this->map, d, [&] (Face f)
+	foreach_incident2<FACE>(this->map, Vertex(d), [&] (Face f)
 	{
 		this->border.push_back(this->map.phi1(f.dart));
 	});
@@ -146,7 +146,7 @@ typename PFP::REAL Collector_OneRing<PFP>::computeArea(const VertexAttribute<VEC
 
 	REAL area = 0;
 
-	for (std::vector<Dart>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
+	for (std::vector<Face>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
 		area += Algo::Surface::Geometry::triangleArea<PFP>(this->map, *it, pos);
 
 	return area;
@@ -160,7 +160,7 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 	tensor.zero() ;
 
 	// collect edges inside the neighborhood
-	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	for (std::vector<Edge>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
 	{
 		const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
@@ -186,7 +186,7 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 	tensor.zero() ;
 
 	// collect edges inside the neighborhood
-	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	for (std::vector<Edge>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
 	{
 		const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		const REAL edgeangle = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
@@ -272,7 +272,7 @@ typename PFP::REAL Collector_OneRing_AroundEdge<PFP>::computeArea(const VertexAt
 
 	REAL area = 0;
 
-	for (std::vector<Dart>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
+	for (std::vector<Face>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
 		area += Algo::Surface::Geometry::triangleArea<PFP>(this->map, *it, pos);
 
 	return area;
@@ -286,7 +286,7 @@ void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexA
 	tensor.zero() ;
 
 	// collect edges inside the neighborhood
-	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	for (std::vector<Edge>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
 	{
 		const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
@@ -312,7 +312,7 @@ void Collector_OneRing_AroundEdge<PFP>::computeNormalCyclesTensor (const VertexA
 	tensor.zero() ;
 
 	// collect edges inside the neighborhood
-	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	for (std::vector<Edge>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
 	{
 		const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		const REAL edgeangle = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
