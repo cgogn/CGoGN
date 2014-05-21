@@ -29,9 +29,8 @@ class ParticleCell2DAndHalfMemo : public ParticleCell2DAndHalf<PFP>
 {
 public :
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
-	typedef VertexAttribute<VEC3, MAP_IMPL> TAB_POS;
+	typedef VertexAttribute<VEC3, MAP> TAB_POS;
 
 //	bool detect_vertex;
 //	bool detect_edge;

@@ -31,9 +31,8 @@ class ParticleCell2DMemo : public ParticleCell2D<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3;
-	typedef VertexAttribute<VEC3, MAP_IMPL> TAB_POS ;
+	typedef VertexAttribute<VEC3, MAP> TAB_POS ;
 
 private:
 	ParticleCell2DMemo()

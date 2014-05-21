@@ -34,7 +34,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P)
 {
 	Vertex v(f.dart);
 	const typename PFP::VEC3& A = position[v];
@@ -47,7 +47,7 @@ typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f
 }
 
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P)
 {
 	typedef typename PFP::REAL REAL;
 
@@ -72,7 +72,7 @@ typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, con
 }
 
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P)
+typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P)
 {
 	const typename PFP::VEC3& A = position[e.dart];
 	typename PFP::VEC3 AB = position[map.phi1(e.dart)] - A;

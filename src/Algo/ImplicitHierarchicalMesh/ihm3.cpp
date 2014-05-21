@@ -41,9 +41,9 @@ namespace IHM
 
 ImplicitHierarchicalMap3::ImplicitHierarchicalMap3() : m_curLevel(0), m_maxLevel(0), m_edgeIdCount(0), m_faceIdCount(0)
 {
-	m_dartLevel = Map3::addAttribute<unsigned int, DART>("dartLevel") ;
-	m_edgeId = Map3::addAttribute<unsigned int, DART>("edgeId") ;
-	m_faceId = Map3::addAttribute<unsigned int, DART>("faceId") ;
+	m_dartLevel = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("dartLevel") ;
+	m_edgeId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("edgeId") ;
+	m_faceId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("faceId") ;
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;
@@ -61,9 +61,9 @@ void ImplicitHierarchicalMap3::clear(bool removeAttrib)
 	Map3::clear(removeAttrib) ;
 	if (removeAttrib)
 	{
-		m_dartLevel = Map3::addAttribute<unsigned int, DART>("dartLevel") ;
-		m_faceId = Map3::addAttribute<unsigned int, DART>("faceId") ;
-		m_edgeId = Map3::addAttribute<unsigned int, DART>("edgeId") ;
+		m_dartLevel = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("dartLevel") ;
+		m_faceId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("faceId") ;
+		m_edgeId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("edgeId") ;
 
 		for(unsigned int i = 0; i < NB_ORBITS; ++i)
 			m_nextLevelCell[i] = NULL ;
@@ -133,7 +133,7 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 	}
 
 	if(isOrbitEmbedded<VOLUME>())
-		setOrbitEmbeddingOnNewCell<VOLUME>(d);
+		Algo::Topo::setOrbitEmbeddingOnNewCell<VOLUME>(*this, d);
 	}
 }
 
@@ -193,7 +193,7 @@ Dart ImplicitHierarchicalMap3::quadranguleFace(Dart d)
 		do
 		{
 			//copyDartEmbedding<VERTEX>(it, phi1(phi3(it)));
-			setOrbitEmbedding<VERTEX>(it, getEmbedding<VERTEX>(phi1(phi3(it))));
+			Algo::Topo::setOrbitEmbedding<VERTEX>(*this, it, getEmbedding<VERTEX>(phi1(phi3(it))));
 			it = phi1(it) ;
 		} while(it != bc) ;
 	}
@@ -842,10 +842,13 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersMoreThanOne(Dart d
 //	return found;
 }
 
-} //namespace IHM
-} // Volume
-} //namespace Algo
-} //namespace CGoGN
+} // namespace IHM
+
+} // namespace Volume
+
+} // namespace Algo
+
+} // namespace CGoGN
 
 
 

@@ -48,7 +48,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 void pipo(PFP::MAP& m)
@@ -73,7 +72,7 @@ int main(int argc, char **argv)
 	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import (position always the first)
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP> position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]);
 
 	// a second map
 	MAP myMap2;
@@ -81,7 +80,7 @@ int main(int argc, char **argv)
 	myMap2.copyFrom(myMap);
 
 	// AttributeHandler are linked to the map, need a new one
-	VertexAttribute<VEC3, MAP_IMPL> position2 = myMap2.getAttribute<VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP> position2 = myMap2.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]);
 
 	// subdivide first map with Loop algo
 	for(unsigned int i = 0; i < nbSteps; ++i)

@@ -45,8 +45,7 @@ namespace Tilings
 template <typename PFP>
 class Tiling
 {
-    typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::MAP MAP;
     typedef typename PFP::VEC3 VEC3;
 
 protected:
@@ -88,10 +87,10 @@ public:
     */
     std::vector<Dart>& getVertexDarts() { return m_tableVertDarts; }
 
-	void computeCenter(VertexAttribute<VEC3, MAP_IMPL>& position);
+	void computeCenter(VertexAttribute<VEC3, MAP>& position);
 
     //void Polyhedron<PFP>::transform(float* matrice)
-	void transform(VertexAttribute<VEC3, MAP_IMPL>& position, const Geom::Matrix44f& matrice);
+	void transform(VertexAttribute<VEC3, MAP>& position, const Geom::Matrix44f& matrice);
 
 	void mark(CellMarker<MAP, VERTEX>& m);
 
@@ -100,7 +99,7 @@ public:
 	*/
     Dart getDart() { return m_dart; }
 
-	bool exportPositions(const VertexAttribute<VEC3, MAP_IMPL>& position, const char* filename);
+	bool exportPositions(const VertexAttribute<VEC3, MAP>& position, const char* filename);
 
 	//	/**
 	//	* mark all embedded vertices of the Polyhedron

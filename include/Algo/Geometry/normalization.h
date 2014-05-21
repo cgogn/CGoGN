@@ -39,7 +39,7 @@ namespace Geometry
 
 // Normalize the average length of given attribute
 template <typename PFP, unsigned int ORBIT>
-typename PFP::REAL normalizeLength(typename PFP::MAP & map, AttributeHandler<typename PFP::VEC3, ORBIT, typename PFP::MAP::IMPL> & m_attr, const typename PFP::REAL scale = 1.0)
+typename PFP::REAL normalizeLength(typename PFP::MAP & map, AttributeHandler<typename PFP::VEC3, ORBIT, typename PFP::MAP> & m_attr, const typename PFP::REAL scale = 1.0)
 {
 //	typename PFP::REAL sum = 0 ;
 //	int count = 0 ;

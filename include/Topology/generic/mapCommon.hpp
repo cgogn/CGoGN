@@ -117,61 +117,6 @@ inline void MapCommon<MAP_IMPL>::copyDartEmbedding(Dart dest, Dart src)
 	setDartEmbedding<ORBIT>(dest, getEmbedding<ORBIT>(src));
 }
 
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-inline void MapCommon<MAP_IMPL>::setOrbitEmbedding(Cell<ORBIT> c, unsigned int em)
-{
-	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	this->foreach_dart_of_orbit(c, [&] (Dart d) { this->setDartEmbedding<ORBIT>(d, em); });
-}
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-inline void MapCommon<MAP_IMPL>::initOrbitEmbedding(Cell<ORBIT> c, unsigned int em)
-{
-	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	this->foreach_dart_of_orbit(c, [&] (Dart d) { this->initDartEmbedding<ORBIT>(d, em); });
-}
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-inline unsigned int MapCommon<MAP_IMPL>::setOrbitEmbeddingOnNewCell(Cell<ORBIT> c)
-{
-	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int em = this->template newCell<ORBIT>();
-	setOrbitEmbedding<ORBIT>(c, em);
-	return em;
-}
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-inline unsigned int MapCommon<MAP_IMPL>::initOrbitEmbeddingOnNewCell(Cell<ORBIT> d)
-{
-	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int em = this->template newCell<ORBIT>();
-	initOrbitEmbedding<ORBIT>(d, em);
-	return em;
-}
-
-template <typename MAP_IMPL>
-template <unsigned int ORBIT>
-inline void MapCommon<MAP_IMPL>::copyCellAttributes(Cell<ORBIT> d, Cell<ORBIT> e)
-{
-	assert(this->template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	unsigned int dE = getEmbedding<ORBIT>(d) ;
-	unsigned int eE = getEmbedding<ORBIT>(e) ;
-	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
-	{
-		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
-		this->m_attribs[ORBIT].copyLine(dE, eE) ;	// copy the data
-	}
-}
-
 /**************************
  *  BOUNDARY MANAGEMENT   *
  **************************/
@@ -188,20 +133,6 @@ template <unsigned int DIM>
 inline void MapCommon<MAP_IMPL>::boundaryUnmark(Dart d)
 {
 	this->m_markTables[DART][0]->operator[](this->dartIndex(d)).unsetMark(this->m_boundaryMarkers[DIM-2]);
-}
-
-template <typename MAP_IMPL>
-template <unsigned int DIM, unsigned int ORBIT>
-void MapCommon<MAP_IMPL>::boundaryMarkOrbit(Cell<ORBIT> c)
-{
-	this->foreach_dart_of_orbit(c, [&] (Dart d) { this->boundaryMark<DIM>(d); });
-}
-
-template <typename MAP_IMPL>
-template <unsigned int DIM, unsigned int ORBIT>
-void MapCommon<MAP_IMPL>::boundaryUnmarkOrbit(Cell<ORBIT> c)
-{
-	this->foreach_dart_of_orbit(c, [&] (Dart d)	{ this->boundaryUnmark<DIM>(d);	});
 }
 
 template <typename MAP_IMPL>
@@ -242,18 +173,18 @@ void MapCommon<MAP_IMPL>::boundaryUnmarkAll()
  ****************************************/
 
 template <typename MAP_IMPL>
-template <typename T, unsigned int ORBIT>
-inline AttributeHandler<T, ORBIT, MAP_IMPL> MapCommon<MAP_IMPL>::addAttribute(const std::string& nameAttr)
+template <typename T, unsigned int ORBIT, typename MAP>
+inline AttributeHandler<T, ORBIT, MAP> MapCommon<MAP_IMPL>::addAttribute(const std::string& nameAttr)
 {
 	if(!this->template isOrbitEmbedded<ORBIT>())
 		this->template addEmbedding<ORBIT>() ;
 	AttributeMultiVector<T>* amv = this->m_attribs[ORBIT].template addAttribute<T>(nameAttr) ;
-	return AttributeHandler<T, ORBIT, MAP_IMPL>(this, amv) ;
+	return AttributeHandler<T, ORBIT, MAP>(static_cast<MAP*>(this), amv) ;
 }
 
 template <typename MAP_IMPL>
-template <typename T, unsigned int ORBIT>
-inline bool MapCommon<MAP_IMPL>::removeAttribute(AttributeHandler<T, ORBIT, MAP_IMPL>& attr)
+template <typename T, unsigned int ORBIT, typename MAP>
+inline bool MapCommon<MAP_IMPL>::removeAttribute(AttributeHandler<T, ORBIT, MAP>& attr)
 {
 	assert(attr.isValid() || !"Invalid attribute handler") ;
 	if(this->m_attribs[attr.getOrbit()].template removeAttribute<T>(attr.getIndex()))
@@ -270,26 +201,26 @@ inline bool MapCommon<MAP_IMPL>::removeAttribute(AttributeHandler<T, ORBIT, MAP_
 }
 
 template <typename MAP_IMPL>
-template <typename T, unsigned int ORBIT>
-inline AttributeHandler<T ,ORBIT, MAP_IMPL> MapCommon<MAP_IMPL>::getAttribute(const std::string& nameAttr)
+template <typename T, unsigned int ORBIT, typename MAP>
+inline AttributeHandler<T ,ORBIT, MAP> MapCommon<MAP_IMPL>::getAttribute(const std::string& nameAttr)
 {
 	AttributeMultiVector<T>* amv = this->m_attribs[ORBIT].template getDataVector<T>(nameAttr) ;
-	return AttributeHandler<T, ORBIT, MAP_IMPL>(this, amv) ;
+	return AttributeHandler<T, ORBIT, MAP>(static_cast<MAP*>(this), amv) ;
 }
 
 template <typename MAP_IMPL>
-template <typename T, unsigned int ORBIT>
-inline AttributeHandler<T ,ORBIT, MAP_IMPL> MapCommon<MAP_IMPL>::checkAttribute(const std::string& nameAttr)
+template <typename T, unsigned int ORBIT, typename MAP>
+inline AttributeHandler<T ,ORBIT, MAP> MapCommon<MAP_IMPL>::checkAttribute(const std::string& nameAttr)
 {
-	AttributeHandler<T, ORBIT, MAP_IMPL> att = this->getAttribute<T,ORBIT>(nameAttr);
+	AttributeHandler<T, ORBIT, MAP> att = this->getAttribute<T,ORBIT>(nameAttr);
 	if (!att.isValid())
 		att = this->addAttribute<T, ORBIT>(nameAttr);
 	return att;
 }
 
 template <typename MAP_IMPL>
-template <typename T, unsigned int ORBIT>
-inline bool MapCommon<MAP_IMPL>::swapAttributes(AttributeHandler<T, ORBIT, MAP_IMPL>& attr1, AttributeHandler<T, ORBIT, MAP_IMPL>& attr2)
+template <typename T, unsigned int ORBIT, typename MAP>
+inline bool MapCommon<MAP_IMPL>::swapAttributes(AttributeHandler<T, ORBIT, MAP>& attr1, AttributeHandler<T, ORBIT, MAP>& attr2)
 {
 	assert((attr1.isValid() && attr2.isValid()) || !"Invalid attribute handler") ;
 //	assert(attr1.getOrbit() == attr2.getOrbit() || !"Cannot swap attributes of different orbits") ;
@@ -302,8 +233,8 @@ inline bool MapCommon<MAP_IMPL>::swapAttributes(AttributeHandler<T, ORBIT, MAP_I
 }
 
 template <typename MAP_IMPL>
-template <typename T, unsigned int ORBIT>
-inline bool MapCommon<MAP_IMPL>::copyAttribute(AttributeHandler<T, ORBIT, MAP_IMPL>& dst, AttributeHandler<T, ORBIT, MAP_IMPL>& src)
+template <typename T, unsigned int ORBIT, typename MAP>
+inline bool MapCommon<MAP_IMPL>::copyAttribute(AttributeHandler<T, ORBIT, MAP>& dst, AttributeHandler<T, ORBIT, MAP>& src)
 {
 	assert((dst.isValid() && src.isValid()) || !"Invalid attribute handler") ;
 //	unsigned int orbit = dst.getOrbit() ;
@@ -315,30 +246,30 @@ inline bool MapCommon<MAP_IMPL>::copyAttribute(AttributeHandler<T, ORBIT, MAP_IM
 	return false ;
 }
 
-template <typename MAP_IMPL>
-inline DartAttribute<Dart, MAP_IMPL> MapCommon<MAP_IMPL>::getInvolution(unsigned int i)
-{
-	return DartAttribute<Dart, MAP_IMPL>(this, this->getInvolutionAttribute(i));
-}
+//template <typename MAP_IMPL>
+//inline DartAttribute<Dart, MAP_IMPL> MapCommon<MAP_IMPL>::getInvolution(unsigned int i)
+//{
+//	return DartAttribute<Dart, MAP_IMPL>(this, this->getInvolutionAttribute(i));
+//}
 
-template <typename MAP_IMPL>
-inline DartAttribute<Dart, MAP_IMPL> MapCommon<MAP_IMPL>::getPermutation(unsigned int i)
-{
-	return DartAttribute<Dart, MAP_IMPL>(this, this->getPermutationAttribute(i));
-}
+//template <typename MAP_IMPL>
+//inline DartAttribute<Dart, MAP_IMPL> MapCommon<MAP_IMPL>::getPermutation(unsigned int i)
+//{
+//	return DartAttribute<Dart, MAP_IMPL>(this, this->getPermutationAttribute(i));
+//}
 
-template <typename MAP_IMPL>
-inline DartAttribute<Dart, MAP_IMPL> MapCommon<MAP_IMPL>::getPermutationInv(unsigned int i)
-{
-	return DartAttribute<Dart, MAP_IMPL>(this, this->getPermutationInvAttribute(i));
-}
+//template <typename MAP_IMPL>
+//inline DartAttribute<Dart, MAP_IMPL> MapCommon<MAP_IMPL>::getPermutationInv(unsigned int i)
+//{
+//	return DartAttribute<Dart, MAP_IMPL>(this, this->getPermutationInvAttribute(i));
+//}
 
 /****************************************
  *     QUICK TRAVERSAL MANAGEMENT       *
  ****************************************/
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT>
+template <typename MAP, unsigned int ORBIT>
 inline void MapCommon<MAP_IMPL>::enableQuickTraversal()
 {
 	if(this->m_quickTraversal[ORBIT] == NULL)
@@ -347,24 +278,18 @@ inline void MapCommon<MAP_IMPL>::enableQuickTraversal()
 			this->template addEmbedding<ORBIT>() ;
 		this->m_quickTraversal[ORBIT] = this->m_attribs[ORBIT].template addAttribute<Dart>("quick_traversal") ;
 	}
-	updateQuickTraversal<ORBIT>() ;
+	updateQuickTraversal<MAP, ORBIT>() ;
 }
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT>
+template <typename MAP, unsigned int ORBIT>
 inline void MapCommon<MAP_IMPL>::updateQuickTraversal()
 {
 	assert(this->m_quickTraversal[ORBIT] != NULL || !"updateQuickTraversal on a disabled orbit") ;
 
-	CellMarker<MapCommon<MAP_IMPL>, ORBIT> cm(*this) ;
-	for(Dart d = this->begin(); d != this->end(); this->next(d))
-	{
-		if(!cm.isMarked(d))
-		{
-			cm.mark(d) ;
-			(*this->m_quickTraversal[ORBIT])[getEmbedding<ORBIT>(d)] = d ;
-		}
-	}
+	foreach_cell<ORBIT>(static_cast<MAP&>(*this), [&] (Cell<ORBIT> c) {
+		(*this->m_quickTraversal[ORBIT])[getEmbedding(c)] = c.dart ;
+	}, FORCE_CELL_MARKING);
 }
 
 template <typename MAP_IMPL>
@@ -386,7 +311,7 @@ inline void MapCommon<MAP_IMPL>::disableQuickTraversal()
 }
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT, unsigned int INCI>
+template <typename MAP, unsigned int ORBIT, unsigned int INCI>
 inline void MapCommon<MAP_IMPL>::enableQuickIncidentTraversal()
 {
 	if(this->m_quickLocalIncidentTraversal[ORBIT][INCI] == NULL)
@@ -397,11 +322,11 @@ inline void MapCommon<MAP_IMPL>::enableQuickIncidentTraversal()
 		ss << "quickIncidentTraversal_" << INCI;
 		this->m_quickLocalIncidentTraversal[ORBIT][INCI] = this->m_attribs[ORBIT].template addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
-	updateQuickIncidentTraversal<ORBIT,INCI>() ;
+	updateQuickIncidentTraversal<MAP, ORBIT, INCI>() ;
 }
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT, unsigned int INCI>
+template <typename MAP, unsigned int ORBIT, unsigned int INCI>
 inline void MapCommon<MAP_IMPL>::updateQuickIncidentTraversal()
 {
 	assert(this->m_quickLocalIncidentTraversal[ORBIT][INCI] != NULL || !"updateQuickTraversal on a disabled orbit") ;
@@ -412,11 +337,11 @@ inline void MapCommon<MAP_IMPL>::updateQuickIncidentTraversal()
 	std::vector<Dart> buffer;
 	buffer.reserve(100);
 
-	TraversorCell<MapCommon<MAP_IMPL>, ORBIT> tra_glob(*this);
+	TraversorCell<MAP, ORBIT> tra_glob(*this);
 	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
 	{
 		buffer.clear();
-		Traversor* tra_loc = TraversorFactory<MapCommon<MAP_IMPL> >::createIncident(*this, d, this->dimension(), ORBIT, INCI);
+		Traversor* tra_loc = TraversorFactory<MAP>::createIncident(*this, d, this->dimension(), ORBIT, INCI);
 		for (Dart e = tra_loc->begin(); e != tra_loc->end(); e = tra_loc->next())
 			buffer.push_back(e);
 		delete tra_loc;
@@ -448,7 +373,7 @@ inline void MapCommon<MAP_IMPL>::disableQuickIncidentTraversal()
 }
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT, unsigned int ADJ>
+template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
 inline void MapCommon<MAP_IMPL>::enableQuickAdjacentTraversal()
 {
 	if(this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] == NULL)
@@ -459,11 +384,11 @@ inline void MapCommon<MAP_IMPL>::enableQuickAdjacentTraversal()
 		ss << "quickAdjacentTraversal" << ADJ;
 		this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] = this->m_attribs[ORBIT].template addAttribute<NoTypeNameAttribute<std::vector<Dart> > >(ss.str()) ;
 	}
-	updateQuickAdjacentTraversal<ORBIT, ADJ>() ;
+	updateQuickAdjacentTraversal<MAP, ORBIT, ADJ>() ;
 }
 
 template <typename MAP_IMPL>
-template <unsigned int ORBIT, unsigned int ADJ>
+template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
 inline void MapCommon<MAP_IMPL>::updateQuickAdjacentTraversal()
 {
 	assert(this->m_quickLocalAdjacentTraversal[ORBIT][ADJ] != NULL || !"updateQuickTraversal on a disabled orbit") ;
@@ -474,11 +399,11 @@ inline void MapCommon<MAP_IMPL>::updateQuickAdjacentTraversal()
 	std::vector<Dart> buffer;
 	buffer.reserve(100);
 
-	TraversorCell<MapCommon<MAP_IMPL>, ORBIT> tra_glob(*this);
+	TraversorCell<MAP, ORBIT> tra_glob(*this);
 	for (Dart d = tra_glob.begin(); d != tra_glob.end(); d = tra_glob.next())
 	{
 		buffer.clear();
-		Traversor* tra_loc = TraversorFactory<MapCommon<MAP_IMPL> >::createAdjacent(*this, d, this->dimension(), ORBIT, ADJ);
+		Traversor* tra_loc = TraversorFactory<MAP>::createAdjacent(*this, d, this->dimension(), ORBIT, ADJ);
 		for (Dart e = tra_loc->begin(); e != tra_loc->end(); e = tra_loc->next())
 			buffer.push_back(e);
 		buffer.push_back(NIL);

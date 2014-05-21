@@ -76,7 +76,7 @@ void MyQT::cb_combo6(int x)
 void MyQT::cb_explode(int x)
 {
     m_expl = float (x) /100.0f;
-    if (m_last==2)
+	if (m_last == 2)
         traverse2();
 }
 
@@ -210,7 +210,7 @@ void MyQT::init(char *fname)
 {
 	if(fname == NULL)
 	{
-		position = myMap.addAttribute<VEC3, VERTEX>( "position");
+		position = myMap.addAttribute<VEC3, VERTEX, MAP>( "position");
 
 		Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 5, 5, true);
 		grid.embedIntoGrid(position, 1.,1.,0.);
@@ -234,18 +234,17 @@ void MyQT::init(char *fname)
 
 			//myMap.dumpAttributesAndMarkers();
 
-			position = myMap.getAttribute<PFP::VEC3, VERTEX>("position");
+			position = myMap.getAttribute<VEC3, VERTEX, MAP>("position");
 		}
 		else if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
 			std::cerr << "could not import " << filename << std::endl ;
 			exit(1);
 		}
-		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
-
+		position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
 	}
 
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	Geom::BoundingBox<VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
 	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
@@ -260,7 +259,6 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-
     if(argc == 1)
     {
 		sqt.init(NULL);
@@ -269,7 +267,6 @@ int main(int argc, char **argv)
     {
 		sqt.init(argv[1]);
     }
-
 
     // interface de tuto5.ui
     Utils::QT::uiDockInterface dock;

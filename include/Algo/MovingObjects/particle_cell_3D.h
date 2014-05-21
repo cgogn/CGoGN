@@ -36,9 +36,8 @@ class ParticleCell3D : public Algo::MovingObjects::ParticleBase<PFP>
 {
 public :
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3;
-	typedef VertexAttribute<VEC3, MAP_IMPL> TAB_POS;
+	typedef VertexAttribute<VEC3, MAP> TAB_POS;
 
 	MAP& m;
 

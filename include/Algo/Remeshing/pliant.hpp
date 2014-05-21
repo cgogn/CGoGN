@@ -40,11 +40,10 @@ namespace Remeshing
 template <typename PFP>
 void pliantRemeshing(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal)
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal)
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -186,7 +185,7 @@ void pliantRemeshing(
 	Algo::Surface::Geometry::computeNormalVertices<PFP>(map, position, normal) ;
 
 	// tangential relaxation
-	VertexAttribute<VEC3, MAP_IMPL> centroid = map.template addAttribute<VEC3, VERTEX>("centroid") ;
+	VertexAttribute<VEC3, MAP> centroid = map.template addAttribute<VEC3, VERTEX>("centroid") ;
 	Surface::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
 
 	CellMarker<MAP, VERTEX> vm(map) ;

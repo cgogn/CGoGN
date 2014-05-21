@@ -40,7 +40,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isEdgeConvex(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+bool isEdgeConvex(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

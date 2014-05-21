@@ -44,7 +44,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool intersectionLineConvexFace(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
+bool intersectionLineConvexFace(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -92,7 +92,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Face f, const VertexAttr
 }
 
 template <typename PFP>
-bool intersectionSegmentConvexFace(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
+bool intersectionSegmentConvexFace(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -109,7 +109,7 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Face f, const VertexA
 }
 
 template <typename PFP>
-bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -238,7 +238,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const 
 }
 
 template <typename PFP>
-bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, typename PFP::REAL& alpha)
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, typename PFP::REAL& alpha)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;

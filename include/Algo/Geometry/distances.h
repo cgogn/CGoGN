@@ -43,7 +43,7 @@ namespace Geometry
 * @return the squared distance to the plane
 */
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P) ;
+typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P) ;
 
 /**
 * compute squared distance from point to face (assuming face is convex)
@@ -55,7 +55,7 @@ typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f
 * @return the squared distance
 */
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P) ;
+typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P) ;
 
 /**
 * compute squared distance from point to an edge
@@ -66,7 +66,7 @@ typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, con
 * @return the squared distance
 */
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P) ;
+typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P) ;
 
 } // namespace Geometry
 

@@ -43,7 +43,7 @@ namespace Export
 {
 
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const char* filename, bool binary)
+bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename, bool binary)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -170,10 +170,9 @@ bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 }
 
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>*>& attributeHandlers, const char* filename, bool binary)
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3, typename PFP::MAP>*>& attributeHandlers, const char* filename, bool binary)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 	// open file
@@ -247,7 +246,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 	out << "comment or contact : cgogn@unistra.fr" << std::endl ;
 	// Vertex elements
 	out << "element vertex " << vertices.size() << std::endl ;
-	for (typename std::vector<VertexAttribute<VEC3, MAP_IMPL>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+	for (typename std::vector<VertexAttribute<VEC3, MAP>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 	{
 		if ((*attrHandler)->isValid() && ((*attrHandler)->getOrbit() == VERTEX) )
 		{
@@ -288,7 +287,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
 		{
-			for (typename std::vector<VertexAttribute<VEC3, MAP_IMPL>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<VEC3, MAP>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 					out << (*(*attrHandler))[vertices[i]] ;
 			out << std::endl ;
@@ -307,7 +306,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 	{
 		// binary vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<VertexAttribute<VEC3, MAP_IMPL>*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<VEC3, MAP>*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 				{
 					const VEC3& v = (*(*attrHandler))[vertices[i]] ;
@@ -329,7 +328,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 }
 
 template <typename PFP>
-bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const char* filename)
+bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -987,7 +986,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
 */
 
 template <typename PFP>
-bool exportChoupi(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const char* filename)
+bool exportChoupi(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
