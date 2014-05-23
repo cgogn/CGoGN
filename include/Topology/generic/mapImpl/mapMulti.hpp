@@ -443,22 +443,14 @@ template <typename FUNC>
 inline void MapMulti::foreach_dart(FUNC f)
 {
 	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (f(d))
-			return true;
-	}
-	return false;
+		f(d);
 }
 
 template <typename FUNC>
 inline void MapMulti::foreach_dart(FUNC& f)
 {
 	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (f(d))
-			return true;
-	}
-	return false;
+		f(d);
 }
 
 } // namespace CGoGN
