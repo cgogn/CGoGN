@@ -46,6 +46,19 @@ public:
 };
 
 
+template <typename MAP>
+class FunctorMap : public virtual FunctorType
+{
+protected:
+	MAP& m_map ;
+public:
+	FunctorMap(MAP& m): m_map(m) {}
+};
+
+
+
+
+
 // Selector functors : return true to select or false to not select a dart
 /********************************************************/
 

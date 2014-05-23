@@ -71,7 +71,7 @@ void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT&
 
 
 template <typename PFP, typename V_ATT>
-typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, const V_ATT& position) ;
+typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Edge d, const V_ATT& position) ;
 
 template <typename PFP, typename V_ATT, typename E_ATT>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int thread = 0) ;
