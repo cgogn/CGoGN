@@ -37,7 +37,7 @@ MapHandlerGen* Volume_Import_Plugin::importFromFile(const QString& fileName)
 			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toStdString(), attrNames);
 
 			// get vertex position attribute
-			VertexAttribute<PFP3::VEC3, PFP3::MAP::IMPL> position = map->getAttribute<PFP3::VEC3, VERTEX>(attrNames[0]);
+			VertexAttribute<PFP3::VEC3, PFP3::MAP> position = map->getAttribute<PFP3::VEC3, VERTEX, PFP3::MAP>(attrNames[0]);
 			mh->registerAttribute(position);
 
 			// update corresponding VBO & emit attribute update signal

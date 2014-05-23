@@ -71,10 +71,10 @@ public:
 	{
 		assert(m_color->isValid() || !"Approximator_ColorNaive: the approximated attribute is not valid") ;
 
-		m_position = this->m_map.template getAttribute<VEC3, VERTEX>("position") ;
+		m_position = this->m_map.template getAttribute<VEC3, VERTEX, MAP>("position") ;
 		assert(m_position.isValid() || !"Approximator_ColorNaive::init: the position attribute is not valid") ;
 
-		m_approxposition = this->m_map.template getAttribute<VEC3, EDGE>("approx_position") ;
+		m_approxposition = this->m_map.template getAttribute<VEC3, EDGE, MAP>("approx_position") ;
 		assert(m_approxposition.isValid() || !"Approximator_ColorNaive::init: the approx_position attribute is not valid") ;
 
 		return m_color->isValid() && m_position.isValid() && m_approxposition.isValid() ;

@@ -52,13 +52,13 @@ Approximator<PFP,T,ORBIT>::Approximator(MAP& m, std::vector<VertexAttribute<T, M
 
 		std::stringstream aname ;
 		aname << "approx_" << m_attrV[i]->name() ;
-		m_approx[i] = this->m_map.template addAttribute<T, ORBIT>(aname.str()) ;
+		m_approx[i] = this->m_map.template addAttribute<T, ORBIT, MAP>(aname.str()) ;
 
 		if(m_predictor)	// if predictors are associated to the approximator
 		{				// create attributes to store the details needed for reconstruction
 			std::stringstream dname ;
 			dname << "detail_" << m_attrV[i]->name() ;
-			m_detail[i] = this->m_map.template addAttribute<T, ORBIT>(dname.str()) ;
+			m_detail[i] = this->m_map.template addAttribute<T, ORBIT, MAP>(dname.str()) ;
 		}
 	}
 }
@@ -117,14 +117,14 @@ Approximator<PFP,T,ORBIT>::getApprox(Dart d, unsigned int index) const
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-const VertexAttribute<T, typename PFP::MAP::IMPL>&
+const VertexAttribute<T, typename PFP::MAP>&
 Approximator<PFP,T,ORBIT>::getAttr(unsigned int index) const
 {
 	return *(m_attrV[index]) ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-VertexAttribute<T, typename PFP::MAP::IMPL>&
+VertexAttribute<T, typename PFP::MAP>&
 Approximator<PFP,T,ORBIT>::getAttr(unsigned int index)
 {
 	return *(m_attrV[index]) ;

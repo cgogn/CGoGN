@@ -77,8 +77,8 @@ public:
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
-		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
+		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~HalfEdgeSelector_QEMml()
 	{
@@ -140,8 +140,8 @@ public:
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,6>, VERTEX>("hQEMext-quadric") ;
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,6>, VERTEX, MAP>("hQEMext-quadric") ;
 	}
 	~HalfEdgeSelector_QEMextColor()
 	{
@@ -319,8 +319,8 @@ public:
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~HalfEdgeSelector_ColorGradient()
 	{

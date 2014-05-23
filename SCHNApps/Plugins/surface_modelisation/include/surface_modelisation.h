@@ -25,7 +25,7 @@ struct MapParameters
 		faceSelector(NULL)
 	{}
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> positionAttribute;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionAttribute;
 
 	CellSelector<PFP2::MAP, VERTEX>* vertexSelector;
 	CellSelector<PFP2::MAP, EDGE>* edgeSelector;
