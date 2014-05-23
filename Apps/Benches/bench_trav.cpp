@@ -57,7 +57,7 @@ int main()
 	Utils::Chrono ch;
 	ch.start();
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 	constexpr int nb = 100;
 	Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
 	cubic.embedIntoGrid(position, 10.0f, 10.0f, 10.0f);

@@ -54,7 +54,7 @@ namespace Filters
 template <typename PFP>
 typename PFP::VEC3 loopOddVertex(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	Dart d1)
 {
 	Dart d2 = map.phi2(d1) ;
@@ -77,7 +77,7 @@ typename PFP::VEC3 loopOddVertex(
 template <typename PFP>
 typename PFP::VEC3 loopEvenVertex(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	Dart d)
 {
 	map.incCurrentLevel() ;

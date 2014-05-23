@@ -37,7 +37,7 @@ MapHandlerGen* Surface_Import_Plugin::importFromFile(const QString& fileName)
 			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toStdString(), attrNames);
 
 			// get vertex position attribute
-			VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> position = map->getAttribute<PFP2::VEC3, VERTEX>(attrNames[0]);
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> position = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>(attrNames[0]);
 			mh->registerAttribute(position);
 
 			// update corresponding VBO & emit attribute update signal

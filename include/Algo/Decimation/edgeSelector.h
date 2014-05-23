@@ -128,7 +128,7 @@ public:
 	EdgeSelector_Length(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_Length()
 	{
@@ -196,8 +196,8 @@ public:
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_QEM()
 	{
@@ -248,8 +248,8 @@ public:
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_QEMml()
 	{
@@ -302,8 +302,8 @@ public:
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		edgeMatrix = m.template addAttribute<Geom::Matrix<3,3,REAL>, EDGE>("NormalAreaMatrix") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		edgeMatrix = m.template addAttribute<Geom::Matrix<3,3,REAL>, EDGE, MAP>("NormalAreaMatrix") ;
 	}
 	~EdgeSelector_NormalArea()
 	{
@@ -366,38 +366,38 @@ public:
 		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
 		radius = bb.diagSize() * 0.003 ;
 
-		normal = m.template getAttribute<VEC3, VERTEX>("normal") ;
+		normal = m.template getAttribute<VEC3, VERTEX, MAP>("normal") ;
 		if(!normal.isValid())
 		{
-			normal = m.template addAttribute<VEC3, VERTEX>("normal") ;
+			normal = m.template addAttribute<VEC3, VERTEX, MAP>("normal") ;
 			Algo::Surface::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
 		}
 
-		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
+		edgeangle = m.template getAttribute<REAL, EDGE, MAP>("edgeangle") ;
 		if(!edgeangle.isValid())
 		{
-			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
+			edgeangle = m.template addAttribute<REAL, EDGE, MAP>("edgeangle") ;
 			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
-		kmax = m.template getAttribute<REAL, VERTEX>("kmax") ;
-		kmin = m.template getAttribute<REAL, VERTEX>("kmin") ;
-		Kmax = m.template getAttribute<VEC3, VERTEX>("Kmax") ;
-		Kmin = m.template getAttribute<VEC3, VERTEX>("Kmin") ;
-		Knormal = m.template getAttribute<VEC3, VERTEX>("Knormal") ;
+		kmax = m.template getAttribute<REAL, VERTEX, MAP>("kmax") ;
+		kmin = m.template getAttribute<REAL, VERTEX, MAP>("kmin") ;
+		Kmax = m.template getAttribute<VEC3, VERTEX, MAP>("Kmax") ;
+		Kmin = m.template getAttribute<VEC3, VERTEX, MAP>("Kmin") ;
+		Knormal = m.template getAttribute<VEC3, VERTEX, MAP>("Knormal") ;
 		// as all these attributes are computed simultaneously by computeCurvatureVertices
 		// one can assume that if one of them is not valid, the others must be created too
 		if(!kmax.isValid())
 		{
-			kmax = m.template addAttribute<REAL, VERTEX>("kmax") ;
-			kmin = m.template addAttribute<REAL, VERTEX>("kmin") ;
-			Kmax = m.template addAttribute<VEC3, VERTEX>("Kmax") ;
-			Kmin = m.template addAttribute<VEC3, VERTEX>("Kmin") ;
-			Knormal = m.template addAttribute<VEC3, VERTEX>("Knormal") ;
+			kmax = m.template addAttribute<REAL, VERTEX, MAP>("kmax") ;
+			kmin = m.template addAttribute<REAL, VERTEX, MAP>("kmin") ;
+			Kmax = m.template addAttribute<VEC3, VERTEX, MAP>("Kmax") ;
+			Kmin = m.template addAttribute<VEC3, VERTEX, MAP>("Kmin") ;
+			Knormal = m.template addAttribute<VEC3, VERTEX, MAP>("Knormal") ;
 			Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 		}
 
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_Curvature()
 	{
@@ -454,14 +454,14 @@ public:
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
+		edgeangle = m.template getAttribute<REAL, EDGE, MAP>("edgeangle") ;
 		if(!edgeangle.isValid())
 		{
-			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
+			edgeangle = m.template addAttribute<REAL, EDGE, MAP>("edgeangle") ;
 			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_CurvatureTensor()
 	{
@@ -511,7 +511,7 @@ public:
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_MinDetail()
 	{
@@ -572,8 +572,8 @@ public:
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_ColorNaive()
 	{
@@ -636,8 +636,8 @@ public:
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_GeomColOptGradient()
 	{
@@ -718,8 +718,8 @@ public:
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,6>, VERTEX, MAP>("QEMext-quadric") ;
 	}
 	~EdgeSelector_QEMextColor()
 	{

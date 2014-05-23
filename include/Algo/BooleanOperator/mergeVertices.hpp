@@ -35,7 +35,7 @@ namespace BooleanOperator
 {
 
 template <typename PFP>
-bool isBetween(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, Dart d, Dart e, Dart f)
+bool isBetween(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, Dart d, Dart e, Dart f)
 {
 	return CGoGN::Geom::isBetween(positions[map.phi1(d)]-positions[d],
 	                 positions[map.phi1(e)]-positions[e],
@@ -43,7 +43,7 @@ bool isBetween(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 }
 
 template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, Dart d, Dart e, int precision)
+void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, Dart d, Dart e, int precision)
 {
 	assert(positions[d].isNear(positions[e], precision) && !map.sameVertex(d, e)) ;
 
@@ -76,7 +76,7 @@ void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typ
 }
 
 template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions, int precision)
+void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, int precision)
 {
 	// TODO optimiser en triant les sommets
 	// map.template enableQuickTraversal<VERTEX>();

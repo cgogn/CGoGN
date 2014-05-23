@@ -38,7 +38,7 @@ namespace Filtering
 {
 
 template <typename PFP>
-void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal, float& sigmaC, float& sigmaS)
+void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal, float& sigmaC, float& sigmaS)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -60,7 +60,7 @@ void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 }
 
 template <typename PFP>
-void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal)
+void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -96,7 +96,7 @@ void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 }
 
 template <typename PFP>
-void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal)
+void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

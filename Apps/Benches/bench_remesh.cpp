@@ -24,8 +24,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
-
 
 
 int main(int argc, char **argv)
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
 		CGoGNerr << "could not import " << argv[1] << CGoGNendl ;
 		return 2;
 	}
-	VertexAttribute<PFP::VEC3, MAP_IMPL> position = myMap.getAttribute<PFP::VEC3,VERTEX>( attrNames[0]) ;
+	VertexAttribute<PFP::VEC3, MAP> position = myMap.getAttribute<PFP::VEC3,VERTEX,MAP>( attrNames[0]) ;
 
 
 	Utils::Chrono chrono;
@@ -54,7 +52,7 @@ int main(int argc, char **argv)
 	Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position) ;
 	unsigned int nbVertices = Algo::Topo::getNbOrbits<VERTEX>(myMap) ;
 
-	std::vector<VertexAttribute<typename PFP::VEC3, MAP_IMPL> *> attr;
+	std::vector<VertexAttribute<typename PFP::VEC3, MAP> *> attr;
 	attr.push_back(&position);
 	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices * 0.1) ;
 
