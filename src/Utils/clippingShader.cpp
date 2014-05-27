@@ -846,7 +846,7 @@ bool ClippingShader::insertClippingCode()
 	"			clip_colorAttenuation *= clip_colorAttenuation;\n"
 	"		#endif\n"
 	"		gl_FragColor.rgb /= (1.0 + clip_colorAttenuation);\n"
-	"	#endif;\n";
+    "	#endif\n";
 
 	// Shader name string
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
