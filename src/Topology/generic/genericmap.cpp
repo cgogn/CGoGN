@@ -42,6 +42,9 @@ int NumberOfThreads = getSystemNumberOfCores();
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;
 
+// table of instancied maps for Dart/CellMarker release
+std::vector<GenericMap*>  GenericMap::s_instances;
+
 GenericMap::GenericMap() : m_nbThreadMarkers(1)
 {
 	if(m_attributes_registry_map == NULL)
@@ -81,6 +84,7 @@ GenericMap::GenericMap() : m_nbThreadMarkers(1)
 	}
 
 	m_nbInstances++;
+	s_instances.push_back(this);
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
@@ -143,6 +147,9 @@ GenericMap::~GenericMap()
 		delete m_attributes_registry_map;
 		m_attributes_registry_map = NULL;
 	}
+
+	// remove instance for table
+	std::remove (s_instances.begin(), s_instances.end(), this); 
 }
 
 void GenericMap::init()

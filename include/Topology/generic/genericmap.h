@@ -138,12 +138,23 @@ protected:
 	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
 	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
 
+// table of instancied maps for Dart/CellMarker release
+	static std::vector<GenericMap*> s_instances;
+
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
 	GenericMap() ;
 
 	virtual ~GenericMap() ;
+
+	static inline bool alive(GenericMap* map)
+	{
+		for (auto it=s_instances.begin(); it != s_instances.end(); ++it)
+			if (*it == map)
+				return true;
+		return false;
+	}
 
 protected:
 	void init();

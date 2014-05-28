@@ -46,15 +46,13 @@ protected:
 	Mark m_mark ;
 	AttributeMultiVector<Mark>* m_markVector ;
 	unsigned int m_thread ;
-	bool releaseOnDestruct ;
 
 public:
 	/**
 	 * constructor
 	 */
 	DartMarkerGen(unsigned int thread = 0) :
-		m_thread(thread),
-		releaseOnDestruct(true)
+		m_thread(thread)
 	{}
 
 	virtual ~DartMarkerGen()
@@ -69,10 +67,6 @@ protected:
 	DartMarkerGen(const DartMarkerGen& /*dm*/)
 	{}
 
-	/**
-	 * set if the mark has to be release on destruction or not
-	 */
-	inline void setReleaseOnDestruct(bool b) { releaseOnDestruct = b ; }
 } ;
 
 template <typename MAP>
@@ -92,7 +86,6 @@ public:
 	{
 		m_mark = m_map.template getMarkerSet<DART>(m_thread).getNewMark() ;
 		m_markVector = m_map.template getMarkVector<DART>(m_thread) ;
-		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
 	DartMarkerTmpl(const MAP& map, unsigned int thread = 0) :
@@ -101,25 +94,13 @@ public:
 	{
 		m_mark = m_map.template getMarkerSet<DART>(m_thread).getNewMark() ;
 		m_markVector = m_map.template getMarkVector<DART>(m_thread) ;
-		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
 	virtual ~DartMarkerTmpl()
 	{
-		if (releaseOnDestruct)
-		{
+		if (GenericMap::alive(&m_map))
 			m_map.template getMarkerSet<DART>(m_thread).releaseMark(m_mark) ;
-			std::vector<DartMarkerGen*>& dmg = m_map.dartMarkers[m_thread] ;
-			for (std::vector<DartMarkerGen*>::iterator it = dmg.begin(); it != dmg.end(); ++it)
-			{
-				if (*it == this)
-				{
-					*it = dmg.back() ;
-					dmg.pop_back() ;
-					return ;
-				}
-			}
-		}
+
 	}
 
 protected:

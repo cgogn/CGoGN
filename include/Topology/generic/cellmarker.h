@@ -47,13 +47,11 @@ protected:
 	AttributeMultiVector<Mark>* m_markVector ;
 	unsigned int m_thread ;
 	unsigned int m_cell ;
-	bool releaseOnDestruct ;
 
 public:
 	CellMarkerGen(unsigned int cell, unsigned int thread = 0) :
 		m_thread(thread),
-		m_cell(cell),
-		releaseOnDestruct(true)
+		m_cell(cell)
 	{}
 
 	virtual ~CellMarkerGen()
@@ -69,10 +67,6 @@ protected:
 	CellMarkerGen(const CellMarkerGen& /*cm*/)
 	{}
 
-	/**
-	 * set if the mark has to be release on destruction or not
-	 */
-	void setReleaseOnDestruct(bool b) { releaseOnDestruct = b ; }
 
 //	virtual void mark(Dart d) = 0 ;
 //	virtual void unmark(Dart d) = 0 ;
@@ -108,7 +102,6 @@ public:
 			m_map.template addEmbedding<CELL>() ;
 		m_mark = m_map.template getMarkerSet<CELL>(m_thread).getNewMark() ;
 		m_markVector = m_map.template getMarkVector<CELL>(m_thread) ;
-		m_map.cellMarkers[m_thread].push_back(this) ;
 	}
 
 	CellMarkerBase(const MAP& map, unsigned int thread = 0) :
@@ -119,26 +112,12 @@ public:
 			m_map.template addEmbedding<CELL>() ;
 		m_mark = m_map.template getMarkerSet<CELL>(m_thread).getNewMark() ;
 		m_markVector = m_map.template getMarkVector<CELL>(m_thread) ;
-		m_map.cellMarkers[m_thread].push_back(this) ;
 	}
 
 	virtual ~CellMarkerBase()
 	{
-		if(releaseOnDestruct)
-		{
+		if (GenericMap::alive(&m_map))
 			m_map.template getMarkerSet<CELL>(m_thread).releaseMark(m_mark) ;
-
-			std::vector<CellMarkerGen*>& cmg = m_map.cellMarkers[m_thread];
-			for(std::vector<CellMarkerGen*>::iterator it = cmg.begin(); it != cmg.end(); ++it)
-			{
-				if(*it == this)
-				{
-					*it = cmg.back();
-					cmg.pop_back();
-					return;
-				}
-			}
-		}
 	}
 
 protected:
