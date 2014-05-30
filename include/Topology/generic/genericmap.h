@@ -82,9 +82,9 @@ class GenericMap
 	template<typename T, typename MAP> friend class EdgeAutoAttribute ;
 	template<typename T, typename MAP> friend class FaceAutoAttribute ;
 	template<typename T, typename MAP> friend class VolumeAutoAttribute ;
-	friend class DartMarkerGen ;
-	friend class CellMarkerGen ;
-	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
+//	friend class DartMarkerGen ;
+//	friend class CellMarkerGen ;
+//	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
 	// protected copy constructor to prevent the copy of map
@@ -112,31 +112,21 @@ protected:
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalIncidentTraversal[NB_ORBITS][NB_ORBITS] ;
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalAdjacentTraversal[NB_ORBITS][NB_ORBITS] ;
 
-	/**
-	 * Marks manager
-	 */
-	MarkSet m_marksets[NB_ORBITS][NB_THREAD] ;
 
-	/**
-	 * Direct access to the attributes that store Marks
-	 */
-	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD] ;
+//	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors[NB_ORBITS] ;
+	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS] ;
+	boost::mutex m_MarkerStorageMutex[NB_ORBITS];
 
 	/**
 	 * Reserved boundary markers
 	 */
-	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
-
-	unsigned int m_nbThreadMarkers ;
+	AttributeMultiVector<MarkerBool>* m_boundaryMarkers[2];
 
 	/**
-	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
+	 * Store links to created AttributeHandlers
 	 */
 	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!)
 	boost::mutex attributeHandlersMutex;
-
-	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
-	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
 
 // table of instancied maps for Dart/CellMarker release
 	static std::vector<GenericMap*> s_instances;
@@ -172,11 +162,6 @@ public:
 	 */
 	virtual void clear(bool removeAttrib) ;
 
-	/**
-	 * get the marker_set of an orbit and thread (used for Cell & Dart Marker)
-	 */
-	template <unsigned int ORBIT>
-	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -290,10 +275,17 @@ public:
 	inline AttributeMultiVectorGen* getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
-	 * get a multi vector of mark attribute (direct access with [i])
+	 * @brief ask for a marker attribute
 	 */
 	template <unsigned int ORBIT>
-	AttributeMultiVector<Mark>* getMarkVector(unsigned int thread = 0) ;
+	AttributeMultiVector<MarkerBool>* askMarkVector() ;
+
+	/**
+	 * @brief release allocated marker attribute
+	 */
+	template <unsigned int ORBIT>
+	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv);
+
 
 	/**
 	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
@@ -351,24 +343,24 @@ protected:
 	 *          THREAD MANAGEMENT           *
 	 ****************************************/
 public:
-	/**
-	 * add threads (a table of Marker per orbit for each thread)
-	 * to allow MT
-	 * @param nb thread to add
-	 */
-	void addThreadMarker(unsigned int nb) ;
+//	/**
+//	 * add threads (a table of Marker per orbit for each thread)
+//	 * to allow MT
+//	 * @param nb thread to add
+//	 */
+//	void addThreadMarker(unsigned int nb) ;
 
-	/**
-	 * return allowed threads
-	 * @return the number of threads (including principal)
-	 */
-	unsigned int getNbThreadMarkers() const;
+//	/**
+//	 * return allowed threads
+//	 * @return the number of threads (including principal)
+//	 */
+//	unsigned int getNbThreadMarkers() const;
 
-	/**
-	 * Remove some added threads
-	 * @return remaining number of threads (including principal)
-	 */
-	void removeThreadMarker(unsigned int nb) ;
+//	/**
+//	 * Remove some added threads
+//	 * @return remaining number of threads (including principal)
+//	 */
+//	void removeThreadMarker(unsigned int nb) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *

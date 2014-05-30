@@ -49,22 +49,13 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 {
 	m_attribs[DART].removeLine(index) ;	// free the dart line
 
-	for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)	// clear markers of
-		(*m_markTables[DART][t])[index].clear() ;	// the removed dart
-
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if (m_embeddings[orbit])									// for each embedded orbit
 		{
 			unsigned int emb = (*m_embeddings[orbit])[index] ;		// get the embedding of the dart
 			if(emb != EMBNULL)
-			{
-				if(m_attribs[orbit].unrefLine(emb))					// unref the pointed embedding line
-				{
-					for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)	// and clear its markers if it was
-						(*m_markTables[orbit][t])[emb].clear() ;	// its last unref (and was thus freed)
-				}
-			}
+				m_attribs[orbit].unrefLine(emb);					// and unref the corresponding line
 		}
 	}
 }
@@ -162,12 +153,36 @@ inline AttributeMultiVectorGen* GenericMap::getAttributeVectorGen(unsigned int o
 	return m_attribs[orbit].getVirtualDataVector(nameAttr) ;
 }
 
+
 template <unsigned int ORBIT>
-inline AttributeMultiVector<Mark>* GenericMap::getMarkVector(unsigned int thread)
+AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector()
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
-	return m_markTables[ORBIT][thread] ;
+
+//	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
+	if (!m_markVectors_free[ORBIT].empty())
+	{
+		AttributeMultiVector<MarkerBool>* amv = m_markVectors_free[ORBIT].back();
+		m_markVectors_free[ORBIT].pop_back();
+		return amv;
+	}
+	//else add attribute
+	AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("") ;
+	std::cout << "ADD ATTRIBUTE"<< std::endl;
+	return amv;
 }
+
+
+template <unsigned int ORBIT>
+inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
+
+//	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
+	m_markVectors_free[ORBIT].push_back(amv);
+}
+
+
 
 template <unsigned int ORBIT>
 inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVector()

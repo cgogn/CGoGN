@@ -83,11 +83,7 @@ void MapCommon<MAP_IMPL>::setDartEmbedding(Dart d, unsigned int emb)
 
 	if (old != EMBNULL)	// if different
 	{
-		if(this->m_attribs[ORBIT].unrefLine(old))	// then unref the old emb
-		{
-			for (unsigned int t = 0; t < this->m_nbThreadMarkers; ++t)	// clear the markers if it was the
-				(*this->m_markTables[ORBIT][t])[old].clear();		// last unref of the line
-		}
+		this->m_attribs[ORBIT].unrefLine(old);	// then unref the old emb
 	}
 
 	if (emb != EMBNULL)
@@ -125,27 +121,27 @@ template <typename MAP_IMPL>
 template <unsigned int DIM>
 inline void MapCommon<MAP_IMPL>::boundaryMark(Dart d)
 {
-	this->m_markTables[DART][0]->operator[](this->dartIndex(d)).setMark(this->m_boundaryMarkers[DIM-2]);
+	this->m_boundaryMarkers[DIM-2]->setTrue(this->dartIndex(d));
 }
 
 template <typename MAP_IMPL>
 template <unsigned int DIM>
 inline void MapCommon<MAP_IMPL>::boundaryUnmark(Dart d)
 {
-	this->m_markTables[DART][0]->operator[](this->dartIndex(d)).unsetMark(this->m_boundaryMarkers[DIM-2]);
+	this->m_boundaryMarkers[DIM-2]->setFalse(this->dartIndex(d));
 }
 
 template <typename MAP_IMPL>
 template <unsigned int DIM>
 inline bool MapCommon<MAP_IMPL>::isBoundaryMarked(Dart d) const
 {
-	return this->m_markTables[DART][0]->operator[](this->dartIndex(d)).testMark(this->m_boundaryMarkers[DIM-2]);
+	return this->m_boundaryMarkers[DIM-2]->operator[](this->dartIndex(d));
 }
 
 template <typename MAP_IMPL>
 inline bool MapCommon<MAP_IMPL>::isBoundaryMarkedCurrent(Dart d) const
 {
-	return this->m_markTables[DART][0]->operator[](this->dartIndex(d)).testMark(this->m_boundaryMarkers[this->dimension()-2]);
+	return this->m_boundaryMarkers[this->dimension()-2]->operator[](this->dartIndex(d));
 }
 
 template <typename MAP_IMPL>
@@ -163,9 +159,7 @@ template <typename MAP_IMPL>
 template <unsigned int DIM>
 void MapCommon<MAP_IMPL>::boundaryUnmarkAll()
 {
-	AttributeContainer& cont = this->m_attribs[DART] ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		this->m_markTables[DART][0]->operator[](i).unsetMark(this->m_boundaryMarkers[DIM-2]);
+	this->m_boundaryMarkers[DIM-2]->allFalse();
 }
 
 /****************************************

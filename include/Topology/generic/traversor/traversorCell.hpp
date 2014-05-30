@@ -706,14 +706,8 @@ void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
 	boost::barrier sync1(nbth+1);
 	boost::barrier sync2(nbth+1);
 	bool finished=false;
-	// lauch threads
-	if (needMarkers)
-	{
-		unsigned int nbth_prec = map.getNbThreadMarkers();
-		if (nbth_prec < nbth+1)
-			map.addThreadMarker(nbth+1-nbth_prec);
-	}
 
+	// launch threads
 	boost::thread** threads = new boost::thread*[nbth];
 	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
 
