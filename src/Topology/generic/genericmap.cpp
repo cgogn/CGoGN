@@ -126,16 +126,16 @@ GenericMap::~GenericMap()
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 
-	for (unsigned int i = 0; i < NB_THREAD; ++i)
-	{
-		for(std::vector<DartMarkerGen*>::iterator it = dartMarkers[i].begin(); it != dartMarkers[i].end(); ++it)
-			(*it)->setReleaseOnDestruct(false) ;
-		dartMarkers[i].clear() ;
+//	for (unsigned int i = 0; i < NB_THREAD; ++i)
+//	{
+//		for(std::vector<DartMarkerGen*>::iterator it = dartMarkers[i].begin(); it != dartMarkers[i].end(); ++it)
+//			(*it)->setReleaseOnDestruct(false) ;
+//		dartMarkers[i].clear() ;
 
-		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
-			(*it)->setReleaseOnDestruct(false) ;
-		cellMarkers[i].clear() ;
-	}
+//		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
+//			(*it)->setReleaseOnDestruct(false) ;
+//		cellMarkers[i].clear() ;
+//	}
 
 	// clean type registry if necessary
 	m_nbInstances--;
