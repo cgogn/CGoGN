@@ -1338,7 +1338,7 @@ unsigned int Map3<MAP_IMPL>::closeMap()
 		if (phi3(d) == d)
 		{
 			++nb ;
-			closeHole(d);
+			closeHole(d,true);
 		}
 	}
 	return nb ;
