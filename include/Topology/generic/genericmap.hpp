@@ -159,7 +159,7 @@ AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector()
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 
-//	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
+	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
 	if (!m_markVectors_free[ORBIT].empty())
 	{
 		AttributeMultiVector<MarkerBool>* amv = m_markVectors_free[ORBIT].back();
@@ -168,7 +168,7 @@ AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector()
 	}
 	//else add attribute
 	AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("") ;
-	std::cout << "ADD ATTRIBUTE"<< std::endl;
+//	std::cout << "ADD ATTRIBUTE"<< std::endl;
 	return amv;
 }
 
@@ -178,7 +178,7 @@ inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 
-//	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
+	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
 	m_markVectors_free[ORBIT].push_back(amv);
 }
 
