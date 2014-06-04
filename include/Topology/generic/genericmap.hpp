@@ -155,31 +155,31 @@ inline AttributeMultiVectorGen* GenericMap::getAttributeVectorGen(unsigned int o
 
 
 template <unsigned int ORBIT>
-AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector()
+AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector(unsigned int thread)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 
-	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
-	if (!m_markVectors_free[ORBIT].empty())
+	if (!m_markVectors_free[ORBIT][thread].empty())
 	{
-		AttributeMultiVector<MarkerBool>* amv = m_markVectors_free[ORBIT].back();
-		m_markVectors_free[ORBIT].pop_back();
+		AttributeMultiVector<MarkerBool>* amv = m_markVectors_free[ORBIT][thread].back();
+		m_markVectors_free[ORBIT][thread].pop_back();
 		return amv;
 	}
-	//else add attribute
-	AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("") ;
-//	std::cout << "ADD ATTRIBUTE"<< std::endl;
-	return amv;
+	else
+	{
+		boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
+		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("") ;
+		return amv;
+	}
 }
 
 
 template <unsigned int ORBIT>
-inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv)
+inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 
-	boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
-	m_markVectors_free[ORBIT].push_back(amv);
+	m_markVectors_free[ORBIT][thread].push_back(amv);
 }
 
 

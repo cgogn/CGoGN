@@ -332,7 +332,7 @@ void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbthread)
 
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
-		tfs[i] = new ThreadFunctionAttrib<FUNC>(func, vd[i], sync1,sync2,finished,1+i);
+		tfs[i] = new ThreadFunctionAttrib<FUNC>(func, vd[i], sync1,sync2,finished,i);
 		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
 	}
 

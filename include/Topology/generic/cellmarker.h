@@ -45,10 +45,11 @@ class CellMarkerGen
 protected:
 	AttributeMultiVector<MarkerBool>* m_markVector ;
 	unsigned int m_cell ;
+	unsigned int m_thread;
 
 public:
 	CellMarkerGen(unsigned int cell, unsigned int thread = 0) :
-		m_cell(cell)
+		m_cell(cell),m_thread(thread)
 	{}
 
 	virtual ~CellMarkerGen()
@@ -86,7 +87,7 @@ public:
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_markVector = m_map.template askMarkVector<CELL>();
+		m_markVector = m_map.template askMarkVector<CELL>(m_thread);
 	}
 
 	CellMarkerBase(const MAP& map, unsigned int thread = 0) :
@@ -95,20 +96,20 @@ public:
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_markVector = m_map.template askMarkVector<CELL>();
+		m_markVector = m_map.template askMarkVector<CELL>(m_thread);
 	}
 
 	virtual ~CellMarkerBase()
 	{
 		if (GenericMap::alive(&m_map))
-			m_map.template releaseMarkVector<CELL>(m_markVector);
+			m_map.template releaseMarkVector<CELL>(m_markVector,m_thread);
 	}
 
 	void update()
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_markVector = m_map.template askMarkVector<CELL>();
+		m_markVector = m_map.template askMarkVector<CELL>(m_thread);
 	}
 
 

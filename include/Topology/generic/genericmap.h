@@ -114,7 +114,7 @@ protected:
 
 
 //	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors[NB_ORBITS] ;
-	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS] ;
+	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS][NB_THREAD] ;
 	boost::mutex m_MarkerStorageMutex[NB_ORBITS];
 
 	/**
@@ -278,13 +278,13 @@ public:
 	 * @brief ask for a marker attribute
 	 */
 	template <unsigned int ORBIT>
-	AttributeMultiVector<MarkerBool>* askMarkVector() ;
+	AttributeMultiVector<MarkerBool>* askMarkVector(unsigned int thread=0) ;
 
 	/**
 	 * @brief release allocated marker attribute
 	 */
 	template <unsigned int ORBIT>
-	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv);
+	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread=0);
 
 
 	/**

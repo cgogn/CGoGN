@@ -44,12 +44,14 @@ class DartMarkerGen
 
 protected:
 	AttributeMultiVector<MarkerBool>* m_markVector;
+	unsigned int m_thread;
 
 public:
 	/**
 	 * constructor
 	 */
-	DartMarkerGen(unsigned int thread=0)
+	DartMarkerGen(unsigned int thread=0):
+		m_thread(thread)
 	{}
 
 	virtual ~DartMarkerGen()
@@ -77,26 +79,26 @@ public:
 		DartMarkerGen(thread),
 		m_map(map)
 	{
-		m_markVector = m_map.template askMarkVector<DART>();
+		m_markVector = m_map.template askMarkVector<DART>(m_thread);
 	}
 
 	DartMarkerTmpl(const MAP& map, unsigned int thread = 0) :
 		DartMarkerGen(thread),
 		m_map(const_cast<MAP&>(map))
 	{
-		m_markVector = m_map.template askMarkVector<DART>();
+		m_markVector = m_map.template askMarkVector<DART>(m_thread);
 	}
 
 	virtual ~DartMarkerTmpl()
 	{
 		if (GenericMap::alive(&m_map))
-			m_map.template releaseMarkVector<DART>(m_markVector);
+			m_map.template releaseMarkVector<DART>(m_markVector,m_thread);
 
 	}
 
 	inline void update()
 	{
-		m_markVector = m_map.template askMarkVector<DART>();
+		m_markVector = m_map.template askMarkVector<DART>(m_thread);
 	}
 
 

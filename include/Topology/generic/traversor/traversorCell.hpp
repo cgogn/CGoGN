@@ -686,7 +686,7 @@ public:
 
 
 template <TraversalOptim OPT, unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
+void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 {
 	// buffer for cell traversing
 	std::vector< Cell<ORBIT> >* vd = new std::vector< Cell<ORBIT> >[nbth];
@@ -759,7 +759,7 @@ void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
 }
 
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, bool needMarkers, TraversalOptim opt, unsigned int nbth)
+void foreach_cell(MAP& map, FUNC func, TraversalOptim opt, unsigned int nbth)
 {
 	if (nbth < 2)
 	{
@@ -769,17 +769,17 @@ void foreach_cell(MAP& map, FUNC func, bool needMarkers, TraversalOptim opt, uns
 	switch(opt)
 	{
 		case FORCE_DART_MARKING:
-			foreach_cell_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 		case FORCE_CELL_MARKING:
-			foreach_cell_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 		case FORCE_QUICK_TRAVERSAL:
-			foreach_cell_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 		case AUTO:
 		default:
-			foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 	}
 }
