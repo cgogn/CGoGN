@@ -172,7 +172,7 @@ void MyQT::cb_Open()
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
 //		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
-//		color[d] = PFP::VEC3(v,0,0);
+		color[d] = PFP::VEC3(1.0,0,0);
 //		if (v>maxV)
 //			maxV=v;
 
@@ -417,14 +417,14 @@ int main(int argc, char **argv)
 		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 		{
 //			float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
-//			color[d] = PFP::VEC3(v,0,0);
+			color[d] = PFP::VEC3(1.0,0,0);
 //			if (v>maxV)
 //				maxV=v;
 
 			if(myMap.isVolumeIncidentToBoundary(d))
 				color[d] = PFP::VEC3(0,0,0);
-			else
-                color[d] = PFP::VEC3(1.0,0,0);
+			//else
+			//    color[d] = PFP::VEC3(1.0,0,0);
 		}
 //		for (unsigned int i = color.begin(); i != color.end(); color.next(i))
 //		{

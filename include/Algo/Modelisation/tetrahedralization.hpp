@@ -922,7 +922,7 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d)
     std::vector<Dart> edges;
     do
     {
-        if(!map.isBoundaryMarked(3,dit))
+		if(!map.isBoundaryMarked(3,dit))
         {
             edges.push_back(map.phi_1(dit));
             edges.push_back(map.phi_1(map.phi2(map.phi_1(edges[0]))));
