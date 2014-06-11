@@ -459,55 +459,35 @@ void Viewer::cb_keyPress(int keycode)
 
 			Utils::Chrono ch;
 			ch.start();
-
-			for (unsigned int i=0; i<4; ++i)
-				Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices "<< ch.elapsed()<< " ms "<< std::endl;
-
-			ch.start();
-
 			CGoGN::Parallel::NumberOfThreads = 1;
 			for (unsigned int i=0; i<4; ++i)
 				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
 			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices1 "<< ch.elapsed()<< " ms "<< std::endl;
 
 			ch.start();
-
 			CGoGN::Parallel::NumberOfThreads = 2;
 			for (unsigned int i=0; i<4; ++i)
 				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
 			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices2 "<< ch.elapsed()<< " ms "<< std::endl;
 
 			ch.start();
-
 			CGoGN::Parallel::NumberOfThreads = 3;
 			for (unsigned int i=0; i<4; ++i)
 				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
 			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices3 "<< ch.elapsed()<< " ms "<< std::endl;
 
 			ch.start();
-
 			CGoGN::Parallel::NumberOfThreads = 4;
 			for (unsigned int i=0; i<4; ++i)
 				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
 			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices4 "<< ch.elapsed()<< " ms "<< std::endl;
 
 			ch.start();
-
 			CGoGN::Parallel::NumberOfThreads = 8;
 			for (unsigned int i=0; i<4; ++i)
 				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
 			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices8 "<< ch.elapsed()<< " ms "<< std::endl;
 
-			ch.start();
-
-			for (unsigned int i=0; i<4; ++i)
-				Parallel::foreach_cell<VERTEX>(myMap, [&] (Vertex v, unsigned int th)
-				{
-					normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap,v,position);
-				}, false, FORCE_CELL_MARKING);
-
-			std::cout << "Parallel::foreach_cell "<< ch.elapsed()<< " ms "<< std::endl;
 
 			//		ch.start();
 			//		Parallel::foreach_cell_EO<VERTEX>(myMap,[&](Vertex v, unsigned int thr)

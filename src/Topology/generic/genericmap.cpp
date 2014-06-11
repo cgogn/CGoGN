@@ -30,6 +30,8 @@
 #include "Geometry/matrix.h"
 #include "Container/registered.h"
 
+#include <algorithm>
+
 namespace CGoGN
 {
 
@@ -42,10 +44,15 @@ int NumberOfThreads = getSystemNumberOfCores();
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;
 
+
+std::vector< std::vector<Dart>* > GenericMap::s_vdartsBuffers[NB_ORBITS];
+
+std::vector< std::vector<unsigned int>* > GenericMap::s_vintsBuffers[NB_ORBITS];
+
 // table of instancied maps for Dart/CellMarker release
 std::vector<GenericMap*>  GenericMap::s_instances;
 
-GenericMap::GenericMap() : m_nbThreadMarkers(1)
+GenericMap::GenericMap()
 {
 	if(m_attributes_registry_map == NULL)
 	{
@@ -83,6 +90,8 @@ GenericMap::GenericMap() : m_nbThreadMarkers(1)
 		registerAttribute<Geom::Matrix44d>(Geom::Matrix44d::CGoGNnameOfType());
 	}
 
+
+
 	m_nbInstances++;
 	s_instances.push_back(this);
 
@@ -90,31 +99,22 @@ GenericMap::GenericMap() : m_nbThreadMarkers(1)
 	{
 		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
-		for(unsigned int j = 0; j < NB_THREAD; ++j)
+	}
+
+	for(unsigned int i = 0; i < NB_THREAD; ++i)
+	{
+		if (s_vdartsBuffers[i].capacity()<8)
 		{
-			m_marksets[i][j].clear() ;
-			m_markTables[i][j] = NULL ;
+			s_vdartsBuffers[i].reserve(8);
+			s_vintsBuffers[i].reserve(8);
+			// prealloc ?
 		}
 	}
-
 	init();
-
-	for (unsigned int i = 0; i < NB_THREAD; ++i)
-	{
-		dartMarkers[i].reserve(16) ;
-		cellMarkers[i].reserve(16) ;
-	}
-
-	// get & lock marker for boundary
-	m_boundaryMarkers[0] = m_marksets[DART][0].getNewMark();
-	m_boundaryMarkers[1] = m_marksets[DART][0].getNewMark();
 }
 
 GenericMap::~GenericMap()
 {
-	// release marker for boundary
-	m_marksets[DART][0].releaseMark(m_boundaryMarkers[0]);
-	m_marksets[DART][0].releaseMark(m_boundaryMarkers[1]);
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
@@ -126,16 +126,6 @@ GenericMap::~GenericMap()
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 
-//	for (unsigned int i = 0; i < NB_THREAD; ++i)
-//	{
-//		for(std::vector<DartMarkerGen*>::iterator it = dartMarkers[i].begin(); it != dartMarkers[i].end(); ++it)
-//			(*it)->setReleaseOnDestruct(false) ;
-//		dartMarkers[i].clear() ;
-
-//		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
-//			(*it)->setReleaseOnDestruct(false) ;
-//		cellMarkers[i].clear() ;
-//	}
 
 	// clean type registry if necessary
 	m_nbInstances--;
@@ -146,6 +136,16 @@ GenericMap::~GenericMap()
 
 		delete m_attributes_registry_map;
 		m_attributes_registry_map = NULL;
+
+		for(unsigned int i = 0; i < NB_THREAD; ++i)
+		{
+			for (auto it =s_vdartsBuffers[i].begin(); it != s_vdartsBuffers[i].end(); ++it)
+				delete *it;
+			for (auto it =s_vintsBuffers[i].begin(); it != s_vintsBuffers[i].end(); ++it)
+				delete *it;
+		}
+
+
 	}
 
 	// remove instance for table
@@ -165,37 +165,12 @@ void GenericMap::init()
 			m_quickLocalIncidentTraversal[i][j] = NULL ;
 			m_quickLocalAdjacentTraversal[i][j] = NULL ;
 		}
-
-		AttributeContainer& cont = m_attribs[i];
-		for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)
-		{
-			std::stringstream ss ;
-			ss << "Mark_" << t ;
-			AttributeMultiVector<Mark>* amvMark = cont.addAttribute<Mark>(ss.str()) ;
-//			for(unsigned int idx = cont.begin(); idx < cont.end(); cont.next(idx))
-//				amvMark->operator[](idx).clear() ;
-			m_markTables[i][t] = amvMark ;
-		}
 	}
 
-	for (unsigned int j = 0; j < NB_THREAD; ++j)
-	{
-		std::vector<CellMarkerGen*>& cmg = cellMarkers[j];
-		for(unsigned int i = 0; i < cmg.size(); ++i)
-		{
-			CellMarkerGen* cm = cmg[i] ;
-			cm->updateMarkVector(m_markTables[cm->getCell()][cm->getThread()]) ;
-		}
+	m_boundaryMarkers[0] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark0") ;
+	m_boundaryMarkers[1] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark1") ;
 
-		std::vector<DartMarkerGen*>& dmg = dartMarkers[j];
-		for(unsigned int i = 0; i < dmg.size(); ++i)
-		{
-			DartMarkerGen* dm = dmg[i] ;
-			dm->updateMarkVector(m_markTables[DART][dm->getThread()]) ;
-		}
-	}
-
-	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
+	 for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 }
@@ -226,27 +201,19 @@ void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit
 
 	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
 
-	for(unsigned int t = 0; t < m_nbThreadMarkers; ++t)
-	{
-		AttributeMultiVector<Mark>* m = m_markTables[orbit1][t] ;
-		m_markTables[orbit1][t] = m_markTables[orbit2][t] ;
-		m_markTables[orbit2][t] = m ;
 
-		MarkSet ms = m_marksets[orbit1][t] ;
-		m_marksets[orbit1][t] = m_marksets[orbit2][t] ;
-		m_marksets[orbit2][t] = ms ;
-	}
+	// NE MARCHE PLUS PAS POSSIBLE DE CHANGER LES CONTAINER
 
-	for (unsigned int i = 0; i < NB_THREAD; ++i)
-	{
-		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
-		{
-			if((*it)->m_cell == orbit1)
-				(*it)->m_cell = orbit2 ;
-			else if((*it)->m_cell == orbit2)
-				(*it)->m_cell = orbit1 ;
-		}
-	}
+//	for (unsigned int i = 0; i < NB_THREAD; ++i)
+//	{
+//		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
+//		{
+//			if((*it)->m_cell == orbit1)
+//				(*it)->m_cell = orbit2 ;
+//			else if((*it)->m_cell == orbit2)
+//				(*it)->m_cell = orbit1 ;
+//		}
+//	}
 }
 
 void GenericMap::viewAttributesTables()
@@ -273,10 +240,10 @@ void GenericMap::viewAttributesTables()
 		std::cout << (long)(m_embeddings[i]) << " / " ;
 	std::cout << std::endl << "-------------------------" << std::endl ;
 
-	std::cout << "m_markTables: " ;
-	for (unsigned int i = 0; i < NB_ORBITS; ++i)
-		std::cout << (long)(m_markTables[i][0]) << " / " ;
-	std::cout << std::endl << "-------------------------" << std::endl << std::dec ;
+//	std::cout << "m_markTables: " ;
+//	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+//		std::cout << (long)(m_markTables[i][0]) << " / " ;
+//	std::cout << std::endl << "-------------------------" << std::endl << std::dec ;
 }
 
 void GenericMap::printDartsTable()
@@ -290,48 +257,48 @@ void GenericMap::printDartsTable()
  *          THREAD MANAGEMENT           *
  ****************************************/
 
-void GenericMap::addThreadMarker(unsigned int nb)
-{
-	unsigned int th ;
+//void GenericMap::addThreadMarker(unsigned int nb)
+//{
+//	unsigned int th ;
 
-	for (unsigned int j = 0; j < nb; ++j)
-	{
-		th = m_nbThreadMarkers ;
-		m_nbThreadMarkers++ ;
+//	for (unsigned int j = 0; j < nb; ++j)
+//	{
+//		th = m_nbThreadMarkers ;
+//		m_nbThreadMarkers++ ;
 
-		for (unsigned int i = 0; i < NB_ORBITS; ++i)
-		{
-			std::stringstream ss ;
-			ss << "Mark_"<< th ;
-			AttributeContainer& cellCont = m_attribs[i] ;
-			AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
-			m_markTables[i][th] = amvMark ;
-		}
-	}
-}
+//		for (unsigned int i = 0; i < NB_ORBITS; ++i)
+//		{
+//			std::stringstream ss ;
+//			ss << "Mark_"<< th ;
+//			AttributeContainer& cellCont = m_attribs[i] ;
+//			AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
+//			m_markTables[i][th] = amvMark ;
+//		}
+//	}
+//}
 
-unsigned int GenericMap::getNbThreadMarkers() const
-{
-	return m_nbThreadMarkers;
-}
+//unsigned int GenericMap::getNbThreadMarkers() const
+//{
+//	return m_nbThreadMarkers;
+//}
 
-void GenericMap::removeThreadMarker(unsigned int nb)
-{
-	unsigned int th = 0;
-	while ((m_nbThreadMarkers > 1) && (nb > 0))
-	{
-		th = --m_nbThreadMarkers ;
-		--nb;
-		for (unsigned int i = 0; i < NB_ORBITS; ++i)
-		{
-			std::stringstream ss ;
-			ss << "Mark_"<< th ;
-			AttributeContainer& cellCont = m_attribs[i] ;
-			cellCont.removeAttribute<Mark>(ss.str()) ;
-			m_markTables[i][th] = NULL ;
-		}
-	}
-}
+//void GenericMap::removeThreadMarker(unsigned int nb)
+//{
+//	unsigned int th = 0;
+//	while ((m_nbThreadMarkers > 1) && (nb > 0))
+//	{
+//		th = --m_nbThreadMarkers ;
+//		--nb;
+//		for (unsigned int i = 0; i < NB_ORBITS; ++i)
+//		{
+//			std::stringstream ss ;
+//			ss << "Mark_"<< th ;
+//			AttributeContainer& cellCont = m_attribs[i] ;
+//			cellCont.removeAttribute<Mark>(ss.str()) ;
+//			m_markTables[i][th] = NULL ;
+//		}
+//	}
+//}
 
 /****************************************
  *             SAVE & LOAD              *
@@ -339,17 +306,6 @@ void GenericMap::removeThreadMarker(unsigned int nb)
 
 void GenericMap::restore_shortcuts()
 {
-	// NB THREADS
-
-	std::vector<std::string> typeMark;
-	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
-	m_nbThreadMarkers = 0;
-	for (unsigned int i = 0; i < nbatt0; ++i)
-	{
-		if (typeMark[i] == "Mark")
-			++m_nbThreadMarkers;
-	}
-
 	// EMBEDDING
 
 	// get container of dart orbit
@@ -371,14 +327,23 @@ void GenericMap::restore_shortcuts()
 		}
 	}
 
-	// MARKERS & QUICK TRAVERSAL
+	// MARKERS
+	m_attribs[DART].getAttributesNames(listeNames);
+
+	for (unsigned int i = 0;  i < listeNames.size(); ++i)
+	{
+		if (listeNames[i] == "BoundaryMark0")
+			m_boundaryMarkers[0] = cont.getDataVector<MarkerBool>(i);
+
+		if (listeNames[i] == "BoundaryMark1")
+			m_boundaryMarkers[1] = cont.getDataVector<MarkerBool>(i);
+	}
+
+	// QUICK TRAVERSAL
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		AttributeContainer& cont = m_attribs[orbit];
-
-		// QUICK TRAVERSAL
-
 		m_quickTraversal[orbit] = cont.getDataVector<Dart>("quick_traversal") ;
 		for(unsigned int j = 0; j < NB_ORBITS; ++j)
 		{
@@ -389,49 +354,6 @@ void GenericMap::restore_shortcuts()
 			ss2 << "quickLocalAdjacentTraversal_" << j;
 			m_quickLocalAdjacentTraversal[orbit][j] = cont.getDataVector< NoTypeNameAttribute<std::vector<Dart> > >(ss2.str()) ;
 		}
-
-		// MARKERS
-
-		std::vector<std::string> listeNames;
-		cont.getAttributesNames(listeNames);
-
-		for (unsigned int i = 0;  i < listeNames.size(); ++i)
-		{
-			std::string sub = listeNames[i].substr(0, 5);
-			if (sub == "Mark_")
-			{
-				// get thread number
-				unsigned int thread = listeNames[i][5] - '0';
-				if (listeNames[i].size() > 6) 					// thread number is >9
-					thread = 10 * thread + (listeNames[i][6] - '0');
-
-				AttributeMultiVector<Mark>* amvMark = cont.getDataVector<Mark>(i);
-				m_markTables[orbit][thread] = amvMark ;
-
-				if ((orbit == DART) && (thread == 0))	// for Dart Marker of thread O
-				{										// clear all marks expect boundary marks
-					Mark m(m_boundaryMarkers[0] + m_boundaryMarkers[1]);
-					m.invert();
-					for (unsigned int k = cont.begin(); k != cont.end(); cont.next(k))
-						amvMark->operator[](k).unsetMark(m);
-				}
-				else									// for others clear all
-				{
-					for (unsigned int k = cont.begin(); k != cont.end(); cont.next(k))
-						amvMark->operator[](k).clear();
-				}
-			}
-		}
-	}
-
-	// restore mark vectors in Dart & Cell Markers
-	for (unsigned int j = 0; j < NB_THREAD; ++j)
-	{
-		for (std::vector<DartMarkerGen*>::iterator it = dartMarkers[j].begin(); it != dartMarkers[j].end(); ++it)
-			(*it)->updateMarkVector(m_markTables[DART][(*it)->getThread()]);
-
-		for (std::vector<CellMarkerGen*>::iterator it = cellMarkers[j].begin(); it != cellMarkers[j].end(); ++it)
-			(*it)->updateMarkVector(m_markTables[(*it)->getCell()][(*it)->getThread()]);
 	}
 
 	// set Attribute handlers invalid
@@ -458,26 +380,26 @@ void GenericMap::dumpAttributesAndMarkers()
 				CGoGNout << "    " << j << " : " << types[j] << " " << names[j] << CGoGNendl;
 		}
 	}
-	CGoGNout << "RESERVED MARKERS "<< CGoGNendl;
-	for (unsigned int i = 0; i < NB_ORBITS; ++i)
-	{
-		for (unsigned int j = 0; j < NB_THREAD; ++j)
-		{
-			MarkSet ms = m_marksets[i][j];
-			if (!ms.isClear())
-			{
-				CGoGNout << "Orbit " << i << "  thread " << j << " : ";
-				Mark m(1);
-				for (unsigned i = 0; i < Mark::getNbMarks(); ++i)
-				{
-					if (ms.testMark(m))
-						CGoGNout << m.getMarkVal() << ", ";
-					m.setMarkVal(m.getMarkVal()<<1);
-				}
-				CGoGNout << CGoGNendl;
-			}
-		}
-	}
+//	CGoGNout << "RESERVED MARKERS "<< CGoGNendl;
+//	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+//	{
+//		for (unsigned int j = 0; j < NB_THREAD; ++j)
+//		{
+//			MarkSet ms = m_marksets[i][j];
+//			if (!ms.isClear())
+//			{
+//				CGoGNout << "Orbit " << i << "  thread " << j << " : ";
+//				Mark m(1);
+//				for (unsigned i = 0; i < Mark::getNbMarks(); ++i)
+//				{
+//					if (ms.testMark(m))
+//						CGoGNout << m.getMarkVal() << ", ";
+//					m.setMarkVal(m.getMarkVal()<<1);
+//				}
+//				CGoGNout << CGoGNendl;
+//			}
+//		}
+//	}
 }
 
 void GenericMap::compact()

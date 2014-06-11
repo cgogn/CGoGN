@@ -235,7 +235,7 @@ void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT&
 	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int /*thr*/)
 	{
 		normal[v] = vertexNormal<PFP>(map, v, position) ;
-	},true,FORCE_CELL_MARKING);
+	},FORCE_CELL_MARKING);
 }
 
 template <typename PFP, typename V_ATT, typename F_ATT>
@@ -244,7 +244,7 @@ void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& no
 	CGoGN::Parallel::foreach_cell<FACE>(map,[&](Face f, unsigned int thr)
 	{
 		normal[f] = faceNormal<PFP>(map, f, position) ;
-	},true,AUTO);
+	});
 }
 
 
@@ -254,7 +254,7 @@ void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& pos
 	CGoGN::Parallel::foreach_cell<EDGE>(map,[&](Edge e, unsigned int thr)
 	{
 		angles[e] = computeAngleBetweenNormalsOnEdge<PFP>(map, e, position) ;
-	},true,AUTO);
+	});
 }
 
 } // namespace Parallel

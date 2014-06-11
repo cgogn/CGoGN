@@ -33,7 +33,6 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <boost/thread/mutex.hpp>
 
 #include "Container/attributeContainer.h"
 #include "Container/fakeAttribute.h"
@@ -43,7 +42,8 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
 
-#include <boost/thread.hpp>
+#include <thread>
+#include <mutex>
 
 namespace CGoGN
 {
@@ -63,8 +63,8 @@ extern int NumberOfThreads;
 inline int getSystemNumberOfCores(bool hyperthreading=false)
 {
 	if (hyperthreading)
-		return boost::thread::hardware_concurrency()/2;
-	return boost::thread::hardware_concurrency();
+		return std::thread::hardware_concurrency()/2;
+	return std::thread::hardware_concurrency();
 }
 
 }
@@ -82,9 +82,9 @@ class GenericMap
 	template<typename T, typename MAP> friend class EdgeAutoAttribute ;
 	template<typename T, typename MAP> friend class FaceAutoAttribute ;
 	template<typename T, typename MAP> friend class VolumeAutoAttribute ;
-	friend class DartMarkerGen ;
-	friend class CellMarkerGen ;
-	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
+//	friend class DartMarkerGen ;
+//	friend class CellMarkerGen ;
+//	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
 	// protected copy constructor to prevent the copy of map
@@ -97,6 +97,10 @@ protected:
 
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
 	static int m_nbInstances;
+
+	// TODO RELEASE MEMORY
+	static  std::vector< std::vector<Dart>* > s_vdartsBuffers[NB_ORBITS];
+	static  std::vector< std::vector<unsigned int>* > s_vintsBuffers[NB_ORBITS];
 
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
@@ -112,31 +116,19 @@ protected:
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalIncidentTraversal[NB_ORBITS][NB_ORBITS] ;
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalAdjacentTraversal[NB_ORBITS][NB_ORBITS] ;
 
-	/**
-	 * Marks manager
-	 */
-	MarkSet m_marksets[NB_ORBITS][NB_THREAD] ;
-
-	/**
-	 * Direct access to the attributes that store Marks
-	 */
-	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD] ;
+	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS][NB_THREAD] ;
+	std::mutex m_MarkerStorageMutex[NB_ORBITS];
 
 	/**
 	 * Reserved boundary markers
 	 */
-	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
-
-	unsigned int m_nbThreadMarkers ;
+	AttributeMultiVector<MarkerBool>* m_boundaryMarkers[2];
 
 	/**
-	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
+	 * Store links to created AttributeHandlers
 	 */
 	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!)
-	boost::mutex attributeHandlersMutex;
-
-	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
-	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
+	std::mutex attributeHandlersMutex;
 
 // table of instancied maps for Dart/CellMarker release
 	static std::vector<GenericMap*> s_instances;
@@ -156,6 +148,13 @@ public:
 		return false;
 	}
 
+	static inline std::vector<Dart>* askDartBuffer(unsigned int orbit);
+	static inline void releaseDartBuffer(std::vector<Dart>* vd, unsigned int orbit);
+
+	static inline std::vector<unsigned int>* askUIntBuffer(unsigned int orbit);
+	static inline void releaseUIntBuffer(std::vector<unsigned int>* vd, unsigned int orbit);
+
+
 protected:
 	void init();
 
@@ -172,11 +171,6 @@ public:
 	 */
 	virtual void clear(bool removeAttrib) ;
 
-	/**
-	 * get the marker_set of an orbit and thread (used for Cell & Dart Marker)
-	 */
-	template <unsigned int ORBIT>
-	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -290,10 +284,17 @@ public:
 	inline AttributeMultiVectorGen* getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
-	 * get a multi vector of mark attribute (direct access with [i])
+	 * @brief ask for a marker attribute
 	 */
 	template <unsigned int ORBIT>
-	AttributeMultiVector<Mark>* getMarkVector(unsigned int thread = 0) ;
+	AttributeMultiVector<MarkerBool>* askMarkVector(unsigned int thread=0) ;
+
+	/**
+	 * @brief release allocated marker attribute
+	 */
+	template <unsigned int ORBIT>
+	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread=0);
+
 
 	/**
 	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
@@ -351,24 +352,24 @@ protected:
 	 *          THREAD MANAGEMENT           *
 	 ****************************************/
 public:
-	/**
-	 * add threads (a table of Marker per orbit for each thread)
-	 * to allow MT
-	 * @param nb thread to add
-	 */
-	void addThreadMarker(unsigned int nb) ;
+//	/**
+//	 * add threads (a table of Marker per orbit for each thread)
+//	 * to allow MT
+//	 * @param nb thread to add
+//	 */
+//	void addThreadMarker(unsigned int nb) ;
 
-	/**
-	 * return allowed threads
-	 * @return the number of threads (including principal)
-	 */
-	unsigned int getNbThreadMarkers() const;
+//	/**
+//	 * return allowed threads
+//	 * @return the number of threads (including principal)
+//	 */
+//	unsigned int getNbThreadMarkers() const;
 
-	/**
-	 * Remove some added threads
-	 * @return remaining number of threads (including principal)
-	 */
-	void removeThreadMarker(unsigned int nb) ;
+//	/**
+//	 * Remove some added threads
+//	 * @return remaining number of threads (including principal)
+//	 */
+//	void removeThreadMarker(unsigned int nb) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *

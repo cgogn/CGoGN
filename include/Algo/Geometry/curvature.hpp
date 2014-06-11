@@ -667,7 +667,7 @@ void computeCurvatureVertices_NormalCycles(
 	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
-	},true,FORCE_CELL_MARKING);
+	},FORCE_CELL_MARKING);
 }
 
 template <typename PFP>
@@ -696,7 +696,7 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
-	},true,FORCE_CELL_MARKING);
+	},FORCE_CELL_MARKING);
 }
 
 
@@ -714,7 +714,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin, threadID) ;
-	},true,FORCE_CELL_MARKING);
+	},FORCE_CELL_MARKING);
 
 }
 

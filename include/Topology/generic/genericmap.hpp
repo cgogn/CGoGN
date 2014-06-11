@@ -28,6 +28,64 @@
 
 namespace CGoGN
 {
+/****************************************
+ *           BUFFERS MANAGEMENT           *
+ ****************************************/
+
+inline std::vector<Dart>* GenericMap::askDartBuffer(unsigned int thread)
+{
+	if (s_vdartsBuffers[thread].empty())
+	{
+		std::vector<Dart>* vd = new std::vector<Dart>;
+		vd->reserve(128);
+		return vd;
+	}
+
+	std::vector<Dart>* vd = s_vdartsBuffers[thread].back();
+	s_vdartsBuffers[thread].pop_back();
+	return vd;
+}
+
+inline void GenericMap::releaseDartBuffer(std::vector<Dart>* vd, unsigned int thread)
+{
+	if (vd->capacity()>1024)
+	{
+		std::vector<Dart> v;
+		vd->swap(v);
+		vd->reserve(128);
+	}
+	vd->clear();
+	s_vdartsBuffers[thread].push_back(vd);
+}
+
+
+inline std::vector<unsigned int>* GenericMap::askUIntBuffer(unsigned int thread)
+{
+	if (s_vintsBuffers[thread].empty())
+	{
+		std::vector<unsigned int>* vui = new std::vector<unsigned int>;
+		vui->reserve(128);
+		return vui;
+	}
+
+	std::vector<unsigned int>* vui = s_vintsBuffers[thread].back();
+	s_vintsBuffers[thread].pop_back();
+	return vui;
+}
+
+inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui, unsigned int thread)
+{
+	if (vui->capacity()>1024)
+	{
+		std::vector<unsigned int> v;
+		vui->swap(v);
+		vui->reserve(128);
+	}
+	vui->clear();
+	s_vintsBuffers[thread].push_back(vui);
+}
+
+
 
 /****************************************
  *           DARTS MANAGEMENT           *
@@ -49,22 +107,13 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 {
 	m_attribs[DART].removeLine(index) ;	// free the dart line
 
-	for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)	// clear markers of
-		(*m_markTables[DART][t])[index].clear() ;	// the removed dart
-
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if (m_embeddings[orbit])									// for each embedded orbit
 		{
 			unsigned int emb = (*m_embeddings[orbit])[index] ;		// get the embedding of the dart
 			if(emb != EMBNULL)
-			{
-				if(m_attribs[orbit].unrefLine(emb))					// unref the pointed embedding line
-				{
-					for (unsigned int t = 0; t < m_nbThreadMarkers; ++t)	// and clear its markers if it was
-						(*m_markTables[orbit][t])[emb].clear() ;	// its last unref (and was thus freed)
-				}
-			}
+				m_attribs[orbit].unrefLine(emb);					// and unref the corresponding line
 		}
 	}
 }
@@ -162,12 +211,36 @@ inline AttributeMultiVectorGen* GenericMap::getAttributeVectorGen(unsigned int o
 	return m_attribs[orbit].getVirtualDataVector(nameAttr) ;
 }
 
+
 template <unsigned int ORBIT>
-inline AttributeMultiVector<Mark>* GenericMap::getMarkVector(unsigned int thread)
+AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector(unsigned int thread)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
-	return m_markTables[ORBIT][thread] ;
+
+	if (!m_markVectors_free[ORBIT][thread].empty())
+	{
+		AttributeMultiVector<MarkerBool>* amv = m_markVectors_free[ORBIT][thread].back();
+		m_markVectors_free[ORBIT][thread].pop_back();
+		return amv;
+	}
+	else
+	{
+		std::lock_guard<std::mutex> lockMV(m_MarkerStorageMutex[ORBIT]);
+		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("") ;
+		return amv;
+	}
 }
+
+
+template <unsigned int ORBIT>
+inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
+
+	m_markVectors_free[ORBIT][thread].push_back(amv);
+}
+
+
 
 template <unsigned int ORBIT>
 inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVector()

@@ -128,7 +128,7 @@ public:
 
 	virtual unsigned int getNbBlocks() const = 0;
 
-	virtual void addBlocksBefore(unsigned int nbb) = 0;
+//	virtual void addBlocksBefore(unsigned int nbb) = 0;
 
 	virtual bool copy(const AttributeMultiVectorGen* atmvg) = 0;
 
@@ -311,6 +311,7 @@ public:
 
 } // namespace CGoGN
 
+#include "attributeMultiVectorBool.hpp"
 #include "attributeMultiVector.hpp"
 
 #endif

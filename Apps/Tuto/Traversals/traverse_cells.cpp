@@ -108,7 +108,7 @@ int main()
 	{
 		position[v] += VEC3(0.0, 0.0, PFP::REAL(thread) * 0.1f);
 		// WARNING thread vary here from 1 to 4 (and not from 0 to 3) !!!!
-	}, false); // 4:4 thread, false for no need for markers in threaded code.
+	}); // 4:4 thread, false for no need for markers in threaded code.
 
 	std::cout << "After // processing"<< std::endl;
 	foreach_cell<VERTEX>(myMap, [&] (Vertex v) // for each Vertex v of the MAP myMap
@@ -132,7 +132,7 @@ int main()
 	{
 		// for each face add surface to accumulator (-1 because counter between 1-3 not 0-3)
 		surf[thr-1] += Algo::Surface::Geometry::convexFaceArea<PFP>(myMap, f, position);
-	}, false);
+	});
 
 	std::cout << surf[0]<< "/"<< surf[1]<< "/"<< surf[2]<< "/"<< std::endl;
 	std::cout << "Total="<<surf[0]+surf[1]+surf[2]<< std::endl;

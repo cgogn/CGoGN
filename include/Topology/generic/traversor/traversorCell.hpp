@@ -22,8 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <boost/thread.hpp>
-#include <boost/thread/barrier.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/thread/barrier.hpp>
+#include "Utils/threadbarrier.h"
 #include <vector>
 
 namespace CGoGN
@@ -656,14 +657,14 @@ class ThreadFunction
 protected:
 	typedef Cell<ORBIT> CELL;
 	std::vector<CELL>& m_cells;
-	boost::barrier& m_sync1;
-	boost::barrier& m_sync2;
+	Utils::Barrier& m_sync1;
+	Utils::Barrier& m_sync2;
 	bool& m_finished;
 	unsigned int m_id;
 	FUNC m_lambda;
 
 public:
-	ThreadFunction(FUNC func, std::vector<CELL>& vd, boost::barrier& s1, boost::barrier& s2, bool& finished, unsigned int id):
+	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id):
 		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func)
 	{
 	}
@@ -686,7 +687,7 @@ public:
 
 
 template <TraversalOptim OPT, unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
+void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 {
 	// buffer for cell traversing
 	std::vector< Cell<ORBIT> >* vd = new std::vector< Cell<ORBIT> >[nbth];
@@ -703,24 +704,18 @@ void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
 		nb++;
 		cell = trav.next();
 	}
-	boost::barrier sync1(nbth+1);
-	boost::barrier sync2(nbth+1);
+	Utils::Barrier sync1(nbth+1);
+	Utils::Barrier sync2(nbth+1);
 	bool finished=false;
-	// lauch threads
-	if (needMarkers)
-	{
-		unsigned int nbth_prec = map.getNbThreadMarkers();
-		if (nbth_prec < nbth+1)
-			map.addThreadMarker(nbth+1-nbth_prec);
-	}
 
-	boost::thread** threads = new boost::thread*[nbth];
+	// launch threads
+	std::thread** threads = new std::thread*[nbth];
 	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
 
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i],sync1,sync2, finished,1+i);
-		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
+		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
 	}
 
 	// and continue to traverse the map
@@ -765,7 +760,7 @@ void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
 }
 
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, bool needMarkers, TraversalOptim opt, unsigned int nbth)
+void foreach_cell(MAP& map, FUNC func, TraversalOptim opt, unsigned int nbth)
 {
 	if (nbth < 2)
 	{
@@ -775,17 +770,17 @@ void foreach_cell(MAP& map, FUNC func, bool needMarkers, TraversalOptim opt, uns
 	switch(opt)
 	{
 		case FORCE_DART_MARKING:
-			foreach_cell_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 		case FORCE_CELL_MARKING:
-			foreach_cell_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 		case FORCE_QUICK_TRAVERSAL:
-			foreach_cell_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 		case AUTO:
 		default:
-			foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
+			foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,nbth-1);
 			break;
 	}
 }
