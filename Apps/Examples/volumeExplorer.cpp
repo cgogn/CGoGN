@@ -29,6 +29,7 @@
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/volume.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 
 #include "Utils/chrono.h"
 
@@ -455,6 +456,9 @@ int main(int argc, char **argv)
 //		Algo::Volume::Export::exportNAS<PFP>(myMap,position,"/tmp/test1.nas");
 //		Algo::Volume::Export::exportVTU<PFP>(myMap,position,"/tmp/test3.vtu");
 	}
+
+    myMap.check();
+
     // un peu d'interface
 	QApplication app(argc, argv);
 	MyQT sqt;

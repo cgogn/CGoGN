@@ -415,6 +415,27 @@ bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread)
 	return true;
 }
 
+template <typename PFP>
+bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread)
+{
+    unsigned int nbFaces = 0;
+
+    //Test the number of faces end its valency
+    Traversor3WF<typename PFP::MAP> travWF(the_map, d, false, thread);
+    for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
+    {
+        //increase the number of faces
+        nbFaces++;
+        if(nbFaces > 6)	//too much faces
+            return false;
+
+        //test the valency of this face
+        if(the_map.faceDegree(dit) != 4)
+            return false;
+    }
+
+    return true;
+}
 
 template <typename PFP>
 void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)

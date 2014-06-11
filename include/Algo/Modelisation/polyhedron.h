@@ -136,6 +136,8 @@ bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
 template <typename PFP>
 bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
 
+template <typename PFP>
+bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
 
 template <typename PFP>
 Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);

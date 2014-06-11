@@ -470,7 +470,7 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd)
  *************************************************************************************************/
 
 template <typename PFP>
-bool isTetrahedron(typename PFP::MAP& map, Vol v, unsigned int thread)
+bool isTetrahedron(typename PFP::MAP& map, Dart v, unsigned int thread)
 {
     unsigned int nbFaces = 0;
 
