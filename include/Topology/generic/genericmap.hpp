@@ -28,6 +28,64 @@
 
 namespace CGoGN
 {
+/****************************************
+ *           BUFFERS MANAGEMENT           *
+ ****************************************/
+
+inline std::vector<Dart>* GenericMap::askDartBuffer(unsigned int thread)
+{
+	if (s_vdartsBuffers[thread].empty())
+	{
+		std::vector<Dart>* vd = new std::vector<Dart>;
+		vd->reserve(128);
+		return vd;
+	}
+
+	std::vector<Dart>* vd = s_vdartsBuffers[thread].back();
+	s_vdartsBuffers[thread].pop_back();
+	return vd;
+}
+
+inline void GenericMap::releaseDartBuffer(std::vector<Dart>* vd, unsigned int thread)
+{
+	if (vd->capacity()>1024)
+	{
+		std::vector<Dart> v;
+		vd->swap(v);
+		vd->reserve(128);
+	}
+	vd->clear();
+	s_vdartsBuffers[thread].push_back(vd);
+}
+
+
+inline std::vector<unsigned int>* GenericMap::askUIntBuffer(unsigned int thread)
+{
+	if (s_vintsBuffers[thread].empty())
+	{
+		std::vector<unsigned int>* vui = new std::vector<unsigned int>;
+		vui->reserve(128);
+		return vui;
+	}
+
+	std::vector<unsigned int>* vui = s_vintsBuffers[thread].back();
+	s_vintsBuffers[thread].pop_back();
+	return vui;
+}
+
+inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui, unsigned int thread)
+{
+	if (vui->capacity()>1024)
+	{
+		std::vector<unsigned int> v;
+		vui->swap(v);
+		vui->reserve(128);
+	}
+	vui->clear();
+	s_vintsBuffers[thread].push_back(vui);
+}
+
+
 
 /****************************************
  *           DARTS MANAGEMENT           *
@@ -167,7 +225,7 @@ AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector(unsigned int thread)
 	}
 	else
 	{
-		boost::mutex::scoped_lock lockMV(m_MarkerStorageMutex[ORBIT]);
+		std::lock_guard<std::mutex> lockMV(m_MarkerStorageMutex[ORBIT]);
 		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("") ;
 		return amv;
 	}

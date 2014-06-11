@@ -22,8 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <boost/thread.hpp>
-#include <boost/thread/barrier.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/thread/barrier.hpp>
+#include "Utils/threadbarrier.h"
 #include <vector>
 
 namespace CGoGN
@@ -656,14 +657,14 @@ class ThreadFunction
 protected:
 	typedef Cell<ORBIT> CELL;
 	std::vector<CELL>& m_cells;
-	boost::barrier& m_sync1;
-	boost::barrier& m_sync2;
+	Utils::Barrier& m_sync1;
+	Utils::Barrier& m_sync2;
 	bool& m_finished;
 	unsigned int m_id;
 	FUNC m_lambda;
 
 public:
-	ThreadFunction(FUNC func, std::vector<CELL>& vd, boost::barrier& s1, boost::barrier& s2, bool& finished, unsigned int id):
+	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id):
 		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func)
 	{
 	}
@@ -703,18 +704,18 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 		nb++;
 		cell = trav.next();
 	}
-	boost::barrier sync1(nbth+1);
-	boost::barrier sync2(nbth+1);
+	Utils::Barrier sync1(nbth+1);
+	Utils::Barrier sync2(nbth+1);
 	bool finished=false;
 
 	// launch threads
-	boost::thread** threads = new boost::thread*[nbth];
+	std::thread** threads = new std::thread*[nbth];
 	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
 
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i],sync1,sync2, finished,1+i);
-		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
+		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
 	}
 
 	// and continue to traverse the map

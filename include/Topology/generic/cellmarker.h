@@ -259,24 +259,27 @@ template <typename MAP, unsigned int CELL>
 class CellMarkerStore: public CellMarkerBase<MAP, CELL>
 {
 protected:
-	std::vector<unsigned int> m_markedCells ;
+	std::vector<unsigned int>* m_markedCells ;
 
 public:
 	CellMarkerStore(MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
 	{
-		m_markedCells.reserve(128);
+//		m_markedCells.reserve(128);
+		m_markedCells = GenericMap::askUIntBuffer(thread);
 	}
 
 	CellMarkerStore(const MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
 	{
-		m_markedCells.reserve(128);
+//		m_markedCells.reserve(128);
+		m_markedCells = GenericMap::askUIntBuffer(thread);
 	}
 
 	virtual ~CellMarkerStore()
 	{
 		unmarkAll() ;
+		GenericMap::releaseUIntBuffer(m_markedCells, this->m_thread);
 //		assert(isAllUnmarked);
 //		CGoGN_ASSERT(this->isAllUnmarked())
 	}
@@ -290,20 +293,20 @@ public:
 	inline void mark(Cell<CELL> d)
 	{
 		CellMarkerBase<MAP, CELL>::mark(d) ;
-		m_markedCells.push_back(this->m_map.template getEmbedding<CELL>(d)) ;
+		m_markedCells->push_back(this->m_map.template getEmbedding<CELL>(d)) ;
 	}
 
 	inline void mark(unsigned int em)
 	{
 		CellMarkerBase<MAP, CELL>::mark(em) ;
-		m_markedCells.push_back(em) ;
+		m_markedCells->push_back(em) ;
 	}
 
 	inline void unmarkAll()
 	{
 		assert(this->m_markVector != NULL);
 
-		for (std::vector<unsigned int>::iterator it = m_markedCells.begin(); it != m_markedCells.end(); ++it)
+		for (std::vector<unsigned int>::iterator it = m_markedCells->begin(); it != m_markedCells->end(); ++it)
 			this->m_markVector->setFalse(*it);
 	}
 };

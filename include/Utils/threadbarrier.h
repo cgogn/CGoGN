@@ -21,62 +21,63 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#ifndef __BARRIER_THREAD__
+#define __BARRIER_THREAD__
 
-#ifndef __TRAVERSOR_DOO_H__
-#define __TRAVERSOR_DOO_H__
 
-#include "Topology/generic/dart.h"
-#include "Topology/generic/traversor/traversorGen.h"
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 
 namespace CGoGN
 {
 
-template <typename MAP, unsigned int ORBIT>
-class TraversorDartsOfOrbit //: public Traversor<MAP>
+namespace Utils
+{
+
+/**
+* Implementation of simple counter barrier (rdv)
+* for std::thread of c++11
+*/
+class Barrier
 {
 private:
-	std::vector<Dart>::iterator m_current ;
-	std::vector<Dart>* m_vd ;
-	unsigned int m_thread;
-
-	TraversorDartsOfOrbit( const TraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
-
-public:
-	TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
-
-	 ~TraversorDartsOfOrbit();
-
-	Dart begin() ;
-
-	Dart end() ;
-
-	Dart next() ;
-} ;
-
-template <typename MAP, unsigned int ORBIT>
-class VTraversorDartsOfOrbit : public Traversor
-{
-private:
-	std::vector<Dart>::iterator m_current ;
-	std::vector<Dart>* m_vd ;
-	unsigned int m_thread;
-
-	VTraversorDartsOfOrbit( const VTraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
+	unsigned int m_initCount;
+	unsigned int m_count;
+	unsigned int m_generation;
+	
+	std::mutex m_protect;
+	std::condition_variable  m_cond;
 
 public:
-	VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
 
-	~VTraversorDartsOfOrbit();
+	/**
+	* constructor
+	* @param count number of threads to syncronize
+	*/
+	inline Barrier(unsigned int count):
+		m_initCount(count), m_count(count), m_generation(0) {}
+	
+	inline bool wait()
+	{
+		std::unique_lock<std::mutex> lock(m_protect);
+		unsigned int gen = m_generation;
+		if (--m_count == 0)
+		{
+			m_generation++;
+			m_count = m_initCount;
+			m_cond.notify_all();
+			return true;
+		}
 
-	Dart begin() ;
+		while (gen == m_generation)
+			m_cond.wait(lock);
+		return false;
+	}
+};
 
-	Dart end() ;
-
-	Dart next() ;
-} ;
-
-} // namespace CGoGN
-
-#include "Topology/generic/traversor/traversorDoO.hpp"
+}
+}
 
 #endif

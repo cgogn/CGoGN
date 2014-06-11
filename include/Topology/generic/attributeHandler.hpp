@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <boost/thread.hpp>
-#include <boost/thread/barrier.hpp>
+#include "Utils/threadbarrier.h"
+
 #include <vector>
 
 namespace CGoGN
@@ -32,7 +32,7 @@ namespace CGoGN
 template <typename T, unsigned int ORBIT, typename MAP>
 inline void AttributeHandler<T, ORBIT, MAP>::registerInMap()
 {
-	boost::mutex::scoped_lock lockAH(m_map->attributeHandlersMutex);
+	std::lock_guard<std::mutex> lockAH(m_map->attributeHandlersMutex);
 	m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
 }
 
@@ -41,7 +41,7 @@ inline void AttributeHandler<T, ORBIT, MAP>::unregisterFromMap()
 {
 	typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
 
-	boost::mutex::scoped_lock lockAH(m_map->attributeHandlersMutex);
+	std::lock_guard<std::mutex> lockAH(m_map->attributeHandlersMutex);
 	std::pair<IT, IT> bounds = m_map->attributeHandlers.equal_range(m_attrib) ;
 	for(IT i = bounds.first; i != bounds.second; ++i)
 	{
@@ -276,13 +276,13 @@ class ThreadFunctionAttrib
 {
 protected:
 	std::vector<unsigned int>& m_ids;
-	boost::barrier& m_sync1;
-	boost::barrier& m_sync2;
+	Utils::Barrier& m_sync1;
+	Utils::Barrier& m_sync2;
 	bool& m_finished;
 	unsigned int m_id;
 	FUNC m_lambda;
 public:
-	ThreadFunctionAttrib(FUNC func, std::vector<unsigned int>& vid, boost::barrier& s1, boost::barrier& s2, bool& finished, unsigned int id):
+	ThreadFunctionAttrib(FUNC func, std::vector<unsigned int>& vid, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id):
 		m_ids(vid), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func)
 	{
 	}
@@ -322,18 +322,18 @@ void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbthread)
 		nb++;
 		attribute.next(attIdx);
 	}
-	boost::barrier sync1(nbth+1);
-	boost::barrier sync2(nbth+1);
+	Utils::Barrier sync1(nbth+1);
+	Utils::Barrier sync2(nbth+1);
 	bool finished=false;
 
 
-	boost::thread** threads = new boost::thread*[nbth];
+	std::thread** threads = new std::thread*[nbth];
 	ThreadFunctionAttrib<FUNC>** tfs = new ThreadFunctionAttrib<FUNC>*[nbth];
 
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		tfs[i] = new ThreadFunctionAttrib<FUNC>(func, vd[i], sync1,sync2,finished,i);
-		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
+		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
 	}
 
 	// and continue to traverse the map

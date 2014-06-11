@@ -33,7 +33,6 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <boost/thread/mutex.hpp>
 
 #include "Container/attributeContainer.h"
 #include "Container/fakeAttribute.h"
@@ -43,7 +42,8 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
 
-#include <boost/thread.hpp>
+#include <thread>
+#include <mutex>
 
 namespace CGoGN
 {
@@ -63,8 +63,8 @@ extern int NumberOfThreads;
 inline int getSystemNumberOfCores(bool hyperthreading=false)
 {
 	if (hyperthreading)
-		return boost::thread::hardware_concurrency()/2;
-	return boost::thread::hardware_concurrency();
+		return std::thread::hardware_concurrency()/2;
+	return std::thread::hardware_concurrency();
 }
 
 }
@@ -98,6 +98,10 @@ protected:
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
 	static int m_nbInstances;
 
+	// TODO RELEASE MEMORY
+	static  std::vector< std::vector<Dart>* > s_vdartsBuffers[NB_ORBITS];
+	static  std::vector< std::vector<unsigned int>* > s_vintsBuffers[NB_ORBITS];
+
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
 	 * (only initialized when necessary, i.e. addEmbedding function)
@@ -112,10 +116,8 @@ protected:
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalIncidentTraversal[NB_ORBITS][NB_ORBITS] ;
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalAdjacentTraversal[NB_ORBITS][NB_ORBITS] ;
 
-
-//	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors[NB_ORBITS] ;
 	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS][NB_THREAD] ;
-	boost::mutex m_MarkerStorageMutex[NB_ORBITS];
+	std::mutex m_MarkerStorageMutex[NB_ORBITS];
 
 	/**
 	 * Reserved boundary markers
@@ -126,7 +128,7 @@ protected:
 	 * Store links to created AttributeHandlers
 	 */
 	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!)
-	boost::mutex attributeHandlersMutex;
+	std::mutex attributeHandlersMutex;
 
 // table of instancied maps for Dart/CellMarker release
 	static std::vector<GenericMap*> s_instances;
@@ -145,6 +147,13 @@ public:
 				return true;
 		return false;
 	}
+
+	static inline std::vector<Dart>* askDartBuffer(unsigned int orbit);
+	static inline void releaseDartBuffer(std::vector<Dart>* vd, unsigned int orbit);
+
+	static inline std::vector<unsigned int>* askUIntBuffer(unsigned int orbit);
+	static inline void releaseUIntBuffer(std::vector<unsigned int>* vd, unsigned int orbit);
+
 
 protected:
 	void init();

@@ -30,6 +30,8 @@
 #include "Geometry/matrix.h"
 #include "Container/registered.h"
 
+#include <algorithm>
+
 namespace CGoGN
 {
 
@@ -41,6 +43,11 @@ int NumberOfThreads = getSystemNumberOfCores();
 
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;
+
+
+std::vector< std::vector<Dart>* > GenericMap::s_vdartsBuffers[NB_ORBITS];
+
+std::vector< std::vector<unsigned int>* > GenericMap::s_vintsBuffers[NB_ORBITS];
 
 // table of instancied maps for Dart/CellMarker release
 std::vector<GenericMap*>  GenericMap::s_instances;
@@ -83,6 +90,8 @@ GenericMap::GenericMap()
 		registerAttribute<Geom::Matrix44d>(Geom::Matrix44d::CGoGNnameOfType());
 	}
 
+
+
 	m_nbInstances++;
 	s_instances.push_back(this);
 
@@ -92,10 +101,16 @@ GenericMap::GenericMap()
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 	}
 
+	for(unsigned int i = 0; i < NB_THREAD; ++i)
+	{
+		if (s_vdartsBuffers[i].capacity()<8)
+		{
+			s_vdartsBuffers[i].reserve(8);
+			s_vintsBuffers[i].reserve(8);
+			// prealloc ?
+		}
+	}
 	init();
-
-	// boundary markers dans init ou ici ?
-	// voir avec load et copy from
 }
 
 GenericMap::~GenericMap()
@@ -121,6 +136,16 @@ GenericMap::~GenericMap()
 
 		delete m_attributes_registry_map;
 		m_attributes_registry_map = NULL;
+
+		for(unsigned int i = 0; i < NB_THREAD; ++i)
+		{
+			for (auto it =s_vdartsBuffers[i].begin(); it != s_vdartsBuffers[i].end(); ++it)
+				delete *it;
+			for (auto it =s_vintsBuffers[i].begin(); it != s_vintsBuffers[i].end(); ++it)
+				delete *it;
+		}
+
+
 	}
 
 	// remove instance for table

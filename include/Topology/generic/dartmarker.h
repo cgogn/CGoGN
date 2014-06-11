@@ -235,24 +235,26 @@ template <typename MAP>
 class DartMarkerStore : public DartMarkerTmpl<MAP>
 {
 protected:
-	std::vector<unsigned int> m_markedDarts ;
-
+	std::vector<unsigned int>* m_markedDarts ;
 public:
 	DartMarkerStore(MAP& map, unsigned int thread=0) :
 		DartMarkerTmpl<MAP>(map, thread)
 	{
-		m_markedDarts.reserve(128);
+//		m_markedDarts.reserve(128);
+		m_markedDarts = GenericMap::askUIntBuffer(thread);
 	}
 
 	DartMarkerStore(const MAP& map, unsigned int thread=0) :
 		DartMarkerTmpl<MAP>(map, thread)
 	{
-		m_markedDarts.reserve(128);
+//		m_markedDarts.reserve(128);
+		m_markedDarts = GenericMap::askUIntBuffer(thread);
 	}
 
 	virtual ~DartMarkerStore()
 	{
 		unmarkAll() ;
+		GenericMap::releaseUIntBuffer(m_markedDarts, this->m_thread);
 //		assert(isAllUnmarked) ;
 //		CGoGN_ASSERT(isAllUnmarked())
 	}
@@ -268,7 +270,7 @@ public:
 	{
 		DartMarkerTmpl<MAP>::mark(d) ;
 		unsigned int d_index = this->m_map.dartIndex(d) ;
-		m_markedDarts.push_back(d_index) ;
+		m_markedDarts->push_back(d_index) ;
 	}
 
 	template <unsigned int ORBIT>
@@ -278,13 +280,13 @@ public:
 		{
 			unsigned int d_index = this->m_map.dartIndex(d);
 			this->m_markVector->setTrue(d_index);
-			m_markedDarts.push_back(d_index);
+			m_markedDarts->push_back(d_index);
 		}) ;
 	}
 
 	inline void unmarkAll()
 	{
-			for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
+			for (std::vector<unsigned int>::iterator it = m_markedDarts->begin(); it != m_markedDarts->end(); ++it)
 			this->m_markVector->setFalse(*it);
 	}
 } ;
