@@ -664,10 +664,10 @@ void computeCurvatureVertices_NormalCycles(
 	if (!map.template isOrbitEmbedded<FACE>())
 		Algo::Topo::initAllOrbitsEmbedding<FACE>(map);
 
-	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	CGoGN::Parallel::foreach_cell<VERTEX>(map, [&] (Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
-	},FORCE_CELL_MARKING);
+	}, FORCE_CELL_MARKING);
 }
 
 template <typename PFP>
@@ -693,13 +693,11 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	if (!map.template isOrbitEmbedded<FACE>())
 		Algo::Topo::initAllOrbitsEmbedding<FACE>(map);
 
-	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	CGoGN::Parallel::foreach_cell<VERTEX>(map, [&] (Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles_Projected<PFP>(map, v, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal, threadID) ;
-	},FORCE_CELL_MARKING);
+	}, FORCE_CELL_MARKING);
 }
-
-
 
 template <typename PFP>
 void computeCurvatureVertices_QuadraticFitting(
@@ -711,10 +709,10 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin)
 {
-	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int threadID)
+	CGoGN::Parallel::foreach_cell<VERTEX>(map, [&] (Vertex v, unsigned int threadID)
 	{
 		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin, threadID) ;
-	},FORCE_CELL_MARKING);
+	}, FORCE_CELL_MARKING);
 
 }
 

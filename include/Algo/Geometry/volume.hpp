@@ -126,17 +126,16 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const V
 template <typename PFP>
 typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int thread)
 {
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
 	{
-		return Parallel::totalVolume<PFP>(map,position);
+		return Parallel::totalVolume<PFP>(map, position);
 	}
-
 
 	double vol = 0.0 ;
 
 	TraversorW<typename PFP::MAP> t(map, thread) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		vol += convexPolyhedronVolume<PFP>(map, d, position,thread) ;
+		vol += convexPolyhedronVolume<PFP>(map, d, position, thread) ;
 	return typename PFP::REAL(vol) ;
 }
 
@@ -148,10 +147,10 @@ template <typename PFP>
 typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	// allocate a vector of 1 accumulator for each thread
-	std::vector<typename PFP::REAL> vols(CGoGN::Parallel::NumberOfThreads-1,0.0);
+	std::vector<typename PFP::REAL> vols(CGoGN::Parallel::NumberOfThreads-1, 0.0);
 
 	// foreach volume
-	CGoGN::Parallel::foreach_cell<VOLUME>(map,[&](Vol v, unsigned int thr)
+	CGoGN::Parallel::foreach_cell<VOLUME>(map, [&] (Vol v, unsigned int thr)
 	{
 		// add volume to the thread accumulator
 		vols[thr-1] += convexPolyhedronVolume<PFP>(map, v, position, thr) ;

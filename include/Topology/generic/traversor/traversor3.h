@@ -361,7 +361,7 @@ inline void foreach_incident3(MAP& map, Cell<ORBIT_FROM> c, FUNC f, bool forceDa
 
 
 template <unsigned int THRU, unsigned int ORBIT, typename MAP, typename FUNC>
-inline void foreach_adjacent3( MAP& map, Cell<ORBIT> c, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
+inline void foreach_adjacent3(MAP& map, Cell<ORBIT> c, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
 	Traversor3XXaY<MAP,ORBIT,THRU> trav(const_cast<const MAP&>(map),c,forceDartMarker,thread);
 	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())

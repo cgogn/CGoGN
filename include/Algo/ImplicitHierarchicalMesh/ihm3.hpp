@@ -361,13 +361,13 @@ inline void ImplicitHierarchicalMap3::foreach_dart_of_volume(Dart d, FUNC& f, un
 }
 
 template <typename FUNC>
-inline void ImplicitHierarchicalMap3::foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread) const
+inline void ImplicitHierarchicalMap3::foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	f(d);
 }
 
 template <typename FUNC>
-inline void ImplicitHierarchicalMap3::foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread) const
+inline void ImplicitHierarchicalMap3::foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	f(d);
 }
