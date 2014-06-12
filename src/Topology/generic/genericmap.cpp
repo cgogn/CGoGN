@@ -41,16 +41,18 @@ namespace Parallel
 int NumberOfThreads = getSystemNumberOfCores();
 }
 
+
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
+
 int GenericMap::m_nbInstances = 0;
 
+std::vector< std::vector<Dart>* >* GenericMap::s_vdartsBuffers = NULL;
 
-std::vector< std::vector<Dart>* > GenericMap::s_vdartsBuffers[NB_ORBITS];
+std::vector< std::vector<unsigned int>* >* GenericMap::s_vintsBuffers = NULL;
 
-std::vector< std::vector<unsigned int>* > GenericMap::s_vintsBuffers[NB_ORBITS];
+std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
 
-// table of instancied maps for Dart/CellMarker release
-std::vector<GenericMap*>  GenericMap::s_instances;
+
 
 GenericMap::GenericMap()
 {
@@ -93,7 +95,23 @@ GenericMap::GenericMap()
 
 
 	m_nbInstances++;
-	s_instances.push_back(this);
+	if (s_instances==NULL)
+		s_instances= new std::vector<GenericMap*>;
+
+	s_instances->push_back(this);
+
+	if (s_vdartsBuffers == NULL)
+	{
+		s_vdartsBuffers = new std::vector< std::vector<Dart>* >[NB_THREAD];
+		s_vintsBuffers = new std::vector< std::vector<unsigned int>* >[NB_THREAD];
+		for(unsigned int i = 0; i < NB_THREAD; ++i)
+		{
+			s_vdartsBuffers[i].reserve(8);
+			s_vintsBuffers[i].reserve(8);
+				// prealloc ?
+		}
+	}
+
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
@@ -101,15 +119,6 @@ GenericMap::GenericMap()
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 	}
 
-	for(unsigned int i = 0; i < NB_THREAD; ++i)
-	{
-		if (s_vdartsBuffers[i].capacity()<8)
-		{
-			s_vdartsBuffers[i].reserve(8);
-			s_vintsBuffers[i].reserve(8);
-			// prealloc ?
-		}
-	}
 	init();
 }
 
@@ -148,8 +157,10 @@ GenericMap::~GenericMap()
 
 	}
 
-	// remove instance for table
-	std::remove (s_instances.begin(), s_instances.end(), this); 
+	// remove instance of table
+	auto it = std::find(s_instances->begin(), s_instances->end(), this);
+	*it = s_instances->back();
+	s_instances->pop_back();
 }
 
 void GenericMap::init()

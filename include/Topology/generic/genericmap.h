@@ -98,9 +98,13 @@ protected:
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
 	static int m_nbInstances;
 
-	// TODO RELEASE MEMORY
-	static  std::vector< std::vector<Dart>* > s_vdartsBuffers[NB_ORBITS];
-	static  std::vector< std::vector<unsigned int>* > s_vintsBuffers[NB_ORBITS];
+	// buffer for less memory allocation
+	static  std::vector< std::vector<Dart>* >* s_vdartsBuffers;
+	static  std::vector< std::vector<unsigned int>* >* s_vintsBuffers;
+
+	// table of instancied maps for Dart/CellMarker release
+	static std::vector<GenericMap*>* s_instances;
+
 
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
@@ -130,9 +134,6 @@ protected:
 	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!)
 	std::mutex attributeHandlersMutex;
 
-// table of instancied maps for Dart/CellMarker release
-	static std::vector<GenericMap*> s_instances;
-
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
@@ -142,9 +143,11 @@ public:
 
 	static inline bool alive(GenericMap* map)
 	{
-		for (auto it=s_instances.begin(); it != s_instances.end(); ++it)
+		for (auto it=s_instances->begin(); it != s_instances->end(); ++it)
+		{
 			if (*it == map)
 				return true;
+		}
 		return false;
 	}
 
