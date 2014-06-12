@@ -27,7 +27,6 @@
 #include "Topology/generic/traversor/traversor2.h"
 #include "Topology/generic/traversor/traversorCell.h"
 #include "Topology/generic/traversor/traversor3.h"
-#include "Algo/Parallel/parallel_foreach.h"
 
 namespace CGoGN
 {

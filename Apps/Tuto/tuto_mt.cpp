@@ -39,8 +39,6 @@
 //#include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Tiling/Surface/square.h"
 
-#include "Algo/Parallel/parallel_foreach.h"
-
 #include "Utils/cgognStream.h"
 #include "Utils/chrono.h"
 
