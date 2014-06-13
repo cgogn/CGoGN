@@ -226,7 +226,16 @@ AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector(unsigned int thread)
 	else
 	{
 		std::lock_guard<std::mutex> lockMV(m_MarkerStorageMutex[ORBIT]);
-		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("") ;
+
+		unsigned int x=m_nextMarkerId++;
+		std::string number("___");
+		number[2]= '0'+x%10;
+		x = x/10;
+		number[1]= '0'+x%10;
+		x = x/10;
+		number[0]= '0'+x%10;
+
+		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("marker_" + orbitName(ORBIT) + number);
 		return amv;
 	}
 }

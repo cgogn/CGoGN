@@ -54,7 +54,8 @@ std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
 
 
 
-GenericMap::GenericMap()
+GenericMap::GenericMap():
+	m_nextMarkerId(0)
 {
 	if(m_attributes_registry_map == NULL)
 	{
@@ -90,6 +91,8 @@ GenericMap::GenericMap()
 
 		registerAttribute<Geom::Matrix33d>(Geom::Matrix33d::CGoGNnameOfType());
 		registerAttribute<Geom::Matrix44d>(Geom::Matrix44d::CGoGNnameOfType());
+
+		registerAttribute<MarkerBool>("MarkerBool");
 	}
 
 
@@ -163,7 +166,7 @@ GenericMap::~GenericMap()
 	s_instances->pop_back();
 }
 
-void GenericMap::init()
+void GenericMap::init(bool addBoundaryMarkers)
 {
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
@@ -178,8 +181,12 @@ void GenericMap::init()
 		}
 	}
 
-	m_boundaryMarkers[0] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark0") ;
-	m_boundaryMarkers[1] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark1") ;
+	if (addBoundaryMarkers)
+	{
+		m_boundaryMarkers[0] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark0") ;
+		m_boundaryMarkers[1] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark1") ;
+	}
+
 
 	 for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 		(*it).second->setInvalid() ;

@@ -136,8 +136,8 @@ bool MapMono::copyFrom(const GenericMap& map)
 		return false;
 	}
 
-	GenericMap::clear(true);
-	// add same thread markers than in map (1 in clear)
+	// clear the map but do not insert boundary markers dart attribute
+	GenericMap::init(false);
 
 	// copy attrib containers
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)

@@ -323,7 +323,9 @@ bool MapMulti::copyFrom(const GenericMap& map)
 		return false;
 	}
 
-	GenericMap::clear(true);
+	// clear the map but do not insert boundary markers dart attribute
+	GenericMap::init(false);
+
 
 	// load attrib container
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)

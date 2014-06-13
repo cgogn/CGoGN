@@ -35,3 +35,10 @@ add_executable( Geom_intersectionD ./Geom_intersection.cpp)
 target_link_libraries( Geom_intersectionD
 	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
 
+add_executable( loadSave ./loadSave.cpp)
+target_link_libraries( loadSave
+	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+
+add_executable( copyfrom ./copyfrom.cpp)
+target_link_libraries( copyfrom
+	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})

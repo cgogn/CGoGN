@@ -123,6 +123,8 @@ protected:
 	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS][NB_THREAD] ;
 	std::mutex m_MarkerStorageMutex[NB_ORBITS];
 
+	unsigned int m_nextMarkerId;
+
 	/**
 	 * Reserved boundary markers
 	 */
@@ -159,7 +161,7 @@ public:
 
 
 protected:
-	void init();
+	void init(bool addBoundaryMarkers=true);
 
 public:
 	virtual std::string mapTypeName() const = 0 ;
