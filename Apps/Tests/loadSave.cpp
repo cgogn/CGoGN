@@ -28,6 +28,7 @@
 #include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Geometry/volume.h"
 
+
 using namespace CGoGN ;
 
 /**
@@ -64,18 +65,36 @@ int main()
 		color[w] = position[w.dart] + VEC3(0.5,0.5,0.5);
 	});
 
-	MAP myMap2;
-
 	CGoGNout.toStd(false);
-	CGoGNout.toFile("map1.csv");
+	CGoGNout.toFile("ls_map1.csv");
 	myMap.dumpCSV();
+	std::cout << "MAP 1 dumped in ls_map1.csv"<< std::endl;
 
-	myMap2.copyFrom(myMap);
+	myMap.saveMapBin("ls_pipo.map");
 
-	CGoGNout.toFile("map2.csv");
+	MAP myMap2;
+	VertexAttribute<VEC3, MAP> position2 = myMap2.addAttribute<VEC3, VERTEX, MAP>("position");
+	CellMarker<MAP,VERTEX> cm(myMap2);
+
+	myMap2.loadMapBin("ls_pipo.map");
+
+	if (!position2.isValid())
+	{
+		std::cout << "Attribute handlers are invalid after load or copy, get it agin"<< std::endl;
+		// get it again (here attribute created in load)
+		position2 = myMap2.getAttribute<VEC3, VERTEX, MAP>("position");
+	}
+
+	CGoGNout.toFile("ls_map2.csv");
 	myMap2.dumpCSV();
+	std::cout << "MAP 2 dumped in ls_map2.csv"<< std::endl;
 
-	std::cout << " Volume Total =" << Algo::Geometry::totalVolume<PFP>(myMap2, position)<< std::endl;
+
+	cm.update();
+	if (cm.isMarked(myMap2.begin()))
+		std::cout << "MARKED"<< std::endl;
+
+	std::cout << " Volume Total =" << Algo::Geometry::totalVolume<PFP>(myMap2, position2)<< std::endl;
 
 	return 0;
 }

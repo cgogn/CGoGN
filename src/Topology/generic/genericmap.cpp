@@ -179,7 +179,11 @@ void GenericMap::init(bool addBoundaryMarkers)
 			m_quickLocalIncidentTraversal[i][j] = NULL ;
 			m_quickLocalAdjacentTraversal[i][j] = NULL ;
 		}
+
+		for(unsigned int j = 0; j < NB_THREAD; ++j)
+			m_markVectors_free[i][j].clear();
 	}
+
 
 	if (addBoundaryMarkers)
 	{

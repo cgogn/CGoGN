@@ -128,13 +128,13 @@ bool MapMono::loadMapBin(const std::string& filename)
 
 bool MapMono::copyFrom(const GenericMap& map)
 {
-	const MapMono& mapM = reinterpret_cast<const MapMono&>(map);
-
 	if (mapTypeName() != map.mapTypeName())
 	{
 		CGoGNerr << "try to copy from incompatible type map" << CGoGNendl;
 		return false;
 	}
+
+	const MapMono& mapM = reinterpret_cast<const MapMono&>(map);
 
 	// clear the map but do not insert boundary markers dart attribute
 	GenericMap::init(false);

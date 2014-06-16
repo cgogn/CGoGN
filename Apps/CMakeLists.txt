@@ -33,7 +33,7 @@ IF (WITH_QT)
 	ENDIF (NOT DONOT_COMPILE_SANDBOX)
 ENDIF (WITH_QT)
 
-add_subdirectory(Examples/Tests)
+add_subdirectory(Tests)
 
 add_subdirectory(Benches)
 

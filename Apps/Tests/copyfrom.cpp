@@ -28,7 +28,6 @@
 #include "Algo/Tiling/Volume/cubic.h"
 #include "Algo/Geometry/volume.h"
 
-
 using namespace CGoGN ;
 
 /**
@@ -66,20 +65,36 @@ int main()
 	});
 
 	CGoGNout.toStd(false);
-	CGoGNout.toFile("map1.csv");
+	CGoGNout.toFile("cf_map1.csv");
 	myMap.dumpCSV();
-
-	myMap.saveMapBin("pipo.map");
+	std::cout << "MAP 1 dumped in cf_map1.csv"<< std::endl;
 
 	MAP myMap2;
+	VertexAttribute<VEC3, MAP> position2 = myMap2.addAttribute<VEC3, VERTEX, MAP>("position");
+	DartMarker<MAP> dm(myMap2);
 
-	myMap2.loadMapBin("pipo.map");
+	myMap2.copyFrom(myMap);
 
-	CGoGNout.toFile("map2.csv");
+	CGoGNout.toFile("cf_map2.csv");
 	myMap2.dumpCSV();
+	std::cout << "MAP 2 dumped in cf_map2.csv"<< std::endl;
 
-	std::cout << " Volume Total =" << Algo::Geometry::totalVolume<PFP>(myMap2, position)<< std::endl;
+	// DartMarker and CellMarker must be updated after copy
+	dm.update();
+	dm.markOrbit<FACE>(myMap2.begin());
 
+	if (!position2.isValid())
+	{
+		std::cout << "Attribute handlers are invalid after load or copy,  get it agins"<< std::endl;
+		// get it again (here attribute created in load)
+		position2 = myMap2.getAttribute<VEC3, VERTEX, MAP>("position");
+	}
+
+	CGoGNout.toFile("cf_map3.csv");
+	myMap2.dumpCSV();
+	std::cout << "MAP 2 dumped in cf_map3.csv"<< std::endl;
+
+	std::cout << " Volume Total =" << Algo::Geometry::totalVolume<PFP>(myMap2, position2)<< std::endl;
 
 	return 0;
 }

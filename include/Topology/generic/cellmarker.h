@@ -57,8 +57,6 @@ public:
 
 	unsigned int getCell() { return m_cell ; }
 
-	void updateMarkVector(AttributeMultiVector<MarkerBool>* amv) { m_markVector = amv ; }
-
 protected:
 	// protected copy constructor to forbid its usage
 	CellMarkerGen(const CellMarkerGen& /*cm*/)
