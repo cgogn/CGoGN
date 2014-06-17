@@ -69,9 +69,9 @@ Approximator<PFP,T,ORBIT>::~Approximator()
 //	std::cout << "Approximator<PFP,T,ORBIT>::~Approximator()" << std::endl ;
 	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
 	{
-		this->m_map.template removeAttribute(m_approx[i]) ;
+		this->m_map.removeAttribute(m_approx[i]) ;
 		if(m_predictor)
-			this->m_map.template removeAttribute(m_detail[i]) ;
+			this->m_map.removeAttribute(m_detail[i]) ;
 	}
 }
 

@@ -288,7 +288,7 @@ public:
 	*/
 	void overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id)
 	{
-		bool b = m_tableData[src_b][src_id/32] & (1 << (src_id%32));
+		bool b = (m_tableData[src_b][src_id/32] & (1 << (src_id%32))) != 0;
 
 		unsigned int mask = 1 << (dst_id%32);
 

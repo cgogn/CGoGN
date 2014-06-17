@@ -54,7 +54,7 @@ int main()
 
 	// add position attribute on vertices and get handler on it
 	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
-	constexpr int nb = 2;
+	const int nb = 2;
 	Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
 	cubic.embedIntoGrid(position, 10.0f, 10.0f, 10.0f);
 
