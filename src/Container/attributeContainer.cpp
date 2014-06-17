@@ -661,7 +661,22 @@ void AttributeContainer::removeLine(unsigned int index)
 
 void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id) const
 {
-	// en ascii id et taille les tailles
+	std::vector<AttributeMultiVectorGen*> bufferamv;
+	bufferamv.reserve(m_tableAttribs.size());
+
+	for(std::vector<AttributeMultiVectorGen*>::const_iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
+	{
+		if (*it != NULL)
+		{
+			const std::string& attName = (*it)->getName();
+			std::string markName = attName.substr(0,7);
+			if (markName != "marker_")
+				bufferamv.push_back(*it);
+		}
+	}
+
+
+	// en ascii id et les tailles
 
 	std::vector<unsigned int> bufferui;
 	bufferui.reserve(10);
@@ -670,20 +685,27 @@ void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id) const
 	bufferui.push_back(_BLOCKSIZE_);
 	bufferui.push_back(m_holesBlocks.size());
 	bufferui.push_back(m_tableBlocksWithFree.size());
-	bufferui.push_back(m_nbAttributes);
+//	bufferui.push_back(m_nbAttributes);
+	bufferui.push_back(bufferamv.size());
 	bufferui.push_back(m_size);
 	bufferui.push_back(m_maxSize);
 	bufferui.push_back(m_orbit);
 	bufferui.push_back(m_nbUnknown);
 
+
 	fs.write(reinterpret_cast<const char*>(&bufferui[0]), bufferui.size()*sizeof(unsigned int));
 
 	unsigned int i = 0;
 
-	for(std::vector<AttributeMultiVectorGen*>::const_iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
+	for(std::vector<AttributeMultiVectorGen*>::const_iterator it = bufferamv.begin(); it != bufferamv.end(); ++it)
 	{
 		if (*it != NULL)
-			(*it)->saveBin(fs, i++);
+		{
+			const std::string& attName = (*it)->getName();
+			std::string markName = attName.substr(0,7);
+			if (markName != "marker_")
+				(*it)->saveBin(fs, i++);
+		}
 		else
 		{
 			CGoGNerr << "PB saving, NULL ptr in m_tableAttribs" <<  CGoGNendl;

@@ -61,11 +61,6 @@ protected:
 	 */
 	unsigned int m_index;
 
-	/**
-	 * Process or not the attribute in arithmetic operations
-	 */
-	bool m_toProcess;
-
 public:
 	AttributeMultiVectorGen(const std::string& strName, const std::string& strType);
 

@@ -42,3 +42,7 @@ target_link_libraries( loadSave
 add_executable( copyfrom ./copyfrom.cpp)
 target_link_libraries( copyfrom
 	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+
+add_executable( movefrom ./movefrom.cpp)
+target_link_libraries( movefrom
+	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})

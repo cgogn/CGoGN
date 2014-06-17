@@ -128,6 +128,7 @@ bool MapMono::loadMapBin(const std::string& filename)
 
 bool MapMono::copyFrom(const GenericMap& map)
 {
+
 	if (mapTypeName() != map.mapTypeName())
 	{
 		CGoGNerr << "try to copy from incompatible type map" << CGoGNendl;
@@ -142,6 +143,8 @@ bool MapMono::copyFrom(const GenericMap& map)
 	// copy attrib containers
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_attribs[i].copyFrom(mapM.m_attribs[i]);
+
+	GenericMap::garbageMarkVectors();
 
 	// restore shortcuts
 	GenericMap::restore_shortcuts();

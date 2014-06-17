@@ -402,6 +402,14 @@ int main(int argc, char **argv)
 		else
 		{
 */
+
+		if(extension == std::string(".map"))
+		{
+			myMap.loadMapBin(filename);
+			position = myMap.getAttribute<VEC3, VERTEX,MAP>("position") ;
+		}
+		else
+		{
 			if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
 			{
 				std::cerr << "could not import " << filename << std::endl ;
@@ -409,9 +417,9 @@ int main(int argc, char **argv)
 			}
 			else
 				position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
-//		}
+		}
 
-		color = myMap.addAttribute<VEC3, VOLUME, MAP>("color");
+		color = myMap.addAttribute<VEC3, VOLUME, MAP>("colorVol");
 
 		TraversorCell<MAP, VOLUME> tra(myMap);
 		float maxV = 0.0f;

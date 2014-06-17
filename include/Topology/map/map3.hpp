@@ -1803,7 +1803,20 @@ void Map3<MAP_IMPL>::computeDualTest()
 //			//deleteVolume(d);
 //		}
 //	}
-
 }
+
+
+template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::moveFrom(Map2<MAP_IMPL>& mapf)
+{
+	GenericMap::moveData(mapf);
+	MAP_IMPL::removeLastInvolutionPtr();
+	MAP_IMPL::addInvolution() ;
+	MAP_IMPL::restore_topo_shortcuts() ;
+	GenericMap::garbageMarkVectors();
+
+	closeMap();
+}
+
 
 } // namespace CGoGN

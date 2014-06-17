@@ -26,11 +26,10 @@ namespace CGoGN
 {
 
 inline AttributeMultiVectorGen::AttributeMultiVectorGen(const std::string& strName, const std::string& strType):
-	m_attrName(strName), m_typeName(strType), m_toProcess(true)
+	m_attrName(strName), m_typeName(strType)
 {}
 
-inline AttributeMultiVectorGen::AttributeMultiVectorGen():
-	m_toProcess(true)
+inline AttributeMultiVectorGen::AttributeMultiVectorGen()
 {}
 
 inline AttributeMultiVectorGen::~AttributeMultiVectorGen()

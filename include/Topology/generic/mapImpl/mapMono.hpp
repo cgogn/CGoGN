@@ -90,6 +90,11 @@ inline void MapMono::addInvolution()
 	m_involution.push_back(addRelation(sstm.str()));
 }
 
+inline void MapMono::removeLastInvolutionPtr()
+{
+	m_involution.pop_back();
+}
+
 inline void MapMono::addPermutation()
 {
 	std::stringstream sstm;

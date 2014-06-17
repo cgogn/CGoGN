@@ -471,4 +471,85 @@ void GenericMap::dumpCSV() const
 	CGoGNout << CGoGNendl;
 }
 
+
+void GenericMap::moveData(GenericMap &mapf)
+{
+	GenericMap::init(false);
+
+	for (unsigned int i=0; i<NB_ORBITS; ++i)
+	{
+		this->m_attribs[i].swap(mapf.m_attribs[i]);
+		this->m_embeddings[i] = mapf.m_embeddings[i];
+		this->m_quickTraversal[i] = mapf.m_quickTraversal[i];
+		mapf.m_embeddings[i] = NULL ;
+		mapf.m_quickTraversal[i] = NULL;
+
+		for (unsigned int j=0; j<NB_ORBITS; ++j)
+		{
+			this->m_quickLocalIncidentTraversal[i][j] = mapf.m_quickLocalIncidentTraversal[i][j];
+			this->m_quickLocalAdjacentTraversal[i][j] = mapf.m_quickLocalAdjacentTraversal[i][j];
+			mapf.m_quickLocalIncidentTraversal[i][j] = NULL ;
+			mapf.m_quickLocalAdjacentTraversal[i][j] = NULL ;
+		}
+
+		for (unsigned int j=0; j<NB_THREAD; ++j)
+			this->m_markVectors_free[i][j].swap(mapf.m_markVectors_free[i][j]);
+	}
+
+	this->m_boundaryMarkers[0] = mapf.m_boundaryMarkers[0];
+	this->m_boundaryMarkers[1] = mapf.m_boundaryMarkers[1];
+
+	this->m_nextMarkerId = mapf.m_nextMarkerId;
+
+	for(auto it = mapf.attributeHandlers.begin(); it != mapf.attributeHandlers.end(); ++it)
+	   (*it).second->setInvalid() ;
+	mapf.attributeHandlers.clear() ;
+
+}
+
+
+void GenericMap::garbageMarkVectors()
+{
+	unsigned int maxId=0;
+
+	for (unsigned int orbit=0; orbit<NB_ORBITS;++orbit)
+	{
+		std::vector<std::string> attNames;
+		m_attribs[orbit].getAttributesNames(attNames);
+		for (auto sit=attNames.begin(); sit!=attNames.end();++sit)
+		{
+			if (sit->substr(0,7) == "marker_")
+			{
+				std::string num = sit->substr(sit->length()-3,3);
+				unsigned int id = 100*(num[0]-'0')+10*(num[1]-'0')+(num[2]-'0');
+				if (id > maxId)
+					maxId = id;
+				AttributeMultiVector<MarkerBool>* amv = m_attribs[orbit].getDataVector<MarkerBool>(*sit);
+				amv->allFalse();
+				m_markVectors_free[orbit][0].push_back(amv);
+			}
+		}
+	}
+	m_nextMarkerId = maxId+1;
+}
+
+void GenericMap::removeMarkVectors()
+{
+	for (unsigned int orbit=0; orbit<NB_ORBITS;++orbit)
+	{
+		std::vector<std::string> attNames;
+		m_attribs[orbit].getAttributesNames(attNames);
+		for (auto sit=attNames.begin(); sit!=attNames.end();++sit)
+		{
+			if (sit->substr(0,7) == "marker_")
+			{
+				m_attribs[orbit].removeAttribute<MarkerBool>(*sit);
+			}
+		}
+	}
+	m_nextMarkerId = 0;
+}
+
+
+
 } // namespace CGoGN

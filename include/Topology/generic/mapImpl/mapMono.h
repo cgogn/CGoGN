@@ -73,6 +73,7 @@ public:
 protected:
 	inline void addInvolution();
 	inline void addPermutation();
+	inline void removeLastInvolutionPtr(); // for moveFrom
 
 	inline AttributeMultiVector<Dart>* getInvolutionAttribute(unsigned int i);
 	inline AttributeMultiVector<Dart>* getPermutationAttribute(unsigned int i);

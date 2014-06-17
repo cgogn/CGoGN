@@ -519,6 +519,13 @@ public:
 
 	void computeDualTest();
 	//@}
+
+	/**
+	 * @brief move all data from a map2 in a map3
+	 * @param mapf the input map2 (which will be empty after)
+	 */
+	void moveFrom(Map2<MAP_IMPL>& mapf);
+
 };
 
 } // namespace CGoGN

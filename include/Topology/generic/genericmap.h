@@ -133,7 +133,7 @@ protected:
 	/**
 	 * Store links to created AttributeHandlers
 	 */
-	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!)
+	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
 	std::mutex attributeHandlersMutex;
 
 public:
@@ -300,6 +300,17 @@ public:
 	template <unsigned int ORBIT>
 	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread=0);
 
+protected:
+	/**
+	 * @brief scan attributes for MarkerBool, clean them and store as free in thread 0
+	 */
+	void garbageMarkVectors();
+
+	/**
+	 * @brief scan attributes for MarkerBool and remove them
+	 */
+	void removeMarkVectors();
+public:
 
 	/**
 	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
@@ -426,6 +437,13 @@ public:
 	 * @brief dump all attributes of map in CSV format  (; separated columns)
 	 */
 	void dumpCSV() const;
+
+public:
+	/**
+	 * @brief move data (container && shortcuts from a map to this map
+	 * @param mapf map from which data are moved);
+	 */
+	void moveData(GenericMap &mapf);
 } ;
 
 
