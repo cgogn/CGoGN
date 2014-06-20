@@ -80,7 +80,7 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const VertexAttribute<typen
 	{
 		area += convexFaceArea<PFP>(map, f, position);
 	}
-	,false,thread);
+	,AUTO,thread);
 	return area ;
 
 }

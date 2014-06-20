@@ -46,3 +46,7 @@ target_link_libraries( copyfrom
 add_executable( movefrom ./movefrom.cpp)
 target_link_libraries( movefrom
 	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+
+add_executable( compact ./compact.cpp)
+target_link_libraries( compact
+	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})

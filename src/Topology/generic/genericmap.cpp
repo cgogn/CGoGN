@@ -427,8 +427,8 @@ void GenericMap::dumpAttributesAndMarkers()
 void GenericMap::compact()
 {
 	// compact embedding attribs
-	std::vector< std::vector<unsigned int>* > oldnews;
-	oldnews.resize(NB_ORBITS);
+	std::vector< std::vector<unsigned int>* > oldnews(NB_ORBITS,NULL);
+
 	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
@@ -455,8 +455,8 @@ void GenericMap::compact()
 
 	// delete allocated vectors
 	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
-			delete[] oldnews[orbit];
+		if (oldnews[orbit] != NULL)
+			delete oldnews[orbit];
 
 	// compact topo (depends on map implementation)
 	compactTopo();
