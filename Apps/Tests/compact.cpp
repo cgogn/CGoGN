@@ -107,8 +107,8 @@ int main()
 	myMap.dumpCSV();
 	std::cout << "MAP with holes dumped in compact_before.csv"<< std::endl;
 
-	std::cout << "Total area "<< Algo::Surface::Geometry::totalArea<PFP2>(myMap,position)<< std::endl;
 
+std::cout << "Total area before simplif "<< Algo::Surface::Geometry::totalArea<PFP2>(myMap,position)<< std::endl;
 
 	myMap.compact();
 
@@ -116,7 +116,7 @@ int main()
 	myMap.dumpCSV();
 	std::cout << "Compacted MAP dumped in compact_after.csv"<< std::endl;
 
-	std::cout << "Total area "<< Algo::Surface::Geometry::totalArea<PFP2>(myMap,position)<< std::endl;
+	std::cout << "Total area after simplif"<< Algo::Surface::Geometry::totalArea<PFP2>(myMap,position)<< std::endl;
 
 	myMap.saveMapBin("compacted_map2.map");
 

@@ -213,99 +213,66 @@ void AttributeContainer::clear(bool removeAttrib)
 
 void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 {
-	unsigned int nbe = _BLOCKSIZE_ * m_holesBlocks.size();
-
-	unsigned int nbb = m_holesBlocks.size() - 1;
-	while ((m_holesBlocks[nbb])->empty())
-	{
-		--nbb;
-		nbe -= _BLOCKSIZE_;
-	}
-	++nbb;
-
 	mapOldNew.clear();
-	mapOldNew.reserve(nbe);
+	mapOldNew.resize(realEnd(),0xffffffff);
 
-	// now get the holes
-	unsigned int baseAdr = 0;
-	for (unsigned int i = 0; i < nbb; ++i)
+	// fill the holes with data & create the map Old->New
+	unsigned int up = realRBegin();
+	unsigned int down = 0;
+
+	while (down < up)
 	{
-		HoleBlockRef* block = m_holesBlocks[i];
-
-		for (unsigned int j = 0; j < _BLOCKSIZE_; ++j)
+		if (!used(down))
 		{
-			if (j < block->sizeTable())
-			{
-				if (block->used(j))
-					mapOldNew.push_back(baseAdr);
-				else
-					mapOldNew.push_back(0xffffffff);
-			}
-			else
-				mapOldNew.push_back(0xffffffff);
-			baseAdr++;
+			mapOldNew[up] = down;
+			// copy data
+			copyLine(down,up);
+			// copy ref counter
+			setNbRefs(down,getNbRefs(up));
+			// set next element to catch for hole filling
+			realRNext(up);
 		}
+		down++;
 	}
 
-	unsigned int last = mapOldNew.size() - 1;
+	// end of table = nb elements
+	m_maxSize = m_size;
 
- 	for (unsigned int i = 0 ; i < last; ++i)
-	{
-		unsigned int val = mapOldNew[i];
-		if (val == 0xffffffff)
-		{
-			// first find last element
-			while (mapOldNew[last] == 0xffffffff)
-				--last;
+	// no more blocks empty
+	m_tableBlocksEmpty.clear();
 
-			// store it in the hole
-			// find the blocks and indices
-			unsigned int bi = i / _BLOCKSIZE_;
-			unsigned int ib = i % _BLOCKSIZE_;
-			unsigned int bj = last / _BLOCKSIZE_;
-			unsigned int jb = last % _BLOCKSIZE_;
-
-			//overwrite attributes
-			for(unsigned int j = 0; j < m_tableAttribs.size(); ++j)
-			{
-				if (m_tableAttribs[j] != NULL)
-					m_tableAttribs[j]->overwrite(bj, jb, bi, ib);
-			}
-
-			// overwrite emptyLine with last line in free blocks
-			m_holesBlocks[bi]->overwrite(ib, m_holesBlocks[bj], jb);
-
-			// set the map value
-			mapOldNew[last] = i;
-			--last;
-		}
-	}
-
-	for (int i = m_holesBlocks.size() - 1; i >= 0; --i)
-	{
-		HoleBlockRef* ptr = m_holesBlocks[i];
-		if (ptr->compressFree())
-		{
-			delete ptr;
-			m_holesBlocks.pop_back();
-		}
-	}
-
-	// maj de la table de block libre
+	// only the last block has free indices
 	m_tableBlocksWithFree.clear();
-	HoleBlockRef* block = m_holesBlocks.back();
-	if (!block->full())
-		m_tableBlocksWithFree.push_back(m_holesBlocks.size() - 1);
 
-	// detruit les blocks de donnees inutiles
+	// compute nb block full
+	unsigned int nbb = m_size / _BLOCKSIZE_;
+	// update holeblock
+	for (unsigned int i=0; i<nbb; ++i)
+		m_holesBlocks[i]->compressFull(_BLOCKSIZE_);
+
+	//update last holeblock
+	unsigned int nbe = m_size % _BLOCKSIZE_;
+	if (nbe != 0)
+	{
+		m_holesBlocks[nbb]->compressFull(nbe);
+		m_tableBlocksWithFree.push_back(nbb);
+		nbb++;
+	}
+
+	// free memory and resize
+	for (int i = m_holesBlocks.size() - 1; i > nbb; --i)
+		delete m_holesBlocks[i];
+	m_holesBlocks.resize(nbb);
+
+
+	// release unused data memory
 	for(unsigned int j = 0; j < m_tableAttribs.size(); ++j)
 	{
 		if (m_tableAttribs[j] != NULL)
 			m_tableAttribs[j]->setNbBlocks(m_holesBlocks.size());
 	}
-
-	m_maxSize = (m_holesBlocks.back())->sizeTable() + (m_holesBlocks.size() - 1) * _BLOCKSIZE_;
 }
+
 
 /**************************************
  *          LINES MANAGEMENT          *

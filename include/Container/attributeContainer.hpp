@@ -224,7 +224,7 @@ inline unsigned int AttributeContainer::memorySize() const
 
 inline bool AttributeContainer::used(unsigned int index) const
 {
-	return m_holesBlocks[index / _BLOCKSIZE_]->used(index % _BLOCKSIZE_);
+	return m_holesBlocks[index / _BLOCKSIZE_]->used(index % _BLOCKSIZE_) != 0;
 }
 
 /**************************************
@@ -294,6 +294,31 @@ inline void AttributeContainer::realNext(unsigned int &it) const
 		++it;
 	} while ((it < m_maxSize) && (!used(it)));
 }
+
+
+inline unsigned int AttributeContainer::realRBegin() const
+{
+	unsigned int it = m_maxSize-1;
+	while ((it != 0xffffffff) && (!used(it)))
+		--it;
+	return it;
+}
+
+inline unsigned int AttributeContainer::realREnd() const
+{
+	return 0xffffffff; // -1
+}
+
+inline void AttributeContainer::realRNext(unsigned int &it) const
+{
+	do
+	{
+		--it;
+	} while ((it !=0xffffffff) && (!used(it)));
+}
+
+
+
 
 /**************************************
  *          LINES MANAGEMENT          *
