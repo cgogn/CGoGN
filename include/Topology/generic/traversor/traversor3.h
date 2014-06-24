@@ -26,9 +26,9 @@
 #define __TRAVERSOR3_H__
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/cells.h"
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversor/traversorCell.h"
-//#include "Topology/generic/traversor/traversorGen.h"
 #include "Topology/generic/traversor/traversorDoO.h"
 
 namespace CGoGN
@@ -62,7 +62,7 @@ public:
  * Traverse all Y incident to X
  */
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-class Traversor3XY//: public Traversor<MAP>
+class Traversor3XY
 {
 private:
 	const MAP& m_map ;
@@ -92,7 +92,7 @@ public:
  * Traverse all X adjacent to X by an Y
  */
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-class Traversor3XXaY//: public Traversor<MAP>
+class Traversor3XXaY
 {
 private:
 	const MAP& m_map ;

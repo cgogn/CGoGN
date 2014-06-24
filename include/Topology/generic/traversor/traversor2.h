@@ -26,9 +26,7 @@
 #define __TRAVERSOR2_H__
 
 #include "Topology/generic/dart.h"
-//#include "Topology/generic/traversorGen.h"
 #include "Topology/generic/cells.h"
-#include <functional>
 
 namespace CGoGN
 {
@@ -39,7 +37,7 @@ namespace CGoGN
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor2VE//: public Traversor<MAP>
+class Traversor2VE
 {
 private:
 	const MAP& m ;
@@ -57,7 +55,7 @@ public:
 
 // Traverse the faces incident to a given vertex
 template <typename MAP>
-class Traversor2VF //: public Traversor<MAP>
+class Traversor2VF
 {
 private:
 	const MAP& m ;
@@ -75,7 +73,7 @@ public:
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
 template <typename MAP>
-class Traversor2VVaE //: public Traversor<MAP>
+class Traversor2VVaE
 {
 private:
 	const MAP& m ;
@@ -93,7 +91,7 @@ public:
 
 // Traverse the vertices adjacent to a given vertex through sharing a common face
 template <typename MAP>
-class Traversor2VVaF //: public Traversor<MAP>
+class Traversor2VVaF
 {
 private:
 	const MAP& m ;
@@ -117,7 +115,7 @@ public:
 
 // Traverse the vertices incident to a given edge
 template <typename MAP>
-class Traversor2EV //: public Traversor<MAP>
+class Traversor2EV
 {
 private:
 	const MAP& m ;
@@ -135,7 +133,7 @@ public:
 
 // Traverse the faces incident to a given edge
 template <typename MAP>
-class Traversor2EF //: public Traversor<MAP>
+class Traversor2EF
 {
 private:
 	const MAP& m ;
@@ -153,7 +151,7 @@ public:
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
 template <typename MAP>
-class Traversor2EEaV //: public Traversor<MAP>
+class Traversor2EEaV
 {
 private:
 	const MAP& m ;
@@ -173,7 +171,7 @@ public:
 
 // Traverse the edges adjacent to a given edge through sharing a common face
 template <typename MAP>
-class Traversor2EEaF //: public Traversor<MAP>
+class Traversor2EEaF
 {
 private:
 	const MAP& m ;
@@ -197,7 +195,7 @@ public:
 
 // Traverse the vertices incident to a given face
 template <typename MAP>
-class Traversor2FV //: public Traversor<MAP>
+class Traversor2FV
 {
 private:
 	const MAP& m ;
@@ -224,7 +222,7 @@ public:
 
 // Traverse the vertices incident to a given face
 template <typename MAP>
-class Traversor2FE //: public Traversor<MAP>
+class Traversor2FE
 {
 private:
 	const MAP& m ;
@@ -243,7 +241,7 @@ public:
 
 // Traverse the faces adjacent to a given face through sharing a common vertex
 template <typename MAP>
-class Traversor2FFaV //: public Traversor<MAP>
+class Traversor2FFaV
 {
 private:
 	const MAP& m ;
@@ -264,7 +262,7 @@ public:
 // Traverse the faces adjacent to a given face through sharing a common edge
 // Warning mult-incidence is not managed (some faces can be send several times)
 template <typename MAP>
-class Traversor2FFaE //: public Traversor<MAP>
+class Traversor2FFaE
 {
 private:
 	const MAP& m ;
@@ -412,8 +410,6 @@ inline void foreach_adjacent2(MAP& map, Cell<ORBIT> c, FUNC f)
 	for (Cell<ORBIT> c = trav.t.begin(), e = trav.t.end(); c.dart != e.dart; c = trav.t.next())
 		f(c);
 }
-
-
 
 } // namespace CGoGN
 

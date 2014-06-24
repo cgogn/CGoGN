@@ -22,10 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR1_H__
-#define __TRAVERSOR1_H__
+#ifndef __VTraversor1_VIRT_H__
+#define __VTraversor1_VIRT_H__
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/traversor/traversorGen.h"
 
 namespace CGoGN
 {
@@ -36,7 +37,7 @@ namespace CGoGN
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor1VE
+class VTraversor1VE : public Traversor
 {
 private:
 	const MAP& m ;
@@ -46,7 +47,7 @@ private:
 	Dart d2 ;
 
 public:
-	Traversor1VE(const MAP& map, Dart dart) ;
+	VTraversor1VE(const MAP& map, Dart dart) ;
 
 	Dart begin() ;
 	Dart end() ;
@@ -55,7 +56,7 @@ public:
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
 template <typename MAP>
-class Traversor1VVaE
+class VTraversor1VVaE : public Traversor
 {
 private:
 	const MAP& m ;
@@ -65,7 +66,7 @@ private:
 	Dart d2 ;
 
 public:
-	Traversor1VVaE(const MAP& map, Dart dart) ;
+	VTraversor1VVaE(const MAP& map, Dart dart) ;
 
 	Dart begin() ;
 	Dart end() ;
@@ -78,7 +79,7 @@ public:
 
 // Traverse the vertices incident to a given edge
 template <typename MAP>
-class Traversor1EV
+class VTraversor1EV : public Traversor
 {
 private:
 	const MAP& m ;
@@ -88,7 +89,7 @@ private:
 	Dart d2 ;
 
 public:
-	Traversor1EV(const MAP& map, Dart dart) ;
+	VTraversor1EV(const MAP& map, Dart dart) ;
 
 	Dart begin() ;
 	Dart end() ;
@@ -97,7 +98,7 @@ public:
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
 template <typename MAP>
-class Traversor1EEaV
+class VTraversor1EEaV : public Traversor
 {
 private:
 	const MAP& m ;
@@ -107,7 +108,7 @@ private:
 	Dart d2 ;
 
 public:
-	Traversor1EEaV(const MAP& map, Dart dart) ;
+	VTraversor1EEaV(const MAP& map, Dart dart) ;
 
 	Dart begin() ;
 	Dart end() ;
@@ -116,6 +117,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversor/traversor1.hpp"
+#include "Topology/generic/traversor/traversor1Virt.hpp"
 
 #endif
