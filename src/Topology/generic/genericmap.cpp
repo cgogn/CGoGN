@@ -424,43 +424,32 @@ void GenericMap::dumpAttributesAndMarkers()
 //	}
 }
 
-void GenericMap::compact()
+
+void GenericMap::compact(bool topoOnly)
 {
-	// compact embedding attribs
-	std::vector< std::vector<unsigned int>* > oldnews;
-	oldnews.resize(NB_ORBITS);
+	compactTopo();
+
+	if (topoOnly)
+		return;
+
+	std::vector<unsigned int> oldnew;
+
 	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
 		{
-			oldnews[orbit] = new std::vector<unsigned int>;
-			m_attribs[orbit].compact(*(oldnews[orbit]));
-		}
-	}
-
-	// update embedding indices of topo
-	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-		{
-			if ((orbit != DART) && (isOrbitEmbedded(orbit)))
+			m_attribs[orbit].compact(oldnew);
+			for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
 			{
 				unsigned int& idx = m_embeddings[orbit]->operator[](i);
-				unsigned int jdx = oldnews[orbit]->operator[](idx);
-				if ((jdx != 0xffffffff) && (jdx != idx))
+				unsigned int jdx = oldnew[idx];
+				if (jdx != 0xffffffff)
 					idx = jdx;
 			}
 		}
 	}
-
-	// delete allocated vectors
-	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
-			delete[] oldnews[orbit];
-
-	// compact topo (depends on map implementation)
-	compactTopo();
 }
+
 
 void GenericMap::dumpCSV() const
 {

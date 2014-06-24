@@ -103,7 +103,7 @@ protected:
 	template <int I>
 	inline void permutationUnsew(Dart d);
 
-	inline virtual void compactTopo();
+	virtual void compactTopo();
 
 	/****************************************
 	 *           DARTS TRAVERSALS           *

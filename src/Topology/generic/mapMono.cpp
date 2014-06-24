@@ -190,4 +190,35 @@ void MapMono::restore_topo_shortcuts()
 	}
 }
 
+
+void MapMono::compactTopo()
+{
+	std::vector<unsigned int> oldnew;
+	m_attribs[DART].compact(oldnew);
+
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		for (unsigned int j = 0; j < m_permutation.size(); ++j)
+		{
+			Dart d = (*m_permutation[j])[i];
+			if (oldnew[d.index] != AttributeContainer::UNKNOWN)
+				(*m_permutation[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_permutation_inv.size(); ++j)
+		{
+			Dart d = (*m_permutation_inv[j])[i];
+			if (oldnew[d.index] != AttributeContainer::UNKNOWN)
+				(*m_permutation_inv[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_involution.size(); ++j)
+		{
+			Dart d = (*m_involution[j])[i];
+			if (oldnew[d.index] != AttributeContainer::UNKNOWN)
+				(*m_involution[j])[i] = Dart(oldnew[d.index]);
+		}
+	}
+}
+
+
+
 } //namespace CGoGN

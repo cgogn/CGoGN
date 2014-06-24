@@ -231,7 +231,7 @@ public:
 	unsigned int begin() const;
 
 	/**
-	 * return the index of the last line of the container
+	 * return the index after the last line of the container
 	 */
 	unsigned int end() const;
 
@@ -249,7 +249,7 @@ public:
 	unsigned int realBegin() const;
 
 	/**
-	 * return the index of the last line of the container
+	 * return the index after the last line of the container
 	 */
 	unsigned int realEnd() const;
 
@@ -259,6 +259,22 @@ public:
 	 */
 	void realNext(unsigned int &it) const;
 
+
+	/**
+	 * return the index of the last line of the container
+	 */
+	unsigned int realRBegin() const;
+
+	/**
+	 * return the index before the first line of the container
+	 */
+	unsigned int realREnd() const;
+
+	/**
+	 * get the index of the line before "it" in the container
+	 * MUST BE USED INSTEAD OF ++ !
+	 */
+	void realRNext(unsigned int &it) const;
 
 	/**************************************
 	 *       INFO ABOUT ATTRIBUTES        *
@@ -320,6 +336,13 @@ public:
 	 * @param mapOldNew table that contains a map from old indices to new indices (holes -> 0xffffffff)
 	 */
 	void compact(std::vector<unsigned int>& mapOldNew);
+
+	/**
+	 * Test the fragmentation of container,
+	 * in fact just size/max_size
+	 * @return 1 if full filled - 0 is lots of holes
+	 */
+	inline float fragmentation();
 
 	/**************************************
 	 *          LINES MANAGEMENT          *

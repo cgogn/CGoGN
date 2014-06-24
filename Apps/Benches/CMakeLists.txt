@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 project(examples)
 
 SET(CMAKE_BUILD_TYPE Release)
+#SET(CMAKE_BUILD_TYPE Debug)
+
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 
 
@@ -26,3 +29,6 @@ target_link_libraries( bench_trav ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
 
 add_executable(bench_remesh bench_remesh.cpp )
 target_link_libraries( bench_remesh ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )
+
+add_executable(bench_compact bench_compact.cpp )
+target_link_libraries( bench_compact ${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS} )

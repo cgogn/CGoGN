@@ -430,8 +430,17 @@ protected:
 public:
 	/**
 	 * compact the map
+	 * @warning the quickTraversals needs to be updated
 	 */
-	void compact() ;
+	void compact(bool topoOnly = false) ;
+
+
+	/**
+	 * test if containers are fragmented
+	 *  ~1.0 no need to compact
+	 *  ~0.0 need to compact
+	 */
+	inline float fragmentation(unsigned int orbit);
 
 	/**
 	 * @brief dump all attributes of map in CSV format  (; separated columns)
