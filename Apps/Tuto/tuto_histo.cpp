@@ -73,13 +73,13 @@ void MyQT::createMap(const std::string& filename)
 		CGoGNerr << "could not import " << filename << CGoGNendl ;
 		return;
 	}
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
+	VertexAttribute<VEC3, MAP> position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
 
 	// attribute on which we make the histogram
-	VertexAttribute<float, MAP_IMPL> area = myMap.addAttribute<float, VERTEX>("area");
+	VertexAttribute<float, MAP> area = myMap.addAttribute<float, VERTEX, MAP>("area");
 
 	// attribute color to generate from histo
-	VertexAttribute<VEC3, MAP_IMPL> colorF = myMap.addAttribute<VEC3, VERTEX>("colorF");
+	VertexAttribute<VEC3, MAP> colorF = myMap.addAttribute<VEC3, VERTEX, MAP>("colorF");
 
 	// compute the area attribute
 	Algo::Surface::Geometry::computeOneRingAreaVertices<PFP>(myMap,position,area);

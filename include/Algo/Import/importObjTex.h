@@ -87,7 +87,6 @@ class OBJModel
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef Geom::Vec2f VEC2;
 
 protected:
@@ -142,17 +141,17 @@ public:
 	DartMarker<MAP> m_dirtyEdges;
 
 	/// Face Attribute for group ID storage
-	FaceAttribute<unsigned int, MAP_IMPL> m_groups;
-	FaceAttribute<unsigned int, MAP_IMPL> m_attMat;
+	FaceAttribute<unsigned int, MAP> m_groups;
+	FaceAttribute<unsigned int, MAP> m_attMat;
 
 	/// Vertex Attribute Handlers
-	VertexAttribute<VEC3, MAP_IMPL> m_positions;
-	VertexAttribute<VEC3, MAP_IMPL> m_normals;
-	VertexAttribute<Geom::Vec2f, MAP_IMPL> m_texCoords;
+	VertexAttribute<VEC3, MAP> m_positions;
+	VertexAttribute<VEC3, MAP> m_normals;
+	VertexAttribute<Geom::Vec2f, MAP> m_texCoords;
 
 	/// Vertex of face Attribute Handlers
-	AttributeHandler<VEC3, VERTEX1, MAP_IMPL> m_normalsF;
-	AttributeHandler<Geom::Vec2f, VERTEX1, MAP_IMPL> m_texCoordsF;
+	AttributeHandler<VEC3, VERTEX1, MAP> m_normalsF;
+	AttributeHandler<Geom::Vec2f, VERTEX1, MAP> m_texCoordsF;
 
 	/**
 	 * @brief Constructeur
@@ -172,19 +171,19 @@ public:
 	 * @brief set position attribute
 	 * @param position attribute
 	 */
-	void setPositionAttribute(VertexAttribute<Geom::Vec3f, MAP_IMPL> position);
+	void setPositionAttribute(VertexAttribute<Geom::Vec3f, MAP> position);
 
 	/**
 	 * @brief set position attribute
 	 * @param position attribute
 	 */
-	void setNormalAttribute(VertexAttribute<Geom::Vec3f, MAP_IMPL> normal);
+	void setNormalAttribute(VertexAttribute<Geom::Vec3f, MAP> normal);
 
 	/**
 	 * @brief set texture coordinate attribute
 	 * @param texcoord attribute
 	 */
-	void setTexCoordAttribute(VertexAttribute<Geom::Vec2f, MAP_IMPL>texcoord);
+	void setTexCoordAttribute(VertexAttribute<Geom::Vec2f, MAP>texcoord);
 
 	bool hasTexCoords() const { return m_tagVT != 0; }
 

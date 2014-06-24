@@ -259,9 +259,9 @@ void MyQT::operation(int x)
 void MyQT::createMap(int n)
 {
     myMap.clear(true);
-    position = myMap.getAttribute<VEC3, VERTEX>("position");
+	position = myMap.getAttribute<VEC3, VERTEX, MAP>("position");
     if (!position.isValid())
-        position = myMap.addAttribute<VEC3, VERTEX>("position");
+		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
     Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, n, n, n);
     cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
@@ -291,10 +291,9 @@ void MyQT::createMap(int n)
 void MyQT::createMapTets()
 {
     myMap.clear(true);
-    position = myMap.getAttribute<VEC3, VERTEX>("position");
+	position = myMap.getAttribute<VEC3, VERTEX, MAP>("position");
     if (!position.isValid())
-        position = myMap.addAttribute<VEC3, VERTEX>("position");
-
+		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
     Dart dd = Algo::Surface::Modelisation::createTetrahedron<PFP>(myMap);
     myMap.closeMap();
@@ -842,7 +841,7 @@ void MyQT::importMesh(std::string& filename)
     if (extension == std::string(".map"))
     {
         myMap.loadMapBin(filename);
-        position = myMap.getAttribute<VEC3, VERTEX>("position") ;
+		position = myMap.getAttribute<VEC3, VERTEX, MAP>("position") ;
     }
     else if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
     {
@@ -850,7 +849,7 @@ void MyQT::importMesh(std::string& filename)
         return ;
     }
     else
-        position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
+		position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
 
     m_selected  = NIL;
     m_selected2 = NIL;

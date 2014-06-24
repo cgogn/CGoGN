@@ -55,7 +55,6 @@ class MarchingCube
 protected:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::MAP L_MAP ;
-	typedef typename PFP::MAP::IMPL L_MAP_IMPL ;
 	typedef Dart L_DART ;
 
 #ifdef MC_WIDTH_EDGE_Z_EMBEDED
@@ -85,7 +84,7 @@ protected:
 	*/
 	L_MAP* m_map;
 
-	VertexAttribute<VEC3, L_MAP_IMPL>& m_positions;
+	VertexAttribute<VEC3, L_MAP>& m_positions;
 
 	/**
 	* Origin of image
@@ -228,7 +227,7 @@ public:
 	* @param wind the windowing class (for inside/outside distinguish)
 	* @param boundRemoved true is bound is going to be removed
 	*/
-	MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3, L_MAP_IMPL>& position, Windowing<DataType> wind, bool boundRemoved);
+	MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3, L_MAP>& position, Windowing<DataType> wind, bool boundRemoved);
 
 	/**
 	* destructor
@@ -266,12 +265,12 @@ public:
 	 */
 	Geom::Vec3f boundMax() const { return m_Image->boundMax(); }
 
-	void removeFacesOfBoundary(VertexAttribute<unsigned char, L_MAP_IMPL>& boundVertices, unsigned int frameWidth);
+	void removeFacesOfBoundary(VertexAttribute<unsigned char, L_MAP>& boundVertices, unsigned int frameWidth);
 
 	void recalPoints(const Geom::Vec3f& origin);
 
 	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
-	void setZSliceAttrib(EdgeAttribute<unsigned long long, L_MAP_IMPL>* zsatt, unsigned int zbound, unsigned int nbZone);
+	void setZSliceAttrib(EdgeAttribute<unsigned long long, L_MAP>* zsatt, unsigned int zbound, unsigned int nbZone);
 	#endif
 };
 

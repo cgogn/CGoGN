@@ -44,7 +44,7 @@ inline void nextNonEmptyLine(std::ifstream& fp, std::string& line)
 template <typename PFP>
 bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, QuadTree& qt)
 {
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
 	if (!position.isValid())
 		position = map.template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
 
@@ -193,7 +193,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	std::cout << "  Create base level mesh.." << std::flush ;
 
-	VertexAutoAttribute<NoTypeNameAttribute<std::vector<Dart> >, typename PFP::MAP::IMPL> vecDartsPerVertex(map, "incidents") ;
+	VertexAutoAttribute<NoTypeNameAttribute<std::vector<Dart> >, typename PFP::MAP> vecDartsPerVertex(map, "incidents") ;
 	DartMarkerNoUnmark<typename PFP::MAP> m(map) ;
 
 	unsigned int vemb = EMBNULL;

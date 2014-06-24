@@ -193,7 +193,6 @@ template <typename PFP>
 class MapHandler : public MapHandlerGen
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 public:
@@ -221,10 +220,10 @@ public:
 	 *********************************************************/
 
 	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT, MAP_IMPL> getAttribute(const QString& nameAttr, bool onlyRegistered = true) const;
+	AttributeHandler<T, ORBIT, MAP> getAttribute(const QString& nameAttr, bool onlyRegistered = true) const;
 
 	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT, MAP_IMPL> addAttribute(const QString& nameAttr, bool registerAttr = true);
+	AttributeHandler<T, ORBIT, MAP> addAttribute(const QString& nameAttr, bool registerAttr = true);
 
 	/*********************************************************
 	 * MANAGE DRAWING
@@ -233,7 +232,7 @@ public:
 	void draw(Utils::GLSLShader* shader, int primitive);
 	void drawBB();
 
-	void updateBB(const VertexAttribute<VEC3, MAP_IMPL>& position);
+	void updateBB(const VertexAttribute<VEC3, MAP>& position);
 	void updateBBDrawer();
 
 	/*********************************************************

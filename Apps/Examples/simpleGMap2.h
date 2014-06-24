@@ -42,7 +42,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 class SimpleGMap2 : public Utils::QT::SimpleQT
@@ -52,7 +51,7 @@ class SimpleGMap2 : public Utils::QT::SimpleQT
 public:
 	MAP myMap ;
 
-	VertexAttribute<VEC3, MAP_IMPL> position ;
+	VertexAttribute<VEC3, MAP> position ;
 
 	SimpleGMap2() ;
 
@@ -61,4 +60,3 @@ public:
 	void cb_initGL() ;
 	void cb_redraw() ;
 };
-

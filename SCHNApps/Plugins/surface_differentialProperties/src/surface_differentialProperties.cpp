@@ -185,11 +185,11 @@ void Surface_DifferentialProperties_Plugin::computeNormal(
 	if(mh == NULL)
 		return;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
 	if(!position.isValid())
 		return;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> normal = mh->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normal = mh->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName);
 	if(!normal.isValid())
 		normal = mh->addAttribute<PFP2::VEC3, VERTEX>(normalAttributeName);
 
@@ -219,35 +219,35 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 	if(mh == NULL)
 		return;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
 	if(!position.isValid())
 		return;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> normal = mh->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normal = mh->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName);
 	if(!normal.isValid())
 		return;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> Kmax = mh->getAttribute<PFP2::VEC3, VERTEX>(KmaxAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> Kmax = mh->getAttribute<PFP2::VEC3, VERTEX>(KmaxAttributeName);
 	if(!Kmax.isValid())
 		Kmax = mh->addAttribute<PFP2::VEC3, VERTEX>(KmaxAttributeName);
 
-	VertexAttribute<PFP2::REAL, PFP2::MAP::IMPL> kmax = mh->getAttribute<PFP2::REAL, VERTEX>(kmaxAttributeName);
+	VertexAttribute<PFP2::REAL, PFP2::MAP> kmax = mh->getAttribute<PFP2::REAL, VERTEX>(kmaxAttributeName);
 	if(!kmax.isValid())
 		kmax = mh->addAttribute<PFP2::REAL, VERTEX>(kmaxAttributeName);
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> Kmin = mh->getAttribute<PFP2::VEC3, VERTEX>(KminAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> Kmin = mh->getAttribute<PFP2::VEC3, VERTEX>(KminAttributeName);
 	if(!Kmin.isValid())
 		Kmin = mh->addAttribute<PFP2::VEC3, VERTEX>(KminAttributeName);
 
-	VertexAttribute<PFP2::REAL, PFP2::MAP::IMPL> kmin = mh->getAttribute<PFP2::REAL, VERTEX>(kminAttributeName);
+	VertexAttribute<PFP2::REAL, PFP2::MAP> kmin = mh->getAttribute<PFP2::REAL, VERTEX>(kminAttributeName);
 	if(!kmin.isValid())
 		kmin = mh->addAttribute<PFP2::REAL, VERTEX>(kminAttributeName);
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> Knormal = mh->getAttribute<PFP2::VEC3, VERTEX>(KnormalAttributeName);
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> Knormal = mh->getAttribute<PFP2::VEC3, VERTEX>(KnormalAttributeName);
 	if(!Knormal.isValid())
 		Knormal = mh->addAttribute<PFP2::VEC3, VERTEX>(KnormalAttributeName);
 
-	EdgeAttribute<PFP2::REAL, PFP2::MAP::IMPL> edgeAngle = mh->getAttribute<PFP2::REAL, EDGE>("edgeAngle");
+	EdgeAttribute<PFP2::REAL, PFP2::MAP> edgeAngle = mh->getAttribute<PFP2::REAL, EDGE>("edgeAngle");
 	if(!edgeAngle.isValid())
 		edgeAngle = mh->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
 
@@ -269,7 +269,7 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 
 	if(compute_kmean)
 	{
-		VertexAttribute<PFP2::REAL, PFP2::MAP::IMPL> kmean = mh->getAttribute<PFP2::REAL, VERTEX>("kmean");
+		VertexAttribute<PFP2::REAL, PFP2::MAP> kmean = mh->getAttribute<PFP2::REAL, VERTEX>("kmean");
 		if(!kmean.isValid())
 			kmean = mh->addAttribute<PFP2::REAL, VERTEX>("kmean");
 
@@ -281,7 +281,7 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 
 	if(compute_kgaussian)
 	{
-		VertexAttribute<PFP2::REAL, PFP2::MAP::IMPL> kgaussian = mh->getAttribute<PFP2::REAL, VERTEX>("kgaussian");
+		VertexAttribute<PFP2::REAL, PFP2::MAP> kgaussian = mh->getAttribute<PFP2::REAL, VERTEX>("kgaussian");
 		if(!kgaussian.isValid())
 			kgaussian = mh->addAttribute<PFP2::REAL, VERTEX>("kgaussian");
 

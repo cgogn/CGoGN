@@ -36,24 +36,24 @@ unsigned int MapHandler<PFP>::getNbOrbits(unsigned int orbit)
 
 template <typename PFP>
 template <typename T, unsigned int ORBIT>
-AttributeHandler<T, ORBIT, typename PFP::MAP::IMPL> MapHandler<PFP>::getAttribute(const QString& nameAttr, bool onlyRegistered) const
+AttributeHandler<T, ORBIT, typename PFP::MAP> MapHandler<PFP>::getAttribute(const QString& nameAttr, bool onlyRegistered) const
 {
 	if(onlyRegistered)
 	{
 		if(m_attribs[ORBIT].contains(nameAttr))
-			return static_cast<MAP*>(m_map)->template getAttribute<T, ORBIT>(nameAttr.toStdString());
+			return static_cast<MAP*>(m_map)->template getAttribute<T, ORBIT, MAP>(nameAttr.toStdString());
 		else
-			return AttributeHandler<T, ORBIT, MAP_IMPL>();
+			return AttributeHandler<T, ORBIT, MAP>();
 	}
 	else
-		return static_cast<MAP*>(m_map)->template getAttribute<T, ORBIT>(nameAttr.toStdString());
+		return static_cast<MAP*>(m_map)->template getAttribute<T, ORBIT, MAP>(nameAttr.toStdString());
 }
 
 template <typename PFP>
 template <typename T, unsigned int ORBIT>
-AttributeHandler<T, ORBIT, typename PFP::MAP::IMPL> MapHandler<PFP>::addAttribute(const QString& nameAttr, bool registerAttr)
+AttributeHandler<T, ORBIT, typename PFP::MAP> MapHandler<PFP>::addAttribute(const QString& nameAttr, bool registerAttr)
 {
-	AttributeHandler<T, ORBIT, MAP_IMPL> ah = static_cast<MAP*>(m_map)->template addAttribute<T, ORBIT>(nameAttr.toStdString());
+	AttributeHandler<T, ORBIT, MAP> ah = static_cast<MAP*>(m_map)->template addAttribute<T, ORBIT, MAP>(nameAttr.toStdString());
 	if(ah.isValid() && registerAttr)
 	{
 		registerAttribute(ah);
@@ -94,7 +94,7 @@ void MapHandler<PFP>::drawBB()
 }
 
 template <typename PFP>
-void MapHandler<PFP>::updateBB(const VertexAttribute<VEC3, MAP_IMPL>& position)
+void MapHandler<PFP>::updateBB(const VertexAttribute<VEC3, MAP>& position)
 {
 	m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<MAP*>(m_map)), position);
 	m_bbMin = qglviewer::Vec(m_bb.min()[0], m_bb.min()[1], m_bb.min()[2]);

@@ -38,10 +38,9 @@ namespace Filtering
 {
 
 template <typename PFP>
-void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2)
+void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 
 	Algo::Surface::Selection::Collector_OneRing<PFP> c(map) ;
@@ -51,7 +50,7 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, ty
 
 	CellMarkerNoUnmark<MAP, VERTEX> mv(map) ;
 
-	FunctorAverage<VertexAttribute<VEC3, MAP_IMPL> > fa1(position) ;
+	FunctorAverage<VertexAttribute<VEC3, MAP> > fa1(position) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if( !mv.isMarked(d))
@@ -74,7 +73,7 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, ty
 	}
 
 	// unshrinking step
-	FunctorAverage<VertexAttribute<VEC3, MAP_IMPL> > fa2(position2) ;
+	FunctorAverage<VertexAttribute<VEC3, MAP> > fa2(position2) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if( mv.isMarked(d))
@@ -101,7 +100,7 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, ty
  * Taubin filter modified as proposed by [Lav09]
  */
 template <typename PFP>
-void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2, typename PFP::REAL radius)
+void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2, typename PFP::REAL radius)
 {
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;

@@ -49,16 +49,15 @@ template <typename PFP>
 class CCVertexSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCVertexSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCVertexSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()

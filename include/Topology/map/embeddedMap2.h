@@ -37,11 +37,15 @@ namespace CGoGN
 */
 class EmbeddedMap2 : public Map2<MapMono>
 {
+
+	EmbeddedMap2(const EmbeddedMap2& m):Map2<MapMono>(m)  {}
 public:
 	typedef MapMono IMPL;
 	typedef Map2<MapMono> TOPO_MAP;
 
 	static const unsigned int DIMENSION = TOPO_MAP::DIMENSION ;
+
+	EmbeddedMap2() {}
 
 	/*
 	 */

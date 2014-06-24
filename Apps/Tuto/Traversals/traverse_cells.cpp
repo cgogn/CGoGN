@@ -42,9 +42,7 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
-
 
 int main()
 {
@@ -52,7 +50,7 @@ int main()
 	MAP myMap;
 
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	// create a topo grid of 2x2 squares
 	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 4, 4, true);
@@ -76,8 +74,7 @@ int main()
 			std::cout << d << " : " << position[d]<< " / ";
 		}
 	}
-	std::cout <<  std::endl;
-
+	std::cout << std::endl;
 
 	// low level traversal using cell marking (use marker on embedding is available)
 	CellMarker<MAP,VERTEX> cm(myMap);
@@ -89,18 +86,16 @@ int main()
 			std::cout << d << " : " << position[d]<< " / ";
 		}
 	}
-	std::cout <<  std::endl;
-
+	std::cout << std::endl;
 
 	// using traversal
 	TraversorV<MAP> tv(myMap);	// alias for Traversor<MAP,VERTEX> 
-	for (Dart d=tv.begin(); d!=tv.end(); d=tv.next())// traverse all vertices (d one dart of each vertex)
+	for (Dart d = tv.begin(); d != tv.end(); d = tv.next())// traverse all vertices (d one dart of each vertex)
 		std::cout << d << " : " << position[d]<< " / ";
 	std::cout <<  std::endl;
 
-
 	//using foreach function (C++11 lambda expression)
-	foreach_cell<VERTEX>(myMap,[&](Vertex v) // for each Vertex v of the MAP myMap
+	foreach_cell<VERTEX>(myMap, [&] (Vertex v) // for each Vertex v of the MAP myMap
 	{
 		std::cout << v << " : " << position[v]<< " / ";
 	});
@@ -108,19 +103,17 @@ int main()
 
 	std::cout <<  std::endl;
 
-
 	// example of parallel traversal of cells
 	Parallel::foreach_cell<VERTEX>(myMap,[&](Vertex v, unsigned int thread) // for each Vertex v of the MAP myMap
 	{
-		position[v] += VEC3(0.0,0.0,PFP::REAL(thread)*0.1f);
+		position[v] += VEC3(0.0, 0.0, PFP::REAL(thread) * 0.1f);
 		// WARNING thread vary here from 1 to 4 (and not from 0 to 3) !!!!
-	},false); // 4:4 thread, false for no need for markers in threaded code.
-
+	}); // 4:4 thread, false for no need for markers in threaded code.
 
 	std::cout << "After // processing"<< std::endl;
-	foreach_cell<VERTEX>(myMap,[&](Vertex v) // for each Vertex v of the MAP myMap
+	foreach_cell<VERTEX>(myMap, [&] (Vertex v) // for each Vertex v of the MAP myMap
 	{
-		std::cout << position[v]<< " / ";
+		std::cout << position[v] << " / ";
 	});
 	std::cout <<  std::endl;
 
@@ -133,21 +126,20 @@ int main()
 	CGoGN::Parallel::NumberOfThreads = 4;
 
 	// init nbthread values with 0
-	float surf[3]={0.0f,0.0f,0.0f};
+	float surf[3] = { 0.0f, 0.0f, 0.0f };
 	// traverse face in //
-	Parallel::foreach_cell<FACE>(myMap,[&](Face f, unsigned int thr)
+	Parallel::foreach_cell<FACE>(myMap, [&] (Face f, unsigned int thr)
 	{
 		// for each face add surface to accumulator (-1 because counter between 1-3 not 0-3)
-		surf[thr-1] += Algo::Surface::Geometry::convexFaceArea<PFP>(myMap,f,position);
-	},false);
+		surf[thr-1] += Algo::Surface::Geometry::convexFaceArea<PFP>(myMap, f, position);
+	});
 
 	std::cout << surf[0]<< "/"<< surf[1]<< "/"<< surf[2]<< "/"<< std::endl;
 	std::cout << "Total="<<surf[0]+surf[1]+surf[2]<< std::endl;
 
-
-	TraversorV<MAP>   tv0(myMap);
-	TraversorCellEven<MAP,VERTEX> tv1(tv0);
-	TraversorCellOdd<MAP,VERTEX>  tv2(tv0);
+	TraversorV<MAP> tv0(myMap);
+	TraversorCellEven<MAP, VERTEX> tv1(tv0);
+	TraversorCellOdd<MAP, VERTEX> tv2(tv0);
 
 	std::cout << "PAIR:";
 	for (Dart d=tv1.begin(); d!=tv1.end(); d=tv1.next())// traverse all vertices (d one dart of each vertex)

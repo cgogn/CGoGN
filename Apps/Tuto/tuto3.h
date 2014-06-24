@@ -46,7 +46,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 class MyQT: public Utils::QT::SimpleQT
@@ -64,7 +63,7 @@ protected:
 	MAP myMap;
 
 	// attribute handler on position;
-	VertexAttribute<VEC3, MAP_IMPL> position;
+	VertexAttribute<VEC3, MAP> position;
 
 	// render (for the topo)
 	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;

@@ -798,7 +798,7 @@ void Clipping::importMesh(std::string& filename)
             return;
         }
         else
-            position = myMap.getAttribute<VEC3, VERTEX>("position") ;
+			position = myMap.getAttribute<VEC3, VERTEX ,MAP>("position") ;
     }
     else
     {
@@ -808,9 +808,8 @@ void Clipping::importMesh(std::string& filename)
             return ;
         }
         else
-            position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
+			position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
     }
-
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 
@@ -1114,7 +1113,7 @@ int main(int argc, char** argv)
     }
 	else
 	{
-        sqt.position = sqt.myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+		sqt.position = sqt.myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
         Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(sqt.myMap, 10,10,10);
         cubic.embedIntoGrid(sqt.position, 1.0f, 1.0f, 1.0f);

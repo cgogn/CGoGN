@@ -54,7 +54,7 @@ namespace Filters
 template <typename PFP>
 typename PFP::VEC3 loopOddVertex(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	Dart d1)
 {
 	Dart d2 = map.phi2(d1) ;
@@ -77,7 +77,7 @@ typename PFP::VEC3 loopOddVertex(
 template <typename PFP>
 typename PFP::VEC3 loopEvenVertex(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	Dart d)
 {
 	map.incCurrentLevel() ;
@@ -108,15 +108,14 @@ template <typename PFP>
 class LoopOddAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	LoopOddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LoopOddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -140,15 +139,14 @@ template <typename PFP>
 class LoopEvenAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position;
+	VertexAttribute<VEC3, MAP>& m_position;
 
 public:
-	LoopEvenAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LoopEvenAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -166,15 +164,14 @@ template <typename PFP>
 class LoopNormalisationAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position;
+	VertexAttribute<VEC3, MAP>& m_position;
 
 public:
-	LoopNormalisationAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LoopNormalisationAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -199,15 +196,14 @@ template <typename PFP>
 class LoopOddSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position;
+	VertexAttribute<VEC3, MAP>& m_position;
 
 public:
-	LoopOddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LoopOddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -231,15 +227,14 @@ template <typename PFP>
 class LoopEvenSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	LoopEvenSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LoopEvenSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -257,15 +252,14 @@ template <typename PFP>
 class LoopNormalisationSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	LoopNormalisationSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LoopNormalisationSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()

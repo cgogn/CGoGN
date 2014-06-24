@@ -43,16 +43,14 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
-
 
 
 // example of cell marking with CellMarker for a simple traversal
 template<unsigned int ORBIT>
 void simpleTraversal(MAP& map) // NEVER COPY THE MAP, ALWAYS USE REFERENCE !!
 {
-	CellMarker<MAP,ORBIT> cm(map);
+	CellMarker<MAP, ORBIT> cm(map);
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if (!cm.isMarked(d))	// is the cell (of dart d) not marked ?
@@ -101,7 +99,7 @@ void doubleTraversal(MAP& map) // NEVER COPY THE MAP, ALWAYS USE REFERENCE !!
 
 
 // example of usage of CellMarkerStore
-void negativePositions(MAP& map, VertexAttribute<VEC3,MAP_IMPL>& position) // NEVER COPY THE MAP, ALWAYS USE REFERENCE !!
+void negativePositions(MAP& map, VertexAttribute<VEC3,MAP>& position) // NEVER COPY THE MAP, ALWAYS USE REFERENCE !!
 {
 	// if user knows that small numbers of cell will be marked
 	// it is more efficient to store them instead of traverse
@@ -128,7 +126,7 @@ int main()
 	MAP myMap;
 
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 	// create a topo grid of 2x2 squares
 	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 2, 2, true);
 	// and embed it using position attribute
@@ -139,7 +137,7 @@ int main()
 
 	doubleTraversal<FACE>(myMap);
 
-	negativePositions(myMap,position);
+	negativePositions(myMap, position);
 
 
 	return 0;

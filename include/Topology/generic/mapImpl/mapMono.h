@@ -42,6 +42,9 @@ public:
 	inline virtual void clear(bool removeAttrib);
 
 protected:
+	// protected copy constructor to prevent the copy of map
+	MapMono(const MapMono& m): GenericMap(m){}
+
 	std::vector<AttributeMultiVector<Dart>*> m_involution;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation_inv;
@@ -70,6 +73,7 @@ public:
 protected:
 	inline void addInvolution();
 	inline void addPermutation();
+	inline void removeLastInvolutionPtr(); // for moveFrom
 
 	inline AttributeMultiVector<Dart>* getInvolutionAttribute(unsigned int i);
 	inline AttributeMultiVector<Dart>* getPermutationAttribute(unsigned int i);
@@ -99,7 +103,7 @@ protected:
 	template <int I>
 	inline void permutationUnsew(Dart d);
 
-	inline virtual void compactTopo();
+	virtual void compactTopo();
 
 	/****************************************
 	 *           DARTS TRAVERSALS           *

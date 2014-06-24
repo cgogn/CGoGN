@@ -45,7 +45,7 @@ namespace CGoGN
 
 enum TraversalOptim {AUTO=0, FORCE_DART_MARKING, FORCE_CELL_MARKING, FORCE_QUICK_TRAVERSAL};
 
-template <typename MAP, unsigned int ORBIT, TraversalOptim OPT=AUTO>
+template <typename MAP, unsigned int ORBIT, TraversalOptim OPT = AUTO>
 class TraversorCell
 {
 protected:
@@ -63,7 +63,7 @@ protected:
 	bool firstTraversal ;
 
 	// just for odd/even versions
-	TraversorCell(const TraversorCell<MAP, ORBIT,OPT>& tc);
+	TraversorCell(const TraversorCell<MAP, ORBIT, OPT>& tc);
 
 public:
 	TraversorCell(const MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
@@ -84,24 +84,24 @@ public:
 
 
 
-template <typename MAP, unsigned int ORBIT, TraversalOptim OPT=AUTO>
-class TraversorCellEven : public TraversorCell<MAP,ORBIT,OPT>
+template <typename MAP, unsigned int ORBIT, TraversalOptim OPT = AUTO>
+class TraversorCellEven : public TraversorCell<MAP, ORBIT, OPT>
 {
 public:
-	TraversorCellEven(const TraversorCell<MAP,ORBIT,OPT>& tra):
-		TraversorCell<MAP,ORBIT,OPT>(tra) {}
-	~TraversorCellEven() { this->cmark = NULL; this->dmark=NULL; }
+	TraversorCellEven(const TraversorCell<MAP,ORBIT, OPT>& tra):
+		TraversorCell<MAP, ORBIT, OPT>(tra) {}
+	~TraversorCellEven() { this->cmark = NULL; this->dmark = NULL; }
 	inline Cell<ORBIT> begin() ;
 } ;
 
 
-template <typename MAP, unsigned int ORBIT, TraversalOptim OPT=AUTO>
-class TraversorCellOdd : public TraversorCell<MAP,ORBIT,OPT>
+template <typename MAP, unsigned int ORBIT, TraversalOptim OPT = AUTO>
+class TraversorCellOdd : public TraversorCell<MAP, ORBIT, OPT>
 {
 public:
-	TraversorCellOdd(const TraversorCell<MAP,ORBIT,OPT>& tra):
-		TraversorCell<MAP,ORBIT,OPT>(tra) {}
-	~TraversorCellOdd() {this->cmark = NULL; this->dmark=NULL; }
+	TraversorCellOdd(const TraversorCell<MAP, ORBIT, OPT>& tra):
+		TraversorCell<MAP, ORBIT, OPT>(tra) {}
+	~TraversorCellOdd() {this->cmark = NULL; this->dmark = NULL; }
 	inline Cell<ORBIT> begin() ;
 	inline Cell<ORBIT> next() ;
 } ;
@@ -127,6 +127,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt = AUTO
 
 namespace Parallel
 {
+
 /**
  * @brief foreach_cell
  * @param map
@@ -136,37 +137,40 @@ namespace Parallel
  * @param nbth number of used thread (0:for traversal, [1,nbth-1] for func computing
 */
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, bool needMarkers=true, TraversalOptim opt=AUTO, unsigned int nbth=NumberOfThreads);
+void foreach_cell(MAP& map, FUNC func, TraversalOptim opt = AUTO, unsigned int nbth = NumberOfThreads);
 
-}
+} // namespace Parallel
 
 
-template <typename MAP, TraversalOptim OPT=AUTO>
-class TraversorV : public TraversorCell<MAP, VERTEX,OPT>
+
+
+
+template <typename MAP, TraversalOptim OPT = AUTO>
+class TraversorV : public TraversorCell<MAP, VERTEX, OPT>
 {
 public:
 	TraversorV(const MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, false, thread)
 	{}
 };
 
-template <typename MAP, TraversalOptim OPT=AUTO>
-class TraversorE : public TraversorCell<MAP, EDGE,OPT>
+template <typename MAP, TraversalOptim OPT = AUTO>
+class TraversorE : public TraversorCell<MAP, EDGE, OPT>
 {
 public:
 	TraversorE(const MAP& m, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, false, thread)
 	{}
 };
 
-template <typename MAP, TraversalOptim OPT=AUTO>
-class TraversorF : public TraversorCell<MAP, FACE,OPT>
+template <typename MAP, TraversalOptim OPT = AUTO>
+class TraversorF : public TraversorCell<MAP, FACE, OPT>
 {
 public:
 	TraversorF(const MAP& m, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, false, thread)
 	{}
 };
 
-template <typename MAP, TraversalOptim OPT=AUTO>
-class TraversorW : public TraversorCell<MAP, VOLUME,OPT>
+template <typename MAP, TraversalOptim OPT = AUTO>
+class TraversorW : public TraversorCell<MAP, VOLUME, OPT>
 {
 public:
 	TraversorW(const MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, false, thread)

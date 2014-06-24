@@ -35,7 +35,7 @@
 
 MAP myMap;
 
-VertexAttribute<VEC3, MAP_IMPL> position ;
+VertexAttribute<VEC3, MAP> position ;
 Dart dglobal;
 
 void MyQT::balls_onoff(bool /*x*/)
@@ -157,7 +157,6 @@ void MyQT::cb_initGL()
 	registerShader(m_sprite);
 	registerShader(m_lines);
 
-
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES);
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS);
@@ -270,7 +269,7 @@ void MyQT::cb_keyPress(int code)
 
 int main(int argc, char **argv)
 {
-	position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+	position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 	CGoGNout << 3 << " tutu "<< 4 << CGoGNendl;

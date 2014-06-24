@@ -38,8 +38,8 @@
 #include "Topology/generic/traversor/traversorFactory.h"
 
 MAP myMap;
-VertexAttribute<VEC3, MAP_IMPL> position ;
-DartAttribute<VEC3, MAP_IMPL> middleDarts;
+VertexAttribute<VEC3, MAP> position ;
+DartAttribute<VEC3, MAP> middleDarts;
 
 void MyQT::text_onoff(bool /*x*/)
 {
@@ -75,7 +75,7 @@ void MyQT::orbit_list(int x)
 }
 
 template< unsigned int ORBIT>
-void MyQT::storeVerticesInfo(const AttributeHandler<int, ORBIT, MAP_IMPL>* attrib)
+void MyQT::storeVerticesInfo(const AttributeHandler<int, ORBIT, MAP>* attrib)
 {
 	SelectorDartNoBoundary<MAP> nb(myMap);
 	m_render_topo->computeDartMiddlePositions(myMap, middleDarts/*, nb*/);
@@ -98,31 +98,31 @@ void MyQT::storeVerticesInfoGen(unsigned int orb, const AttributeHandlerGen* att
 	switch(orb)
 	{
 	case VERTEX:
-		storeVerticesInfo<VERTEX>(static_cast< const AttributeHandler<int, VERTEX, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<VERTEX>(static_cast< const AttributeHandler<int, VERTEX, MAP>* >(attrib));
 		break;
 	case EDGE:
-		storeVerticesInfo<EDGE>(static_cast< const AttributeHandler<int, EDGE, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<EDGE>(static_cast< const AttributeHandler<int, EDGE, MAP>* >(attrib));
 		break;
 	case FACE:
-		storeVerticesInfo<FACE>(static_cast< const AttributeHandler<int, FACE, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<FACE>(static_cast< const AttributeHandler<int, FACE, MAP>* >(attrib));
 		break;
 	case VOLUME:
-		storeVerticesInfo<VOLUME>(static_cast< const AttributeHandler<int, VOLUME, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<VOLUME>(static_cast< const AttributeHandler<int, VOLUME, MAP>* >(attrib));
 		break;
 	case MAP::VERTEX_OF_PARENT:
-		storeVerticesInfo<MAP::VERTEX_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::VERTEX_OF_PARENT, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<MAP::VERTEX_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::VERTEX_OF_PARENT, MAP>* >(attrib));
 		break;
 	case MAP::EDGE_OF_PARENT:
-		storeVerticesInfo<MAP::EDGE_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::EDGE_OF_PARENT, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<MAP::EDGE_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::EDGE_OF_PARENT, MAP>* >(attrib));
 		break;
 	case MAP::FACE_OF_PARENT:
-		storeVerticesInfo<MAP::FACE_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::FACE_OF_PARENT, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<MAP::FACE_OF_PARENT>(static_cast< const AttributeHandler<int, MAP::FACE_OF_PARENT, MAP>* >(attrib));
 		break;
 	case MAP::VERTEX_OF_PARENT2:
-		storeVerticesInfo<MAP::VERTEX_OF_PARENT2>(static_cast< const AttributeHandler<int, MAP::VERTEX_OF_PARENT2, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<MAP::VERTEX_OF_PARENT2>(static_cast< const AttributeHandler<int, MAP::VERTEX_OF_PARENT2, MAP>* >(attrib));
 		break;
 	case MAP::EDGE_OF_PARENT2:
-		storeVerticesInfo<MAP::EDGE_OF_PARENT2>(static_cast< const AttributeHandler<int, MAP::EDGE_OF_PARENT2, MAP_IMPL>* >(attrib));
+		storeVerticesInfo<MAP::EDGE_OF_PARENT2>(static_cast< const AttributeHandler<int, MAP::EDGE_OF_PARENT2, MAP>* >(attrib));
 		break;
 	}
 }
@@ -178,7 +178,7 @@ void MyQT::init_att_orb(AttributeHandlerGen* attg)
 	unsigned int i = 0;
 	TraversorCell<MAP,ORB> tra(myMap);
 
-	AttributeHandler<int, ORB, MAP_IMPL>* att = static_cast< AttributeHandler<int, ORB, MAP_IMPL>* >(attg);
+	AttributeHandler<int, ORB, MAP>* att = static_cast< AttributeHandler<int, ORB, MAP>* >(attg);
 
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 		(*att)[d] = i++;
@@ -188,20 +188,20 @@ void MyQT::initMap()
 {
 	std::cout << "INIT MAP"<< std::endl;
 
-	position = myMap.addAttribute<VEC3, VERTEX>("position");
+	position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 	int nb = 2;
     Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
     cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
-	m_att_orbits[0] = new AttributeHandler<int, VERTEX, MAP_IMPL>(myMap.addAttribute<int, VERTEX>("vertex"));
-	m_att_orbits[1] = new AttributeHandler<int, EDGE, MAP_IMPL>(myMap.addAttribute<int, EDGE>("edge"));
-	m_att_orbits[2] = new AttributeHandler<int, FACE, MAP_IMPL>(myMap.addAttribute<int, FACE>("face"));
-	m_att_orbits[3] = new AttributeHandler<int, VOLUME, MAP_IMPL>(myMap.addAttribute<int, VOLUME>("volume"));
-	m_att_orbits[4] = new AttributeHandler<int, MAP::VERTEX_OF_PARENT, MAP_IMPL>(myMap.addAttribute<int, MAP::VERTEX_OF_PARENT>("vertex2"));
-	m_att_orbits[5] = new AttributeHandler<int, MAP::EDGE_OF_PARENT, MAP_IMPL>(myMap.addAttribute<int, MAP::EDGE_OF_PARENT>("edge2"));
-	m_att_orbits[6] = new AttributeHandler<int, MAP::FACE_OF_PARENT, MAP_IMPL>(myMap.addAttribute<int, MAP::FACE_OF_PARENT>("face2"));
-	m_att_orbits[7] = new AttributeHandler<int, MAP::VERTEX_OF_PARENT2, MAP_IMPL>(myMap.addAttribute<int, MAP::VERTEX_OF_PARENT2>("vertex1"));
-	m_att_orbits[8] = new AttributeHandler<int, MAP::EDGE_OF_PARENT2, MAP_IMPL>(myMap.addAttribute<int, MAP::EDGE_OF_PARENT2>("face1"));
+	m_att_orbits[0] = new AttributeHandler<int, VERTEX, MAP>(myMap.addAttribute<int, VERTEX, MAP>("vertex"));
+	m_att_orbits[1] = new AttributeHandler<int, EDGE, MAP>(myMap.addAttribute<int, EDGE, MAP>("edge"));
+	m_att_orbits[2] = new AttributeHandler<int, FACE, MAP>(myMap.addAttribute<int, FACE, MAP>("face"));
+	m_att_orbits[3] = new AttributeHandler<int, VOLUME, MAP>(myMap.addAttribute<int, VOLUME, MAP>("volume"));
+	m_att_orbits[4] = new AttributeHandler<int, MAP::VERTEX_OF_PARENT, MAP>(myMap.addAttribute<int, MAP::VERTEX_OF_PARENT, MAP>("vertex2"));
+	m_att_orbits[5] = new AttributeHandler<int, MAP::EDGE_OF_PARENT, MAP>(myMap.addAttribute<int, MAP::EDGE_OF_PARENT, MAP>("edge2"));
+	m_att_orbits[6] = new AttributeHandler<int, MAP::FACE_OF_PARENT, MAP>(myMap.addAttribute<int, MAP::FACE_OF_PARENT, MAP>("face2"));
+	m_att_orbits[7] = new AttributeHandler<int, MAP::VERTEX_OF_PARENT2, MAP>(myMap.addAttribute<int, MAP::VERTEX_OF_PARENT2, MAP>("vertex1"));
+	m_att_orbits[8] = new AttributeHandler<int, MAP::EDGE_OF_PARENT2, MAP>(myMap.addAttribute<int, MAP::EDGE_OF_PARENT2, MAP>("face1"));
 
 	init_att_orb<VERTEX>(m_att_orbits[0]);
 	init_att_orb<EDGE>(m_att_orbits[1]);
@@ -213,7 +213,7 @@ void MyQT::initMap()
 	init_att_orb<MAP::VERTEX_OF_PARENT2>(m_att_orbits[7]);
 	init_att_orb<MAP::EDGE_OF_PARENT2>(m_att_orbits[8]);
 
-	middleDarts = myMap.addAttribute<VEC3, DART>("middle");
+	middleDarts = myMap.addAttribute<VEC3, DART, MAP>("middle");
 }
 
 int main(int argc, char **argv)

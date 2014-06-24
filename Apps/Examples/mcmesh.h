@@ -54,7 +54,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 typedef unsigned char DATATYPE;
@@ -75,7 +74,7 @@ public:
 	bool m_drawEdges ;
 	bool m_drawFaces ;
 
-	VertexAttribute<VEC3, MAP_IMPL> position ;
+	VertexAttribute<VEC3, MAP> position ;
 
 	Algo::Render::GL2::MapRender* m_render ;
 
