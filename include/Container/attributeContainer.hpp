@@ -227,6 +227,11 @@ inline bool AttributeContainer::used(unsigned int index) const
 	return m_holesBlocks[index / _BLOCKSIZE_]->used(index % _BLOCKSIZE_) != 0;
 }
 
+inline float AttributeContainer::fragmentation()
+{
+	return float(m_size) / float(m_maxSize);
+}
+
 /**************************************
  *         CONTAINER TRAVERSAL        *
  **************************************/

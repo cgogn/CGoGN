@@ -337,6 +337,13 @@ public:
 	 */
 	void compact(std::vector<unsigned int>& mapOldNew);
 
+	/**
+	 * Test the fragmentation of container,
+	 * in fact just size/max_size
+	 * @return 1 if full filled - 0 is lots of holes
+	 */
+	inline float fragmentation();
+
 	/**************************************
 	 *          LINES MANAGEMENT          *
 	 **************************************/

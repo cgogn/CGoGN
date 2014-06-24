@@ -322,4 +322,11 @@ inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& na
 	return amv ;
 }
 
+inline float GenericMap::fragmentation(unsigned int orbit)
+{
+	if (isOrbitEmbedded(orbit))
+		return m_attribs[orbit].fragmentation();
+	return 1.0f;
+}
+
 } //namespace CGoGN

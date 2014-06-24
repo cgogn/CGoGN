@@ -216,6 +216,17 @@ void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 	mapOldNew.clear();
 	mapOldNew.resize(realEnd(),0xffffffff);
 
+//VERSION THAT PRESERVE ORDER OF ELEMENTS ?
+//	unsigned int down = 0;
+//	for (unsigned int occup = realBegin(); occup != realEnd(); next(occup))
+//	{
+//		mapOldNew[occup] = down;
+//		copyLine(down,occup);
+//		// copy ref counter
+//		setNbRefs(down,getNbRefs(occup));
+//		down++;
+//	}
+
 	// fill the holes with data & create the map Old->New
 	unsigned int up = realRBegin();
 	unsigned int down = 0;
