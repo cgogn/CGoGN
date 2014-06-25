@@ -450,6 +450,50 @@ void GenericMap::compact(bool topoOnly)
 	}
 }
 
+void GenericMap::compactOrbitContainer(unsigned int orbit, float frag)
+{
+	std::vector<unsigned int> oldnew;
+
+	if (isOrbitEmbedded(orbit) && (fragmentation(orbit)< frag))
+	{
+		m_attribs[orbit].compact(oldnew);
+		for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+		{
+			unsigned int& idx = m_embeddings[orbit]->operator[](i);
+			unsigned int jdx = oldnew[idx];
+			if (jdx != 0xffffffff)
+				idx = jdx;
+		}
+	}
+}
+
+
+void GenericMap::compactIfNeeded(float frag, bool topoOnly)
+{
+	if (fragmentation(DART)< frag)
+		compactTopo();
+
+	if (topoOnly)
+		return;
+
+	std::vector<unsigned int> oldnew;
+
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		if ((orbit != DART) && (isOrbitEmbedded(orbit)) && (fragmentation(orbit)< frag))
+		{
+			m_attribs[orbit].compact(oldnew);
+			for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+			{
+				unsigned int& idx = m_embeddings[orbit]->operator[](i);
+				unsigned int jdx = oldnew[idx];
+				if (jdx != 0xffffffff)
+					idx = jdx;
+			}
+		}
+	}
+}
+
 
 void GenericMap::dumpCSV() const
 {

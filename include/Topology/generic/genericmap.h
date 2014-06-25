@@ -431,14 +431,30 @@ public:
 	/**
 	 * compact the map
 	 * @warning the quickTraversals needs to be updated
+	 * @param topoOnly compact only the topo ?
 	 */
 	void compact(bool topoOnly = false) ;
 
 
 	/**
+	 * compact a container (and update embedding attribute of topo)
+	 * @param orbit orbit of container to compact
+	 * @param frag minimum fragmentation value for compacting (default value 1.0 mean always compact)s
+	 */
+	void compactOrbitContainer(unsigned int orbit, float frag=1.0);
+
+	/**
+	 * @brief compact if containers are fragmented.
+	 * @warning the quickTraversals needs to be updated
+	 * @param frag if fragmentation (filling) of containers inferior to frag then compact
+	 * @param topoOnly compact only the topo ?
+	 */
+	void compactIfNeeded(float frag, bool topoOnly = false) ;
+
+	/**
 	 * test if containers are fragmented
-	 *  ~1.0 no need to compact
-	 *  ~0.0 need to compact
+	 *  ~1.0 (full filled) no need to compact
+	 *  ~0.0 (lots of holes) need to compact
 	 */
 	inline float fragmentation(unsigned int orbit);
 
