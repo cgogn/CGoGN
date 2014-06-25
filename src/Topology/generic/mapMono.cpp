@@ -193,6 +193,9 @@ void MapMono::restore_topo_shortcuts()
 
 void MapMono::compactTopo()
 {
+	if (fragmentation(DART)==1.0)
+		return;
+
 	std::vector<unsigned int> oldnew;
 	m_attribs[DART].compact(oldnew);
 

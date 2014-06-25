@@ -243,7 +243,7 @@ template <typename MAP_IMPL>
 void Map2<MAP_IMPL>::createHole(Dart d)
 {
 	assert(!isBoundaryEdge(d)) ;
-	this->template boundaryMarkOrbit<2,FACE>(d) ;
+	Algo::Topo::boundaryMarkOrbit<2,FACE>(*this, d) ;
 }
 
 /*! @name Topological Operators

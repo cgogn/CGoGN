@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Topology/generic/mapImpl/mapMulti.h"
+#include "Topology/generic/mapImpl/mapMono.h"
 
 namespace CGoGN
 {
@@ -313,31 +314,77 @@ bool MapMulti::loadMapBin(const std::string& filename)
 	return true;
 }
 
+
+bool MapMulti::copyFromOtherType(const MapMono& mapMR)
+{
+//	map.compactIfNeeded(1.0);
+
+	// clear the map but do not insert boundary markers dart attribute
+	GenericMap::init(false);
+
+	// init MR data
+	initMR();
+
+	// copy attrib containers from MapMono
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+		m_attribs[i].copyFrom(mapMR.getAttributeContainer(i));
+
+	// restore shortcuts
+	GenericMap::restore_shortcuts();
+	restore_topo_shortcuts();
+
+	AttributeContainer darts = m_attribs[DART];
+	for(unsigned int xd = darts.begin(); xd != darts.end(); darts.next(xd))
+	{
+		unsigned int mrdi = m_mrattribs.insertLine() ;
+		assert(mrdi==xd);
+		(*m_mrDarts[0])[mrdi] = xd ;
+	}
+
+	return true;
+}
+
+
 bool MapMulti::copyFrom(const GenericMap& map)
 {
-	const MapMulti& mapMR = reinterpret_cast<const MapMulti&>(map);
+	const MapMulti* mapMR = dynamic_cast<const MapMulti*>(&map);
 
-	if (mapTypeName() != map.mapTypeName())
+
+	if (mapMR == NULL)
 	{
-		CGoGNerr << "try to copy from incompatible type map" << CGoGNendl;
-		return false;
+		const MapMono* mapmono = dynamic_cast<const MapMono*>(mapMR);
+		if (mapmono == NULL)
+		{
+			CGoGNerr << "try to copy from incompatible type map" << CGoGNendl;
+			return false;
+		}
+		copyFromOtherType(*mapmono);
 	}
 
 	// clear the map but do not insert boundary markers dart attribute
 	GenericMap::init(false);
 
+	// init MR data without adding the attributes
+	m_mrattribs.clear(true) ;
+	m_mrattribs.setRegistry(m_attributes_registry_map) ;
+	m_mrDarts.clear() ;
+	m_mrDarts.reserve(16) ;
+	m_mrNbDarts.clear();
+	m_mrNbDarts.reserve(16);
+	m_mrLevelStack.clear() ;
+	m_mrLevelStack.reserve(16) ;
 
-	// load attrib container
+	// copy attrib containers
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
-		m_attribs[i].copyFrom(mapMR.m_attribs[i]);
+		m_attribs[i].copyFrom(mapMR->m_attribs[i]);
 
-	m_mrattribs.copyFrom(mapMR.m_mrattribs);
-	m_mrCurrentLevel = mapMR.m_mrCurrentLevel;
+	m_mrattribs.copyFrom(mapMR->m_mrattribs);
 
-	unsigned int nb = mapMR.m_mrNbDarts.size();
-	m_mrNbDarts.resize(nb);
-	for (unsigned int i = 0; i < nb; ++i)
-		m_mrNbDarts[i] = mapMR.m_mrNbDarts[i];
+	m_mrCurrentLevel = mapMR->m_mrCurrentLevel;
+
+	m_mrNbDarts.assign(mapMR->m_mrNbDarts.begin(), mapMR->m_mrNbDarts.end());
+
+	m_mrLevelStack.assign(mapMR->m_mrLevelStack.begin(), mapMR->m_mrLevelStack.end());  // ??
 
 	// restore shortcuts
 	GenericMap::restore_shortcuts();

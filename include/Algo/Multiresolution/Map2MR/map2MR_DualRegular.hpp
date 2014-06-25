@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Algo/Topo/embedding.h"
+
 namespace CGoGN
 {
 
@@ -87,8 +89,10 @@ void Map2MR<PFP>::addNewLevel(bool embedNewVertices)
 		// take care of edge embedding
 		if(m_map.template isOrbitEmbedded<EDGE>())
 		{
-			m_map.template setOrbitEmbedding<EDGE>(nf, m_map.template getEmbedding<EDGE>(d));
-			m_map.template setOrbitEmbedding<EDGE>(m_map.phi1(m_map.phi1(nf)), m_map.template getEmbedding<EDGE>(d2));
+//			m_map.template setOrbitEmbedding<EDGE>(nf, m_map.template getEmbedding<EDGE>(d));
+//			m_map.template setOrbitEmbedding<EDGE>(m_map.phi1(m_map.phi1(nf)), m_map.template getEmbedding<EDGE>(d2));
+			Algo::Topo::setOrbitEmbedding<EDGE>(m_map, nf, m_map.template getEmbedding<EDGE>(d));
+			Algo::Topo::setOrbitEmbedding<EDGE>(m_map, m_map.phi1(m_map.phi1(nf)), m_map.template getEmbedding<EDGE>(d2));
 		}
 
 		m_map.decCurrentLevel();
@@ -109,13 +113,15 @@ void Map2MR<PFP>::addNewLevel(bool embedNewVertices)
 		{
 			if(m_map.template isOrbitEmbedded<EDGE>())
 			{
-				m_map.template setOrbitEmbedding<EDGE>(temp, m_map.template getEmbedding<EDGE>(	m_map.phi2(temp)));
+//				m_map.template setOrbitEmbedding<EDGE>(temp, m_map.template getEmbedding<EDGE>(	m_map.phi2(temp)));
+				Algo::Topo::setOrbitEmbedding<EDGE>(m_map, temp, m_map.template getEmbedding<EDGE>(	m_map.phi2(temp)));
 			}
 
 			if(!shareVertexEmbeddings)
 			{
 				//if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
-				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(temp) ;
+				Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(m_map, temp);
+
 				//m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 			}
 
