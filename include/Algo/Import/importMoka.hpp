@@ -121,7 +121,8 @@ bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vecto
 	}
 
 	for(typename std::map<Dart, unsigned int>::iterator it = map_dart_emb.begin() ; it != map_dart_emb.end() ; ++it)
-		gmap.template setOrbitEmbedding<VERTEX>(it->first, it->second);
+//		gmap.template setOrbitEmbedding<VERTEX>(it->first, it->second);
+		Algo::Topo::setOrbitEmbedding<VERTEX>(gmap,it->first, it->second);
 
 	gmap.closeMap();
 
