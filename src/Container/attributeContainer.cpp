@@ -844,8 +844,6 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 
 void AttributeContainer::dumpCSV() const
 {
-	CGoGNout << "Container of "<<orbitName(this->getOrbit())<< CGoGNendl;
-
 	CGoGNout << "Name ; ;";
 	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
 	{
@@ -887,6 +885,7 @@ void AttributeContainer::dumpCSV() const
 		}
 		CGoGNout << CGoGNendl;
 	}
+	CGoGNout << CGoGNendl;
 }
 
 void AttributeContainer::dumpByLines() const

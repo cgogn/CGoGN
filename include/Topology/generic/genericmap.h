@@ -73,6 +73,7 @@ inline int getSystemNumberOfCores(bool hyperthreading=false)
 class AttributeHandlerGen ;
 class DartMarkerGen ;
 class CellMarkerGen ;
+class MapManipulator;
 
 class GenericMap
 {
@@ -98,11 +99,11 @@ protected:
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
 	static int m_nbInstances;
 
-	// buffer for less memory allocation
+	/// buffer for less memory allocation
 	static  std::vector< std::vector<Dart>* >* s_vdartsBuffers;
 	static  std::vector< std::vector<unsigned int>* >* s_vintsBuffers;
 
-	// table of instancied maps for Dart/CellMarker release
+	/// table of instancied maps for Dart/CellMarker release
 	static std::vector<GenericMap*>* s_instances;
 
 
@@ -176,6 +177,34 @@ public:
 	 */
 	virtual void clear(bool removeAttrib) ;
 
+
+	/****************************************
+	 *     MANIPULATOR MANAGEMENT           *
+	 ****************************************/
+protected:
+	/// manipulator pointer to Manipulator object that currently work on map
+	MapManipulator* m_manipulator;
+
+public:
+	/**
+	 * @brief ask for associating manipulator to the map
+	 * @param ptr Manipulator ptr
+	 * @return ok or not
+	 */
+	bool askManipulate(MapManipulator* ptr);
+
+	/**
+	 * @brief release the map from manipulator
+	 * @param ptr manipulator asking for release
+	 * @return ok or not
+	 */
+	bool releaseManipulate(MapManipulator* ptr);
+
+	/**
+	 * @brief get the manipulator
+	 * @return manipulator ptr
+	 */
+	MapManipulator* getManipulator();
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -461,7 +490,7 @@ public:
 	/**
 	 * @brief dump all attributes of map in CSV format  (; separated columns)
 	 */
-	void dumpCSV() const;
+	virtual void dumpCSV() const;
 
 public:
 	/**
@@ -472,39 +501,32 @@ public:
 } ;
 
 
+/**
+ * @brief The MapManipulator class
+ */
+class MapManipulator
+{
+protected:
+	std::string m_name;
+public:
+	MapManipulator(const std::string& name, GenericMap *gm):
+		m_name(name)
+	{
+		gm->askManipulate(this);
+	}
 
-//
-//template <typename MAP>
-//bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
-//{
-//	switch(orbit)
-//	{
-//		case  DART: return f(d);
-//		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread) ;
-//		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread) ;
-//		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
-//		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread) ;
-//		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread) ;
-//		default: assert(!"Cells of this dimension are not handled") ;
-//	}
-//	return false ;
-//}
-//
-//template <typename MAP>
-//bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
-//{
-//	switch(orbit)
-//	{
-//		case  DART: return f(d);
-//		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread) ;
-//		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread) ;
-//		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
-//		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread) ;
-//		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread) ;
-//		default: assert(!"Cells of this dimension are not handled") ;
-//	}
-//	return false ;
-//}
+	~MapManipulator():
+		m_name(name)
+	{
+		gm->releaseManipulate(this);
+	}
+
+	const std::string& name() { return m_name;}
+
+	virtual MapManipulator* create(GenericMap *gm);
+};
+
+
 
 } //namespace CGoGN
 

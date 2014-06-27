@@ -230,16 +230,24 @@ bool MapMulti::saveMapBin(const std::string& filename) const
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_attribs[i].saveBin(fs, i);
 
+	// save mr_attrtibs
 	m_mrattribs.saveBin(fs, 00);
 
+	// save current level
 	fs.write(reinterpret_cast<const char*>(&m_mrCurrentLevel), sizeof(unsigned int));
 
+	// save table of nb darts per level
 	unsigned int nb = m_mrNbDarts.size();
 	fs.write(reinterpret_cast<const char*>(&nb), sizeof(unsigned int));
 	fs.write(reinterpret_cast<const char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
 
+//	nb = m_mrLevelStack.size();
+//	fs.write(reinterpret_cast<const char*>(&nb), sizeof(unsigned int));
+//	fs.write(reinterpret_cast<const char*>(&(m_mrLevelStack[0])), nb *sizeof(unsigned int));
+
 	return true;
 }
+
 
 bool MapMulti::loadMapBin(const std::string& filename)
 {
@@ -250,7 +258,18 @@ bool MapMulti::loadMapBin(const std::string& filename)
 		return false;
 	}
 
-	GenericMap::clear(true);
+	// clear the map but do not insert boundary markers dart attribute
+	GenericMap::init(false);
+
+	// init MR data without adding the attributes
+	m_mrattribs.clear(true) ;
+	m_mrattribs.setRegistry(m_attributes_registry_map) ;
+	m_mrDarts.clear() ;
+	m_mrDarts.reserve(16) ;
+	m_mrNbDarts.clear();
+	m_mrNbDarts.reserve(16);
+	m_mrLevelStack.clear() ;
+	m_mrLevelStack.reserve(16) ;
 
 	// read info
 	char* buff = new char[256];
@@ -298,10 +317,12 @@ bool MapMulti::loadMapBin(const std::string& filename)
 		m_attribs[id].loadBin(fs);
 	}
 
-	AttributeContainer::loadBinId(fs); // not used but need to read to skip
+	AttributeContainer::loadBinId(fs); // not used but need to read for skipping data file
 	m_mrattribs.loadBin(fs);
 
+	// read current level
 	fs.read(reinterpret_cast<char*>(&m_mrCurrentLevel), sizeof(unsigned int));
+	// read table of nb darts per level
 	unsigned int nb;
 	fs.read(reinterpret_cast<char*>(&nb), sizeof(unsigned int));
 	m_mrNbDarts.resize(nb);
@@ -506,6 +527,16 @@ void MapMulti::compactTopo()
 		}
 	}
 }
+
+
+void MapMulti::dumpCSV() const
+{
+	CGoGNout << "Container of MR_DART"<< CGoGNendl;
+	m_mrattribs.dumpCSV();
+	CGoGNout << CGoGNendl;
+	GenericMap::dumpCSV();
+}
+
 
 
 } //namespace CGoGN

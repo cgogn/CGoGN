@@ -44,10 +44,10 @@ namespace Regular
 
 template <typename PFP>
 Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
+	MapManipulator("DualRegular2",&map),
 	m_map(map),
 	shareVertexEmbeddings(false)
 {
-
 }
 
 template <typename PFP>
@@ -62,6 +62,17 @@ Map2MR<PFP>::~Map2MR()
 	for(unsigned int i = 0 ; i < level ; ++i)
 		m_map.removeLevelFront();
 }
+
+template <typename PFP>
+MapManipulator* Map2MR<PFP>::create(GenericMap *gm)
+{
+	typename PFP::MAP* map = dynamic_cast<typename PFP::MAP*>(gm);
+	if (map != NULL)
+		return (new Map2MR<PFP>(*map));
+	else
+		return NULL;
+}
+
 
 template <typename PFP>
 void Map2MR<PFP>::addNewLevel(bool embedNewVertices)

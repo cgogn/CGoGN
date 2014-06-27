@@ -306,6 +306,8 @@ public:
 	bool copyFromOtherType(const MapMono& map);
 
 	void restore_topo_shortcuts();
+
+	virtual void dumpCSV() const;
 } ;
 
 } //namespace CGoGN
