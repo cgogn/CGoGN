@@ -1036,7 +1036,7 @@ void GLSLShader::setCurrentOGLVersion(unsigned int version)
  */
 void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview)
 {
-	this->bind();
+    this->bind();
 
 	if (*m_uniMat_Proj >= 0)
 		glUniformMatrix4fv(*m_uniMat_Proj, 1, false, &projection[0][0]);

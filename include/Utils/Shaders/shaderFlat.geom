@@ -19,9 +19,11 @@ void main(void)
 	vec4 newPos =  ModelViewMatrix * vec4(center,0.0);
 	vec3 L =  normalize (lightPosition - newPos.xyz);
 	float lambertTerm = dot(N,L);
-	ColorFS = ambient;
-	if(lambertTerm > 0.0)
-		ColorFS += diffuse * lambertTerm;
+        ColorFS = ambient;
+
+        if(lambertTerm > 0.0)
+                ColorFS += diffuse * lambertTerm;
+
 	int i;
 	for(i=0; i< NBVERTS_IN; i++)
 	{
