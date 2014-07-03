@@ -501,33 +501,6 @@ public:
 } ;
 
 
-/**
- * @brief The MapManipulator class
- */
-class MapManipulator
-{
-protected:
-	std::string m_name;
-public:
-	MapManipulator(const std::string& name, GenericMap *gm):
-		m_name(name)
-	{
-		gm->askManipulate(this);
-	}
-
-	~MapManipulator():
-		m_name(name)
-	{
-		gm->releaseManipulate(this);
-	}
-
-	const std::string& name() { return m_name;}
-
-	virtual MapManipulator* create(GenericMap *gm);
-};
-
-
-
 } //namespace CGoGN
 
 #include "Topology/generic/genericmap.hpp"

@@ -200,7 +200,13 @@ public:
 	inline void markAll()
 	{
 		assert(m_markVector != NULL);
-		m_markVector->allFalse();
+
+		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
+		if (cont.hasBrowser())
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				this->m_markVector->setTrue(i);
+		else
+			m_markVector->allTrue();
 	}
 
 	inline bool isAllUnmarked()
@@ -208,10 +214,15 @@ public:
 		assert(m_markVector != NULL);
 
 		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			if(m_markVector->operator[](i))
+		if (cont.hasBrowser())
+		{
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				if(m_markVector->operator[](i))
 				return false ;
-		return true ;
+			return true ;
+		}
+		//else
+		return m_markVector->isAllFalse();
 	}
 };
 
@@ -244,7 +255,13 @@ public:
 	inline void unmarkAll()
 	{
 		assert(this->m_markVector != NULL);
-		this->m_markVector->allFalse();
+
+		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
+		if (cont.hasBrowser())
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				this->m_markVector->setFalse(i);
+		else
+			this->m_markVector->allFalse();
 	}
 };
 
@@ -380,32 +397,95 @@ public:
 template <typename MAP, unsigned int CELL>
 class CellMarkerNoUnmark: public CellMarkerBase<MAP, CELL>
 {
+#ifndef NDEBUG
+	int m_counter;
+#endif
 public:
 	CellMarkerNoUnmark(MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
+  #ifndef NDEBUG
+		,m_counter(0)
+  #endif
 	{}
 
 	CellMarkerNoUnmark(const MAP& map, unsigned int thread = 0) :
 		CellMarkerBase<MAP, CELL>(map, thread)
+  #ifndef NDEBUG
+		,m_counter(0)
+  #endif
 	{}
 
 	virtual ~CellMarkerNoUnmark()
 	{
-//		assert(isAllUnmarked()) ;
-//		CGoGN_ASSERT(this->isAllUnmarked())
+#ifndef NDEBUG
+		if (m_counter != 0)
+		{
+			CGoGNerr << "CellMarkerNoUnmark: Warning problem unmarking not complete"<< CGoGNendl;
+			CGoGNerr << "CellMarkerNoUnmark:  -> calling unmarkAll()"<< CGoGNendl;
+			unmarkAll();
+		}
+#endif
 	}
 
 protected:
 	CellMarkerNoUnmark(const CellMarkerNoUnmark& cm) :
 		CellMarkerBase<MAP, CELL>(cm)
+  #ifndef NDEBUG
+		,m_counter(cm.m_counter)
+  #endif
 	{}
 
 public:
 	inline void unmarkAll()
 	{
 		assert(this->m_markVector != NULL);
-		this->m_markVector->allFalse();
+
+		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
+		if (cont.hasBrowser())
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				this->m_markVector->setFalse(i);
+		else
+			this->m_markVector->allFalse();
 	}
+
+
+#ifndef NDEBUG
+	inline void mark(Cell<CELL> c)
+	{
+		if (this->isMarked(c))
+			return;
+		CellMarkerBase<MAP, CELL>::mark(c) ;
+		m_counter++;
+	}
+
+	inline void unmark(Cell<CELL> c)
+	{
+		if (!this->isMarked(c))
+			return;
+		CellMarkerBase<MAP, CELL>::unmark(c) ;
+		m_counter--;
+	}
+
+	inline void mark(unsigned int i)
+	{
+		if (this->isMarked(i))
+			return;
+		CellMarkerBase<MAP, CELL>::mark(i) ;
+		m_counter++;
+	}
+
+	/**
+	 * unmark the dart
+	 */
+	inline void unmark(unsigned int i)
+	{
+		if (!this->isMarked(i))
+			return;
+		CellMarkerBase<MAP, CELL>::unmark(i) ;
+		m_counter--;
+	}
+
+#endif
 };
 
 // Selector and count functors testing for marker existence

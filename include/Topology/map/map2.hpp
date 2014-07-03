@@ -227,7 +227,10 @@ void Map2<MAP_IMPL>::deleteCC(Dart d)
 	}
 
 	for(std::vector<Dart>::iterator it = visited.begin(); it != visited.end(); ++it)
+	{
+		mark.unmark(*it);
 		this->deleteDart(*it) ;
+	}
 }
 
 template <typename MAP_IMPL>
