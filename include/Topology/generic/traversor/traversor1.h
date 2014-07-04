@@ -26,7 +26,6 @@
 #define __TRAVERSOR1_H__
 
 #include "Topology/generic/dart.h"
-#include "Topology/generic/traversor/traversorGen.h"
 
 namespace CGoGN
 {
@@ -37,7 +36,7 @@ namespace CGoGN
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor1VE: public Traversor
+class Traversor1VE
 {
 private:
 	const MAP& m ;
@@ -56,7 +55,7 @@ public:
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
 template <typename MAP>
-class Traversor1VVaE: public Traversor
+class Traversor1VVaE
 {
 private:
 	const MAP& m ;
@@ -79,7 +78,7 @@ public:
 
 // Traverse the vertices incident to a given edge
 template <typename MAP>
-class Traversor1EV: public Traversor
+class Traversor1EV
 {
 private:
 	const MAP& m ;
@@ -98,7 +97,7 @@ public:
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
 template <typename MAP>
-class Traversor1EEaV: public Traversor
+class Traversor1EEaV
 {
 private:
 	const MAP& m ;

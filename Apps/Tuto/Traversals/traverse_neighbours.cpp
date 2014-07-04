@@ -42,7 +42,6 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 
 
@@ -51,7 +50,7 @@ int main()
 	// declare a map to handle the mesh
 	MAP myMap;
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 	// create a topo grid of 2x2 squares
 	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 4, 4, true);
 	// and embed it using position attribute
@@ -64,15 +63,14 @@ int main()
 		if (position[it] == VEC3(0,0,0))
 		{
 			v = it;
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	});
 
 	// must test of find ok (if not v.dart is NIL)
 	if (! v.valid())
 		std::cerr << "could not find a vertex with position (0,0,0)" << std::endl;
-
 
 // WITH TRAVERSORS:
 	

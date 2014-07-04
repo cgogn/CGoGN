@@ -177,8 +177,8 @@ void MyQT::traversors(int x)
 
 void MyQT::createMap(int n)
 {
-	position = myMap.addAttribute<VEC3, VERTEX>("position");
-	colorDarts = myMap.addAttribute<VEC3, DART>("color");
+	position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
+	colorDarts = myMap.addAttribute<VEC3, DART, MAP>("color");
 
     Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, n, n, true);
     grid.embedIntoGrid(position, 1.,1.,0.);
@@ -379,7 +379,7 @@ void MyQT::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
+		position = myMap.getAttribute<VEC3, VERTEX, MAP>("position") ;
 	}
 	else
 	{
@@ -389,13 +389,13 @@ void MyQT::importMesh(std::string& filename)
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
 		}
-		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
+		position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
 	}
 
-	colorDarts = myMap.getAttribute<VEC3, DART>("color");
+	colorDarts = myMap.getAttribute<VEC3, DART, MAP>("color");
 	if (!colorDarts.isValid())
 	{
-		colorDarts = myMap.addAttribute<VEC3, DART>("color");
+		colorDarts = myMap.addAttribute<VEC3, DART, MAP>("color");
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
 			if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))

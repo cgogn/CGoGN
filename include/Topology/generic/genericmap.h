@@ -33,7 +33,6 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <boost/thread/mutex.hpp>
 
 #include "Container/attributeContainer.h"
 #include "Container/fakeAttribute.h"
@@ -43,8 +42,33 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
 
+#include <thread>
+#include <mutex>
+
 namespace CGoGN
 {
+
+namespace Parallel
+{
+/**
+ * @brief Number of threads used for // traversal foreach
+ */
+extern int NumberOfThreads;
+
+/**
+ * @brief get number of cores of computer (threads, /2 if hyperthreading)
+ * @param hyperthreading
+ * @return nb of core
+ */
+inline int getSystemNumberOfCores(bool hyperthreading=false)
+{
+	if (hyperthreading)
+		return std::thread::hardware_concurrency()/2;
+	return std::thread::hardware_concurrency();
+}
+
+}
+
 
 class AttributeHandlerGen ;
 class DartMarkerGen ;
@@ -58,18 +82,29 @@ class GenericMap
 	template<typename T, typename MAP> friend class EdgeAutoAttribute ;
 	template<typename T, typename MAP> friend class FaceAutoAttribute ;
 	template<typename T, typename MAP> friend class VolumeAutoAttribute ;
-	friend class DartMarkerGen ;
-	friend class CellMarkerGen ;
-	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
+//	friend class DartMarkerGen ;
+//	friend class CellMarkerGen ;
+//	template<typename MAP, unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
+	// protected copy constructor to prevent the copy of map
+	GenericMap(const GenericMap& ) {}
+
 	/**
 	 * Attributes Containers
 	 */
 	AttributeContainer m_attribs[NB_ORBITS] ;
 
-	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map ;
+	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
 	static int m_nbInstances;
+
+	// buffer for less memory allocation
+	static  std::vector< std::vector<Dart>* >* s_vdartsBuffers;
+	static  std::vector< std::vector<unsigned int>* >* s_vintsBuffers;
+
+	// table of instancied maps for Dart/CellMarker release
+	static std::vector<GenericMap*>* s_instances;
+
 
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
@@ -85,31 +120,21 @@ protected:
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalIncidentTraversal[NB_ORBITS][NB_ORBITS] ;
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalAdjacentTraversal[NB_ORBITS][NB_ORBITS] ;
 
-	/**
-	 * Marks manager
-	 */
-	MarkSet m_marksets[NB_ORBITS][NB_THREAD] ;
+	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS][NB_THREAD] ;
+	std::mutex m_MarkerStorageMutex[NB_ORBITS];
 
-	/**
-	 * Direct access to the attributes that store Marks
-	 */
-	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD] ;
+	unsigned int m_nextMarkerId;
 
 	/**
 	 * Reserved boundary markers
 	 */
-	Mark m_boundaryMarkers[2] ; // 0 for dim 2 / 1 for dim 3
-
-	unsigned int m_nbThreads ;
+	AttributeMultiVector<MarkerBool>* m_boundaryMarkers[2];
 
 	/**
-	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
+	 * Store links to created AttributeHandlers
 	 */
-	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!)
-	boost::mutex attributeHandlersMutex;
-
-	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
-	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
+	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
+	std::mutex attributeHandlersMutex;
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
@@ -118,8 +143,25 @@ public:
 
 	virtual ~GenericMap() ;
 
+	static inline bool alive(GenericMap* map)
+	{
+		for (auto it=s_instances->begin(); it != s_instances->end(); ++it)
+		{
+			if (*it == map)
+				return true;
+		}
+		return false;
+	}
+
+	static inline std::vector<Dart>* askDartBuffer(unsigned int orbit);
+	static inline void releaseDartBuffer(std::vector<Dart>* vd, unsigned int orbit);
+
+	static inline std::vector<unsigned int>* askUIntBuffer(unsigned int orbit);
+	static inline void releaseUIntBuffer(std::vector<unsigned int>* vd, unsigned int orbit);
+
+
 protected:
-	void init();
+	void init(bool addBoundaryMarkers=true);
 
 public:
 	virtual std::string mapTypeName() const = 0 ;
@@ -134,11 +176,6 @@ public:
 	 */
 	virtual void clear(bool removeAttrib) ;
 
-	/**
-	 * get the marker_set of an orbit and thread (used for Cell & Dart Marker)
-	 */
-	template <unsigned int ORBIT>
-	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -169,28 +206,18 @@ public:
 	 *          ORBITS TRAVERSALS           *
 	 ****************************************/
 
-	//! Apply a function on every dart of an orbit
-	/*! @param c a cell
-	 *  @param f a function
-	 */
-	template <unsigned int ORBIT>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+//	virtual void foreach_dart_of_vertex(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_edge(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_face(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_volume(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_cc(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
-	template <unsigned int ORBIT>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, std::function<void (Dart)>& f, unsigned int thread = 0) const ;
+//	virtual void foreach_dart_of_vertex1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_edge1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
-	virtual void foreach_dart_of_vertex(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_edge(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_face(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_volume(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_cc(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-
-	virtual void foreach_dart_of_vertex1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_edge1(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-
-	virtual void foreach_dart_of_vertex2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_edge2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
-	virtual void foreach_dart_of_face2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_vertex2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_edge2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
+//	virtual void foreach_dart_of_face2(Dart /*d*/, std::function<void (Dart)>& /*f*/, unsigned int /*thread = 0*/) const { std::cerr << "Not implemented" << std::endl; }
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -262,10 +289,28 @@ public:
 	inline AttributeMultiVectorGen* getAttributeVectorGen(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
-	 * get a multi vector of mark attribute (direct access with [i])
+	 * @brief ask for a marker attribute
 	 */
 	template <unsigned int ORBIT>
-	AttributeMultiVector<Mark>* getMarkVector(unsigned int thread = 0) ;
+	AttributeMultiVector<MarkerBool>* askMarkVector(unsigned int thread=0) ;
+
+	/**
+	 * @brief release allocated marker attribute
+	 */
+	template <unsigned int ORBIT>
+	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread=0);
+
+protected:
+	/**
+	 * @brief scan attributes for MarkerBool, clean them and store as free in thread 0
+	 */
+	void garbageMarkVectors();
+
+	/**
+	 * @brief scan attributes for MarkerBool and remove them
+	 */
+	void removeMarkVectors();
+public:
 
 	/**
 	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
@@ -323,24 +368,24 @@ protected:
 	 *          THREAD MANAGEMENT           *
 	 ****************************************/
 public:
-	/**
-	 * add threads (a table of Marker per orbit for each thread)
-	 * to allow MT
-	 * @param nb thread to add
-	 */
-	void addThreadMarker(unsigned int nb) ;
+//	/**
+//	 * add threads (a table of Marker per orbit for each thread)
+//	 * to allow MT
+//	 * @param nb thread to add
+//	 */
+//	void addThreadMarker(unsigned int nb) ;
 
-	/**
-	 * return allowed threads
-	 * @return the number of threads (including principal)
-	 */
-	unsigned int getNbThreadMarkers() ;
+//	/**
+//	 * return allowed threads
+//	 * @return the number of threads (including principal)
+//	 */
+//	unsigned int getNbThreadMarkers() const;
 
-	/**
-	 * Remove some added threads
-	 * @return remaining number of threads (including principal)
-	 */
-	void removeThreadMarker(unsigned int nb) ;
+//	/**
+//	 * Remove some added threads
+//	 * @return remaining number of threads (including principal)
+//	 */
+//	void removeThreadMarker(unsigned int nb) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *
@@ -385,9 +430,32 @@ protected:
 public:
 	/**
 	 * compact the map
+	 * @warning the quickTraversals needs to be updated
 	 */
-	void compact() ;
+	void compact(bool topoOnly = false) ;
+
+
+	/**
+	 * test if containers are fragmented
+	 *  ~1.0 no need to compact
+	 *  ~0.0 need to compact
+	 */
+	inline float fragmentation(unsigned int orbit);
+
+	/**
+	 * @brief dump all attributes of map in CSV format  (; separated columns)
+	 */
+	void dumpCSV() const;
+
+public:
+	/**
+	 * @brief move data (container && shortcuts from a map to this map
+	 * @param mapf map from which data are moved);
+	 */
+	void moveData(GenericMap &mapf);
 } ;
+
+
 
 //
 //template <typename MAP>

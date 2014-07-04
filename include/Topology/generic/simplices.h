@@ -27,7 +27,7 @@
 
 #include <iostream>
 #include "cells.h"
-#include "Algo/Topo/Generic/simplex.h"
+#include "Algo/Topo/simplex.h"
 
 namespace CGoGN
 {

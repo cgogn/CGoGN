@@ -50,14 +50,13 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP;
-typedef PFP::MAP::IMPL MAP_IMPL;
 typedef PFP::VEC3 VEC3;
 
 PFP::MAP myMap;
 
-VertexAttribute<VEC3, MAP_IMPL> position;
-VertexAttribute<VEC3, MAP_IMPL> position2;
-VertexAttribute<VEC3, MAP_IMPL> normal;
+VertexAttribute<VEC3, MAP> position;
+VertexAttribute<VEC3, MAP> position2;
+VertexAttribute<VEC3, MAP> normal;
 
 void MyQT::cb_initGL()
 {
@@ -106,12 +105,12 @@ void MyQT::squareTiling(int code)
 		case 1:
 		{
 			std::cout << "square grid tiling" << std::endl;
-			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
-			g.embedIntoGrid(position,1.0,1.0, 0.0);
+			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap, 10, 10, true);
+			g.embedIntoGrid(position, 1.0, 1.0, 0.0);
 
 			Geom::Matrix44f trf;
 			trf.identity();
-			Geom::translate<float>(0.5,0.5,0.0,trf);
+			Geom::translate<float>(0.5, 0.5, 0.0, trf);
 			g.transform(position, trf);
 
 			g.exportPositions(position, "grid.bs");
@@ -121,12 +120,12 @@ void MyQT::squareTiling(int code)
 		case 2:
 		{
 			std::cout << "square grid twisted strip tiling" << std::endl;
-			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,10,10,true);
+			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap, 10, 10, true);
 			g.embedIntoTwistedStrip(position, 0.2, 0.7, 5);
 
 			Geom::Matrix44f trf;
 			trf.identity();
-			Geom::translate<float>(0.5,0.5,0.0,trf);
+			Geom::translate<float>(0.5, 0.5, 0.0, trf);
 			g.transform(position, trf);
 
 
@@ -421,10 +420,10 @@ int main(int argc, char **argv)
 	CGoGNStream::allToConsole(&sqt);
 
 	if (!position.isValid())
-		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+		position = myMap.addAttribute<PFP::VEC3, VERTEX, MAP>("position");
 
 	if (!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
+		normal = myMap.addAttribute<PFP::VEC3, VERTEX, MAP>("normal");
 
 	if(argc == 3)
 	{

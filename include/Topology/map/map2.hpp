@@ -236,7 +236,7 @@ void Map2<MAP_IMPL>::fillHole(Dart d)
 	assert(isBoundaryEdge(d)) ;
 	if(!this->template isBoundaryMarked<2>(d))
 		d = phi2(d) ;
-	this->template boundaryUnmarkOrbit<2,FACE>(d) ;
+	Algo::Topo::boundaryUnmarkOrbit<2,FACE>(*this, d) ;
 }
 
 template <typename MAP_IMPL>
@@ -789,7 +789,7 @@ Dart Map2<MAP_IMPL>::findBoundaryEdgeOfFace(Face f) const
 template <typename MAP_IMPL>
 bool Map2<MAP_IMPL>::sameOrientedVolume(Vol v1, Vol v2) const
 {
-	DartMarkerStore<MAP_IMPL> mark(*this);	// Lock a marker
+	DartMarkerStore<Map2<MAP_IMPL> > mark(*this);	// Lock a marker
 
 	std::list<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.push_back(v1.dart);	// Start with a face of v1
@@ -828,7 +828,7 @@ template <typename MAP_IMPL>
 unsigned int Map2<MAP_IMPL>::volumeDegree(Vol v) const
 {
 	unsigned int count = 0;
-	DartMarkerStore<MAP_IMPL> mark(*this);		// Lock a marker
+	DartMarkerStore<Map2<MAP_IMPL> > mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(16);
@@ -860,7 +860,7 @@ template <typename MAP_IMPL>
 int Map2<MAP_IMPL>::checkVolumeDegree(Vol v, unsigned int vd) const
 {
 	unsigned int count = 0;
-	DartMarkerStore<MAP_IMPL> mark(*this);		// Lock a marker
+	DartMarkerStore<Map2<MAP_IMPL> > mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(16);
@@ -907,7 +907,7 @@ template <typename MAP_IMPL>
 bool Map2<MAP_IMPL>::check() const
 {
 	CGoGNout << "Check: topology begin" << CGoGNendl;
-	DartMarker<MAP_IMPL> m(*this);
+	DartMarker<Map2<MAP_IMPL> > m(*this);
 	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
 		Dart d2 = phi2(d);
@@ -961,7 +961,7 @@ bool Map2<MAP_IMPL>::check() const
 template <typename MAP_IMPL>
 bool Map2<MAP_IMPL>::checkSimpleOrientedPath(std::vector<Dart>& vd)
 {
-	DartMarkerStore<MAP_IMPL> dm(*this) ;
+	DartMarkerStore<Map2<MAP_IMPL> > dm(*this) ;
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
 		if(dm.isMarked(*it))
@@ -985,7 +985,42 @@ bool Map2<MAP_IMPL>::checkSimpleOrientedPath(std::vector<Dart>& vd)
  *************************************************************************/
 
 template <typename MAP_IMPL>
-inline void Map2<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <unsigned int ORBIT, typename FUNC>
+void Map2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <unsigned int ORBIT, typename FUNC>
+void Map2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void Map2<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	Dart dNext = d;
 	do
@@ -996,28 +1031,46 @@ inline void Map2<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (D
 }
 
 template <typename MAP_IMPL>
-inline void Map2<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <typename FUNC>
+inline void Map2<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	f(d);
 	f(phi2(d));
 }
 
 template <typename MAP_IMPL>
-inline void Map2<MAP_IMPL>::foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void Map2<MAP_IMPL>::foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void Map2<MAP_IMPL>::foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void Map2<MAP_IMPL>::foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread) const
 {
 	foreach_dart_of_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-void Map2<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void Map2<MAP_IMPL>::foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread) const
 {
-	DartMarkerStore<MAP_IMPL> mark(*this, thread);	// Lock a marker
+	return ParentMap::foreach_dart_of_vertex(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void Map2<MAP_IMPL>::foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread) const
+{
+	return ParentMap::foreach_dart_of_edge(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+void Map2<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread) const
+{
+	DartMarkerStore<Map2<MAP_IMPL> > mark(*this, thread);	// Lock a marker
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
@@ -1046,18 +1099,6 @@ void Map2<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, u
 	}
 }
 
-template <typename MAP_IMPL>
-inline void Map2<MAP_IMPL>::foreach_dart_of_vertex1(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
-{
-	return ParentMap::foreach_dart_of_vertex(d, f, thread);
-}
-
-template <typename MAP_IMPL>
-inline void Map2<MAP_IMPL>::foreach_dart_of_edge1(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
-{
-	return ParentMap::foreach_dart_of_edge(d, f, thread);
-}
-
 /*! @name Close map after import or creation
  *  These functions must be used with care, generally only by import/creation algorithms
  *************************************************************************/
@@ -1066,7 +1107,7 @@ template <typename MAP_IMPL>
 Dart Map2<MAP_IMPL>::newBoundaryCycle(unsigned int nbE)
 {
 	Dart d = ParentMap::newCycle(nbE);
-	this->template boundaryMarkOrbit<2,FACE>(d);
+	Algo::Topo::boundaryMarkOrbit<2,FACE>(*this, d);
 	return d;
 }
 
@@ -1100,7 +1141,7 @@ unsigned int Map2<MAP_IMPL>::closeHole(Dart d, bool forboundary)
 	} while (dPhi1 != d);
 
 	if (forboundary)
-		this->template boundaryMarkOrbit<2,FACE>(phi2(d));
+		Algo::Topo::boundaryMarkOrbit<2,FACE>(*this, phi2(d));
 
 	return countEdges ;
 }
@@ -1128,10 +1169,10 @@ unsigned int Map2<MAP_IMPL>::closeMap(bool forboundary)
 template <typename MAP_IMPL>
 void Map2<MAP_IMPL>::reverseOrientation()
 {
-	DartAttribute<unsigned int, MAP_IMPL> emb0(this, this->template getEmbeddingAttributeVector<VERTEX>()) ;
+	DartAttribute<unsigned int, Map2<MAP_IMPL> > emb0(this, this->template getEmbeddingAttributeVector<VERTEX>()) ;
 	if(emb0.isValid())
 	{
-		DartAttribute<unsigned int, MAP_IMPL> new_emb0 = this->template addAttribute<unsigned int, DART>("new_EMB_0") ;
+		DartAttribute<unsigned int, Map2<MAP_IMPL> > new_emb0 = this->template addAttribute<unsigned int, DART, Map2<MAP_IMPL> >("new_EMB_0") ;
 		for(Dart d = this->begin(); d != this->end(); this->next(d))
 			new_emb0[d] = emb0[this->phi1(d)] ;
 
@@ -1139,8 +1180,8 @@ void Map2<MAP_IMPL>::reverseOrientation()
 		this->removeAttribute(new_emb0) ;
 	}
 
-	DartAttribute<Dart, MAP_IMPL> n_phi1 = this->getPermutation(0) ;
-	DartAttribute<Dart, MAP_IMPL> n_phi_1 = this->getPermutationInv(0) ;
+	DartAttribute<Dart, Map2<MAP_IMPL> > n_phi1(this, this->getPermutationAttribute(0)) ;
+	DartAttribute<Dart, Map2<MAP_IMPL> > n_phi_1(this, this->getPermutationInvAttribute(0)) ;
 
 	this->swapAttributes(n_phi1, n_phi_1) ;
 }
@@ -1148,11 +1189,11 @@ void Map2<MAP_IMPL>::reverseOrientation()
 template <typename MAP_IMPL>
 void Map2<MAP_IMPL>::computeDual()
 {
-	DartAttribute<Dart, MAP_IMPL> old_phi1 = this->getPermutation(0) ;
-	DartAttribute<Dart, MAP_IMPL> old_phi_1 = this->getPermutationInv(0) ;
+	DartAttribute<Dart, Map2<MAP_IMPL> > old_phi1(this, this->getPermutationAttribute(0)) ;
+	DartAttribute<Dart, Map2<MAP_IMPL> > old_phi_1(this, this->getPermutationInvAttribute(0)) ;
 
-	DartAttribute<Dart, MAP_IMPL> new_phi1 = this->template addAttribute<Dart, DART>("new_phi1") ;
-	DartAttribute<Dart, MAP_IMPL> new_phi_1 = this->template addAttribute<Dart, DART>("new_phi_1") ;
+	DartAttribute<Dart, Map2<MAP_IMPL> > new_phi1 = this->template addAttribute<Dart, DART, Map2<MAP_IMPL> >("new_phi1") ;
+	DartAttribute<Dart, Map2<MAP_IMPL> > new_phi_1 = this->template addAttribute<Dart, DART, Map2<MAP_IMPL> >("new_phi_1") ;
 
 	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
@@ -1176,7 +1217,7 @@ void Map2<MAP_IMPL>::computeDual()
 	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
 		if(this->template isBoundaryMarked<2>(d))
-			this->template boundaryMarkOrbit<2,FACE>(deleteVertex(phi2(d)));
+			Algo::Topo::boundaryMarkOrbit<2,FACE>(*this, deleteVertex(phi2(d)));
 	}
 }
 

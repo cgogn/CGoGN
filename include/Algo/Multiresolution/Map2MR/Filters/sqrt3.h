@@ -106,15 +106,14 @@ template <typename PFP>
 class Sqrt3FaceSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	Sqrt3FaceSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	Sqrt3FaceSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -154,15 +153,14 @@ template <typename PFP>
 class Sqrt3VertexSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	Sqrt3VertexSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	Sqrt3VertexSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -242,15 +240,14 @@ template <typename PFP>
 class Sqrt3VertexAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	Sqrt3VertexAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	Sqrt3VertexAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -296,15 +293,14 @@ template <typename PFP>
 class Sqrt3FaceAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	Sqrt3FaceAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	Sqrt3FaceAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()

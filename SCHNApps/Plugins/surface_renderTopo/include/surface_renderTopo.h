@@ -25,7 +25,7 @@ struct MapParameters
 		facesScaleFactor(1.0f)
 	{}
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> positionAttribute;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionAttribute;
 	bool drawDarts;
 	QColor dartsColor;
 	bool drawPhi1;

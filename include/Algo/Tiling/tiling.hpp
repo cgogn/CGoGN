@@ -57,7 +57,7 @@ Tiling<PFP>::Tiling(const Tiling<PFP>& t1, const Tiling<PFP> t2):
 }
 
 template <typename PFP>
-void Tiling<PFP>::computeCenter(VertexAttribute<VEC3, MAP_IMPL>& position)
+void Tiling<PFP>::computeCenter(VertexAttribute<VEC3, MAP>& position)
 {
     typename PFP::VEC3 center(0);
 
@@ -72,7 +72,7 @@ void Tiling<PFP>::computeCenter(VertexAttribute<VEC3, MAP_IMPL>& position)
 
 template <typename PFP>
 //void Tiling<PFP>::transform(float* matrice)
-void Tiling<PFP>::transform(VertexAttribute<VEC3, MAP_IMPL>& position, const Geom::Matrix44f& matrice)
+void Tiling<PFP>::transform(VertexAttribute<VEC3, MAP>& position, const Geom::Matrix44f& matrice)
 {
 //	Geom::Vec4f v1(matrice[0],matrice[4],matrice[8], matrice[12]);
 //	Geom::Vec4f v2(matrice[1],matrice[5],matrice[9], matrice[13]);
@@ -105,7 +105,7 @@ void Tiling<PFP>::mark(CellMarker<MAP, VERTEX>& m)
 }
 
 template <typename PFP>
-bool Tiling<PFP>::exportPositions(const VertexAttribute<VEC3, MAP_IMPL>& position, const char* filename)
+bool Tiling<PFP>::exportPositions(const VertexAttribute<VEC3, MAP>& position, const char* filename)
 {
 	// open file
 	std::ofstream out ;

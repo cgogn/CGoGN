@@ -39,7 +39,7 @@
 
 MAP myMap;
 
-VertexAttribute<VEC3, MAP_IMPL> position ;
+VertexAttribute<VEC3, MAP> position ;
 Dart dglobal;
 
 void MyQT::cb_checkTopo(bool b)
@@ -326,7 +326,7 @@ int main(int argc, char **argv)
 {
     if(argc == 1)
     {
-        position = myMap.addAttribute<VEC3, VERTEX>( "position");
+		position = myMap.addAttribute<VEC3, VERTEX, MAP>( "position");
 
         Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, 3, 3, 3);
         cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
@@ -369,15 +369,14 @@ int main(int argc, char **argv)
 
             //myMap.dumpAttributesAndMarkers();
 
-            position = myMap.getAttribute<PFP::VEC3, VERTEX>("position");
+			position = myMap.getAttribute<PFP::VEC3, VERTEX, MAP>("position");
         }
         else if(!Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames))
         {
             std::cerr << "could not import " << filename << std::endl ;
             return -1;
         }
-        position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
-
+		position = myMap.getAttribute<PFP::VEC3, VERTEX, MAP>(attrNames[0]) ;
     }
 
     // un peu d'interface

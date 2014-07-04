@@ -42,7 +42,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		DartMarker<MAP>& inactive,
 		Algo::Surface::Decimation::SelectorType s,
 		Algo::Surface::Decimation::ApproximatorType a,
-		VertexAttribute<VEC3, MAP_IMPL>& pos
+		VertexAttribute<VEC3, MAP>& pos
 	) :
 	m_map(map),
 	position(pos),
@@ -50,7 +50,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 
-	std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos_v ;
+	std::vector<VertexAttribute<VEC3, MAP>*> pos_v ;
 	pos_v.push_back(&position) ;
 	switch(a)
 	{

@@ -89,7 +89,7 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d)
 }
 
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, Dart d, Geom::Plane3D<typename PFP::REAL> pl)
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, Dart d, Geom::Plane3D<typename PFP::REAL> pl)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -217,7 +217,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 }
 
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, Dart d, CellMarker<typename PFP::MAP, EDGE>& edgesToCut, CellMarker<typename PFP::MAP, VERTEX>& verticesToSplit)
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, Dart d, CellMarker<typename PFP::MAP, EDGE>& edgesToCut, CellMarker<typename PFP::MAP, VERTEX>& verticesToSplit)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -318,7 +318,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 }
 
 template <typename PFP>
-std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, CellMarker<typename PFP::MAP, VOLUME>& volumesToCut, CellMarker<typename PFP::MAP, EDGE>& edgesToCut, CellMarker<typename PFP::MAP, VERTEX>& verticesToSplit)
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, CellMarker<typename PFP::MAP, VOLUME>& volumesToCut, CellMarker<typename PFP::MAP, EDGE>& edgesToCut, CellMarker<typename PFP::MAP, VERTEX>& verticesToSplit)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -447,14 +447,13 @@ template <typename PFP, typename EMBV>
 void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename EMBV::DATA_TYPE EMB;
 
 	//std::vector<Dart> l_centers;
 	std::vector<Dart> l_vertices;
 
 	//pre-computation : compute the centroid of all volume
-	VolumeAutoAttribute<EMB, MAP_IMPL> attBary(map);
+	VolumeAutoAttribute<EMB, MAP> attBary(map);
 	Volume::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary);
 
 	//subdivision
@@ -669,10 +668,9 @@ inline double sqrt3_K(unsigned int n)
 }
 
 template <typename PFP>
-void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 	DartMarkerStore<MAP> m(map);
@@ -880,13 +878,12 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typena
 // solving Ax = b
 
 template <typename PFP>
-void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VertexAttribute<unsigned int, MAP_IMPL> indexV = map.template getAttribute<unsigned int, VERTEX>("indexV");
+	VertexAttribute<unsigned int, MAP> indexV = map.template getAttribute<unsigned int, VERTEX>("indexV");
 	if(!indexV.isValid())
 		indexV = map.template addAttribute<unsigned int, VERTEX>("indexV");
 
@@ -971,14 +968,13 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, type
 }
 
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 	// VolumeAttribute -> after dual new VertexAttribute
-	VolumeAttribute<VEC3, MAP_IMPL> positionV  = map.template getAttribute<VEC3, VOLUME>("position") ;
+	VolumeAttribute<VEC3, MAP> positionV  = map.template getAttribute<VEC3, VOLUME>("position") ;
 	if(!positionV.isValid())
 		positionV = map.template addAttribute<VEC3, VOLUME>("position") ;
 

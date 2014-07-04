@@ -323,7 +323,9 @@ bool MapMulti::copyFrom(const GenericMap& map)
 		return false;
 	}
 
-	GenericMap::clear(true);
+	// clear the map but do not insert boundary markers dart attribute
+	GenericMap::init(false);
+
 
 	// load attrib container
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
@@ -413,5 +415,50 @@ void MapMulti::restore_topo_shortcuts()
 			CGoGNerr << "Warning problem MR_DARTS = NULL" << CGoGNendl;
 	}
 }
+
+
+// TODO A VERIFIER ET A TESTER
+void MapMulti::compactTopo()
+{
+	std::vector<unsigned int> oldnewMR;
+
+	m_mrattribs.compact(oldnewMR);
+
+	unsigned int nbl = m_mrDarts.size();
+	for (unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	{
+		for (unsigned int level = 0; level < nbl; ++level)
+		{
+			unsigned int& d = m_mrDarts[level]->operator[](i);
+			if (oldnewMR[d] != AttributeContainer::UNKNOWN)
+				d = oldnewMR[d];
+		}
+	}
+
+	m_attribs[DART].compact(oldnewMR);
+
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		for (unsigned int j = 0; j < m_permutation.size(); ++j)
+		{
+			Dart d = (*m_permutation[j])[i];
+			if (oldnewMR[d.index] != AttributeContainer::UNKNOWN)
+				(*m_permutation[j])[i] = Dart(oldnewMR[d.index]);
+		}
+		for (unsigned int j = 0; j < m_permutation_inv.size(); ++j)
+		{
+			Dart d = (*m_permutation_inv[j])[i];
+			if (oldnewMR[d.index] != AttributeContainer::UNKNOWN)
+				(*m_permutation_inv[j])[i] = Dart(oldnewMR[d.index]);
+		}
+		for (unsigned int j = 0; j < m_involution.size(); ++j)
+		{
+			Dart d = (*m_involution[j])[i];
+			if (oldnewMR[d.index] != AttributeContainer::UNKNOWN)
+				(*m_involution[j])[i] = Dart(oldnewMR[d.index]);
+		}
+	}
+}
+
 
 } //namespace CGoGN

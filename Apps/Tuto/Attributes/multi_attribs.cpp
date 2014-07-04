@@ -43,14 +43,18 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 typedef PFP::VEC4 VEC4;
 
 
-
 /**
- * Example of function that work with any kin of Vertex Attribute
+ * Example of function that work with any kind of Vertex Attribute (normal/2/3/4)
+ *
+ * operators on multi-attribute are limited to:
+ *   affectation
+ *   +, -, +=, -=
+ *   *(double) /(double) *=(double) /=(double)
+ *
  */
 template <typename MAP, typename ATT>
 typename ATT::DATA_TYPE smooth(MAP& map, Vertex v, const ATT& attributs)
@@ -89,7 +93,7 @@ int main()
 	MAP myMap;
 
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	// create a topo grid of 2x2 squares
 	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, 2, 2, true);
@@ -97,15 +101,15 @@ int main()
 	grid.embedIntoGrid(position, 2.,2.,0.);
 
 	// second vertex attribute (for out)
-	VertexAttribute<VEC3, MAP_IMPL> pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2");
+	VertexAttribute<VEC3, MAP> pos2 = myMap.addAttribute<VEC3, VERTEX, MAP>("pos2");
 
 	// first color attribute on vertices
-	VertexAttribute<VEC4, MAP_IMPL> vc = myMap.addAttribute<VEC4, VERTEX>("vertexColor");
+	VertexAttribute<VEC4, MAP> vc = myMap.addAttribute<VEC4, VERTEX, MAP>("vertexColor");
 	// second color attribute on vertices
-	VertexAttribute<VEC4, MAP_IMPL> vc2 = myMap.addAttribute<VEC4, VERTEX>("vertexColor2");
+	VertexAttribute<VEC4, MAP> vc2 = myMap.addAttribute<VEC4, VERTEX, MAP>("vertexColor2");
 
 	// add some random on position and compute a color
-	for (unsigned int i= position.begin(); i != position.end(); position.next(i))
+	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
 	{
 		position[i] += VEC3(0.02f*i,0.01f*i,0.03f*i);
 		vc[i] = VEC4(position[i][0]*0.3f,position[i][1]*0.3f,position[i][2]*0.3f,1.0f);
@@ -120,8 +124,8 @@ int main()
 	});
 
 	// define two multi attributes (one for in, one for out)
-	Vertex2Attributes<VEC3, VEC4, MAP_IMPL> pv_in(position, vc);
-	Vertex2Attributes<VEC3, VEC4, MAP_IMPL> pv_out(pos2, vc2);
+	Vertex2Attributes<VEC3, VEC4, MAP> pv_in(position, vc);
+	Vertex2Attributes<VEC3, VEC4, MAP> pv_out(pos2, vc2);
 
 	// and call algo once just like with simple attributes
 	applySmooth(myMap, pv_in, pv_out);

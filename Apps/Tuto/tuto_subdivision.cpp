@@ -33,6 +33,7 @@
 #include "Algo/Export/export.h"
 
 #include "Algo/Modelisation/subdivision.h"
+#include "Algo/Geometry/normal.h"
 
 using namespace CGoGN ;
 
@@ -47,22 +48,22 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
+
+void pipo(PFP::MAP& m)
+{
+	std::cout << m.getNbDarts()<< std::endl;
+}
+
 
 int main(int argc, char **argv)
 {
 	if(argc != 3)
 	{
-		CGoGNout << "Usage : " << argv[0] << " filename nbSteps" << CGoGNendl;
-		return 0;
+		CGoGNerr << "Usage : " << argv[0] << " filename nbSteps" << CGoGNendl;
+		return 1;
 	}
-
-	std::string filename(argv[1]);
-
-	unsigned int nbSteps;
-	std::istringstream iss(argv[2]);
-	iss >> nbSteps;
+	unsigned int nbSteps = atoi(argv[2]);
 
 	// declaration of the map
 	MAP myMap;
@@ -70,13 +71,32 @@ int main(int argc, char **argv)
 	std::vector<std::string> attrNames ;
 	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
-	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
+	// get a handler to the 3D vector attribute created by the import (position always the first)
+	VertexAttribute<VEC3, MAP> position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]);
 
+	// a second map
+	MAP myMap2;
+	// for copying the initial mesh
+	myMap2.copyFrom(myMap);
+
+	// AttributeHandler are linked to the map, need a new one
+	VertexAttribute<VEC3, MAP> position2 = myMap2.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]);
+
+	// subdivide first map with Loop algo
 	for(unsigned int i = 0; i < nbSteps; ++i)
 		Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position);
 
-	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "result.off");
+	// and export to file
+	Algo::Surface::Export::exportOFF<PFP>(myMap, position, "resultLoop.off");
+
+	// subdivide second map with CatmullClark (using map2/position2)
+	for(unsigned int i = 0; i < nbSteps; ++i)
+		Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP>(myMap2, position2);
+
+	// and export to file (using map2/position2)
+	Algo::Surface::Export::exportOFF<PFP>(myMap2, position2, "resultCC.off");
+
+
 
     return 0;
 }

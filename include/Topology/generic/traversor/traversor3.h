@@ -26,9 +26,9 @@
 #define __TRAVERSOR3_H__
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/cells.h"
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversor/traversorCell.h"
-//#include "Topology/generic/traversor/traversorGen.h"
 #include "Topology/generic/traversor/traversorDoO.h"
 
 namespace CGoGN
@@ -62,7 +62,7 @@ public:
  * Traverse all Y incident to X
  */
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-class Traversor3XY//: public Traversor<MAP>
+class Traversor3XY
 {
 private:
 	const MAP& m_map ;
@@ -92,7 +92,7 @@ public:
  * Traverse all X adjacent to X by an Y
  */
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-class Traversor3XXaY//: public Traversor<MAP>
+class Traversor3XXaY
 {
 private:
 	const MAP& m_map ;
@@ -361,7 +361,7 @@ inline void foreach_incident3(MAP& map, Cell<ORBIT_FROM> c, FUNC f, bool forceDa
 
 
 template <unsigned int THRU, unsigned int ORBIT, typename MAP, typename FUNC>
-inline void foreach_adjacent3( MAP& map, Cell<ORBIT> c, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
+inline void foreach_adjacent3(MAP& map, Cell<ORBIT> c, FUNC f, bool forceDartMarker = false, unsigned int thread = 0)
 {
 	Traversor3XXaY<MAP,ORBIT,THRU> trav(const_cast<const MAP&>(map),c,forceDartMarker,thread);
 	for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())

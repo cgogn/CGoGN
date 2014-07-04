@@ -71,7 +71,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP;
-typedef PFP::MAP::IMPL MAP_IMPL;
 typedef PFP::VEC3 VEC3;
 
 class Clipping: public Utils::QT::SimpleQT
@@ -81,7 +80,7 @@ class Clipping: public Utils::QT::SimpleQT
 public:
 	//Manip Carte
 	MAP myMap ;
-	VertexAttribute<VEC3, MAP_IMPL> position;
+	VertexAttribute<VEC3, MAP> position;
 	Dart dglobal;
 
 	//Render

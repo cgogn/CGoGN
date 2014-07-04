@@ -60,7 +60,7 @@ void Surface_RenderScalar_DockTab::selectedScalarVBOChanged()
 				if(vbo)
 				{
 					MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
-					const VertexAttribute<PFP2::REAL, PFP2::MAP::IMPL>& attr = mh->getAttribute<PFP2::REAL, VERTEX>(QString::fromStdString(vbo->name()));
+					const VertexAttribute<PFP2::REAL, PFP2::MAP>& attr = mh->getAttribute<PFP2::REAL, VERTEX>(QString::fromStdString(vbo->name()));
 					p.scalarMin = std::numeric_limits<float>::max();
 					p.scalarMax = std::numeric_limits<float>::min();
 					for(unsigned int i = attr.begin(); i != attr.end(); attr.next(i))

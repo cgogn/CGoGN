@@ -75,7 +75,7 @@ namespace Modelisation
  * @param d a dart from the vertex
  */
 template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 
 
@@ -140,11 +140,11 @@ template <typename PFP>
 bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
 
 template <typename PFP>
-Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
+Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
 
 
 template <typename PFP>
-Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float radius, float height);
+Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
 
 } // namespace Modelisation
 
