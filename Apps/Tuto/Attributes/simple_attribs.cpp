@@ -112,6 +112,8 @@ void computeNewPositions(MAP& map, VertexAttribute<VEC3, MAP>& pos)
 template<typename ATTRIB>
 void dumpAttribute(const ATTRIB& attr)
 {
+	CHECK_ATTRIBUTEHANDER__TYPE(ATTRIB);
+
 	std::cout << "Attribute " <<attr.name() << " of orbit "<< orbitName(attr.getOrbit())<< " of type "<< attr.typeName()<< std::endl;
 
 	// NEVER USE 0 AND ++ IN FOR LOOP ON ATTRIBUTE !
