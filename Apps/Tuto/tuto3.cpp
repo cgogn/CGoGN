@@ -149,7 +149,7 @@ void MyQT::createMap()
 
 //	Dart d2 = d1;
 
-    position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+	position = myMap.addAttribute<PFP::VEC3, VERTEX, MAP>("position");
 
     Algo::Surface::Tilings::Square::Cylinder<PFP> prim1(myMap, 256,256,true,true);
     prim1.embedIntoSphere(position, 2.0f);

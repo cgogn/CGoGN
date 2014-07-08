@@ -128,13 +128,12 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 // declaration of the map
 MAP myMap;
 // and attribute of position
-VertexAttribute<VEC3, MAP_IMPL> position;
+VertexAttribute<VEC3, MAP> position;
 
 unsigned int nb_ears;
 
@@ -245,7 +244,7 @@ void MyQT::cb_keyPress(int code)
 
 int main(int argc, char **argv)
 {
-	position = myMap.addAttribute<VEC3, VERTEX>("position");
+	position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	Dart d0 = myMap.newFace(12);
 	position[d0] = PFP::VEC3(0, 20, 0);

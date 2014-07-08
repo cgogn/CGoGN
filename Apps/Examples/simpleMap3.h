@@ -45,7 +45,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 class SimpleMap3 : public Utils::QT::SimpleQT
@@ -56,7 +55,7 @@ public:
 	MAP myMap ;
 	SelectorTrue allDarts ;
 
-	VertexAttribute<VEC3, MAP_IMPL> position ;
+	VertexAttribute<VEC3, MAP> position ;
 
 	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
 	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo_boundary;

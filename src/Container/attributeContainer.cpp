@@ -30,6 +30,7 @@
 #include <iostream>
 
 #include "Container/attributeContainer.h"
+#include "Topology/generic/dart.h"
 
 namespace CGoGN
 {
@@ -83,7 +84,7 @@ unsigned int AttributeContainer::getAttributeIndex(const std::string& attribName
 		return index - 1 ;
 }
 
-const std::string& AttributeContainer::getAttributeName(unsigned int index)
+const std::string& AttributeContainer::getAttributeName(unsigned int index) const
 {
 	assert(index < m_tableAttribs.size() || !"getAttributeName: attribute index out of bounds");
 	assert(m_tableAttribs[index] != NULL || !"getAttributeName: attribute does not exist");
@@ -102,7 +103,7 @@ unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrInd
 	return atm->getBlocksPointers(vect_ptr, byteBlockSize);
 }
 
-unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names)
+unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names) const
 {
 	names.clear() ;
 	names.reserve(m_nbAttributes) ;
@@ -212,99 +213,77 @@ void AttributeContainer::clear(bool removeAttrib)
 
 void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 {
-	unsigned int nbe = _BLOCKSIZE_ * m_holesBlocks.size();
-
-	unsigned int nbb = m_holesBlocks.size() - 1;
-	while ((m_holesBlocks[nbb])->empty())
-	{
-		--nbb;
-		nbe -= _BLOCKSIZE_;
-	}
-	++nbb;
-
 	mapOldNew.clear();
-	mapOldNew.reserve(nbe);
+	mapOldNew.resize(realEnd(),0xffffffff);
 
-	// now get the holes
-	unsigned int baseAdr = 0;
-	for (unsigned int i = 0; i < nbb; ++i)
+//VERSION THAT PRESERVE ORDER OF ELEMENTS ?
+//	unsigned int down = 0;
+//	for (unsigned int occup = realBegin(); occup != realEnd(); next(occup))
+//	{
+//		mapOldNew[occup] = down;
+//		copyLine(down,occup);
+//		// copy ref counter
+//		setNbRefs(down,getNbRefs(occup));
+//		down++;
+//	}
+
+	// fill the holes with data & create the map Old->New
+	unsigned int up = realRBegin();
+	unsigned int down = 0;
+
+	while (down < up)
 	{
-		HoleBlockRef* block = m_holesBlocks[i];
-
-		for (unsigned int j = 0; j < _BLOCKSIZE_; ++j)
+		if (!used(down))
 		{
-			if (j < block->sizeTable())
-			{
-				if (block->used(j))
-					mapOldNew.push_back(baseAdr);
-				else
-					mapOldNew.push_back(0xffffffff);
-			}
-			else
-				mapOldNew.push_back(0xffffffff);
-			baseAdr++;
+			mapOldNew[up] = down;
+			// copy data
+			copyLine(down,up);
+			// copy ref counter
+			setNbRefs(down,getNbRefs(up));
+			// set next element to catch for hole filling
+			realRNext(up);
 		}
+		down++;
 	}
 
-	unsigned int last = mapOldNew.size() - 1;
+	// end of table = nb elements
+	m_maxSize = m_size;
 
- 	for (unsigned int i = 0 ; i < last; ++i)
-	{
-		unsigned int val = mapOldNew[i];
-		if (val == 0xffffffff)
-		{
-			// first find last element
-			while (mapOldNew[last] == 0xffffffff)
-				--last;
+	// no more blocks empty
+	m_tableBlocksEmpty.clear();
 
-			// store it in the hole
-			// find the blocks and indices
-			unsigned int bi = i / _BLOCKSIZE_;
-			unsigned int ib = i % _BLOCKSIZE_;
-			unsigned int bj = last / _BLOCKSIZE_;
-			unsigned int jb = last % _BLOCKSIZE_;
-
-			//overwrite attributes
-			for(unsigned int j = 0; j < m_tableAttribs.size(); ++j)
-			{
-				if (m_tableAttribs[j] != NULL)
-					m_tableAttribs[j]->overwrite(bj, jb, bi, ib);
-			}
-
-			// overwrite emptyLine with last line in free blocks
-			m_holesBlocks[bi]->overwrite(ib, m_holesBlocks[bj], jb);
-
-			// set the map value
-			mapOldNew[last] = i;
-			--last;
-		}
-	}
-
-	for (int i = m_holesBlocks.size() - 1; i >= 0; --i)
-	{
-		HoleBlockRef* ptr = m_holesBlocks[i];
-		if (ptr->compressFree())
-		{
-			delete ptr;
-			m_holesBlocks.pop_back();
-		}
-	}
-
-	// maj de la table de block libre
+	// only the last block has free indices
 	m_tableBlocksWithFree.clear();
-	HoleBlockRef* block = m_holesBlocks.back();
-	if (!block->full())
-		m_tableBlocksWithFree.push_back(m_holesBlocks.size() - 1);
 
-	// detruit les blocks de donnees inutiles
+	// compute nb block full
+	unsigned int nbb = m_size / _BLOCKSIZE_;
+	// update holeblock
+	for (unsigned int i=0; i<nbb; ++i)
+		m_holesBlocks[i]->compressFull(_BLOCKSIZE_);
+
+	//update last holeblock
+	unsigned int nbe = m_size % _BLOCKSIZE_;
+	if (nbe != 0)
+	{
+		m_holesBlocks[nbb]->compressFull(nbe);
+		m_tableBlocksWithFree.push_back(nbb);
+		nbb++;
+	}
+
+	// free memory and resize
+	for (int i = m_holesBlocks.size() - 1; i > nbb; --i)
+		delete m_holesBlocks[i];
+	m_holesBlocks.resize(nbb);
+
+
+	// release unused data memory
 	for(unsigned int j = 0; j < m_tableAttribs.size(); ++j)
 	{
 		if (m_tableAttribs[j] != NULL)
 			m_tableAttribs[j]->setNbBlocks(m_holesBlocks.size());
 	}
-
-	m_maxSize = (m_holesBlocks.back())->sizeTable() + (m_holesBlocks.size() - 1) * _BLOCKSIZE_;
 }
+
 
 /**************************************
  *          LINES MANAGEMENT          *
@@ -660,7 +639,22 @@ void AttributeContainer::removeLine(unsigned int index)
 
 void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id) const
 {
-	// en ascii id et taille les tailles
+	std::vector<AttributeMultiVectorGen*> bufferamv;
+	bufferamv.reserve(m_tableAttribs.size());
+
+	for(std::vector<AttributeMultiVectorGen*>::const_iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
+	{
+		if (*it != NULL)
+		{
+			const std::string& attName = (*it)->getName();
+			std::string markName = attName.substr(0,7);
+			if (markName != "marker_")
+				bufferamv.push_back(*it);
+		}
+	}
+
+
+	// en ascii id et les tailles
 
 	std::vector<unsigned int> bufferui;
 	bufferui.reserve(10);
@@ -669,20 +663,27 @@ void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id) const
 	bufferui.push_back(_BLOCKSIZE_);
 	bufferui.push_back(m_holesBlocks.size());
 	bufferui.push_back(m_tableBlocksWithFree.size());
-	bufferui.push_back(m_nbAttributes);
+//	bufferui.push_back(m_nbAttributes);
+	bufferui.push_back(bufferamv.size());
 	bufferui.push_back(m_size);
 	bufferui.push_back(m_maxSize);
 	bufferui.push_back(m_orbit);
 	bufferui.push_back(m_nbUnknown);
 
+
 	fs.write(reinterpret_cast<const char*>(&bufferui[0]), bufferui.size()*sizeof(unsigned int));
 
 	unsigned int i = 0;
 
-	for(std::vector<AttributeMultiVectorGen*>::const_iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
+	for(std::vector<AttributeMultiVectorGen*>::const_iterator it = bufferamv.begin(); it != bufferamv.end(); ++it)
 	{
 		if (*it != NULL)
-			(*it)->saveBin(fs, i++);
+		{
+			const std::string& attName = (*it)->getName();
+			std::string markName = attName.substr(0,7);
+			if (markName != "marker_")
+				(*it)->saveBin(fs, i++);
+		}
 		else
 		{
 			CGoGNerr << "PB saving, NULL ptr in m_tableAttribs" <<  CGoGNendl;
@@ -752,7 +753,6 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 		{
 			RegisteredBaseAttribute* ra = itAtt->second;
 			AttributeMultiVectorGen* amvg = ra->addAttribute(*this, nameAtt);
-//			CGoGNout << "loading attribute " << nameAtt << " : " << typeAtt << CGoGNendl;
 			amvg->loadBin(fs);
 		}
 	}
@@ -790,6 +790,12 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 	for (unsigned int i = 0; i < sz; ++i)
 		m_holesBlocks[i] = new HoleBlockRef(*(cont.m_holesBlocks[i]));
 
+	//  free indices
+	sz = cont.m_freeIndices.size();
+	m_freeIndices.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_freeIndices[i] = cont.m_freeIndices[i];
+
 	// blocks with free
 	sz = cont.m_tableBlocksWithFree.size();
 	m_tableBlocksWithFree.resize(sz);
@@ -809,19 +815,100 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 	{
 		if (cont.m_tableAttribs[i] != NULL)
 		{
-			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
-			ptr->setName(cont.m_tableAttribs[i]->getName());
-			ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
-			ptr->setIndex(m_tableAttribs.size());
-			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
-			ptr->copy(cont.m_tableAttribs[i]);
-	//			if (cont.m_tableAttribs[i]->toProcess())
-	//				ptr->toggleProcess();
-	//			else
-	//				ptr->toggleNoProcess();
-			m_tableAttribs.push_back(ptr);
+			std::string sub = cont.m_tableAttribs[i]->getName().substr(0, 5);
+			if (sub != "Mark_") // Mark leaved by
+			{
+				AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
+				ptr->setName(cont.m_tableAttribs[i]->getName());
+				ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
+				ptr->setIndex(m_tableAttribs.size());
+				ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+				ptr->copy(cont.m_tableAttribs[i]);
+				m_tableAttribs.push_back(ptr);
+			}
+			else
+			{
+				// get id of thread
+				const std::string& str = cont.m_tableAttribs[i]->getName();
+				unsigned int thId = (unsigned int)(str[5]-'0');
+				if (str.size()==7)
+					thId = 10*thId +  (unsigned int)(sub[6]-'0');
+				// Mark always at the begin, because called after clear
+				AttributeMultiVectorGen* ptr = m_tableAttribs[thId];
+				ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+				ptr->copy(cont.m_tableAttribs[i]);
+			}
 		}
 	}
 }
+
+void AttributeContainer::dumpCSV() const
+{
+	CGoGNout << "Name ; ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << m_tableAttribs[i]->getName() << " ; ";
+		}
+	}
+	CGoGNout << CGoGNendl;
+	CGoGNout << "Type  ; ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << m_tableAttribs[i]->getTypeName() << " ; ";
+		}
+	}
+	CGoGNout << CGoGNendl;
+	CGoGNout << "line ; refs ;";
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << "value;";
+		}
+	}
+	CGoGNout << CGoGNendl;
+
+	for (unsigned int l=this->begin(); l!= this->end(); this->next(l))
+	{
+		CGoGNout << l << " ; "<< this->getNbRefs(l)<< " ; ";
+		for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+		{
+			if (m_tableAttribs[i] != NULL)
+			{
+				m_tableAttribs[i]->dump(l);
+				CGoGNout << " ; ";
+			}
+		}
+		CGoGNout << CGoGNendl;
+	}
+	CGoGNout << CGoGNendl;
+}
+
+void AttributeContainer::dumpByLines() const
+{
+	CGoGNout << "Container of "<<orbitName(this->getOrbit())<< CGoGNendl;
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+		{
+			CGoGNout << "Name: "<< m_tableAttribs[i]->getName();
+			CGoGNout << " / Type: "<< m_tableAttribs[i]->getTypeName();
+			for (unsigned int l=this->begin(); l!= this->end(); this->next(l))
+			{
+				CGoGNout << l << " ; ";
+				m_tableAttribs[i]->dump(l);
+				CGoGNout << CGoGNendl;
+			}
+
+		}
+
+	}
+}
+
+
 
 }

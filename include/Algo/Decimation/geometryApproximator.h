@@ -46,15 +46,14 @@ class Approximator_QEM : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<Utils::Quadric<REAL>, MAP_IMPL> m_quadric ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
 public:
-	Approximator_QEM(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_QEM(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_QEM: attribute vector is empty") ;
@@ -71,15 +70,14 @@ class Approximator_QEMhalfEdge : public Approximator<PFP, typename PFP::VEC3, DA
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<Utils::Quadric<REAL>, MAP_IMPL> m_quadric ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
 public:
-	Approximator_QEMhalfEdge(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_QEMhalfEdge(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, DART>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_QEMhalfEdge: attribute vector is empty") ;
@@ -96,11 +94,10 @@ class Approximator_MidEdge : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_MidEdge(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_MidEdge(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_MidEdge: attribute vector is empty") ;
@@ -117,11 +114,10 @@ class Approximator_HalfCollapse : public Approximator<PFP, typename PFP::VEC3, D
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_HalfCollapse(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_HalfCollapse(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, DART>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_HalfCollapse: attribute vector is empty") ;
@@ -138,11 +134,10 @@ class Approximator_CornerCutting : public Approximator<PFP, typename PFP::VEC3, 
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_CornerCutting(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_CornerCutting(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_CornerCutting: attribute vector is empty") ;
@@ -159,15 +154,14 @@ class Approximator_NormalArea : public Approximator<PFP, typename PFP::VEC3, EDG
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	EdgeAttribute<Geom::Matrix<3,3,REAL>, MAP_IMPL> edgeMatrix ;
+	EdgeAttribute<Geom::Matrix<3,3,REAL>, MAP> edgeMatrix ;
 
 public:
-	Approximator_NormalArea(MAP& m, std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_NormalArea(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_NormalArea: attribute vector is empty") ;

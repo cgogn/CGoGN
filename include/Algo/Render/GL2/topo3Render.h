@@ -56,7 +56,6 @@ template <typename PFP>
 class Topo3Render
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
@@ -122,7 +121,7 @@ protected:
 	/**
 	 * attribute index to get easy correspondence dart/color
 	 */
-	DartAttribute<unsigned int, MAP_IMPL> m_attIndex;
+	DartAttribute<unsigned int, MAP> m_attIndex;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
@@ -268,7 +267,7 @@ public:
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
 	*/
-	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv) = 0;
+	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, float kv) = 0;
 
 //	template<typename PFP>
 //	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv);
@@ -281,14 +280,14 @@ public:
 //	template<typename PFP, typename EMBV>
 //	void updateColorsGen(typename PFP::MAP& map, const EMBV& colors);
 
-	void updateColors(MAP& map, const VertexAttribute<Geom::Vec3f, MAP_IMPL>& colors);
+	void updateColors(MAP& map, const VertexAttribute<Geom::Vec3f, MAP>& colors);
 
 	/**
 	 * Get back middle position of drawn darts
 	 * @param map the map
 	 * @param posExpl the output positions
 	 */
-	void computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP_IMPL>& posExpl);
+	void computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP>& posExpl);
 
 	/**
 	 * render to svg struct
@@ -313,7 +312,7 @@ public:
 //	* @param kf exploding coef for face
 // 	* @param kv exploding coef for face
 //	*/
-//	void updateDataMap3(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv);
+//	void updateDataMap3(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, float kv);
 
 //	/**
 //	* update all drawing buffers to render a gmap
@@ -323,29 +322,27 @@ public:
 //	* @param kf exploding coef for face
 // 	* @param kv exploding coef for face
 //	*/
-//	void updateDataGMap3(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float kv);
+//	void updateDataGMap3(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, float kv);
 };
 
 template <typename PFP>
 class Topo3RenderMap : public Topo3Render<PFP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 public:
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL> &positions, float ke, float kf, float kv);
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP> &positions, float ke, float kf, float kv);
 };
 
 template <typename PFP>
 class Topo3RenderGMap : public Topo3Render<PFP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 public:
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL> &positions, float ke, float kf, float kv);
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP> &positions, float ke, float kf, float kv);
 };
 
 }//end namespace GL2

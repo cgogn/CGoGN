@@ -35,7 +35,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-void statModele(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void statModele(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	int nbFaces = 0;
 	int nbVertex = 0;

@@ -319,7 +319,7 @@ void Viewer::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
+		position = myMap.getAttribute<VEC3, VERTEX, MAP>("position") ;
 	}
 	else
 	{
@@ -329,7 +329,7 @@ void Viewer::importMesh(std::string& filename)
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
 		}
-		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
+		position = myMap.getAttribute<PFP::VEC3, VERTEX, MAP>(attrNames[0]) ;
 	}
 
 	//	myMap.enableQuickTraversal<VERTEX>() ;
@@ -344,9 +344,9 @@ void Viewer::importMesh(std::string& filename)
 	normalBaseSize = bb.diagSize() / 100.0f ;
 	//	vertexBaseSize = normalBaseSize / 5.0f ;
 
-	normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
+	normal = myMap.getAttribute<VEC3, VERTEX, MAP>("normal") ;
 	if(!normal.isValid())
-		normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
+		normal = myMap.addAttribute<VEC3, VERTEX, MAP>("normal") ;
 
 	Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
@@ -370,7 +370,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 		if (askExportMode)
 			Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
 
-		std::vector<VertexAttribute<VEC3, MAP_IMPL>*> attributes ;
+		std::vector<VertexAttribute<VEC3, MAP>*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii) ;
 	}

@@ -840,14 +840,14 @@ float FrameManipulator::scaleFromMouse(int dx, int dy)
 	if (abs(dx) > abs(dy))
 	{
 		if (dx>0)
-			return 1.01;
-		return 0.99;
+			return 1.01f;
+		return 0.99f;
 	}
 	else
 	{
 		if (dy>0)
-			return 1.01;
-		return 0.99;
+			return 1.01f;
+		return 0.99f;
 	}
 }
 

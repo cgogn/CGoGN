@@ -36,10 +36,15 @@ class TraversorDartsOfOrbit //: public Traversor<MAP>
 {
 private:
 	std::vector<Dart>::iterator m_current ;
-	std::vector<Dart> m_vd ;
+	std::vector<Dart>* m_vd ;
+	unsigned int m_thread;
+
+	TraversorDartsOfOrbit( const TraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
 
 public:
 	TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
+
+	 ~TraversorDartsOfOrbit();
 
 	Dart begin() ;
 
@@ -53,10 +58,15 @@ class VTraversorDartsOfOrbit : public Traversor
 {
 private:
 	std::vector<Dart>::iterator m_current ;
-	std::vector<Dart> m_vd ;
+	std::vector<Dart>* m_vd ;
+	unsigned int m_thread;
+
+	VTraversorDartsOfOrbit( const VTraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
 
 public:
 	VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
+
+	~VTraversorDartsOfOrbit();
 
 	Dart begin() ;
 

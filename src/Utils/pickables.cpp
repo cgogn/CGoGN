@@ -262,7 +262,7 @@ Pickable* Pickable::pick(const std::vector<Pickable*>& picks,const Geom::Vec3f& 
 			glm::vec4 IWglm = tr*ii;
 			Geom::Vec3f IW(IWglm[0]/IWglm[3],IWglm[1]/IWglm[3],IWglm[2]/IWglm[3]);
 			IW -= P;
-			float dist = IW.norm();
+			float dist = float(IW.norm());
 			if (dist < mdist)
 			{
 				res = *it;

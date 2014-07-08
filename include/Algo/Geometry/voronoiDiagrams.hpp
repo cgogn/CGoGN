@@ -15,7 +15,7 @@ namespace Geometry
  ***********************************************************/
 
 template <typename PFP>
-VoronoiDiagram<PFP>::VoronoiDiagram (MAP& m, const EdgeAttribute<REAL, MAP_IMPL>& p, VertexAttribute<unsigned int, MAP_IMPL>& r) :
+VoronoiDiagram<PFP>::VoronoiDiagram (MAP& m, const EdgeAttribute<REAL, MAP>& p, VertexAttribute<unsigned int, MAP>& r) :
 	map(m),
 	edgeCost (p),
 	regions (r),
@@ -243,11 +243,11 @@ void VoronoiDiagram<PFP>::computeDistancesWithinRegion (Dart seed)
 template <typename PFP>
 CentroidalVoronoiDiagram<PFP>::CentroidalVoronoiDiagram (
 	MAP& m,
-	const EdgeAttribute<REAL, MAP_IMPL>& c,
-	VertexAttribute<unsigned int, MAP_IMPL>& r,
-	VertexAttribute<REAL, MAP_IMPL>& d,
-	VertexAttribute<Dart, MAP_IMPL>& o,
-	VertexAttribute<REAL, MAP_IMPL>& a) :
+	const EdgeAttribute<REAL, MAP>& c,
+	VertexAttribute<unsigned int, MAP>& r,
+	VertexAttribute<REAL, MAP>& d,
+	VertexAttribute<Dart, MAP>& o,
+	VertexAttribute<REAL, MAP>& a) :
 		VoronoiDiagram<PFP>(m,c,r), distances(d), pathOrigins(o), areaElts(a)
 {
 }
@@ -442,7 +442,7 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned i
 	// compute the gradient
 	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
 	VEC3 grad (0.0);
-	const VertexAttribute<VEC3, MAP_IMPL>& pos = this->map.template getAttribute<VEC3, VERTEX>("position");
+	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3, VERTEX>("position");
 
 	for (unsigned int j = 0; j < v.size(); ++j)
 	{
@@ -460,7 +460,7 @@ Dart CentroidalVoronoiDiagram<PFP>::selectBestNeighborFromSeed(unsigned int numS
 {
 	Dart e = this->seeds[numSeed];
 	Dart newSeed = e;
-	const VertexAttribute<VEC3, MAP_IMPL>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
+	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
 
 	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
 	float maxProj = 0.0;

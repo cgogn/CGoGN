@@ -21,292 +21,311 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#include <boost/thread.hpp>
-#include <boost/thread/barrier.hpp>
+
+//#include <boost/thread.hpp>
+//#include <boost/thread/barrier.hpp>
+#include "Utils/threadbarrier.h"
 #include <vector>
 
 namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-TraversorCell<MAP, ORBIT,OPT>::TraversorCell(const MAP& map, bool forceDartMarker, unsigned int thread) :
-	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true)
+TraversorCell<MAP, ORBIT, OPT>::TraversorCell(const MAP& map, bool forceDartMarker, unsigned int thread) :
+	m(map),
+	dmark(NULL),
+	cmark(NULL),
+	quickTraversal(NULL),
+	current(NIL),
+	firstTraversal(true)
 {
 	dimension = map.dimension();
 
 	switch(OPT)
 	{
-	case FORCE_DART_MARKING:
-		dmark = new DartMarker<MAP>(map, thread) ;
-		break;
-	case FORCE_CELL_MARKING:
-		cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
-		break;
-	case FORCE_QUICK_TRAVERSAL:
-		quickTraversal = map.template getQuickTraversal<ORBIT>() ;
-		assert(quickTraversal != NULL);
-		cont = &(map.template getAttributeContainer<ORBIT>()) ;
-		break;
-	case AUTO:
-		if(forceDartMarker)
+		case FORCE_DART_MARKING:
 			dmark = new DartMarker<MAP>(map, thread) ;
-		else
-		{
+			break;
+		case FORCE_CELL_MARKING:
+			cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
+			break;
+		case FORCE_QUICK_TRAVERSAL:
 			quickTraversal = map.template getQuickTraversal<ORBIT>() ;
-			if(quickTraversal != NULL)
-			{
-				cont = &(map.template getAttributeContainer<ORBIT>()) ;
-
-			}
+			assert(quickTraversal != NULL);
+			cont = &(map.template getAttributeContainer<ORBIT>()) ;
+			break;
+		case AUTO:
+			if(forceDartMarker)
+				dmark = new DartMarker<MAP>(map, thread) ;
 			else
 			{
-				if(map.template isOrbitEmbedded<ORBIT>())
-					cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
+				quickTraversal = map.template getQuickTraversal<ORBIT>() ;
+				if(quickTraversal != NULL)
+				{
+					cont = &(map.template getAttributeContainer<ORBIT>()) ;
+
+				}
 				else
-					dmark = new DartMarker<MAP>(map, thread) ;
+				{
+					if(map.template isOrbitEmbedded<ORBIT>())
+						cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
+					else
+						dmark = new DartMarker<MAP>(map, thread) ;
+				}
 			}
-		}
-	default:
-		break;
+			break;
+		default:
+			break;
 	}
 }
 
-
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-TraversorCell<MAP, ORBIT,OPT>::TraversorCell(const TraversorCell<MAP, ORBIT,OPT>& tc) :
-	m(tc.m), dimension(tc.dimension), cont( tc.cont), qCurrent(tc.qCurrent), dmark(tc.dmark), cmark(tc.cmark),
-	quickTraversal(tc.quickTraversal), current(tc.current), firstTraversal(tc.firstTraversal)
-{
-}
-
-
-
+TraversorCell<MAP, ORBIT, OPT>::TraversorCell(const TraversorCell<MAP, ORBIT, OPT>& tc) :
+	m(tc.m),
+	dimension(tc.dimension),
+	cont(tc.cont),
+	qCurrent(tc.qCurrent),
+	dmark(tc.dmark),
+	cmark(tc.cmark),
+	quickTraversal(tc.quickTraversal),
+	current(tc.current),
+	firstTraversal(tc.firstTraversal)
+{}
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
 TraversorCell<MAP, ORBIT,OPT>::~TraversorCell()
 {
 	switch(OPT)
 	{
-	case FORCE_DART_MARKING:
-		delete dmark ;
-	break;
-	case FORCE_CELL_MARKING:
-		delete cmark ;
-	break;
-	case AUTO:
-		if(dmark)
+		case FORCE_DART_MARKING:
 			delete dmark ;
-		else if(cmark)
+			break;
+		case FORCE_CELL_MARKING:
 			delete cmark ;
-	default:
-		break;
+			break;
+		case AUTO:
+			if(dmark)
+				delete dmark ;
+			else if(cmark)
+				delete cmark ;
+			break;
+		default:
+			break;
 	}
 }
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-Cell<ORBIT> TraversorCell<MAP, ORBIT,OPT>::begin()
+Cell<ORBIT> TraversorCell<MAP, ORBIT, OPT>::begin()
 {
-
 	switch(OPT)
 	{
-	case FORCE_DART_MARKING:
-	{
-		if(!firstTraversal)
-			dmark->unmarkAll() ;
-
-		current.dart = m.begin() ;
-		while(current.dart != m.end() && (m.isBoundaryMarked(dimension, current.dart) ))
-			m.next(current.dart) ;
-
-		if(current.dart == m.end())
-			current.dart = NIL ;
-		else
-			dmark->template markOrbit<ORBIT>(current.dart) ;
-	}
-	break;
-	case FORCE_CELL_MARKING:
-	{
-		if(!firstTraversal)
-			cmark->unmarkAll() ;
-
-		current.dart = m.begin() ;
-		while(current.dart != m.end() && (m.isBoundaryMarked(dimension, current.dart) ))
-			m.next(current.dart) ;
-
-		if(current.dart == m.end())
-			current.dart = NIL ;
-		else
-			cmark->mark(current) ;
-	}
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-		qCurrent = cont->begin() ;
-		current.dart = (*quickTraversal)[qCurrent] ;
-	break;
-	case AUTO:
-
-		if(quickTraversal != NULL)
-		{
-			qCurrent = cont->begin() ;
-			current.dart = (*quickTraversal)[qCurrent] ;
-		}
-		else
+		case FORCE_DART_MARKING:
 		{
 			if(!firstTraversal)
-			{
-				if(dmark)
-					dmark->unmarkAll() ;
-				else
-					cmark->unmarkAll() ;
-			}
+				dmark->unmarkAll() ;
 
 			current.dart = m.begin() ;
-			while(current.dart != m.end() && (m.isBoundaryMarked(dimension, current.dart) ))
+			while(current.dart != m.end() && (m.isBoundaryMarked(dimension, current.dart)))
 				m.next(current.dart) ;
 
 			if(current.dart == m.end())
 				current.dart = NIL ;
 			else
+				dmark->markOrbit(current) ;
+		}
+			break;
+		case FORCE_CELL_MARKING:
+		{
+			if(!firstTraversal)
+				cmark->unmarkAll() ;
+
+			current.dart = m.begin() ;
+			while(current.dart != m.end() && (m.isBoundaryMarked(dimension, current.dart)))
+				m.next(current.dart) ;
+
+			if(current.dart == m.end())
+				current.dart = NIL ;
+			else
+				cmark->mark(current) ;
+		}
+			break;
+		case FORCE_QUICK_TRAVERSAL:
+		{
+			qCurrent = cont->begin() ;
+			current.dart = (*quickTraversal)[qCurrent] ;
+		}
+			break;
+		case AUTO:
+		{
+			if(quickTraversal != NULL)
 			{
-				if(dmark)
-					dmark->template markOrbit<ORBIT>(current.dart) ;
+				qCurrent = cont->begin() ;
+				current.dart = (*quickTraversal)[qCurrent] ;
+			}
+			else
+			{
+				if(!firstTraversal)
+				{
+					if(dmark)
+						dmark->unmarkAll() ;
+					else
+						cmark->unmarkAll() ;
+				}
+
+				current.dart = m.begin() ;
+				while(current.dart != m.end() && (m.isBoundaryMarked(dimension, current.dart)))
+					m.next(current.dart) ;
+
+				if(current.dart == m.end())
+					current.dart = NIL ;
 				else
-					cmark->mark(current) ;
+				{
+					if(dmark)
+						dmark->markOrbit(current) ;
+					else
+						cmark->mark(current) ;
+				}
 			}
 		}
-	default:
-	break;
+			break;
+		default:
+			break;
 	}
+
 	firstTraversal = false ;
 	return current ;
 }
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-Cell<ORBIT> TraversorCell<MAP, ORBIT,OPT>::end()
+Cell<ORBIT> TraversorCell<MAP, ORBIT, OPT>::end()
 {
 	return Cell<ORBIT>(NIL) ;
 }
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-Cell<ORBIT> TraversorCell<MAP, ORBIT,OPT>::next()
+Cell<ORBIT> TraversorCell<MAP, ORBIT, OPT>::next()
 {
 	assert(current.dart != NIL);
 
 	switch(OPT)
 	{
-	case FORCE_DART_MARKING:
-	{
-		bool ismarked = dmark->isMarked(current.dart) ;
-		while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart)))
+		case FORCE_DART_MARKING:
 		{
-			m.next(current.dart) ;
-			if(current.dart == m.end())
-				current.dart = NIL ;
-			else
-				ismarked = dmark->isMarked(current.dart) ;
+			bool ismarked = dmark->isMarked(current.dart) ;
+			while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart)))
+			{
+				m.next(current.dart) ;
+				if(current.dart == m.end())
+					current.dart = NIL ;
+				else
+					ismarked = dmark->isMarked(current.dart) ;
+			}
+			if(current.dart != NIL)
+				dmark->markOrbit(current) ;
 		}
-		if(current.dart != NIL)
-			dmark->template markOrbit<ORBIT>(current.dart) ;
-	}
-	break;
-	case FORCE_CELL_MARKING:
-	{
-		bool ismarked = cmark->isMarked(current) ;
-		while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart) ))
+			break;
+		case FORCE_CELL_MARKING:
 		{
-			m.next(current.dart) ;
-			if(current.dart == m.end())
-				current.dart = NIL ;
-			else
-				ismarked = cmark->isMarked(current) ;
+			bool ismarked = cmark->isMarked(current) ;
+			while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart)))
+			{
+				m.next(current.dart) ;
+				if(current.dart == m.end())
+					current.dart = NIL ;
+				else
+					ismarked = cmark->isMarked(current) ;
+			}
+			if(current.dart != NIL)
+				cmark->mark(current) ;
 		}
-		if(current.dart != NIL)
-			cmark->mark(current) ;
-	}
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-		cont->next(qCurrent) ;
-		if (qCurrent != cont->end())
-			current.dart = (*quickTraversal)[qCurrent] ;
-		else current.dart = NIL;
-	break;
-	case AUTO:
-		if(quickTraversal != NULL)
+			break;
+		case FORCE_QUICK_TRAVERSAL:
 		{
 			cont->next(qCurrent) ;
 			if (qCurrent != cont->end())
 				current.dart = (*quickTraversal)[qCurrent] ;
 			else current.dart = NIL;
 		}
-		else
+			break;
+		case AUTO:
 		{
-			if(dmark)
+			if(quickTraversal != NULL)
 			{
-				bool ismarked = dmark->isMarked(current.dart) ;
-				while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart)))
-				{
-					m.next(current.dart) ;
-					if(current.dart == m.end())
-						current.dart = NIL ;
-					else
-						ismarked = dmark->isMarked(current.dart) ;
-				}
-				if(current.dart != NIL)
-					dmark->template markOrbit<ORBIT>(current.dart) ;
+				cont->next(qCurrent) ;
+				if (qCurrent != cont->end())
+					current.dart = (*quickTraversal)[qCurrent] ;
+				else current.dart = NIL;
 			}
 			else
 			{
-				bool ismarked = cmark->isMarked(current) ;
-				while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart) ))
+				if(dmark)
 				{
-					m.next(current.dart) ;
-					if(current.dart == m.end())
-						current.dart = NIL ;
-					else
-						ismarked = cmark->isMarked(current) ;
+					bool ismarked = dmark->isMarked(current.dart) ;
+					while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart)))
+					{
+						m.next(current.dart) ;
+						if(current.dart == m.end())
+							current.dart = NIL ;
+						else
+							ismarked = dmark->isMarked(current.dart) ;
+					}
+					if(current.dart != NIL)
+						dmark->markOrbit(current) ;
 				}
-				if(current.dart != NIL)
-					cmark->mark(current) ;
+				else
+				{
+					bool ismarked = cmark->isMarked(current) ;
+					while(current.dart != NIL && (ismarked || m.isBoundaryMarked(dimension, current.dart) ))
+					{
+						m.next(current.dart) ;
+						if(current.dart == m.end())
+							current.dart = NIL ;
+						else
+							ismarked = cmark->isMarked(current) ;
+					}
+					if(current.dart != NIL)
+						cmark->mark(current) ;
+				}
 			}
 		}
-	default:
-		break;
+			break;
+		default:
+			break;
 	}
 	return current ;
 }
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-void TraversorCell<MAP, ORBIT,OPT>::skip(Cell<ORBIT> c)
+void TraversorCell<MAP, ORBIT, OPT>::skip(Cell<ORBIT> c)
 {
 	switch(OPT)
 	{
-	case FORCE_DART_MARKING:
-		dmark->template markOrbit<ORBIT>(c.dart) ;
-	break;
-	case FORCE_CELL_MARKING:
-		cmark->mark(c) ;
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-	break;
-	case AUTO:
-		if(dmark)
-			dmark->template markOrbit<ORBIT>(c.dart) ;
-		else
+		case FORCE_DART_MARKING:
+			dmark->markOrbit(c) ;
+			break;
+		case FORCE_CELL_MARKING:
 			cmark->mark(c) ;
-	default:
-		break;
+			break;
+		case FORCE_QUICK_TRAVERSAL:
+			break;
+		case AUTO:
+			if(dmark)
+				dmark->markOrbit(c) ;
+			else
+				cmark->mark(c) ;
+			break;
+		default:
+			break;
 	}
-
-
 }
 
 
 
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-Cell<ORBIT> TraversorCellEven<MAP, ORBIT,OPT>::begin()
+Cell<ORBIT> TraversorCellEven<MAP, ORBIT, OPT>::begin()
 {
-	Cell<ORBIT> c = TraversorCell<MAP, ORBIT,OPT>::begin();
+	Cell<ORBIT> c = TraversorCell<MAP, ORBIT, OPT>::begin();
 	this->firstTraversal = true;
 	return c;
 }
@@ -314,41 +333,11 @@ Cell<ORBIT> TraversorCellEven<MAP, ORBIT,OPT>::begin()
 
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-Cell<ORBIT> TraversorCellOdd<MAP, ORBIT,OPT>::begin()
+Cell<ORBIT> TraversorCellOdd<MAP, ORBIT, OPT>::begin()
 {
 	switch(OPT)
 	{
-	case FORCE_DART_MARKING:
-		this->current.dart = this->m.begin() ;
-		while(this->current.dart != this->m.end() && (this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
-			this->m.next(this->current.dart) ;
-
-		if(this->current.dart == this->m.end())
-			this->current.dart = NIL ;
-		else
-			this->dmark->template unmarkOrbit<ORBIT>(this->current.dart) ;
-	break;
-	case FORCE_CELL_MARKING:
-		this->current.dart = this->m.begin() ;
-		while(this->current.dart != this->m.end() && (this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
-			this->m.next(this->current.dart) ;
-
-		if(this->current.dart == this->m.end())
-			this->current.dart = NIL ;
-		else
-			this->cmark->unmark(this->current) ;
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-		this->qCurrent = this->cont->begin() ;
-		this->current.dart = this->quickTraversal->operator[](this->qCurrent);
-	break;
-	case AUTO:
-		if(this->quickTraversal != NULL)
-		{
-			this->qCurrent = this->cont->begin() ;
-			this->current.dart = this->quickTraversal->operator[](this->qCurrent);
-		}
-		else
+		case FORCE_DART_MARKING:
 		{
 			this->current.dart = this->m.begin() ;
 			while(this->current.dart != this->m.end() && (this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
@@ -357,104 +346,147 @@ Cell<ORBIT> TraversorCellOdd<MAP, ORBIT,OPT>::begin()
 			if(this->current.dart == this->m.end())
 				this->current.dart = NIL ;
 			else
+				this->dmark->unmarkOrbit(this->current) ;
+		}
+			break;
+		case FORCE_CELL_MARKING:
+		{
+			this->current.dart = this->m.begin() ;
+			while(this->current.dart != this->m.end() && (this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+				this->m.next(this->current.dart) ;
+
+			if(this->current.dart == this->m.end())
+				this->current.dart = NIL ;
+			else
+				this->cmark->unmark(this->current) ;
+		}
+			break;
+		case FORCE_QUICK_TRAVERSAL:
+		{
+			this->qCurrent = this->cont->begin() ;
+			this->current.dart = this->quickTraversal->operator[](this->qCurrent);
+		}
+			break;
+		case AUTO:
+		{
+			if(this->quickTraversal != NULL)
 			{
-				if(this->dmark)
-					this->dmark->template unmarkOrbit<ORBIT>(this->current.dart) ;
+				this->qCurrent = this->cont->begin() ;
+				this->current.dart = this->quickTraversal->operator[](this->qCurrent);
+			}
+			else
+			{
+				this->current.dart = this->m.begin() ;
+				while(this->current.dart != this->m.end() && (this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+					this->m.next(this->current.dart) ;
+
+				if(this->current.dart == this->m.end())
+					this->current.dart = NIL ;
 				else
-					this->cmark->unmark(this->current) ;
+				{
+					if(this->dmark)
+						this->dmark->unmarkOrbit(this->current) ;
+					else
+						this->cmark->unmark(this->current) ;
+				}
 			}
 		}
-	default:
-	break;
+			break;
+		default:
+			break;
 	}
 	return this->current ;
 }
 
-
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-Cell<ORBIT> TraversorCellOdd<MAP, ORBIT,OPT>::next()
+Cell<ORBIT> TraversorCellOdd<MAP, ORBIT, OPT>::next()
 {
 	assert(this->current.dart != NIL);
 
 	switch(OPT)
 	{
-	case FORCE_DART_MARKING:
-	{
-		bool ismarked = this->dmark->isMarked(this->current.dart) ;
-		while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension,this->current.dart)))
+		case FORCE_DART_MARKING:
 		{
-			this->m.next(this->current.dart) ;
-			if(this->current.dart == this->m.end())
-				this->current.dart = NIL ;
-			else
-				ismarked = this->dmark->isMarked(this->current.dart) ;
+			bool ismarked = this->dmark->isMarked(this->current.dart) ;
+			while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension,this->current.dart)))
+			{
+				this->m.next(this->current.dart) ;
+				if(this->current.dart == this->m.end())
+					this->current.dart = NIL ;
+				else
+					ismarked = this->dmark->isMarked(this->current.dart) ;
+			}
+			if(this->current.dart != NIL)
+				this->dmark->unmarkOrbit(this->current) ;
 		}
-		if(this->current.dart != NIL)
-			this->dmark->template unmarkOrbit<ORBIT>(this->current.dart) ;
-	}
-	break;
-	case FORCE_CELL_MARKING:
-	{
-		bool ismarked = this->cmark->isMarked(this->current) ;
-		while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+			break;
+		case FORCE_CELL_MARKING:
 		{
-			this->m.next(this->current.dart) ;
-			if(this->current.dart == this->m.end())
-				this->current.dart = NIL ;
-			else
-				ismarked = this->cmark->isMarked(this->current) ;
+			bool ismarked = this->cmark->isMarked(this->current) ;
+			while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+			{
+				this->m.next(this->current.dart) ;
+				if(this->current.dart == this->m.end())
+					this->current.dart = NIL ;
+				else
+					ismarked = this->cmark->isMarked(this->current) ;
+			}
+			if(this->current.dart != NIL)
+				this->cmark->unmark(this->current) ;
 		}
-		if(this->current.dart != NIL)
-			this->cmark->unmark(this->current) ;
-	}
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-		this->cont->next(this->qCurrent) ;
-		if (this->qCurrent != this->cont->end())
-			this->current.dart = this->quickTraversal->operator[](this->qCurrent) ;
-		else this->current.dart = NIL;
-	break;
-	case AUTO:
-		if(this->quickTraversal != NULL)
+			break;
+		case FORCE_QUICK_TRAVERSAL:
 		{
 			this->cont->next(this->qCurrent) ;
 			if (this->qCurrent != this->cont->end())
 				this->current.dart = this->quickTraversal->operator[](this->qCurrent) ;
 			else this->current.dart = NIL;
 		}
-		else
+			break;
+		case AUTO:
 		{
-			if(this->dmark)
+			if(this->quickTraversal != NULL)
 			{
-				bool ismarked = this->dmark->isMarked(this->current.dart) ;
-				while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension,this->current.dart)))
-				{
-					this->m.next(this->current.dart) ;
-					if(this->current.dart == this->m.end())
-						this->current.dart = NIL ;
-					else
-						ismarked = this->dmark->isMarked(this->current.dart) ;
-				}
-				if(this->current.dart != NIL)
-					this->dmark->template unmarkOrbit<ORBIT>(this->current.dart) ;
+				this->cont->next(this->qCurrent) ;
+				if (this->qCurrent != this->cont->end())
+					this->current.dart = this->quickTraversal->operator[](this->qCurrent) ;
+				else this->current.dart = NIL;
 			}
 			else
 			{
-				bool ismarked = this->cmark->isMarked(this->current) ;
-				while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+				if(this->dmark)
 				{
-					this->m.next(this->current.dart) ;
-					if(this->current.dart == this->m.end())
-						this->current.dart = NIL ;
-					else
-						ismarked = this->cmark->isMarked(this->current) ;
+					bool ismarked = this->dmark->isMarked(this->current.dart) ;
+					while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension,this->current.dart)))
+					{
+						this->m.next(this->current.dart) ;
+						if(this->current.dart == this->m.end())
+							this->current.dart = NIL ;
+						else
+							ismarked = this->dmark->isMarked(this->current.dart) ;
+					}
+					if(this->current.dart != NIL)
+						this->dmark->unmarkOrbit(this->current) ;
 				}
-				if(this->current.dart != NIL)
-					this->cmark->unmark(this->current) ;
+				else
+				{
+					bool ismarked = this->cmark->isMarked(this->current) ;
+					while(this->current.dart != NIL && (!ismarked || this->m.isBoundaryMarked(this->dimension, this->current.dart) ))
+					{
+						this->m.next(this->current.dart) ;
+						if(this->current.dart == this->m.end())
+							this->current.dart = NIL ;
+						else
+							ismarked = this->cmark->isMarked(this->current) ;
+					}
+					if(this->current.dart != NIL)
+						this->cmark->unmark(this->current) ;
+				}
 			}
 		}
-	default:
-		break;
+			break;
+		default:
+			break;
 	}
 
 	return this->current ;
@@ -468,36 +500,35 @@ inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt, unsigned in
 {
 	switch(opt)
 	{
-	case FORCE_DART_MARKING:
-	{
-		TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			f(c);
-	}
-	break;
-	case FORCE_CELL_MARKING:
-	{
-		TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			f(c);
-	}
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-	{
-		TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			f(c);
-	}
-	break;
-	case AUTO:
-	default:
-	{
-		TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			f(c);
-	}
-	break;
-
+		case FORCE_DART_MARKING:
+		{
+			TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				f(c);
+		}
+			break;
+		case FORCE_CELL_MARKING:
+		{
+			TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				f(c);
+		}
+			break;
+		case FORCE_QUICK_TRAVERSAL:
+		{
+			TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				f(c);
+		}
+			break;
+		case AUTO:
+		default:
+		{
+			TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				f(c);
+		}
+			break;
 	}
 }
 
@@ -506,39 +537,39 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 {
 	switch(opt)
 	{
-	case FORCE_DART_MARKING:
-	{
-		TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			if (!f(c))
-				break;
-	}
-	break;
-	case FORCE_CELL_MARKING:
-	{
-		TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			if (!f(c))
-				break;
-	}
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-	{
-		TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			if (!f(c))
-				break;
-	}
-	break;
-	case AUTO:
-	default:
-	{
-		TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
-		for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
-			if (!f(c))
-				break;
-	}
-	break;
+		case FORCE_DART_MARKING:
+		{
+			TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				if (!f(c))
+					break;
+		}
+			break;
+		case FORCE_CELL_MARKING:
+		{
+			TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				if (!f(c))
+					break;
+		}
+			break;
+		case FORCE_QUICK_TRAVERSAL:
+		{
+			TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				if (!f(c))
+					break;
+		}
+			break;
+		case AUTO:
+		default:
+		{
+			TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
+			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
+				if (!f(c))
+					break;
+		}
+			break;
 	}
 }
 
@@ -626,13 +657,14 @@ class ThreadFunction
 protected:
 	typedef Cell<ORBIT> CELL;
 	std::vector<CELL>& m_cells;
-	boost::barrier& m_sync1;
-	boost::barrier& m_sync2;
+	Utils::Barrier& m_sync1;
+	Utils::Barrier& m_sync2;
 	bool& m_finished;
 	unsigned int m_id;
 	FUNC m_lambda;
+
 public:
-	ThreadFunction(FUNC func, std::vector<CELL>& vd, boost::barrier& s1, boost::barrier& s2, bool& finished, unsigned int id):
+	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id):
 		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func)
 	{
 	}
@@ -645,7 +677,7 @@ public:
 		while (!m_finished)
 		{
 			for (typename std::vector<CELL>::const_iterator it = m_cells.begin(); it != m_cells.end(); ++it)
-				m_lambda(*it,m_id);
+				m_lambda(*it, m_id);
 			m_cells.clear();
 			m_sync1.wait(); // wait every body has finished
 			m_sync2.wait(); // wait vectors has been refilled
@@ -655,7 +687,7 @@ public:
 
 
 template <TraversalOptim OPT, unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
+void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 {
 	// buffer for cell traversing
 	std::vector< Cell<ORBIT> >* vd = new std::vector< Cell<ORBIT> >[nbth];
@@ -672,24 +704,18 @@ void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
 		nb++;
 		cell = trav.next();
 	}
-	boost::barrier sync1(nbth+1);
-	boost::barrier sync2(nbth+1);
+	Utils::Barrier sync1(nbth+1);
+	Utils::Barrier sync2(nbth+1);
 	bool finished=false;
-	// lauch threads
-	if (needMarkers)
-	{
-		unsigned int nbth_prec = map.getNbThreadMarkers();
-		if (nbth_prec < nbth+1)
-			map.addThreadMarker(nbth+1-nbth_prec);
-	}
 
-	boost::thread** threads = new boost::thread*[nbth];
+	// launch threads
+	std::thread** threads = new std::thread*[nbth];
 	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
 
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i],sync1,sync2, finished,1+i);
-		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
+		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
 	}
 
 	// and continue to traverse the map
@@ -733,34 +759,32 @@ void foreach_cell_tmpl(MAP& map, FUNC func, bool needMarkers, unsigned int nbth)
 	delete[] tempo;
 }
 
-
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-void foreach_cell(MAP& map, FUNC func, bool needMarkers, TraversalOptim opt, unsigned int nbth)
+void foreach_cell(MAP& map, FUNC func, TraversalOptim opt, unsigned int nbth)
 {
 	if (nbth < 2)
 	{
 		CGoGNerr << "Warning number of threads must be > 1 for //" << CGoGNendl;
-		nbth =2;
+		nbth = 2;
 	}
 	switch(opt)
 	{
-	case FORCE_DART_MARKING:
-		foreach_cell_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
-	break;
-	case FORCE_CELL_MARKING:
-		foreach_cell_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
-	break;
-	case FORCE_QUICK_TRAVERSAL:
-		foreach_cell_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
-	break;
-	case AUTO:
-	default:
-		foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,needMarkers,nbth-1);
-	break;
+		case FORCE_DART_MARKING:
+			foreach_cell_tmpl<FORCE_DART_MARKING,ORBIT,MAP,FUNC>(map,func,nbth-1);
+			break;
+		case FORCE_CELL_MARKING:
+			foreach_cell_tmpl<FORCE_CELL_MARKING,ORBIT,MAP,FUNC>(map,func,nbth-1);
+			break;
+		case FORCE_QUICK_TRAVERSAL:
+			foreach_cell_tmpl<FORCE_QUICK_TRAVERSAL,ORBIT,MAP,FUNC>(map,func,nbth-1);
+			break;
+		case AUTO:
+		default:
+			foreach_cell_tmpl<AUTO,ORBIT,MAP,FUNC>(map,func,nbth-1);
+			break;
 	}
 }
 
-}// namespace Parallel
-
+} // namespace Parallel
 
 } // namespace CGoGN

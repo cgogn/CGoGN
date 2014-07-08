@@ -204,7 +204,7 @@ void GMap2<MAP_IMPL>::deleteFace(Dart d)
 template <typename MAP_IMPL>
 void GMap2<MAP_IMPL>::deleteCC(Dart d)
 {
-	DartMarkerStore<MAP_IMPL> mark(*this);
+	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this);
 
 	std::vector<Dart> visited;
 	visited.reserve(1024) ;
@@ -244,7 +244,7 @@ void GMap2<MAP_IMPL>::fillHole(Dart d)
 	Dart dd = d ;
 	if(!this->template isBoundaryMarked<2>(dd))
 		dd = phi2(dd) ;
-	this->template boundaryUnmarkOrbit<2,FACE>(dd) ;
+	Algo::Topo::boundaryUnmarkOrbit<2,FACE>(*this, dd) ;
 }
 
 /*! @name Topological Operators
@@ -864,7 +864,7 @@ bool GMap2<MAP_IMPL>::isBoundaryAdjacentFace(Dart d) const
 template <typename MAP_IMPL>
 bool GMap2<MAP_IMPL>::sameOrientedVolume(Dart d, Dart e) const
 {
-	DartMarkerStore<MAP_IMPL> mark(*this);	// Lock a marker
+	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this);	// Lock a marker
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.push_back(d);		// Start with the face of d
@@ -902,7 +902,7 @@ template <typename MAP_IMPL>
 unsigned int GMap2<MAP_IMPL>::volumeDegree(Dart d) const
 {
 	unsigned int count = 0;
-	DartMarkerStore<MAP_IMPL> mark(*this);		// Lock a marker
+	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(16);
@@ -935,7 +935,7 @@ template <typename MAP_IMPL>
 int GMap2<MAP_IMPL>::checkVolumeDegree(Dart d, unsigned int volDeg) const
 {
 	unsigned int count = 0;
-	DartMarkerStore<MAP_IMPL> mark(*this);		// Lock a marker
+	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(16);
@@ -1016,7 +1016,7 @@ bool GMap2<MAP_IMPL>::check() const
 template <typename MAP_IMPL>
 bool GMap2<MAP_IMPL>::checkSimpleOrientedPath(std::vector<Dart>& vd)
 {
-	DartMarkerStore<MAP_IMPL> dm(*this) ;
+	DartMarkerStore<GMap2<MAP_IMPL> > dm(*this) ;
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
 		if(dm.isMarked(*it))
@@ -1041,7 +1041,42 @@ bool GMap2<MAP_IMPL>::checkSimpleOrientedPath(std::vector<Dart>& vd)
  *************************************************************************/
 
 template <typename MAP_IMPL>
-void GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <unsigned int ORBIT, typename FUNC>
+void GMap2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <unsigned int ORBIT, typename FUNC>
+void GMap2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
+		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case FACE: 		foreach_dart_of_face(c, f, thread); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+void GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	Dart it = d;
 	do
@@ -1052,21 +1087,24 @@ void GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, std::function<void
 }
 
 template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread) const
 {
 	GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(d, f, thread);
 	GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(this->beta1(d), f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	f(d);
 	f(beta2(this->beta0(d)));
 }
 
 template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int /*thread*/) const
 {
 	f(d);
 	Dart e = this->beta0(d) ;
@@ -1078,21 +1116,45 @@ inline void GMap2<MAP_IMPL>::foreach_dart_of_edge(Dart d, std::function<void (Da
 }
 
 template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_face(Dart d, FUNC& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_oriented_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread) const
 {
 	ParentMap::foreach_dart_of_cc(d, f, thread);
 }
 
 template <typename MAP_IMPL>
-void GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread) const
 {
-	DartMarkerStore<MAP_IMPL> mark(*this, thread);	// Lock a marker
+	foreach_dart_of_cc(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread) const
+{
+	ParentMap::foreach_dart_of_vertex(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread) const
+{
+	ParentMap::foreach_dart_of_edge(d, f, thread);
+}
+
+template <typename MAP_IMPL>
+template <typename FUNC>
+void GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FUNC& f, unsigned int thread) const
+{
+	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this, thread);	// Lock a marker
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
@@ -1122,22 +1184,11 @@ void GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, std::function<void (Da
 }
 
 template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void GMap2<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread) const
 {
 	GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(d, f, thread);
 	GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(this->beta0(d), f, thread);
-}
-
-template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex1(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
-{
-	ParentMap::foreach_dart_of_vertex(d, f, thread);
-}
-
-template <typename MAP_IMPL>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_edge1(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
-{
-	ParentMap::foreach_dart_of_edge(d, f, thread);
 }
 
 /*! @name Close map after import or creation
@@ -1148,7 +1199,7 @@ template <typename MAP_IMPL>
 Dart GMap2<MAP_IMPL>::newBoundaryCycle(unsigned int nbE)
 {
 	Dart d = ParentMap::newCycle(nbE);
-	this->template boundaryMarkOrbit<2,FACE>(d);
+	Algo::Topo::boundaryMarkOrbit<2,FACE>(*this, d);
 	return d;
 }
 
@@ -1190,7 +1241,7 @@ unsigned int GMap2<MAP_IMPL>::closeHole(Dart d, bool forboundary)
 	this->beta1sew(prev, this->beta0(first)) ;
 
 	if(forboundary)
-		this->template boundaryMarkOrbit<2,FACE>(phi2(d));
+		Algo::Topo::boundaryMarkOrbit<2,FACE>(*this, phi2(d));
 
 	return countEdges ;
 }

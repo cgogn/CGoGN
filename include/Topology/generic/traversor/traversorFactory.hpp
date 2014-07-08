@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/traversor/traversor1.h"
+#include "Topology/generic/traversor/traversor1Virt.h"
 #include "Topology/generic/traversor/traversor2Virt.h"
 #include "Topology/generic/traversor/traversor3Virt.h"
 #include "Topology/generic/traversor/traversorCellVirt.h"
@@ -97,12 +97,11 @@ Traversor* TraversorFactory<MAP>::createIncident(MAP& map, Dart dart, unsigned i
 			return new VTraversor2FE<MAP>(map,dart);
 			break;
 
-
 		case 0x101:
-			return new Traversor1VE<MAP>(map,dart);
+			return new VTraversor1VE<MAP>(map,dart);
 			break;
 		case 0x110:
-			return new Traversor1EV<MAP>(map,dart);
+			return new VTraversor1EV<MAP>(map,dart);
 			break;
 		default:
 			return NULL;
@@ -178,10 +177,10 @@ Traversor* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsigned i
 			break;
 
 		case 0x101:
-			return new Traversor1VVaE<MAP>(map,dart);
+			return new VTraversor1VVaE<MAP>(map,dart);
 			break;
 		case 0x110:
-			return new Traversor1EEaV<MAP>(map,dart);
+			return new VTraversor1EEaV<MAP>(map,dart);
 			break;
 		default:
 			return NULL;

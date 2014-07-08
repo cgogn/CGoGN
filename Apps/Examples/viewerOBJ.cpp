@@ -313,10 +313,8 @@ void ObjView::cb_redraw()
 
 void ObjView::init(const std::string& fnm)
 {
-
 	std::vector<std::string> attrNames;
 	m_obj.import(fnm,attrNames);
-
 
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, m_obj.m_positions);
 	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
@@ -324,9 +322,7 @@ void ObjView::init(const std::string& fnm)
 
 	// send BB info to interface for centering on GL screen
 	setParamObject(lWidthObj, lPosObj.data());
-
 }
-
 
 
 int main(int argc, char**argv)

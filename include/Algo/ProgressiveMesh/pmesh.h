@@ -52,13 +52,12 @@ class ProgressiveMesh
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 private:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& position ;
+	VertexAttribute<VEC3, MAP>& position ;
 
     DartMarker<MAP>& inactiveMarker ;
 
@@ -85,7 +84,7 @@ public:
         DartMarker<MAP>& inactive,
 		Algo::Surface::Decimation::SelectorType s,
 		Algo::Surface::Decimation::ApproximatorType a,
-		VertexAttribute<VEC3, MAP_IMPL>& position
+		VertexAttribute<VEC3, MAP>& position
 	) ;
 	ProgressiveMesh(
             MAP& map, DartMarker<MAP>& inactive,

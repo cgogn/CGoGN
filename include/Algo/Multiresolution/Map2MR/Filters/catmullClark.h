@@ -71,16 +71,15 @@ template <typename PFP>
 class CCInitEdgeSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	bool first;
 
 public:
-	CCInitEdgeSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p), first(true)
+	CCInitEdgeSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p), first(true)
 	{}
 
 	void operator() ()
@@ -103,16 +102,15 @@ template <typename PFP>
 class CCInitFaceSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	bool first;
 
 public:
-	CCInitFaceSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p), first(true)
+	CCInitFaceSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p), first(true)
 	{}
 
 	void operator() ()
@@ -135,15 +133,14 @@ template <typename PFP>
 class CCEdgeSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCEdgeSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCEdgeSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -165,15 +162,14 @@ template <typename PFP>
 class CCFaceSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCFaceSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCFaceSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -217,15 +213,14 @@ template <typename PFP>
 class CCVertexSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCVertexSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCVertexSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -273,15 +268,14 @@ template <typename PFP>
 class CCScalingSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCScalingSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCScalingSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -310,15 +304,14 @@ template <typename PFP>
 class CCScalingAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCScalingAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCScalingAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -347,15 +340,14 @@ template <typename PFP>
 class CCVertexAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCVertexAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCVertexAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -405,15 +397,14 @@ template <typename PFP>
 class CCFaceAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCFaceAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCFaceAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -457,15 +448,14 @@ template <typename PFP>
 class CCEdgeAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	CCEdgeAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	CCEdgeAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()

@@ -30,7 +30,7 @@
 
 SimpleGMap2::SimpleGMap2()
 {
-	 position = myMap.addAttribute<VEC3, VERTEX>("position");
+	 position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
      Dart d = Algo::Surface::Modelisation::createTetrahedron<PFP>(myMap);
      position[d] = VEC3(0,0,0);
@@ -62,7 +62,7 @@ void SimpleGMap2::cb_initGL()
 {
 	Utils::GLSLShader::setCurrentOGLVersion(1) ;
 
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+	Geom::BoundingBox<VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	VEC3 gPosObj = bb.center() ;
 	float tailleX = bb.size(0) ;
 	float tailleY = bb.size(1) ;

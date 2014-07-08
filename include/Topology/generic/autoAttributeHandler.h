@@ -33,11 +33,11 @@ namespace CGoGN
 /**
  *  shortcut class for Dart AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL>
-class DartAutoAttribute : public DartAttribute<T, MAP_IMPL>
+template <typename T, typename MAP>
+class DartAutoAttribute : public DartAttribute<T, MAP>
 {
 public:
-	DartAutoAttribute(MapCommon<MAP_IMPL>& m, const std::string& nameAttr = "")
+	DartAutoAttribute(MAP& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
 		if(!m.template isOrbitEmbedded<DART>())
@@ -51,18 +51,18 @@ public:
 	~DartAutoAttribute()
 	{
 		if (this->valid)
-			this->m_map->template removeAttribute<T>(*this) ;
+			this->m_map->removeAttribute(*this) ;
 	}
 };
 
 /**
  *  shortcut class for Vertex AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL>
-class VertexAutoAttribute : public VertexAttribute<T, MAP_IMPL>
+template <typename T, typename MAP>
+class VertexAutoAttribute : public VertexAttribute<T, MAP>
 {
 public:
-	VertexAutoAttribute(MapCommon<MAP_IMPL>& m, const std::string& nameAttr = "")
+	VertexAutoAttribute(MAP& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
 		if(!m.template isOrbitEmbedded<VERTEX>())
@@ -76,18 +76,18 @@ public:
 	~VertexAutoAttribute()
 	{
 		if (this->valid)
-			this->m_map->template removeAttribute<T>(*this) ;
+			this->m_map->removeAttribute(*this) ;
 	}
 };
 
 /**
  *  shortcut class for Edge AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL>
-class EdgeAutoAttribute : public EdgeAttribute<T, MAP_IMPL>
+template <typename T, typename MAP>
+class EdgeAutoAttribute : public EdgeAttribute<T, MAP>
 {
 public:
-	EdgeAutoAttribute(MapCommon<MAP_IMPL>& m, const std::string& nameAttr = "")
+	EdgeAutoAttribute(MAP& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
 		if(!m.template isOrbitEmbedded<EDGE>())
@@ -101,18 +101,18 @@ public:
 	~EdgeAutoAttribute()
 	{
 		if (this->valid)
-			this->m_map->template removeAttribute<T>(*this) ;
+			this->m_map->removeAttribute(*this) ;
 	}
 };
 
 /**
  *  shortcut class for Face AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL>
-class FaceAutoAttribute : public FaceAttribute<T, MAP_IMPL>
+template <typename T, typename MAP>
+class FaceAutoAttribute : public FaceAttribute<T, MAP>
 {
 public:
-	FaceAutoAttribute(MapCommon<MAP_IMPL>& m, const std::string& nameAttr = "")
+	FaceAutoAttribute(MAP& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
 		if(!m.template isOrbitEmbedded<FACE>())
@@ -126,18 +126,18 @@ public:
 	~FaceAutoAttribute()
 	{
 		if (this->valid)
-			this->m_map->template removeAttribute<T>(*this) ;
+			this->m_map->removeAttribute(*this) ;
 	}
 };
 
 /**
  *  shortcut class for Volume AutoAttribute (Handler)
  */
-template <typename T, typename MAP_IMPL>
-class VolumeAutoAttribute : public VolumeAttribute<T, MAP_IMPL>
+template <typename T, typename MAP>
+class VolumeAutoAttribute : public VolumeAttribute<T, MAP>
 {
 public:
-	VolumeAutoAttribute(MapCommon<MAP_IMPL>& m, const std::string& nameAttr = "")
+	VolumeAutoAttribute(MAP& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
 		if(!m.template isOrbitEmbedded<VOLUME>())
@@ -151,7 +151,7 @@ public:
 	~VolumeAutoAttribute()
 	{
 		if (this->valid)
-			this->m_map->template removeAttribute<T>(*this) ;
+			this->m_map->removeAttribute(*this) ;
 	}
 };
 

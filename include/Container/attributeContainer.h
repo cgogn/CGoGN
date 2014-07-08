@@ -138,12 +138,15 @@ public:
 
 	~AttributeContainer();
 
-	unsigned int getOrbit();
+	unsigned int getOrbit() const;
+
 	void setOrbit(unsigned int orbit);
 
 	void setRegistry(std::map<std::string, RegisteredBaseAttribute*>* re);
 
 	void setContainerBrowser(ContainerBrowser* bro) { m_currentBrowser = bro;}
+
+	bool hasBrowser() { return m_currentBrowser != NULL; }
 
 	/**************************************
 	 *          BASIC FEATURES            *
@@ -230,7 +233,7 @@ public:
 	unsigned int begin() const;
 
 	/**
-	 * return the index of the last line of the container
+	 * return the index after the last line of the container
 	 */
 	unsigned int end() const;
 
@@ -248,7 +251,7 @@ public:
 	unsigned int realBegin() const;
 
 	/**
-	 * return the index of the last line of the container
+	 * return the index after the last line of the container
 	 */
 	unsigned int realEnd() const;
 
@@ -258,6 +261,22 @@ public:
 	 */
 	void realNext(unsigned int &it) const;
 
+
+	/**
+	 * return the index of the last line of the container
+	 */
+	unsigned int realRBegin() const;
+
+	/**
+	 * return the index before the first line of the container
+	 */
+	unsigned int realREnd() const;
+
+	/**
+	 * get the index of the line before "it" in the container
+	 * MUST BE USED INSTEAD OF ++ !
+	 */
+	void realRNext(unsigned int &it) const;
 
 	/**************************************
 	 *       INFO ABOUT ATTRIBUTES        *
@@ -273,7 +292,7 @@ public:
 	/**
 	 * get the name of an attribute, given its index in the container
 	 */
-	const std::string& getAttributeName(unsigned int attrIndex);
+	const std::string& getAttributeName(unsigned int attrIndex) const;
 
 	/**
 	 * fill a vector with pointers to the blocks of the given attribute
@@ -290,7 +309,7 @@ public:
 	 * @param names vector of names
 	 * @return number of attributes
 	 */
-	unsigned int getAttributesNames(std::vector<std::string>& names);
+	unsigned int getAttributesNames(std::vector<std::string>& names) const;
 
 	/**
 	 * fill a vector with attribute type names
@@ -319,6 +338,13 @@ public:
 	 * @param mapOldNew table that contains a map from old indices to new indices (holes -> 0xffffffff)
 	 */
 	void compact(std::vector<unsigned int>& mapOldNew);
+
+	/**
+	 * Test the fragmentation of container,
+	 * in fact just size/max_size
+	 * @return 1 if full filled - 0 is lots of holes
+	 */
+	inline float fragmentation();
 
 	/**************************************
 	 *          LINES MANAGEMENT          *
@@ -364,7 +390,7 @@ public:
 	* @param index index of the line
 	* @return number of refs of the line
 	*/
-	unsigned int getNbRefs(unsigned int index);
+	unsigned int getNbRefs(unsigned int index) const;
 
 	/**
 	* set the number of refs of the given line
@@ -472,6 +498,14 @@ public:
 	 * TODO a version that compact on the fly ?
 	 */
 	void copyFrom(const AttributeContainer& cont);
+
+	/**
+	 * dump the container in CSV format (; separated columns)
+	 */
+	void dumpCSV() const;
+
+	void dumpByLines() const;
+
 
 };
 

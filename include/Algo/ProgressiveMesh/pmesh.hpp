@@ -42,7 +42,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
         DartMarker<MAP>& inactive,
 		Algo::Surface::Decimation::SelectorType s,
 		Algo::Surface::Decimation::ApproximatorType a,
-		VertexAttribute<VEC3, MAP_IMPL>& pos
+		VertexAttribute<VEC3, MAP>& pos
 	) :
 	m_map(map),
 	position(pos),
@@ -50,7 +50,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 
-	std::vector<VertexAttribute<VEC3, MAP_IMPL>*> pos_v ;
+	std::vector<VertexAttribute<VEC3, MAP>*> pos_v ;
 	pos_v.push_back(&position) ;
 	switch(a)
 	{
@@ -215,9 +215,9 @@ void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 
 		edgeCollapse(vs) ;							// collapse edge
 
-		unsigned int newV = m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
-		unsigned int newE1 = m_map.template setOrbitEmbeddingOnNewCell<EDGE>(d2) ;
-		unsigned int newE2 = m_map.template setOrbitEmbeddingOnNewCell<EDGE>(dd2) ;
+		unsigned int newV = Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(m_map,d2);
+		unsigned int newE1 = Algo::Topo::setOrbitEmbeddingOnNewCell<EDGE>(m_map,d2);
+		unsigned int newE2 = Algo::Topo::setOrbitEmbeddingOnNewCell<EDGE>(m_map,dd2);
 		vs->setApproxV(newV) ;
 		vs->setApproxE1(newE1) ;
 		vs->setApproxE2(newE2) ;
@@ -281,9 +281,10 @@ void ProgressiveMesh<PFP>::coarsen()
 
 	edgeCollapse(vs) ;	// collapse edge
 
-	m_map.template setOrbitEmbedding<VERTEX>(d2, vs->getApproxV()) ;
-	m_map.template setOrbitEmbedding<EDGE>(d2, vs->getApproxE1()) ;
-	m_map.template setOrbitEmbedding<EDGE>(dd2, vs->getApproxE2()) ;
+	Algo::Topo::setOrbitEmbedding<VERTEX>(m_map, d2,s->getApproxV()) ;
+	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, d2, vs->getApproxE1()) ;
+	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, dd2, vs->getApproxE2()) ;
+
 }
 
 template <typename PFP>
@@ -328,12 +329,12 @@ void ProgressiveMesh<PFP>::refine()
 
 	vertexSplit(vs) ; // split vertex
 
-	m_map.template setOrbitEmbedding<VERTEX>(d, v1) ;	// embed the
-	m_map.template setOrbitEmbedding<VERTEX>(dd, v2) ;	// new vertices
-	m_map.template setOrbitEmbedding<EDGE>(d1, e1) ;
-	m_map.template setOrbitEmbedding<EDGE>(d2, e2) ;	// and new edges
-	m_map.template setOrbitEmbedding<EDGE>(dd1, e3) ;
-	m_map.template setOrbitEmbedding<EDGE>(dd2, e4) ;
+	Algo::Topo::setOrbitEmbedding<VERTEX>(m_map, d, v1) ;	// embed the
+	Algo::Topo::setOrbitEmbedding<VERTEX>(m_map, dd, v2) ;	// new vertices
+	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, d1, e1) ;
+	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, d2, e2) ;	// and new edges
+	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, dd1, e3) ;
+	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, dd2, e4) ;
 
 	if(!m_predictors.empty())
 	{

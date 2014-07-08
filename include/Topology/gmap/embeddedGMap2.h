@@ -37,11 +37,14 @@ namespace CGoGN
 */
 class EmbeddedGMap2 : public GMap2<MapMono>
 {
+	EmbeddedGMap2(const EmbeddedGMap2& m):GMap2<MapMono>(m) {}
 public:
 	typedef MapMono IMPL;
 	typedef GMap2<MapMono> TOPO_MAP;
 
 	static const unsigned int DIMENSION = TOPO_MAP::DIMENSION ;
+
+	EmbeddedGMap2() {}
 
 	/**
 	 *	create a new face with managed embeddings

@@ -60,7 +60,7 @@ namespace Modelisation
 template<typename PFP>
 Dart extrusion_scale(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normalProfile,
@@ -87,7 +87,7 @@ template<typename PFP>
 //Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normalProfile,
@@ -114,7 +114,7 @@ template<typename PFP>
 //Polyhedron<PFP>* extrusion_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 Algo::Surface::Tilings::Tiling<PFP>* extrusion_prim(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normalProfile,
@@ -137,7 +137,7 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_prim(
 template<typename PFP>
 Dart extrusion(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normal,
@@ -159,7 +159,7 @@ template<typename PFP>
 //Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 Algo::Surface::Tilings::Tiling<PFP>* revolution_prim(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& center,
 	const typename PFP::VEC3& axis,
@@ -179,7 +179,7 @@ Algo::Surface::Tilings::Tiling<PFP>* revolution_prim(
 template<typename PFP>
 Dart revolution(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& center,
 	const typename PFP::VEC3& axis,
@@ -195,7 +195,7 @@ Dart revolution(
 template<typename PFP>
 Dart extrudeFace(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	Dart d,
 	const typename PFP::VEC3& N);
 
@@ -208,14 +208,14 @@ Dart extrudeFace(
 template<typename PFP>
 Dart extrudeFace(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positions,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions,
 	Dart d,
 	float dist);
 
 template<typename PFP>
 Dart extrudeRegion(
 	typename PFP::MAP& the_map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	Dart d,
 	const CellMarker<typename PFP::MAP, FACE>& cm);
 

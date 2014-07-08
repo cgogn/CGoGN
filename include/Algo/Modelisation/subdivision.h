@@ -65,8 +65,8 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positionF) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& positionF) ;
 
 /**
 * Quadrangule a face with central vertex
@@ -85,7 +85,7 @@ template <typename PFP, typename EMBV, typename EMB>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
 //template <typename PFP>
-//void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+//void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position) ;
 
 /**
  * Catmull-Clark subdivision scheme
@@ -135,13 +135,13 @@ void DooSabin(typename PFP::MAP& map, EMBV& position);
 //void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 template <typename PFP>
-void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 template <typename PFP>
-void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 } // namespace Modelisation
 

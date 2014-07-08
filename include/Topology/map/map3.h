@@ -51,6 +51,9 @@ template <typename MAP_IMPL>
 class Map3 : public Map2<MAP_IMPL>
 {
 protected:
+	// protected copy constructor to prevent the copy of map
+	Map3(const Map3<MAP_IMPL>& m):Map2<MAP_IMPL>(m) {}
+
 	void init() ;
 
 public:
@@ -382,53 +385,84 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Apply a functor on each dart of a vertex
-	/*! @param d a dart of the vertex
-	 *  @param fonct the functor
+	//! Apply a function on every dart of an orbit
+	/*! @param c a cell
+	 *  @param f a function
 	 */
-	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
-
-	//! Apply a functor on each dart of an edge
-	/*! @param d a dart of the oriented edge
-	 *  @param fonct the functor
-	 */
-	void foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
-
-	//! Apply a functor on each dart of a face
-	/*! @param d a dart of the oriented face
-	 *  @param fonct the functor
-	 */
-	void foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
-
-	//! Apply a functor on each dart of a face
-	/*! @param d a dart of the oriented face
-	 *  @param fonct the functor
-	 */
-	void foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
-
-	//! Apply a functor on each dart of a cc
-	/*! @param d a dart of the cc
-	 *  @param fonct the functor
-	 */
-	void foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread = 0) const ;
 
 	//! Apply a functor on each dart of a vertex
 	/*! @param d a dart of the vertex
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_vertex2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of an edge
 	/*! @param d a dart of the oriented edge
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_edge2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_edge(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	//! Apply a functor on each dart of a face
+	/*! @param d a dart of the oriented face
+	 *  @param fonct the functor
+	 */
+	template <typename FUNC>
+	void foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	//! Apply a functor on each dart of a face
+	/*! @param d a dart of the oriented face
+	 *  @param fonct the functor
+	 */
+	template <typename FUNC>
+	void foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	//! Apply a functor on each dart of a vertex
+	/*! @param d a dart of the vertex
+	 *  @param fonct the functor
+	 */
+	template <typename FUNC>
+	void foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	//! Apply a functor on each dart of an edge
+	/*! @param d a dart of the oriented edge
+	 *  @param fonct the functor
+	 */
+	template <typename FUNC>
+	void foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	//! Apply a functor on each dart of a vertex
+	/*! @param d a dart of the vertex
+	 *  @param fonct the functor
+	 */
+	template <typename FUNC>
+	void foreach_dart_of_vertex2(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	//! Apply a functor on each dart of an edge
+	/*! @param d a dart of the oriented edge
+	 *  @param fonct the functor
+	 */
+	template <typename FUNC>
+	void foreach_dart_of_edge2(Dart d, FUNC& f, unsigned int thread = 0) const;
 
 	//! Apply a functor on each dart of an oriented face
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
-	void foreach_dart_of_face2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_face2(Dart d, FUNC& f, unsigned int thread = 0) const;
+
+	//! Apply a functor on each dart of a cc
+	/*! @param d a dart of the cc
+	 *  @param fonct the functor
+	 */
+	template <typename FUNC>
+	void foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread = 0) const;
 
 	//@}
 
@@ -485,6 +519,13 @@ public:
 
 	void computeDualTest();
 	//@}
+
+	/**
+	 * @brief move all data from a map2 in a map3
+	 * @param mapf the input map2 (which will be empty after)
+	 */
+	void moveFrom(Map2<MAP_IMPL>& mapf);
+
 };
 
 } // namespace CGoGN

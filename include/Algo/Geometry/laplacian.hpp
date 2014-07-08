@@ -42,7 +42,7 @@ template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianTopoVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr)
 {
 	ATTR_TYPE l(0) ;
 	ATTR_TYPE value = attr[d] ;
@@ -63,9 +63,9 @@ template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianCotanVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& vertexArea,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr)
 {
 	typedef typename PFP::REAL REAL;
 
@@ -89,8 +89,8 @@ ATTR_TYPE computeLaplacianCotanVertex(
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianTopoVertices(
 	typename PFP::MAP& map,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
-	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& laplacian)
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
+	VertexAttribute<ATTR_TYPE, typename PFP::MAP>& laplacian)
 {
 	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -100,10 +100,10 @@ void computeLaplacianTopoVertices(
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianCotanVertices(
 	typename PFP::MAP& map,
-	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
-	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& laplacian)
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& vertexArea,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
+	VertexAttribute<ATTR_TYPE, typename PFP::MAP>& laplacian)
 {
 	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -114,7 +114,7 @@ template <typename PFP>
 typename PFP::REAL computeCotanWeightEdge(
 	typename PFP::MAP& map,
 	Dart d,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -144,8 +144,8 @@ typename PFP::REAL computeCotanWeightEdge(
 template <typename PFP>
 void computeCotanWeightEdges(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight)
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& edgeWeight)
 {
 	TraversorE<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -167,7 +167,7 @@ template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianTopoVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr)
 {
 	ATTR_TYPE l(0) ;
 	ATTR_TYPE value = attr[d] ;
@@ -187,8 +187,8 @@ ATTR_TYPE computeLaplacianTopoVertex(
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianTopoVertices(
 	typename PFP::MAP& map,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
-	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& laplacian)
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
+	VertexAttribute<ATTR_TYPE, typename PFP::MAP>& laplacian)
 {
 	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())

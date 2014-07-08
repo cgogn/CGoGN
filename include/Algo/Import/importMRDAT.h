@@ -104,7 +104,7 @@ public:
 //				if(oldEmb == EMBNULL)
 //				{
 					//std::cout << "oldEmb == NULL"<< std::endl;
-					map.template setOrbitEmbedding<VERTEX>(dd, newEmb) ;
+					Algo::Topo::setOrbitEmbedding<VERTEX>(map,dd,newEmb);
 
 					//needed because the darts are duplicated at each level
 					//and the vertex orbits are initialized at the creation of each level with wrong embedding indices
@@ -114,7 +114,8 @@ public:
 					for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
 					{
 						map.setCurrentLevel(i) ;
-						map.template setOrbitEmbedding<VERTEX>(dd, newEmb) ;
+						Algo::Topo::setOrbitEmbedding<VERTEX>(map,dd,newEmb);
+
 					}
 					//map.popLevel() ;
 					map.setCurrentLevel(cur);

@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#include <Algo/Topo/embedding.h>
 
 namespace CGoGN
 {
@@ -1191,7 +1192,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
+//	unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
+	const unsigned int newV = Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(m,d2);
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
@@ -1204,8 +1206,11 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
-	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
+//	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
+//	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
+	Algo::Topo::setOrbitEmbedding<VERTEX>(m,d,v1);
+	Algo::Topo::setOrbitEmbedding<VERTEX>(m,dd,v2);
+
 
 	REAL err = 0 ;
 
@@ -1422,7 +1427,8 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	const unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
+//	const unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
+	const unsigned int newV = Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(m,d2);
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute tensor after collapse
@@ -1435,8 +1441,10 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
-	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
+//	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
+//	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
+	Algo::Topo::setOrbitEmbedding<VERTEX>(m,d,v1);
+	Algo::Topo::setOrbitEmbedding<VERTEX>(m,dd,v2);
 
 	// compute err from the tensors
 	tens1 -= tens2;
@@ -1678,7 +1686,7 @@ bool EdgeSelector_ColorNaive<PFP>::init()
 				++ok ;
 				m_approxindex_color = approxindex ;
 				m_attrindex_color = attrindex ;
-				m_color = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+				m_color = m.template getAttribute<typename PFP::VEC3, VERTEX, MAP>("color") ;
 				assert(m_color.isValid() || !"EdgeSelector_ColorNaive: color attribute is not valid") ;
 				if (!saved)
 				{
@@ -1939,7 +1947,7 @@ bool EdgeSelector_GeomColOptGradient<PFP>::init()
 				++ok ;
 				m_approxindex_color = approxindex ;
 				m_attrindex_color = attrindex ;
-				m_color = m.template getAttribute<VEC3, VERTEX>("color") ;
+				m_color = m.template getAttribute<VEC3, VERTEX, MAP>("color") ;
 				assert(m_color.isValid() || !"EdgeSelector_GeomColOptGradient: color attribute is not valid") ;
 				if (!saved)
 				{
@@ -2262,7 +2270,7 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 				++ok ;
 				m_approxindex_color = approxindex ;
 				m_attrindex_color = attrindex ;
-				m_color = m.template getAttribute<VEC3, VERTEX>("color") ;
+				m_color = m.template getAttribute<VEC3, VERTEX, MAP>("color") ;
 				assert(m_color.isValid() || !"EdgeSelector_QEMextColor: color attribute is not valid") ;
 				if (!saved)
 				{

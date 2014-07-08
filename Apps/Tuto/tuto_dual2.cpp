@@ -47,7 +47,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 int main(int argc, char **argv)
@@ -67,11 +66,11 @@ int main(int argc, char **argv)
 	Algo::Surface::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP> position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]);
 
-	FaceAttribute<VEC3, MAP_IMPL> positionF = myMap.getAttribute<VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP> positionF = myMap.getAttribute<VEC3, FACE, MAP>("position") ;
 	if(!positionF.isValid())
-		positionF = myMap.addAttribute<VEC3, FACE>("position") ;
+		positionF = myMap.addAttribute<VEC3, FACE, MAP>("position") ;
 
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
 
