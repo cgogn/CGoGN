@@ -181,6 +181,12 @@ public:
 	 */
 	Dart deleteVertex(Dart d);
 
+	//! Merge two opposite vertices in a quadrangular face
+	/*! \pre Darts d MUST belong to the face of the vertices to be merged
+	 *  @param d a dart in vertex v
+	 */
+	void mergeOppositeVertices(Dart d);
+
 	//! Cut the edge of d by inserting a new vertex
 	/*! @param d a dart of the edge to cut
 	 *  @return a dart of the new vertex

@@ -285,6 +285,26 @@ Dart Map2<MAP_IMPL>::deleteVertex(Dart d)
 }
 
 template <typename MAP_IMPL>
+void Map2<MAP_IMPL>::mergeOppositeVertices(Dart d)
+{
+	Dart d2 = phi2(d);
+	Dart d_12 = phi2(this->phi_1(d));
+	Dart d_112 = phi2(this->phi_1(this->phi_1(d)));
+	Dart d12 = phi2(this->phi1(d));
+
+	phi2unsew(d2);
+	phi2unsew(d_12);
+	phi2unsew(d_112);
+	phi2unsew(d12);
+
+	phi2sew(d2,d12);
+	phi2sew(d_12,d_112);
+
+	ParentMap::deleteCycle(d);
+}
+
+
+template <typename MAP_IMPL>
 Dart Map2<MAP_IMPL>::cutEdge(Dart d)
 {
 	Dart e = phi2(d);
