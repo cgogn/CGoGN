@@ -619,7 +619,7 @@ bool HalfEdgeSelector_QEMextColorNormal<PFP>::init()
 				++ok ;
 				m_approxindex_color = approxindex ;
 				m_attrindex_color = attrindex ;
-				m_color = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+                m_color = m.template getAttribute<typename PFP::VEC3, VERTEX, MAP>("color") ;
 				assert(m_color.isValid() || !"EdgeSelector_QEMextColor: color attribute is not valid") ;
 				if (!saved)
 				{
@@ -632,7 +632,7 @@ bool HalfEdgeSelector_QEMextColorNormal<PFP>::init()
 				++ok ;
 				m_approxindex_normal = approxindex ;
 				m_attrindex_normal = attrindex ;
-				m_normal = m.template getAttribute<typename PFP::VEC3, VERTEX>("normal") ;
+                m_normal = m.template getAttribute<typename PFP::VEC3, VERTEX, MAP>("normal") ;
 				assert(m_normal.isValid() || !"EdgeSelector_QEMextColorNormal: normal attribute is not valid") ;
 				if (!saved)
 				{

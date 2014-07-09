@@ -230,8 +230,8 @@ public:
 		m_approxindex_normal(-1),
 		m_attrindex_normal(-1)
 	{
-		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,9>, VERTEX>("hQEMextNormal-quadric") ;
+        halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
+        m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,9>, VERTEX, MAP>("hQEMextNormal-quadric") ;
 	}
 	~HalfEdgeSelector_QEMextColorNormal()
 	{

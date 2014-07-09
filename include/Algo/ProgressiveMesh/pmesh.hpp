@@ -139,7 +139,7 @@ template <typename PFP>
 ProgressiveMesh<PFP>::ProgressiveMesh(
         MAP& map, DartMarker<MAP>& inactive,
 		Algo::Surface::Decimation::Selector<PFP>* selector, std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>& approximators,
-        VertexAttribute<VEC3,MAP_IMPL>& position
+        VertexAttribute<VEC3,MAP>& position
 	) :
     m_map(map), m_selector(selector), m_approximators(approximators), position(position), inactiveMarker(inactive)
 {
@@ -281,7 +281,7 @@ void ProgressiveMesh<PFP>::coarsen()
 
 	edgeCollapse(vs) ;	// collapse edge
 
-	Algo::Topo::setOrbitEmbedding<VERTEX>(m_map, d2,s->getApproxV()) ;
+    Algo::Topo::setOrbitEmbedding<VERTEX>(m_map, d2, vs->getApproxV()) ;
 	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, d2, vs->getApproxE1()) ;
 	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, dd2, vs->getApproxE2()) ;
 

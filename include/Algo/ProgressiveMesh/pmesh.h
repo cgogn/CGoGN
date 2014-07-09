@@ -89,7 +89,7 @@ public:
 	ProgressiveMesh(
             MAP& map, DartMarker<MAP>& inactive,
 			Algo::Surface::Decimation::Selector<PFP>* selector, std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>& approximators,
-            VertexAttribute<VEC3,MAP_IMPL>& position) ;
+            VertexAttribute<VEC3, MAP>& position) ;
 	~ProgressiveMesh() ;
 
 	bool initOk() { return m_initOk ; }
