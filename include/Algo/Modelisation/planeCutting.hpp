@@ -131,7 +131,7 @@ void planeCut(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 template <typename PFP>
 void planeCut(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	const Geom::Plane3D<typename PFP::REAL>& plane,
 	CellMarker<typename PFP::MAP, FACE>& cmf_over,
 	bool keepTriangles,
@@ -261,13 +261,12 @@ void planeCut(
 template <typename PFP>
 void planeCut2(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	const Geom::Plane3D<typename PFP::REAL>& plane,
 	CellMarker<typename PFP::MAP, FACE>& cmf_over,
 	bool with_unsew)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 
 	//marker for vertices on the plane
@@ -275,7 +274,7 @@ void planeCut2(
 	// marker for vertices over the plane
 	CellMarker<MAP, VERTEX> cmv_over(map);
 
-	EdgeAutoAttribute<VEC3, MAP_IMPL> positionEdge(map);
+	EdgeAutoAttribute<VEC3, MAP> positionEdge(map);
 
 	CellMarker<MAP, EDGE> cme(map);
 
@@ -405,14 +404,14 @@ namespace Modelisation
 template <typename PFP>
 void planeCut(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	const Geom::Plane3D<typename PFP::REAL>& plane,
 	CellMarker<typename PFP::MAP, FACE>& cmf_over,
 	bool keepTetrahedra,
 	bool with_unsew)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::MAP MAP;
 	typedef typename PFP::REAL REAL;
 
 	//marker for vertices on the plane

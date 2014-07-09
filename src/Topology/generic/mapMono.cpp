@@ -128,7 +128,6 @@ bool MapMono::loadMapBin(const std::string& filename)
 
 bool MapMono::copyFrom(const GenericMap& map)
 {
-	const MapMono& mapM = reinterpret_cast<const MapMono&>(map);
 
 	if (mapTypeName() != map.mapTypeName())
 	{
@@ -136,11 +135,16 @@ bool MapMono::copyFrom(const GenericMap& map)
 		return false;
 	}
 
-	GenericMap::clear(true);
+	const MapMono& mapM = reinterpret_cast<const MapMono&>(map);
 
-	// load attrib container
+	// clear the map but do not insert boundary markers dart attribute
+	GenericMap::init(false);
+
+	// copy attrib containers
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_attribs[i].copyFrom(mapM.m_attribs[i]);
+
+	GenericMap::garbageMarkVectors();
 
 	// restore shortcuts
 	GenericMap::restore_shortcuts();
@@ -185,5 +189,36 @@ void MapMono::restore_topo_shortcuts()
 		}
 	}
 }
+
+
+void MapMono::compactTopo()
+{
+	std::vector<unsigned int> oldnew;
+	m_attribs[DART].compact(oldnew);
+
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		for (unsigned int j = 0; j < m_permutation.size(); ++j)
+		{
+			Dart d = (*m_permutation[j])[i];
+			if (oldnew[d.index] != AttributeContainer::UNKNOWN)
+				(*m_permutation[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_permutation_inv.size(); ++j)
+		{
+			Dart d = (*m_permutation_inv[j])[i];
+			if (oldnew[d.index] != AttributeContainer::UNKNOWN)
+				(*m_permutation_inv[j])[i] = Dart(oldnew[d.index]);
+		}
+		for (unsigned int j = 0; j < m_involution.size(); ++j)
+		{
+			Dart d = (*m_involution[j])[i];
+			if (oldnew[d.index] != AttributeContainer::UNKNOWN)
+				(*m_involution[j])[i] = Dart(oldnew[d.index]);
+		}
+	}
+}
+
+
 
 } //namespace CGoGN

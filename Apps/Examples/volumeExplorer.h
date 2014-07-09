@@ -21,8 +21,9 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef __TUTO5_
-#define __TUTO5_
+
+#ifndef __VOLUME_EXPLORER__
+#define __VOLUME_EXPLORER__
 
 #include <iostream>
 
@@ -53,8 +54,8 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP;
-typedef PFP::MAP::IMPL MAP_IMPL;
 typedef PFP::VEC3 VEC3;
+typedef PFP::REAL REAL;
 
 using namespace CGoGN ;
 
@@ -121,7 +122,6 @@ protected:
 	void cb_Open();
 	void cb_Save();
 
-
 // slots locaux
 public slots:
 	void volumes_onoff(bool x);
@@ -135,4 +135,4 @@ public slots:
 	void slider_explodeF(int x);
 };
 
-#endif
+#endif // __VOLUME_EXPLORER__

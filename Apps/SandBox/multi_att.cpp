@@ -51,7 +51,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP;
-typedef PFP::MAP::IMPL MAP_IMPL;
 typedef PFP::VEC3 VEC3;
 typedef PFP::VEC4 VEC4;
 
@@ -136,22 +135,22 @@ int main(int argc, char **argv)
 
 
 	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
-	VertexAttribute<VEC3, MAP_IMPL> pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2");
-	VertexAttribute<VEC4, MAP_IMPL> vc = myMap.addAttribute<VEC4, VERTEX>("vertexColor");
-	VertexAttribute<VEC4, MAP_IMPL> vc2 = myMap.addAttribute<VEC4, VERTEX>("vertexColor2");
+	VertexAttribute<VEC3, MAP> position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]);
+	VertexAttribute<VEC3, MAP> pos2 = myMap.addAttribute<VEC3, VERTEX, MAP>("pos2");
+	VertexAttribute<VEC4, MAP> vc = myMap.addAttribute<VEC4, VERTEX, MAP>("vertexColor");
+	VertexAttribute<VEC4, MAP> vc2 = myMap.addAttribute<VEC4, VERTEX, MAP>("vertexColor2");
 
 	// classic usage with simple vertex attributes
 	applySmooth<PFP>(myMap, position, pos2);
 
 	// multi attributes usage
-	Vertex2Attributes<VEC3, VEC4, MAP_IMPL> pv_in(position, vc);
-	Vertex2Attributes<VEC3, VEC4, MAP_IMPL> pv_out(pos2, vc2);
+	Vertex2Attributes<VEC3, VEC4, MAP> pv_in(position, vc);
+	Vertex2Attributes<VEC3, VEC4, MAP> pv_out(pos2, vc2);
 	applySmooth<PFP>(myMap, pv_in, pv_out);
 
 	// usage with with a face attribute
-	FaceAttribute<VEC4, MAP_IMPL> fc = myMap.addAttribute<VEC4, FACE>("faceColor");
-	FaceAttribute<VEC4, MAP_IMPL> fc2 = myMap.addAttribute<VEC4, FACE>("faceColor2");
+	FaceAttribute<VEC4, MAP> fc = myMap.addAttribute<VEC4, FACE, MAP>("faceColor");
+	FaceAttribute<VEC4, MAP> fc2 = myMap.addAttribute<VEC4, FACE, MAP>("faceColor2");
 	applySmooth<PFP>(myMap, fc, fc2);
 
 

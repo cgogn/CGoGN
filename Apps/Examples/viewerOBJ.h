@@ -69,13 +69,12 @@ public:
 
 	Utils::Drawer* m_dr;
 	unsigned int m_currentGroupDrawn;
-	void drawBB( const Geom::BoundingBox<VEC3>& bb);
+	void drawBB(const Geom::BoundingBox<VEC3>& bb);
 
 	// VBO
 	Utils::VBO* m_positionVBO;
 	Utils::VBO* m_normalVBO;
 	Utils::VBO* m_texcoordVBO;
-
 
 	// shader simple texture
 	Utils::ShaderSimpleTexture* m_shader;
@@ -96,8 +95,6 @@ public:
 	void cb_initGL();
 
 	void cb_keyPress(int k);
-
-
 };
 
 #endif

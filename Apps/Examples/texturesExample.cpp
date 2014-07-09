@@ -89,9 +89,9 @@ void TexView::cb_initGL()
 
 	if (!m_obj.hasNormals())
 	{
-		VertexAttribute<Geom::Vec3f, MAP_IMPL> normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
+		VertexAttribute<Geom::Vec3f, MAP> normal = myMap.getAttribute<VEC3, VERTEX, MAP>("normal") ;
 		if(!normal.isValid())
-			normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
+			normal = myMap.addAttribute<VEC3, VERTEX, MAP>("normal") ;
 
 		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, m_obj.m_positions, normal) ;
 		m_obj.setNormalAttribute(normal);
@@ -206,8 +206,8 @@ void TexView::computeTore()
 {
 #define NB 96
 
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
-	VertexAttribute<Geom::Vec2f, MAP_IMPL> texcoord = myMap.addAttribute<Geom::Vec2f, VERTEX>("texcoord");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
+	VertexAttribute<Geom::Vec2f, MAP> texcoord = myMap.addAttribute<Geom::Vec2f, VERTEX, MAP>("texcoord");
     //Algo::Surface::Modelisation::Polyhedron<PFP> prim(myMap, position);
     Algo::Surface::Tilings::Square::Tore<PFP> prim(myMap, NB, NB);
     prim.embedIntoTore(position, 40.0f,20.0f);

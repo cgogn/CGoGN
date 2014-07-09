@@ -50,7 +50,6 @@ template <typename PFP>
 class EdgeSelector_MapOrder : public Selector<PFP>
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -58,7 +57,7 @@ private:
 	Dart cur ;
 
 public:
-	EdgeSelector_MapOrder(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_MapOrder(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx)
 	{}
 	~EdgeSelector_MapOrder()
@@ -75,7 +74,6 @@ template <typename PFP>
 class EdgeSelector_Random : public Selector<PFP>
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -85,7 +83,7 @@ private:
 	bool allSkipped ;
 
 public:
-	EdgeSelector_Random(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_Random(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		cur(0),
 		allSkipped(false)
@@ -105,7 +103,6 @@ class EdgeSelector_Length : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -118,7 +115,7 @@ private:
 	} LengthEdgeInfo ;
 	typedef NoTypeNameAttribute<LengthEdgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -128,10 +125,10 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Length(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_Length(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_Length()
 	{
@@ -145,7 +142,7 @@ public:
 
 	void updateWithoutCollapse();
 
-	void getEdgeErrors(EdgeAttribute<REAL, MAP_IMPL> *errors) const
+	void getEdgeErrors(EdgeAttribute<REAL, MAP> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -169,7 +166,6 @@ class EdgeSelector_QEM : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -182,8 +178,8 @@ private:
 	} QEMedgeInfo ;
 	typedef NoTypeNameAttribute<QEMedgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	VertexAttribute<Utils::Quadric<REAL>, MAP_IMPL> quadric ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP> quadric ;
 	Utils::Quadric<REAL> tmpQ ;
 
 	std::multimap<float,Dart> edges ;
@@ -196,12 +192,12 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_QEM(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_QEM(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_QEM()
 	{
@@ -222,7 +218,6 @@ class EdgeSelector_QEMml : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -235,8 +230,8 @@ private:
 	} QEMedgeInfo ;
 	typedef NoTypeNameAttribute<QEMedgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	VertexAttribute<Utils::Quadric<REAL>, MAP_IMPL> quadric ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP> quadric ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -249,12 +244,12 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	EdgeSelector_QEMml(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_QEMml(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_QEMml()
 	{
@@ -276,7 +271,6 @@ class EdgeSelector_NormalArea : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -289,8 +283,8 @@ private:
 	} NormalAreaEdgeInfo ;
 	typedef NoTypeNameAttribute<NormalAreaEdgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	EdgeAttribute<Geom::Matrix<3,3,REAL>, MAP_IMPL> edgeMatrix ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	EdgeAttribute<Geom::Matrix<3,3,REAL>, MAP> edgeMatrix ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -304,12 +298,12 @@ private:
 //	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	EdgeSelector_NormalArea(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_NormalArea(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		edgeMatrix = m.template addAttribute<Geom::Matrix<3,3,REAL>, EDGE>("NormalAreaMatrix") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		edgeMatrix = m.template addAttribute<Geom::Matrix<3,3,REAL>, EDGE, MAP>("NormalAreaMatrix") ;
 	}
 	~EdgeSelector_NormalArea()
 	{
@@ -331,7 +325,6 @@ class EdgeSelector_Curvature : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -347,14 +340,14 @@ private:
 	Geom::BoundingBox<VEC3> bb ;
 	REAL radius ;
 
-	VertexAttribute<VEC3, MAP_IMPL> normal ;
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	EdgeAttribute<REAL, MAP_IMPL> edgeangle ;
-	VertexAttribute<REAL, MAP_IMPL> kmax ;
-	VertexAttribute<REAL, MAP_IMPL> kmin ;
-	VertexAttribute<VEC3, MAP_IMPL> Kmax ;
-	VertexAttribute<VEC3, MAP_IMPL> Kmin ;
-	VertexAttribute<VEC3, MAP_IMPL> Knormal ;
+	VertexAttribute<VEC3, MAP> normal ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	EdgeAttribute<REAL, MAP> edgeangle ;
+	VertexAttribute<REAL, MAP> kmax ;
+	VertexAttribute<REAL, MAP> kmin ;
+	VertexAttribute<VEC3, MAP> Kmax ;
+	VertexAttribute<VEC3, MAP> Kmin ;
+	VertexAttribute<VEC3, MAP> Knormal ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -366,45 +359,45 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Curvature(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_Curvature(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
 		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
 		radius = bb.diagSize() * 0.003 ;
 
-		normal = m.template getAttribute<VEC3, VERTEX>("normal") ;
+		normal = m.template getAttribute<VEC3, VERTEX, MAP>("normal") ;
 		if(!normal.isValid())
 		{
-			normal = m.template addAttribute<VEC3, VERTEX>("normal") ;
+			normal = m.template addAttribute<VEC3, VERTEX, MAP>("normal") ;
 			Algo::Surface::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
 		}
 
-		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
+		edgeangle = m.template getAttribute<REAL, EDGE, MAP>("edgeangle") ;
 		if(!edgeangle.isValid())
 		{
-			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
+			edgeangle = m.template addAttribute<REAL, EDGE, MAP>("edgeangle") ;
 			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
-		kmax = m.template getAttribute<REAL, VERTEX>("kmax") ;
-		kmin = m.template getAttribute<REAL, VERTEX>("kmin") ;
-		Kmax = m.template getAttribute<VEC3, VERTEX>("Kmax") ;
-		Kmin = m.template getAttribute<VEC3, VERTEX>("Kmin") ;
-		Knormal = m.template getAttribute<VEC3, VERTEX>("Knormal") ;
+		kmax = m.template getAttribute<REAL, VERTEX, MAP>("kmax") ;
+		kmin = m.template getAttribute<REAL, VERTEX, MAP>("kmin") ;
+		Kmax = m.template getAttribute<VEC3, VERTEX, MAP>("Kmax") ;
+		Kmin = m.template getAttribute<VEC3, VERTEX, MAP>("Kmin") ;
+		Knormal = m.template getAttribute<VEC3, VERTEX, MAP>("Knormal") ;
 		// as all these attributes are computed simultaneously by computeCurvatureVertices
 		// one can assume that if one of them is not valid, the others must be created too
 		if(!kmax.isValid())
 		{
-			kmax = m.template addAttribute<REAL, VERTEX>("kmax") ;
-			kmin = m.template addAttribute<REAL, VERTEX>("kmin") ;
-			Kmax = m.template addAttribute<VEC3, VERTEX>("Kmax") ;
-			Kmin = m.template addAttribute<VEC3, VERTEX>("Kmin") ;
-			Knormal = m.template addAttribute<VEC3, VERTEX>("Knormal") ;
+			kmax = m.template addAttribute<REAL, VERTEX, MAP>("kmax") ;
+			kmin = m.template addAttribute<REAL, VERTEX, MAP>("kmin") ;
+			Kmax = m.template addAttribute<VEC3, VERTEX, MAP>("Kmax") ;
+			Kmin = m.template addAttribute<VEC3, VERTEX, MAP>("Kmin") ;
+			Knormal = m.template addAttribute<VEC3, VERTEX, MAP>("Knormal") ;
 			Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 		}
 
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_Curvature()
 	{
@@ -432,7 +425,6 @@ class EdgeSelector_CurvatureTensor : public Selector<PFP>
 	// TODO : this selector still needs to be tested
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -445,8 +437,8 @@ private:
 	} CurvatureTensorEdgeInfo ;
 	typedef NoTypeNameAttribute<CurvatureTensorEdgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	EdgeAttribute<REAL, MAP_IMPL> edgeangle ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	EdgeAttribute<REAL, MAP> edgeangle ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -458,18 +450,18 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_CurvatureTensor(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_CurvatureTensor(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeangle = m.template getAttribute<REAL, EDGE>("edgeangle") ;
+		edgeangle = m.template getAttribute<REAL, EDGE, MAP>("edgeangle") ;
 		if(!edgeangle.isValid())
 		{
-			edgeangle = m.template addAttribute<REAL, EDGE>("edgeangle") ;
+			edgeangle = m.template addAttribute<REAL, EDGE, MAP>("edgeangle") ;
 			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_CurvatureTensor()
 	{
@@ -491,7 +483,6 @@ class EdgeSelector_MinDetail : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -504,7 +495,7 @@ private:
 	} MinDetailEdgeInfo ;
 	typedef NoTypeNameAttribute<MinDetailEdgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -516,11 +507,11 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_MinDetail(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_MinDetail(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_positionApproximator(NULL)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_MinDetail()
 	{
@@ -544,7 +535,6 @@ class EdgeSelector_ColorNaive : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -557,10 +547,10 @@ private:
 	} ColorNaiveedgeInfo ;
 	typedef NoTypeNameAttribute<ColorNaiveedgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	VertexAttribute<Utils::Quadric<REAL>, MAP_IMPL> m_quadric ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
-	VertexAttribute<VEC3, MAP_IMPL> m_pos, m_color ;
+	VertexAttribute<VEC3, MAP> m_pos, m_color ;
 	int m_approxindex_pos, m_attrindex_pos ;
 	int m_approxindex_color, m_attrindex_color ;
 
@@ -575,15 +565,15 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	EdgeSelector_ColorNaive(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_ColorNaive(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_ColorNaive()
 	{
@@ -608,7 +598,6 @@ class EdgeSelector_GeomColOptGradient : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -621,10 +610,10 @@ private:
 	} ColorNaiveedgeInfo ;
 	typedef NoTypeNameAttribute<ColorNaiveedgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	VertexAttribute<Utils::Quadric<REAL>, MAP_IMPL> m_quadric ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
-	VertexAttribute<VEC3, MAP_IMPL> m_pos, m_color ;
+	VertexAttribute<VEC3, MAP> m_pos, m_color ;
 	int m_approxindex_pos, m_attrindex_pos ;
 	int m_approxindex_color, m_attrindex_color ;
 
@@ -640,15 +629,15 @@ private:
 	VEC3 computeEdgeGradientColorError(const Dart& v0, const VEC3& p, const VEC3& c) ;
 
 public:
-	EdgeSelector_GeomColOptGradient(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_GeomColOptGradient(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
 	}
 	~EdgeSelector_GeomColOptGradient()
 	{
@@ -663,7 +652,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<REAL, MAP_IMPL> *errors) const
+	void getEdgeErrors(EdgeAttribute<REAL, MAP> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())
@@ -691,7 +680,6 @@ class EdgeSelector_QEMextColor : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename Geom::Vector<6,REAL> VEC6 ;
@@ -705,10 +693,10 @@ private:
 	} QEMextColorEdgeInfo ;
 	typedef NoTypeNameAttribute<QEMextColorEdgeInfo> EdgeInfo ;
 
-	EdgeAttribute<EdgeInfo, MAP_IMPL> edgeInfo ;
-	VertexAttribute<Utils::QuadricNd<REAL,6>, MAP_IMPL> m_quadric ;
+	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
+	VertexAttribute<Utils::QuadricNd<REAL,6>, MAP> m_quadric ;
 
-	VertexAttribute<VEC3, MAP_IMPL> m_pos, m_color ;
+	VertexAttribute<VEC3, MAP> m_pos, m_color ;
 	int m_approxindex_pos, m_attrindex_pos ;
 	int m_approxindex_color, m_attrindex_color ;
 
@@ -723,15 +711,15 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	EdgeSelector_QEMextColor(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
+	EdgeSelector_QEMextColor(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
 		Selector<PFP>(m, pos, approx),
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_color(-1),
 		m_attrindex_color(-1)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,6>, VERTEX, MAP>("QEMext-quadric") ;
 	}
 	~EdgeSelector_QEMextColor()
 	{
@@ -746,7 +734,7 @@ public:
 
 	void updateWithoutCollapse() { }
 
-	void getEdgeErrors(EdgeAttribute<REAL, MAP_IMPL> *errors) const
+	void getEdgeErrors(EdgeAttribute<REAL, MAP> *errors) const
 	{
 		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
 		if (!errors->isValid())

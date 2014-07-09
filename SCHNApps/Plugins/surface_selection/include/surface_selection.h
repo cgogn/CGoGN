@@ -26,8 +26,8 @@ struct MapParameters
 		selectionMethod(SingleCell)
 	{}
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> positionAttribute;
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> normalAttribute;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionAttribute;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normalAttribute;
 	SelectionMethod selectionMethod;
 };
 

@@ -25,7 +25,6 @@
 #ifndef __ALGO_GEOMETRY_BOUNDINGBOX_H__
 #define __ALGO_GEOMETRY_BOUNDINGBOX_H__
 
-#include "Geometry/basic.h"
 #include "Geometry/bounding_box.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/traversor/traversorCell.h"
@@ -40,12 +39,10 @@ namespace Geometry
 {
 
 template <typename PFP>
-Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	Geom::BoundingBox<typename PFP::VEC3> bb ;
-	TraversorV<typename PFP::MAP> t(map) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		bb.addPoint(position[d]) ;
+	foreach_cell<VERTEX>(map, [&] (Vertex v) { bb.addPoint(position[v]) ; });
 	return bb ;
 }
 

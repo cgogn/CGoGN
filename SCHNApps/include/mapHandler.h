@@ -99,39 +99,11 @@ public:
 
 	const AttributeSet& getAttributeSet(unsigned int orbit) const { return m_attribs[orbit]; }
 
-	void notifyAttributeModification(const AttributeHandlerGen& attr)
-	{
-		QString nameAttr = QString::fromStdString(attr.name());
-		if(m_vbo.contains(nameAttr))
-			m_vbo[nameAttr]->updateData(attr);
+	void notifyAttributeModification(const AttributeHandlerGen& attr);
 
-		emit(attributeModified(attr.getOrbit(), nameAttr));
+	void notifyConnectivityModification();
 
-		foreach(View* view, l_views)
-			view->updateGL();
-	}
-
-	void notifyConnectivityModification()
-	{
-		if (m_render)
-		{
-			m_render->setPrimitiveDirty(Algo::Render::GL2::POINTS);
-			m_render->setPrimitiveDirty(Algo::Render::GL2::LINES);
-			m_render->setPrimitiveDirty(Algo::Render::GL2::TRIANGLES);
-			m_render->setPrimitiveDirty(Algo::Render::GL2::BOUNDARY);
-		}
-
-		for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-		{
-			foreach (CellSelectorGen* cs, m_cellSelectors[orbit])
-				cs->rebuild();
-		}
-
-		emit(connectivityModified());
-
-		foreach(View* view, l_views)
-			view->updateGL();
-	}
+	void clear(bool removeAttrib);
 
 	/*********************************************************
 	 * MANAGE VBOs
@@ -184,6 +156,7 @@ signals:
 
 	void attributeAdded(unsigned int orbit, const QString& nameAttr);
 	void attributeModified(unsigned int orbit, QString nameAttr);
+	void attributeRemoved(unsigned int orbit, const QString& nameAttr);
 
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
@@ -220,7 +193,6 @@ template <typename PFP>
 class MapHandler : public MapHandlerGen
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 public:
@@ -248,10 +220,10 @@ public:
 	 *********************************************************/
 
 	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT, MAP_IMPL> getAttribute(const QString& nameAttr, bool onlyRegistered = true) const;
+	AttributeHandler<T, ORBIT, MAP> getAttribute(const QString& nameAttr, bool onlyRegistered = true) const;
 
 	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT, MAP_IMPL> addAttribute(const QString& nameAttr, bool registerAttr = true);
+	AttributeHandler<T, ORBIT, MAP> addAttribute(const QString& nameAttr, bool registerAttr = true);
 
 	/*********************************************************
 	 * MANAGE DRAWING
@@ -260,7 +232,7 @@ public:
 	void draw(Utils::GLSLShader* shader, int primitive);
 	void drawBB();
 
-	void updateBB(const VertexAttribute<VEC3, MAP_IMPL>& position);
+	void updateBB(const VertexAttribute<VEC3, MAP>& position);
 	void updateBBDrawer();
 
 	/*********************************************************

@@ -44,6 +44,9 @@ public:
 	inline virtual void clear(bool removeAttrib);
 
 protected:
+	// protected copy constructor to prevent the copy of map
+	MapMulti(const MapMulti& m): GenericMap(m) {}
+
 	std::vector<AttributeMultiVector<Dart>*> m_involution;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation;
 	std::vector<AttributeMultiVector<Dart>*> m_permutation_inv;
@@ -162,7 +165,7 @@ protected:
 	template <int I>
 	inline void permutationUnsew(Dart d);
 
-	inline virtual void compactTopo();
+	virtual void compactTopo();
 
 	/****************************************
 	 *      MR CONTAINER MANAGEMENT         *
@@ -280,9 +283,13 @@ public:
 
 	/**
 	 * Apply a functor on each dart of the map
-	 * @param f a ref to the functor obj
+	 * @param f a callable taking a Dart parameter
 	 */
-	bool foreach_dart(FunctorType& f) ;
+	template <typename FUNC>
+	void foreach_dart(FUNC f) ;
+
+	template <typename FUNC>
+	void foreach_dart(FUNC& f) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *

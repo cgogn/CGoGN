@@ -53,18 +53,18 @@ Viewer::Viewer() :
 
 void Viewer::initGUI()
 {
-    setDock(&dock) ;
+	setDock(&dock) ;
 
-    dock.check_drawVertices->setChecked(false) ;
-    dock.check_drawEdges->setChecked(false) ;
-    dock.check_drawFaces->setChecked(true) ;
-    dock.check_drawNormals->setChecked(false) ;
+	dock.check_drawVertices->setChecked(false) ;
+	dock.check_drawEdges->setChecked(false) ;
+	dock.check_drawFaces->setChecked(true) ;
+	dock.check_drawNormals->setChecked(false) ;
 
-    dock.slider_verticesSize->setVisible(false) ;
-    dock.slider_normalsSize->setVisible(false) ;
+	dock.slider_verticesSize->setVisible(false) ;
+	dock.slider_normalsSize->setVisible(false) ;
 
-    dock.slider_verticesSize->setSliderPosition(50) ;
-    dock.slider_normalsSize->setSliderPosition(50) ;
+	dock.slider_verticesSize->setSliderPosition(50) ;
+	dock.slider_normalsSize->setSliderPosition(50) ;
 
 	setCallBack( dock.check_drawVertices, SIGNAL(toggled(bool)), SLOT(slot_drawVertices(bool)) ) ;
 	setCallBack( dock.slider_verticesSize, SIGNAL(valueChanged(int)), SLOT(slot_verticesSize(int)) ) ;
@@ -192,149 +192,323 @@ void Viewer::cb_Save()
 
 void Viewer::cb_keyPress(int keycode)
 {
-    switch(keycode)
-    {
-    	case 'c' :
-    		myMap.check();
-    		break;
-
-
-	case 'a':
+	switch(keycode)
 	{
-		Utils::Chrono ch;
-		ch.start();
-		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
-		if(!pos2.isValid())
-			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
+		case 'c' :
+			myMap.check();
+			break;
 
-		for (int i=0; i< 10; ++i)
+		case 'a':
 		{
-			TraversorV<MAP> trav(myMap);
-			for (Dart d=trav.begin(), d_end = trav.end(); d!=d_end ; d = trav.next())
+			Utils::Chrono ch;
+			ch.start();
+			VertexAttribute<VEC3, MAP> pos2 = myMap.getAttribute<VEC3, VERTEX, MAP>("pos2") ;
+			if(!pos2.isValid())
+				pos2 = myMap.addAttribute<VEC3, VERTEX, MAP>("pos2") ;
+
+			for (int i=0; i< 10; ++i)
 			{
-				pos2[d] = VEC3(0,0,0);
-				int nb=0;
-				Traversor2VVaF<MAP> trf(myMap,d);
-				for (Dart e = trf.begin(),e_end =trf.end() ; e != e_end; e = trf.next())
+				TraversorV<MAP> trav(myMap);
+				for (Dart d=trav.begin(), d_end = trav.end(); d!=d_end ; d = trav.next())
 				{
-					pos2[d] += position[e];
-					nb++;
+					pos2[d] = VEC3(0,0,0);
+					int nb=0;
+					Traversor2VVaF<MAP> trf(myMap,d);
+					for (Dart e = trf.begin(),e_end =trf.end() ; e != e_end; e = trf.next())
+					{
+						pos2[d] += position[e];
+						nb++;
+					}
+					pos2[d]/=nb;
 				}
-				pos2[d]/=nb;
+				myMap.swapAttributes(position, pos2);
 			}
-			myMap.swapAttributes(position,pos2);
+			std::cout << "Traversor "<< ch.elapsed()<< " ms "<< std::endl;
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+			m_positionVBO->updateData(position) ;
+			m_normalVBO->updateData(normal) ;
+			updateGL();
 		}
-		std::cout << "Traversor "<< ch.elapsed()<< " ms "<< std::endl;
-		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-		m_positionVBO->updateData(position) ;
-		m_normalVBO->updateData(normal) ;
-		updateGL();
-	}
-		break;
+			break;
 
-	case 'b':
-	{
-		Utils::Chrono ch;
-		ch.start();
-
-		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
-		if(!pos2.isValid())
-			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
-
-		for (int i=0; i< 10; ++i)
+		case 'b':
 		{
-			foreach_cell<VERTEX>(myMap, [&] (Vertex d)
+			Utils::Chrono ch;
+			ch.start();
+
+			VertexAttribute<VEC3,MAP> pos2 = myMap.getAttribute<VEC3, VERTEX, MAP>("pos2") ;
+			if(!pos2.isValid())
+				pos2 = myMap.addAttribute<VEC3, VERTEX, MAP>("pos2") ;
+
+			for (int i=0; i< 6; ++i)
 			{
-				pos2[d] = VEC3(0,0,0);
-				int nb=0;
-				foreach_adjacent2<FACE>(myMap,d,[&](Vertex e)
+				foreach_cell<VERTEX>(myMap, [&] (Vertex d)
 				{
-					pos2[d] += position[e];
-					nb++;
+					pos2[d] = VEC3(0,0,0);
+					int nb=0;
+					foreach_adjacent2<FACE>(myMap,d,[&](Vertex e)
+					{
+						pos2[d] += position[e];
+						nb++;
+					});
+					pos2[d]/=nb;
 				});
-				pos2[d]/=nb;
-			});
-			myMap.swapAttributes(position,pos2);
+				myMap.swapAttributes(position,pos2);
+			}
+			std::cout << "Lambda "<< ch.elapsed()<< " ms "<< std::endl;
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+			m_positionVBO->updateData(position) ;
+			m_normalVBO->updateData(normal) ;
+			updateGL();
 		}
-		std::cout << "Lambda "<< ch.elapsed()<< " ms "<< std::endl;
-		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-		m_positionVBO->updateData(position) ;
-		m_normalVBO->updateData(normal) ;
-		updateGL();
-	}
-		break;
-
-
-	case 'e':
-	{
-		Utils::Chrono ch;
-		ch.start();
-		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
-		if(!pos2.isValid())
-			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
-
-		for (int i=0; i< 10; ++i)
+			break;
+		case 'B':
 		{
-			TraversorV<MAP> trav(myMap);
-			for (Dart d=trav.begin(), d_end = trav.end(); d!=d_end ; d = trav.next())
+			Utils::Chrono ch;
+			ch.start();
+
+			VertexAttribute<VEC3,MAP> pos2 = myMap.getAttribute<VEC3, VERTEX, MAP>("pos2") ;
+			if(!pos2.isValid())
+				pos2 = myMap.addAttribute<VEC3, VERTEX, MAP>("pos2") ;
+
+			//		foreach_cell_EvenOddd<VERTEX>(myMap, [&] (Vertex d)
+			//		{
+			//			pos2[d] = VEC3(0,0,0);
+			//			int nb=0;
+			//			foreach_adjacent2<FACE>(myMap,d,[&](Vertex e)
+			//			{
+			//				pos2[d] += position[e];
+			//				nb++;
+			//			});
+			//			pos2[d]/=nb;
+			//		},
+			//		[&] (Vertex d)
+			//		{
+			//			position[d] = VEC3(0,0,0);
+			//			int nb=0;
+			//			foreach_adjacent2<FACE>(myMap,d,[&](Vertex e)
+			//			{
+			//				position[d] += pos2[e];
+			//				nb++;
+			//			});
+			//			position[d]/=nb;
+			//		},
+			//		3);
+
+			//		std::cout << "Even/Odd "<< ch.elapsed()<< " ms "<< std::endl;
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+			m_positionVBO->updateData(position) ;
+			m_normalVBO->updateData(normal) ;
+			updateGL();
+		}
+			break;
+
+		case 'e':
+		{
+			Utils::Chrono ch;
+			ch.start();
+			VertexAttribute<VEC3,MAP> pos2 = myMap.getAttribute<VEC3, VERTEX, MAP>("pos2") ;
+			if(!pos2.isValid())
+				pos2 = myMap.addAttribute<VEC3, VERTEX, MAP>("pos2") ;
+
+			for (int i=0; i< 10; ++i)
 			{
-				pos2[d] = VEC3(0,0,0);
-				int nb=0;
-				Traversor2VE<MAP> trf(myMap,d);
-				for (Dart e = trf.begin(),e_end =trf.end() ; e != e_end; e = trf.next())
+				TraversorV<MAP> trav(myMap);
+				for (Dart d=trav.begin(), d_end = trav.end(); d!=d_end ; d = trav.next())
 				{
-					pos2[d] += position[myMap.phi1(e)];
-					nb++;
+					pos2[d] = VEC3(0,0,0);
+					int nb=0;
+					Traversor2VE<MAP> trf(myMap,d);
+					for (Dart e = trf.begin(),e_end =trf.end() ; e != e_end; e = trf.next())
+					{
+						pos2[d] += position[myMap.phi1(e)];
+						nb++;
+					}
+					pos2[d]/=nb;
 				}
-				pos2[d]/=nb;
+				myMap.swapAttributes(position,pos2);
 			}
-			myMap.swapAttributes(position,pos2);
+			std::cout << "Traversor "<< ch.elapsed()<< " ms "<< std::endl;
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+			m_positionVBO->updateData(position) ;
+			m_normalVBO->updateData(normal) ;
+			updateGL();
 		}
-		std::cout << "Traversor "<< ch.elapsed()<< " ms "<< std::endl;
-		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-		m_positionVBO->updateData(position) ;
-		m_normalVBO->updateData(normal) ;
-		updateGL();
-	}
-		break;
+			break;
 
-	case 'f':
-	{
-		Utils::Chrono ch;
-		ch.start();
-
-		VertexAttribute<VEC3,MAP_IMPL> pos2 = myMap.getAttribute<VEC3, VERTEX>("pos2") ;
-		if(!pos2.isValid())
-			pos2 = myMap.addAttribute<VEC3, VERTEX>("pos2") ;
-
-		for (int i=0; i< 10; ++i)
+		case 'f':
 		{
-			foreach_cell<VERTEX>(myMap, [&] (Vertex d)
+			Utils::Chrono ch;
+			ch.start();
+
+			VertexAttribute<VEC3,MAP> pos2 = myMap.getAttribute<VEC3, VERTEX, MAP>("pos2") ;
+			if(!pos2.isValid())
+				pos2 = myMap.addAttribute<VEC3, VERTEX, MAP>("pos2") ;
+
+			for (int i=0; i< 10; ++i)
 			{
-				pos2[d] = VEC3(0,0,0);
-				int nb=0;
-				foreach_incident2<EDGE>(myMap,d,[&](Edge e)
+				foreach_cell<VERTEX>(myMap, [&] (Vertex d)
 				{
-					pos2[d] += position[myMap.phi1(e)];
-					nb++;
+					pos2[d] = VEC3(0,0,0);
+					int nb=0;
+					foreach_incident2<EDGE>(myMap,d,[&](Edge e)
+					{
+						pos2[d] += position[myMap.phi1(e)];
+						nb++;
+					});
+					pos2[d]/=nb;
 				});
-				pos2[d]/=nb;
-			});
-			myMap.swapAttributes(position,pos2);
+				myMap.swapAttributes(position,pos2);
+			}
+			std::cout << "Lambda "<< ch.elapsed()<< " ms "<< std::endl;
+			Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+			m_positionVBO->updateData(position) ;
+			m_normalVBO->updateData(normal) ;
+			updateGL();
 		}
-		std::cout << "Lambda "<< ch.elapsed()<< " ms "<< std::endl;
-		Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-		m_positionVBO->updateData(position) ;
-		m_normalVBO->updateData(normal) ;
-		updateGL();
+			break;
+
+		case'A':
+		{
+			myMap.disableQuickTraversal<VERTEX>() ;
+#define NBLOOP 5
+			Utils::Chrono ch;
+			ch.start();
+			{
+				TraversorCell<MAP, VERTEX, FORCE_CELL_MARKING> trav(myMap,true);
+				for(unsigned int i=0; i<NBLOOP; ++i)
+				{
+					for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+					{
+						normal[v][0] = 0.0f;
+					}
+				}
+				std::cout << "FORCE_CELL_MARKING "<< ch.elapsed()<< " ms "<< std::endl;
+			}
+
+			ch.start();
+			{
+				TraversorCell<MAP, VERTEX> trav(myMap);
+				for(unsigned int i=0; i<NBLOOP; ++i)
+				{
+					for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+					{
+						normal[v][0] = 0.0f;
+					}
+				}
+				std::cout << "auto "<< ch.elapsed()<< " ms "<< std::endl;
+			}
+
+			ch.start();
+			{
+				TraversorCell<MAP, VERTEX> trav(myMap,true);
+				for(unsigned int i=0; i<NBLOOP; ++i)
+				{
+					for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+					{
+						normal[v][0] = 0.0f;
+					}
+				}
+				std::cout << "auto forcedart "<< ch.elapsed()<< " ms "<< std::endl;
+			}
+
+			ch.start();
+			{
+				TraversorCell<MAP, VERTEX, FORCE_DART_MARKING> trav(myMap,true);
+				for(unsigned int i=0; i<NBLOOP; ++i)
+				{
+					for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+					{
+						normal[v][0] = 0.0f;
+					}
+				}
+				std::cout << "FORCE_DART_MARKING "<< ch.elapsed()<< " ms "<< std::endl;
+			}
+			myMap.enableQuickTraversal<MAP, VERTEX>() ;
+			ch.start();
+			{
+				TraversorCell<MAP, VERTEX> trav(myMap);
+				for(unsigned int i=0; i<NBLOOP; ++i)
+				{
+					for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+					{
+						normal[v][0] = 0.0f;
+					}
+				}
+				std::cout << "auto (quick) "<< ch.elapsed()<< " ms "<< std::endl;
+			}
+
+			ch.start();
+			{
+				TraversorCell<MAP, VERTEX, FORCE_QUICK_TRAVERSAL> trav(myMap);
+				for(unsigned int i=0; i<NBLOOP; ++i)
+				{
+					for (Cell<VERTEX> v = trav.begin(), e = trav.end(); v.dart != e.dart; v = trav.next())
+					{
+						normal[v][0] = 0.0f;
+					}
+				}
+				std::cout << "FORCE_QUICK_TRAVERSAL "<< ch.elapsed()<< " ms "<< std::endl;
+			}
+
+		}
+			break;
+
+		case'Z':
+		{
+
+			Utils::Chrono ch;
+			ch.start();
+			CGoGN::Parallel::NumberOfThreads = 1;
+			for (unsigned int i=0; i<4; ++i)
+				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
+			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices1 "<< ch.elapsed()<< " ms "<< std::endl;
+
+			ch.start();
+			CGoGN::Parallel::NumberOfThreads = 2;
+			for (unsigned int i=0; i<4; ++i)
+				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
+			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices2 "<< ch.elapsed()<< " ms "<< std::endl;
+
+			ch.start();
+			CGoGN::Parallel::NumberOfThreads = 3;
+			for (unsigned int i=0; i<4; ++i)
+				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
+			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices3 "<< ch.elapsed()<< " ms "<< std::endl;
+
+			ch.start();
+			CGoGN::Parallel::NumberOfThreads = 4;
+			for (unsigned int i=0; i<4; ++i)
+				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
+			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices4 "<< ch.elapsed()<< " ms "<< std::endl;
+
+			ch.start();
+			CGoGN::Parallel::NumberOfThreads = 8;
+			for (unsigned int i=0; i<4; ++i)
+				Algo::Surface::Geometry::Parallel::computeNormalVertices<PFP>(myMap, position, normal) ;
+			std::cout << "Algo::Surface::Geometry::Parallel::computeNormalVertices8 "<< ch.elapsed()<< " ms "<< std::endl;
+
+
+			//		ch.start();
+			//		Parallel::foreach_cell_EO<VERTEX>(myMap,[&](Vertex v, unsigned int thr)
+			//		{
+			//			normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap,v,position);
+			//		},
+			//		[&](Vertex v, unsigned int th)
+			//		{
+			//			normal[v] = Algo::Surface::Geometry::vertexNormal<PFP>(myMap,v,position);
+			//		},2,4,false,FORCE_CELL_MARKING);
+
+			//		std::cout << "Parallel::foreach_cell_EO "<< ch.elapsed()<< " ms "<< std::endl;
+
+
+		}
+			break;
+
+
+		default:
+			break;
 	}
-		break;
-
-
-
-    	default:
-    		break;
-    }
 }
 
 void Viewer::importMesh(std::string& filename)
@@ -347,7 +521,7 @@ void Viewer::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
+		position = myMap.getAttribute<VEC3, VERTEX, MAP>("position") ;
 	}
 	else
 	{
@@ -357,10 +531,10 @@ void Viewer::importMesh(std::string& filename)
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
 		}
-		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
+		position = myMap.getAttribute<PFP::VEC3, VERTEX, MAP>(attrNames[0]) ;
 	}
 
-	myMap.enableQuickTraversal<VERTEX>() ;
+	//	myMap.enableQuickTraversal<VERTEX>() ;
 
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
@@ -370,11 +544,11 @@ void Viewer::importMesh(std::string& filename)
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
-//	vertexBaseSize = normalBaseSize / 5.0f ;
+	//	vertexBaseSize = normalBaseSize / 5.0f ;
 
-	normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
+	normal = myMap.getAttribute<VEC3, VERTEX, MAP>("normal") ;
 	if(!normal.isValid())
-		normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
+		normal = myMap.addAttribute<VEC3, VERTEX, MAP>("normal") ;
 
 	Utils::Chrono c;
 	c.start();
@@ -403,7 +577,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 		if (askExportMode)
 			Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
 
-		std::vector<VertexAttribute<VEC3, MAP_IMPL>*> attributes ;
+		std::vector<VertexAttribute<VEC3, MAP>*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii) ;
 	}
@@ -482,7 +656,7 @@ int main(int argc, char **argv)
 
 	Viewer sqt ;
 	sqt.setGeometry(0, 0, 1000, 800) ;
- 	sqt.show() ;
+	sqt.show() ;
 
 	if(argc >= 2)
 	{

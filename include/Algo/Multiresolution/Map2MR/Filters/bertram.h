@@ -57,16 +57,15 @@ template <typename PFP>
 class Ber02OddAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	typename VEC3::DATA_TYPE m_a;
 
 public:
-	Ber02OddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
+	Ber02OddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
 	{}
 
 	void operator() ()
@@ -118,16 +117,15 @@ template <typename PFP>
 class Ber02EvenAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	typename VEC3::DATA_TYPE m_a;
 
 public:
-	Ber02EvenAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
+	Ber02EvenAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
 	{}
 
 	void operator() ()
@@ -210,16 +208,15 @@ template <typename PFP>
 class Ber02ScaleAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	typename VEC3::DATA_TYPE m_a;
 
 public:
-	Ber02ScaleAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
+	Ber02ScaleAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
 	{}
 
 	void operator() ()
@@ -256,17 +253,16 @@ template <typename PFP>
 class Ber02OddSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	typename VEC3::DATA_TYPE m_a;
 
 
 public:
-	Ber02OddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
+	Ber02OddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
 	{}
 
 	void operator() ()
@@ -319,16 +315,15 @@ template <typename PFP>
 class Ber02EvenSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	typename VEC3::DATA_TYPE m_a;
 
 public:
-	Ber02EvenSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
+	Ber02EvenSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
 	{}
 
 	void operator() ()
@@ -407,16 +402,15 @@ template <typename PFP>
 class Ber02ScaleSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 	typename VEC3::DATA_TYPE m_a;
 
 public:
-	Ber02ScaleSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
+	Ber02ScaleSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p, typename VEC3::DATA_TYPE a) : m_map(m), m_position(p), m_a(a)
 	{}
 
 	void operator() ()

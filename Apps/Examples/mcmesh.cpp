@@ -138,9 +138,9 @@ void MCMesh::MC()
 	SAlgo::MC::WindowingGreater<DATATYPE> myWindFunc;
 	myWindFunc.setIsoValue(DATATYPE(127));
 
-	position = myMap.getAttribute<VEC3, VERTEX>("position");
+	position = myMap.getAttribute<VEC3, VERTEX, MAP>("position");
 	if (!position.isValid())
-		position = myMap.addAttribute<VEC3, VERTEX>("position");
+		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	// instanciation du mc
 	SAlgo::MC::MarchingCube<DATATYPE, SAlgo::MC::WindowingGreater,PFP> mc(myImgFr, &myMap, position, myWindFunc, false);

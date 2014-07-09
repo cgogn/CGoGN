@@ -55,15 +55,14 @@ template <typename PFP>
 class LerpQuadOddSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	LerpQuadOddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LerpQuadOddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -115,15 +114,14 @@ template <typename PFP>
 class LerpTriQuadOddSynthesisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	LerpTriQuadOddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LerpTriQuadOddSynthesisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -180,15 +178,14 @@ template <typename PFP>
 class LerpQuadOddAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	LerpQuadOddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LerpQuadOddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -238,15 +235,14 @@ template <typename PFP>
 class LerpTriQuadOddAnalysisFilter : public Algo::MR::Filter
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP_IMPL>& m_position ;
+	VertexAttribute<VEC3, MAP>& m_position ;
 
 public:
-	LerpTriQuadOddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP_IMPL>& p) : m_map(m), m_position(p)
+	LerpTriQuadOddAnalysisFilter(MAP& m, VertexAttribute<VEC3, MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()

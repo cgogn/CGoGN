@@ -39,7 +39,7 @@ void sewFaceEmb(typename PFP::MAP& map, Dart d, Dart e)
 {
 	map.sewFaces(d, e, false) ;
 	if (map.template isOrbitEmbedded<EDGE>())
-		map.template initOrbitEmbeddingNewCell<EDGE>(d) ;
+		Algo::Topo::initOrbitEmbeddingNewCell<EDGE>(map, d) ;
 }
 
 template <typename PFP>
@@ -47,7 +47,7 @@ Dart newFaceEmb(typename PFP::MAP& map, unsigned int n)
 {
 	Dart d = map.newFace(n,false);
 	if (map.template isOrbitEmbedded<FACE>())
-		map.template initOrbitEmbeddingNewCell<FACE>(d) ;
+		Algo::Topo::initOrbitEmbeddingNewCell<FACE>(map, d) ;
 	return d;
 }
 

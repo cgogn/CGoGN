@@ -42,16 +42,16 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
 
 /**
- * @brief get attribute
- * @param map
+ * @brief test if map has a Vertex Attribute of VEC3 named name
+ * @param map  the map
+ * @param name name of attribute
  */
-void byNames(MAP& map, const std::string& name)
+void testVAbyNames(MAP& map, const std::string& name)
 {
-	VertexAttribute<VEC3, MAP_IMPL> testPos = map.getAttribute<VEC3, VERTEX>(name);
+	VertexAttribute<VEC3, MAP> testPos = map.getAttribute<VEC3, VERTEX, MAP>(name);
 	if (testPos.isValid())
 		std::cout << "Attribute "<< name <<" valid"<< std::endl;
 	else
@@ -60,11 +60,12 @@ void byNames(MAP& map, const std::string& name)
 
 /**
  * @brief computeLengthEdges
+ * Demonstrate usage of 2 attributes on 2 differents orbits.
  * @param map the map
  * @param pos attribute handler of position of vertices
  * @param len attribute handler of length of edges
  */
-void computeLengthEdges(MAP& map,const VertexAttribute<VEC3, MAP_IMPL>& pos, EdgeAttribute<float, MAP_IMPL> len)
+void computeLengthEdges(MAP& map,const VertexAttribute<VEC3, MAP>& pos, EdgeAttribute<float, MAP> len)
 {
 	// warning c++11 lambda syntax
 	foreach_cell<EDGE>(map,[&](Edge e) // for all edge e of map do
@@ -76,12 +77,14 @@ void computeLengthEdges(MAP& map,const VertexAttribute<VEC3, MAP_IMPL>& pos, Edg
 	});
 }
 
-
-void computeNewPositions(MAP& map, VertexAttribute<VEC3, MAP_IMPL>& pos)
+/**
+ * @brief computeNewPositions Demonstrate  the usage of AutoAttributes
+ */
+void computeNewPositions(MAP& map, VertexAttribute<VEC3, MAP>& pos)
 {
-	// here we need new and old positions simultaneously so create temporary position
+	// here we need new and old positions simultaneously so create temporary attribute position
 
-	VertexAutoAttribute<VEC3, MAP_IMPL> pos2(map);
+	VertexAutoAttribute<VEC3, MAP> pos2(map);
 
 	foreach_cell<VERTEX>(map,[&](Vertex v)  // for all vertices
 	{
@@ -96,7 +99,10 @@ void computeNewPositions(MAP& map, VertexAttribute<VEC3, MAP_IMPL>& pos)
 	});
 
 	// swap attribute position with temporary (constant complexity !)
+	// only possible with same type and same orbit attribute.
 	map.swapAttributes(pos,pos2);
+
+	// destruction of VertexAutoAttribute handller remove the attribute from the map.
 }
 
 /**
@@ -123,7 +129,7 @@ int main()
 	MAP myMap;
 
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> positionAtt = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> positionAtt = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 	if (!positionAtt.isValid())
 		std::cerr << "impossible to create an attribute with name position (already used ?)"<< std::endl;
 
@@ -134,20 +140,22 @@ int main()
 	grid.embedIntoGrid(positionAtt, 1.,1.,0.);
 
 
+	// ATTRIBUTE DECLARATION
+
 	// add an attribute of type float on orbit EDGE
-	EdgeAttribute<float, MAP_IMPL> lengthAtt = myMap.addAttribute<float, EDGE>("length");
+	EdgeAttribute<float, MAP> lengthAtt = myMap.addAttribute<float, EDGE, MAP>("length");
 	if (!lengthAtt.isValid())
 		std::cerr << "impossible to create the attribute"<< std::endl;
 
 	computeLengthEdges(myMap,positionAtt,lengthAtt);
 
 	// add an attribute of type std::string on orbit FACE
-	FaceAttribute<std::string, MAP_IMPL> nameAtt = myMap.addAttribute<std::string, FACE>("name");
+	FaceAttribute<std::string, MAP> nameAtt = myMap.addAttribute<std::string, FACE, MAP>("name");
 	if (!nameAtt.isValid())
 		std::cerr << "impossible to create the attribute"<< std::endl;
 
 	// for complex type use following template (function nameOfType not applicable)
-	EdgeAttribute< NoTypeNameAttribute< std::vector<int> >, MAP_IMPL> vectAtt = myMap.addAttribute< NoTypeNameAttribute< std::vector<int> >, EDGE>("vector_of_int");
+	EdgeAttribute< NoTypeNameAttribute< std::vector<int> >, MAP> vectAtt = myMap.addAttribute< NoTypeNameAttribute< std::vector<int> >, EDGE, MAP>("vector_of_int");
 	if (!vectAtt.isValid())
 		std::cerr << "impossible to create the attribute"<< std::endl;
 
@@ -156,6 +164,9 @@ int main()
 	Vertex v(d);
 	// define a face from a dart
 	Face f(d);
+
+
+	// ATTRIBUTE ACCESS
 
 	// [] operator can take a dart, a cell (only same off attribute), or an unsigned inf
 	// access to any attributes with darts
@@ -173,13 +184,17 @@ int main()
 	// access to FaceAttribute with a Face
 	std::cout << nameAtt[f]<< std::endl;
 
-// following line does not compile because of wrong cell type
-//	std::cout << positionAtt[f]<< std::endl;
-//  possible to bypass using dart access
+	// following line does not compile because of wrong cell type
+	//	std::cout << positionAtt[f]<< std::endl;
+	//  possible to bypass using dart access
 	std::cout << positionAtt[f.dart]<< std::endl;
 
+	// access with unsigned int is dangerous, index must be obtain with begin/end/next (see dumpAttribute)
+
+	// COPY, REMOVE, SWAP
+
 	// possible to have any number of attribute a same ORBIT
-	VertexAttribute<VEC3, MAP_IMPL> position2Att = myMap.addAttribute<VEC3, VERTEX>("other_position");
+	VertexAttribute<VEC3, MAP> position2Att = myMap.addAttribute<VEC3, VERTEX, MAP>("other_position");
 
 	// copy of attribute of same type (linear complexity)
 	myMap.copyAttribute(position2Att,positionAtt);
@@ -187,15 +202,16 @@ int main()
 	positionAtt[v] += VEC3(0,0,1);
 
 	computeNewPositions(myMap,positionAtt);
-
 	dumpAttribute(positionAtt);
 
-	byNames(myMap,"position");
+	//check if there is a Vertex Attribute of VEC3 named position => yes
+	testVAbyNames(myMap,"position");
 
-	myMap.removeAttribute<VEC3, VERTEX>(positionAtt);
+	// remove the attribute
+	myMap.removeAttribute(positionAtt);
 
-	byNames(myMap,"position");
-
+	//check if there is a Vertex Attribute of VEC3 named position => no
+	testVAbyNames(myMap,"position");
 
 	return 0;
 }

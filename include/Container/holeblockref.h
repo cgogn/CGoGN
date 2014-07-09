@@ -128,6 +128,14 @@ public:
 	*/
 	bool compressFree();
 
+
+	inline void compressFull(unsigned int nb)
+	{
+		m_nbfree = 0;
+		m_nbref = nb;
+		m_nb = nb;
+	}
+
 	/**
 	* clear the container of free block
 	*/

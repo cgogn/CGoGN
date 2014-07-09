@@ -90,6 +90,11 @@ inline void MapMono::addInvolution()
 	m_involution.push_back(addRelation(sstm.str()));
 }
 
+inline void MapMono::removeLastInvolutionPtr()
+{
+	m_involution.pop_back();
+}
+
 inline void MapMono::addPermutation()
 {
 	std::stringstream sstm;
@@ -181,33 +186,6 @@ inline void MapMono::permutationUnsew(Dart d)
 	(*m_permutation_inv[I])[e.index] = e ;
 }
 
-inline void MapMono::compactTopo()
-{
-	std::vector<unsigned int> oldnew;
-	m_attribs[DART].compact(oldnew);
-
-	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		for (unsigned int j = 0; j < m_permutation.size(); ++j)
-		{
-			Dart d = (*m_permutation[j])[i];
-			if (d.index != oldnew[d.index])
-				(*m_permutation[j])[i] = Dart(oldnew[d.index]);
-		}
-		for (unsigned int j = 0; j < m_permutation_inv.size(); ++j)
-		{
-			Dart d = (*m_permutation_inv[j])[i];
-			if (d.index != oldnew[d.index])
-				(*m_permutation_inv[j])[i] = Dart(oldnew[d.index]);
-		}
-		for (unsigned int j = 0; j < m_involution.size(); ++j)
-		{
-			Dart d = (*m_involution[j])[i];
-			if (d.index != oldnew[d.index])
-				(*m_involution[j])[i] = Dart(oldnew[d.index]);
-		}
-	}
-}
 
 /****************************************
  *           DARTS TRAVERSALS           *
@@ -228,14 +206,18 @@ inline void MapMono::next(Dart& d) const
 	m_attribs[DART].next(d.index) ;
 }
 
-inline bool MapMono::foreach_dart(FunctorType& f)
+template <typename FUNC>
+inline void MapMono::foreach_dart(FUNC f)
 {
 	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (f(d))
-			return true;
-	}
-	return false;
+		f(d);
+}
+
+template <typename FUNC>
+inline void MapMono::foreach_dart(FUNC& f)
+{
+	for (Dart d = begin(); d != end(); next(d))
+		f(d);
 }
 
 } // namespace CGoGN

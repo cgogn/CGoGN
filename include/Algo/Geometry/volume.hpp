@@ -36,7 +36,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -49,7 +49,7 @@ typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const 
 }
 
 template <typename PFP>
-typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -62,7 +62,7 @@ typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const Vertex
 }
 
 template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
+typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int thread)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -124,13 +124,18 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const V
 }
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int thread)
 {
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
+	{
+		return Parallel::totalVolume<PFP>(map, position);
+	}
+
 	double vol = 0.0 ;
 
 	TraversorW<typename PFP::MAP> t(map, thread) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		vol += convexPolyhedronVolume<PFP>(map, d, position,thread) ;
+		vol += convexPolyhedronVolume<PFP>(map, d, position, thread) ;
 	return typename PFP::REAL(vol) ;
 }
 
@@ -139,49 +144,24 @@ namespace Parallel
 {
 
 template <typename PFP>
-class FunctorTotalVolume: public FunctorMapThreaded<typename PFP::MAP >
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
-	 const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& m_position;
-	 double m_vol;
+	// allocate a vector of 1 accumulator for each thread
+	std::vector<typename PFP::REAL> vols(CGoGN::Parallel::NumberOfThreads-1, 0.0);
 
-public:
-	 FunctorTotalVolume<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position):
-	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol(0.0)
-	 { }
-
-	void run(Dart d, unsigned int threadID)
+	// foreach volume
+	CGoGN::Parallel::foreach_cell<VOLUME>(map, [&] (Vol v, unsigned int thr)
 	{
-		m_vol += convexPolyhedronVolume<PFP>(this->m_map, d, m_position, threadID) ;
-	}
+		// add volume to the thread accumulator
+		vols[thr-1] += convexPolyhedronVolume<PFP>(map, v, position, thr) ;
+	});
 
-	double getVol() const
-	{
-		return m_vol;
-	}
-};
+	// compute the sum of volumes
+	typename PFP::REAL total(0);
+	for (unsigned int i=0; i< CGoGN::Parallel::NumberOfThreads-1; ++i )
+		total += vols[i];
 
-template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int nbth)
-{
-	if (nbth == 0)
-		nbth = Algo::Parallel::optimalNbThreads();
-
-	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
-	for (unsigned int i = 0; i < nbth; ++i)
-	{
-		functs.push_back(new FunctorTotalVolume<PFP>(map,position));
-	}
-
-	double total = 0.0;
-
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, true);
-
-	for (unsigned int i=0; i < nbth; ++i)
-	{
-		total += reinterpret_cast<FunctorTotalVolume<PFP>*>(functs[i])->getVol();
-		delete functs[i];
-	}
-	return typename PFP::REAL(total);
+	return total;
 }
 
 } // namespace Parallel

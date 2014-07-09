@@ -122,7 +122,7 @@ void MyQT::createMap()
 
 	Dart d2 = d1;
 
-	position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+	position = myMap.addAttribute<PFP::VEC3, VERTEX, MAP>("position");
 
 	position[d2] = PFP::VEC3(1, 0, 0);
 	d2 = PHI1(d2);

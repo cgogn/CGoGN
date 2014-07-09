@@ -50,9 +50,9 @@ struct Coeff
 template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
 	const CellMarker<typename PFP::MAP, VERTEX>& freeMarker,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr)
 {
 	foreach_cell<VERTEX>(m, [&] (Dart d)
 	{
@@ -65,9 +65,9 @@ void setupVariables(
 template <typename PFP, typename ATTR_TYPE>
 void setupVariables(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
 	const CellMarker<typename PFP::MAP, VERTEX>& freeMarker,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
 	unsigned int coord)
 {
 	foreach_cell<VERTEX>(m, [&] (Dart d)
@@ -85,9 +85,9 @@ void setupVariables(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& weight)
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& weight)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 
@@ -106,8 +106,8 @@ void addRowsRHS_Equality(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
 	float weight)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
@@ -127,9 +127,9 @@ void addRowsRHS_Equality(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& weight,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& weight,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
@@ -149,8 +149,8 @@ void addRowsRHS_Equality(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
 	float weight,
 	unsigned int coord)
 {
@@ -175,7 +175,7 @@ void addRowsRHS_Equality(
 template <typename PFP>
 void addRows_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index)
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 
@@ -201,8 +201,8 @@ void addRows_Laplacian_Topo(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 
@@ -237,8 +237,8 @@ void addRowsRHS_Laplacian_Topo(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
@@ -278,9 +278,9 @@ void addRowsRHS_Laplacian_Topo(
 template <typename PFP>
 void addRows_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea)
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& vertexArea)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 
@@ -307,10 +307,10 @@ void addRows_Laplacian_Cotan(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& vertexArea,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
 
@@ -346,10 +346,10 @@ void addRowsRHS_Laplacian_Cotan(
 template <typename PFP, typename ATTR_TYPE>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& edgeWeight,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& vertexArea,
-	const VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	const EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& vertexArea,
+	const VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
 	unsigned int coord)
 {
 	nlEnable(NL_NORMALIZE_ROWS) ;
@@ -390,8 +390,8 @@ void addRowsRHS_Laplacian_Cotan(
 template <typename PFP, typename ATTR_TYPE>
 void getResult(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr)
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr)
 {
 	foreach_cell<VERTEX>(m, [&] (Dart d)
 	{
@@ -402,8 +402,8 @@ void getResult(
 template <typename PFP, typename ATTR_TYPE>
 void getResult(
 	typename PFP::MAP& m,
-	const VertexAttribute<unsigned int, typename PFP::MAP::IMPL>& index,
-	VertexAttribute<ATTR_TYPE, typename PFP::MAP::IMPL>& attr,
+	const VertexAttribute<unsigned int, typename PFP::MAP>& index,
+	VertexAttribute<ATTR_TYPE, typename PFP::MAP>& attr,
 	unsigned int coord)
 {
 	foreach_cell<VERTEX>(m, [&] (Dart d)

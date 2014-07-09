@@ -43,83 +43,7 @@ struct PFP: public PFP_STANDARD
 
 // some typedef shortcuts
 typedef PFP::MAP MAP ;				// map type
-typedef PFP::MAP::IMPL MAP_IMPL ;	// map implementation
 typedef PFP::VEC3 VEC3 ;			// type of R³ vector 
-
-
-
-// example of cell marking with CellMarker for a simple traversal
-template<unsigned int ORBIT>
-void simpleTraversal(MAP& map) // NEVER COPY THE MAP, ALWAYS USE REFERENCE !!
-{
-	CellMarker<MAP,ORBIT> cm(map);
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if (!cm.isMarked(d))	// is the cell (of dart d) not marked ?
-		{
-			std::cout << orbitName(ORBIT)<< " of dart "<< d << std::endl;
-			cm.mark(d);			// mark the cell
-		}
-	}
-	std::cout <<  std::endl;
-
-	// all cells are unmarked automatically during the destruction of the CellMarker
-}
-
-
-
-// example of cell marking with CellMarkerNoUnmark for a double traversal
-template<unsigned int ORBIT>
-void doubleTraversal(MAP& map) // NEVER COPY THE MAP, ALWAYS USE REFERENCE !!
-{
-	CellMarkerNoUnmark<MAP,ORBIT> cm(map);
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if (!cm.isMarked(d))	// is the cell (of dart d) not marked ?
-		{
-			std::cout << "First Pass" << orbitName(ORBIT)<< " of dart "<< d << std::endl;
-			cm.mark(d);			// mark the cell
-		}
-	}
-	std::cout <<  std::endl;
-
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if (cm.isMarked(d))	// is the cell (of dart d) marked ?
-		{
-			std::cout << "second Pass" << orbitName(ORBIT)<< " of dart "<< d << std::endl;
-			cm.unmark(d);			// unmark the cell
-		}
-	}
-	std::cout <<  std::endl;
-
-	// destructor does not clean the markers
-	// user MUST ensure that he has unmark all he has marked
-}
-
-
-
-
-// example of usage of CellMarkerStore
-void negativePositions(MAP& map, VertexAttribute<VEC3,MAP_IMPL>& position) // NEVER COPY THE MAP, ALWAYS USE REFERENCE !!
-{
-	// if user knows that small numbers of cell will be marked
-	// it is more efficient to store them instead of traverse
-	// all darts for cleanning. CellMarkerStore do it for you.
-
-	CellMarkerStore<MAP,VERTEX> cms(map);
-
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if (!cms.isMarked(d) && (position[d][0]<= 0.0) && (position[d][1]<= 0.0))
-		{
-			std::cout << "position["<<d<<"] < (0,0)" << std::endl;
-			cms.mark(d);
-		}
-	}
-	std::cout <<  std::endl;
-}
-
 
 
 int main()
@@ -128,7 +52,7 @@ int main()
 	MAP myMap;
 
 	// add position attribute on vertices and get handler on it
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3, MAP> position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
 	// create a triangle
 	Face f1 = myMap.newFace(3);
@@ -148,7 +72,6 @@ int main()
 
 	position[myMap.phi<11>(f2.dart)] = VEC3(0, -2, 0);
 	position[myMap.phi_1(f2.dart)] = VEC3(2, -2, 0);
-
 
 	return 0;
 }

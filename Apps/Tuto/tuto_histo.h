@@ -48,7 +48,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 /*
@@ -82,11 +81,11 @@ public:
 //	double operator[](unsigned int i) const { return double(m_va[i])*0.33;}
 //};
 
-class AttConv: public Algo::Histogram::AttributeConvert<VertexAttribute<float, MAP_IMPL> >
+class AttConv: public Algo::Histogram::AttributeConvert<VertexAttribute<float, MAP> >
 {
 public:
 	/// constructor with attribute reference
-	AttConv(VertexAttribute<float, MAP_IMPL>& va): Algo::Histogram::AttributeConvert<VertexAttribute<float, MAP_IMPL> >(va){}
+	AttConv(VertexAttribute<float, MAP>& va): Algo::Histogram::AttributeConvert<VertexAttribute<float, MAP> >(va){}
 	double operator[](unsigned int i) const { return double(attrib[i]) * 0.33; }
 };
 
