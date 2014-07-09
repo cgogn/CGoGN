@@ -45,7 +45,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		VertexAttribute<VEC3, MAP>& pos
 	) :
 	m_map(map),
-	position(pos),
+    position(pos),
 	inactiveMarker(inactive)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
@@ -141,7 +141,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		Algo::Surface::Decimation::Selector<PFP>* selector, std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>& approximators,
         VertexAttribute<VEC3,MAP>& position
 	) :
-    m_map(map), m_selector(selector), m_approximators(approximators), position(position), inactiveMarker(inactive)
+    m_map(map), position(position), inactiveMarker(inactive), m_selector(selector), m_approximators(approximators)
 {
 	CGoGNout << "  initializing approximators.." << CGoGNflush ;
 	for(typename std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)

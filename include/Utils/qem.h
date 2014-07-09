@@ -521,9 +521,9 @@ public:
 	 */
 	friend std::ostream& operator<<(std::ostream& out, const QuadricHF<REAL>& q)
 	{
-		// TODO out << "(" << q.m_A << ", " << q.m_b << ", " << q.m_c << ")" ;
+        out << "(" << q.m_A << ", " << q.m_b << ", " << q.m_c << ")" ;
 		return out ;
-	} ;
+    }
 
 	/*!
 	 * \brief Read from stream operator
