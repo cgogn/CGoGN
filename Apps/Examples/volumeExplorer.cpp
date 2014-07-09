@@ -177,8 +177,8 @@ void MyQT::cb_Open()
 //		if (v>maxV)
 //			maxV=v;
 
-		if(myMap.isVolumeIncidentToBoundary(d))
-			color[d] = PFP::VEC3(0,0,0);
+        //if(myMap.isVolumeIncidentToBoundary(d))
+        //	color[d] = PFP::VEC3(0,0,0);
 	}
 //	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
 //	{
@@ -422,8 +422,8 @@ int main(int argc, char **argv)
 //			if (v>maxV)
 //				maxV=v;
 
-			if(myMap.isVolumeIncidentToBoundary(d))
-				color[d] = PFP::VEC3(0,0,0);
+            if(myMap.isVolumeIncidentToBoundary(d))
+                color[d] = PFP::VEC3(1,0.41,0.706);
 			//else
 			//    color[d] = PFP::VEC3(1.0,0,0);
 		}
