@@ -85,6 +85,8 @@ typename V_ATT::DATA_TYPE faceNormal(typename PFP::MAP& map, Face f, const V_ATT
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
 {
+	CHECK_ATTRIBUTEHANDER_ORBIT_TYPE(V_ATT,VERTEX);
+
 	typedef typename V_ATT::DATA_TYPE VEC3 ;
 
 	VEC3 N(0) ;
@@ -96,14 +98,20 @@ typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V
 		{
 			VEC3 v1 = vectorOutOfDart<PFP>(map, f.dart, position) ;
 			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(f), position) ;
-			n *= convexFaceArea<PFP>(map, f, position) / (v1.norm2() * v2.norm2()) ;
-			N += n ;
+			typename VEC3::DATA_TYPE l = (v1.norm2() * v2.norm2());
+			if (l > (typename VEC3::DATA_TYPE(0.0)) )
+			{
+				n *= convexFaceArea<PFP>(map, f, position) / l ;
+				N += n ;
+			}
 		}
 	});
 
 	N.normalize() ;
 	return N ;
 }
+
+
 
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
