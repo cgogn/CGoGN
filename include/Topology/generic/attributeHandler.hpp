@@ -29,15 +29,15 @@
 namespace CGoGN
 {
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline void AttributeHandler<T, ORBIT, MAP>::registerInMap()
+template <typename T, unsigned int ORB, typename MAP>
+inline void AttributeHandler<T, ORB, MAP>::registerInMap()
 {
 	std::lock_guard<std::mutex> lockAH(m_map->attributeHandlersMutex);
 	m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline void AttributeHandler<T, ORBIT, MAP>::unregisterFromMap()
+template <typename T, unsigned int ORB, typename MAP>
+inline void AttributeHandler<T, ORB, MAP>::unregisterFromMap()
 {
 	typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
 
@@ -56,22 +56,22 @@ inline void AttributeHandler<T, ORBIT, MAP>::unregisterFromMap()
 
 // =================================================================
 
-template <typename T, unsigned int ORBIT, typename MAP>
-AttributeHandler<T, ORBIT, MAP>::AttributeHandler() :
+template <typename T, unsigned int ORB, typename MAP>
+AttributeHandler<T, ORB, MAP>::AttributeHandler() :
 	AttributeHandlerGen(false),
 	m_map(NULL),
 	m_attrib(NULL)
 {}
 
-template <typename T, unsigned int ORBIT, typename MAP>
-AttributeHandler<T, ORBIT, MAP>::AttributeHandler(MAP* m, AttributeMultiVector<T>* amv) :
+template <typename T, unsigned int ORB, typename MAP>
+AttributeHandler<T, ORB, MAP>::AttributeHandler(MAP* m, AttributeMultiVector<T>* amv) :
 	AttributeHandlerGen(false),
 	m_map(m),
 	m_attrib(amv)
 {
 	if(m != NULL && amv != NULL && amv->getIndex() != AttributeContainer::UNKNOWN)
 	{
-		assert(ORBIT == amv->getOrbit() || !"AttributeHandler: orbit incompatibility") ;
+		assert(ORB == amv->getOrbit() || !"AttributeHandler: orbit incompatibility") ;
 		valid = true ;
 		registerInMap() ;
 	}
@@ -79,8 +79,8 @@ AttributeHandler<T, ORBIT, MAP>::AttributeHandler(MAP* m, AttributeMultiVector<T
 		valid = false ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-AttributeHandler<T, ORBIT, MAP>::AttributeHandler(const AttributeHandler<T, ORBIT, MAP>& ta) :
+template <typename T, unsigned int ORB, typename MAP>
+AttributeHandler<T, ORB, MAP>::AttributeHandler(const AttributeHandler<T, ORB, MAP>& ta) :
 	AttributeHandlerGen(ta.valid),
 	m_map(ta.m_map),
 	m_attrib(ta.m_attrib)
@@ -89,9 +89,9 @@ AttributeHandler<T, ORBIT, MAP>::AttributeHandler(const AttributeHandler<T, ORBI
 		registerInMap() ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
+template <typename T, unsigned int ORB, typename MAP>
 template <unsigned int ORBIT2>
-AttributeHandler<T, ORBIT, MAP>::AttributeHandler(const AttributeHandler<T, ORBIT2, MAP>& h) :
+AttributeHandler<T, ORB, MAP>::AttributeHandler(const AttributeHandler<T, ORBIT2, MAP>& h) :
 	AttributeHandlerGen(h.valid),
 	m_map(h.m_map),
 	m_attrib(h.m_attrib)
@@ -105,8 +105,8 @@ AttributeHandler<T, ORBIT, MAP>::AttributeHandler(const AttributeHandler<T, ORBI
 		valid = false;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline AttributeHandler<T, ORBIT, MAP>& AttributeHandler<T, ORBIT, MAP>::operator=(const AttributeHandler<T, ORBIT, MAP>& ta)
+template <typename T, unsigned int ORB, typename MAP>
+inline AttributeHandler<T, ORB, MAP>& AttributeHandler<T, ORB, MAP>::operator=(const AttributeHandler<T, ORB, MAP>& ta)
 {
 	if(valid)
 		unregisterFromMap() ;
@@ -118,9 +118,9 @@ inline AttributeHandler<T, ORBIT, MAP>& AttributeHandler<T, ORBIT, MAP>::operato
 	return *this ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
+template <typename T, unsigned int ORB, typename MAP>
 template <unsigned int ORBIT2>
-inline AttributeHandler<T, ORBIT, MAP>& AttributeHandler<T, ORBIT, MAP>::operator=(const AttributeHandler<T, ORBIT2, MAP>& ta)
+inline AttributeHandler<T, ORB, MAP>& AttributeHandler<T, ORB, MAP>::operator=(const AttributeHandler<T, ORBIT2, MAP>& ta)
 {
 	if(valid)
 		unregisterFromMap() ;
@@ -132,64 +132,64 @@ inline AttributeHandler<T, ORBIT, MAP>& AttributeHandler<T, ORBIT, MAP>::operato
 	return *this ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-AttributeHandler<T, ORBIT, MAP>::~AttributeHandler()
+template <typename T, unsigned int ORB, typename MAP>
+AttributeHandler<T, ORB, MAP>::~AttributeHandler()
 {
 	if(valid)
 		unregisterFromMap() ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline AttributeMultiVector<T>* AttributeHandler<T, ORBIT, MAP>::getDataVector() const
+template <typename T, unsigned int ORB, typename MAP>
+inline AttributeMultiVector<T>* AttributeHandler<T, ORB, MAP>::getDataVector() const
 {
 	return m_attrib ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline AttributeMultiVectorGen* AttributeHandler<T, ORBIT, MAP>::getDataVectorGen() const
+template <typename T, unsigned int ORB, typename MAP>
+inline AttributeMultiVectorGen* AttributeHandler<T, ORB, MAP>::getDataVectorGen() const
 {
 	return m_attrib ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline int AttributeHandler<T, ORBIT, MAP>::getSizeOfType() const
+template <typename T, unsigned int ORB, typename MAP>
+inline int AttributeHandler<T, ORB, MAP>::getSizeOfType() const
 {
 	return sizeof(T) ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline unsigned int AttributeHandler<T, ORBIT, MAP>::getOrbit() const
+template <typename T, unsigned int ORB, typename MAP>
+inline unsigned int AttributeHandler<T, ORB, MAP>::getOrbit() const
 {
-	return ORBIT ;
+	return ORB ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline unsigned int AttributeHandler<T, ORBIT, MAP>::getIndex() const
+template <typename T, unsigned int ORB, typename MAP>
+inline unsigned int AttributeHandler<T, ORB, MAP>::getIndex() const
 {
 	return m_attrib->getIndex() ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline const std::string& AttributeHandler<T, ORBIT, MAP>::name() const
+template <typename T, unsigned int ORB, typename MAP>
+inline const std::string& AttributeHandler<T, ORB, MAP>::name() const
 {
 	return m_attrib->getName() ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline const std::string& AttributeHandler<T, ORBIT, MAP>::typeName() const
+template <typename T, unsigned int ORB, typename MAP>
+inline const std::string& AttributeHandler<T, ORB, MAP>::typeName() const
 {
 	return m_attrib->getTypeName();
 }
 
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline unsigned int AttributeHandler<T, ORBIT, MAP>::nbElements() const
+template <typename T, unsigned int ORB, typename MAP>
+inline unsigned int AttributeHandler<T, ORB, MAP>::nbElements() const
 {
-	return m_map->template getAttributeContainer<ORBIT>().size() ;
+	return m_map->template getAttributeContainer<ORB>().size() ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline T& AttributeHandler<T, ORBIT, MAP>::operator[](Cell<ORBIT> c)
+template <typename T, unsigned int ORB, typename MAP>
+inline T& AttributeHandler<T, ORB, MAP>::operator[](Cell<ORB> c)
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	unsigned int a = m_map->getEmbedding(c) ;
@@ -200,71 +200,71 @@ inline T& AttributeHandler<T, ORBIT, MAP>::operator[](Cell<ORBIT> c)
 	return m_attrib->operator[](a) ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline const T& AttributeHandler<T, ORBIT, MAP>::operator[](Cell<ORBIT> c) const
+template <typename T, unsigned int ORB, typename MAP>
+inline const T& AttributeHandler<T, ORB, MAP>::operator[](Cell<ORB> c) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	unsigned int a = m_map->getEmbedding(c) ;
 	return m_attrib->operator[](a) ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline T& AttributeHandler<T, ORBIT, MAP>::operator[](unsigned int a)
+template <typename T, unsigned int ORB, typename MAP>
+inline T& AttributeHandler<T, ORB, MAP>::operator[](unsigned int a)
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	return m_attrib->operator[](a) ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline const T& AttributeHandler<T, ORBIT, MAP>::operator[](unsigned int a) const
+template <typename T, unsigned int ORB, typename MAP>
+inline const T& AttributeHandler<T, ORB, MAP>::operator[](unsigned int a) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	return m_attrib->operator[](a) ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline unsigned int AttributeHandler<T, ORBIT, MAP>::insert(const T& elt)
+template <typename T, unsigned int ORB, typename MAP>
+inline unsigned int AttributeHandler<T, ORB, MAP>::insert(const T& elt)
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	unsigned int idx = m_map->template getAttributeContainer<ORBIT>().insertLine() ;
+	unsigned int idx = m_map->template getAttributeContainer<ORB>().insertLine() ;
 	m_attrib->operator[](idx) = elt ;
 	return idx ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline unsigned int AttributeHandler<T, ORBIT, MAP>::newElt()
+template <typename T, unsigned int ORB, typename MAP>
+inline unsigned int AttributeHandler<T, ORB, MAP>::newElt()
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	unsigned int idx = m_map->template getAttributeContainer<ORBIT>().insertLine() ;
+	unsigned int idx = m_map->template getAttributeContainer<ORB>().insertLine() ;
 	return idx ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline void AttributeHandler<T, ORBIT, MAP>::setAllValues(const T& v)
+template <typename T, unsigned int ORB, typename MAP>
+inline void AttributeHandler<T, ORB, MAP>::setAllValues(const T& v)
 {
 	for(unsigned int i = begin(); i != end(); next(i))
 		m_attrib->operator[](i) = v ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline unsigned int AttributeHandler<T, ORBIT, MAP>::begin() const
+template <typename T, unsigned int ORB, typename MAP>
+inline unsigned int AttributeHandler<T, ORB, MAP>::begin() const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	return m_map->template getAttributeContainer<ORBIT>().begin() ;
+	return m_map->template getAttributeContainer<ORB>().begin() ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline unsigned int AttributeHandler<T, ORBIT, MAP>::end() const
+template <typename T, unsigned int ORB, typename MAP>
+inline unsigned int AttributeHandler<T, ORB, MAP>::end() const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	return m_map->template getAttributeContainer<ORBIT>().end() ;
+	return m_map->template getAttributeContainer<ORB>().end() ;
 }
 
-template <typename T, unsigned int ORBIT, typename MAP>
-inline void AttributeHandler<T, ORBIT, MAP>::next(unsigned int& iter) const
+template <typename T, unsigned int ORB, typename MAP>
+inline void AttributeHandler<T, ORB, MAP>::next(unsigned int& iter) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	m_map->template getAttributeContainer<ORBIT>().next(iter) ;
+	m_map->template getAttributeContainer<ORB>().next(iter) ;
 }
 
 

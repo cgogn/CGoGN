@@ -85,25 +85,33 @@ typename V_ATT::DATA_TYPE faceNormal(typename PFP::MAP& map, Face f, const V_ATT
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
 {
-    typedef typename V_ATT::DATA_TYPE VEC3 ;
+	CHECK_ATTRIBUTEHANDER_ORBIT_TYPE(V_ATT,VERTEX);
 
-    VEC3 N(0) ;
+	typedef typename V_ATT::DATA_TYPE VEC3 ;
 
-    foreach_incident2<FACE>(map, v, [&] (Face f)
-    {
-        VEC3 n = faceNormal<PFP>(map, f, position) ;
-        if(!n.hasNan())
-        {
-            VEC3 v1 = vectorOutOfDart<PFP>(map, f.dart, position) ;
-            VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(f), position) ;
-            n *= convexFaceArea<PFP>(map, f, position) / (v1.norm2() * v2.norm2()) ;
-            N += n ;
-        }
-    });
+	VEC3 N(0) ;
 
-    N.normalize() ;
-    return N ;
+	foreach_incident2<FACE>(map, v, [&] (Face f)
+	{
+		VEC3 n = faceNormal<PFP>(map, f, position) ;
+		if(!n.hasNan())
+		{
+			VEC3 v1 = vectorOutOfDart<PFP>(map, f.dart, position) ;
+			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(f), position) ;
+			typename VEC3::DATA_TYPE l = (v1.norm2() * v2.norm2());
+			if (l > (typename VEC3::DATA_TYPE(0.0)) )
+			{
+				n *= convexFaceArea<PFP>(map, f, position) / l ;
+				N += n ;
+			}
+		}
+	});
+
+	N.normalize() ;
+	return N ;
 }
+
+
 
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
