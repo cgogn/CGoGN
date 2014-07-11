@@ -41,6 +41,10 @@ IF (WITH_QT)
 	target_link_libraries(testPlaneCutting ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
 ENDIF()
 
+QT4_WRAP_CPP(wallPaper_moc wallPaper.h)
+add_executable(wallPaper wallPaper.cpp  ${wallPaper_moc})
+target_link_libraries(wallPaper ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+
 # Example with Qt
 #
 #QT4_WRAP_CPP(tuto1_moc tuto1.h)

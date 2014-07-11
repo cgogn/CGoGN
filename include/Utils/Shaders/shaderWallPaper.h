@@ -21,89 +21,73 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef _TEXTURE_EXAMPLE_
-#define _TEXTURE_EXAMPLE_
 
-#include <iostream>
+#ifndef __CGOGN_SHADER_WALLPAPER__
+#define __CGOGN_SHADER_WALLPAPER__
 
 
-#include "Utils/Qt/qtSimple.h"
+#include "Geometry/vector_gen.h"
+#include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
 #include "Utils/textures.h"
-#include "Utils/Shaders/shaderSimpleTexture.h"
-#include "Utils/Shaders/shaderPhongTexture.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Import/importObjTex.h"
+#include "Utils/gl_def.h"
 
-#include "Utils/Shaders/shaderWallPaper.h"
-
-
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Utils { class VBO; } }
-
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP ;
-};
 
-typedef PFP::MAP MAP ;
-typedef PFP::VEC3 VEC3 ;
-
-/**
- * A class for a little interface and rendering
- */
-
-class TexView: public Utils::QT::SimpleQT
+namespace Utils
 {
-	Q_OBJECT
+
+class ShaderWallPaper : public ClippingShader
+{
 protected:
-	void computeImage();
-	void computeTore();
+	// shader sources
+	static std::string vertexShaderText;
+	static std::string fragmentShaderText;
+
+	CGoGNGLuint m_unif_unit;
+	int m_unit;
+
+	Utils::GTexture* m_tex_ptr;
+	VBO* m_vboPos;
+	VBO* m_vboTexCoord;
+
+	void restoreUniformsAttribs();
+
 public:
+	ShaderWallPaper();
 
-	MAP myMap ;
-	Algo::Surface::Import::OBJModel<PFP> m_obj;
+	~ShaderWallPaper();
 
-	// VBO
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_texcoordVBO;
-	Utils::VBO* m_normalVBO;
-	unsigned int m_nbIndices;
+	/**
+	 * choose the texture unit engine to use for this texture
+	 */
+	void setTextureUnit(GLenum texture_unit);
 
-	Utils::Texture<2,Geom::Vec3uc>* m_texture;
-	Utils::Texture<2,Geom::Vec3uc>* m_textureWP;
+	/**
+	 * set the texture to use
+	 */
+	void setTexture(Utils::GTexture* tex);
 
+	/**
+	 * activation of texture unit with set texture
+	 */
+	void activeTexture();
+	
+	/**
+	 * activation of texture unit with texture id
+	 */
+	void activeTexture(CGoGNGLuint texId);
 
-	// shader simple texture
-	Utils::ShaderSimpleTexture* m_shader;
-	Utils::ShaderPhongTexture* m_shader2;
-	Utils::ShaderWallPaper* m_shaderWP;
-
-	bool m_phong;
-
-	/// filename of loaded mesh
-	std::string m_fileNameMesh;
-	/// filename of loaded texture
-	std::string m_fileNameTex;
-
-	TexView();
-
-	~TexView();
-
-	void init(const std::string& fnm, const std::string& fnt);
-
-	// callbacks of simpleQT to overdefine:
-	void cb_redraw();
-
-	void cb_initGL();
-
-	void cb_keyPress(int code);
-
+	/**
+	 * @brief draw the quad as wallpaper
+	 */
+	void draw();
 };
 
-#endif
+} // namespace Utils
+
+} // namespace CGoGN
+
+
+#endif /* __CGOGN_SHADER_SIMPLETEXTURE__ */
