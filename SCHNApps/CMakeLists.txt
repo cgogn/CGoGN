@@ -2,15 +2,22 @@ cmake_minimum_required(VERSION 2.8)
 
 project(SCHNApps)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
+IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
+	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
+		SET(CMAKE_BUILD_TYPE "Debug")
+	ELSE()
+		SET(CMAKE_BUILD_TYPE "Release")
+	ENDIF()
+ENDIF()
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
 
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 
 
 find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS regex thread system REQUIRED)
+find_package(Boost COMPONENTS regex system REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
@@ -30,32 +37,21 @@ SET( QT_USE_QTPLUGIN TRUE )
 INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-
-
-
-file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_mr.h FORCE_MR)
-IF (FORCE_MR EQUAL 1)
-	add_definitions(-DCGoGN_FORCE_MR=1)
-ENDIF (FORCE_MR EQUAL 1)
+#MESSAGE HERE FOR MORE EASY READING (MESSAGE AT THE END)
+MESSAGE("Build type = " ${CMAKE_BUILD_TYPE} " (for change -DCMAKE_BUILD_TYPE=Release|Debug)" )
 
 file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
-	SET(CGoGN_LIBS_D cgognD)
-	SET(CGoGN_LIBS_R cgogn)
-ELSE (ONELIB_STR EQUAL 1)
-	SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
-	SET(CGoGN_LIBS_R topology algo container utils)
-ENDIF (ONELIB_STR EQUAL 1)
+	SET(CGoGN_LIBS cgogn)
+ELSE()
+	SET(CGoGN_LIBS topology algo container utils)
+ENDIF()
 
 IF (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
 ELSE (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=false)
 ENDIF (DEFINED ASSERTON)
-
-add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
-
-
 
 
 # define includes of external libs 
@@ -83,7 +79,6 @@ SET (EXT_LIBS
 	${LIBXML2_LIBRARIES}
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
-	${Boost_THREAD_LIBRARY}
 	${QT_LIBRARIES}
 	${QGLVIEWER_LIBRARIES}
 	${PYTHON_LIBRARIES}
@@ -114,9 +109,12 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 
 SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
-SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin)
-SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib)
+SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
 
+# for application auto selection of plugin directory
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
+\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
 
 file(
 	GLOB_RECURSE
@@ -150,7 +148,41 @@ SET(SCHNApps_QOBJECT_FILES
 
 
 
-ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Release Release)
-IF (NOT WIN32)
-	ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Debug Debug)
-ENDIF (NOT WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+
+
+INCLUDE_DIRECTORIES(
+	${CGoGN_ROOT_DIR}/include
+	${SCHNApps_ROOT_DIR}/include
+	${EXT_INCLUDES}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}
+)
+
+QT4_WRAP_UI( UIC_FILES
+	${SCHNApps_UI_FILES}
+)
+
+QT4_WRAP_CPP( MOC_FILES
+	${SCHNApps_QOBJECT_FILES}
+)
+
+QT4_ADD_RESOURCES( RCC_FILES
+	${SCHNApps_ROOT_DIR}/resources/resources.qrc
+)
+
+ADD_EXECUTABLE( SCHNApps
+	${SCHNApps_FILES}
+	${UIC_FILES}
+	${MOC_FILES}
+	${RCC_FILES}
+)
+
+TARGET_LINK_LIBRARIES( SCHNApps
+	${CGoGN_LIBS}
+	${EXT_LIBS}
+)
+
+
+ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
+

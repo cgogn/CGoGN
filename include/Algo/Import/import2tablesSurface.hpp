@@ -30,6 +30,8 @@
 
 #include "Algo/Import/AHEM.h"
 
+#include <algorithm>
+
 namespace CGoGN
 {
 
