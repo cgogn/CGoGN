@@ -1,15 +1,22 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(CGoGNRelease)
+project(CGoGNLibrary)
 
-SET(CMAKE_BUILD_TYPE Release)
+# SET(CMAKE_BUILD_TYPE Release)
+
+#IF(WIN32)
+#	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib)
+#ELSE(WIN32)
+#	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
+#	ADD_DEFINITIONS(-DNOTOPOWARNING)
+#ENDIF(WIN32)
+
 
 IF(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib)
-ELSE(WIN32)
-	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
-	ADD_DEFINITIONS(-DNOTOPOWARNING)
-ENDIF(WIN32)
+ELSE()
+	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+ENDIF()
 
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -58,11 +65,11 @@ IF(WIN32)
 	add_custom_target(shader_target ${CGoGN_ROOT_DIR}/ThirdParty/bin/Release/shader_to_h ${shaders_src}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_src} )
-ELSE(WIN32)
+ELSE()
 	add_custom_target(shader_target ${CGoGN_ROOT_DIR}/ThirdParty/bin/shader_to_h ${shaders_src}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_src} )
-ENDIF(WIN32)
+ENDIF()
 
 
 file(
@@ -99,7 +106,7 @@ IF(WITH_QT)
 		
 	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})
-ENDIF (WITH_QT)
+ENDIF()
 
 file(	GLOB_RECURSE
 		files_geometry
@@ -116,20 +123,21 @@ file(	GLOB_RECURSE
 IF (ONELIB)
 	IF(WITH_QT)
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
-	ELSE(WITH_QT)
+	ELSE()
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
-	ENDIF (WITH_QT)
+	ENDIF()
 	add_dependencies(cgogn shader_target )
-ELSE (ONELIB)
+ELSE()
 	add_library( container	${files_container})
 	add_library( topology	${files_topology})
 	add_library( algo		${files_algo})
-	IF(WITH_QT)
+	IF (WITH_QT)
 		add_library( utils ${files_utils_withQt} )
-	ELSE(WITH_QT)
+	ELSE()
 		add_library( utils ${files_utils} )
-	ENDIF (WITH_QT)
+	ENDIF()
 	add_custom_target( Geometry 	SOURCES ${files_geometry} )
 	add_custom_target( ThirdParty 	SOURCES ${files_thirdParty} )
 	add_dependencies( utils shader_target )
-ENDIF (ONELIB)
+ENDIF()
+

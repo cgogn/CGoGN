@@ -9,25 +9,25 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
-	SET(CMAKE_BUILD_TYPE Debug)
-ELSE (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
-	SET(CMAKE_BUILD_TYPE Release)
-ENDIF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
+#	SET(CMAKE_BUILD_TYPE Debug)
+	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Debug/Release" FORCE)
+ELSE()
+#	SET(CMAKE_BUILD_TYPE Release)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Debug/Release" FORCE)	
+ENDIF()
 
 IF(WIN32)
-	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib) #release added by visual
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/)
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
-ELSE(WIN32)
-	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
 ENDIF(WIN32)
 
+SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
 
 # for shared or not shared
 SET (BUILD_SHARED_LIBS OFF CACHE BOOL 
 	"if used all library are build as shared type (.so/.dylib/.dll)")
 
-SET (WITH_ASSIMP ON CACHE BOOL "build with Assimp")
+SET (WITH_ASSIMP OFF CACHE BOOL "build with Assimp")
 SET (WITH_ZINRI ON CACHE BOOL "build with Zinri libs")
 SET (WITH_PYTHONQT ON CACHE BOOL "build PythonQt (for Schnapps)")
 

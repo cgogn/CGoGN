@@ -1,44 +1,67 @@
-SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
 
 IF (ONELIB)
-	SET(CGoGN_LIBS_R cgogn)
+	SET(CGoGN_LIBS cgogn)
 ELSE (ONELIB)
-	SET(CGoGN_LIBS_R topology algo container utils)
+	SET(CGoGN_LIBS topology algo container utils)
 ENDIF (ONELIB)
 
-IF(WIN32)
-	# libs have same name but in different place in Visual
-	IF (ONELIB)
-		SET(CGoGN_LIBS_D cgogn)
-	ELSE (ONELIB)
-		SET(CGoGN_LIBS_D topology algo container utils)
-	ENDIF (ONELIB)
-ELSE(WIN32)
-	IF (ONELIB)
-		SET(CGoGN_LIBS_D cgognD)
-	ELSE (ONELIB)
-		SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
-	ENDIF (ONELIB)
 
-	IF (WITH_QT)
-		add_subdirectory(Examples/Debug)
-	ENDIF (WITH_QT)
-ENDIF(WIN32)
+#IF(${CMAKE_BUILD_TYPE} MATCHES Release|release|RELEASE)
+#	SET(CGoGN_LIBS ${CGoGN_LIBS_R})
+#ELSE()
+#	SET(CGoGN_LIBS ${CGoGN_LIBS_D})
+#ENDIF()
 
-IF (WITH_QT)
+
+#IF(WIN32)
+#	link_directories(${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)
+#	${Boost_LIBRARY_DIRS})
+#ELSE(WIN32)
+
+SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}	)
+
+link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+
+include_directories(
+	${CGoGN_ROOT_DIR}/include
+	${CGoGN_EXT_INCLUDES})
+
+
+
+IF (COMPILE_SANDBOX)
+	add_subdirectory(SandBox)
+ENDIF()
+
+IF (COMPILE_EXAMPLES AND WITH_QT)
+		add_subdirectory(Examples)
+ENDIF()
+
+IF (COMPILE_TUTOS)
 	add_subdirectory(Tuto)
-	add_subdirectory(Examples/Release)
-	IF (NOT DONOT_COMPILE_SANDBOX)
-		add_subdirectory(SandBox)
-	ENDIF (NOT DONOT_COMPILE_SANDBOX)
-ENDIF (WITH_QT)
+ENDIF()
 
-add_subdirectory(Tests)
+IF (COMPILE_BENCHES)
+	add_subdirectory(Benches)
+ENDIF()
 
-add_subdirectory(Benches)
+IF (COMPILE_TESTS)
+	add_subdirectory(Tests)
+ENDIF()
 
-add_subdirectory(Tuto/Traversals)
-add_subdirectory(Tuto/Attributes)
-add_subdirectory(Tuto/Markers)
-add_subdirectory(Tuto/Boundary)
-add_subdirectory(Tuto/Modelling)
+
+#IF (WITH_QT)
+#	add_subdirectory(Tuto)
+#	add_subdirectory(Examples)
+#	IF (NOT DONOT_COMPILE_SANDBOX)
+#		add_subdirectory(SandBox)
+#	ENDIF (NOT DONOT_COMPILE_SANDBOX)
+#ENDIF (WITH_QT)
+
+#add_subdirectory(Tests)
+#add_subdirectory(Benches)
+
+#add_subdirectory(Tuto/Traversals)
+#add_subdirectory(Tuto/Attributes)
+#add_subdirectory(Tuto/Markers)
+#add_subdirectory(Tuto/Boundary)
+#add_subdirectory(Tuto/Modelling)
