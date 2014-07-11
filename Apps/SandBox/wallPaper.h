@@ -21,29 +21,30 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef _TEXTURE_EXAMPLE_
-#define _TEXTURE_EXAMPLE_
+
+#ifndef TUTO_WALLPAPER_H
+#define TUTO_WALLPAPER_H
 
 #include <iostream>
 
+#include "Utils/Qt/qtQGLV.h"
 
-#include "Utils/Qt/qtSimple.h"
-#include "Utils/textures.h"
-#include "Utils/Shaders/shaderSimpleTexture.h"
-#include "Utils/Shaders/shaderPhongTexture.h"
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
+
+#include "Geometry/vector_gen.h"
+#include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Import/importObjTex.h"
+
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/vbo.h"
+#include "Utils/cgognStream.h"
+
 
 #include "Utils/Shaders/shaderWallPaper.h"
 
-
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Utils { class VBO; } }
-
 using namespace CGoGN ;
+
 
 struct PFP: public PFP_STANDARD
 {
@@ -51,59 +52,46 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP ;
 };
 
-typedef PFP::MAP MAP ;
-typedef PFP::VEC3 VEC3 ;
+typedef PFP::MAP MAP;
+typedef PFP::VEC3 VEC3;
 
 /**
  * A class for a little interface and rendering
  */
-
-class TexView: public Utils::QT::SimpleQT
+class MyQT: public Utils::QT::SimpleQGLV
 {
-	Q_OBJECT
-protected:
-	void computeImage();
-	void computeTore();
+    Q_OBJECT
+
 public:
-
 	MAP myMap ;
-	Algo::Surface::Import::OBJModel<PFP> m_obj;
+	VertexAttribute<VEC3, MAP> position ;
 
-	// VBO
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_texcoordVBO;
-	Utils::VBO* m_normalVBO;
-	unsigned int m_nbIndices;
+    Algo::Render::GL2::MapRender* m_render;
+    Utils::VBO* m_positionVBO;
+    Utils::ShaderSimpleColor* m_shader;
 
-	Utils::Texture<2,Geom::Vec3uc>* m_texture;
+	// FOR WALL PAPER
 	Utils::Texture<2,Geom::Vec3uc>* m_textureWP;
-
-
-	// shader simple texture
-	Utils::ShaderSimpleTexture* m_shader;
-	Utils::ShaderPhongTexture* m_shader2;
 	Utils::ShaderWallPaper* m_shaderWP;
 
-	bool m_phong;
+    MyQT():
+        m_render(NULL),
+        m_positionVBO(NULL),
 
-	/// filename of loaded mesh
-	std::string m_fileNameMesh;
-	/// filename of loaded texture
-	std::string m_fileNameTex;
+        m_shader(NULL),
+		m_shaderWP(NULL)
+    {}
 
-	TexView();
 
-	~TexView();
+protected:
 
-	void init(const std::string& fnm, const std::string& fnt);
-
-	// callbacks of simpleQT to overdefine:
-	void cb_redraw();
+    void cb_redraw();
 
 	void cb_initGL();
 
-	void cb_keyPress(int code);
+	void cb_keyPress(int keycode);
 
+	void computeTexture();
 };
 
-#endif
+#endif // TUTO_TILINGS_H
