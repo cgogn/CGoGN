@@ -78,7 +78,7 @@ template <typename MAP, typename ATT>
 void applySmooth(MAP& map, const ATT& att_in, ATT& att_out)
 {
 	// check at compile if ATT is an AttributeHandler on orbit VERTEX
-	CHECK_ATTRIBUTEHANDER_ORBIT_TYPE(ATT,VERTEX);
+	CHECK_ATTRIBUTEHANDLER_ORBIT(ATT, VERTEX);
 
 	foreach_cell<VERTEX>(map,[&](Vertex v) // for all vertex v of map do
 	{
