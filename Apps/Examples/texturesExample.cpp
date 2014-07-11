@@ -58,21 +58,14 @@ void TexView::cb_initGL()
 
 	m_texture = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
 
-	m_textureWP = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
-
 	if (m_texture->load(m_fileNameTex))
 		m_texture->update();
 	else
 		computeImage();
 //		CGoGNerr << "Problem loading image"<< CGoGNendl;
 
-	computeImage();
 	m_texture->setWrapping(GL_CLAMP_TO_EDGE);
 	m_texture->update();
-
-	computeImage();
-	m_textureWP->setWrapping(GL_CLAMP_TO_EDGE);
-	m_textureWP->update();
 
 	m_shader = new Utils::ShaderSimpleTexture();
 	m_shader->setAttributePosition(m_positionVBO);
@@ -92,12 +85,6 @@ void TexView::cb_initGL()
 	m_shader2->setSpecular(Geom::Vec4f(0.5));
 	registerShader(m_shader2);
 
-	m_shaderWP = new Utils::ShaderWallPaper();
-	m_shaderWP->setTextureUnit(GL_TEXTURE2);
-	m_shaderWP->setTexture(m_textureWP);
-	registerShader(m_shaderWP);
-
-
 	glEnable(GL_TEXTURE_2D);
 
 	if (!m_obj.hasNormals())
@@ -116,8 +103,6 @@ void TexView::cb_initGL()
 void TexView::cb_redraw()
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	m_shaderWP->draw();
 
 	if (m_phong)
 	{
@@ -202,27 +187,16 @@ void TexView::computeImage()
 	colorTable.push_back(Geom::Vec3uc(0,255,255));
 	colorTable.push_back(Geom::Vec3uc(255,255,255));
 
-//	m_texture->create(Geom::Vec2ui(512,512));
-
-	m_textureWP->create(Geom::Vec2ui(512,512));
+	m_texture->create(Geom::Vec2ui(512,512));
 
 #define WIDTHCHECKER 20
 
-//	for (unsigned int ki = 0; ki < m_texture->size()[0]; ++ki)
-//	{
-//		for (unsigned int kj = 0; kj <  m_texture->size()[1]; ++kj)
-//		{
-//			unsigned int kc = ((kj/WIDTHCHECKER)*m_texture->size()[0] + (ki/WIDTHCHECKER))%7;
-//			(*m_texture)(ki,kj) =colorTable[kc];
-//		}
-//	}
-
-	for (unsigned int ki = 0; ki < m_textureWP->size()[0]; ++ki)
+	for (unsigned int ki = 0; ki < m_texture->size()[0]; ++ki)
 	{
-		for (unsigned int kj = 0; kj <  m_textureWP->size()[1]; ++kj)
+		for (unsigned int kj = 0; kj <  m_texture->size()[1]; ++kj)
 		{
-			unsigned int kc = ((kj/WIDTHCHECKER)*m_textureWP->size()[0] + (ki/WIDTHCHECKER))%7;
-			(*m_textureWP)(ki,kj) =colorTable[kc];
+			unsigned int kc = ((kj/WIDTHCHECKER)*m_texture->size()[0] + (ki/WIDTHCHECKER))%7;
+			(*m_texture)(ki,kj) =colorTable[kc];
 		}
 	}
 #undef WIDTHCHECKER

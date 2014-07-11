@@ -39,11 +39,12 @@ IF (WITH_QT)
 	QT4_WRAP_CPP(testPlaneCutting_moc testPlaneCutting.h)
 	add_executable(testPlaneCutting testPlaneCutting.cpp  ${testPlaneCutting_ui} ${testPlaneCutting_moc})
 	target_link_libraries(testPlaneCutting ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
-ENDIF()
 
-QT4_WRAP_CPP(wallPaper_moc wallPaper.h)
-add_executable(wallPaper wallPaper.cpp  ${wallPaper_moc})
-target_link_libraries(wallPaper ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
+	QT4_WRAP_CPP(wallPaper_moc wallPaper.h)
+	add_executable(wallPaper wallPaper.cpp  ${wallPaper_moc})
+	target_link_libraries(wallPaper ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
+
+ENDIF()
 
 # Example with Qt
 #

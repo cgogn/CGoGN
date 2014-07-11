@@ -36,8 +36,6 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Import/importObjTex.h"
 
-#include "Utils/Shaders/shaderWallPaper.h"
-
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
@@ -76,13 +74,10 @@ public:
 	unsigned int m_nbIndices;
 
 	Utils::Texture<2,Geom::Vec3uc>* m_texture;
-	Utils::Texture<2,Geom::Vec3uc>* m_textureWP;
-
 
 	// shader simple texture
 	Utils::ShaderSimpleTexture* m_shader;
 	Utils::ShaderPhongTexture* m_shader2;
-	Utils::ShaderWallPaper* m_shaderWP;
 
 	bool m_phong;
 
