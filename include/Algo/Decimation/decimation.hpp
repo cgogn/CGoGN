@@ -195,7 +195,7 @@ int decimate(
 			return -1 ; // init failed
 	}
 
-	unsigned int nbVertices = Algo::Topo::getNbOrbits<VERTEX>(map) ;
+    unsigned int nbVertices = Algo::Topo::getNbOrbits<VERTEX>(map) ;
 	bool finished = false ;
 
 	while(!finished)

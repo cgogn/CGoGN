@@ -73,18 +73,6 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
         CGoGNout << "TYPE: PLY" << CGoGNendl;
         return importPly(filename, attrNames);
         break;
-/*	case PLYPTM:
-        CGoGNout << "TYPE: PLYPTM" << CGoGNendl;
-        return importPlyPTM(filename, attrNames);
-        break;
-*/	case PLYSLFgeneric:
-        CGoGNout << "TYPE: PLYSLFgeneric" << CGoGNendl;
-        return importPlySLFgeneric(filename, attrNames);
-        break;
-    case PLYSLFgenericBin:
-        CGoGNout << "TYPE: PLYSLFgenericBin" << CGoGNendl;
-        return importPlySLFgenericBin(filename, attrNames);
-        break;
     case OBJ:
         CGoGNout << "TYPE: OBJ" << CGoGNendl;
         return importObj(filename, attrNames);
@@ -772,7 +760,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 
     // Define containers
 	VertexAttribute<VEC3, MAP> positions =  m_map.template getAttribute<VEC3, VERTEX, MAP>("position") ;
-;
+
     if (!positions.isValid())
 		positions = m_map.template addAttribute<VEC3, VERTEX, MAP>("position") ;
     attrNames.push_back(positions.name()) ;

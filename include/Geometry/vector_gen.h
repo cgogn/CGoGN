@@ -75,7 +75,7 @@ public:
 	 * constructor that initialize all component to a given value
 	 * @param x the value to assign to all component
 	 */
-	Vector(T x) ;
+    explicit Vector(T x) ;
 
 	void set(T a) ;
 

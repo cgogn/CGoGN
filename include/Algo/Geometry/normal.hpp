@@ -28,6 +28,8 @@
 #include "Topology/generic/traversor/traversorCell.h"
 #include "Topology/generic/traversor/traversor2.h"
 
+#include "Algo/Parallel/parallel_foreach.h"
+
 #include <cmath>
 
 namespace CGoGN
@@ -45,8 +47,6 @@ namespace Geometry
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE triangleNormal(typename PFP::MAP& map, Face f, const V_ATT& position)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-
 	typename V_ATT::DATA_TYPE N = Geom::triangleNormal(
 		position[f.dart],
 		position[map.phi1(f)],
@@ -59,8 +59,6 @@ typename V_ATT::DATA_TYPE triangleNormal(typename PFP::MAP& map, Face f, const V
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE newellNormal(typename PFP::MAP& map, Face f, const V_ATT& position)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-
 	typedef typename V_ATT::DATA_TYPE VEC3;
 	VEC3 N(0);
 
@@ -80,8 +78,6 @@ typename V_ATT::DATA_TYPE newellNormal(typename PFP::MAP& map, Face f, const V_A
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE faceNormal(typename PFP::MAP& map, Face f, const V_ATT& position)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-
 	if(map.faceDegree(f) == 3)
 		return triangleNormal<PFP>(map, f, position) ;
 	else
@@ -91,8 +87,6 @@ typename V_ATT::DATA_TYPE faceNormal(typename PFP::MAP& map, Face f, const V_ATT
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-
 	typedef typename V_ATT::DATA_TYPE VEC3 ;
 
 	VEC3 N(0) ;
@@ -104,12 +98,8 @@ typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V
 		{
 			VEC3 v1 = vectorOutOfDart<PFP>(map, f.dart, position) ;
 			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(f), position) ;
-			typename VEC3::DATA_TYPE l = (v1.norm2() * v2.norm2());
-			if (l > (typename VEC3::DATA_TYPE(0.0)) )
-			{
-				n *= convexFaceArea<PFP>(map, f, position) / l ;
-				N += n ;
-			}
+			n *= convexFaceArea<PFP>(map, f, position) / (v1.norm2() * v2.norm2()) ;
+			N += n ;
 		}
 	});
 
@@ -120,7 +110,6 @@ typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V
 template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
 	assert(map.dimension() == 3);
 
 	typedef typename V_ATT::DATA_TYPE VEC3 ;
@@ -156,43 +145,39 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, c
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal, unsigned int thread)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-	CHECK_ATTRIBUTEHANDLER_ORBIT(F_ATT, FACE);
-
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
 	{
-		Parallel::computeNormalFaces<PFP,V_ATT,F_ATT>(map, position, face_normal);
+		Parallel::computeNormalFaces<PFP,V_ATT,F_ATT>(map,position,face_normal);
 		return;
 	}
 
 	foreach_cell<FACE>(map, [&] (Face f)
 	{
 		face_normal[f] = faceNormal<PFP>(map, f, position) ;
-	}, AUTO, thread);
+	},
+	AUTO, thread);
 }
 
 template <typename PFP, typename V_ATT>
 void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int thread)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
 	{
-		Parallel::computeNormalVertices<PFP,V_ATT>(map, position, normal);
+		Parallel::computeNormalVertices<PFP,V_ATT>(map,position,normal);
 		return;
 	}
 
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		normal[v] = vertexNormal<PFP>(map, v, position) ;
-	}, FORCE_CELL_MARKING, thread);
+	},
+	FORCE_CELL_MARKING, thread);
 }
+
 
 template <typename PFP, typename V_ATT>
 typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Edge e, const V_ATT& position)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-
 	typedef typename V_ATT::DATA_TYPE VEC3 ;
 
 	if(map.isBoundaryEdge(e))
@@ -226,20 +211,19 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Edge
 template <typename PFP, typename V_ATT, typename E_ATT>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int thread)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-	CHECK_ATTRIBUTEHANDLER_ORBIT(E_ATT, EDGE);
-
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
+	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
 	{
-		Parallel::computeAnglesBetweenNormalsOnEdges<PFP,V_ATT,E_ATT>(map, position, angles);
+		Parallel::computeAnglesBetweenNormalsOnEdges<PFP,V_ATT,E_ATT>(map,position,angles);
 		return;
 	}
 
 	foreach_cell<EDGE>(map, [&] (Edge e)
 	{
 		angles[e] = computeAngleBetweenNormalsOnEdge<PFP>(map, e, position) ;
-	}, AUTO, thread);
+	},
+	AUTO, thread);
 }
+
 
 
 namespace Parallel
@@ -248,36 +232,29 @@ namespace Parallel
 template <typename PFP, typename V_ATT>
 void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-
-	CGoGN::Parallel::foreach_cell<VERTEX>(map, [&] (Vertex v, unsigned int /*thr*/)
+	CGoGN::Parallel::foreach_cell<VERTEX>(map,[&](Vertex v, unsigned int /*thr*/)
 	{
 		normal[v] = vertexNormal<PFP>(map, v, position) ;
-	}, FORCE_CELL_MARKING);
+	},true,FORCE_CELL_MARKING);
 }
 
 template <typename PFP, typename V_ATT, typename F_ATT>
 void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& normal)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-	CHECK_ATTRIBUTEHANDLER_ORBIT(F_ATT, FACE);
-
-	CGoGN::Parallel::foreach_cell<FACE>(map, [&] (Face f, unsigned int /*thr*/)
+	CGoGN::Parallel::foreach_cell<FACE>(map,[&](Face f, unsigned int thr)
 	{
 		normal[f] = faceNormal<PFP>(map, f, position) ;
-	});
+	},true,AUTO);
 }
+
 
 template <typename PFP, typename V_ATT, typename E_ATT>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles)
 {
-	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
-	CHECK_ATTRIBUTEHANDLER_ORBIT(E_ATT, EDGE);
-
-	CGoGN::Parallel::foreach_cell<EDGE>(map,[&](Edge e, unsigned int /*thr*/)
+	CGoGN::Parallel::foreach_cell<EDGE>(map,[&](Edge e, unsigned int thr)
 	{
 		angles[e] = computeAngleBetweenNormalsOnEdge<PFP>(map, e, position) ;
-	});
+	},true,AUTO);
 }
 
 } // namespace Parallel

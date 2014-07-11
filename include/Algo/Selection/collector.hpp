@@ -119,7 +119,7 @@ void Collector_OneRing<PFP>::collectAll(Dart d)
 
 	this->insideVertices.push_back(d);
 
-	foreach_incident2<EDGE>(this->map, Vertex(d), [&] (Edge e)
+    foreach_incident2<EDGE>(this->map, Vertex(d), [&] (Edge e)
 	{
 		this->insideEdges.push_back(e);
 		this->insideFaces.push_back(e.dart);
@@ -133,7 +133,7 @@ void Collector_OneRing<PFP>::collectBorder(Dart d)
 	this->init(d);
 	this->border.reserve(12);
 
-	foreach_incident2<FACE>(this->map, Vertex(d), [&] (Face f)
+    foreach_incident2<FACE>(this->map, Vertex(d), [&] (Face f)
 	{
 		this->border.push_back(this->map.phi1(f.dart));
 	});
@@ -146,7 +146,7 @@ typename PFP::REAL Collector_OneRing<PFP>::computeArea(const VertexAttribute<VEC
 
 	REAL area = 0;
 
-	for (std::vector<Face>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
+    for (std::vector<Face>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
 		area += Algo::Surface::Geometry::triangleArea<PFP>(this->map, *it, pos);
 
 	return area;
@@ -169,7 +169,7 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 	// collect edges on the border
 	// TODO : should be an option ?
 	// TODO : not boundary safe
-	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
+    for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
 		const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
@@ -196,7 +196,7 @@ void Collector_OneRing<PFP>::computeNormalCyclesTensor (const VertexAttribute<VE
 	// collect edges on the border
 	// TODO : should be an option ?
 	// TODO : not boundary safe
-	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
+    for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
 		const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		const REAL edgeangle = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
@@ -518,12 +518,12 @@ void Collector_WithinSphere<PFP>::computeNormalCyclesTensor(const VertexAttribut
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) ;
 	}
 	// collect edges crossing the neighborhood's border
-	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
+    for (std::vector<Dart>::iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
 		const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->map, *it, pos) ;
 		REAL alpha ;
 		Algo::Surface::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, radius, *it, pos, alpha) ;
-		const REAL edgeangle = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, *it, pos) ;
+        const REAL edgeangle = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(this->map, Edge(*it), pos) ;
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle * (1 / e.norm()) * alpha ;
 	}
 

@@ -39,13 +39,13 @@ namespace PMesh
 template <typename PFP>
 ProgressiveMesh<PFP>::ProgressiveMesh(
 		MAP& map,
-		DartMarker<MAP>& inactive,
+        DartMarker<MAP>& inactive,
 		Algo::Surface::Decimation::SelectorType s,
 		Algo::Surface::Decimation::ApproximatorType a,
 		VertexAttribute<VEC3, MAP>& pos
 	) :
 	m_map(map),
-	position(pos),
+    position(pos),
 	inactiveMarker(inactive)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
@@ -87,22 +87,22 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	switch(s)
 	{
 		case Algo::Surface::Decimation::S_MapOrder : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_MapOrder<PFP>(m_map, positionsTable, m_approximators) ;
+            m_selector = new Algo::Surface::Decimation::EdgeSelector_MapOrder<PFP>(m_map, position, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_Random : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_Random<PFP>(m_map, positionsTable, m_approximators) ;
+            m_selector = new Algo::Surface::Decimation::EdgeSelector_Random<PFP>(m_map, position, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_EdgeLength : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_Length<PFP>(m_map, positionsTable, m_approximators) ;
+            m_selector = new Algo::Surface::Decimation::EdgeSelector_Length<PFP>(m_map, position, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_QEM : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_QEM<PFP>(m_map, positionsTable, m_approximators) ;
+            m_selector = new Algo::Surface::Decimation::EdgeSelector_QEM<PFP>(m_map, position, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_MinDetail : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, positionsTable, m_approximators) ;
+            m_selector = new Algo::Surface::Decimation::EdgeSelector_MinDetail<PFP>(m_map, position, m_approximators) ;
 			break ; }
 		case Algo::Surface::Decimation::S_Curvature : {
-			m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, positionsTable, m_approximators) ;
+            m_selector = new Algo::Surface::Decimation::EdgeSelector_Curvature<PFP>(m_map, position, m_approximators) ;
 			break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
@@ -137,11 +137,11 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 
 template <typename PFP>
 ProgressiveMesh<PFP>::ProgressiveMesh(
-		MAP& map, DartMarker& inactive,
+        MAP& map, DartMarker<MAP>& inactive,
 		Algo::Surface::Decimation::Selector<PFP>* selector, std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>& approximators,
-		VertexAttribute<typename PFP::VEC3>& position
+        VertexAttribute<VEC3,MAP>& position
 	) :
-	m_map(map), m_selector(selector), m_approximators(approximators), positionsTable(position), inactiveMarker(inactive)
+    m_map(map), position(position), inactiveMarker(inactive), m_selector(selector), m_approximators(approximators)
 {
 	CGoGNout << "  initializing approximators.." << CGoGNflush ;
 	for(typename std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
@@ -187,7 +187,7 @@ ProgressiveMesh<PFP>::~ProgressiveMesh()
 template <typename PFP>
 void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 {
-	unsigned int nbVertices = m_map.template getNbOrbits<VERTEX>() ;
+    unsigned int nbVertices = Algo::Topo::getNbOrbits<VERTEX>(m_map)  ;
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
 	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
 
@@ -281,7 +281,7 @@ void ProgressiveMesh<PFP>::coarsen()
 
 	edgeCollapse(vs) ;	// collapse edge
 
-	Algo::Topo::setOrbitEmbedding<VERTEX>(m_map, d2,s->getApproxV()) ;
+    Algo::Topo::setOrbitEmbedding<VERTEX>(m_map, d2, vs->getApproxV()) ;
 	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, d2, vs->getApproxE1()) ;
 	Algo::Topo::setOrbitEmbedding<EDGE>(m_map, dd2, vs->getApproxE2()) ;
 
@@ -544,7 +544,7 @@ float ProgressiveMesh<PFP>::computeDistance2()
 	float distance = 0; // sum of 2-distance between original vertices and new vertices
 
 	gotoLevel(0) ; // mesh reconstruction from detail vectors
-	DartMarker mUpdate(m_map) ;
+    DartMarker<MAP> mUpdate(m_map) ;
 	for(Dart d = m_map.begin(); d != m_map.end(); m_map.next(d)) // vertices loop
 	{
 		if(!mUpdate.isMarked(d))

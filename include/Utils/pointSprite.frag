@@ -18,6 +18,7 @@ uniform vec4 colorsprite;
 
 VARYING_FRAG vec2 spriteCoord;
 VARYING_FRAG vec3 sphereCenter;
+FRAG_OUT_DEF ;
 
 void main(void)
 {

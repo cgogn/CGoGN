@@ -459,7 +459,7 @@ void SimpleQT::updateGL()
 void SimpleQT::updateGLMatrices()
 {
 	m_glWidget->modelModified();
-//	m_glWidget->updateGL();
+    updateGL();
 }
 
 void SimpleQT::transfoRotate(float angle, float x, float y, float z)

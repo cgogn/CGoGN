@@ -49,7 +49,7 @@ public:
 	Cell(): dart() {}
 
 	/// constructor from Dart
-	inline Cell(Dart d): dart(d) {}
+    inline Cell(Dart d): dart(d) {}
 
 	/// copy constructor
 	inline Cell(const Cell<ORBIT>& c): dart(c.dart) {}
