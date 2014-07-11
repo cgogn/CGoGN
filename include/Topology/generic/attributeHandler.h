@@ -33,13 +33,14 @@
 #include "Container/fakeAttribute.h"
 #include "Topology/generic/cells.h"
 
-/// Macro that check if ATTRIBUTEHANDLER type is an AttributeHandler of orbit ORBITVALUE
-#define CHECK_ATTRIBUTEHANDER_ORBIT_TYPE(ATTRIBUTEHANDLER, ORBITVALUE) \
-	static_assert(std::is_base_of<AttributeHandlerGen,ATTRIBUTEHANDLER>::value, "Error not AttributeHandler");\
-	static_assert(ATTRIBUTEHANDLER::ORBIT==ORBITVALUE,"Error wrong orbit of AttributeHandler");
+/// Macro that checks if ATTRIBUTEHANDLER type is an AttributeHandler
+#define CHECK_ATTRIBUTEHANDLER(ATTRIBUTEHANDLER)\
+	static_assert(std::is_base_of<AttributeHandlerGen, ATTRIBUTEHANDLER>::value, "Error not AttributeHandler");
 
-#define CHECK_ATTRIBUTEHANDER__TYPE(ATTRIBUTEHANDLER) \
-	static_assert(std::is_base_of<AttributeHandlerGen,ATTRIBUTEHANDLER>::value, "Error not AttributeHandler");
+/// Macro that checks if ATTRIBUTEHANDLER type is an AttributeHandler of orbit ORBITVALUE
+#define CHECK_ATTRIBUTEHANDLER_ORBIT(ATTRIBUTEHANDLER, ORBITVALUE)\
+	static_assert(std::is_base_of<AttributeHandlerGen, ATTRIBUTEHANDLER>::value, "Error not AttributeHandler");\
+	static_assert(ATTRIBUTEHANDLER::ORBIT == ORBITVALUE, "Error wrong orbit of AttributeHandler");
 
 namespace CGoGN
 {
@@ -58,10 +59,7 @@ public:
 		valid(v)
 	{}
 
-	bool isValid() const
-	{
-		return valid ;
-	}
+	bool isValid() const { return valid ; }
 
 	virtual int getSizeOfType() const = 0;
 
@@ -73,10 +71,7 @@ public:
 	virtual AttributeMultiVectorGen* getDataVectorGen() const = 0;
 
 protected:
-	void setInvalid()
-	{
-		valid = false ;
-	}
+	void setInvalid() { valid = false ; }
 } ;
 
 /**

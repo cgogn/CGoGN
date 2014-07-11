@@ -112,15 +112,15 @@ void computeNewPositions(MAP& map, VertexAttribute<VEC3, MAP>& pos)
 template<typename ATTRIB>
 void dumpAttribute(const ATTRIB& attr)
 {
-	CHECK_ATTRIBUTEHANDER__TYPE(ATTRIB);
+	CHECK_ATTRIBUTEHANDLER(ATTRIB);
 
-	std::cout << "Attribute " <<attr.name() << " of orbit "<< orbitName(attr.getOrbit())<< " of type "<< attr.typeName()<< std::endl;
+	std::cout << "Attribute " << attr.name() << " of orbit " << orbitName(attr.getOrbit()) << " of type " << attr.typeName() << std::endl;
 
 	// NEVER USE 0 AND ++ IN FOR LOOP ON ATTRIBUTE !
 	// USE ONLY BEGIN / END / NEXT (for hole jumping over)
-	for (unsigned int i=attr.begin(); i!=attr.end(); attr.next(i))
+	for (unsigned int i = attr.begin(); i != attr.end(); attr.next(i))
 	{
-		std::cout << attr.name() << "["<< i << "] = "<<attr[i]<< std::endl;
+		std::cout << attr.name() << "[" << i << "] = " << attr[i] << std::endl;
 	}
 }
 
