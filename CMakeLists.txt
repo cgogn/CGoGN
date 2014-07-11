@@ -142,7 +142,7 @@ IF (WITH_QT)
 	ADD_DEFINITIONS(${QT_DEFINITIONS})
 	find_package(QGLViewer REQUIRED)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${QT_INCLUDE_DIR} ${QGLVIEWER_INCLUDE_DIR} )
-        SET (CGoGN_EXT_LIBS ${QT_LIBRARIES} ${QGLVIEWER_LIBRARIES} ${CGoGN_EXT_LIBS})
+	SET (CGoGN_EXT_LIBS ${QT_LIBRARIES} ${QGLVIEWER_LIBRARIES} ${CGoGN_EXT_LIBS})
 ENDIF (WITH_QT)
 
 IF (WITH_GLEWMX)
@@ -173,11 +173,138 @@ ELSE()
 	endif()
 ENDIF()
 
-add_subdirectory(Release)
+
+
+
+IF(WIN32)
+	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib)
+ELSE()
+	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+ENDIF()
+
+include_directories(
+	${CMAKE_CURRENT_BINARY_DIR}
+	${CGoGN_ROOT_DIR}/include
+	${CGoGN_EXT_INCLUDES}
+)
+
+file(
+	GLOB_RECURSE
+	files_topology
+	${CGoGN_ROOT_DIR}/src/Topology/*.cpp
+	${CGoGN_ROOT_DIR}/include/Topology/*.hpp
+	${CGoGN_ROOT_DIR}/include/Topology/*.h
+)
+
+file(
+	GLOB_RECURSE
+	files_container
+	${CGoGN_ROOT_DIR}/src/Container/*.cpp
+	${CGoGN_ROOT_DIR}/include/Container/*.hpp
+	${CGoGN_ROOT_DIR}/include/Container/*.h
+)
+
+file(
+	GLOB_RECURSE
+	files_algo
+	${CGoGN_ROOT_DIR}/src/Algo/*.cpp
+	${CGoGN_ROOT_DIR}/src/Algo/*.c
+	${CGoGN_ROOT_DIR}/include/Algo/*.hpp
+	${CGoGN_ROOT_DIR}/include/Algo/*.h
+)
+
+file(
+	GLOB
+	shaders_src
+	${CGoGN_ROOT_DIR}/include/Utils/*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/*.geom	
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.geom
+)
+
+
+IF(WIN32)
+	add_custom_target(shader_target ${CGoGN_ROOT_DIR}/ThirdParty/bin/Release/shader_to_h ${shaders_src}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	SOURCES ${shaders_src} )
+ELSE()
+	add_custom_target(shader_target ${CGoGN_ROOT_DIR}/ThirdParty/bin/shader_to_h ${shaders_src}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	SOURCES ${shaders_src} )
+ENDIF()
+
+
+file(
+	GLOB		# WARNING NO MORE RECURSE TO AVOID TAKING QT FILES
+	files_utils
+	${CGoGN_ROOT_DIR}/src/Utils/*.cpp
+	${CGoGN_ROOT_DIR}/include/Utils/*.hpp
+	${CGoGN_ROOT_DIR}/include/Utils/*.h
+
+	${CGoGN_ROOT_DIR}/src/Utils/Shaders/*.cpp
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.hpp
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.h
+)
+
+IF(WITH_QT)
+	file(
+		GLOB
+		files_utils_qt
+		${CGoGN_ROOT_DIR}/src/Utils/Qt/*.cpp
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.hpp
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.h
+	)
+	file(
+		GLOB
+		utils_qt_headers
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtgl.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtSimple.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtQGLV_glw.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtQGLV.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtpopup.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qthistodraw.h 
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtcolorschooser.h
+	)	
+		
+	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
+	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})
+ENDIF()
+
+file(	GLOB_RECURSE
+		files_geometry
+		${CGoGN_ROOT_DIR}/include/Geometry/*.h
+		${CGoGN_ROOT_DIR}/include/Geometry/*.hpp
+)
+
+file(	GLOB_RECURSE
+		files_thirdParty
+		${CGoGN_ROOT_DIR}/ThirdParty/include/*.h
+		${CGoGN_ROOT_DIR}/ThirdParty/include/*.hpp
+)
+
+IF (ONELIB)
+	IF(WITH_QT)
+		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
+	ELSE()
+		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
+	ENDIF()
+	add_dependencies(cgogn shader_target )
+ELSE()
+	add_library( container	${files_container})
+	add_library( topology	${files_topology})
+	add_library( algo		${files_algo})
+	IF (WITH_QT)
+		add_library( utils ${files_utils_withQt} )
+	ELSE()
+		add_library( utils ${files_utils} )
+	ENDIF()
+	add_custom_target( Geometry 	SOURCES ${files_geometry} )
+	add_custom_target( ThirdParty 	SOURCES ${files_thirdParty} )
+	add_dependencies( utils shader_target )
+ENDIF()
+
+
 add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 
-
-#INSTALL (DIRECTORY ${CGoGN_ROOT_DIR}/include ${CGoGN_ROOT_DIR}/lib ${CGoGN_ROOT_DIR}/bin DESTINATION .)
-#INSTALL (DIRECTORY ThirdParty/glm  DESTINATION include)
-#INSTALL (DIRECTORY cmake_modules  DESTINATION .)
-#INSTALL (FILES apps_cmake.txt  DESTINATION .)

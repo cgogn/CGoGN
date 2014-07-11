@@ -11,8 +11,12 @@ Pour compiler CGoGN:
 	make (-j x si vous avez x cores)
 	make install
 
+	La même chose en debug:
+	cd ../buildDebug
+	cmake ..
+	make (-j x si vous avez x cores)
+
 	On peut fixer certaines option pour ne pas tout compiler (cf le README.TXT dans ThirdParty)
-	On peut aussi compiler en debug en compilant dans un répertoire dont le nom finit par Debug ("buildDebug" par exemple)
 	
   - ensuite on compile CGoGN (compile les libs dans CGoGN/lib et des exemples dans CGoGN/bin) :
 
@@ -20,17 +24,18 @@ Pour compiler CGoGN:
 	cmake ..
 	make (-j x si vous avez x cores)
 
+	Et en Debug avec:
+	cd ../buildDebug
+	cmake ..
+	make (-j x si vous avez x cores)
+
     -> certaines options sont disponibles :
 
 	  BUILD_SHARED_LIBS  (F) experimental !
 	  WITH_ASSIMP        (T)
-	  WITH_NUMERICAL     (T)
 	  WITH_ZINRI         (T)
-	  WITH_QT	         (T)
+	  WITH_QT	     (T)
 	    -> afin de limiter les dépendances et le temps de compilation
-	
-	  FORCE_MR           (0)
-	    -> permet de compiler dans 2 modes: mono-resolution(0), multi-resolution(1)
 	
 	  ONELIB             (F)
 	    -> permet de forcer la compilation en une seule lib (libcgogn.a) au lieu de quatre.
@@ -40,6 +45,15 @@ Pour compiler CGoGN:
 	cd CGoGN/SCHNApps/build
 	cmake ..
 	make (-j x si vous avez x cores)
+
+	Et en Debug avec:
+	cd ../buildDebug
+	cmake ..
+	make (-j x si vous avez x cores)
+
+
+Les librairies sont generees dans lib/Release et lib/Debug
+Les binaires sont generes dans bin/Release et bin/Debug
 
 
 Des exemples de données (fichiers trianbgz, off, etc..) sont accessible à l'adresse suivante: 
@@ -63,6 +77,11 @@ To compile CGoGN:
 	make (-j x if you have x cores)
 	make install
 
+	In debug mode
+	cd ../buildDebug
+	cmake ..
+	make 
+
 	Some options are available to not compile everything (see the README.TXT in ThirdParty)
 
   - then compile CGoGN (the libs are generated in CGoGN/lib and some examples in CGoGN/bin):
@@ -71,17 +90,18 @@ To compile CGoGN:
 	cmake ..
 	make (-j x if you have x cores)
 
+	in debug mode:
+	cd ../buildDebug
+	cmake ..
+	make
+
 	-> some options are available:.
 
 	  BUILD_SHARED_LIBS  (F) experimental !
 	  WITH_ASSIMP        (T)
-	  WITH_NUMERICAL     (T)
 	  WITH_ZINRI         (T)
-	  WITH_QT	         (T)
+	  WITH_QT	     (T)
 	    -> to minimize dependencies and compilation time
-	
-	  FORCE_MR           (0)
-	    -> allows the compilation in 2 modes: mono-resolution(0), multi-resolution(1)
 	
 	  ONELIB             (F)
 	    -> allow compilation in one lib (libcgogn.a) instead of four.
@@ -91,6 +111,14 @@ To compile CGoGN:
 	cd CGoGN/SCHNApps/build
 	cmake ..
 	make (-j x if you have x cores)
+
+	in debug mode:
+	cd ../buildDebug
+	cmake ..
+	make 
+
+Libraries are generated in lib/Release and lib/Debug
+Binaries are generated in bin/Release and bin/Debug
 
 
 Examples of data (trianbgz, off, etc.. files) are available at the following address:
