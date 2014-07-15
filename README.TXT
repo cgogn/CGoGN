@@ -38,12 +38,6 @@ On peut fixer certaines option pour ne pas tout compiler:
 
     Certaines options sont disponibles :
 
-	* BUILD_SHARED_LIBS  (F) experimental !  
-	* WITH_ASSIMP        (?)  
-	* WITH_ZINRI ->
-	* WITH_QT	 -> afin de limiter les dépendances et le temps de compilation  
-	* ONELIB	-> permet de forcer la compilation en une seule lib (libcgogn.a) au lieu de quatre.
-
 	* BUILD_SHARED_LIBS -Q experimental !
 	* ONELIB	-> compilation en une seule lib (libcgogn.a) au lieu de 4
 	* WITH_ASSIMP  -> utilise Assimp (auto set par third party compil)
