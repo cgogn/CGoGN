@@ -6,27 +6,17 @@ ELSE (ONELIB)
 ENDIF (ONELIB)
 
 
-#IF(${CMAKE_BUILD_TYPE} MATCHES Release|release|RELEASE)
-#	SET(CGoGN_LIBS ${CGoGN_LIBS_R})
-#ELSE()
-#	SET(CGoGN_LIBS ${CGoGN_LIBS_D})
-#ENDIF()
-
-
-#IF(WIN32)
-#	link_directories(${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)
-#	${Boost_LIBRARY_DIRS})
-#ELSE(WIN32)
-
-SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}	)
-
-link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+IF (WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
+	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+ELSE()
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
+ENDIF()
 
 include_directories(
 	${CGoGN_ROOT_DIR}/include
 	${CGoGN_EXT_INCLUDES})
-
-
 
 IF (COMPILE_SANDBOX)
 	add_subdirectory(SandBox)

@@ -354,7 +354,7 @@ public:
 		for (unsigned int i = 0; i < m_nb; ++i)
 		{
 			const Geom::Vec3d& vd = *typedIn++;
-			*typedOut++ = Geom::Vec3f(vd[0],vd[1],vd[2]);
+			*typedOut++ = Geom::Vec3f(float(vd[0]),float(vd[1]),float(vd[2]));
 //			Geom::Vec3f& vf = *typedOut++;
 //			vf[0]=vd[0];vf[1]=vd[1];vf[2]=vd[2];
 		}

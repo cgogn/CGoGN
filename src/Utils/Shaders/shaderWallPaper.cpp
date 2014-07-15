@@ -53,10 +53,10 @@ ShaderWallPaper::ShaderWallPaper():
 	m_vboPos->allocate(4);
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(m_vboPos->lockPtr());
 
-	ptrPos[0] = Geom::Vec3f(-1,-1, 0.9999999);
-	ptrPos[1] = Geom::Vec3f( 1,-1, 0.9999999);
-	ptrPos[2] = Geom::Vec3f( 1, 1, 0.9999999);
-	ptrPos[3] = Geom::Vec3f(-1, 1, 0.9999999);
+	ptrPos[0] = Geom::Vec3f(-1,-1, 0.9999999f);
+	ptrPos[1] = Geom::Vec3f( 1,-1, 0.9999999f);
+	ptrPos[2] = Geom::Vec3f( 1, 1, 0.9999999f);
+	ptrPos[3] = Geom::Vec3f(-1, 1, 0.9999999f);
 
 	m_vboPos->releasePtr();
 
