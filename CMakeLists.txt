@@ -21,7 +21,8 @@ ENDIF()
 # for shared or not shared
 SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
 
-IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp")
+#IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp")
+IF(EXISTS "${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}/*assimp*")
 	SET ( WITH_ASSIMP ON CACHE BOOL "build CGoGN with Assimp" )
 ELSE()
 	SET ( WITH_ASSIMP OFF CACHE BOOL "build CGoGN with Assimp" )
@@ -60,7 +61,7 @@ find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
 
 # MESSAGE HERE FOR MORE EASY USER READING
-MESSAGE("Building type = " ${CMAKE_BUILD_TYPE} " (for change -DCMAKE_BUILD_TYPE=Release|Debug)" )
+MESSAGE("Building type = " ${CMAKE_BUILD_TYPE} " (for change with cmake use -DCMAKE_BUILD_TYPE=Release|Debug)" )
 
 
 IF (DEFINED ASSERTON)

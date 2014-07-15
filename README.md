@@ -1,6 +1,6 @@
 English version bellow
 
-DÃ©pendences Linux
+Dépendences Linux
 =================
 installer les paquets suivants:  
 cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
@@ -9,17 +9,21 @@ cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev libxml2-dev
 Pour compiler CGoGN
 ===================
 
-* on compile tout d'abord les bibliothÃ¨ques third-party :
+* on compile tout d'abord les bibliothèques third-party :
 
+``` 
 cd CGoGN/ThirdParty/build  
 cmake ..  
 make (-j x si vous avez x cores)  
 make install  
+```
 
-La mÃªme chose en debug:  
+La même chose en debug:  
+```
 cd ../buildDebug  
 cmake ..  
 make (-j x si vous avez x cores)  
+```
 
 On peut fixer certaines option pour ne pas tout compiler:
 	* WITH_ASSIMP  -> compile et utilise la librairie Assimp
@@ -27,21 +31,25 @@ On peut fixer certaines option pour ne pas tout compiler:
 	* WITH_PYTHONQT	-> pour SCHNApps
 	
 * ensuite on compile CGoGN :  
+	```
 	cd CGoGN/build  
 	cmake ..  
 	make (-j x si vous avez x cores)  
+	```
 
 	Et en Debug avec:  
+	```
 	cd ../buildDebug  
 	cmake ..  
 	make (-j x si vous avez x cores)  
+	```
 
     Certaines options sont disponibles :
 
 	* BUILD_SHARED_LIBS  (F) experimental !  
 	* WITH_ASSIMP        (?)  
 	* WITH_ZINRI ->
-	* WITH_QT	 -> afin de limiter les dÃ©pendances et le temps de compilation  
+	* WITH_QT	 -> afin de limiter les dépendances et le temps de compilation  
 	* ONELIB	-> permet de forcer la compilation en une seule lib (libcgogn.a) au lieu de quatre.
 
 	* BUILD_SHARED_LIBS -Q experimental !
@@ -58,17 +66,21 @@ On peut fixer certaines option pour ne pas tout compiler:
 
 * on peut ensuite compiler SCHNApps ainsi que les plugins fournis :
 	
+	```
 	cd CGoGN/SCHNApps/build  
 	cmake ..  
 	make (-j x si vous avez x cores)  
+	```
 
 	Et en Debug avec:  
+	```
 	cd ../buildDebug  
 	cmake ..  
 	make (-j x si vous avez x cores)  
+	```
 
 
-Des exemples de donnÃ©es (fichiers trianbgz, off, etc..) sont accessible Ã  l'adresse suivante: 
+Des exemples de données (fichiers trianbgz, off, etc..) sont accessible à l'adresse suivante: 
 https://iggservis.u-strasbg.fr/Data/data.zip
 
 
@@ -84,15 +96,19 @@ To compile CGoGN
 ================
  * first compile third-party libraries:
 
+	```
 	cd CGoGN/ThirdParty/build  
 	cmake ..  
 	make (-j x if you have x cores)  
 	make install  
+	```
 
 	In debug mode:  
+	```
 	cd ../buildDebug  
 	cmake ..  
 	make  
+	```
 
 	Some options are available to not compile everything:
 	* WITH_ASSIMP  -> compile and use Assimp library 
@@ -101,14 +117,18 @@ To compile CGoGN
 
 * then compile CGoGN (the libs are generated in CGoGN/lib and some examples in CGoGN/bin):
 
+	```
 	cd CGoGN/build  
 	cmake ..  
 	make (-j x if you have x cores)  
+	```
 
 	in debug mode:  
+	```
 	cd ../buildDebug  
 	cmake ..  
 	make  
+	```
 
 	Some options are available:
 
@@ -121,14 +141,18 @@ To compile CGoGN
 
 * we can then compile SCHNApps and the provided plugins :
 	
+	```
 	cd CGoGN/SCHNApps/build  
 	cmake ..  
 	make (-j x if you have x cores)  
+	```
 
 	in debug mode:
+	```
 	cd ../buildDebug  
 	cmake ..  
 	make  
+	```
 
 Libraries are generated in lib/Release and lib/Debug
 Binaries are generated in bin/Release and bin/Debug
