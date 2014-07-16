@@ -68,8 +68,6 @@ public:
 
     Algo::Render::GL2::MapRender* m_render;
 
-	// converter for automatic conversion when updating VBOs
-	ConvertVec3dToVec3f converterDF;
     Utils::VBO* m_positionVBO;
 
     Utils::ShaderSimpleColor* m_shader;

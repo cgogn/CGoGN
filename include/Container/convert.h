@@ -29,11 +29,6 @@ protected:
 	unsigned int m_nb;
 
 	/**
-	 * size of element in input
-	 */
-	unsigned int m_szElt;
-
-	/**
 	 * buffer
 	 */
 	void* m_buffer;
@@ -42,9 +37,7 @@ public:
 	/**
 	 *
 	 */
-	ConvertBuffer() : m_size(0),m_nb(0),m_szElt(0),m_buffer(NULL) {}
-
-	ConvertBuffer(unsigned int sz) : m_size(0),m_nb(0),m_szElt(sz),m_buffer(NULL) {}
+	ConvertBuffer() : m_size(0),m_nb(0),m_buffer(NULL) {}
 
 	/**
 	 *
@@ -95,11 +88,8 @@ class ConvertToFloat : public ConvertBuffer
 {
 protected:
 	float* m_typedBuffer;
-	unsigned int m_szVect;
-
 public:
-	ConvertToFloat():
-		ConvertBuffer(sizeof(TYPE_IN)),m_szVect(1)
+	ConvertToFloat()
 	{}
 
 	~ConvertToFloat()
@@ -119,7 +109,7 @@ public:
 	
 	void reserve(unsigned int nb)
 	{
-		m_nb = nb*m_szVect;						// store number of elements
+		m_nb = nb;						// store number of elements
 		m_typedBuffer = new float[m_nb];	// allocate buffer
 		m_buffer = m_typedBuffer;			// store void* casted ptr
 		m_size = m_nb*sizeof(float);		// store size of buffer in bytes
@@ -137,12 +127,7 @@ public:
 
 	unsigned int vectorSize()
 	{
-		return m_szVect;
-	}
-
-	void setPseudoVectorSize(unsigned int sz)
-	{
-		m_szVect = sz;
+		return 1;
 	}
 };
 
@@ -159,8 +144,8 @@ protected:
 	TYPE_OUT* m_typedBuffer;
 	
 public:
-	ConvertNormalized():
-		ConvertBuffer(sizeof(TYPE_IN))
+	ConvertNormalized()/*:
+		ConvertBuffer(sizeof(TYPE_IN))*/
 	{}
 
 	~ConvertNormalized()
@@ -226,7 +211,11 @@ protected:
 	TYPE_IN m_diff;
 
 public:
-	ConvertToRGBf(TYPE_IN min, TYPE_IN max) : ConvertBuffer(sizeof(TYPE_IN)),m_min(min), m_diff(max-min) {}
+	ConvertToRGBf(TYPE_IN min, TYPE_IN max) :
+//		ConvertBuffer(sizeof(TYPE_IN)),
+		m_min(min),
+		m_diff(max-min),
+		m_typedBuffer(NULL) {}
 
 	~ConvertToRGBf()
 	{
@@ -306,24 +295,26 @@ public:
 
 	unsigned int vectorSize()
 	{
-		return 1;
+		return 3;
 	}
 };
 
 
-
-class ConvertVec3dToVec3f : public ConvertBuffer
+template< unsigned int D>
+class ConvertVecXdToVecXf : public ConvertBuffer
 {
 protected:
-	Geom::Vec3f* m_typedBuffer;
+	typedef Geom::Vector<D,float> VECF;
+	typedef Geom::Vector<D,double> VECD;
 
+	VECF* m_typedBuffer;
 public:
-	ConvertVec3dToVec3f():
-		ConvertBuffer(sizeof(Geom::Vec3d)),
+	ConvertVecXdToVecXf():
+
 		m_typedBuffer(NULL)
 	{}
 
-	~ConvertVec3dToVec3f()
+	~ConvertVecXdToVecXf()
 	{
 		if (m_typedBuffer)
 			delete[] m_typedBuffer;
@@ -341,32 +332,36 @@ public:
 	void reserve(unsigned int nb)
 	{
 		m_nb = nb;							// store number of elements
-		m_typedBuffer = new Geom::Vec3f[nb];	// allocate buffer typed (not possible to delete void*)
+		m_typedBuffer = new VECF[nb];	// allocate buffer typed (not possible to delete void*)
 		m_buffer = m_typedBuffer;			// store void* casted ptr
-		m_size = nb*sizeof(Geom::Vec3f);		// store size of buffer in bytes
+		m_size = nb*sizeof(VECF);		// store size of buffer in bytes
 	}
 
 	void convert(const void* ptrIn)
 	{
 		// cast ptr in & out with right type
-		const Geom::Vec3d* typedIn = reinterpret_cast<const Geom::Vec3d*>(ptrIn);
-		Geom::Vec3f* typedOut = m_typedBuffer;
+		const VECD* typedIn = reinterpret_cast<const VECD*>(ptrIn);
+		VECF* typedOut = m_typedBuffer;
 		// compute conversion
 		for (unsigned int i = 0; i < m_nb; ++i)
 		{
-			const Geom::Vec3d& vd = *typedIn++;
-			*typedOut++ = Geom::Vec3f(float(vd[0]),float(vd[1]),float(vd[2]));
+			const VECD& vd = *typedIn++;
+			for (unsigned int j=0; j<D; ++j)
+				(*typedOut)[j] = float(vd[j]);
+			typedOut++;
 		}
 
 	}
 
 	unsigned int vectorSize()
 	{
-		return 3;
+		return D;
 	}
 };
 
-
+typedef ConvertVecXdToVecXf<2> ConvertVec2dToVec2f;
+typedef ConvertVecXdToVecXf<3> ConvertVec3dToVec3f;
+typedef ConvertVecXdToVecXf<4> ConvertVec4dToVec4f;
 
 typedef ConvertToFloat<double> ConvertDoubleToFloat;
 

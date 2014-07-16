@@ -30,7 +30,7 @@ using namespace CGoGN ;
 void MyQT::cb_initGL()
 {
 	position = myMap.addAttribute<PFP::VEC3, VERTEX, MAP>("position");
-	Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
+	Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,50,50);
 	c.embedIntoCylinder(position,0.5,0.7,1.0);
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
@@ -43,7 +43,7 @@ void MyQT::cb_initGL()
 	m_render = new Algo::Render::GL2::MapRender();
 
 	// create VBO for position
-	m_positionVBO = new Utils::VBO(&converterDF);
+	m_positionVBO = new Utils::VBO();
 	m_positionVBO->updateData(position);
 
 	m_shader = new Utils::ShaderSimpleColor();
