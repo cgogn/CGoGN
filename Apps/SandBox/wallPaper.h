@@ -46,7 +46,7 @@
 using namespace CGoGN ;
 
 
-struct PFP: public PFP_STANDARD
+struct PFP: public PFP_DOUBLE
 {
 	// definition of the map
 	typedef EmbeddedMap2 MAP ;
@@ -67,7 +67,11 @@ public:
 	VertexAttribute<VEC3, MAP> position ;
 
     Algo::Render::GL2::MapRender* m_render;
+
+	// converter for automatic conversion when updating VBOs
+	ConvertVec3dToVec3f converterDF;
     Utils::VBO* m_positionVBO;
+
     Utils::ShaderSimpleColor* m_shader;
 
 	// FOR WALL PAPER

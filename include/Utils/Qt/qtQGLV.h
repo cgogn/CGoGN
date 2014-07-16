@@ -193,12 +193,35 @@ public:
 	/**
 	 * set width and pos center of object to draw
 	 */
-	void setParamObject(float width, float* pos) { m_qglWidget->setParamObject(width, pos); }
+	template<typename T>
+	inline void setParamObject(T width, T* pos)
+	{
+		float posF[3];
+		posF[0]=float(pos[0]);
+		posF[1]=float(pos[1]);
+		posF[2]=float(pos[2]);
+		m_qglWidget->setParamObject(float(width), posF);
+	}
+
 
 	/**
 	 * set BB min & max corner of object to draw
 	 */
-	void setObjectBB(float* bbmin, float* bbmax) { m_qglWidget->setObjectBB(bbmin, bbmax); }
+	inline void setObjectBB(float* bbmin, float* bbmax) { m_qglWidget->setObjectBB(bbmin, bbmax); }
+
+	template <typename T>
+	void setObjectBB(T* bbmin, T* bbmax)
+	{
+		float bbminF[3];
+		bbminF[0]=float(bbmin[0]);
+		bbminF[1]=float(bbmin[1]);
+		bbminF[2]=float(bbmin[2]);
+		float bbmaxF[3];
+		bbmaxF[0]=float(bbmax[0]);
+		bbmaxF[1]=float(bbmax[1]);
+		bbmaxF[2]=float(bbmax[2]);
+		m_qglWidget->setObjectBB(bbminF, bbmaxF);
+	}
 
 	/**
 	 * @brief get pointer on QGLViewer widget for direct access

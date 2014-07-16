@@ -43,7 +43,7 @@ void MyQT::cb_initGL()
 	m_render = new Algo::Render::GL2::MapRender();
 
 	// create VBO for position
-	m_positionVBO = new Utils::VBO();
+	m_positionVBO = new Utils::VBO(&converterDF);
 	m_positionVBO->updateData(position);
 
 	m_shader = new Utils::ShaderSimpleColor();

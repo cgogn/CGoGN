@@ -319,7 +319,8 @@ protected:
 
 public:
 	ConvertVec3dToVec3f():
-		ConvertBuffer(sizeof(Geom::Vec3d))
+		ConvertBuffer(sizeof(Geom::Vec3d)),
+		m_typedBuffer(NULL)
 	{}
 
 	~ConvertVec3dToVec3f()
@@ -349,15 +350,14 @@ public:
 	{
 		// cast ptr in & out with right type
 		const Geom::Vec3d* typedIn = reinterpret_cast<const Geom::Vec3d*>(ptrIn);
-		Geom::Vec3f* typedOut = reinterpret_cast<Geom::Vec3f*>(m_buffer);
+		Geom::Vec3f* typedOut = m_typedBuffer;
 		// compute conversion
 		for (unsigned int i = 0; i < m_nb; ++i)
 		{
 			const Geom::Vec3d& vd = *typedIn++;
 			*typedOut++ = Geom::Vec3f(float(vd[0]),float(vd[1]),float(vd[2]));
-//			Geom::Vec3f& vf = *typedOut++;
-//			vf[0]=vd[0];vf[1]=vd[1];vf[2]=vd[2];
 		}
+
 	}
 
 	unsigned int vectorSize()
