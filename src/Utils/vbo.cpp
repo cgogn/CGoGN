@@ -193,7 +193,6 @@ void VBO::updateData_withConversion(const AttributeMultiVectorGen* attrib, Conve
 
 	// libere la memoire de la conversion
 	conv->release();
-
 }
 
 void* VBO::lockPtr()
@@ -241,6 +240,7 @@ void VBO::allocate(unsigned int nbElts)
 	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	glBufferData(GL_ARRAY_BUFFER, nbElts * m_data_size * sizeof(float), 0, GL_STREAM_DRAW);
 }
+
 
 } // namespace Utils
 

@@ -147,6 +147,9 @@ public:
 
 	void updateData(const AttributeMultiVectorGen* attrib);
 
+//	template <typename T_IN, typename T_OUT, unsigned int VS, typename CONVFUNC>
+//	void updateData_withLambdaConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv);
+
 	/**
 	 * set the converter that convert buffer to float *
 	 */
@@ -168,7 +171,61 @@ public:
 	void copyData(void *ptr) const;
 
 	void allocate(unsigned int nbElts);
+
+
+	template <typename T_IN, typename T_OUT, unsigned int VS, typename CONVFUNC>
+	void updateData_withLambdaConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv)
+	{
+		const AttributeMultiVectorGen* attrib = attribHG.getDataVectorGen();
+
+		m_name = attrib->getName();
+		m_typeName = attrib->getTypeName();
+		m_data_size = VS;
+
+		// alloue la memoire pour le buffer et initialise le conv
+		T_OUT* typedBuffer = new T_OUT[_BLOCKSIZE_];
+
+		std::vector<void*> addr;
+		unsigned int byteTableSize;
+		unsigned int nbb = attrib->getBlocksPointers(addr, byteTableSize);
+
+		m_nbElts = nbb * _BLOCKSIZE_/(VS*sizeof(T_OUT));
+
+		// bind buffer to update
+		glBindBuffer(GL_ARRAY_BUFFER, *m_id);
+		glBufferData(GL_ARRAY_BUFFER, nbb * _BLOCKSIZE_, 0, GL_STREAM_DRAW);
+
+		unsigned int offset = 0;
+		unsigned int szb = _BLOCKSIZE_*sizeof(T_OUT);
+
+		for (unsigned int i = 0; i < nbb; ++i)
+		{
+			// convertit les donnees dans le buffer de conv
+			const T_IN* typedIn = reinterpret_cast<const T_IN*>(addr[i]);
+			T_OUT* typedOut = typedBuffer;
+			// compute conversion
+			for (unsigned int i = 0; i < _BLOCKSIZE_; ++i)
+			{
+//				*typedOut++ = conv(*typedIn++);
+				std::cout << *typedIn << " -> " ;
+				*typedOut = conv(*typedIn++);
+				std::cout << *typedOut++ << std::endl;
+			}
+
+			// update sub-vbo
+			glBufferSubDataARB(GL_ARRAY_BUFFER, offset, szb, typedBuffer);
+			// block suivant
+			offset += szb;
+		}
+
+		// libere la memoire de la conversion
+		delete[] typedBuffer;
+	}
+
+
 };
+
+
 
 } // namespace Utils
 
