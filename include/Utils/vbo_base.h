@@ -74,7 +74,7 @@ protected:
 	/**
 	 * update data from AttributeMultiVectorGen to the vbo, with conversion
 	 */
-	void updateData_withConversion(const AttributeMultiVectorGen* attrib, ConvertBuffer* conv);
+	void updateData_withInternalConversion(const AttributeMultiVectorGen* attrib, ConvertBuffer* conv);
 
 public:
 	/**
@@ -147,9 +147,6 @@ public:
 
 	void updateData(const AttributeMultiVectorGen* attrib);
 
-//	template <typename T_IN, typename T_OUT, unsigned int VS, typename CONVFUNC>
-//	void updateData_withLambdaConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv);
-
 	/**
 	 * set the converter that convert buffer to float *
 	 */
@@ -172,15 +169,24 @@ public:
 
 	void allocate(unsigned int nbElts);
 
-
-	template <typename T_IN, typename T_OUT, unsigned int VS, typename CONVFUNC>
-	void updateData_withLambdaConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv)
+	/**
+	 * update the VBO from Attribute Handler with on the fly conversion
+	 * template paramters:
+	 * T_IN input type  attribute handler
+	 * NB_COMPONENTS 3 for vbo of pos/normal, 2 for texture etc..
+	 * @param attribHG the attribute handler source
+	 * @param conv lambda function that take a const T_IN& and return a Vector<NB_COMPONENTS,float>
+	 */
+	template <typename T_IN, unsigned int NB_COMPONENTS, typename CONVFUNC>
+	void updateDataConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv)
 	{
+		typedef Geom::Vector<NB_COMPONENTS,float> T_OUT;
+
 		const AttributeMultiVectorGen* attrib = attribHG.getDataVectorGen();
 
 		m_name = attrib->getName();
 		m_typeName = attrib->getTypeName();
-		m_data_size = VS;
+		m_data_size = NB_COMPONENTS;
 
 		// alloue la memoire pour le buffer et initialise le conv
 		T_OUT* typedBuffer = new T_OUT[_BLOCKSIZE_];
@@ -189,14 +195,14 @@ public:
 		unsigned int byteTableSize;
 		unsigned int nbb = attrib->getBlocksPointers(addr, byteTableSize);
 
-		m_nbElts = nbb * _BLOCKSIZE_/(VS*sizeof(T_OUT));
-
-		// bind buffer to update
-		glBindBuffer(GL_ARRAY_BUFFER, *m_id);
-		glBufferData(GL_ARRAY_BUFFER, nbb * _BLOCKSIZE_, 0, GL_STREAM_DRAW);
+		m_nbElts = nbb * _BLOCKSIZE_/(sizeof(T_OUT));
 
 		unsigned int offset = 0;
 		unsigned int szb = _BLOCKSIZE_*sizeof(T_OUT);
+
+		// bind buffer to update
+		glBindBuffer(GL_ARRAY_BUFFER, *m_id);
+		glBufferData(GL_ARRAY_BUFFER, nbb * szb, 0, GL_STREAM_DRAW);
 
 		for (unsigned int i = 0; i < nbb; ++i)
 		{
@@ -204,22 +210,18 @@ public:
 			const T_IN* typedIn = reinterpret_cast<const T_IN*>(addr[i]);
 			T_OUT* typedOut = typedBuffer;
 			// compute conversion
-			for (unsigned int i = 0; i < _BLOCKSIZE_; ++i)
-			{
-//				*typedOut++ = conv(*typedIn++);
-				std::cout << *typedIn << " -> " ;
-				*typedOut = conv(*typedIn++);
-				std::cout << *typedOut++ << std::endl;
-			}
+			for (unsigned int j = 0; j < _BLOCKSIZE_; ++j)
+				*typedOut++ = conv(*typedIn++);
 
 			// update sub-vbo
-			glBufferSubDataARB(GL_ARRAY_BUFFER, offset, szb, typedBuffer);
+			glBufferSubDataARB(GL_ARRAY_BUFFER, offset, szb, reinterpret_cast<void*>(typedBuffer));
 			// block suivant
 			offset += szb;
 		}
 
 		// libere la memoire de la conversion
 		delete[] typedBuffer;
+
 	}
 
 

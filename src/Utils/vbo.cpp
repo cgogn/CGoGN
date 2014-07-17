@@ -49,7 +49,7 @@ VBO::VBO(const VBO& vbo) :
 	m_data_size(vbo.m_data_size),
 	m_nbElts(vbo.m_nbElts),
 	m_lock(false),
-	m_conv(NULL)
+	m_conv(vbo.m_conv)
 {
 	unsigned int nbbytes =  sizeof(float) * m_data_size * m_nbElts;
 
@@ -97,7 +97,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 
 	if (m_conv != NULL)
 	{
-		updateData_withConversion(attrib, m_conv);
+		updateData_withInternalConversion(attrib, m_conv);
 		return;
 	}
 
@@ -105,7 +105,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 	if (amv3 != NULL)
 	{
 		ConvertVec3dToVec3f conv;
-		updateData_withConversion(attrib,&conv);
+		updateData_withInternalConversion(attrib,&conv);
 		return;
 	}
 
@@ -113,7 +113,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 	if (amv2 != NULL)
 	{
 		ConvertVec2dToVec2f conv;
-		updateData_withConversion(attrib,&conv);
+		updateData_withInternalConversion(attrib,&conv);
 		return;
 	}
 
@@ -121,7 +121,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 	if (amv4 != NULL)
 	{
 		ConvertVec4dToVec4f conv;
-		updateData_withConversion(attrib,&conv);
+		updateData_withInternalConversion(attrib,&conv);
 		return;
 	}
 
@@ -129,7 +129,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 	if (amv1 != NULL)
 	{
 		ConvertDoubleToFloat conv;
-		updateData_withConversion(attrib,&conv);
+		updateData_withInternalConversion(attrib,&conv);
 		return;
 	}
 
@@ -159,7 +159,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 }
 
 
-void VBO::updateData_withConversion(const AttributeMultiVectorGen* attrib, ConvertBuffer* conv)
+void VBO::updateData_withInternalConversion(const AttributeMultiVectorGen* attrib, ConvertBuffer* conv)
 {
 
 	m_name = attrib->getName();

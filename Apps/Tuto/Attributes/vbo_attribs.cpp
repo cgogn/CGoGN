@@ -69,19 +69,14 @@ void MyQT::createMap()
 	colorF[PHI_1(d2)] = Geom::Vec3f(0.0f,1.0f,1.0f);
 
 	// create another attribute on vertices (for edges drawing)
-	VertexAttribute<VEC3, MAP> colorE = myMap.addAttribute<PFP::VEC3, VERTEX, MAP>("colorE");
+	VertexAttribute<int, MAP> colorE = myMap.addAttribute<int, VERTEX, MAP>("colorE");
 
-	colorE[d1] = Geom::Vec3f(0.0f,0.5f,0.5f);
-	colorE[PHI1(d1)] = Geom::Vec3f(0.5f,0.0f,0.5f);
-	colorE[PHI_1(d1)] = Geom::Vec3f(0.5f,0.5f,0.0f);
-	colorE[PHI<11>(d2)] = Geom::Vec3f(0.0f,0.5f,0.0f);
-	colorE[PHI_1(d2)] = Geom::Vec3f(0.5f,0.0f,0.0f);
+	colorE[d1] = 0;
+	colorE[PHI1(d1)] = 255;
+	colorE[PHI_1(d1)] = 64;
+	colorE[PHI<11>(d2)] = 127;
+	colorE[PHI_1(d2)] = 192;
 
-	// example of attribute on face
-	// here for example we store the number of edges of faces at construction
-	FaceAttribute<int, MAP> side = myMap.addAttribute<int, FACE, MAP>("nb_sides");
-	side[d1] = 3;
-	side[d2] = 4;
 
     //  bounding box of scene
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
@@ -94,20 +89,27 @@ void MyQT::createMap()
 	// first show for be sure that GL context is binded
 	show();
 
-	// update of position VBO (context GL necessary)
-	m_positionVBO->updateData(position);
-//	m_colorVBO1->updateData(colorF);
-	m_colorVBO2->updateData(colorE);
 
-	m_colorVBO1->updateData_withLambdaConversion<PFP::VEC3,Geom::Vec3f,3>(colorF, [](const PFP::VEC3& x)
+	// HERE VBO conversion on the fly
+
+	// update of position VBO  with on the fly conversion from double to float (automatic)
+	m_positionVBO->updateData(position);
+
+	// update color edge with on the fly computation of RGB from int
+	m_colorVBO1->updateDataConversion<int,3>(colorE, [](const float& x)
 	{
-		return Geom::Vec3f(float(1.0-x[0]),float(1.0-x[1]),float(1.0-x[2]));
+		return Geom::Vec3f(float(x)/255.0f,float(255-x)/255.0f,1.0f);
 	});
 
-//	m_colorVBO2->updateData_withLambdaConversion<PFP::VEC3,Geom::Vec3f,3>(colorE, [](const PFP::VEC3& x)
-//	{
-//		return Geom::Vec3f(float(1.0-x[0]),float(1.0-x[1]),float(1.0-x[2]));
-//	});
+	// update color face with on the fly inversion of RGB
+	m_colorVBO2->updateDataConversion<PFP::VEC3,3>(colorF, [](const PFP::VEC3& c)
+	{
+		return Geom::Vec3f(float(1.0-c[0]),float(1.0-c[1]),float(1.0-c[2]));
+	});
+
+
+
+
 
 	// construct rendering primities
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
@@ -140,7 +142,6 @@ void MyQT::cb_initGL()
 
 	m_shader2 = new Utils::ShaderColorPerVertex();
 	m_shader2->setAttributePosition(m_positionVBO);
-//	m_shader2->setAttributeColor(m_colorVBO1);
 	// each shader must be registred to allow Qt interface to update matrices uniforms
 	registerShader(m_shader2);
 }
@@ -151,7 +152,6 @@ void MyQT::cb_redraw()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 
-	// draw yellow points
 	glLineWidth(2.0f);
 	m_shader2->setAttributeColor(m_colorVBO1);
 	m_render->draw(m_shader2, Algo::Render::GL2::LINES);
