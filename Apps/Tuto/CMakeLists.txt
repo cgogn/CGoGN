@@ -20,6 +20,11 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #	link_directories(${CGoGN_ROOT_DIR}/lib/Release ${CGoGN_ROOT_DIR}/lib/Debug)
 #ENDIF(WIN32)
 
+add_subdirectory(Boundary)
+add_subdirectory(Modelling)
+add_subdirectory(Markers)
+add_subdirectory(Traversals)
+add_subdirectory(Attributes)
 
 #define exec to compile
 IF (WITH_QT)
