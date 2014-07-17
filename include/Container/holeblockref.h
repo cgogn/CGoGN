@@ -189,6 +189,8 @@ public:
 	void saveBin(CGoGNostream& fs);
 
 	bool loadBin(CGoGNistream& fs);
+
+	unsigned int* getTableFree(unsigned int & nb) {nb =m_nbfree; return m_tableFree;}
 };
 
 } // namespace CGoGN

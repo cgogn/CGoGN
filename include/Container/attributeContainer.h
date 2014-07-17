@@ -146,6 +146,8 @@ public:
 
 	void setContainerBrowser(ContainerBrowser* bro) { m_currentBrowser = bro;}
 
+	bool hasBrowser() { return m_currentBrowser != NULL; }
+
 	/**************************************
 	 *          BASIC FEATURES            *
 	 **************************************/

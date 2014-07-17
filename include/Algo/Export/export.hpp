@@ -46,7 +46,6 @@ template <typename PFP>
 bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename, bool binary)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
 	
 	// open file
 	std::ofstream out ;
@@ -989,7 +988,6 @@ template <typename PFP>
 bool exportChoupi(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
 
 	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())

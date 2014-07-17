@@ -76,9 +76,11 @@ Vector<DIM,T> isobarycenter(const Vector<DIM,T>& v1, const Vector<DIM,T>& v2, co
 template <typename VEC>
 typename VEC::DATA_TYPE cos_angle(const VEC& a, const VEC& b)
 {
-	typename VEC::DATA_TYPE na2 = a.norm2() ;
-	typename VEC::DATA_TYPE nb2 = b.norm2() ;
-	return (a * b) / sqrt(na2 * nb2) ;
+    typename VEC::DATA_TYPE na2 = a.norm2() ;
+    typename VEC::DATA_TYPE nb2 = b.norm2() ;
+
+    typename VEC::DATA_TYPE res = (a * b) / sqrt(na2 * nb2) ;
+    return res > 1.0 ? 1.0 : (res < -1.0 ? -1.0 : res) ;
 }
 
 // angle formed by 2 vectors

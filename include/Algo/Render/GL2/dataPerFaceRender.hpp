@@ -50,7 +50,7 @@ m_nbTris(0)
 template<typename PFP, unsigned int ORBIT, typename T>
 void
 DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<T,ORBIT>& dataPerXXX)
+        const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, const AttributeHandler<T,ORBIT, typename PFP::MAP>& dataPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;

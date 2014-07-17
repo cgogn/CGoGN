@@ -206,9 +206,9 @@ template <typename MAP_IMPL>
 template <typename T, unsigned int ORBIT, typename MAP>
 inline AttributeHandler<T ,ORBIT, MAP> MapCommon<MAP_IMPL>::checkAttribute(const std::string& nameAttr)
 {
-	AttributeHandler<T, ORBIT, MAP> att = this->getAttribute<T,ORBIT>(nameAttr);
+    AttributeHandler<T, ORBIT, MAP> att = this->getAttribute<T,ORBIT,MAP>(nameAttr);
 	if (!att.isValid())
-		att = this->addAttribute<T, ORBIT>(nameAttr);
+        att = this->addAttribute<T, ORBIT, MAP>(nameAttr);
 	return att;
 }
 

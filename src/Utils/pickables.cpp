@@ -422,14 +422,14 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 
 	for (unsigned int i=0; i<parAll; ++i)
 	{
-		float beta = float(i+1)*M_PI/float(parAll+1);
+		float beta = float(i+1)*float(M_PI)/float(parAll+1);
 		float z = -cos(beta);
 
 		float radius = sin(beta);
 
 		for (unsigned int j=0; j<merAll; ++j)
 		{
-			float alpha = 2.0f*float(j)*M_PI/float(merAll);
+			float alpha = 2.0f*float(j)*float(M_PI) / float(merAll);
 			float x = radius*cos(alpha);
 			float y = radius*sin(alpha);
 			points.push_back(Geom::Vec3f(x,y,z));
@@ -555,7 +555,7 @@ void Cone::changeTopo(unsigned int par, unsigned int mer)
 
 		for (unsigned int j=0; j<merAll; ++j)
 		{
-			float alpha = 2.0f*float(j)*M_PI/float(merAll);
+			float alpha = 2.0f*float(j)*float(M_PI) / float(merAll);
 			float x = radius*cos(alpha);
 			float y = radius*sin(alpha);
 			points.push_back(Geom::Vec3f(x,y,z));
@@ -689,7 +689,7 @@ void Cylinder::changeTopo(unsigned int parp, unsigned int mer)
 
 		for (unsigned int j=0; j<merAll; ++j)
 		{
-			float alpha = 2.0f*float(j)*M_PI/float(merAll);
+			float alpha = 2.0f*float(j)*float(M_PI) / float(merAll);
 			float x = cos(alpha);
 			float y = sin(alpha);
 			points.push_back(Geom::Vec3f(x,y,z));

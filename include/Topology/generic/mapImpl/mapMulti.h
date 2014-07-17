@@ -30,6 +30,8 @@
 namespace CGoGN
 {
 
+class MapMono;
+
 class MapMulti : public GenericMap
 {
 	template<typename MAP> friend class DartMarkerTmpl ;
@@ -301,7 +303,11 @@ public:
 
 	bool copyFrom(const GenericMap& map);
 
+	bool copyFromOtherType(const MapMono& map);
+
 	void restore_topo_shortcuts();
+
+	virtual void dumpCSV() const;
 } ;
 
 } //namespace CGoGN

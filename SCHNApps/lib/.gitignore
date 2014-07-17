@@ -1,0 +1,3 @@
+# ignoring Debug and Release directory of generated libraries
+Debug
+Release

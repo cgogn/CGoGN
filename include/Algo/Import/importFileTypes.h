@@ -48,15 +48,6 @@ namespace Import
 		if ((filename.rfind(".meshbin")!=std::string::npos) || (filename.rfind(".MESHBIN")!=std::string::npos))
 			return MESHBIN;
 
-	/*	if ((filename.rfind(".plyptm")!=std::string::npos) || (filename.rfind(".PLYGEN")!=std::string::npos))
-			return PLYPTM;
-	*/
-		if ((filename.rfind(".plyPTMextBin")!=std::string::npos) || (filename.rfind(".plySHrealBin")!=std::string::npos))
-			return PLYSLFgenericBin;
-
-		if ((filename.rfind(".plyPTMext")!=std::string::npos) || (filename.rfind(".plySHreal")!=std::string::npos))
-			return PLYSLFgeneric;
-
 		if ((filename.rfind(".ply")!=std::string::npos) || (filename.rfind(".PLY")!=std::string::npos))
 			return PLY;
 

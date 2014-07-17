@@ -28,6 +28,8 @@
 #include "Container/fakeAttribute.h"
 #include "Geometry/basic.h"
 
+#include "Topology/generic/traversor/traversor2.h"
+
 /*****************************************
  * Class hierarchy :
  * Collector (virtual)

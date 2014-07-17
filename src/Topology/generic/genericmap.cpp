@@ -55,6 +55,7 @@ std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
 
 
 GenericMap::GenericMap():
+	m_manipulator(NULL),
 	m_nextMarkerId(0)
 {
 	if(m_attributes_registry_map == NULL)
@@ -165,6 +166,36 @@ GenericMap::~GenericMap()
 	*it = s_instances->back();
 	s_instances->pop_back();
 }
+
+bool GenericMap::askManipulate(MapManipulator* ptr)
+{
+	if (m_manipulator == NULL)
+	{
+		CGoGNerr << "Map already manipulated by other manipulator" << CGoGNendl;
+		return false;
+	}
+
+	m_manipulator = ptr;
+	return true;
+}
+
+MapManipulator* GenericMap::getManipulator()
+{
+	return m_manipulator;
+}
+
+bool GenericMap::releaseManipulate(MapManipulator* ptr)
+{
+	if (m_manipulator != ptr)
+	{
+		CGoGNerr << "Wrong manipulator want to release the map" << CGoGNendl;
+		return false;
+	}
+
+	m_manipulator = NULL;
+	return true;
+}
+
 
 void GenericMap::init(bool addBoundaryMarkers)
 {
@@ -450,11 +481,56 @@ void GenericMap::compact(bool topoOnly)
 	}
 }
 
+void GenericMap::compactOrbitContainer(unsigned int orbit, float frag)
+{
+	std::vector<unsigned int> oldnew;
+
+	if (isOrbitEmbedded(orbit) && (fragmentation(orbit)< frag))
+	{
+		m_attribs[orbit].compact(oldnew);
+		for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+		{
+			unsigned int& idx = m_embeddings[orbit]->operator[](i);
+			unsigned int jdx = oldnew[idx];
+			if (jdx != 0xffffffff)
+				idx = jdx;
+		}
+	}
+}
+
+
+void GenericMap::compactIfNeeded(float frag, bool topoOnly)
+{
+	if (fragmentation(DART)< frag)
+		compactTopo();
+
+	if (topoOnly)
+		return;
+
+	std::vector<unsigned int> oldnew;
+
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		if ((orbit != DART) && (isOrbitEmbedded(orbit)) && (fragmentation(orbit)< frag))
+		{
+			m_attribs[orbit].compact(oldnew);
+			for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+			{
+				unsigned int& idx = m_embeddings[orbit]->operator[](i);
+				unsigned int jdx = oldnew[idx];
+				if (jdx != 0xffffffff)
+					idx = jdx;
+			}
+		}
+	}
+}
+
 
 void GenericMap::dumpCSV() const
 {
 	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
+		CGoGNout << "Container of "<<orbitName(orbit)<< CGoGNendl;
 		m_attribs[orbit].dumpCSV();
 	}
 	CGoGNout << CGoGNendl;

@@ -582,8 +582,8 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 					// take care of edge embedding
 					if(map.template isOrbitEmbedded<EDGE>())
 					{
-						map.template setOrbitEmbedding<EDGE>(nf, map.template getEmbedding<EDGE>(e));
-						map.template setOrbitEmbedding<EDGE>(map.template phi<11>(nf), map.template getEmbedding<EDGE>(e2));
+						Algo::Topo::setOrbitEmbedding<VERTEX>(map, nf, map.template getEmbedding<EDGE>(e));
+						Algo::Topo::setOrbitEmbedding<VERTEX>(map, map.template phi<11>(nf), map.template getEmbedding<EDGE>(e2));
 					}
 
 					dm.markOrbit<FACE>(nf);
@@ -608,7 +608,8 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 				Dart d = df;
 				do
 				{
-					map.template setOrbitEmbedding<EDGE>(d,map.template getEmbedding<EDGE>(map.phi2(d)));
+//					map.template setOrbitEmbedding<EDGE>(d,map.template getEmbedding<EDGE>(map.phi2(d)));
+					Algo::Topo::setOrbitEmbedding<VERTEX>(map, d, map.template getEmbedding<EDGE>(map.phi2(d)));
 					d = map.phi1(d);
 				} while (d != df);
 			}
@@ -646,7 +647,8 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 					P+= c2*buffer[j];
 				}
 			}
-			map.template setOrbitEmbeddingOnNewCell<VERTEX>(e);
+//			map.template setOrbitEmbeddingOnNewCell<VERTEX>(e);
+			Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(map,e);
 			position[e] = P;
 			e = map.phi1(e);
 		}
@@ -730,9 +732,9 @@ void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typ
 	typedef typename PFP::VEC3 VEC3 ;
 
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE,MAP>("position") ;
 	if(!positionF.isValid())
-		positionF = map.template addAttribute<VEC3, FACE>("position") ;
+		positionF = map.template addAttribute<VEC3, FACE,MAP>("position") ;
 
 	// Compute Centroid for the faces
 	Algo::Surface::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
@@ -752,9 +754,9 @@ void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typen
 	typedef typename PFP::REAL REAL ;
 
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE,MAP>("position") ;
 	if(!positionF.isValid())
-		positionF = map.template addAttribute<VEC3, FACE>("position") ;
+		positionF = map.template addAttribute<VEC3, FACE,MAP>("position") ;
 
 	//Triangule boundary faces & compute for each new face the centroid
 	std::vector<Dart> boundsDart;
@@ -823,9 +825,9 @@ void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, Ver
 	typedef typename PFP::REAL REAL ;
 
 	// Face Attribute -> after dual new Vertex Attribute
-	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE>("position") ;
+	FaceAttribute<VEC3, MAP> positionF  = map.template getAttribute<VEC3, FACE,MAP>("position") ;
 	if(!positionF.isValid())
-		positionF = map.template addAttribute<VEC3, FACE>("position") ;
+		positionF = map.template addAttribute<VEC3, FACE,MAP>("position") ;
 
 	//Triangule boundary faces & compute for each new face the centroid
 	std::vector<Dart> boundsDart;

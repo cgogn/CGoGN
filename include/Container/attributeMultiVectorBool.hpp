@@ -186,6 +186,41 @@ public:
 		//memset(m_tableData[i],0,_BLOCKSIZE_/8);
 	}
 
+	inline void allTrue()
+	{
+		for (unsigned int i = 0; i < m_tableData.size(); ++i)
+		{
+			unsigned int *ptr =m_tableData[i];
+			for (unsigned int j=0; j<_BLOCKSIZE_/32;++j)
+				*ptr++ = 0xffffffff;
+		}
+		//memset(m_tableData[i],0,_BLOCKSIZE_/8);
+	}
+
+	inline bool isAllFalse()
+	{
+		for (unsigned int i = 0; i < m_tableData.size(); ++i)
+		{
+			unsigned int *ptr =m_tableData[i];
+			for (unsigned int j=0; j<_BLOCKSIZE_/32;++j)
+				if (*ptr++ != 0)
+					return false;
+		}
+		return true;
+	}
+
+	inline bool isAllTrue()
+	{
+		for (unsigned int i = 0; i < m_tableData.size(); ++i)
+		{
+			unsigned int *ptr =m_tableData[i];
+			for (unsigned int j=0; j<_BLOCKSIZE_/32;++j)
+				if (*ptr++ != 0xffffffff)
+					return false;
+		}
+		return true;
+	}
+
 	/**************************************
 	 *             DATA ACCESS            *
 	 **************************************/

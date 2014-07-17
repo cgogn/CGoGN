@@ -101,6 +101,39 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 		return;
 	}
 
+	const AttributeMultiVector<Geom::Vec3d>* amv3 = dynamic_cast<const AttributeMultiVector<Geom::Vec3d>*>(attrib);
+	if (amv3 != NULL)
+	{
+		ConvertVec3dToVec3f conv;
+		updateData_withConversion(attrib,&conv);
+		return;
+	}
+
+	const AttributeMultiVector<Geom::Vec2d>* amv2 = dynamic_cast<const AttributeMultiVector<Geom::Vec2d>*>(attrib);
+	if (amv2 != NULL)
+	{
+		ConvertVec2dToVec2f conv;
+		updateData_withConversion(attrib,&conv);
+		return;
+	}
+
+	const AttributeMultiVector<Geom::Vec4d>* amv4 = dynamic_cast<const AttributeMultiVector<Geom::Vec4d>*>(attrib);
+	if (amv4 != NULL)
+	{
+		ConvertVec4dToVec4f conv;
+		updateData_withConversion(attrib,&conv);
+		return;
+	}
+
+	const AttributeMultiVector<double>* amv1 = dynamic_cast<const AttributeMultiVector<double>*>(attrib);
+	if (amv1 != NULL)
+	{
+		ConvertDoubleToFloat conv;
+		updateData_withConversion(attrib,&conv);
+		return;
+	}
+
+
 	m_name = attrib->getName();
 	m_typeName = attrib->getTypeName();
 
@@ -131,8 +164,6 @@ void VBO::updateData_withConversion(const AttributeMultiVectorGen* attrib, Conve
 
 	m_name = attrib->getName();
 	m_typeName = attrib->getTypeName();
-
-//	m_data_size = attrib->getSizeOfType() / conv->sizeElt();
 	m_data_size = conv->vectorSize();
 
 	// alloue la memoire pour le buffer et initialise le conv
@@ -142,7 +173,7 @@ void VBO::updateData_withConversion(const AttributeMultiVectorGen* attrib, Conve
 	unsigned int byteTableSize;
 	unsigned int nbb = attrib->getBlocksPointers(addr, byteTableSize);
 
-	m_nbElts = nbb * attrib->getBlockSize()*m_data_size;
+	m_nbElts = nbb * attrib->getBlockSize()/(m_data_size*sizeof(float));
 
 	// bind buffer to update
 	glBindBuffer(GL_ARRAY_BUFFER, *m_id);

@@ -204,7 +204,7 @@ void GMap2<MAP_IMPL>::deleteFace(Dart d)
 template <typename MAP_IMPL>
 void GMap2<MAP_IMPL>::deleteCC(Dart d)
 {
-	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this);
+	DartMarkerNoUnmark<MAP_IMPL> mark(*this);
 
 	std::vector<Dart> visited;
 	visited.reserve(1024) ;
@@ -234,7 +234,10 @@ void GMap2<MAP_IMPL>::deleteCC(Dart d)
 	}
 
 	for(std::vector<Dart>::iterator it = visited.begin(); it != visited.end(); ++it)
+	{
+		mark.unmark(*it);
 		this->deleteDart(*it) ;
+	}
 }
 
 template <typename MAP_IMPL>
