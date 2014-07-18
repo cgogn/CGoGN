@@ -71,7 +71,7 @@ void MyQT::createMap()
 	// create another attribute on vertices (for edges drawing)
 	VertexAttribute<int, MAP> colorE = myMap.addAttribute<int, VERTEX, MAP>("colorE");
 
-	colorE[d1] = 0;
+	colorE[d1] = 152;
 	colorE[PHI1(d1)] = 255;
 	colorE[PHI_1(d1)] = 64;
 	colorE[PHI<11>(d2)] = 127;
@@ -96,18 +96,21 @@ void MyQT::createMap()
 	m_positionVBO->updateData(position);
 
 	// update color edge with on the fly computation of RGB from int
-	m_colorVBO1->updateDataConversion<int,3>(colorE, [](const float& x)
-	{
-		return Geom::Vec3f(float(x)/255.0f,float(255-x)/255.0f,1.0f);
-	});
+	// code writen in lambda
+//	m_colorVBO1->updateDataConversion<int,3>(colorE, [](const float& x)
+//	{
+//		return Geom::Vec3f(float(x)/255.0f,float(x)/255.0f,float(x)/255.0f);
+//	});
+	// or with furnished operator of conversion
+	DataConversion::operatorScalarToRGBf<int> conv2col(0,255);
+	m_colorVBO1->updateDataConversion<int,3>(colorE,conv2col);
+
 
 	// update color face with on the fly inversion of RGB
 	m_colorVBO2->updateDataConversion<PFP::VEC3,3>(colorF, [](const PFP::VEC3& c)
 	{
-		return Geom::Vec3f(float(1.0-c[0]),float(1.0-c[1]),float(1.0-c[2]));
+		return Geom::Vec3f(float(1.0-c[2]),float(1.0-c[1]),float(1.0-c[0]));
 	});
-
-
 
 
 
@@ -133,6 +136,8 @@ void MyQT::cb_initGL()
 	m_colorVBO1 = new Utils::VBO();
 	m_colorVBO2 = new Utils::VBO();
 
+	m_scalarVBO = new Utils::VBO();
+
 	// using simple shader with color
 	m_shader = new Utils::ShaderSimpleColor();
 	m_shader->setAttributePosition(m_positionVBO);
@@ -152,7 +157,7 @@ void MyQT::cb_redraw()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 
-	glLineWidth(2.0f);
+	glLineWidth(4.0f);
 	m_shader2->setAttributeColor(m_colorVBO1);
 	m_render->draw(m_shader2, Algo::Render::GL2::LINES);
 

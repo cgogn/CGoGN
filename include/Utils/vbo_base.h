@@ -67,25 +67,11 @@ protected:
 	/// type name of the last attribute used to fill the VBO
 	std::string m_typeName;
 
-	/// pointer to buffer converter
-	ConvertBuffer* m_conv;
-
-
-	/**
-	 * update data from AttributeMultiVectorGen to the vbo, with conversion
-	 */
-	void updateData_withInternalConversion(const AttributeMultiVectorGen* attrib, ConvertBuffer* conv);
-
 public:
 	/**
 	 * constructor: allocate the OGL VBO
 	 */
 	VBO(const std::string& name = "");
-
-	/**
-	 * constructor with buffer converter: allocate the OGL VBO
-	 */
-	VBO(ConvertBuffer* conv, const std::string& name = "");
 
 	/**
 	 * copy constructor, new VBO copy content
@@ -138,19 +124,17 @@ public:
 	void sameAllocSameBufferSize(const VBO& vbo);
 
 	/**
+	 * update data from attribute multivector to the vbo (automatic conversion if necessary and possible)
+	 */
+	void updateData(const AttributeMultiVectorGen* attrib);
+
+	/**
 	 * update data from attribute handler to the vbo
 	 */
 	inline void updateData(const AttributeHandlerGen& attrib)
 	{
 		updateData(attrib.getDataVectorGen()) ;
 	}
-
-	void updateData(const AttributeMultiVectorGen* attrib);
-
-	/**
-	 * set the converter that convert buffer to float *
-	 */
-	void setBufferConverter(ConvertBuffer* conv);
 
 	/**
 	 * update data from given data vector
@@ -170,20 +154,48 @@ public:
 	void allocate(unsigned int nbElts);
 
 	/**
-	 * update the VBO from Attribute Handler with on the fly conversion
+	 * update the VBO from Attribute Handler of vectors with on the fly conversion
 	 * template paramters:
 	 * T_IN input type  attribute handler
 	 * NB_COMPONENTS 3 for vbo of pos/normal, 2 for texture etc..
 	 * @param attribHG the attribute handler source
-	 * @param conv lambda function that take a const T_IN& and return a Vector<NB_COMPONENTS,float>
+	 * @param conv lambda or function/fonctor that take a const T_IN& and return a Vector<NB_COMPONENTS,float>
 	 */
 	template <typename T_IN, unsigned int NB_COMPONENTS, typename CONVFUNC>
-	void updateDataConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv)
+	inline void updateDataConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv)
 	{
-		typedef Geom::Vector<NB_COMPONENTS,float> T_OUT;
-
 		const AttributeMultiVectorGen* attrib = attribHG.getDataVectorGen();
+		updateDataConversion<T_IN,Geom::Vector<NB_COMPONENTS,float>,NB_COMPONENTS,CONVFUNC>(attrib,conv);
+	}
 
+	/**
+	 * update the VBO from Attribute Handler of vectors with on the fly conversion
+	 * template paramters:
+	 * T_IN input type  attribute handler
+	 * @param attribHG the attribute handler source
+	 * @param conv lambda or function/fonctor that take a const T_IN& and return a Vector<NB_COMPONENTS,float>
+	 */
+	template <typename T_IN, typename CONVFUNC>
+	inline void updateDataConversion(const AttributeHandlerGen& attribHG, CONVFUNC conv)
+	{
+		const AttributeMultiVectorGen* attrib = attribHG.getDataVectorGen();
+		updateDataConversion<T_IN,float,1,CONVFUNC>(attrib,conv);
+	}
+
+
+protected:
+	/**
+	 * update the VBO from Attribute Handler with on the fly conversion
+	 * template paramters:
+	 * T_IN input type  attribute handler
+	 * NB_COMPONENTS 3 for vbo of pos/normal, 2 for texture etc..
+	 * @param attrib the attribute multivector source
+	 * @param conv lambda function that take a const T_IN& and return a Vector<NB_COMPONENTS,float>
+	 */
+	template <typename T_IN, typename T_OUT, unsigned int NB_COMPONENTS, typename CONVFUNC>
+	void updateDataConversion(const AttributeMultiVectorGen* attrib, CONVFUNC conv)
+	{
+		unsigned int old_nbb =  sizeof(float) * m_data_size * m_nbElts;
 		m_name = attrib->getName();
 		m_typeName = attrib->getTypeName();
 		m_data_size = NB_COMPONENTS;
@@ -202,7 +214,8 @@ public:
 
 		// bind buffer to update
 		glBindBuffer(GL_ARRAY_BUFFER, *m_id);
-		glBufferData(GL_ARRAY_BUFFER, nbb * szb, 0, GL_STREAM_DRAW);
+		if (nbb!=old_nbb)
+			glBufferData(GL_ARRAY_BUFFER, nbb * szb, 0, GL_STREAM_DRAW);
 
 		for (unsigned int i = 0; i < nbb; ++i)
 		{
@@ -223,7 +236,6 @@ public:
 		delete[] typedBuffer;
 
 	}
-
 
 };
 

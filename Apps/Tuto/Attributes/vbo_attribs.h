@@ -72,6 +72,8 @@ protected:
 	Utils::VBO* m_colorVBO1;	// color per vertex for face drawing
 	Utils::VBO* m_colorVBO2;	// color per vertex for edge drawing
 
+	Utils::VBO* m_scalarVBO;	// color per vertex for edge drawing
+
 	//shaders
 	Utils::ShaderSimpleColor* m_shader;
 	Utils::ShaderColorPerVertex* m_shader2;
