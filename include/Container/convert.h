@@ -10,7 +10,10 @@ namespace CGoGN
 {
 namespace DataConversion
 {
-
+/**
+ * function that convert a Vec of double into a Vec of float
+ * template param D: dimension of vector
+ */
 template< unsigned int D>
 inline Geom::Vector<D,float> funcVecXdToVecXf(const Geom::Vector<D,double>& x)
 {
@@ -20,21 +23,29 @@ inline Geom::Vector<D,float> funcVecXdToVecXf(const Geom::Vector<D,double>& x)
 	return v;
 }
 
+/**
+ * function that convert a scalar (char/short/int/double) into float
+ * template param TYPE_IN: scalar type to convert
+ */
 template<typename TYPE_IN>
 inline float funcToFloat(const TYPE_IN& x)
 {
 	return float(x);
 }
 
-
+/**
+ * functor that convert a scalar (char/short/int/double) into float normalized in [0,1]
+ * template param TYPE_IN: scalar type to convert
+ * Constructor params: min/max values of data for normalization
+ */
 template<typename TYPE_IN>
-class operatorToFloatNormalized
+class functorToFloatNormalized
 {
 protected:
 	double m_min;
 	double m_diff;
 public:
-	operatorToFloatNormalized(TYPE_IN min, TYPE_IN max) :
+	functorToFloatNormalized(TYPE_IN min, TYPE_IN max) :
 		m_min(double(min)),
 		m_diff(double(max-min)) {}
 
@@ -45,14 +56,19 @@ public:
 	}
 };
 
+/**
+ * functor that convert a scalar (char/short/int/double) into a RGB color (Vec3f)
+ * template param TYPE_IN: scalar type to convert
+ * Constructor params: min/max values of data for normalization
+ */
 template<typename TYPE_IN>
-class operatorScalarToRGBf
+class functorScalarToRGBf
 {
 protected:
 	double m_min;
 	double m_diff;
 public:
-	operatorScalarToRGBf(TYPE_IN min, TYPE_IN max) :
+	functorScalarToRGBf(TYPE_IN min, TYPE_IN max) :
 		m_min(double(min)),
 		m_diff(double(max-min)) {}
 
@@ -89,366 +105,6 @@ public:
 };
 
 }
-
-
-///**
-// * Conversion d'un T* en U* en fonction de la surcharge des membres
-// * Classe abstraite, a surcharger:
-// * - reserve(), convert(), release() & vectorSize()
-// *
-// */
-//class ConvertBuffer
-//{
-//protected:
-//	/**
-//	 * size of buffer in bytes
-//	 */
-//	unsigned int m_size;
-	
-//	/**
-//	 * size of buffer in number of elements
-//	 */
-//	unsigned int m_nb;
-
-//	/**
-//	 * buffer
-//	 */
-//	void* m_buffer;
-
-//public:
-//	/**
-//	 *
-//	 */
-//	ConvertBuffer() : m_size(0),m_nb(0),m_buffer(NULL) {}
-
-//	/**
-//	 *
-//	 */
-////	virtual ~ConvertBuffer() = 0;
-//	 ~ConvertBuffer() {}
-
-//	/**
-//	 * set the number of element to convert & reserve memory for buffer
-//	 * @param nb nb elements (usually block size when call from VBO)
-//	 */
-//	virtual void reserve(unsigned int nb) = 0;
-
-//	/**
-//	 * release memory buffer ( and set ptrs to null)
-//	 */
-//	 virtual void release() =  0;
-
-//	/**
-//	 * convert the buffer
-//	 */
-//	virtual void convert(const void* ptrIn) = 0;
-
-//	/**
-//	 * get the data size in elements (ex: 3 for Vec3f)
-//	 */
-//	virtual unsigned int vectorSize() = 0;
-
-//	/**
-//	 * get the buffer (void*)
-//	 */
-//	void* buffer() { return m_buffer; }
-
-//	/**
-//	 * get the size of buffer in bytes
-//	 */
-//	unsigned int sizeBuffer() { return m_size; }
-
-//};
-
-
-///**
-//* Convertit simplement en castant chaque element
-//* Exemple double ou int float
-//*/
-//template<typename TYPE_IN>
-//class ConvertToFloat : public ConvertBuffer
-//{
-//protected:
-//	float* m_typedBuffer;
-//public:
-//	ConvertToFloat()
-//	{}
-
-//	~ConvertToFloat()
-//	{
-//		if (m_typedBuffer)
-//			delete[] m_typedBuffer;
-//	}
-
-//	void release()
-//	{
-//		delete[] m_typedBuffer;
-//		m_typedBuffer = NULL;
-//		m_buffer = NULL;
-//		m_nb = 0;
-//		m_size = 0;
-//	}
-	
-//	void reserve(unsigned int nb)
-//	{
-//		m_nb = nb;						// store number of elements
-//		m_typedBuffer = new float[m_nb];	// allocate buffer
-//		m_buffer = m_typedBuffer;			// store void* casted ptr
-//		m_size = m_nb*sizeof(float);		// store size of buffer in bytes
-//	}
-	
-//	void convert(const void* ptrIn)
-//	{
-//		// cast ptr in & out with right type
-//		const TYPE_IN* typedIn = reinterpret_cast<const TYPE_IN*>(ptrIn);
-//		float* typedOut = reinterpret_cast<float*>(m_buffer);
-//		// compute conversion
-//		for (unsigned int i = 0; i < m_nb; ++i)
-//			*typedOut++ = float(*typedIn++);
-//	}
-
-//	unsigned int vectorSize()
-//	{
-//		return 1;
-//	}
-//};
-
-
-
-
-///**
-//* Convertit un type scalaire (char, short, int, ...)
-//* en un autre (float ou double) en le normalisant
-//* entre 0 et 1
-//*/
-//template<typename TYPE_IN, typename TYPE_OUT>
-//class ConvertNormalized : public ConvertBuffer
-//{
-//protected:
-//	TYPE_OUT* m_typedBuffer;
-	
-//public:
-//	ConvertNormalized()/*:
-//		ConvertBuffer(sizeof(TYPE_IN))*/
-//	{}
-
-//	~ConvertNormalized()
-//	{
-//		if (m_typedBuffer)
-//			delete[] m_typedBuffer;
-//	}
-
-//	void release()
-//	{
-//		if (m_typedBuffer)
-//		{
-//			delete[] m_typedBuffer;
-//			m_typedBuffer = NULL;
-//			m_buffer = NULL;
-//			m_nb = 0;
-//			m_size = 0;
-//		}
-//	}
-	
-//	void reserve(unsigned int nb)
-//	{
-//		m_nb = nb;							// store number of elements
-//		m_typedBuffer = new TYPE_OUT[m_nb];	// allocate buffer
-//		m_buffer = m_typedBuffer;			// store void* casted ptr
-//		m_size = m_nb*sizeof(TYPE_OUT);		// store size of buffer in bytes
-//	}
-	
-//	void convert(const void* ptrIn)
-//	{
-//		// cast ptr in & out with right type
-//		const TYPE_IN* typedIn = reinterpret_cast<const TYPE_IN*>(ptrIn);
-//		TYPE_OUT* typedOut = reinterpret_cast<TYPE_OUT*>(m_buffer);
-		
-//		// compute conversion
-//		for (int i=0; i <m_nb; ++i)
-//		{
-//			TYPE_OUT val = (float(*typedIn++) - TYPE_OUT(std::numeric_limits<TYPE_IN>::min()));
-//			val /= TYPE_OUT(std::numeric_limits<TYPE_IN>::max()) - TYPE_OUT(std::numeric_limits<TYPE_IN>::min());
-//			*typedOut++ = val;
-//		}
-//	}
-
-//	unsigned int vectorSize()
-//	{
-//		return 1;
-//	}
-
-//};
-
-
-///**
-//* Convertit un type scalaire (char, short, int, float ..)
-//* en une couleur variant suivant un schema hsv
-//* Un min et max donne les valeurs servant à l'interpolation
-//*/
-//template<typename TYPE_IN>
-//class ConvertToRGBf : public ConvertBuffer
-//{
-//protected:
-//	float* m_typedBuffer;
-//	TYPE_IN m_min;
-//	TYPE_IN m_diff;
-
-//public:
-//	ConvertToRGBf(TYPE_IN min, TYPE_IN max) :
-////		ConvertBuffer(sizeof(TYPE_IN)),
-//		m_min(min),
-//		m_diff(max-min),
-//		m_typedBuffer(NULL) {}
-
-//	~ConvertToRGBf()
-//	{
-//		if (m_typedBuffer)
-//			delete[] m_typedBuffer;
-//	}
-
-//	void release()
-//	{
-//		if (m_typedBuffer)
-//		{
-//			delete[] m_typedBuffer;
-//			m_typedBuffer = NULL;
-//			m_buffer = NULL;
-//			m_nb = 0;
-//			m_size = 0;
-//		}
-//	}
-	
-//	void reserve(unsigned int nb)
-//	{
-//		m_nb = nb;							// store number of elements
-//		m_typedBuffer = new float[3*nb];	// allocate buffer
-//		m_buffer = m_typedBuffer;			// store void* casted ptr
-//		m_size = 3*nb*sizeof(float);		// store size of buffer in bytes
-//	}
-	
-//	void convert(const void* ptrIn)
-//	{
-//		// cast ptr in & out with right type
-//		const TYPE_IN* typedIn = reinterpret_cast<const TYPE_IN*>(ptrIn);
-//		float* typedOut = reinterpret_cast<float*>(m_buffer);
-		
-//		// compute conversion
-//		for (int i=0; i <m_nb; ++i)
-//		{
-//			float h = (360.0f /(m_diff))*(*typedIn++ - m_min); // normalize in 0-360
-//			int hi = int(floor(h / 60.0f)) % 6;
-//			float f = (h / 60.0) - floor(h / 60.0);
-//			float q = 1.0f - f;
-//			switch(hi)
-//			{
-//				case 0:
-//					*typedOut++ = 0.0f;
-//					*typedOut++ = f;
-//					*typedOut++ = 1.0f;
-//					break;
-//				case 1:
-//					*typedOut++ = 0.0f;
-//					*typedOut++ = 1.0f;
-//					*typedOut++ = q;
-//					break;
-//				case 2:
-//					*typedOut++ = f;
-//					*typedOut++ = 1.0f;
-//					*typedOut++ = 0.0f;
-//					break;
-//				case 3:
-//					*typedOut++ = 1.0f;
-//					*typedOut++ = q;
-//					*typedOut++ = 0.0f;
-//					break;
-//				case 4:
-//					*typedOut++ = 1.0f;
-//					*typedOut++ = 0.0f;
-//					*typedOut++ = f;
-//					break;
-//				case 5:
-//					*typedOut++ = q;
-//					*typedOut++ = 0.0f;
-//					*typedOut++ = 1.0f;
-//				default:
-//					break;
-//			}
-//		}
-//	}
-
-//	unsigned int vectorSize()
-//	{
-//		return 3;
-//	}
-//};
-
-
-//template< unsigned int D>
-//class ConvertVecXdToVecXf : public ConvertBuffer
-//{
-//protected:
-//	typedef Geom::Vector<D,float> VECF;
-//	typedef Geom::Vector<D,double> VECD;
-
-//	VECF* m_typedBuffer;
-//public:
-//	ConvertVecXdToVecXf():
-
-//		m_typedBuffer(NULL)
-//	{}
-
-//	~ConvertVecXdToVecXf()
-//	{
-//		if (m_typedBuffer)
-//			delete[] m_typedBuffer;
-//	}
-
-//	void release()
-//	{
-//		delete[] m_typedBuffer;
-//		m_typedBuffer = NULL;
-//		m_buffer = NULL;
-//		m_nb = 0;
-//		m_size = 0;
-//	}
-
-//	void reserve(unsigned int nb)
-//	{
-//		m_nb = nb;							// store number of elements
-//		m_typedBuffer = new VECF[nb];	// allocate buffer typed (not possible to delete void*)
-//		m_buffer = m_typedBuffer;			// store void* casted ptr
-//		m_size = nb*sizeof(VECF);		// store size of buffer in bytes
-//	}
-
-//	void convert(const void* ptrIn)
-//	{
-//		// cast ptr in & out with right type
-//		const VECD* typedIn = reinterpret_cast<const VECD*>(ptrIn);
-//		VECF* typedOut = m_typedBuffer;
-//		// compute conversion
-//		for (unsigned int i = 0; i < m_nb; ++i)
-//		{
-//			const VECD& vd = *typedIn++;
-//			for (unsigned int j=0; j<D; ++j)
-//				(*typedOut)[j] = float(vd[j]);
-//			typedOut++;
-//		}
-
-//	}
-
-//	unsigned int vectorSize()
-//	{
-//		return D;
-//	}
-//};
-
-//typedef ConvertVecXdToVecXf<2> ConvertVec2dToVec2f;
-//typedef ConvertVecXdToVecXf<3> ConvertVec3dToVec3f;
-//typedef ConvertVecXdToVecXf<4> ConvertVec4dToVec4f;
-
-//typedef ConvertToFloat<double> ConvertDoubleToFloat;
-
 
 }
 

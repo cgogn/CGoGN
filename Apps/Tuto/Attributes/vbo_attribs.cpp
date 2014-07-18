@@ -102,7 +102,7 @@ void MyQT::createMap()
 //		return Geom::Vec3f(float(x)/255.0f,float(x)/255.0f,float(x)/255.0f);
 //	});
 	// or with furnished operator of conversion
-	DataConversion::operatorScalarToRGBf<int> conv2col(0,255);
+	DataConversion::functorScalarToRGBf<int> conv2col(0,255);
 	m_colorVBO1->updateDataConversion<int,3>(colorE,conv2col);
 
 
