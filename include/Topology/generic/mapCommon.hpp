@@ -203,6 +203,14 @@ inline AttributeHandler<T ,ORBIT, MAP> MapCommon<MAP_IMPL>::getAttribute(const s
 }
 
 template <typename MAP_IMPL>
+template < unsigned int ORBIT>
+inline CGoGNCodeType MapCommon<MAP_IMPL>::getAttributeTypeCode(const std::string& nameAttr)
+{
+	return this->m_attribs[ORBIT].getTypeCode(nameAttr);
+}
+
+
+template <typename MAP_IMPL>
 template <typename T, unsigned int ORBIT, typename MAP>
 inline AttributeHandler<T ,ORBIT, MAP> MapCommon<MAP_IMPL>::checkAttribute(const std::string& nameAttr)
 {

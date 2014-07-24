@@ -150,6 +150,15 @@ public:
 	inline AttributeHandler<T, ORBIT, MAP> getAttribute(const std::string& nameAttr) ;
 
 	/**
+	 * @brief get attribute type code
+	 * @param nameAttr name of attribute
+	 * @return code enum
+	 */
+	template <unsigned int ORBIT>
+	inline CGoGNCodeType getAttributeTypeCode(const std::string& nameAttr);
+
+
+	/**
 	* check if an attribute exist ( get, test if valid and add if necessary)
 	* @param nameAttr attribute name
 	* @return an AttributeHandler

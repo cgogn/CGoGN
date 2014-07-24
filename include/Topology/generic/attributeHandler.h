@@ -72,7 +72,19 @@ public:
 
 protected:
 	void setInvalid() { valid = false ; }
+	void setValid() { valid = true ; }
 } ;
+
+template <unsigned int ORB>
+class AttributeHandlerOrbit: public AttributeHandlerGen
+{
+public:
+	AttributeHandlerOrbit(bool v) :
+		AttributeHandlerGen(v)
+	{}
+
+	static const unsigned int ORBIT = ORB;
+};
 
 /**
  * Class that create an access-table to an existing attribute
@@ -82,7 +94,7 @@ protected:
  * - begin / end / next to manage indexing
  */
 template <typename T, unsigned int ORB, typename MAP>
-class AttributeHandler : public AttributeHandlerGen
+class AttributeHandler : public AttributeHandlerOrbit<ORB>
 {
 protected:
 	// the map that contains the linked attribute
@@ -95,7 +107,7 @@ protected:
 
 public:
 	typedef T DATA_TYPE ;
-	static const unsigned int ORBIT = ORB;
+//	static const unsigned int ORBIT = ORB;
 
 	/**
 	 * Default constructor
@@ -253,11 +265,17 @@ public:
 template <typename T, typename MAP>
 using DartAttribute = AttributeHandler<T, DART, MAP>;
 
+typedef AttributeHandlerOrbit<DART> DartAttributeGen;
+
+
 /**
  *  c++11 shortcut for Vertex Attribute (Handler)
  */
 template <typename T, typename MAP>
 using VertexAttribute = AttributeHandler<T, VERTEX, MAP>;
+
+typedef AttributeHandlerOrbit<VERTEX> VertexAttributeGen;
+
 
 /**
  *  c++11 shortcut for Edge Attribute (Handler)
@@ -265,11 +283,15 @@ using VertexAttribute = AttributeHandler<T, VERTEX, MAP>;
 template <typename T, typename MAP>
 using EdgeAttribute = AttributeHandler<T, EDGE, MAP>;
 
+typedef AttributeHandlerOrbit<EDGE> EdgeAttributeGen;
+
 /**
  *  c++11 shortcut for Face Attribute (Handler)
  */
 template <typename T, typename MAP>
 using FaceAttribute = AttributeHandler<T, FACE, MAP>;
+
+typedef AttributeHandlerOrbit<FACE> FaceAttributeGen;
 
 /**
  *  c++11 shortcut for Volume Attribute (Handler)
@@ -277,6 +299,7 @@ using FaceAttribute = AttributeHandler<T, FACE, MAP>;
 template <typename T, typename MAP>
 using VolumeAttribute = AttributeHandler<T, VOLUME, MAP>;
 
+typedef AttributeHandlerOrbit<VOLUME> VolumeAttributeGen;
 
 
 
@@ -307,6 +330,12 @@ namespace Parallel
 template <typename ATTR, typename FUNC>
 void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbth = NumberOfThreads);
 
+}
+
+template<unsigned int ORBIT>
+inline bool checkAttributeHandlerOrbit(const AttributeHandlerGen& att)
+{
+	return (dynamic_cast<const AttributeHandlerOrbit<ORBIT>*>(&att)!=NULL) != NULL;
 }
 
 } // namespace CGoGN

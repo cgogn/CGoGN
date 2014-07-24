@@ -68,7 +68,7 @@ AttributeContainer::~AttributeContainer()
  *       INFO ABOUT ATTRIBUTES        *
  **************************************/
 
-unsigned int AttributeContainer::getAttributeIndex(const std::string& attribName)
+unsigned int AttributeContainer::getAttributeIndex(const std::string& attribName) const
 {
 	unsigned int index ;
 	bool found = false ;
