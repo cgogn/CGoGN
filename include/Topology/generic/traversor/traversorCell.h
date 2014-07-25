@@ -144,7 +144,6 @@ void foreach_cell(MAP& map, FUNC func, TraversalOptim opt = AUTO, unsigned int n
 
 
 
-
 template <typename MAP, TraversalOptim OPT = AUTO>
 class TraversorV : public TraversorCell<MAP, VERTEX, OPT>
 {
@@ -176,6 +175,88 @@ public:
 	TraversorW(const MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, false, thread)
 	{}
 };
+
+template <typename MAP, unsigned int ORBIT, TraversalOptim OPT = AUTO>
+class allCells: public TraversorCell<MAP,ORBIT,OPT>
+{
+public:
+	allCells(const MAP& map, bool forceDartMarker = false, unsigned int thread = 0):
+		TraversorCell<MAP,ORBIT,OPT>(map,forceDartMarker,thread) {}
+
+
+	class iterator
+	{
+		Cell<ORBIT> m_index;
+		TraversorCell<MAP,ORBIT,OPT>* m_ptr;
+
+	public:
+
+		inline iterator(allCells<MAP,ORBIT,OPT>* p, Cell<ORBIT> i): m_ptr(p),m_index(i){}
+
+		inline iterator& operator++()
+		{
+			m_index = m_ptr->next();
+			return *this;
+		}
+
+		inline Cell<ORBIT>& operator*()
+		{
+			return m_index;
+		}
+
+		inline bool operator!=(iterator it)
+		{
+			return m_index.dart != it.m_index.dart;
+		}
+
+	};
+
+	inline iterator begin()
+	{
+		return iterator(this,TraversorCell<MAP,ORBIT,OPT>::begin());
+	}
+
+	inline iterator end()
+	{
+		return iterator(this,TraversorCell<MAP,ORBIT,OPT>::end());
+	}
+
+};
+
+template <typename MAP, TraversalOptim OPT = AUTO>
+class allVertices : public allCells<MAP, VERTEX, OPT>
+{
+public:
+	allVertices(const MAP& m, unsigned int thread = 0) : allCells<MAP, VERTEX>(m, false, thread)
+	{}
+};
+
+
+template <typename MAP, TraversalOptim OPT = AUTO>
+class allEdges : public allCells<MAP, EDGE, OPT>
+{
+public:
+	allEdges(const MAP& m, unsigned int thread = 0) : allCells<MAP, EDGE>(m, false, thread)
+	{}
+};
+
+template <typename MAP, TraversalOptim OPT = AUTO>
+class allFaces : public allCells<MAP, FACE, OPT>
+{
+public:
+	allFaces(const MAP& m, unsigned int thread = 0) : allCells<MAP, FACE>(m, false, thread)
+	{}
+};
+
+template <typename MAP, TraversalOptim OPT = AUTO>
+class allVolumes : public allCells<MAP, VOLUME, OPT>
+{
+public:
+	allVolumes(const MAP& m, unsigned int thread = 0) : allCells<MAP, VOLUME>(m, false, thread)
+	{}
+};
+
+
 
 
 

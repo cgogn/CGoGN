@@ -129,10 +129,18 @@ void dumpAttribute(const ATTRIB& attr)
 template<typename T>
 void VertexTyped(MAP& map, T& va)
 {
-	foreach_cell<VERTEX>(map,[&](Vertex v)  // for all vertices
-	{
-		va[v] = 1.1 * va[v];
-	});
+
+//	foreach_cell<VERTEX>(map,[&](Vertex v)  // for all vertices
+//	{
+//		va[v] = 1.1 * va[v];
+//	});
+
+	// other syntax for traversal
+	 for (Vertex v : allVertices<MAP>(map))
+	 {
+		 va[v] = 1.1 * va[v];
+		 std::cout << "V:" << v << " -> "<<va[v]<< std::endl;
+	 }
 }
 
 // version that take a VertexAttribute, check type at runtime and call instancied template version

@@ -65,6 +65,12 @@ public:
 	template <typename T2>
 	Vector(const Vector<DIM, T2>& v) ;
 
+	/**
+	 * @brief Vector constructor from list init. (c++11)
+	 * @param args {x,y,z}
+	 */
+	Vector(typename std::initializer_list<T> args);
+
 	Vector(T x, T y) ;
 
 	Vector(T x, T y, T z) ;
