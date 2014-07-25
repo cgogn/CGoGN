@@ -105,10 +105,10 @@ public:
 
 	inline void next(Dart& d) const ;
 
+//	template <unsigned int ORBIT, typename FUNC>
+//	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
 	template <unsigned int ORBIT, typename FUNC>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
-	template <unsigned int ORBIT, typename FUNC>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_orbit(Cell<ORBIT> c, const FUNC& f, unsigned int thread = 0) const ;
 
 	template <typename FUNC>
 	void foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread = 0) const;
