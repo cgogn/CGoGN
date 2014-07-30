@@ -413,7 +413,7 @@ public:
 	 *  @param forboundary tag the created face as boundary (default is true)
 	 *  @return the degree of the created volume
 	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+	virtual unsigned int closeHole(Dart d);
 
 	//! Close the map removing topological holes: DO NOT USE, only for import/creation algorithm
 	/*! Add volumes to the map that close every existing hole.

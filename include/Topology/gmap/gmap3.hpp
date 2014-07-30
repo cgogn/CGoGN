@@ -1204,7 +1204,7 @@ Dart GMap3<MAP_IMPL>::newBoundaryCycle(unsigned int nbE)
 }
 
 template <typename MAP_IMPL>
-unsigned int GMap3<MAP_IMPL>::closeHole(Dart d, bool forboundary)
+unsigned int GMap3<MAP_IMPL>::closeHole(Dart d)
 {
 	assert(beta3(d) == d);		// Nothing to close
 	DartMarkerStore<GMap3<MAP_IMPL> > m(*this) ;
