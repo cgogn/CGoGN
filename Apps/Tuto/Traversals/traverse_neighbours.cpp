@@ -102,5 +102,16 @@ int main()
 		std::cout << "vertex of dart " << x << " adjacent to vertex of dart " << v.dart << " by a face" << std::endl;
 	});
 
+// WITH FOR C++11 SYNTAX
+	for(Face f : facesIncidentToVertex2(myMap,v))
+	{
+		std::cout << "Face of dart " << f << " incident to vertex of dart " << v.dart << std::endl;
+	}
+
+	for (Vertex x : verticesAdjacentByFace2(myMap,v))
+	{
+		std::cout << "vertex of dart " << x << " adjacent to vertex of dart " << v.dart << " by a face" << std::endl;
+	}
+
 	return 0;
 }

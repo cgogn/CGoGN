@@ -73,7 +73,7 @@ int main()
 
 	// using parallel foreach
 	// parameter position must be captured explicitly even if it used as first parameter of foreach !
-	Parallel::foreach_attribute(position, [&position] (unsigned int id, unsigned int thread) // for each elt of the position attribute
+	Parallel::foreach_attribute(position, [&position] (unsigned int id, unsigned int /*thread*/) // for each elt of the position attribute
 	{
 		position[id] *= 2.0f;
 	}, 4); // 4:4 thread, false for no need for markers in threaded code.

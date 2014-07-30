@@ -46,6 +46,11 @@ public:
 
 	 ~TraversorDartsOfOrbit();
 
+	TraversorDartsOfOrbit(TraversorDartsOfOrbit<MAP,ORBIT>&& tr):
+		m_vd(tr.m_vd), m_current(tr.m_current),m_thread(tr.m_thread)
+	{
+	}
+
 	Dart begin() ;
 
 	Dart end() ;

@@ -136,7 +136,7 @@ void VertexTyped(MAP& map, T& va)
 //	});
 
 	// other syntax for traversal
-	 for (Vertex v : allVertices<MAP>(map))
+	 for (Vertex v : allVerticesOf(map))
 	 {
 		 va[v] = 1.1 * va[v];
 		 std::cout << "V:" << v << " -> "<<va[v]<< std::endl;

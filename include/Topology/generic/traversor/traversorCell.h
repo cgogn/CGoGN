@@ -186,8 +186,8 @@ public:
 
 	class iterator
 	{
-		Cell<ORBIT> m_index;
 		TraversorCell<MAP,ORBIT,OPT>* m_ptr;
+		Cell<ORBIT> m_index;
 
 	public:
 
@@ -223,6 +223,57 @@ public:
 
 };
 
+template <typename MAP>
+inline allCells<MAP, VERTEX, AUTO> allVerticesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,VERTEX,AUTO>(m, false, thread);
+}
+
+template <typename MAP>
+inline allCells<MAP, EDGE, AUTO> allEdgesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,EDGE,AUTO>(m, false, thread);
+}
+
+template <typename MAP>
+inline allCells<MAP, FACE, AUTO> allFacesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,FACE,AUTO>(m, false, thread);
+}
+
+template <typename MAP>
+inline allCells<MAP, VOLUME, AUTO> allVolumesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,VOLUME,AUTO>(m, false, thread);
+}
+
+
+template <TraversalOptim OPT, typename MAP>
+inline allCells<MAP, VERTEX, OPT> allVerticesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,VERTEX,OPT>(m, false, thread);
+}
+
+template <TraversalOptim OPT, typename MAP>
+inline allCells<MAP, EDGE, OPT> allEdgesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,EDGE,OPT>(m, false, thread);
+}
+
+template <TraversalOptim OPT, typename MAP>
+inline allCells<MAP, FACE, OPT> allFacesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,FACE,OPT>(m, false, thread);
+}
+
+template <TraversalOptim OPT, typename MAP>
+inline allCells<MAP, VOLUME, OPT> allVolumesOf(const MAP& m,unsigned int thread=0)
+{
+	return allCells<MAP,VOLUME,OPT>(m, false, thread);
+}
+
+
+/*
 template <typename MAP, TraversalOptim OPT = AUTO>
 class allVertices : public allCells<MAP, VERTEX, OPT>
 {
@@ -256,7 +307,7 @@ public:
 	{}
 };
 
-
+*/
 
 
 

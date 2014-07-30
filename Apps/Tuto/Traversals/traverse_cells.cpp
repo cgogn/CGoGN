@@ -111,16 +111,17 @@ int main()
 	}); // 4:4 thread, false for no need for markers in threaded code.
 
 	std::cout << "After // processing"<< std::endl;
-	foreach_cell<VERTEX>(myMap, [&] (Vertex v) // for each Vertex v of the MAP myMap
+
+	// last and simple traversal method (new for c++11 syntax)
+	for(Vertex v : allVerticesOf(myMap))
 	{
 		std::cout << position[v] << " / ";
-	});
+	}
 	std::cout <<  std::endl;
 
 
 	// Example with // accumulation
 	// computing the sum of area faces
-
 
 	// force number of threads to 4 (0 for traverse, 1,2,3 for computation)
 	CGoGN::Parallel::NumberOfThreads = 4;
@@ -136,6 +137,8 @@ int main()
 
 	std::cout << surf[0]<< "/"<< surf[1]<< "/"<< surf[2]<< "/"<< std::endl;
 	std::cout << "Total="<<surf[0]+surf[1]+surf[2]<< std::endl;
+
+	// example of traversal in two pass (optimizing marking/unmarking)
 
 	TraversorV<MAP> tv0(myMap);
 	TraversorCellEven<MAP, VERTEX> tv1(tv0);
