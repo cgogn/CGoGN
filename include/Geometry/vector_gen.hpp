@@ -57,7 +57,7 @@ Vector<DIM, T>::Vector(typename std::initializer_list<T> args)
 		m_data[i] = *iter;
 
 	// finish with 0 if necessary
-	for (int j=i;j<DIM;++j)
+	for (unsigned int j=i;j<DIM;++j)
 		m_data[j] = 0;
 }
 

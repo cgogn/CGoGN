@@ -55,8 +55,8 @@ std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
 
 
 GenericMap::GenericMap():
-	m_manipulator(NULL),
-	m_nextMarkerId(0)
+	m_nextMarkerId(0),
+	m_manipulator(NULL)
 {
 	if(m_attributes_registry_map == NULL)
 	{

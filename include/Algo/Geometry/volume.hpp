@@ -158,7 +158,7 @@ typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typ
 
 	// compute the sum of volumes
 	typename PFP::REAL total(0);
-	for (unsigned int i=0; i< CGoGN::Parallel::NumberOfThreads-1; ++i )
+	for (int i=0; i< CGoGN::Parallel::NumberOfThreads-1; ++i )
 		total += vols[i];
 
 	return total;

@@ -271,7 +271,7 @@ void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 	}
 
 	// free memory and resize
-	for (int i = m_holesBlocks.size() - 1; i > nbb; --i)
+	for (int i = m_holesBlocks.size() - 1; i > int(nbb); --i)
 		delete m_holesBlocks[i];
 	m_holesBlocks.resize(nbb);
 

@@ -335,7 +335,7 @@ void foreach_attribute(ATTR& attribute, FUNC func, unsigned int nbth = NumberOfT
 template<unsigned int ORBIT>
 inline bool checkAttributeHandlerOrbit(const AttributeHandlerGen& att)
 {
-	return (dynamic_cast<const AttributeHandlerOrbit<ORBIT>*>(&att)!=NULL) != NULL;
+	return dynamic_cast<const AttributeHandlerOrbit<ORBIT>*>(&att) != NULL;
 }
 
 } // namespace CGoGN
