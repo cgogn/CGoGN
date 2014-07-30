@@ -1589,8 +1589,10 @@ void Map3<MAP_IMPL>::computeDual()
 	//std::cout << "Map closed (" << closeMap() <<" boundary faces)" << std::endl;
 }
 
+
+//TODO A METTRE EN ALGO
 template <typename MAP_IMPL>
-Dart Map3<MAP_IMPL>::explodBorderTopo(Dart d)
+Dart Map3<MAP_IMPL>::explodBorderTopo(/*Dart d*/)
 {
 	std::vector<std::pair<Dart,Dart> > ve;
 	ve.reserve(1024);

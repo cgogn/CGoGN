@@ -515,7 +515,7 @@ public:
 	// - triangule chaque face
 	// - ferme par phi3 chaque volume
 	// - recoud le tout
-	Dart explodBorderTopo(Dart d);
+	Dart explodBorderTopo(/*Dart d*/);
 
 	void computeDualTest();
 	//@}
