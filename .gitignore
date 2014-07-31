@@ -1,2 +1,5 @@
 # ignore QtCreator files
 CMakeLists.txt.user
+bin/
+ThirdParty/bin/
+SCHNApps/bin
