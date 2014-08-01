@@ -27,6 +27,7 @@
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/cells.h"
+#include "Topology/generic/traversor/iterTrav.h"
 
 namespace CGoGN
 {
@@ -466,55 +467,55 @@ inline void foreach_adjacent2(MAP& map, Cell<ORBIT> c, FUNC f)
  * template classs that add iterator to Traversor
  * to allow the use of c++11 syntax for (auto d : v)
  */
-template <typename TRAV>
-class Iteratorize: public TRAV
-{
-public:
-	typedef typename TRAV::MapType MAP;
-	typedef typename TRAV::IterType ITER;
-	typedef typename TRAV::ParamType PARAM;
+//template <typename TRAV>
+//class Iteratorize: public TRAV
+//{
+//public:
+//	typedef typename TRAV::MapType MAP;
+//	typedef typename TRAV::IterType ITER;
+//	typedef typename TRAV::ParamType PARAM;
 
-	Iteratorize(const MAP& map, PARAM p):
-		TRAV(map,p){}
+//	Iteratorize(const MAP& map, PARAM p):
+//		TRAV(map,p){}
 
-	class iterator
-	{
-		Iteratorize<TRAV>* m_ptr;
-		ITER m_index;
+//	class iterator
+//	{
+//		Iteratorize<TRAV>* m_ptr;
+//		ITER m_index;
 
-	public:
+//	public:
 
-		inline iterator(Iteratorize<TRAV>* p, ITER i): m_ptr(p),m_index(i){}
+//		inline iterator(Iteratorize<TRAV>* p, ITER i): m_ptr(p),m_index(i){}
 
-		inline iterator& operator++()
-		{
-			m_index = m_ptr->next();
-			return *this;
-		}
+//		inline iterator& operator++()
+//		{
+//			m_index = m_ptr->next();
+//			return *this;
+//		}
 
-		inline ITER& operator*()
-		{
-			return m_index;
-		}
+//		inline ITER& operator*()
+//		{
+//			return m_index;
+//		}
 
-		inline bool operator!=(const iterator& it)
-		{
-			return m_index.dart != it.m_index.dart;
-		}
+//		inline bool operator!=(const iterator& it)
+//		{
+//			return m_index.dart != it.m_index.dart;
+//		}
 
-	};
+//	};
 
-	inline iterator begin()
-	{
-		return iterator(this,TRAV::begin());
-	}
+//	inline iterator begin()
+//	{
+//		return iterator(this,TRAV::begin());
+//	}
 
-	inline iterator end()
-	{
-		return iterator(this,TRAV::end());
-	}
+//	inline iterator end()
+//	{
+//		return iterator(this,TRAV::end());
+//	}
 
-};
+//};
 
 // functions that return the traversor+iterator
 // functions instead of typedef because function

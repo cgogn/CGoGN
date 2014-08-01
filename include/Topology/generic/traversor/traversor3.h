@@ -30,6 +30,7 @@
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversor/traversorCell.h"
 #include "Topology/generic/traversor/traversorDoO.h"
+#include "Topology/generic/traversor/iterTrav.h"
 
 namespace CGoGN
 {
@@ -88,7 +89,6 @@ public:
 		m_dmark = tra.m_dmark;
 		m_cmark = tra.m_cmark;
 		m_current = tra.m_current;
-//		m_tradoo = std::move(tra.m_tradoo);
 	}
 
 	Cell<ORBY> begin() ;
@@ -393,205 +393,215 @@ inline void foreach_adjacent3(MAP& map, Cell<ORBIT> c, FUNC f, bool forceDartMar
  * template classs that add iterator to Traversor
  * to allow the use of c++11 syntax for (auto d : v)
  */
-template <typename TRAV>
-class Iteratorize3: public TRAV
-{
-public:
-	typedef typename TRAV::MapType MAP;
-	typedef typename TRAV::IterType ITER;
-	typedef typename TRAV::ParamType PARAM;
+//template <typename TRAV>
+//class Iteratorize3: public TRAV
+//{
+//public:
+//	typedef typename TRAV::MapType MAP;
+//	typedef typename TRAV::IterType ITER;
+//	typedef typename TRAV::ParamType PARAM;
 
-	Iteratorize3(const MAP& map, PARAM p):
-		TRAV(map,p){}
+//	Iteratorize3(const MAP& map, PARAM p):
+//		TRAV(map,p),m_begin(this,TRAV::begin()),m_end(this,TRAV::end())
+//	{
+////		m_begin = this->begin();
+////		m_end = this->end();
+//	}
 
 
-	class iterator
-	{
-		Iteratorize3<TRAV>* m_ptr;
-		ITER m_index;
+//	class iterator
+//	{
+//		Iteratorize3<TRAV>* m_ptr;
+//		ITER m_index;
 
-	public:
+//	public:
 
-		inline iterator(Iteratorize3<TRAV>* p, ITER i): m_ptr(p),m_index(i){}
+//		inline iterator(Iteratorize3<TRAV>* p, ITER i): m_ptr(p),m_index(i){}
 
-		inline iterator& operator++()
-		{
-			m_index = m_ptr->next();
-			return *this;
-		}
+//		inline iterator& operator++()
+//		{
+//			m_index = m_ptr->next();
+//			return *this;
+//		}
 
-		inline ITER& operator*()
-		{
-			return m_index;
-		}
+//		inline ITER& operator*()
+//		{
+//			return m_index;
+//		}
 
-		inline bool operator!=(const iterator& it)
-		{
-			return m_index.dart != it.m_index.dart;
-		}
+//		inline bool operator!=(const iterator& it)
+//		{
+//			return m_index.dart != it.m_index.dart;
+//		}
 
-	};
+//	};
 
-	inline iterator begin()
-	{
-		return iterator(this,TRAV::begin());
-	}
+//	inline iterator begin()
+//	{
+////		return iterator(this,TRAV::begin());
+//		return m_begin;
+//	}
 
-	inline iterator end()
-	{
-		return iterator(this,TRAV::end());
-	}
-};
+//	inline iterator end()
+//	{
+////		return iterator(this,TRAV::end());
+//		return m_end;
+//	}
+
+//protected:
+//	iterator m_begin;
+//	iterator m_end;
+//};
 
 // functions that return the traversor+iterator
 // functions instead of typedef because function
 // allows the compiler to deduce template param
 
 template <typename MAP>
-inline Iteratorize3< Traversor3VE<MAP> > edgesIncidentToVertex3(const MAP& m, Vertex c)
+inline Iteratorize< Traversor3VE<MAP> > edgesIncidentToVertex3(const MAP& m, Vertex c)
 {
-	return Iteratorize3< Traversor3VE<MAP> >(m, c);
+	return Iteratorize< Traversor3VE<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3VF<MAP> > facesIncidentToVertex3(const MAP& m, Vertex c)
+inline Iteratorize< Traversor3VF<MAP> > facesIncidentToVertex3(const MAP& m, Vertex c)
 {
-	return Iteratorize3< Traversor3VF<MAP> >(m, c);
+	return Iteratorize< Traversor3VF<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3VW<MAP> > VolumesIncidentToVertex3(const MAP& m, Vertex c)
+inline Iteratorize< Traversor3VW<MAP> > VolumesIncidentToVertex3(const MAP& m, Vertex c)
 {
-	return Iteratorize3< Traversor3VW<MAP> >(m, c);
+	return Iteratorize< Traversor3VW<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3EV<MAP> > verticesIncidentToEdge3(const MAP& m, Edge c)
+inline Iteratorize< Traversor3EV<MAP> > verticesIncidentToEdge3(const MAP& m, Edge c)
 {
-	return Iteratorize3< Traversor3EV<MAP> >(m, c);
+	return Iteratorize< Traversor3EV<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3EF<MAP> > facesIncidentToEdge3(const MAP& m, Edge c)
+inline Iteratorize< Traversor3EF<MAP> > facesIncidentToEdge3(const MAP& m, Edge c)
 {
-	return Iteratorize3< Traversor3EF<MAP> >(m, c);
+	return Iteratorize< Traversor3EF<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3EW<MAP> > volumesIncidentToEdge3(const MAP& m, Edge c)
+inline Iteratorize< Traversor3EW<MAP> > volumesIncidentToEdge3(const MAP& m, Edge c)
 {
-	return Iteratorize3< Traversor3EW<MAP> >(m, c);
+	return Iteratorize< Traversor3EW<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3FV<MAP> > verticesIncidentToFace3(const MAP& m, Face c)
+inline Iteratorize< Traversor3FV<MAP> > verticesIncidentToFace3(const MAP& m, Face c)
 {
-	return Iteratorize3< Traversor3FV<MAP> >(m, c);
+	return Iteratorize< Traversor3FV<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3FE<MAP> > edgesIncidentToFace3(const MAP& m, Face c)
+inline Iteratorize< Traversor3FE<MAP> > edgesIncidentToFace3(const MAP& m, Face c)
 {
-	return Iteratorize3< Traversor3FE<MAP> >(m, c);
+	return Iteratorize< Traversor3FE<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3FW<MAP> > volumesIncidentToFace3(const MAP& m, Face c)
+inline Iteratorize< Traversor3FW<MAP> > volumesIncidentToFace3(const MAP& m, Face c)
 {
-	return Iteratorize3< Traversor3FW<MAP> >(m, c);
-}
-
-
-template <typename MAP>
-inline Iteratorize3< Traversor3WV<MAP> > verticesIncidentToVolume3(const MAP& m, Vol c)
-{
-	return Iteratorize3< Traversor3WV<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3WE<MAP> > edgesIncidentToVolume3(const MAP& m, Vol c)
-{
-	return Iteratorize3< Traversor3WE<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3WF<MAP> > facesIncidentToVolume3(const MAP& m, Vol c)
-{
-	return Iteratorize3< Traversor3WF<MAP> >(m, c);
+	return Iteratorize< Traversor3FW<MAP> >(m, c);
 }
 
 
 template <typename MAP>
-inline Iteratorize3< Traversor3VVaE<MAP> > verticesAdjacentByEdge3(const MAP& m, Vertex c)
+inline Iteratorize< Traversor3WV<MAP> > verticesIncidentToVolume3(const MAP& m, Vol c)
 {
-	return Iteratorize3< Traversor3VVaE<MAP> >(m, c);
+	return Iteratorize< Traversor3WV<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3VVaF<MAP> > verticesAdjacentByFace3(const MAP& m, Vertex c)
+inline Iteratorize< Traversor3WE<MAP> > edgesIncidentToVolume3(const MAP& m, Vol c)
 {
-	return Iteratorize3< Traversor3VVaF<MAP> >(m, c);
+	return Iteratorize< Traversor3WE<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3VVaW<MAP> > verticesAdjacentByVolume3(const MAP& m, Vertex c)
+inline Iteratorize< Traversor3WF<MAP> > facesIncidentToVolume3(const MAP& m, Vol c)
 {
-	return Iteratorize3< Traversor3VVaW<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3EEaV<MAP> > edgesAdjacentByVertex3(const MAP& m, Edge c)
-{
-	return Iteratorize3< Traversor3EEaV<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3EEaF<MAP> > edgesAdjacentByFace3(const MAP& m, Edge c)
-{
-	return Iteratorize3< Traversor3EEaF<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3EEaW<MAP> > edgesAdjacentByVolume3(const MAP& m, Edge c)
-{
-	return Iteratorize3< Traversor3EEaW<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3FFaV<MAP> > facesAdjacentByVertex3(const MAP& m, Face c)
-{
-	return Iteratorize3< Traversor3FFaV<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3FFaE<MAP> > facesAdjacentByEdge3(const MAP& m, Face c)
-{
-	return Iteratorize3< Traversor3FFaE<MAP> >(m, c);
-}
-
-template <typename MAP>
-inline Iteratorize3< Traversor3FFaW<MAP> > facesAdjacentByVolume3(const MAP& m, Face c)
-{
-	return Iteratorize3< Traversor3FFaW<MAP> >(m, c);
+	return Iteratorize< Traversor3WF<MAP> >(m, c);
 }
 
 
 template <typename MAP>
-inline Iteratorize3< Traversor3WWaV<MAP> > volumesAdjacentByVertex3(const MAP& m, Vol c)
+inline Iteratorize< Traversor3VVaE<MAP> > verticesAdjacentByEdge3(const MAP& m, Vertex c)
 {
-	return Iteratorize3< Traversor3WWaV<MAP> >(m, c);
+	return Iteratorize< Traversor3VVaE<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3WWaE<MAP> > volumesAdjacentByEdge3(const MAP& m, Vol c)
+inline Iteratorize< Traversor3VVaF<MAP> > verticesAdjacentByFace3(const MAP& m, Vertex c)
 {
-	return Iteratorize3< Traversor3WWaE<MAP> >(m, c);
+	return Iteratorize< Traversor3VVaF<MAP> >(m, c);
 }
 
 template <typename MAP>
-inline Iteratorize3< Traversor3WWaF<MAP> > volumesAdjacentByFace3(const MAP& m, Vol c)
+inline Iteratorize< Traversor3VVaW<MAP> > verticesAdjacentByVolume3(const MAP& m, Vertex c)
 {
-	return Iteratorize3< Traversor3WWaF<MAP> >(m, c);
+	return Iteratorize< Traversor3VVaW<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3EEaV<MAP> > edgesAdjacentByVertex3(const MAP& m, Edge c)
+{
+	return Iteratorize< Traversor3EEaV<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3EEaF<MAP> > edgesAdjacentByFace3(const MAP& m, Edge c)
+{
+	return Iteratorize< Traversor3EEaF<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3EEaW<MAP> > edgesAdjacentByVolume3(const MAP& m, Edge c)
+{
+	return Iteratorize< Traversor3EEaW<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3FFaV<MAP> > facesAdjacentByVertex3(const MAP& m, Face c)
+{
+	return Iteratorize< Traversor3FFaV<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3FFaE<MAP> > facesAdjacentByEdge3(const MAP& m, Face c)
+{
+	return Iteratorize< Traversor3FFaE<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3FFaW<MAP> > facesAdjacentByVolume3(const MAP& m, Face c)
+{
+	return Iteratorize< Traversor3FFaW<MAP> >(m, c);
+}
+
+
+template <typename MAP>
+inline Iteratorize< Traversor3WWaV<MAP> > volumesAdjacentByVertex3(const MAP& m, Vol c)
+{
+	return Iteratorize< Traversor3WWaV<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3WWaE<MAP> > volumesAdjacentByEdge3(const MAP& m, Vol c)
+{
+	return Iteratorize< Traversor3WWaE<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor3WWaF<MAP> > volumesAdjacentByFace3(const MAP& m, Vol c)
+{
+	return Iteratorize< Traversor3WWaF<MAP> >(m, c);
 }
 
 
