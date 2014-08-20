@@ -130,6 +130,14 @@ ELSE()
 	
 ENDIF()
 
+IF(NOT CMAKE_BUILD_TYPE)
+	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug")
+		set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	ELSE()
+		set(CMAKE_BUILD_TYPE "Release" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	ENDIF()
+ENDIF()
+
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 
 IF(WIN32)
@@ -140,10 +148,4 @@ ELSE ()
 	SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 ENDIF ()
 
-IF(NOT CMAKE_BUILD_TYPE)
-	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug")
-		set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
-	ELSE()
-		set(CMAKE_BUILD_TYPE "Release" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
-	ENDIF()
-ENDIF()
+
