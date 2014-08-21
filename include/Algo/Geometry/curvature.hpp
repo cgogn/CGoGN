@@ -148,7 +148,7 @@ void vertexQuadraticFitting(
 	nlBegin(NL_MATRIX) ;
 	foreach_adjacent2<EDGE>(map, v, [&] (Vertex it) {
 		typename PFP::VEC3 itp = position[it] ;
-		quadraticFittingAddVertexPos<PFP>(v, itp, localFrame) ;
+//		quadraticFittingAddVertexPos<PFP>(v, itp, localFrame) ;
 		typename PFP::VEC3 itn = normal[it] ;
 		quadraticFittingAddVertexNormal<PFP>(itp, itn, p, localFrame) ;
 	});
@@ -711,7 +711,7 @@ void computeCurvatureVertices_QuadraticFitting(
 {
 	CGoGN::Parallel::foreach_cell<VERTEX>(map, [&] (Vertex v, unsigned int threadID)
 	{
-		computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin, threadID) ;
+        computeCurvatureVertex_QuadraticFitting<PFP>(map, v, position, normal, kmax, kmin, Kmax, Kmin) ;
 	}, FORCE_CELL_MARKING);
 
 }
