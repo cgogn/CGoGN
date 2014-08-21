@@ -57,7 +57,7 @@ public :
 	virtual void setSeeds_fromVector (const std::vector<Dart>&);
 	virtual void setSeeds_random (unsigned int nbseeds);
 	const std::vector<Dart>& getBorder () { return border; }
-	void setCost (const EdgeAttribute<REAL>& c);
+	void setCost (const EdgeAttribute<REAL,MAP>& c);
 
 	Dart computeDiagram ();
 	virtual void computeDiagram_incremental (unsigned int nbseeds);
@@ -74,7 +74,6 @@ protected :
 template <typename PFP>
 class CentroidalVoronoiDiagram : public VoronoiDiagram<PFP>
 {
-	typedef typename PFP::MAP MAP;
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
