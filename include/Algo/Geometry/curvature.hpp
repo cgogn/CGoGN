@@ -136,7 +136,7 @@ void vertexQuadraticFitting(
 	typename PFP::MATRIX33& localFrame,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal,
-	float& a, float& b, float& c, float& d, float& e)
+    typename PFP::REAL& a, typename PFP::REAL& b, typename PFP::REAL& c, typename PFP::REAL& d, typename PFP::REAL& e)
 {
 	typename PFP::VEC3 p = position[v] ;
 
@@ -148,7 +148,7 @@ void vertexQuadraticFitting(
 	nlBegin(NL_MATRIX) ;
 	foreach_adjacent2<EDGE>(map, v, [&] (Vertex it) {
 		typename PFP::VEC3 itp = position[it] ;
-//		quadraticFittingAddVertexPos<PFP>(v, itp, localFrame) ;
+        quadraticFittingAddVertexPos<PFP>(p, itp, localFrame) ;
 		typename PFP::VEC3 itn = normal[it] ;
 		quadraticFittingAddVertexNormal<PFP>(itp, itn, p, localFrame) ;
 	});
@@ -629,7 +629,7 @@ void normalCycles_SortTensor(Geom::Matrix<3,3,typename PFP::REAL>& tensor, unsig
 }
 
 template <typename PFP>
-void normalCycles_ProjectTensor(Geom::Matrix<3,3,typename PFP::REAL>& tensor, const typename PFP::VEC3& normal_vector, unsigned int thread)
+void normalCycles_ProjectTensor(Geom::Matrix<3,3,typename PFP::REAL>& tensor, const typename PFP::VEC3& normal_vector, unsigned int /*thread*/)
 {
 	Geom::Matrix<3,3,typename PFP::REAL> proj;
 	proj.identity();

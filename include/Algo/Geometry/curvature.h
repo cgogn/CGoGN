@@ -79,7 +79,7 @@ void vertexQuadraticFitting(
 	typename PFP::MATRIX33& localFrame,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal,
-	float& a, float& b, float& c, float& d, float& e) ;
+    typename PFP::REAL& a, typename PFP::REAL& b, typename PFP::REAL& c, typename PFP::REAL& d, typename PFP::REAL& e) ;
 
 template <typename PFP>
 void quadraticFittingAddVertexPos(
