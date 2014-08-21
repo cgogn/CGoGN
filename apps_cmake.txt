@@ -132,13 +132,6 @@ ENDIF()
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 
-IF(WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
-	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
-ELSE ()
-	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-	SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-ENDIF ()
 
 IF(NOT CMAKE_BUILD_TYPE)
 	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug")
@@ -147,3 +140,11 @@ IF(NOT CMAKE_BUILD_TYPE)
 		set(CMAKE_BUILD_TYPE "Release" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 	ENDIF()
 ENDIF()
+
+IF(WIN32)
+        link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
+        SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+ELSE ()
+        link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+        SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+ENDIF ()
