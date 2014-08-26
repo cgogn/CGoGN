@@ -231,7 +231,14 @@ void GenericMap::init(bool addBoundaryMarkers)
 void GenericMap::clear(bool removeAttrib)
 {
 	if (removeAttrib)
+	{
+#ifndef NDEBUG
+		for(unsigned int i = 0; i < NB_ORBITS; ++i)
+			if (m_attribs[i].hasMarkerAttribute())
+				CGoGNout << "Warning removing marker attribute on orbit, need update ? "<<orbitName(i)<< CGoGNendl;
+#endif
 		init();
+	}
 	else
 	{
 		for(unsigned int i = 0; i < NB_ORBITS; ++i)

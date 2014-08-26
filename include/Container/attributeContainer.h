@@ -223,6 +223,11 @@ public:
 	*/
 	inline bool used(unsigned int index) const;
 
+	/**
+	 * @brief check if container contain marker attribute
+	 */
+	bool hasMarkerAttribute() const;
+
 	/**************************************
 	 *         CONTAINER TRAVERSAL        *
 	 **************************************/

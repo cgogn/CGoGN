@@ -103,6 +103,10 @@ public:
 			m_map.template releaseMarkVector<CELL>(m_markVector,m_thread);
 	}
 
+	/**
+	 * @brief update: realloc the marker in map
+	 * @warning call only after map cleaning
+	 */
 	void update()
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())

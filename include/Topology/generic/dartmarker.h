@@ -96,6 +96,10 @@ public:
 
 	}
 
+	/**
+	 * @brief update: realloc the marker in map
+	 * @warning call only after map cleaning
+	 */
 	inline void update()
 	{
 		m_markVector = m_map.template askMarkVector<DART>(m_thread);

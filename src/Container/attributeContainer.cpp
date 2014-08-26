@@ -211,6 +211,21 @@ void AttributeContainer::clear(bool removeAttrib)
 	}
 }
 
+bool AttributeContainer::hasMarkerAttribute() const
+{
+	for (auto it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
+	{
+		if ((*it) != NULL)
+		{
+			std::string strMarker = (*it)->getName().substr(0,6);
+			if (strMarker=="marker")
+				return true;
+		}
+	}
+	return false;
+}
+
+
 void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 {
 	mapOldNew.clear();
