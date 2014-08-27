@@ -63,13 +63,24 @@ int main()
 	{
 		std::cout << id << " : " << position[id]<< " / ";
 	}
-	std::cout << std::endl;
+
+	std::cout << std::endl << "--------------------------------" << std::endl;
+
+	//using (C++11 for syntax)
+	// warning: if you want ot modify the attributes do not forget the &
+	for (auto& p: position.iterable())
+	{
+		p *= 2.0;
+	}
+
 
 	//using foreach function (C++11 lambda expression)
 	foreach_attribute(position, [&] (unsigned int id) // for each element of position
 	{
 		std::cout << id << " : " << position[id]<< " / ";
 	});
+
+	std::cout << std::endl << "--------------------------------" << std::endl;
 
 	// using parallel foreach
 	// parameter position must be captured explicitly even if it used as first parameter of foreach !

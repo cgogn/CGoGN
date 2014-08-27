@@ -86,6 +86,13 @@ public:
 	static const unsigned int ORBIT = ORB;
 };
 
+
+// forward declaration
+template <typename T, unsigned int ORB, typename MAP>
+class AttributeHandlerIter;
+
+
+
 /**
  * Class that create an access-table to an existing attribute
  * Main available operations are:
@@ -107,7 +114,6 @@ protected:
 
 public:
 	typedef T DATA_TYPE ;
-//	static const unsigned int ORBIT = ORB;
 
 	/**
 	 * Default constructor
@@ -255,6 +261,8 @@ public:
 	 * @param iter iterator to
 	 */
 	void next(unsigned int& iter) const;
+
+	AttributeHandlerIter<T,ORB,MAP> iterable() const;
 } ;
 
 
@@ -300,6 +308,64 @@ template <typename T, typename MAP>
 using VolumeAttribute = AttributeHandler<T, VOLUME, MAP>;
 
 typedef AttributeHandlerOrbit<VOLUME> VolumeAttributeGen;
+
+
+
+
+template <typename T, unsigned int ORB, typename MAP>
+class AttributeHandlerIter : public AttributeHandler<T,ORB,MAP>
+{
+public:
+
+	AttributeHandlerIter(const AttributeHandler<T, ORB, MAP>& ta):
+		AttributeHandler<T,ORB,MAP>(ta)
+	{
+	}
+
+
+	class iterator
+	{
+		AttributeHandlerIter<T,ORB,MAP>* m_ptr;
+		unsigned int m_index;
+
+	public:
+
+		inline iterator(AttributeHandlerIter<T, ORB, MAP>* p, unsigned int i): m_ptr(p),m_index(i){}
+
+		inline iterator& operator++()
+		{
+			m_ptr->next(m_index);
+			return *this;
+		}
+
+		inline T& operator*()
+		{
+			T& v = m_ptr->operator[](m_index);
+			return v;
+		}
+
+		inline bool operator!=(iterator it)
+		{
+			return m_index != it.m_index;
+		}
+
+	};
+
+	inline iterator begin()
+	{
+		return iterator(this,AttributeHandler<T,ORB,MAP>::begin());
+	}
+
+	inline iterator end()
+	{
+		return iterator(this,AttributeHandler<T,ORB,MAP>::end());
+	}
+
+};
+
+
+
+
 
 
 

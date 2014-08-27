@@ -268,6 +268,13 @@ inline void AttributeHandler<T, ORB, MAP>::next(unsigned int& iter) const
 }
 
 
+template <typename T, unsigned int ORB, typename MAP>
+inline AttributeHandlerIter<T,ORB,MAP> AttributeHandler<T, ORB, MAP>::iterable() const
+{
+	return AttributeHandlerIter<T,ORB,MAP>(*this);
+}
+
+
 namespace Parallel
 {
 
