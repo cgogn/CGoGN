@@ -154,12 +154,12 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, c
 }
 
 template <typename PFP, typename V_ATT, typename F_ATT>
-void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal, unsigned int thread)
+void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal)
 {
 	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
 	CHECK_ATTRIBUTEHANDLER_ORBIT(F_ATT, FACE);
 
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
+	if (CGoGN::Parallel::NumberOfThreads > 1)
 	{
 		Parallel::computeNormalFaces<PFP,V_ATT,F_ATT>(map, position, face_normal);
 		return;
@@ -168,15 +168,15 @@ void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& fa
 	foreach_cell<FACE>(map, [&] (Face f)
 	{
 		face_normal[f] = faceNormal<PFP>(map, f, position) ;
-	}, AUTO, thread);
+	}, AUTO);
 }
 
 template <typename PFP, typename V_ATT>
-void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int thread)
+void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal)
 {
 	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
 
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
+	if (CGoGN::Parallel::NumberOfThreads > 1)
 	{
 		Parallel::computeNormalVertices<PFP,V_ATT>(map, position, normal);
 		return;
@@ -185,7 +185,7 @@ void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT&
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		normal[v] = vertexNormal<PFP>(map, v, position) ;
-	}, FORCE_CELL_MARKING, thread);
+	}, FORCE_CELL_MARKING);
 }
 
 template <typename PFP, typename V_ATT>
@@ -224,12 +224,12 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Edge
 }
 
 template <typename PFP, typename V_ATT, typename E_ATT>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int thread)
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles)
 {
 	CHECK_ATTRIBUTEHANDLER_ORBIT(V_ATT, VERTEX);
 	CHECK_ATTRIBUTEHANDLER_ORBIT(E_ATT, EDGE);
 
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread == 0))
+	if (CGoGN::Parallel::NumberOfThreads > 1)
 	{
 		Parallel::computeAnglesBetweenNormalsOnEdges<PFP,V_ATT,E_ATT>(map, position, angles);
 		return;
@@ -238,7 +238,7 @@ void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& pos
 	foreach_cell<EDGE>(map, [&] (Edge e)
 	{
 		angles[e] = computeAngleBetweenNormalsOnEdge<PFP>(map, e, position) ;
-	}, AUTO, thread);
+	}, AUTO);
 }
 
 

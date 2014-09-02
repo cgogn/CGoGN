@@ -33,15 +33,15 @@ namespace CGoGN
 //**********************
 
 template <typename MAP, unsigned int ORBIT>
-MarkerForTraversor<MAP, ORBIT>::MarkerForTraversor(const MAP& map, bool forceDartMarker, unsigned int thread) :
+MarkerForTraversor<MAP, ORBIT>::MarkerForTraversor(const MAP& map, bool forceDartMarker) :
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL)
 {
 	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT))
-		m_cmark = new CellMarkerStore<MAP, ORBIT>(map, thread) ;
+		m_cmark = new CellMarkerStore<MAP, ORBIT>(map) ;
 	else
-		m_dmark = new DartMarkerStore<MAP>(map, thread) ;
+		m_dmark = new DartMarkerStore<MAP>(map) ;
 }
 
 template <typename MAP, unsigned int ORBIT>
@@ -96,11 +96,11 @@ DartMarkerStore<MAP>* MarkerForTraversor<MAP, ORBIT>::dmark()
 //**************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> c, bool forceDartMarker, unsigned int thread) :
+Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> c, bool forceDartMarker) :
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL),
-	m_tradoo(map, c, thread),
+	m_tradoo(map, c),
 	m_QLT(NULL),
 	m_allocated(true),
 	m_first(true)
@@ -113,16 +113,16 @@ Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> c, bool f
 	else
 	{
 		if(!forceDartMarker && map.isOrbitEmbedded(ORBY))
-			m_cmark = new CellMarkerStore<MAP, ORBY>(map, thread) ;
+			m_cmark = new CellMarkerStore<MAP, ORBY>(map) ;
 		else
-			m_dmark = new DartMarkerStore<MAP>(map, thread) ;
+			m_dmark = new DartMarkerStore<MAP>(map) ;
 	}
 }
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> c, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/, unsigned int thread) :
+Traversor3XY<MAP, ORBX, ORBY>::Traversor3XY(const MAP& map, Cell<ORBX> c, MarkerForTraversor<MAP, ORBY>& tmo, bool /*forceDartMarker*/) :
 	m_map(map),
-	m_tradoo(map, c, thread),
+	m_tradoo(map, c),
 	m_QLT(NULL),
 	m_allocated(false),
 	m_first(true)
@@ -255,7 +255,7 @@ Cell<ORBY> Traversor3XY<MAP, ORBX, ORBY>::next()
 //*********************************************
 
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Cell<ORBX> c, bool forceDartMarker, unsigned int thread):
+Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Cell<ORBX> c, bool forceDartMarker):
 	m_map(map),
 	m_QLT(NULL)
 {
@@ -266,13 +266,13 @@ Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(const MAP& map, Cell<ORBX> c, bo
 	}
 	else
 	{
-		MarkerForTraversor<MAP, ORBX> mk(map, forceDartMarker, thread);
+		MarkerForTraversor<MAP, ORBX> mk(map, forceDartMarker);
 		mk.mark(c.dart);
 
-		Traversor3XY<MAP, ORBX, ORBY> traAdj(map, c, forceDartMarker, thread);
+		Traversor3XY<MAP, ORBX, ORBY> traAdj(map, c, forceDartMarker);
 		for (Dart d = traAdj.begin(); d != traAdj.end(); d = traAdj.next())
 		{
-			Traversor3XY<MAP, ORBY, ORBX> traInci(map, d, mk, forceDartMarker, thread);
+			Traversor3XY<MAP, ORBY, ORBX> traInci(map, d, mk, forceDartMarker);
 			for (Dart e = traInci.begin(); e != traInci.end(); e = traInci.next())
 				m_vecDarts.push_back(e);
 		}

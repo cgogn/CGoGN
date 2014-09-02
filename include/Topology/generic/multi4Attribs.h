@@ -91,7 +91,7 @@ struct RefCompo4Type
 //template <typename T1, typename T2,  typename T3, typename T4>
 //class Vertex4Attributes
 template <typename T1, typename T2, typename T3, typename T4, unsigned int ORB, typename MAP>
-class Cell4Attributes: public AttributeHandlerGen
+class Cell4Attributes: public AttributeHandlerOrbit<ORB>
 {
 	AttributeHandler<T1, ORB, MAP>& m_h1;
 	AttributeHandler<T2, ORB, MAP>& m_h2;
@@ -106,7 +106,7 @@ public:
 					AttributeHandler<T2, ORB, MAP>& h2,
 					AttributeHandler<T3, ORB, MAP>& h3,
 					AttributeHandler<T4, ORB, MAP>& h4)	:
-		AttributeHandlerGen(true),
+		AttributeHandlerOrbit<ORB>(true),
 		m_h1(h1), m_h2(h2), m_h3(h3), m_h4(h4) {}
 
 	static const unsigned int ORBIT = ORB;

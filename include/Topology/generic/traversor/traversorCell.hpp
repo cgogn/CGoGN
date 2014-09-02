@@ -22,8 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-//#include <boost/thread.hpp>
-//#include <boost/thread/barrier.hpp>
 #include "Utils/threadbarrier.h"
 #include <vector>
 
@@ -31,7 +29,7 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT, TraversalOptim OPT>
-TraversorCell<MAP, ORBIT, OPT>::TraversorCell(const MAP& map, bool forceDartMarker, unsigned int thread) :
+TraversorCell<MAP, ORBIT, OPT>::TraversorCell(const MAP& map, bool forceDartMarker) :
 	m(map),
 	dmark(NULL),
 	cmark(NULL),
@@ -44,10 +42,10 @@ TraversorCell<MAP, ORBIT, OPT>::TraversorCell(const MAP& map, bool forceDartMark
 	switch(OPT)
 	{
 		case FORCE_DART_MARKING:
-			dmark = new DartMarker<MAP>(map, thread) ;
+			dmark = new DartMarker<MAP>(map) ;
 			break;
 		case FORCE_CELL_MARKING:
-			cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
+			cmark = new CellMarker<MAP, ORBIT>(map) ;
 			break;
 		case FORCE_QUICK_TRAVERSAL:
 			quickTraversal = map.template getQuickTraversal<ORBIT>() ;
@@ -56,7 +54,7 @@ TraversorCell<MAP, ORBIT, OPT>::TraversorCell(const MAP& map, bool forceDartMark
 			break;
 		case AUTO:
 			if(forceDartMarker)
-				dmark = new DartMarker<MAP>(map, thread) ;
+				dmark = new DartMarker<MAP>(map) ;
 			else
 			{
 				quickTraversal = map.template getQuickTraversal<ORBIT>() ;
@@ -68,9 +66,9 @@ TraversorCell<MAP, ORBIT, OPT>::TraversorCell(const MAP& map, bool forceDartMark
 				else
 				{
 					if(map.template isOrbitEmbedded<ORBIT>())
-						cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
+						cmark = new CellMarker<MAP, ORBIT>(map) ;
 					else
-						dmark = new DartMarker<MAP>(map, thread) ;
+						dmark = new DartMarker<MAP>(map) ;
 				}
 			}
 			break;
@@ -496,27 +494,27 @@ Cell<ORBIT> TraversorCellOdd<MAP, ORBIT, OPT>::next()
 
 
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt, unsigned int thread)
+inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt)
 {
 	switch(opt)
 	{
 		case FORCE_DART_MARKING:
 		{
-			TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				f(c);
 		}
 			break;
 		case FORCE_CELL_MARKING:
 		{
-			TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				f(c);
 		}
 			break;
 		case FORCE_QUICK_TRAVERSAL:
 		{
-			TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				f(c);
 		}
@@ -524,7 +522,7 @@ inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt, unsigned in
 		case AUTO:
 		default:
 		{
-			TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,AUTO> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				f(c);
 		}
@@ -533,13 +531,13 @@ inline void foreach_cell(const MAP& map, FUNC f, TraversalOptim opt, unsigned in
 }
 
 template <unsigned int ORBIT, typename MAP, typename FUNC>
-inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsigned int thread)
+inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt)
 {
 	switch(opt)
 	{
 		case FORCE_DART_MARKING:
 		{
-			TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,FORCE_DART_MARKING> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				if (!f(c))
 					break;
@@ -547,7 +545,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 			break;
 		case FORCE_CELL_MARKING:
 		{
-			TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,FORCE_CELL_MARKING> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				if (!f(c))
 					break;
@@ -555,7 +553,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 			break;
 		case FORCE_QUICK_TRAVERSAL:
 		{
-			TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				if (!f(c))
 					break;
@@ -564,7 +562,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 		case AUTO:
 		default:
 		{
-			TraversorCell<MAP, ORBIT,AUTO> trav(map, false, thread);
+			TraversorCell<MAP, ORBIT,AUTO> trav(map, false);
 			for (Cell<ORBIT> c = trav.begin(), e = trav.end(); c.dart != e.dart; c = trav.next())
 				if (!f(c))
 					break;
@@ -575,13 +573,13 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 
 
 //template <unsigned int ORBIT, typename MAP, typename FUNC, typename FUNC2>
-//inline void foreach_cell_EvenOdd(const MAP& map, FUNC f, FUNC2 g, unsigned int nbpasses, TraversalOptim opt, unsigned int thread)
+//inline void foreach_cell_EvenOdd(const MAP& map, FUNC f, FUNC2 g, unsigned int nbpasses, TraversalOptim opt)
 //{
 //	switch(opt)
 //	{
 //	case FORCE_DART_MARKING:
 //	{
-//		TraversorCell<MAP,ORBIT,FORCE_DART_MARKING> trav(map, false, thread);
+//		TraversorCell<MAP,ORBIT,FORCE_DART_MARKING> trav(map, false);
 //		TraversorCellEven<MAP,ORBIT,FORCE_DART_MARKING> tr1(trav);
 //		TraversorCellOdd<MAP,ORBIT,FORCE_DART_MARKING> tr2(trav);
 
@@ -596,7 +594,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 //	break;
 //	case FORCE_CELL_MARKING:
 //	{
-//		TraversorCell<MAP,ORBIT,FORCE_CELL_MARKING> trav(map, false, thread);
+//		TraversorCell<MAP,ORBIT,FORCE_CELL_MARKING> trav(map, false);
 //		TraversorCellEven<MAP,ORBIT,FORCE_CELL_MARKING> tr1(trav);
 //		TraversorCellOdd<MAP,ORBIT, FORCE_CELL_MARKING> tr2(trav);
 
@@ -611,7 +609,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 //	break;
 //	case FORCE_QUICK_TRAVERSAL:
 //	{
-//		TraversorCell<MAP,ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false, thread);
+//		TraversorCell<MAP,ORBIT,FORCE_QUICK_TRAVERSAL> trav(map, false);
 //		TraversorCellEven<MAP,ORBIT,FORCE_QUICK_TRAVERSAL> tr1(trav);
 //		TraversorCellOdd<MAP,ORBIT,FORCE_QUICK_TRAVERSAL> tr2(trav);
 
@@ -627,7 +625,7 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt, unsig
 //	case AUTO:
 //	default:
 //	{
-//		TraversorCell<MAP,ORBIT,AUTO> trav(map, false, thread);
+//		TraversorCell<MAP,ORBIT,AUTO> trav(map, false);
 //		TraversorCellEven<MAP,ORBIT,AUTO> tr1(trav);
 //		TraversorCellOdd<MAP,ORBIT,AUTO> tr2(trav);
 
@@ -716,6 +714,7 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 	{
 		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i],sync1,sync2, finished,1+i);
 		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
+		map.addThreadId(threads[i]->get_id());
 	}
 
 	// and continue to traverse the map
@@ -753,6 +752,9 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 		delete threads[i];
 		delete tfs[i];
 	}
+
+	map.popThreadIds(nbth);
+
 	delete[] tfs;
 	delete[] threads;
 	delete[] vd;

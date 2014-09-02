@@ -72,10 +72,9 @@ void computeFaceGradient(
 	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_normal,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& scalar,
 	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& area,
-	FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient,
-	unsigned int thread)
+	FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient)
 {
-	TraversorF<typename PFP::MAP> trav(map, thread);
+	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		face_gradient[d] = faceGradient<PFP>(map, d, position, face_normal, scalar, area) ;
 }
@@ -121,10 +120,9 @@ void computeVertexGradient(
 	typename PFP::MAP& map,
 	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient,
 	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& face_area,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
-	unsigned int thread)
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient)
 {
-	TraversorV<typename PFP::MAP> trav(map, thread);
+	TraversorV<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		vertex_gradient[d] = vertexGradient<PFP>(map, d, face_gradient, face_area) ;
 }
@@ -177,10 +175,9 @@ template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& K,
-	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	unsigned int thread)
+	CellMarker<typename PFP::MAP, FACE>& regularMarker)
 {
-	TraversorF<typename PFP::MAP> trav(map, thread);
+	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
 		if(isTriangleRegular<PFP>(map, d, K))
@@ -244,10 +241,9 @@ bool isTriangleRegular(
 template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments,
-	unsigned int thread)
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
 {
-	TraversorF<typename PFP::MAP> trav(map, thread);
+	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		ridge_segments[d].type = EMPTY ;
 }
@@ -261,10 +257,9 @@ void computeRidgeLines(
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments,
-	unsigned int thread)
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
 {
-	TraversorF<typename PFP::MAP> trav(map, thread);
+	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
 		if (regularMarker.isMarked(d))
@@ -383,10 +378,9 @@ template <typename PFP>
 void computeSingularTriangle(
 	typename PFP::MAP& map,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments,
-	unsigned int thread)
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
 {
-	TraversorF<typename PFP::MAP> trav(map, thread);
+	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
 		if (! regularMarker.isMarked(d))

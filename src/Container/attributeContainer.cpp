@@ -68,7 +68,7 @@ AttributeContainer::~AttributeContainer()
  *       INFO ABOUT ATTRIBUTES        *
  **************************************/
 
-unsigned int AttributeContainer::getAttributeIndex(const std::string& attribName)
+unsigned int AttributeContainer::getAttributeIndex(const std::string& attribName) const
 {
 	unsigned int index ;
 	bool found = false ;
@@ -211,6 +211,21 @@ void AttributeContainer::clear(bool removeAttrib)
 	}
 }
 
+bool AttributeContainer::hasMarkerAttribute() const
+{
+	for (auto it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
+	{
+		if ((*it) != NULL)
+		{
+			std::string strMarker = (*it)->getName().substr(0,6);
+			if (strMarker=="marker")
+				return true;
+		}
+	}
+	return false;
+}
+
+
 void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 {
 	mapOldNew.clear();
@@ -271,7 +286,7 @@ void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 	}
 
 	// free memory and resize
-	for (int i = m_holesBlocks.size() - 1; i > nbb; --i)
+	for (int i = m_holesBlocks.size() - 1; i > int(nbb); --i)
 		delete m_holesBlocks[i];
 	m_holesBlocks.resize(nbb);
 

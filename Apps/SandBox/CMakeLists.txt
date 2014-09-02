@@ -24,6 +24,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(multi_att multi_att.cpp)
 target_link_libraries(multi_att ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
 
+add_executable(trav3_test trav3_test.cpp)
+target_link_libraries(trav3_test ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
+
 IF (WITH_QT)
 	QT4_WRAP_CPP(tilings_moc tilings.h)
 	add_executable(tilings tilings.cpp  ${tilings_moc})

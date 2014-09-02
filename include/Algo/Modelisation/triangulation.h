@@ -107,7 +107,7 @@ public:
 //	void trianguleFace(Dart d, DartMarker& mark);
 	void trianguleFace(Dart d);
 
-	void triangule(unsigned int thread = 0);
+	void triangule();
 };
 
 } // namespace Modelisation

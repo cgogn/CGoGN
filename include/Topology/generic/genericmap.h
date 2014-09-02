@@ -91,6 +91,23 @@ protected:
 	// protected copy constructor to prevent the copy of map
 	GenericMap(const GenericMap& ) {}
 
+
+	/**
+	 *
+	 */
+	std::vector<std::thread::id> m_thread_ids;
+public:
+	/// compute thread index in the table of thread
+	inline unsigned int getCurrentThreadIndex() const;
+
+	/// add a thread to the table of thread
+	inline void addThreadId(const std::thread::id& id);
+
+	/// remove  the n last added threads from table
+	inline void popThreadIds(unsigned int nb);
+
+
+protected:
 	/**
 	 * Attributes Containers
 	 */
@@ -102,6 +119,7 @@ protected:
 	/// buffer for less memory allocation
 	static  std::vector< std::vector<Dart>* >* s_vdartsBuffers;
 	static  std::vector< std::vector<unsigned int>* >* s_vintsBuffers;
+
 
 	/// table of instancied maps for Dart/CellMarker release
 	static std::vector<GenericMap*>* s_instances;
@@ -154,12 +172,11 @@ public:
 		return false;
 	}
 
-	static inline std::vector<Dart>* askDartBuffer(unsigned int orbit);
-	static inline void releaseDartBuffer(std::vector<Dart>* vd, unsigned int orbit);
+	inline std::vector<Dart>* askDartBuffer() const;
+	inline void releaseDartBuffer(std::vector<Dart>* vd) const;
 
-	static inline std::vector<unsigned int>* askUIntBuffer(unsigned int orbit);
-	static inline void releaseUIntBuffer(std::vector<unsigned int>* vd, unsigned int orbit);
-
+	inline std::vector<unsigned int>* askUIntBuffer() const;
+	inline void releaseUIntBuffer(std::vector<unsigned int>* vd) const;
 
 protected:
 	void init(bool addBoundaryMarkers=true);
@@ -321,13 +338,13 @@ public:
 	 * @brief ask for a marker attribute
 	 */
 	template <unsigned int ORBIT>
-	AttributeMultiVector<MarkerBool>* askMarkVector(unsigned int thread=0) ;
+	AttributeMultiVector<MarkerBool>* askMarkVector() ;
 
 	/**
 	 * @brief release allocated marker attribute
 	 */
 	template <unsigned int ORBIT>
-	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread=0);
+	void releaseMarkVector(AttributeMultiVector<MarkerBool>* amv);
 
 protected:
 	/**
@@ -392,29 +409,6 @@ protected:
 	 * @return the attribute multi-vector pointer
 	 */
 	AttributeMultiVector<Dart>* getRelation(const std::string& name) ;
-
-	/****************************************
-	 *          THREAD MANAGEMENT           *
-	 ****************************************/
-public:
-//	/**
-//	 * add threads (a table of Marker per orbit for each thread)
-//	 * to allow MT
-//	 * @param nb thread to add
-//	 */
-//	void addThreadMarker(unsigned int nb) ;
-
-//	/**
-//	 * return allowed threads
-//	 * @return the number of threads (including principal)
-//	 */
-//	unsigned int getNbThreadMarkers() const;
-
-//	/**
-//	 * Remove some added threads
-//	 * @return remaining number of threads (including principal)
-//	 */
-//	void removeThreadMarker(unsigned int nb) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *
@@ -499,6 +493,34 @@ public:
 	 */
 	void moveData(GenericMap &mapf);
 } ;
+
+
+// DartBufferThread class that hide the usage of askDartBuffer & releaseDartBuffer
+// scope of DartBuffer declaration use for auto release;
+// typical usage:
+//    DartBuffer buff(thread)
+//    std::vector<DART>& vd=buff.vector();
+//    vd.push_back(..)
+//    ....
+
+//class DartsBufferThread
+//{
+//protected:
+//	std::vector<Dart>* m_vd;
+//public:
+//	inline DartsBufferThread()
+//	{
+//		m_vd = GenericMap::askDartBuffer();
+//	}
+
+//	inline ~DartsBufferThread()
+//	{
+//		GenericMap::releaseDartBuffer(m_vd);
+//	}
+
+//	inline std::vector<Dart>& vector() { return *m_vd;}
+//};
+
 
 
 } //namespace CGoGN
