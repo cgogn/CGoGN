@@ -65,7 +65,7 @@ public:
     typedef typename VEC3::DATA_TYPE DATA_TYPE ;
 	typedef typename PFP::REAL REAL ;
 
-private:
+protected:
 	MAP& m_map;
 
 	unsigned int m_nbVertices;

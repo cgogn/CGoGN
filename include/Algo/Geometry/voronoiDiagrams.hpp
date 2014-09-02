@@ -102,7 +102,7 @@ void VoronoiDiagram<PFP>::initFrontWithSeeds ()
 }
 
 template <typename PFP>
-void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL>& c)
+void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL,typename PFP::MAP>& c)
 {
 	edgeCost = c;
 }
