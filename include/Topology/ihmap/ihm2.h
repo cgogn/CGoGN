@@ -106,36 +106,36 @@ public:
 	inline void next(Dart& d) const ;
 
 //	template <unsigned int ORBIT, typename FUNC>
-//	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
+//	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f) const ;
 	template <unsigned int ORBIT, typename FUNC>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, const FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_orbit(Cell<ORBIT> c, const FUNC& f) const ;
 
 	template <typename FUNC>
-	void foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex(Dart d, FUNC& f) const;
 
 	template <typename FUNC>
-	void foreach_dart_of_edge(Dart d, FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_edge(Dart d, FUNC& f) const ;
 
 	template <typename FUNC>
-	void foreach_dart_of_oriented_face(Dart d, FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_oriented_face(Dart d, FUNC& f) const ;
 
 	template <typename FUNC>
-	void foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread = 0)  const;
+	void foreach_dart_of_face(Dart d, FUNC& f)  const;
 
 	template <typename FUNC>
-	void foreach_dart_of_oriented_volume(Dart d, FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_oriented_volume(Dart d, FUNC& f) const ;
 
 	template <typename FUNC>
-	void foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_volume(Dart d, FUNC& f) const ;
 
 	template <typename FUNC>
-	void foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex1(Dart d, FUNC& f) const;
 
 	template <typename FUNC>
-	void foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge1(Dart d, FUNC& f) const;
 
 	template <typename FUNC>
-	void foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_cc(Dart d, FUNC& f) const ;
 
 	/***************************************************
 	 *               MAP MANIPULATION                  *

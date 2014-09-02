@@ -291,9 +291,9 @@ public:
 	 *  @param f a function
 	 */
 	template <unsigned int ORBIT, typename FUNC>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f) const ;
 	template <unsigned int ORBIT, typename FUNC>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread = 0) const ;
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f) const ;
 
 	/**
 	* Apply a functor on each dart of an oriented vertex
@@ -301,7 +301,7 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_oriented_vertex(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_oriented_vertex(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of a vertex
@@ -309,7 +309,7 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of an oriented edge
@@ -317,7 +317,7 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_oriented_edge(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_oriented_edge(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of an edge
@@ -325,28 +325,28 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_edge(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of a face
 	/*! @param d a dart of the face
 	 *  @param f the functor to apply
 	 */
 	template <typename FUNC>
-	void foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_face(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of an oriented volume
 	/*! @param d a dart of the oriented volume
 	 *  @param f the functor to apply
 	 */
 	template <typename FUNC>
-	void foreach_dart_of_oriented_volume(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_oriented_volume(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
 	template <typename FUNC>
-	void foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_volume(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of a vertex
@@ -354,7 +354,7 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex1(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of an edge
@@ -362,7 +362,7 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge1(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of a vertex
@@ -370,7 +370,7 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_vertex2(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_vertex2(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of an edge
@@ -378,14 +378,14 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_edge2(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_edge2(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of a face
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
 	template <typename FUNC>
-	void foreach_dart_of_face2(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_face2(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of a cc
@@ -393,7 +393,7 @@ public:
 	* @param fonct functor obj ref
 	*/
 	template <typename FUNC>
-	void foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread = 0) const;
+	void foreach_dart_of_cc(Dart d, FUNC& f) const;
 	//@}
 
 	/*! @name Close map after import or creation

@@ -2,7 +2,7 @@
 IF (ONELIB)
 	SET(CGoGN_LIBS cgogn)
 ELSE (ONELIB)
-	SET(CGoGN_LIBS topology algo container utils)
+	SET(CGoGN_LIBS algo topology container utils)
 ENDIF (ONELIB)
 
 

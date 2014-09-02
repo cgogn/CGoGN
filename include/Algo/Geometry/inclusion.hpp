@@ -42,15 +42,15 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isConvex(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, bool CCW, unsigned int thread)
+bool isConvex(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, bool CCW)
 {
 	//get all the dart of the volume
 	std::vector<Dart> vStore;
-	map.foreach_dart_of_orbit(v, [&] (Dart d) { vStore.push_back(d); }, thread);
+	map.foreach_dart_of_orbit(v, [&] (Dart d) { vStore.push_back(d); });
 
 	bool convex = true;
 
-	DartMarkerStore<typename PFP::MAP> m(map, thread);
+	DartMarkerStore<typename PFP::MAP> m(map);
 	for (std::vector<Dart>::iterator it = vStore.begin() ; it != vStore.end() && convex ; ++it)
 	{
 		Dart e = *it;
@@ -64,7 +64,7 @@ bool isConvex(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP:
 	return convex;
 }
 
-// TODO add thread Pameter
+
 template <typename PFP>
 bool isPointInVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& point)
 {

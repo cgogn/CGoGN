@@ -43,7 +43,7 @@ namespace Modelisation
 {
 
 template <typename PFP>
-bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
+bool isHexahedron(typename PFP::MAP& the_map, Dart d);
 
 /**
 * Cut a 3D ear from a mesh : the ear is sewn by phi3 to the rest of the volume

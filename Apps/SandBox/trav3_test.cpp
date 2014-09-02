@@ -47,7 +47,7 @@ typedef PFP::VEC3 VEC3 ;			// type of R³ vector
 
 
 template <typename PFP, typename V_ATT>
-typename V_ATT::DATA_TYPE localvolumeCentroidELW(typename PFP::MAP& map, Vol d, const V_ATT& attributs, unsigned int thread=0)
+typename V_ATT::DATA_TYPE localvolumeCentroidELW(typename PFP::MAP& map, Vol d, const V_ATT& attributs)
 {
 	typedef typename V_ATT::DATA_TYPE EMB;
 	EMB center(0.0);

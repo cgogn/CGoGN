@@ -50,6 +50,9 @@ std::vector< std::vector<Dart>* >* GenericMap::s_vdartsBuffers = NULL;
 
 std::vector< std::vector<unsigned int>* >* GenericMap::s_vintsBuffers = NULL;
 
+//std::mutex* GenericMap::s_DartBufferMutex = NULL;
+//std::mutex* GenericMap::s_IntBufferMutex = NULL;
+
 std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
 
 
@@ -104,10 +107,15 @@ GenericMap::GenericMap():
 
 	s_instances->push_back(this);
 
+	m_thread_ids.reserve(NB_THREAD+1);
+	m_thread_ids.push_back( std::this_thread::get_id() );
+
+
 	if (s_vdartsBuffers == NULL)
 	{
 		s_vdartsBuffers = new std::vector< std::vector<Dart>* >[NB_THREAD];
 		s_vintsBuffers = new std::vector< std::vector<unsigned int>* >[NB_THREAD];
+
 		for(unsigned int i = 0; i < NB_THREAD; ++i)
 		{
 			s_vdartsBuffers[i].reserve(8);

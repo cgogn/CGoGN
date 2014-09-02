@@ -45,11 +45,10 @@ class CellMarkerGen
 protected:
 	AttributeMultiVector<MarkerBool>* m_markVector ;
 	unsigned int m_cell ;
-	unsigned int m_thread;
 
 public:
-	CellMarkerGen(unsigned int cell, unsigned int thread = 0) :
-		m_cell(cell),m_thread(thread)
+	CellMarkerGen(unsigned int cell) :
+		m_cell(cell)
 	{}
 
 	virtual ~CellMarkerGen()
@@ -79,28 +78,28 @@ public:
 	 * constructor
 	 * @param map the map on which we work
 	 */
-	CellMarkerBase(MAP& map, unsigned int thread = 0) :
-		CellMarkerGen(CELL, thread),
+	CellMarkerBase(MAP& map) :
+		CellMarkerGen(CELL),
 		m_map(map)
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_markVector = m_map.template askMarkVector<CELL>(m_thread);
+		m_markVector = m_map.template askMarkVector<CELL>();
 	}
 
-	CellMarkerBase(const MAP& map, unsigned int thread = 0) :
-		CellMarkerGen(CELL, thread),
+	CellMarkerBase(const MAP& map) :
+		CellMarkerGen(CELL),
 		m_map(const_cast<MAP&>(map))
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_markVector = m_map.template askMarkVector<CELL>(m_thread);
+		m_markVector = m_map.template askMarkVector<CELL>();
 	}
 
 	virtual ~CellMarkerBase()
 	{
 		if (GenericMap::alive(&m_map))
-			m_map.template releaseMarkVector<CELL>(m_markVector,m_thread);
+			m_map.template releaseMarkVector<CELL>(m_markVector);
 	}
 
 	/**
@@ -111,7 +110,7 @@ public:
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_markVector = m_map.template askMarkVector<CELL>(m_thread);
+		m_markVector = m_map.template askMarkVector<CELL>();
 	}
 
 
@@ -238,11 +237,11 @@ template <typename MAP, unsigned int CELL>
 class CellMarker : public CellMarkerBase<MAP, CELL>
 {
 public:
-	CellMarker(MAP& map, unsigned int thread = 0) : CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarker(MAP& map) : CellMarkerBase<MAP, CELL>(map)
 	{}
 
-	CellMarker(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarker(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{}
 
 	virtual ~CellMarker()
@@ -281,24 +280,24 @@ protected:
 	std::vector<unsigned int>* m_markedCells ;
 
 public:
-	CellMarkerStore(MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerStore(MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
 //		m_markedCells.reserve(128);
-		m_markedCells = GenericMap::askUIntBuffer(thread);
+		m_markedCells = this->m_map.askUIntBuffer();
 	}
 
-	CellMarkerStore(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerStore(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
 //		m_markedCells.reserve(128);
-		m_markedCells = GenericMap::askUIntBuffer(thread);
+		m_markedCells = this->m_map.askUIntBuffer();
 	}
 
 	virtual ~CellMarkerStore()
 	{
 		unmarkAll() ;
-		GenericMap::releaseUIntBuffer(m_markedCells, this->m_thread);
+		this->m_map.releaseUIntBuffer(m_markedCells);
 //		assert(isAllUnmarked);
 //		CGoGN_ASSERT(this->isAllUnmarked())
 	}
@@ -342,14 +341,14 @@ protected:
 	std::vector<Dart> m_markedDarts ;
 
 public:
-	CellMarkerMemo(MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerMemo(MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
 		m_markedDarts.reserve(128);
 	}
 
-	CellMarkerMemo(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerMemo(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
 		m_markedDarts.reserve(128);
 	}
@@ -405,15 +404,15 @@ class CellMarkerNoUnmark: public CellMarkerBase<MAP, CELL>
 	int m_counter;
 #endif
 public:
-	CellMarkerNoUnmark(MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerNoUnmark(MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
   #ifndef NDEBUG
 		,m_counter(0)
   #endif
 	{}
 
-	CellMarkerNoUnmark(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerNoUnmark(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
   #ifndef NDEBUG
 		,m_counter(0)
   #endif
