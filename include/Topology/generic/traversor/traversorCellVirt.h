@@ -50,7 +50,7 @@ private:
 	bool firstTraversal ;
 
 public:
-	VTraversorCell(const MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
+	VTraversorCell(const MAP& map, bool forceDartMarker = false) ;
 
 	~VTraversorCell() ;
 
@@ -67,7 +67,7 @@ public:
 //class TraversorV : public VTraversorCell<MAP, VERTEX>
 //{
 //public:
-//	TraversorV(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, VERTEX>(m, forceDartMarker, thread)
+//	TraversorV(MAP& m, bool forceDartMarker = false) : VTraversorCell<MAP, VERTEX>(m, forceDartMarker)
 //	{}
 //};
 
@@ -75,7 +75,7 @@ public:
 //class TraversorE : public VTraversorCell<MAP, EDGE>
 //{
 //public:
-//	TraversorE(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, EDGE>(m, forceDartMarker, thread)
+//	TraversorE(MAP& m, bool forceDartMarker = false) : VTraversorCell<MAP, EDGE>(m, forceDartMarker)
 //	{}
 //};
 
@@ -83,7 +83,7 @@ public:
 //class TraversorF : public VTraversorCell<MAP, FACE>
 //{
 //public:
-//	TraversorF(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, FACE>(m, forceDartMarker, thread)
+//	TraversorF(MAP& m, bool forceDartMarker = false) : VTraversorCell<MAP, FACE>(m, forceDartMarker)
 //	{}
 //};
 
@@ -91,7 +91,7 @@ public:
 //class TraversorW : public VTraversorCell<MAP, VOLUME>
 //{
 //public:
-//	TraversorW(MAP& m, bool forceDartMarker = false, unsigned int thread = 0) : VTraversorCell<MAP, VOLUME>(m, forceDartMarker, thread)
+//	TraversorW(MAP& m, bool forceDartMarker = false) : VTraversorCell<MAP, VOLUME>(m, forceDartMarker)
 //	{}
 //};
 
@@ -100,7 +100,7 @@ template <typename MAP>
 class TraversorV : public VTraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, VERTEX>(m, false, thread)
+	TraversorV(MAP& m) : VTraversorCell<MAP, VERTEX>(m, false)
 	{}
 };
 
@@ -108,7 +108,7 @@ template <typename MAP>
 class TraversorE : public VTraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, EDGE>(m, false, thread)
+	TraversorE(MAP& m) : VTraversorCell<MAP, EDGE>(m, false)
 	{}
 };
 
@@ -116,7 +116,7 @@ template <typename MAP>
 class TraversorF : public VTraversorCell<MAP, FACE>
 {
 public:
-	TraversorF(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, FACE>(m, false, thread)
+	TraversorF(MAP& m) : VTraversorCell<MAP, FACE>(m, false)
 	{}
 };
 
@@ -124,7 +124,7 @@ template <typename MAP>
 class TraversorW : public VTraversorCell<MAP, VOLUME>
 {
 public:
-	TraversorW(MAP& m, unsigned int thread = 0) : VTraversorCell<MAP, VOLUME>(m, false, thread)
+	TraversorW(MAP& m) : VTraversorCell<MAP, VOLUME>(m, false)
 	{}
 };
 */	

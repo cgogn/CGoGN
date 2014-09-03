@@ -432,45 +432,34 @@ void TopoRender<PFP>::setBoundaryShift(float bs)
 }
 
 template<typename PFP>
-void TopoRender<PFP>::updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf,float ns)
+void TopoRender<PFP>::updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, float ns)
 {
 	m_normalShift = ns;
 	SelectorDartBoundary<MAP> sdb(map);
 	DartContainerBrowserSelector<MAP> browser(map, sdb);
 	browser.enable();
-	updateData(map, positions, ke, kf, true);
+	updateData(map, positions, ke, kf, false,true); // false,true because we are drawing the boundary of a 3map
 	browser.disable();
 	m_normalShift = 0.0f;
 }
 
-//template<typename PFP>
-//void TopoRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary)
-//{
-//	std::string typeName = map.mapTypeName();
-//	if (typeName[0] == 'M') // "Map2"
-//	{
-//		updateDataMap(map, positions, ke, kf, withBoundary);
-//		return;
-//	}
-//	if (typeName[0] == 'G') // "GMap2"
-//	{
-//		updateDataGMap(map, positions, ke, kf, withBoundary);
-//		return;
-//	}
-//}
+
+
 
 template<typename PFP>
-void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary)
+void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary)
 {
-	//Map2& map = reinterpret_cast<Map2&>(mapx);
+	std::string name_index("dart_index2");
+	if (onlyBoundary)
+		name_index = std::string("dart_boundary_index2");
 
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(mapx.getNbDarts());  // no problem dart is int: no problem of memory
 
-	this->m_attIndex = mapx.template getAttribute<unsigned int, DART, MAP>("dart_index2");
+	this->m_attIndex = mapx.template getAttribute<unsigned int, DART, MAP>(name_index);
 
 	if (!this->m_attIndex.isValid())
-		this->m_attIndex  = mapx.template addAttribute<unsigned int, DART, MAP>("dart_index2");
+		this->m_attIndex  = mapx.template addAttribute<unsigned int, DART, MAP>(name_index);
 
 	for(Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
 	{
@@ -653,18 +642,23 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 
 
 template<typename PFP>
-void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary)
+void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary)
 {
 //	GMap2& map = dynamic_cast<GMap2&>(mapx);
 
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
 
+	std::string name_index("dart_index2");
+	if (onlyBoundary)
+		name_index = std::string("dart_boundary_index2");
+
+
 	if (this->m_attIndex.map() != &map)
-		this->m_attIndex  = map.template getAttribute<unsigned int, DART, MAP>("dart_index2");
+		this->m_attIndex  = map.template getAttribute<unsigned int, DART, MAP>(name_index);
 
 	if (!this->m_attIndex.isValid())
-		this->m_attIndex  = map.template addAttribute<unsigned int, DART, MAP>("dart_index2");
+		this->m_attIndex  = map.template addAttribute<unsigned int, DART, MAP>(name_index);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{

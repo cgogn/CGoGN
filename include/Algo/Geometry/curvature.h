@@ -58,8 +58,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmax,
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin) ;
 
 template <typename PFP>
 void computeCurvatureVertex_QuadraticFitting(
@@ -118,8 +117,7 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 template <typename PFP>
 void computeCurvatureVertex_NormalCycles(
@@ -133,8 +131,7 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 template <typename PFP>
 void normalCycles_SortAndSetEigenComponents(
@@ -145,19 +142,16 @@ void normalCycles_SortAndSetEigenComponents(
 	typename PFP::VEC3& Kmax,
 	typename PFP::VEC3& Kmin,
 	typename PFP::VEC3& Knormal,
-	const typename PFP::VEC3& normal,
-	unsigned int thread = 0) ;
+	const typename PFP::VEC3& normal) ;
 
 template <typename PFP>
 void normalCycles_SortTensor(
-	Geom::Matrix<3,3,typename PFP::REAL>& tensor,
-	unsigned int thread = 0) ;
+	Geom::Matrix<3,3,typename PFP::REAL>& tensor) ;
 
 template <typename PFP>
 void normalCycles_ProjectTensor(
 	Geom::Matrix<3,3,typename PFP::REAL>& tensor,
-	const typename PFP::VEC3& normal_vector,
-	unsigned int thread = 0) ;
+	const typename PFP::VEC3& normal_vector) ;
 
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles_Projected(
@@ -170,8 +164,7 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 template <typename PFP>
 void computeCurvatureVertex_NormalCycles_Projected(
@@ -185,8 +178,7 @@ void computeCurvatureVertex_NormalCycles_Projected(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 /* normal cycles with collector as a parameter : not usable in parallel */
 
@@ -201,8 +193,7 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 template <typename PFP>
 void computeCurvatureVertex_NormalCycles(
@@ -215,8 +206,7 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 template <typename PFP>
 void computeCurvatureVertices_NormalCycles_Projected(
@@ -229,8 +219,7 @@ void computeCurvatureVertices_NormalCycles_Projected(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 template <typename PFP>
 void computeCurvatureVertex_NormalCycles_Projected(
@@ -243,8 +232,7 @@ void computeCurvatureVertex_NormalCycles_Projected(
 	VertexAttribute<typename PFP::REAL, typename PFP::MAP>& kmin,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmax,
 	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Kmin,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& Knormal) ;
 
 
 namespace Parallel

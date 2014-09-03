@@ -49,7 +49,7 @@ namespace Geometry
  * @param true if the faces of the volume must be in CCW order (default=true)
  */
 template <typename PFP>
-bool isConvex(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool CCW, unsigned int thread = 0);
+bool isConvex(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool CCW);
 
 /**
  * test if a point is inside a volume
