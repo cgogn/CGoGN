@@ -232,12 +232,14 @@ protected:
 public:
 	inline void unmarkAll()
 	{
-		AttributeContainer& cont = this->m_map.template  getAttributeContainer<DART>();
-		if (cont.hasBrowser())
-			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-				this->m_markVector->setFalse(i);
-		else
-			this->m_markVector->allFalse();
+//		AttributeContainer& cont = this->m_map.template  getAttributeContainer<DART>();
+//		if (cont.hasBrowser())
+//			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+//				this->m_markVector->setFalse(i);
+//		else
+
+		// always unmark all darts, it's to dangerous because of markOrbit that can mark dart out of Browser !
+		this->m_markVector->allFalse();
 	}
 } ;
 
@@ -354,12 +356,14 @@ protected:
 public:
 	inline void unmarkAll()
 	{
-		AttributeContainer& cont = this->m_map.template  getAttributeContainer<DART>();
-		if (cont.hasBrowser())
-			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-				this->m_markVector->setFalse(i);
-		else
-			this->m_markVector->allFalse();
+//		AttributeContainer& cont = this->m_map.template  getAttributeContainer<DART>();
+//		if (cont.hasBrowser())
+//			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+//				this->m_markVector->setFalse(i);
+//		else
+
+		// always unmark all darts, it's to dangerous because of markOrbit that can mark dart out of Browser !
+		this->m_markVector->allFalse();
 	}
 
 #ifndef NDEBUG
