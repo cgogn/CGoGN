@@ -154,7 +154,6 @@ unsigned int IHM2<PFP>::faceLevel(Dart d)
     return fLevel ;
 }
 
-
 template <typename PFP>
 Dart IHM2<PFP>::faceOrigin(Dart d)
 {
@@ -330,7 +329,7 @@ template <typename PFP>
 void IHM2<PFP>::coarsenEdge(Dart d)
 {
 	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"coarsenEdge : called with a dart inserted after current level") ;
-	assert(m_map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
+    assert(edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
 
 
 	unsigned int cur = m_map.getCurrentLevel() ;
@@ -496,7 +495,7 @@ void IHM2<PFP>::coarsenFace(Dart d)
 	fit = d ;
 	do
 	{
-		if(m_map.edgeCanBeCoarsened(fit))
+        if(edgeCanBeCoarsened(fit))
 			coarsenEdge(fit) ;
 		fit = m_map.phi1(fit) ;
 	} while(fit != d) ;

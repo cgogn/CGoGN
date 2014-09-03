@@ -44,7 +44,7 @@ template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
-	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
+    template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
 
 public:
 	FunctorType* vertexVertexFunctor ;
@@ -52,92 +52,92 @@ public:
 	FunctorType* faceVertexFunctor ;
 	FunctorType* volumeVertexFunctor ;
 
-	unsigned int m_curLevel ;
-	unsigned int m_maxLevel ;
-	unsigned int m_edgeIdCount ;
-	unsigned int m_faceIdCount;
+    unsigned int m_curLevel ;
+    unsigned int m_maxLevel ;
+    unsigned int m_edgeIdCount ;
+    unsigned int m_faceIdCount;
 
-	DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_dartLevel ;
-	DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_edgeId ;
-	DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_faceId ;
+    DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_dartLevel ;
+    DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_edgeId ;
+    DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_faceId ;
 
-	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
+    AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
 //    std::vector<Algo::MR::Filter*> synthesisFilters ;
 //    std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
-	ImplicitHierarchicalMap3() ;
+    ImplicitHierarchicalMap3() ;
 
-	~ImplicitHierarchicalMap3() ;
+    ~ImplicitHierarchicalMap3() ;
 
-	static const unsigned int DIMENSION = 3 ;
+    static const unsigned int DIMENSION = 3 ;
 
-	//!
-	/*!
-	 *
-	 */
-	void update_topo_shortcuts();
+    //!
+    /*!
+     *
+     */
+    void update_topo_shortcuts();
 
-	//!
-	/*!
-	 *
-	 */
-	void initImplicitProperties() ;
+    //!
+    /*!
+     *
+     */
+    void initImplicitProperties() ;
 
-	/**
-	 * clear the map
-	 * @param remove attrib remove attribute (not only clear the content)
-	 */
-	void clear(bool removeAttrib);
+    /**
+     * clear the map
+     * @param remove attrib remove attribute (not only clear the content)
+     */
+    void clear(bool removeAttrib);
 
-	/*! @name Attributes Management
-	 *  To handles Attributes for each level of an implicit 3-map
-	 *************************************************************************/
+    /*! @name Attributes Management
+     *  To handles Attributes for each level of an implicit 3-map
+     *************************************************************************/
 
-	//@{
-	//!
-	/*!
-	 *
-	 */
-	template <typename T, unsigned int ORBIT>
-	AttributeHandler_IHM<T, ORBIT> addAttribute(const std::string& nameAttr) ;
+    //@{
+    //!
+    /*!
+     *
+     */
+    template <typename T, unsigned int ORBIT>
+    AttributeHandler_IHM<T, ORBIT> addAttribute(const std::string& nameAttr) ;
 
-	//!
-	/*!
-	 *
-	 */
-	template <typename T, unsigned int ORBIT>
-	AttributeHandler_IHM<T, ORBIT> getAttribute(const std::string& nameAttr) ;
-	//@}
+    //!
+    /*!
+     *
+     */
+    template <typename T, unsigned int ORBIT>
+    AttributeHandler_IHM<T, ORBIT> getAttribute(const std::string& nameAttr) ;
+    //@}
 
-	/*! @name Basic Topological Operators
-	 *  Redefinition of the basic topological operators
-	 *************************************************************************/
+    /*! @name Basic Topological Operators
+     *  Redefinition of the basic topological operators
+     *************************************************************************/
 
-	//@{
-	virtual Dart newDart() ;
+    //@{
+    virtual Dart newDart() ;
 
-	Dart phi1(Dart d) const;
+    Dart phi1(Dart d) const;
 
-	Dart phi_1(Dart d) const;
+    Dart phi_1(Dart d) const;
 
-	Dart phi2(Dart d) const;
+    Dart phi2(Dart d) const;
 
 private:
-	Dart phi2bis(Dart d) const;
+    Dart phi2bis(Dart d) const;
 
 public:
-	Dart phi3(Dart d) const;
+    Dart phi3(Dart d) const;
 
-	Dart alpha0(Dart d) const;
+    Dart alpha0(Dart d) const;
 
-	Dart alpha1(Dart d) const;
+    Dart alpha1(Dart d) const;
 
-	Dart alpha2(Dart d) const;
+    Dart alpha2(Dart d) const;
 
-	Dart alpha_2(Dart d) const;
-	//@}
+    Dart alpha_2(Dart d) const;
+    //@}
 
 	/*! @name Topological Operators with Cells id management
 	 *  Topological operations on Hierarchical Implicit 3-maps
@@ -195,41 +195,41 @@ public:
 	 *  Operations to manage the levels of an Implicit Hierarchical 3-map
 	 *************************************************************************/
 
-	void incCurrentLevel();
+    void incCurrentLevel();
 
-	void decCurrentLevel();
+    void decCurrentLevel();
 
 
-	//@{
-	//!
-	/*!
-	 *
-	 */
-	unsigned int getCurrentLevel() const ;
+    //@{
+    //!
+    /*!
+     *
+     */
+    unsigned int getCurrentLevel() const ;
 
-	//!
-	/*!
-	 *
-	 */
-	void setCurrentLevel(unsigned int l) ;
+    //!
+    /*!
+     *
+     */
+    void setCurrentLevel(unsigned int l) ;
 
-	//!
-	/*!
-	 *
-	 */
-	unsigned int getMaxLevel() const ;
+    //!
+    /*!
+     *
+     */
+    unsigned int getMaxLevel() const ;
 
-	//!
-	/*!
-	 *
-	 */
-	unsigned int getDartLevel(Dart d) const ;
+    //!
+    /*!
+     *
+     */
+    unsigned int getDartLevel(Dart d) const ;
 
-	//!
-	/*!
-	 *
-	 */
-	void setDartLevel(Dart d, unsigned int i) ;
+    //!
+    /*!
+     *
+     */
+    void setDartLevel(Dart d, unsigned int i) ;
 	//@}
 
 	/*! @name Id Management
@@ -237,47 +237,47 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Give a new unique id to all the edges of the map
-	/*!
-	 */
-	void initEdgeId() ;
+    //! Give a new unique id to all the edges of the map
+    /*!
+     */
+    void initEdgeId() ;
 
-	//! Return the next available edge id
-	/*!
-	 */
-	unsigned int getNewEdgeId() ;
+    //! Return the next available edge id
+    /*!
+     */
+    unsigned int getNewEdgeId() ;
 
-	//! Return the id of the edge of d
-	/*!
-	 */
-	unsigned int getEdgeId(Dart d) ;
+    //! Return the id of the edge of d
+    /*!
+     */
+    unsigned int getEdgeId(Dart d) ;
 
-	//! Set an edge id to all darts from an orbit of d
-	/*!
-	 */
-	void setEdgeId(Dart d, unsigned int i, unsigned int orbit); //TODO a virer
-	void setEdgeId(Dart d, unsigned int i);
+    //! Set an edge id to all darts from an orbit of d
+    /*!
+     */
+    void setEdgeId(Dart d, unsigned int i, unsigned int orbit); //TODO a virer
+    void setEdgeId(Dart d, unsigned int i);
 
-	//! Give a new unique id to all the faces of the map
-	/*!
-	 */
-	void initFaceId() ;
+    //! Give a new unique id to all the faces of the map
+    /*!
+     */
+    void initFaceId() ;
 
-	//! Return the next available face id
-	/*!
-	 */
-	unsigned int getNewFaceId() ;
+    //! Return the next available face id
+    /*!
+     */
+    unsigned int getNewFaceId() ;
 
-	//! Return the id of the face of d
-	/*!
-	 */
-	unsigned int getFaceId(Dart d) ;
+    //! Return the id of the face of d
+    /*!
+     */
+    unsigned int getFaceId(Dart d) ;
 
-	//! Set a face id to all darts from an orbit of d
-	/*!
-	 */
-	void setFaceId(Dart d, unsigned int i, unsigned int orbit); //TODO a virer
-	void setFaceId(unsigned int orbit, Dart d);
+    //! Set a face id to all darts from an orbit of d
+    /*!
+     */
+    void setFaceId(Dart d, unsigned int i, unsigned int orbit); //TODO a virer
+    void setFaceId(unsigned int orbit, Dart d);
 	//@}
 
 	/*! @name Cells Information
@@ -285,10 +285,10 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Return the level of insertion of the vertex of d
-	/*!
-	 */
-	unsigned int vertexInsertionLevel(Dart d) const;
+    //! Return the level of insertion of the vertex of d
+    /*!
+     */
+    unsigned int vertexInsertionLevel(Dart d) const;
 
 	//! Return the level of the edge of d in the current level map
 	/*!
@@ -371,53 +371,53 @@ public:
 	 *************************************************************************/
 
 	//@{
-	Dart begin() const;
+    Dart begin() const;
 
-	Dart end() const;
+    Dart end() const;
 
-	void next(Dart& d) const ;
+    void next(Dart& d) const ;
 
-	template <unsigned int ORBIT, typename FUNC>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
-	template <unsigned int ORBIT, typename FUNC>
-	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread = 0) const ;
+    template <unsigned int ORBIT, typename FUNC>
+    void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread = 0) const ;
+    template <unsigned int ORBIT, typename FUNC>
+    void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread = 0) const ;
 
-	template <typename FUNC>
-	void foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread = 0) const ;
+    template <typename FUNC>
+    void foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread = 0) const ;
 
-	template <typename FUNC>
-	void foreach_dart_of_edge(Dart d, FUNC& f, unsigned int thread = 0) const ;
+    template <typename FUNC>
+    void foreach_dart_of_edge(Dart d, FUNC& f, unsigned int thread = 0) const ;
 
-	template <typename FUNC>
-	void foreach_dart_of_oriented_face(Dart d, FUNC& f, unsigned int thread = 0) const;
+    template <typename FUNC>
+    void foreach_dart_of_oriented_face(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	template <typename FUNC>
-	void foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread = 0) const ;
+    template <typename FUNC>
+    void foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread = 0) const ;
 
-	template <typename FUNC>
-	void foreach_dart_of_oriented_volume(Dart d, FUNC& f, unsigned int thread = 0) const;
+    template <typename FUNC>
+    void foreach_dart_of_oriented_volume(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	template <typename FUNC>
-	void foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread = 0) const ;
+    template <typename FUNC>
+    void foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread = 0) const ;
 
-	template <typename FUNC>
-	void foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread = 0) const;
+    template <typename FUNC>
+    void foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	template <typename FUNC>
-	void foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread = 0) const;
+    template <typename FUNC>
+    void foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	template <typename FUNC>
-	void foreach_dart_of_vertex2(Dart d, FUNC& f, unsigned int thread = 0) const;
+    template <typename FUNC>
+    void foreach_dart_of_vertex2(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	template <typename FUNC>
-	void foreach_dart_of_edge2(Dart d, FUNC& f, unsigned int thread = 0) const;
+    template <typename FUNC>
+    void foreach_dart_of_edge2(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	template <typename FUNC>
-	void foreach_dart_of_face2(Dart d, FUNC& f, unsigned int thread = 0) const;
+    template <typename FUNC>
+    void foreach_dart_of_face2(Dart d, FUNC& f, unsigned int thread = 0) const;
 
-	template <typename FUNC>
-	void foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread = 0) const ;
-	//@}
+    template <typename FUNC>
+    void foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread = 0) const ;
+    //@}
 
     template <unsigned int ORBIT>
 	unsigned int getEmbedding(Cell<ORBIT> c) const;
