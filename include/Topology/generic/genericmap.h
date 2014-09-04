@@ -100,11 +100,14 @@ public:
 	/// compute thread index in the table of thread
 	inline unsigned int getCurrentThreadIndex() const;
 
-	/// add a thread to the table of thread
-	inline void addThreadId(const std::thread::id& id);
+	/// add place for n new threads in the table of thread return index of first
+	inline unsigned int addEmptyThreadIds(unsigned int n);
 
 	/// remove  the n last added threads from table
 	inline void popThreadIds(unsigned int nb);
+
+	/// get ref to jth threadId for updating (in thread)
+	inline std::thread::id& getThreadId(unsigned int j);
 
 
 protected:
