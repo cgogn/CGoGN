@@ -148,10 +148,35 @@ bool GLSLShader::areGeometryShadersSupported()
 
 bool GLSLShader::areShadersSupported()
 {
-	if ( ! glewGetExtension("GL_ARB_vertex_shader")) return false;
-	if ( ! glewGetExtension("GL_ARB_fragment_shader")) return false;
-	if ( ! glewGetExtension("GL_ARB_shader_objects")) return false;
-	if ( ! glewGetExtension("GL_ARB_shading_language_100")) return false;
+	if ( ! glewIsSupported("GL_ARB_vertex_shader"))
+	{
+		CGoGNerr << " vertex shaders not supported!" <<CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_fragment_shader"))
+	{
+		CGoGNerr << " fragment shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_geometry_shader4"))
+	{
+		CGoGNerr << " geometry shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_shader_objects"))
+	{
+		CGoGNerr << " shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_shading_language_100"))
+	{
+		CGoGNerr << " GLSL no supported!" << CGoGNendl;
+		return false;
+	}
 
 	return true;
 }
@@ -399,7 +424,7 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 		*m_geom_shader_object=0;
 	}
 	/*** create shader object ***/
-	*m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER_EXT);
+	*m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER);
 
 	if( !*m_geom_shader_object )
 	{

@@ -206,6 +206,8 @@ void MyQT::cb_initGL()
 {
 	// choose to use GL version 2
 	Utils::GLSLShader::setCurrentOGLVersion(2);
+	CGoGNout << "GL VERSION = "<< glGetString(GL_VERSION)<< CGoGNendl;
+	Utils::GLSLShader::areShadersSupported();
 
 	// create the renders
 	m_topo_render = new Algo::Render::GL2::Topo3RenderMap<PFP>();
