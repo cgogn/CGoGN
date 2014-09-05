@@ -660,10 +660,10 @@ protected:
 	bool& m_finished;
 	unsigned int m_id;
 	FUNC m_lambda;
-
+	std::thread::id& m_threadId;	// ref on thread::id in table of threads in genericMap for init at operator()
 public:
-	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id):
-		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func)
+	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id, std::thread::id& threadId) :
+		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func), m_threadId(threadId)
 	{
 	}
 
@@ -672,6 +672,9 @@ public:
 
 	void operator()()
 	{
+		// first thing to do set the thread id in genericMap
+		m_threadId = std::this_thread::get_id();
+
 		while (!m_finished)
 		{
 			for (typename std::vector<CELL>::const_iterator it = m_cells.begin(); it != m_cells.end(); ++it)
@@ -710,11 +713,12 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 	std::thread** threads = new std::thread*[nbth];
 	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
 
+	// add place for nbth new threads in the table of threadId in genericmap
+	unsigned int firstThread = map.addEmptyThreadIds(nbth);
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
-		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i],sync1,sync2, finished,1+i);
+		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i],sync1,sync2, finished,1+i,map.getThreadId(firstThread+i));
 		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
-		map.addThreadId(threads[i]->get_id());
 	}
 
 	// and continue to traverse the map

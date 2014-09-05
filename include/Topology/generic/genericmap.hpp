@@ -38,14 +38,21 @@ inline unsigned int GenericMap::getCurrentThreadIndex() const
 	while (id != m_thread_ids[i])
 	{
 		i++;
-		assert(i<<m_thread_ids.size());
+		assert(i<m_thread_ids.size());
 	}
 	return i;
 }
 
-inline void GenericMap::addThreadId(const std::thread::id& id)
+//inline void GenericMap::addThreadId(const std::thread::id& id)
+//{
+//	m_thread_ids.push_back(id);
+//}
+
+inline unsigned int GenericMap::addEmptyThreadIds(unsigned int n)
 {
-	m_thread_ids.push_back(id);
+	unsigned int nb = m_thread_ids.size();
+	m_thread_ids.resize(nb + n);
+	return nb;
 }
 
 inline void GenericMap::popThreadIds(unsigned int nb)
@@ -53,6 +60,11 @@ inline void GenericMap::popThreadIds(unsigned int nb)
 	assert(nb<m_thread_ids.size());
 	for ( unsigned int i=0; i<nb; ++i)
 		m_thread_ids.pop_back();
+}
+
+inline std::thread::id& GenericMap::getThreadId(unsigned int j)
+{
+	return m_thread_ids[j];
 }
 
 
