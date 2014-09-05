@@ -63,10 +63,10 @@ class CellSelector : public CellSelectorGen
 	typedef CellSelector<MAP, ORBIT> SELECTOR;
 
 public:
-	CellSelector(MAP& map, const QString& name, unsigned int thread = 0) :
+	CellSelector(MAP& map, const QString& name) :
 		CellSelectorGen(name),
 		m_map(map),
-		m_cm(map, thread)
+		m_cm(map)
 	{}
 
 	~CellSelector()

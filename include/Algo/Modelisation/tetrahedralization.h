@@ -50,7 +50,6 @@ template <typename PFP>
 class EarTriangulation
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 
 protected:
@@ -86,9 +85,9 @@ protected:
 protected:
 	MAP& m_map;
 
-	VertexAutoAttribute<EarAttr, MAP_IMPL> m_dartEars;
+	VertexAutoAttribute<EarAttr, MAP> m_dartEars;
 
-	VertexAttribute<VEC3, MAP_IMPL> m_position;
+	VertexAttribute<VEC3, MAP> m_position;
 
 	std::vector<Dart> m_resTets;
 
@@ -110,7 +109,7 @@ public:
 //	void trianguleFace(Dart d, DartMarker& mark);
 	void trianguleFace(Dart d);
 
-	void triangule(unsigned int thread = 0);
+	void triangule();
 
 	std::vector<Dart> getResultingTets() { return m_resTets; }
 };
@@ -153,7 +152,7 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd);
  *
  */
 template <typename PFP>
-bool isTetrahedron(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+bool isTetrahedron(typename PFP::MAP& map, Dart d);
 
 //!
 /*!

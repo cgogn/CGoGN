@@ -28,9 +28,11 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 #include "Utils/cgognStream.h"
 
 #include "glm/gtx/inverse_transpose.hpp"
+
 
 namespace CGoGN
 {
@@ -1036,7 +1038,7 @@ void GLSLShader::setCurrentOGLVersion(unsigned int version)
  */
 void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview)
 {
-	this->bind();
+    this->bind();
 
 	if (*m_uniMat_Proj >= 0)
 		glUniformMatrix4fv(*m_uniMat_Proj, 1, false, &projection[0][0]);
@@ -1088,6 +1090,7 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
+		assert((it->vbo_ptr->dataSize()!=0) || !"dataSize of VBO is 0 ! could not draw");
 		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)((unsigned long)(begin)));
 	}
 //	this->unbind();

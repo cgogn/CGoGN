@@ -36,6 +36,12 @@ class MapCommon : public MAP_IMPL
 {
 	typedef MAP_IMPL IMPL;
 
+protected:
+	// protected copy constructor to prevent the copy of map
+	MapCommon(const MapCommon<MAP_IMPL>& m) : MAP_IMPL(m) {}
+public:
+	MapCommon() {}
+
 	/****************************************
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/
@@ -48,7 +54,7 @@ public:
 	unsigned int degree(Dart d) const;
 
 	template <unsigned int ORBIT>
-	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread = 0) const;
+	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2) const;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -83,51 +89,10 @@ public:
 	template <unsigned int ORBIT>
 	inline void copyDartEmbedding(Dart dest, Dart src) ;
 
-	/**
-	* Set the index of the associated cell to all the darts of an orbit
-	* @param orbit orbit to embed
-	* @param d a dart of the topological vertex
-	* @param em index of attribute to store as embedding
-	*/
-	template <unsigned int ORBIT>
-	void setOrbitEmbedding(Cell<ORBIT> d, unsigned int em) ;
-
-	/**
-	 * Set the index of the associated cell to all the darts of an orbit
-	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
-	 */
-	template <unsigned int ORBIT>
-	void initOrbitEmbedding(Cell<ORBIT> d, unsigned int em) ;
-
-	/**
-	* Associate an new cell to all darts of an orbit
-	* @param orbit orbit to embed
-	* @param d a dart of the topological cell
-	* @return index of the attribute in table
-	*/
-	template <unsigned int ORBIT>
-	unsigned int setOrbitEmbeddingOnNewCell(Cell<ORBIT> d) ;
-
-	/**
-	 * Associate an new cell to all darts of an orbit
-	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
-	 */
-	template <unsigned int ORBIT>
-	unsigned int initOrbitEmbeddingOnNewCell(Cell<ORBIT> d) ;
-
-	/**
-	 * Copy the cell associated to a dart over an other dart
-	 * @param orbit attribute orbit to use
-	 * @param d the dart to overwrite (dest)
-	 * @param e the dart to copy (src)
-	 */
-	template <unsigned int ORBIT>
-	void copyCellAttributes(Cell<ORBIT> d, Cell<ORBIT> e) ;
-
 	/****************************************
 	 *         BOUNDARY MANAGEMENT          *
 	 ****************************************/
-protected:
+
 	/**
 	 * mark a dart as  belonging to boundary
 	 */
@@ -141,24 +106,11 @@ protected:
 	void boundaryUnmark(Dart d) ;
 
 	/**
-	 * mark an orbit as belonging to boundary
-	 */
-	template <unsigned int DIM, unsigned int ORBIT>
-	void boundaryMarkOrbit(Cell<ORBIT> c) ;
-
-	/**
-	 * unmark an orbit from the boundary
-	 */
-	template <unsigned int DIM, unsigned int ORBIT>
-	void boundaryUnmarkOrbit(Cell<ORBIT> c) ;
-
-	/**
 	 * clear all boundary markers
 	 */
 	template<unsigned int DIM>
 	void boundaryUnmarkAll() ;
 
-public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
@@ -178,68 +130,77 @@ public:
 	* @param nameAttr attribute name
 	* @return an AttributeHandler
 	*/
-	template <typename T, unsigned int ORBIT>
-	inline AttributeHandler<T, ORBIT, MAP_IMPL> addAttribute(const std::string& nameAttr = "") ;
+	template <typename T, unsigned int ORBIT, typename MAP>
+	inline AttributeHandler<T, ORBIT, MAP> addAttribute(const std::string& nameAttr = "") ;
 
 	/**
 	 * remove an attribute
 	 * @param attr a handler to the attribute to remove
 	 * @return true if remove succeed else false
 	 */
-	template <typename T, unsigned int ORBIT>
-	inline bool removeAttribute(AttributeHandler<T, ORBIT, MAP_IMPL>& attr) ;
+	template <typename T, unsigned int ORBIT, typename MAP>
+	inline bool removeAttribute(AttributeHandler<T, ORBIT, MAP>& attr) ;
 
 	/**
 	* search an attribute for a given orbit
 	* @param nameAttr attribute name
 	* @return an AttributeHandler
 	*/
-	template <typename T, unsigned int ORBIT>
-	inline AttributeHandler<T, ORBIT, MAP_IMPL> getAttribute(const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT, typename MAP>
+	inline AttributeHandler<T, ORBIT, MAP> getAttribute(const std::string& nameAttr) ;
+
+	/**
+	 * @brief get attribute type code
+	 * @param nameAttr name of attribute
+	 * @return code enum
+	 */
+	template <unsigned int ORBIT>
+	inline CGoGNCodeType getAttributeTypeCode(const std::string& nameAttr);
+
 
 	/**
 	* check if an attribute exist ( get, test if valid and add if necessary)
 	* @param nameAttr attribute name
 	* @return an AttributeHandler
 	*/
-	template <typename T, unsigned int ORBIT>
-	AttributeHandler<T, ORBIT, MAP_IMPL> checkAttribute(const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT, typename MAP>
+	AttributeHandler<T, ORBIT, MAP> checkAttribute(const std::string& nameAttr) ;
 
 	/**
 	 * swap the content of two attributes (efficient, only swap pointers)
 	 */
-	template <typename T, unsigned int ORBIT>
-	bool swapAttributes(AttributeHandler<T, ORBIT, MAP_IMPL>& attr1, AttributeHandler<T, ORBIT, MAP_IMPL>& attr2) ;
+	template <typename T, unsigned int ORBIT, typename MAP>
+	bool swapAttributes(AttributeHandler<T, ORBIT, MAP>& attr1, AttributeHandler<T, ORBIT, MAP>& attr2) ;
 
 	/**
 	 * copy the content of src attribute to dst attribute
 	 */
-	template <typename T, unsigned int ORBIT>
-	bool copyAttribute(AttributeHandler<T, ORBIT, MAP_IMPL>& dst, AttributeHandler<T, ORBIT, MAP_IMPL>& src) ;
+	template <typename T, unsigned int ORBIT, typename MAP>
+	bool copyAttribute(AttributeHandler<T, ORBIT, MAP>& dst, AttributeHandler<T, ORBIT, MAP>& src) ;
 
-	/**
-	 * get a DartAttribute to an involution of the map
-	 */
-	inline DartAttribute<Dart, MAP_IMPL> getInvolution(unsigned int i);
+//	/**
+//	 * get a DartAttribute to an involution of the map
+//	 */
+//	inline DartAttribute<Dart, MAP_IMPL> getInvolution(unsigned int i);
 
-	/**
-	 * get a DartAttribute to a permutation of the map
-	 */
-	inline DartAttribute<Dart, MAP_IMPL> getPermutation(unsigned int i);
+//	/**
+//	 * get a DartAttribute to a permutation of the map
+//	 */
+//	inline DartAttribute<Dart, MAP_IMPL> getPermutation(unsigned int i);
 
-	/**
-	 * get a DartAttribute to a permutation of the map
-	 */
-	inline DartAttribute<Dart, MAP_IMPL> getPermutationInv(unsigned int i);
+//	/**
+//	 * get a DartAttribute to a permutation of the map
+//	 */
+//	inline DartAttribute<Dart, MAP_IMPL> getPermutationInv(unsigned int i);
 
 	/****************************************
 	 *     QUICK TRAVERSAL MANAGEMENT       *
 	 ****************************************/
 
-	template <unsigned int ORBIT>
+	template <typename MAP, unsigned int ORBIT>
 	void enableQuickTraversal() ;
 
-	template <unsigned int ORBIT>
+	template <typename MAP, unsigned int ORBIT>
 	void updateQuickTraversal() ;
 
 	template <unsigned int ORBIT>
@@ -248,10 +209,10 @@ public:
 	template <unsigned int ORBIT>
 	void disableQuickTraversal() ;
 
-	template <unsigned int ORBIT, unsigned int INCI>
+	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
 	void enableQuickIncidentTraversal();
 
-	template <unsigned int ORBIT, unsigned int INCI>
+	template <typename MAP, unsigned int ORBIT, unsigned int INCI>
 	void updateQuickIncidentTraversal();
 
 	template <unsigned int ORBIT, unsigned int INCI>
@@ -260,10 +221,10 @@ public:
 	template <unsigned int ORBIT, unsigned int INCI>
 	void disableQuickIncidentTraversal();
 
-	template <unsigned int ORBIT, unsigned int ADJ>
+	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
 	void enableQuickAdjacentTraversal();
 
-	template <unsigned int ORBIT, unsigned int ADJ>
+	template <typename MAP, unsigned int ORBIT, unsigned int ADJ>
 	void updateQuickAdjacentTraversal();
 
 	template <unsigned int ORBIT, unsigned int INCI>

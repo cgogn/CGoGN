@@ -28,19 +28,19 @@ struct MapParameters
 	void start(MapHandlerGen* mh);
 	void stop(MapHandlerGen* mh);
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> positionAttribute;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionAttribute;
 
 	CellSelector<PFP2::MAP, VERTEX>* handleSelector;
 	CellSelector<PFP2::MAP, VERTEX>* freeSelector;
 
 	bool initialized;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> positionInit;
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> diffCoord;
-	VertexAttribute<Eigen_Matrix3f, PFP2::MAP::IMPL> vertexRotationMatrix;
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> rotatedDiffCoord;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionInit;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> diffCoord;
+	VertexAttribute<Eigen_Matrix3f, PFP2::MAP> vertexRotationMatrix;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> rotatedDiffCoord;
 
-	VertexAttribute<unsigned int, PFP2::MAP::IMPL> vIndex;
+	VertexAttribute<unsigned int, PFP2::MAP> vIndex;
 	unsigned int nb_vertices;
 
 	NLContext nlContext;

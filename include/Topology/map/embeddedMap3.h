@@ -35,11 +35,14 @@ namespace CGoGN
  */
 class EmbeddedMap3 : public Map3<MapMono>
 {
+	EmbeddedMap3(const EmbeddedMap3& m) : Map3<MapMono>(m) {}
 public:
 	typedef MapMono IMPL;
-	typedef Map3 TOPO_MAP;
+	typedef Map3<MapMono> TOPO_MAP;
 
 	static const unsigned int DIMENSION = TOPO_MAP::DIMENSION ;
+
+	EmbeddedMap3() {}
 
 	//!
 	/*!
@@ -131,7 +134,7 @@ public:
 	//!
 	/*! No attribute is attached to the new volume
 	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+	virtual unsigned int closeHole(Dart d);
 
 	//!
 	/*!

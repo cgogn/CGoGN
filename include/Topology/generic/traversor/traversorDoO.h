@@ -36,16 +36,26 @@ class TraversorDartsOfOrbit //: public Traversor<MAP>
 {
 private:
 	std::vector<Dart>::iterator m_current ;
-	std::vector<Dart> m_vd ;
+	std::vector<Dart>* m_vd ;
+	const GenericMap* m_map;
+
+	TraversorDartsOfOrbit( const TraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
 
 public:
-	TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
+	TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c) ;
 
-	Dart begin() ;
+	 ~TraversorDartsOfOrbit();
 
-	Dart end() ;
+	TraversorDartsOfOrbit(TraversorDartsOfOrbit<MAP,ORBIT>&& tr):
+		 m_current(tr.m_current),m_vd(tr.m_vd)
+	{
+	}
 
-	Dart next() ;
+	inline Dart begin() ;
+
+	inline Dart end() ;
+
+	inline Dart next() ;
 } ;
 
 template <typename MAP, unsigned int ORBIT>
@@ -53,16 +63,21 @@ class VTraversorDartsOfOrbit : public Traversor
 {
 private:
 	std::vector<Dart>::iterator m_current ;
-	std::vector<Dart> m_vd ;
+	std::vector<Dart>* m_vd ;
+	const GenericMap* m_map;
+
+	VTraversorDartsOfOrbit( const VTraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
 
 public:
-	VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread = 0) ;
+	VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c) ;
 
-	Dart begin() ;
+	~VTraversorDartsOfOrbit();
 
-	Dart end() ;
+	inline Dart begin() ;
 
-	Dart next() ;
+	inline Dart end() ;
+
+	inline Dart next() ;
 } ;
 
 } // namespace CGoGN

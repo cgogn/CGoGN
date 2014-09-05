@@ -235,7 +235,7 @@ Dart createOctahedron(typename PFP::MAP& map, bool withBoundary)
 }
 
 template <typename PFP>
-Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height)
+Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -307,7 +307,7 @@ Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, type
 }
 
 template <typename PFP>
-Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float radius, float height)
+Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float radius, float height)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -366,13 +366,13 @@ Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, ty
 }
 
 template <typename PFP>
-bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread)
+bool isPyra(typename PFP::MAP& map, Dart d)
 {
 	unsigned int nbFacesT = 0;
 	unsigned int nbFacesQ = 0;
 
 	//Test the number of faces end its valency
-	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false);
 	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
 	{
 		//increase the number of faces
@@ -391,13 +391,13 @@ bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread)
 }
 
 template <typename PFP>
-bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread)
+bool isPrism(typename PFP::MAP& map, Dart d)
 {
 	unsigned int nbFacesT = 0;
 	unsigned int nbFacesQ = 0;
 
 	//Test the number of faces end its valency
-	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false);
 	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
 	{
 		//increase the number of faces
@@ -417,7 +417,7 @@ bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread)
 
 
 template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	map.unsewVertexUmbrella(d);
 	unsigned int newFaceDegree = map.closeHole(map.phi1(d));
@@ -492,7 +492,6 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename 
 			fit = map.phi1(fit);
 		}
 		while(map.faceDegree(fit) > 4 && fit != d12);
-
 	}
 }
 

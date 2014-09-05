@@ -1,0 +1,6 @@
+# ignoring files added by make install
+PythonQt
+NL
+tetgen
+Zinri
+Assimp

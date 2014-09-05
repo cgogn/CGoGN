@@ -65,8 +65,8 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& positionF) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& positionF) ;
 
 /**
 * Quadrangule a face with central vertex
@@ -85,7 +85,7 @@ template <typename PFP, typename EMBV, typename EMB>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
 //template <typename PFP>
-//void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position) ;
+//void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position) ;
 
 /**
  * Catmull-Clark subdivision scheme
@@ -93,18 +93,71 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 template <typename PFP, typename EMBV>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
-//template <typename PFP>
-//void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
-
 /**
  * Loop subdivision scheme
  */
-//template <typename PFP, typename EMBV, typename EMB>
 template <typename PFP, typename EMBV>
 void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
-//template <typename PFP>
-//void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) ;
+template <typename PFP>
+void LoopSubdivisionGen(typename PFP::MAP& map, VertexAttributeGen& attrib)
+{
+	auto va3 = dynamic_cast<VertexAttribute<typename PFP::VEC3, typename PFP::MAP>*>(&attrib);
+	if (va3 != NULL)
+		return LoopSubdivision<PFP>(map,*va3);
+
+	auto va4 = dynamic_cast<VertexAttribute<typename PFP::VEC4, typename PFP::MAP>*>(&attrib);
+	if (va4 != NULL)
+		return LoopSubdivision<PFP>(map,*va4);
+
+	auto var = dynamic_cast<VertexAttribute<typename PFP::REAL, typename PFP::MAP>*>(&attrib);
+	if (var != NULL)
+		return LoopSubdivision<PFP>(map,*var);
+
+	CGoGNerr << "LoopSubdivision not supported on attribute of type "<< attrib.typeName() << CGoGNendl;
+}
+
+/**
+ * Loop typed version with attribute name parameter
+ */
+template <typename PFP, typename T>
+inline void LoopSubdivisionAttribNameTyped(typename PFP::MAP& map, const std::string& nameAttrib)
+{
+	VertexAttribute<T,typename PFP::MAP> va = map.template getAttribute<T,VERTEX,typename PFP::MAP>(nameAttrib) ;
+}
+
+/**
+ * Loop genereo version with attribute name parameter
+ */
+template <typename PFP>
+void LoopSubdivisionAttribName(typename PFP::MAP& map, const std::string& nameAttrib)
+{
+	typedef typename PFP::MAP MAP;
+
+	switch(map.template getAttributeTypeCode<VERTEX>(nameAttrib))
+	{
+	case CGoGNFLOAT:
+		return LoopSubdivisionAttribNameTyped<PFP,float>(map,nameAttrib);
+		break;
+	case CGoGNDOUBLE:
+		return LoopSubdivisionAttribNameTyped<PFP,double>(map,nameAttrib);
+		break;
+	case CGoGNVEC3F:
+		return LoopSubdivisionAttribNameTyped<PFP,Geom::Vec3f>(map,nameAttrib);
+		break;
+	case CGoGNVEC3D:
+		return LoopSubdivisionAttribNameTyped<PFP,Geom::Vec3d>(map,nameAttrib);
+		break;
+	case CGoGNVEC4F:
+		return LoopSubdivisionAttribNameTyped<PFP,Geom::Vec4f>(map,nameAttrib);
+		break;
+	case CGoGNVEC4D:
+		return LoopSubdivisionAttribNameTyped<PFP,Geom::Vec4d>(map,nameAttrib);
+		break;
+	}
+	CGoGNerr << "LoopSubdivision not supported on attribute "<< nameAttrib << CGoGNendl;
+}
+
 
 
 /**
@@ -135,13 +188,13 @@ void DooSabin(typename PFP::MAP& map, EMBV& position);
 //void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 template <typename PFP>
-void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void computeBoundaryConstraintDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 template <typename PFP>
-void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void computeBoundaryConstraintKeepingOldVerticesDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 } // namespace Modelisation
 

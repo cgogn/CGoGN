@@ -37,6 +37,9 @@ template <typename MAP_IMPL>
 class GMap3 : public GMap2<MAP_IMPL>
 {
 protected:
+	// protected copy constructor to prevent the copy of map
+	GMap3(const GMap3<MAP_IMPL>& m):GMap2<MAP_IMPL>(m) {}
+
 	void init() ;
 
 public:
@@ -283,78 +286,114 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Apply a function on every dart of an orbit
+	/*! @param c a cell
+	 *  @param f a function
+	 */
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f) const ;
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f) const ;
+
 	/**
 	* Apply a functor on each dart of an oriented vertex
 	* @param d a dart of the oriented vertex
 	* @param fonct functor obj ref
 	*/
-	void foreach_dart_of_oriented_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_oriented_vertex(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of a vertex
 	* @param d a dart of the vertex
 	* @param fonct functor obj ref
 	*/
-	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_vertex(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of an oriented edge
 	* @param d a dart of the oriented edge
 	* @param fonct functor obj ref
 	*/
-	void foreach_dart_of_oriented_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_oriented_edge(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of an edge
 	* @param d a dart of the edge
 	* @param fonct functor obj ref
 	*/
-	void foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_edge(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of a face
 	/*! @param d a dart of the face
 	 *  @param f the functor to apply
 	 */
-	void foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_face(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of an oriented volume
 	/*! @param d a dart of the oriented volume
 	 *  @param f the functor to apply
 	 */
-	void foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_oriented_volume(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	void foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
-
-	/**
-	* Apply a functor on each dart of a cc
-	* @param d a dart of the cc
-	* @param fonct functor obj ref
-	*/
-	void foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_volume(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of a vertex
 	* @param d a dart of the face
 	* @param fonct functor obj ref
 	*/
-	void foreach_dart_of_vertex2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_vertex1(Dart d, FUNC& f) const;
 
 	/**
 	* Apply a functor on each dart of an edge
 	* @param d a dart of the oriented face
 	* @param fonct functor obj ref
 	*/
-	void foreach_dart_of_edge2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_edge1(Dart d, FUNC& f) const;
+
+	/**
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the face
+	* @param fonct functor obj ref
+	*/
+	template <typename FUNC>
+	void foreach_dart_of_vertex2(Dart d, FUNC& f) const;
+
+	/**
+	* Apply a functor on each dart of an edge
+	* @param d a dart of the oriented face
+	* @param fonct functor obj ref
+	*/
+	template <typename FUNC>
+	void foreach_dart_of_edge2(Dart d, FUNC& f) const;
 
 	//! Apply a functor on every dart of a face
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	void foreach_dart_of_face2(Dart d, std::function<void (Dart)>& f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_face2(Dart d, FUNC& f) const;
+
+	/**
+	* Apply a functor on each dart of a cc
+	* @param d a dart of the cc
+	* @param fonct functor obj ref
+	*/
+	template <typename FUNC>
+	void foreach_dart_of_cc(Dart d, FUNC& f) const;
 	//@}
 
 	/*! @name Close map after import or creation
@@ -374,7 +413,7 @@ public:
 	 *  @param forboundary tag the created face as boundary (default is true)
 	 *  @return the degree of the created volume
 	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+	virtual unsigned int closeHole(Dart d);
 
 	//! Close the map removing topological holes: DO NOT USE, only for import/creation algorithm
 	/*! Add volumes to the map that close every existing hole.

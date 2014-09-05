@@ -150,11 +150,10 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	typedef typename V_ATT::DATA_TYPE VEC3;
 	typedef typename W_ATT::DATA_TYPE COL3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;
@@ -229,7 +228,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 			}
 		}
 	});
-//	,false,thread); ????
+//	,false); ????
 
 	m_nbTris = buffer.size()/4;
 
@@ -260,7 +259,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 			buffer.push_back(PFP::toVec3f(positions[c.dart]));
 			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
 	});
-	//	,false,thread); ????
+	//	,false); ????
 
 	m_nbLines = buffer.size()/3;
 
@@ -285,11 +284,10 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 {
 	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef typename Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;
@@ -362,7 +360,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 				bufferColors.push_back(m_globalColor);
 			}
 		}
-	}); // false,thread) ???
+	}); // false) ???
 	
 	m_nbTris = buffer.size()/4;
 
@@ -425,20 +423,17 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 
 	if (m_smooth)
 	{
-
 		updateSmooth<PFP>(map,positions,colorPerXXX);
 		return;
 	}
 
-
     //typedef typename PFP::VEC3 VEC3;
 	typedef typename V_ATT::DATA_TYPE VEC3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;
@@ -515,7 +510,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 	{			buffer.push_back(PFP::toVec3f(centerVolumes[c.dart]));
 			buffer.push_back(PFP::toVec3f(positions[c.dart]));
 			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
-	}); // false,thread ???
+	}); // false ???
 
 	m_nbLines = buffer.size()/3;
 
@@ -545,11 +540,10 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 
 	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
-	VolumeAutoAttribute<VEC3, MAP_IMPL> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
 	Algo::Volume::Geometry::Parallel::computeCentroidELWVolumes<PFP>(map, positions, centerVolumes);
 
 	std::vector<VEC3F> buffer;

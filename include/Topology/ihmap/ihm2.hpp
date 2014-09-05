@@ -36,7 +36,7 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::addAttribute(const std:
 	if(!isOrbitEmbedded<ORBIT>())
 		addNextLevelCell = true ;
 
-	AttributeHandler<T, ORBIT, EMap2_IMPL> h = TOPO_MAP::addAttribute<T, ORBIT>(nameAttr) ;
+	AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2> h = TOPO_MAP::addAttribute<T, ORBIT>(nameAttr) ;
 
 	if(addNextLevelCell)
 	{
@@ -53,7 +53,7 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::addAttribute(const std:
 template <typename T, unsigned int ORBIT>
 AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::getAttribute(const std::string& nameAttr)
 {
-	AttributeHandler<T, ORBIT, EMap2_IMPL> h = TOPO_MAP::getAttribute<T, ORBIT>(nameAttr) ;
+	AttributeHandler<T, ORBIT, ImplicitHierarchicalMap2> h = TOPO_MAP::getAttribute<T, ORBIT, ImplicitHierarchicalMap2>(nameAttr) ;
 	return AttributeHandler_IHM<T, ORBIT>(this, h.getDataVector()) ;
 }
 
@@ -61,8 +61,8 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap2::getAttribute(const std:
 inline void ImplicitHierarchicalMap2::update_topo_shortcuts()
 {
 //	TOPO_MAP::update_topo_shortcuts();
-	m_dartLevel = TOPO_MAP::getAttribute<unsigned int, DART>("dartLevel") ;
-	m_edgeId = TOPO_MAP::getAttribute<unsigned int, DART>("edgeId") ;
+	m_dartLevel = TOPO_MAP::getAttribute<unsigned int, DART, ImplicitHierarchicalMap2>("dartLevel") ;
+	m_edgeId = TOPO_MAP::getAttribute<unsigned int, DART, ImplicitHierarchicalMap2>("edgeId") ;
 
 	//AttributeContainer& cont = m_attribs[DART] ;
 	//m_nextLevelCell = cont.getDataVector<unsigned int>(cont.getAttributeIndex("nextLevelCell")) ;
@@ -168,7 +168,40 @@ inline void ImplicitHierarchicalMap2::next(Dart& d) const
 		d = TOPO_MAP::end() ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+//template <unsigned int ORBIT, typename FUNC>
+//void ImplicitHierarchicalMap2::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f) const
+//{
+//	switch(ORBIT)
+//	{
+//		case DART:		f(c); break;
+//		case VERTEX: 	foreach_dart_of_vertex(c, f); break;
+//		case EDGE: 		foreach_dart_of_edge(c, f); break;
+//		case FACE: 		foreach_dart_of_face(c, f); break;
+//		case VOLUME: 	foreach_dart_of_volume(c, f); break;
+//		case VERTEX1: 	foreach_dart_of_vertex1(c, f); break;
+//		case EDGE1: 	foreach_dart_of_edge1(c, f); break;
+//		default: 		assert(!"Cells of this dimension are not handled"); break;
+//	}
+//}
+
+template <unsigned int ORBIT, typename FUNC>
+void ImplicitHierarchicalMap2::foreach_dart_of_orbit(Cell<ORBIT> c, const FUNC& f) const
+{
+	switch(ORBIT)
+	{
+		case DART:		f(c); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f); break;
+		case EDGE: 		foreach_dart_of_edge(c, f); break;
+		case FACE: 		foreach_dart_of_face(c, f); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f); break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
+	}
+}
+
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, FUNC& f) const
 {
 	Dart dNext = d;
 	do
@@ -178,7 +211,8 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex(Dart d, std::functi
 	} while (dNext != d);
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, FUNC& f) const
 {
 	f(d);
 	Dart d2 = phi2(d);
@@ -186,7 +220,8 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_edge(Dart d, std::function
 		f(d2);
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)>& f, unsigned int /*thread*/) const
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, FUNC& f) const
 {
 	Dart dNext = d ;
 	do
@@ -196,14 +231,16 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_face(Dart d, std:
 	} while (dNext != d) ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_face(Dart d, FUNC& f) const
 {
-	foreach_dart_of_oriented_face(d, f, thread) ;
+	foreach_dart_of_oriented_face(d, f) ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, FUNC& f) const
 {
-	DartMarkerStore<Map2> mark(*this, thread);	// Lock a marker
+	DartMarkerStore<Map2> mark(*this);	// Lock a marker
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.push_back(d);		// Start with the face of d
@@ -215,7 +252,7 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, st
 		if (!mark.isMarked(*face))		// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			foreach_dart_of_oriented_face(*face, f, thread);
+			foreach_dart_of_oriented_face(*face, f);
 
 			// mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face
@@ -232,14 +269,28 @@ inline void ImplicitHierarchicalMap2::foreach_dart_of_oriented_volume(Dart d, st
 	}
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_volume(Dart d, FUNC& f) const
 {
-	foreach_dart_of_oriented_volume(d, f, thread) ;
+	foreach_dart_of_oriented_volume(d, f) ;
 }
 
-inline void ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, std::function<void (Dart)>& f, unsigned int thread) const
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_vertex1(Dart d, FUNC& f) const
 {
-	foreach_dart_of_oriented_volume(d, f, thread) ;
+	f(d);
+}
+
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_edge1(Dart d, FUNC& f) const
+{
+	f(d);
+}
+
+template <typename FUNC>
+inline void ImplicitHierarchicalMap2::foreach_dart_of_cc(Dart d, FUNC& f) const
+{
+	foreach_dart_of_oriented_volume(d, f) ;
 }
 
 /***************************************************
@@ -253,8 +304,8 @@ inline void ImplicitHierarchicalMap2::splitFace(Dart d, Dart e)
 	{
 		unsigned int cur = m_curLevel ;
 		m_curLevel = m_maxLevel ;
-		this->setOrbitEmbedding<FACE>(d, this->getEmbedding<FACE>(d)) ;
-		this->setOrbitEmbedding<FACE>(e, this->getEmbedding<FACE>(e)) ;
+		Algo::Topo::setOrbitEmbedding<FACE>(*this, d, this->getEmbedding<FACE>(d)) ;
+		Algo::Topo::setOrbitEmbedding<FACE>(*this, e, this->getEmbedding<FACE>(e)) ;
 		m_curLevel = cur ;
 	}
 }
@@ -413,7 +464,7 @@ T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d)
 
 	if(index == EMBNULL)
 	{
-		index = m->setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+		index = Algo::Topo::setOrbitEmbeddingOnNewCell<ORBIT>(m, d) ;
 		m->m_nextLevelCell[orbit]->operator[](index) = EMBNULL ;
 	}
 

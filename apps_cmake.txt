@@ -3,32 +3,38 @@
 
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 
-SET ( WITH_ASSIMP ON CACHE BOOL "need Assimp")
-SET ( WITH_ZINRI ON CACHE BOOL "need Zinri lib")
+#SET ( WITH_ASSIMP ON CACHE BOOL "need Assimp")
+#SET ( WITH_ZINRI ON CACHE BOOL "need Zinri lib")
+
+IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp")
+	SET ( WITH_ASSIMP ON CACHE BOOL "build CGoGN with Assimp" )
+ELSE()
+	SET ( WITH_ASSIMP OFF CACHE BOOL "build CGoGN with Assimp" )
+ENDIF()
+
+IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Zinri")
+	SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib" )
+ELSE()
+	SET ( WITH_ZINRI OFF CACHE BOOL "build CGoGN with Zinri lib" )
+ENDIF()
+
 SET ( WITH_QT ON CACHE BOOL "need Qt lib")
 
-# for CGoGN MR
-file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_mr.h FORCE_MR)
-IF (FORCE_MR EQUAL 1)
-	add_definitions(-DCGoGN_FORCE_MR=1)
-ENDIF (FORCE_MR EQUAL 1)
 
 # for CGoGN in one lib or not
 file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
-	SET(CGoGN_LIBS_D cgognD)
-	SET(CGoGN_LIBS_R cgogn)
-ELSE (ONELIB_STR EQUAL 1)
-	SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
-	SET(CGoGN_LIBS_R topology algo container utils)
-ENDIF (ONELIB_STR EQUAL 1)
+	SET(CGoGN_LIBS cgogn)
+ELSE()
+	SET(CGoGN_LIBS algo topology container utils)
+ENDIF()
 
 IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
 ENDIF(WIN32)
 
 find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS regex thread system REQUIRED)
+find_package(Boost COMPONENTS regex REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
@@ -60,7 +66,6 @@ SET (COMMON_LIBS
 	${LIBXML2_LIBRARIES}
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
-	${Boost_THREAD_LIBRARY}
 )
 
 IF(WIN32)
@@ -111,14 +116,36 @@ IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
 	set(CMAKE_CONFIGURATION_TYPES Release Debug)
 	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
-ELSE(WIN32)
+ELSE()
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC -std=c++11")
-ENDIF(WIN32)
+	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+		if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+			SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
+		endif()
+	endif()
+	
+ENDIF()
+
+IF(NOT CMAKE_BUILD_TYPE)
+	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug")
+		set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	ELSE()
+		set(CMAKE_BUILD_TYPE "Release" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	ENDIF()
+ENDIF()
+
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 
 IF(WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/ ${Boost_LIBRARY_DIRS} )
-ELSE (WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/Debug ${CGoGN_ROOT_DIR}/lib/Release)
-ENDIF (WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
+	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+ELSE ()
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+	SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+ENDIF ()
+
+

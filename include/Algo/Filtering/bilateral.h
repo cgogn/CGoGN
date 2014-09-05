@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 #include <math.h>
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 namespace CGoGN
 {
@@ -38,7 +38,7 @@ namespace Filtering
 {
 
 template <typename PFP>
-void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal, float& sigmaC, float& sigmaS)
+void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal, float& sigmaC, float& sigmaS)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -59,13 +59,24 @@ void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 	sigmaS = 2.5f * ( sumAngles / float(nbEdges) ) ;
 }
 
+/**
+ * \brief Function applying a bilateral filter smoothing on the mesh.
+ * \param map the map of the mesh
+ * \param positionIn the current positions container of the mesh
+ * \param positionOut the smoothed positions after the function call
+ * \param normal the normals
+ */
 template <typename PFP>
-void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal)
+void filterBilateral(
+        typename PFP::MAP& map,
+        const VertexAttribute<typename PFP::VEC3,typename PFP::MAP>& positionIn,
+        VertexAttribute<typename PFP::VEC3,typename PFP::MAP>& positionOut,
+        const VertexAttribute<typename PFP::VEC3,typename PFP::MAP>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
 	float sigmaC, sigmaS ;
-	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS) ;
+    sigmaBilateral<PFP>(map, positionIn, normal, sigmaC, sigmaS) ;
 
 	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -80,7 +91,7 @@ void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 			Traversor2VE<typename PFP::MAP> te(map, d) ;
 			for(Dart it = te.begin(); it != te.end(); it = te.next())
 			{
-				VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
+                VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, it, positionIn) ;
 				float h = normal_d * vec ;
 				float t = vec.norm() ;
 				float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) ) ;
@@ -88,15 +99,15 @@ void filterBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 				normalizer += wcs ;
 			}
 
-			position2[d] = position[d] + ((sum / normalizer) * normal_d) ;
+            positionOut[d] = positionIn[d] + ((sum / normalizer) * normal_d) ;
 		}
 		else
-			position2[d] = position[d] ;
+            positionOut[d] = positionIn[d] ;
 	}
 }
 
 template <typename PFP>
-void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal)
+void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

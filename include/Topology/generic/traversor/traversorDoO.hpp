@@ -29,17 +29,24 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT>
-TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread)
+TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c)
+	:m_map(&map)
 {
-	m_vd.reserve(16);
-	map.foreach_dart_of_orbit(c, [&] (Dart d) { if (!map.isBoundaryMarkedCurrent(d)) m_vd.push_back(d); }, thread);
-	m_vd.push_back(NIL);
+	m_vd = map.askDartBuffer();
+	map.foreach_dart_of_orbit(c, [&] (Dart d) { if (!map.isBoundaryMarkedCurrent(d)) m_vd->push_back(d); });
+	m_vd->push_back(NIL);
+}
+
+template <typename MAP, unsigned int ORBIT>
+TraversorDartsOfOrbit<MAP, ORBIT>::~TraversorDartsOfOrbit()
+{
+	m_map->releaseDartBuffer(m_vd);
 }
 
 template <typename MAP, unsigned int ORBIT>
 Dart TraversorDartsOfOrbit<MAP, ORBIT>::begin()
 {
-	m_current = m_vd.begin();
+	m_current = m_vd->begin();
 	return *m_current;
 }
 
@@ -60,17 +67,24 @@ Dart TraversorDartsOfOrbit<MAP, ORBIT>::next()
 
 
 template <typename MAP, unsigned int ORBIT>
-VTraversorDartsOfOrbit<MAP, ORBIT>::VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c, unsigned int thread)
+VTraversorDartsOfOrbit<MAP, ORBIT>::VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c)
+:m_map(&map)
 {
-	m_vd.reserve(16);
-	map.foreach_dart_of_orbit(c, [&] (Dart d) {	if (!map.isBoundaryMarkedCurrent(d)) m_vd.push_back(d); }, thread);
-	m_vd.push_back(NIL);
+	m_vd = map.askDartBuffer();
+	map.foreach_dart_of_orbit(c, [&] (Dart d) {	if (!map.isBoundaryMarkedCurrent(d)) m_vd->push_back(d); });
+	m_vd->push_back(NIL);
+}
+
+template <typename MAP, unsigned int ORBIT>
+VTraversorDartsOfOrbit<MAP, ORBIT>::~VTraversorDartsOfOrbit()
+{
+	m_map->releaseDartBuffer(m_vd);
 }
 
 template <typename MAP, unsigned int ORBIT>
 Dart VTraversorDartsOfOrbit<MAP, ORBIT>::begin()
 {
-	m_current = m_vd.begin();
+	m_current = m_vd->begin();
 	return *m_current;
 }
 

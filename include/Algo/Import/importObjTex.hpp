@@ -84,19 +84,19 @@ inline Geom::Vec2f OBJModel<PFP>::getTexCoord(Dart d)
 }
 
 template <typename PFP>
-void OBJModel<PFP>::setPositionAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP::IMPL> position)
+void OBJModel<PFP>::setPositionAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP> position)
 {
 	m_positions = position;
 }
 
 template <typename PFP>
-void OBJModel<PFP>::setNormalAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP::IMPL> normal)
+void OBJModel<PFP>::setNormalAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP> normal)
 {
 	m_normals = normal;
 }
 
 template <typename PFP>
-void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f, typename PFP::MAP::IMPL>texcoord)
+void OBJModel<PFP>::setTexCoordAttribute(VertexAttribute<Geom::Vec2f, typename PFP::MAP>texcoord)
 {
 	m_texCoords = texcoord;
 }
@@ -1527,11 +1527,6 @@ void OBJModel<PFP>::computeBB(const std::vector<Geom::Vec3f>& pos)
 template <typename PFP>
 bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string>& attrNames)
 {
-	typedef  typename PFP::MAP MAP;
-	typedef  typename PFP::MAP::IMPL MAP_IMPL;
-	typedef  typename PFP::VEC3 VEC3;
-	typedef Geom::Vec2f VEC2;
-
 	attrNames.clear();
 	// open file
 	std::ifstream fp(filename.c_str()/*, std::ios::binary*/);
@@ -1571,46 +1566,46 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 
 	} while (!fp.eof());
 
-	m_positions =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+	m_positions =  m_map.template getAttribute<VEC3, VERTEX, MAP>("position") ;
 	if (!m_positions.isValid())
-		m_positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;
+		m_positions = m_map.template addAttribute<VEC3, VERTEX, MAP>("position") ;
 	attrNames.push_back(m_positions.name()) ;
 
-	m_texCoords =  m_map.template getAttribute<VEC2, VERTEX>("texCoord") ;
+	m_texCoords =  m_map.template getAttribute<VEC2, VERTEX, MAP>("texCoord") ;
 	if (!m_texCoords.isValid())
-		m_texCoords = m_map.template addAttribute<VEC2, VERTEX>("texCoord") ;
+		m_texCoords = m_map.template addAttribute<VEC2, VERTEX, MAP>("texCoord") ;
 	attrNames.push_back(m_texCoords.name()) ;
 
 	if (m_tagVT != 0)
 	{
-		m_texCoordsF =  m_map.template getAttribute<VEC2, VERTEX1>("texCoordF") ;
+		m_texCoordsF =  m_map.template getAttribute<VEC2, VERTEX1, MAP>("texCoordF") ;
 		if (!m_texCoordsF.isValid())
-			m_texCoordsF = m_map.template addAttribute<VEC2, VERTEX1>("texCoordF") ;
+			m_texCoordsF = m_map.template addAttribute<VEC2, VERTEX1, MAP>("texCoordF") ;
 	}
 
-	m_normals =  m_map.template getAttribute<typename PFP::VEC3, VERTEX>("normal") ;
+	m_normals =  m_map.template getAttribute<VEC3, VERTEX, MAP>("normal") ;
 	if (!m_normals.isValid())
-		m_normals = m_map.template addAttribute<VEC3, VERTEX>("normal") ;
+		m_normals = m_map.template addAttribute<VEC3, VERTEX, MAP>("normal") ;
 	attrNames.push_back(m_normals.name()) ;
 
 	if (m_tagVN != 0)
 	{
-		m_normalsF =  m_map.template getAttribute<VEC3, VERTEX1>("normalF") ;
+		m_normalsF =  m_map.template getAttribute<VEC3, VERTEX1, MAP>("normalF") ;
 		if (!m_normalsF.isValid())
-			m_normalsF = m_map.template addAttribute<VEC3, VERTEX1>("normalF") ;
+			m_normalsF = m_map.template addAttribute<VEC3, VERTEX1, MAP>("normalF") ;
 	}
 	
 //	if (m_tagG != 0) always use group even if not in the file
 	{
-		m_groups =  m_map.template getAttribute<unsigned int, FACE>("groups") ;
+		m_groups =  m_map.template getAttribute<unsigned int, FACE, MAP>("groups") ;
 		if (!m_groups.isValid())
-			m_groups = m_map.template addAttribute<unsigned int, FACE>("groups") ;
+			m_groups = m_map.template addAttribute<unsigned int, FACE, MAP>("groups") ;
 		attrNames.push_back(m_groups.name()) ;
 	}
 	
-	m_attMat =  m_map.template getAttribute<unsigned int, FACE>("material") ;
+	m_attMat =  m_map.template getAttribute<unsigned int, FACE, MAP>("material") ;
 	if (!m_attMat.isValid())
-		m_attMat = m_map.template addAttribute<unsigned int, FACE>("material") ;
+		m_attMat = m_map.template addAttribute<unsigned int, FACE, MAP>("material") ;
 	attrNames.push_back(m_attMat.name()) ;
 
 	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
@@ -1636,13 +1631,12 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 	std::vector<unsigned int> localIndices;
 	localIndices.reserve(64*3);
 
-	unsigned int vemb = EMBNULL;
-	auto fsetemb = [&] (Dart d) { m_map.template initDartEmbedding<VERTEX>(d, vemb); };
-//	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(m_map);
+//	unsigned int vemb = EMBNULL;
+//	auto fsetemb = [&] (Dart d) { m_map.template initDartEmbedding<VERTEX>(d, vemb); };
 
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP_IMPL> vecDartsPerVertex(m_map, "incidents");
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> >, MAP_IMPL> vecNormIndPerVertex(m_map, "incidentsN");
-	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> >, MAP_IMPL> vecTCIndPerVertex(m_map, "incidentsTC");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP> vecDartsPerVertex(m_map, "incidents");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> >, MAP> vecNormIndPerVertex(m_map, "incidentsN");
+	VertexAutoAttribute< NoTypeNameAttribute< std::vector<unsigned int> >, MAP> vecTCIndPerVertex(m_map, "incidentsTC");
 
 	int currentGroup = -1;
 	unsigned int currentMat = 0;
@@ -1742,8 +1736,8 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 			
 			for (short j = 0; j < nbe; ++j)
 			{
-				vemb = localIndices[3*j]-1;		// get embedding
-				m_map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+				unsigned int vemb = localIndices[3*j]-1;		// get embedding
+				m_map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, [&] (Dart dd) { m_map.template initDartEmbedding<VERTEX>(dd, vemb); });
 				mk.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[vemb].push_back(d);		// store incident darts for fast adjacency reconstruction
 				vecTCIndPerVertex[vemb].push_back(localIndices[3*j+1]-1);

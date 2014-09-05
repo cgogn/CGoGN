@@ -52,42 +52,40 @@ typedef NoTypeNameAttribute<e0segment> ridgeSegment ;
 template <typename PFP>
 void featureEdgeDetection(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	CellMarker<typename PFP::MAP, EDGE>& featureEdge) ;
 
 template <typename PFP>
 void computeFaceGradient(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& face_normal,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& scalar,
-	const FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& face_area,
-	FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& face_gradient,
-	unsigned int thread = 0) ;
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_normal,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& scalar,
+	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& face_area,
+	FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient) ;
 
 template <typename PFP>
 typename PFP::VEC3 faceGradient(
 	typename PFP::MAP& map,
 	Dart d,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& face_normal,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& scalar,
-	const FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& face_area) ;
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_normal,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& scalar,
+	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& face_area) ;
 
 template <typename PFP>
 void computeVertexGradient(
 	typename PFP::MAP& map,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& face_gradient,
-	const FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& face_area,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& vertex_gradient,
-	unsigned int thread = 0) ;
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient,
+	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& face_area,
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient) ;
 
 template <typename PFP>
 typename PFP::VEC3 vertexGradient(
 	typename PFP::MAP& map,
 	Dart d,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& face_gradient,
-	const FaceAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& area) ;
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient,
+	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& area) ;
 
 //template <typename PFP>
 //typename PFP::REAL extremality(
@@ -100,59 +98,55 @@ typename PFP::VEC3 vertexGradient(
 template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& K,
-	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	unsigned int thread = 0) ;
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& K,
+	CellMarker<typename PFP::MAP, FACE>& regularMarker) ;
 
 template <typename PFP>
 bool isTriangleRegular(
 	typename PFP::MAP& map,
 	Dart d,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& K) ;
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& K) ;
 
 template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
-	FaceAttribute<ridgeSegment, typename PFP::MAP::IMPL>& ridge_segments,
-	unsigned int thread = 0) ;
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 void computeRidgeLines(
 	typename PFP::MAP& map,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& K,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& vertex_gradient,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& k,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP::IMPL>& ridge_segments,
-	unsigned int thread = 0) ;
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& K,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 void ridgeLines(
 	typename PFP::MAP& map,
 	Dart d,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& face_area,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& K,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& vertex_gradient,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& k,
-	const VertexAttribute<typename PFP::REAL, typename PFP::MAP::IMPL>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP::IMPL>& ridge_segments) ;
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_area,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& K,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
+	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 void computeSingularTriangle(
 	typename PFP::MAP& map,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP::IMPL>& ridge_segments,
-	unsigned int thread = 0) ;
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 void singularTriangle(
 	typename PFP::MAP& map,
 	Dart d,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP::IMPL>& ridge_segments) ;
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 bool isEdgeInTriangle(
@@ -164,8 +158,8 @@ template <typename PFP>
 std::vector<typename PFP::VEC3> occludingContoursDetection(
 	typename PFP::MAP& map,
 	const typename PFP::VEC3& cameraPosition,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position,
-	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& normal) ;
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal) ;
 
 } // namespace Geometry
 

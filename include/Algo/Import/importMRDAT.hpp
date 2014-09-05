@@ -44,9 +44,9 @@ inline void nextNonEmptyLine(std::ifstream& fp, std::string& line)
 template <typename PFP>
 bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, QuadTree& qt)
 {
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map.template getAttribute<typename PFP::VEC3, VERTEX, typename PFP::MAP>("position") ;
 	if (!position.isValid())
-		position = map.template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
+		position = map.template addAttribute<typename PFP::VEC3, VERTEX, typename PFP::MAP>("position") ;
 
 	attrNames.push_back(position.name()) ;
 
@@ -193,11 +193,10 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	std::cout << "  Create base level mesh.." << std::flush ;
 
-	VertexAutoAttribute<NoTypeNameAttribute<std::vector<Dart> >, typename PFP::MAP::IMPL> vecDartsPerVertex(map, "incidents") ;
+	VertexAutoAttribute<NoTypeNameAttribute<std::vector<Dart> >, typename PFP::MAP> vecDartsPerVertex(map, "incidents") ;
 	DartMarkerNoUnmark<typename PFP::MAP> m(map) ;
 
 	unsigned int vemb = EMBNULL;
-	auto fsetemb = [&] (Dart d) { map.template setDartEmbedding<VERTEX>(d, vemb); };
 
 	unsigned nbf = qt.roots.size() ;
 
@@ -211,7 +210,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			unsigned int idx = qt.roots[i]->indices[j] ;
 			vemb = qt.verticesID[idx] ;
 
-			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb) ;
+			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, [&] (Dart dd) { map.template initDartEmbedding<VERTEX>(dd, vemb); });
 
 			m.mark(d) ;								// mark on the fly to unmark on second loop
 			vecDartsPerVertex[vemb].push_back(d) ;	// store incident darts for fast adjacency reconstruction

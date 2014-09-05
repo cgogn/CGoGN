@@ -74,7 +74,7 @@ unsigned int vertexLevel(typename PFP::MAP& map, Vertex v)
 
 
 template <typename PFP, typename T>
-void filterLowPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP::IMPL>& attIn, unsigned int cutoffLevel)
+void filterLowPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP>& attIn, unsigned int cutoffLevel)
 {
 	unsigned int cur = map.getCurrentLevel();
 	unsigned int max = map.getMaxLevel();
@@ -92,7 +92,7 @@ void filterLowPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP:
 }
 
 template <typename PFP, typename T>
-void filterHighPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP::IMPL>& attIn, unsigned int cutoffLevel)
+void filterHighPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP>& attIn, unsigned int cutoffLevel)
 {
 	unsigned int cur = map.getCurrentLevel();
 	unsigned int max = map.getMaxLevel();
@@ -110,7 +110,7 @@ void filterHighPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP
 }
 
 template <typename PFP, typename T>
-void filterBandPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP::IMPL>& attIn, unsigned int cutoffLevelLow, unsigned int cutoffLevelHigh)
+void filterBandPass(typename PFP::MAP& map, VertexAttribute<T, typename PFP::MAP>& attIn, unsigned int cutoffLevelLow, unsigned int cutoffLevelHigh)
 {
 	unsigned int cur = map.getCurrentLevel();
 	unsigned int max = map.getMaxLevel();
@@ -146,7 +146,7 @@ typename PFP::VEC3 doTwist(typename PFP::VEC3 pos, float t )
 }
 
 template <typename PFP>
-void frequencyDeformation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& attIn, unsigned int cutoffLevel)
+void frequencyDeformation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& attIn, unsigned int cutoffLevel)
 {
 	float time = 1.0;
 	//float angle_deg_max = 0.4;

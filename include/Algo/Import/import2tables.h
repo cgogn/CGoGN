@@ -61,12 +61,11 @@ class MeshTablesSurface
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
     typedef typename PFP::VEC3 VEC3 ;
     typedef typename VEC3::DATA_TYPE DATA_TYPE ;
 	typedef typename PFP::REAL REAL ;
 
-private:
+protected:
 	MAP& m_map;
 
 	unsigned int m_nbVertices;
@@ -86,7 +85,7 @@ private:
 	std::vector<unsigned int> m_emb;
 
 #ifdef WITH_ASSIMP
-	void extractMeshRec(AttributeContainer& container, VertexAttribute<VEC3, MAP_IMPL>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
+	void extractMeshRec(AttributeContainer& container, VertexAttribute<VEC3, MAP>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
 #endif
 
 	bool importTrian(const std::string& filename, std::vector<std::string>& attrNames);
@@ -155,7 +154,6 @@ class MeshTablesVolume
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
     typedef typename PFP::VEC3 VEC3 ;
     typedef typename VEC3::DATA_TYPE DATA_TYPE ;
     typedef typename PFP::REAL REAL;

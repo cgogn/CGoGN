@@ -217,7 +217,7 @@ void Surface_Modelisation_Plugin::createEmptyMap()
 		MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 
 		// add vertex position attribute
-		VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL> position = mh->addAttribute<PFP2::VEC3, VERTEX>("position");
+		VertexAttribute<PFP2::VEC3, PFP2::MAP> position = mh->addAttribute<PFP2::VEC3, VERTEX>("position");
 		// update corresponding VBO & emit attribute update signal
 		mh->notifyAttributeModification(position);
         mapNumber++;
@@ -230,7 +230,7 @@ void Surface_Modelisation_Plugin::createNewFace(MapHandlerGen* mhg)
     PFP2::MAP* map = mh->getMap();
     if (h_parameterSet[mhg].positionAttribute.isValid())
     {
-		VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL>& position = h_parameterSet[mhg].positionAttribute;
+		VertexAttribute<PFP2::VEC3, PFP2::MAP>& position = h_parameterSet[mhg].positionAttribute;
         if (collectedVertices.size() >= 3)
         {
             Dart d = map->newFace(collectedVertices.size());
@@ -259,7 +259,7 @@ void Surface_Modelisation_Plugin::addCube(MapHandlerGen *mhg)
     PFP2::MAP* map = mh->getMap();
     if (h_parameterSet[mhg].positionAttribute.isValid())
     {
-		VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL>& position = h_parameterSet[mhg].positionAttribute;
+		VertexAttribute<PFP2::VEC3, PFP2::MAP>& position = h_parameterSet[mhg].positionAttribute;
 
         Algo::Surface::Modelisation::embedPrism<PFP2>(*map, position, 4, true, 0.7f, 0.7f, 1.0f);
 
@@ -743,7 +743,7 @@ void Surface_Modelisation_Plugin::pathExtrudeFace(MapHandlerGen *mhg)
     PFP2::MAP* map = mh->getMap();
 
     MapParameters& p = h_parameterSet[mhg];
-	VertexAttribute<PFP2::VEC3, PFP2::MAP::IMPL>& position = p.positionAttribute;
+	VertexAttribute<PFP2::VEC3, PFP2::MAP>& position = p.positionAttribute;
     if(p.faceSelector && !p.faceSelector->getSelectedCells().empty())
     {
 		const std::vector<Face>& selectedDart = p.faceSelector->getSelectedCells();

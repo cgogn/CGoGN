@@ -297,48 +297,6 @@ inline void MapMulti::permutationUnsew(Dart d)
 	(*m_permutation_inv[I])[e_index] = e ;
 }
 
-inline void MapMulti::compactTopo()
-{
-	std::vector<unsigned int> oldnewMR;
-	m_mrattribs.compact(oldnewMR);
-
-	std::vector<unsigned int> oldnew;
-	m_attribs[DART].compact(oldnew);
-
-	unsigned int nbl = m_mrDarts.size();
-	for (unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-	{
-		for (unsigned int level = 0; level < nbl; ++level)
-		{
-			unsigned int& d = m_mrDarts[level]->operator[](i);
-			if (d != oldnew[d])
-				d = oldnew[d];
-		}
-	}
-
-	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		for (unsigned int j = 0; j < m_permutation.size(); ++j)
-		{
-			Dart d = (*m_permutation[j])[i];
-			if (d.index != oldnewMR[d.index])
-				(*m_permutation[j])[i] = Dart(oldnewMR[d.index]);
-		}
-		for (unsigned int j = 0; j < m_permutation_inv.size(); ++j)
-		{
-			Dart d = (*m_permutation_inv[j])[i];
-			if (d.index != oldnewMR[d.index])
-				(*m_permutation_inv[j])[i] = Dart(oldnewMR[d.index]);
-		}
-		for (unsigned int j = 0; j < m_involution.size(); ++j)
-		{
-			Dart d = (*m_involution[j])[i];
-			if (d.index != oldnewMR[d.index])
-				(*m_involution[j])[i] = Dart(oldnewMR[d.index]);
-		}
-	}
-}
-
 /****************************************
  *      MR CONTAINER MANAGEMENT         *
  ****************************************/
@@ -443,22 +401,14 @@ template <typename FUNC>
 inline void MapMulti::foreach_dart(FUNC f)
 {
 	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (f(d))
-			return true;
-	}
-	return false;
+		f(d);
 }
 
 template <typename FUNC>
 inline void MapMulti::foreach_dart(FUNC& f)
 {
 	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (f(d))
-			return true;
-	}
-	return false;
+		f(d);
 }
 
 } // namespace CGoGN

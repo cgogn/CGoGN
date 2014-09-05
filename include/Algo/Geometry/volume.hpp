@@ -36,7 +36,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -49,7 +49,7 @@ typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Vol v, const 
 }
 
 template <typename PFP>
-typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -62,19 +62,19 @@ typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Vol v, const Vertex
 }
 
 template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
+typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
 
-	if (Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, v, thread))
+	if (Volume::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, v))
 		return tetrahedronVolume<PFP>(map, v, position) ;
 	else
 	{
 		typename PFP::REAL vol = 0 ;
-		VEC3 vCentroid = Algo::Surface::Geometry::volumeCentroid<PFP>(map, v, position, thread) ;
+		VEC3 vCentroid = Algo::Surface::Geometry::volumeCentroid<PFP>(map, v, position) ;
 
-		DartMarkerStore<MAP> mark(map, thread) ;	// Lock a marker
+		DartMarkerStore<MAP> mark(map) ;	// Lock a marker
 
 		std::vector<Face> visitedFaces ;
 		visitedFaces.reserve(100) ;
@@ -124,19 +124,18 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Vol v, const V
 }
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int thread)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
-	if ((CGoGN::Parallel::NumberOfThreads > 1) && (thread==0))
+	if (CGoGN::Parallel::NumberOfThreads > 1)
 	{
-		return Parallel::totalVolume<PFP>(map,position);
+		return Parallel::totalVolume<PFP>(map, position);
 	}
-
 
 	double vol = 0.0 ;
 
-	TraversorW<typename PFP::MAP> t(map, thread) ;
+	TraversorW<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		vol += convexPolyhedronVolume<PFP>(map, d, position,thread) ;
+		vol += convexPolyhedronVolume<PFP>(map, d, position) ;
 	return typename PFP::REAL(vol) ;
 }
 
@@ -145,21 +144,21 @@ namespace Parallel
 {
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	// allocate a vector of 1 accumulator for each thread
-	std::vector<typename PFP::REAL> vols(CGoGN::Parallel::NumberOfThreads-1,0.0);
+	std::vector<typename PFP::REAL> vols(CGoGN::Parallel::NumberOfThreads-1, 0.0);
 
 	// foreach volume
-	CGoGN::Parallel::foreach_cell<VOLUME>(map,[&](Vol v, unsigned int thr)
+	CGoGN::Parallel::foreach_cell<VOLUME>(map, [&] (Vol v, unsigned int thr)
 	{
 		// add volume to the thread accumulator
-		vols[thr-1] += convexPolyhedronVolume<PFP>(map, v, position, thr) ;
+		vols[thr-1] += convexPolyhedronVolume<PFP>(map, v, position) ;
 	});
 
 	// compute the sum of volumes
 	typename PFP::REAL total(0);
-	for (unsigned int i=0; i< CGoGN::Parallel::NumberOfThreads-1; ++i )
+	for (int i=0; i< CGoGN::Parallel::NumberOfThreads-1; ++i )
 		total += vols[i];
 
 	return total;

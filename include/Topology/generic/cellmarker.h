@@ -28,6 +28,8 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/functor.h"
+#include "Algo/Topo/embedding.h"
+
 #include "Utils/static_assert.h"
 
 namespace CGoGN
@@ -41,46 +43,24 @@ class CellMarkerGen
 	friend class GenericMap ;
 
 protected:
-	Mark m_mark ;
-	AttributeMultiVector<Mark>* m_markVector ;
-	unsigned int m_thread ;
+	AttributeMultiVector<MarkerBool>* m_markVector ;
 	unsigned int m_cell ;
-	bool releaseOnDestruct ;
 
 public:
-	CellMarkerGen(unsigned int cell, unsigned int thread = 0) :
-		m_thread(thread),
-		m_cell(cell),
-		releaseOnDestruct(true)
+	CellMarkerGen(unsigned int cell) :
+		m_cell(cell)
 	{}
 
 	virtual ~CellMarkerGen()
 	{}
 
-	unsigned int getThread() { return m_thread ; }
 	unsigned int getCell() { return m_cell ; }
-
-	void updateMarkVector(AttributeMultiVector<Mark>* amv) { m_markVector = amv ; }
 
 protected:
 	// protected copy constructor to forbid its usage
 	CellMarkerGen(const CellMarkerGen& /*cm*/)
 	{}
 
-	/**
-	 * set if the mark has to be release on destruction or not
-	 */
-	void setReleaseOnDestruct(bool b) { releaseOnDestruct = b ; }
-
-//	virtual void mark(Dart d) = 0 ;
-//	virtual void unmark(Dart d) = 0 ;
-//	virtual bool isMarked(Dart d) const = 0 ;
-//	virtual void mark(unsigned int em) = 0 ;
-//	virtual void unmark(unsigned int em) = 0 ;
-//	virtual bool isMarked(unsigned int em) const = 0 ;
-//	virtual void markAll() = 0 ;
-//	virtual void unmarkAll() = 0 ;
-//	virtual bool isAllUnmarked() = 0 ;
 };
 
 /**
@@ -98,46 +78,41 @@ public:
 	 * constructor
 	 * @param map the map on which we work
 	 */
-	CellMarkerBase(MAP& map, unsigned int thread = 0) :
-		CellMarkerGen(CELL, thread),
+	CellMarkerBase(MAP& map) :
+		CellMarkerGen(CELL),
 		m_map(map)
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_mark = m_map.template getMarkerSet<CELL>(m_thread).getNewMark() ;
-		m_markVector = m_map.template getMarkVector<CELL>(m_thread) ;
-		m_map.cellMarkers[m_thread].push_back(this) ;
+		m_markVector = m_map.template askMarkVector<CELL>();
 	}
 
-	CellMarkerBase(const MAP& map, unsigned int thread = 0) :
-		CellMarkerGen(CELL, thread),
+	CellMarkerBase(const MAP& map) :
+		CellMarkerGen(CELL),
 		m_map(const_cast<MAP&>(map))
 	{
 		if(!m_map.template isOrbitEmbedded<CELL>())
 			m_map.template addEmbedding<CELL>() ;
-		m_mark = m_map.template getMarkerSet<CELL>(m_thread).getNewMark() ;
-		m_markVector = m_map.template getMarkVector<CELL>(m_thread) ;
-		m_map.cellMarkers[m_thread].push_back(this) ;
+		m_markVector = m_map.template askMarkVector<CELL>();
 	}
 
 	virtual ~CellMarkerBase()
 	{
-		if(releaseOnDestruct)
-		{
-			m_map.template getMarkerSet<CELL>(m_thread).releaseMark(m_mark) ;
-
-			std::vector<CellMarkerGen*>& cmg = m_map.cellMarkers[m_thread];
-			for(std::vector<CellMarkerGen*>::iterator it = cmg.begin(); it != cmg.end(); ++it)
-			{
-				if(*it == this)
-				{
-					*it = cmg.back();
-					cmg.pop_back();
-					return;
-				}
-			}
-		}
+		if (GenericMap::alive(&m_map))
+			m_map.template releaseMarkVector<CELL>(m_markVector);
 	}
+
+	/**
+	 * @brief update: realloc the marker in map
+	 * @warning call only after map cleaning
+	 */
+	void update()
+	{
+		if(!m_map.template isOrbitEmbedded<CELL>())
+			m_map.template addEmbedding<CELL>() ;
+		m_markVector = m_map.template askMarkVector<CELL>();
+	}
+
 
 protected:
 	// protected copy constructor to forbid its usage
@@ -152,13 +127,14 @@ public:
 	 */
 	inline void mark(Cell<CELL> c)
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding(c) ;
+
 		if (a == EMBNULL)
-			a = m_map.setOrbitEmbeddingOnNewCell(c) ;
-		(*m_markVector)[a].setMark(m_mark) ;
+			a = Algo::Topo::setOrbitEmbeddingOnNewCell(m_map, c) ;
+
+		m_markVector->setTrue(a);
 	}
 
 	/**
@@ -166,13 +142,14 @@ public:
 	 */
 	inline void unmark(Cell<CELL> c)
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding(c) ;
+
 		if (a == EMBNULL)
-			a = m_map.setOrbitEmbeddingOnNewCell(c) ;
-		(*m_markVector)[a].unsetMark(m_mark) ;
+			a = Algo::Topo::setOrbitEmbeddingOnNewCell(m_map, c) ;
+
+		m_markVector->setFalse(a);
 	}
 
 	/**
@@ -180,13 +157,14 @@ public:
 	 */
 	inline bool isMarked(Cell<CELL> c) const
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding(c) ;
+
 		if (a == EMBNULL)
 			return false ;
-		return (*m_markVector)[a].testMark(m_mark) ;
+
+		return m_markVector->operator[](a);
 	}
 
 	/**
@@ -194,10 +172,8 @@ public:
 	 */
 	inline void mark(unsigned int em)
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
-
-		(*m_markVector)[em].setMark(m_mark) ;
+		m_markVector->setTrue(em);
 	}
 
 	/**
@@ -205,10 +181,8 @@ public:
 	 */
 	inline void unmark(unsigned int em)
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
-
-		(*m_markVector)[em].unsetMark(m_mark) ;
+		m_markVector->setFalse(em);
 	}
 
 	/**
@@ -216,12 +190,11 @@ public:
 	 */
 	inline bool isMarked(unsigned int em) const
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		if (em == EMBNULL)
 			return false ;
-		return (*m_markVector)[em].testMark(m_mark) ;
+		return m_markVector->operator[](em);
 	}
 
 	/**
@@ -229,24 +202,30 @@ public:
 	 */
 	inline void markAll()
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			(*m_markVector)[i].setMark(m_mark) ;
+		if (cont.hasBrowser())
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				this->m_markVector->setTrue(i);
+		else
+			m_markVector->allTrue();
 	}
 
 	inline bool isAllUnmarked()
 	{
-		assert(m_map.template getMarkerSet<CELL>(m_thread).testMark(m_mark));
 		assert(m_markVector != NULL);
 
 		AttributeContainer& cont = m_map.template getAttributeContainer<CELL>() ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			if((*m_markVector)[i].testMark(m_mark))
+		if (cont.hasBrowser())
+		{
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				if(m_markVector->operator[](i))
 				return false ;
-		return true ;
+			return true ;
+		}
+		//else
+		return m_markVector->isAllFalse();
 	}
 };
 
@@ -258,11 +237,11 @@ template <typename MAP, unsigned int CELL>
 class CellMarker : public CellMarkerBase<MAP, CELL>
 {
 public:
-	CellMarker(MAP& map, unsigned int thread = 0) : CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarker(MAP& map) : CellMarkerBase<MAP, CELL>(map)
 	{}
 
-	CellMarker(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarker(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{}
 
 	virtual ~CellMarker()
@@ -278,12 +257,14 @@ protected:
 public:
 	inline void unmarkAll()
 	{
-		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
 
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
-		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
-			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;
+		if (cont.hasBrowser())
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				this->m_markVector->setFalse(i);
+		else
+			this->m_markVector->allFalse();
 	}
 };
 
@@ -296,24 +277,27 @@ template <typename MAP, unsigned int CELL>
 class CellMarkerStore: public CellMarkerBase<MAP, CELL>
 {
 protected:
-	std::vector<unsigned int> m_markedCells ;
+	std::vector<unsigned int>* m_markedCells ;
 
 public:
-	CellMarkerStore(MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerStore(MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
-		m_markedCells.reserve(128);
+//		m_markedCells.reserve(128);
+		m_markedCells = this->m_map.askUIntBuffer();
 	}
 
-	CellMarkerStore(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerStore(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
-		m_markedCells.reserve(128);
+//		m_markedCells.reserve(128);
+		m_markedCells = this->m_map.askUIntBuffer();
 	}
 
 	virtual ~CellMarkerStore()
 	{
 		unmarkAll() ;
+		this->m_map.releaseUIntBuffer(m_markedCells);
 //		assert(isAllUnmarked);
 //		CGoGN_ASSERT(this->isAllUnmarked())
 	}
@@ -327,22 +311,21 @@ public:
 	inline void mark(Cell<CELL> d)
 	{
 		CellMarkerBase<MAP, CELL>::mark(d) ;
-		m_markedCells.push_back(this->m_map.template getEmbedding<CELL>(d)) ;
+		m_markedCells->push_back(this->m_map.template getEmbedding<CELL>(d)) ;
 	}
 
 	inline void mark(unsigned int em)
 	{
 		CellMarkerBase<MAP, CELL>::mark(em) ;
-		m_markedCells.push_back(em) ;
+		m_markedCells->push_back(em) ;
 	}
 
 	inline void unmarkAll()
 	{
-		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
 
-		for (std::vector<unsigned int>::iterator it = m_markedCells.begin(); it != m_markedCells.end(); ++it)
-			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
+		for (std::vector<unsigned int>::iterator it = m_markedCells->begin(); it != m_markedCells->end(); ++it)
+			this->m_markVector->setFalse(*it);
 	}
 };
 
@@ -358,14 +341,14 @@ protected:
 	std::vector<Dart> m_markedDarts ;
 
 public:
-	CellMarkerMemo(MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerMemo(MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
 		m_markedDarts.reserve(128);
 	}
 
-	CellMarkerMemo(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerMemo(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
 	{
 		m_markedDarts.reserve(128);
 	}
@@ -394,7 +377,6 @@ public:
 
 	inline void unmarkAll()
 	{
-		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
 		for (std::vector<Dart>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
 		{
@@ -418,36 +400,95 @@ public:
 template <typename MAP, unsigned int CELL>
 class CellMarkerNoUnmark: public CellMarkerBase<MAP, CELL>
 {
+#ifndef NDEBUG
+	int m_counter;
+#endif
 public:
-	CellMarkerNoUnmark(MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerNoUnmark(MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
+  #ifndef NDEBUG
+		,m_counter(0)
+  #endif
 	{}
 
-	CellMarkerNoUnmark(const MAP& map, unsigned int thread = 0) :
-		CellMarkerBase<MAP, CELL>(map, thread)
+	CellMarkerNoUnmark(const MAP& map) :
+		CellMarkerBase<MAP, CELL>(map)
+  #ifndef NDEBUG
+		,m_counter(0)
+  #endif
 	{}
 
 	virtual ~CellMarkerNoUnmark()
 	{
-//		assert(isAllUnmarked()) ;
-//		CGoGN_ASSERT(this->isAllUnmarked())
+#ifndef NDEBUG
+		if (m_counter != 0)
+		{
+			CGoGNerr << "CellMarkerNoUnmark: Warning problem unmarking not complete"<< CGoGNendl;
+			CGoGNerr << "CellMarkerNoUnmark:  -> calling unmarkAll()"<< CGoGNendl;
+			unmarkAll();
+		}
+#endif
 	}
 
 protected:
 	CellMarkerNoUnmark(const CellMarkerNoUnmark& cm) :
 		CellMarkerBase<MAP, CELL>(cm)
+  #ifndef NDEBUG
+		,m_counter(cm.m_counter)
+  #endif
 	{}
 
 public:
 	inline void unmarkAll()
 	{
-		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
 		assert(this->m_markVector != NULL);
 
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
-		for (unsigned int i = cont.realBegin(); i != cont.realEnd(); cont.realNext(i))
-			this->m_markVector->operator[](i).unsetMark(this->m_mark) ;
+		if (cont.hasBrowser())
+			for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+				this->m_markVector->setFalse(i);
+		else
+			this->m_markVector->allFalse();
 	}
+
+
+#ifndef NDEBUG
+	inline void mark(Cell<CELL> c)
+	{
+		if (this->isMarked(c))
+			return;
+		CellMarkerBase<MAP, CELL>::mark(c) ;
+		m_counter++;
+	}
+
+	inline void unmark(Cell<CELL> c)
+	{
+		if (!this->isMarked(c))
+			return;
+		CellMarkerBase<MAP, CELL>::unmark(c) ;
+		m_counter--;
+	}
+
+	inline void mark(unsigned int i)
+	{
+		if (this->isMarked(i))
+			return;
+		CellMarkerBase<MAP, CELL>::mark(i) ;
+		m_counter++;
+	}
+
+	/**
+	 * unmark the dart
+	 */
+	inline void unmark(unsigned int i)
+	{
+		if (!this->isMarked(i))
+			return;
+		CellMarkerBase<MAP, CELL>::unmark(i) ;
+		m_counter--;
+	}
+
+#endif
 };
 
 // Selector and count functors testing for marker existence

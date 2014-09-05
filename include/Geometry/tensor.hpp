@@ -22,7 +22,7 @@
  *                                                                              *
  *******************************************************************************/
 
-/* \file tensor.hpp */
+#include <algorithm>
 
 namespace CGoGN {
 namespace Geom {

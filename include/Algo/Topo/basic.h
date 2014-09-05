@@ -78,7 +78,7 @@ void initAllOrbitsEmbedding(MAP& map, bool realloc = false)
 	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT> c)
 	{
 		if(realloc || map.template getEmbedding<ORBIT>(c) == EMBNULL)
-			map.template setOrbitEmbeddingOnNewCell<ORBIT>(c) ;
+			Algo::Topo::setOrbitEmbeddingOnNewCell<ORBIT>(map, c) ;
 	});
 }
 
@@ -87,7 +87,7 @@ void initAllOrbitsEmbedding(MAP& map, bool realloc = false)
  * @return the number of cells of the orbit
  */
 template <unsigned int ORBIT, typename MAP>
-unsigned int computeIndexCells(MAP& map, AttributeHandler<unsigned int, ORBIT, typename MAP::IMPL>& idx)
+unsigned int computeIndexCells(MAP& map, AttributeHandler<unsigned int, ORBIT, MAP>& idx)
 {
 	AttributeContainer& cont = map.template getAttributeContainer<ORBIT>();
 	unsigned int cpt = 0 ;
@@ -105,7 +105,7 @@ void bijectiveOrbitEmbedding(MAP& map)
 	if(!map.template isOrbitEmbedded<ORBIT>())
 		map.template addEmbedding<ORBIT>() ;
 
-	AttributeHandler<int, ORBIT, typename MAP::IMPL> counter = map.template addAttribute<int, ORBIT>("tmpCounter") ;
+	AttributeHandler<int, ORBIT, MAP> counter = map.template addAttribute<int, ORBIT, MAP>("tmpCounter") ;
 	counter.setAllValues(int(0)) ;
 
 	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT> d)
@@ -115,7 +115,7 @@ void bijectiveOrbitEmbedding(MAP& map)
 		{
 			if (counter[d] > 0)
 			{
-				unsigned int newEmb = map.template setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+				unsigned int newEmb = Algo::Topo::setOrbitEmbeddingOnNewCell<ORBIT>(map, d) ;
 				map.template copyCell<ORBIT>(newEmb, emb) ;
 //				map.template getAttributeContainer<ORBIT>().copyLine(newEmb, emb) ;
 			}

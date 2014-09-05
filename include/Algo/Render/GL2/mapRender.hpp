@@ -69,7 +69,7 @@ bool MapRender::inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  c
 }
 
 template<typename PFP>
-void MapRender::recompute2Ears(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex)
+void MapRender::recompute2Ears(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -153,7 +153,7 @@ float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PF
 }
 
 template<typename PFP>
-bool MapRender::computeEarIntersection(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly)
+bool MapRender::computeEarIntersection(const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -178,14 +178,14 @@ bool MapRender::computeEarIntersection(const VertexAttribute<typename PFP::VEC3,
 }
 
 template<typename PFP>
-inline void MapRender::addEarTri(typename PFP::MAP& map, Face f, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* pos)
+inline void MapRender::addEarTri(typename PFP::MAP& map, Face f, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* pos)
 {
 	typedef typename PFP::VEC3 VEC3;
 
 	bool(*fn_pt1)(VertexPoly*,VertexPoly*) = &(MapRender::cmpVP);
 	VPMS ears(fn_pt1);
 
-	const VertexAttribute<VEC3, typename PFP::MAP::IMPL>& position = *pos ;
+	const VertexAttribute<VEC3, typename PFP::MAP>& position = *pos ;
 
 	// compute normal to polygon
 	VEC3 normalPoly = Algo::Surface::Geometry::newellNormal<PFP>(map, f, position);
@@ -302,7 +302,7 @@ inline void MapRender::addTri(typename PFP::MAP& map, Face f, std::vector<GLuint
 }
 
 template<typename PFP>
-void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, unsigned int thread)
+void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position)
 {
 	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
@@ -311,7 +311,7 @@ void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& table
 		foreach_cell<FACE>(map, [&] (Face f)
 		{
 			addTri<PFP>(map, f, tableIndices);
-		}, AUTO, thread);
+		}, AUTO);
 	}
 	else
 	{
@@ -321,15 +321,15 @@ void MapRender::initTriangles(typename PFP::MAP& map, std::vector<GLuint>& table
 				addTri<PFP>(map, f, tableIndices);
 			else
 				addEarTri<PFP>(map, f, tableIndices, position);
-		}, AUTO, thread);
+		}, AUTO);
 	}
 }
 
 template<typename PFP>
-void MapRender::initTrianglesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, unsigned int thread)
+void MapRender::initTrianglesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position)
 {
 #define LIST_SIZE 20
-	DartMarker<typename PFP::MAP> m(map, thread);
+	DartMarker<typename PFP::MAP> m(map);
 	// reserve memory for triangles ( nb indices == nb darts )
 	// and a little bit more
 	// if lots of polygonal faces, realloc is done by vector
@@ -402,25 +402,25 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, std::vector<GLuin
 }
 
 template<typename PFP>
-void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLines(typename PFP::MAP& map, std::vector<GLuint>& tableIndices)
 {
 	tableIndices.reserve(map.getNbDarts());
 
-//	TraversorE<typename PFP::MAP> trav(map, thread);
+//	TraversorE<typename PFP::MAP> trav(map);
 	foreach_cell<EDGE>(map, [&] (Edge e)
 	{
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(e.dart));
 		tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(e)));
 	}
-	,AUTO,thread);
+	,AUTO);
 }
 
 template<typename PFP>
-void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tableIndices)
 {
 	tableIndices.reserve(map.getNbDarts()); //TODO optimisation ?
 
-//	TraversorE<typename PFP::MAP> trav(map, thread);
+//	TraversorE<typename PFP::MAP> trav(map);
 //	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	foreach_cell<EDGE>(map, [&] (Edge e)
 	{
@@ -430,14 +430,14 @@ void MapRender::initBoundaries(typename PFP::MAP& map, std::vector<GLuint>& tabl
 			tableIndices.push_back(map.template getEmbedding<VERTEX>(map.phi1(e)));
 		}
 	}
-	,AUTO,thread);
+	,AUTO);
 }
 
 template<typename PFP>
-void MapRender::initLinesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLinesOptimized(typename PFP::MAP& map, std::vector<GLuint>& tableIndices)
 {
 #define LIST_SIZE 20
-	DartMarker<typename PFP::MAP> m(map, thread);
+	DartMarker<typename PFP::MAP> m(map);
 
 	// reserve memory for edges indices ( nb indices == nb darts)
 	tableIndices.reserve(map.getNbDarts());
@@ -481,26 +481,26 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, std::vector<GLuint>& 
 }
 
 template<typename PFP>
-void MapRender::initPoints(typename PFP::MAP& map, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initPoints(typename PFP::MAP& map, std::vector<GLuint>& tableIndices)
 {
 	tableIndices.reserve(map.getNbDarts() / 5);
 
-//	TraversorV<typename PFP::MAP> trav(map, thread);
+//	TraversorV<typename PFP::MAP> trav(map);
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		tableIndices.push_back(map.getEmbedding(v));
 	}
-	,FORCE_CELL_MARKING,thread); //
+	,FORCE_CELL_MARKING); //
 }
 
 template<typename PFP>
-void MapRender::initPrimitives(typename PFP::MAP& map, int prim, bool optimized, unsigned int thread)
+void MapRender::initPrimitives(typename PFP::MAP& map, int prim, bool optimized)
 {
-	initPrimitives<PFP>(map, prim, NULL, optimized, thread) ;
+	initPrimitives<PFP>(map, prim, NULL, optimized) ;
 }
 
 template <typename PFP>
-void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, bool optimized, unsigned int thread)
+void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position, bool optimized)
 {
 	std::vector<GLuint> tableIndices;
 
@@ -508,24 +508,24 @@ void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAtt
 	{
 		case POINTS:
 
-			initPoints<PFP>(map, tableIndices, thread);
+			initPoints<PFP>(map, tableIndices);
 			break;
 		case LINES:
 			if(optimized)
-				initLinesOptimized<PFP>(map, tableIndices, thread);
+				initLinesOptimized<PFP>(map, tableIndices);
 			else
-				initLines<PFP>(map, tableIndices, thread) ;
+				initLines<PFP>(map, tableIndices) ;
 			break;
 		case TRIANGLES:
 			if(optimized)
-				initTrianglesOptimized<PFP>(map, tableIndices, position, thread);
+				initTrianglesOptimized<PFP>(map, tableIndices, position);
 			else
-				initTriangles<PFP>(map, tableIndices, position, thread) ;
+				initTriangles<PFP>(map, tableIndices, position) ;
 			break;
 		case FLAT_TRIANGLES:
 			break;
 		case BOUNDARY:
-			initBoundaries<PFP>(map, tableIndices, thread) ;
+			initBoundaries<PFP>(map, tableIndices) ;
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
@@ -541,7 +541,7 @@ void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAtt
 }
 
 template <typename PFP>
-void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>* position, bool optimized, unsigned int thread)
+void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* position, bool optimized)
 {
 	std::vector<GLuint> tableIndices;
 
@@ -549,24 +549,24 @@ void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttr
 	{
 		case POINTS:
 
-			initPoints<PFP>(map, tableIndices, thread);
+			initPoints<PFP>(map, tableIndices);
 			break;
 		case LINES:
 			if(optimized)
-				initLinesOptimized<PFP>(map, tableIndices, thread);
+				initLinesOptimized<PFP>(map, tableIndices);
 			else
-				initLines<PFP>(map, tableIndices, thread) ;
+				initLines<PFP>(map, tableIndices) ;
 			break;
 		case TRIANGLES:
 			if(optimized)
-				initTrianglesOptimized<PFP>(map, tableIndices, position, thread);
+				initTrianglesOptimized<PFP>(map, tableIndices, position);
 			else
-				initTriangles<PFP>(map, tableIndices, position, thread) ;
+				initTriangles<PFP>(map, tableIndices, position) ;
 			break;
 		case FLAT_TRIANGLES:
 			break;
 		case BOUNDARY:
-			initBoundaries<PFP>(map, tableIndices, thread) ;
+			initBoundaries<PFP>(map, tableIndices) ;
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;

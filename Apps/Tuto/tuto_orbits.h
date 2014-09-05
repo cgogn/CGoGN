@@ -61,7 +61,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 typedef PFP::REAL REAL ;
 
@@ -124,7 +123,7 @@ public:
 
 protected:
 	template <unsigned int ORBIT>
-	void storeVerticesInfo(const AttributeHandler<int, ORBIT, MAP_IMPL>* attrib);
+	void storeVerticesInfo(const AttributeHandler<int, ORBIT, MAP>* attrib);
 
 	void storeVerticesInfoGen(unsigned int orb, const AttributeHandlerGen* attrib);
 

@@ -55,7 +55,6 @@ template <typename PFP>
 class TopoRender
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
@@ -119,7 +118,7 @@ protected:
 	/**
 	 * attribut d'index dans le VBO
 	 */
-	DartAttribute<unsigned int, MAP_IMPL> m_attIndex;
+	DartAttribute<unsigned int, MAP> m_attIndex;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
@@ -252,12 +251,12 @@ public:
 
 	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
-	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false) = 0;
+	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false) = 0;
 
 	/**
 	 * Special update function used to draw boundary of map3
 	 */
-	void updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, float ns);
+	void updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, float ns);
 
 	/**
 	 * render to svg struct
@@ -286,26 +285,24 @@ template <typename PFP>
 class TopoRenderMap : public TopoRender<PFP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 public:
 	TopoRenderMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false);
 };
 
 template <typename PFP>
 class TopoRenderGMap : public TopoRender<PFP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 public:
 	TopoRenderGMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP_IMPL>& positions, float ke, float kf, bool withBoundary = false);
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false);
 };
 
 } // namespace GL2

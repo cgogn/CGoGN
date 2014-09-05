@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/traversor/traversor1.h"
+#include "Topology/generic/traversor/traversor1Virt.h"
 #include "Topology/generic/traversor/traversor2Virt.h"
 #include "Topology/generic/traversor/traversor3Virt.h"
 #include "Topology/generic/traversor/traversorCellVirt.h"
@@ -97,12 +97,11 @@ Traversor* TraversorFactory<MAP>::createIncident(MAP& map, Dart dart, unsigned i
 			return new VTraversor2FE<MAP>(map,dart);
 			break;
 
-
 		case 0x101:
-			return new Traversor1VE<MAP>(map,dart);
+			return new VTraversor1VE<MAP>(map,dart);
 			break;
 		case 0x110:
-			return new Traversor1EV<MAP>(map,dart);
+			return new VTraversor1EV<MAP>(map,dart);
 			break;
 		default:
 			return NULL;
@@ -178,10 +177,10 @@ Traversor* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsigned i
 			break;
 
 		case 0x101:
-			return new Traversor1VVaE<MAP>(map,dart);
+			return new VTraversor1VVaE<MAP>(map,dart);
 			break;
 		case 0x110:
-			return new Traversor1EEaV<MAP>(map,dart);
+			return new VTraversor1EEaV<MAP>(map,dart);
 			break;
 		default:
 			return NULL;
@@ -192,39 +191,39 @@ Traversor* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsigned i
 }
 
 template<typename MAP>
-Traversor* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, bool forceDartMarker, unsigned int thread)
+Traversor* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, bool forceDartMarker)
 {
 	switch(orb)
 	{
 		case VERTEX:
-			return new VTraversorCell<MAP,VERTEX>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VERTEX>(map,forceDartMarker);
 			break;
 		case EDGE:
-			return new VTraversorCell<MAP,EDGE>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,EDGE>(map,forceDartMarker);
 			break;
 		case FACE:
-			return new VTraversorCell<MAP,FACE>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,FACE>(map,forceDartMarker);
 			break;
 		case VOLUME:
-			return new VTraversorCell<MAP,VOLUME>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VOLUME>(map,forceDartMarker);
 			break;
 		case CC:
-			return new VTraversorCell<MAP,CC>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,CC>(map,forceDartMarker);
 			break;
 		case VERTEX1:
-			return new VTraversorCell<MAP,VERTEX1>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VERTEX1>(map,forceDartMarker);
 			break;
 		case EDGE1:
-			return new VTraversorCell<MAP,EDGE1>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,EDGE1>(map,forceDartMarker);
 			break;
 		case VERTEX2:
-			return new VTraversorCell<MAP,VERTEX2>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VERTEX2>(map,forceDartMarker);
 			break;
 		case EDGE2:
-			return new VTraversorCell<MAP,EDGE2>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,EDGE2>(map,forceDartMarker);
 			break;
 		case FACE2:
-			return new VTraversorCell<MAP,FACE2>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,FACE2>(map,forceDartMarker);
 			break;
 		default:
 			return NULL;

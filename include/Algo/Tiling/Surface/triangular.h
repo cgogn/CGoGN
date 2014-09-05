@@ -42,14 +42,12 @@ namespace Tilings
 namespace Triangular
 {
 
-
 /*! \brief The class of regular grid square tiling
  */
 template <typename PFP>
 class Grid : public Tiling<PFP>
 {
-    typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::MAP MAP;
     typedef typename PFP::VEC3 VEC3;
 
 public:
@@ -76,7 +74,7 @@ public:
      *  @param x size in Y
      *  @param y position in Z (centered on 0 by default)
      */
-	void embedIntoGrid(VertexAttribute<VEC3, MAP_IMPL>& position, float x, float y, float z = 0.0f);
+	void embedIntoGrid(VertexAttribute<VEC3, MAP>& position, float x, float y, float z = 0.0f);
 
     //! Embed a topological grid into a twister open ribbon with turns=PI it is a Moebius strip, needs only to be closed (if model allow it)
     /*! @param position Attribute used to store vertices positions
@@ -84,7 +82,7 @@ public:
      *  @param radius_max
      *  @param turns number of turn multiplied by 2*PI
      */
-	void embedIntoTwistedStrip(VertexAttribute<VEC3, MAP_IMPL>& position, float radius_min, float radius_max, float turns);
+	void embedIntoTwistedStrip(VertexAttribute<VEC3, MAP>& position, float radius_min, float radius_max, float turns);
 
     //! Embed a topological grid into a helicoid
     /*! @param position Attribute used to store vertices positions
@@ -93,7 +91,7 @@ public:
      *  @param maxHeight height to reach
      *  @param turns number of turn
      */
-	void embedIntoHelicoid(VertexAttribute<VEC3, MAP_IMPL>& position, float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
+	void embedIntoHelicoid(VertexAttribute<VEC3, MAP>& position, float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
     //@}
 
 protected:
@@ -118,7 +116,6 @@ template <typename PFP>
 class Cylinder : public Tiling<PFP>
 {
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
 	typedef typename PFP::VEC3 VEC3;
 
 private:
@@ -158,21 +155,21 @@ public:
 	 *  @param top_radius
 	 *  @param height
 	 */
-	void embedIntoCylinder(VertexAttribute<VEC3, MAP_IMPL>& position, float bottom_radius, float top_radius, float height);
+	void embedIntoCylinder(VertexAttribute<VEC3, MAP>& position, float bottom_radius, float top_radius, float height);
 
 	//! Embed a topological sphere
 	/*! @param position Attribute used to store vertices positions
 	 *  @param radius
 	 *  @param height
 	 */
-	void embedIntoSphere(VertexAttribute<VEC3, MAP_IMPL>& position, float radius);
+	void embedIntoSphere(VertexAttribute<VEC3, MAP>& position, float radius);
 
 	//! Embed a topological cone
 	/*! @param position Attribute used to store vertices positions
 	 *  @param radius
 	 *  @param height
 	 */
-	void embedIntoCone(VertexAttribute<VEC3, MAP_IMPL>& position, float radius, float height);
+	void embedIntoCone(VertexAttribute<VEC3, MAP>& position, float radius, float height);
 	//@}
 
 	/*! @name Topological Operators
@@ -209,8 +206,7 @@ protected:
 template <typename PFP>
 class Cube : public Cylinder<PFP>
 {
-    typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::MAP MAP;
     typedef typename PFP::VEC3 VEC3;
 
 public:
@@ -231,7 +227,7 @@ public:
      *  @param y
      *  @param z
      */
-	void embedIntoCube(VertexAttribute<VEC3, MAP_IMPL>& position, float x, float y, float z);
+	void embedIntoCube(VertexAttribute<VEC3, MAP>& position, float x, float y, float z);
     //@}
 
 protected:
@@ -255,8 +251,7 @@ protected:
 template <typename PFP>
 class Tore : public Cylinder<PFP>
 {
-    typedef typename PFP::MAP MAP;
-	typedef typename PFP::MAP::IMPL MAP_IMPL;
+	typedef typename PFP::MAP MAP;
     typedef typename PFP::VEC3 VEC3;
 
 public:
@@ -276,7 +271,7 @@ public:
      *  @param big_radius
      *  @param small_radius
      */
-	void embedIntoTore(VertexAttribute<VEC3, MAP_IMPL>& position, float big_radius, float small_radius);
+	void embedIntoTore(VertexAttribute<VEC3, MAP>& position, float big_radius, float small_radius);
     //@}
 
     /*! @name Topological Operators

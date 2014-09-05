@@ -50,7 +50,6 @@ template <typename PFP>
 class EarTriangulation
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::MAP::IMPL MAP_IMPL ;
 	typedef typename PFP::VEC3 VEC3 ;
 
 protected:
@@ -86,9 +85,9 @@ protected:
 protected:
 	typename PFP::MAP& m_map;
 
-	VertexAutoAttribute<EarAttr, MAP_IMPL> m_dartEars;
+	VertexAutoAttribute<EarAttr, MAP> m_dartEars;
 
-	VertexAttribute<VEC3, MAP_IMPL> m_position;
+	VertexAttribute<VEC3, MAP> m_position;
 
 	VPMS m_ears;
 
@@ -102,13 +101,13 @@ public:
 
 	EarTriangulation(MAP& map) : m_map(map), m_dartEars(map)
 	{
-		m_position = map.template getAttribute<VEC3, VERTEX>("position");
+		m_position = map.template getAttribute<VEC3, VERTEX, MAP>("position");
 	}
 
 //	void trianguleFace(Dart d, DartMarker& mark);
 	void trianguleFace(Dart d);
 
-	void triangule(unsigned int thread = 0);
+	void triangule();
 };
 
 } // namespace Modelisation

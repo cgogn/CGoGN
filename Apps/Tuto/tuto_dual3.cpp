@@ -48,7 +48,6 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
-typedef PFP::MAP::IMPL MAP_IMPL ;
 typedef PFP::VEC3 VEC3 ;
 
 int main(int argc, char **argv)
@@ -75,13 +74,13 @@ int main(int argc, char **argv)
 		Algo::Volume::Import::importMesh<PFP>(myMap, filename, attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
-	VertexAttribute<VEC3, MAP_IMPL> position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<VEC3, MAP> position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]);
 
 	// Les faces vont devenir des aretes -> echange de FACE ET EDGE
 
-	VolumeAttribute<VEC3, MAP_IMPL> positionV = myMap.getAttribute<VEC3, VOLUME>("position") ;
+	VolumeAttribute<VEC3, MAP> positionV = myMap.getAttribute<VEC3, VOLUME, MAP>("position") ;
 	if(!positionV.isValid())
-		positionV = myMap.addAttribute<VEC3, VOLUME>("position") ;
+		positionV = myMap.addAttribute<VEC3, VOLUME, MAP>("position") ;
 
 	Algo::Volume::Geometry::computeCentroidVolumes<PFP>(myMap, position, positionV) ;
 
@@ -95,7 +94,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	Dart dcenter = myMap.explodBorderTopo(dsave);
+	Dart dcenter = myMap.explodBorderTopo(/*dsave*/);
 
 	DartMarker<MAP> mf(myMap);
 	for(Dart dit = myMap.begin() ; dit != myMap.end() ; myMap.next(dit))
@@ -118,13 +117,13 @@ int main(int argc, char **argv)
 	//
 	//Compute Dual Test -- begin
 	//
-	DartAttribute<Dart, MAP_IMPL> old_phi1 = myMap.getAttribute<Dart, DART>("phi1") ;
-	DartAttribute<Dart, MAP_IMPL> old_phi_1 = myMap.getAttribute<Dart, DART>("phi_1") ;
-	DartAttribute<Dart, MAP_IMPL> new_phi1 = myMap.addAttribute<Dart, DART>("new_phi1") ;
-	DartAttribute<Dart, MAP_IMPL> new_phi_1 = myMap.addAttribute<Dart, DART>("new_phi_1") ;
+	DartAttribute<Dart, MAP> old_phi1 = myMap.getAttribute<Dart, DART, MAP>("phi1") ;
+	DartAttribute<Dart, MAP> old_phi_1 = myMap.getAttribute<Dart, DART, MAP>("phi_1") ;
+	DartAttribute<Dart, MAP> new_phi1 = myMap.addAttribute<Dart, DART, MAP>("new_phi1") ;
+	DartAttribute<Dart, MAP> new_phi_1 = myMap.addAttribute<Dart, DART, MAP>("new_phi_1") ;
 
-	DartAttribute<Dart, MAP_IMPL> old_phi2 = myMap.getAttribute<Dart, DART>("phi2") ;
-	DartAttribute<Dart, MAP_IMPL> new_phi2 = myMap.addAttribute<Dart, DART>("new_phi2") ;
+	DartAttribute<Dart, MAP> old_phi2 = myMap.getAttribute<Dart, DART, MAP>("phi2") ;
+	DartAttribute<Dart, MAP> new_phi2 = myMap.addAttribute<Dart, DART, MAP>("new_phi2") ;
 
 	for(Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
@@ -153,7 +152,7 @@ int main(int argc, char **argv)
 
 	myMap.createHole(dcenter);
 
-	VolumeAttribute<VEC3, MAP_IMPL> del;
+	VolumeAttribute<VEC3, MAP> del;
 	del = position;
 	position = positionV ;
 

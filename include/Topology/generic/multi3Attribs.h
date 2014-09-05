@@ -86,27 +86,39 @@ struct RefCompo3Type
 
 
 
-template <typename T1, typename T2,  typename T3>
-class Vertex3Attributes
+
+template <typename T1, typename T2, typename T3, unsigned int ORB, typename MAP>
+class Cell3Attributes: public AttributeHandlerOrbit<ORB>
 {
-	VertexAttribute<T1>& m_h1;
-	VertexAttribute<T2>& m_h2;
-	VertexAttribute<T3>& m_h3;
+
+	AttributeHandler<T1, ORB, MAP>& m_h1;
+	AttributeHandler<T2, ORB, MAP>& m_h2;
+	AttributeHandler<T3, ORB, MAP>& m_h3;
 public:
 	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
 	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
 
-	Vertex3Attributes(VertexAttribute<T1>& h1, VertexAttribute<T2>& h2, VertexAttribute<T3>& h3):
+	Cell3Attributes(AttributeHandler<T1, ORB, MAP>& h1,
+					AttributeHandler<T2, ORB, MAP>& h2,
+					AttributeHandler<T3, ORB, MAP>& h3):
+		AttributeHandlerOrbit<ORB>(true),
 		m_h1(h1), m_h2(h2), m_h3(h3) {}
 
+	static const unsigned int ORBIT = ORB;
+	virtual int getSizeOfType() const {return m_h1.getSizeOfType()+m_h2.getSizeOfType()+m_h3.getSizeOfType(); }
+	virtual unsigned int getOrbit() const {return ORB;}
+	virtual const std::string& name() const { return m_h1.name(); }
+	virtual const std::string& typeName() const { return m_h1.typeName();}
+	virtual AttributeMultiVectorGen* getDataVectorGen() const { return NULL;}
+
 	RefCompo3Type<T1,T2,T3> operator[](unsigned int a)
 	{
 		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
 	}
 
-	RefCompo3Type<T1,T2,T3> operator[](Vertex d)
+	RefCompo3Type<T1,T2,T3> operator[](Cell<ORB> c)
 	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
+		return RefCompo3Type<T1,T2,T3>(m_h1[c],m_h2[c],m_h3[c]);
 	}
 
 	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
@@ -114,126 +126,24 @@ public:
 		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
 	}
 
-	const RefCompo3Type<T1,T2,T3> operator[](Vertex d) const
+	const RefCompo3Type<T1,T2,T3> operator[](Cell<ORB> c) const
 	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
+		return RefCompo3Type<T1,T2,T3>(m_h1[c],m_h2[c],m_h3[c]);
 	}
-
-	static unsigned int getOrbit() { return VERTEX; }
-};
-
-
-template <typename T1, typename T2,  typename T3>
-class Edge3Attributes
-{
-	EdgeAttribute<T1>& m_h1;
-	EdgeAttribute<T2>& m_h2;
-	EdgeAttribute<T3>& m_h3;
-public:
-	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
-	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
-
-	Edge3Attributes(EdgeAttribute<T1>& h1, EdgeAttribute<T2>& h2, EdgeAttribute<T3>& h3):
-		m_h1(h1), m_h2(h2), m_h3(h3) {}
-
-	RefCompo3Type<T1,T2,T3> operator[](unsigned int a)
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
-	}
-
-	RefCompo3Type<T1,T2,T3> operator[](Edge d)
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
-	}
-
-	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
-	}
-
-	const RefCompo3Type<T1,T2,T3> operator[](Edge d) const
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
-	}
-
-	static unsigned int getOrbit() { return EDGE; }
-};
-
-
-
-template <typename T1, typename T2,  typename T3>
-class Face3Attributes
-{
-	FaceAttribute<T1>& m_h1;
-	FaceAttribute<T2>& m_h2;
-	FaceAttribute<T3>& m_h3;
-public:
-	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
-	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
-
-	Face3Attributes(FaceAttribute<T1>& h1, FaceAttribute<T2>& h2, FaceAttribute<T3>& h3):
-		m_h1(h1), m_h2(h2), m_h3(h3) {}
-
-	RefCompo3Type<T1,T2,T3> operator[](unsigned int a)
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
-	}
-
-	RefCompo3Type<T1,T2,T3> operator[](Face d)
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
-	}
-
-	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
-	}
-
-	const RefCompo3Type<T1,T2,T3> operator[](Face d) const
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
-	}
-
-	static unsigned int getOrbit() { return FACE; }
-};
-
-template <typename T1, typename T2,  typename T3>
-class Volume3Attributes
-{
-	VolumeAttribute<T1>& m_h1;
-	VolumeAttribute<T2>& m_h2;
-	VolumeAttribute<T3>& m_h3;
-public:
-	typedef Compo3Type<T1,T2,T3> DATA_TYPE;
-	typedef RefCompo3Type<T1,T2,T3> REF_DATA_TYPE;
-
-	 Volume3Attributes(VolumeAttribute<T1>& h1, VolumeAttribute<T2>& h2, VolumeAttribute<T2>& h3):
-		 m_h1(h1), m_h2(h2), m_h3(h3) {}
-
-	RefCompo3Type<T1,T2,T3> operator[](unsigned int a)
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
-	}
-
-	RefCompo3Type<T1,T2,T3> operator[](Vol d)
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
-	}
-
-	const RefCompo3Type<T1,T2,T3> operator[](unsigned int a) const
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[a],m_h2[a],m_h3[a]);
-	}
-
-	const RefCompo3Type<T1,T2,T3> operator[](Vol d) const
-	{
-		return RefCompo3Type<T1,T2,T3>(m_h1[d],m_h2[d],m_h3[d]);
-	}
-
-	static unsigned int getOrbit() { return VOLUME; }
 
 };
 
+template <typename T1, typename T2, typename T3, typename MAP>
+using Vertex3Attributes = Cell3Attributes<T1, T2, T3, VERTEX, MAP>;
+
+template <typename T1, typename T2, typename T3, typename MAP>
+using Edge3Attributes = Cell3Attributes<T1, T2, T3, EDGE, MAP>;
+
+template <typename T1, typename T2, typename T3, typename MAP>
+using Face3Attributes = Cell3Attributes<T1, T2, T3, FACE, MAP>;
+
+template <typename T1, typename T2, typename T3, typename MAP>
+using Volume3Attributes = Cell3Attributes<T1, T2, T3, VOLUME, MAP>;
 
 
 /// implementation

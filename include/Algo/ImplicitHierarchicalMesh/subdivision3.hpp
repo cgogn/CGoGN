@@ -1955,7 +1955,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
             }while(f != x);
         }
 
-        map.template setOrbitEmbedding<VERTEX>(centralDart, map.template getEmbedding<VERTEX>(centralDart));
+		Algo::Topo::setOrbitEmbedding<VERTEX>(map,centralDart,map.template getEmbedding<VERTEX>(centralDart));
 
         //Third step : 3-sew internal faces
         for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
@@ -2350,7 +2350,8 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename P
 			}while(f != x);
 		}
 
-		map.template setOrbitEmbedding<VERTEX>(centralDart, map.template getEmbedding<VERTEX>(centralDart));
+//		map.template setOrbitEmbedding<VERTEX>(centralDart, map.template getEmbedding<VERTEX>(centralDart));
+		Algo::Topo::setOrbitEmbedding<VERTEX>(map,centralDart,map.template getEmbedding<VERTEX>(centralDart));
 
 		//Third step : 3-sew internal faces
 		for (std::vector<std::pair<char, std::pair<Dart,Dart> > >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)

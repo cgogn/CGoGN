@@ -42,8 +42,6 @@ namespace IHM
 
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
-typedef EmbeddedMap3::IMPL EMap3_IMPL;
-
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
@@ -59,9 +57,9 @@ public:
 	unsigned int m_edgeIdCount ;
 	unsigned int m_faceIdCount;
 
-	DartAttribute<unsigned int, EMap3_IMPL> m_dartLevel ;
-	DartAttribute<unsigned int, EMap3_IMPL> m_edgeId ;
-	DartAttribute<unsigned int, EMap3_IMPL> m_faceId ;
+	DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_dartLevel ;
+	DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_edgeId ;
+	DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_faceId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
@@ -373,29 +371,52 @@ public:
 	 *************************************************************************/
 
 	//@{
-	virtual Dart begin() const;
+	Dart begin() const;
 
-	virtual Dart end() const;
+	Dart end() const;
 
-	virtual void next(Dart& d) const ;
+	void next(Dart& d) const ;
 
-	void foreach_dart_of_vertex(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f) const ;
+	template <unsigned int ORBIT, typename FUNC>
+	void foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f) const ;
 
-	void foreach_dart_of_edge(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	template <typename FUNC>
+	void foreach_dart_of_vertex(Dart d, FUNC& f) const ;
 
-	void foreach_dart_of_oriented_face(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
-	void foreach_dart_of_face(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	template <typename FUNC>
+	void foreach_dart_of_edge(Dart d, FUNC& f) const ;
 
-	void foreach_dart_of_oriented_volume(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
-	void foreach_dart_of_volume(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	template <typename FUNC>
+	void foreach_dart_of_oriented_face(Dart d, FUNC& f) const;
 
-	void foreach_dart_of_cc(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const ;
+	template <typename FUNC>
+	void foreach_dart_of_face(Dart d, FUNC& f) const ;
 
-	void foreach_dart_of_vertex2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_oriented_volume(Dart d, FUNC& f) const;
 
-	void foreach_dart_of_edge2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_volume(Dart d, FUNC& f) const ;
 
-	void foreach_dart_of_face2(Dart d, std::function<void (Dart)> f, unsigned int thread = 0) const;
+	template <typename FUNC>
+	void foreach_dart_of_vertex1(Dart d, FUNC& f) const;
+
+	template <typename FUNC>
+	void foreach_dart_of_edge1(Dart d, FUNC& f) const;
+
+	template <typename FUNC>
+	void foreach_dart_of_vertex2(Dart d, FUNC& f) const;
+
+	template <typename FUNC>
+	void foreach_dart_of_edge2(Dart d, FUNC& f) const;
+
+	template <typename FUNC>
+	void foreach_dart_of_face2(Dart d, FUNC& f) const;
+
+	template <typename FUNC>
+	void foreach_dart_of_cc(Dart d, FUNC& f) const ;
 	//@}
 
     template <unsigned int ORBIT>
@@ -403,25 +424,25 @@ public:
 } ;
 
 template <typename T, unsigned int ORBIT>
-class AttributeHandler_IHM : public AttributeHandler<T, ORBIT, EMap3_IMPL>
+class AttributeHandler_IHM : public AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3>
 {
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler_IHM() : AttributeHandler<T, ORBIT, EMap3_IMPL>()
+	AttributeHandler_IHM() : AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3>()
 	{}
 
-	AttributeHandler_IHM(ImplicitHierarchicalMap3* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT, EMap3_IMPL>(m, amv)
+	AttributeHandler_IHM(ImplicitHierarchicalMap3* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3>(m, amv)
 	{}
 
 	AttributeMultiVector<T>* getDataVector() const
 	{
-		return AttributeHandler<T, ORBIT, EMap3_IMPL>::getDataVector() ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3>::getDataVector() ;
 	}
 
 	bool isValid() const
 	{
-		return AttributeHandler<T, ORBIT, EMap3_IMPL>::isValid() ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3>::isValid() ;
 	}
 
 	virtual T& operator[](Dart d) ;
@@ -430,12 +451,12 @@ public:
 
 	T& operator[](unsigned int a)
 	{
-		return AttributeHandler<T, ORBIT, EMap3_IMPL>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3>::operator[](a) ;
 	}
 
 	const T& operator[](unsigned int a) const
 	{
-		return AttributeHandler<T, ORBIT, EMap3_IMPL>::operator[](a) ;
+		return AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3>::operator[](a) ;
 	}
 
 } ;

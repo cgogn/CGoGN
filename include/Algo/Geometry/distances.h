@@ -37,38 +37,36 @@ namespace Geometry
 /**
 * compute squared distance from point to the plane of a planar face
 * @param map the map
-* @param d a dart of the face
+* @param f a face
+* @param position the vertex attribute storing positions
 * @param P the point
-* @return the squared distance to tha plane
+* @return the squared distance to the plane
 */
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P) ;
+typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P) ;
 
 /**
 * compute squared distance from point to face (assuming face is convex)
 * Algo: min  distance of each subtriangle of face (not optimum ?)
 * @param map the map
-* @param d a dart of the face
+* @param f a face
+* @param position the vertex attribute storing positions
 * @param P the point
 * @return the squared distance
 */
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P) ;
-
+typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P) ;
 
 /**
 * compute squared distance from point to an edge
 * @param map the map
-* @param d a dart of the edge
+* @param e an edge
+* @param position the vertex attribute storing positions
 * @param P the point
 * @return the squared distance
 */
 template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, const VEC3& P) ;
-
-template <typename PFP>
-bool isPlanar(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
-
+typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VEC3& P) ;
 
 } // namespace Geometry
 

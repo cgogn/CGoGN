@@ -99,26 +99,210 @@ double length(const T& v)
 }
 
 
-template <typename T1, typename T2, typename MAP_IMPL>
-class Vertex2Attributes
+//template <typename T1, typename T2, typename MAP>
+//class Vertex2Attributes: public AttributeHandlerGen
+//{
+//	VertexAttribute<T1, MAP>& m_h1;
+//	VertexAttribute<T2, MAP>& m_h2;
+//public:
+//	typedef Compo2Type<T1,T2> DATA_TYPE;
+//	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
+
+//	Vertex2Attributes(VertexAttribute<T1, MAP>& h1, VertexAttribute<T2, MAP>& h2):
+//		AttributeHandlerGen(true),
+//		m_h1(h1), m_h2(h2) {}
+
+//	static const unsigned int ORBIT = VERTEX;
+//	virtual int getSizeOfType() const {return m_h1.getSizeOfType()+m_h2.getSizeOfType(); }
+//	virtual unsigned int getOrbit() const {return VERTEX;}
+//	virtual const std::string& name() const { return m_h1.name(); }
+//	virtual const std::string& typeName() const { return m_h1.typeName();}
+//	virtual AttributeMultiVectorGen* getDataVectorGen() const { return NULL;}
+
+//	RefCompo2Type<T1,T2> operator[](unsigned int a)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	RefCompo2Type<T1,T2> operator[](Vertex d)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](Vertex d) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+////	static unsigned int getOrbit() { return VERTEX; }
+//};
+
+//template <typename T1, typename T2, typename MAP>
+//class Edge2Attributes: public AttributeHandlerGen
+//{
+//	EdgeAttribute<T1, MAP>& m_h1;
+//	EdgeAttribute<T2, MAP>& m_h2;
+//public:
+//	typedef Compo2Type<T1,T2> DATA_TYPE;
+//	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
+
+//	Edge2Attributes(EdgeAttribute<T1, MAP>& h1, EdgeAttribute<T2, MAP>& h2):
+//		AttributeHandlerGen(true),
+//		m_h1(h1), m_h2(h2) {}
+
+//	static const unsigned int ORBIT = EDGE;
+//	virtual int getSizeOfType() const {return m_h1.getSizeOfType()+m_h2.getSizeOfType(); }
+//	virtual unsigned int getOrbit() const {return EDGE;}
+//	virtual const std::string& name() const { return m_h1.name(); }
+//	virtual const std::string& typeName() const { return m_h1.typeName();}
+//	virtual AttributeMultiVectorGen* getDataVectorGen() const { return NULL;}
+
+
+//	RefCompo2Type<T1,T2> operator[](unsigned int a)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	RefCompo2Type<T1,T2> operator[](Edge d)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](Edge d) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+////	static unsigned int getOrbit() { return EDGE; }
+//};
+
+//template <typename T1, typename T2, typename MAP>
+//class Face2Attributes: public AttributeHandlerGen
+//{
+//	FaceAttribute<T1, MAP>& m_h1;
+//	FaceAttribute<T2, MAP>& m_h2;
+//public:
+//	typedef Compo2Type<T1,T2> DATA_TYPE;
+//	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
+
+//	Face2Attributes(FaceAttribute<T1, MAP>& h1, FaceAttribute<T2, MAP>& h2):
+//		AttributeHandlerGen(true),
+//		m_h1(h1), m_h2(h2) {}
+
+//	static const unsigned int ORBIT = FACE;
+//	virtual int getSizeOfType() const {return m_h1.getSizeOfType()+m_h2.getSizeOfType(); }
+//	virtual unsigned int getOrbit() const {return FACE;}
+//	virtual const std::string& name() const { return m_h1.name(); }
+//	virtual const std::string& typeName() const { return m_h1.typeName();}
+//	virtual AttributeMultiVectorGen* getDataVectorGen() const { return NULL;}
+
+//	RefCompo2Type<T1,T2> operator[](unsigned int a)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	RefCompo2Type<T1,T2> operator[](Face d)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](Face d) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+////	static unsigned int getOrbit() { return FACE; }
+//};
+
+//template <typename T1, typename T2, typename MAP>
+//class Volume2Attributes: public AttributeHandlerGen
+//{
+//	VolumeAttribute<T1, MAP>& m_h1;
+//	VolumeAttribute<T2, MAP>& m_h2;
+//public:
+//	typedef Compo2Type<T1,T2> DATA_TYPE;
+//	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
+
+//	 Volume2Attributes(VolumeAttribute<T1, MAP>& h1, VolumeAttribute<T2, MAP>& h2):
+//		 AttributeHandlerGen(true),
+//		 m_h1(h1), m_h2(h2) {}
+
+//	 static const unsigned int ORBIT = VOLUME;
+//	 virtual int getSizeOfType() const {return m_h1.getSizeOfType()+m_h2.getSizeOfType(); }
+//	 virtual unsigned int getOrbit() const {return VOLUME;}
+//	 virtual const std::string& name() const { return m_h1.name(); }
+//	 virtual const std::string& typeName() const { return m_h1.typeName();}
+//	 virtual AttributeMultiVectorGen* getDataVectorGen() const { return NULL;}
+
+//	RefCompo2Type<T1,T2> operator[](unsigned int a)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	RefCompo2Type<T1,T2> operator[](Vol d)
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
+//	}
+
+//	const RefCompo2Type<T1,T2> operator[](Vol d) const
+//	{
+//		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+//	}
+
+////	static unsigned int getOrbit() { return VOLUME; }
+
+//};
+
+
+
+template <typename T1, typename T2, unsigned int ORB, typename MAP>
+class Cell2Attributes: public AttributeHandlerOrbit<ORB>
 {
-	VertexAttribute<T1, MAP_IMPL>& m_h1;
-	VertexAttribute<T2, MAP_IMPL>& m_h2;
+	AttributeHandler<T1, ORB, MAP>& m_h1;
+	AttributeHandler<T2, ORB, MAP>& m_h2;
 public:
 	typedef Compo2Type<T1,T2> DATA_TYPE;
 	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
 
-	Vertex2Attributes(VertexAttribute<T1, MAP_IMPL>& h1, VertexAttribute<T2, MAP_IMPL>& h2):
-		m_h1(h1), m_h2(h2) {}
+	 Cell2Attributes(AttributeHandler<T1, ORB, MAP>& h1, AttributeHandler<T2, ORB, MAP>& h2):
+		 AttributeHandlerOrbit<ORB>(true),
+		 m_h1(h1), m_h2(h2) {}
+
+	 static const unsigned int ORBIT = ORB;
+	 virtual int getSizeOfType() const {return m_h1.getSizeOfType()+m_h2.getSizeOfType(); }
+	 virtual unsigned int getOrbit() const {return ORB;}
+	 virtual const std::string& name() const { return m_h1.name(); }
+	 virtual const std::string& typeName() const { return m_h1.typeName();}
+	 virtual AttributeMultiVectorGen* getDataVectorGen() const { return NULL;}
 
 	RefCompo2Type<T1,T2> operator[](unsigned int a)
 	{
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	RefCompo2Type<T1,T2> operator[](Vertex d)
+	RefCompo2Type<T1,T2> operator[](Cell<ORB> c)
 	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+		return RefCompo2Type<T1,T2>(m_h1[c],m_h2[c]);
 	}
 
 	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
@@ -126,119 +310,24 @@ public:
 		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
 	}
 
-	const RefCompo2Type<T1,T2> operator[](Vertex d) const
+	const RefCompo2Type<T1,T2> operator[](Cell<ORB> c) const
 	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
+		return RefCompo2Type<T1,T2>(m_h1[c],m_h2[c]);
 	}
-
-	static unsigned int getOrbit() { return VERTEX; }
 };
 
-template <typename T1, typename T2, typename MAP_IMPL>
-class Edge2Attributes
-{
-	EdgeAttribute<T1, MAP_IMPL>& m_h1;
-	EdgeAttribute<T2, MAP_IMPL>& m_h2;
-public:
-	typedef Compo2Type<T1,T2> DATA_TYPE;
-	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
+template <typename T1, typename T2, typename MAP>
+using Vertex2Attributes = Cell2Attributes<T1, T2, VERTEX, MAP>;
 
-	Edge2Attributes(EdgeAttribute<T1, MAP_IMPL>& h1, EdgeAttribute<T2, MAP_IMPL>& h2):
-		m_h1(h1), m_h2(h2) {}
+template <typename T1, typename T2, typename MAP>
+using Edge2Attributes = Cell2Attributes<T1, T2, EDGE, MAP>;
 
-	RefCompo2Type<T1,T2> operator[](unsigned int a)
-	{
-		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
-	}
+template <typename T1, typename T2, typename MAP>
+using Face2Attributes = Cell2Attributes<T1, T2, FACE, MAP>;
 
-	RefCompo2Type<T1,T2> operator[](Edge d)
-	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
-	}
+template <typename T1, typename T2, typename MAP>
+using Volume2Attributes = Cell2Attributes<T1, T2, VOLUME, MAP>;
 
-	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
-	{
-		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
-	}
-
-	const RefCompo2Type<T1,T2> operator[](Edge d) const
-	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
-	}
-
-	static unsigned int getOrbit() { return EDGE; }
-};
-
-template <typename T1, typename T2, typename MAP_IMPL>
-class Face2Attributes
-{
-	FaceAttribute<T1, MAP_IMPL>& m_h1;
-	FaceAttribute<T2, MAP_IMPL>& m_h2;
-public:
-	typedef Compo2Type<T1,T2> DATA_TYPE;
-	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
-
-	Face2Attributes(FaceAttribute<T1, MAP_IMPL>& h1, FaceAttribute<T2, MAP_IMPL>& h2):
-		m_h1(h1), m_h2(h2) {}
-
-	RefCompo2Type<T1,T2> operator[](unsigned int a)
-	{
-		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
-	}
-
-	RefCompo2Type<T1,T2> operator[](Face d)
-	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
-	}
-
-	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
-	{
-		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
-	}
-
-	const RefCompo2Type<T1,T2> operator[](Face d) const
-	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
-	}
-
-	static unsigned int getOrbit() { return FACE; }
-};
-
-template <typename T1, typename T2, typename MAP_IMPL>
-class Volume2Attributes
-{
-	VolumeAttribute<T1, MAP_IMPL>& m_h1;
-	VolumeAttribute<T2, MAP_IMPL>& m_h2;
-public:
-	typedef Compo2Type<T1,T2> DATA_TYPE;
-	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
-
-	 Volume2Attributes(VolumeAttribute<T1, MAP_IMPL>& h1, VolumeAttribute<T2, MAP_IMPL>& h2):
-		m_h1(h1), m_h2(h2) {}
-
-	RefCompo2Type<T1,T2> operator[](unsigned int a)
-	{
-		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
-	}
-
-	RefCompo2Type<T1,T2> operator[](Vol d)
-	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
-	}
-
-	const RefCompo2Type<T1,T2> operator[](unsigned int a) const
-	{
-		return RefCompo2Type<T1,T2>(m_h1[a],m_h2[a]);
-	}
-
-	const RefCompo2Type<T1,T2> operator[](Vol d) const
-	{
-		return RefCompo2Type<T1,T2>(m_h1[d],m_h2[d]);
-	}
-
-	static unsigned int getOrbit() { return VOLUME; }
-
-};
 
 
 /// implementation

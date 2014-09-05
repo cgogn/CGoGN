@@ -75,7 +75,7 @@ namespace Modelisation
  * @param d a dart from the vertex
  */
 template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position);
+void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 
 
@@ -130,19 +130,19 @@ Dart createOctahedron(typename PFP::MAP& map, bool withBoundary = true);
 
 //TODO optimize
 template <typename PFP>
-bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+bool isPyra(typename PFP::MAP& map, Dart d);
 
 //TODO optimize
 template <typename PFP>
-bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+bool isPrism(typename PFP::MAP& map, Dart d);
 
 
 template <typename PFP>
-Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
+Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
 
 
 template <typename PFP>
-Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP::IMPL>& position, unsigned int n, bool withBoundary, float radius, float height);
+Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
 
 } // namespace Modelisation
 
