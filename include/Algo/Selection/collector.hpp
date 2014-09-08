@@ -47,42 +47,38 @@ Collector<PFP>::Collector(MAP& m, unsigned int thread) : map(m), m_thread(thread
 {}
 
 template <typename PFP>
-inline bool Collector<PFP>::applyOnInsideVertices(FunctorType& f)
+template <typename FUNC>
+inline void Collector<PFP>::applyOnInsideVertices(FUNC& f)
 {
 	assert(isInsideCollected || !"applyOnInsideVertices: inside cells have not been collected.") ;
 	for(std::vector<Vertex>::iterator iv = insideVertices.begin(); iv != insideVertices.end(); ++iv)
-		if(f((*iv).dart))
-			return true ;
-	return false ;
+		f((*iv).dart);
 }
 
 template <typename PFP>
-inline bool Collector<PFP>::applyOnInsideEdges(FunctorType& f)
+template <typename FUNC>
+inline void Collector<PFP>::applyOnInsideEdges(FUNC& f)
 {
 	assert(isInsideCollected || !"applyOnInsideEdges: inside cells have not been collected.") ;
 	for(std::vector<Edge>::iterator iv = insideEdges.begin(); iv != insideEdges.end(); ++iv)
-		if(f((*iv).dart))
-			return true ;
-	return false ;
+		f((*iv).dart);
 }
 
 template <typename PFP>
-inline bool Collector<PFP>::applyOnInsideFaces(FunctorType& f)
+template <typename FUNC>
+inline void Collector<PFP>::applyOnInsideFaces(FUNC& f)
 {
 	assert(isInsideCollected || !"applyOnInsideFaces: inside cells have not been collected.") ;
 	for(std::vector<Face>::iterator iv = insideFaces.begin(); iv != insideFaces.end(); ++iv)
-		if(f((*iv).dart))
-			return true ;
-	return false ;
+		f((*iv).dart);
 }
 
 template <typename PFP>
-inline bool Collector<PFP>::applyOnBorder(FunctorType& f)
+template <typename FUNC>
+inline void Collector<PFP>::applyOnBorder(FUNC& f)
 {
 	for(std::vector<Dart>::iterator iv = border.begin(); iv != border.end(); ++iv)
-		if(f(*iv))
-			return true ;
-	return false ;
+		f(*iv);
 }
 
 template <typename PPFP>
