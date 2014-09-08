@@ -363,33 +363,33 @@ inline bool GMap1<MAP_IMPL>::isCycleTriangle(Dart d) const
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT, typename FUNC>
-void GMap1<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread) const
+void GMap1<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f) const
 {
 	switch(ORBIT)
 	{
 		case DART:		f(c); break;
-		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
-		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f); break;
+		case EDGE: 		foreach_dart_of_edge(c, f); break;
 		default: 		assert(!"Cells of this dimension are not handled"); break;
 	}
 }
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT, typename FUNC>
-void GMap1<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread) const
+void GMap1<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f) const
 {
 	switch(ORBIT)
 	{
 		case DART:		f(c); break;
-		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
-		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f); break;
+		case EDGE: 		foreach_dart_of_edge(c, f); break;
 		default: 		assert(!"Cells of this dimension are not handled"); break;
 	}
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int /*thread*/) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f) const
 {
 	f(d);
 	Dart d1 = beta1(d);
@@ -399,7 +399,7 @@ inline void GMap1<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f, unsigned in
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int /*thread*/) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f) const
 {
 	f(d);
 	Dart d1 = this->beta0(d);
@@ -409,7 +409,7 @@ inline void GMap1<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int 
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FUNC& f, unsigned int /*thread*/) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FUNC& f) const
 {
 	Dart it = d ;
 	do
@@ -421,10 +421,10 @@ inline void GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FUNC& f, unsign
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap1<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap1<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f) const
 {
-	GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(d, f, thread);
-	GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(this->beta0(d), f, thread);
+	GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(d, f);
+	GMap1<MAP_IMPL>::foreach_dart_of_oriented_cc(this->beta0(d), f);
 }
 
 } // namespace CGoGN

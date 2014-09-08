@@ -228,7 +228,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 			}
 		}
 	});
-//	,false,thread); ????
+//	,false); ????
 
 	m_nbTris = buffer.size()/4;
 
@@ -259,7 +259,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 			buffer.push_back(PFP::toVec3f(positions[c.dart]));
 			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
 	});
-	//	,false,thread); ????
+	//	,false); ????
 
 	m_nbLines = buffer.size()/3;
 
@@ -360,7 +360,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 				bufferColors.push_back(m_globalColor);
 			}
 		}
-	}); // false,thread) ???
+	}); // false) ???
 	
 	m_nbTris = buffer.size()/4;
 
@@ -510,7 +510,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 	{			buffer.push_back(PFP::toVec3f(centerVolumes[c.dart]));
 			buffer.push_back(PFP::toVec3f(positions[c.dart]));
 			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
-	}); // false,thread ???
+	}); // false ???
 
 	m_nbLines = buffer.size()/3;
 

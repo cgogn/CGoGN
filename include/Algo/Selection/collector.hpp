@@ -43,7 +43,7 @@ namespace Selection
  *********************************************************/
 
 template <typename PFP>
-Collector<PFP>::Collector(MAP& m, unsigned int thread) : map(m), m_thread(thread), isInsideCollected(false)
+Collector<PFP>::Collector(MAP& m) : map(m), isInsideCollected(false)
 {}
 
 template <typename PFP>
@@ -221,7 +221,7 @@ void Collector_OneRing_AroundEdge<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(16);
 	this->border.reserve(16);
 
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);
+	CellMarkerStore<MAP, FACE> fm(this->map);
 	fm.mark(d);
 	fm.mark(d2);
 
@@ -250,7 +250,7 @@ void Collector_OneRing_AroundEdge<PFP>::collectBorder(Dart d)
 
 	this->border.reserve(16);
 
-	CellMarkerStore<MAP, FACE> fm (this->map, this->m_thread);
+	CellMarkerStore<MAP, FACE> fm (this->map);
 	fm.mark(d);
 	fm.mark(d2);
 
@@ -341,9 +341,9 @@ void Collector_WithinSphere<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark the collected inside-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark the collected inside-edges + border-edges
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);	// mark the collected inside-faces + border-faces
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<MAP, FACE> fm(this->map);	// mark the collected inside-faces + border-faces
 
 	this->insideVertices.push_back(d);
 	vm.mark(d);
@@ -399,8 +399,8 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 	this->border.reserve(128);
 	this->insideVertices.reserve(128);
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark the collected inside-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark the collected inside-edges + border-edges
 
 	this->insideVertices.push_back(d);
 	vm.mark(d);
@@ -539,9 +539,9 @@ void Collector_NormalAngle<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark the collected inside-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark the collected inside-edges + border-edges
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);	// mark the collected inside-faces + border-faces
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<MAP, FACE> fm(this->map);	// mark the collected inside-faces + border-faces
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
@@ -601,8 +601,8 @@ void Collector_NormalAngle<PFP>::collectBorder(Dart d)
 	this->border.reserve(128);
 	this->insideVertices.reserve(128);
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark the collected inside-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark the collected inside-edges + border-edges
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
@@ -656,8 +656,8 @@ void Collector_NormalAngle_Triangles<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);	// mark the collected inside-faces + front-faces
-	CellMarkerStore<MAP, FACE> fminside(this->map, this->m_thread);	// mark the collected inside-faces
+	CellMarkerStore<MAP, FACE> fm(this->map);	// mark the collected inside-faces + front-faces
+	CellMarkerStore<MAP, FACE> fminside(this->map);	// mark the collected inside-faces
 
 	std::queue<Dart> front;
 	front.push(this->centerDart);
@@ -687,8 +687,8 @@ void Collector_NormalAngle_Triangles<PFP>::collectAll(Dart d)
 		}
 	}
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark inside-vertices and border-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark inside-edges and border-edges
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark inside-vertices and border-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark inside-edges and border-edges
 	std::vector<Dart>::iterator f_it;
 	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
 	{ // collect insideVertices, insideEdges, and border
@@ -736,8 +736,8 @@ void Collector_NormalAngle_Triangles<PFP>::collectBorder(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);	// mark the collected inside-faces + front-faces
-	CellMarkerStore<MAP, FACE> fminside(this->map, this->m_thread);	// mark the collected inside-faces
+	CellMarkerStore<MAP, FACE> fm(this->map);	// mark the collected inside-faces + front-faces
+	CellMarkerStore<MAP, FACE> fminside(this->map);	// mark the collected inside-faces
 
 	std::queue<Dart> front;
 	front.push(this->centerDart);
@@ -766,7 +766,7 @@ void Collector_NormalAngle_Triangles<PFP>::collectBorder(Dart d)
 		}
 	}
 
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark inside-edges and border-edges
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark inside-edges and border-edges
 	std::vector<Dart>::iterator f_it;
 	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
 	{ // collect border (edges)
@@ -800,9 +800,9 @@ void Collector_Vertices<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark the collected inside-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark the collected inside-edges + border-edges
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);	// mark the collected inside-faces + border-faces
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<MAP, FACE> fm(this->map);	// mark the collected inside-faces + border-faces
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
@@ -858,8 +858,8 @@ void Collector_Vertices<PFP>::collectBorder(Dart d)
 	this->border.reserve(128);
 	this->insideVertices.reserve(128);
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark the collected inside-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark the collected inside-edges + border-edges
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
@@ -911,8 +911,8 @@ void Collector_Triangles<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);	// mark the collected inside-faces + front-faces
-	CellMarkerStore<MAP, FACE> fminside(this->map, this->m_thread);	// mark the collected inside-faces
+	CellMarkerStore<MAP, FACE> fm(this->map);	// mark the collected inside-faces + front-faces
+	CellMarkerStore<MAP, FACE> fminside(this->map);	// mark the collected inside-faces
 
 	std::queue<Dart> front;
 	front.push(this->centerDart);
@@ -939,8 +939,8 @@ void Collector_Triangles<PFP>::collectAll(Dart d)
 		}
 	}
 
-	CellMarkerStore<MAP, VERTEX> vm(this->map, this->m_thread);	// mark inside-vertices and border-vertices
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark inside-edges and border-edges
+	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark inside-vertices and border-vertices
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark inside-edges and border-edges
 	std::vector<Dart>::iterator f_it;
 	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
 	{ // collect insideVertices, insideEdges, and border
@@ -979,8 +979,8 @@ void Collector_Triangles<PFP>::collectBorder(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<MAP, FACE> fm(this->map, this->m_thread);	// mark the collected inside-faces + front-faces
-	CellMarkerStore<MAP, FACE> fminside(this->map, this->m_thread);	// mark the collected inside-faces
+	CellMarkerStore<MAP, FACE> fm(this->map);	// mark the collected inside-faces + front-faces
+	CellMarkerStore<MAP, FACE> fminside(this->map);	// mark the collected inside-faces
 
 	std::queue<Dart> front;
 	front.push(this->centerDart);
@@ -1007,7 +1007,7 @@ void Collector_Triangles<PFP>::collectBorder(Dart d)
 		}
 	}
 
-	CellMarkerStore<MAP, EDGE> em(this->map, this->m_thread);	// mark inside-edges and border-edges
+	CellMarkerStore<MAP, EDGE> em(this->map);	// mark inside-edges and border-edges
 	std::vector<Dart>::iterator f_it;
 	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
 	{ // collect border (edges)
@@ -1037,7 +1037,7 @@ void Collector_Dijkstra_Vertices<PFP>::collectAll(Dart dinit)
 	init(dinit);
 	this->isInsideCollected = true;
 
-	CellMarkerStore<MAP, VERTEX> vmReached (this->map, this->m_thread);
+	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
 	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
@@ -1083,8 +1083,8 @@ void Collector_Dijkstra_Vertices<PFP>::collectAll(Dart dinit)
 		front.erase(front.begin());
 	}
 
-	CellMarkerStore<MAP, EDGE> em (this->map, this->m_thread);
-	CellMarkerStore<MAP, FACE> fm (this->map, this->m_thread);
+	CellMarkerStore<MAP, EDGE> em (this->map);
+	CellMarkerStore<MAP, FACE> fm (this->map);
 	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
 	{
 		// collect insideEdges
@@ -1122,7 +1122,7 @@ void Collector_Dijkstra_Vertices<PFP>::collectBorder(Dart dinit)
 {
 	init(dinit);
 
-	CellMarkerStore<MAP, VERTEX> vmReached (this->map, this->m_thread);
+	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
 	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
@@ -1166,7 +1166,7 @@ void Collector_Dijkstra_Vertices<PFP>::collectBorder(Dart dinit)
 		front.erase(front.begin());
 	}
 
-	CellMarkerStore<MAP, FACE> fm (this->map, this->m_thread);
+	CellMarkerStore<MAP, FACE> fm (this->map);
 	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
 	{
 		// collect border
@@ -1197,7 +1197,7 @@ void Collector_Dijkstra<PFP>::collectAll(Dart dinit)
 	init(dinit);
 	this->isInsideCollected = true;
 
-	CellMarkerStore<MAP, VERTEX> vmReached (this->map, this->m_thread);
+	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
 	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
@@ -1241,8 +1241,8 @@ void Collector_Dijkstra<PFP>::collectAll(Dart dinit)
 		front.erase(front.begin());
 	}
 
-	CellMarkerStore<MAP, EDGE> em (this->map, this->m_thread);
-	CellMarkerStore<MAP, FACE> fm (this->map, this->m_thread);
+	CellMarkerStore<MAP, EDGE> em (this->map);
+	CellMarkerStore<MAP, FACE> fm (this->map);
 	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
 	{
 		// collect insideEdges
@@ -1280,7 +1280,7 @@ void Collector_Dijkstra<PFP>::collectBorder(Dart dinit)
 {
 	init(dinit);
 
-	CellMarkerStore<MAP, VERTEX> vmReached (this->map, this->m_thread);
+	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
 	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
@@ -1324,7 +1324,7 @@ void Collector_Dijkstra<PFP>::collectBorder(Dart dinit)
 		front.erase(front.begin());
 	}
 
-	CellMarkerStore<MAP, FACE> fm (this->map, this->m_thread);
+	CellMarkerStore<MAP, FACE> fm (this->map);
 	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
 	{
 		// collect border

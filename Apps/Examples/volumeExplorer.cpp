@@ -169,7 +169,6 @@ void MyQT::cb_Open()
 	color = myMap.addAttribute<VEC3, VOLUME, MAP>("color");
 
 	TraversorCell<MAP, VOLUME> tra(myMap);
-	float maxV = 0.0f;
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
 //		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
@@ -503,11 +502,11 @@ int main(int argc, char **argv)
 
 	Utils::Chrono ch;
 
-	Vertex v(myMap.begin());
-	VEC3 p = Algo::Volume::Geometry::vertexNeighborhoodCentroid<PFP>(myMap,v,position);
+//	Vertex v(myMap.begin());
+//	VEC3 p = Algo::Volume::Geometry::vertexNeighborhoodCentroid<PFP>(myMap,v,position);
 
-	Vol w(myMap.begin());
-	VEC3 q = Algo::Surface::Geometry::volumeCentroid<PFP>(myMap,w,position);
+//	Vol w(myMap.begin());
+//	VEC3 q = Algo::Surface::Geometry::volumeCentroid<PFP>(myMap,w,position);
 
 	ch.start();
 	float vol = Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);

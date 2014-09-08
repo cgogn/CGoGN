@@ -38,6 +38,17 @@
 namespace CGoGN
 {
 
+enum CGoGNCodeType
+	{CGoGNUNKNOWNTYPE=0,
+	 CGoGNINT,CGoGNUINT,
+	 CGoGNSHORT,CGoGNUSHORT,
+	 CGoGNCHAR,CGoGNUCHAR,
+	 CGoGNFLOAT,CGoGNDOUBLE,
+	 CGoGNVEC2F,CGoGNVEC2D,
+	 CGoGNVEC3F,CGoGNVEC3D,
+	 CGoGNVEC4F,CGoGNVEC4D
+	};
+
 class AttributeMultiVectorGen
 {
 protected:
@@ -50,6 +61,11 @@ protected:
 	 * Name of the type of the attribute
 	 */
 	std::string m_typeName;
+
+	/**
+	 * Code of type
+	 */
+	CGoGNCodeType m_typeCode;
 
 	/**
 	 * orbit of the attribute
@@ -101,6 +117,8 @@ public:
 	const std::string& getTypeName() const;
 
 	void setTypeName(const std::string& n);
+
+	CGoGNCodeType getTypeCode() const;
 
 	/**
 	 * get block size
@@ -191,6 +209,8 @@ class AttributeMultiVector : public AttributeMultiVectorGen
 	* table of blocks of data pointers: vectors!
 	*/
 	std::vector<T*> m_tableData;
+
+	inline void setTypeCode();
 
 public:
 	AttributeMultiVector(const std::string& strName, const std::string& strType);

@@ -421,6 +421,17 @@ AttributeMultiVector<T>* AttributeContainer::getDataVector(const std::string& at
 	return atm;
 }
 
+
+inline CGoGNCodeType AttributeContainer::getTypeCode(const std::string& attribName) const
+{
+	unsigned int index = getAttributeIndex(attribName) ;
+	if(index == UNKNOWN)
+		return CGoGNUNKNOWNTYPE ;
+	return m_tableAttribs[index]->getTypeCode();
+}
+
+
+
 inline AttributeMultiVectorGen* AttributeContainer::getVirtualDataVector(const std::string& attribName)
 {
 	unsigned int index = getAttributeIndex(attribName) ;

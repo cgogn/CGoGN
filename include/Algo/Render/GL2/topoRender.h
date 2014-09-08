@@ -251,7 +251,7 @@ public:
 
 	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 
-	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false) = 0;
+	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false) = 0;
 
 	/**
 	 * Special update function used to draw boundary of map3
@@ -290,7 +290,7 @@ class TopoRenderMap : public TopoRender<PFP>
 
 public:
 	TopoRenderMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false);
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false);
 };
 
 template <typename PFP>
@@ -302,7 +302,7 @@ class TopoRenderGMap : public TopoRender<PFP>
 
 public:
 	TopoRenderGMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false);
+	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false);
 };
 
 } // namespace GL2
