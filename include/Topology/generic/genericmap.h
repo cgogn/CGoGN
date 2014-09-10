@@ -69,6 +69,17 @@ inline int getSystemNumberOfCores(bool hyperthreading=false)
 
 }
 
+// forward
+class GenericMap;
+
+// classs that store static pointer for copy in schnapps plugins
+struct StaticPointers
+{
+	std::map<std::string, RegisteredBaseAttribute*>* att_registry;
+	std::vector<GenericMap*>* instances;
+	std::vector< std::vector<Dart>* >* vdartsBuffers;
+	std::vector< std::vector<unsigned int>* >* vintsBuffers;
+};
 
 class AttributeHandlerGen ;
 class DartMarkerGen ;
@@ -117,16 +128,15 @@ protected:
 	AttributeContainer m_attribs[NB_ORBITS] ;
 
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
-	static int m_nbInstances;
 
 	/// buffer for less memory allocation
 	static  std::vector< std::vector<Dart>* >* s_vdartsBuffers;
 	static  std::vector< std::vector<unsigned int>* >* s_vintsBuffers;
 
-
+public:
 	/// table of instancied maps for Dart/CellMarker release
 	static std::vector<GenericMap*>* s_instances;
-
+protected:
 
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
@@ -160,6 +170,12 @@ protected:
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
+
+	/// copy all static pointers: use in SCHNApps only
+	static void copyAllStatics(const StaticPointers& sp);
+
+	/// init all static and store in sp (if not null) : use in SCHNApps only
+	static void initAllStatics(StaticPointers* sp);
 
 	GenericMap() ;
 

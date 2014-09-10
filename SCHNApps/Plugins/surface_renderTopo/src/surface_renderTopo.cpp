@@ -10,6 +10,9 @@ namespace SCHNApps
 
 bool Surface_RenderTopo_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_dockTab = new Surface_RenderTopo_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_RenderTopo");
 
@@ -217,11 +220,7 @@ void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString
 //	}
 //}
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_RenderTopo_Plugin, Surface_RenderTopo_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_RenderTopo_PluginD, Surface_RenderTopo_Plugin)
-#endif
 
 } // namespace SCHNApps
 
