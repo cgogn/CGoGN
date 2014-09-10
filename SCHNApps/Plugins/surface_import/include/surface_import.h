@@ -16,7 +16,8 @@ class Surface_Import_Plugin : public PluginProcessing
 
 public:
 	Surface_Import_Plugin()
-	{}
+	{
+	}
 
 	~Surface_Import_Plugin()
 	{}

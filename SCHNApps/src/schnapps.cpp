@@ -26,6 +26,7 @@
 #include "plugin_processing.h"
 
 #include "plugins_default_directory.h"
+#include "Topology/generic/genericmap.h"
 
 namespace CGoGN
 {
@@ -41,6 +42,8 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_firstView(NULL),
 	m_selectedView(NULL)
 {
+	GenericMap::initAllStatics(&m_sp);
+
 	this->setupUi(this);
 
 	// create & setup control dock

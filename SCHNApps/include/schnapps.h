@@ -101,6 +101,8 @@ public slots:
 	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { emit(selectedCellSelectorChanged(cs)); }
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
 
+	const StaticPointers& getStaticPointers() const {return m_sp;}
+
 	/*********************************************************
 	 * MANAGE TEXTURES
 	 *********************************************************/
@@ -180,6 +182,8 @@ protected:
 	MapSet m_maps;
 
 	TextureSet m_textures;
+
+	StaticPointers m_sp;
 };
 
 } // namespace SCHNApps
