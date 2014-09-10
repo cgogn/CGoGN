@@ -10,6 +10,9 @@ namespace SCHNApps
 
 bool Surface_Render_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_dockTab = new Surface_Render_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Render");
 
@@ -323,11 +326,7 @@ void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QStr
 	}
 }
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_Render_PluginD, Surface_Render_Plugin)
-#endif
 
 } // namespace SCHNApps
 

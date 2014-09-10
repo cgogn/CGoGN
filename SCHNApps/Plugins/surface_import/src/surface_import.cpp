@@ -16,6 +16,9 @@ namespace SCHNApps
 
 bool Surface_Import_Plugin::enable()
 {
+//	magic line that init static variables of GenericMap in the plugins
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	importAction = new QAction("import", this);
 	m_schnapps->addMenuAction(this, "Surface;Import", importAction);
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
@@ -28,6 +31,12 @@ MapHandlerGen* Surface_Import_Plugin::importFromFile(const QString& fileName)
 	if(fi.exists())
 	{
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
+
+		std::cout << "IMPORT PLUGIN 2" << std::endl;
+		std::cout << "PTR="<< GenericMap::s_instances<< std::endl;
+		for (auto inst : *GenericMap::s_instances)
+			std::cout << inst<< std::endl;
+
 		if(mhg)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
@@ -62,11 +71,7 @@ void Surface_Import_Plugin::importFromFileDialog()
 	}
 }
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_Import_Plugin, Surface_Import_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_Import_PluginD, Surface_Import_Plugin)
-#endif
 
 } // namespace SCHNApps
 
