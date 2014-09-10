@@ -16,6 +16,9 @@ namespace SCHNApps
 
 bool Volume_Import_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	importAction = new QAction("import", this);
 	m_schnapps->addMenuAction(this, "Volume;Import", importAction);
 	connect(importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
@@ -62,11 +65,7 @@ void Volume_Import_Plugin::importFromFileDialog()
 	}
 }
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Volume_Import_Plugin, Volume_Import_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Volume_Import_PluginD, Volume_Import_Plugin)
-#endif
 
 } // namespace SCHNApps
 

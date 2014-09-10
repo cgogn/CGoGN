@@ -16,7 +16,12 @@ class Volume_Import_Plugin : public PluginProcessing
 
 public:
 	Volume_Import_Plugin()
-	{}
+	{
+		std::cout << "VOL IMPORT CONSTR" << std::endl;
+		std::cout << "&PTR="<< &(GenericMap::s_instances)<< std::endl;
+		std::cout << "PTR="<< GenericMap::s_instances<< std::endl;
+
+	}
 
 	~Volume_Import_Plugin()
 	{}
