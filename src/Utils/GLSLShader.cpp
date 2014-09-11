@@ -1088,9 +1088,9 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 	this->bind();
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 	{
+		assert(((it->vbo_ptr->nbElts()==0) || (it->vbo_ptr->dataSize()!=0) ) || !"dataSize of VBO is 0 ! could not draw");
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
-		assert((it->vbo_ptr->dataSize()!=0) || !"dataSize of VBO is 0 ! could not draw");
 		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)((unsigned long)(begin)));
 	}
 //	this->unbind();

@@ -108,7 +108,8 @@ void View::unlinkPlugin(PluginInteraction* plugin)
 	{
 		plugin->unlinkView(this);
 		emit(pluginUnlinked(plugin));
-		updateGL();
+//		removed because of crash when application close
+//		updateGL();
 	}
 }
 
@@ -159,7 +160,8 @@ void View::unlinkMap(MapHandlerGen* map)
 		emit(mapUnlinked(map));
 
 		updateCurrentCameraBB();
-		updateGL();
+//		removed because of crash when application close
+//		updateGL();
 
 		disconnect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
 		disconnect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
