@@ -106,7 +106,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 
 	DartMarker<MAP> cmf(map);
 
-	cmf.markOrbit<FACE>(faceSeed);
+	cmf.template markOrbit<FACE>(faceSeed);
 	propag.push_back(faceSeed);
 
 	while (!propag.empty() || !propag_inv.empty())
@@ -120,7 +120,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 			do
 			{
 				Dart e = map.phi2(d);
-				if (map.isBoundaryMarked2(e))
+				if (map.template isBoundaryMarked<2>(e))
 				{
 					e = findOtherInCouplesOfDarts(couples,d);
 					if (e!=NIL)
@@ -129,7 +129,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 						{
 							propag_inv.push_back(e);
 							face2invert.push_back(e);
-							cmf.markOrbit<FACE>(e);
+							cmf.template markOrbit<FACE>(e);
 						}
 						cmf.mark(map.phi2(e));// use cmf also to mark boudary cycle to invert
 					}
@@ -140,7 +140,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 					if (!cmf.isMarked(e))
 					{
 						propag.push_back(e);
-						cmf.markOrbit<FACE>(e);
+						cmf.template markOrbit<FACE>(e);
 					}
 				}
 				d= map.phi1(d);
@@ -157,7 +157,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 			do
 			{
 				Dart e = map.phi2(d);
-				if (map.isBoundaryMarked2(e))
+				if (map.template isBoundaryMarked<2>(e))
 				{
 					e = findOtherInCouplesOfDarts(couples,d);
 					if (e!=NIL)
@@ -165,7 +165,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 						if (!cmf.isMarked(e))
 						{
 							propag.push_back(e);
-							cmf.markOrbit<FACE>(e);
+							cmf.template markOrbit<FACE>(e);
 						}
 						cmf.mark(map.phi2(d));// use cmf also to mark boudary cycle to invert
 					}
@@ -176,7 +176,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 					{
 						propag_inv.push_back(e);
 						face2invert.push_back(e);
-						cmf.markOrbit<FACE>(e);
+						cmf.template markOrbit<FACE>(e);
 					}
 				}
 				d= map.phi1(d); // traverse all edges of face
@@ -195,7 +195,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 		if (cmf.isMarked(e))	// check cmf for wrong orientation
 		{
 			reverse2MapFaceKeepPhi2<MAP>(map,e);
-			cmf.unmarkOrbit<FACE>(e);
+			cmf.template unmarkOrbit<FACE>(e);
 		}
 	}
 

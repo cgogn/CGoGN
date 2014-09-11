@@ -31,12 +31,6 @@ MapHandlerGen* Surface_Import_Plugin::importFromFile(const QString& fileName)
 	if(fi.exists())
 	{
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
-
-		std::cout << "IMPORT PLUGIN 2" << std::endl;
-		std::cout << "PTR="<< GenericMap::s_instances<< std::endl;
-		for (auto inst : *GenericMap::s_instances)
-			std::cout << inst<< std::endl;
-
 		if(mhg)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);

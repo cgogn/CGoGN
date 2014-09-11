@@ -24,9 +24,13 @@ int main(int argc, char* argv[])
 
 	// get a smart pointer to the __main__ module of the Python interpreter
 	PythonQtObjectPtr pythonContext = PythonQt::self()->getMainModule();
-	PythonQtScriptingConsole pythonConsole(NULL, pythonContext);
 
-	CGoGN::SCHNApps::SCHNApps schnapps(app.applicationDirPath(), pythonContext, pythonConsole);
+//	PythonQtScriptingConsole pythonConsole(NULL, pythonContext);
+//	CGoGN::SCHNApps::SCHNApps schnapps(app.applicationDirPath(), pythonContext, pythonConsole);
+
+	PythonQtScriptingConsole* pythonConsole = new PythonQtScriptingConsole(NULL, pythonContext);
+	CGoGN::SCHNApps::SCHNApps schnapps(app.applicationDirPath(), pythonContext, *pythonConsole);
+
 	schnapps.show();
 
 	pythonContext.addObject("schnapps", &schnapps);
