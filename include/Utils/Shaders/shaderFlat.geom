@@ -16,13 +16,13 @@ void main(void)
 	N  =  normalize (vec3(NormalMatrix*vec4(N,0.0))); 
 	vec3 center = POSITION_IN(0).xyz + POSITION_IN(1).xyz + POSITION_IN(2).xyz; 
 	center /= 3.0;
-	vec4 newPos =  ModelViewMatrix * vec4(center,0.0);
+	vec4 newPos =  ModelViewMatrix * vec4(center,1.0);
 	vec3 L =  normalize (lightPosition - newPos.xyz);
 	float lambertTerm = dot(N,L);
-        ColorFS = ambient;
+	ColorFS = ambient;
 
-        if(lambertTerm > 0.0)
-                ColorFS += diffuse * lambertTerm;
+	if(lambertTerm > 0.0)
+		 ColorFS += diffuse * lambertTerm;
 
 	int i;
 	for(i=0; i< NBVERTS_IN; i++)
