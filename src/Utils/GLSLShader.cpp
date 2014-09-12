@@ -148,10 +148,35 @@ bool GLSLShader::areGeometryShadersSupported()
 
 bool GLSLShader::areShadersSupported()
 {
-	if ( ! glewGetExtension("GL_ARB_vertex_shader")) return false;
-	if ( ! glewGetExtension("GL_ARB_fragment_shader")) return false;
-	if ( ! glewGetExtension("GL_ARB_shader_objects")) return false;
-	if ( ! glewGetExtension("GL_ARB_shading_language_100")) return false;
+	if ( ! glewIsSupported("GL_ARB_vertex_shader"))
+	{
+		CGoGNerr << " vertex shaders not supported!" <<CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_fragment_shader"))
+	{
+		CGoGNerr << " fragment shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_geometry_shader4"))
+	{
+		CGoGNerr << " geometry shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_shader_objects"))
+	{
+		CGoGNerr << " shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_shading_language_100"))
+	{
+		CGoGNerr << " GLSL no supported!" << CGoGNendl;
+		return false;
+	}
 
 	return true;
 }
@@ -399,7 +424,7 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 		*m_geom_shader_object=0;
 	}
 	/*** create shader object ***/
-	*m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER_EXT);
+	*m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER);
 
 	if( !*m_geom_shader_object )
 	{
@@ -1088,9 +1113,9 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 	this->bind();
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 	{
+		assert(((it->vbo_ptr->nbElts()==0) || (it->vbo_ptr->dataSize()!=0) ) || !"dataSize of VBO is 0 ! could not draw");
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
-		assert((it->vbo_ptr->dataSize()!=0) || !"dataSize of VBO is 0 ! could not draw");
 		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)((unsigned long)(begin)));
 	}
 //	this->unbind();

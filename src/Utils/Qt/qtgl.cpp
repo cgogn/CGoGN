@@ -193,7 +193,6 @@ glm::vec3& GLWidget::getObjPos()
 
 void GLWidget::initializeGL()
 {
-	std::cout << "GL VERSION = "<< glGetString(GL_VERSION)<< std::endl;
 	glEnable(GL_DEPTH_TEST);
 
 	if (m_cbs)
