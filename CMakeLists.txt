@@ -303,9 +303,18 @@ ELSE()
 	ELSE()
 		add_library( utils ${files_utils} )
 	ENDIF()
+	target_link_libraries(utils ${CGoGN_EXT_LIBS})
+
 	add_library( container	${files_container})
+	target_link_libraries(container utils)
+
 	add_library( topology	${files_topology})
+	target_link_libraries(topology container)
+
 	add_library( algo		${files_algo})
+	target_link_libraries(algo utils topology)
+
+
 	add_custom_target( Geometry 	SOURCES ${files_geometry} )
 	add_custom_target( ThirdParty 	SOURCES ${files_thirdParty} )
 	add_dependencies( utils shader_target )
