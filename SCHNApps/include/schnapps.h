@@ -90,6 +90,7 @@ private slots:
 public slots:
 	MapHandlerGen* addMap(const QString& name, unsigned int dim);
 	void removeMap(const QString& name);
+	void setSelectedMap(const QString& mapName);
 
 	MapHandlerGen* getMap(const QString& name) const;
 	const MapSet& getMapSet() const { return m_maps; }

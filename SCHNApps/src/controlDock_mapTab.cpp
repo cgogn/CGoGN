@@ -447,6 +447,17 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 	b_updatingUI = false;
 }
 
+
+void ControlDock_MapTab::setSelectedMap(const QString& mapName)
+{
+	QList<QListWidgetItem *> lm = list_maps->findItems(mapName,Qt::MatchExactly);
+	if (!lm.empty())
+	{
+		lm[0]->setSelected(true);
+	}
+}
+
+
 } // namespace SCHNApps
 
 } // namespace CGoGN

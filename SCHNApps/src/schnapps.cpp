@@ -520,6 +520,11 @@ void SCHNApps::removeMap(const QString& name)
 	}
 }
 
+void SCHNApps::setSelectedMap(const QString& mapName)
+{
+	m_controlMapTab->setSelectedMap(mapName);
+}
+
 MapHandlerGen* SCHNApps::getMap(const QString& name) const
 {
 	if (m_maps.contains(name))
