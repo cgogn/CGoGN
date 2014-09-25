@@ -78,7 +78,7 @@ void Viewer::initGUI()
 
 void Viewer::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(3) ;
+	Utils::GLSLShader::setCurrentOGLVersion(2) ;
 	CGoGNout << "GL VERSION = "<< glGetString(GL_VERSION)<< CGoGNendl;
 	Utils::GLSLShader::areShadersSupported();
 
@@ -102,6 +102,7 @@ void Viewer::cb_initGL()
 	m_flatShader->setAttributePosition(m_positionVBO) ;
 	m_flatShader->setAmbiant(colClear) ;
 	m_flatShader->setDiffuse(colDif) ;
+	m_flatShader->setDiffuseBack(Geom::Vec4f(0,0,0,0)) ;
 	m_flatShader->setExplode(faceShrinkage) ;
 
 	m_vectorShader = new Utils::ShaderVectorPerVertex() ;

@@ -4,8 +4,6 @@
 #include <QtPlugin>
 #include <QAction>
 
-#include <GL/glew.h>
-
 #include "types.h"
 
 namespace CGoGN
@@ -21,24 +19,18 @@ class Plugin : public QObject
 	friend class SCHNApps;
 
 public:
-	Plugin() : m_schnapps(NULL)
-	{
-		glewInit();
-	}
-
-	virtual ~Plugin() {}
-
-	const QString& getName() const { return m_name; }
+	Plugin();
+	virtual ~Plugin();
 
 public slots:
-	QString getName() { return m_name; }
-	const QString& getFilePath() { return m_filePath; }
-	SCHNApps* getSCHNApps() { return m_schnapps; }
+	QString getName();
+	QString getFilePath();
+	SCHNApps* getSCHNApps();
 
 private:
-	void setName(const QString& name) { m_name = name; }
-	void setFilePath(const QString& f) { m_filePath = f; }
-	void setSCHNApps(SCHNApps* s) { m_schnapps = s; }
+	void setName(const QString& name);
+	void setFilePath(const QString& f);
+	void setSCHNApps(SCHNApps* s);
 
 	virtual bool enable() = 0;
 	virtual void disable() = 0;
