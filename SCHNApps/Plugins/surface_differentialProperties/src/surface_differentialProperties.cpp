@@ -121,6 +121,14 @@ void Surface_DifferentialProperties_Plugin::computeNormalFromDialog()
 		bool autoUpdate = (currentItems[0]->checkState() == Qt::Checked);
 
 		computeNormal(mapName, positionName, normalName, autoUpdate);
+
+		// create VBO if asked
+		if (m_computeNormalDialog->enableVBO->isChecked())
+		{
+			MapHandlerGen* mhg = getSCHNApps()->getMap(mapName);
+			if (mhg != NULL)
+				mhg->createVBO(normalName);
+		}
 	}
 }
 

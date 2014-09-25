@@ -66,7 +66,8 @@ std::string* GLSLShader::DEFINES_GL = NULL;
 
 std::vector<std::string> GLSLShader::m_pathes;
 
-std::set< std::pair<void*, GLSLShader*> > GLSLShader::m_registeredShaders;
+//std::set< std::pair<void*, GLSLShader*> > GLSLShader::m_registeredShaders;
+std::set< std::pair<void*, GLSLShader*> >* GLSLShader::m_registeredShaders = NULL;
 
 
 //glm::mat4* GLSLShader::s_current_matrices=NULL;
@@ -90,16 +91,19 @@ GLSLShader::GLSLShader() :
 		DEFINES_GL = &DEFINES_GL2;
 
 	m_nbMaxVertices = 16;
+
+	if (m_registeredShaders==NULL)
+		m_registeredShaders = new std::set< std::pair<void*, GLSLShader*> >;
 }
 
 void GLSLShader::registerShader(void* ptr, GLSLShader* shader)
 {
-	m_registeredShaders.insert(std::pair<void*,GLSLShader*>(ptr, shader));
+	m_registeredShaders->insert(std::pair<void*,GLSLShader*>(ptr, shader));
 }
 
 void GLSLShader::unregisterShader(void* ptr, GLSLShader* shader)
 {
-	m_registeredShaders.erase(std::pair<void*,GLSLShader*>(ptr, shader));
+	m_registeredShaders->erase(std::pair<void*,GLSLShader*>(ptr, shader));
 }
 
 std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std::string& primitivesOut, int maxVert)
@@ -657,7 +661,7 @@ GLSLShader::~GLSLShader()
 	if (m_geom_shader_source != NULL)
 		delete[] m_geom_shader_source;
 
-//	m_registeredShaders.erase(this);
+//	m_registeredShaders->erase(this);
 }
 
 std::string GLSLShader::findFile(const std::string filename)
@@ -1138,7 +1142,7 @@ void GLSLShader::updateCurrentMatrices()
 	currentPMV() = currentProjection() * model;
 	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
 
-	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders->begin(); it != m_registeredShaders->end(); ++it)
 		it->second->updateMatrices(currentProjection(), model, currentPMV(), currentNormalMatrix());
 }
 
@@ -1165,7 +1169,7 @@ void GLSLShader::updateAllFromGLMatrices()
 	currentPMV() = proj * model;
 	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
 
-	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders->begin(); it != m_registeredShaders->end(); ++it)
 		it->second->updateMatrices(proj, model, currentPMV(), currentNormalMatrix());
 }
 
