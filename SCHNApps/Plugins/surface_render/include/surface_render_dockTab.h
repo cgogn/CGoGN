@@ -3,6 +3,7 @@
 
 #include "ui_surface_render.h"
 #include "Utils/vbo.h"
+#include <QColorDialog>
 
 namespace CGoGN
 {
@@ -27,6 +28,11 @@ private:
 	SCHNApps* m_schnapps;
 	Surface_Render_Plugin* m_plugin;
 	bool b_updatingUI;
+	QColorDialog* m_colorDial;
+	QColor m_diffuseColor;
+	QColor m_simpleColor;
+	QColor m_vertexColor;
+	int m_currentColorDial;
 
 private slots:
 	void positionVBOChanged(int index);
@@ -37,6 +43,13 @@ private slots:
 	void renderFacesChanged(bool b);
 	void faceStyleChanged(QAbstractButton* b);
 	void renderBoundaryChanged(bool b);
+
+	void diffuseColorClicked();
+	void simpleColorClicked();
+	void vertexColorClicked();
+	void colorSelected(const QColor& col);
+
+
 
 private:
 	void addPositionVBO(QString name);

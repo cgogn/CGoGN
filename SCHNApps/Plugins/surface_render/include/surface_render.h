@@ -32,7 +32,11 @@ struct MapParameters
 		renderVertices(false),
 		renderEdges(false),
 		renderFaces(true),
-		faceStyle(FLAT)
+		faceStyle(FLAT),
+		diffuseColor(0.8,0.9,0.7,0.0),
+		simpleColor(0.0,0.0,0.0,0.0),
+		vertexColor(0.0,0.0,1.0,0.0)
+
 	{}
 
 	Utils::VBO* positionVBO;
@@ -43,6 +47,10 @@ struct MapParameters
 	bool renderFaces;
 	bool renderBoundary;
 	FaceShadingStyle faceStyle;
+
+	Geom::Vec4f diffuseColor;
+	Geom::Vec4f simpleColor;
+	Geom::Vec4f vertexColor;
 };
 
 class Surface_Render_Plugin : public PluginInteraction
