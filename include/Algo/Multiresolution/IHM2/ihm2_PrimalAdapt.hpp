@@ -351,8 +351,6 @@ unsigned int IHM2<PFP>::subdivideFace(Dart d, bool triQuad, bool OneLevelDiffere
     unsigned int fLevel = faceLevel(d) ;
     Dart old = faceOldestDart(d) ;
 
-	//std::cout << "faceLevel = " << fLevel << std::endl;
-
 	unsigned int cur = m_map.getCurrentLevel() ;
 	m_map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 

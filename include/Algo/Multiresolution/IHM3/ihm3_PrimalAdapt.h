@@ -137,7 +137,7 @@ protected:
     /***************************************************
      *               SUBDIVISION                       *
      ***************************************************/
-
+public:
     /**
      * subdivide the edge of d to the next level
      */
@@ -158,11 +158,11 @@ protected:
      */
     void coarsenFace(Dart d) ;
 
-public:
+
     //! Subdivide the volume of d to hexahedral cells
     /*! @param d Dart from the volume
      */
-    unsigned int subdivideVolume(Dart d, bool triQuad = true, bool OneLevelDifference = true);
+	Dart subdivideVolume(Dart d, bool triQuad = true, bool OneLevelDifference = true);
 
     /*!
      * \brief subdivideHexa
@@ -178,6 +178,8 @@ public:
     /*! @param d Dart from the volume
      */
     void subdivideVolumeTetOcta(Dart d) ;
+
+	void coarsenVolume(Dart d) ;
 
     /**
      * vertices attributes management
@@ -201,6 +203,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/IHM2/ihm2_PrimalAdapt.hpp"
+#include "Algo/Multiresolution/IHM3/ihm3_PrimalAdapt.hpp"
 
 #endif

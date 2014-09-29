@@ -103,7 +103,7 @@ public:
 
 	EarTriangulation(MAP& map) : m_map(map), m_dartEars(map)
 	{
-		m_position = map.template getAttribute<VEC3, VERTEX>("position");
+		m_position = map.template getAttribute<VEC3, VERTEX, MAP>("position");
 	}
 
 //	void trianguleFace(Dart d, DartMarker& mark);

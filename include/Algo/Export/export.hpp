@@ -996,7 +996,7 @@ bool exportChoupi(typename PFP::MAP& map, const VertexAttribute<typename PFP::VE
 		return false ;
 	}
 
-	out << map.template getNbOrbits<VERTEX>() << " " << map.template getNbOrbits<EDGE>() << std::endl;
+	out << Algo::Topo::getNbOrbits<VERTEX>(map) << " " << Algo::Topo::getNbOrbits<EDGE>(map) << std::endl;
 
 	TraversorV<MAP> travV(map);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())

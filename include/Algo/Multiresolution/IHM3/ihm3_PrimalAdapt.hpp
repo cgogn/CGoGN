@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Algo/Multiresolution/IHM3/ihm3_PrimalAdapt.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 namespace CGoGN
 {
@@ -43,8 +44,8 @@ namespace Adaptive
 {
 
 template <typename PFP>
-IHM3<PFP>::IHM3(m_map& m_map) :
-    m_m_map(m_map),
+IHM3<PFP>::IHM3(MAP& map) :
+	m_map(map),
     shareVertexEmbeddings(true),
     vertexVertexFunctor(NULL),
     edgeVertexFunctor(NULL),
@@ -60,35 +61,24 @@ IHM3<PFP>::IHM3(m_map& m_map) :
 template <typename PFP>
 unsigned int IHM3<PFP>::edgeLevel(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 
-    // the level of an edge is the maximum of the
-    // insertion levels of its darts
+	// the level of an edge is the maximum of the
+	// insertion levels of its darts
 
-//    unsigned int r = 0;
+	unsigned int ld = m_map.getDartLevel(d) ;
+	unsigned int ldd = m_map.getDartLevel(m_map.phi2(d)) ;
+	unsigned int max = ld > ldd ? ld : ldd;
 
-//    Dart e = d;
-//    do
-//    {
-        unsigned int ld = m_map.getDartLevel(e) ;
-        unsigned int ldd = m_map.getDartLevel(map.phi2(e)) ;
-        unsigned int max = ld > ldd ? ld : ldd;
-
-//        r =  r < temp ? temp : r ;
-
-//        e = alpha2(e);
-//    } while(e != d);
-
-//    return r;
-        return max;
+	return max;
 }
 
 template <typename PFP>
 unsigned int IHM3<PFP>::faceLevel(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"faceLevel : called with a dart inserted after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"faceLevel : called with a dart inserted after current level") ;
 
-    if(map.getCurrentLevel() == 0)
+	if(m_map.getCurrentLevel() == 0)
         return 0 ;
 
     Dart it = d ;
@@ -107,7 +97,7 @@ unsigned int IHM3<PFP>::faceLevel(Dart d)
         unsigned int l = edgeLevel(it) ;		// is the minimum of the levels
         fLevel = l < fLevel ? l : fLevel ;		// of its edges
     } while(it != d) ;
-
+/*
     unsigned int cur = m_map.getCurrentLevel() ;
     m_map.setCurrentLevel(fLevel) ;
 
@@ -118,7 +108,7 @@ unsigned int IHM3<PFP>::faceLevel(Dart d)
     {											// but not the face itself
         ++nbSubd ;								// is treated here
         it = m_map.phi1(it) ;
-    } while(map.getEdgeId(it) == eId) ;
+	} while(m_map.getEdgeId(it) == eId) ;
 
     while(nbSubd > 1)
     {
@@ -127,22 +117,37 @@ unsigned int IHM3<PFP>::faceLevel(Dart d)
     }
 
     m_map.setCurrentLevel(cur) ;
-
+*/
     return fLevel ;
 }
 
 template <typename PFP>
 unsigned int IHM3<PFP>::volumeLevel(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 
-    if(map.getCurrentLevel() == 0)
+	if(m_map.getCurrentLevel() == 0)
         return 0 ;
 
+	Dart oldest = d ;
+	unsigned int vLevel = std::numeric_limits<unsigned int>::max(); //hook sioux
+
+	//First : the level of a volume is the minimum of the levels of its faces
+	Traversor3WF<typename PFP::MAP> travF(m_map, d);
+	for (Dart dit = travF.begin(); dit != travF.end(); dit = travF.next())
+	{
+		// in a first time, the level of a face
+		//the level of the volume is the minimum of the
+		//levels of its faces
+		unsigned int fLevel = faceLevel(dit);
+		vLevel = fLevel < vLevel ? fLevel : vLevel ;
+	}
+
+	/*
     //First : the level of a volume is the
     //minimum of the levels of its faces
 
-    DartMarkerStore<m_map3> mark(*this);		// Lock a marker
+	DartMarkerStore<MAP> mark(m_map);		// Lock a marker
 
     std::vector<Dart> visitedFaces;		// Faces that are traversed
     visitedFaces.reserve(512);
@@ -155,7 +160,7 @@ unsigned int IHM3<PFP>::volumeLevel(Dart d)
     //parcours les faces du volume au niveau courant
     //on cherche le brin de niveau le plus bas de la hierarchie
     //on note le niveau le plus bas de la hierarchie
-    mark.markOrbit<FACE>(d) ;
+	mark.markOrbit(Face(d)) ;
     for(unsigned int i = 0; i < visitedFaces.size(); ++i)
     {
         Dart e = visitedFaces[i] ;
@@ -174,7 +179,7 @@ unsigned int IHM3<PFP>::volumeLevel(Dart d)
         unsigned int fLevel = edgeLevel(it) ;
         do
         {
-            it = phi1(it) ;
+			it = m_map.phi1(it) ;
             unsigned int dl = m_map.getDartLevel(it) ;
             if(dl < l_old)							// compute the oldest dart of the face
             {										// in the same time
@@ -215,7 +220,7 @@ unsigned int IHM3<PFP>::volumeLevel(Dart d)
         // compute the oldest dart from the volume
         // if the oldest dart from this face is oldest than the oldest saved dart
         //
-        if(map.getDartLevel(old) < m_map.getDartLevel(oldest))
+		if(m_map.getDartLevel(old) < m_map.getDartLevel(oldest))
             oldest = old ;
 
         //
@@ -227,11 +232,12 @@ unsigned int IHM3<PFP>::volumeLevel(Dart d)
             if(!mark.isMarked(ee)) // not already marked
             {
                 visitedFaces.push_back(ee) ;
-                mark.markOrbit<FACE>(ee) ;
+				mark.markOrbit(Face(ee)) ;
             }
             e = m_map.phi1(e) ;
         } while(e != visitedFaces[i]) ;
     }
+	*/
 
 
     //Second : the case of all faces regularly subdivided but not the volume itself
@@ -246,7 +252,7 @@ unsigned int IHM3<PFP>::volumeLevel(Dart d)
     {
         ++nbSubd ;
         it = m_map.phi1(it) ;
-    } while(map.getEdgeId(it) == eId) ;
+	} while(m_map.getEdgeId(it) == eId) ;
 
 
     while(nbSubd > 1)
@@ -263,7 +269,7 @@ unsigned int IHM3<PFP>::volumeLevel(Dart d)
 template <typename PFP>
 Dart IHM3<PFP>::faceOldestDart(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     Dart it = d ;
     Dart oldest = it ;
     unsigned int l_old = m_map.getDartLevel(oldest) ;
@@ -286,12 +292,12 @@ Dart IHM3<PFP>::faceOldestDart(Dart d)
 template <typename PFP>
 Dart IHM3<PFP>::volumeOldestDart(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 
     Dart oldest = d;
     unsigned int l_old = m_map.getDartLevel(oldest);
 
-    Traversor3WF<ImplicitHierarchicalm_map3> trav3WF(*this, oldest);
+	Traversor3WF<typename PFP::MAP> trav3WF(m_map, oldest);
     for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
     {
         Dart old = faceOldestDart(dit);
@@ -309,16 +315,14 @@ Dart IHM3<PFP>::volumeOldestDart(Dart d)
 template <typename PFP>
 bool IHM3<PFP>::edgeIsSubdivided(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 
-    //Dart d2 = phi2(d) ;
-    Dart d1 = m_map.phi1(d) ;
-    ++m_curLevel ;
-    //Dart d2_l = phi2(d) ;
-    Dart d1_l = m_map.phi1(d) ;
-    --m_curLevel ;
-    //if(d2 != d2_l)
-    if(d1 != d1_l)
+	//TODO replace by phi1
+	Dart d2 = m_map.phi2(d) ;
+	m_map.incCurrentLevel();
+	Dart d2_l = m_map.phi2(d) ;
+	m_map.decCurrentLevel() ;
+	if(d2 != d2_l)
         return true ;
     else
         return false ;
@@ -327,7 +331,7 @@ bool IHM3<PFP>::edgeIsSubdivided(Dart d)
 template <typename PFP>
 bool IHM3<PFP>::edgeCanBeCoarsened(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 
     bool subd = false ;
     bool subdOnce = true ;
@@ -338,7 +342,7 @@ bool IHM3<PFP>::edgeCanBeCoarsened(Dart d)
         subd = true ;
         m_map.incCurrentLevel() ;
 
-        if(map.vertexDegree(map.phi1(d)) == 2)
+		if(m_map.vertexDegree(m_map.phi1(d)) == 2)
         {
             degree2 = true ;
             if(edgeIsSubdivided(d))
@@ -352,16 +356,20 @@ bool IHM3<PFP>::edgeCanBeCoarsened(Dart d)
 template <typename PFP>
 bool IHM3<PFP>::faceIsSubdivided(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-    unsigned int fLevel = faceLevel(d) ;
-    if(fLevel < m_map.getCurrentLevel())
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+
+//	if(m_map.getCurrentLevel() == m_map.getMaxLevel())
+//		return false ;
+
+	unsigned int fLevel = faceLevel(d) ;
+	if(fLevel < m_map.getCurrentLevel())
         return false ;
 
     bool subd = false ;
-    m_map.incCurrentLevel() ;
-    if(map.getDartLevel(map.phi1(d)) == m_map.getCurrentLevel() && m_map.getEdgeId(m_map.phi1(d)) != m_map.getEdgeId(d))
+	m_map.incCurrentLevel();
+	if(m_map.getDartLevel(m_map.phi1(d)) == m_map.getCurrentLevel() && m_map.getEdgeId(m_map.phi1(d)) != m_map.getEdgeId(d))
         subd = true ;
-    m_map.decCurrentLevel() ;
+	m_map.decCurrentLevel();
 
     return subd ;
 }
@@ -369,7 +377,7 @@ bool IHM3<PFP>::faceIsSubdivided(Dart d)
 template <typename PFP>
 bool IHM3<PFP>::faceCanBeCoarsened(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 
     bool subd = false;
     bool subdOnce = true;
@@ -384,8 +392,9 @@ bool IHM3<PFP>::faceCanBeCoarsened(Dart d)
         if(d3 != d && volumeIsSubdivided(d3))
             subdNeighborhood = true;
 
-        m_map.incCurrentLevel() ;
-        //tester si la face subdivise a des faces subdivise
+		unsigned int cur = m_map.getCurrentLevel();
+		m_map.setCurrentLevel(cur + 1) ;
+		//tester si la face subdivise a des faces subdivise
         Dart cf = m_map.phi1(d);
 
         do
@@ -393,12 +402,12 @@ bool IHM3<PFP>::faceCanBeCoarsened(Dart d)
             if(faceIsSubdivided(cf))
                 subdOnce = false;
 
-            cf = m_map.phi2(map.phi1(cf));
+			cf = m_map.phi2(m_map.phi1(cf));
         }
         while(subdOnce && cf != m_map.phi1(d));
 
-        --m_curLevel;
-    }
+		m_map.setCurrentLevel(cur) ;
+	}
 
     return subd && !subdNeighborhood && subdOnce;
 }
@@ -406,47 +415,52 @@ bool IHM3<PFP>::faceCanBeCoarsened(Dart d)
 template <typename PFP>
 bool IHM3<PFP>::volumeIsSubdivided(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-    unsigned int vLevel = volumeLevel(d);
-    if(vLevel < m_map.getCurrentLevel())
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+
+	unsigned int vLevel = volumeLevel(d);
+	if(vLevel < m_map.getCurrentLevel())
         return false;
 
-    bool subd = false;
-
-    m_map.incCurrentLevel() ;
-    if(map.getDartLevel(map.phi2(map.phi1(map.phi1(d)))) == m_map.getCurrentLevel() && m_map.getFaceId(map.phi2(map.phi1(map.phi1(d)))) != m_map.getFaceId(d))
-        subd = true;
-    m_map.decCurrentLevel() ;
-
-    return subd;
-
-//	//bool facesAreSubdivided = faceIsSubdivided(d) ;
-//	bool facesAreSubdivided = true ;
-//
-//	Traversor3WF<ImplicitHierarchicalm_map3> trav3WF(*this, d);
-//	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
-//	{
-//		// in a first time, the level of a face
-//		//the level of the volume is the minimum of the
-//		//levels of its faces
-//
-//		facesAreSubdivided &= faceIsSubdivided(dit) ;
-//	}
-//
-//	//but not the volume itself
 //	bool subd = false;
-//	++m_curLevel;
-//	if(facesAreSubdivided && m_dartLevel[phi2(phi1(phi1(d)))] == m_curLevel && m_faceId[phi2(phi1(phi1(d)))] != m_faceId[d])
+
+//	unsigned int cur = m_map.getCurrentLevel();
+//	m_map.setCurrentLevel(cur + 1) ;
+//	if(m_map.getDartLevel(m_map.phi2(m_map.phi1(m_map.phi1(d)))) == m_map.getCurrentLevel() && m_map.getFaceId(m_map.phi2(m_map.phi1(m_map.phi1(d)))) != m_map.getFaceId(d))
 //		subd = true;
-//	--m_curLevel;
-//
+//	m_map.setCurrentLevel(cur) ;
+
+//	std::cout << "volume is subdivided ? " << ( subd ? "true" : "false" ) << std::endl;
+
 //	return subd;
+
+	bool facesAreSubdivided = faceIsSubdivided(d) ;
+	//bool facesAreSubdivided = true ;
+
+	Traversor3WF<MAP> trav3WF(m_map, d);
+	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
+	{
+		// in a first time, the level of a face
+		//the level of the volume is the minimum of the
+		//levels of its faces
+
+		facesAreSubdivided &= faceIsSubdivided(dit) ;
+	}
+
+	//but not the volume itself
+	bool subd = false;
+	m_map.incCurrentLevel() ;
+	if(facesAreSubdivided && m_map.getDartLevel(m_map.phi2(m_map.phi1(m_map.phi1(d)))) == m_map.getCurrentLevel() && m_map.getFaceId(m_map.phi2(m_map.phi1(m_map.phi1(d)))) != m_map.getFaceId(d))
+		subd = true;
+	m_map.decCurrentLevel() ;
+
+	return subd;
+
 }
 
 template <typename PFP>
 bool IHM3<PFP>::volumeIsSubdividedOnce(Dart d)
 {
-    assert(map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     unsigned int vLevel = volumeLevel(d);
     if(vLevel < m_map.getCurrentLevel())
         return false;
@@ -455,15 +469,15 @@ bool IHM3<PFP>::volumeIsSubdividedOnce(Dart d)
     bool subdOnce = true ;
 
     m_map.incCurrentLevel() ;
-    if(map.getDartLevel(map.phi2(map.phi1(map.phi1(d)))) == m_map.getCurrentLevel() && m_map.getFaceId(map.phi2(map.phi1(map.phi1(d)))) != m_map.getFaceId(d))
+	if(m_map.getDartLevel(m_map.phi2(m_map.phi1(m_map.phi1(d)))) == m_map.getCurrentLevel() && m_map.getFaceId(m_map.phi2(m_map.phi1(m_map.phi1(d)))) != m_map.getFaceId(d))
     {
         subd = true;
         m_map.incCurrentLevel() ;
-        Dart dcenter = phi_1(phi2(phi1(d)));
-        Traversor3VW<ImplicitHierarchicalm_map3> trav3(*this, dcenter);
+		Dart dcenter = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
+		Traversor3VW<ImplicitHierarchicalMap3> trav3(m_map, dcenter);
         for(Dart dit = trav3.begin() ; subdOnce && dit != trav3.end() && subdOnce; dit = trav3.next())
         {
-            if(map.getDartLevel(map.phi2(map.phi1(map.phi1(dit)))) == m_map.getCurrentLevel() && m_map.getFaceId(map.phi2(map.phi1(map.phi1(dit)))) != m_map.getFaceId(dit))
+			if(m_map.getDartLevel(m_map.phi2(m_map.phi1(m_map.phi1(dit)))) == m_map.getCurrentLevel() && m_map.getFaceId(m_map.phi2(m_map.phi1(m_map.phi1(dit)))) != m_map.getFaceId(dit))
                 subdOnce = false;
         }
         m_map.decCurrentLevel() ;
@@ -474,7 +488,7 @@ bool IHM3<PFP>::volumeIsSubdividedOnce(Dart d)
 //	//si le volume est subdivise
 //
 //	//test si toutes les faces sont subdivisee
-//	DartMarkerStore mark(*this);		// Lock a marker
+//	DartMarkerStore<MAP> mark(m_map);		// Lock a marker
 //
 //	std::vector<Dart> visitedFaces;		// Faces that are traversed
 //	visitedFaces.reserve(512);
@@ -519,8 +533,7 @@ template <typename PFP>
 void IHM3<PFP>::subdivideEdge(Dart d)
 {
     assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-    assert(!m_map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
-    assert(!m_map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
 
     unsigned int eLevel = edgeLevel(d) ;
 
@@ -533,8 +546,8 @@ void IHM3<PFP>::subdivideEdge(Dart d)
 
     m_map.cutEdge(d) ;
     unsigned int eId = m_map.getEdgeId(d) ;
-    m_map.setEdgeId(m_map.phi1(d), eId, EDGE) ; //mise a jour de l'id d'arrete sur chaque moitie d'arete
-    m_map.setEdgeId(m_map.phi1(dd), eId, EDGE) ;
+	m_map.setEdgeId(m_map.phi1(d), eId) ; //mise a jour de l'id d'arrete sur chaque moitie d'arete
+	m_map.setEdgeId(m_map.phi1(dd), eId) ;
 
     m_map.setFaceId(EDGE, d) ; //mise a jour de l'id de face sur chaque brin de chaque moitie d'arete
     m_map.setFaceId(EDGE, dd) ;
@@ -560,8 +573,7 @@ template <typename PFP>
 unsigned int IHM3<PFP>::subdivideFace(Dart d, bool triQuad)
 {
     assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-    assert(!m_map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
-    assert(!m_map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
 
     unsigned int fLevel = faceLevel(d) ;
     Dart old = faceOldestDart(d) ;
@@ -569,42 +581,29 @@ unsigned int IHM3<PFP>::subdivideFace(Dart d, bool triQuad)
     unsigned int cur = m_map.getCurrentLevel() ;
     m_map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 
-    //one level of subdivision in the neighbordhood
-//	unsigned int vLevel = m_map.volumeLevel(old);
-//	Traversor3VW<typename PFP::m_map> trav3EW(m_map, old);
-//	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
-//	{
-//		Dart oldit = m_map.volumeOldestDart(dit);
-//
-//		//std::cout << "vLevel courant = " << m_map.volumeLevel(oldit) << std::endl;
-//
-//		if(((vLevel+1) - m_map.volumeLevel(oldit)) > 1)
-//				IHM::subdivideVolumeClassic<PFP>(m_map, oldit, position);
-//	}
-
     unsigned int degree = 0 ;
-    Traversor2FE<typename PFP::m_map>  travE(m_map, old);
+	Traversor3FE<typename PFP::MAP>  travE(m_map, old);
     for(Dart it = travE.begin(); it != travE.end() ; it = travE.next())
     {
         ++degree ;						// compute the degree of the face
 
-        if(!m_map.edgeIsSubdivided(it))							// first cut the edges (if they are not already)
-            IHM::subdivideEdge<PFP>(m_map, it, position) ;	// and compute the degree of the face
+		if(!edgeIsSubdivided(it))							// first cut the edges (if they are not already)
+			subdivideEdge(it) ;	// and compute the degree of the face
     }
 
     m_map.setCurrentLevel(fLevel + 1) ;			// go to the next level to perform face subdivision
-
 
     if((degree == 3) && triQuad)					// if subdividing a triangle
     {
         Dart dd = m_map.phi1(old) ;
         Dart e = m_map.phi1(dd) ;
         (*vertexVertexFunctor)(e) ;
-        Dart e = m_map.phi1(e) ;
+		e = m_map.phi1(e) ;
 
         m_map.splitFace(dd, e) ;					// insert a new edge
-        unsigned int id = m_map.getNewEdgeId() ;
-        m_map.setEdgeId(m_map.phi_1(dd), id, EDGE) ;		// set the edge id of the inserted edge to the next available id
+		//unsigned int id = m_map.getNewEdgeId() ;
+		unsigned int id = m_map.triRefinementEdgeId(m_map.phi_1(dd));
+		m_map.setEdgeId(m_map.phi_1(dd), id) ;		// set the edge id of the inserted edge to the next available id
 
         unsigned int idface = m_map.getFaceId(old);
         m_map.setFaceId(dd, idface, FACE) ;
@@ -615,8 +614,9 @@ unsigned int IHM3<PFP>::subdivideFace(Dart d, bool triQuad)
         (*vertexVertexFunctor)(e) ;
         e = m_map.phi1(dd);
         m_map.splitFace(dd, e) ;
-        id = m_map.getNewEdgeId() ;
-        m_map.setEdgeId(m_map.phi_1(dd), id, EDGE) ;
+		//id = m_map.getNewEdgeId() ;
+		id = m_map.triRefinementEdgeId(m_map.phi_1(dd));
+		m_map.setEdgeId(m_map.phi_1(dd), id) ;
 
         m_map.setFaceId(dd, idface, FACE) ;
         m_map.setFaceId(e, idface, FACE) ;
@@ -626,12 +626,12 @@ unsigned int IHM3<PFP>::subdivideFace(Dart d, bool triQuad)
         (*vertexVertexFunctor)(e) ;
         e = m_map.phi1(dd);
         m_map.splitFace(dd, e) ;
-        id = m_map.getNewEdgeId() ;
-        m_map.setEdgeId(m_map.phi_1(dd), id, EDGE) ;
+		//id = m_map.getNewEdgeId() ;
+		id = m_map.triRefinementEdgeId(m_map.phi_1(dd));
+		m_map.setEdgeId(m_map.phi_1(dd), id) ;
 
         m_map.setFaceId(dd, idface, FACE) ;
         m_map.setFaceId(e, idface, FACE) ;
-
     }
     else
     {
@@ -640,30 +640,30 @@ unsigned int IHM3<PFP>::subdivideFace(Dart d, bool triQuad)
         (*vertexVertexFunctor)(next) ;
         next = m_map.phi1(next);
         m_map.splitFace(dd, next) ;
-
         Dart ne = m_map.phi2(m_map.phi_1(dd));
         Dart ne2 = m_map.phi2(ne);
 
         m_map.cutEdge(ne) ;
-        unsigned int id = m_map.getNewEdgeId() ;
-        m_map.setEdgeId(ne, id, EDGE) ;
-        id = m_map.getNewEdgeId() ;
-        m_map.setEdgeId(ne2, id, EDGE) ;
+		//unsigned int id = m_map.getNewEdgeId() ;
+		unsigned int id = m_map.getQuadRefinementEdgeId(m_map.phi2(ne));
+		m_map.setEdgeId(ne, id) ;
+		//id = m_map.getNewEdgeId() ;
+		id = m_map.getQuadRefinementEdgeId(m_map.phi2(ne2));
+		m_map.setEdgeId(ne2, id) ;
 
-        dd = m_map.phi1(ne) ;
+		dd = m_map.phi1(next) ;
         (*vertexVertexFunctor)(dd) ;
-        dd = m_map.phi1(m_map.phi1(dd));
+		dd = m_map.phi1(dd);
         while(dd != ne)
-        {
-            Dart next = m_map.phi1(m_map.phi1(dd)) ;
+        {          
             m_map.splitFace(m_map.phi1(ne), dd) ;
-            (*vertexVertexFunctor)(m_map.phi1(dd)) ;
             Dart nne = m_map.phi2(m_map.phi_1(dd)) ;
-
-            id = m_map.getNewEdgeId() ;
-            m_map.setEdgeId(nne, id, EDGE) ;
-
-            dd = next ;
+			//id = m_map.getNewEdgeId() ;
+			id = m_map.getQuadRefinementEdgeId(m_map.phi2(nne));
+			m_map.setEdgeId(nne, id) ;
+			dd = m_map.phi1(dd) ;
+			(*vertexVertexFunctor)(dd) ;
+			dd = m_map.phi1(dd) ;
         }
 
         unsigned int idface = m_map.getFaceId(old);
@@ -676,10 +676,7 @@ unsigned int IHM3<PFP>::subdivideFace(Dart d, bool triQuad)
         }
         while(dd != ne);
 
-
-        (*faceVertexFunctor)(m_map.phi1(ne)) ;
-
-
+        (*faceVertexFunctor)(m_map.phi1(ne)) ;		
     }
 
     m_map.setCurrentLevel(cur) ;
@@ -739,11 +736,10 @@ void IHM3<PFP>::coarsenFace(Dart d)
 }
 
 template <typename PFP>
-unsigned int IHM3<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDifference)
+Dart IHM3<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDifference)
 {
     assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-    assert(!m_map.isBoundaryMarked(d,3) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int vLevel = volumeLevel(d);
     Dart old = volumeOldestDart(d);
@@ -751,106 +747,73 @@ unsigned int IHM3<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDiffe
     unsigned int cur = m_map.getCurrentLevel();
     m_map.setCurrentLevel(vLevel);
 
-    //	//one level of subdivision in the neighbordhood
-    //	Traversor3VW<typename PFP::m_map> trav3EW(m_map, old);
-    //	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
-    //	{
-    //		Dart oldit = m_map.volumeOldestDart(dit);
-    //		if(((vLevel+1) - m_map.volumeLevel(oldit)) > 1)
-    //			IHM::subdivideVolumeClassic<PFP>(m_map, oldit, position);
-    //	}
+	if(OneLevelDifference)
+	{
+		Traversor3WF<typename PFP::MAP> traF(m_map, old);
+		for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
+		{
+			Dart nv = m_map.phi3(dit);
+			if(!m_map.isBoundaryMarked(3, nv))
+				if(volumeLevel(nv) == vLevel - 1)
+					subdivideVolume(nv,triQuad,OneLevelDifference);
+		}
+	}
 
-    /*
-     * au niveau du volume courant i
-     * stockage d'un brin de chaque face de celui-ci
-     * avec calcul du centroid
-     */
+	//Store the edges before the cutEdge
+	std::vector<Dart> oldEdges;
+	oldEdges.reserve(20);
 
-    DartMarkerStore mf(m_map);		// Lock a face marker to save one dart per face
-    DartMarkerStore mv(m_map);
+	Traversor3WV<typename PFP::MAP> traV(m_map, old);
+	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
+	{
+		oldEdges.push_back(dit);
+		std::cout << "rec corner : " << dit << std::endl;
+	}
 
-    //Store faces that are traversed and start with the face of d
-    std::vector<Dart> visitedFaces;
-    visitedFaces.reserve(200);
-    visitedFaces.push_back(old);
+	std::vector<std::pair<Dart, Dart> > subdividedFaces;
+	subdividedFaces.reserve(128);
 
-    //Store the edges before the cutEdge
-    std::vector<Dart> oldEdges;
-    oldEdges.reserve(20);
+	Traversor3WF<typename PFP::MAP> traF(m_map, old);
+	for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
+	{
+		//if needed subdivide face
+		if(!faceIsSubdivided(dit))
+			subdivideFace(dit, triQuad);
 
-    mf.markOrbit<FACE>(old) ;
+		//save a dart from the subdivided face
+		m_map.incCurrentLevel();
 
-    for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-    {
-        Dart e = visitedFaces[i] ;
-        do
-        {
-            //add one old edge per vertex to the old edge list
-            //compute volume centroid
-            if(!mv.isMarked(e))
-            {
-                mv.markOrbit<VERTEX>(e);
-                oldEdges.push_back(e);
-            }
+		//unsigned int fLevel = faceLevel(dit); //puisque dans tous les cas, la face est subdivisee
+		//m_map.setCurrentLevel(fLevel + 1) ;
 
-            // add all face neighbours to the table
-            Dart ee = m_map.phi2(e) ;
-            if(!mf.isMarked(ee)) // not already marked
-            {
-                visitedFaces.push_back(ee) ;
-                mf.markOrbit<FACE>(ee) ;
-            }
+		//le brin est forcement du niveau cur
+		Dart cf = m_map.phi1(dit);
+		Dart e = cf;
+		do
+		{
+			subdividedFaces.push_back(std::pair<Dart,Dart>(e,m_map.phi2(e)));
+			e = m_map.phi2(m_map.phi1(e));
+		}while (e != cf);
 
-            e = m_map.phi1(e) ;
-        } while(e != visitedFaces[i]) ;
-    }
+		m_map.decCurrentLevel();
+	}
 
-    /*
-     * Subdivision
-     */
-
-    //Store the darts from quadrangulated faces
-    std::vector<std::pair<Dart,Dart> > subdividedfaces;
-    subdividedfaces.reserve(25);
-
-    //First step : subdivide edges and faces
-    //creates a i+1 edge level and i+1 face level
-    for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-    {
-        Dart d = *face;
-
-        //if needed subdivide face
-        if(!faceIsSubdivided(d))
-            subdivideFace(d);
-
-        //save a dart from the subdivided face
-        unsigned int cur = m_map.getCurrentLevel() ;
-
-        unsigned int fLevel = faceLevel(d) + 1; //puisque dans tous les cas, la face est subdivisee
-        m_map.setCurrentLevel(fLevel) ;
-
-        //le brin est forcement du niveau cur
-        Dart cf = m_map.phi1(d);
-        Dart e = cf;
-        do
-        {
-            subdividedfaces.push_back(std::pair<Dart,Dart>(e,m_map.phi2(e)));
-            e = m_map.phi2(m_map.phi1(e));
-        }while (e != cf);
-
-        m_map.setCurrentLevel(cur);
-    }
-
-    m_map.setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
+	Dart centralDart = NIL;
 
     std::vector<Dart> newEdges;	//save darts from inner edges
     newEdges.reserve(50);
 
-    Dart centralDart = NIL;
+	m_map.setCurrentLevel(vLevel + 1) ;
+
     //Second step : deconnect each corner, close each hole, subdivide each new face into 3
-    for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
-    {
-        Dart e = *edge;
+//	Traversor3WV<typename PFP::MAP> traWV(m_map, old);
+//	for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+//	{
+	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
+	{
+		Dart e = *edge;
+//		m_map.setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
+//		Dart e = ditWV;
 
         std::vector<Dart> v ;
 
@@ -861,114 +824,104 @@ unsigned int IHM3<PFP>::subdivideVolume(Dart d, bool triQuad, bool OneLevelDiffe
 
             e = m_map.phi2(m_map.phi_1(e));
         }
-        while(e != *edge);
+		while(e != *edge);
 
-        m_map.splitVolume(v) ;
+		std::cout << "corner : " << *edge << std::endl;
 
-        Dart old = m_map.phi2(m_map.phi1(*edge));
-        Dart dd = m_map.phi1(m_map.phi1(old)) ;
-        m_map.splitFace(old,dd) ;
+		//m_map.splitVolume(v) ;
 
-        unsigned int idface = m_map.getNewFaceId();
-        m_map.setFaceId(dd,idface, FACE);
+//		Dart old = m_map.phi2(m_map.phi1(*edge));
+//        Dart dd = m_map.phi1(m_map.phi1(old)) ;
+//        m_map.splitFace(old,dd) ;
 
-        Dart ne = m_map.phi1(m_map.phi1(old)) ;
+//        unsigned int idface = m_map.getNewFaceId();
+//        m_map.setFaceId(dd,idface, FACE);
 
-        m_map.cutEdge(ne);
-        centralDart = m_map.phi1(ne);
-        newEdges.push_back(ne);
-        newEdges.push_back(m_map.phi1(ne));
+//        Dart ne = m_map.phi1(m_map.phi1(old)) ;
 
-        unsigned int id = m_map.getNewEdgeId() ;
-        m_map.setEdgeId(ne, id, EDGE) ;
+//        m_map.cutEdge(ne);
+//        centralDart = m_map.phi1(ne);
+//        newEdges.push_back(ne);
+//        newEdges.push_back(m_map.phi1(ne));
 
-        Dart stop = m_map.phi2(m_map.phi1(ne));
-        ne = m_map.phi2(ne);
-        do
-        {
-            dd = m_map.phi1(m_map.phi1(m_map.phi1(ne)));
+//        unsigned int id = m_map.getNewEdgeId() ;
+//		m_map.setEdgeId(ne, id) ;
 
-            m_map.splitFace(ne, dd) ;
-            unsigned int idface = m_map.getNewFaceId();
-            m_map.setFaceId(dd,idface, FACE);
+//        Dart stop = m_map.phi2(m_map.phi1(ne));
+//        ne = m_map.phi2(ne);
+//        do
+//        {
+//            dd = m_map.phi1(m_map.phi1(m_map.phi1(ne)));
 
-            newEdges.push_back(m_map.phi1(dd));
+//            m_map.splitFace(ne, dd) ;
+//            unsigned int idface = m_map.getNewFaceId();
+//            m_map.setFaceId(dd,idface, FACE);
 
-            ne = m_map.phi2(m_map.phi_1(ne));
-            dd = m_map.phi1(m_map.phi1(dd));
-        }
-        while(dd != stop);
+//            newEdges.push_back(m_map.phi1(dd));
+
+//            ne = m_map.phi2(m_map.phi_1(ne));
+//            dd = m_map.phi1(m_map.phi1(dd));
+//        }
+//        while(dd != stop);
+
+		//m_map.setCurrentLevel(vLevel) ;
     }
 
+//	m_map.setCurrentLevel(vLevel + 1) ;
 
-     m_map.deleteVolume(m_map.phi3(m_map.phi2(m_map.phi1(oldEdges.front()))));
+//	 m_map.deleteVolume(m_map.phi3(m_map.phi2(m_map.phi1(old))));
 
-    //Third step : 3-sew internal faces
-    for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
-    {
-        Dart f1 = (*it).first;
-        Dart f2 = (*it).second;
+//    //Third step : 3-sew internal faces
+//	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
+//    {
+//        Dart f1 = (*it).first;
+//        Dart f2 = (*it).second;
 
-        if(m_map.isBoundaryFace(m_map.phi2(f1)) && m_map.isBoundaryFace(m_map.phi2(f2)))
-        {
-            //id pour toutes les faces interieures
-            m_map.sewVolumes(m_map.phi2(f1), m_map.phi2(f2));
+//        if(m_map.isBoundaryFace(m_map.phi2(f1)) && m_map.isBoundaryFace(m_map.phi2(f2)))
+//        {
+//            //id pour toutes les faces interieures
+//			m_map.sewVolumes(m_map.phi2(f1), m_map.phi2(f2),false);
 
-            //Fais a la couture !!!!!
-            unsigned int idface = m_map.getNewFaceId();
-            m_map.setFaceId(m_map.phi2(f1),idface, FACE);
-        }
+//            //Fais a la couture !!!!!
+//            unsigned int idface = m_map.getNewFaceId();
+//            m_map.setFaceId(m_map.phi2(f1),idface, FACE);
+//        }
 
-        //FAIS a la couture !!!!!!!
-        //id pour toutes les aretes exterieurs des faces quadrangulees
-        unsigned int idedge = m_map.getEdgeId(f1);
-        m_map.setEdgeId(m_map.phi2(f1), idedge, DART);
-        m_map.setEdgeId( m_map.phi2(f2), idedge, DART);
-    }
+//        //FAIS a la couture !!!!!!!
+//        //id pour toutes les aretes exterieurs des faces quadrangulees
+//        unsigned int idedge = m_map.getEdgeId(f1);
+//		m_map.setDartEdgeId(m_map.phi2(f1), idedge);
+//		m_map.setDartEdgeId( m_map.phi2(f2), idedge);
+//    }
 
     //replonger l'orbit de ditV.
-    Algo::Topo::setOrbitEmbedding<VERTEX>(m_map,centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
-    (*volumeVertexFunctor)(centralDart) ;
+	//Algo::Topo::setOrbitEmbedding<VERTEX>(m_map,centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
 
     //LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
     //id pour les aretes interieurs : (i.e. 6 pour un hexa)
-    DartMarkerStore mne(m_map);
-    for(unsigned int i = 0; i < newEdges.size(); ++i)
-    {
-        if(!mne.isMarked(newEdges[i]))
-        {
-            unsigned int idedge = m_map.getNewEdgeId();
-            m_map.setEdgeId(newEdges[i], idedge, EDGE);
-            mne.markOrbit<EDGE>(newEdges[i]);
-        }
-    }
-
-//	std::cout << m_map.getCurrentLevel() << std::endl;
-//	//Second step : deconnect each corner, close each hole, subdivide each new face into 3
-//    for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
+//	DartMarkerStore<typename PFP::MAP> mne(m_map);
+//    for(unsigned int i = 0; i < newEdges.size(); ++i)
 //    {
-//        Dart e = *edge;
-//        if(e == 309)
-//            std::cout << "plop" << std::endl;
-//        //std::cout << "emb ? " << m_map.template getEmbedding<VERTEX>(e) << std::endl;
-//        //if(m_map.template getEmbedding<VERTEX>(e) == EMBNULL)
-//        m_map.computeVertexVertexFunctor(e);
-//        //std::cout << "emb = " << m_map.template getEmbedding<VERTEX>(e) << " / dartlevel = " <<  m_map.getDartLevel(e) << std::endl;
+//        if(!mne.isMarked(newEdges[i]))
+//        {
+//            unsigned int idedge = m_map.getNewEdgeId();
+//			m_map.setEdgeId(newEdges[i], idedge);
+//			mne.markOrbit(Edge(newEdges[i]));
+//        }
 //    }
-//    std::cout << std::endl;
 
-//    m_map.computerVolumeVertexFunctor(centralDart);
+//	(*volumeVertexFunctor)(centralDart) ;
 
     m_map.setCurrentLevel(cur) ;
 
-    return centralDart; //subdividedfaces.begin()->first;
+	return centralDart;
 }
 
 template <typename PFP>
-void ImplicitHierarchicalm_map3::coarsenVolume(Dart d)
+void IHM3<PFP>::coarsenVolume(Dart d)
 {
     assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-    assert(m_map.volumeIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided volume or a more than once subdivided volume") ;
+	assert(volumeIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided volume or a more than once subdivided volume") ;
 
     unsigned int cur = m_map.getCurrentLevel() ;
 

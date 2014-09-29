@@ -61,14 +61,14 @@ void ImplicitHierarchicalMap3::clear(bool removeAttrib)
 
 void ImplicitHierarchicalMap3::initImplicitProperties()
 {
-    initEdgeId() ;
+	//initEdgeId() ;
     initFaceId();
 
-//	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
-//	{
-//		m_edgeId[d] = 0;
-//		m_faceId[d] = 0;
-//	}
+	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
+	{
+		m_edgeId[d] = 0;
+		//m_faceId[d] = 0;
+	}
 
     for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
     {
@@ -128,6 +128,21 @@ void ImplicitHierarchicalMap3::initFaceId()
             m_faceIdCount++;
         }
     }
+}
+
+Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
+{
+	Dart nd = EmbeddedMap3::cutEdge(d);
+
+//	unsigned int id = getEdgeId(d);
+
+//	setEdgeId(nd, id);
+//	setEdgeId(phi2(d), id);
+
+//	setFaceId(EDGE, nd);
+//	m_faceId[]
+
+	return nd;
 }
 
 } //namespace CGoGN

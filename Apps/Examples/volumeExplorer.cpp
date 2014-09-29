@@ -407,7 +407,7 @@ int main(int argc, char **argv)
 		{
 */
 
-		if(extension == std::string(".map"))
+		if(extension == std::string(".mapbin"))
 		{
 			myMap.loadMapBin(filename);
 			position = myMap.getAttribute<VEC3, VERTEX,MAP>("position") ;

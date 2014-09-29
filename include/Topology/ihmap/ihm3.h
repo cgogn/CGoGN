@@ -32,12 +32,12 @@ namespace CGoGN
 
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
-typedef EmbeddedMap3::TOPO_MAP TOPO_MAP;
 
 
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
     template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
+	typedef EmbeddedMap3::TOPO_MAP TOPO_MAP;
 
 private:
     unsigned int m_curLevel ;
@@ -80,11 +80,11 @@ public:
      *             ATTRIBUTES MANAGEMENT               *
      ***************************************************/
 
-    template <typename T, unsigned int ORBIT>
-    AttributeHandler_IHM<T, ORBIT> addAttribute(const std::string& nameAttr) ;
+//	template <typename T, unsigned int ORBIT, typename MAP>
+//	AttributeHandler_IHM<T, ORBIT, MAP> addAttribute(const std::string& nameAttr) ;
 
-    template <typename T, unsigned int ORBIT>
-    AttributeHandler_IHM<T, ORBIT> getAttribute(const std::string& nameAttr) ;
+//	template <typename T, unsigned int ORBIT, typename MAP>
+//	AttributeHandler_IHM<T, ORBIT, MAP> getAttribute(const std::string& nameAttr) ;
 
     /***************************************************
      *                 MAP TRAVERSAL                   *
@@ -163,6 +163,8 @@ public:
      *               MAP MANIPULATION                  *
      ***************************************************/
 
+	Dart cutEdge(Dart d);
+
     /***************************************************
      *              LEVELS MANAGEMENT                  *
      ***************************************************/
@@ -201,8 +203,15 @@ public:
     //! Set an edge id to all darts from an orbit of d
     /*!
      */
-    void setEdgeId(Dart d, unsigned int i, unsigned int orbit); //TODO a virer
-    void setEdgeId(Dart d, unsigned int i);
+	void setEdgeId(Dart d, unsigned int i); //TODO a virer
+	void setDartEdgeId(Dart d, unsigned int i);
+
+	unsigned int getTriRefinementEdgeId(Dart d);
+
+	unsigned int getQuadRefinementEdgeId(Dart d);
+
+
+
 
     //! Give a new unique id to all the faces of the map
     /*!
