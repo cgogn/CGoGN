@@ -62,8 +62,7 @@ void computeFaceGradient(
 	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_normal,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& scalar,
 	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& face_area,
-	FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient,
-	unsigned int thread = 0) ;
+	FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient) ;
 
 template <typename PFP>
 typename PFP::VEC3 faceGradient(
@@ -79,8 +78,7 @@ void computeVertexGradient(
 	typename PFP::MAP& map,
 	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_gradient,
 	const FaceAttribute<typename PFP::REAL, typename PFP::MAP>& face_area,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
-	unsigned int thread = 0) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient) ;
 
 template <typename PFP>
 typename PFP::VEC3 vertexGradient(
@@ -101,8 +99,7 @@ template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& K,
-	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	unsigned int thread = 0) ;
+	CellMarker<typename PFP::MAP, FACE>& regularMarker) ;
 
 template <typename PFP>
 bool isTriangleRegular(
@@ -113,8 +110,7 @@ bool isTriangleRegular(
 template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments,
-	unsigned int thread = 0) ;
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 void computeRidgeLines(
@@ -125,8 +121,7 @@ void computeRidgeLines(
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments,
-	unsigned int thread = 0) ;
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 void ridgeLines(
@@ -144,8 +139,7 @@ template <typename PFP>
 void computeSingularTriangle(
 	typename PFP::MAP& map,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments,
-	unsigned int thread = 0) ;
+	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments) ;
 
 template <typename PFP>
 void singularTriangle(

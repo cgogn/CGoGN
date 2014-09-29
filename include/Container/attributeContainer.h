@@ -223,6 +223,11 @@ public:
 	*/
 	inline bool used(unsigned int index) const;
 
+	/**
+	 * @brief check if container contain marker attribute
+	 */
+	bool hasMarkerAttribute() const;
+
 	/**************************************
 	 *         CONTAINER TRAVERSAL        *
 	 **************************************/
@@ -287,7 +292,7 @@ public:
 	* @param attribName nom de l'attribut
 	* @return l'indice de l'attribut
 	*/
-	unsigned int getAttributeIndex(const std::string& attribName);
+	unsigned int getAttributeIndex(const std::string& attribName) const;
 
 	/**
 	 * get the name of an attribute, given its index in the container
@@ -416,6 +421,8 @@ public:
 	/**************************************
 	 *       ATTRIBUTES DATA ACCESS       *
 	 **************************************/
+
+	inline CGoGNCodeType getTypeCode(const std::string& attribName) const;
 
 	/**
 	* get an AttributeMultiVector

@@ -10,6 +10,9 @@ namespace SCHNApps
 
 bool Surface_Render_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_dockTab = new Surface_Render_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Render");
 
@@ -71,7 +74,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 		{
 			m_pointSprite->setSize(map->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
 			m_pointSprite->setAttributePosition(p.positionVBO);
-			m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
+			m_pointSprite->setColor(p.vertexColor);
 			map->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
 		}
 		if(p.renderEdges)
@@ -80,6 +83,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 			CGoGN::Geom::Vec4f c(0.1f, 0.1f, 0.1f, 1.0f);
 			m_simpleColorShader->setColor(c);
 			m_simpleColorShader->setAttributePosition(p.positionVBO);
+			m_simpleColorShader->setColor(p.simpleColor);
 			map->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
 		}
 		if(p.renderFaces)
@@ -92,6 +96,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 			{
 				case MapParameters::FLAT :
 					m_flatShader->setAttributePosition(p.positionVBO);
+					m_flatShader->setDiffuse(p.diffuseColor);
 					map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
 					break;
 				case MapParameters::PHONG :
@@ -99,6 +104,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 					{
 						m_phongShader->setAttributePosition(p.positionVBO);
 						m_phongShader->setAttributeNormal(p.normalVBO);
+						m_phongShader->setDiffuse(p.diffuseColor);
 						map->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
 					}
 					break;
@@ -323,11 +329,7 @@ void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QStr
 	}
 }
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_Render_PluginD, Surface_Render_Plugin)
-#endif
 
 } // namespace SCHNApps
 

@@ -366,13 +366,13 @@ Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, ty
 }
 
 template <typename PFP>
-bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread)
+bool isPyra(typename PFP::MAP& map, Dart d)
 {
 	unsigned int nbFacesT = 0;
 	unsigned int nbFacesQ = 0;
 
 	//Test the number of faces end its valency
-	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false);
 	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
 	{
 		//increase the number of faces
@@ -391,13 +391,13 @@ bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread)
 }
 
 template <typename PFP>
-bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread)
+bool isPrism(typename PFP::MAP& map, Dart d)
 {
 	unsigned int nbFacesT = 0;
 	unsigned int nbFacesQ = 0;
 
 	//Test the number of faces end its valency
-	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false);
 	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
 	{
 		//increase the number of faces

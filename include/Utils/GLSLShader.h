@@ -66,7 +66,7 @@ public:
 
 	static unsigned int CURRENT_OGL_VERSION;
 
-	static std::set< std::pair<void*, GLSLShader*> > m_registeredShaders;
+	static std::set< std::pair<void*, GLSLShader*> >* m_registeredShaders;
 
 //	static glm::mat4* s_current_matrices;
 	static Utils::GL_Matrices* s_current_matrices;

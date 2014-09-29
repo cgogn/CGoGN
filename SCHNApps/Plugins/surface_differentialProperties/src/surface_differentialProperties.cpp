@@ -13,6 +13,9 @@ namespace SCHNApps
 
 bool Surface_DifferentialProperties_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_computeNormalDialog = new Dialog_ComputeNormal(m_schnapps);
 	m_computeCurvatureDialog = new Dialog_ComputeCurvature(m_schnapps);
 
@@ -118,6 +121,14 @@ void Surface_DifferentialProperties_Plugin::computeNormalFromDialog()
 		bool autoUpdate = (currentItems[0]->checkState() == Qt::Checked);
 
 		computeNormal(mapName, positionName, normalName, autoUpdate);
+
+		// create VBO if asked
+		if (m_computeNormalDialog->enableVBO->isChecked())
+		{
+			MapHandlerGen* mhg = getSCHNApps()->getMap(mapName);
+			if (mhg != NULL)
+				mhg->createVBO(normalName);
+		}
 	}
 }
 
@@ -292,11 +303,7 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 	}
 }
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_PluginD, Surface_DifferentialProperties_Plugin)
-#endif
 
 } // namespace SCHNApps
 

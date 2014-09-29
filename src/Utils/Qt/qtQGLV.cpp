@@ -445,8 +445,8 @@ void SimpleQGLV::cb_updateMatrix()
 	}
 	else
 	{
-		for(std::set< std::pair<void*, GLSLShader*> >::iterator it = GLSLShader::m_registeredShaders.begin();
-			it != GLSLShader::m_registeredShaders.end();
+		for(std::set< std::pair<void*, GLSLShader*> >::iterator it = GLSLShader::m_registeredShaders->begin();
+			it != GLSLShader::m_registeredShaders->end();
 			++it)
 		{
 			if ((it->first == NULL) || (it->first == this))

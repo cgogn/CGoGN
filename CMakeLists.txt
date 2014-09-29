@@ -143,7 +143,7 @@ IF (WITH_QT)
 	ADD_DEFINITIONS(${QT_DEFINITIONS})
 	find_package(QGLViewer REQUIRED)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${QT_INCLUDE_DIR} ${QGLVIEWER_INCLUDE_DIR} )
-	SET (CGoGN_EXT_LIBS ${QT_LIBRARIES} ${QGLVIEWER_LIBRARIES} ${CGoGN_EXT_LIBS})
+	SET (CGoGN_EXT_LIBS ${QGLVIEWER_LIBRARIES} ${QT_LIBRARIES} ${CGoGN_EXT_LIBS})
 ENDIF (WITH_QT)
 
 IF (WITH_GLEWMX)
@@ -285,22 +285,35 @@ file(	GLOB_RECURSE
 		${CGoGN_ROOT_DIR}/ThirdParty/include/*.hpp
 )
 
+link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+
 IF (ONELIB)
 	IF(WITH_QT)
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
 	ELSE()
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
 	ENDIF()
-	add_dependencies(cgogn shader_target )
+	add_dependencies(cgogn shader_target)
+	target_link_libraries(cgogn ${CGoGN_EXT_LIBS})
+
 ELSE()
-	add_library( container	${files_container})
-	add_library( topology	${files_topology})
-	add_library( algo		${files_algo})
 	IF (WITH_QT)
 		add_library( utils ${files_utils_withQt} )
 	ELSE()
 		add_library( utils ${files_utils} )
 	ENDIF()
+	target_link_libraries(utils ${CGoGN_EXT_LIBS})
+
+	add_library( container	${files_container})
+	target_link_libraries(container utils)
+
+	add_library( topology	${files_topology})
+	target_link_libraries(topology container)
+
+	add_library( algo		${files_algo})
+	target_link_libraries(algo utils topology)
+
+
 	add_custom_target( Geometry 	SOURCES ${files_geometry} )
 	add_custom_target( ThirdParty 	SOURCES ${files_thirdParty} )
 	add_dependencies( utils shader_target )

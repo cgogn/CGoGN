@@ -24,12 +24,16 @@ int main(int argc, char* argv[])
 
 	// get a smart pointer to the __main__ module of the Python interpreter
 	PythonQtObjectPtr pythonContext = PythonQt::self()->getMainModule();
-	PythonQtScriptingConsole pythonConsole(NULL, pythonContext);
 
-	CGoGN::SCHNApps::SCHNApps schnapps(app.applicationDirPath(), pythonContext, pythonConsole);
-	schnapps.show();
+//	PythonQtScriptingConsole pythonConsole(NULL, pythonContext);
+//	CGoGN::SCHNApps::SCHNApps schnapps(app.applicationDirPath(), pythonContext, pythonConsole);
 
-	pythonContext.addObject("schnapps", &schnapps);
+	PythonQtScriptingConsole* pythonConsole = new PythonQtScriptingConsole(NULL, pythonContext);
+	CGoGN::SCHNApps::SCHNApps* schnapps = new CGoGN::SCHNApps::SCHNApps(app.applicationDirPath(), pythonContext, *pythonConsole);
+
+	schnapps->show();
+
+	pythonContext.addObject("schnapps", schnapps);
 
 	if(argc > 1)
 	{
@@ -39,8 +43,8 @@ int main(int argc, char* argv[])
 			pythonContext.evalFile(fi.filePath());
 	}
 
-	splash->finish(&schnapps);
+	splash->finish(schnapps);
 	delete splash;
 
-	return app.exec();
+	return app.exec();;
 }

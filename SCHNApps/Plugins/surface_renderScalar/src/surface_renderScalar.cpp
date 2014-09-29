@@ -10,6 +10,9 @@ namespace SCHNApps
 
 bool Surface_RenderScalar_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_dockTab = new Surface_RenderScalar_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_RenderScalar");
 
@@ -255,11 +258,7 @@ void Surface_RenderScalar_Plugin::changeExpansion(const QString& view, const QSt
 	}
 }
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_RenderScalar_Plugin, Surface_RenderScalar_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_RenderScalar_PluginD, Surface_RenderScalar_Plugin)
-#endif
 
 } // namespace SCHNApps
 

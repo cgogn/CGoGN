@@ -276,7 +276,7 @@ double length(const T& v)
 
 
 template <typename T1, typename T2, unsigned int ORB, typename MAP>
-class Cell2Attributes: public AttributeHandlerGen
+class Cell2Attributes: public AttributeHandlerOrbit<ORB>
 {
 	AttributeHandler<T1, ORB, MAP>& m_h1;
 	AttributeHandler<T2, ORB, MAP>& m_h2;
@@ -285,7 +285,7 @@ public:
 	typedef RefCompo2Type<T1,T2> REF_DATA_TYPE;
 
 	 Cell2Attributes(AttributeHandler<T1, ORB, MAP>& h1, AttributeHandler<T2, ORB, MAP>& h2):
-		 AttributeHandlerGen(true),
+		 AttributeHandlerOrbit<ORB>(true),
 		 m_h1(h1), m_h2(h2) {}
 
 	 static const unsigned int ORBIT = ORB;

@@ -66,7 +66,8 @@ std::string* GLSLShader::DEFINES_GL = NULL;
 
 std::vector<std::string> GLSLShader::m_pathes;
 
-std::set< std::pair<void*, GLSLShader*> > GLSLShader::m_registeredShaders;
+//std::set< std::pair<void*, GLSLShader*> > GLSLShader::m_registeredShaders;
+std::set< std::pair<void*, GLSLShader*> >* GLSLShader::m_registeredShaders = NULL;
 
 
 //glm::mat4* GLSLShader::s_current_matrices=NULL;
@@ -90,16 +91,19 @@ GLSLShader::GLSLShader() :
 		DEFINES_GL = &DEFINES_GL2;
 
 	m_nbMaxVertices = 16;
+
+	if (m_registeredShaders==NULL)
+		m_registeredShaders = new std::set< std::pair<void*, GLSLShader*> >;
 }
 
 void GLSLShader::registerShader(void* ptr, GLSLShader* shader)
 {
-	m_registeredShaders.insert(std::pair<void*,GLSLShader*>(ptr, shader));
+	m_registeredShaders->insert(std::pair<void*,GLSLShader*>(ptr, shader));
 }
 
 void GLSLShader::unregisterShader(void* ptr, GLSLShader* shader)
 {
-	m_registeredShaders.erase(std::pair<void*,GLSLShader*>(ptr, shader));
+	m_registeredShaders->erase(std::pair<void*,GLSLShader*>(ptr, shader));
 }
 
 std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std::string& primitivesOut, int maxVert)
@@ -148,10 +152,35 @@ bool GLSLShader::areGeometryShadersSupported()
 
 bool GLSLShader::areShadersSupported()
 {
-	if ( ! glewGetExtension("GL_ARB_vertex_shader")) return false;
-	if ( ! glewGetExtension("GL_ARB_fragment_shader")) return false;
-	if ( ! glewGetExtension("GL_ARB_shader_objects")) return false;
-	if ( ! glewGetExtension("GL_ARB_shading_language_100")) return false;
+	if ( ! glewIsSupported("GL_ARB_vertex_shader"))
+	{
+		CGoGNerr << " vertex shaders not supported!" <<CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_fragment_shader"))
+	{
+		CGoGNerr << " fragment shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_geometry_shader4"))
+	{
+		CGoGNerr << " geometry shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_shader_objects"))
+	{
+		CGoGNerr << " shaders not supported!" << CGoGNendl;
+		return false;
+	}
+
+	if ( ! glewIsSupported("GL_ARB_shading_language_100"))
+	{
+		CGoGNerr << " GLSL no supported!" << CGoGNendl;
+		return false;
+	}
 
 	return true;
 }
@@ -399,7 +428,7 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 		*m_geom_shader_object=0;
 	}
 	/*** create shader object ***/
-	*m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER_EXT);
+	*m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER);
 
 	if( !*m_geom_shader_object )
 	{
@@ -632,7 +661,7 @@ GLSLShader::~GLSLShader()
 	if (m_geom_shader_source != NULL)
 		delete[] m_geom_shader_source;
 
-//	m_registeredShaders.erase(this);
+//	m_registeredShaders->erase(this);
 }
 
 std::string GLSLShader::findFile(const std::string filename)
@@ -1088,9 +1117,9 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 	this->bind();
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 	{
+		assert(((it->vbo_ptr->nbElts()==0) || (it->vbo_ptr->dataSize()!=0) ) || !"dataSize of VBO is 0 ! could not draw");
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
-		assert((it->vbo_ptr->dataSize()!=0) || !"dataSize of VBO is 0 ! could not draw");
 		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)((unsigned long)(begin)));
 	}
 //	this->unbind();
@@ -1113,7 +1142,7 @@ void GLSLShader::updateCurrentMatrices()
 	currentPMV() = currentProjection() * model;
 	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
 
-	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders->begin(); it != m_registeredShaders->end(); ++it)
 		it->second->updateMatrices(currentProjection(), model, currentPMV(), currentNormalMatrix());
 }
 
@@ -1140,7 +1169,7 @@ void GLSLShader::updateAllFromGLMatrices()
 	currentPMV() = proj * model;
 	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
 
-	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders->begin(); it != m_registeredShaders->end(); ++it)
 		it->second->updateMatrices(proj, model, currentPMV(), currentNormalMatrix());
 }
 

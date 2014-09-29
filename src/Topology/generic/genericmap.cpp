@@ -44,19 +44,45 @@ int NumberOfThreads = getSystemNumberOfCores();
 
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 
-int GenericMap::m_nbInstances = 0;
-
 std::vector< std::vector<Dart>* >* GenericMap::s_vdartsBuffers = NULL;
 
 std::vector< std::vector<unsigned int>* >* GenericMap::s_vintsBuffers = NULL;
 
+//std::mutex* GenericMap::s_DartBufferMutex = NULL;
+//std::mutex* GenericMap::s_IntBufferMutex = NULL;
+
 std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
 
-
-
 GenericMap::GenericMap():
-	m_manipulator(NULL),
-	m_nextMarkerId(0)
+	m_nextMarkerId(0),
+	m_manipulator(NULL)
+{
+	if(m_attributes_registry_map == NULL)
+		initAllStatics(NULL); // no need here to store the pointers
+
+	s_instances->push_back(this);
+
+	m_thread_ids.reserve(NB_THREAD+1);
+	m_thread_ids.push_back( std::this_thread::get_id() );
+
+	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	{
+		m_attribs[i].setOrbit(i) ;
+		m_attribs[i].setRegistry(m_attributes_registry_map) ;
+	}
+
+	init();
+}
+
+void GenericMap::copyAllStatics(const StaticPointers& sp)
+{
+	m_attributes_registry_map = sp.att_registry;
+	s_instances = sp.instances;
+	s_vdartsBuffers = sp.vdartsBuffers;
+	s_vintsBuffers = sp.vintsBuffers;
+}
+
+void GenericMap::initAllStatics(StaticPointers* sp)
 {
 	if(m_attributes_registry_map == NULL)
 	{
@@ -96,18 +122,14 @@ GenericMap::GenericMap():
 		registerAttribute<MarkerBool>("MarkerBool");
 	}
 
-
-
-	m_nbInstances++;
 	if (s_instances==NULL)
 		s_instances= new std::vector<GenericMap*>;
-
-	s_instances->push_back(this);
 
 	if (s_vdartsBuffers == NULL)
 	{
 		s_vdartsBuffers = new std::vector< std::vector<Dart>* >[NB_THREAD];
 		s_vintsBuffers = new std::vector< std::vector<unsigned int>* >[NB_THREAD];
+
 		for(unsigned int i = 0; i < NB_THREAD; ++i)
 		{
 			s_vdartsBuffers[i].reserve(8);
@@ -115,15 +137,13 @@ GenericMap::GenericMap():
 				// prealloc ?
 		}
 	}
-
-
-	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	if (sp != NULL)
 	{
-		m_attribs[i].setOrbit(i) ;
-		m_attribs[i].setRegistry(m_attributes_registry_map) ;
+		sp->att_registry = m_attributes_registry_map;
+		sp->instances = s_instances;
+		sp->vdartsBuffers = s_vdartsBuffers;
+		sp->vintsBuffers = s_vintsBuffers;
 	}
-
-	init();
 }
 
 GenericMap::~GenericMap()
@@ -139,10 +159,14 @@ GenericMap::~GenericMap()
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 
+	// remove instance of table
+	auto it = std::find(s_instances->begin(), s_instances->end(), this);
+	*it = s_instances->back();
+	s_instances->pop_back();
 
 	// clean type registry if necessary
-	m_nbInstances--;
-	if (m_nbInstances <= 0)
+
+	if (s_instances->size() == 0)
 	{
 		for (std::map<std::string, RegisteredBaseAttribute*>::iterator it =  m_attributes_registry_map->begin(); it != m_attributes_registry_map->end(); ++it)
 			delete it->second;
@@ -160,11 +184,6 @@ GenericMap::~GenericMap()
 
 
 	}
-
-	// remove instance of table
-	auto it = std::find(s_instances->begin(), s_instances->end(), this);
-	*it = s_instances->back();
-	s_instances->pop_back();
 }
 
 bool GenericMap::askManipulate(MapManipulator* ptr)
@@ -231,7 +250,14 @@ void GenericMap::init(bool addBoundaryMarkers)
 void GenericMap::clear(bool removeAttrib)
 {
 	if (removeAttrib)
+	{
+#ifndef NDEBUG
+		for(unsigned int i = 0; i < NB_ORBITS; ++i)
+			if (m_attribs[i].hasMarkerAttribute())
+				CGoGNout << "Warning removing marker attribute on orbit, need update ? "<<orbitName(i)<< CGoGNendl;
+#endif
 		init();
+	}
 	else
 	{
 		for(unsigned int i = 0; i < NB_ORBITS; ++i)

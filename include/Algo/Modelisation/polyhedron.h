@@ -130,11 +130,11 @@ Dart createOctahedron(typename PFP::MAP& map, bool withBoundary = true);
 
 //TODO optimize
 template <typename PFP>
-bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+bool isPyra(typename PFP::MAP& map, Dart d);
 
 //TODO optimize
 template <typename PFP>
-bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+bool isPrism(typename PFP::MAP& map, Dart d);
 
 template <typename PFP>
 bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);

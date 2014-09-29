@@ -27,6 +27,7 @@
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/cells.h"
+#include "Topology/generic/traversor/iterTrav.h"
 
 namespace CGoGN
 {
@@ -51,6 +52,10 @@ public:
 	inline Edge begin() ;
 	inline Edge end() ;
 	inline Edge next() ;
+
+	typedef Edge IterType;
+	typedef Vertex ParamType;
+	typedef MAP MapType;
 } ;
 
 // Traverse the faces incident to a given vertex
@@ -69,6 +74,10 @@ public:
 	inline Face begin() ;
 	inline Face end() ;
 	inline Face next() ;
+
+	typedef Face IterType;
+	typedef Vertex ParamType;
+	typedef MAP MapType;
 } ;
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
@@ -87,6 +96,10 @@ public:
 	inline Vertex begin() ;
 	inline Vertex end() ;
 	inline Vertex next() ;
+
+	typedef Vertex IterType;
+	typedef Vertex ParamType;
+	typedef MAP MapType;
 } ;
 
 // Traverse the vertices adjacent to a given vertex through sharing a common face
@@ -107,6 +120,10 @@ public:
 	inline Vertex begin() ;
 	inline Vertex end() ;
 	inline Vertex next() ;
+
+	typedef Vertex IterType;
+	typedef Vertex ParamType;
+	typedef MAP MapType;
 } ;
 
 /*******************************************************************************
@@ -129,6 +146,10 @@ public:
 	inline Vertex begin() ;
 	inline Vertex end() ;
 	inline Vertex next() ;
+
+	typedef Vertex IterType;
+	typedef Edge ParamType;
+	typedef MAP MapType;
 } ;
 
 // Traverse the faces incident to a given edge
@@ -147,6 +168,10 @@ public:
 	inline Face begin() ;
 	inline Face end() ;
 	inline Face next() ;
+
+	typedef Face IterType;
+	typedef Edge ParamType;
+	typedef MAP MapType;
 } ;
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
@@ -167,6 +192,10 @@ public:
 	inline Edge begin() ;
 	inline Edge end() ;
 	inline Edge next() ;
+
+	typedef Edge IterType;
+	typedef Edge ParamType;
+	typedef MAP MapType;
 } ;
 
 // Traverse the edges adjacent to a given edge through sharing a common face
@@ -187,6 +216,10 @@ public:
 	inline Edge begin() ;
 	inline Edge end() ;
 	inline Edge next() ;
+
+	typedef Edge IterType;
+	typedef Edge ParamType;
+	typedef MAP MapType;
 } ;
 
 /*******************************************************************************
@@ -209,6 +242,10 @@ public:
 	inline Vertex begin() ;
 	inline Vertex end() ;
 	inline Vertex next() ;
+
+	typedef Vertex IterType;
+	typedef Face ParamType;
+	typedef MAP MapType;
 } ;
 
 
@@ -236,6 +273,10 @@ public:
 	inline Edge begin() ;
 	inline Edge end() ;
 	inline Edge next() ;
+
+	typedef Edge IterType;
+	typedef Face ParamType;
+	typedef MAP MapType;
 } ;
 
 
@@ -257,6 +298,10 @@ public:
 	inline Face begin() ;
 	inline Face end() ;
 	inline Face next() ;
+
+	typedef Face IterType;
+	typedef Face ParamType;
+	typedef MAP MapType;
 } ;
 
 // Traverse the faces adjacent to a given face through sharing a common edge
@@ -276,6 +321,10 @@ public:
 	inline Face begin() ;
 	inline Face end() ;
 	inline Face next() ;
+
+	typedef Face IterType;
+	typedef Face ParamType;
+	typedef MAP MapType;
 } ;
 
 
@@ -394,6 +443,7 @@ public:
 	AdjacentTrav2(const MAP& m, Face d):t(m,d) {}
 };
 
+// foreach traversal function
 
 template <unsigned int ORBIT_TO, unsigned int ORBIT_FROM, typename MAP, typename FUNC>
 inline void foreach_incident2(MAP& map, Cell<ORBIT_FROM> c, FUNC f)
@@ -410,6 +460,141 @@ inline void foreach_adjacent2(MAP& map, Cell<ORBIT> c, FUNC f)
 	for (Cell<ORBIT> c = trav.t.begin(), e = trav.t.end(); c.dart != e.dart; c = trav.t.next())
 		f(c);
 }
+
+
+
+/**
+ * template classs that add iterator to Traversor
+ * to allow the use of c++11 syntax for (auto d : v)
+ */
+//template <typename TRAV>
+//class Iteratorize: public TRAV
+//{
+//public:
+//	typedef typename TRAV::MapType MAP;
+//	typedef typename TRAV::IterType ITER;
+//	typedef typename TRAV::ParamType PARAM;
+
+//	Iteratorize(const MAP& map, PARAM p):
+//		TRAV(map,p){}
+
+//	class iterator
+//	{
+//		Iteratorize<TRAV>* m_ptr;
+//		ITER m_index;
+
+//	public:
+
+//		inline iterator(Iteratorize<TRAV>* p, ITER i): m_ptr(p),m_index(i){}
+
+//		inline iterator& operator++()
+//		{
+//			m_index = m_ptr->next();
+//			return *this;
+//		}
+
+//		inline ITER& operator*()
+//		{
+//			return m_index;
+//		}
+
+//		inline bool operator!=(const iterator& it)
+//		{
+//			return m_index.dart != it.m_index.dart;
+//		}
+
+//	};
+
+//	inline iterator begin()
+//	{
+//		return iterator(this,TRAV::begin());
+//	}
+
+//	inline iterator end()
+//	{
+//		return iterator(this,TRAV::end());
+//	}
+
+//};
+
+// functions that return the traversor+iterator
+// functions instead of typedef because function
+// allows the compiler to deduce template param
+
+template <typename MAP>
+inline Iteratorize< Traversor2VE<MAP> > edgesIncidentToVertex2(const MAP& m, Vertex c)
+{
+	return Iteratorize< Traversor2VE<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2VF<MAP> > facesIncidentToVertex2(const MAP& m, Vertex c)
+{
+	return Iteratorize< Traversor2VF<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2EV<MAP> > verticesIncidentToEdge2(const MAP& m, Edge c)
+{
+	return Iteratorize< Traversor2EV<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2EF<MAP> > facesIncidentToEdge2(const MAP& m, Edge c)
+{
+	return Iteratorize< Traversor2EF<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2FV<MAP> > verticesIncidentToFace2(const MAP& m, Face c)
+{
+	return Iteratorize< Traversor2FV<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2FE<MAP> > edgesIncidentToFace2(const MAP& m, Face c)
+{
+	return Iteratorize< Traversor2FE<MAP> >(m, c);
+}
+
+
+template <typename MAP>
+inline Iteratorize< Traversor2VVaE<MAP> > verticesAdjacentByEdge2(const MAP& m, Vertex c)
+{
+	return Iteratorize< Traversor2VVaE<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2VVaF<MAP> > verticesAdjacentByFace2(const MAP& m, Vertex c)
+{
+	return Iteratorize< Traversor2VVaF<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2EEaV<MAP> > edgesAdjacentByVertex2(const MAP& m, Edge c)
+{
+	return Iteratorize< Traversor2EEaV<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2EEaF<MAP> > edgesAdjacentByFace2(const MAP& m, Edge c)
+{
+	return Iteratorize< Traversor2EEaF<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2FFaV<MAP> > facesAdjacentByVertex2(const MAP& m, Face c)
+{
+	return Iteratorize< Traversor2FFaV<MAP> >(m, c);
+}
+
+template <typename MAP>
+inline Iteratorize< Traversor2FFaE<MAP> > facesAdjacentByEdge2(const MAP& m, Face c)
+{
+	return Iteratorize< Traversor2FFaE<MAP> >(m, c);
+}
+
+
 
 } // namespace CGoGN
 
