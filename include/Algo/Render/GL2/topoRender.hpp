@@ -36,6 +36,7 @@
 #include "Algo/Geometry/normal.h"
 
 #include "Container/containerBrowser.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
 
 namespace CGoGN
 {
@@ -49,179 +50,15 @@ namespace Render
 namespace GL2
 {
 
-template<typename PFP>
-TopoRender<PFP>::TopoRender(float bs):
-	m_nbDarts(0),
-	m_nbRel2(0),
-	m_topo_dart_width(2.0f),
-	m_topo_relation_width(3.0f),
-	m_normalShift(0.0f),
-	m_boundShift(bs),
-	m_dartsColor(1.0f,1.0f,1.0f),
-	m_dartsBoundaryColor(0.7f,1.0f,0.7f),
-	m_bufferDartPosition(NULL)
+template<typename MAP>
+void TopoRender::overdrawDart(MAP& map, Dart d, float width, float r, float g, float b)
 {
-	m_vbo0 = new Utils::VBO();
-	m_vbo1 = new Utils::VBO();
-	m_vbo2 = new Utils::VBO();
-	m_vbo3 = new Utils::VBO();
+	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(m_nameIndex);
+	if (!attIndex.isValid())
+		attIndex  = map.template addAttribute<unsigned int, DART, MAP>(m_nameIndex);
 
-	m_vbo0->setDataSize(3);
-	m_vbo1->setDataSize(3);
-	m_vbo2->setDataSize(3);
-	m_vbo3->setDataSize(3);
 
-	m_shader1 = new Utils::ShaderSimpleColor();
-	m_shader2 = new Utils::ShaderColorPerVertex();
-
-	// binding VBO - VA
-	m_vaId = m_shader1->setAttributePosition(m_vbo1);
-
-	m_shader2->setAttributePosition(m_vbo0);
-	m_shader2->setAttributeColor(m_vbo3);
-
-	// registering for auto matrices update
-	Utils::GLSLShader::registerShader(NULL, m_shader1);
-	Utils::GLSLShader::registerShader(NULL, m_shader2);
-}
-
-template<typename PFP>
-TopoRender<PFP>::~TopoRender()
-{
-	Utils::GLSLShader::unregisterShader(NULL, m_shader2);
-	Utils::GLSLShader::unregisterShader(NULL, m_shader1);
-
-	delete m_shader2;
-	delete m_shader1;
-	delete m_vbo3;
-	delete m_vbo2;
-	delete m_vbo1;
-	delete m_vbo0;
-
-	if (m_attIndex.isValid())
-		m_attIndex.map()->removeAttribute(m_attIndex);
-
-	if (m_bufferDartPosition!=NULL)
-		delete[] m_bufferDartPosition;
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setDartWidth(float dw)
-{
-	m_topo_dart_width = dw;
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setRelationWidth(float pw)
-{
-	m_topo_relation_width = pw;
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setDartColor(Dart d, float r, float g, float b)
-{
-	float RGB[6];
-	RGB[0]=r; RGB[1]=g; RGB[2]=b;
-	RGB[3]=r; RGB[4]=g; RGB[5]=b;
-	m_vbo3->bind();
-	glBufferSubData(GL_ARRAY_BUFFER, m_attIndex[d]*3*sizeof(float), 6*sizeof(float),RGB);
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setAllDartsColor(float r, float g, float b)
-{
-	m_vbo3->bind();
-	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	float* colorDartBuf = reinterpret_cast<float*>(ColorDartsBuffer);
-	for (unsigned int i=0; i < 2*m_nbDarts; ++i)
-	{
-		*colorDartBuf++ = r;
-		*colorDartBuf++ = g;
-		*colorDartBuf++ = b;
-	}
-
-	m_vbo3->bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setInitialDartsColor(float r, float g, float b)
-{
-	m_dartsColor = Geom::Vec3f(r,g,b);
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setInitialBoundaryDartsColor(float r, float g, float b)
-{
-	m_dartsBoundaryColor = Geom::Vec3f(r,g,b);
-}
-
-template<typename PFP>
-void TopoRender<PFP>::drawDarts()
-{
-	if (m_nbDarts==0)
-		return;
-
-	m_shader2->enableVertexAttribs();
-
-	glLineWidth(m_topo_dart_width);
-	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
-
-	// change the stride to take 1/2 vertices
-	m_shader2->enableVertexAttribs(6*sizeof(GL_FLOAT));
-
-	glPointSize(2.0f*m_topo_dart_width);
-	glDrawArrays(GL_POINTS, 0, m_nbDarts);
-
-	m_shader2->disableVertexAttribs();
-}
-
-template<typename PFP>
-void TopoRender<PFP>::drawRelation1()
-{
-	if (m_nbDarts==0)
-		return;
-
-	glLineWidth(m_topo_relation_width);
-
-	m_shader1->changeVA_VBO(m_vaId, m_vbo1);
-	m_shader1->setColor(Geom::Vec4f(0.0f,1.0f,1.0f,0.0f));
-	m_shader1->enableVertexAttribs();
-
-	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
-
-	m_shader1->disableVertexAttribs();
-}
-
-template<typename PFP>
-void TopoRender<PFP>::drawRelation2()
-{
-	if (m_nbRel2==0)
-		return;
-
-	glLineWidth(m_topo_relation_width);
-
-	m_shader1->changeVA_VBO(m_vaId, m_vbo2);
-	m_shader1->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
-	m_shader1->enableVertexAttribs();
-
-	glDrawArrays(GL_LINES, 0, m_nbRel2*2);
-
-	m_shader1->disableVertexAttribs();
-}
-
-template<typename PFP>
-void TopoRender<PFP>::drawTopo()
-{
-	drawDarts();
-	drawRelation1();
-	drawRelation2();
-}
-
-template<typename PFP>
-void TopoRender<PFP>::overdrawDart(Dart d, float width, float r, float g, float b)
-{
-	unsigned int indexDart = m_attIndex[d];
+	unsigned int indexDart = attIndex[d];
 
 	m_shader1->changeVA_VBO(m_vaId, m_vbo0);
 	m_shader1->setColor(Geom::Vec4f(r,g,b,0.0f));
@@ -233,257 +70,98 @@ void TopoRender<PFP>::overdrawDart(Dart d, float width, float r, float g, float 
 	glPointSize(2.0f*width);
 	glDrawArrays(GL_POINTS, indexDart, 1);
 
-	m_shader2->disableVertexAttribs();
+	m_shader1->disableVertexAttribs();
 }
 
-template<typename PFP>
-Dart TopoRender<PFP>::colToDart(float* color)
+
+template<typename MAP>
+void TopoRender::drawColoredDarts(MAP& map)
 {
-	unsigned int r = (unsigned int)(color[0]*255.0f);
-	unsigned int g = (unsigned int)(color[1]*255.0f);
-	unsigned int b = (unsigned int)(color[2]*255.0f);
+	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(m_nameIndex);
+	if (!attIndex.isValid())
+		return;
 
-	unsigned int id = r + 255*g +255*255*b;
+	glLineWidth(m_topo_dart_width);
+	float ps = 2.0f*m_topo_dart_width;
 
-	if (id == 0)
-		return NIL;
-	return Dart(id-1);
+	m_shader1->changeVA_VBO(m_vaId, m_vbo0);
+	m_shader1->enableVertexAttribs();
+
+	for (auto it=m_coloredDarts.begin(); it != m_coloredDarts.end(); ++it)
+	{
+		unsigned int indexDart = attIndex[it->d];
+
+		m_shader1->setColor(Geom::Vec4f(it->r,it->g,it->b,0.0f));
+		m_shader1->enableVertexAttribs();
+		glDrawArrays(GL_LINES, indexDart, 2);
+
+		glPointSize(ps);
+		glDrawArrays(GL_POINTS, indexDart, 1);
+	}
+	m_shader1->disableVertexAttribs();
+
 }
 
+
+
 template<typename PFP>
-void TopoRender<PFP>::dartToCol(Dart d, float& r, float& g, float& b)
+void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions)
 {
-	// here use d.index beacause it is what we want (and not map.dartIndex(d) !!)
-	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
-
-	r = float(lab%255) / 255.0f; lab = lab/255;
-	g = float(lab%255) / 255.0f; lab = lab/255;
-	b = float(lab%255) / 255.0f; lab = lab/255;
-	if (lab!=0)
-		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
+	updateDataBoundary<PFP>(map,positions,m_ke,m_kf,m_ns);
 }
 
-template<typename PFP>
-Dart TopoRender<PFP>::pickColor(unsigned int x, unsigned int y)
-{
-	//more easy picking for
-	unsigned int dw = m_topo_dart_width;
-	m_topo_dart_width+=2;
-
-	// save clear color and set to zero
-	float cc[4];
-	glGetFloatv(GL_COLOR_CLEAR_VALUE,cc);
-
-	glClearColor(0.0f,0.0f,0.0f,0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glDisable(GL_LIGHTING);
-	// draw in back buffer (not shown on screen)
-	drawDarts();
-
-	// restore dart width
-	m_topo_dart_width = dw;
-
-	// read the pixel under the mouse in back buffer
-	glReadBuffer(GL_BACK);
-	float color[3];
-	glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,color);
-
-	glClearColor(cc[0], cc[1], cc[2], cc[3]);
-
-	return colToDart(color);
-}
 
 template<typename PFP>
-void TopoRender<PFP>::pushColors()
-{
-	m_color_save = new float[6*m_nbDarts];
-	m_vbo3->bind();
-	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
-
-	memcpy(m_color_save, colorBuffer, 6*m_nbDarts*sizeof(float));
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-}
-
-template<typename PFP>
-void TopoRender<PFP>::popColors()
-{
-	m_vbo3->bind();
-	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
-
-	memcpy(colorBuffer, m_color_save, 6*m_nbDarts*sizeof(float));
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-
-	delete[] m_color_save;
-	m_color_save=NULL;
-}
-
-template<typename PFP>
-void TopoRender<PFP>::svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj)
-{
-	Utils::SVG::SVGOut svg(filename,model,proj);
-	toSVG(svg);
-	svg.write();
-}
-
-template<typename PFP>
-void TopoRender<PFP>::toSVG(Utils::SVG::SVGOut& svg)
-{
-//	svg.setWidth(m_topo_relation_width);
-//
-//	// PHI2 / beta2
-//	const Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo2->lockPtr());
-//	svg.beginLines();
-//	for (unsigned int i=0; i<m_nbRel2; ++i)
-//		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.8f,0.0f,0.0f));
-//	svg.endLines();
-//
-//	m_vbo2->releasePtr();
-//
-//	//PHI1 /beta1
-//	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
-//	svg.beginLines();
-//	for (unsigned int i=0; i<m_nbRel1; ++i)
-//		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
-//	svg.endLines();
-//	m_vbo1->releasePtr();
-//
-//
-//	const Geom::Vec3f* colorsPtr = reinterpret_cast<const Geom::Vec3f*>(m_vbo3->lockPtr());
-//	ptr= reinterpret_cast<Geom::Vec3f*>(m_vbo0->lockPtr());
-//
-//	svg.setWidth(m_topo_dart_width);
-//	svg.beginLines();
-//	for (unsigned int i=0; i<m_nbDarts; ++i)
-//		svg.addLine(ptr[2*i], ptr[2*i+1], colorsPtr[2*i]);
-//	svg.endLines();
-//
-//	svg.beginPoints();
-//	for (unsigned int i=0; i<m_nbDarts; ++i)
-//			svg.addPoint(ptr[2*i], colorsPtr[2*i]);
-//	svg.endPoints();
-//
-//	m_vbo0->releasePtr();
-//	m_vbo3->releasePtr();
-
-	// PHI2 / beta2
-	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("phi2", svg.m_model, svg.m_proj);
-	svg1->setToLayer();
-	const Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo2->lockPtr());
-	svg1->setWidth(m_topo_relation_width);
-	svg1->beginLines();
-	for (unsigned int i=0; i<m_nbRel2; ++i)
-		svg1->addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.8f,0.0f,0.0f));
-	svg1->endLines();
-	m_vbo2->releasePtr();
-
-	svg.addGroup(svg1);
-
-	//PHI1 /beta1
-	Utils::SVG::SvgGroup* svg2 = new Utils::SVG::SvgGroup("phi1", svg.m_model, svg.m_proj);
-	svg2->setToLayer();
-	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
-	svg2->setWidth(m_topo_relation_width);
-	svg2->beginLines();
-	for (unsigned int i=0; i<m_nbRel1; ++i)
-		svg2->addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
-	svg2->endLines();
-	m_vbo1->releasePtr();
-
-	svg.addGroup(svg2);
-
-	const Geom::Vec3f* colorsPtr = reinterpret_cast<const Geom::Vec3f*>(m_vbo3->lockPtr());
-	ptr= reinterpret_cast<Geom::Vec3f*>(m_vbo0->lockPtr());
-
-	Utils::SVG::SvgGroup* svg3 = new Utils::SVG::SvgGroup("darts", svg.m_model, svg.m_proj);
-	svg3->setToLayer();
-	svg3->setWidth(m_topo_dart_width);
-	svg3->beginLines();
-	for (unsigned int i=0; i<m_nbDarts; ++i)
-		svg3->addLine(ptr[2*i], ptr[2*i+1], colorsPtr[2*i]);
-	svg3->endLines();
-
-	svg.addGroup(svg3);
-
-	Utils::SVG::SvgGroup* svg4 = new Utils::SVG::SvgGroup("dartEmb", svg.m_model, svg.m_proj);
-	svg4->setWidth(m_topo_dart_width);
-	svg4->setToLayer();
-	svg4->beginPoints();
-	for (unsigned int i=0; i<m_nbDarts; ++i)
-			svg4->addPoint(ptr[2*i], colorsPtr[2*i]);
-	svg4->endPoints();
-
-	svg.addGroup(svg4);
-
-	m_vbo0->releasePtr();
-	m_vbo3->releasePtr();
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setNormalShift(float ns)
+void TopoRender::updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, float ns)
 {
 	m_normalShift = ns;
-}
-
-template<typename PFP>
-void TopoRender<PFP>::setBoundaryShift(float bs)
-{
-	m_boundShift = bs;
-}
-
-template<typename PFP>
-void TopoRender<PFP>::updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, float ns)
-{
-	m_normalShift = ns;
-	SelectorDartBoundary<MAP> sdb(map);
-	DartContainerBrowserSelector<MAP> browser(map, sdb);
+	SelectorDartBoundary<typename PFP::MAP> sdb(map);
+	DartContainerBrowserSelector<typename PFP::MAP> browser(map, sdb);
 	browser.enable();
-	updateData(map, positions, ke, kf, false,true); // false,true because we are drawing the boundary of a 3map
+	this->updateData<PFP>(map, positions, ke, kf, false,true); // false,true because we are drawing the boundary of a 3map
 	browser.disable();
 	m_normalShift = 0.0f;
 }
 
 
-
+template<typename PFP>
+void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool onlyBoundary)
+{
+	updateData<PFP>(map,positions,m_ke,m_kf,m_wb,onlyBoundary);
+}
 
 template<typename PFP>
-void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary)
+void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary)
 {
-	std::string name_index("dart_index2");
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	std::string name_index(this->m_nameIndex);
 	if (onlyBoundary)
 		name_index = std::string("dart_boundary_index2");
 
 	std::vector<Dart> vecDarts;
-	vecDarts.reserve(mapx.getNbDarts());  // no problem dart is int: no problem of memory
+	vecDarts.reserve(map.getNbDarts());  // no problem dart is int: no problem of memory
 
-	this->m_attIndex = mapx.template getAttribute<unsigned int, DART, MAP>(name_index);
+	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(name_index);
+	if (!attIndex.isValid())
+		attIndex  = map.template addAttribute<unsigned int, DART, MAP>(name_index);
 
-	if (!this->m_attIndex.isValid())
-		this->m_attIndex  = mapx.template addAttribute<unsigned int, DART, MAP>(name_index);
 
-	for(Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (withBoundary || !mapx.template isBoundaryMarked<2>(d))
+		if (withBoundary || !map.template isBoundaryMarked<2>(d))
 			vecDarts.push_back(d);
 	}
 	this->m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	DartAutoAttribute<VEC3, MAP> fv1(mapx);
+	DartAutoAttribute<VEC3, MAP> fv1(map);
 	// fin phi1
-	DartAutoAttribute<VEC3, MAP> fv11(mapx);
+	DartAutoAttribute<VEC3, MAP> fv11(map);
 	// phi2
-	DartAutoAttribute<VEC3, MAP> fv2(mapx);
-
-	this->m_vbo3->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*this->m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
-	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	Geom::Vec3f* colorDartBuf = reinterpret_cast<Geom::Vec3f*>(ColorDartsBuffer);
-
-//	m_vbo0->bind();
-//	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-//	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-//	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
+	DartAutoAttribute<VEC3, MAP> fv2(map);
 
 	if (this->m_bufferDartPosition!=NULL)
 		delete this->m_bufferDartPosition;
@@ -495,28 +173,28 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 
 	unsigned int indexDC = 0;
 
-	DartMarker<MAP> mf(mapx);
+	DartMarker<MAP> mf(map);
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id != vecDarts.end(); id++)
 	{
 		Dart d = *id;
 		if (!mf.isMarked(d))
 		{
 			vecPos.clear();
-			if (!mapx.template isBoundaryMarked<2>(d))
+			if (!map.template isBoundaryMarked<2>(d))
 			{
-				//VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(mapx,d,positions);
-				VEC3 center = Algo::Surface::Geometry::faceCentroid<PFP>(mapx,d,positions);
+				//VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(map,d,positions);
+				VEC3 center = Algo::Surface::Geometry::faceCentroid<PFP>(map,d,positions);
 				float k = 1.0f - kf;
 				Dart dd = d;
 				do
 				{
 					vecPos.push_back(center*k + positions[dd]*kf);
-					dd = mapx.phi1(dd);
+					dd = map.phi1(dd);
 				} while (dd != d);
 
 				if (this->m_normalShift > 0.0f)
 				{
-					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,d,positions);
+					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(map,d,positions);
 					for (typename std::vector<VEC3>::iterator pit = vecPos.begin(); pit != vecPos.end(); ++pit)
 					{
 						*pit -= normal * this->m_normalShift;
@@ -533,19 +211,17 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 					VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
 					VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
 
-					this->m_attIndex[d] = indexDC;
+					attIndex[d] = indexDC;
 					indexDC+=2;
 					*positionDartBuf++ = PFP::toVec3f(P);
 					*positionDartBuf++ = PFP::toVec3f(Q);
-					*colorDartBuf++ = this->m_dartsColor;
-					*colorDartBuf++ = this->m_dartsColor;
 					VEC3 f = P*0.5f + Q*0.5f;
 					fv2[d] = f;
 					f = P*0.1f + Q*0.9f;
 					fv1[d] = f;
 					f = P*0.9f + Q*0.1f;
 					fv11[d] = f;
-					d = mapx.phi1(d);
+					d = map.phi1(d);
 				}
 				mf.template markOrbit<FACE>(d);
 			}
@@ -554,16 +230,16 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 				Dart dd = d;
 				do
 				{
-					Dart ee = mapx.phi2(dd);
-					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(mapx,ee,positions);
-					VEC3 vd = Algo::Surface::Geometry::vectorOutOfDart<PFP>(mapx,ee,positions);
+					Dart ee = map.phi2(dd);
+					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(map,ee,positions);
+					VEC3 vd = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,ee,positions);
 					VEC3 v = vd ^ normal;
 					v.normalize();
-					VEC3 P = positions[mapx.phi1(ee)] + v* this->m_boundShift;
+					VEC3 P = positions[map.phi1(ee)] + v* this->m_boundShift;
 					vecPos.push_back(P);
-					dd = mapx.phi1(dd);
-					ee = mapx.phi2(dd);
-					P = positions[mapx.phi1(ee)] + v* this->m_boundShift;
+					dd = map.phi1(dd);
+					ee = map.phi2(dd);
+					P = positions[map.phi1(ee)] + v* this->m_boundShift;
 					vecPos.push_back(P);
 				} while (dd != d);
 
@@ -575,19 +251,17 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 					VEC3 P = vecPos[2*i]*ke + vecPos[2*i+1]*k;
 					VEC3 Q = vecPos[2*i+1]*ke + vecPos[2*i]*k;
 
-					this->m_attIndex[d] = indexDC;
+					attIndex[d] = indexDC;
 					indexDC+=2;
 					*positionDartBuf++ = PFP::toVec3f(P);
 					*positionDartBuf++ = PFP::toVec3f(Q);
-					*colorDartBuf++ = this->m_dartsBoundaryColor;
-					*colorDartBuf++ = this->m_dartsBoundaryColor;
 					VEC3 f = P*0.5f + Q*0.5f;
 					fv2[d] = f;
 					f = P*0.1f + Q*0.9f;
 					fv1[d] = f;
 					f = P*0.9f + Q*0.1f;
 					fv11[d] = f;
-					d = mapx.phi1(d);
+					d = map.phi1(d);
 				}
 				mf.template markOrbit<FACE>(d);
 			}
@@ -596,10 +270,7 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 
 	this->m_vbo0->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*this->m_nbDarts*sizeof(Geom::Vec3f), this->m_bufferDartPosition, GL_STREAM_DRAW);
-//	glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	this->m_vbo3->bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	this->m_vbo1->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*this->m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
@@ -617,17 +288,17 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 	{
 		Dart d = *id;
 
-		Dart e = mapx.phi2(d);
+		Dart e = map.phi2(d);
 
 //		if (good(e) && (e.index > d.index))
-		if ( (withBoundary || !mapx.template isBoundaryMarked<2>(e)) && (e.index > d.index))
+		if ( (withBoundary || !map.template isBoundaryMarked<2>(e)) && (e.index > d.index))
 		{
 			*positionF2++ = PFP::toVec3f(fv2[d]);
 			*positionF2++ = PFP::toVec3f(fv2[e]);
 			this->m_nbRel2++;
 		}
 
-		e = mapx.phi1(d);
+		e = map.phi1(d);
 		*positionF1++ = PFP::toVec3f(fv1[d]);
 		*positionF1++ = PFP::toVec3f(fv11[e]);
 	}
@@ -642,23 +313,41 @@ void TopoRenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>&
 
 
 template<typename PFP>
-void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary)
+void TopoRender::updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool onlyBoundary)
 {
-//	GMap2& map = dynamic_cast<GMap2&>(mapx);
+	updateDataGMap<PFP>(map,positions,m_ke,m_kf,m_wb,onlyBoundary);
+}
+
+template<typename PFP>
+void TopoRender::updateDataGMap(typename PFP::MAP& dmap, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary)
+{
+
+	// compilation trick to bypass compilation problems
+
+	struct GPFP:public PFP
+	{
+		typedef EmbeddedGMap2 MAP;
+	};
+
+	typedef typename GPFP::MAP MAP;
+	typedef typename GPFP::VEC3 VEC3;
+	typedef typename GPFP::REAL REAL;
+
+
+	MAP& map = reinterpret_cast<MAP&>(dmap);
 
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
 
-	std::string name_index("dart_index2");
+	std::string name_index(this->m_nameIndex);
 	if (onlyBoundary)
 		name_index = std::string("dart_boundary_index2");
 
 
-	if (this->m_attIndex.map() != &map)
-		this->m_attIndex  = map.template getAttribute<unsigned int, DART, MAP>(name_index);
+	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(name_index);
+	if (!attIndex.isValid())
+		attIndex  = map.template addAttribute<unsigned int, DART, MAP>(name_index);
 
-	if (!this->m_attIndex.isValid())
-		this->m_attIndex  = map.template addAttribute<unsigned int, DART, MAP>(name_index);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -673,11 +362,6 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 	DartAutoAttribute<VEC3, MAP> fv11(map);
 	// phi2
 	DartAutoAttribute<VEC3, MAP> fv2(map);
-
-	this->m_vbo3->bind();
-	glBufferData(GL_ARRAY_BUFFER, 4*this->m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
-	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	Geom::Vec3f* colorDartBuf = reinterpret_cast<Geom::Vec3f*>(ColorDartsBuffer);
 
 	this->m_vbo0->bind();
 	glBufferData(GL_ARRAY_BUFFER, 4*this->m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
@@ -697,7 +381,7 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 		if (!mf.isMarked(d))
 		{
 			vecPos.clear();
-			VEC3 center = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
+			VEC3 center = Algo::Surface::Geometry::faceCentroidELW<GPFP>(map, d, positions);
 			
 			float k = 1.0f - kf;
 			Dart dd = d;
@@ -710,7 +394,7 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 
 			if (this->m_normalShift > 0.0f)
 			{
-				VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(map, d, positions);
+				VEC3 normal = Algo::Surface::Geometry::newellNormal<GPFP>(map, d, positions);
 				for (typename std::vector<VEC3>::iterator pit = vecPos.begin(); pit != vecPos.end(); ++pit)
 				{
 					*pit -= normal * this->m_normalShift;
@@ -727,17 +411,12 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 				VEC3 PP = REAL(0.52)*P + REAL(0.48)*Q;
 				VEC3 QQ = REAL(0.52)*Q + REAL(0.48)*P;
 
-				this->m_attIndex[d] = indexDC;
+				attIndex[d] = indexDC;
 				indexDC+=2;
-				*positionDartBuf++ = PFP::toVec3f(P);
-				*colorDartBuf++ = this->m_dartsColor;
-				*positionDartBuf++ = PFP::toVec3f(PP);
-				*colorDartBuf++ = this->m_dartsColor;
-				*positionDartBuf++ = PFP::toVec3f(Q);
-				*colorDartBuf++ = this->m_dartsColor;
-				*positionDartBuf++ = PFP::toVec3f(QQ);
-				*colorDartBuf++ = this->m_dartsColor;
-
+				*positionDartBuf++ = GPFP::toVec3f(P);
+				*positionDartBuf++ = GPFP::toVec3f(PP);
+				*positionDartBuf++ = GPFP::toVec3f(Q);
+				*positionDartBuf++ = GPFP::toVec3f(QQ);
 				VEC3 f = P*0.5f + PP*0.5f;
 				fv2[d] = f;
 				f = P*0.9f + PP*0.1f;
@@ -748,7 +427,7 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 				fv2[dd] = f;
 				f = Q*0.9f + QQ*0.1f;
 				fv1[dd] = f;
-				this->m_attIndex[dd] = indexDC;
+				attIndex[dd] = indexDC;
 				indexDC+=2;
 
 				d = map.phi1(d);
@@ -758,9 +437,6 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 	}
 
 	this->m_vbo0->bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-
-	this->m_vbo3->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	this->m_vbo1->bind();
@@ -782,14 +458,14 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 //		if (d < e )
 		if ( (withBoundary || !map.template isBoundaryMarked<2>(e)) && (d < e ))
 		{
-			*positionF2++ = PFP::toVec3f(fv2[d]);
-			*positionF2++ = PFP::toVec3f(fv2[e]);
+			*positionF2++ = GPFP::toVec3f(fv2[d]);
+			*positionF2++ = GPFP::toVec3f(fv2[e]);
 			this->m_nbRel2++;
 		}
 
 		e = map.beta1(d);
-		*positionF1++ = PFP::toVec3f(fv1[d]);
-		*positionF1++ = PFP::toVec3f(fv1[e]);
+		*positionF1++ = GPFP::toVec3f(fv1[d]);
+		*positionF1++ = GPFP::toVec3f(fv1[e]);
 	}
 	this->m_nbRel1 = vecDarts.size()/2;
 
@@ -800,18 +476,25 @@ void TopoRenderGMap<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>&
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-template<typename PFP>
-void TopoRender<PFP>::setDartsIdColor(MAP& map, bool withBoundary)
+
+
+template<typename MAP>
+Dart TopoRender::picking(MAP& map,int x, int y, bool withBoundary)
 {
-	m_vbo3->bind();
+
+	Utils::VBO vboCol;
+	vboCol.setDataSize(3);
+
+	vboCol.bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*this->m_nbDarts*sizeof(Geom::Vec3f), NULL, GL_STREAM_DRAW);
 	float* colorBuffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb = 0;
 
-	m_attIndex = map.template getAttribute<unsigned int, DART, MAP>("dart_index2");
-	if (!m_attIndex.isValid())
+	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(m_nameIndex);
+	if (!attIndex.isValid())
 	{
 		CGoGNerr << "Error attribute_dartIndex does not exist during TopoRender<PFP>::picking" << CGoGNendl;
-		return;
+		return NIL;
 	}
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -823,7 +506,7 @@ void TopoRender<PFP>::setDartsIdColor(MAP& map, bool withBoundary)
 			{
 				float r,g,b;
 				dartToCol(d, r,g,b);
-				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
+				float* local = colorBuffer+3*attIndex[d]; // get the right position in VBO
 				*local++ = r;
 				*local++ = g;
 				*local++ = b;
@@ -841,21 +524,89 @@ void TopoRender<PFP>::setDartsIdColor(MAP& map, bool withBoundary)
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-}
 
-template<typename PFP>
-Dart TopoRender<PFP>::picking(MAP& map,int x, int y, bool withBoundary)
-{
-	pushColors();
-	setDartsIdColor(map,withBoundary);
-	Dart d = pickColor(x,y);
-	popColors();
+
+	Utils::ShaderColorPerVertex shaderCol;
+	shaderCol.setAttributePosition(m_vbo0);
+	shaderCol.setAttributeColor(&vboCol);
+	shaderCol.updateMatrices(m_shader1);
+
+	unsigned int dw = m_topo_dart_width;
+	m_topo_dart_width+=2;
+
+	// save clear color and set to zero
+	float cc[4];
+	glGetFloatv(GL_COLOR_CLEAR_VALUE,cc);
+
+	glClearColor(0.0f,0.0f,0.0f,0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_LIGHTING);
+	// draw in back buffer (not shown on screen)
+
+	shaderCol.enableVertexAttribs();
+
+	glLineWidth(m_topo_dart_width);
+	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
+
+	// change the stride to take 1/2 vertices
+	shaderCol.enableVertexAttribs(6*sizeof(GL_FLOAT));
+
+	glPointSize(2.0f*m_topo_dart_width);
+	glDrawArrays(GL_POINTS, 0, m_nbDarts);
+
+	shaderCol.disableVertexAttribs();
+
+	// restore dart width
+	m_topo_dart_width = dw;
+
+	// read the pixel under the mouse in back buffer
+	glReadBuffer(GL_BACK);
+	float color[3];
+	glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,color);
+
+	glClearColor(cc[0], cc[1], cc[2], cc[3]);
+
+	Dart d = colToDart(color);
+
 	return d;
+
+
 }
 
-template<typename PFP>
-Dart TopoRender<PFP>::coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//template<typename PFP>
+template<typename MAP>
+Dart TopoRender::coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle)
 {
+	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(m_nameIndex);
+	if (!attIndex.isValid())
+		attIndex  = map.template addAttribute<unsigned int, DART, MAP>(m_nameIndex);
+
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;
 	double sin2 = sin(M_PI/180.0 * angle);
@@ -865,8 +616,8 @@ Dart TopoRender<PFP>::coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geo
 	for(Dart d = map.begin(); d!=map.end(); map.next(d))
 	{
 		// get back position of segment PQ
-		const Geom::Vec3f& P = m_bufferDartPosition[m_attIndex[d]];
-		const Geom::Vec3f& Q =m_bufferDartPosition[m_attIndex[d]+1];
+		const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
+		const Geom::Vec3f& Q =m_bufferDartPosition[attIndex[d]+1];
 		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
 		Geom::Vec3f V = (P+Q)/2.0f - rayA;
 		double d2 = double(V*V);
@@ -883,9 +634,14 @@ Dart TopoRender<PFP>::coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geo
 	return dFinal;
 }
 
-template<typename PFP>
-Dart TopoRender<PFP>::raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
+//template<typename PFP>
+template<typename MAP>
+Dart TopoRender::raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax)
 {
+	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(m_nameIndex);
+	if (!attIndex.isValid())
+		attIndex  = map.template addAttribute<unsigned int, DART, MAP>(m_nameIndex);
+
 	float AB2 = rayAB*rayAB;
 	Dart dFinal;
 	float dm2 = dmax*dmax;
@@ -894,8 +650,8 @@ Dart TopoRender<PFP>::raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom
 	for(Dart d = map.begin(); d!=map.end(); map.next(d))
 	{
 		// get back position of segment PQ
-		const Geom::Vec3f& P = m_bufferDartPosition[m_attIndex[d]];
-		const Geom::Vec3f& Q =m_bufferDartPosition[m_attIndex[d]+1];
+		const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
+		const Geom::Vec3f& Q =m_bufferDartPosition[attIndex[d]+1];
 		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
 		if (ld2<dm2)
 		{

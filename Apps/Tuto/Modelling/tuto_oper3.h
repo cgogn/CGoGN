@@ -104,7 +104,7 @@ protected:
 #else
 	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
 #endif
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo_boundary;
+	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
 	Dart m_selected;
 	Dart m_selected2;
 	std::vector<Dart> m_selecteds;
@@ -132,11 +132,10 @@ protected:
 	int clip_id1;
 	int clip_id2;
 	int clip_id3;
-	int clip_id4;
+
 	Utils::ClippingShader* m_sh1;
 	Utils::ClippingShader* m_sh2;
 	Utils::ClippingShader* m_sh3;
-	Utils::ClippingShader* m_sh4;
 
 public:
 	// example of simple map creation

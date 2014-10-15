@@ -25,6 +25,7 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	m_name(name),
 	m_schnapps(s),
 	m_currentCamera(NULL),
+	m_lastSelectedMap(NULL),
 	m_buttonArea(NULL),
 	m_closeButton(NULL),
 	m_VsplitButton(NULL),
@@ -410,8 +411,15 @@ void View::updateCurrentCameraBB()
 
 void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 {
+//	m_lastSelectedMap = cur;
 	if(cur && isLinkedToMap(cur))
+	{
 		setManipulatedFrame(cur->getFrame());
+//		std::cout << "in view "<< this->getName().toStdString();
+//		std::cout << " selectedMapChanged: "<< cur->getName().toStdString() << std::endl;
+	}
+//	else
+//		std::cout << "in view "<< this->getName().toStdString()<< " selectedMapChanged: NULL"<< std::endl;
 	updateGL();
 }
 
@@ -428,6 +436,15 @@ void View::ui_horizontalSplitView(int x, int y, int globalX, int globalY)
 void View::ui_closeView(int x, int y, int globalX, int globalY)
 {
 	m_schnapps->removeView(m_name);
+}
+
+void View::setLastSelectedMap(MapHandlerGen* m) {
+	m_lastSelectedMap=m;
+	std::cout << "in view "<< this->getName().toStdString();
+	if (m)
+		std::cout << " selectedMapChanged: "<< m->getName().toStdString() << std::endl;
+	else
+		std::cout << " selectedMapChanged: NULL"<< std::endl;
 }
 
 } // namespace SCHNApps

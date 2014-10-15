@@ -77,6 +77,8 @@ void ControlDock_MapTab::selectedMapChanged()
 {
 	if(!b_updatingUI)
 	{
+
+
 		if(m_selectedMap)
 		{
 			disconnect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
@@ -87,6 +89,7 @@ void ControlDock_MapTab::selectedMapChanged()
 		}
 
 		QList<QListWidgetItem*> items = list_maps->selectedItems();
+
 		if(!items.empty())
 		{
 			MapHandlerGen* old = m_selectedMap;
@@ -94,15 +97,25 @@ void ControlDock_MapTab::selectedMapChanged()
 			QString selectedMapName = items[0]->text();
 			m_selectedMap = m_schnapps->getMap(selectedMapName);
 
+			items[0]->setCheckState(Qt::Checked);
+
 			updateSelectedMapInfo();
 
 			m_schnapps->notifySelectedMapChanged(old, m_selectedMap);
+			m_schnapps->getSelectedView()->setLastSelectedMap(m_selectedMap);
 
 			connect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 			connect(m_selectedMap, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(selectedMapVBOAdded(Utils::VBO*)));
 			connect(m_selectedMap, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(selectedMapVBORemoved(Utils::VBO*)));
 			connect(m_selectedMap, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorAdded(unsigned int, const QString&)));
 			connect(m_selectedMap, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorRemoved(unsigned int, const QString&)));
+		}
+		else
+		{
+			MapHandlerGen* old = m_selectedMap;
+			m_selectedMap = NULL;
+			m_schnapps->notifySelectedMapChanged(old,m_selectedMap);
+			m_schnapps->getSelectedView()->setLastSelectedMap(NULL);
 		}
 	}
 }
@@ -116,9 +129,16 @@ void ControlDock_MapTab::mapCheckStateChanged(QListWidgetItem *item)
 		if(m)
 		{
 			if(item->checkState() == Qt::Checked)
+			{
 				selectedView->linkMap(m);
+				if (m_selectedMap==NULL)
+					setSelectedMap(m->getName());
+			}
 			else
+			{
 				selectedView->unlinkMap(m);
+				item->setSelected(false);
+			}
 		}
 	}
 }
@@ -454,6 +474,15 @@ void ControlDock_MapTab::setSelectedMap(const QString& mapName)
 	if (!lm.empty())
 	{
 		lm[0]->setSelected(true);
+	}
+	else
+	{
+		QList<QListWidgetItem*> items = list_maps->selectedItems();
+		if(!items.empty())
+		{
+			m_selectedMap = NULL;
+			items[0]->setSelected(false);
+		}
 	}
 }
 

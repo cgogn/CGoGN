@@ -12,7 +12,9 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_map(map),
 	m_frame(NULL),
 	m_bbDrawer(NULL),
-	m_render(NULL)
+	m_render(NULL),
+	m_topoRender(NULL)
+
 {
 	m_frame = new qglviewer::ManipulatedFrame();
 }
@@ -27,6 +29,8 @@ MapHandlerGen::~MapHandlerGen()
 		delete m_render;
 	foreach(CGoGN::Utils::VBO* vbo, m_vbo)
 		delete vbo;
+
+	deleteTopoRender();
 }
 
 /*********************************************************
@@ -250,6 +254,13 @@ void MapHandlerGen::linkView(View* view)
 void MapHandlerGen::unlinkView(View* view)
 {
 	l_views.removeOne(view);
+}
+
+
+void MapHandlerGen::deleteTopoRender()
+{
+	if (m_topoRender)
+		delete m_topoRender;
 }
 
 } // namespace SCHNApps

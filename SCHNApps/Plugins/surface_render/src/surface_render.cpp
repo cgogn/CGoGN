@@ -134,6 +134,10 @@ void Surface_Render_Plugin::selectedViewChanged(View *prev, View *cur)
 void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
@@ -328,6 +332,52 @@ void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QStr
 		}
 	}
 }
+
+void Surface_Render_Plugin::changeFaceColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].diffuseColor = Geom::Vec4f(r,g,b,0);
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Render_Plugin::changeEdgeColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].simpleColor = Geom::Vec4f(r,g,b,0);
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Render_Plugin::changeVertexColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].vertexColor = Geom::Vec4f(r,g,b,0);
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
 
 Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)
 

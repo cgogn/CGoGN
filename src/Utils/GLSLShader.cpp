@@ -1110,6 +1110,48 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 }
 
 
+void GLSLShader::updateMatrices(const Utils::GLSLShader *sh)
+{
+	float mp[16];
+	float mmv[16];
+	float mmpv[16];
+	float mn[16];
+
+	sh->bind();
+	if (*m_uniMat_Proj >= 0)
+		glGetUniformfv(*(sh->m_program_object),*(sh->m_uniMat_Proj),mp);
+
+
+	if (*m_uniMat_Model >= 0)
+		glGetUniformfv(*(sh->m_program_object),*(sh->m_uniMat_Model),mmv);
+
+	if (*m_uniMat_ModelProj >= 0)
+		glGetUniformfv(*(sh->m_program_object),*(sh->m_uniMat_ModelProj),mmpv);
+
+	if (*m_uniMat_Normal >= 0)
+		glGetUniformfv(*(sh->m_program_object),*(sh->m_uniMat_Normal),mn);
+
+
+	this->bind();
+
+	if (*m_uniMat_Proj >= 0)
+		glUniformMatrix4fv(*m_uniMat_Proj, 1, false, mp);
+
+	if (*m_uniMat_Model >= 0)
+		glUniformMatrix4fv(*m_uniMat_Model,	1, false, mmv);
+
+	if (*m_uniMat_ModelProj >= 0)
+		glUniformMatrix4fv(*m_uniMat_ModelProj,	1 , false, mmpv);
+
+	if (*m_uniMat_Normal >= 0)
+		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, mn);
+
+	this->unbind();
+}
+
+
+
+
 
 
 void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) const

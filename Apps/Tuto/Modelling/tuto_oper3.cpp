@@ -76,19 +76,16 @@ void MyQT::clipping_onoff(bool x)
         m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
         m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
         m_sh3->setClipPlaneParamsAll(clip_id3, normal, pos);
-        m_sh4->setClipPlaneParamsAll(clip_id4, normal, pos);
     }
     else
     {
         m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
         m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
         m_sh3->setClipPlaneParamsAll(clip_id3, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-        m_sh4->setClipPlaneParamsAll(clip_id4, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
 
         m_sh1->setClipColorAttenuationFactorRelative(0.0f,0.0f);
         m_sh2->setClipColorAttenuationFactorRelative(0.0f,0.0f);
         m_sh3->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-        m_sh4->setClipColorAttenuationFactorRelative(0.0f,0.0f);
 
     }
     updateMap();
@@ -343,7 +340,7 @@ void MyQT::updateMap()
 #else
 	m_render_topo->updateData(myMap, position, m_ex1,m_ex2,m_ex3);
 #endif
-	m_render_topo_boundary->updateDataBoundary(myMap,position,m_ex1,m_ex2,m_shift);
+	m_render_topo_boundary->updateDataBoundary<PFP>(myMap,position,m_ex1,m_ex2,m_shift);
 }
 
 // initialization GL callback
@@ -356,7 +353,7 @@ void MyQT::cb_initGL()
 #else
 	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>() ;
 #endif
-	m_render_topo_boundary = new Algo::Render::GL2::TopoRenderMap<PFP>();
+	m_render_topo_boundary = new Algo::Render::GL2::TopoRender();
     m_render_topo_boundary->setInitialDartsColor(0.0f,0.9f,0.0f);
 
     m_PlanePick = new Utils::Pickable(Utils::Pickable::GRID,1);
@@ -366,26 +363,18 @@ void MyQT::cb_initGL()
     m_sh1 = static_cast<Utils::ClippingShader*>(m_render_topo->shader1());
     m_sh2 = static_cast<Utils::ClippingShader*>(m_render_topo->shader2());
     m_sh3 = static_cast<Utils::ClippingShader*>(m_render_topo_boundary->shader1());
-    m_sh4 = static_cast<Utils::ClippingShader*>(m_render_topo_boundary->shader2());
-
-
 
     m_sh1->insertClippingCode();
     m_sh2->insertClippingCode();
     m_sh3->insertClippingCode();
-    m_sh4->insertClippingCode();
-
 
     clip_id1 = m_sh1->addClipPlane();
     clip_id2 = m_sh2->addClipPlane();
     clip_id3 = m_sh3->addClipPlane();
-    clip_id4 = m_sh4->addClipPlane();
-
 
     m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), bb.center());
     m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), bb.center());
     m_sh3->setClipPlaneParamsAll(clip_id3, Geom::Vec3f(0,0,1), bb.center());
-    m_sh4->setClipPlaneParamsAll(clip_id4, Geom::Vec3f(0,0,1), bb.center());
 
 }
 
@@ -553,7 +542,6 @@ void  MyQT::cb_mouseMove(int buttons, int x, int y)
     m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
     m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
     m_sh3->setClipPlaneParamsAll(clip_id3, normal, pos);
-    m_sh4->setClipPlaneParamsAll(clip_id4, normal, pos);
 
 
     m_begX = x;
