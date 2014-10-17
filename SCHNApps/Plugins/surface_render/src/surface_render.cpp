@@ -1,6 +1,7 @@
 #include "surface_render.h"
 
 #include "mapHandler.h"
+#include "slot_debug.h"
 
 namespace CGoGN
 {
@@ -128,11 +129,13 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 void Surface_Render_Plugin::selectedViewChanged(View *prev, View *cur)
 {
+	DEBUG_SLOT();
 	m_dockTab->updateMapParameters();
 }
 
 void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
+	DEBUG_SLOT();
 	m_dockTab->updateMapParameters();
 	if (cur==NULL)
 		m_dockTab->setDisabled(true);
@@ -142,12 +145,14 @@ void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGe
 
 void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
 {
+	DEBUG_SLOT();
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 }
 
 void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 {
+	DEBUG_SLOT();
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 }
@@ -158,6 +163,7 @@ void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 
 void Surface_Render_Plugin::vboAdded(Utils::VBO *vbo)
 {
+	DEBUG_SLOT();
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
 	if(map == m_schnapps->getSelectedMap())
@@ -172,6 +178,7 @@ void Surface_Render_Plugin::vboAdded(Utils::VBO *vbo)
 
 void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 {
+	DEBUG_SLOT();
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
 	if(map == m_schnapps->getSelectedMap())
@@ -213,6 +220,7 @@ void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 
 void Surface_Render_Plugin::changePositionVBO(const QString& view, const QString& map, const QString& vbo)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -229,6 +237,7 @@ void Surface_Render_Plugin::changePositionVBO(const QString& view, const QString
 
 void Surface_Render_Plugin::changeNormalVBO(const QString& view, const QString& map, const QString& vbo)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -245,6 +254,7 @@ void Surface_Render_Plugin::changeNormalVBO(const QString& view, const QString& 
 
 void Surface_Render_Plugin::changeRenderVertices(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -260,6 +270,7 @@ void Surface_Render_Plugin::changeRenderVertices(const QString& view, const QStr
 
 void Surface_Render_Plugin::changeVerticesScaleFactor(const QString& view, const QString& map, float f)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -275,6 +286,7 @@ void Surface_Render_Plugin::changeVerticesScaleFactor(const QString& view, const
 
 void Surface_Render_Plugin::changeRenderEdges(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -290,6 +302,7 @@ void Surface_Render_Plugin::changeRenderEdges(const QString& view, const QString
 
 void Surface_Render_Plugin::changeRenderFaces(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -305,6 +318,7 @@ void Surface_Render_Plugin::changeRenderFaces(const QString& view, const QString
 
 void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -320,6 +334,7 @@ void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString&
 
 void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -335,6 +350,7 @@ void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QStr
 
 void Surface_Render_Plugin::changeFaceColor(const QString& view, const QString& map, float r, float g, float b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -350,6 +366,7 @@ void Surface_Render_Plugin::changeFaceColor(const QString& view, const QString& 
 
 void Surface_Render_Plugin::changeEdgeColor(const QString& view, const QString& map, float r, float g, float b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -365,6 +382,7 @@ void Surface_Render_Plugin::changeEdgeColor(const QString& view, const QString& 
 
 void Surface_Render_Plugin::changeVertexColor(const QString& view, const QString& map, float r, float g, float b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)

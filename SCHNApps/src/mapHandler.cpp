@@ -7,13 +7,13 @@ namespace SCHNApps
 {
 
 MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) :
+	m_topoRender(NULL),
 	m_name(name),
 	m_schnapps(s),
 	m_map(map),
 	m_frame(NULL),
 	m_bbDrawer(NULL),
-	m_render(NULL),
-	m_topoRender(NULL)
+	m_render(NULL)
 
 {
 	m_frame = new qglviewer::ManipulatedFrame();
@@ -43,6 +43,7 @@ void MapHandlerGen::notifyAttributeModification(const AttributeHandlerGen& attr)
 	if(m_vbo.contains(nameAttr))
 		m_vbo[nameAttr]->updateData(attr);
 
+	DEBUG_EMIT("attributeModified");
 	emit(attributeModified(attr.getOrbit(), nameAttr));
 
 	foreach(View* view, l_views)
@@ -65,6 +66,7 @@ void MapHandlerGen::notifyConnectivityModification()
 			cs->rebuild();
 	}
 
+	DEBUG_EMIT("connectivityModified");
 	emit(connectivityModified());
 
 	foreach(View* view, l_views)
@@ -109,17 +111,20 @@ void MapHandlerGen::clear(bool removeAttrib)
 			{
 				if (orbit == VERTEX)
 					deleteVBO(name);
+				DEBUG_EMIT("attributeRemoved");
 				emit(attributeRemoved(orbit, name));
 			}
 			else
 			{
 				if (orbit == VERTEX)
 					updateVBO(name);
+				DEBUG_EMIT("attributeModified");
 				emit(attributeModified(orbit, name));
 			}
 		}
 	}
 
+	DEBUG_EMIT("connectivityModified");
 	emit(connectivityModified());
 }
 
@@ -138,6 +143,7 @@ Utils::VBO* MapHandlerGen::createVBO(const AttributeMultiVectorGen* attr)
 			vbo = new Utils::VBO(attr->getName());
 			vbo->updateData(attr);
 			m_vbo.insert(name, vbo);
+			DEBUG_EMIT("vboAdded");
 			emit(vboAdded(vbo));
 		}
 		else
@@ -192,6 +198,7 @@ void MapHandlerGen::deleteVBO(const QString& name)
 	{
 		Utils::VBO* vbo = m_vbo[name];
 		m_vbo.remove(name);
+		DEBUG_EMIT("vboRemoved");
 		emit(vboRemoved(vbo));
 		delete vbo;
 	}
@@ -207,6 +214,7 @@ void MapHandlerGen::removeCellSelector(unsigned int orbit, const QString& name)
 	if (cs)
 	{
 		m_cellSelectors[orbit].remove(name);
+		DEBUG_EMIT("cellSelectorRemoved");
 		emit(cellSelectorRemoved(orbit, name));
 
 		disconnect(cs, SIGNAL(selectedCellsChanged()), this, SIGNAL(selectedCellsChanged()));
@@ -226,6 +234,7 @@ CellSelectorGen* MapHandlerGen::getCellSelector(unsigned int orbit, const QStrin
 void MapHandlerGen::selectedCellsChanged()
 {
 	CellSelectorGen* cs = static_cast<CellSelectorGen*>(QObject::sender());
+	DEBUG_EMIT("selectedCellsChanged");
 	emit(selectedCellsChanged(cs));
 }
 

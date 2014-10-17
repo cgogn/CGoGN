@@ -6,6 +6,7 @@
 #include "types.h"
 #include "PythonQt/PythonQt.h"
 #include "PythonQt/gui/PythonQtScriptingConsole.h"
+#include "slot_debug.h"
 
 class QVBoxLayout;
 class QSplitter;
@@ -95,11 +96,11 @@ public slots:
 	MapHandlerGen* getMap(const QString& name) const;
 	const MapSet& getMapSet() const { return m_maps; }
 
-	void notifySelectedMapChanged(MapHandlerGen* old, MapHandlerGen* cur) { emit(selectedMapChanged(old, cur)); }
+	void notifySelectedMapChanged(MapHandlerGen* old, MapHandlerGen* cur) { DEBUG_EMIT("selectedMapChanged"); emit(selectedMapChanged(old, cur)); }
 	MapHandlerGen* getSelectedMap() const;
 
 	unsigned int getCurrentOrbit() const;
-	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { emit(selectedCellSelectorChanged(cs)); }
+	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { DEBUG_EMIT("selectedCellSelectorChanged"); emit(selectedCellSelectorChanged(cs)); }
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
 
 	const StaticPointers& getStaticPointers() const {return m_sp;}

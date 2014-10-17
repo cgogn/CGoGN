@@ -58,6 +58,7 @@ AttributeHandler<T, ORBIT, typename PFP::MAP> MapHandler<PFP>::addAttribute(cons
 	if(ah.isValid() && registerAttr)
 	{
 		registerAttribute(ah);
+		DEBUG_EMIT("attributeAdded");
 		emit(attributeAdded(ORBIT, nameAttr));
 	}
 	return ah;
@@ -166,6 +167,7 @@ CellSelectorGen* MapHandler<PFP>::addCellSelector(unsigned int orbit, const QStr
 		return NULL;
 
 	m_cellSelectors[orbit].insert(name, cs);
+	DEBUG_EMIT("cellSelectorAdded");
 	emit(cellSelectorAdded(orbit, name));
 
 	connect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));

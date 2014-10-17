@@ -47,7 +47,6 @@ void Surface_RenderTopo_Plugin::disable()
 
 void Surface_RenderTopo_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
-//	std::cout << "Surface_RenderTopo_Plugin::drawMap"<< std::endl;
 	ViewMapParam& p = h_viewParameterSet[view][map];
 
 	map->getTopoRender()->setInitialDartsColor(p.dartsColor.redF(),p.dartsColor.greenF(),p.dartsColor.blueF());
@@ -58,7 +57,6 @@ void Surface_RenderTopo_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 	if (pm.needUpdate)
 	{
-//		std::cout << "NEED UPDATE"<< std::endl;
 		map->getTopoRender()->setExplodeEdge(pm.edgesScaleFactor);
 		map->getTopoRender()->setExplodeFace(pm.facesScaleFactor);
 		QString pos = m_dockTab->combo_positionAttribute->currentText();
@@ -112,7 +110,6 @@ void Surface_RenderTopo_Plugin::mapRemoved(MapHandlerGen* map)
 
 void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
-//	std::cout << "attributeAdded"<< std::endl;
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 	if(orbit == VERTEX && map == m_schnapps->getSelectedMap())
 	{

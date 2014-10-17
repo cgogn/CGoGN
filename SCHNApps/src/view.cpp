@@ -8,6 +8,8 @@
 #include "Utils/GLSLShader.h"
 #include "Algo/Geometry/boundingbox.h"
 
+#include "slot_debug.h"
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
@@ -56,6 +58,7 @@ View::~View()
 
 void View::setCurrentCamera(Camera* c)
 {
+	DEBUG_SLOT();
 	if(c != m_currentCamera && c != NULL)
 	{
 		Camera* prev = m_currentCamera;
@@ -66,6 +69,7 @@ void View::setCurrentCamera(Camera* c)
 		this->setCamera(m_currentCamera);
 		m_currentCamera->linkView(this);
 
+		DEBUG_EMIT("currentCameraChanged");
 		emit(currentCameraChanged(prev, c));
 
 		updateCurrentCameraBB();
@@ -74,7 +78,7 @@ void View::setCurrentCamera(Camera* c)
 }
 
 void View::setCurrentCamera(const QString& name)
-{
+{	
 	Camera* c = m_schnapps->getCamera(name);
 	if(c)
 		setCurrentCamera(c);
@@ -87,10 +91,12 @@ bool View::usesCamera(const QString& cameraName) const
 
 void View::linkPlugin(PluginInteraction* plugin)
 {
+	DEBUG_SLOT();
 	if(plugin && !l_plugins.contains(plugin))
 	{
 		l_plugins.push_back(plugin);
 		plugin->linkView(this);
+		DEBUG_EMIT("pluginLinked");
 		emit(pluginLinked(plugin));
 		updateGL();
 	}
@@ -105,9 +111,11 @@ void View::linkPlugin(const QString& name)
 
 void View::unlinkPlugin(PluginInteraction* plugin)
 {
+	DEBUG_SLOT();
 	if(l_plugins.removeOne(plugin))
 	{
 		plugin->unlinkView(this);
+		DEBUG_EMIT("pluginUnlinked");
 		emit(pluginUnlinked(plugin));
 		updateGL();
 	}
@@ -128,10 +136,12 @@ bool View::isLinkedToPlugin(const QString& name) const
 
 void View::linkMap(MapHandlerGen* map)
 {
+	DEBUG_SLOT();
 	if(map && !l_maps.contains(map))
 	{
 		l_maps.push_back(map);
 		map->linkView(this);
+		DEBUG_EMIT("mapLinked");
 		emit(mapLinked(map));
 
 		updateCurrentCameraBB();
@@ -154,9 +164,11 @@ void View::linkMap(const QString& name)
 
 void View::unlinkMap(MapHandlerGen* map)
 {
+	DEBUG_SLOT();
 	if(l_maps.removeOne(map))
 	{
 		map->unlinkView(this);
+		DEBUG_EMIT("mapUnlinked");
 		emit(mapUnlinked(map));
 
 		updateCurrentCameraBB();
@@ -411,15 +423,9 @@ void View::updateCurrentCameraBB()
 
 void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 {
-//	m_lastSelectedMap = cur;
+	DEBUG_SLOT();
 	if(cur && isLinkedToMap(cur))
-	{
 		setManipulatedFrame(cur->getFrame());
-//		std::cout << "in view "<< this->getName().toStdString();
-//		std::cout << " selectedMapChanged: "<< cur->getName().toStdString() << std::endl;
-	}
-//	else
-//		std::cout << "in view "<< this->getName().toStdString()<< " selectedMapChanged: NULL"<< std::endl;
 	updateGL();
 }
 
@@ -438,14 +444,8 @@ void View::ui_closeView(int x, int y, int globalX, int globalY)
 	m_schnapps->removeView(m_name);
 }
 
-void View::setLastSelectedMap(MapHandlerGen* m) {
-	m_lastSelectedMap=m;
-	std::cout << "in view "<< this->getName().toStdString();
-	if (m)
-		std::cout << " selectedMapChanged: "<< m->getName().toStdString() << std::endl;
-	else
-		std::cout << " selectedMapChanged: NULL"<< std::endl;
-}
+//void View::setLastSelectedMap(MapHandlerGen* m)
+//{m_lastSelectedMap=m;}
 
 } // namespace SCHNApps
 

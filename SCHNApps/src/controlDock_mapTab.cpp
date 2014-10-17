@@ -292,6 +292,35 @@ void ControlDock_MapTab::selectedViewChanged(View* prev, View* cur)
 		connect(cur, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(selectedViewMapLinked(MapHandlerGen*)));
 		connect(cur, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(selectedViewMapUnlinked(MapHandlerGen*)));
 	}
+
+	if( (cur->lastSelectedMap() != NULL) && (cur->isLinkedToMap(cur->lastSelectedMap())))
+	{
+		setSelectedMap(cur->lastSelectedMap()->getName());
+	}
+	else
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if ((map == NULL) || (! map->isLinkedToView(cur)))
+		{
+			bool changed = false;
+			const MapSet& ms = m_schnapps->getMapSet();
+			foreach(MapHandlerGen* mhg, ms)
+			{
+				if (mhg->isLinkedToView(cur))
+				{
+					setSelectedMap(mhg->getName());
+					changed = true;
+					break; // out of the loop, not nice but ...
+				}
+			}
+			if (!changed)// no possibility to selected a map automatically so none
+			{
+				setSelectedMap(QString("NONE"));
+			}
+		}
+	}
+
+
 }
 
 
@@ -470,19 +499,21 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 
 void ControlDock_MapTab::setSelectedMap(const QString& mapName)
 {
-	QList<QListWidgetItem *> lm = list_maps->findItems(mapName,Qt::MatchExactly);
-	if (!lm.empty())
-	{
-		lm[0]->setSelected(true);
-	}
-	else
+	if (mapName == QString("NONE"))
 	{
 		QList<QListWidgetItem*> items = list_maps->selectedItems();
 		if(!items.empty())
 		{
-			m_selectedMap = NULL;
 			items[0]->setSelected(false);
+			m_selectedMap = NULL;
 		}
+		return;
+	}
+
+	QList<QListWidgetItem *> lm = list_maps->findItems(mapName,Qt::MatchExactly);
+	if (!lm.empty())
+	{
+		lm[0]->setSelected(true);
 	}
 }
 

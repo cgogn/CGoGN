@@ -145,6 +145,7 @@ Camera* SCHNApps::addCamera(const QString& name)
 
 	Camera* camera = new Camera(name, this);
 	m_cameras.insert(name, camera);
+	DEBUG_EMIT("cameraAdded");
 	emit(cameraAdded(camera));
 	return camera;
 }
@@ -160,6 +161,7 @@ void SCHNApps::removeCamera(const QString& name)
 	if (camera && !camera->isUsed())
 	{
 		m_cameras.remove(name);
+		DEBUG_EMIT("cameraRemoved");
 		emit(cameraRemoved(camera));
 		delete camera;
 	}
@@ -189,6 +191,7 @@ View* SCHNApps::addView(const QString& name)
 		view = new View(name, this, m_firstView);
 	m_views.insert(name, view);
 
+	DEBUG_EMIT("viewAdded");
 	emit(viewAdded(view));
 
 	return view;
@@ -225,6 +228,7 @@ void SCHNApps::removeView(const QString& name)
 
 			m_views.remove(name);
 
+			DEBUG_EMIT("viewRemoved");
 			emit(viewRemoved(view));
 
 			delete view;
@@ -263,7 +267,7 @@ void SCHNApps::setSelectedView(View* view)
 	m_pluginDockTabWidget->setCurrentIndex(currentTab);
 
 
-
+	DEBUG_EMIT("selectedViewChanged");
 	emit(selectedViewChanged(oldSelected, m_selectedView));
 
 	if(oldSelected)
@@ -271,35 +275,32 @@ void SCHNApps::setSelectedView(View* view)
 	m_selectedView->updateGL();
 
 	// check if selected map is correct
-
-
-	if( (view->lastSelectedMap() != NULL) && (view->lastSelectedMap()->isLinkedToView(view)))
-	{
-		this->setSelectedMap(view->lastSelectedMap()->getName());
-	}
-	else
-	{
-		MapHandlerGen* map = this->getSelectedMap();
-		if ((map == NULL) || (! map->isLinkedToView(view)))
-		{
-			bool changed = false;
-			const MapSet& ms = this->getMapSet();
-			foreach(MapHandlerGen* mhg,ms)
-			{
-				if (mhg->isLinkedToView(view))
-				{
-					this->setSelectedMap(mhg->getName());
-					changed = true;
-					break; // out of the loop, not nice but ...
-				}
-			}
-			if (!changed)// no possibility to selected a map automatically so none
-			{
-				setSelectedMap(QString("NONE"));
-			}
-		}
-
-	}
+//	if( (view->lastSelectedMap() != NULL) && (view->lastSelectedMap()->isLinkedToView(view)))
+//	{
+//		this->setSelectedMap(view->lastSelectedMap()->getName());
+//	}
+//	else
+//	{
+//		MapHandlerGen* map = this->getSelectedMap();
+//		if ((map == NULL) || (! map->isLinkedToView(view)))
+//		{
+//			bool changed = false;
+//			const MapSet& ms = this->getMapSet();
+//			foreach(MapHandlerGen* mhg, ms)
+//			{
+//				if (mhg->isLinkedToView(view))
+//				{
+//					this->setSelectedMap(mhg->getName());
+//					changed = true;
+//					break; // out of the loop, not nice but ...
+//				}
+//			}
+//			if (!changed)// no possibility to selected a map automatically so none
+//			{
+//				setSelectedMap(QString("NONE"));
+//			}
+//		}
+//	}
 
 }
 
@@ -352,6 +353,7 @@ void SCHNApps::registerPluginsDirectory(const QString& path)
 			if(!m_availablePlugins.contains(pluginName))
 			{
 				m_availablePlugins.insert(pluginName, pluginFilePath);
+				DEBUG_EMIT("pluginAvailableAdded");
 				emit(pluginAvailableAdded(pluginName));
 			}
 		}
@@ -386,6 +388,7 @@ Plugin* SCHNApps::enablePlugin(const QString& pluginName)
 				m_plugins.insert(pluginName, plugin);
 
 				statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
+				DEBUG_EMIT("pluginEnabled");
 				emit(pluginEnabled(plugin));
 
 				// method success
@@ -439,6 +442,7 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 		loader.unload();
 
 		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
+		DEBUG_EMIT("pluginDisabled");
 		emit(pluginDisabled(plugin));
 
 		delete plugin;
@@ -532,6 +536,7 @@ MapHandlerGen* SCHNApps::addMap(const QString& name, unsigned int dim)
 
 	m_maps.insert(name, mh);
 
+	DEBUG_EMIT("mapAdded");
 	emit(mapAdded(mh));
 
 	return mh;
@@ -542,13 +547,23 @@ void SCHNApps::removeMap(const QString& name)
 	if (m_maps.contains(name))
 	{
 		MapHandlerGen* map = m_maps[name];
+		std::cout << "REMOVE MAP:"<< std::hex<< long(map) << std::dec<< std::endl;
 
 		foreach(View* view, map->getLinkedViews())
+		{
 			view->unlinkMap(map);
+			if (view->lastSelectedMap() == map)
+				view->setLastSelectedMap(NULL);
+		}
 
 		m_maps.remove(name);
 
+		DEBUG_EMIT("mapRemoved");
 		emit(mapRemoved(map));
+
+		// unselect map if it is removed
+		if (this->getSelectedMap() == map)
+			setSelectedMap(QString("NONE"));
 
 		delete map;
 	}

@@ -34,7 +34,7 @@ public:
 	const QString& getName() const { return m_name; }
 
 	MapHandlerGen* lastSelectedMap() { return m_lastSelectedMap;}
-	void setLastSelectedMap(MapHandlerGen* m);
+	void setLastSelectedMap(MapHandlerGen* m) { m_lastSelectedMap=m; }
 
 public slots:
 	QString getName() { return m_name; }
