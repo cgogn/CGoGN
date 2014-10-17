@@ -33,6 +33,9 @@ public:
 
 	const QString& getName() const { return m_name; }
 
+	MapHandlerGen* lastSelectedMap() { return m_lastSelectedMap;}
+	void setLastSelectedMap(MapHandlerGen* m) { m_lastSelectedMap=m; }
+
 public slots:
 	QString getName() { return m_name; }
 	SCHNApps* getSCHNApps() const { return m_schnapps; }
@@ -109,6 +112,7 @@ protected:
 	Camera* m_currentCamera;
 	QList<PluginInteraction*> l_plugins;
 	QList<MapHandlerGen*> l_maps;
+	MapHandlerGen* m_lastSelectedMap;
 
 	ViewButtonArea* m_buttonArea;
 

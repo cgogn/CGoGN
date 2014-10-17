@@ -1,3 +1,5 @@
+#include "Utils/Shaders/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
 
 namespace CGoGN
 {
@@ -17,7 +19,6 @@ inline QString MapHandlerGen::getAttributeTypeName(unsigned int orbit, const QSt
 	else
 		return "";
 }
-
 
 
 
@@ -57,6 +58,7 @@ AttributeHandler<T, ORBIT, typename PFP::MAP> MapHandler<PFP>::addAttribute(cons
 	if(ah.isValid() && registerAttr)
 	{
 		registerAttribute(ah);
+		DEBUG_EMIT("attributeAdded");
 		emit(attributeAdded(ORBIT, nameAttr));
 	}
 	return ah;
@@ -165,6 +167,7 @@ CellSelectorGen* MapHandler<PFP>::addCellSelector(unsigned int orbit, const QStr
 		return NULL;
 
 	m_cellSelectors[orbit].insert(name, cs);
+	DEBUG_EMIT("cellSelectorAdded");
 	emit(cellSelectorAdded(orbit, name));
 
 	connect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));
@@ -181,6 +184,51 @@ CellSelector<typename PFP::MAP, ORBIT>* MapHandler<PFP>::getCellSelector(const Q
 	else
 		return NULL;
 }
+
+template <typename PFP>
+void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* sh1)
+{
+//	std::cout << "MH:createTopo"<< std::endl;
+	if (m_topoRender)
+		return;
+
+	if (m_map->dimension() == 2)
+	{
+		CGoGN::Utils::ShaderSimpleColor* ssc =static_cast<CGoGN::Utils::ShaderSimpleColor*>(sh1);
+
+		m_topoRender = new Algo::Render::GL2::TopoRender(ssc);
+		m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
+	}
+	else
+		std::cerr << "TOPO3 NOT SUPPORTED"<< std::endl;
+}
+
+template <typename PFP>
+void MapHandler<PFP>::updateTopoRender(const QString& positionName)
+{
+	if (m_topoRender==NULL)
+		return;
+
+	typename PFP::MAP* map = this->getMap();
+
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map->getAttribute<VEC3, VERTEX, MAP>(positionName.toStdString()) ;
+	if(position.isValid())
+	{
+		m_topoRender->updateData<PFP>(*map,position,false);
+
+	}
+}
+
+template <typename PFP>
+void MapHandler<PFP>::drawTopoRender(int code)
+{
+	if (m_topoRender == NULL)
+		return;
+	m_topoRender->drawTopo(code);
+}
+
+
+
 
 } // namespace SCHNApps
 

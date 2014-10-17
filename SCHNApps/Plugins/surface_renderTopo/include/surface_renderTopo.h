@@ -5,6 +5,8 @@
 #include "surface_renderTopo_dockTab.h"
 
 #include "Algo/Render/GL2/topoRender.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
 
 namespace CGoGN
 {
@@ -12,29 +14,6 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-struct MapParameters
-{
-	MapParameters() :
-		drawDarts(true),
-		dartsColor("white"),
-		drawPhi1(true),
-		phi1Color("cyan"),
-		drawPhi2(true),
-		phi2Color("red"),
-		edgesScaleFactor(1.0f),
-		facesScaleFactor(1.0f)
-	{}
-
-	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionAttribute;
-	bool drawDarts;
-	QColor dartsColor;
-	bool drawPhi1;
-	QColor phi1Color;
-	bool drawPhi2;
-	QColor phi2Color;
-	float edgesScaleFactor;
-	float facesScaleFactor;
-};
 
 class Surface_RenderTopo_Plugin : public PluginInteraction
 {
@@ -44,6 +23,42 @@ class Surface_RenderTopo_Plugin : public PluginInteraction
 	friend class Surface_RenderTopo_DockTab;
 
 public:
+
+	struct ViewMapParam
+	{
+		ViewMapParam() :
+			drawDarts(true),
+			dartsColor("white"),
+			drawPhi1(true),
+			phi1Color("cyan"),
+			drawPhi2(true),
+			phi2Color("red")
+		{}
+
+		bool drawDarts;
+		QColor dartsColor;
+		bool drawPhi1;
+		QColor phi1Color;
+		bool drawPhi2;
+		QColor phi2Color;
+	};
+
+
+	struct MapParam
+	{
+		MapParam() :
+			edgesScaleFactor(0.95f),
+			facesScaleFactor(0.95f),
+			needUpdate(true)
+		{}
+
+		QString posAttName;
+		float edgesScaleFactor;
+		float facesScaleFactor;
+		bool needUpdate;
+	};
+
+
 	Surface_RenderTopo_Plugin()
 	{}
 
@@ -78,22 +93,32 @@ private slots:
 
 public slots:
 	// slots for Python calls
-//	void changePositionAttribute(const QString& view, const QString& map, const QString& attrName);
 //	void changeDrawDarts(const QString& view, const QString& map, bool b);
 //	void changeDartsColor(const QString& view, const QString& map, QColor c);
 //	void changeDrawPhi1(const QString& view, const QString& map, bool b);
 //	void changePhi1Color(const QString& view, const QString& map, QColor c);
 //	void changeDrawPhi2(const QString& view, const QString& map, bool b);
 //	void changePhi2Color(const QString& view, const QString& map, QColor c);
-//	void changeEdgesScaleFactor(const QString& view, const QString& map, int i);
-//	void changeFacesScaleFactor(const QString& view, const QString& map, int i);
+
+//	void changePositionAttribute(const QString& map, const QString& attrName);
+//	void changeEdgesScaleFactor(const QString& map, int i);
+//	void changeFacesScaleFactor(const QString& map, int i);
 
 //signals:
 //	void dartSelected(Dart d);
 
 protected:
 	Surface_RenderTopo_DockTab* m_dockTab;
-	QHash<View*, QHash<MapHandlerGen*, MapParameters> > h_viewParameterSet;
+
+	/// parameters that depend of view and map
+	QHash<View*, QHash<MapHandlerGen*, ViewMapParam> > h_viewParameterSet;
+
+	/// parameters that depend of map only
+	QHash<MapHandlerGen*, MapParam> h_parameterSet;
+
+	/// shader used in TopoRender
+	CGoGN::Utils::ShaderSimpleColor* m_shaderTopo1;
+
 };
 
 } // namespace SCHNApps
