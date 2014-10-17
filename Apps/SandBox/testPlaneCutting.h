@@ -103,7 +103,7 @@ public:
 	VertexAttribute<VEC3, MAP> normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_topoRender ;
+	Algo::Render::GL2::TopoRender* m_topoRender ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::VBO* m_normalVBO;

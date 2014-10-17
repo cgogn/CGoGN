@@ -21,112 +21,85 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef __SHOW_TRAVERSORS_
-#define __SHOW_TRAVERSORS_
 
-#include <iostream>
+#ifndef __CGOGN_SHADER_SFLAT__
+#define __CGOGN_SHADER_SFLAT__
 
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap3.h"
-
+#include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
-#include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Render/GL2/topoRender.h"
-#include "Topology/generic/cellmarker.h"
 
-#include "Utils/cgognStream.h"
-#include "Utils/drawer.h"
+#include <string>
 
-#include "Utils/Qt/qtSimple.h"
-
-#include "ui_show_traversors2.h"
-// inclure qtui.h juste après le ui_xxx.h
-#include "Utils/Qt/qtui.h"
-
-
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition de la carte
-	typedef EmbeddedMap2 MAP;
-};
 
-typedef PFP::MAP MAP ;
-typedef PFP::VEC3 VEC3 ;
-
-/**
- * Utilisation de designer-qt4:
- * Faire un DockWiget (laisser le nom par defaut
- * dans le Contents ajouter le layout choisi (vertical classiquement)
- * Ajouter les widgets necessaires, mettre des noms clairs pour
- * les utiliser dans le .cpp (pour les call back principalement)
- */
-class MyQT: public Utils::QT::SimpleQT
+namespace Utils
 {
-	Q_OBJECT
 
-	Algo::Render::GL2::TopoRender* m_render_topo;
-	bool m_showTopo;
-
-
-	unsigned int m_first2;
-	unsigned int m_ajd_or_inci2;
-	unsigned int m_second2;
-	float m_expl;
-	unsigned int m_last;
-public:
-	MyQT():
-		m_render_topo(NULL),
-		m_showTopo(true),
-		m_first2(0),
-		m_ajd_or_inci2(0),
-		m_second2(1),
-		m_expl(0.8f),
-		m_last(2),
-		m_selected(NIL),
-		m_dm_topo(NULL)
-	{}
-
-	Dart m_selected;
-	std::vector<Dart> m_affDarts;
-
-	Utils::Drawer m_drawer;
-
-	DartMarker<MAP>* m_dm_topo;
-
-	MAP myMap;
-
-	VertexAttribute<VEC3, MAP> position ;
-
-	Dart dglobal;
-
-	void init(char *fname);
-
+class ShaderSimpleFlat : public ClippingShader
+{
 protected:
-    void storeVerticesInfo();
+	// flag color per vertex or not
+	bool m_with_color;
+	// flag color per vertex or not
+	bool m_with_eyepos;	
 
-	void cb_redraw();
+	// shader sources OGL3
+    static std::string vertexShaderText;
+    static std::string fragmentShaderText;
 
-	void cb_initGL();
+    // uniform locations
+	CGoGNGLuint m_unif_ambiant;
+	CGoGNGLuint m_unif_diffuse;
+	CGoGNGLuint m_unif_lightPos;
 
-	void cb_Save();
+	//values
+	Geom::Vec4f m_ambiant;
+	Geom::Vec4f m_diffuse;
+	Geom::Vec3f m_lightPos;
 
-	void cb_mousePress(int button, int x, int y);
+	VBO* m_vboPos;
+	VBO* m_vboColor;
+
+	void getLocations();
+
+	void sendParams();
+
+	void restoreUniformsAttribs();
+
+public:
+	ShaderSimpleFlat(bool doubleSided = false);
+
+	// inviduals parameter setting functions
+	void setAmbiant(const Geom::Vec4f& ambiant);
+
+	void setDiffuse(const Geom::Vec4f& diffuse);
 
 
-	void traverse2();
-	void dynamicMarkOrbit(unsigned int orb);
+	void setLightPosition(const Geom::Vec3f& lp);
+	
+	const Geom::Vec4f& getAmbiant() const { return m_ambiant; }
 
-// slots locaux
-public slots:
-	void cb_combo4(int x);
-	void cb_combo5(int x);
-	void cb_combo6(int x);
+	const Geom::Vec4f& getDiffuse() const { return m_diffuse; }
 
-	void cb_checkTopo(bool b);
-	void cb_explode(int x);
+	const Geom::Vec3f& getLightPosition() const { return m_lightPos; }
+
+	/**
+	 * set all parameter in on call (one bind also)
+	 */
+	void setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos);
+
+	// attributes
+	unsigned int setAttributePosition(VBO* vbo);
+
+	// optional attributes
+	unsigned int setAttributeColor(VBO* vbo);
+	void unsetAttributeColor();
 };
+
+} // namespace Utils
+
+} // namespace CGoGN
 
 #endif

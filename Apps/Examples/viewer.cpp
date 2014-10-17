@@ -83,7 +83,7 @@ void Viewer::cb_initGL()
 	Utils::GLSLShader::areShadersSupported();
 
 	m_render = new Algo::Render::GL2::MapRender() ;
-	m_topoRender = new Algo::Render::GL2::TopoRenderMap<PFP>() ;
+	m_topoRender = new Algo::Render::GL2::TopoRender() ;
 
 	m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
 
@@ -98,12 +98,12 @@ void Viewer::cb_initGL()
 	m_phongShader->setSpecular(colSpec) ;
 	m_phongShader->setShininess(shininess) ;
 
-	m_flatShader = new Utils::ShaderFlat() ;
+	m_flatShader = new Utils::ShaderSimpleFlat() ;
 	m_flatShader->setAttributePosition(m_positionVBO) ;
 	m_flatShader->setAmbiant(colClear) ;
 	m_flatShader->setDiffuse(colDif) ;
-	m_flatShader->setDiffuseBack(Geom::Vec4f(0,0,0,0)) ;
-	m_flatShader->setExplode(faceShrinkage) ;
+//	m_flatShader->setDiffuseBack(Geom::Vec4f(0,0,0,0)) ;
+//	m_flatShader->setExplode(faceShrinkage) ;
 
 	m_vectorShader = new Utils::ShaderVectorPerVertex() ;
 	m_vectorShader->setAttributePosition(m_positionVBO) ;
@@ -130,12 +130,14 @@ void Viewer::cb_redraw()
 {
 	if(m_drawVertices)
 	{
+		glDepthFunc(GL_LEQUAL);
 		m_pointSprite->setSize(vertexScaleFactor) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
 	}
 
 	if(m_drawEdges)
 	{
+		glDepthFunc(GL_LEQUAL);
 		glLineWidth(1.0f) ;
 		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES) ;
 	}
@@ -146,10 +148,10 @@ void Viewer::cb_redraw()
 		glEnable(GL_LIGHTING) ;
 		glEnable(GL_POLYGON_OFFSET_FILL) ;
 		glPolygonOffset(1.0f, 1.0f) ;
+		glDepthFunc(GL_LESS);
 		switch(m_renderStyle)
 		{
 			case FLAT :
-				m_flatShader->setExplode(faceShrinkage) ;
 				m_render->draw(m_flatShader, Algo::Render::GL2::TRIANGLES) ;
 				break ;
 			case PHONG :
@@ -161,6 +163,7 @@ void Viewer::cb_redraw()
 
 	if(m_drawTopo)
 	{
+		glDepthFunc(GL_LEQUAL);
 		m_topoRender->drawTopo() ;
 	}
 
@@ -543,7 +546,7 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
-	m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;

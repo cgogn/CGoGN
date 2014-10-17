@@ -447,13 +447,13 @@ int main(int argc, char **argv)
 	{
 		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
-		int nb = 8;
+		int nb = 64;
 		Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
 		cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
 		for (unsigned int i = position.begin(); i != position.end(); position.next(i))
 		{
-			VEC3 pert(float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0));
+			VEC3 pert(float(double(rand())/RAND_MAX/200.0),float(double(rand())/RAND_MAX/200.0),float(double(rand())/RAND_MAX/200.0));
 			position[i]+= pert;
 		}
 

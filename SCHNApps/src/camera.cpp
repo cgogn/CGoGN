@@ -24,6 +24,7 @@ Camera::~Camera()
 void Camera::setProjectionType(int t)
 {
 	setType(qglviewer::Camera::Type(t));
+	DEBUG_EMIT("projectionTypeChanged");
 	emit(projectionTypeChanged(t));
 	foreach(View* view, m_schnapps->getViewSet().values())
 		view->updateGL();
@@ -32,6 +33,7 @@ void Camera::setProjectionType(int t)
 void Camera::setDraw(bool b)
 {
 	m_draw = b;
+	DEBUG_EMIT("drawChanged");
 	emit(drawChanged(b));
 	foreach(View* view, m_schnapps->getViewSet().values())
 		view->updateGL();
@@ -40,6 +42,7 @@ void Camera::setDraw(bool b)
 void Camera::setDrawPath(bool b)
 {
 	m_drawPath = b;
+	DEBUG_EMIT("drawPathChanged");
 	emit(drawPathChanged(b));
 	foreach(View* view, m_schnapps->getViewSet().values())
 		view->updateGL();

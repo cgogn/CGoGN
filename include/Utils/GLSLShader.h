@@ -391,6 +391,7 @@ public:
 	 */
 	void updateMatrices(const glm::mat4& projection, const glm::mat4& modelview, const glm::mat4& PMV, const glm::mat4& normalMatrix);
 
+	void updateMatrices(const Utils::GLSLShader *sh);
 
 	/**
 	 * bind, enable, and set all vertex attrib pointers

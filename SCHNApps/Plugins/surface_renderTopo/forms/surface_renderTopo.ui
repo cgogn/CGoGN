@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>207</width>
+    <width>337</width>
     <height>600</height>
    </rect>
   </property>
@@ -14,8 +14,37 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0" colspan="3">
+    <widget class="QCheckBox" name="check_drawPhi1">
+     <property name="text">
+      <string>draw phi1</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="4">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="2" column="3">
     <widget class="ColorComboBox" name="combo_phi1Color"/>
+   </item>
+   <item row="3" column="3">
+    <widget class="ColorComboBox" name="combo_phi2Color"/>
+   </item>
+   <item row="1" column="3">
+    <widget class="ColorComboBox" name="combo_dartsColor"/>
    </item>
    <item row="3" column="0" colspan="3">
     <widget class="QCheckBox" name="check_drawPhi2">
@@ -27,23 +56,27 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QCheckBox" name="check_drawPhi1">
+   <item row="13" column="0" colspan="2">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>draw phi1</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
+      <string>explod faces</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
-    <widget class="ColorComboBox" name="combo_dartsColor"/>
+   <item row="13" column="2" colspan="2">
+    <widget class="QSlider" name="slider_facesScaleFactor">
+     <property name="value">
+      <number>50</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
-   <item row="0" column="1" colspan="3">
+   <item row="10" column="2" colspan="2">
     <widget class="QComboBox" name="combo_positionAttribute">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -55,17 +88,7 @@
      </item>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>explod edges</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="ColorComboBox" name="combo_phi2Color"/>
-   </item>
-   <item row="4" column="2" colspan="2">
+   <item row="12" column="2" colspan="2">
     <widget class="QSlider" name="slider_edgesScaleFactor">
      <property name="value">
       <number>50</number>
@@ -75,17 +98,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="2" colspan="2">
-    <widget class="QSlider" name="slider_facesScaleFactor">
-     <property name="value">
-      <number>50</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="4">
+   <item row="15" column="0" colspan="4">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -98,10 +111,22 @@
      </property>
     </spacer>
    </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>explod faces</string>
+   <item row="6" column="0" colspan="3">
+    <widget class="Line" name="line_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>230</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -115,10 +140,36 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
+   <item row="12" column="0" colspan="2">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>explod edges</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Position :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="4">
+    <widget class="QLabel" name="label_map_param">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Per map parameters</string>
      </property>
     </widget>
    </item>
@@ -132,7 +183,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>combo_positionAttribute</tabstop>
   <tabstop>check_drawDarts</tabstop>
   <tabstop>combo_dartsColor</tabstop>
   <tabstop>check_drawPhi1</tabstop>

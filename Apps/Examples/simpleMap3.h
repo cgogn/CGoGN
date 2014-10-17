@@ -58,7 +58,7 @@ public:
 	VertexAttribute<VEC3, MAP> position ;
 
 	Algo::Render::GL2::Topo3RenderMap<PFP>* m_render_topo;
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo_boundary;
+	Algo::Render::GL2::TopoRender* m_render_topo_boundary;
 	Algo::Render::GL2::Topo3PrimalRender<PFP>* m_render_topo_primal;
 
 	SimpleMap3() ;
