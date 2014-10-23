@@ -211,7 +211,7 @@ void MapHandler<PFP>::updateTopoRender(const QString& positionName)
 
 	typename PFP::MAP* map = this->getMap();
 
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map->getAttribute<VEC3, VERTEX, MAP>(positionName.toStdString()) ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map->template getAttribute<VEC3, VERTEX, MAP>(positionName.toStdString()) ;
 	if(position.isValid())
 	{
 		m_topoRender->updateData<PFP>(*map,position,false);
