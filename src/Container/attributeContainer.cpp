@@ -925,5 +925,33 @@ void AttributeContainer::dumpByLines() const
 }
 
 
+AttributeMultiVectorGen* AttributeContainer::addAttribute(const std::string& typeName, const std::string& attribName)
+{
+	// first check if attribute already exist
+	unsigned int index = UNKNOWN ;
+	if (attribName != "")
+	{
+		index = getAttributeIndex(attribName) ;
+		if (index != UNKNOWN)
+		{
+			CGoGNerr << "attribute " << attribName << " already found.." << CGoGNendl ;
+			return NULL ;
+		}
+	}
+
+	// create the new attribute
+	std::map<std::string, RegisteredBaseAttribute*>::iterator itAtt = m_attributes_registry_map->find(typeName);
+	if (itAtt == m_attributes_registry_map->end())
+	{
+		CGoGNerr << "type " << typeName << " not registred.." << CGoGNendl ;
+		return NULL ;
+	}
+
+	RegisteredBaseAttribute* ra = itAtt->second;
+	AttributeMultiVectorGen* amv = ra->addAttribute(*this, attribName);
+
+	return amv ;
+}
+
 
 }
