@@ -106,6 +106,11 @@ public slots:
 	void changeRenderFaces(const QString& view, const QString& map, bool b);
 	void changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style);
 	void changeRenderBoundary(const QString& view, const QString& map, bool b);
+	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
+	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
+	void changeVertexColor(const QString& view, const QString& map, float r, float g, float b);
+
+
 
 protected:
 	Surface_Render_DockTab* m_dockTab;

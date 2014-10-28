@@ -31,6 +31,8 @@ public:
 	unsigned int getCurrentOrbit();
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) { return m_selectedSelector[orbit]; }
 
+	void setSelectedMap(const QString& mapName);
+
 private slots:
 	// slots called from UI actions
 	void selectedMapChanged();

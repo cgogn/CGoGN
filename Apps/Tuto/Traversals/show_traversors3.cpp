@@ -126,8 +126,10 @@ void MyQT::cb_redraw()
 {
     if (m_showTopo)
     {
+		glDepthFunc(GL_LESS);
         m_render_topo->drawTopo();
 
+		glDepthFunc(GL_LEQUAL);
         if (m_selected != NIL)
             m_render_topo->overdrawDart(m_selected, 7, 1.0f, 0.0f, 1.0f);
 

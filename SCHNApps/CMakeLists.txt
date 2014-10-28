@@ -15,6 +15,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 
+SET( SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
+
 
 find_package(OpenGL REQUIRED)
 find_package(Boost COMPONENTS regex system REQUIRED)
@@ -48,12 +50,15 @@ ELSE()
 	SET(CGoGN_LIBS topology algo container utils)
 ENDIF()
 
-IF (DEFINED ASSERTON)
+IF(DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
-ELSE (DEFINED ASSERTON)
+ELSE(DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=false)
 ENDIF (DEFINED ASSERTON)
 
+IF(SLOT_DEBUG_MODE)
+	add_definitions(-DSLOT_DEBUG_MODE=1)
+ENDIF()
 
 # define includes of external libs 
 SET (EXT_INCLUDES 
