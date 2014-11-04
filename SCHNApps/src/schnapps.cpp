@@ -132,6 +132,8 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 
 SCHNApps::~SCHNApps()
 {
+	// TODO check that cameras are destructed
+	m_cameras.clear();
 }
 
 /*********************************************************
@@ -178,6 +180,14 @@ Camera* SCHNApps::getCamera(const QString& name) const
 /*********************************************************
  * MANAGE VIEWS
  *********************************************************/
+
+void SCHNApps::redrawAllViews()
+{
+	foreach(View *v, m_views)
+	{
+		v->updateGL();
+	}
+}
 
 View* SCHNApps::addView(const QString& name)
 {
@@ -547,13 +557,9 @@ void SCHNApps::removeMap(const QString& name)
 	if (m_maps.contains(name))
 	{
 		MapHandlerGen* map = m_maps[name];
-		std::cout << "REMOVE MAP:"<< std::hex<< long(map) << std::dec<< std::endl;
-
 		foreach(View* view, map->getLinkedViews())
 		{
 			view->unlinkMap(map);
-			if (view->lastSelectedMap() == map)
-				view->setLastSelectedMap(NULL);
 		}
 
 		m_maps.remove(name);
@@ -781,6 +787,21 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", getAppPath(), "Python script (*.py)");
 	loadPythonScriptFromFile(fileName);
+}
+
+void SCHNApps::closeEvent(QCloseEvent *event)
+{
+	foreach(View *v, m_views)
+	{
+		v->closeDialogs();
+	}
+
+	foreach(Plugin *p, m_plugins)
+	{
+		emit(appsFinished());
+	}
+
+	QMainWindow::closeEvent(event);
 }
 
 } // namespace SCHNApps

@@ -37,6 +37,9 @@ bool Surface_DifferentialProperties_Plugin::enable()
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
+	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+
+
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapAdded(map);
 
@@ -56,6 +59,8 @@ void Surface_DifferentialProperties_Plugin::disable()
 
 	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+
+	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
 }
 
 void Surface_DifferentialProperties_Plugin::mapAdded(MapHandlerGen *map)
@@ -213,6 +218,7 @@ void Surface_DifferentialProperties_Plugin::computeNormal(
 	mh->notifyAttributeModification(normal);
 }
 
+
 void Surface_DifferentialProperties_Plugin::computeCurvature(
 	const QString& mapName,
 	const QString& positionAttributeName,
@@ -302,6 +308,13 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 		mh->notifyAttributeModification(kgaussian);
 	}
 }
+
+void Surface_DifferentialProperties_Plugin::appsFinished()
+{
+	m_computeNormalDialog->close();
+	m_computeCurvatureDialog->close();
+}
+
 
 Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
 

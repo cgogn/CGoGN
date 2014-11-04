@@ -28,22 +28,25 @@ private slots:
 	void cameraProjectionChanged(QAbstractButton* b);
 	void cameraDrawClicked(bool b);
 	void cameraDrawPathClicked(bool b);
+	void cameraSelectionChanged();
 
 	// slots called from SCHNApps signals
 	void cameraAdded(Camera* c);
 	void cameraRemoved(Camera* c);
-	void selectedViewChanged(View* prev, View* cur);
+//	void selectedViewChanged(View* prev, View* cur);
+
 
 	// slots called from selected View signals
-	void selectedViewCurrentCameraChanged(Camera* prev, Camera* cur);
+//	void selectedViewCurrentCameraChanged(Camera* prev, Camera* cur);
 
 	// slots called from current Camera signals
-	void currentCameraProjectionTypeChanged(int t);
-	void currentCameraDrawChanged(bool b);
-	void currentCameraDrawPathChanged(bool b);
+//	void currentCameraProjectionTypeChanged(int t);
+//	void currentCameraDrawChanged(bool b);
+//	void currentCameraDrawPathChanged(bool b);
 
 private:
 	void updateCurrentCameraInfo();
+	Camera* currentCam();
 
 	SCHNApps* m_schnapps;
 	bool b_updatingUI;

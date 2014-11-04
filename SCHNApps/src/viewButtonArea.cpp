@@ -100,6 +100,11 @@ void ViewButtonArea::setTopRightPosition(int x, int y)
 	m_form.moveTopRight(QPoint(x,y));
 }
 
+void ViewButtonArea::setTopLeftPosition(int x, int y)
+{
+	m_form.moveTopLeft(QPoint(x+ViewButton::SPACE,y));
+}
+
 void ViewButtonArea::draw()
 {
 	int p_x = m_form.x();
