@@ -31,7 +31,7 @@
 #include <algorithm>
 #include "Utils/cgognStream.h"
 
-#include "glm/gtx/inverse_transpose.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
 
 
 namespace CGoGN
@@ -1083,7 +1083,7 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 
 	if (*m_uniMat_Normal >= 0)
 	{
-		glm::mat4 normalMatrix = glm::gtx::inverse_transpose::inverseTranspose(modelview);
+		glm::mat4 normalMatrix = glm::inverseTranspose(modelview);
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
 	}
 
@@ -1182,7 +1182,7 @@ void GLSLShader::updateCurrentMatrices()
 	model *= currentTransfo();
 
 	currentPMV() = currentProjection() * model;
-	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
+	currentNormalMatrix() = glm::inverseTranspose(model);
 
 	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders->begin(); it != m_registeredShaders->end(); ++it)
 		it->second->updateMatrices(currentProjection(), model, currentPMV(), currentNormalMatrix());
@@ -1209,7 +1209,7 @@ void GLSLShader::updateAllFromGLMatrices()
 	model = currentTransfo() * model;
 
 	currentPMV() = proj * model;
-	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
+	currentNormalMatrix() = glm::inverseTranspose(model);
 
 	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders->begin(); it != m_registeredShaders->end(); ++it)
 		it->second->updateMatrices(proj, model, currentPMV(), currentNormalMatrix());

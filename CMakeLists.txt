@@ -84,6 +84,7 @@ ENDIF (WITH_GLEWMX)
 
 
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
+add_definitions(-DGLM_FORCE_RADIANS)
 
 # define includes of external libs 
 SET (CGoGN_EXT_INCLUDES
