@@ -796,10 +796,7 @@ void SCHNApps::closeEvent(QCloseEvent *event)
 		v->closeDialogs();
 	}
 
-	foreach(Plugin *p, m_plugins)
-	{
 		emit(appsFinished());
-	}
 
 	QMainWindow::closeEvent(event);
 }
