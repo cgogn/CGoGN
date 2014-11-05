@@ -151,6 +151,9 @@ IF (WITH_GLEWMX)
 	ADD_DEFINITIONS(-DGLEW_MX)
 ENDIF (WITH_GLEWMX)
 
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")	
+endif()
 
 # qq definition specifiques pour mac
 #IF(APPLE)
