@@ -219,8 +219,10 @@ void ControlDock_MapTab::removeSelector()
 void ControlDock_MapTab::mapAdded(MapHandlerGen* m)
 {
 	b_updatingUI = true;
-	QListWidgetItem* item = new QListWidgetItem(m->getName(), list_maps);
+//	QListWidgetItem* item = new QListWidgetItem(m->getName(), list_maps);
 //	item->setCheckState(Qt::Unchecked);
+
+	new QListWidgetItem(m->getName(), list_maps);
 	b_updatingUI = false;
 }
 

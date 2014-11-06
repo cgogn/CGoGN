@@ -28,7 +28,7 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	m_name(name),
 	m_schnapps(s),
 	m_currentCamera(NULL),
-	m_lastSelectedMap(NULL),
+//	m_lastSelectedMap(NULL),
 	m_buttonArea(NULL),
 	m_closeButton(NULL),
 	m_VsplitButton(NULL),

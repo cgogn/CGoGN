@@ -109,7 +109,8 @@ void ControlDock_PluginTab::pluginEnabled(Plugin *plugin)
 	if(!av.empty())
 		delete av[0];
 
-	QListWidgetItem* item = new QListWidgetItem(pluginName, list_pluginsEnabled);
+//	QListWidgetItem* item = new QListWidgetItem(pluginName, list_pluginsEnabled);
+	new QListWidgetItem(pluginName, list_pluginsEnabled);
 
 	// only interaction plugins are checkable (i.e. can be associated to a view)
 //	PluginInteraction* p = dynamic_cast<PluginInteraction*>(plugin);
