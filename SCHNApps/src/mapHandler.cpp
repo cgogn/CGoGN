@@ -17,6 +17,7 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 
 {
 	m_frame = new qglviewer::ManipulatedFrame();
+	connect(m_frame, SIGNAL(manipulated()), this, SLOT(frameModified()));
 }
 
 MapHandlerGen::~MapHandlerGen()
@@ -271,6 +272,7 @@ void MapHandlerGen::deleteTopoRender()
 	if (m_topoRender)
 		delete m_topoRender;
 }
+
 
 } // namespace SCHNApps
 

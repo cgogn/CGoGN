@@ -29,6 +29,7 @@ public:
 private slots:
 	void openSubdivisionDialog();
 	void subdivideFromDialog();
+	void appsFinished();
 
 public slots:
 	void loopSubdivision(

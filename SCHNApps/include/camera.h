@@ -26,6 +26,12 @@ public:
 	~Camera();
 	const QString& getName() const { return m_name; }
 
+	void updateParams();
+
+	void drawBBCam();
+
+	bool m_drawBB;
+
 public slots:
 	QString getName() { return m_name; }
 	SCHNApps* getSCHNApps() const { return m_schnapps; }
@@ -40,17 +46,23 @@ public slots:
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
+	bool isLinkedToMap(MapHandlerGen* mhg) const;
+
 private:
 	void linkView(View* view);
 	void unlinkView(View* view);
 
 private slots:
 	void frameModified();
+	void mapAdded(MapHandlerGen* mhg);
+	void mapRemoved(MapHandlerGen* mhg);
+	void BBModified();
 
 public slots:
 	void setProjectionType(int t);
 	void setDraw(bool b);
 	void setDrawPath(bool b);
+
 
 signals:
 	void projectionTypeChanged(int);
@@ -58,6 +70,10 @@ signals:
 	void drawPathChanged(bool);
 
 protected:
+	qglviewer::Vec m_bbMin;
+	qglviewer::Vec m_bbMax;
+
+
 	QString m_name;
 	SCHNApps* m_schnapps;
 

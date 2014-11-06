@@ -125,6 +125,16 @@ public:
 	 *        ATTRIBUTES MANAGEMENT         *
 	 ****************************************/
 
+
+	/**
+	* Create an attribute for a given orbit
+	* @param typeName type  in aa string
+	* @param nameAttr attribute name
+	* @return true if created
+	*/
+	template <unsigned int ORBIT>
+	bool addAttribute(const std::string& typeName, const std::string& nameAttr);
+
 	/**
 	* Create an attribute for a given orbit
 	* @param nameAttr attribute name

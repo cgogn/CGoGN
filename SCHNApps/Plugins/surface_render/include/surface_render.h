@@ -67,6 +67,8 @@ public:
 	~Surface_Render_Plugin()
 	{}
 
+
+
 private:
 	virtual bool enable();
 	virtual void disable();
@@ -94,6 +96,8 @@ private slots:
 	// slots called from MapHandler signals
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
+
+	void appsFinished();
 
 
 public slots:

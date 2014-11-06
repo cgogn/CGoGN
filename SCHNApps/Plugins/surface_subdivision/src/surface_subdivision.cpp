@@ -125,6 +125,12 @@ void Surface_Subdivision_Plugin::trianguleFaces(
 		view->updateGL();
 }
 
+void Surface_Subdivision_Plugin::appsFinished()
+{
+	m_subdivisionDialog->close();
+}
+
+
 Q_EXPORT_PLUGIN2(Surface_Subdivision_Plugin, Surface_Subdivision_Plugin)
 
 } // namespace SCHNApps
