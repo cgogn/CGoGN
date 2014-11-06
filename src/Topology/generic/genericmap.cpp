@@ -166,24 +166,22 @@ GenericMap::~GenericMap()
 
 	// clean type registry if necessary
 
-	if (s_instances->size() == 0)
-	{
-		for (std::map<std::string, RegisteredBaseAttribute*>::iterator it =  m_attributes_registry_map->begin(); it != m_attributes_registry_map->end(); ++it)
-			delete it->second;
+//	if (s_instances->size() == 0)
+//	{
+//		for (std::map<std::string, RegisteredBaseAttribute*>::iterator it =  m_attributes_registry_map->begin(); it != m_attributes_registry_map->end(); ++it)
+//			delete it->second;
 
-		delete m_attributes_registry_map;
-		m_attributes_registry_map = NULL;
+//		delete m_attributes_registry_map;
+//		m_attributes_registry_map = NULL;
 
-		for(unsigned int i = 0; i < NB_THREAD; ++i)
-		{
-			for (auto it =s_vdartsBuffers[i].begin(); it != s_vdartsBuffers[i].end(); ++it)
-				delete *it;
-			for (auto it =s_vintsBuffers[i].begin(); it != s_vintsBuffers[i].end(); ++it)
-				delete *it;
-		}
-
-
-	}
+//		for(unsigned int i = 0; i < NB_THREAD; ++i)
+//		{
+//			for (auto it =s_vdartsBuffers[i].begin(); it != s_vdartsBuffers[i].end(); ++it)
+//				delete *it;
+//			for (auto it =s_vintsBuffers[i].begin(); it != s_vintsBuffers[i].end(); ++it)
+//				delete *it;
+//		}
+//	}
 }
 
 bool GenericMap::askManipulate(MapManipulator* ptr)

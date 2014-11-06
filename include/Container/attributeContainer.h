@@ -161,6 +161,15 @@ public:
 	template <typename T>
 	AttributeMultiVector<T>* addAttribute(const std::string& attribName);
 
+	/**
+	 * add a new attribute to the container
+	 * @param typeName type of the new attribute in a string
+	 * @param attribName name of the new attribute
+	 * @return pointer to the new AttributeMultiVectorGen (unknown type inside)
+	 */
+	AttributeMultiVectorGen* addAttribute(const std::string& typeName, const std::string& attribName);
+
+
 protected:
 	/**
 	 * add a new attribute with a given index (for load only)

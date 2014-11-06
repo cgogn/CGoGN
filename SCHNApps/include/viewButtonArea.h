@@ -69,6 +69,8 @@ public:
 
 	void setTopRightPosition(int x, int y);
 
+	void setTopLeftPosition(int x, int y);
+
 	void draw();
 
 protected:

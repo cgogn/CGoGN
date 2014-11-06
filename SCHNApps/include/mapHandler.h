@@ -51,8 +51,8 @@ public slots:
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
-	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
+//	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
+//	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	float getBBdiagSize() const { return m_bbDiagSize; }
 
 	Utils::GLSLShader* getBBDrawerShader() const
@@ -77,9 +77,12 @@ public slots:
 		return matrix;
 	}
 
+	void frameModified() { DEBUG_EMIT("frameModified");emit(BBisModified());}
+
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
 	virtual void drawBB() = 0;
+	virtual void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
 
 	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
@@ -181,6 +184,8 @@ signals:
 	void cellSelectorRemoved(unsigned int orbit, const QString& name);
 	void selectedCellsChanged(CellSelectorGen* cs);
 
+	void BBisModified();
+
 protected:
 	QString m_name;
 	SCHNApps* m_schnapps;
@@ -252,6 +257,9 @@ public:
 
 	void updateBB(const VertexAttribute<VEC3, MAP>& position);
 	void updateBBDrawer();
+
+	void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax);
+
 
 	/*********************************************************
 	 * MANAGE TOPO DRAWING

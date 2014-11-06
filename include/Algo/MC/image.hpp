@@ -455,7 +455,7 @@ bool Image<DataType>::loadVTKBinaryMask(const char* filename)
 
 
 template< typename  DataType >
-bool Image<DataType>::loadIPB(const char* filename)
+bool Image<DataType>::loadIPB(const char* /*filename*/)
 {
 	// chargement fichier
 

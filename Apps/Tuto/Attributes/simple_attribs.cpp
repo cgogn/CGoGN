@@ -55,7 +55,7 @@ void testVAbyNames(MAP& map, const std::string& name)
 	if (testPos.isValid())
 		std::cout << "Attribute "<< name <<" valid"<< std::endl;
 	else
-		std::cout << "Attribute "<< name <<"invalid"<< std::endl;
+		std::cout << "Attribute "<< name <<" invalid"<< std::endl;
 }
 
 /**
@@ -240,6 +240,7 @@ int main()
 	computeNewPositions(myMap,positionAtt);
 	dumpAttribute(positionAtt);
 
+
 	//check if there is a Vertex Attribute of VEC3 named position => yes
 	testVAbyNames(myMap,"position");
 
@@ -247,7 +248,29 @@ int main()
 	myMap.removeAttribute(positionAtt);
 
 	//check if there is a Vertex Attribute of VEC3 named position => no
+	std::cout << "after removing position"<< std::endl;
 	testVAbyNames(myMap,"position");
+
+
+	// its also possible to add an attribute only with name of type in a string (if type has been registred)
+	if (myMap.addAttribute<VERTEX>("double", "pipo_double"))
+	{
+		VertexAttribute<double, MAP> position_double = myMap.getAttribute<double, VERTEX, MAP>("pipo_double");
+		position_double[v] = 3.1415926;
+	}
+
+	if (!myMap.addAttribute<VERTEX>("double", "pipo_double"))
+	{
+		std::cout << "problem"<< std::endl;
+	}
+
+	if (!myMap.addAttribute<VERTEX>("triple", "pipo_triple"))
+	{
+		std::cout << "problem"<< std::endl;
+	}
+
+
+
 
 	return 0;
 }

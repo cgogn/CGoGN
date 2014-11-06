@@ -24,28 +24,64 @@ unsigned int View::viewCount = 0;
 
 View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	QGLViewer(NULL, shareWidget),
+	b_updatingUI(false),
 	m_name(name),
 	m_schnapps(s),
 	m_currentCamera(NULL),
-	m_lastSelectedMap(NULL),
+//	m_lastSelectedMap(NULL),
 	m_buttonArea(NULL),
 	m_closeButton(NULL),
 	m_VsplitButton(NULL),
-	m_HsplitButton(NULL)
+	m_HsplitButton(NULL),
+	m_buttonAreaLeft(NULL),
+	m_mapsButton(NULL),
+	m_pluginsButton(NULL),
+	m_camerasButton(NULL),
+	m_dialogMaps(NULL)
 {
 	++viewCount;
 
 	m_currentCamera = m_schnapps->addCamera();
+	m_currentCamera->linkView(this);
 
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
+
+	m_dialogMaps = new ListPopUp("Linked Maps");
+	m_dialogPlugins = new ListPopUp("Enabled Plugins");
+	m_dialogCameras = new ListPopUp("Cameras");
+
+//	setCurrentCamera(m_schnapps->addCamera());
+
+	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	connect(m_dialogMaps->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
+
+	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
+		mapAdded(map);
+
+	connect(m_schnapps, SIGNAL(pluginEnabled(Plugin*)), this, SLOT(pluginEnabled(Plugin*)));
+	connect(m_schnapps, SIGNAL(pluginDisabled(Plugin*)), this, SLOT(pluginDisabled(Plugin*)));
+	connect(m_dialogPlugins->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(pluginCheckStateChanged(QListWidgetItem*)));
+
+	foreach(Plugin* plug, m_schnapps->getPluginSet().values())
+		pluginEnabled(plug);
+
+	connect(m_schnapps, SIGNAL(cameraAdded(Camera*)), this, SLOT(cameraAdded(Camera*)));
+	connect(m_schnapps, SIGNAL(cameraRemoved(Camera*)), this, SLOT(cameraRemoved(Camera*)));
+	connect(m_dialogCameras->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(cameraCheckStateChanged(QListWidgetItem*)));
+
+	foreach(Camera* cam, m_schnapps->getCameraSet().values())
+		cameraAdded(cam);
+
+	m_dialogCameras->check(m_currentCamera->getName(),Qt::Checked);
 }
 
 View::~View()
 {
 	qglviewer::Camera* c = new qglviewer::Camera();
 	this->setCamera(c);
-
 	m_currentCamera->unlinkView(this);
+
 
 	foreach(PluginInteraction* p, l_plugins)
 		unlinkPlugin(p);
@@ -53,12 +89,25 @@ View::~View()
 	foreach(MapHandlerGen* m, l_maps)
 		unlinkMap(m);
 
+
 	delete m_buttonArea;
+	delete m_buttonAreaLeft;
+
+	delete m_dialogMaps;
+	delete m_dialogPlugins;
+	delete m_dialogCameras;
+}
+
+void View::closeDialogs()
+{
+	m_dialogMaps->close();
+	m_dialogPlugins->close();
+	m_dialogCameras->close();
 }
 
 void View::setCurrentCamera(Camera* c)
 {
-	DEBUG_SLOT();
+//	DEBUG_SLOT();
 	if(c != m_currentCamera && c != NULL)
 	{
 		Camera* prev = m_currentCamera;
@@ -69,10 +118,36 @@ void View::setCurrentCamera(Camera* c)
 		this->setCamera(m_currentCamera);
 		m_currentCamera->linkView(this);
 
-		DEBUG_EMIT("currentCameraChanged");
-		emit(currentCameraChanged(prev, c));
+//		DEBUG_EMIT("currentCameraChanged");
+//		emit(currentCameraChanged(prev, c));
 
-		updateCurrentCameraBB();
+		if(prev)
+		{
+			QListWidgetItem* prevItem = m_dialogCameras->findItem(prev->getName());
+			if(prevItem)
+			{
+				b_updatingUI = true;
+				prevItem->setCheckState(Qt::Unchecked);
+				b_updatingUI = false;
+			}
+		}
+		if(m_currentCamera)
+		{
+			QListWidgetItem* curItem = m_dialogCameras->findItem(m_currentCamera->getName());
+			if(curItem)
+			{
+				b_updatingUI = true;
+				curItem->setCheckState(Qt::Checked);
+				b_updatingUI = false;
+			}
+		}
+
+//		b_updatingUI = true;
+//		m_dialogCameras->check(c->getName(),Qt::Checked);
+//		b_updatingUI = false;
+
+//		updateCurrentCameraBB();
+		m_currentCamera->updateParams();
 		updateGL();
 	}
 }
@@ -98,6 +173,11 @@ void View::linkPlugin(PluginInteraction* plugin)
 		plugin->linkView(this);
 		DEBUG_EMIT("pluginLinked");
 		emit(pluginLinked(plugin));
+
+		b_updatingUI = true;
+		m_dialogPlugins->check(plugin->getName(),Qt::Checked);
+		b_updatingUI = false;
+
 		updateGL();
 	}
 }
@@ -117,6 +197,11 @@ void View::unlinkPlugin(PluginInteraction* plugin)
 		plugin->unlinkView(this);
 		DEBUG_EMIT("pluginUnlinked");
 		emit(pluginUnlinked(plugin));
+
+		b_updatingUI = true;
+		m_dialogPlugins->check(plugin->getName(),Qt::Unchecked);
+		b_updatingUI = false;
+
 		updateGL();
 	}
 }
@@ -144,14 +229,20 @@ void View::linkMap(MapHandlerGen* map)
 		DEBUG_EMIT("mapLinked");
 		emit(mapLinked(map));
 
-		updateCurrentCameraBB();
+		std::cout << "View::linkMap Maps:"<<map->getName().toStdString()<< std::endl;
+		m_currentCamera->updateParams();
 		updateGL();
 
-		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
+//		connect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
+//		connect(map->getFrame(), SIGNAL(modified()), m_currentCamera, SLOT(BBModified(map)));
 		connect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
 
 		if(map->isSelectedMap())
 			setManipulatedFrame(map->getFrame());
+
+		b_updatingUI = true;
+		m_dialogMaps->check(map->getName(),Qt::Checked);
+		b_updatingUI = false;
 	}
 }
 
@@ -171,7 +262,8 @@ void View::unlinkMap(MapHandlerGen* map)
 		DEBUG_EMIT("mapUnlinked");
 		emit(mapUnlinked(map));
 
-		updateCurrentCameraBB();
+//		updateCurrentCameraBB();
+		m_currentCamera->updateParams();
 		updateGL();
 
 		disconnect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
@@ -179,6 +271,11 @@ void View::unlinkMap(MapHandlerGen* map)
 
 		if(map == m_schnapps->getSelectedMap())
 			setManipulatedFrame(NULL);
+
+		b_updatingUI = true;
+		m_dialogMaps->check(map->getName(),Qt::Unchecked);
+		b_updatingUI = false;
+
 	}
 }
 
@@ -212,6 +309,24 @@ void View::init()
 	m_buttonArea->addButton(m_closeButton);
 	connect(m_closeButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_closeView(int, int, int, int)));
 
+	m_buttonAreaLeft = new ViewButtonArea(this);
+	m_buttonAreaLeft->setTopLeftPosition(0, 0);
+
+
+	m_mapsButton = new ViewButton(":icons/icons/maps.png", this);
+	m_buttonAreaLeft->addButton(m_mapsButton);
+	connect(m_mapsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_mapsListView(int, int, int, int)));
+
+	m_pluginsButton = new ViewButton(":icons/icons/plugins.png", this);
+	m_buttonAreaLeft->addButton(m_pluginsButton);
+	connect(m_pluginsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_pluginsListView(int, int, int, int)));
+
+	m_camerasButton = new ViewButton(":icons/icons/cameras.png", this);
+	m_buttonAreaLeft->addButton(m_camerasButton);
+	connect(m_camerasButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_camerasListView(int, int, int, int)));
+
+
+
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
 	delete c;
@@ -228,7 +343,9 @@ void View::preDraw()
 
 void View::draw()
 {
-	foreach(Camera* camera, m_schnapps->getCameraSet().values())
+	const CameraSet& cams = m_schnapps->getCameraSet();
+	QList<Camera*> lc = cams.values();
+	foreach(Camera* camera, lc)
 	{
 		if(camera != m_currentCamera)
 		{
@@ -236,6 +353,9 @@ void View::draw()
 			if(camera->getDrawPath()) camera->drawAllPaths();
 		}
 	}
+
+// for debugging
+//	m_currentCamera->drawBBCam();
 
 	glm::mat4 mm = getCurrentModelViewMatrix();
 	glm::mat4 pm = getCurrentProjectionMatrix();
@@ -282,6 +402,9 @@ void View::resizeGL(int width, int height)
 	QGLViewer::resizeGL(width, height);
 	if(m_buttonArea)
 		m_buttonArea->setTopRightPosition(width, 0);
+
+	if(m_buttonAreaLeft)
+		m_buttonAreaLeft->setTopLeftPosition(0, 0);
 }
 
 void View::drawButtons()
@@ -289,6 +412,7 @@ void View::drawButtons()
 	glEnable(GL_TEXTURE_2D);
 	startScreenCoordinatesSystem();
 	m_buttonArea->draw();
+	m_buttonAreaLeft->draw();
 	stopScreenCoordinatesSystem();
 	glDisable(GL_TEXTURE_2D);
 }
@@ -325,6 +449,8 @@ void View::mousePressEvent(QMouseEvent* event)
 {
 	if(m_buttonArea->isClicked(event->x(), event->y()))
 		m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
+	else if(m_buttonAreaLeft->isClicked(event->x(), event->y()))
+		m_buttonAreaLeft->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
 	else
 	{
 		if(!isSelectedView())
@@ -395,31 +521,6 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 	return mvpm;
 }
 
-void View::updateCurrentCameraBB()
-{
-	qglviewer::Vec bbMin(0,0,0);
-	qglviewer::Vec bbMax(1,1,1);
-	if(!l_maps.empty())
-	{
-		bbMin = l_maps[0]->getBBmin();
-		bbMax = l_maps[0]->getBBmax();
-		for(int i = 1; i < l_maps.size(); ++i)
-		{
-			MapHandlerGen* m = l_maps[i];
-			qglviewer::Vec min = m->getBBmin();
-			qglviewer::Vec max = m->getBBmax();
-			for(unsigned int dim = 0; dim < 3; ++dim)
-			{
-				if(min[dim] < bbMin[dim])
-					bbMin[dim] = min[dim];
-				if(max[dim] > bbMax[dim])
-					bbMax[dim] = max[dim];
-			}
-		}
-	}
-	camera()->setSceneBoundingBox(bbMin, bbMax);
-	camera()->showEntireScene();
-}
 
 void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 {
@@ -428,6 +529,7 @@ void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 		setManipulatedFrame(cur->getFrame());
 	updateGL();
 }
+
 
 void View::ui_verticalSplitView(int x, int y, int globalX, int globalY)
 {
@@ -444,8 +546,143 @@ void View::ui_closeView(int x, int y, int globalX, int globalY)
 	m_schnapps->removeView(m_name);
 }
 
-//void View::setLastSelectedMap(MapHandlerGen* m)
-//{m_lastSelectedMap=m;}
+void View::ui_mapsListView(int x, int y, int globalX, int globalY)
+{
+	if (m_dialogMaps->isHidden())
+	{
+		m_dialogMaps->show();
+		m_dialogMaps->move(QPoint(globalX,globalY+8));
+		m_dialogCameras->hide();
+		m_dialogPlugins->hide();
+	}
+	else
+		m_dialogMaps->hide();
+
+}
+
+
+void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
+{
+	if (m_dialogPlugins->isHidden())
+	{
+		m_dialogPlugins->show();
+		m_dialogPlugins->move(QPoint(globalX,globalY+8));
+		m_dialogMaps->hide();
+		m_dialogCameras->hide();
+	}
+	else
+		m_dialogPlugins->hide();
+
+}
+
+void View::ui_camerasListView(int x, int y, int globalX, int globalY)
+{
+	if (m_dialogCameras->isHidden())
+	{
+		m_dialogCameras->show();
+		m_dialogCameras->move(QPoint(globalX,globalY+8));
+		m_dialogPlugins->hide();
+		m_dialogMaps->hide();
+	}
+	else
+		m_dialogCameras->hide();
+
+}
+
+void View::mapAdded(MapHandlerGen* mh )
+{
+	DEBUG_SLOT();
+	if (mh)
+	{
+		m_dialogMaps->addItem(mh->getName());
+	}
+}
+
+void View::mapRemoved(MapHandlerGen* mh )
+{
+	DEBUG_SLOT();
+	if (mh)
+	{
+		m_dialogMaps->removeItem(mh->getName());
+	}
+}
+
+
+void View::pluginEnabled(Plugin *plugin)
+{
+	DEBUG_SLOT();
+	if (dynamic_cast<PluginInteraction*>(plugin))
+	{
+		m_dialogPlugins->addItem(plugin->getName());
+	}
+
+}
+
+void View::pluginDisabled(Plugin *plugin)
+{
+	DEBUG_SLOT();
+	if (dynamic_cast<PluginInteraction*>(plugin))
+	{
+		m_dialogPlugins->removeItem(plugin->getName());
+	}
+}
+
+
+void View::cameraAdded(Camera* camera)
+{
+	DEBUG_SLOT();
+	if (camera)
+	{
+		m_dialogCameras->addItem(camera->getName());
+	}
+}
+
+void View::cameraRemoved(Camera* camera)
+{
+	DEBUG_SLOT();
+	if (camera)
+	{
+		m_dialogCameras->removeItem(camera->getName());
+	}
+}
+
+void View::mapCheckStateChanged(QListWidgetItem* item)
+{
+	if (b_updatingUI)
+		return;
+
+	DEBUG_SLOT();
+
+	if (item->checkState()==Qt::Checked)
+		linkMap(item->text());
+	else
+		unlinkMap(item->text());
+
+
+}
+
+void View::pluginCheckStateChanged(QListWidgetItem* item)
+{
+	if (b_updatingUI)
+		return;
+
+	DEBUG_SLOT();
+	if (item->checkState()==Qt::Checked)
+		linkPlugin(item->text());
+	else
+		unlinkPlugin(item->text());
+}
+
+void View::cameraCheckStateChanged(QListWidgetItem* item)
+{
+	if (b_updatingUI)
+		return;
+
+	DEBUG_SLOT();
+	if (item->checkState()==Qt::Checked)
+		setCurrentCamera(item->text());
+}
+
 
 } // namespace SCHNApps
 

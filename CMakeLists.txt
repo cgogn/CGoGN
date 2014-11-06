@@ -84,6 +84,7 @@ ENDIF (WITH_GLEWMX)
 
 
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
+add_definitions(-DGLM_FORCE_RADIANS)
 
 # define includes of external libs 
 SET (CGoGN_EXT_INCLUDES
@@ -115,7 +116,7 @@ IF(WIN32)
 ELSE(WIN32)
 	find_package(SuiteSparse REQUIRED)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${SUITESPARSE_INCLUDE_DIRS})
-	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES})
+	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES} pthread)
 ENDIF(WIN32)
 
 
@@ -150,7 +151,6 @@ IF (WITH_GLEWMX)
 	ADD_DEFINITIONS(-DGLEW_MX)
 ENDIF (WITH_GLEWMX)
 
-
 # qq definition specifiques pour mac
 #IF(APPLE)
 #	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMAC_OSX")	
@@ -174,7 +174,9 @@ ELSE()
 	endif()
 ENDIF()
 
-
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
+endif()
 
 
 IF(WIN32)
