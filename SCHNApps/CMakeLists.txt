@@ -39,6 +39,7 @@ SET( QT_USE_QTSVG TRUE )
 
 INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
+add_definitions(-DGLM_FORCE_RADIANS)
 
 #MESSAGE HERE FOR MORE EASY READING (MESSAGE AT THE END)
 MESSAGE("Build type = " ${CMAKE_BUILD_TYPE} " (for change -DCMAKE_BUILD_TYPE=Release|Debug)" )
@@ -96,13 +97,18 @@ SET (EXT_LIBS
 
 
 # qq definition specifiques pour mac
-IF(APPLE)
+#IF(APPLE)
 # attention a changer pour chercher la bonne version automatiquement
-	SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.6.sdk" CACHE STRING "developer SDK")
-	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMAC_OSX")
-	SET(CMAKE_OSX_ARCHITECTURES x86_64)
-ENDIF(APPLE)
+#	SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.6.sdk" CACHE STRING "developer SDK")
+#	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
+#	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMAC_OSX")
+#	SET(CMAKE_OSX_ARCHITECTURES x86_64)
+#ENDIF(APPLE)
+
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")	
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
@@ -150,6 +156,7 @@ SET(SCHNApps_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/controlDock_pluginTab.h
 	${SCHNApps_ROOT_DIR}/include/controlDock_mapTab.h
 	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
+	${SCHNApps_ROOT_DIR}/include/dialogList.h
 )
 
 
@@ -187,6 +194,7 @@ ADD_EXECUTABLE( SCHNApps
 TARGET_LINK_LIBRARIES( SCHNApps
 	${CGoGN_LIBS}
 	${EXT_LIBS}
+	pthread
 )
 
 

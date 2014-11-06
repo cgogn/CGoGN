@@ -20,7 +20,7 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 	setupUi(this);
 
 	connect(list_maps, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
-	connect(list_maps, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
+//	connect(list_maps, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
 	connect(list_vertexAttributes, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(vertexAttributeCheckStateChanged(QListWidgetItem*)));
 
 	connect(tabWidget_mapInfo, SIGNAL(currentChanged(int)), this, SLOT(selectedSelectorChanged()));
@@ -52,7 +52,7 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
+//	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
 }
 
 unsigned int ControlDock_MapTab::getCurrentOrbit()
@@ -77,8 +77,6 @@ void ControlDock_MapTab::selectedMapChanged()
 {
 	if(!b_updatingUI)
 	{
-
-
 		if(m_selectedMap)
 		{
 			disconnect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
@@ -97,12 +95,12 @@ void ControlDock_MapTab::selectedMapChanged()
 			QString selectedMapName = items[0]->text();
 			m_selectedMap = m_schnapps->getMap(selectedMapName);
 
-			items[0]->setCheckState(Qt::Checked);
+//			items[0]->setCheckState(Qt::Checked);
 
 			updateSelectedMapInfo();
 
 			m_schnapps->notifySelectedMapChanged(old, m_selectedMap);
-			m_schnapps->getSelectedView()->setLastSelectedMap(m_selectedMap);
+//			m_schnapps->getSelectedView()->setLastSelectedMap(m_selectedMap);
 
 			connect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 			connect(m_selectedMap, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(selectedMapVBOAdded(Utils::VBO*)));
@@ -115,33 +113,12 @@ void ControlDock_MapTab::selectedMapChanged()
 			MapHandlerGen* old = m_selectedMap;
 			m_selectedMap = NULL;
 			m_schnapps->notifySelectedMapChanged(old,m_selectedMap);
-			m_schnapps->getSelectedView()->setLastSelectedMap(NULL);
+//			m_schnapps->getSelectedView()->setLastSelectedMap(NULL);
 		}
 	}
 }
 
-void ControlDock_MapTab::mapCheckStateChanged(QListWidgetItem *item)
-{
-	if(!b_updatingUI)
-	{
-		View* selectedView = m_schnapps->getSelectedView();
-		MapHandlerGen* m = m_schnapps->getMap(item->text());
-		if(m)
-		{
-			if(item->checkState() == Qt::Checked)
-			{
-				selectedView->linkMap(m);
-				if (m_selectedMap==NULL)
-					setSelectedMap(m->getName());
-			}
-			else
-			{
-				selectedView->unlinkMap(m);
-				item->setSelected(false);
-			}
-		}
-	}
-}
+
 
 void ControlDock_MapTab::vertexAttributeCheckStateChanged(QListWidgetItem *item)
 {
@@ -241,9 +218,11 @@ void ControlDock_MapTab::removeSelector()
 
 void ControlDock_MapTab::mapAdded(MapHandlerGen* m)
 {
-	QListWidgetItem* item = new QListWidgetItem(m->getName(), list_maps);
 	b_updatingUI = true;
-	item->setCheckState(Qt::Unchecked);
+//	QListWidgetItem* item = new QListWidgetItem(m->getName(), list_maps);
+//	item->setCheckState(Qt::Unchecked);
+
+	new QListWidgetItem(m->getName(), list_maps);
 	b_updatingUI = false;
 }
 
@@ -258,96 +237,95 @@ void ControlDock_MapTab::mapRemoved(MapHandlerGen* m)
 	}
 }
 
-void ControlDock_MapTab::selectedViewChanged(View* prev, View* cur)
-{
-	if(prev)
-	{
-		foreach(MapHandlerGen* map, prev->getLinkedMaps())
-		{
-			QList<QListWidgetItem*> prevItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
-			if(!prevItems.empty())
-			{
-				b_updatingUI = true;
-				prevItems[0]->setCheckState(Qt::Unchecked);
-				b_updatingUI = false;
-			}
-		}
+//void ControlDock_MapTab::selectedViewChanged(View* prev, View* cur)
+//{
+//	if(prev)
+//	{
+//		foreach(MapHandlerGen* map, prev->getLinkedMaps())
+//		{
+//			QList<QListWidgetItem*> prevItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
+//			if(!prevItems.empty())
+//			{
+//				b_updatingUI = true;
+//				prevItems[0]->setCheckState(Qt::Unchecked);
+//				b_updatingUI = false;
+//			}
+//		}
 
-		disconnect(prev, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(selectedViewMapLinked(MapHandlerGen*)));
-		disconnect(prev, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(selectedViewMapUnlinked(MapHandlerGen*)));
-	}
-	if(cur)
-	{
-		foreach(MapHandlerGen* map, cur->getLinkedMaps())
-		{
-			QList<QListWidgetItem*> curItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
-			if(!curItems.empty())
-			{
-				b_updatingUI = true;
-				curItems[0]->setCheckState(Qt::Checked);
-				b_updatingUI = false;
-			}
-		}
+//		disconnect(prev, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(selectedViewMapLinked(MapHandlerGen*)));
+//		disconnect(prev, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(selectedViewMapUnlinked(MapHandlerGen*)));
+//	}
+//	if(cur)
+//	{
+//		foreach(MapHandlerGen* map, cur->getLinkedMaps())
+//		{
+//			QList<QListWidgetItem*> curItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
+//			if(!curItems.empty())
+//			{
+//				b_updatingUI = true;
+//				curItems[0]->setCheckState(Qt::Checked);
+//				b_updatingUI = false;
+//			}
+//		}
 
-		connect(cur, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(selectedViewMapLinked(MapHandlerGen*)));
-		connect(cur, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(selectedViewMapUnlinked(MapHandlerGen*)));
-	}
+//		connect(cur, SIGNAL(mapLinked(MapHandlerGen*)), this, SLOT(selectedViewMapLinked(MapHandlerGen*)));
+//		connect(cur, SIGNAL(mapUnlinked(MapHandlerGen*)), this, SLOT(selectedViewMapUnlinked(MapHandlerGen*)));
+//	}
 
-	if( (cur->lastSelectedMap() != NULL) && (cur->isLinkedToMap(cur->lastSelectedMap())))
-	{
-		setSelectedMap(cur->lastSelectedMap()->getName());
-	}
-	else
-	{
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if ((map == NULL) || (! map->isLinkedToView(cur)))
-		{
-			bool changed = false;
-			const MapSet& ms = m_schnapps->getMapSet();
-			foreach(MapHandlerGen* mhg, ms)
-			{
-				if (mhg->isLinkedToView(cur))
-				{
-					setSelectedMap(mhg->getName());
-					changed = true;
-					break; // out of the loop, not nice but ...
-				}
-			}
-			if (!changed)// no possibility to selected a map automatically so none
-			{
-				setSelectedMap(QString("NONE"));
-			}
-		}
-	}
+//	if( (cur->lastSelectedMap() != NULL) && (cur->isLinkedToMap(cur->lastSelectedMap())))
+//	{
+//		setSelectedMap(cur->lastSelectedMap()->getName());
+//	}
+//	else
+//	{
+//		MapHandlerGen* map = m_schnapps->getSelectedMap();
+//		if ((map == NULL) || (! map->isLinkedToView(cur)))
+//		{
+//			bool changed = false;
+//			const MapSet& ms = m_schnapps->getMapSet();
+//			foreach(MapHandlerGen* mhg, ms)
+//			{
+//				if (mhg->isLinkedToView(cur))
+//				{
+//					setSelectedMap(mhg->getName());
+//					changed = true;
+//					break; // out of the loop, not nice but ...
+//				}
+//			}
+//			if (!changed)// no possibility to selected a map automatically so none
+//			{
+//				setSelectedMap(QString("NONE"));
+//			}
+//		}
+//	}
 
-
-}
-
+//}
 
 
 
 
-void ControlDock_MapTab::selectedViewMapLinked(MapHandlerGen* map)
-{
-	QList<QListWidgetItem*> curItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
-	if(!curItems.empty())
-	{
-		b_updatingUI = true;
-		curItems[0]->setCheckState(Qt::Checked);
-		b_updatingUI = false;
-	}
-}
 
-void ControlDock_MapTab::selectedViewMapUnlinked(MapHandlerGen* map)
-{
-	QList<QListWidgetItem*> prevItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
-	if(!prevItems.empty())
-	{
-		b_updatingUI = true;
-		prevItems[0]->setCheckState(Qt::Unchecked);
-		b_updatingUI = false;
-	}
-}
+//void ControlDock_MapTab::selectedViewMapLinked(MapHandlerGen* map)
+//{
+//	QList<QListWidgetItem*> curItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
+//	if(!curItems.empty())
+//	{
+//		b_updatingUI = true;
+//		curItems[0]->setCheckState(Qt::Checked);
+//		b_updatingUI = false;
+//	}
+//}
+
+//void ControlDock_MapTab::selectedViewMapUnlinked(MapHandlerGen* map)
+//{
+//	QList<QListWidgetItem*> prevItems = list_maps->findItems(map->getName(), Qt::MatchExactly);
+//	if(!prevItems.empty())
+//	{
+//		b_updatingUI = true;
+//		prevItems[0]->setCheckState(Qt::Unchecked);
+//		b_updatingUI = false;
+//	}
+//}
 
 
 

@@ -41,6 +41,7 @@ bool Surface_Render_Plugin::enable()
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapAdded(map);
@@ -61,6 +62,7 @@ void Surface_Render_Plugin::disable()
 	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapRemoved(map);
@@ -396,6 +398,12 @@ void Surface_Render_Plugin::changeVertexColor(const QString& view, const QString
 	}
 }
 
+
+
+void Surface_Render_Plugin::appsFinished()
+{
+	m_dockTab->m_colorDial->close();
+}
 
 Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)
 

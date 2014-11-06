@@ -47,6 +47,8 @@ public slots:
 	/*********************************************************
 	 * MANAGE VIEWS
 	 *********************************************************/
+public:
+	void redrawAllViews();
 
 public slots:
 	View* addView(const QString& name);
@@ -151,6 +153,8 @@ signals:
 	void pluginEnabled(Plugin* plugin);
 	void pluginDisabled(Plugin* plugin);
 
+	void appsFinished();
+
 protected:
 	QString m_appPath;
 	PythonQtObjectPtr& m_pythonContext;
@@ -186,6 +190,8 @@ protected:
 	TextureSet m_textures;
 
 	StaticPointers m_sp;
+
+	void closeEvent(QCloseEvent *event);
 };
 
 } // namespace SCHNApps

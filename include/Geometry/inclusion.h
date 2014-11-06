@@ -76,7 +76,7 @@ Inclusion isSegmentInTriangle(const VEC3& P1, const VEC3& P2, const VEC3& Ta, co
  * @return true if the faces of the tetra are in CCW order (default=true)
  */
 template <typename VEC3>
-bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool CCW) ;
+bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool /*CCW*/) ;
 
 /**
  * test if an edge is inside or intersect a tetrahedron
