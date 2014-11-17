@@ -47,7 +47,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 #ifdef USE_OGL_CORE_PROFILE
 	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(3);
 #else
-	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(3);
+	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(2);
 #endif
 
 	this->setupUi(this);
