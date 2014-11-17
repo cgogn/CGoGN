@@ -536,8 +536,8 @@ void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAtt
 	m_indexBufferUpToDate[prim] = true;
 
 	// setup du buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
 template <typename PFP>
@@ -575,7 +575,7 @@ void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttr
 
 	m_indexBufferUpToDate[prim] = true;
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
 	GLint sz=0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &sz);
 	GLuint* oldIndices =  reinterpret_cast<GLuint*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE));
@@ -591,7 +591,7 @@ void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttr
 	//and new ones
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sz, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]) );
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
 	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
 	glDeleteBuffers(1,&(m_indexBuffers[prim]));

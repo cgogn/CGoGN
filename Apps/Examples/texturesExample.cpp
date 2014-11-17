@@ -48,9 +48,6 @@ TexView::~TexView()
 
 void TexView::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	// create VBO for position
 	m_positionVBO = new Utils::VBO;
 	m_texcoordVBO = new Utils::VBO;

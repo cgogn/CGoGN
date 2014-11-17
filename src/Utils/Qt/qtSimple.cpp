@@ -47,7 +47,21 @@ SimpleQT::SimpleQT() :
 	m_modelView_matrix(m_mat.m_matrices[1]),
 	m_transfo_matrix(m_mat.m_matrices[2])
 {
-	m_glWidget = new GLWidget(this);
+	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
+	{
+		QGLFormat format;
+		format.setProfile(QGLFormat::CoreProfile);
+		format.setVersion(GLSLShader::MAJOR_OGL_CORE, GLSLShader::MINOR_OGL_CORE);
+		format.setDepth(true);
+//		format.setDepthBufferSize(24);
+		format.setDoubleBuffer(true);
+
+		m_glWidget = new GLWidget(this,format);
+	}
+	else
+		m_glWidget = new GLWidget(this);
+
+
 	setCentralWidget(m_glWidget);
 	setWindowTitle(tr("CGoGN"));
 
@@ -118,7 +132,14 @@ SimpleQT::SimpleQT(const SimpleQT& sqt):
 	m_modelView_matrix(m_mat.m_matrices[1]),
 	m_transfo_matrix(m_mat.m_matrices[2])
 {
-	m_glWidget = new GLWidget(this);
+	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
+	{
+		QGLFormat format = sqt.m_glWidget->format();
+		m_glWidget = new GLWidget(this,format);
+	}
+	else
+		m_glWidget = new GLWidget(this);
+
 	setCentralWidget(m_glWidget);
 
 	m_dock = new QDockWidget(sqt.m_dock) ;
@@ -146,7 +167,14 @@ SimpleQT::~SimpleQT()
 
 void SimpleQT::operator=(const SimpleQT& sqt)
 {
-	m_glWidget = new GLWidget(this);
+	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
+	{
+		QGLFormat format = sqt.m_glWidget->format();
+		m_glWidget = new GLWidget(this,format);
+	}
+	else
+		m_glWidget = new GLWidget(this);
+
 	setCentralWidget(m_glWidget) ;
 
 	m_dock = new QDockWidget(sqt.m_dock) ;
@@ -464,7 +492,7 @@ void SimpleQT::updateGLMatrices()
 
 void SimpleQT::transfoRotate(float angle, float x, float y, float z)
 {
-	transfoMatrix() = glm::rotate(transfoMatrix(), angle, glm::vec3(x,y,z));
+	transfoMatrix() = glm::rotate(transfoMatrix(), glm::radians(angle), glm::vec3(x,y,z));
 }
 
 void SimpleQT::transfoTranslate(float tx, float ty, float tz)

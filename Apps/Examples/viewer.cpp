@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include "viewer.h"
-#include "Utils/chrono.h"
 
 Viewer::Viewer() :
 	m_renderStyle(FLAT),
@@ -38,7 +37,8 @@ Viewer::Viewer() :
 	m_flatShader(NULL),
 	m_vectorShader(NULL),
 	m_simpleColorShader(NULL),
-	m_pointSprite(NULL)
+	m_pointSprite(NULL),
+	m_nbFrames(0)
 {
 	normalScaleFactor = 1.0f ;
 	vertexScaleFactor = 0.1f ;
@@ -78,9 +78,11 @@ void Viewer::initGUI()
 
 void Viewer::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(2) ;
-	CGoGNout << "GL VERSION = "<< glGetString(GL_VERSION)<< CGoGNendl;
-	Utils::GLSLShader::areShadersSupported();
+	int major = 0;
+	int minor = 0;
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
+	CGoGNout <<"Using GL "<< major <<"."<< minor << CGoGNendl;
 
 	m_render = new Algo::Render::GL2::MapRender() ;
 	m_topoRender = new Algo::Render::GL2::TopoRender() ;
@@ -173,6 +175,14 @@ void Viewer::cb_redraw()
 		m_vectorShader->setScale(size) ;
 		glLineWidth(1.0f) ;
 		m_render->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
+	}
+
+	m_nbFrames++;
+	if (m_nbFrames >=100)
+	{
+		std::cout << 100000.0/m_frame_ch.elapsed()<< " fps"<<std::endl;
+		m_nbFrames = 0;
+		m_frame_ch.start();
 	}
 }
 

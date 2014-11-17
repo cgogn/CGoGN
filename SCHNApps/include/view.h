@@ -9,6 +9,8 @@
 
 #include "schnapps.h"
 #include "Utils/gl_matrices.h"
+#include "Utils/GLSLShader.h"
+#include "Utils/drawer.h"
 
 namespace CGoGN
 {
@@ -31,13 +33,13 @@ class View : public QGLViewer
 public:
 	static unsigned int viewCount;
 
-	View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget = NULL);
+	View(const QString& name, SCHNApps* s, QGLFormat& format);
+	View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget* shareWidget);
 	~View();
 
 	const QString& getName() const { return m_name; }
 
 	MapHandlerGen* lastSelectedMap() { return m_lastSelectedMap;}
-//	void setLastSelectedMap(MapHandlerGen* m) { m_lastSelectedMap=m; }
 
 	void closeDialogs();
 
@@ -153,6 +155,8 @@ protected:
 	ListPopUp* m_dialogMaps;
 	ListPopUp* m_dialogPlugins;
 	ListPopUp* m_dialogCameras;
+
+	Utils::Drawer* m_frameDrawer;
 
 };
 

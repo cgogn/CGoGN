@@ -49,8 +49,6 @@ void MCMesh::cb_initGL()
 	Geom::Vec4f colDif(0.8f, 0.9f, 0.7f, 1.0f);
 	Geom::Vec4f colSpec(0.9f, 0.9f, 0.9f, 1.0f);
 
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	m_render = new Algo::Render::GL2::MapRender();
 
 	m_positionVBO = new Utils::VBO();

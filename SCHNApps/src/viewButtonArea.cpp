@@ -2,8 +2,10 @@
 
 #include "schnapps.h"
 #include "view.h"
-#include "texture.h"
+//#include "texture.h"
 //#include "camera.h"
+
+#include "Utils/Shaders/shaderWallPaper.h"
 
 #include <iostream>
 
@@ -13,11 +15,18 @@ namespace CGoGN
 namespace SCHNApps
 {
 
+
 ViewButton::ViewButton(const QString& image, View* view) :
 	m_img(image),
 	m_view(view)
 {
-	m_tex = m_view->getSCHNApps()->getTexture(m_img);
+	m_texture = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
+
+	if (!m_texture->load(m_img.toStdString()))
+		std::cerr << "Problem loading icon "<< m_img.toStdString() << std::endl;
+
+	m_texture->update();
+	m_texture->setWrapping(GL_CLAMP_TO_EDGE);
 }
 
 ViewButton::~ViewButton()
@@ -25,31 +34,32 @@ ViewButton::~ViewButton()
 	m_view->getSCHNApps()->releaseTexture(m_img);
 }
 
-QSize ViewButton::getSize()
-{
-	return m_tex->size;
-}
-
 void ViewButton::click(int x, int y, int globalX, int globalY)
 {
 	emit clicked(x, y, globalX, globalY);
 }
 
-void ViewButton::drawAt(int x, int y)
+void ViewButton::drawAt(int x, int y, Utils::ShaderWallPaper* shader)
 {
-	glBindTexture(GL_TEXTURE_2D, m_tex->texID);
-	glBegin (GL_QUADS);
-		glTexCoord2i(0, 1);
-		glVertex2i(x, y);
-		glTexCoord2i(0, 0);
-		glVertex2i(x, y + SIZE);
-		glTexCoord2i(1, 0);
-		glVertex2i(x + SIZE, y + SIZE);
-		glTexCoord2i(1, 1);
-		glVertex2i(x + SIZE, y);
-	glEnd();
+	QSize szw = m_view->size();
+
+	shader->drawFront(szw.width(),szw.height(),x,y,ViewButton::SIZE,ViewButton::SIZE, m_texture);
+
 }
 
+ViewButtonArea::ViewButtonArea(View* view) :
+	m_view(view),
+	m_form(0,0,0,0)
+{
+	m_shaderButton = new CGoGN::Utils::ShaderWallPaper();
+	m_shaderButton->setTextureUnit(GL_TEXTURE0);
+
+}
+
+ViewButtonArea::~ViewButtonArea()
+{
+	delete m_shaderButton;
+}
 
 
 
@@ -112,7 +122,7 @@ void ViewButtonArea::draw()
 
 	foreach(ViewButton* b, l_buttons)
 	{
-		b->drawAt(p_x, p_y + ViewButton::SPACE);
+		b->drawAt(p_x, p_y + ViewButton::SPACE, m_shaderButton);
 		p_x += ViewButton::SIZE + ViewButton::SPACE;
 	}
 }
