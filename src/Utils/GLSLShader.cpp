@@ -65,8 +65,8 @@ std::string GLSLShader::DEFINES_GL3=\
 "#version 150\n"
 "#define PRECISON precision highp float\n"
 "#define ATTRIBUTE in\n"
-"#define VARYING_VERT smooth out\n"
-"#define VARYING_FRAG smooth in\n"
+"#define VARYING_VERT out\n"
+"#define VARYING_FRAG in\n"
 "#define FRAG_OUT_DEF out vec4 outFragColor\n"
 "#define FRAG_OUT outFragColor\n"
 "#define INVARIANT_POS invariant gl_Position\n";
@@ -134,8 +134,8 @@ std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std:
 		ss << maxVert;
 		str.append(ss.str());
 		str.append(") out;\n");
-		str.append("#define VARYING_IN smooth in\n");
-		str.append("#define VARYING_OUT smooth out\n");
+		str.append("#define VARYING_IN in\n");
+		str.append("#define VARYING_OUT out\n");
 		str.append("#define POSITION_IN(X) gl_in[X].gl_Position\n");
 		str.append("#define NBVERTS_IN gl_in.length()\n");
 		return str;
@@ -1177,9 +1177,9 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin)
 
 	if (CURRENT_OGL_VERSION>=3)
 	{
-		if (m_vao!=0)
-			glDeleteVertexArrays(1, &m_vao);
-		glGenVertexArrays(1, &m_vao);
+        if (m_vao!=0)
+            glDeleteVertexArrays(1, &m_vao);
+        glGenVertexArrays(1, &m_vao);
 		glBindVertexArray(m_vao);
 
 		for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
