@@ -52,5 +52,5 @@ void main()
 		finalColor += materialSpecular * specular;
 	}
 #endif
-	gl_FragColor=finalColor;
+	FRAG_OUT=finalColor;
 }

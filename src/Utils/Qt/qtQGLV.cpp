@@ -48,7 +48,20 @@ SimpleQGLV::SimpleQGLV() :
 	m_modelView_matrix(m_mat.m_matrices[1]),
 	m_transfo_matrix(m_mat.m_matrices[2])
 {
-	m_qglWidget = new QGLView(this);
+	QGLFormat format;
+	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
+	{
+		format.setProfile(QGLFormat::CoreProfile);
+		format.setVersion(GLSLShader::MAJOR_OGL_CORE, GLSLShader::MINOR_OGL_CORE);
+		format.setDepth(true);
+		format.setDepthBufferSize(24);
+		format.setDoubleBuffer(true);
+	}
+	else
+		format = QGLFormat::defaultFormat();
+
+	m_qglWidget = new QGLView(this,format);
+
 	setCentralWidget(m_qglWidget);
 	setWindowTitle(tr("CGoGN"));
 
@@ -111,10 +124,10 @@ SimpleQGLV::SimpleQGLV() :
 	resize(1200,800);
 	m_qglWidget->setFocus(Qt::MouseFocusReason);
 
-	QGLFormat format(/*QGL::SampleBuffers |*/ QGL::DoubleBuffer | QGL::AlphaChannel);
-	format.setSamples(2);
-	m_qglWidget->setFormat(format);
-	m_qglWidget->makeCurrent();
+//	QGLFormat format(/*QGL::SampleBuffers |*/ QGL::DoubleBuffer | QGL::AlphaChannel);
+//	format.setSamples(2);
+//	m_qglWidget->setFormat(format);
+//	m_qglWidget->makeCurrent();
 }
 
 SimpleQGLV::SimpleQGLV(const SimpleQGLV& sqt):
@@ -124,7 +137,9 @@ SimpleQGLV::SimpleQGLV(const SimpleQGLV& sqt):
 	m_modelView_matrix(m_mat.m_matrices[1]),
 	m_transfo_matrix(m_mat.m_matrices[2])
 {
-	m_qglWidget = new QGLView(this);
+	QGLFormat format = sqt.m_qglWidget->format();
+	m_qglWidget = new QGLView(this,format);
+
 	setCentralWidget(m_qglWidget);
 
 	m_dock = new QDockWidget(sqt.m_dock) ;
@@ -152,7 +167,9 @@ SimpleQGLV::~SimpleQGLV()
 
 void SimpleQGLV::operator=(const SimpleQGLV& sqt)
 {
-	m_qglWidget = new QGLView(this);
+	QGLFormat format = sqt.m_qglWidget->format();
+	m_qglWidget = new QGLView(this,format);
+
 	setCentralWidget(m_qglWidget) ;
 
 	m_dock = new QDockWidget(sqt.m_dock) ;
@@ -435,7 +452,7 @@ void SimpleQGLV::cb_updateMatrix()
 	glm::mat4 model(m_modelView_matrix);
 	model *= m_transfo_matrix;
 
-	if (GLSLShader::CURRENT_OGL_VERSION == 1)
+	if (GLSLShader::CURRENT_OGL_VERSION == 1) // more more used
 	{
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(glm::value_ptr(m_projection_matrix));
@@ -477,7 +494,7 @@ void SimpleQGLV::updateGLMatrices()
 
 void SimpleQGLV::transfoRotate(float angle, float x, float y, float z)
 {
-	transfoMatrix() = glm::rotate(transfoMatrix(), angle, glm::vec3(x,y,z));
+	transfoMatrix() = glm::rotate(transfoMatrix(), glm::radians(angle), glm::vec3(x,y,z));
 }
 
 void SimpleQGLV::transfoTranslate(float tx, float ty, float tz)

@@ -48,6 +48,7 @@
 #include "Utils/pointSprite.h"
 #include "Utils/text3d.h"
 #include "Utils/vbo.h"
+#include "Utils/chrono.h"
 
 #include "Utils/Qt/qtInputs.h"
 
@@ -114,6 +115,9 @@ public:
 	Utils::ShaderVectorPerVertex* m_vectorShader ;
 	Utils::ShaderSimpleColor* m_simpleColorShader ;
 	Utils::PointSprite* m_pointSprite ;
+
+	Utils::Chrono m_frame_ch;
+	unsigned int m_nbFrames;
 
 	Viewer() ;
 

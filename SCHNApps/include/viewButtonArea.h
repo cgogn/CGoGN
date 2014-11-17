@@ -9,6 +9,10 @@
 
 #include <iostream>
 
+#define WITH_QT 1
+#include "Utils/textures.h"
+#include "Utils/Shaders/shaderWallPaper.h"
+
 namespace CGoGN
 {
 
@@ -16,7 +20,6 @@ namespace SCHNApps
 {
 
 class View;
-struct Texture;
 
 class ViewButton : public QObject
 {
@@ -29,7 +32,7 @@ public:
 	QSize getSize();
 
 	void click(int x, int y, int globalX, int globalY);
-	void drawAt(int x, int y);
+	void drawAt(int x, int y, Utils::ShaderWallPaper* shader);
 
 	static const int SIZE = 24;
 	static const int SPACE = 4;
@@ -37,7 +40,7 @@ public:
 protected:
 	QString m_img;
 	View* m_view;
-	Texture* m_tex;
+	Utils::Texture<2,Geom::Vec3uc>* m_texture;
 
 signals:
 	void clicked(int x, int y, int globalX, int globalY);
@@ -48,16 +51,9 @@ class ViewButtonArea : public QObject
 	Q_OBJECT
 
 public:
-	ViewButtonArea(View* view) :
-		m_view(view),
-		m_form(0,0,0,0)
-	{}
+	ViewButtonArea(View* view);
 
-	~ViewButtonArea()
-	{
-//		foreach(ViewButton* b, l_buttons)
-//			delete b;
-	}
+	~ViewButtonArea();
 
 	void addButton(ViewButton* button);
 	void removeButton(ViewButton* button);
@@ -77,6 +73,7 @@ protected:
 	View* m_view;
 	QRect m_form;
 	QList<ViewButton*> l_buttons;
+	Utils::ShaderWallPaper* m_shaderButton;
 };
 
 } // namespace SCHNApps

@@ -21,14 +21,71 @@ namespace SCHNApps
 {
 
 unsigned int View::viewCount = 0;
-
-View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
-	QGLViewer(NULL, shareWidget),
+View::View(const QString& name, SCHNApps* s,  QGLFormat& format) :
+	QGLViewer(format, NULL, NULL),
 	b_updatingUI(false),
 	m_name(name),
 	m_schnapps(s),
 	m_currentCamera(NULL),
-//	m_lastSelectedMap(NULL),
+	m_lastSelectedMap(NULL),
+	m_buttonArea(NULL),
+	m_closeButton(NULL),
+	m_VsplitButton(NULL),
+	m_HsplitButton(NULL),
+	m_buttonAreaLeft(NULL),
+	m_mapsButton(NULL),
+	m_pluginsButton(NULL),
+	m_camerasButton(NULL),
+	m_dialogMaps(NULL)
+{
+	++viewCount;
+
+	m_currentCamera = m_schnapps->addCamera();
+	m_currentCamera->linkView(this);
+
+	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
+
+	m_dialogMaps = new ListPopUp("Linked Maps");
+	m_dialogPlugins = new ListPopUp("Enabled Plugins");
+	m_dialogCameras = new ListPopUp("Cameras");
+
+//	setCurrentCamera(m_schnapps->addCamera());
+
+	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	connect(m_dialogMaps->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
+
+	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
+		mapAdded(map);
+
+	connect(m_schnapps, SIGNAL(pluginEnabled(Plugin*)), this, SLOT(pluginEnabled(Plugin*)));
+	connect(m_schnapps, SIGNAL(pluginDisabled(Plugin*)), this, SLOT(pluginDisabled(Plugin*)));
+	connect(m_dialogPlugins->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(pluginCheckStateChanged(QListWidgetItem*)));
+
+	foreach(Plugin* plug, m_schnapps->getPluginSet().values())
+		pluginEnabled(plug);
+
+	connect(m_schnapps, SIGNAL(cameraAdded(Camera*)), this, SLOT(cameraAdded(Camera*)));
+	connect(m_schnapps, SIGNAL(cameraRemoved(Camera*)), this, SLOT(cameraRemoved(Camera*)));
+	connect(m_dialogCameras->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(cameraCheckStateChanged(QListWidgetItem*)));
+
+	foreach(Camera* cam, m_schnapps->getCameraSet().values())
+		cameraAdded(cam);
+
+	m_dialogCameras->check(m_currentCamera->getName(),Qt::Checked);
+}
+
+
+
+
+
+View::View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget* shareWidget) :
+	QGLViewer(format, NULL, shareWidget),
+	b_updatingUI(false),
+	m_name(name),
+	m_schnapps(s),
+	m_currentCamera(NULL),
+	m_lastSelectedMap(NULL),
 	m_buttonArea(NULL),
 	m_closeButton(NULL),
 	m_VsplitButton(NULL),
@@ -294,6 +351,24 @@ bool View::isLinkedToMap(const QString& name) const
 
 void View::init()
 {
+	glewExperimental = GL_TRUE; // needed for GL Core Profile 3.3
+	glewInit();
+
+//	int major = 0;
+//	int minor = 0;
+//	glGetIntegerv(GL_MAJOR_VERSION, &major);
+//	glGetIntegerv(GL_MINOR_VERSION, &minor);
+//	std::cout << this->getName().toStdString() << "is using GL "<< major <<"."<< minor << std::endl;
+
+
+	qglviewer::Camera* c = this->camera();
+	this->setCamera(m_currentCamera);
+	delete c;
+
+	this->setBackgroundColor(QColor(0,0,0));
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	m_buttonArea = new ViewButtonArea(this);
 	m_buttonArea->setTopRightPosition(this->width(), 0);
 
@@ -326,16 +401,37 @@ void View::init()
 	connect(m_camerasButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_camerasListView(int, int, int, int)));
 
 
+	// FRAME DRAWER
 
-	qglviewer::Camera* c = this->camera();
-	this->setCamera(m_currentCamera);
-	delete c;
+	m_frameDrawer = new Utils::Drawer();
+	glm::mat4 mm(1.0);
+	glm::mat4 pm(1.0);
+	m_frameDrawer->getShader()->updateMatrices(mm, pm);
+
+	m_frameDrawer->newList(GL_COMPILE);
+	m_frameDrawer->color3f(0.0f,1.0f,0.0f);
+	m_frameDrawer->lineWidth(4.0f);
+	m_frameDrawer->begin(GL_LINE_LOOP);
+	m_frameDrawer->vertex3f(-1.0f,-1.0f, 0.0f);
+	m_frameDrawer->vertex3f( 1.0f,-1.0f, 0.0f);
+	m_frameDrawer->vertex3f( 1.0f, 1.0f, 0.0f);
+	m_frameDrawer->vertex3f(-1.0f, 1.0f, 0.0f);
+	m_frameDrawer->end();
+	m_frameDrawer->endList();
+
+	std::cout << "end INIT of "<< this->getName().toStdString()<< std::endl;
+
+//	qglviewer::Camera* c = this->camera();
+//	this->setCamera(m_currentCamera);
+//	delete c;
 
 	this->setBackgroundColor(QColor(0,0,0));
 }
 
 void View::preDraw()
 {
+	if (Utils::GLSLShader::CURRENT_OGL_VERSION>=3)
+		makeCurrent();
 	m_currentCamera->setScreenWidthAndHeight(width(), height());
 
 	QGLViewer::preDraw();
@@ -343,6 +439,13 @@ void View::preDraw()
 
 void View::draw()
 {
+	if (Utils::GLSLShader::CURRENT_OGL_VERSION>=3)
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+	}
+
 	const CameraSet& cams = m_schnapps->getCameraSet();
 	QList<Camera*> lc = cams.values();
 	foreach(Camera* camera, lc)
@@ -388,12 +491,9 @@ void View::draw()
 
 void View::postDraw()
 {
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	drawButtons();
 	if(isSelectedView())
 		drawFrame();
-	glPopAttrib();
-
+	drawButtons();
 	QGLViewer::postDraw();
 }
 
@@ -409,26 +509,15 @@ void View::resizeGL(int width, int height)
 
 void View::drawButtons()
 {
-	glEnable(GL_TEXTURE_2D);
-	startScreenCoordinatesSystem();
 	m_buttonArea->draw();
 	m_buttonAreaLeft->draw();
-	stopScreenCoordinatesSystem();
-	glDisable(GL_TEXTURE_2D);
 }
 
 void View::drawFrame()
 {
-	startScreenCoordinatesSystem();
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glLineWidth(2.0);
-	glBegin(GL_LINE_LOOP);
-		glVertex2i(1, 1);
-		glVertex2i(1, height()-1);
-		glVertex2i(width()-1, height()-1);
-		glVertex2i(width()-1, 1);
-	glEnd();
-	stopScreenCoordinatesSystem();
+	glDisable(GL_DEPTH_TEST);
+	m_frameDrawer->callList();
+	glEnable(GL_DEPTH_TEST);
 }
 
 void View::keyPressEvent(QKeyEvent* event)

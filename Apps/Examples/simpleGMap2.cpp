@@ -60,8 +60,6 @@ void SimpleGMap2::initGUI()
 
 void SimpleGMap2::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(1) ;
-
 	Geom::BoundingBox<VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	VEC3 gPosObj = bb.center() ;
 	float tailleX = bb.size(0) ;

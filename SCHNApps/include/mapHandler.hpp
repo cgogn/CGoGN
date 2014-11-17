@@ -82,11 +82,11 @@ void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 template <typename PFP>
 void MapHandler<PFP>::drawBB()
 {
-	if(!m_bbDrawer)
-	{
-		m_bbDrawer = new Utils::Drawer();
-		updateBBDrawer();
-	}
+//	if(!m_bbDrawer)
+//	{
+//		m_bbDrawer = new Utils::Drawer();
+//		updateBBDrawer();
+//	}
 
 //	QGLViewer::drawAxis();
 	m_bbDrawer->callList();
@@ -97,9 +97,22 @@ void MapHandler<PFP>::updateBB(const VertexAttribute<VEC3, MAP>& position)
 {
 	m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<MAP*>(m_map)), position);
 	m_bbDiagSize = m_bb.diagSize();
+
+	const typename PFP::VEC3& bmin = m_bb.min();
+	m_bbMin = qglviewer::Vec(bmin[0],bmin[1],bmin[2]);
+
+	const typename PFP::VEC3& bmax = m_bb.max();
+	m_bbMax = qglviewer::Vec(bmax[0],bmax[1],bmax[2]);
+
 	updateBBDrawer();
 }
 
+template <typename PFP>
+void MapHandler<PFP>::initBBDrawer()
+{
+	if(!m_bbDrawer)
+		m_bbDrawer = new Utils::Drawer();
+}
 
 template <typename PFP>
 void MapHandler<PFP>::updateBBDrawer()
@@ -192,7 +205,7 @@ void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* sh1)
 
 	if (m_map->dimension() == 2)
 	{
-		CGoGN::Utils::ShaderSimpleColor* ssc =static_cast<CGoGN::Utils::ShaderSimpleColor*>(sh1);
+		CGoGN::Utils::ShaderSimpleColor* ssc = static_cast<CGoGN::Utils::ShaderSimpleColor*>(sh1);
 
 		m_topoRender = new Algo::Render::GL2::TopoRender(ssc);
 		m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
