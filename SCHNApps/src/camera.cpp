@@ -174,37 +174,39 @@ void Camera::drawBBCam()
 	if (!m_drawBB)
 		return;
 
-	float shift = 0.01f*(m_bbMax - m_bbMin).norm();
+//TODO with Drawer ?
 
-	glDisable(GL_LIGHTING);
-	glColor3f(0.5f,1.0f,0.0f);
-	glLineWidth(1.0f);
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
-	glEnd();
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
-	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
-	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
-	glEnd();
-	glBegin(GL_LINES);
-	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
-	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
-	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
-	glEnd();
-	glColor3f(1.0f,1.0f,1.0f);
-	glEnable(GL_LIGHTING);
+//	float shift = 0.01f*(m_bbMax - m_bbMin).norm();
+
+//	glDisable(GL_LIGHTING);
+//	glColor3f(0.5f,1.0f,0.0f);
+//	glLineWidth(1.0f);
+//	glBegin(GL_LINE_LOOP);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
+//	glEnd();
+//	glBegin(GL_LINE_LOOP);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
+//	glEnd();
+//	glBegin(GL_LINES);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMin[0]-shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMax[1]+shift, m_bbMax[2]+shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMin[2]-shift);
+//	glVertex3f(m_bbMax[0]+shift, m_bbMin[1]-shift, m_bbMax[2]+shift);
+//	glEnd();
+//	glColor3f(1.0f,1.0f,1.0f);
+//	glEnable(GL_LIGHTING);
 }
 
 } // namespace SCHNApps

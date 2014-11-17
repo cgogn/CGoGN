@@ -129,9 +129,6 @@ void MyQT::storeVerticesInfoGen(unsigned int orb, const AttributeHandlerGen* att
 
 void MyQT::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
 	m_render_topo->updateData(myMap, position,  0.9f, 0.8f, 0.8f);
 

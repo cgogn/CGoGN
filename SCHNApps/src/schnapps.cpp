@@ -44,6 +44,12 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 {
 	GenericMap::initAllStatics(&m_sp);
 
+#ifdef USE_OGL_CORE_PROFILE
+	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(3);
+#else
+	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(3);
+#endif
+
 	this->setupUi(this);
 
 	// create & setup control dock
@@ -104,9 +110,8 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	connect(action_ShowHidePythonDock, SIGNAL(triggered()), this, SLOT(showHidePythonDock()));
 	connect(action_LoadPythonScript, SIGNAL(triggered()), this, SLOT(loadPythonScriptFromFileDialog()));
 
-	// create & setup central widget (views)
-//	glewInit();
 
+	// create & setup central widget (views)
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
 	m_rootSplitter = new QSplitter(centralwidget);
@@ -194,11 +199,28 @@ View* SCHNApps::addView(const QString& name)
 	if (m_views.contains(name))
 		return NULL;
 
+	QGLFormat format;
+	if (Utils::GLSLShader::CURRENT_OGL_VERSION >= 3)
+	{
+		format.setProfile(QGLFormat::CoreProfile);
+		format.setVersion(Utils::GLSLShader::MAJOR_OGL_CORE, Utils::GLSLShader::MINOR_OGL_CORE);
+		format.setDepth(true);
+		format.setDoubleBuffer(true);
+		format.setBlueBufferSize(8);
+		std::cout << "CORE_PROFILE GL"<< std::endl;
+	}
+	else
+	{
+		format = QGLFormat::defaultFormat();
+		std::cout << "DEFAULT GL"<< std::endl;
+	}
+
 	View* view = NULL;
 	if(m_firstView == NULL)
-		view = new View(name, this);
+		view = new View(name, this, format);
 	else
-		view = new View(name, this, m_firstView);
+		view = new View(name, this, format, m_firstView);
+
 	m_views.insert(name, view);
 
 	DEBUG_EMIT("viewAdded");

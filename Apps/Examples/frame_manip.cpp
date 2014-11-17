@@ -57,9 +57,6 @@ PFP::MAP myMap;
 
 void MyQT::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	m_frame = new Utils::FrameManipulator();
 
 	// frame is rendered twice the size of normal

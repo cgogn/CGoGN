@@ -55,6 +55,8 @@ class GLWidget : public QGLWidget
 public:
 	GLWidget(SimpleQT* cbs, QWidget *parent = 0);
 
+	GLWidget(SimpleQT* cbs, QGLFormat& format, QWidget *parent = 0);
+
 	~GLWidget();
 
     QSize minimumSizeHint() const;

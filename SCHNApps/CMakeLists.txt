@@ -16,6 +16,8 @@ SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 
 SET( SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
+SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
+
 
 
 find_package(OpenGL REQUIRED)
@@ -59,6 +61,10 @@ ENDIF (DEFINED ASSERTON)
 
 IF(SLOT_DEBUG_MODE)
 	add_definitions(-DSLOT_DEBUG_MODE=1)
+ENDIF()
+
+IF(USE_OGL_CORE_PROFILE)
+	add_definitions(-DUSE_OGL_CORE_PROFILE=1)
 ENDIF()
 
 # define includes of external libs 

@@ -62,7 +62,7 @@ protected:
 	int m_state_modifier;
 
 public:
-	QGLView(SimpleQGLV* ptr, QWidget *parent = 0);
+	QGLView(SimpleQGLV* ptr, QGLFormat& format, QWidget *parent = 0);
 	~QGLView();
 
 	void setObjectBB(float* bbmin, float* bbmax);
