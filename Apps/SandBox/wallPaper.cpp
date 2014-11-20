@@ -37,8 +37,6 @@ void MyQT::cb_initGL()
 	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 	setParamObject(lWidthObj,lPosObj.data());
 
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
 
@@ -58,10 +56,18 @@ void MyQT::cb_initGL()
 	// FOR WALL PAPER
 
 	m_textureWP = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
-	if (!m_textureWP->load("../SCHNApps/resources/cgogn/cgogn2.png"))
+	if (!m_textureWP->load("../../SCHNApps/resources/cgogn/cgogn2.png"))
 		computeTexture();
 	m_textureWP->update();
 	m_textureWP->setWrapping(GL_CLAMP_TO_EDGE);
+
+
+	m_textureWP2 = new Utils::Texture<2,Geom::Vec3uc>(GL_UNSIGNED_BYTE);
+	if (!m_textureWP2->load("../../SCHNApps/resources/icons/cameras.png"))
+		computeTexture();
+	m_textureWP2->update();
+	m_textureWP2->setWrapping(GL_CLAMP_TO_EDGE);
+
 
 	m_shaderWP = new Utils::ShaderWallPaper();
 	m_shaderWP->setTextureUnit(GL_TEXTURE0);
@@ -78,7 +84,10 @@ void MyQT::cb_redraw()
 	// FOR WALL PAPER
 	m_render->draw(m_shader, Algo::Render::GL2::LINES);
 
+	m_shaderWP->setTexture(m_textureWP);
 	m_shaderWP->draw();
+
+	m_shaderWP->drawFront(this->getWidth(), this->getHeight(),150,10,200,200,m_textureWP2);
 }
 
 
@@ -87,7 +96,7 @@ void MyQT::cb_keyPress(int keycode)
 	switch(keycode)
 	{
 	case 'l' :
-		if (m_textureWP->load("../SCHNApps/resources/cgogn/cgogn2.png"))
+		if (m_textureWP->load("../../SCHNApps/resources/cgogn/cgogn2.png"))
 			m_textureWP->update();
 		m_textureWP->setWrapping(GL_CLAMP_TO_EDGE);
 		break;

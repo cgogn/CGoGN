@@ -7,7 +7,7 @@ FRAG_OUT_DEF;
 void main()
 {
 	if (gl_FrontFacing)
-		gl_FragColor = ambient + lambertTerm*diffuse;
+		FRAG_OUT = ambient + lambertTerm*diffuse;
 	else
-		gl_FragColor = ambient + lambertTerm*diffuseBack;
+		FRAG_OUT = ambient + lambertTerm*diffuseBack;
 }

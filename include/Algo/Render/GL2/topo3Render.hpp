@@ -135,7 +135,7 @@ template<typename PFP>
 void Topo3Render<PFP>::setAllDartsColor(float r, float g, float b)
 {
 	m_vbo4->bind();
-	GLvoid* ColorDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	float* colorDartBuf = reinterpret_cast<float*>(ColorDartsBuffer);
 	for (unsigned int i=0; i < 2*m_nbDarts; ++i)
 	{
@@ -143,7 +143,7 @@ void Topo3Render<PFP>::setAllDartsColor(float r, float g, float b)
 		*colorDartBuf++ = g;
 		*colorDartBuf++ = b;
 	}
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 }
 
@@ -177,18 +177,18 @@ void Topo3Render<PFP>::drawDarts()
 //	glLineWidth(m_topo_dart_width);
 //	glPointSize(2.0f*m_topo_dart_width);
 //
-//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+//	glBindBuffer(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
 //	glColorPointer(3, GL_FLOAT, 0, 0);
 //	glEnableClientState(GL_COLOR_ARRAY);
 //
-//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
+//	glBindBuffer(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
 //	glVertexPointer(3, GL_FLOAT, 0, 0);
 //	glEnableClientState(GL_VERTEX_ARRAY);
 //	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
 //
 // 	glVertexPointer(3, GL_FLOAT, 6*sizeof(GL_FLOAT), 0);
 //
-//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+//	glBindBuffer(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
 // 	glColorPointer(3, GL_FLOAT, 6*sizeof(GL_FLOAT), 0);
 // 	glDrawArrays(GL_POINTS, 0, m_nbDarts)
 // 	;
@@ -215,7 +215,7 @@ void Topo3Render<PFP>::drawRelation1()
 
 //	glLineWidth(m_topo_relation_width);
 //	glColor3f(0.0f,1.0f,1.0f);
-//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
+//	glBindBuffer(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
 //	glVertexPointer(3, GL_FLOAT, 0, 0);
 //
 //	glEnableClientState(GL_VERTEX_ARRAY);
@@ -239,7 +239,7 @@ void Topo3Render<PFP>::drawRelation2()
 
 //	glLineWidth(m_topo_relation_width);
 //	glColor3f(1.0f,0.0f,0.0f);
-//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[2]);
+//	glBindBuffer(GL_ARRAY_BUFFER, m_VBOBuffers[2]);
 //	glVertexPointer(3, GL_FLOAT, 0, 0);
 //
 //	glEnableClientState(GL_VERTEX_ARRAY);
@@ -263,7 +263,7 @@ void Topo3Render<PFP>::drawRelation3(Geom::Vec4f c)
 
 //	glLineWidth(m_topo_relation_width);
 //	glColor3f(1.0f,1.0f,0.0f);
-//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[3]);
+//	glBindBuffer(GL_ARRAY_BUFFER, m_VBOBuffers[3]);
 //	glVertexPointer(3, GL_FLOAT, 0, 0);
 //
 //	glEnableClientState(GL_VERTEX_ARRAY);
@@ -303,7 +303,7 @@ void Topo3Render<PFP>::pushColors()
 {
 	m_color_save = new float[6*m_nbDarts];
 	m_vbo4->bind();
-	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	void* colorBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	memcpy(m_color_save, colorBuffer, 6*m_nbDarts*sizeof(float));
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -313,7 +313,7 @@ template<typename PFP>
 void Topo3Render<PFP>::popColors()
 {
 	m_vbo4->bind();
-	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	void* colorBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	memcpy(colorBuffer, m_color_save, 6*m_nbDarts*sizeof(float));
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -872,17 +872,17 @@ void Topo3RenderGMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP
 	// beta3
 	this->m_vbo1->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*this->m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer1 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	GLvoid* PositionBuffer1 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	// beta3
 	this->m_vbo2->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*this->m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	GLvoid* PositionBuffer2 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	// beta3
 	this->m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*this->m_nbDarts*sizeof(Geom::Vec3f), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer3 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	GLvoid* PositionBuffer3 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	Geom::Vec3f* positionF1 = reinterpret_cast<Geom::Vec3f*>(PositionBuffer1);
 	Geom::Vec3f* positionF2 = reinterpret_cast<Geom::Vec3f*>(PositionBuffer2);
@@ -941,10 +941,10 @@ void Topo3RenderGMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP
 	}
 
 	this->m_vbo3->bind();
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	this->m_vbo2->bind();
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	this->m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -1128,17 +1128,17 @@ void Topo3Render<PFP>::computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, 
 //	// phi1
 //	m_vbo1->bind();
 //	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-//	GLvoid* PositionBuffer1 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+//	GLvoid* PositionBuffer1 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 //
 //	//phi2
 //	m_vbo2->bind();
 //	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-//	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+//	GLvoid* PositionBuffer2 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 //
 //	//phi3
 //	m_vbo3->bind();
 //	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-//	GLvoid* PositionBuffer3 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+//	GLvoid* PositionBuffer3 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 //
 //	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
 //	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
@@ -1179,10 +1179,10 @@ void Topo3Render<PFP>::computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, 
 //	}
 //
 //	m_vbo3->bind();
-//	glUnmapBufferARB(GL_ARRAY_BUFFER);
+//	glUnmapBuffer(GL_ARRAY_BUFFER);
 //
 //	m_vbo2->bind();
-//	glUnmapBufferARB(GL_ARRAY_BUFFER);
+//	glUnmapBuffer(GL_ARRAY_BUFFER);
 //
 //	m_vbo1->bind();
 //	glUnmapBuffer(GL_ARRAY_BUFFER);

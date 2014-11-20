@@ -10,6 +10,7 @@ namespace SCHNApps
 
 Plugin::Plugin() : m_schnapps(NULL)
 {
+	glewExperimental = GL_TRUE; // needed for GL Core Profile 3.3
 	glewInit();
 }
 

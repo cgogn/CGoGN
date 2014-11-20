@@ -2,7 +2,7 @@
 
 PRECISON;
 VARYING_FRAG vec3 LightDir;
-VARYING_VERT vec3 Position;
+VARYING_FRAG vec3 Position;
 #ifdef WITH_COLOR
 VARYING_FRAG vec3 Color;
 #endif
@@ -11,6 +11,7 @@ uniform vec4 materialSpecular;
 uniform vec4 materialAmbient;
 uniform float shininess;
 FRAG_OUT_DEF;
+
 void main()
 {
 	vec3 DX = dFdx(Position);
@@ -47,5 +48,5 @@ void main()
 #endif
 	}
 #endif
-	gl_FragColor=finalColor;
+	FRAG_OUT=finalColor;
 }

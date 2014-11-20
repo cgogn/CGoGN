@@ -74,6 +74,7 @@ public:
 
 	// FOR WALL PAPER
 	Utils::Texture<2,Geom::Vec3uc>* m_textureWP;
+	Utils::Texture<2,Geom::Vec3uc>* m_textureWP2;
 	Utils::ShaderWallPaper* m_shaderWP;
 
     MyQT():

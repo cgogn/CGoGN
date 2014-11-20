@@ -41,8 +41,8 @@ namespace QT
 {
 
 
-QGLView::QGLView(SimpleQGLV* ptr, QWidget *parent):
-	QGLViewer(parent),
+QGLView::QGLView(SimpleQGLV* ptr, QGLFormat& format, QWidget *parent):
+	QGLViewer(format,parent),
 	m_sqgl(ptr),m_state_modifier(0)
 {
 }
@@ -79,6 +79,7 @@ QSize QGLView::sizeHint() const
 
 void QGLView::init()
 {
+	glewExperimental = GL_TRUE;
 	glewInit();
 	if (m_sqgl)
 		m_sqgl->cb_initGL();

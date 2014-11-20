@@ -82,8 +82,6 @@ void Viewer::initGUI()
 
 void Viewer::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(2) ;
-
 	m_render = new Algo::Render::GL2::MapRender() ;
 	m_topoRender = new Algo::Render::GL2::TopoRender() ;
 

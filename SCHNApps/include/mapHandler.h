@@ -51,8 +51,8 @@ public slots:
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-//	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
-//	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
+	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
+	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	float getBBdiagSize() const { return m_bbDiagSize; }
 
 	Utils::GLSLShader* getBBDrawerShader() const
@@ -83,6 +83,7 @@ public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
 	virtual void drawBB() = 0;
 	virtual void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
+	virtual void initBBDrawer() = 0;
 
 	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
@@ -256,6 +257,7 @@ public:
 	void drawBB();
 
 	void updateBB(const VertexAttribute<VEC3, MAP>& position);
+	void initBBDrawer();
 	void updateBBDrawer();
 
 	void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax);

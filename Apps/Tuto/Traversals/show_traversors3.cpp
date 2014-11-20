@@ -113,9 +113,6 @@ void MyQT::cb_explode(int x)
 
 void MyQT::cb_initGL()
 {
-    // choose to use GL version 2
-    Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
 
 	m_render_topo->updateData(myMap, position,  0.95f, 0.9f, 0.8f);

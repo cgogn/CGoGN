@@ -46,6 +46,8 @@ protected:
 	static std::string fragmentShaderText;
 
 	CGoGNGLuint m_unif_unit;
+	CGoGNGLuint m_unif_pos;
+	CGoGNGLuint m_unif_sz;
 	int m_unit;
 
 	Utils::GTexture* m_tex_ptr;
@@ -83,6 +85,22 @@ public:
 	 * @brief draw the quad as wallpaper
 	 */
 	void draw();
+
+	/**
+	 * @brief draw a specific texture at a specific place in a window
+	 * @param window_w
+	 * @param window_h
+	 * @param x
+	 * @param y
+	 * @param w
+	 * @param h
+	 * @param button
+	 */
+	void drawBack(int window_w, int window_h, int x, int y, int w, int h, Utils::GTexture* button);
+
+	void drawFront(int window_w, int window_h, int x, int y, int w, int h, Utils::GTexture* button);
+
+
 };
 
 } // namespace Utils

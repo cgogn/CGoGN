@@ -220,8 +220,6 @@ void Surface_RenderTopo_DockTab::updateMapParameters()
 
 		const Surface_RenderTopo_Plugin::ViewMapParam& p = m_plugin->h_viewParameterSet[view][map];
 
-		bool attChanged;
-
 		QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
 
 		int i = 1;
@@ -236,7 +234,6 @@ void Surface_RenderTopo_DockTab::updateMapParameters()
 					if (combo_positionAttribute->currentIndex() != i)
 					{
 						combo_positionAttribute->setCurrentIndex(i);
-						attChanged = true;
 					}
 				}
 				++i;
