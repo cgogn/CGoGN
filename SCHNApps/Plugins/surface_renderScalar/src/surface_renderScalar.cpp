@@ -79,6 +79,10 @@ void Surface_RenderScalar_Plugin::selectedViewChanged(View *prev, View *cur)
 void Surface_RenderScalar_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_RenderScalar_Plugin::mapAdded(MapHandlerGen* map)

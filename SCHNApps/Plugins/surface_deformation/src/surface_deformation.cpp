@@ -240,6 +240,10 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 void Surface_Deformation_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_Deformation_Plugin::mapAdded(MapHandlerGen* map)

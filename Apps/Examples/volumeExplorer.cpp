@@ -208,11 +208,6 @@ void MyQT::cb_Save()
 
 void MyQT::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-	CGoGNout << "GL VERSION = "<< glGetString(GL_VERSION)<< CGoGNendl;
-	Utils::GLSLShader::areShadersSupported();
-
 	// create the renders
 	m_topo_render = new Algo::Render::GL2::Topo3RenderMap<PFP>();
     m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,true);
@@ -463,13 +458,13 @@ int main(int argc, char **argv)
 	{
 		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
-		int nb = 8;
+		int nb = 32;
 		Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
 		cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
 		for (unsigned int i = position.begin(); i != position.end(); position.next(i))
 		{
-			VEC3 pert(float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0));
+			VEC3 pert(float(double(rand())/RAND_MAX/200.0),float(double(rand())/RAND_MAX/200.0),float(double(rand())/RAND_MAX/200.0));
 			position[i]+= pert;
 		}
 

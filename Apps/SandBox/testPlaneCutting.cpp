@@ -82,10 +82,8 @@ void Viewer::initGUI()
 
 void Viewer::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(2) ;
-
 	m_render = new Algo::Render::GL2::MapRender() ;
-	m_topoRender = new Algo::Render::GL2::TopoRenderMap<PFP>() ;
+	m_topoRender = new Algo::Render::GL2::TopoRender() ;
 
 	m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
 
@@ -232,7 +230,7 @@ void Viewer::cb_keyPress(int keycode)
 			m_positionVBO->updateData(position) ;
 			m_normalVBO->updateData(normal) ;
 
-			m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+			m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
 			updateGL();
 
 			break;
@@ -267,7 +265,7 @@ void Viewer::cb_keyPress(int keycode)
 			m_positionVBO->updateData(position) ;
 			m_normalVBO->updateData(normal) ;
 
-			m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+			m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
 			updateGL();
 
 			break;
@@ -338,7 +336,7 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
-	m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;

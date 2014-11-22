@@ -48,6 +48,7 @@ SET ( COMPILE_SANDBOX ON CACHE BOOL "compile all in sandbox" )
 SET ( ONELIB OFF CACHE BOOL "build CGoGN in one lib" )
 
 SET ( WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW" )
+SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
 
 
 IF(WIN32)
@@ -83,6 +84,12 @@ ELSE (WITH_GLEWMX)
 ENDIF (WITH_GLEWMX)
 
 
+IF(USE_OGL_CORE_PROFILE)
+	add_definitions(-DUSE_OGL_CORE_PROFILE=1)
+ENDIF()
+
+add_definitions(-DGLM_FORCE_RADIANS)
+
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 
 # define includes of external libs 
@@ -115,7 +122,7 @@ IF(WIN32)
 ELSE(WIN32)
 	find_package(SuiteSparse REQUIRED)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${SUITESPARSE_INCLUDE_DIRS})
-	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES})
+	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES} pthread)
 ENDIF(WIN32)
 
 
@@ -150,7 +157,6 @@ IF (WITH_GLEWMX)
 	ADD_DEFINITIONS(-DGLEW_MX)
 ENDIF (WITH_GLEWMX)
 
-
 # qq definition specifiques pour mac
 #IF(APPLE)
 #	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMAC_OSX")	
@@ -174,7 +180,9 @@ ELSE()
 	endif()
 ENDIF()
 
-
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
+endif()
 
 
 IF(WIN32)

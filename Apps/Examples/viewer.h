@@ -42,12 +42,13 @@
 #include "Algo/Render/GL2/topoRender.h"
 
 #include "Utils/Shaders/shaderPhong.h"
-#include "Utils/Shaders/shaderFlat.h"
+#include "Utils/Shaders/shaderSimpleFlat.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/pointSprite.h"
 #include "Utils/text3d.h"
 #include "Utils/vbo.h"
+#include "Utils/chrono.h"
 
 #include "Utils/Qt/qtInputs.h"
 
@@ -104,16 +105,19 @@ public:
 	VertexAttribute<VEC3, MAP> normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_topoRender ;
+	Algo::Render::GL2::TopoRender* m_topoRender ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::VBO* m_normalVBO;
 
 	Utils::ShaderPhong* m_phongShader ;
-	Utils::ShaderFlat* m_flatShader ;
+	Utils::ShaderSimpleFlat* m_flatShader ;
 	Utils::ShaderVectorPerVertex* m_vectorShader ;
 	Utils::ShaderSimpleColor* m_simpleColorShader ;
 	Utils::PointSprite* m_pointSprite ;
+
+	Utils::Chrono m_frame_ch;
+	unsigned int m_nbFrames;
 
 	Viewer() ;
 

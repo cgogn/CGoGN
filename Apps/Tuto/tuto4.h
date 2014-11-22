@@ -65,7 +65,7 @@ protected:
 	VertexAttribute<VEC3, MAP> position;
 
 	// render (for the topo)
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo;
 
 	// selected dart (mouse click)
 	std::vector<Dart> dart_selected;

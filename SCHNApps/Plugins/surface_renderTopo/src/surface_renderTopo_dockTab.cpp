@@ -43,7 +43,13 @@ void Surface_RenderTopo_DockTab::positionAttributeChanged(int index)
 //			if(index == 0)
 //				;
 //			else
-//				m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+
+//			m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+//		QString pos = this->combo_positionAttribute->currentText();
+
+			QString& pos = m_plugin->h_parameterSet[map].posAttName;
+			pos = this->combo_positionAttribute->currentText();
+			map->updateTopoRender(pos);
 			view->updateGL();
 		}
 	}
@@ -133,19 +139,34 @@ void Surface_RenderTopo_DockTab::phi2ColorChanged(int i)
 	}
 }
 
+
 void Surface_RenderTopo_DockTab::facesScaleFactorChanged(int i)
 {
 	if(!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
+
 		if(view && map)
 		{
-			m_plugin->h_viewParameterSet[view][map].facesScaleFactor = i / 100.0f;
-			view->updateGL();
+			m_plugin->h_parameterSet[map].facesScaleFactor = i / 100.0f;
+			m_plugin->h_parameterSet[map].needUpdate = true;
+			map->updateTopoRender(m_plugin->h_parameterSet[map].posAttName);
+		}
+		const ViewSet& vs= m_schnapps->getViewSet();
+		foreach (View* pv, vs)
+		{
+			if (m_plugin->h_viewParameterSet[pv].find(map) != m_plugin->h_viewParameterSet[pv].end())/* && (pv!=view))*/
+			{
+				pv->updateGL();
+			}
 		}
 	}
 }
+
+
+
+
 
 void Surface_RenderTopo_DockTab::edgesScaleFactorChanged(int i)
 {
@@ -155,8 +176,16 @@ void Surface_RenderTopo_DockTab::edgesScaleFactorChanged(int i)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(view && map)
 		{
-			m_plugin->h_viewParameterSet[view][map].edgesScaleFactor = i / 100.0f;
-			view->updateGL();
+			m_plugin->h_parameterSet[map].edgesScaleFactor = i / 100.0f;
+			m_plugin->h_parameterSet[map].needUpdate = true;
+		}
+		const ViewSet& vs= m_schnapps->getViewSet();
+		foreach (View* pv, vs)
+		{
+			if (m_plugin->h_viewParameterSet[pv].find(map) != m_plugin->h_viewParameterSet[pv].end())
+			{
+				pv->updateGL();
+			}
 		}
 	}
 }
@@ -187,20 +216,26 @@ void Surface_RenderTopo_DockTab::updateMapParameters()
 
 	if(view && map)
 	{
-		const MapParameters& p = m_plugin->h_viewParameterSet[view][map];
+		this->label_map_param->setText(QString("Per map parameters: ")+map->getName());
+
+		const Surface_RenderTopo_Plugin::ViewMapParam& p = m_plugin->h_viewParameterSet[view][map];
 
 		QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
 
-		unsigned int i = 1;
+		int i = 1;
 		const AttributeSet& attribs = map->getAttributeSet(VERTEX);
 		for(AttributeSet::const_iterator it = attribs.constBegin(); it != attribs.constEnd(); ++it)
 		{
 			if(it.value() == vec3TypeName)
 			{
 				combo_positionAttribute->addItem(it.key());
-				if(p.positionAttribute.isValid() && it.key() == QString::fromStdString(p.positionAttribute.name()))
-					combo_positionAttribute->setCurrentIndex(i);
-
+				if (m_plugin->h_parameterSet[map].posAttName == it.key())
+				{
+					if (combo_positionAttribute->currentIndex() != i)
+					{
+						combo_positionAttribute->setCurrentIndex(i);
+					}
+				}
 				++i;
 			}
 		}
@@ -211,8 +246,11 @@ void Surface_RenderTopo_DockTab::updateMapParameters()
 		combo_phi1Color->setColor(p.phi1Color);
 		check_drawPhi2->setChecked(p.drawPhi2);
 		combo_phi2Color->setColor(p.phi2Color);
-		slider_edgesScaleFactor->setSliderPosition(p.edgesScaleFactor * 100.0);
-		slider_facesScaleFactor->setSliderPosition(p.facesScaleFactor * 100.0);
+
+		slider_edgesScaleFactor->setSliderPosition(m_plugin->h_parameterSet[map].edgesScaleFactor * 100.0);
+		slider_facesScaleFactor->setSliderPosition(m_plugin->h_parameterSet[map].facesScaleFactor * 100.0);
+		m_plugin->h_parameterSet[map].needUpdate = true;
+
 	}
 
 	b_updatingUI = false;

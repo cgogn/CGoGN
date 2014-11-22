@@ -141,7 +141,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 
 	for (unsigned int i = 0; i < nbb; ++i)
 	{
-		glBufferSubDataARB(GL_ARRAY_BUFFER, offset, byteTableSize, addr[i]);
+		glBufferSubData(GL_ARRAY_BUFFER, offset, byteTableSize, addr[i]);
 		offset += byteTableSize;
 	}
 

@@ -150,13 +150,13 @@ void MyQT::createMap()
 
 	// first show for be sure that GL context is binded
 	show();
-	m_render_topo->updateData(myMap, position, 0.9f, 0.9f);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
 }
 
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>() ;
+	m_render_topo = new Algo::Render::GL2::TopoRender() ;
 }
 
 // redraw GL callback (clear and swap already done)
@@ -165,7 +165,7 @@ void MyQT::cb_redraw()
 	if (!dart_selected.empty())
 	for (std::vector<Dart>::iterator it = dart_selected.begin(); it != dart_selected.end(); ++it)
 	{
-		m_render_topo->overdrawDart(*it, 5, color[0],color[1],color[2]);
+		m_render_topo->overdrawDart(myMap, *it, 5, color[0],color[1],color[2]);
 	}
 	m_render_topo->drawTopo();
 }

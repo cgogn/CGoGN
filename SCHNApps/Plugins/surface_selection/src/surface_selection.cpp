@@ -491,6 +491,11 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
 	}
+
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_Selection_Plugin::updateSelectedCellsRendering()

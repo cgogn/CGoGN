@@ -92,6 +92,10 @@ void Surface_Modelisation_Plugin::mousePress(View* view, QMouseEvent* event)
 void Surface_Modelisation_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_Modelisation_Plugin::mapAdded(MapHandlerGen* map)

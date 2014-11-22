@@ -27,17 +27,17 @@ private slots:
 	void addPluginDirectoryClicked();
 	void enableSelectedPluginsClicked();
 	void disableSelectedPluginsClicked();
-	void pluginCheckStateChanged(QListWidgetItem* item);
+//	void pluginCheckStateChanged(QListWidgetItem* item);
 
 	// slots called from SCHNApps signals
 	void pluginAvailableAdded(QString name);
 	void pluginEnabled(Plugin* plugin);
 	void pluginDisabled(Plugin* plugin);
-	void selectedViewChanged(View* prev, View* cur);
+//	void selectedViewChanged(View* prev, View* cur);
 
 	// slots called from selected View signals
-	void selectedViewPluginLinked(PluginInteraction* plugin);
-	void selectedViewPluginUnlinked(PluginInteraction* plugin);
+//	void selectedViewPluginLinked(PluginInteraction* plugin);
+//	void selectedViewPluginUnlinked(PluginInteraction* plugin);
 
 private:
 	SCHNApps* m_schnapps;

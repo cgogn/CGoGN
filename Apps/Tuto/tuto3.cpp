@@ -67,17 +67,17 @@ void MyQT::traverseMap()
 
     // render the topo of the map without boundary darts
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData(myMap, position, 0.9f, 0.9f); // nb
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
 
     for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
     {
         if (m2.isMarked(d))
         {
-            m_render_topo->setDartColor(d,1.0f,0.0f,0.0f);
+//			m_render_topo->setDartColor(myMap,d,1.0f,0.0f,0.0f);
         }
         if (m1.isMarked(d))
         {
-            m_render_topo->setDartColor(d,0.0f,1.0f,0.0f);
+//			m_render_topo->setDartColor(myMap,d,0.0f,1.0f,0.0f);
         }
     }
 
@@ -198,20 +198,20 @@ void MyQT::createMap()
 
     // render the topo of the map without boundary darts
 //	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData(myMap, position, 0.9f, 0.9f); // nb
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f); // nb
 }
 
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>();
+	m_render_topo = new Algo::Render::GL2::TopoRender();
 }
 
 // redraw GL callback (clear and swap already done)
 void MyQT::cb_redraw()
 {
     if (dart_selected != NIL)
-        m_render_topo->overdrawDart(dart_selected, 5, 1.0f,0.0f,0.0f);
+		m_render_topo->overdrawDart(myMap, dart_selected, 5, 1.0f,0.0f,0.0f);
     m_render_topo->drawTopo();
 }
 

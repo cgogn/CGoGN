@@ -60,8 +60,6 @@ VertexAttribute<VEC3, MAP> normal;
 
 void MyQT::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
 

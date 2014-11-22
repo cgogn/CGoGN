@@ -312,7 +312,7 @@ void Material_Node::render()
 //		m_shader->bind();
 //	else
 //		if (m_disable_shader)
-//			glUseProgramObjectARB(0);
+//			glUseProgramObject(0);
 }
 
 

@@ -18,18 +18,28 @@ ControlDock_CameraTab::ControlDock_CameraTab(SCHNApps* s) :
 {
 	setupUi(this);
 
+	list_cameras->setSelectionMode(QAbstractItemView::SingleSelection);
+
 	connect(button_addCamera, SIGNAL(clicked()), this, SLOT(addCameraButtonClicked()));
 	connect(list_cameras, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(cameraCheckStateChanged(QListWidgetItem*)));
+	connect(list_cameras, SIGNAL(itemSelectionChanged()), this, SLOT(cameraSelectionChanged()));
 	connect(group_projectionType, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(cameraProjectionChanged(QAbstractButton*)));
 	connect(check_drawCamera, SIGNAL(clicked(bool)), this, SLOT(cameraDrawClicked(bool)));
 	connect(check_drawCameraPath, SIGNAL(clicked(bool)), this, SLOT(cameraDrawPathClicked(bool)));
 
 	connect(m_schnapps, SIGNAL(cameraAdded(Camera*)), this, SLOT(cameraAdded(Camera*)));
 	connect(m_schnapps, SIGNAL(cameraRemoved(Camera*)), this, SLOT(cameraRemoved(Camera*)));
-	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
 }
 
 
+Camera* ControlDock_CameraTab::currentCam()
+{
+	QList<QListWidgetItem *> sels = list_cameras->selectedItems();
+	if (!sels.empty())
+		return m_schnapps->getCamera(sels[0]->text());
+	//else
+	return m_schnapps->getCamera(list_cameras->item(0)->text());
+}
 
 
 
@@ -43,14 +53,8 @@ void ControlDock_CameraTab::cameraCheckStateChanged(QListWidgetItem *item)
 {
 	if(!b_updatingUI)
 	{
-		if(item->checkState() == Qt::Checked)
-			m_schnapps->getSelectedView()->setCurrentCamera(m_schnapps->getCamera(item->text()));
-		else // forbid to uncheck current camera (current view cannot have no camera)
-		{
-			b_updatingUI = true;
-			item->setCheckState(Qt::Checked);
-			b_updatingUI = false;
-		}
+		m_schnapps->getCamera(item->text())->m_drawBB = (item->checkState() == Qt::Checked);
+		m_schnapps->redrawAllViews();
 	}
 }
 
@@ -58,7 +62,7 @@ void ControlDock_CameraTab::cameraProjectionChanged(QAbstractButton* b)
 {
 	if(!b_updatingUI)
 	{
-		Camera* c = m_schnapps->getSelectedView()->getCurrentCamera();
+		Camera* c =currentCam();
 		if(radio_orthographicProjection->isChecked())
 			c->setProjectionType(qglviewer::Camera::ORTHOGRAPHIC);
 		else if(radio_perspectiveProjection->isChecked())
@@ -70,7 +74,7 @@ void ControlDock_CameraTab::cameraDrawClicked(bool b)
 {
 	if(!b_updatingUI)
 	{
-		Camera* c = m_schnapps->getSelectedView()->getCurrentCamera();
+		Camera* c = currentCam();
 		c->setDraw(b);
 	}
 }
@@ -79,12 +83,10 @@ void ControlDock_CameraTab::cameraDrawPathClicked(bool b)
 {
 	if(!b_updatingUI)
 	{
-		Camera* c = m_schnapps->getSelectedView()->getCurrentCamera();
+		Camera* c = currentCam();
 		c->setDrawPath(b);
 	}
 }
-
-
 
 
 
@@ -92,7 +94,8 @@ void ControlDock_CameraTab::cameraAdded(Camera* c)
 {
 	QListWidgetItem* item = new QListWidgetItem(c->getName(), list_cameras);
 	b_updatingUI = true;
-	item->setCheckState(Qt::Unchecked);
+//	item->setCheckState(Qt::Unchecked);
+	item->setSelected(true);
 	b_updatingUI = false;
 }
 
@@ -107,129 +110,17 @@ void ControlDock_CameraTab::cameraRemoved(Camera* c)
 	}
 }
 
-void ControlDock_CameraTab::selectedViewChanged(View* prev, View* cur)
+void ControlDock_CameraTab::cameraSelectionChanged()
 {
-	if(prev)
-	{
-		Camera* prevCam = prev->getCurrentCamera();
-		QList<QListWidgetItem*> prevItems = list_cameras->findItems(prevCam->getName(), Qt::MatchExactly);
-		if(!prevItems.empty())
-		{
-			b_updatingUI = true;
-			prevItems[0]->setCheckState(Qt::Unchecked);
-			b_updatingUI = false;
-		}
-
-		disconnect(prevCam, SIGNAL(projectionTypeChanged(int)), this, SLOT(currentCameraProjectionTypeChanged(int)));
-		disconnect(prevCam, SIGNAL(drawChanged(bool)), this, SLOT(currentCameraDrawChanged(bool)));
-		disconnect(prevCam, SIGNAL(drawPathChanged(bool)), this, SLOT(currentCameraDrawPathChanged(bool)));
-
-		disconnect(prev, SIGNAL(currentCameraChanged(Camera*,Camera*)), this, SLOT(selectedViewCurrentCameraChanged(Camera*,Camera*)));
-	}
-
-	if(cur)
-	{
-		Camera* curCam = cur->getCurrentCamera();
-		QList<QListWidgetItem*> curItems = list_cameras->findItems(curCam->getName(), Qt::MatchExactly);
-		if(!curItems.empty())
-		{
-			b_updatingUI = true;
-			curItems[0]->setCheckState(Qt::Checked);
-			b_updatingUI = false;
-		}
-
-		connect(curCam, SIGNAL(projectionTypeChanged(int)), this, SLOT(currentCameraProjectionTypeChanged(int)));
-		connect(curCam, SIGNAL(drawChanged(bool)), this, SLOT(currentCameraDrawChanged(bool)));
-		connect(curCam, SIGNAL(drawPathChanged(bool)), this, SLOT(currentCameraDrawPathChanged(bool)));
-
-		connect(cur, SIGNAL(currentCameraChanged(Camera*,Camera*)), this, SLOT(selectedViewCurrentCameraChanged(Camera*,Camera*)));
-	}
-
 	updateCurrentCameraInfo();
 }
-
-
-
-
-
-void ControlDock_CameraTab::selectedViewCurrentCameraChanged(Camera* prev, Camera* cur)
-{
-	if(prev)
-	{
-		QList<QListWidgetItem*> prevItems = list_cameras->findItems(prev->getName(), Qt::MatchExactly);
-		if(!prevItems.empty())
-		{
-			b_updatingUI = true;
-			prevItems[0]->setCheckState(Qt::Unchecked);
-			b_updatingUI = false;
-		}
-
-		disconnect(prev, SIGNAL(projectionTypeChanged(int)), this, SLOT(currentCameraProjectionTypeChanged(int)));
-		disconnect(prev, SIGNAL(drawChanged(bool)), this, SLOT(currentCameraDrawChanged(bool)));
-		disconnect(prev, SIGNAL(drawPathChanged(bool)), this, SLOT(currentCameraDrawPathChanged(bool)));
-	}
-
-	if(cur)
-	{
-		QList<QListWidgetItem*> curItems = list_cameras->findItems(cur->getName(), Qt::MatchExactly);
-		if(!curItems.empty())
-		{
-			b_updatingUI = true;
-			curItems[0]->setCheckState(Qt::Checked);
-			b_updatingUI = false;
-		}
-
-		connect(cur, SIGNAL(projectionTypeChanged(int)), this, SLOT(currentCameraProjectionTypeChanged(int)));
-		connect(cur, SIGNAL(drawChanged(bool)), this, SLOT(currentCameraDrawChanged(bool)));
-		connect(cur, SIGNAL(drawPathChanged(bool)), this, SLOT(currentCameraDrawPathChanged(bool)));
-	}
-
-	updateCurrentCameraInfo();
-}
-
-
-
-
-
-void ControlDock_CameraTab::currentCameraProjectionTypeChanged(int t)
-{
-	b_updatingUI = true;
-	switch(t)
-	{
-		case qglviewer::Camera::ORTHOGRAPHIC : radio_orthographicProjection->setChecked(true); break;
-		case qglviewer::Camera::PERSPECTIVE : radio_perspectiveProjection->setChecked(true); break;
-	}
-	b_updatingUI = false;
-}
-
-void ControlDock_CameraTab::currentCameraDrawChanged(bool b)
-{
-	b_updatingUI = true;
-	if(b)
-		check_drawCamera->setCheckState(Qt::Checked);
-	else
-		check_drawCamera->setCheckState(Qt::Unchecked);
-	b_updatingUI = false;
-}
-
-void ControlDock_CameraTab::currentCameraDrawPathChanged(bool b)
-{
-	b_updatingUI = true;
-	if(b)
-		check_drawCameraPath->setCheckState(Qt::Checked);
-	else
-		check_drawCameraPath->setCheckState(Qt::Unchecked);
-	b_updatingUI = false;
-}
-
 
 
 
 void ControlDock_CameraTab::updateCurrentCameraInfo()
 {
 	b_updatingUI = true;
-
-	Camera* c = m_schnapps->getSelectedView()->getCurrentCamera();
+	Camera* c = currentCam();
 
 	if(c->getProjectionType() == qglviewer::Camera::PERSPECTIVE)
 		radio_perspectiveProjection->setChecked(true);
@@ -242,6 +133,9 @@ void ControlDock_CameraTab::updateCurrentCameraInfo()
 
 	b_updatingUI = false;
 }
+
+
+
 
 } // namespace SCHNApps
 

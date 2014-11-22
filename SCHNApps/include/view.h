@@ -5,8 +5,12 @@
 #include <QGLViewer/qglviewer.h>
 #include <QGLViewer/manipulatedFrame.h>
 
+#include "dialogList.h"
+
 #include "schnapps.h"
 #include "Utils/gl_matrices.h"
+#include "Utils/GLSLShader.h"
+#include "Utils/drawer.h"
 
 namespace CGoGN
 {
@@ -19,6 +23,7 @@ class ViewButtonArea;
 class ViewButton;
 class PluginInteraction;
 
+
 class View : public QGLViewer
 {
 	Q_OBJECT
@@ -28,10 +33,15 @@ class View : public QGLViewer
 public:
 	static unsigned int viewCount;
 
-	View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget = NULL);
+	View(const QString& name, SCHNApps* s, QGLFormat& format);
+	View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget* shareWidget);
 	~View();
 
 	const QString& getName() const { return m_name; }
+
+	MapHandlerGen* lastSelectedMap() { return m_lastSelectedMap;}
+
+	void closeDialogs();
 
 public slots:
 	QString getName() { return m_name; }
@@ -64,6 +74,8 @@ public slots:
 	bool isLinkedToMap(const QString& name) const;
 
 private:
+	bool b_updatingUI;
+
 	virtual void init();
 	virtual void preDraw();
 	virtual void draw();
@@ -84,7 +96,7 @@ private:
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
-	void updateCurrentCameraBB();
+//	void updateCurrentCameraBB();
 
 private slots:
 	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
@@ -92,6 +104,22 @@ private slots:
 	void ui_verticalSplitView(int x, int y, int globalX, int globalY);
 	void ui_horizontalSplitView(int x, int y, int globalX, int globalY);
 	void ui_closeView(int x, int y, int globalX, int globalY);
+
+
+	void ui_mapsListView(int x, int y, int globalX, int globalY);
+	void ui_pluginsListView(int x, int y, int globalX, int globalY);
+	void ui_camerasListView(int x, int y, int globalX, int globalY);
+
+	void mapAdded(MapHandlerGen* map);
+	void mapRemoved(MapHandlerGen* map);
+	void pluginEnabled(Plugin *plugin);
+	void pluginDisabled(Plugin *plugin);
+	void cameraAdded(Camera* camera);
+	void cameraRemoved(Camera* camera);
+
+	void mapCheckStateChanged(QListWidgetItem* item);
+	void pluginCheckStateChanged(QListWidgetItem* item);
+	void cameraCheckStateChanged(QListWidgetItem* item);
 
 signals:
 	void currentCameraChanged(Camera*, Camera*);
@@ -109,6 +137,7 @@ protected:
 	Camera* m_currentCamera;
 	QList<PluginInteraction*> l_plugins;
 	QList<MapHandlerGen*> l_maps;
+	MapHandlerGen* m_lastSelectedMap;
 
 	ViewButtonArea* m_buttonArea;
 
@@ -116,7 +145,19 @@ protected:
 	ViewButton* m_VsplitButton;
 	ViewButton* m_HsplitButton;
 
+	ViewButtonArea* m_buttonAreaLeft;
+	ViewButton* m_mapsButton;
+	ViewButton* m_pluginsButton;
+	ViewButton* m_camerasButton;
+
 	QString m_textInfo;
+
+	ListPopUp* m_dialogMaps;
+	ListPopUp* m_dialogPlugins;
+	ListPopUp* m_dialogCameras;
+
+	Utils::Drawer* m_frameDrawer;
+
 };
 
 } // namespace SCHNApps

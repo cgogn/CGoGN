@@ -31,10 +31,12 @@ public:
 	unsigned int getCurrentOrbit();
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) { return m_selectedSelector[orbit]; }
 
+	void setSelectedMap(const QString& mapName);
+
 private slots:
 	// slots called from UI actions
 	void selectedMapChanged();
-	void mapCheckStateChanged(QListWidgetItem* item);
+//	void mapCheckStateChanged(QListWidgetItem* item);
 	void vertexAttributeCheckStateChanged(QListWidgetItem* item);
 
 	void selectedSelectorChanged();
@@ -45,11 +47,11 @@ private slots:
 	// slots called from SCHNApps signals
 	void mapAdded(MapHandlerGen* m);
 	void mapRemoved(MapHandlerGen* m);
-	void selectedViewChanged(View* prev, View* cur);
+//	void selectedViewChanged(View* prev, View* cur);
 
 	// slots called from selected View signals
-	void selectedViewMapLinked(MapHandlerGen* plugin);
-	void selectedViewMapUnlinked(MapHandlerGen* plugin);
+//	void selectedViewMapLinked(MapHandlerGen* plugin);
+//	void selectedViewMapUnlinked(MapHandlerGen* plugin);
 
 	// slots called from selected MapHandler signals
 	void selectedMapAttributeAdded(unsigned int orbit, const QString& name);

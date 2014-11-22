@@ -320,7 +320,7 @@ void Surface_Render_DockTab::updateMapParameters()
 		m_simpleColor = QColor(255*p.simpleColor[0],255*p.simpleColor[1],255*p.simpleColor[2]);
 		scolorButton->setStyleSheet("QPushButton { background-color:"+m_simpleColor.name()+ " }");
 
-		m_vertexColor = QColor(255*p.simpleColor[0],255*p.vertexColor[1],255*p.vertexColor[2]);
+		m_vertexColor = QColor(255*p.vertexColor[0],255*p.vertexColor[1],255*p.vertexColor[2]);
 		vcolorButton->setStyleSheet("QPushButton { background-color:"+m_vertexColor.name()+ " }");
 
 
