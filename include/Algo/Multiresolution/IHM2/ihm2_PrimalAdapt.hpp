@@ -312,14 +312,14 @@ void IHM2<PFP>::subdivideEdge(Dart d)
 	unsigned int cur = m_map.getCurrentLevel() ;
 	m_map.setCurrentLevel(eLevel) ;
 
-    Dart dd = m_map.phi2(d) ;
+	Dart dd = m_map.phi2(d) ;
 
 	m_map.setCurrentLevel(eLevel + 1) ;
 
     m_map.cutEdge(d) ;
 	unsigned int eId = m_map.getEdgeId(d) ;
-    m_map.setEdgeId(m_map.phi1(d), eId) ;
-    m_map.setEdgeId(m_map.phi1(dd), eId) ;
+	m_map.setEdgeId(m_map.phi1(d), eId) ;
+	m_map.setEdgeId(m_map.phi1(dd), eId) ;
     (*edgeVertexFunctor)(m_map.phi1(d)) ;
 
 	m_map.setCurrentLevel(cur) ;

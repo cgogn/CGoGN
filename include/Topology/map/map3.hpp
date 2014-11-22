@@ -776,6 +776,52 @@ void Map3<MAP_IMPL>::splitVolume(std::vector<Dart>& vd)
 }
 
 template <typename MAP_IMPL>
+void Map3<MAP_IMPL>::cutVolume(std::vector<Dart>& vd)
+{
+	//assert(checkSimpleOrientedPath(vd));
+
+	Dart e = vd.front();
+	Dart e2 = this->phi2(e);
+
+	//cut the volume following the path
+	ParentMap::splitSurface(vd, true, true);
+
+	//create the boundary
+	Dart b1 = newBoundaryCycle(vd.size());
+	Dart b2 = newBoundaryCycle(vd.size());
+
+	Dart fit1 = this->phi2(e);
+	Dart fit2 = this->phi2(e2);
+
+	Dart fitB1 = b1;
+	Dart fitB2 = b2;
+
+	do
+	{
+		Dart f = findBoundaryFaceOfEdge(fit1) ;
+		if(f != NIL)
+		{
+			Dart f2 = this->phi2(f) ;
+			this->phi2unsew(f) ;
+			this->phi2sew(fitB1, f) ;
+			this->phi2sew(fitB2, f2) ;
+		}
+		else
+			this->phi2sew(fitB1, fitB2) ;
+
+		//no phi3unsew for fit1 : already unsewed
+		phi3unsew(fit1) ;
+		phi3sew(fit1, fitB1);
+		phi3sew(fit2, fitB2);
+
+		fit1 = this->phi1(fit1);
+		fit2 = this->phi_1(fit2);
+		fitB1 = this->phi_1(fitB1);
+		fitB2 = this->phi1(fitB2);
+	} while(fitB1 != b1);
+}
+
+template <typename MAP_IMPL>
 void Map3<MAP_IMPL>::splitVolumeWithFace(std::vector<Dart>& vd, Dart d)
 {
 	assert(vd.size() == this->faceDegree(d));
@@ -1428,7 +1474,7 @@ unsigned int Map3<MAP_IMPL>::closeMap()
 		if (phi3(d) == d)
 		{
 			++nb ;
-			closeHole(d,true);
+			closeHole(d);
 		}
 	}
 	return nb ;

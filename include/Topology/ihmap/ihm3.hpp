@@ -575,14 +575,14 @@ inline unsigned int ImplicitHierarchicalMap3::faceId(Dart d)
 
 	if(fId == 0)
 		return 1;
-	else if(id == 1)
+	else if(fId == 1)
 		return 2;
-	else if(id == 2)
+	else if(fId == 2)
 	{
-		if(dId == eId)
+//		if(dId == eId)
 			return 0;
-		else
-			return 1;
+//		else
+//			return 1;
 	}
 
 	//else if(id == 3)

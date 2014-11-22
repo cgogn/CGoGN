@@ -248,6 +248,24 @@ void MyQT::operation(int x)
                 updateMap();
             }
             break;
+		case 13 :
+			CGoGNout <<"split volume"<<CGoGNendl;
+			if (!m_selecteds.empty())
+			{
+				myMap.splitVolume(m_selecteds);
+				m_selecteds.clear();
+				updateMap();
+			}
+			break;
+		case 14 :
+			CGoGNout <<"cut volume"<<CGoGNendl;
+			if (!m_selecteds.empty())
+			{
+				myMap.cutVolume(m_selecteds);
+				m_selecteds.clear();
+				updateMap();
+			}
+			break;
         default:
             break;
     }
@@ -470,12 +488,12 @@ void MyQT::cb_mousePress(int button, int x, int y)
     {
         if (button == Qt::LeftButton)
         {
-			Dart d = m_render_topo_boundary->picking(myMap, x,y,true);
-            if (d != Dart::nil())
-            {
-                Dart e = myMap.phi2(d);
-                std::cout << "Dart "<< d.index << " / phi2:" << e.index << std::endl;
-            }
+			m_selecteds.push_back(Dart(173));
+			m_selecteds.push_back(Dart(186));
+			m_selecteds.push_back(Dart(185));
+			m_selecteds.push_back(Dart(171));
+			m_selecteds.push_back(Dart(170));
+			m_selecteds.push_back(Dart(174));
         }
         if (button == Qt::RightButton)
         {
@@ -483,8 +501,6 @@ void MyQT::cb_mousePress(int button, int x, int y)
             if (d != Dart::nil())
             {
                 m_selecteds.push_back(d);
-                Dart e = myMap.phi2(d);
-                std::cout << "Dart "<< d.index << " / phi2:" << e.index << std::endl;
             }
         }
 

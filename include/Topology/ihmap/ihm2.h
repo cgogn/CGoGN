@@ -143,7 +143,7 @@ public:
 
 	void splitFace(Dart d, Dart e) ;
 
-    unsigned int vertexDegree(Dart d);
+	unsigned int vertexDegree(Dart d);
 
 	/***************************************************
 	 *              LEVELS MANAGEMENT                  *

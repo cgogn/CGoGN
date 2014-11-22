@@ -115,7 +115,7 @@ void Image<DataType>::createMask(const Image<DataTypeIn>& img )
 
 
 template< typename  DataType >
-void Image<DataType>::loadRaw(char *filename)
+void Image<DataType>::loadRaw(const char *filename)
 {
 	std::ifstream fp( filename, std::ios::in|std::ios::binary);
 	if (!fp.good())
@@ -147,7 +147,7 @@ void Image<DataType>::loadRaw(char *filename)
 
 
 template< typename  DataType >
-void Image<DataType>::loadVox(char *filename)
+void Image<DataType>::loadVox(const char *filename)
 {
 	std::ifstream in(filename);
 	if (!in)

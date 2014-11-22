@@ -157,6 +157,17 @@ void MyQT::operation(int x)
 			m_selected2=NIL;
 		}
 		break;
+	case 10:
+		CGoGNout <<"split surface"<<CGoGNendl;
+		if (!m_selecteds.empty())
+		{
+			myMap.splitSurface(m_selecteds);
+			updateMap();
+			m_selected=NIL;
+			m_selected2=NIL;
+			m_selecteds.clear();
+		}
+		break;
 
 	default:
 		break;
@@ -256,6 +267,12 @@ void MyQT::cb_redraw()
 
 	if (m_selected2 != NIL)
 		m_render_topo->overdrawDart(m_selected2, 11, 0.0f, 1.0f, 0.0f);
+
+	if(!m_selecteds.empty())
+	{
+		for(std::vector<Dart>::iterator it = m_selecteds.begin() ; it != m_selecteds.end() ; ++it)
+			m_render_topo->overdrawDart(*it, 11, 0.0f, 0.0f, 1.0f);
+	}
 }
 
 void MyQT::cb_mousePress(int button, int x, int y)
@@ -274,6 +291,17 @@ void MyQT::cb_mousePress(int button, int x, int y)
 				m_selected2 = d;
 		}
 		updateGL();
+	}
+	if(Control())
+	{
+		Dart d = m_render_topo->picking(myMap, x,y); // nb
+		if (button == Qt::LeftButton)
+		{
+			if (d == Dart::nil())
+				m_selecteds.clear();
+			else
+				m_selecteds.push_back(d);
+		}
 	}
 }
 

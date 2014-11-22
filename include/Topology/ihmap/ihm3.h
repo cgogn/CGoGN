@@ -163,7 +163,6 @@ public:
      *               MAP MANIPULATION                  *
      ***************************************************/
 
-	Dart cutEdge(Dart d);
 
     /***************************************************
      *              LEVELS MANAGEMENT                  *
@@ -206,9 +205,9 @@ public:
 	void setEdgeId(Dart d, unsigned int i); //TODO a virer
 	void setDartEdgeId(Dart d, unsigned int i);
 
-	unsigned int getTriRefinementEdgeId(Dart d);
+	unsigned int triRefinementEdgeId(Dart d);
 
-	unsigned int getQuadRefinementEdgeId(Dart d);
+	unsigned int quadRefinementEdgeId(Dart d);
 
 
 
@@ -227,6 +226,8 @@ public:
     /*!
      */
     unsigned int getFaceId(Dart d) ;
+
+	unsigned int faceId(Dart d);
 
     //! Set a face id to all darts from an orbit of d
     /*!
