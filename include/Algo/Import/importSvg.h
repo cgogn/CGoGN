@@ -25,6 +25,8 @@
 #ifndef __IMPORTSVG_H__
 #define __IMPORTSVG_H__
 
+#include "Utils/xml.h"
+
 namespace CGoGN
 {
 
@@ -43,16 +45,16 @@ namespace Import
  * @param name the name
  * @ return true if node has the good name
  */
-bool checkXmlNode(xmlNodePtr node, const std::string& name);
+bool checkXmlNode(tinyxml2::XMLElement* node, const std::string& name);
 
 template <typename PFP>
-void readCoordAndStyle(xmlNode* cur_path,
+void readCoordAndStyle(tinyxml2::XMLElement* cur_path,
 		std::vector<std::vector<VEC3 > >& allPoly,
 		std::vector<std::vector<VEC3 > >& allBrokenLines,
 		std::vector<float>& allBrokenLinesWidth);
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces);
+bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3,typename PFP::MAP>& position, CellMarker<typename PFP::MAP,EDGE>& polygons, CellMarker<typename PFP::MAP,FACE>& polygonsFaces);
 
 /**
  *
