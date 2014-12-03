@@ -418,6 +418,11 @@ void AttributeMultiVector<T>::dump(unsigned int i) const
 	CGoGNout << this->operator[](i);
 }
 
+template <typename T>
+inline bool AttributeMultiVector<T>::isMarkerBool()
+{
+	return false;
+}
 
 template <typename T>
 inline void AttributeMultiVector<T>::setTypeCode()

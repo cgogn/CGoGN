@@ -142,6 +142,7 @@ inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui) const
 inline Dart GenericMap::newDart()
 {
 	unsigned int di = m_attribs[DART].insertLine();		// insert a new dart line
+	m_attribs[DART].initMarkersOfLine(di);
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		if (m_embeddings[i])							// set all its embeddings
@@ -206,7 +207,11 @@ template <unsigned int ORBIT>
 inline unsigned int GenericMap::newCell()
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	return m_attribs[ORBIT].insertLine();
+
+	unsigned int c = m_attribs[ORBIT].insertLine();
+	m_attribs[ORBIT].initMarkersOfLine(c);
+	return c;
+//	return m_attribs[ORBIT].insertLine();
 }
 
 template <unsigned int ORBIT>

@@ -379,6 +379,11 @@ public:
 	void initLine(unsigned int index);
 
 	/**
+	 * initialize all markers of a line of the container
+	 */
+	void initMarkersOfLine(unsigned int index);
+
+	/**
 	 * copy the content of line src in line dst
 	 */
 	void copyLine(unsigned int dstIndex, unsigned int srcIndex);

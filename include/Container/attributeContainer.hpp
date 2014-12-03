@@ -338,6 +338,16 @@ inline void AttributeContainer::initLine(unsigned int index)
 	}
 }
 
+inline void AttributeContainer::initMarkersOfLine(unsigned int index)
+{
+	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if ((m_tableAttribs[i] != NULL) && (m_tableAttribs[i]->isMarkerBool()))
+			m_tableAttribs[i]->initElt(index);
+	}
+}
+
+
 inline void AttributeContainer::copyLine(unsigned int dstIndex, unsigned int srcIndex)
 {
 	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
