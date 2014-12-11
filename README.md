@@ -3,7 +3,7 @@ English version bellow
 Dépendences Linux
 =================
 installer les paquets suivants:  
-cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
+cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev libqglviewer-dev
 
 
 Pour compiler CGoGN
@@ -84,7 +84,7 @@ ENGLISH VERSION
 Linux dependencies
 ==================
 install the following packages:  
-cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev
+cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev libgsl0-dev libsuitesparse-dev libqglviewer-dev
 
 To compile CGoGN
 ================
