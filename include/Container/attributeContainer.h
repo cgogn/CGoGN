@@ -38,7 +38,6 @@ namespace CGoGN
 class RegisteredBaseAttribute;
 class AttributeContainer;
 
-
 class ContainerBrowser
 {
 public:
@@ -72,6 +71,11 @@ protected:
 	* vector of pointers to AttributeMultiVectors
 	*/
 	std::vector<AttributeMultiVectorGen*> m_tableAttribs;
+
+	/**
+	* vector of pointers to AttributeMultiVectors of MarkerBool
+	*/
+	std::vector<AttributeMultiVector<MarkerBool>*> m_tableMarkerAttribs;
 
 	/**
 	 * vector of free indices in the vector of AttributeMultiVectors
@@ -158,6 +162,10 @@ public:
 	template <typename T>
 	AttributeMultiVector<T>* addAttribute(const std::string& attribName);
 
+	/// special version for marker
+	AttributeMultiVector<MarkerBool>* addMarkerAttribute(const std::string& attribName);
+
+
 	/**
 	 * add a new attribute to the container
 	 * @param typeName type of the new attribute in a string
@@ -186,6 +194,8 @@ public:
 	*/
 	template <typename T>
 	bool removeAttribute(const std::string& attribName);
+
+	bool removeMarkerAttribute(const std::string& attribName);
 
 	/**
 	* Remove an attribute (destroys data)
@@ -322,12 +332,15 @@ public:
 	 */
 	unsigned int getAttributesNames(std::vector<std::string>& names) const;
 
+
 	/**
 	 * fill a vector with attribute type names
 	 * @param types vector of type names
 	 * @return number of attributes
 	 */
 	unsigned int getAttributesTypes(std::vector<std::string>& types);
+
+	std::vector<AttributeMultiVector<MarkerBool>*>& getMarkerAttributes();
 
 	/**************************************
 	 *        CONTAINER MANAGEMENT        *
@@ -443,6 +456,7 @@ public:
 	AttributeMultiVector<T>* getDataVector(unsigned int attrIndex);
 
 	AttributeMultiVectorGen* getVirtualDataVector(unsigned int attrIndex);
+
 
 	/**
 	* get an AttributeMultiVector

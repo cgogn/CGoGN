@@ -211,7 +211,6 @@ inline unsigned int GenericMap::newCell()
 	unsigned int c = m_attribs[ORBIT].insertLine();
 	m_attribs[ORBIT].initMarkersOfLine(c);
 	return c;
-//	return m_attribs[ORBIT].insertLine();
 }
 
 template <unsigned int ORBIT>
@@ -291,7 +290,7 @@ AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector()
 		x = x/10;
 		number[0]= '0'+x%10;
 
-		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("marker_" + orbitName(ORBIT) + number);
+		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addMarkerAttribute("marker_" + orbitName(ORBIT) + number);
 		return amv;
 	}
 }

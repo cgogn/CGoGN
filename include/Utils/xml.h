@@ -49,7 +49,7 @@ inline std::string XMLAttribute(tinyxml2::XMLElement* node, const char* attName)
 	const char *ptr = node->Attribute(attName);
 	if (ptr == NULL)
 	{
-		CGoGNerr << "Warning attrbute "<< attName << " not found"<< CGoGNendl;
+		CGoGNerr << "Warning attribute "<< attName << " not found"<< CGoGNendl;
 		return "";
 	}
 	return std::string(ptr);
