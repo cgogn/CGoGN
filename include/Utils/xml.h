@@ -22,87 +22,38 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef __QTQGLVIEWER_GLW_H
-#define __QTQGLVIEWER_GLW_H
+#ifndef __CGoGN_XML__
+#define __CGoGN_XML__
 
-#include <QApplication>
-#include <QDesktopWidget>
-#include <QMainWindow>
-#include <QWidget>
-#include <QtGui>
-#include <GL/glew.h>
-#include <QGLViewer/qglviewer.h>
-
-#include <set>
 #include <string>
-#include "Geometry/vector_gen.h"
-#include "Utils/gl_matrices.h"
+#include "Utils/cgognStream.h"
+#include <tinyxml2.h>
 
-namespace CGoGN { namespace Utils { class GLSLShader; } }
 
 namespace CGoGN
 {
 
-namespace Utils
+
+inline bool XMLisError(tinyxml2::XMLError err, const std::string& msg)
 {
+	if (err != tinyxml2::XML_NO_ERROR)
+	{
+		CGoGNerr << msg << CGoGNendl;
+		return true;
+	}
+	return false;
+}
 
-namespace QT
+inline std::string XMLAttribute(tinyxml2::XMLElement* node, const char* attName)
 {
-// forward definition
-class SimpleQGLV;
+	const char *ptr = node->Attribute(attName);
+	if (ptr == NULL)
+	{
+		CGoGNerr << "Warning attribute "<< attName << " not found"<< CGoGNendl;
+		return "";
+	}
+	return std::string(ptr);
+}
 
-
-class QGLView : public QGLViewer
-{
-	Q_OBJECT
-protected:
-	SimpleQGLV* m_sqgl;
-	int W;
-	int H;
-	int m_state_modifier;
-	int m_current_button;
-
-public:
-	QGLView(SimpleQGLV* ptr, QGLFormat& format, QWidget *parent = 0);
-	~QGLView();
-
-	void setObjectBB(float* bbmin, float* bbmax);
-	void setParamObject(float width, float* pos);
-	void glMousePosition(int& x, int& y);
-
-	virtual void init();
-	virtual void preDraw();
-	virtual void draw();
-	virtual void postDraw() {}
-	virtual void resizeGL(int width, int height);
-
-	void mousePressEvent(QMouseEvent* event);
-	void mouseReleaseEvent(QMouseEvent* event);
-	void mouseClickEvent(QMouseEvent* event);
-//	void mouseDoubleClickEvent(QMouseEvent* event);
-	void mouseMoveEvent(QMouseEvent* event);
-	void keyPressEvent(QKeyEvent* event);
-	void keyReleaseEvent(QKeyEvent* event);
-//	void wheelEvent(QWheelEvent* event);
-	bool Shift() { return m_state_modifier & Qt::ShiftModifier; }
-	bool Control() { return m_state_modifier & Qt::ControlModifier; }
-	bool Alt() { return m_state_modifier & Qt::AltModifier; }
-	int getHeight() const { return H; }
-	int getWidth() const { return W; }
-
-	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius);
-	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center);
-
-	QSize minimumSizeHint() const;
-	QSize sizeHint() const;
-
-};
-
-
-} // namespace QT
-
-} // namespace Utils
-
-} // namespace CGoGN
-
+}
 #endif

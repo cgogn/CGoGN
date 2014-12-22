@@ -235,8 +235,8 @@ void GenericMap::init(bool addBoundaryMarkers)
 
 	if (addBoundaryMarkers)
 	{
-		m_boundaryMarkers[0] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark0") ;
-		m_boundaryMarkers[1] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark1") ;
+		m_boundaryMarkers[0] = m_attribs[DART].addMarkerAttribute("BoundaryMark0") ;
+		m_boundaryMarkers[1] = m_attribs[DART].addMarkerAttribute("BoundaryMark1") ;
 	}
 
 
@@ -405,16 +405,15 @@ void GenericMap::restore_shortcuts()
 	}
 
 	// MARKERS
-	m_attribs[DART].getAttributesNames(listeNames);
-
-	for (unsigned int i = 0;  i < listeNames.size(); ++i)
+	std::vector<AttributeMultiVector<MarkerBool>*>& amvv = m_attribs[DART].getMarkerAttributes();
+	for (auto it=amvv.begin(); it != amvv.end(); ++it)
 	{
-		if (listeNames[i] == "BoundaryMark0")
-			m_boundaryMarkers[0] = cont.getDataVector<MarkerBool>(i);
-
-		if (listeNames[i] == "BoundaryMark1")
-			m_boundaryMarkers[1] = cont.getDataVector<MarkerBool>(i);
+		if ((*it)->getName() == "BoundaryMark0")
+			m_boundaryMarkers[0] = *it;
+		if ((*it)->getName() == "BoundaryMark1")
+			m_boundaryMarkers[1] = *it;
 	}
+
 
 	// QUICK TRAVERSAL
 
@@ -603,17 +602,20 @@ void GenericMap::garbageMarkVectors()
 
 	for (unsigned int orbit=0; orbit<NB_ORBITS;++orbit)
 	{
-		std::vector<std::string> attNames;
-		m_attribs[orbit].getAttributesNames(attNames);
-		for (auto sit=attNames.begin(); sit!=attNames.end();++sit)
+		std::vector<AttributeMultiVector<MarkerBool>*>& amvv = m_attribs[orbit].getMarkerAttributes();
+
+		for (auto it = amvv.begin(); it != amvv.end(); ++it )
 		{
-			if (sit->substr(0,7) == "marker_")
+			AttributeMultiVector<MarkerBool>* amv = *it;
+			const std::string& name = amv->getName();
+			if (name.substr(0,7) == "marker_")
 			{
-				std::string num = sit->substr(sit->length()-3,3);
+				// store tne next free index for unique numbering
+				std::string num = name.substr(name.length()-3,3);
 				unsigned int id = 100*(num[0]-'0')+10*(num[1]-'0')+(num[2]-'0');
 				if (id > maxId)
 					maxId = id;
-				AttributeMultiVector<MarkerBool>* amv = m_attribs[orbit].getDataVector<MarkerBool>(*sit);
+
 				amv->allFalse();
 				m_markVectors_free[orbit][0].push_back(amv);
 			}
