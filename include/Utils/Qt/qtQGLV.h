@@ -259,14 +259,14 @@ public:
 	 * @param radius radius on pixel for clicking precision
 	 * @return the distance in modelview world corresponding to radius pixel in screen
 	 */
-//	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius=4) { return m_glWidget->getOrthoScreenRay(x,y,rayA,rayB,radius);}
+	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius=4) { return m_qglWidget->getOrthoScreenRay(x,y,rayA,rayB,radius);}
 
 	/**
 	 * transform a pixel distance on screen in distance in world
 	 * @param pixel_width width on pixel on screen
 	 * @param center reference point on world to use (defaut 0,0,0)
 	 */
-//	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center) { return m_glWidget->getWidthInWorld(pixel_width,center);}
+	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center) { return m_qglWidget->getWidthInWorld(pixel_width,center);}
 
 
 	const glm::mat4& transfoMatrix() const { return m_transfo_matrix; }

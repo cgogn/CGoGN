@@ -400,6 +400,12 @@ public:
 	{
 		CGoGNout << this->operator[](i);
 	}
+
+	inline bool isMarkerBool()
+	{
+		return true;
+	}
+
 };
 
 

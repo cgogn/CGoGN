@@ -26,8 +26,12 @@
 #include "Geometry/bounding_box.h"
 #include "Geometry/plane_3d.h"
 #include "Algo/BooleanOperator/mergeVertices.h"
+#include "Algo/Topo/basic.h"
 #include "Container/fakeAttribute.h"
+
 #include <limits>
+
+#include "Utils/xml.h" // just for highlighting/completion in editor
 
 namespace CGoGN
 {
@@ -41,9 +45,14 @@ namespace Surface
 namespace Import
 {
 
-inline bool checkXmlNode(xmlNodePtr node, const std::string& name)
+//inline bool checkXmlNode(xmlNodePtr node, const std::string& name)
+//{
+//	return (strcmp((char*)(node->name),(char*)(name.c_str())) == 0);
+//}
+
+inline bool checkXmlNode(tinyxml2::XMLElement* node, const std::string& name)
 {
-	return (strcmp((char*)(node->name),(char*)(name.c_str())) == 0);
+	return (strcmp(node->Name(),name.c_str()) == 0);
 }
 
 template<typename T>
@@ -206,7 +215,7 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 }
 
 template <typename PFP>
-void readCoordAndStyle(xmlNode* cur_path,
+void readCoordAndStyle(tinyxml2::XMLElement* cur_path,
 		std::vector<std::vector<VEC3 > >& allPoly,
 		std::vector<std::vector<VEC3 > >& allBrokenLines,
 		std::vector<float>& allBrokenLinesWidth)
@@ -218,14 +227,16 @@ void readCoordAndStyle(xmlNode* cur_path,
 	POLYGON curPoly;
 
 //	CGoGNout << "--load a path--"<< CGoGNendl;
-	xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "d");
-	std::string allcoords((reinterpret_cast<const char*>(prop)));
+//	xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "d");
+//	std::string allcoords((reinterpret_cast<const char*>(prop)));
+	std::string allcoords = XMLAttribute(cur_path,"d");
+
 	getPolygonFromSVG(allcoords,curPoly,closedPoly);
 
 	//check orientation : set in CCW
 	if(curPoly.size()>2)
 	{
-		VEC3 v(0), v1, v2;
+		VEC3 v(0)/*, v1, v2*/;
 		typename std::vector<VEC3 >::iterator it0, it1, it2;
 		it0 = curPoly.begin();
 		it1 = it0+1;
@@ -255,8 +266,11 @@ void readCoordAndStyle(xmlNode* cur_path,
 	{
 		//if not : read the linewidth for further dilatation
 		allBrokenLines.push_back(curPoly);
-		xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "style");
-		std::string allstyle((reinterpret_cast<const char*>(prop)));
+
+//		xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "style");
+//		std::string allstyle((reinterpret_cast<const char*>(prop)));
+
+		std::string allstyle = XMLAttribute(cur_path,"style");
 		std::stringstream is(allstyle);
 		std::string style;
 		while ( std::getline( is, style, ';' ) )
@@ -274,7 +288,7 @@ void readCoordAndStyle(xmlNode* cur_path,
 }
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3>& position, CellMarker<EDGE>& obstacleMark, CellMarker<FACE>& buildingMark)
+bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3,typename PFP::MAP>& position, CellMarker<typename PFP::MAP,EDGE>& obstacleMark, CellMarker<typename PFP::MAP,FACE>& buildingMark)
 {
 	//TODO : remove auto-intersecting faces
 	//TODO : handling polygons with holes
@@ -282,8 +296,18 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	typedef typename PFP::VEC3 VEC3;
 	typedef std::vector<VEC3> POLYGON;
 
-	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
-	xmlNodePtr map_node = xmlDocGetRootElement(doc);
+
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError eResult = doc.LoadFile(filename.c_str());
+
+	if (XMLisError(eResult,"unable loading file"+filename))
+		return false;
+
+	tinyxml2::XMLElement* map_node = doc.RootElement();
+
+
+//	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
+//	xmlNodePtr map_node = xmlDocGetRootElement(doc);
 
 	if (!checkXmlNode(map_node,"svg"))
 	{
@@ -295,11 +319,11 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	std::vector<POLYGON> allBrokenLines;
 	std::vector<float> allBrokenLinesWidth;
 
-	for (xmlNode* cur_node = map_node->children; cur_node; cur_node = cur_node->next)
+	for (tinyxml2::XMLElement* cur_node = map_node->FirstChildElement(); cur_node; cur_node = cur_node->NextSiblingElement())
 	{
 		// for each layer
 		if (checkXmlNode(cur_node, "g"))
-			for (xmlNode* cur_path = cur_node->children ; cur_path; cur_path = cur_path->next)
+			for (tinyxml2::XMLElement* cur_path = cur_node->FirstChildElement(); cur_path; cur_path = cur_path->NextSiblingElement())
 			{
 				if (checkXmlNode(cur_path, "path"))
 					readCoordAndStyle<PFP>(cur_path, allPoly, allBrokenLines, allBrokenLinesWidth);
@@ -308,17 +332,30 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 				readCoordAndStyle<PFP>(cur_node, allPoly, allBrokenLines, allBrokenLinesWidth);
 	}
 
-	xmlFreeDoc(doc);
+//	for (xmlNode* cur_node = map_node->children; cur_node; cur_node = cur_node->next)
+//	{
+//		// for each layer
+//		if (checkXmlNode(cur_node, "g"))
+//			for (xmlNode* cur_path = cur_node->children ; cur_path; cur_path = cur_path->next)
+//			{
+//				if (checkXmlNode(cur_path, "path"))
+//					readCoordAndStyle<PFP>(cur_path, allPoly, allBrokenLines, allBrokenLinesWidth);
+//			}
+//		else if (checkXmlNode(cur_node, "path"))
+//				readCoordAndStyle<PFP>(cur_node, allPoly, allBrokenLines, allBrokenLinesWidth);
+//	}
+
+//	xmlFreeDoc(doc);
 
 	std::cout << "importSVG : XML read." << std::endl;
 
-	CellMarker<EDGE> brokenMark(map);
-	EdgeAttribute<float> edgeWidth = map.template addAttribute<float, EDGE>("width");
+	CellMarker<typename PFP::MAP,EDGE> brokenMark(map);
+	EdgeAttribute<float,typename PFP::MAP> edgeWidth = map.template addAttribute<float, EDGE,typename PFP::MAP>("width");
 //	EdgeAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
-	EdgeAttribute<NoTypeNameAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoTypeNameAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
+	EdgeAttribute<NoTypeNameAttribute<Geom::Plane3D<typename PFP::REAL> >, typename PFP::MAP> edgePlanes = map.template addAttribute<NoTypeNameAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE,typename PFP::MAP>("planes");
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create broken lines
-	DartMarker brokenL(map);
+	DartMarker<typename PFP::MAP> brokenL(map);
 
 	typename std::vector<POLYGON >::iterator it;
 	std::vector<float >::iterator itW = allBrokenLinesWidth.begin();
@@ -459,7 +496,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//process broken lines
-	CellMarker<EDGE> eMTreated(map) ;
+	CellMarker<typename PFP::MAP,EDGE> eMTreated(map) ;
 	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 	{
 		if (brokenL.isMarked(d) && !eMTreated.isMarked(d))
@@ -521,7 +558,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	{
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
-			if(map.isBoundaryMarked2(d))
+			if(map.template isBoundaryMarked<2>(d))
 			{
 				map.fillHole(d);
 			}
@@ -552,14 +589,14 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 			}
 		}
 
-		map.template initAllOrbitsEmbedding<FACE>(true);
-
+		Algo::Topo::initAllOrbitsEmbedding<FACE>(map,true);
 
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
-			if (!map.isBoundaryMarked2(d) && brokenL.isMarked(d))
+			if (!map.template isBoundaryMarked<2>(d) && brokenL.isMarked(d))
 			{
-				map.deleteFace(d,false);
+				// ??? map.deleteFace(d,false);
+				map.deleteCycle(d); // ???
 			}
 		}
 
@@ -567,7 +604,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
-			if (map.isBoundaryMarked2(d))
+			if (map.template isBoundaryMarked<2>(d))
 				buildingMark.mark(d);
 		}
 
