@@ -9,6 +9,29 @@ SET ( CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR} )
 SET ( CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/ )
 
 
+# ====== Check GCC VERSION FOR C++11 ======
+if(CMAKE_COMPILER_IS_GNUCXX)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	if (GCC_VERSION VERSION_LESS 4.8)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a gcc/g++ compiler with a version at least 4.8 is needed.")
+	endif()
+endif()
+
+# ====== Check CLANG VERSION FOR C++11 ======
+if (APPLE)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
+	if (CLANG_VERSION VERSION_LESS 3.1)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a clang compiler with a version at least 3.1 is needed !!")
+	endif()
+endif()
+
+# ====== Check MSVC VERSION FOR C++11 ======
+if(WIN32)
+	if(MSVC_VERSION LESS 1800)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a microsoft compiler with a version at least 12 is needed.")
+	endif()
+endif()
+
 
 IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
@@ -58,7 +81,6 @@ ENDIF(WIN32)
 find_package(OpenGL REQUIRED)
 find_package(Boost COMPONENTS regex REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
 
 # MESSAGE HERE FOR MORE EASY USER READING
@@ -98,7 +120,6 @@ SET (CGoGN_EXT_INCLUDES
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
-	${LIBXML2_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
 )
 
@@ -108,8 +129,8 @@ SET (CGoGN_EXT_LIBS
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
-	${LIBXML2_LIBRARIES}
 	${Boost_REGEX_LIBRARY}
+	tinyxml2
 )
 
 IF(WIN32)
