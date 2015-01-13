@@ -32,7 +32,7 @@ if(WIN32)
 	endif()
 endif()
 
-
+# ======== Check  Build Type =============
 IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
 		SET(CMAKE_BUILD_TYPE "Debug")
@@ -40,6 +40,7 @@ IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 		SET(CMAKE_BUILD_TYPE "Release")
 	ENDIF()
 ENDIF()
+
 
 # for shared or not shared
 SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
@@ -193,11 +194,8 @@ ELSE()
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Woverride-init -fPIC")
 	# remove the 60000+ "no unused local typedefs" warnings with GCC4.8+
 	if(CMAKE_COMPILER_IS_GNUCXX)
-		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-		if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-			SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
-		endif(GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
 	endif()
 ENDIF()
 

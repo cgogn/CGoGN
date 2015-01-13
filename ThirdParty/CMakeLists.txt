@@ -4,7 +4,6 @@ include(ExternalProject)
 project(CGoGN_ThirdParty)
 
 
-
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 
 IF(WIN32)
@@ -82,7 +81,9 @@ IF (WITH_TINYXML2)
 		INSTALL_COMMAND make install
 	)
 	INSTALL (DIRECTORY TinyXml2/include/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include)
-	FILE(GLOB_RECURSE tinyLib_files ${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2/lib/*.so.* ${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2/lib/*.a )
+	FILE( GLOB_RECURSE tinyLib_files 
+				${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2/lib/*.so*
+				${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2/lib/*.a
+				${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2/lib/*.dylib )
 	INSTALL (FILES ${tinyLib_files} DESTINATION ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-
 ENDIF (WITH_TINYXML2)	
