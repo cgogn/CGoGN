@@ -27,7 +27,7 @@
 
 #include <string>
 #include "Utils/cgognStream.h"
-#include <tinyxml2.h>
+#include "TinyXml2/tinyxml2.h"
 
 
 namespace CGoGN

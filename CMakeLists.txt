@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(CGoGN)
+cmake_policy(SET CMP0042 NEW) # rpath new policy
 
 #SET ( CMAKE_VERBOSE_MAKEFILE 1 )
 
@@ -42,8 +43,15 @@ IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 ENDIF()
 
 
-# for shared or not shared
-SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+# for shared or not shared (default except on windows)
+
+if(WIN32)
+	SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+else()
+	SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+endif()
+
+
 
 #IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp")
 IF(EXISTS "${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}/*assimp*")
@@ -68,8 +76,9 @@ SET ( COMPILE_BENCHES ON CACHE BOOL "compile benches" )
 SET ( COMPILE_SANDBOX ON CACHE BOOL "compile all in sandbox" )
 
 
-#create one big lib
+#create one big lib 
 SET ( ONELIB OFF CACHE BOOL "build CGoGN in one lib" )
+
 
 SET ( WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW" )
 SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )

@@ -1,16 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
-include(ExternalProject)
 
 project(CGoGN_ThirdParty)
-
-# for access to var CMAKE_INSTALL_LIBDIR
-include(GNUInstallDirs)
+cmake_policy(SET CMP0042 NEW) # rpath new policy
 
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 
-IF(WIN32)
-	
-ENDIF(WIN32)
 
 IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
 	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Debug/Release" FORCE)
@@ -24,29 +18,14 @@ IF(WIN32)
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib)
 	set(CMAKE_CONFIGURATION_TYPES Release Debug)
+	SET (BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)")
 ELSE()
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-	ExternalProject_Add(
-		Tinyxml2
-		PREFIX ${CMAKE_CURRENT_BINARY_DIR}/tinyxml2
-		GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
-		CMAKE_CACHE_ARGS "-DCMAKE_BUILD_TYPE:string=${CMAKE_BUILD_TYPE}"
-		CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2"
-		BUILD_COMMAND make
-		INSTALL_COMMAND make install
-	)
-	INSTALL (DIRECTORY TinyXml2/include/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include)
-	INSTALL (DIRECTORY TinyXml2/${CMAKE_INSTALL_LIBDIR}/ DESTINATION ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}
-				 PATTERN "pkgconfig" EXCLUDE )
-
-
+	SET (BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)")
 ENDIF()
 
 
-
 # for shared or not shared
-SET (BUILD_SHARED_LIBS OFF CACHE BOOL 
-	"if used all library are build as shared type (.so/.dylib/.dll)")
 
 SET (WITH_ASSIMP OFF CACHE BOOL "build with Assimp")
 SET (WITH_ZINRI ON CACHE BOOL "build with Zinri libs")
@@ -78,3 +57,7 @@ IF (WITH_ASSIMP)
 	add_subdirectory(Assimp Assimp/build)
 	INSTALL (DIRECTORY Assimp/include/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp)
 ENDIF (WITH_ASSIMP)
+
+add_subdirectory(TinyXml2 TinyXml2/build)
+INSTALL (DIRECTORY TinyXml2/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/TinyXml2 FILES_MATCHING PATTERN "*.h")
+
