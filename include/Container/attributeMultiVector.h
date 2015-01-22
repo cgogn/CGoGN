@@ -195,6 +195,8 @@ public:
 	 * @param fs filestream
 	 */
 	virtual void dump(unsigned int i) const = 0;
+
+	virtual bool isMarkerBool() = 0;
 };
 
 
@@ -321,6 +323,8 @@ public:
 	 * @param fs filestream
 	 */
 	virtual void dump(unsigned int i) const;
+
+	inline bool isMarkerBool();
 
 };
 
