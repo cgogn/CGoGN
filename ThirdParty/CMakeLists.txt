@@ -1,15 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
-include(ExternalProject)
 
 project(CGoGN_ThirdParty)
-
-
+cmake_policy(SET CMP0042 NEW) # rpath new policy
 
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 
-IF(WIN32)
-	
-ENDIF(WIN32)
 
 IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug")
 	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Debug/Release" FORCE)
@@ -23,23 +18,15 @@ IF(WIN32)
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib)
 	set(CMAKE_CONFIGURATION_TYPES Release Debug)
-#	SET(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
-#	SET(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "" FORCE)
-#	MARK_AS_ADVANCED(CMAKE_CONFIGURATION_TYPES)
+	SET (BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)")
 ELSE()
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+	SET (BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)")
 ENDIF()
-IF(WIN32)
-	
-ENDIF(WIN32)
-
 
 
 # for shared or not shared
-SET (BUILD_SHARED_LIBS OFF CACHE BOOL 
-	"if used all library are build as shared type (.so/.dylib/.dll)")
 
-SET (WITH_TINYXML2 ON CACHE BOOL "get & build tinyxml2")
 SET (WITH_ASSIMP OFF CACHE BOOL "build with Assimp")
 SET (WITH_ZINRI ON CACHE BOOL "build with Zinri libs")
 SET (WITH_PYTHONQT ON CACHE BOOL "build PythonQt (for Schnapps)")
@@ -71,18 +58,6 @@ IF (WITH_ASSIMP)
 	INSTALL (DIRECTORY Assimp/include/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp)
 ENDIF (WITH_ASSIMP)
 
-IF (WITH_TINYXML2)
-	ExternalProject_Add(
-		Tinyxml2
-		PREFIX ${CMAKE_CURRENT_BINARY_DIR}/tinyxml2
-		GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
-		CMAKE_CACHE_ARGS "-DCMAKE_BUILD_TYPE:string=${CMAKE_BUILD_TYPE}"
-		CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2"
-		BUILD_COMMAND make
-		INSTALL_COMMAND make install
-	)
-	INSTALL (DIRECTORY TinyXml2/include/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include)
-	FILE(GLOB_RECURSE tinyLib_files ${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2/lib/*.so.* ${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2/lib/*.a )
-	INSTALL (FILES ${tinyLib_files} DESTINATION ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+add_subdirectory(TinyXml2 TinyXml2/build)
+INSTALL (DIRECTORY TinyXml2/ DESTINATION ${CGoGN_ROOT_DIR}/ThirdParty/include/TinyXml2 FILES_MATCHING PATTERN "*.h")
 
-ENDIF (WITH_TINYXML2)	
