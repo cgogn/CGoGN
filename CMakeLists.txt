@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(CGoGN)
+cmake_policy(SET CMP0042 NEW) # rpath new policy
 
 #SET ( CMAKE_VERBOSE_MAKEFILE 1 )
 
@@ -32,7 +33,7 @@ if(WIN32)
 	endif()
 endif()
 
-
+# ======== Check  Build Type =============
 IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
 		SET(CMAKE_BUILD_TYPE "Debug")
@@ -41,8 +42,16 @@ IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 	ENDIF()
 ENDIF()
 
-# for shared or not shared
-SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+
+# for shared or not shared (default except on windows)
+
+if(WIN32)
+	SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+else()
+	SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+endif()
+
+
 
 #IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp")
 IF(EXISTS "${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}/*assimp*")
@@ -67,8 +76,9 @@ SET ( COMPILE_BENCHES ON CACHE BOOL "compile benches" )
 SET ( COMPILE_SANDBOX ON CACHE BOOL "compile all in sandbox" )
 
 
-#create one big lib
+#create one big lib 
 SET ( ONELIB OFF CACHE BOOL "build CGoGN in one lib" )
+
 
 SET ( WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW" )
 SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
@@ -193,11 +203,8 @@ ELSE()
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Woverride-init -fPIC")
 	# remove the 60000+ "no unused local typedefs" warnings with GCC4.8+
 	if(CMAKE_COMPILER_IS_GNUCXX)
-		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-		if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-			SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
-		endif(GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
 	endif()
 ENDIF()
 
