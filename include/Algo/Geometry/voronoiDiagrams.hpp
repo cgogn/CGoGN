@@ -21,7 +21,7 @@ VoronoiDiagram<PFP>::VoronoiDiagram (MAP& m, const EdgeAttribute<REAL, MAP>& p, 
 	regions (r),
 	vmReached(m)
 {
-	vertexInfo = map.template addAttribute<VertexInfo, VERTEX>("vertexInfo");
+	vertexInfo = map.template addAttribute<VertexInfo, VERTEX, typename PFP::MAP>("vertexInfo");
 }
 
 template <typename PFP>
@@ -442,7 +442,7 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned i
 	// compute the gradient
 	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
 	VEC3 grad (0.0);
-	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3, VERTEX>("position");
+	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3, VERTEX, typename PFP::MAP>("position");
 
 	for (unsigned int j = 0; j < v.size(); ++j)
 	{
@@ -460,7 +460,7 @@ Dart CentroidalVoronoiDiagram<PFP>::selectBestNeighborFromSeed(unsigned int numS
 {
 	Dart e = this->seeds[numSeed];
 	Dart newSeed = e;
-	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
+	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3,VERTEX,typename PFP::MAP>("position");
 
 	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
 	float maxProj = 0.0;

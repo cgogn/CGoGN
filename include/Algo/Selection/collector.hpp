@@ -942,10 +942,9 @@ void Collector_Triangles<PFP>::collectAll(Dart d)
 			}
 		}
 	}
-
 	CellMarkerStore<MAP, VERTEX> vm(this->map);	// mark inside-vertices and border-vertices
 	CellMarkerStore<MAP, EDGE> em(this->map);	// mark inside-edges and border-edges
-	std::vector<Dart>::iterator f_it;
+	std::vector<Face>::iterator f_it;
 	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
 	{ // collect insideVertices, insideEdges, and border
 		Traversor2FE<MAP> te (this->map, *f_it) ;
@@ -1010,9 +1009,8 @@ void Collector_Triangles<PFP>::collectBorder(Dart d)
 			}
 		}
 	}
-
 	CellMarkerStore<MAP, EDGE> em(this->map);	// mark inside-edges and border-edges
-	std::vector<Dart>::iterator f_it;
+	std::vector<Face>::iterator f_it;
 	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
 	{ // collect border (edges)
 		Traversor2FE<MAP> te (this->map, *f_it) ;
@@ -1089,7 +1087,7 @@ void Collector_Dijkstra_Vertices<PFP>::collectAll(Dart dinit)
 
 	CellMarkerStore<MAP, EDGE> em (this->map);
 	CellMarkerStore<MAP, FACE> fm (this->map);
-	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
+	for (std::vector<Vertex>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
 	{
 		// collect insideEdges
 		Traversor2VE<MAP> te (this->map, *e_it);
@@ -1169,9 +1167,8 @@ void Collector_Dijkstra_Vertices<PFP>::collectBorder(Dart dinit)
 		vmReached.unmark(front.begin()->second);
 		front.erase(front.begin());
 	}
-
 	CellMarkerStore<MAP, FACE> fm (this->map);
-	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
+	for (std::vector<Vertex>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
 	{
 		// collect border
 		Traversor2VF<MAP> tf (this->map, *e_it);

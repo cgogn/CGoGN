@@ -488,7 +488,7 @@ public:
 		edge_cost(c),
 		maxDist(d)
 	{
-		vertexInfo = m.template addAttribute<VertexInfo, VERTEX>("vertexInfo");
+		vertexInfo = m.template addAttribute<VertexInfo, VERTEX, typename PFP::MAP>("vertexInfo");
 	}
 	~Collector_Dijkstra_Vertices()
 	{
