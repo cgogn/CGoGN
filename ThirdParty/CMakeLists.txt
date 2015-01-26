@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(CGoGN_ThirdParty)
-cmake_policy(SET CMP0042 NEW) # rpath new policy
+#cmake_policy(SET CMP0042 NEW) # rpath new policy
 
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 
