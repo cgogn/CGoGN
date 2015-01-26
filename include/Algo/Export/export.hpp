@@ -392,9 +392,9 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 	out.close() ;
 	return true ;
 }
-/*
+
 template <typename PFP>
-bool exportOBJ(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+bool exportOBJ(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -416,7 +416,7 @@ bool exportOBJ(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	std::vector<unsigned int> vertices ;
 	vertices.reserve(nbDarts/6) ;
 
-	CellMarker<VERTEX> markV(map) ;
+	CellMarker<typename PFP::MAP,VERTEX> markV(map) ;
 	TraversorF<MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
@@ -425,7 +425,9 @@ bool exportOBJ(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
-			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+//			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			unsigned int vNum = map. template getEmbedding<VERTEX>(it) ;
+
 			if(!markV.isMarked(it))
 			{
 				markV.mark(it) ;
@@ -458,7 +460,7 @@ bool exportOBJ(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	out.close() ;
 	return true ;
 }
-
+/*
 template <typename PFP>
 bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
 {

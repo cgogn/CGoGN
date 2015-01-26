@@ -245,9 +245,6 @@ void MyQT::cb_keyPress(int keycode)
 
 void MyQT::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
 

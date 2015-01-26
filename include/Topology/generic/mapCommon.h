@@ -54,7 +54,7 @@ public:
 	unsigned int degree(Dart d) const;
 
 	template <unsigned int ORBIT>
-	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread = 0) const;
+	bool sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2) const;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -125,6 +125,16 @@ public:
 	 *        ATTRIBUTES MANAGEMENT         *
 	 ****************************************/
 
+
+	/**
+	* Create an attribute for a given orbit
+	* @param typeName type  in aa string
+	* @param nameAttr attribute name
+	* @return true if created
+	*/
+	template <unsigned int ORBIT>
+	bool addAttribute(const std::string& typeName, const std::string& nameAttr);
+
 	/**
 	* Create an attribute for a given orbit
 	* @param nameAttr attribute name
@@ -148,6 +158,15 @@ public:
 	*/
 	template <typename T, unsigned int ORBIT, typename MAP>
 	inline AttributeHandler<T, ORBIT, MAP> getAttribute(const std::string& nameAttr) ;
+
+	/**
+	 * @brief get attribute type code
+	 * @param nameAttr name of attribute
+	 * @return code enum
+	 */
+	template <unsigned int ORBIT>
+	inline CGoGNCodeType getAttributeTypeCode(const std::string& nameAttr);
+
 
 	/**
 	* check if an attribute exist ( get, test if valid and add if necessary)

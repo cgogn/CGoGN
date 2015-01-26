@@ -37,7 +37,7 @@
 #include "Utils/svg.h"
 
 #include "Utils/Shaders/shaderSimpleColor.h"
-#include "Utils/Shaders/shaderColorPerVertex.h"
+
 
 namespace CGoGN
 {
@@ -51,13 +51,12 @@ namespace Render
 namespace GL2
 {
 
-template <typename PFP>
-class TopoRender
-{
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
 
+
+
+
+class TopoGenRender
+{
 protected:
 	/**
 	* vbo buffers
@@ -69,7 +68,7 @@ protected:
 	Utils::VBO* m_vbo0;
 	Utils::VBO* m_vbo1;
 	Utils::VBO* m_vbo2;
-	Utils::VBO* m_vbo3;
+
 
 	unsigned int m_vaId;
 
@@ -106,24 +105,28 @@ protected:
 	/**
 	 * initial darts color (set in update)
 	 */
-	Geom::Vec3f m_dartsColor;
-
-	/**
-	 * initial darts color (set in update)
-	 */
-	Geom::Vec3f m_dartsBoundaryColor;
-
-	float *m_color_save;
-
-	/**
-	 * attribut d'index dans le VBO
-	 */
-	DartAttribute<unsigned int, MAP> m_attIndex;
+	Geom::Vec4f m_dartsColor;
+	Geom::Vec4f m_colorPhi1;
+	Geom::Vec4f m_colorPhi2;
+	Geom::Vec4f m_dartsBoundaryColor;
 
 	Geom::Vec3f* m_bufferDartPosition;
 
 	Utils::ShaderSimpleColor* m_shader1;
-	Utils::ShaderColorPerVertex* m_shader2;
+
+	bool m_sharedShaders;
+
+	std::string m_nameIndex;
+
+
+	float m_ke;
+	float m_kf;
+	bool m_wb;
+	float m_ns;
+
+	Geom::Vec4f colorPhi1;
+	Geom::Vec4f colorPhi2;
+
 
 	/**
 	 * compute color from dart index (for color picking)
@@ -135,37 +138,35 @@ protected:
 	 */
 	void dartToCol(Dart d, float& r, float& g, float& b);
 
-	/**
-	 * pick the color in the rendered image
-	 */
-	Dart pickColor(unsigned int x, unsigned int y);
+	class ColoredDart
+	{
+	public:
+		 Dart d;
+		 float r;
+		 float g;
+		 float b;
+		 ColoredDart(Dart dd, float rr, float gg, float bb):
+			 d(dd),r(rr),g(gg),b(bb) {}
 
-	/**
-	 * affect a color to each dart
-	 */
-	void setDartsIdColor(MAP& map, bool withBoundary);
+	};
 
-	/**
-	 * save colors before picking
-	 */
-	void pushColors();
+	std::vector<ColoredDart> m_coloredDarts;
 
-	/**
-	 * restore colors after picking
-	 */
-	void popColors();
+
 
 public:
 	/**
 	* Constructor
 	* @param bs shift for boundary drawing
 	*/
-	TopoRender(float bs = 0.01f);
+	TopoGenRender(float bs = 0.01f);
+
+	TopoGenRender(Utils::ShaderSimpleColor* ssc, float bs = 0.01f);
 
 	/**
 	* Destructor
 	*/
-	~TopoRender();
+	~TopoGenRender();
 
 	/**
 	 * set the with of line use to draw darts (default val is 2)
@@ -178,6 +179,10 @@ public:
 	 * @param pw width
 	 */
 	void setRelationWidth(float pw);
+
+	void setColorPhi1(const Geom::Vec4f& col);
+
+	void setColorPhi2(const Geom::Vec4f& col);
 
 	/**
 	* Drawing function for darts only
@@ -196,23 +201,15 @@ public:
 
 	/**
 	 * draw all topo
+	 * @param code bit 0: draw darts/ bit 1 drawRelation1 / bit 2 drawRelation2();
 	 */
-	void drawTopo();
+	void drawTopo(int code=0xf);
 
 	/**
 	 * get shader objects
 	 */
 	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
-	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
 
-	/**
-	 * change dart drawing color
-	 * @param d the dart
-	 * @param r red !
-	 * @param g green !
-	 * @param b blue !
-	 */
-	void setDartColor(Dart d, float r, float g, float b);
 
 	/**
 	 * change all darts drawing color
@@ -227,36 +224,12 @@ public:
 
 	void setInitialBoundaryDartsColor(float r, float g, float b);
 
-	/**
-	 * redraw one dart with specific width and color (not efficient use only for debug with small amount of call)
-	 * @param d the dart
-	 * @param width the drawing width
-	 * @param r red !
-	 * @param g green !
-	 * @param b blue !
-	 */
-	void overdrawDart(Dart d, float width, float r, float g, float b);
 
 	/**
-	 * pick dart with color set by setDartsIdColor
-	 * Do not forget to apply same transformation to scene before picking than before drawing !
-	 * @param map the map in which we pick (same as drawn !)
-	 * @param x position of mouse (x)
-	 * @param y position of mouse (pass H-y, classic pb of origin)
-	 * @return the dart or NIL
+	 * pick the color in the rendered image
 	 */
-	Dart picking(MAP& map, int x, int y, bool withBoundary=false);
+	Dart pickColor(unsigned int x, unsigned int y);
 
-	Dart coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
-
-	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
-
-	virtual void updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false) = 0;
-
-	/**
-	 * Special update function used to draw boundary of map3
-	 */
-	void updateDataBoundary(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, float ns);
 
 	/**
 	 * render to svg struct
@@ -279,31 +252,113 @@ public:
 	 * @param ns distance shift
 	 */
 	void setBoundaryShift(float bs);
+
+	void setExplodeEdge(float ke);
+
+	void setExplodeFace(float kf);
+
+	void setWithBoundary(bool wb);
+
+
+	/**
+	 * @brief add dart to set of colored dart to draw
+	 * @param d
+	 * @param r
+	 * @param g
+	 * @param b
+	 */
+	void addColoredDart(Dart d, float r, float g, float b);
+
+	/**
+	 * @brief clear the ColoredDarts set
+	 * @param d
+	 */
+	inline void clearColoredDarts() { m_coloredDarts.clear();}
+
+	/**
+	 * @brief remove a dart the ColoredDarts set
+	 * @param d
+	 */
+	void removeColoredDart(Dart d);
+
 };
 
-template <typename PFP>
-class TopoRenderMap : public TopoRender<PFP>
+
+
+//template <typename PFP>
+class TopoRender : public TopoGenRender
 {
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
 public:
-	TopoRenderMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false);
+	/**
+	* Constructor
+	* @param bs shift for boundary drawing
+	*/
+	TopoRender(float bs = 0.01f): TopoGenRender(bs) {}
+
+	TopoRender(Utils::ShaderSimpleColor* ssc, float bs = 0.01f) :TopoGenRender(ssc,bs) {}
+
+	/**
+	* Destructor
+	*/
+	~TopoRender() {}
+
+	/**
+	 * redraw one dart with specific width and color (not efficient use only for debug with small amount of call)
+	 * @param d the dart
+	 * @param width the drawing width
+	 * @param r red !
+	 * @param g green !
+	 * @param b blue !
+	 */
+	template<typename MAP>
+	void overdrawDart(MAP& map, Dart d, float width, float r, float g, float b);
+
+	/**
+	 * pick dart with color set by setDartsIdColor
+	 * Do not forget to apply same transformation to scene before picking than before drawing !
+	 * @param map the map in which we pick (same as drawn !)
+	 * @param x position of mouse (x)
+	 * @param y position of mouse (pass H-y, classic pb of origin)
+	 * @return the dart or NIL
+	 */
+	template<typename MAP>
+	Dart picking(MAP& map, int x, int y, bool withBoundary=false);
+
+	template<typename MAP>
+	Dart coneSelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
+
+	template<typename MAP>
+	Dart raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
+
+
+	template <typename PFP>
+	void updateData(typename PFP::MAP &map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false);
+
+	template <typename PFP>
+	void updateData(typename PFP::MAP &map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool onlyBoundary=false);
+
+
+	/**
+	 * Special update function used to draw boundary of map3
+	 */
+	template<typename PFP>
+	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, float ns);
+
+	template<typename PFP>
+	void updateDataBoundary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions);
+
+
+	template <typename PFP>
+	void updateDataGMap(typename PFP::MAP &map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float ke, float kf, bool withBoundary = false, bool onlyBoundary=false);
+
+	template <typename PFP>
+	void updateDataGMap(typename PFP::MAP &map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, bool onlyBoundary=false);
+
+
+	template<typename MAP>
+	void drawColoredDarts(MAP& map);
 };
 
-template <typename PFP>
-class TopoRenderGMap : public TopoRender<PFP>
-{
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
-public:
-	TopoRenderGMap(float bs = 0.01f) : TopoRender<PFP>(bs) {}
-	void updateData(MAP &map, const VertexAttribute<VEC3, MAP>& positions, float ke, float kf, bool withBoundary = false);
-};
 
 } // namespace GL2
 

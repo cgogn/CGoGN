@@ -94,7 +94,7 @@ protected:
 #ifdef USE_GMAP
 	Algo::Render::GL2::TopoRenderGMap<PFP>* m_render_topo;
 #else
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo;
 #endif
 
 	Dart m_selected;

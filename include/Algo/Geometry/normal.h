@@ -56,7 +56,7 @@ template<typename PFP, typename V_ATT>
 typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, const V_ATT& position) ;
 
 template <typename PFP, typename V_ATT, typename F_ATT>
-void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal, unsigned int thread = 0) ;
+void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& face_normal) ;
 
 /**
  * compute normals of  vertices
@@ -64,17 +64,16 @@ void computeNormalFaces(typename PFP::MAP& map, const V_ATT& position, F_ATT& fa
  * @param position the position of vertices attribute handler
  * @param normal the normal handler in which the result will be stored
  * @param the selector
- * @ param th the thread number
  */
 template <typename PFP,typename V_ATT>
-void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal, unsigned int thread = 0) ;
+void computeNormalVertices(typename PFP::MAP& map, const V_ATT& position, V_ATT& normal) ;
 
 
 template <typename PFP, typename V_ATT>
 typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Edge d, const V_ATT& position) ;
 
 template <typename PFP, typename V_ATT, typename E_ATT>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles, unsigned int thread = 0) ;
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const V_ATT& position, E_ATT& angles) ;
 
 
 

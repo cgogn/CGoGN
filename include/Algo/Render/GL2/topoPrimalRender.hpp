@@ -124,7 +124,7 @@ template <typename PFP>
 void TopoPrimalRender<PFP>::setAllDartsColor(float r, float g, float b)
 {
 	m_vbo2->bind();
-	GLvoid* ColorDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	float* colorDartBuf = reinterpret_cast<float*>(ColorDartsBuffer);
 	for (unsigned int i=0; i < 2*m_nbDarts; ++i)
 	{
@@ -132,7 +132,7 @@ void TopoPrimalRender<PFP>::setAllDartsColor(float r, float g, float b)
 		*colorDartBuf++ = g;
 		*colorDartBuf++ = b;
 	}
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 template <typename PFP>
@@ -213,7 +213,7 @@ void TopoPrimalRender<PFP>::pushColors()
 {
 	m_color_save = new float[6*m_nbDarts];
 	m_vbo2->bind();
-	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	void* colorBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	memcpy(m_color_save, colorBuffer, 6*m_nbDarts*sizeof(float));
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -223,7 +223,7 @@ template <typename PFP>
 void TopoPrimalRender<PFP>::popColors()
 {
 	m_vbo2->bind();
-	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	void* colorBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	memcpy(colorBuffer, m_color_save, 6*m_nbDarts*sizeof(float));
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -513,7 +513,7 @@ void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP
 	// alpha1
 	m_vbo1->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer1 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	GLvoid* PositionBuffer1 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
 

@@ -55,7 +55,7 @@ void testVAbyNames(MAP& map, const std::string& name)
 	if (testPos.isValid())
 		std::cout << "Attribute "<< name <<" valid"<< std::endl;
 	else
-		std::cout << "Attribute "<< name <<"invalid"<< std::endl;
+		std::cout << "Attribute "<< name <<" invalid"<< std::endl;
 }
 
 /**
@@ -125,6 +125,38 @@ void dumpAttribute(const ATTRIB& attr)
 }
 
 
+//function that apply on vertice with templated attribute type
+template<typename T>
+void VertexTyped(MAP& map, T& va)
+{
+
+//	foreach_cell<VERTEX>(map,[&](Vertex v)  // for all vertices
+//	{
+//		va[v] = 1.1 * va[v];
+//	});
+
+	// other syntax for traversal
+	 for (Vertex v : allVerticesOf(map))
+	 {
+		 va[v] = 1.1 * va[v];
+		 std::cout << "V:" << v << " -> "<<va[v]<< std::endl;
+	 }
+}
+
+// version that take a VertexAttribute, check type at runtime and call instancied template version
+void VertexGeneric(MAP& map, VertexAttributeGen& vg)
+{
+	auto va3 = dynamic_cast<VertexAttribute<VEC3, MAP>*>(&vg);
+	if (va3 != NULL)
+		return VertexTyped(map,*va3);
+
+	auto vaf = dynamic_cast<VertexAttribute<float, MAP>*>(&vg);
+	if (vaf != NULL)
+		return VertexTyped(map,*vaf);
+}
+
+
+
 int main()
 {
 	// declare a map to handle the mesh
@@ -141,6 +173,8 @@ int main()
 	// and embed it using position attribute
 	grid.embedIntoGrid(positionAtt, 1.,1.,0.);
 
+
+	VertexGeneric(myMap,positionAtt);
 
 	// ATTRIBUTE DECLARATION
 
@@ -206,6 +240,7 @@ int main()
 	computeNewPositions(myMap,positionAtt);
 	dumpAttribute(positionAtt);
 
+
 	//check if there is a Vertex Attribute of VEC3 named position => yes
 	testVAbyNames(myMap,"position");
 
@@ -213,7 +248,29 @@ int main()
 	myMap.removeAttribute(positionAtt);
 
 	//check if there is a Vertex Attribute of VEC3 named position => no
+	std::cout << "after removing position"<< std::endl;
 	testVAbyNames(myMap,"position");
+
+
+	// its also possible to add an attribute only with name of type in a string (if type has been registred)
+	if (myMap.addAttribute<VERTEX>("double", "pipo_double"))
+	{
+		VertexAttribute<double, MAP> position_double = myMap.getAttribute<double, VERTEX, MAP>("pipo_double");
+		position_double[v] = 3.1415926;
+	}
+
+	if (!myMap.addAttribute<VERTEX>("double", "pipo_double"))
+	{
+		std::cout << "problem"<< std::endl;
+	}
+
+	if (!myMap.addAttribute<VERTEX>("triple", "pipo_triple"))
+	{
+		std::cout << "problem"<< std::endl;
+	}
+
+
+
 
 	return 0;
 }

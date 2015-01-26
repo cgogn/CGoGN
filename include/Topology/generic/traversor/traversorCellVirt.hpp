@@ -26,11 +26,11 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT>
-VTraversorCell<MAP, ORBIT>::VTraversorCell(const MAP& map, bool forceDartMarker, unsigned int thread) :
+VTraversorCell<MAP, ORBIT>::VTraversorCell(const MAP& map, bool forceDartMarker) :
 	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true)
 {
 	if(forceDartMarker)
-		dmark = new DartMarker<MAP>(map, thread) ;
+		dmark = new DartMarker<MAP>(map) ;
 	else
 	{
 		quickTraversal = map.template getQuickTraversal<ORBIT>() ;
@@ -41,9 +41,9 @@ VTraversorCell<MAP, ORBIT>::VTraversorCell(const MAP& map, bool forceDartMarker,
 		else
 		{
 			if(map.template isOrbitEmbedded<ORBIT>())
-				cmark = new CellMarker<MAP, ORBIT>(map, thread) ;
+				cmark = new CellMarker<MAP, ORBIT>(map) ;
 			else
-				dmark = new DartMarker<MAP>(map, thread) ;
+				dmark = new DartMarker<MAP>(map) ;
 		}
 	}
 }

@@ -60,9 +60,10 @@ protected:
 	int W;
 	int H;
 	int m_state_modifier;
+	int m_current_button;
 
 public:
-	QGLView(SimpleQGLV* ptr, QWidget *parent = 0);
+	QGLView(SimpleQGLV* ptr, QGLFormat& format, QWidget *parent = 0);
 	~QGLView();
 
 	void setObjectBB(float* bbmin, float* bbmax);
@@ -79,7 +80,7 @@ public:
 	void mouseReleaseEvent(QMouseEvent* event);
 	void mouseClickEvent(QMouseEvent* event);
 //	void mouseDoubleClickEvent(QMouseEvent* event);
-//	void mouseMoveEvent(QMouseEvent* event);
+	void mouseMoveEvent(QMouseEvent* event);
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent* event);
 //	void wheelEvent(QWheelEvent* event);
@@ -88,6 +89,9 @@ public:
 	bool Alt() { return m_state_modifier & Qt::AltModifier; }
 	int getHeight() const { return H; }
 	int getWidth() const { return W; }
+
+	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius);
+	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center);
 
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;

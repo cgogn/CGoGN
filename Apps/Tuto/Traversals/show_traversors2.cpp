@@ -82,11 +82,8 @@ void MyQT::cb_explode(int x)
 
 void MyQT::cb_initGL()
 {
-    // choose to use GL version 2
-    Utils::GLSLShader::setCurrentOGLVersion(2);
-
-	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>();
-	m_render_topo->updateData(myMap, position,  0.95f, 0.9f, 0.8f);
+	m_render_topo = new Algo::Render::GL2::TopoRender();
+	m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f);
 	m_dm_topo = new DartMarker<MAP>(myMap);
 }
 
@@ -94,14 +91,16 @@ void MyQT::cb_redraw()
 {
     if (m_showTopo)
     {
+		glDepthFunc(GL_LESS);
         m_render_topo->drawTopo();
 
+		glDepthFunc(GL_LEQUAL);
         if (m_selected != NIL)
-            m_render_topo->overdrawDart(m_selected, 7, 1.0f, 0.0f, 1.0f);
+			m_render_topo->overdrawDart(myMap, m_selected, 7, 1.0f, 0.0f, 1.0f);
 
         for (std::vector<Dart>::iterator it=m_affDarts.begin(); it!=m_affDarts.end(); ++it)
         {
-            m_render_topo->overdrawDart(*it, 6, 1.0f, 1.0f, 1.0f);
+			m_render_topo->overdrawDart(myMap, *it, 6, 1.0f, 1.0f, 1.0f);
         }
     }
 
@@ -138,11 +137,6 @@ void  MyQT::cb_Save()
     svg2.write();
 }
 
-template <unsigned int ORBIT>
-void MyQT::colorizeCell(Cell<ORBIT> c, float r, float g, float b)
-{
-	myMap.foreach_dart_of_orbit(c, [&] (Dart d) { m_render_topo->setDartColor(d, r, g, b); });
-}
 
 void MyQT::traverse2()
 {
@@ -180,7 +174,7 @@ void MyQT::traverse2()
     m_drawer.endList();
 
     //	SelectorMarked sm(*m_dm_topo);
-	m_render_topo->updateData(myMap, position, 0.95f, 0.9f, 0.8f);
+	m_render_topo->updateData<PFP>(myMap, position, 0.95f, 0.9f, 0.8f);
 
     updateGL();
 }

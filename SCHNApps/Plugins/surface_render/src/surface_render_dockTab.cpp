@@ -13,7 +13,9 @@ namespace SCHNApps
 Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugin* p) :
 	m_schnapps(s),
 	m_plugin(p),
-	b_updatingUI(false)
+	b_updatingUI(false),
+	m_currentColorDial(0)
+
 {
 	setupUi(this);
 
@@ -25,6 +27,91 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(check_renderFaces, SIGNAL(toggled(bool)), this, SLOT(renderFacesChanged(bool)));
 	connect(group_faceShading, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(faceStyleChanged(QAbstractButton*)));
 	connect(check_renderBoundary, SIGNAL(toggled(bool)), this, SLOT(renderBoundaryChanged(bool)));
+
+	m_colorDial  = new QColorDialog(m_diffuseColor,NULL);
+	connect(dcolorButton,SIGNAL(clicked()),this,SLOT(diffuseColorClicked()));
+	connect(scolorButton,SIGNAL(clicked()),this,SLOT(simpleColorClicked()));
+	connect(vcolorButton,SIGNAL(clicked()),this,SLOT(vertexColorClicked()));
+	connect(m_colorDial,SIGNAL(colorSelected(const QColor&)),this,SLOT(colorSelected(const QColor&)));
+
+}
+
+
+
+void Surface_Render_DockTab::diffuseColorClicked()
+{
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_diffuseColor);
+	m_currentColorDial = 1;
+}
+
+void Surface_Render_DockTab::simpleColorClicked()
+{
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_simpleColor);
+	m_currentColorDial = 2;
+}
+
+void Surface_Render_DockTab::vertexColorClicked()
+{
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_vertexColor);
+	m_currentColorDial = 3;
+}
+
+
+void Surface_Render_DockTab::colorSelected(const QColor& col)
+{
+	if (m_currentColorDial == 1)
+	{
+
+		m_diffuseColor = col;
+		dcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0/255.0*m_diffuseColor.red(), 1.0/255.0*m_diffuseColor.green(),1.0/255.0*m_diffuseColor.blue(),0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
+			view->updateGL();
+		}
+	}
+
+	if (m_currentColorDial == 2)
+	{
+
+		m_simpleColor = col;
+		scolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0/255.0*m_simpleColor.red(), 1.0/255.0*m_simpleColor.green(),1.0/255.0*m_simpleColor.blue(),0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].simpleColor = rgbCol;
+			view->updateGL();
+		}
+	}
+
+	if (m_currentColorDial == 3)
+	{
+
+		m_vertexColor = col;
+		vcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0/255.0*m_vertexColor.red(), 1.0/255.0*m_vertexColor.green(),1.0/255.0*m_vertexColor.blue(),0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
+			view->updateGL();
+		}
+	}
 }
 
 
@@ -226,6 +313,17 @@ void Surface_Render_DockTab::updateMapParameters()
 		check_renderFaces->setChecked(p.renderFaces);
 		radio_flatShading->setChecked(p.faceStyle == MapParameters::FLAT);
 		radio_phongShading->setChecked(p.faceStyle == MapParameters::PHONG);
+
+		m_diffuseColor = QColor(255*p.diffuseColor[0],255*p.diffuseColor[1],255*p.diffuseColor[2]);
+		dcolorButton->setStyleSheet("QPushButton { background-color:"+m_diffuseColor.name()+ " }");
+
+		m_simpleColor = QColor(255*p.simpleColor[0],255*p.simpleColor[1],255*p.simpleColor[2]);
+		scolorButton->setStyleSheet("QPushButton { background-color:"+m_simpleColor.name()+ " }");
+
+		m_vertexColor = QColor(255*p.vertexColor[0],255*p.vertexColor[1],255*p.vertexColor[2]);
+		vcolorButton->setStyleSheet("QPushButton { background-color:"+m_vertexColor.name()+ " }");
+
+
 	}
 
 	b_updatingUI = false;

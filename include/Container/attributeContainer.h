@@ -31,16 +31,12 @@
 
 #include <vector>
 #include <map>
-#include <libxml/encoding.h>
-#include <libxml/xmlwriter.h>
-#include <libxml/parser.h>
 
 namespace CGoGN
 {
 
 class RegisteredBaseAttribute;
 class AttributeContainer;
-
 
 class ContainerBrowser
 {
@@ -75,6 +71,11 @@ protected:
 	* vector of pointers to AttributeMultiVectors
 	*/
 	std::vector<AttributeMultiVectorGen*> m_tableAttribs;
+
+	/**
+	* vector of pointers to AttributeMultiVectors of MarkerBool
+	*/
+	std::vector<AttributeMultiVector<MarkerBool>*> m_tableMarkerAttribs;
 
 	/**
 	 * vector of free indices in the vector of AttributeMultiVectors
@@ -161,6 +162,19 @@ public:
 	template <typename T>
 	AttributeMultiVector<T>* addAttribute(const std::string& attribName);
 
+	/// special version for marker
+	AttributeMultiVector<MarkerBool>* addMarkerAttribute(const std::string& attribName);
+
+
+	/**
+	 * add a new attribute to the container
+	 * @param typeName type of the new attribute in a string
+	 * @param attribName name of the new attribute
+	 * @return pointer to the new AttributeMultiVectorGen (unknown type inside)
+	 */
+	AttributeMultiVectorGen* addAttribute(const std::string& typeName, const std::string& attribName);
+
+
 protected:
 	/**
 	 * add a new attribute with a given index (for load only)
@@ -180,6 +194,8 @@ public:
 	*/
 	template <typename T>
 	bool removeAttribute(const std::string& attribName);
+
+	bool removeMarkerAttribute(const std::string& attribName);
 
 	/**
 	* Remove an attribute (destroys data)
@@ -222,6 +238,11 @@ public:
 	* is the line used in the container
 	*/
 	inline bool used(unsigned int index) const;
+
+	/**
+	 * @brief check if container contain marker attribute
+	 */
+	bool hasMarkerAttribute() const;
 
 	/**************************************
 	 *         CONTAINER TRAVERSAL        *
@@ -287,7 +308,7 @@ public:
 	* @param attribName nom de l'attribut
 	* @return l'indice de l'attribut
 	*/
-	unsigned int getAttributeIndex(const std::string& attribName);
+	unsigned int getAttributeIndex(const std::string& attribName) const;
 
 	/**
 	 * get the name of an attribute, given its index in the container
@@ -311,12 +332,15 @@ public:
 	 */
 	unsigned int getAttributesNames(std::vector<std::string>& names) const;
 
+
 	/**
 	 * fill a vector with attribute type names
 	 * @param types vector of type names
 	 * @return number of attributes
 	 */
 	unsigned int getAttributesTypes(std::vector<std::string>& types);
+
+	std::vector<AttributeMultiVector<MarkerBool>*>& getMarkerAttributes();
 
 	/**************************************
 	 *        CONTAINER MANAGEMENT        *
@@ -368,6 +392,11 @@ public:
 	void initLine(unsigned int index);
 
 	/**
+	 * initialize all markers of a line of the container
+	 */
+	void initMarkersOfLine(unsigned int index);
+
+	/**
 	 * copy the content of line src in line dst
 	 */
 	void copyLine(unsigned int dstIndex, unsigned int srcIndex);
@@ -417,6 +446,8 @@ public:
 	 *       ATTRIBUTES DATA ACCESS       *
 	 **************************************/
 
+	inline CGoGNCodeType getTypeCode(const std::string& attribName) const;
+
 	/**
 	* get an AttributeMultiVector
 	* @param attrIndex index of the attribute
@@ -425,6 +456,7 @@ public:
 	AttributeMultiVector<T>* getDataVector(unsigned int attrIndex);
 
 	AttributeMultiVectorGen* getVirtualDataVector(unsigned int attrIndex);
+
 
 	/**
 	* get an AttributeMultiVector

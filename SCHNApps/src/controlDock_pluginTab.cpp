@@ -26,12 +26,12 @@ ControlDock_PluginTab::ControlDock_PluginTab(SCHNApps* s) :
 	connect(button_addPluginDirectory, SIGNAL(clicked()), this, SLOT(addPluginDirectoryClicked()));
 	connect(button_enablePlugins, SIGNAL(clicked()), this, SLOT(enableSelectedPluginsClicked()));
 	connect(button_disablePlugins, SIGNAL(clicked()), this, SLOT(disableSelectedPluginsClicked()));
-	connect(list_pluginsEnabled, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(pluginCheckStateChanged(QListWidgetItem*)));
+//	connect(list_pluginsEnabled, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(pluginCheckStateChanged(QListWidgetItem*)));
 
 	connect(m_schnapps, SIGNAL(pluginAvailableAdded(QString)), this, SLOT(pluginAvailableAdded(QString)));
 	connect(m_schnapps, SIGNAL(pluginEnabled(Plugin*)), this, SLOT(pluginEnabled(Plugin*)));
 	connect(m_schnapps, SIGNAL(pluginDisabled(Plugin*)), this, SLOT(pluginDisabled(Plugin*)));
-	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
+//	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
 }
 
 
@@ -74,21 +74,21 @@ void ControlDock_PluginTab::disableSelectedPluginsClicked()
 	}
 }
 
-void ControlDock_PluginTab::pluginCheckStateChanged(QListWidgetItem *item)
-{
-	if(!b_updatingUI)
-	{
-		View* selectedView = m_schnapps->getSelectedView();
-		PluginInteraction* p = dynamic_cast<PluginInteraction*>(m_schnapps->getPlugin(item->text()));
-		if(p)
-		{
-			if(item->checkState() == Qt::Checked)
-				selectedView->linkPlugin(p);
-			else
-				selectedView->unlinkPlugin(p);
-		}
-	}
-}
+//void ControlDock_PluginTab::pluginCheckStateChanged(QListWidgetItem *item)
+//{
+//	if(!b_updatingUI)
+//	{
+//		View* selectedView = m_schnapps->getSelectedView();
+//		PluginInteraction* p = dynamic_cast<PluginInteraction*>(m_schnapps->getPlugin(item->text()));
+//		if(p)
+//		{
+//			if(item->checkState() == Qt::Checked)
+//				selectedView->linkPlugin(p);
+//			else
+//				selectedView->unlinkPlugin(p);
+//		}
+//	}
+//}
 
 
 
@@ -109,12 +109,13 @@ void ControlDock_PluginTab::pluginEnabled(Plugin *plugin)
 	if(!av.empty())
 		delete av[0];
 
-	QListWidgetItem* item = new QListWidgetItem(pluginName, list_pluginsEnabled);
+//	QListWidgetItem* item = new QListWidgetItem(pluginName, list_pluginsEnabled);
+	new QListWidgetItem(pluginName, list_pluginsEnabled);
 
 	// only interaction plugins are checkable (i.e. can be associated to a view)
-	PluginInteraction* p = dynamic_cast<PluginInteraction*>(plugin);
-	if(p)
-		item->setCheckState(Qt::Unchecked);
+//	PluginInteraction* p = dynamic_cast<PluginInteraction*>(plugin);
+//	if(p)
+//		item->setCheckState(Qt::Unchecked);
 	b_updatingUI = false;
 }
 
@@ -129,67 +130,67 @@ void ControlDock_PluginTab::pluginDisabled(Plugin *plugin)
 	b_updatingUI = false;
 }
 
-void ControlDock_PluginTab::selectedViewChanged(View* prev, View* cur)
-{
-	if(prev)
-	{
-		foreach(PluginInteraction* pi, prev->getLinkedPlugins())
-		{
-			QList<QListWidgetItem*> prevItems = list_pluginsEnabled->findItems(pi->getName(), Qt::MatchExactly);
-			if(!prevItems.empty())
-			{
-				b_updatingUI = true;
-				prevItems[0]->setCheckState(Qt::Unchecked);
-				b_updatingUI = false;
-			}
-		}
+//void ControlDock_PluginTab::selectedViewChanged(View* prev, View* cur)
+//{
+//	if(prev)
+//	{
+//		foreach(PluginInteraction* pi, prev->getLinkedPlugins())
+//		{
+//			QList<QListWidgetItem*> prevItems = list_pluginsEnabled->findItems(pi->getName(), Qt::MatchExactly);
+//			if(!prevItems.empty())
+//			{
+//				b_updatingUI = true;
+//				prevItems[0]->setCheckState(Qt::Unchecked);
+//				b_updatingUI = false;
+//			}
+//		}
 
-		disconnect(prev, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(selectedViewPluginLinked(PluginInteraction*)));
-		disconnect(prev, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(selectedViewPluginUnlinked(PluginInteraction*)));
-	}
-	if(cur)
-	{
-		foreach(PluginInteraction* pi, cur->getLinkedPlugins())
-		{
-			QList<QListWidgetItem*> curItems = list_pluginsEnabled->findItems(pi->getName(), Qt::MatchExactly);
-			if(!curItems.empty())
-			{
-				b_updatingUI = true;
-				curItems[0]->setCheckState(Qt::Checked);
-				b_updatingUI = false;
-			}
-		}
+//		disconnect(prev, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(selectedViewPluginLinked(PluginInteraction*)));
+//		disconnect(prev, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(selectedViewPluginUnlinked(PluginInteraction*)));
+//	}
+//	if(cur)
+//	{
+//		foreach(PluginInteraction* pi, cur->getLinkedPlugins())
+//		{
+//			QList<QListWidgetItem*> curItems = list_pluginsEnabled->findItems(pi->getName(), Qt::MatchExactly);
+//			if(!curItems.empty())
+//			{
+//				b_updatingUI = true;
+//				curItems[0]->setCheckState(Qt::Checked);
+//				b_updatingUI = false;
+//			}
+//		}
 
-		connect(cur, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(selectedViewPluginLinked(PluginInteraction*)));
-		connect(cur, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(selectedViewPluginUnlinked(PluginInteraction*)));
-	}
-}
-
-
+//		connect(cur, SIGNAL(pluginLinked(PluginInteraction*)), this, SLOT(selectedViewPluginLinked(PluginInteraction*)));
+//		connect(cur, SIGNAL(pluginUnlinked(PluginInteraction*)), this, SLOT(selectedViewPluginUnlinked(PluginInteraction*)));
+//	}
+//}
 
 
 
-void ControlDock_PluginTab::selectedViewPluginLinked(PluginInteraction* plugin)
-{
-	QList<QListWidgetItem*> curItems = list_pluginsEnabled->findItems(plugin->getName(), Qt::MatchExactly);
-	if(!curItems.empty())
-	{
-		b_updatingUI = true;
-		curItems[0]->setCheckState(Qt::Checked);
-		b_updatingUI = false;
-	}
-}
 
-void ControlDock_PluginTab::selectedViewPluginUnlinked(PluginInteraction* plugin)
-{
-	QList<QListWidgetItem*> prevItems = list_pluginsEnabled->findItems(plugin->getName(), Qt::MatchExactly);
-	if(!prevItems.empty())
-	{
-		b_updatingUI = true;
-		prevItems[0]->setCheckState(Qt::Unchecked);
-		b_updatingUI = false;
-	}
-}
+
+//void ControlDock_PluginTab::selectedViewPluginLinked(PluginInteraction* plugin)
+//{
+//	QList<QListWidgetItem*> curItems = list_pluginsEnabled->findItems(plugin->getName(), Qt::MatchExactly);
+//	if(!curItems.empty())
+//	{
+//		b_updatingUI = true;
+//		curItems[0]->setCheckState(Qt::Checked);
+//		b_updatingUI = false;
+//	}
+//}
+
+//void ControlDock_PluginTab::selectedViewPluginUnlinked(PluginInteraction* plugin)
+//{
+//	QList<QListWidgetItem*> prevItems = list_pluginsEnabled->findItems(plugin->getName(), Qt::MatchExactly);
+//	if(!prevItems.empty())
+//	{
+//		b_updatingUI = true;
+//		prevItems[0]->setCheckState(Qt::Unchecked);
+//		b_updatingUI = false;
+//	}
+//}
 
 } // namespace SCHNApps
 

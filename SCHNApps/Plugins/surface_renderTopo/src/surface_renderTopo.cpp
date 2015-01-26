@@ -10,6 +10,9 @@ namespace SCHNApps
 
 bool Surface_RenderTopo_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_dockTab = new Surface_RenderTopo_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_RenderTopo");
 
@@ -18,8 +21,13 @@ bool Surface_RenderTopo_Plugin::enable()
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
+	m_shaderTopo1 = new CGoGN::Utils::ShaderSimpleColor();
+	registerShader(m_shaderTopo1);
+
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
+	{
 		mapAdded(map);
+	}
 
 	m_dockTab->updateMapParameters();
 
@@ -39,17 +47,31 @@ void Surface_RenderTopo_Plugin::disable()
 
 void Surface_RenderTopo_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
-	const MapParameters& p = h_viewParameterSet[view][map];
+	ViewMapParam& p = h_viewParameterSet[view][map];
 
-//	if(p.positionAttribute.isValid())
-//	{
-//		if(p.drawDarts)
-//			map->drawTopo(DARTS);
-//		if(p.drawPhi1)
-//			map->drawTopo(RELATION1);
-//		if(p.drawPhi2)
-//			map->drawTopo(RELATION2);
-//	}
+	map->getTopoRender()->setInitialDartsColor(p.dartsColor.redF(),p.dartsColor.greenF(),p.dartsColor.blueF());
+	map->getTopoRender()->setColorPhi1(Geom::Vec4f(p.phi1Color.redF(),p.phi1Color.greenF(),p.phi1Color.blueF(),0.0f));
+	map->getTopoRender()->setColorPhi2(Geom::Vec4f(p.phi2Color.redF(),p.phi2Color.greenF(),p.phi2Color.blueF(),0.0f));
+
+	MapParam& pm = h_parameterSet[map];
+
+	if (pm.needUpdate)
+	{
+		map->getTopoRender()->setExplodeEdge(pm.edgesScaleFactor);
+		map->getTopoRender()->setExplodeFace(pm.facesScaleFactor);
+		QString pos = m_dockTab->combo_positionAttribute->currentText();
+		map->updateTopoRender(pos);
+		pm.needUpdate = false;
+	}
+
+	int code=0;
+	if(p.drawDarts)
+		code |= 1;
+	if(p.drawPhi1)
+		code |= 2;
+	if(p.drawPhi2)
+		code |= 4;
+	map->drawTopoRender(code);
 }
 
 
@@ -64,11 +86,17 @@ void Surface_RenderTopo_Plugin::selectedViewChanged(View *prev, View *cur)
 void Surface_RenderTopo_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
+
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_RenderTopo_Plugin::mapAdded(MapHandlerGen* map)
 {
 	connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
+	map->createTopoRender(m_shaderTopo1);
 }
 
 void Surface_RenderTopo_Plugin::mapRemoved(MapHandlerGen* map)
@@ -84,15 +112,19 @@ void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 	if(orbit == VERTEX && map == m_schnapps->getSelectedMap())
+	{
 		m_dockTab->addVertexAttribute(name);
+	}
 }
 
 
 
 
 
-//void Surface_RenderTopo_Plugin::changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3> attribute, bool fromUI)
+//void Surface_RenderTopo_Plugin::changePositionAttribute(View* view, MapHandlerGen* map, VertexAttribute<PFP2::VEC3, PFP2::MAP> attribute, bool fromUI)
 //{
+////	map->updateTopoRender
+
 //	ParameterSet* params = h_viewParams[view];
 //	PerMapParameterSet* perMap = params->perMap[map->getName()];
 //	perMap->positionAttribute = attribute;
@@ -217,11 +249,7 @@ void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString
 //	}
 //}
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_RenderTopo_Plugin, Surface_RenderTopo_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_RenderTopo_PluginD, Surface_RenderTopo_Plugin)
-#endif
 
 } // namespace SCHNApps
 

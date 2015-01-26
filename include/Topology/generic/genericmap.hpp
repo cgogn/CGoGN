@@ -29,11 +29,53 @@
 namespace CGoGN
 {
 /****************************************
- *           BUFFERS MANAGEMENT           *
+ *         THREAD ID MANAGEMENT         *
+ ****************************************/
+inline unsigned int GenericMap::getCurrentThreadIndex() const
+{
+	std::thread::id id = std::this_thread::get_id();
+	unsigned int i=0;
+	while (id != m_thread_ids[i])
+	{
+		i++;
+		assert(i<m_thread_ids.size());
+	}
+	return i;
+}
+
+//inline void GenericMap::addThreadId(const std::thread::id& id)
+//{
+//	m_thread_ids.push_back(id);
+//}
+
+inline unsigned int GenericMap::addEmptyThreadIds(unsigned int n)
+{
+	unsigned int nb = m_thread_ids.size();
+	m_thread_ids.resize(nb + n);
+	return nb;
+}
+
+inline void GenericMap::popThreadIds(unsigned int nb)
+{
+	assert(nb<m_thread_ids.size());
+	for ( unsigned int i=0; i<nb; ++i)
+		m_thread_ids.pop_back();
+}
+
+inline std::thread::id& GenericMap::getThreadId(unsigned int j)
+{
+	return m_thread_ids[j];
+}
+
+
+/****************************************
+ *         BUFFERS MANAGEMENT           *
  ****************************************/
 
-inline std::vector<Dart>* GenericMap::askDartBuffer(unsigned int thread)
+inline std::vector<Dart>* GenericMap::askDartBuffer() const
 {
+	unsigned int thread = getCurrentThreadIndex();
+
 	if (s_vdartsBuffers[thread].empty())
 	{
 		std::vector<Dart>* vd = new std::vector<Dart>;
@@ -46,8 +88,10 @@ inline std::vector<Dart>* GenericMap::askDartBuffer(unsigned int thread)
 	return vd;
 }
 
-inline void GenericMap::releaseDartBuffer(std::vector<Dart>* vd, unsigned int thread)
+inline void GenericMap::releaseDartBuffer(std::vector<Dart>* vd) const
 {
+	unsigned int thread = getCurrentThreadIndex();
+
 	if (vd->capacity()>1024)
 	{
 		std::vector<Dart> v;
@@ -59,8 +103,10 @@ inline void GenericMap::releaseDartBuffer(std::vector<Dart>* vd, unsigned int th
 }
 
 
-inline std::vector<unsigned int>* GenericMap::askUIntBuffer(unsigned int thread)
+inline std::vector<unsigned int>* GenericMap::askUIntBuffer() const
 {
+	unsigned int thread = getCurrentThreadIndex();
+
 	if (s_vintsBuffers[thread].empty())
 	{
 		std::vector<unsigned int>* vui = new std::vector<unsigned int>;
@@ -73,8 +119,10 @@ inline std::vector<unsigned int>* GenericMap::askUIntBuffer(unsigned int thread)
 	return vui;
 }
 
-inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui, unsigned int thread)
+inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui) const
 {
+	unsigned int thread = getCurrentThreadIndex();
+
 	if (vui->capacity()>1024)
 	{
 		std::vector<unsigned int> v;
@@ -94,6 +142,7 @@ inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui, unsign
 inline Dart GenericMap::newDart()
 {
 	unsigned int di = m_attribs[DART].insertLine();		// insert a new dart line
+	m_attribs[DART].initMarkersOfLine(di);
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		if (m_embeddings[i])							// set all its embeddings
@@ -158,7 +207,10 @@ template <unsigned int ORBIT>
 inline unsigned int GenericMap::newCell()
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-	return m_attribs[ORBIT].insertLine();
+
+	unsigned int c = m_attribs[ORBIT].insertLine();
+	m_attribs[ORBIT].initMarkersOfLine(c);
+	return c;
 }
 
 template <unsigned int ORBIT>
@@ -213,9 +265,12 @@ inline AttributeMultiVectorGen* GenericMap::getAttributeVectorGen(unsigned int o
 
 
 template <unsigned int ORBIT>
-AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector(unsigned int thread)
+AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector()
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
+
+	// get current thread index for table of markers
+	unsigned int thread = getCurrentThreadIndex();
 
 	if (!m_markVectors_free[ORBIT][thread].empty())
 	{
@@ -235,16 +290,18 @@ AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector(unsigned int thread)
 		x = x/10;
 		number[0]= '0'+x%10;
 
-		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addAttribute<MarkerBool>("marker_" + orbitName(ORBIT) + number);
+		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addMarkerAttribute("marker_" + orbitName(ORBIT) + number);
 		return amv;
 	}
 }
 
 
 template <unsigned int ORBIT>
-inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv, unsigned int thread)
+inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
+
+	unsigned int thread = getCurrentThreadIndex();
 
 	m_markVectors_free[ORBIT][thread].push_back(amv);
 }

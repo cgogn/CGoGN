@@ -222,9 +222,9 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 }
 
 template<typename PFP>
-void EarTriangulation<PFP>::triangule(unsigned int thread)
+void EarTriangulation<PFP>::triangule()
 {
-//	DartMarker m(m_map, thread);
+//	DartMarker m(m_map);
 //
 //	for(Dart d = m_map.begin(); d != m_map.end(); m_map.next(d))
 //	{
@@ -237,7 +237,7 @@ void EarTriangulation<PFP>::triangule(unsigned int thread)
 //	}
 //	m.unmarkAll();
 
-	TraversorF<typename PFP::MAP> trav(m_map,thread);
+	TraversorF<typename PFP::MAP> trav(m_map);
 
 	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{

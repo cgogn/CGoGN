@@ -88,6 +88,8 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 		return;
 	}
 
+	//TODO find a more generic way to choose the conversion function ?
+
 	const AttributeMultiVector<Geom::Vec3d>* amv3 = dynamic_cast<const AttributeMultiVector<Geom::Vec3d>*>(attrib);
 	if (amv3 != NULL)
 	{
@@ -139,7 +141,7 @@ void VBO::updateData(const AttributeMultiVectorGen* attrib)
 
 	for (unsigned int i = 0; i < nbb; ++i)
 	{
-		glBufferSubDataARB(GL_ARRAY_BUFFER, offset, byteTableSize, addr[i]);
+		glBufferSubData(GL_ARRAY_BUFFER, offset, byteTableSize, addr[i]);
 		offset += byteTableSize;
 	}
 

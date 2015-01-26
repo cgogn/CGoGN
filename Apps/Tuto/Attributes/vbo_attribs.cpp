@@ -102,7 +102,7 @@ void MyQT::createMap()
 //		return Geom::Vec3f(float(x)/255.0f,float(x)/255.0f,float(x)/255.0f);
 //	});
 	// or with furnished operator of conversion
-	DataConversion::operatorScalarToRGBf<int> conv2col(0,255);
+	DataConversion::functorScalarToRGBf<int> conv2col(0,255);
 	m_colorVBO1->updateDataConversion<int,3>(colorE,conv2col);
 
 
@@ -124,9 +124,6 @@ void MyQT::createMap()
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
 

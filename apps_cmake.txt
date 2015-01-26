@@ -26,7 +26,7 @@ file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS cgogn)
 ELSE()
-	SET(CGoGN_LIBS topology algo container utils)
+	SET(CGoGN_LIBS algo topology container utils)
 ENDIF()
 
 IF(WIN32)
@@ -46,6 +46,9 @@ ELSE (DEFINED ASSERTON)
 ENDIF (DEFINED ASSERTON)
 
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
+
+add_definitions(-DGLM_FORCE_RADIANS)
+
 
 # define includes of external libs 
 SET(COMMON_INCLUDES 
@@ -78,7 +81,7 @@ IF(WIN32)
 ELSE(WIN32)
 	find_package(SuiteSparse REQUIRED)
 	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${SUITESPARSE_INCLUDE_DIRS})
-	SET (COMMON_LIBS ${COMMON_LIBS} ${SUITESPARSE_LIBRARIES})
+	SET (COMMON_LIBS ${SUITESPARSE_LIBRARIES} lapack blas ${COMMON_LIBS} pthread )
 
 ENDIF(WIN32)
 
@@ -107,9 +110,9 @@ IF (WITH_QT)
 	SET (COMMON_LIBS ${COMMON_LIBS} ${QT_LIBRARIES} ${QGLVIEWER_LIBRARIES})
 ENDIF (WITH_QT)
 
-IF(APPLE)
-	SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L/usr/local/lib")
-ENDIF(APPLE)
+#IF(APPLE)
+#	SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L/usr/local/lib")
+#ENDIF(APPLE)
 
 # qq definition specifiques pour windows
 IF(WIN32)
@@ -130,9 +133,6 @@ ELSE()
 	
 ENDIF()
 
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-
-
 IF(NOT CMAKE_BUILD_TYPE)
 	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug")
 		set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
@@ -141,10 +141,14 @@ IF(NOT CMAKE_BUILD_TYPE)
 	ENDIF()
 ENDIF()
 
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+
 IF(WIN32)
-        link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
-        SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
+	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
 ELSE ()
-        link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-        SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+	SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 ENDIF ()
+
+

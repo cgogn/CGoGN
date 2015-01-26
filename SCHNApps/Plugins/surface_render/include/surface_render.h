@@ -32,7 +32,11 @@ struct MapParameters
 		renderVertices(false),
 		renderEdges(false),
 		renderFaces(true),
-		faceStyle(FLAT)
+		faceStyle(FLAT),
+		diffuseColor(0.8,0.9,0.7,0.0),
+		simpleColor(0.0,0.0,0.0,0.0),
+		vertexColor(0.0,0.0,1.0,0.0)
+
 	{}
 
 	Utils::VBO* positionVBO;
@@ -43,6 +47,10 @@ struct MapParameters
 	bool renderFaces;
 	bool renderBoundary;
 	FaceShadingStyle faceStyle;
+
+	Geom::Vec4f diffuseColor;
+	Geom::Vec4f simpleColor;
+	Geom::Vec4f vertexColor;
 };
 
 class Surface_Render_Plugin : public PluginInteraction
@@ -58,6 +66,8 @@ public:
 
 	~Surface_Render_Plugin()
 	{}
+
+
 
 private:
 	virtual bool enable();
@@ -87,6 +97,8 @@ private slots:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
+	void appsFinished();
+
 
 public slots:
 	// slots for Python calls
@@ -98,6 +110,11 @@ public slots:
 	void changeRenderFaces(const QString& view, const QString& map, bool b);
 	void changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style);
 	void changeRenderBoundary(const QString& view, const QString& map, bool b);
+	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
+	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
+	void changeVertexColor(const QString& view, const QString& map, float r, float g, float b);
+
+
 
 protected:
 	Surface_Render_DockTab* m_dockTab;

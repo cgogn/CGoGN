@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	Dart dcenter = myMap.explodBorderTopo(dsave);
+	Dart dcenter = myMap.explodBorderTopo(/*dsave*/);
 
 	DartMarker<MAP> mf(myMap);
 	for(Dart dit = myMap.begin() ; dit != myMap.end() ; myMap.next(dit))

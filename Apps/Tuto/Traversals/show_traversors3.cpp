@@ -113,9 +113,6 @@ void MyQT::cb_explode(int x)
 
 void MyQT::cb_initGL()
 {
-    // choose to use GL version 2
-    Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	m_render_topo = new Algo::Render::GL2::Topo3RenderMap<PFP>();
 
 	m_render_topo->updateData(myMap, position,  0.95f, 0.9f, 0.8f);
@@ -126,8 +123,10 @@ void MyQT::cb_redraw()
 {
     if (m_showTopo)
     {
+		glDepthFunc(GL_LESS);
         m_render_topo->drawTopo();
 
+		glDepthFunc(GL_LEQUAL);
         if (m_selected != NIL)
             m_render_topo->overdrawDart(m_selected, 7, 1.0f, 0.0f, 1.0f);
 

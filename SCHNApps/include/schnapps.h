@@ -6,6 +6,7 @@
 #include "types.h"
 #include "PythonQt/PythonQt.h"
 #include "PythonQt/gui/PythonQtScriptingConsole.h"
+#include "slot_debug.h"
 
 class QVBoxLayout;
 class QSplitter;
@@ -46,6 +47,8 @@ public slots:
 	/*********************************************************
 	 * MANAGE VIEWS
 	 *********************************************************/
+public:
+	void redrawAllViews();
 
 public slots:
 	View* addView(const QString& name);
@@ -90,16 +93,19 @@ private slots:
 public slots:
 	MapHandlerGen* addMap(const QString& name, unsigned int dim);
 	void removeMap(const QString& name);
+	void setSelectedMap(const QString& mapName);
 
 	MapHandlerGen* getMap(const QString& name) const;
 	const MapSet& getMapSet() const { return m_maps; }
 
-	void notifySelectedMapChanged(MapHandlerGen* old, MapHandlerGen* cur) { emit(selectedMapChanged(old, cur)); }
+	void notifySelectedMapChanged(MapHandlerGen* old, MapHandlerGen* cur) { DEBUG_EMIT("selectedMapChanged"); emit(selectedMapChanged(old, cur)); }
 	MapHandlerGen* getSelectedMap() const;
 
 	unsigned int getCurrentOrbit() const;
-	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { emit(selectedCellSelectorChanged(cs)); }
+	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { DEBUG_EMIT("selectedCellSelectorChanged"); emit(selectedCellSelectorChanged(cs)); }
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
+
+	const StaticPointers& getStaticPointers() const {return m_sp;}
 
 	/*********************************************************
 	 * MANAGE TEXTURES
@@ -147,6 +153,8 @@ signals:
 	void pluginEnabled(Plugin* plugin);
 	void pluginDisabled(Plugin* plugin);
 
+	void appsFinished();
+
 protected:
 	QString m_appPath;
 	PythonQtObjectPtr& m_pythonContext;
@@ -180,6 +188,10 @@ protected:
 	MapSet m_maps;
 
 	TextureSet m_textures;
+
+	StaticPointers m_sp;
+
+	void closeEvent(QCloseEvent *event);
 };
 
 } // namespace SCHNApps

@@ -43,9 +43,9 @@ unsigned int MapCommon<MAP_IMPL>::degree(Dart d) const
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT>
-bool MapCommon<MAP_IMPL>::sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2, unsigned int thread) const
+bool MapCommon<MAP_IMPL>::sameOrbit(Cell<ORBIT> c1, Cell<ORBIT> c2) const
 {
-	TraversorDartsOfOrbit<MapCommon<MAP_IMPL>, ORBIT> tradoo(*this, c1, thread);
+	TraversorDartsOfOrbit<MapCommon<MAP_IMPL>, ORBIT> tradoo(*this, c1);
 	for (Dart x = tradoo.begin(); x != tradoo.end(); x = tradoo.next())
 	{
 		if (x == c2.dart)
@@ -167,6 +167,19 @@ void MapCommon<MAP_IMPL>::boundaryUnmarkAll()
  ****************************************/
 
 template <typename MAP_IMPL>
+template <unsigned int ORBIT>
+inline bool MapCommon<MAP_IMPL>::addAttribute(const std::string& typeName, const std::string& nameAttr)
+{
+	if(!this->template isOrbitEmbedded<ORBIT>())
+		this->template addEmbedding<ORBIT>() ;
+
+	AttributeMultiVectorGen* amv = this->m_attribs[ORBIT].addAttribute(typeName,nameAttr) ;
+
+	return amv != NULL;
+}
+
+
+template <typename MAP_IMPL>
 template <typename T, unsigned int ORBIT, typename MAP>
 inline AttributeHandler<T, ORBIT, MAP> MapCommon<MAP_IMPL>::addAttribute(const std::string& nameAttr)
 {
@@ -201,6 +214,14 @@ inline AttributeHandler<T ,ORBIT, MAP> MapCommon<MAP_IMPL>::getAttribute(const s
 	AttributeMultiVector<T>* amv = this->m_attribs[ORBIT].template getDataVector<T>(nameAttr) ;
 	return AttributeHandler<T, ORBIT, MAP>(static_cast<MAP*>(this), amv) ;
 }
+
+template <typename MAP_IMPL>
+template < unsigned int ORBIT>
+inline CGoGNCodeType MapCommon<MAP_IMPL>::getAttributeTypeCode(const std::string& nameAttr)
+{
+	return this->m_attribs[ORBIT].getTypeCode(nameAttr);
+}
+
 
 template <typename MAP_IMPL>
 template <typename T, unsigned int ORBIT, typename MAP>

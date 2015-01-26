@@ -44,19 +44,45 @@ int NumberOfThreads = getSystemNumberOfCores();
 
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 
-int GenericMap::m_nbInstances = 0;
-
 std::vector< std::vector<Dart>* >* GenericMap::s_vdartsBuffers = NULL;
 
 std::vector< std::vector<unsigned int>* >* GenericMap::s_vintsBuffers = NULL;
 
+//std::mutex* GenericMap::s_DartBufferMutex = NULL;
+//std::mutex* GenericMap::s_IntBufferMutex = NULL;
+
 std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
 
-
-
 GenericMap::GenericMap():
-	m_manipulator(NULL),
-	m_nextMarkerId(0)
+	m_nextMarkerId(0),
+	m_manipulator(NULL)
+{
+	if(m_attributes_registry_map == NULL)
+		initAllStatics(NULL); // no need here to store the pointers
+
+	s_instances->push_back(this);
+
+	m_thread_ids.reserve(NB_THREAD+1);
+	m_thread_ids.push_back( std::this_thread::get_id() );
+
+	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	{
+		m_attribs[i].setOrbit(i) ;
+		m_attribs[i].setRegistry(m_attributes_registry_map) ;
+	}
+
+	init();
+}
+
+void GenericMap::copyAllStatics(const StaticPointers& sp)
+{
+	m_attributes_registry_map = sp.att_registry;
+	s_instances = sp.instances;
+	s_vdartsBuffers = sp.vdartsBuffers;
+	s_vintsBuffers = sp.vintsBuffers;
+}
+
+void GenericMap::initAllStatics(StaticPointers* sp)
 {
 	if(m_attributes_registry_map == NULL)
 	{
@@ -96,18 +122,14 @@ GenericMap::GenericMap():
 		registerAttribute<MarkerBool>("MarkerBool");
 	}
 
-
-
-	m_nbInstances++;
 	if (s_instances==NULL)
 		s_instances= new std::vector<GenericMap*>;
-
-	s_instances->push_back(this);
 
 	if (s_vdartsBuffers == NULL)
 	{
 		s_vdartsBuffers = new std::vector< std::vector<Dart>* >[NB_THREAD];
 		s_vintsBuffers = new std::vector< std::vector<unsigned int>* >[NB_THREAD];
+
 		for(unsigned int i = 0; i < NB_THREAD; ++i)
 		{
 			s_vdartsBuffers[i].reserve(8);
@@ -115,15 +137,13 @@ GenericMap::GenericMap():
 				// prealloc ?
 		}
 	}
-
-
-	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	if (sp != NULL)
 	{
-		m_attribs[i].setOrbit(i) ;
-		m_attribs[i].setRegistry(m_attributes_registry_map) ;
+		sp->att_registry = m_attributes_registry_map;
+		sp->instances = s_instances;
+		sp->vdartsBuffers = s_vdartsBuffers;
+		sp->vintsBuffers = s_vintsBuffers;
 	}
-
-	init();
 }
 
 GenericMap::~GenericMap()
@@ -139,32 +159,29 @@ GenericMap::~GenericMap()
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 
-
-	// clean type registry if necessary
-	m_nbInstances--;
-	if (m_nbInstances <= 0)
-	{
-		for (std::map<std::string, RegisteredBaseAttribute*>::iterator it =  m_attributes_registry_map->begin(); it != m_attributes_registry_map->end(); ++it)
-			delete it->second;
-
-		delete m_attributes_registry_map;
-		m_attributes_registry_map = NULL;
-
-		for(unsigned int i = 0; i < NB_THREAD; ++i)
-		{
-			for (auto it =s_vdartsBuffers[i].begin(); it != s_vdartsBuffers[i].end(); ++it)
-				delete *it;
-			for (auto it =s_vintsBuffers[i].begin(); it != s_vintsBuffers[i].end(); ++it)
-				delete *it;
-		}
-
-
-	}
-
 	// remove instance of table
 	auto it = std::find(s_instances->begin(), s_instances->end(), this);
 	*it = s_instances->back();
 	s_instances->pop_back();
+
+	// clean type registry if necessary
+
+//	if (s_instances->size() == 0)
+//	{
+//		for (std::map<std::string, RegisteredBaseAttribute*>::iterator it =  m_attributes_registry_map->begin(); it != m_attributes_registry_map->end(); ++it)
+//			delete it->second;
+
+//		delete m_attributes_registry_map;
+//		m_attributes_registry_map = NULL;
+
+//		for(unsigned int i = 0; i < NB_THREAD; ++i)
+//		{
+//			for (auto it =s_vdartsBuffers[i].begin(); it != s_vdartsBuffers[i].end(); ++it)
+//				delete *it;
+//			for (auto it =s_vintsBuffers[i].begin(); it != s_vintsBuffers[i].end(); ++it)
+//				delete *it;
+//		}
+//	}
 }
 
 bool GenericMap::askManipulate(MapManipulator* ptr)
@@ -218,8 +235,8 @@ void GenericMap::init(bool addBoundaryMarkers)
 
 	if (addBoundaryMarkers)
 	{
-		m_boundaryMarkers[0] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark0") ;
-		m_boundaryMarkers[1] = m_attribs[DART].addAttribute<MarkerBool>("BoundaryMark1") ;
+		m_boundaryMarkers[0] = m_attribs[DART].addMarkerAttribute("BoundaryMark0") ;
+		m_boundaryMarkers[1] = m_attribs[DART].addMarkerAttribute("BoundaryMark1") ;
 	}
 
 
@@ -231,7 +248,14 @@ void GenericMap::init(bool addBoundaryMarkers)
 void GenericMap::clear(bool removeAttrib)
 {
 	if (removeAttrib)
+	{
+#ifndef NDEBUG
+		for(unsigned int i = 0; i < NB_ORBITS; ++i)
+			if (m_attribs[i].hasMarkerAttribute())
+				CGoGNout << "Warning removing marker attribute on orbit, need update ? "<<orbitName(i)<< CGoGNendl;
+#endif
 		init();
+	}
 	else
 	{
 		for(unsigned int i = 0; i < NB_ORBITS; ++i)
@@ -381,16 +405,15 @@ void GenericMap::restore_shortcuts()
 	}
 
 	// MARKERS
-	m_attribs[DART].getAttributesNames(listeNames);
-
-	for (unsigned int i = 0;  i < listeNames.size(); ++i)
+	std::vector<AttributeMultiVector<MarkerBool>*>& amvv = m_attribs[DART].getMarkerAttributes();
+	for (auto it=amvv.begin(); it != amvv.end(); ++it)
 	{
-		if (listeNames[i] == "BoundaryMark0")
-			m_boundaryMarkers[0] = cont.getDataVector<MarkerBool>(i);
-
-		if (listeNames[i] == "BoundaryMark1")
-			m_boundaryMarkers[1] = cont.getDataVector<MarkerBool>(i);
+		if ((*it)->getName() == "BoundaryMark0")
+			m_boundaryMarkers[0] = *it;
+		if ((*it)->getName() == "BoundaryMark1")
+			m_boundaryMarkers[1] = *it;
 	}
+
 
 	// QUICK TRAVERSAL
 
@@ -579,17 +602,20 @@ void GenericMap::garbageMarkVectors()
 
 	for (unsigned int orbit=0; orbit<NB_ORBITS;++orbit)
 	{
-		std::vector<std::string> attNames;
-		m_attribs[orbit].getAttributesNames(attNames);
-		for (auto sit=attNames.begin(); sit!=attNames.end();++sit)
+		std::vector<AttributeMultiVector<MarkerBool>*>& amvv = m_attribs[orbit].getMarkerAttributes();
+
+		for (auto it = amvv.begin(); it != amvv.end(); ++it )
 		{
-			if (sit->substr(0,7) == "marker_")
+			AttributeMultiVector<MarkerBool>* amv = *it;
+			const std::string& name = amv->getName();
+			if (name.substr(0,7) == "marker_")
 			{
-				std::string num = sit->substr(sit->length()-3,3);
+				// store tne next free index for unique numbering
+				std::string num = name.substr(name.length()-3,3);
 				unsigned int id = 100*(num[0]-'0')+10*(num[1]-'0')+(num[2]-'0');
 				if (id > maxId)
 					maxId = id;
-				AttributeMultiVector<MarkerBool>* amv = m_attribs[orbit].getDataVector<MarkerBool>(*sit);
+
 				amv->allFalse();
 				m_markVectors_free[orbit][0].push_back(amv);
 			}

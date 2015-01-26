@@ -191,39 +191,39 @@ Traversor* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsigned i
 }
 
 template<typename MAP>
-Traversor* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, bool forceDartMarker, unsigned int thread)
+Traversor* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, bool forceDartMarker)
 {
 	switch(orb)
 	{
 		case VERTEX:
-			return new VTraversorCell<MAP,VERTEX>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VERTEX>(map,forceDartMarker);
 			break;
 		case EDGE:
-			return new VTraversorCell<MAP,EDGE>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,EDGE>(map,forceDartMarker);
 			break;
 		case FACE:
-			return new VTraversorCell<MAP,FACE>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,FACE>(map,forceDartMarker);
 			break;
 		case VOLUME:
-			return new VTraversorCell<MAP,VOLUME>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VOLUME>(map,forceDartMarker);
 			break;
 		case CC:
-			return new VTraversorCell<MAP,CC>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,CC>(map,forceDartMarker);
 			break;
 		case VERTEX1:
-			return new VTraversorCell<MAP,VERTEX1>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VERTEX1>(map,forceDartMarker);
 			break;
 		case EDGE1:
-			return new VTraversorCell<MAP,EDGE1>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,EDGE1>(map,forceDartMarker);
 			break;
 		case VERTEX2:
-			return new VTraversorCell<MAP,VERTEX2>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,VERTEX2>(map,forceDartMarker);
 			break;
 		case EDGE2:
-			return new VTraversorCell<MAP,EDGE2>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,EDGE2>(map,forceDartMarker);
 			break;
 		case FACE2:
-			return new VTraversorCell<MAP,FACE2>(map,forceDartMarker,thread);
+			return new VTraversorCell<MAP,FACE2>(map,forceDartMarker);
 			break;
 		default:
 			return NULL;

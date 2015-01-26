@@ -24,6 +24,9 @@ Surface_Modelisation_Plugin::Surface_Modelisation_Plugin()
 
 bool Surface_Modelisation_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_dockTab = new Surface_Modelisation_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Modelisation");
 
@@ -89,6 +92,10 @@ void Surface_Modelisation_Plugin::mousePress(View* view, QMouseEvent* event)
 void Surface_Modelisation_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_Modelisation_Plugin::mapAdded(MapHandlerGen* map)
@@ -790,11 +797,7 @@ void Surface_Modelisation_Plugin::pathExtrudeFace(MapHandlerGen *mhg)
 }
 
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_Modelisation_Plugin, Surface_Modelisation_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_Modelisation_PluginD, Surface_Modelisation_Plugin)
-#endif
 
 } // namespace SCHNApps
 

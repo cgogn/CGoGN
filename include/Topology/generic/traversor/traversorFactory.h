@@ -68,10 +68,9 @@ public:
 	 * Factory of incident traversors creation
 	 * @param map the map in which we work
 	 * @param forceDartMarker (default value false)
-	 * @param thread (default value 0)
 	 * @return a ptr on Generic Traversor
 	 */
-	static Traversor* createCell(MAP& map, unsigned int orb, bool forceDartMarker = false, unsigned int thread = 0);
+	static Traversor* createCell(MAP& map, unsigned int orb, bool forceDartMarker = false);
 };
 
 } // namespace CGoGN

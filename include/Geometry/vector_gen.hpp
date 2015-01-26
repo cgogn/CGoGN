@@ -49,6 +49,19 @@ std::string Vector<DIM, T>::CGoGNnameOfType()
 /**********************************************/
 
 template <unsigned int DIM, typename T>
+Vector<DIM, T>::Vector(typename std::initializer_list<T> args)
+{
+	unsigned int i=0;
+	// fill from initializer list
+	for (auto iter = args.begin(); (iter != args.end()) && (i<DIM); ++iter, ++i)
+		m_data[i] = *iter;
+
+	// finish with 0 if necessary
+	for (unsigned int j=i;j<DIM;++j)
+		m_data[j] = 0;
+}
+
+template <unsigned int DIM, typename T>
 Vector<DIM, T>::Vector()
 {
 	CGoGN_STATIC_ASSERT(DIM > 0, invalid_zero_dimensional_Vector) ;

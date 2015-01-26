@@ -9,6 +9,8 @@
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/cellmarker.h"
 
+#include "slot_debug.h"
+
 namespace CGoGN
 {
 
@@ -38,6 +40,7 @@ public:
 	{
 		if(m_selectionChanged)
 		{
+			DEBUG_EMIT("selectedCellsChanged");
 			emit(selectedCellsChanged());
 			m_selectionChanged = false;
 		}
@@ -63,10 +66,10 @@ class CellSelector : public CellSelectorGen
 	typedef CellSelector<MAP, ORBIT> SELECTOR;
 
 public:
-	CellSelector(MAP& map, const QString& name, unsigned int thread = 0) :
+	CellSelector(MAP& map, const QString& name) :
 		CellSelectorGen(name),
 		m_map(map),
-		m_cm(map, thread)
+		m_cm(map)
 	{}
 
 	~CellSelector()
@@ -92,7 +95,10 @@ public:
 					cs->unselect(c, emitSignal);
 			}
 			if(emitSignal)
+			{
+				DEBUG_EMIT("selectedCellsChanged");
 				emit(selectedCellsChanged());
+			}
 			else
 				m_selectionChanged = true;
 		}
@@ -128,7 +134,10 @@ public:
 				m_cells[i-1] = m_cells.back();
 				m_cells.pop_back();
 				if(emitSignal)
+				{
+					DEBUG_EMIT("selectedCellsChanged");
 					emit(selectedCellsChanged());
+				}
 				else
 					m_selectionChanged = true;
 			}

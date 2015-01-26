@@ -516,7 +516,7 @@ bool EmbeddedGMap2::mergeVolumes(Dart d, Dart e)
 
 unsigned int EmbeddedGMap2::closeHole(Dart d, bool forboundary)
 {
-	unsigned int nbE = GMap2::closeHole(d) ;
+	unsigned int nbE = GMap2::closeHole(d, forboundary) ;
 	Dart dd = phi2(d) ;
 	Dart it = dd ;
 	do

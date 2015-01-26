@@ -88,7 +88,7 @@ struct RefCompo3Type
 
 
 template <typename T1, typename T2, typename T3, unsigned int ORB, typename MAP>
-class Cell3Attributes: public AttributeHandlerGen
+class Cell3Attributes: public AttributeHandlerOrbit<ORB>
 {
 
 	AttributeHandler<T1, ORB, MAP>& m_h1;
@@ -101,7 +101,7 @@ public:
 	Cell3Attributes(AttributeHandler<T1, ORB, MAP>& h1,
 					AttributeHandler<T2, ORB, MAP>& h2,
 					AttributeHandler<T3, ORB, MAP>& h3):
-		AttributeHandlerGen(true),
+		AttributeHandlerOrbit<ORB>(true),
 		m_h1(h1), m_h2(h2), m_h3(h3) {}
 
 	static const unsigned int ORBIT = ORB;

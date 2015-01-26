@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(CGoGN)
+#cmake_policy(SET CMP0042 NEW) # rpath new policy
 
 #SET ( CMAKE_VERBOSE_MAKEFILE 1 )
 
@@ -9,7 +10,30 @@ SET ( CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR} )
 SET ( CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/ )
 
 
+# ====== Check GCC VERSION FOR C++11 ======
+if(CMAKE_COMPILER_IS_GNUCXX)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	if (GCC_VERSION VERSION_LESS 4.8)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a gcc/g++ compiler with a version at least 4.8 is needed.")
+	endif()
+endif()
 
+# ====== Check CLANG VERSION FOR C++11 ======
+if (APPLE)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
+	if (CLANG_VERSION VERSION_LESS 3.1)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a clang compiler with a version at least 3.1 is needed !!")
+	endif()
+endif()
+
+# ====== Check MSVC VERSION FOR C++11 ======
+if(WIN32)
+	if(MSVC_VERSION LESS 1800)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a microsoft compiler with a version at least 12 is needed.")
+	endif()
+endif()
+
+# ======== Check  Build Type =============
 IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
 		SET(CMAKE_BUILD_TYPE "Debug")
@@ -18,8 +42,16 @@ IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 	ENDIF()
 ENDIF()
 
-# for shared or not shared
-SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+
+# for shared or not shared (default except on windows)
+
+if(WIN32)
+	SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+else()
+	SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+endif()
+
+
 
 #IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp")
 IF(EXISTS "${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}/*assimp*")
@@ -44,10 +76,12 @@ SET ( COMPILE_BENCHES ON CACHE BOOL "compile benches" )
 SET ( COMPILE_SANDBOX ON CACHE BOOL "compile all in sandbox" )
 
 
-#create one big lib
+#create one big lib 
 SET ( ONELIB OFF CACHE BOOL "build CGoGN in one lib" )
 
+
 SET ( WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW" )
+SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
 
 
 IF(WIN32)
@@ -57,7 +91,6 @@ ENDIF(WIN32)
 find_package(OpenGL REQUIRED)
 find_package(Boost COMPONENTS regex REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
 
 # MESSAGE HERE FOR MORE EASY USER READING
@@ -83,6 +116,12 @@ ELSE (WITH_GLEWMX)
 ENDIF (WITH_GLEWMX)
 
 
+IF(USE_OGL_CORE_PROFILE)
+	add_definitions(-DUSE_OGL_CORE_PROFILE=1)
+ENDIF()
+
+add_definitions(-DGLM_FORCE_RADIANS)
+
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 
 # define includes of external libs 
@@ -91,7 +130,6 @@ SET (CGoGN_EXT_INCLUDES
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
-	${LIBXML2_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
 )
 
@@ -101,8 +139,8 @@ SET (CGoGN_EXT_LIBS
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
-	${LIBXML2_LIBRARIES}
 	${Boost_REGEX_LIBRARY}
+	tinyxml2
 )
 
 IF(WIN32)
@@ -115,7 +153,7 @@ IF(WIN32)
 ELSE(WIN32)
 	find_package(SuiteSparse REQUIRED)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${SUITESPARSE_INCLUDE_DIRS})
-	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES})
+	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES} pthread)
 ENDIF(WIN32)
 
 
@@ -143,13 +181,12 @@ IF (WITH_QT)
 	ADD_DEFINITIONS(${QT_DEFINITIONS})
 	find_package(QGLViewer REQUIRED)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${QT_INCLUDE_DIR} ${QGLVIEWER_INCLUDE_DIR} )
-	SET (CGoGN_EXT_LIBS ${QT_LIBRARIES} ${QGLVIEWER_LIBRARIES} ${CGoGN_EXT_LIBS})
+	SET (CGoGN_EXT_LIBS ${QGLVIEWER_LIBRARIES} ${QT_LIBRARIES} ${CGoGN_EXT_LIBS})
 ENDIF (WITH_QT)
 
 IF (WITH_GLEWMX)
 	ADD_DEFINITIONS(-DGLEW_MX)
 ENDIF (WITH_GLEWMX)
-
 
 # qq definition specifiques pour mac
 #IF(APPLE)
@@ -166,15 +203,14 @@ ELSE()
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Woverride-init -fPIC")
 	# remove the 60000+ "no unused local typedefs" warnings with GCC4.8+
 	if(CMAKE_COMPILER_IS_GNUCXX)
-		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-		if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-			SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
-		endif(GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
 	endif()
 ENDIF()
 
-
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
+endif()
 
 
 IF(WIN32)
@@ -285,22 +321,35 @@ file(	GLOB_RECURSE
 		${CGoGN_ROOT_DIR}/ThirdParty/include/*.hpp
 )
 
+link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+
 IF (ONELIB)
 	IF(WITH_QT)
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
 	ELSE()
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
 	ENDIF()
-	add_dependencies(cgogn shader_target )
+	add_dependencies(cgogn shader_target)
+	target_link_libraries(cgogn ${CGoGN_EXT_LIBS})
+
 ELSE()
-	add_library( container	${files_container})
-	add_library( topology	${files_topology})
-	add_library( algo		${files_algo})
 	IF (WITH_QT)
 		add_library( utils ${files_utils_withQt} )
 	ELSE()
 		add_library( utils ${files_utils} )
 	ENDIF()
+	target_link_libraries(utils ${CGoGN_EXT_LIBS})
+
+	add_library( container	${files_container})
+	target_link_libraries(container utils)
+
+	add_library( topology	${files_topology})
+	target_link_libraries(topology container)
+
+	add_library( algo		${files_algo})
+	target_link_libraries(algo utils topology)
+
+
 	add_custom_target( Geometry 	SOURCES ${files_geometry} )
 	add_custom_target( ThirdParty 	SOURCES ${files_thirdParty} )
 	add_dependencies( utils shader_target )

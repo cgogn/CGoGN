@@ -125,7 +125,7 @@ inline Dart GMap2<MAP_IMPL>::phi(Dart d) const
 	}
 	switch(N%10)
 	{
-		case 1 : return phi1(phi<N/10>(d)) ;
+		case 1 : return this->phi1(phi<N/10>(d)) ;
 		case 2 : return phi2(phi<N/10>(d)) ;
 		default : assert(!"Wrong multi-phi relation value") ; return d ;
 	}
@@ -1045,41 +1045,41 @@ bool GMap2<MAP_IMPL>::checkSimpleOrientedPath(std::vector<Dart>& vd)
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT, typename FUNC>
-void GMap2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f, unsigned int thread) const
+void GMap2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC f) const
 {
 	switch(ORBIT)
 	{
 		case DART:		f(c); break;
-		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
-		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
-		case FACE: 		foreach_dart_of_face(c, f, thread); break;
-		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
-		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
-		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f); break;
+		case EDGE: 		foreach_dart_of_edge(c, f); break;
+		case FACE: 		foreach_dart_of_face(c, f); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f); break;
 		default: 		assert(!"Cells of this dimension are not handled"); break;
 	}
 }
 
 template <typename MAP_IMPL>
 template <unsigned int ORBIT, typename FUNC>
-void GMap2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f, unsigned int thread) const
+void GMap2<MAP_IMPL>::foreach_dart_of_orbit(Cell<ORBIT> c, FUNC& f) const
 {
 	switch(ORBIT)
 	{
 		case DART:		f(c); break;
-		case VERTEX: 	foreach_dart_of_vertex(c, f, thread); break;
-		case EDGE: 		foreach_dart_of_edge(c, f, thread); break;
-		case FACE: 		foreach_dart_of_face(c, f, thread); break;
-		case VOLUME: 	foreach_dart_of_volume(c, f, thread); break;
-		case VERTEX1: 	foreach_dart_of_vertex1(c, f, thread); break;
-		case EDGE1: 	foreach_dart_of_edge1(c, f, thread); break;
+		case VERTEX: 	foreach_dart_of_vertex(c, f); break;
+		case EDGE: 		foreach_dart_of_edge(c, f); break;
+		case FACE: 		foreach_dart_of_face(c, f); break;
+		case VOLUME: 	foreach_dart_of_volume(c, f); break;
+		case VERTEX1: 	foreach_dart_of_vertex1(c, f); break;
+		case EDGE1: 	foreach_dart_of_edge1(c, f); break;
 		default: 		assert(!"Cells of this dimension are not handled"); break;
 	}
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-void GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, FUNC& f, unsigned int /*thread*/) const
+void GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, FUNC& f) const
 {
 	Dart it = d;
 	do
@@ -1091,15 +1091,15 @@ void GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(Dart d, FUNC& f, unsigned 
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex(Dart d, FUNC& f) const
 {
-	GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(d, f, thread);
-	GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(this->beta1(d), f, thread);
+	GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(d, f);
+	GMap2<MAP_IMPL>::foreach_dart_of_oriented_vertex(this->beta1(d), f);
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, FUNC& f, unsigned int /*thread*/) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, FUNC& f) const
 {
 	f(d);
 	f(beta2(this->beta0(d)));
@@ -1107,7 +1107,7 @@ inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_edge(Dart d, FUNC& f, unsi
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int /*thread*/) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f) const
 {
 	f(d);
 	Dart e = this->beta0(d) ;
@@ -1120,44 +1120,44 @@ inline void GMap2<MAP_IMPL>::foreach_dart_of_edge(Dart d, FUNC& f, unsigned int 
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_face(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_oriented_face(Dart d, FUNC& f) const
 {
-	ParentMap::foreach_dart_of_oriented_cc(d, f, thread);
+	ParentMap::foreach_dart_of_oriented_cc(d, f);
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_face(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_face(Dart d, FUNC& f) const
 {
-	ParentMap::foreach_dart_of_cc(d, f, thread);
+	ParentMap::foreach_dart_of_cc(d, f);
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_volume(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_volume(Dart d, FUNC& f) const
 {
-	foreach_dart_of_cc(d, f, thread);
+	foreach_dart_of_cc(d, f);
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex1(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_vertex1(Dart d, FUNC& f) const
 {
-	ParentMap::foreach_dart_of_vertex(d, f, thread);
+	ParentMap::foreach_dart_of_vertex(d, f);
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_edge1(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_edge1(Dart d, FUNC& f) const
 {
-	ParentMap::foreach_dart_of_edge(d, f, thread);
+	ParentMap::foreach_dart_of_edge(d, f);
 }
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-void GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FUNC& f, unsigned int thread) const
+void GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FUNC& f) const
 {
-	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this, thread);	// Lock a marker
+	DartMarkerStore<GMap2<MAP_IMPL> > mark(*this);	// Lock a marker
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
@@ -1188,10 +1188,10 @@ void GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(Dart d, FUNC& f, unsigned int 
 
 template <typename MAP_IMPL>
 template <typename FUNC>
-inline void GMap2<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f, unsigned int thread) const
+inline void GMap2<MAP_IMPL>::foreach_dart_of_cc(Dart d, FUNC& f) const
 {
-	GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(d, f, thread);
-	GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(this->beta0(d), f, thread);
+	GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(d, f);
+	GMap2<MAP_IMPL>::foreach_dart_of_oriented_cc(this->beta0(d), f);
 }
 
 /*! @name Close map after import or creation

@@ -12,6 +12,9 @@ namespace SCHNApps
 
 bool Surface_Subdivision_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_subdivisionDialog = new Dialog_Surface_Subdivision(m_schnapps);
 
 	m_subdivisionAction = new QAction("Subdivide surface", this);
@@ -122,11 +125,13 @@ void Surface_Subdivision_Plugin::trianguleFaces(
 		view->updateGL();
 }
 
-#ifndef DEBUG
+void Surface_Subdivision_Plugin::appsFinished()
+{
+	m_subdivisionDialog->close();
+}
+
+
 Q_EXPORT_PLUGIN2(Surface_Subdivision_Plugin, Surface_Subdivision_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_Subdivision_PluginD, Surface_Subdivision_Plugin)
-#endif
 
 } // namespace SCHNApps
 

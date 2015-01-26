@@ -38,6 +38,8 @@ private slots:
 	void computeNormalFromDialog();
 	void computeCurvatureFromDialog();
 
+	void appsFinished();
+
 public slots:
 	void computeNormal(const QString& mapName,
 		const QString& positionAttributeName = "position",

@@ -75,8 +75,7 @@ void MyQT::traversors(int x)
 	// update all color to grey
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
-		colorDarts[d] =  Geom::Vec3f(0.5f,0.5f,0.5f);
-		m_render_topo->setDartColor(d,0.5f,0.5f,0.5f);
+		m_render_topo->addColoredDart(d,0.5f,0.5f,0.5f);
 	}
 
 	switch(x)
@@ -85,7 +84,7 @@ void MyQT::traversors(int x)
 	{
 		Traversor2VVaE<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 
 	}
 		break;
@@ -94,14 +93,14 @@ void MyQT::traversors(int x)
 
 		Traversor2VVaF<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 2:
 	{
 		Traversor2EEaV<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 3:
@@ -109,63 +108,63 @@ void MyQT::traversors(int x)
 		Traversor2EEaF<MAP> trav(myMap,m_selected);
 		float c=0.0f;
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,c);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,c);
 	}
 		break;
 	case 4:
 	{
 		Traversor2FFaV<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 5:
 	{
 		Traversor2FFaE<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 6:
 	{
 		Traversor2FV<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 7:
 	{
 		Traversor2FE<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 8:
 	{
 		Traversor2EV<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 9:
 	{
 		Traversor2EF<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 10:
 	{
 		Traversor2VE<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	case 11:
 	{
 		Traversor2VF<MAP> trav(myMap,m_selected);
 		for(Dart b=trav.begin(); b!= trav.end(); b=trav.next())
-			m_render_topo->setDartColor(b,0.0f,1.0f,0.0f);
+			m_render_topo->addColoredDart(b,0.0f,1.0f,0.0f);
 	}
 		break;
 	default:
@@ -178,9 +177,8 @@ void MyQT::traversors(int x)
 void MyQT::createMap(int n)
 {
 	position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
-	colorDarts = myMap.addAttribute<VEC3, DART, MAP>("color");
 
-    Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, n, n, true);
+	Algo::Surface::Tilings::Square::Grid<PFP> grid(myMap, n, n, true);
     grid.embedIntoGrid(position, 1.,1.,0.);
 
     //  bounding box of scene
@@ -197,31 +195,28 @@ void MyQT::createMap(int n)
 	m_render_topo->setInitialDartsColor(0.5f,0.5f,0.5f);
 	m_render_topo->setInitialBoundaryDartsColor(0.3f,0.3f,0.3f);
 
-	m_render_topo->updateData(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
+	std::cout << "markAll OK"<< std::endl;
 
-	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
-		{
-			colorDarts[d] =  Geom::Vec3f(0.5f,0.5f,0.5f);
-			m_render_topo->setDartColor(d,0.5f,0.5f,0.5f);
-		}
-	}
+
+	#ifdef USE_GMAP
+	m_render_topo->updateDataGMap<PFP>(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
+	#else
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
+	#endif
+
+	std::cout << "markAll OK"<< std::endl;
+
 }
 
 void MyQT::updateMap()
 {
 	m_render_topo->setInitialBoundaryDartsColor(0.0f,0.0f,0.0f);
-	m_render_topo->updateData(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
-	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
-		{
-			const Geom::Vec3f& C = colorDarts[d];
-			if (C*C != 0.0f)
-				m_render_topo->setDartColor(d,C[0],C[1],C[2]);
-		}
-	}
+	#ifdef USE_GMAP
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
+	#else
+	m_render_topo->updateDataGMap<PFP>(myMap, position, 0.9f, 0.9f, dock.withBoundary->isChecked());
+	#endif
+
 	updateGL();
 }
 
@@ -229,28 +224,24 @@ void MyQT::updateMap()
 void MyQT::cb_initGL()
 {
 	glClearColor(1.0f,1.0f,1.0f,1.0f);
-#ifdef USE_GMAP
-	m_render_topo = new Algo::Render::GL2::TopoRenderGMap<PFP>(0.01f) ;
-#else
-	m_render_topo = new Algo::Render::GL2::TopoRenderMap<PFP>(0.01f) ;
-#endif
+	m_render_topo = new Algo::Render::GL2::TopoRender(0.01f) ;
 }
 
 // redraw GL callback (clear and swap already done)
 void MyQT::cb_redraw()
 {
-	glEnable( GL_POLYGON_OFFSET_FILL );
-	glPolygonOffset( 1.0f, 1.0f );
 
+	glDepthFunc(GL_LESS);
 	m_render_topo->drawTopo();
 
-	glDisable( GL_POLYGON_OFFSET_FILL );
+	glDepthFunc(GL_LEQUAL);
+	m_render_topo->drawColoredDarts(myMap);
 
 	if (m_selected != NIL)
-		m_render_topo->overdrawDart(m_selected, 11, 1.0f, 0.0f, 0.0f);
+		m_render_topo->overdrawDart(myMap, m_selected, 11, 1.0f, 0.0f, 0.0f);
 
 	if (m_selected2 != NIL)
-		m_render_topo->overdrawDart(m_selected2, 11, 0.0f, 1.0f, 0.0f);
+		m_render_topo->overdrawDart(myMap, m_selected2, 11, 0.0f, 1.0f, 0.0f);
 }
 
 void MyQT::cb_mousePress(int button, int x, int y)
@@ -279,38 +270,6 @@ void MyQT::cb_keyPress(int keycode)
 {
 	switch(keycode)
 	{
-	case 'c':
-		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-		{
-			if (!myMap.isBoundaryMarked<2>(d))
-			{
-				int n = rand();
-				float r = float(n&0x7f)/255.0f + 0.25f;
-				float g = float((n>>8)&0x7f)/255.0f + 0.25f;
-				float b = float((n>>16)&0x7f)/255.0 + 0.25f;
-				colorDarts[d] =  Geom::Vec3f(r,g,b);
-				m_render_topo->setDartColor(d,r,g,b);
-			}
-		}
-		break;
-	case 'g':
-		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-		{
-			colorDarts[d] =  Geom::Vec3f(0.5f,0.5f,0.5f);
-			m_render_topo->setDartColor(d,0.5f,0.5f,0.5f);
-		}
-		break;
-
-	case 'h':
-		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-		{
-			if (!myMap.isBoundaryMarked<2>(d))
-			{
-				colorDarts[d] =  Geom::Vec3f(0.0f,0.0f,0.0f);
-				m_render_topo->setDartColor(d,0.0f,0.0f,0.0f);
-			}
-		}
-		break;
 	case Qt::Key_Up:
 		if (m_selected!=NIL)
 			position[m_selected][1] += m_shift;
@@ -344,11 +303,6 @@ void MyQT::cb_keyPress(int keycode)
 
 void MyQT::svg()
 {
-	if (m_selected!=NIL)
-		m_render_topo->setDartColor(m_selected,0.8f,0.0f,0.0f);
-	if (m_selected2!=NIL)
-		m_render_topo->setDartColor(m_selected2,0.0f,0.8f,0.0f);
-
 	std::string filename = selectFileSave("snapshot file", ".", "(*.svg)");
 	m_render_topo->svgout2D(filename, modelViewMatrix(),projectionMatrix());
 }
@@ -392,23 +346,6 @@ void MyQT::importMesh(std::string& filename)
 		position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
 	}
 
-	colorDarts = myMap.getAttribute<VEC3, DART, MAP>("color");
-	if (!colorDarts.isValid())
-	{
-		colorDarts = myMap.addAttribute<VEC3, DART, MAP>("color");
-		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-		{
-			if (dm.isMarked(d) && (!myMap.isBoundaryMarked<2>(d)))
-			{
-				int n = rand();
-				float r = float(n&0x7f)/255.0f + 0.25f;
-				float g = float((n>>8)&0x7f)/255.0f + 0.25f;
-				float b = float((n>>16)&0x7f)/255.0 + 0.25f;
-				colorDarts[d] =  Geom::Vec3f(r,g,b);
-				m_render_topo->setDartColor(d,r,g,b);
-			}
-		}
-	}
 
 	m_selected  = NIL;
 	m_selected2 = NIL;

@@ -95,8 +95,6 @@ void SimpleMap3::initGUI()
 
 void SimpleMap3::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(2) ;
-
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	VEC3 gPosObj = bb.center() ;
 	float tailleX = bb.size(0) ;
@@ -110,10 +108,10 @@ void SimpleMap3::cb_initGL()
 	m_render_topo->setInitialDartsColor(1.0f,1.0f,1.0f);
 	m_render_topo->updateData(myMap, position, 0.9f,0.9f,0.8f);
 
-	m_render_topo_boundary = new Algo::Render::GL2::TopoRenderMap<PFP>();
+	m_render_topo_boundary = new Algo::Render::GL2::TopoRender();
 	m_render_topo_boundary->setDartWidth(2.0f);
 	m_render_topo_boundary->setInitialDartsColor(0.4f,0.8f,0.4f);
-	m_render_topo_boundary->updateDataBoundary(myMap, position, 0.9f,0.9f,bb.maxSize()/50.0f);
+	m_render_topo_boundary->updateDataBoundary<PFP>(myMap, position, 0.9f,0.9f,bb.maxSize()/50.0f);
 
 	m_render_topo_primal = new Algo::Render::GL2::Topo3PrimalRender<PFP>();
 	m_render_topo_primal->setDartWidth(2.0f);

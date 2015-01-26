@@ -169,7 +169,6 @@ void MyQT::cb_Open()
 	color = myMap.addAttribute<VEC3, VOLUME, MAP>("color");
 
 	TraversorCell<MAP, VOLUME> tra(myMap);
-	float maxV = 0.0f;
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
 //		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
@@ -205,9 +204,6 @@ void MyQT::cb_Save()
 
 void MyQT::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	// create the renders
 	m_topo_render = new Algo::Render::GL2::Topo3RenderMap<PFP>();
     m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true,true);
@@ -446,13 +442,13 @@ int main(int argc, char **argv)
 	{
 		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
-		int nb = 8;
+		int nb = 32;
 		Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
 		cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
 		for (unsigned int i = position.begin(); i != position.end(); position.next(i))
 		{
-			VEC3 pert(float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0),float(double(rand())/RAND_MAX/20.0));
+			VEC3 pert(float(double(rand())/RAND_MAX/200.0),float(double(rand())/RAND_MAX/200.0),float(double(rand())/RAND_MAX/200.0));
 			position[i]+= pert;
 		}
 
@@ -503,11 +499,11 @@ int main(int argc, char **argv)
 
 	Utils::Chrono ch;
 
-	Vertex v(myMap.begin());
-	VEC3 p = Algo::Volume::Geometry::vertexNeighborhoodCentroid<PFP>(myMap,v,position);
+//	Vertex v(myMap.begin());
+//	VEC3 p = Algo::Volume::Geometry::vertexNeighborhoodCentroid<PFP>(myMap,v,position);
 
-	Vol w(myMap.begin());
-	VEC3 q = Algo::Surface::Geometry::volumeCentroid<PFP>(myMap,w,position);
+//	Vol w(myMap.begin());
+//	VEC3 q = Algo::Surface::Geometry::volumeCentroid<PFP>(myMap,w,position);
 
 	ch.start();
 	float vol = Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);

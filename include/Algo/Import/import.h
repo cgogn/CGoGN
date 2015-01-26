@@ -94,7 +94,7 @@ namespace Import
  * @return a boolean indicating if import was successful
  */
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames/*, bool mergeCloseVertices = false*/);
 
 /**
  * import a mesh and extrude it

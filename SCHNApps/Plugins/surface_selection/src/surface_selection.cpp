@@ -23,6 +23,9 @@ Surface_Selection_Plugin::Surface_Selection_Plugin() :
 
 bool Surface_Selection_Plugin::enable()
 {
+	//	magic line that init static variables of GenericMap in the plugins
+		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+
 	m_dockTab = new Surface_Selection_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Selection");
 
@@ -488,6 +491,11 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
 	}
+
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_Selection_Plugin::updateSelectedCellsRendering()
@@ -625,11 +633,7 @@ void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigne
 	}
 }
 
-#ifndef DEBUG
 Q_EXPORT_PLUGIN2(Surface_Selection_Plugin, Surface_Selection_Plugin)
-#else
-Q_EXPORT_PLUGIN2(Surface_Selection_PluginD, Surface_Selection_Plugin)
-#endif
 
 } // namespace SCHNApps
 

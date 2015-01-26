@@ -11,7 +11,7 @@ namespace SCHNApps
 
 class SCHNApps;
 class Surface_RenderTopo_Plugin;
-struct MapParameters;
+//struct MapParameters;
 
 class Surface_RenderTopo_DockTab : public QWidget, public Ui::Surface_RenderTopo_TabWidget
 {
