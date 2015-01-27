@@ -15,6 +15,7 @@
 #include "Utils/drawer.h"
 
 #include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Render/GL2/topoRender.h"
 #include "Algo/Geometry/boundingbox.h"
 
 #include "Algo/Topo/basic.h"
@@ -76,9 +77,13 @@ public slots:
 		return matrix;
 	}
 
+	void frameModified() { DEBUG_EMIT("frameModified");emit(BBisModified());}
+
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
 	virtual void drawBB() = 0;
+	virtual void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
+	virtual void initBBDrawer() = 0;
 
 	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
@@ -148,6 +153,21 @@ private:
 	void unlinkView(View* view);
 
 	/*********************************************************
+	 * MANAGE TOPO_RENDERING
+	 *********************************************************/
+public:
+
+	virtual void createTopoRender(CGoGN::Utils::GLSLShader* sh1) = 0;
+	void deleteTopoRender();
+	virtual void updateTopoRender(const QString& name) = 0;
+	virtual void drawTopoRender(int code) = 0;
+
+	inline Algo::Render::GL2::TopoRender* getTopoRender() { return m_topoRender;}
+
+protected:
+	Algo::Render::GL2::TopoRender* m_topoRender;
+
+	/*********************************************************
 	 * SIGNALS
 	 *********************************************************/
 
@@ -164,6 +184,8 @@ signals:
 	void cellSelectorAdded(unsigned int orbit, const QString& name);
 	void cellSelectorRemoved(unsigned int orbit, const QString& name);
 	void selectedCellsChanged(CellSelectorGen* cs);
+
+	void BBisModified();
 
 protected:
 	QString m_name;
@@ -186,6 +208,8 @@ protected:
 	AttributeSet m_attribs[NB_ORBITS];
 
 	CellSelectorSet m_cellSelectors[NB_ORBITS];
+
+
 };
 
 
@@ -233,7 +257,19 @@ public:
 	void drawBB();
 
 	void updateBB(const VertexAttribute<VEC3, MAP>& position);
+	void initBBDrawer();
 	void updateBBDrawer();
+
+	void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax);
+
+
+	/*********************************************************
+	 * MANAGE TOPO DRAWING
+	 *********************************************************/
+	void createTopoRender(CGoGN::Utils::GLSLShader* sh1);
+	void updateTopoRender(const QString& positionName);
+	void drawTopoRender(int code);
+
 
 	/*********************************************************
 	 * MANAGE CELL SELECTORS
@@ -251,6 +287,7 @@ protected:
 } // namespace SCHNApps
 
 } // namespace CGoGN
+
 
 #include "mapHandler.hpp"
 

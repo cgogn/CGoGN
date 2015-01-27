@@ -67,7 +67,7 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo;
 	bool m_showTopo;
 
 
@@ -115,8 +115,6 @@ protected:
 
 	void cb_mousePress(int button, int x, int y);
 
-	template <unsigned int ORBIT>
-	void colorizeCell(Cell<ORBIT> c, float r,float g, float b);
 
 	void traverse2();
 	void dynamicMarkOrbit(unsigned int orb);

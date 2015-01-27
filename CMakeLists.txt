@@ -9,6 +9,29 @@ SET ( CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR} )
 SET ( CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/ )
 
 
+# ====== Check GCC VERSION FOR C++11 ======
+if(CMAKE_COMPILER_IS_GNUCXX)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	if (GCC_VERSION VERSION_LESS 4.8)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a gcc/g++ compiler with a version at least 4.8 is needed.")
+	endif()
+endif()
+
+# ====== Check CLANG VERSION FOR C++11 ======
+if (APPLE)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
+	if (CLANG_VERSION VERSION_LESS 3.1)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a clang compiler with a version at least 3.1 is needed !!")
+	endif()
+endif()
+
+# ====== Check MSVC VERSION FOR C++11 ======
+if(WIN32)
+	if(MSVC_VERSION LESS 1800)
+		message(FATAL_ERROR "Full support of C++11 needed. Therefore a microsoft compiler with a version at least 12 is needed.")
+	endif()
+endif()
+
 
 IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
 	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
@@ -48,6 +71,7 @@ SET ( COMPILE_SANDBOX ON CACHE BOOL "compile all in sandbox" )
 SET ( ONELIB OFF CACHE BOOL "build CGoGN in one lib" )
 
 SET ( WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW" )
+SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
 
 
 IF(WIN32)
@@ -57,7 +81,6 @@ ENDIF(WIN32)
 find_package(OpenGL REQUIRED)
 find_package(Boost COMPONENTS regex REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
 
 # MESSAGE HERE FOR MORE EASY USER READING
@@ -83,6 +106,12 @@ ELSE (WITH_GLEWMX)
 ENDIF (WITH_GLEWMX)
 
 
+IF(USE_OGL_CORE_PROFILE)
+	add_definitions(-DUSE_OGL_CORE_PROFILE=1)
+ENDIF()
+
+add_definitions(-DGLM_FORCE_RADIANS)
+
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 
 # define includes of external libs 
@@ -91,18 +120,17 @@ SET (CGoGN_EXT_INCLUDES
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
-	${LIBXML2_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
 )
 
 # define libs for external libs
 SET (CGoGN_EXT_LIBS
-    nl
+    	nl
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
-	${LIBXML2_LIBRARIES}
 	${Boost_REGEX_LIBRARY}
+	tinyxml2
 )
 
 IF(WIN32)
@@ -115,7 +143,7 @@ IF(WIN32)
 ELSE(WIN32)
 	find_package(SuiteSparse REQUIRED)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${SUITESPARSE_INCLUDE_DIRS})
-	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES})
+	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${SUITESPARSE_LIBRARIES} pthread)
 ENDIF(WIN32)
 
 
@@ -150,7 +178,6 @@ IF (WITH_GLEWMX)
 	ADD_DEFINITIONS(-DGLEW_MX)
 ENDIF (WITH_GLEWMX)
 
-
 # qq definition specifiques pour mac
 #IF(APPLE)
 #	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMAC_OSX")	
@@ -174,7 +201,9 @@ ELSE()
 	endif()
 ENDIF()
 
-
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
+endif()
 
 
 IF(WIN32)

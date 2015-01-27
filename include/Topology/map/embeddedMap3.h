@@ -123,6 +123,11 @@ public:
 	virtual void splitVolume(std::vector<Dart>& vd);
 
 	//!
+	/*!
+	 */
+	virtual void cutVolume(std::vector<Dart>& vd);
+
+	//!
 	virtual void splitVolumeWithFace(std::vector<Dart>& vd, Dart d);
 
 

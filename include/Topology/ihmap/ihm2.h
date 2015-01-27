@@ -32,11 +32,11 @@ namespace CGoGN
 
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
-typedef EmbeddedMap2::TOPO_MAP TOPO_MAP;
 
 class ImplicitHierarchicalMap2 : public EmbeddedMap2
 {
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
+	typedef EmbeddedMap2::TOPO_MAP TOPO_MAP;
 
 private:
 	unsigned int m_curLevel ;
@@ -143,7 +143,7 @@ public:
 
 	void splitFace(Dart d, Dart e) ;
 
-    unsigned int vertexDegree(Dart d);
+	unsigned int vertexDegree(Dart d);
 
 	/***************************************************
 	 *              LEVELS MANAGEMENT                  *

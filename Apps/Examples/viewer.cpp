@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include "viewer.h"
-#include "Utils/chrono.h"
 
 Viewer::Viewer() :
 	m_renderStyle(FLAT),
@@ -32,13 +31,14 @@ Viewer::Viewer() :
 	m_drawFaces(true),
 	m_drawNormals(false),
 	m_drawTopo(false),
-	m_drawBoundaryTopo(true),
+	m_drawBoundaryTopo(false),
 	m_render(NULL),
 	m_phongShader(NULL),
 	m_flatShader(NULL),
 	m_vectorShader(NULL),
 	m_simpleColorShader(NULL),
-	m_pointSprite(NULL)
+	m_pointSprite(NULL),
+	m_nbFrames(0)
 {
 	normalScaleFactor = 1.0f ;
 	vertexScaleFactor = 0.1f ;
@@ -78,14 +78,16 @@ void Viewer::initGUI()
 
 void Viewer::cb_initGL()
 {
-	Utils::GLSLShader::setCurrentOGLVersion(2) ;
-	CGoGNout << "GL VERSION = "<< glGetString(GL_VERSION)<< CGoGNendl;
-	Utils::GLSLShader::areShadersSupported();
+	int major = 0;
+	int minor = 0;
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
+	CGoGNout <<"Using GL "<< major <<"."<< minor << CGoGNendl;
 
 	m_render = new Algo::Render::GL2::MapRender() ;
-	m_topoRender = new Algo::Render::GL2::TopoRenderMap<PFP>() ;
+	m_topoRender = new Algo::Render::GL2::TopoRender() ;
 
-	m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
+	m_topoRender->setInitialDartsColor(1.0f, 1.00f, 1.00f) ;
 
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
@@ -98,12 +100,12 @@ void Viewer::cb_initGL()
 	m_phongShader->setSpecular(colSpec) ;
 	m_phongShader->setShininess(shininess) ;
 
-	m_flatShader = new Utils::ShaderFlat() ;
+	m_flatShader = new Utils::ShaderSimpleFlat() ;
 	m_flatShader->setAttributePosition(m_positionVBO) ;
 	m_flatShader->setAmbiant(colClear) ;
 	m_flatShader->setDiffuse(colDif) ;
-	m_flatShader->setDiffuseBack(Geom::Vec4f(0,0,0,0)) ;
-	m_flatShader->setExplode(faceShrinkage) ;
+//	m_flatShader->setDiffuseBack(Geom::Vec4f(0,0,0,0)) ;
+//	m_flatShader->setExplode(faceShrinkage) ;
 
 	m_vectorShader = new Utils::ShaderVectorPerVertex() ;
 	m_vectorShader->setAttributePosition(m_positionVBO) ;
@@ -130,12 +132,14 @@ void Viewer::cb_redraw()
 {
 	if(m_drawVertices)
 	{
+		glDepthFunc(GL_LEQUAL);
 		m_pointSprite->setSize(vertexScaleFactor) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
 	}
 
 	if(m_drawEdges)
 	{
+		glDepthFunc(GL_LEQUAL);
 		glLineWidth(1.0f) ;
 		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES) ;
 	}
@@ -146,10 +150,10 @@ void Viewer::cb_redraw()
 		glEnable(GL_LIGHTING) ;
 		glEnable(GL_POLYGON_OFFSET_FILL) ;
 		glPolygonOffset(1.0f, 1.0f) ;
+		glDepthFunc(GL_LESS);
 		switch(m_renderStyle)
 		{
 			case FLAT :
-				m_flatShader->setExplode(faceShrinkage) ;
 				m_render->draw(m_flatShader, Algo::Render::GL2::TRIANGLES) ;
 				break ;
 			case PHONG :
@@ -161,6 +165,7 @@ void Viewer::cb_redraw()
 
 	if(m_drawTopo)
 	{
+		glDepthFunc(GL_LEQUAL);
 		m_topoRender->drawTopo() ;
 	}
 
@@ -170,6 +175,14 @@ void Viewer::cb_redraw()
 		m_vectorShader->setScale(size) ;
 		glLineWidth(1.0f) ;
 		m_render->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
+	}
+
+	m_nbFrames++;
+	if (m_nbFrames >=100)
+	{
+		std::cout << 100000.0/m_frame_ch.elapsed()<< " fps"<<std::endl;
+		m_nbFrames = 0;
+		m_frame_ch.start();
 	}
 }
 
@@ -539,11 +552,14 @@ void Viewer::importMesh(std::string& filename)
 
 	//	myMap.enableQuickTraversal<VERTEX>() ;
 
+
+	std::cout << "The mesh is " << (myMap.isOpen() ? "open" : "closed") << std::endl;
+
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
-	m_topoRender->updateData(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo, true) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;

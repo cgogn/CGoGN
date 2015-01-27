@@ -1,6 +1,7 @@
 #include "surface_render.h"
 
 #include "mapHandler.h"
+#include "slot_debug.h"
 
 namespace CGoGN
 {
@@ -40,6 +41,7 @@ bool Surface_Render_Plugin::enable()
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapAdded(map);
@@ -60,6 +62,7 @@ void Surface_Render_Plugin::disable()
 	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapRemoved(map);
@@ -70,7 +73,32 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 	const MapParameters& p = h_viewParameterSet[view][map];
 	if(p.positionVBO)
 	{
-		if(p.renderVertices)
+        if(p.renderFaces)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glEnable(GL_LIGHTING);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0f, 1.0f);
+            switch(p.faceStyle)
+            {
+                case MapParameters::FLAT :
+                    m_flatShader->setAttributePosition(p.positionVBO);
+                    m_flatShader->setDiffuse(p.diffuseColor);
+                    map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+                    break;
+                case MapParameters::PHONG :
+                    if(p.normalVBO != NULL)
+                    {
+                        m_phongShader->setAttributePosition(p.positionVBO);
+                        m_phongShader->setAttributeNormal(p.normalVBO);
+                        m_phongShader->setDiffuse(p.diffuseColor);
+                        map->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+                    }
+                    break;
+            }
+            glDisable(GL_POLYGON_OFFSET_FILL);
+        }
+            if(p.renderVertices)
 		{
 			m_pointSprite->setSize(map->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
 			m_pointSprite->setAttributePosition(p.positionVBO);
@@ -86,31 +114,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 			m_simpleColorShader->setColor(p.simpleColor);
 			map->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
 		}
-		if(p.renderFaces)
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glEnable(GL_LIGHTING);
-			glEnable(GL_POLYGON_OFFSET_FILL);
-			glPolygonOffset(1.0f, 1.0f);
-			switch(p.faceStyle)
-			{
-				case MapParameters::FLAT :
-					m_flatShader->setAttributePosition(p.positionVBO);
-					m_flatShader->setDiffuse(p.diffuseColor);
-					map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
-					break;
-				case MapParameters::PHONG :
-					if(p.normalVBO != NULL)
-					{
-						m_phongShader->setAttributePosition(p.positionVBO);
-						m_phongShader->setAttributeNormal(p.normalVBO);
-						m_phongShader->setDiffuse(p.diffuseColor);
-						map->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
-					}
-					break;
-			}
-			glDisable(GL_POLYGON_OFFSET_FILL);
-		}
+
 		if(p.renderBoundary)
 		{
 			glLineWidth(5.0f);
@@ -128,22 +132,30 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 void Surface_Render_Plugin::selectedViewChanged(View *prev, View *cur)
 {
+	DEBUG_SLOT();
 	m_dockTab->updateMapParameters();
 }
 
 void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
+	DEBUG_SLOT();
 	m_dockTab->updateMapParameters();
+	if (cur==NULL)
+		m_dockTab->setDisabled(true);
+	else
+		m_dockTab->setDisabled(false);
 }
 
 void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
 {
+	DEBUG_SLOT();
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 }
 
 void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 {
+	DEBUG_SLOT();
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 }
@@ -154,6 +166,7 @@ void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 
 void Surface_Render_Plugin::vboAdded(Utils::VBO *vbo)
 {
+	DEBUG_SLOT();
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
 	if(map == m_schnapps->getSelectedMap())
@@ -168,6 +181,7 @@ void Surface_Render_Plugin::vboAdded(Utils::VBO *vbo)
 
 void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 {
+	DEBUG_SLOT();
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
 	if(map == m_schnapps->getSelectedMap())
@@ -209,6 +223,7 @@ void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 
 void Surface_Render_Plugin::changePositionVBO(const QString& view, const QString& map, const QString& vbo)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -225,6 +240,7 @@ void Surface_Render_Plugin::changePositionVBO(const QString& view, const QString
 
 void Surface_Render_Plugin::changeNormalVBO(const QString& view, const QString& map, const QString& vbo)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -241,6 +257,7 @@ void Surface_Render_Plugin::changeNormalVBO(const QString& view, const QString& 
 
 void Surface_Render_Plugin::changeRenderVertices(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -256,6 +273,7 @@ void Surface_Render_Plugin::changeRenderVertices(const QString& view, const QStr
 
 void Surface_Render_Plugin::changeVerticesScaleFactor(const QString& view, const QString& map, float f)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -271,6 +289,7 @@ void Surface_Render_Plugin::changeVerticesScaleFactor(const QString& view, const
 
 void Surface_Render_Plugin::changeRenderEdges(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -286,6 +305,7 @@ void Surface_Render_Plugin::changeRenderEdges(const QString& view, const QString
 
 void Surface_Render_Plugin::changeRenderFaces(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -301,6 +321,7 @@ void Surface_Render_Plugin::changeRenderFaces(const QString& view, const QString
 
 void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -316,6 +337,7 @@ void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString&
 
 void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QString& map, bool b)
 {
+	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
@@ -327,6 +349,61 @@ void Surface_Render_Plugin::changeRenderBoundary(const QString& view, const QStr
 			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
+}
+
+void Surface_Render_Plugin::changeFaceColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].diffuseColor = Geom::Vec4f(r,g,b,0);
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Render_Plugin::changeEdgeColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].simpleColor = Geom::Vec4f(r,g,b,0);
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Render_Plugin::changeVertexColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		h_viewParameterSet[v][m].vertexColor = Geom::Vec4f(r,g,b,0);
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+
+
+void Surface_Render_Plugin::appsFinished()
+{
+	m_dockTab->m_colorDial->close();
 }
 
 Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)

@@ -488,6 +488,64 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 	}
 }
 
+void EmbeddedMap3::cutVolume(std::vector<Dart>& vd)
+{
+	Map3::cutVolume(vd);
+
+	// follow the edge path a second time to embed the vertex, edge and volume orbits
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		Dart dit = *it;
+		Dart dit23 = phi3(phi2(dit));
+
+		// embed the vertex embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<VERTEX>())
+		{
+//			if(!sameVertex(dit, dd))
+//			{
+//				Algo::Topo::setOrbitEmbedding<VERTEX>(*this, dit, getEmbedding<VERTEX>(dit)) ;
+//				Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(*this, dit23);
+//				Algo::Topo::copyCellAttributes<VERTEX>(*this, dit23, dit);
+//			}
+//			else
+//			{
+//				Algo::Topo::setOrbitEmbedding<VERTEX>(*this, dit, getEmbedding<VERTEX>(dit)) ;
+//			}
+		}
+
+		// embed the edge embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<EDGE>())
+		{
+			if(!sameEdge(dit, dit23))
+			{
+				Algo::Topo::setOrbitEmbeddingOnNewCell<EDGE>(*this, dit23);
+				Algo::Topo::copyCellAttributes<EDGE>(*this, dit23, dit);
+				copyDartEmbedding<EDGE>(phi3(dit), dit) ;
+			}
+			else
+			{
+				unsigned int eEmb = getEmbedding<EDGE>(dit) ;
+				setDartEmbedding<EDGE>(phi3(dit), eEmb) ;
+				setDartEmbedding<EDGE>(alpha_2(dit), eEmb) ;
+			}
+		}
+
+		// embed the volume embedded from the origin volume to the new darts
+		if(isOrbitEmbedded<VOLUME>())
+		{
+			copyDartEmbedding<VOLUME>(phi2(dit), dit);
+		}
+	}
+
+	if(isOrbitEmbedded<VOLUME>())
+	{
+		Dart v = vd.front() ;
+		Dart v23 = phi3(phi2(v));
+		Algo::Topo::setOrbitEmbeddingOnNewCell<VOLUME>(*this, v23) ;
+		Algo::Topo::copyCellAttributes<VOLUME>(*this, v23, v) ;
+	}
+}
+
 //! Split a volume into two volumes along a edge path and add the given face between
 void EmbeddedMap3::splitVolumeWithFace(std::vector<Dart>& vd, Dart d)
 {

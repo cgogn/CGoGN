@@ -167,6 +167,19 @@ void MapCommon<MAP_IMPL>::boundaryUnmarkAll()
  ****************************************/
 
 template <typename MAP_IMPL>
+template <unsigned int ORBIT>
+inline bool MapCommon<MAP_IMPL>::addAttribute(const std::string& typeName, const std::string& nameAttr)
+{
+	if(!this->template isOrbitEmbedded<ORBIT>())
+		this->template addEmbedding<ORBIT>() ;
+
+	AttributeMultiVectorGen* amv = this->m_attribs[ORBIT].addAttribute(typeName,nameAttr) ;
+
+	return amv != NULL;
+}
+
+
+template <typename MAP_IMPL>
 template <typename T, unsigned int ORBIT, typename MAP>
 inline AttributeHandler<T, ORBIT, MAP> MapCommon<MAP_IMPL>::addAttribute(const std::string& nameAttr)
 {

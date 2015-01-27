@@ -252,7 +252,7 @@ void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<ty
 template <typename PFP>
 void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP>& vertex_area)
 {
-	CGoGN::Parallel::foreach_cell<VERTEX>(map, [&] (Vertex v, unsigned int thr)
+	CGoGN::Parallel::foreach_cell<VERTEX>(map, [&] (Vertex v, unsigned int /*thr*/)
 	{
 		vertex_area[v] = vertexBarycentricArea<PFP>(map, v, position) ;
 	}, FORCE_CELL_MARKING);

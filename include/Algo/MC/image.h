@@ -195,12 +195,12 @@ public:
 	/**
 	* Load a raw image
 	*/
-	void loadRaw(char *filename);
+	void loadRaw(const char *filename);
 
 	/**
 	 * Load a vox file
 	 */
-	void loadVox(char *filename);
+	void loadVox(const char *filename);
 
 	/**
 	* save current image into file

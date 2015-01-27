@@ -6,7 +6,9 @@ project(Tutos)
 #SET (CMAKE_BUILD_TYPE Debug)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 
-
+if(APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
+endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 #	${CGoGN_ROOT_DIR}/include

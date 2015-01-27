@@ -227,7 +227,7 @@ protected:
 				*typedOut++ = conv(*typedIn++);
 
 			// update sub-vbo
-			glBufferSubDataARB(GL_ARRAY_BUFFER, offset, szb, reinterpret_cast<void*>(typedBuffer));
+			glBufferSubData(GL_ARRAY_BUFFER, offset, szb, reinterpret_cast<void*>(typedBuffer));
 			// block suivant
 			offset += szb;
 		}

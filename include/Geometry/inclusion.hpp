@@ -124,7 +124,7 @@ Inclusion isSegmentInTriangle2D(const VEC3& P1, const VEC3& P2, const VEC3& Ta, 
 }
 
 template <typename VEC3>
-bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool CCW)
+bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool /*CCW*/)
 {
 	typedef typename VEC3::DATA_TYPE T ;
 

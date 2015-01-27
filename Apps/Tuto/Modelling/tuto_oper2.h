@@ -84,16 +84,16 @@ protected:
 	MAP myMap;
 
 	VertexAttribute<VEC3, MAP> position;
-	DartAttribute<VEC3, MAP> colorDarts;
 
 	// render (for the topo)
 #ifdef PRIMAL_TOPO
 	Algo::Render::GL2::TopoPrimalRender<PFP>* m_render_topo;
 #else
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo;
 #endif
 	Dart m_selected;
 	Dart m_selected2;
+	std::vector<Dart> m_selecteds;
 	DartMarker<MAP> dm;
 	float m_shift;
 

@@ -49,8 +49,6 @@ void MCMesh::cb_initGL()
 	Geom::Vec4f colDif(0.8f, 0.9f, 0.7f, 1.0f);
 	Geom::Vec4f colSpec(0.9f, 0.9f, 0.9f, 1.0f);
 
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	m_render = new Algo::Render::GL2::MapRender();
 
 	m_positionVBO = new Utils::VBO();
@@ -170,7 +168,8 @@ void MCMesh::updateRender()
 void MCMesh::fromFile(char* fname)
 {
 	myImg = new SAlgo::MC::Image<DATATYPE>();
-	myImg->loadInrgz(fname);
+	//myImg->loadInrgz(fname);
+	myImg->loadVox(fname);
 	CGoGNout << "Image chargee"<<CGoGNendl;
 	CGoGNout << myImg->getWidthX() <<"x"<< myImg->getWidthY() <<"x"<< myImg->getWidthZ() << "voxels"<<CGoGNendl;
 }

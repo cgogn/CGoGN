@@ -25,14 +25,12 @@
 #ifndef _TUTO1_
 #define _TUTO1_
 
-//#define USE_GMAP
-
 //#include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtQGLV.h"
 #include "Utils/cgognStream.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
 #include "Algo/Render/GL2/topoRender.h"
 
@@ -45,7 +43,7 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the type of the map
-	typedef EmbeddedMap2 MAP;
+	typedef EmbeddedGMap2 MAP;
 };
 
 typedef PFP::MAP MAP;
@@ -69,7 +67,7 @@ protected:
 	VertexAttribute<VEC3, MAP> position;
 
 	// render (for the topo)
-	Algo::Render::GL2::TopoRenderMap<PFP>* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo;
 
 	// just for more compact writing
 	inline Dart PHI1(Dart d) { return myMap.phi1(d); }

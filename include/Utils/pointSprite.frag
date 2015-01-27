@@ -55,5 +55,5 @@ void main(void)
 	vec4 result = colorsprite*lambertTerm;
 	result.xyz += ambiant;
 
-	gl_FragColor = result;
+	FRAG_OUT = result;
 }

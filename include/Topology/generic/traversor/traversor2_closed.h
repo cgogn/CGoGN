@@ -26,7 +26,7 @@
 #define __TRAVERSOR2_CLOSED_H__
 
 #include "Topology/generic/dart.h"
-#include "Topology/generic/traversorGen.h"
+#include "Topology/generic/traversor/traversorGen.h"
 
 namespace CGoGN
 {
@@ -255,6 +255,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversor2_closed.hpp"
+#include "Topology/generic/traversor/traversor2_closed.hpp"
 
 #endif

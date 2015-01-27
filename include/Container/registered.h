@@ -49,6 +49,8 @@ public:
 	 */
 	const std::string& getTypeName() { return m_name; }
 
+	virtual unsigned int size() = 0;
+
 	/**
 	 * Ajout de l'attribut au container (A IMPLEMENTER)
 	 */
@@ -74,6 +76,11 @@ public:
 			return container.addAttribute<T>(attribName);
 		// or existing one
 		return container.getDataVector<T>(id);
+	}
+
+	unsigned int size()
+	{
+		return sizeof(T);
 	}
 };
 

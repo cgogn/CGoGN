@@ -24,9 +24,12 @@
 
 #include "Geometry/orientation.h"
 
-#include <libxml/encoding.h>
-#include <libxml/xmlwriter.h>
-#include <libxml/parser.h>
+//#include <libxml/encoding.h>
+//#include <libxml/xmlwriter.h>
+//#include <libxml/parser.h>
+
+//#include <tinyxml2.h>
+#include "Utils/xml.h"
 
 namespace CGoGN
 {
@@ -190,6 +193,8 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 	m_nbFaces.reserve(m_nbVolumes*4);
 	m_emb.reserve(m_nbVolumes*12);
 
+    unsigned int nbc = 0;
+
 	for (unsigned int i = 0; i < m_nbVolumes ; ++i)
 	{
 		do
@@ -201,8 +206,36 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 		int n;
 		oss >> n; // type of volumes
 
+
+        if(!oss.good())
+        {
+            oss.clear();
+            char dummy;
+            oss >> dummy; // type of volumes
+            oss >> dummy;
+
+            if(dummy == 'C')// connector
+            {
+                ++nbc;
+                m_nbFaces.push_back(3);
+
+                int s0,s1,s2,s3;
+
+                oss >> s0;
+                oss >> s1;
+                oss >> s2;
+                oss >> s3;
+
+                //std::cout << "connector " << s0 << " " << s1 << " " << s2 << " " << s3 << std::endl;
+
+                m_emb.push_back(verticesID[s0]);
+                m_emb.push_back(verticesID[s1]);
+                m_emb.push_back(verticesID[s2]);
+                m_emb.push_back(verticesID[s3]);
+            }
+        }
 		//tetrahedron
-		if(n == 4)
+        else if(n == 4)
 		{
 			m_nbFaces.push_back(4);
 
@@ -216,9 +249,9 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 			typename PFP::VEC3 P = position[verticesID[s0]];
 			typename PFP::VEC3 A = position[verticesID[s1]];
 			typename PFP::VEC3 B = position[verticesID[s2]];
-			typename PFP::VEC3 C = position[verticesID[s3]];
+            typename PFP::VEC3 C = position[verticesID[s3]];
 
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
 			{
 				int ui = s1;
 				s1 = s2;
@@ -334,33 +367,33 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 			oss >> s6;
 			oss >> s7;
 
-			typename PFP::VEC3 P = position[verticesID[s4]];
-			typename PFP::VEC3 A = position[verticesID[s0]];
-			typename PFP::VEC3 B = position[verticesID[s1]];
-			typename PFP::VEC3 C = position[verticesID[s2]];
+            typename PFP::VEC3 P = position[verticesID[s4]];
+            typename PFP::VEC3 A = position[verticesID[s0]];
+            typename PFP::VEC3 B = position[verticesID[s1]];
+            typename PFP::VEC3 C = position[verticesID[s2]];
 
-			// 1 hexa ok avec cette partie
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
-			{
-				unsigned int pt[8];
-				pt[0] = s0;
-				pt[1] = s1;
-				pt[2] = s3;
-				pt[3] = s2;
-				pt[4] = s4;
-				pt[5] = s5;
-				pt[6] = s7;
-				pt[7] = s6;
+            // 1 hexa ok avec cette partie
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+            {
+                unsigned int pt[8];
+                pt[0] = s0;
+                pt[1] = s1;
+                pt[2] = s3;
+                pt[3] = s2;
+                pt[4] = s4;
+                pt[5] = s5;
+                pt[6] = s7;
+                pt[7] = s6;
 
-				s0 = pt[0];
-				s1 = pt[1];
-				s2 = pt[2];
-				s3 = pt[3];
-				s4 = pt[4];
-				s5 = pt[5];
-				s6 = pt[6];
-				s7 = pt[7];
-			}
+                s0 = pt[0];
+                s1 = pt[1];
+                s2 = pt[2];
+                s3 = pt[3];
+                s4 = pt[4];
+                s5 = pt[5];
+                s6 = pt[6];
+                s7 = pt[7];
+            }
 
 			m_emb.push_back(verticesID[s0]);
 			m_emb.push_back(verticesID[s1]);
@@ -371,8 +404,9 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 			m_emb.push_back(verticesID[s6]);
 			m_emb.push_back(verticesID[s7]);
 		}
-
 	}
+
+    std::cout << "#connectors = " << nbc << std::endl;
 
 	fp.close();
 	return true;
@@ -1436,9 +1470,249 @@ bool MeshTablesVolume<PFP>::importVBGZ(const std::string& filename, std::vector<
 	return true;
 }
 
+//template <typename PFP>
+//bool MeshTablesVolume<PFP>::importVTU(const std::string& filename, std::vector<std::string>& attrNames)
+//{
+//	VertexAttribute<VEC3, MAP> position =  m_map.template getAttribute<VEC3, VERTEX, MAP>("position") ;
+
+//	if (!position.isValid())
+//		position = m_map.template addAttribute<VEC3, VERTEX, MAP>("position") ;
+
+//	attrNames.push_back(position.name()) ;
+
+//	//
+//	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
+
+//	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
+//	xmlNodePtr vtu_node = xmlDocGetRootElement(doc);
+
+//	//	std::cout << " NAME "<<vtu_node->name << std::endl;
+
+//	xmlChar *prop = xmlGetProp(vtu_node, BAD_CAST "type");
+//	//	std::cout << "type = "<< prop << std::endl;
+
+//	xmlNode* grid_node = vtu_node->children;
+//	while (strcmp((char*)(grid_node->name),(char*)"UnstructuredGrid")!=0)
+//		grid_node = grid_node->next;
+
+//	xmlNode* piece_node = grid_node->children;
+//	while (strcmp((char*)(piece_node->name),(char*)"Piece")!=0)
+//		piece_node = piece_node->next;
+
+//	prop = xmlGetProp(piece_node, BAD_CAST "NumberOfPoints");
+//	m_nbVertices = atoi((char*)(prop));
+
+//	prop = xmlGetProp(piece_node, BAD_CAST "NumberOfCells");
+//	m_nbVolumes = atoi((char*)(prop));
+
+//	std::cout << "Number of points = "<< m_nbVertices<< std::endl;
+//	std::cout << "Number of cells = "<< m_nbVolumes << std::endl;
+
+//	xmlNode* points_node = piece_node->children;
+//	while (strcmp((char*)(points_node->name),(char*)"Points")!=0)
+//		points_node = points_node->next;
+
+//	points_node = points_node->children;
+//	while (strcmp((char*)(points_node->name),(char*)"DataArray")!=0)
+//		points_node = points_node->next;
+
+//	std::vector<unsigned int> verticesID;
+//	verticesID.reserve(m_nbVertices);
+
+//	std::stringstream ss((char*)(xmlNodeGetContent(points_node->children)));
+//	for (unsigned int i=0; i< m_nbVertices; ++i)
+//	{
+//		typename PFP::VEC3 P;
+//		ss >> P[0]; ss >> P[1]; ss >> P[2];
+//		unsigned int id = container.insertLine();
+//		position[id] = P;
+//		verticesID.push_back(id);
+//	}
+
+//	xmlNode* cell_node = piece_node->children;
+//	while (strcmp((char*)(cell_node->name),(char*)"Cells")!=0)
+//		cell_node = cell_node->next;
+
+//	std::cout <<"CELL NODE = "<< cell_node->name << std::endl;
+
+
+//	std::vector<unsigned char> typeVols;
+//	typeVols.reserve(m_nbVolumes);
+//	std::vector<unsigned int> offsets;
+//	offsets.reserve(m_nbVolumes);
+//	std::vector<unsigned int> indices;
+//	indices.reserve(m_nbVolumes*4);
+
+//	for (xmlNode* x_node = cell_node->children; x_node!=NULL; x_node = x_node->next)
+//	{
+//		while ((x_node!=NULL) && (strcmp((char*)(x_node->name),(char*)"DataArray")!=0))
+//			x_node = x_node->next;
+
+//		if (x_node == NULL)
+//			break;
+//		else
+//		{
+//			xmlChar* type = xmlGetProp(x_node, BAD_CAST "Name");
+
+//			if (strcmp((char*)(type),(char*)"connectivity")==0)
+//			{
+//				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
+//				while (!ss.eof())
+//				{
+//					unsigned int ind;
+//					ss >> ind;
+//					indices.push_back(ind);
+//				}
+//			}
+//			if (strcmp((char*)(type),(char*)"offsets")==0)
+//			{
+//				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
+//				for (unsigned int i=0; i< m_nbVolumes; ++i)
+//				{
+//					unsigned int o;
+//					ss >> o;
+//					offsets.push_back(o);
+//				}
+//			}
+//			if (strcmp((char*)(type),(char*)"types")==0)
+//			{
+//				bool unsupported = false;
+//				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
+//				for (unsigned int i=0; i< m_nbVolumes; ++i)
+//				{
+//					unsigned int t;
+//					ss >> t;
+//					if ((t != 12) && (t!= 10))
+//					{
+//						unsupported = true;
+//						typeVols.push_back(0);
+//					}
+//					else
+//					{
+//						typeVols.push_back((unsigned char)t);
+//					}
+//				}
+//				if (unsupported)
+//					CGoGNerr << "warning, some unsupported volume cell types"<< CGoGNendl;
+//			}
+//		}
+//	}
+
+//	xmlFreeDoc(doc);
+
+//	unsigned int currentOffset = 0;
+//	for (unsigned int i=0; i< m_nbVolumes; ++i)
+//	{
+//		if (typeVols[i]==12)
+//		{
+//			m_nbFaces.push_back(8);
+
+//			unsigned int pt[8];
+//			pt[0] = indices[currentOffset];
+//			pt[1] = indices[currentOffset+1];
+//			pt[2] = indices[currentOffset+2];
+//			pt[3] = indices[currentOffset+3];
+//			pt[4] = indices[currentOffset+4];
+//			typename PFP::VEC3 P = position[verticesID[indices[currentOffset+4]]];
+//			typename PFP::VEC3 A = position[verticesID[indices[currentOffset  ]]];
+//			typename PFP::VEC3 B = position[verticesID[indices[currentOffset+1]]];
+//			typename PFP::VEC3 C = position[verticesID[indices[currentOffset+2]]];
+
+//			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+//			{
+
+//				pt[0] = indices[currentOffset+3];
+//				pt[1] = indices[currentOffset+2];
+//				pt[2] = indices[currentOffset+1];
+//				pt[3] = indices[currentOffset+0];
+//				pt[4] = indices[currentOffset+7];
+//				pt[5] = indices[currentOffset+6];
+//				pt[6] = indices[currentOffset+5];
+//				pt[7] = indices[currentOffset+4];
+//			}
+//			else
+//			{
+//				pt[0] = indices[currentOffset+0];
+//				pt[1] = indices[currentOffset+1];
+//				pt[2] = indices[currentOffset+2];
+//				pt[3] = indices[currentOffset+3];
+//				pt[4] = indices[currentOffset+4];
+//				pt[5] = indices[currentOffset+5];
+//				pt[6] = indices[currentOffset+6];
+//				pt[7] = indices[currentOffset+7];
+//			}
+
+//			m_emb.push_back(verticesID[pt[0]]);
+//			m_emb.push_back(verticesID[pt[1]]);
+//			m_emb.push_back(verticesID[pt[2]]);
+//			m_emb.push_back(verticesID[pt[3]]);
+//			m_emb.push_back(verticesID[pt[4]]);
+//			m_emb.push_back(verticesID[pt[5]]);
+//			m_emb.push_back(verticesID[pt[6]]);
+//			m_emb.push_back(verticesID[pt[7]]);
+
+//		}
+//		else if (typeVols[i]==10)
+//		{
+//			m_nbFaces.push_back(4);
+
+//			Geom::Vec4ui pt;
+//			pt[0] = indices[currentOffset];
+//			pt[1] = indices[currentOffset+1];
+//			pt[2] = indices[currentOffset+2];
+//			pt[3] = indices[currentOffset+3];
+
+//			typename PFP::VEC3 P = position[verticesID[pt[0]]];
+//			typename PFP::VEC3 A = position[verticesID[pt[1]]];
+//			typename PFP::VEC3 B = position[verticesID[pt[2]]];
+//			typename PFP::VEC3 C = position[verticesID[pt[3]]];
+
+//			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+//			{
+//				unsigned int ui=pt[1];
+//				pt[1] = pt[2];
+//				pt[2] = ui;
+//			}
+
+//			m_emb.push_back(verticesID[pt[0]]);
+//			m_emb.push_back(verticesID[pt[1]]);
+//			m_emb.push_back(verticesID[pt[2]]);
+//			m_emb.push_back(verticesID[pt[3]]);
+//		}
+//		currentOffset = offsets[i];
+//	}
+
+//	return true;
+//}
+
+
+//inline bool XMLisError(tinyxml2::XMLError err, const std::string& msg)
+//{
+//	if (err != tinyxml2::XML_NO_ERROR)
+//	{
+//		CGoGNerr << msg << CGoGNendl;
+//		return true;
+//	}
+//	return false;
+//}
+
+//inline std::string XMLAttribute(tinyxml2::XMLElement* node, const char* attName)
+//{
+//	const char *ptr = node->Attribute(attName);
+//	if (ptr == NULL)
+//	{
+//		CGoGNerr << "Warning attrbute "<< attName << " not found"<< CGoGNendl;
+//		return "";
+//	}
+//	return std::string(ptr);
+//}
+
+
+
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importVTU(const std::string& filename, std::vector<std::string>& attrNames)
 {
+
 	VertexAttribute<VEC3, MAP> position =  m_map.template getAttribute<VEC3, VERTEX, MAP>("position") ;
 
 	if (!position.isValid())
@@ -1449,43 +1723,36 @@ bool MeshTablesVolume<PFP>::importVTU(const std::string& filename, std::vector<s
 	//
 	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
 
-	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
-	xmlNodePtr vtu_node = xmlDocGetRootElement(doc);
 
-	//	std::cout << " NAME "<<vtu_node->name << std::endl;
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError eResult = doc.LoadFile(filename.c_str());
 
-	xmlChar *prop = xmlGetProp(vtu_node, BAD_CAST "type");
-	//	std::cout << "type = "<< prop << std::endl;
+	if (XMLisError(eResult,"unable loading file"+filename))
+		return false;
 
-	xmlNode* grid_node = vtu_node->children;
-	while (strcmp((char*)(grid_node->name),(char*)"UnstructuredGrid")!=0)
-		grid_node = grid_node->next;
+	tinyxml2::XMLElement* vtu_node = doc.RootElement();
 
-	xmlNode* piece_node = grid_node->children;
-	while (strcmp((char*)(piece_node->name),(char*)"Piece")!=0)
-		piece_node = piece_node->next;
+	tinyxml2::XMLElement* grid_node = vtu_node->FirstChildElement("UnstructuredGrid");
+	tinyxml2::XMLElement* piece_node = grid_node->FirstChildElement("Piece");
 
-	prop = xmlGetProp(piece_node, BAD_CAST "NumberOfPoints");
-	m_nbVertices = atoi((char*)(prop));
+	eResult = piece_node->QueryUnsignedAttribute("NumberOfPoints",&m_nbVertices);
+	if (XMLisError(eResult,"unreadable VTU file: "+filename))
+		return false;
+	eResult = piece_node->QueryUnsignedAttribute("NumberOfCells",&m_nbVolumes);
+	if (XMLisError(eResult,"unreadable VTU file: "+filename))
+		return false;
 
-	prop = xmlGetProp(piece_node, BAD_CAST "NumberOfCells");
-	m_nbVolumes = atoi((char*)(prop));
+	CGoGNout << "Number of points = "<< m_nbVertices<< CGoGNendl;
+	CGoGNout << "Number of cells = "<< m_nbVolumes << CGoGNendl;
 
-	std::cout << "Number of points = "<< m_nbVertices<< std::endl;
-	std::cout << "Number of cells = "<< m_nbVolumes << std::endl;
-
-	xmlNode* points_node = piece_node->children;
-	while (strcmp((char*)(points_node->name),(char*)"Points")!=0)
-		points_node = points_node->next;
-
-	points_node = points_node->children;
-	while (strcmp((char*)(points_node->name),(char*)"DataArray")!=0)
-		points_node = points_node->next;
+	tinyxml2::XMLElement* points_node = piece_node->FirstChildElement("Points");
+	tinyxml2::XMLElement* array_node = points_node->FirstChildElement("DataArray");
 
 	std::vector<unsigned int> verticesID;
 	verticesID.reserve(m_nbVertices);
 
-	std::stringstream ss((char*)(xmlNodeGetContent(points_node->children)));
+	std::stringstream ss(array_node->GetText());
+
 	for (unsigned int i=0; i< m_nbVertices; ++i)
 	{
 		typename PFP::VEC3 P;
@@ -1495,12 +1762,8 @@ bool MeshTablesVolume<PFP>::importVTU(const std::string& filename, std::vector<s
 		verticesID.push_back(id);
 	}
 
-	xmlNode* cell_node = piece_node->children;
-	while (strcmp((char*)(cell_node->name),(char*)"Cells")!=0)
-		cell_node = cell_node->next;
-
-	std::cout <<"CELL NODE = "<< cell_node->name << std::endl;
-
+	tinyxml2::XMLElement* cell_node = piece_node->FirstChildElement("Cells");
+	array_node = cell_node->FirstChildElement("DataArray");
 
 	std::vector<unsigned char> typeVols;
 	typeVols.reserve(m_nbVolumes);
@@ -1509,62 +1772,59 @@ bool MeshTablesVolume<PFP>::importVTU(const std::string& filename, std::vector<s
 	std::vector<unsigned int> indices;
 	indices.reserve(m_nbVolumes*4);
 
-	for (xmlNode* x_node = cell_node->children; x_node!=NULL; x_node = x_node->next)
+	while (array_node)
 	{
-		while ((x_node!=NULL) && (strcmp((char*)(x_node->name),(char*)"DataArray")!=0))
-			x_node = x_node->next;
+		std::string propName = XMLAttribute(array_node,"Name");
 
-		if (x_node == NULL)
-			break;
-		else
+		if (propName == "")
 		{
-			xmlChar* type = xmlGetProp(x_node, BAD_CAST "Name");
+			CGoGNerr << "Error reading VTU unreadable file: "<<filename<< CGoGNendl;
+			return false;
+		}
 
-			if (strcmp((char*)(type),(char*)"connectivity")==0)
+		if (propName == "connectivity")
+		{
+			std::stringstream ss(array_node->GetText());
+			while (!ss.eof())
 			{
-				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
-				while (!ss.eof())
-				{
-					unsigned int ind;
-					ss >> ind;
-					indices.push_back(ind);
-				}
-			}
-			if (strcmp((char*)(type),(char*)"offsets")==0)
-			{
-				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
-				for (unsigned int i=0; i< m_nbVolumes; ++i)
-				{
-					unsigned int o;
-					ss >> o;
-					offsets.push_back(o);
-				}
-			}
-			if (strcmp((char*)(type),(char*)"types")==0)
-			{
-				bool unsupported = false;
-				std::stringstream ss((char*)(xmlNodeGetContent(x_node->children)));
-				for (unsigned int i=0; i< m_nbVolumes; ++i)
-				{
-					unsigned int t;
-					ss >> t;
-					if ((t != 12) && (t!= 10))
-					{
-						unsupported = true;
-						typeVols.push_back(0);
-					}
-					else
-					{
-						typeVols.push_back((unsigned char)t);
-					}
-				}
-				if (unsupported)
-					CGoGNerr << "warning, some unsupported volume cell types"<< CGoGNendl;
+				unsigned int ind;
+				ss >> ind;
+				indices.push_back(ind);
 			}
 		}
+		if (propName == "offsets")
+		{
+			std::stringstream ss(array_node->GetText());
+			for (unsigned int i=0; i< m_nbVolumes; ++i)
+			{
+				unsigned int o;
+				ss >> o;
+				offsets.push_back(o);
+			}
+		}
+		if (propName == "types")
+		{
+			bool unsupported = false;
+			std::stringstream ss(array_node->GetText());
+			for (unsigned int i=0; i< m_nbVolumes; ++i)
+			{
+				unsigned int t;
+				ss >> t;
+				if ((t != 12) && (t!= 10))
+				{
+					unsupported = true;
+					typeVols.push_back(0);
+				}
+				else
+				{
+					typeVols.push_back((unsigned char)t);
+				}
+			}
+			if (unsupported)
+				CGoGNerr << "warning, some unsupported volume cell types"<< CGoGNendl;
+		}
+		array_node = array_node->NextSiblingElement("DataArray");
 	}
-
-	xmlFreeDoc(doc);
 
 	unsigned int currentOffset = 0;
 	for (unsigned int i=0; i< m_nbVolumes; ++i)

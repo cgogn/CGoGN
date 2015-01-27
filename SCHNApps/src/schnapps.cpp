@@ -44,6 +44,12 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 {
 	GenericMap::initAllStatics(&m_sp);
 
+#ifdef USE_OGL_CORE_PROFILE
+	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(3);
+#else
+	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(2);
+#endif
+
 	this->setupUi(this);
 
 	// create & setup control dock
@@ -104,9 +110,8 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	connect(action_ShowHidePythonDock, SIGNAL(triggered()), this, SLOT(showHidePythonDock()));
 	connect(action_LoadPythonScript, SIGNAL(triggered()), this, SLOT(loadPythonScriptFromFileDialog()));
 
-	// create & setup central widget (views)
-//	glewInit();
 
+	// create & setup central widget (views)
 	m_centralLayout = new QVBoxLayout(centralwidget);
 
 	m_rootSplitter = new QSplitter(centralwidget);
@@ -132,6 +137,8 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 
 SCHNApps::~SCHNApps()
 {
+	// TODO check that cameras are destructed
+	m_cameras.clear();
 }
 
 /*********************************************************
@@ -145,6 +152,7 @@ Camera* SCHNApps::addCamera(const QString& name)
 
 	Camera* camera = new Camera(name, this);
 	m_cameras.insert(name, camera);
+	DEBUG_EMIT("cameraAdded");
 	emit(cameraAdded(camera));
 	return camera;
 }
@@ -160,6 +168,7 @@ void SCHNApps::removeCamera(const QString& name)
 	if (camera && !camera->isUsed())
 	{
 		m_cameras.remove(name);
+		DEBUG_EMIT("cameraRemoved");
 		emit(cameraRemoved(camera));
 		delete camera;
 	}
@@ -177,18 +186,44 @@ Camera* SCHNApps::getCamera(const QString& name) const
  * MANAGE VIEWS
  *********************************************************/
 
+void SCHNApps::redrawAllViews()
+{
+	foreach(View *v, m_views)
+	{
+		v->updateGL();
+	}
+}
+
 View* SCHNApps::addView(const QString& name)
 {
 	if (m_views.contains(name))
 		return NULL;
 
+	QGLFormat format;
+	if (Utils::GLSLShader::CURRENT_OGL_VERSION >= 3)
+	{
+		format.setProfile(QGLFormat::CoreProfile);
+		format.setVersion(Utils::GLSLShader::MAJOR_OGL_CORE, Utils::GLSLShader::MINOR_OGL_CORE);
+		format.setDepth(true);
+		format.setDoubleBuffer(true);
+		format.setBlueBufferSize(8);
+		std::cout << "CORE_PROFILE GL"<< std::endl;
+	}
+	else
+	{
+		format = QGLFormat::defaultFormat();
+		std::cout << "DEFAULT GL"<< std::endl;
+	}
+
 	View* view = NULL;
 	if(m_firstView == NULL)
-		view = new View(name, this);
+		view = new View(name, this, format);
 	else
-		view = new View(name, this, m_firstView);
+		view = new View(name, this, format, m_firstView);
+
 	m_views.insert(name, view);
 
+	DEBUG_EMIT("viewAdded");
 	emit(viewAdded(view));
 
 	return view;
@@ -225,6 +260,7 @@ void SCHNApps::removeView(const QString& name)
 
 			m_views.remove(name);
 
+			DEBUG_EMIT("viewRemoved");
 			emit(viewRemoved(view));
 
 			delete view;
@@ -262,11 +298,42 @@ void SCHNApps::setSelectedView(View* view)
 
 	m_pluginDockTabWidget->setCurrentIndex(currentTab);
 
+
+	DEBUG_EMIT("selectedViewChanged");
 	emit(selectedViewChanged(oldSelected, m_selectedView));
 
 	if(oldSelected)
 		oldSelected->updateGL();
 	m_selectedView->updateGL();
+
+	// check if selected map is correct
+//	if( (view->lastSelectedMap() != NULL) && (view->lastSelectedMap()->isLinkedToView(view)))
+//	{
+//		this->setSelectedMap(view->lastSelectedMap()->getName());
+//	}
+//	else
+//	{
+//		MapHandlerGen* map = this->getSelectedMap();
+//		if ((map == NULL) || (! map->isLinkedToView(view)))
+//		{
+//			bool changed = false;
+//			const MapSet& ms = this->getMapSet();
+//			foreach(MapHandlerGen* mhg, ms)
+//			{
+//				if (mhg->isLinkedToView(view))
+//				{
+//					this->setSelectedMap(mhg->getName());
+//					changed = true;
+//					break; // out of the loop, not nice but ...
+//				}
+//			}
+//			if (!changed)// no possibility to selected a map automatically so none
+//			{
+//				setSelectedMap(QString("NONE"));
+//			}
+//		}
+//	}
+
 }
 
 void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
@@ -318,6 +385,7 @@ void SCHNApps::registerPluginsDirectory(const QString& path)
 			if(!m_availablePlugins.contains(pluginName))
 			{
 				m_availablePlugins.insert(pluginName, pluginFilePath);
+				DEBUG_EMIT("pluginAvailableAdded");
 				emit(pluginAvailableAdded(pluginName));
 			}
 		}
@@ -352,6 +420,7 @@ Plugin* SCHNApps::enablePlugin(const QString& pluginName)
 				m_plugins.insert(pluginName, plugin);
 
 				statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
+				DEBUG_EMIT("pluginEnabled");
 				emit(pluginEnabled(plugin));
 
 				// method success
@@ -405,6 +474,7 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 		loader.unload();
 
 		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
+		DEBUG_EMIT("pluginDisabled");
 		emit(pluginDisabled(plugin));
 
 		delete plugin;
@@ -498,6 +568,7 @@ MapHandlerGen* SCHNApps::addMap(const QString& name, unsigned int dim)
 
 	m_maps.insert(name, mh);
 
+	DEBUG_EMIT("mapAdded");
 	emit(mapAdded(mh));
 
 	return mh;
@@ -508,16 +579,27 @@ void SCHNApps::removeMap(const QString& name)
 	if (m_maps.contains(name))
 	{
 		MapHandlerGen* map = m_maps[name];
-
 		foreach(View* view, map->getLinkedViews())
+		{
 			view->unlinkMap(map);
+		}
 
 		m_maps.remove(name);
 
+		DEBUG_EMIT("mapRemoved");
 		emit(mapRemoved(map));
+
+		// unselect map if it is removed
+		if (this->getSelectedMap() == map)
+			setSelectedMap(QString("NONE"));
 
 		delete map;
 	}
+}
+
+void SCHNApps::setSelectedMap(const QString& mapName)
+{
+	m_controlMapTab->setSelectedMap(mapName);
 }
 
 MapHandlerGen* SCHNApps::getMap(const QString& name) const
@@ -727,6 +809,18 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", getAppPath(), "Python script (*.py)");
 	loadPythonScriptFromFile(fileName);
+}
+
+void SCHNApps::closeEvent(QCloseEvent *event)
+{
+	foreach(View *v, m_views)
+	{
+		v->closeDialogs();
+	}
+
+		emit(appsFinished());
+
+	QMainWindow::closeEvent(event);
 }
 
 } // namespace SCHNApps

@@ -96,9 +96,6 @@ void ObjView::cb_keyPress(int k)
 
 void ObjView::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
 	m_dr = new Utils::Drawer;
 
 	// create VBO for position
