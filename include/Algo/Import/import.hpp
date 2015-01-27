@@ -182,6 +182,19 @@ bool importVoxellisation(typename PFP::MAP& map, Algo::Surface::Modelisation::Vo
     return importMesh<PFP>(map, mts);
 }
 
+template <typename PFP2, typename PFP3>
+bool import3DMap(typename PFP2::MAP& map2, typename PFP3::MAP& map3, std::vector<std::string>& attrNames, bool mergeCloseVertices)
+{
+	MeshTablesSurface<PFP2> mts(map2);
+
+	if(!mts.template import3DMap<PFP3>(map3, attrNames))
+		return false;
+
+	if(mergeCloseVertices)
+		mts.mergeCloseVertices();
+
+	return importMesh<PFP2>(map2, mts);
+}
 
 template <typename PFP>
 bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)

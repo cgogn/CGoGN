@@ -48,7 +48,7 @@ enum SubdivideType
 
 
 template <typename PFP>
-void newLevelHexa(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+void newLevelHexa(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 
 /***********************************************************************************
@@ -56,30 +56,13 @@ void newLevelHexa(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, V
  ***********************************************************************************/
 
 template <typename PFP>
-void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
+void subdivideEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position) ;
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType = S_TRI);
+void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType = S_TRI);
 
 template <typename PFP>
-Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
-
-
-
-
-
-
-
-
-template <typename PFP>
-void subdivideEdgeWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
-
-template <typename PFP>
-void subdivideFaceWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType = S_TRI);
-
-template <typename PFP>
-Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
-
+Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 
 
@@ -89,23 +72,40 @@ Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, AttributeHandle
 
 
 template <typename PFP>
-Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+void subdivideEdgeWrong(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position) ;
+
+template <typename PFP>
+void subdivideFaceWrong(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType = S_TRI);
+
+template <typename PFP>
+Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
+
+
+
+
 
 
 
 
 
 template <typename PFP>
-Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+Dart subdivideVolume(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
+
+
 
 
 
 template <typename PFP>
-Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
+
 
 
 template <typename PFP>
-void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
+
+
+template <typename PFP>
+void subdivideLoop(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 
 /***********************************************************************************
@@ -113,13 +113,13 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
  ***********************************************************************************/
 
 template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+void coarsenEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType = S_TRI);
+void coarsenFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType = S_TRI);
 
 template <typename PFP>
-void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+void coarsenVolume(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 /***********************************************************************************
  *												Raffinement
@@ -128,7 +128,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
  * Un brin de la face oppose aux faces a spliter
  */
 template <typename PFP>
-void splitVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+void splitVolume(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
 
 
 

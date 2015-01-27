@@ -25,6 +25,7 @@
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Modelisation/subdivision.h"
 #include "Algo/Modelisation/extrusion.h"
+#include "Topology/generic/dartmarker.h"
 
 namespace CGoGN
 {
@@ -41,11 +42,11 @@ namespace IHM
 
 
 template <typename PFP>
-void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void subdivideEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int eLevel = map.edgeLevel(d) ;
 
@@ -73,11 +74,11 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 }
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
+void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int fLevel = map.faceLevel(d) ;
     Dart old = map.faceOldestDart(d) ;
@@ -193,12 +194,12 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 }
 
 template <typename PFP>
-Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 //Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, Algo::Volume::IHM::AttributeHandler_IHM<typename PFP::VEC3, VERTEX>& position)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int vLevel = map.volumeLevel(d);
     Dart old = map.volumeOldestDart(d);
@@ -221,8 +222,8 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
      * avec calcul du centroid
      */
 
-    DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-    DartMarkerStore mv(map);
+	DartMarkerStore<typename PFP::MAP> mf(map);		// Lock a face marker to save one dart per face
+	DartMarkerStore<typename PFP::MAP> mv(map);
 
     typename PFP::VEC3 volCenter;
     unsigned count = 0 ;
@@ -236,7 +237,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
     std::vector<Dart> oldEdges;
     oldEdges.reserve(20);
 
-    mf.markOrbit<FACE>(old) ;
+	mf.markOrbit(Face(old)) ;
 
     for(unsigned int i = 0; i < visitedFaces.size(); ++i)
     {
@@ -247,7 +248,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
             //compute volume centroid
             if(!mv.isMarked(e))
             {
-                mv.markOrbit<VERTEX>(e);
+				mv.markOrbit(Vertex(e));
                 volCenter += position[e];
                 ++count;
                 oldEdges.push_back(e);
@@ -258,7 +259,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
             if(!mf.isMarked(ee)) // not already marked
             {
                 visitedFaces.push_back(ee) ;
-                mf.markOrbit<FACE>(ee) ;
+				mf.markOrbit(Face(ee)) ;
             }
 
             e = map.phi1(e) ;
@@ -393,14 +394,14 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
     //LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
     //id pour les aretes interieurs : (i.e. 6 pour un hexa)
-    DartMarkerStore mne(map);
+	DartMarkerStore<typename PFP::MAP> mne(map);
     for(unsigned int i = 0; i < newEdges.size(); ++i)
     {
         if(!mne.isMarked(newEdges[i]))
         {
             unsigned int idedge = map.getNewEdgeId();
             map.setEdgeId(newEdges[i], idedge, EDGE);
-            mne.markOrbit<EDGE>(newEdges[i]);
+			mne.markOrbit(Edge(newEdges[i]));
         }
     }
 
@@ -454,11 +455,11 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
 
 template <typename PFP>
-void subdivideEdgeGeom(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void subdivideEdgeGeom(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int eLevel = map.edgeLevel(d) ;
 
@@ -486,11 +487,11 @@ void subdivideEdgeGeom(typename PFP::MAP& map, Dart d, AttributeHandler<typename
 }
 
 template <typename PFP>
-void subdivideFaceGeom(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
+void subdivideFaceGeom(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int fLevel = map.faceLevel(d) ;
     Dart old = map.faceOldestDart(d) ;
@@ -607,12 +608,12 @@ void subdivideFaceGeom(typename PFP::MAP& map, Dart d, AttributeHandler<typename
 }
 
 template <typename PFP>
-Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 //Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, Algo::Volume::IHM::AttributeHandler_IHM<typename PFP::VEC3, VERTEX>& position)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int vLevel = map.volumeLevel(d);
     Dart old = map.volumeOldestDart(d);
@@ -635,8 +636,8 @@ Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, AttributeHandler
      * avec calcul du centroid
      */
 
-    DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-    DartMarkerStore mv(map);
+	DartMarkerStore<typename PFP::MAP> mf(map);		// Lock a face marker to save one dart per face
+	DartMarkerStore<typename PFP::MAP> mv(map);
 
     typename PFP::VEC3 volCenter;
     unsigned count = 0 ;
@@ -650,7 +651,7 @@ Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, AttributeHandler
     std::vector<Dart> oldEdges;
     oldEdges.reserve(20);
 
-    mf.markOrbit<FACE>(old) ;
+	mf.markOrbit(Face(old)) ;
 
     for(unsigned int i = 0; i < visitedFaces.size(); ++i)
     {
@@ -661,7 +662,7 @@ Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, AttributeHandler
             //compute volume centroid
             if(!mv.isMarked(e))
             {
-                mv.markOrbit<VERTEX>(e);
+				mv.markOrbit(Vertex(e));
                 volCenter += position[e];
                 ++count;
                 oldEdges.push_back(e);
@@ -672,7 +673,7 @@ Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, AttributeHandler
             if(!mf.isMarked(ee)) // not already marked
             {
                 visitedFaces.push_back(ee) ;
-                mf.markOrbit<FACE>(ee) ;
+				mf.markOrbit(Face(ee)) ;
             }
 
             e = map.phi1(e) ;
@@ -807,14 +808,14 @@ Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, AttributeHandler
 
     //LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
     //id pour les aretes interieurs : (i.e. 6 pour un hexa)
-    DartMarkerStore mne(map);
+	DartMarkerStore<typename PFP::MAP> mne(map);
     for(unsigned int i = 0; i < newEdges.size(); ++i)
     {
         if(!mne.isMarked(newEdges[i]))
         {
             unsigned int idedge = map.getNewEdgeId();
             map.setEdgeId(newEdges[i], idedge, EDGE);
-            mne.markOrbit<EDGE>(newEdges[i]);
+			mne.markOrbit(Edge(newEdges[i]));
         }
     }
 
@@ -916,11 +917,11 @@ Dart subdivideVolumeClassicGeom(typename PFP::MAP& map, Dart d, AttributeHandler
 
 
 template <typename PFP>
-void subdivideEdgeWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void subdivideEdgeWrong(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int eLevel = map.edgeLevel(d) ;
 
@@ -947,11 +948,11 @@ void subdivideEdgeWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typenam
 }
 
 template <typename PFP>
-void subdivideFaceWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
+void subdivideFaceWrong(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int fLevel = map.faceLevel(d) ;
     Dart old = map.faceOldestDart(d) ;
@@ -1110,11 +1111,11 @@ void subdivideFaceWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typenam
 
 template <typename PFP>
 //Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
-Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int vLevel = map.volumeLevel(d);
     Dart old = map.volumeOldestDart(d);
@@ -1137,8 +1138,8 @@ Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, AttributeHandle
      * avec calcul du centroid
      */
 
-    DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-    DartMarkerStore mv(map);
+	DartMarkerStore<typename PFP::MAP> mf(map);		// Lock a face marker to save one dart per face
+	DartMarkerStore<typename PFP::MAP> mv(map);
 
     typename PFP::VEC3 volCenter;
     unsigned count = 0 ;
@@ -1307,7 +1308,7 @@ Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, AttributeHandle
 
     //LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
     //id pour les aretes interieurs : (i.e. 6 pour un hexa)
-    DartMarkerStore mne(map);
+	DartMarkerStore<typename PFP::MAP> mne(map);
     for(unsigned int i = 0; i < newEdges.size(); ++i)
     {
         if(!mne.isMarked(newEdges[i]))
@@ -1330,7 +1331,7 @@ Dart subdivideVolumeClassicWrong(typename PFP::MAP& map, Dart d, AttributeHandle
 
 
 template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void coarsenEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
@@ -1342,7 +1343,7 @@ void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 }
 
 template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
+void coarsenFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.faceCanBeCoarsened(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
@@ -1395,7 +1396,7 @@ void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 }
 
 template <typename PFP>
-void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void coarsenVolume(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.volumeIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided volume or a more than once subdivided volume") ;
@@ -1438,11 +1439,11 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 
 
 template <typename PFP>
-Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-	assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
 	unsigned int vLevel = map.volumeLevel(d);
 	Dart old = map.volumeOldestDart(d);
@@ -1551,7 +1552,7 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<ty
 
 	//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
 	//id pour les aretes interieurs : (i.e. 6 pour un hexa)
-	DartMarker mne(map);
+	DartMarker<typename PFP::MAP> mne(map);
 	for(unsigned int i = 0; i < newEdges.size(); ++i)
 	{
 		if(!mne.isMarked(newEdges[i]))
@@ -1581,11 +1582,11 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<ty
 
 
 template <typename PFP>
-void subdivideEdgeLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void subdivideEdgeLoop(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int eLevel = map.edgeLevel(d) ;
 
@@ -1611,11 +1612,11 @@ void subdivideEdgeLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename
 }
 
 template <typename PFP>
-void subdivideFaceLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
+void subdivideFaceLoop(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, SubdivideType sType)
 {
     assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
     assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
-    assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
     unsigned int fLevel = map.faceLevel(d) ;
     Dart old = map.faceOldestDart(d) ;
@@ -1780,11 +1781,11 @@ void subdivideFaceLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename
 
 
 template <typename PFP>
-void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void subdivideLoop(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-	assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked(3,d) || !"Trying to subdivide a dart marked boundary");
 
 	unsigned int vLevel = map.volumeLevel(d);
 	Dart old = map.volumeOldestDart(d);
@@ -1918,7 +1919,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
     //switch inner faces
     if(isNotTet)
     {
-        DartMarker me(map);
+		DartMarker<typename PFP::MAP> me(map);
 
         for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
         {
@@ -1947,8 +1948,8 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
                     map.setEdgeId(f3,map.getEdgeId(f3), EDGE);
                     map.setEdgeId(f32,map.getEdgeId(f32), EDGE);
 
-                    me.markOrbit<EDGE>(f3);
-                    me.markOrbit<EDGE>(f32);
+					me.markOrbit(Edge(f3));
+					me.markOrbit(Edge(f32));
                 }
 
                 f = map.phi2(map.phi_1(f));
@@ -1975,7 +1976,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 
 
 template <typename PFP>
-Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Dart subdivideVolume(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
@@ -1993,8 +1994,8 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename P
 	 * avec calcul du centroid
 	 */
 
-	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-	CellMarker<VERTEX> mv(map);
+	DartMarkerStore<typename PFP::MAP> mf(map);		// Lock a face marker to save one dart per face
+	CellMarker<typename PFP::MAP, VERTEX> mv(map);
 
 	typename PFP::VEC3 volCenter;
 	unsigned count = 0 ;
@@ -2297,7 +2298,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename P
 
 		//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
 		//id pour les aretes interieurs : (i.e. 16 pour un octa)
-		DartMarker mne(map);
+		DartMarker<typename PFP::MAP> mne(map);
 		for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
 		{
 			if(!mne.isMarked(*it))
@@ -2313,7 +2314,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename P
 	if(isocta)
 	{
 
-		DartMarker me(map);
+		DartMarker<typename PFP::MAP> me(map);
 
 		for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
 		{
@@ -2535,7 +2536,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename P
 
 
 template <typename PFP>
-Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
@@ -2552,8 +2553,8 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typenam
 	 * avec calcul du centroid
 	 */
 
-	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-	CellMarker<VERTEX> mv(map);
+	DartMarkerStore<typename PFP::MAP> mf(map);		// Lock a face marker to save one dart per face
+	CellMarker<typename PFP::MAP, VERTEX> mv(map);
 
 	typename PFP::VEC3 volCenter;
 	unsigned count = 0 ;
@@ -2795,7 +2796,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typenam
 
 	//std::cout << "1ere etape finished" << std::endl;
 
-	CellMarker<FACE> mtf(map);
+	CellMarker<typename PFP::MAP, FACE> mtf(map);
 
 	//Etape 2
 	for (std::vector<std::pair<Dart,Dart> >::iterator edges = subdividedfacesT.begin(); edges != subdividedfacesT.end(); ++edges)
@@ -2998,7 +2999,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typenam
  *												Raffinement
  ***********************************************************************************/
 template <typename PFP>
-void splitVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void splitVolume(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;

@@ -248,7 +248,7 @@ void MyQT::cb_redraw()
 	if(!m_selecteds.empty())
 	{
 		for(std::vector<Dart>::iterator it = m_selecteds.begin() ; it != m_selecteds.end() ; ++it)
-			m_render_topo->overdrawDart(*it, 11, 0.0f, 0.0f, 1.0f);
+			m_render_topo->overdrawDart(myMap, *it, 11, 0.0f, 0.0f, 1.0f);
 	}
 
 		m_render_topo->overdrawDart(myMap, m_selected2, 11, 0.0f, 1.0f, 0.0f);

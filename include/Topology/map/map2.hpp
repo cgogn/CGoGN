@@ -961,6 +961,24 @@ bool Map2<MAP_IMPL>::isTriangular() const
 }
 
 template <typename MAP_IMPL>
+bool Map2<MAP_IMPL>::isOpen() const
+{
+	bool open = false;
+	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
+	{
+		if(this->template isBoundaryMarked<2>(d))
+		{
+			open = true;
+			return open;
+		}
+
+	}
+
+	return open;
+}
+
+
+template <typename MAP_IMPL>
 bool Map2<MAP_IMPL>::check() const
 {
 	CGoGNout << "Check: topology begin" << CGoGNendl;

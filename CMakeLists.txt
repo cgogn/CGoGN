@@ -125,7 +125,7 @@ SET (CGoGN_EXT_INCLUDES
 
 # define libs for external libs
 SET (CGoGN_EXT_LIBS
-    nl
+    	nl
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}

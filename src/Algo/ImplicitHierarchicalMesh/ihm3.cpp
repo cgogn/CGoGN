@@ -41,9 +41,9 @@ namespace IHM
 
 ImplicitHierarchicalMap3::ImplicitHierarchicalMap3() : m_curLevel(0), m_maxLevel(0), m_edgeIdCount(0), m_faceIdCount(0)
 {
-	m_dartLevel = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("dartLevel") ;
-	m_edgeId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("edgeId") ;
-	m_faceId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("faceId") ;
+	m_dartLevel = Map3::addAttribute<unsigned int, DART, EmbeddedMap3>("dartLevel") ;
+	m_edgeId = Map3::addAttribute<unsigned int, DART, EmbeddedMap3>("edgeId") ;
+	m_faceId = Map3::addAttribute<unsigned int, DART, EmbeddedMap3>("faceId") ;
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;
@@ -61,9 +61,9 @@ void ImplicitHierarchicalMap3::clear(bool removeAttrib)
 	Map3::clear(removeAttrib) ;
 	if (removeAttrib)
 	{
-		m_dartLevel = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("dartLevel") ;
-		m_faceId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("faceId") ;
-		m_edgeId = Map3::addAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("edgeId") ;
+		m_dartLevel = Map3::addAttribute<unsigned int, DART, EmbeddedMap3>("dartLevel") ;
+		m_faceId = Map3::addAttribute<unsigned int, DART, EmbeddedMap3>("faceId") ;
+		m_edgeId = Map3::addAttribute<unsigned int, DART, EmbeddedMap3>("edgeId") ;
 
 		for(unsigned int i = 0; i < NB_ORBITS; ++i)
 			m_nextLevelCell[i] = NULL ;

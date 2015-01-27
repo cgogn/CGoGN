@@ -37,7 +37,7 @@ namespace IHM
 /***************************************************
  *  	   ATTRIBUTES MANAGEMENT    	           	 *
  ***************************************************/
-
+/*
 template <typename T, unsigned int ORBIT>
 AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap3::addAttribute(const std::string& nameAttr)
 {
@@ -65,13 +65,13 @@ AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap3::getAttribute(const std:
     AttributeHandler<T, ORBIT, ImplicitHierarchicalMap3> h = Map3::getAttribute<T, ORBIT, ImplicitHierarchicalMap3>(nameAttr) ;
     return AttributeHandler_IHM<T, ORBIT>(this, h.getDataVector()) ;
 }
-
+*/
 inline void ImplicitHierarchicalMap3::update_topo_shortcuts()
 {
 //	Map3::update_topo_shortcuts();
-    m_dartLevel = Map3::getAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("dartLevel") ;
-    m_faceId = Map3::getAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("faceId") ;
-    m_edgeId = Map3::getAttribute<unsigned int, DART, ImplicitHierarchicalMap3>("edgeId") ;
+	m_dartLevel = Map3::getAttribute<unsigned int, DART, EmbeddedMap3>("dartLevel") ;
+	m_faceId = Map3::getAttribute<unsigned int, DART, EmbeddedMap3>("faceId") ;
+	m_edgeId = Map3::getAttribute<unsigned int, DART, EmbeddedMap3>("edgeId") ;
 
     //AttributeContainer& cont = m_attribs[DART] ;
     //m_nextLevelCell = cont.getDataVector<unsigned int>(cont.getAttributeIndex("nextLevelCell")) ;
@@ -638,6 +638,7 @@ inline unsigned int ImplicitHierarchicalMap3::edgeLevel(Dart d)
 	return r;
 }
 
+/*
 template <unsigned int ORBIT>
 inline unsigned int ImplicitHierarchicalMap3::getEmbedding(Cell<ORBIT> c) const
 {
@@ -655,7 +656,7 @@ inline unsigned int ImplicitHierarchicalMap3::getEmbedding(Cell<ORBIT> c) const
     }
 
     return index;
-}
+}*/
 
 inline bool ImplicitHierarchicalMap3::isWellEmbedded()
 {

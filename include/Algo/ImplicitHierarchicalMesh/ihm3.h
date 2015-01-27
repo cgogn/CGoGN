@@ -57,9 +57,9 @@ public:
     unsigned int m_edgeIdCount ;
     unsigned int m_faceIdCount;
 
-    DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_dartLevel ;
-    DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_edgeId ;
-    DartAttribute<unsigned int, ImplicitHierarchicalMap3> m_faceId ;
+	DartAttribute<unsigned int, EmbeddedMap3> m_dartLevel ;
+	DartAttribute<unsigned int, EmbeddedMap3> m_edgeId ;
+	DartAttribute<unsigned int, EmbeddedMap3> m_faceId ;
 
     AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
@@ -100,15 +100,15 @@ public:
     /*!
      *
      */
-    template <typename T, unsigned int ORBIT>
-    AttributeHandler_IHM<T, ORBIT> addAttribute(const std::string& nameAttr) ;
+//    template <typename T, unsigned int ORBIT>
+//    AttributeHandler_IHM<T, ORBIT> addAttribute(const std::string& nameAttr) ;
 
     //!
     /*!
      *
      */
-    template <typename T, unsigned int ORBIT>
-    AttributeHandler_IHM<T, ORBIT> getAttribute(const std::string& nameAttr) ;
+//    template <typename T, unsigned int ORBIT>
+//    AttributeHandler_IHM<T, ORBIT> getAttribute(const std::string& nameAttr) ;
     //@}
 
     /*! @name Basic Topological Operators
@@ -419,8 +419,8 @@ public:
 	void foreach_dart_of_cc(Dart d, FUNC& f) const ;
 	//@}
 
-    template <unsigned int ORBIT>
-	unsigned int getEmbedding(Cell<ORBIT> c) const;
+//    template <unsigned int ORBIT>
+//	unsigned int getEmbedding(Cell<ORBIT> c) const;
 } ;
 
 template <typename T, unsigned int ORBIT>

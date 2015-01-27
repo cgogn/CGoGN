@@ -852,7 +852,7 @@ void MyQT::importMesh(std::string& filename)
         std::cerr << "could not import " << filename << std::endl ;
         return ;
     }
-    else
+	else
 		position = myMap.getAttribute<VEC3, VERTEX, MAP>(attrNames[0]) ;
 
     m_selected  = NIL;

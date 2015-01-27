@@ -133,6 +133,10 @@ public:
 
 	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
 
+	template <typename PFP3>
+	bool import3DMap(typename PFP3::MAP& map, std::vector<std::string>& attrNames);
+
+
 	MeshTablesSurface(MAP& map):
 		m_map(map)
     { }

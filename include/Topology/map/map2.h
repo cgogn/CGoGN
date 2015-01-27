@@ -430,6 +430,12 @@ public:
 	 */
 	bool isTriangular() const;
 
+	/**
+	 * @brief isOpen check if the mesh is open or not
+	 * @return a boolean indicating the mesh is open
+	 */
+	bool isOpen() const;
+
 	// TODO a mettre en algo
 	/**
 	 * Check if map is complete
