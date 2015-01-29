@@ -31,6 +31,8 @@ find_package(SuiteSparse REQUIRED)
 #find_package(SuperLU REQUIRED)
 
 
+add_definitions(-DWITH_QT)
+
 SET( QT_USE_QTOPENGL TRUE )
 SET( QT_USE_QTXML TRUE )
 SET( QT_USE_QTDESIGNER TRUE )
