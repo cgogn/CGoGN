@@ -10,6 +10,7 @@
 #include "schnapps.h"
 #include "Utils/gl_matrices.h"
 #include "Utils/GLSLShader.h"
+#include "Utils/Shaders/shaderWallPaper.h"
 #include "Utils/drawer.h"
 
 namespace CGoGN
@@ -105,7 +106,6 @@ private slots:
 	void ui_horizontalSplitView(int x, int y, int globalX, int globalY);
 	void ui_closeView(int x, int y, int globalX, int globalY);
 
-
 	void ui_mapsListView(int x, int y, int globalX, int globalY);
 	void ui_pluginsListView(int x, int y, int globalX, int globalY);
 	void ui_camerasListView(int x, int y, int globalX, int globalY);
@@ -158,6 +158,8 @@ protected:
 
 	Utils::Drawer* m_frameDrawer;
 
+	Utils::Texture<2, Geom::Vec3uc>* m_textureWallpaper;
+	Utils::ShaderWallPaper* m_shaderWallpaper;
 };
 
 } // namespace SCHNApps

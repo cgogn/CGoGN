@@ -36,7 +36,12 @@ View::View(const QString& name, SCHNApps* s,  QGLFormat& format) :
 	m_mapsButton(NULL),
 	m_pluginsButton(NULL),
 	m_camerasButton(NULL),
-	m_dialogMaps(NULL)
+	m_dialogMaps(NULL),
+	m_dialogPlugins(NULL),
+	m_dialogCameras(NULL),
+	m_frameDrawer(NULL),
+	m_textureWallpaper(NULL),
+	m_shaderWallpaper(NULL)
 {
 	++viewCount;
 
@@ -75,10 +80,6 @@ View::View(const QString& name, SCHNApps* s,  QGLFormat& format) :
 	m_dialogCameras->check(m_currentCamera->getName(),Qt::Checked);
 }
 
-
-
-
-
 View::View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget* shareWidget) :
 	QGLViewer(format, NULL, shareWidget),
 	b_updatingUI(false),
@@ -94,7 +95,12 @@ View::View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget
 	m_mapsButton(NULL),
 	m_pluginsButton(NULL),
 	m_camerasButton(NULL),
-	m_dialogMaps(NULL)
+	m_dialogMaps(NULL),
+	m_dialogPlugins(NULL),
+	m_dialogCameras(NULL),
+	m_frameDrawer(NULL),
+	m_textureWallpaper(NULL),
+	m_shaderWallpaper(NULL)
 {
 	++viewCount;
 
@@ -232,7 +238,7 @@ void View::linkPlugin(PluginInteraction* plugin)
 		emit(pluginLinked(plugin));
 
 		b_updatingUI = true;
-		m_dialogPlugins->check(plugin->getName(),Qt::Checked);
+		m_dialogPlugins->check(plugin->getName(), Qt::Checked);
 		b_updatingUI = false;
 
 		updateGL();
@@ -256,7 +262,7 @@ void View::unlinkPlugin(PluginInteraction* plugin)
 		emit(pluginUnlinked(plugin));
 
 		b_updatingUI = true;
-		m_dialogPlugins->check(plugin->getName(),Qt::Unchecked);
+		m_dialogPlugins->check(plugin->getName(), Qt::Unchecked);
 		b_updatingUI = false;
 
 		updateGL();
@@ -298,7 +304,7 @@ void View::linkMap(MapHandlerGen* map)
 			setManipulatedFrame(map->getFrame());
 
 		b_updatingUI = true;
-		m_dialogMaps->check(map->getName(),Qt::Checked);
+		m_dialogMaps->check(map->getName(), Qt::Checked);
 		b_updatingUI = false;
 	}
 }
@@ -330,7 +336,7 @@ void View::unlinkMap(MapHandlerGen* map)
 			setManipulatedFrame(NULL);
 
 		b_updatingUI = true;
-		m_dialogMaps->check(map->getName(),Qt::Unchecked);
+		m_dialogMaps->check(map->getName(), Qt::Unchecked);
 		b_updatingUI = false;
 
 	}
@@ -360,7 +366,6 @@ void View::init()
 //	glGetIntegerv(GL_MINOR_VERSION, &minor);
 //	std::cout << this->getName().toStdString() << "is using GL "<< major <<"."<< minor << std::endl;
 
-
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
 	delete c;
@@ -387,7 +392,6 @@ void View::init()
 	m_buttonAreaLeft = new ViewButtonArea(this);
 	m_buttonAreaLeft->setTopLeftPosition(0, 0);
 
-
 	m_mapsButton = new ViewButton(":icons/icons/maps.png", this);
 	m_buttonAreaLeft->addButton(m_mapsButton);
 	connect(m_mapsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_mapsListView(int, int, int, int)));
@@ -399,7 +403,6 @@ void View::init()
 	m_camerasButton = new ViewButton(":icons/icons/cameras.png", this);
 	m_buttonAreaLeft->addButton(m_camerasButton);
 	connect(m_camerasButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_camerasListView(int, int, int, int)));
-
 
 	// FRAME DRAWER
 
@@ -419,18 +422,36 @@ void View::init()
 	m_frameDrawer->end();
 	m_frameDrawer->endList();
 
-	std::cout << "end INIT of "<< this->getName().toStdString()<< std::endl;
+	std::cout << "end INIT of " << this->getName().toStdString() << std::endl;
 
 //	qglviewer::Camera* c = this->camera();
 //	this->setCamera(m_currentCamera);
 //	delete c;
+
+	m_textureWallpaper = new Utils::Texture<2, Geom::Vec3uc>(GL_UNSIGNED_BYTE);
+	m_textureWallpaper->create(Geom::Vec2ui(1024, 1024));
+	const float max = m_textureWallpaper->size()[0];
+	for (unsigned int ki = 0; ki < m_textureWallpaper->size()[0]; ++ki)
+	{
+		for (unsigned int kj = 0; kj <  m_textureWallpaper->size()[1]; ++kj)
+		{
+			float col = 255 - (255 * (ki/max));//*0.85 + 0.15;
+			(*m_textureWallpaper)(kj, ki) = Geom::Vec3f(col, col, col);
+		}
+	}
+	m_textureWallpaper->update();
+	m_textureWallpaper->setWrapping(GL_CLAMP_TO_EDGE);
+
+	m_shaderWallpaper = new Utils::ShaderWallPaper();
+	m_shaderWallpaper->setTextureUnit(GL_TEXTURE0);
+	m_shaderWallpaper->setTexture(m_textureWallpaper);
 
 	this->setBackgroundColor(QColor(0,0,0));
 }
 
 void View::preDraw()
 {
-	if (Utils::GLSLShader::CURRENT_OGL_VERSION>=3)
+	if (Utils::GLSLShader::CURRENT_OGL_VERSION >= 3)
 		makeCurrent();
 	m_currentCamera->setScreenWidthAndHeight(width(), height());
 
@@ -439,7 +460,7 @@ void View::preDraw()
 
 void View::draw()
 {
-	if (Utils::GLSLShader::CURRENT_OGL_VERSION>=3)
+	if (Utils::GLSLShader::CURRENT_OGL_VERSION >= 3)
 	{
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -487,6 +508,8 @@ void View::draw()
 
 	foreach(PluginInteraction* plugin, l_plugins)
 		plugin->draw(this);
+
+	m_shaderWallpaper->draw();
 }
 
 void View::postDraw()
@@ -610,7 +633,6 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 	return mvpm;
 }
 
-
 void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 {
 	DEBUG_SLOT();
@@ -618,7 +640,6 @@ void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 		setManipulatedFrame(cur->getFrame());
 	updateGL();
 }
-
 
 void View::ui_verticalSplitView(int x, int y, int globalX, int globalY)
 {
@@ -646,9 +667,7 @@ void View::ui_mapsListView(int x, int y, int globalX, int globalY)
 	}
 	else
 		m_dialogMaps->hide();
-
 }
-
 
 void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
 {
@@ -661,7 +680,6 @@ void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
 	}
 	else
 		m_dialogPlugins->hide();
-
 }
 
 void View::ui_camerasListView(int x, int y, int globalX, int globalY)
@@ -675,7 +693,6 @@ void View::ui_camerasListView(int x, int y, int globalX, int globalY)
 	}
 	else
 		m_dialogCameras->hide();
-
 }
 
 void View::mapAdded(MapHandlerGen* mh )
@@ -695,7 +712,6 @@ void View::mapRemoved(MapHandlerGen* mh )
 		m_dialogMaps->removeItem(mh->getName());
 	}
 }
-
 
 void View::pluginEnabled(Plugin *plugin)
 {
