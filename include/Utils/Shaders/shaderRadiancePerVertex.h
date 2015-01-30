@@ -22,66 +22,63 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Geometry/distances.h"
+#ifndef __CGOGN_SHADER_RADIANCEPERVERTEX__
+#define __CGOGN_SHADER_RADIANCEPERVERTEX__
+
+#include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
+#include "Utils/textures.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
 
-namespace Algo
+namespace Utils
 {
 
-namespace Geometry
+class ShaderRadiancePerVertex : public ClippingShader
 {
+protected:
+	// shader sources
+    static std::string vertexShaderText;
+    static std::string geometryShaderText;
+    static std::string fragmentShaderText;
 
-template <typename PFP>
-typename PFP::REAL squaredDistancePoint2FacePlane(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P)
-{
-	Vertex v(f.dart);
-	const typename PFP::VEC3& A = position[v];
-	v.dart = map.phi1(v.dart);
-	const typename PFP::VEC3& B = position[v];
-	v.dart = map.phi1(v.dart);
-	const typename PFP::VEC3& C = position[v];
+	CGoGNGLuint m_uniform_resolution;
+	CGoGNGLuint m_uniform_tex;
+	CGoGNGLuint m_uniform_K_tab;
+	CGoGNGLuint m_uniform_cam;
 
-	return Geom::squaredDistancePoint2TrianglePlane(P, A, B, C);
-}
+    VBO* m_vboPos;
+	VBO* m_vboNorm;
+	VBO* m_vboParam;
+	Utils::Texture<2, Geom::Vec3f>* m_tex_ptr;
 
-template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P)
-{
-	typedef typename PFP::REAL REAL;
+	unsigned int m_tex_unit;
+	int m_resolution;
+	float* K_tab;
+	Geom::Vec3f m_camera;
 
-	const typename PFP::VEC3& A = position[f.dart];
+	static int index (int l, int m) { return l*(l+1)+m; } // compute indices in K_tab
 
-	Dart d = map.phi1(f.dart);
-	Dart e = map.phi1(d);
-	REAL dist2 = Geom::squaredDistancePoint2Triangle(P, A, position[d], position[e]);
-	d = e;
-	e = map.phi1(d);
+public:
+	ShaderRadiancePerVertex(int resolution);
 
-	while (e != f.dart)
-	{
-		REAL d2 = Geom::squaredDistancePoint2Triangle(P, A, position[d], position[e]);
-		if (d2 < dist2)
-			dist2 = d2;
-		d = e;
-		e = map.phi1(d);
-	}
+	~ShaderRadiancePerVertex() ;
 
-	return dist2;
-}
+	void compile();
 
-template <typename PFP>
-typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P)
-{
-	const typename PFP::VEC3& A = position[e.dart];
-	typename PFP::VEC3 AB = position[map.phi1(e.dart)] - A;
-	typename PFP::REAL AB2 = AB * AB;
-	return Geom::squaredDistanceSeg2Point(A, AB, AB2, P) ;
-}
+	void setCamera(Geom::Vec3f camera) ;
 
-} // namespace Geometry
+	unsigned int setAttributePosition(VBO* vbo);
 
-} // namespace Algo
+	unsigned int setAttributeNormal(VBO* vbo);
+
+	unsigned int setAttributeRadiance(VBO* vbo, Utils::Texture<2, Geom::Vec3f>* texture, GLenum texunit = GL_TEXTURE0);
+};
+
+} // namespace Utils
 
 } // namespace CGoGN
+
+#endif

@@ -73,7 +73,6 @@ protected:
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
 
-
 	QString m_name;
 	SCHNApps* m_schnapps;
 
