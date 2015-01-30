@@ -73,6 +73,7 @@ void main ()
 
     //init_K_tab();
     vec3 eyeV = normalize(camera - VertexPosition); // normalized outgoing line-of-sight vector
+	eyeV = 2*dot(VertexNormal,eyeV)*VertexNormal-eyeV ; // symmetrize
     set_eval_direction(eyeV);
 
     ColorAttrib = vec3(0.,0.,0.) ;
