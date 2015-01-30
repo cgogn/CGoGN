@@ -34,15 +34,17 @@ namespace Utils
 #include "shaderRadiancePerVertex.geom"
 #include "shaderRadiancePerVertex.frag"
 
-ShaderRadiancePerVertex::ShaderRadiancePerVertex() :
+ShaderRadiancePerVertex::ShaderRadiancePerVertex(int resolution) :
 	m_vboPos(NULL),
 	m_vboNorm(NULL),
 	m_vboParam(NULL),
 	m_tex_ptr(NULL),
 	m_tex_unit(-1),
-	m_resolution(-1),
+	m_resolution(resolution),
 	K_tab(NULL)
-{}
+{
+	compile();
+}
 
 ShaderRadiancePerVertex::~ShaderRadiancePerVertex()
 {
@@ -50,13 +52,12 @@ ShaderRadiancePerVertex::~ShaderRadiancePerVertex()
 		delete[] K_tab ;
 }
 
-void ShaderRadiancePerVertex::compile(int resolution)
+void ShaderRadiancePerVertex::compile()
 {
 	m_nameVS = "ShaderRadiancePerVertex_vs";
 	m_nameFS = "ShaderRadiancePerVertex_fs";
 	m_nameGS = "ShaderRadiancePerVertex_gs";
 
-	m_resolution = resolution;
 	const int nb_coefs = (m_resolution+1)*(m_resolution+1);
 	if (m_resolution != -1)
 	{
