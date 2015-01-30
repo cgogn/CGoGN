@@ -260,10 +260,8 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 			mapParams.paramVBO = new Utils::VBO();
 			mapParams.paramVBO->updateData(mapParams.param);
 
-			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex();
+			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(SH_TYPE::get_resolution());
 			registerShader(mapParams.radiancePerVertexShader);
-
-			mapParams.radiancePerVertexShader->compile(SH_TYPE::get_resolution());
 
 			mapParams.radiancePerVertexShader->setAttributeRadiance(mapParams.paramVBO, mapParams.radianceTexture, GL_TEXTURE1);
 

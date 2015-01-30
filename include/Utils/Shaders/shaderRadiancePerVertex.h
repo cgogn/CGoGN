@@ -62,11 +62,11 @@ protected:
 	static int index (int l, int m) { return l*(l+1)+m; } // compute indices in K_tab
 
 public:
-	ShaderRadiancePerVertex();
+	ShaderRadiancePerVertex(int resolution);
 
 	~ShaderRadiancePerVertex() ;
 
-	void compile(int resolution);
+	void compile();
 
 	void setCamera(Geom::Vec3f camera) ;
 
