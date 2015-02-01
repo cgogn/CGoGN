@@ -1,6 +1,6 @@
 // ShaderCustomTex::fragmentShaderText
 
-PRECISON;
+PRECISION;
 uniform sampler2D textureUnit;
 in vec3 N;
 in vec2 fragTexCoord;
