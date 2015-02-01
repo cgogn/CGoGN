@@ -1,6 +1,6 @@
 // ShaderPhongTexture::fragmentShaderText
 
-PRECISON;
+PRECISION;
 VARYING_FRAG vec3 EyeVector, Normal, LightDir;
 VARYING_FRAG vec2 texCoord;
 

@@ -48,7 +48,7 @@ namespace Utils
 //
 //
 //std::string ShaderSimpleTexture::fragmentShaderText =
-//		"PRECISON;\n"
+//		"PRECISION;\n"
 //		"VARYING_FRAG vec2 texCoord;\n"
 //		"uniform sampler2D textureUnit;\n"
 //		"FRAG_OUT_DEF;\n"

@@ -48,7 +48,7 @@ namespace Utils
 //
 //
 //std::string ShaderColorPerVertex::fragmentShaderText =
-//		"PRECISON;\n"
+//		"PRECISION;\n"
 //		"VARYING_FRAG vec3 color;\n"
 //		"FRAG_OUT_DEF;\n"
 //		"void main()\n"

@@ -1,6 +1,6 @@
 //ShaderSimpleFlat::fragmentShaderText
 
-PRECISON;
+PRECISION;
 VARYING_FRAG vec3 LightDir;
 VARYING_FRAG vec3 Position;
 #ifdef WITH_COLOR

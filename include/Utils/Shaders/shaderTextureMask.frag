@@ -1,6 +1,6 @@
 // ShaderTextureMask::fragmentShaderText
 
-PRECISON;
+PRECISION;
 VARYING_FRAG vec2 texCoord;
 uniform sampler2D textureUnit;
 uniform sampler2D textureUnitMask;

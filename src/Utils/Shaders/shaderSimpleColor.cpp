@@ -44,7 +44,7 @@ namespace Utils
 //
 //
 //std::string ShaderSimpleColor::fragmentShaderText =
-//		"PRECISON;\n"
+//		"PRECISION;\n"
 //		"uniform vec4 color;\n"
 //		"FRAG_OUT_DEF;\n"
 //		"void main()\n"

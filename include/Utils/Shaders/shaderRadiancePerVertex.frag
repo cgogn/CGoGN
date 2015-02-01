@@ -1,7 +1,6 @@
 // ShaderRadiancePerVertex::fragmentShaderText
 
-// PRECISION; // pose un pb non élucidé. remplacé temporairement par :
-precision highp float;
+PRECISION;
 VARYING_FRAG vec3 vxColor;
 FRAG_OUT_DEF;
 void main (void)
