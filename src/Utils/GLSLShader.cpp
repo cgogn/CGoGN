@@ -52,7 +52,7 @@ unsigned int GLSLShader::MINOR_OGL_CORE = 3;
 
 std::string GLSLShader::DEFINES_GL2=\
 "#version 110\n"
-"#define PRECISON float pipo_PRECISION\n"
+"#define PRECISION float pipo_PRECISION\n"
 "#define ATTRIBUTE attribute\n"
 "#define VARYING_VERT varying\n"
 "#define VARYING_FRAG varying\n"
@@ -63,7 +63,7 @@ std::string GLSLShader::DEFINES_GL2=\
 
 std::string GLSLShader::DEFINES_GL3=\
 "#version 150\n"
-"#define PRECISON precision highp float\n"
+"#define PRECISION precision highp float\n"
 "#define ATTRIBUTE in\n"
 "#define VARYING_VERT out\n"
 "#define VARYING_FRAG in\n"
