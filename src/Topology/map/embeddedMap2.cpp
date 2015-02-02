@@ -142,6 +142,25 @@ Dart EmbeddedMap2::deleteVertex(Dart d)
 	return f ;
 }
 
+void EmbeddedMap2::mergeOppositeVertices(Dart d)
+{
+	Dart d2 = phi2(d);
+	Dart d_12 = phi2(phi_1(d));
+
+	Map2::mergeOppositeVertices(d);
+
+	if(isOrbitEmbedded<VERTEX>())
+	{
+		Algo::Topo::setOrbitEmbedding<VERTEX>(*this, d_12, getEmbedding<VERTEX>(d_12)) ;
+	}
+
+	if(isOrbitEmbedded<EDGE>())
+	{
+		copyDartEmbedding<EDGE>(phi2(d2), d2) ;
+		copyDartEmbedding<EDGE>(phi2(d_12), d_12) ;
+	}
+}
+
 Dart EmbeddedMap2::cutEdge(Dart d)
 {
 	Dart nd = Map2::cutEdge(d) ;

@@ -66,6 +66,11 @@ public:
 	Dart deleteVertex(Dart d) ;
 
 	/**
+	 * The attributes attached to the edges of d and phi_1(d) are kept to the new edges
+	 */
+	void mergeOppositeVertices(Dart d);
+
+	/**
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
 	Dart cutEdge(Dart d) ;

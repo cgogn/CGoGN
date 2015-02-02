@@ -193,6 +193,8 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 	m_nbFaces.reserve(m_nbVolumes*4);
 	m_emb.reserve(m_nbVolumes*12);
 
+    unsigned int nbc = 0;
+
 	for (unsigned int i = 0; i < m_nbVolumes ; ++i)
 	{
 		do
@@ -204,8 +206,36 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 		int n;
 		oss >> n; // type of volumes
 
+
+        if(!oss.good())
+        {
+            oss.clear();
+            char dummy;
+            oss >> dummy; // type of volumes
+            oss >> dummy;
+
+            if(dummy == 'C')// connector
+            {
+                ++nbc;
+                m_nbFaces.push_back(3);
+
+                int s0,s1,s2,s3;
+
+                oss >> s0;
+                oss >> s1;
+                oss >> s2;
+                oss >> s3;
+
+                //std::cout << "connector " << s0 << " " << s1 << " " << s2 << " " << s3 << std::endl;
+
+                m_emb.push_back(verticesID[s0]);
+                m_emb.push_back(verticesID[s1]);
+                m_emb.push_back(verticesID[s2]);
+                m_emb.push_back(verticesID[s3]);
+            }
+        }
 		//tetrahedron
-		if(n == 4)
+        else if(n == 4)
 		{
 			m_nbFaces.push_back(4);
 
@@ -219,9 +249,9 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 			typename PFP::VEC3 P = position[verticesID[s0]];
 			typename PFP::VEC3 A = position[verticesID[s1]];
 			typename PFP::VEC3 B = position[verticesID[s2]];
-			typename PFP::VEC3 C = position[verticesID[s3]];
+            typename PFP::VEC3 C = position[verticesID[s3]];
 
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
 			{
 				int ui = s1;
 				s1 = s2;
@@ -337,33 +367,33 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 			oss >> s6;
 			oss >> s7;
 
-			typename PFP::VEC3 P = position[verticesID[s4]];
-			typename PFP::VEC3 A = position[verticesID[s0]];
-			typename PFP::VEC3 B = position[verticesID[s1]];
-			typename PFP::VEC3 C = position[verticesID[s2]];
+            typename PFP::VEC3 P = position[verticesID[s4]];
+            typename PFP::VEC3 A = position[verticesID[s0]];
+            typename PFP::VEC3 B = position[verticesID[s1]];
+            typename PFP::VEC3 C = position[verticesID[s2]];
 
-			// 1 hexa ok avec cette partie
-			if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::UNDER)
-			{
-				unsigned int pt[8];
-				pt[0] = s0;
-				pt[1] = s1;
-				pt[2] = s3;
-				pt[3] = s2;
-				pt[4] = s4;
-				pt[5] = s5;
-				pt[6] = s7;
-				pt[7] = s6;
+            // 1 hexa ok avec cette partie
+            if (Geom::testOrientation3D<typename PFP::VEC3>(P,A,B,C) == Geom::OVER)
+            {
+                unsigned int pt[8];
+                pt[0] = s0;
+                pt[1] = s1;
+                pt[2] = s3;
+                pt[3] = s2;
+                pt[4] = s4;
+                pt[5] = s5;
+                pt[6] = s7;
+                pt[7] = s6;
 
-				s0 = pt[0];
-				s1 = pt[1];
-				s2 = pt[2];
-				s3 = pt[3];
-				s4 = pt[4];
-				s5 = pt[5];
-				s6 = pt[6];
-				s7 = pt[7];
-			}
+                s0 = pt[0];
+                s1 = pt[1];
+                s2 = pt[2];
+                s3 = pt[3];
+                s4 = pt[4];
+                s5 = pt[5];
+                s6 = pt[6];
+                s7 = pt[7];
+            }
 
 			m_emb.push_back(verticesID[s0]);
 			m_emb.push_back(verticesID[s1]);
@@ -374,8 +404,9 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 			m_emb.push_back(verticesID[s6]);
 			m_emb.push_back(verticesID[s7]);
 		}
-
 	}
+
+    std::cout << "#connectors = " << nbc << std::endl;
 
 	fp.close();
 	return true;

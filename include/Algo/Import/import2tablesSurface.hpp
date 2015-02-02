@@ -381,6 +381,92 @@ bool MeshTablesSurface<PFP>::importVoxellisation(Algo::Surface::Modelisation::Vo
     return true;
 }
 
+template <typename PFP>
+template <typename PFP3>
+bool MeshTablesSurface<PFP>::import3DMap(typename PFP3::MAP& map, std::vector<std::string>& attrNames)
+{
+	VertexAttribute<VEC3, MAP> positions = m_map.template getAttribute<VEC3, VERTEX, MAP>("position") ;
+
+
+	VertexAttribute<VEC3, typename PFP3::MAP> position_from = map.template getAttribute<VEC3, VERTEX, typename PFP3::MAP>("position") ;
+
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<VEC3, VERTEX, MAP>("position") ;
+
+	attrNames.push_back(positions.name()) ;
+
+	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
+
+	// lecture des nombres de sommets / faces du bord
+	m_nbVertices = 0;
+	foreach_cell<VERTEX>(map, [&] (Vertex v)
+	{
+		if(map.isBoundaryVertex(v.dart))
+			++m_nbVertices;
+	}, FORCE_DART_MARKING);
+
+	std::cout << "nbVertices = " << m_nbVertices << std::endl;
+
+	m_nbFaces = 0;
+	foreach_cell<FACE>(map, [&] (Face f)
+	{
+		if(map.isBoundaryFace(f.dart))
+			++m_nbFaces;
+	}, FORCE_DART_MARKING);
+
+	std::cout << "m_nbFaces = " << m_nbFaces << std::endl;
+
+//	std::vector<unsigned int> verticesID;
+//	verticesID.reserve(m_nbVertices);
+
+//	//parcours des sommets de la 3-carte
+//	foreach_cell<VERTEX>(map, [&] (Vertex v)
+//	{
+//		//si c'est un sommet du bord
+//		if(map.isBoundaryVertex(v.dart))
+//		{
+//			// insert une nouvelle ligne dans le container
+//			unsigned int id = container.insertLine();
+//			// copie de la position
+//			positions[id] = position_from[id];
+//			// push_back
+//			verticesID.push_back(id);
+//		}
+//	}, FORCE_DART_MARKING);
+
+//	//parcours des faces de la 3-carte
+//	// normalement nbVertices*8 devrait suffire largement
+//	m_nbEdges.reserve(m_nbFaces);
+//	m_emb.reserve(m_nbVertices*8);
+
+//	foreach_cell<FACE>(map, [&] (Face f)
+//	{
+//		if(map.isBoundaryFace(f.dart))
+//		{
+//			Dart d = f.dart;
+//			if(!map.template isBoundaryMarked<3>(d))
+//				d = map.phi3(d);
+
+//			Dart dit = d;
+//			do
+//			{
+//				unsigned int index ; // index of embedding
+
+//				index = map.getEmbedding(Vertex(d));
+
+//				m_emb.push_back(verticesID[index]) ;
+
+//				dit = map.phi1(dit);
+//			}while(dit != d);
+
+
+//		}
+//	}, FORCE_DART_MARKING);
+
+	return true;
+}
+
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importMeshBin(const std::string& filename, std::vector<std::string>& attrNames)
 {

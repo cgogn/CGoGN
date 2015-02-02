@@ -93,6 +93,7 @@ protected:
 #endif
 	Dart m_selected;
 	Dart m_selected2;
+	std::vector<Dart> m_selecteds;
 	DartMarker<MAP> dm;
 	float m_shift;
 

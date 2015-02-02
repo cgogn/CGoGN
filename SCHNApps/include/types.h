@@ -39,6 +39,7 @@ class Camera;
 class MapHandlerGen;
 class CellSelectorGen;
 struct Texture;
+class ObjectHandlerGen;
 
 typedef QMap<QString, Plugin*> PluginSet;
 typedef QMap<QString, View*> ViewSet;
@@ -50,6 +51,8 @@ typedef QMap<QString, CellSelectorGen*> CellSelectorSet;
 typedef QMap<QString, Utils::GLSLShader*> ShaderSet;
 
 typedef QMap<QString, Texture*> TextureSet;
+
+typedef QMap<QString, ObjectHandlerGen*> ObjectSet;
 
 } // namespace SCHNApps
 
