@@ -39,35 +39,37 @@ namespace Decimation
  ************************************************************************************/
 
 template <typename PFP>
+bool Approximator_ColorNaive<PFP>::init()
+{
+	return this->m_approx.isValid() && m_position.isValid() && m_approximatedPosition.isValid() ;
+}
+
+template <typename PFP>
 void Approximator_ColorNaive<PFP>::approximate(Dart d)
 {
 	Dart dd = this->m_map.phi1(d) ;
 
-	const VEC3& p1 = m_position.operator[](d) ;
-	const VEC3& p2 = m_position.operator[](dd) ;
-	const VEC3& p = m_approxposition.operator[](d) ;
+	const VEC3& p1 = m_position[d] ;
+	const VEC3& p2 = m_position[dd] ;
+	const VEC3& p = m_approximatedPosition[d] ;
 
-	const VEC3& edge = p2 - p1 ;
-	const REAL& ratio = std::max(std::min(((p - p1) * edge) / edge.norm2(),REAL(1)),REAL(0)) ;
+	VEC3 edge = p2 - p1 ;
+	REAL ratio = std::max(std::min(((p - p1) * edge) / edge.norm2(), REAL(1)), REAL(0)) ;
 
-	this->m_approx[0][d] = m_color->operator[](d)*ratio + m_color->operator[](dd)*(1-ratio) ;
+	this->m_approx[d] = this->m_attr[d] * ratio + this->m_attr[dd] * (REAL(1) - ratio) ;
 }
 
 /************************************************************************************
  *                            EXTENDED QUADRIC ERROR METRIC                         *
  ************************************************************************************/
+/*
 template <typename PFP>
 bool Approximator_ColorQEMext<PFP>::init()
 {
 	m_quadric = this->m_map.template getAttribute<Utils::QuadricNd<REAL,6>, VERTEX, MAP>("QEMext-quadric") ;
 	// Does not require to be valid (if it is not, altenatives will be used).
 
-	if(this->m_predictor)
-	{
-		return false ;
-	}
-
-	return m_position->isValid() && m_color->isValid() ;
+	return m_position.isValid() && m_color.isValid() ;
 }
 
 template <typename PFP>
@@ -88,12 +90,12 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 			VEC6 p0,p1,p2 ;
 			for (unsigned int i = 0 ; i < 3 ; ++i)
 			{
-				p0[i] = this->m_attrV[0]->operator[](it)[i] ;
-				p0[i+3] = this->m_attrV[1]->operator[](it)[i] ;
-				p1[i] = this->m_attrV[0]->operator[](m.phi1(it))[i] ;
-				p1[i+3] = this->m_attrV[1]->operator[](m.phi1(it))[i] ;
-				p2[i] = this->m_attrV[0]->operator[](m.phi_1(it))[i] ;
-				p2[i+3] = this->m_attrV[1]->operator[](m.phi_1(it))[i] ;
+				p0[i] = (*m_position)[it][i] ;
+				p0[i+3] = (*m_color)[it][i] ;
+				p1[i] = (*m_position)[m.phi1(it)][i] ;
+				p1[i+3] = (*m_color)[m.phi1(it)][i] ;
+				p2[i] = (*m_position)[m.phi_1(it)][i] ;
+				p2[i+3] = (*m_color)[m.phi_1(it)][i] ;
 			}
 
 			Utils::QuadricNd<REAL,6> q(p0,p1,p2) ;
@@ -108,12 +110,12 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 			VEC6 p0,p1,p2 ;
 			for (unsigned int i = 0 ; i < 3 ; ++i)
 			{
-				p0[i] = this->m_attrV[0]->operator[](it)[i] ;
-				p0[i+3] = this->m_attrV[1]->operator[](it)[i] ;
-				p1[i] = this->m_attrV[0]->operator[](m.phi1(it))[i] ;
-				p1[i+3] = this->m_attrV[1]->operator[](m.phi1(it))[i] ;
-				p2[i] = this->m_attrV[0]->operator[](m.phi_1(it))[i] ;
-				p2[i+3] = this->m_attrV[1]->operator[](m.phi_1(it))[i] ;
+				p0[i] = (*m_position)[it][i] ;
+				p0[i+3] = (*m_color)[it][i] ;
+				p1[i] = (*m_position)[m.phi1(it)][i] ;
+				p1[i+3] = (*m_color)[m.phi1(it)][i] ;
+				p2[i] = (*m_position)[m.phi_1(it)][i] ;
+				p2[i+3] = (*m_color)[m.phi_1(it)][i] ;
 			}
 
 			Utils::QuadricNd<REAL,6> q(p0,p1,p2) ;
@@ -138,10 +140,10 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 		VEC6 p1, p2 ;
 		for (unsigned int i = 0 ; i < 3; ++i)
 		{
-			p1[i] = this->m_attrV[0]->operator[](d)[i] ;	// let the new vertex lie
-			p1[i+3] = this->m_attrV[1]->operator[](d)[i] ; // on either one
-			p2[i] = this->m_attrV[0]->operator[](dd)[i] ;	// of the two
-			p2[i+3] = this->m_attrV[1]->operator[](dd)[i] ; // endpoints
+			p1[i] = (*m_position)[d][i] ;	// let the new vertex lie
+			p1[i+3] = (*m_color)[d][i] ; // on either one
+			p2[i] = (*m_position)[dd][i] ;	// of the two
+			p2[i+3] = (*m_color)[dd][i] ; // endpoints
 		}
 		VEC6 p12 = (p1 + p2) / 2.0f ;	// or the middle of the edge
 
@@ -164,10 +166,11 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 		this->m_approx[1][d][i] = res[i+3] ;
 	}
 }
-
+*/
 /************************************************************************************
  *                    GEOM + COLOR OPTIMIZED ERROR METRIC                           *
  ************************************************************************************/
+/*
 template <typename PFP>
 bool Approximator_GeomColOpt<PFP>::init()
 {
@@ -198,7 +201,7 @@ void Approximator_GeomColOpt<PFP>::approximate(Dart d)
 		Dart it = d ;
 		do
 		{
-			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q((*m_position)[it], (*m_position)[m.phi1(it)], (*m_position)[m.phi_1(it)]) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -207,7 +210,7 @@ void Approximator_GeomColOpt<PFP>::approximate(Dart d)
 		it = dd ;
 		do
 		{
-			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q((*m_position)[it], (*m_position)[m.phi1(it)], (*m_position)[m.phi_1(it)]) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -225,8 +228,8 @@ void Approximator_GeomColOpt<PFP>::approximate(Dart d)
 	VEC3 res ;
 	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
 
-	const VEC3& p0 = this->m_attrV[0]->operator[](d) ;    // let the new vertex lie
-	const VEC3& p1 = this->m_attrV[0]->operator[](dd) ;   // on either one of the two endpoints
+	const VEC3& p0 = (*m_position)[d] ;    // let the new vertex lie
+	const VEC3& p1 = (*m_position)[dd] ;   // on either one of the two endpoints
 
 	if(false && !opt)
 	{
@@ -247,8 +250,8 @@ void Approximator_GeomColOpt<PFP>::approximate(Dart d)
 	const VEC3& p = this->m_approx[0][d] ;
 
 	// COLOR
-	const VEC3& c1 = this->m_attrV[1]->operator[](d) ;    // let the new vertex lie
-	const VEC3& c2 = this->m_attrV[1]->operator[](dd) ;   // on either one of the two endpoints
+	const VEC3& c1 = (*m_color)[d] ;    // let the new vertex lie
+	const VEC3& c2 = (*m_color)[dd] ;   // on either one of the two endpoints
 
 	VEC3 e = p1 - p0 ;
 	VEC3 e1 = p - p0 ;
@@ -259,12 +262,11 @@ void Approximator_GeomColOpt<PFP>::approximate(Dart d)
 
 	this->m_approx[1][d] = ratio*c1 + (1-ratio)*c2 ;
 }
+*/
+} // namespace Decimation
 
+} // namespace Surface
 
-} //namespace Decimation
+} // namespace Algo
 
-}
-
-} //namespace Algo
-
-} //namespace CGoGN
+} // namespace CGoGN

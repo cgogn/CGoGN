@@ -43,45 +43,26 @@ bool HalfEdgeSelector_QEMml<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	bool ok = false ;
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
-		it != this->m_approximators.end() && !ok;
-		++it)
+	if(m_positionApproximator.getApproximatedAttributeName() != m_position.name())
 	{
-		if((*it)->getApproximatedAttributeName() == "position")
-		{
-			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,DART>* >(*it) ;
-			ok = true ;
-		}
-	}
-
-	if(!ok)
 		return false ;
-
-	CellMarker<MAP, VERTEX> vMark(m) ;
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
-	{
-		if(!vMark.isMarked(d))
-		{
-			Utils::Quadric<REAL> q ;	// create one quadric
-			quadric[d] = q ;	// per vertex
-			vMark.mark(d) ;
-		}
 	}
 
-	DartMarker<MAP> mark(m) ;
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
+	for (Vertex v : allVerticesOf(m))
 	{
-		if(!mark.isMarked(d))
-		{
-			Dart d1 = m.phi1(d) ;				// for each triangle,
-			Dart d_1 = m.phi_1(d) ;				// initialize the quadric of the triangle
-			Utils::Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
-			quadric[d] += q ;					// and add the contribution of
-			quadric[d1] += q ;					// this quadric to the ones
-			quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.template markOrbit<FACE>(d) ;
-		}
+		Utils::Quadric<REAL> q ;	// create one quadric
+		m_quadric[v] = q ;				// per vertex
+	}
+
+	for (Face f : allFacesOf(m))
+	{
+		Dart d = f.dart;
+		Dart d1 = m.phi1(d) ;	// for each triangle,
+		Dart d_1 = m.phi_1(d) ;	// initialize the quadric of the triangle
+		Utils::Quadric<REAL> q(m_position[d], m_position[d1], m_position[d_1]) ;
+		m_quadric[d] += q ;		// and add the contribution of
+		m_quadric[d1] += q ;		// this quadric to the ones
+		m_quadric[d_1] += q ;		// of the 3 incident vertices
 	}
 
 	// Init multimap for each Half-edge
@@ -144,27 +125,23 @@ void HalfEdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void HalfEdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
 {
-	Dart dFront,dBack ;
-	Dart dInit = d ;
+	MAP& m = this->m_map;
+	Utils::Quadric<REAL>& q = m_quadric[d];
+	q.zero() ;
+	Traversor2VF<MAP> tf(m, d);
+	for (Dart f = tf.begin() ; f != tf.end() ; f = tf.next())
+	{
+		q += Utils::Quadric<REAL>(m_position[f], m_position[m.phi1(f)], m_position[m.phi_1(f)]) ;
+	}
 
-	// Init Front
-	dFront = dInit ;
-
-	quadric[d].zero() ;
-
-   	do {
-   		// Make step
-   		dBack = this->m_map.phi1(dFront) ;
-       	dFront = this->m_map.phi2_1(dFront) ;
-
-       	if (this->m_map.phi2(dFront) != dFront) { // if dFront is no border
-           	quadric[d] += Utils::Quadric<REAL>(this->m_position[d],this->m_position[dBack],this->m_position[this->m_map.phi1(dFront)]) ;
-       	}
-
-       	if (recomputeNeighbors)
-       		recomputeQuadric(dBack, false) ;
-
-    } while(dFront != dInit) ;
+	if (recomputeNeighbors)
+	{
+		Traversor2VVaE<MAP> tv(m, d);
+		for (Dart v = tv.begin() ; v != tv.end() ; v = tv.next())
+		{
+			recomputeQuadric(v, false);
+		}
+	}
 }
 
 template <typename PFP>
@@ -261,12 +238,12 @@ void HalfEdgeSelector_QEMml<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 	Dart dd = m.phi1(d) ;
 
 	Utils::Quadric<REAL> quad ;
-	quad += quadric[d] ;	// compute the sum of the
-	quad += quadric[dd] ;	// two vertices quadrics
+	quad += m_quadric[d] ;	// compute the sum of the
+	quad += m_quadric[dd] ;	// two vertices quadrics
 
-	m_positionApproximator->approximate(d) ;
+	m_positionApproximator.approximate(d) ;
 
-	REAL err = quad(m_positionApproximator->getApprox(d)) ;
+	REAL err = quad(m_positionApproximator.getApprox(d)) ;
 	heinfo.it = halfEdges.insert(std::make_pair(err, d)) ;
 	heinfo.valid = true ;
 }
@@ -280,79 +257,49 @@ bool HalfEdgeSelector_QEMextColor<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	// Verify availability of required approximators
-	unsigned int ok = 0 ;
-	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
-	{
-		assert(this->m_approximators[approxindex]->getType() == A_hQEM
-				|| this->m_approximators[approxindex]->getType() == A_hHalfCollapse
-				|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
+	assert(m_positionApproximator->getType() == A_hQEM
+		|| m_positionApproximator->getType() == A_hHalfCollapse
+		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
-		bool saved = false ;
-		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
+	assert(m_colorApproximator->getType() == A_hQEM
+		|| m_colorApproximator->getType() == A_hHalfCollapse
+		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
+
+	if(m_positionApproximator.getApproximatedAttributeName() != m_position.name())
+	{
+		return false;
+	}
+	if(m_colorApproximator.getApproximatedAttributeName() != m_color.name())
+	{
+		return false;
+	}
+
+	for (Vertex v : allVerticesOf(m))
+	{
+		Utils::QuadricNd<REAL,6> q ;	// create one quadric
+		m_quadric[v] = q ;				// per vertex
+	}
+
+	for (Face f : allFacesOf(m))
+	{
+		Dart d = f.dart;
+		Dart d1 = m.phi1(d) ;	// for each triangle,
+		Dart d_1 = m.phi_1(d) ;	// initialize the quadric of the triangle
+		VEC6 p0, p1, p2 ;
+		for (unsigned int i = 0 ; i < 3 ; ++i)
 		{
-			// constraint : 2 approximators in specific order
-			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
-			{
-				++ok ;
-				m_approxindex_pos = approxindex ;
-				m_attrindex_pos = attrindex ;
-				m_pos = this->m_position ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "color")
-			{
-				++ok ;
-				m_approxindex_color = approxindex ;
-				m_attrindex_color = attrindex ;
-				m_color = m.template getAttribute<typename PFP::VEC3, VERTEX, MAP>("color") ;
-				assert(m_color.isValid() || !"EdgeSelector_QEMextColor: color attribute is not valid") ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
+			p0[i] = m_position[d][i] ;
+			p0[i+3] = m_color[d][i] ;
+			p1[i] = m_position[d1][i] ;
+			p1[i+3] = m_color[d1][i] ;
+			p2[i] = m_position[d_1][i] ;
+			p2[i+3] = m_color[d_1][i] ;
 		}
+		Utils::QuadricNd<REAL,6> q(p0, p1, p2) ;
+		m_quadric[d] += q ;		// and add the contribution of
+		m_quadric[d1] += q ;		// this quadric to the ones
+		m_quadric[d_1] += q ;		// of the 3 incident vertices
 	}
-
-	if(ok != 2)
-		return false ;
-
-	TraversorV<MAP> travV(m);
-	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
-	{
-		Utils::QuadricNd<REAL,6> q ;		// create one quadric
-		m_quadric[dit] = q ;		// per vertex
-	}
-
-	// Compute quadric per vertex
-	TraversorF<MAP> travF(m) ;
-	for(Dart dit = travF.begin() ; dit != travF.end() ; dit = travF.next()) // init QEM quadrics
-	{
-		Dart d1 = m.phi1(dit) ;					// for each triangle,
-		Dart d_1 = m.phi_1(dit) ;					// initialize the quadric of the triangle
-
-   		VEC6 p0, p1, p2 ;
-   		for (unsigned int i = 0 ; i < 3 ; ++i)
-   		{
-   			p0[i] = this->m_position[dit][i] ;
-   			p0[i+3] = this->m_color[dit][i] ;
-   			p1[i] = this->m_position[d1][i] ;
-   			p1[i+3] = this->m_color[d1][i] ;
-   			p2[i] = this->m_position[d_1][i] ;
-   			p2[i+3] = this->m_color[d_1][i] ;
-   		}
-		Utils::QuadricNd<REAL,6> q(p0,p1,p2) ;
-		m_quadric[dit] += q ;						// and add the contribution of
-		m_quadric[d1] += q ;						// this quadric to the ones
-		m_quadric[d_1] += q ;						// of the 3 incident vertices
-	}
-
 
 	// Init multimap for each Half-edge
 	halfEdges.clear() ;
@@ -412,42 +359,37 @@ void HalfEdgeSelector_QEMextColor<PFP>::updateBeforeCollapse(Dart d)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_QEMextColor<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors) {
-	Dart dFront,dBack ;
-	Dart dInit = d ;
+void HalfEdgeSelector_QEMextColor<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
+{
+	MAP& m = this->m_map;
+	Utils::QuadricNd<REAL,6>& q = m_quadric[d];
+	q.zero() ;
+	Traversor2VF<MAP> tf(m, d);
+	for (Dart f = tf.begin() ; f != tf.end() ; f = tf.next())
+	{
+		Dart f1 = m.phi1(f) ;
+		Dart f_1 = m.phi_1(f) ;
+		VEC6 p0, p1, p2 ;
+		for (unsigned int i = 0 ; i < 3 ; ++i)
+		{
+			p0[i] = m_position[f][i] ;
+			p0[i+3] = m_color[f][i] ;
+			p1[i] = m_position[f1][i] ;
+			p1[i+3] = m_color[f1][i] ;
+			p2[i] = m_position[f_1][i] ;
+			p2[i+3] = m_color[f_1][i] ;
+		}
+		q += Utils::QuadricNd<REAL,6>(p0, p1, p2) ;
+	}
 
-	// Init Front
-	dFront = dInit ;
-
-	m_quadric[d].zero() ;
-
- 	do
-   	{
-   		// Make step
-   		dBack = this->m_map.phi2(dFront) ;
-       	dFront = this->m_map.phi2_1(dFront) ;
-
-       	if (dBack != dFront)
-       	{ // if dFront is no border
-   			Dart d2 = this->m_map.phi2(dFront) ;
-
-       		VEC6 p0, p1, p2 ;
-       		for (unsigned int i = 0 ; i < 3 ; ++i)
-       		{
-
-       			p0[i] = this->m_position[d][i] ;
-       			p0[i+3] = this->m_color[d][i] ;
-       			p1[i] = this->m_position[d2][i] ;
-       			p1[i+3] = this->m_color[d2][i] ;
-       			p2[i] = this->m_position[dBack][i] ;
-       			p2[i+3] = this->m_color[dBack][i] ;
-       		}
-       		m_quadric[d] += Utils::QuadricNd<REAL,6>(p0,p1,p2) ;
-       	}
-       	if (recomputeNeighbors)
-       		recomputeQuadric(dBack, false) ;
-
-    } while(dFront != dInit) ;
+	if (recomputeNeighbors)
+	{
+		Traversor2VVaE<MAP> tv(m, d);
+		for (Dart v = tv.begin() ; v != tv.end() ; v = tv.next())
+		{
+			recomputeQuadric(v, false);
+		}
+	}
 }
 
 template <typename PFP>
@@ -541,6 +483,7 @@ template <typename PFP>
 void HalfEdgeSelector_QEMextColor<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
 {
 	MAP& m = this->m_map ;
+
 	Dart dd = m.phi1(d) ;
 
 	// New position
@@ -549,17 +492,13 @@ void HalfEdgeSelector_QEMextColor<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo
 	quad += m_quadric[dd] ;	// two vertices quadrics
 
 	// compute all approximated attributes
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
-			it != this->m_approximators.end() ;
-			++it)
-	{
-		(*it)->approximate(d) ;
-	}
+	m_positionApproximator.approximate(d) ;
+	m_colorApproximator.approximate(d) ;
 
 	// get pos
-	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
+	const VEC3& newPos = m_positionApproximator.getApprox(d) ;
 	// get col
-	const VEC3& newCol = this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) ; // get newCol
+	const VEC3& newCol = m_colorApproximator.getApprox(d) ;
 
 	// compute error
 	VEC6 newEmb ;
@@ -590,96 +529,60 @@ bool HalfEdgeSelector_QEMextColorNormal<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	// Verify availability of required approximators
-	unsigned int ok = 0 ;
-	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
-	{
-		assert(this->m_approximators[approxindex]->getType() == A_hQEM
-				|| this->m_approximators[approxindex]->getType() == A_hHalfCollapse
-				|| !"Approximator for selector (HalfEdgeSelector_QEMextColorNormal) must be of a half-edge approximator") ;
+	assert(m_positionApproximator->getType() == A_hQEM
+		|| m_positionApproximator->getType() == A_hHalfCollapse
+		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
-		bool saved = false ;
-		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
-		{
-			// constraint : 2 approximators in specific order
-			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
-			{
-				++ok ;
-				m_approxindex_pos = approxindex ;
-				m_attrindex_pos = attrindex ;
-				m_pos = this->m_position ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "color")
-			{
-				++ok ;
-				m_approxindex_color = approxindex ;
-				m_attrindex_color = attrindex ;
-                m_color = m.template getAttribute<typename PFP::VEC3, VERTEX, MAP>("color") ;
-				assert(m_color.isValid() || !"EdgeSelector_QEMextColor: color attribute is not valid") ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-			else if(ok == 2 && (this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "normal" || this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameN"))
-			{
-				++ok ;
-				m_approxindex_normal = approxindex ;
-				m_attrindex_normal = attrindex ;
-                m_normal = m.template getAttribute<typename PFP::VEC3, VERTEX, MAP>("normal") ;
-				assert(m_normal.isValid() || !"EdgeSelector_QEMextColorNormal: normal attribute is not valid") ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-		}
+	assert(m_colorApproximator->getType() == A_hQEM
+		|| m_colorApproximator->getType() == A_hHalfCollapse
+		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
+
+	assert(m_normalApproximator->getType() == A_hQEM
+		|| m_normalApproximator->getType() == A_hHalfCollapse
+		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
+
+	if(m_positionApproximator.getApproximatedAttributeName() != m_position.name())
+	{
+		return false;
+	}
+	if(m_colorApproximator.getApproximatedAttributeName() != m_color.name())
+	{
+		return false;
+	}
+	if(m_normalApproximator.getApproximatedAttributeName() != m_normal.name())
+	{
+		return false;
 	}
 
-	if(ok != 3)
-		return false ;
-
-	TraversorV<MAP> travV(m);
-	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
+	for (Vertex v : allVerticesOf(m))
 	{
-		Utils::QuadricNd<REAL,9> q ;		// create one quadric
-		m_quadric[dit] = q ;		// per vertex
+		Utils::QuadricNd<REAL,9> q ;	// create one quadric
+		m_quadric[v] = q ;				// per vertex
 	}
 
-	// Compute quadric per vertex
-	TraversorF<MAP> travF(m) ;
-	for(Dart dit = travF.begin() ; dit != travF.end() ; dit = travF.next()) // init QEM quadrics
+	for (Face f : allFacesOf(m))
 	{
-		Dart d1 = m.phi1(dit) ;					// for each triangle,
-		Dart d_1 = m.phi_1(dit) ;					// initialize the quadric of the triangle
-
+		Dart d = f.dart;
+		Dart d1 = m.phi1(d) ;	// for each triangle,
+		Dart d_1 = m.phi_1(d) ;	// initialize the quadric of the triangle
 		VEC9 p0, p1, p2 ;
 		for (unsigned int i = 0 ; i < 3 ; ++i)
 		{
-			p0[i] = this->m_position[dit][i] ;
-			p0[i+3] = this->m_color[dit][i] ;
-			p0[i+6] = this->m_normal[dit][i] ;
-			p1[i] = this->m_position[d1][i] ;
-			p1[i+3] = this->m_color[d1][i] ;
-			p1[i+6] = this->m_normal[d1][i] ;
-			p2[i] = this->m_position[d_1][i] ;
-			p2[i+3] = this->m_color[d_1][i] ;
-			p2[i+6] = this->m_normal[d_1][i] ;
-
+			p0[i] = m_position[d][i] ;
+			p0[i+3] = m_color[d][i] ;
+			p0[i+6] = m_normal[d][i] ;
+			p1[i] = m_position[d1][i] ;
+			p1[i+3] = m_color[d1][i] ;
+			p1[i+6] = m_normal[d1][i] ;
+			p2[i] = m_position[d_1][i] ;
+			p2[i+3] = m_color[d_1][i] ;
+			p2[i+6] = m_normal[d_1][i] ;
 		}
-		Utils::QuadricNd<REAL,9> q(p0,p1,p2) ;
-		m_quadric[dit] += q ;						// and add the contribution of
-		m_quadric[d1] += q ;						// this quadric to the ones
-		m_quadric[d_1] += q ;						// of the 3 incident vertices
+		Utils::QuadricNd<REAL,9> q(p0, p1, p2) ;
+		m_quadric[d] += q ;		// and add the contribution of
+		m_quadric[d1] += q ;		// this quadric to the ones
+		m_quadric[d_1] += q ;		// of the 3 incident vertices
 	}
-
 
 	// Init multimap for each Half-edge
 	halfEdges.clear() ;
@@ -739,45 +642,40 @@ void HalfEdgeSelector_QEMextColorNormal<PFP>::updateBeforeCollapse(Dart d)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_QEMextColorNormal<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors) {
-	Dart dFront,dBack ;
-	Dart dInit = d ;
-
-	// Init Front
-	dFront = dInit ;
-
-	m_quadric[d].zero() ;
-
-	do
+void HalfEdgeSelector_QEMextColorNormal<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
+{
+	MAP& m = this->m_map;
+	Utils::QuadricNd<REAL,9>& q = m_quadric[d];
+	q.zero() ;
+	Traversor2VF<MAP> tf(m, d);
+	for (Dart f = tf.begin() ; f != tf.end() ; f = tf.next())
 	{
-		// Make step
-		dBack = this->m_map.phi2(dFront) ;
-		dFront = this->m_map.phi2_1(dFront) ;
-
-		if (dBack != dFront)
-		{ // if dFront is no border
-			Dart d2 = this->m_map.phi2(dFront) ;
-
-			VEC9 p0, p1, p2 ;
-			for (unsigned int i = 0 ; i < 3 ; ++i)
-			{
-
-				p0[i] = this->m_position[d][i] ;
-				p0[i+3] = this->m_color[d][i] ;
-				p0[i+6] = this->m_normal[d][i] ;
-				p1[i] = this->m_position[d2][i] ;
-				p1[i+3] = this->m_color[d2][i] ;
-				p1[i+6] = this->m_normal[d2][i] ;
-				p2[i] = this->m_position[dBack][i] ;
-				p2[i+3] = this->m_color[dBack][i] ;
-				p2[i+6] = this->m_normal[dBack][i] ;
-			}
-			m_quadric[d] += Utils::QuadricNd<REAL,9>(p0,p1,p2) ;
+		Dart f1 = m.phi1(f) ;
+		Dart f_1 = m.phi_1(f) ;
+		VEC9 p0, p1, p2 ;
+		for (unsigned int i = 0 ; i < 3 ; ++i)
+		{
+			p0[i] = m_position[f][i] ;
+			p0[i+3] = m_color[f][i] ;
+			p0[i+6] = m_normal[f][i] ;
+			p1[i] = m_position[f1][i] ;
+			p1[i+3] = m_color[f1][i] ;
+			p1[i+6] = m_normal[f1][i] ;
+			p2[i] = m_position[f_1][i] ;
+			p2[i+3] = m_color[f_1][i] ;
+			p2[i+6] = m_normal[f_1][i] ;
 		}
-		if (recomputeNeighbors)
-			recomputeQuadric(dBack, false) ;
+		q += Utils::QuadricNd<REAL,9>(p0, p1, p2) ;
+	}
 
-	} while(dFront != dInit) ;
+	if (recomputeNeighbors)
+	{
+		Traversor2VVaE<MAP> tv(m, d);
+		for (Dart v = tv.begin() ; v != tv.end() ; v = tv.next())
+		{
+			recomputeQuadric(v, false);
+		}
+	}
 }
 
 template <typename PFP>
@@ -879,19 +777,16 @@ void HalfEdgeSelector_QEMextColorNormal<PFP>::computeHalfEdgeInfo(Dart d, HalfEd
 	quad += m_quadric[dd] ;	// two vertices quadrics
 
 	// compute all approximated attributes
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
-			it != this->m_approximators.end() ;
-			++it)
-	{
-		(*it)->approximate(d) ;
-	}
+	m_positionApproximator.approximate(d) ;
+	m_colorApproximator.approximate(d) ;
+	m_normalApproximator.approximate(d) ;
 
 	// get pos
-	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
+	const VEC3& newPos = m_positionApproximator.getApprox(d) ;
 	// get col
-	const VEC3& newCol = this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) ; // get newCol
+	const VEC3& newCol = m_colorApproximator.getApprox(d) ;
 	// get normal
-	const VEC3& newN = this->m_approx[m_approxindex_normal]->getApprox(d,m_attrindex_normal) ; // get newN
+	const VEC3& newN = m_normalApproximator.getApprox(d) ;
 
 	// compute error
 	VEC9 newEmb ;
@@ -924,74 +819,38 @@ bool HalfEdgeSelector_ColorGradient<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
+	assert(m_positionApproximator->getType() == A_hQEM
+		|| m_positionApproximator->getType() == A_hHalfCollapse
+		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
-	// Verify availability of required approximators
-	unsigned int ok = 0 ;
-	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
+	assert(m_colorApproximator->getType() == A_hQEM
+		|| m_colorApproximator->getType() == A_hHalfCollapse
+		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
+
+	if(m_positionApproximator.getApproximatedAttributeName() != m_position.name())
 	{
-		assert(this->m_approximators[approxindex]->getType() == A_hQEM
-				|| this->m_approximators[approxindex]->getType() == A_hHalfCollapse
-				|| !"Approximator for selector (HalfEdgeSelector_ColorExperimental) must be of a half-edge approximator") ;
-
-		bool saved = false ;
-		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
-		{
-			// constraint : 2 approximators in specific order
-			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
-			{
-				++ok ;
-				m_approxindex_pos = approxindex ;
-				m_attrindex_pos = attrindex ;
-				m_pos = this->m_position ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "color")
-			{
-				++ok ;
-				m_approxindex_color = approxindex ;
-				m_attrindex_color = attrindex ;
-				m_color = m.template getAttribute<typename PFP::VEC3, VERTEX, MAP>("color") ;
-				assert(m_color.isValid() || !"EdgeSelector_QEMextColor: color attribute is not valid") ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3, DART>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-		}
+		return false;
+	}
+	if(m_colorApproximator.getApproximatedAttributeName() != m_color.name())
+	{
+		return false;
 	}
 
-	if(ok != 2)
-		return false ;
-
-	CellMarker<MAP, VERTEX> vMark(m) ;
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
+	for (Vertex v : allVerticesOf(m))
 	{
-		if(!vMark.isMarked(d))
-		{
-			Utils::Quadric<REAL> q ;	// create one quadric
-			m_quadric[d] = q ;	// per vertex
-			vMark.mark(d) ;
-		}
+		Utils::Quadric<REAL> q ;	// create one quadric
+		m_quadric[v] = q ;				// per vertex
 	}
 
-	DartMarker<MAP> mark(m) ;
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
+	for (Face f : allFacesOf(m))
 	{
-		if(!mark.isMarked(d))
-		{
-			Dart d1 = m.phi1(d) ;				// for each triangle,
-			Dart d_1 = m.phi_1(d) ;				// initialize the quadric of the triangle
-			Utils::Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
-			m_quadric[d] += q ;					// and add the contribution of
-			m_quadric[d1] += q ;					// this quadric to the ones
-			m_quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.template markOrbit<FACE>(d) ;
-		}
+		Dart d = f.dart;
+		Dart d1 = m.phi1(d) ;	// for each triangle,
+		Dart d_1 = m.phi_1(d) ;	// initialize the quadric of the triangle
+		Utils::Quadric<REAL> q(m_position[d], m_position[d1], m_position[d_1]) ;
+		m_quadric[d] += q ;		// and add the contribution of
+		m_quadric[d1] += q ;		// this quadric to the ones
+		m_quadric[d_1] += q ;		// of the 3 incident vertices
 	}
 
 	// Init multimap for each Half-edge
@@ -1078,23 +937,14 @@ void HalfEdgeSelector_ColorGradient<PFP>::updateBeforeCollapse(Dart d)
 template <typename PFP>
 void HalfEdgeSelector_ColorGradient<PFP>::recomputeQuadric(const Dart d)
 {
-	Dart dFront,dBack ;
-	Dart dInit = d ;
-
-	// Init Front
-	dFront = dInit ;
-
-	m_quadric[d].zero() ;
-
-	do {
-		// Make step
-		dBack = this->m_map.phi1(dFront) ;
-		dFront = this->m_map.phi2_1(dFront) ;
-
-		if (this->m_map.phi2(dFront) != dFront) { // if dFront is no border
-			m_quadric[d] += Utils::Quadric<REAL>(this->m_position[d],this->m_position[dBack],this->m_position[this->m_map.phi1(dFront)]) ;
-		}
-	} while(dFront != dInit) ;
+	MAP& m = this->m_map;
+	Utils::Quadric<REAL>& q = m_quadric[d];
+	q.zero() ;
+	Traversor2VF<MAP> tf(m, d);
+	for (Dart f = tf.begin() ; f != tf.end() ; f = tf.next())
+	{
+		q += Utils::Quadric<REAL>(m_position[f], m_position[m.phi1(f)], m_position[m.phi_1(f)]) ;
+	}
 }
 
 template <typename PFP>
@@ -1129,7 +979,6 @@ void HalfEdgeSelector_ColorGradient<PFP>::initHalfEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
 	HalfEdgeInfo heinfo ;
-
 	if(m.edgeCanCollapse(d))
 		computeHalfEdgeInfo(d, heinfo) ;
 	else
@@ -1158,26 +1007,21 @@ void HalfEdgeSelector_ColorGradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 	quad += m_quadric[d] ;	// compute the sum of the
 	quad += m_quadric[dd] ;	// two vertices quadrics
 
-
 	// compute all approximated attributes
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
-			it != this->m_approximators.end() ;
-			++it)
-	{
-		(*it)->approximate(d) ;
-	}
+	m_positionApproximator.approximate(d) ;
+	m_colorApproximator.approximate(d) ;
 
 	// Get all approximated attributes
 	// New position
-	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
-	// New normal
-//	const VEC3& newColor = this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) ; // get new color
+	const VEC3& newPos = m_positionApproximator.getApprox(d) ;
+	// New color
+	const VEC3& newCol = m_colorApproximator.getApprox(d) ;
 
 	const Dart& v0 = dd ;
 	const Dart& v1 = d ;
 
-	assert(newPos == m_pos[v1]) ;
-	assert( this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) == m_color[v1]) ;
+	assert(newPos == m_position[v1]) ;
+	assert(newCol == m_color[v1]) ;
 
 	// Compute errors
 	// Position
@@ -1189,9 +1033,9 @@ void HalfEdgeSelector_ColorGradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 	// sum of QEM metric and color gradient metric
 	const REAL t = 0.01 ;
 	const REAL& err =
-			t*quadGeom(newPos) + // geom
-			(1-t)*computeGradientColorError(v0,v1).norm()/sqrt(3) // color
-			;
+		t * quadGeom(newPos) + // geom
+		(1-t) * computeGradientColorError(v0,v1).norm()/sqrt(3) // color
+	;
 
 	/*std::cout << quadGeom(newPos) << std::endl ;
 	std::cerr << computeGradientColorError(v0,v1).norm()/sqrt(3) << std::endl ;*/
@@ -1212,10 +1056,10 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 {
 	MAP& m = this->m_map ;
 
-	Traversor2VF<MAP> tf(m,v0) ; // all faces around vertex v0
+	Traversor2VF<MAP> tf(m, v0) ; // all faces around vertex v0
 
-	const VEC3& P0 = m_pos[v0] ;
-	const VEC3& P1 = m_pos[v1] ;
+	const VEC3& P0 = m_position[v0] ;
+	const VEC3& P1 = m_position[v1] ;
 	const VEC3& c0 = m_color[v0] ;
 	const VEC3& c1 = m_color[v1] ;
 	const VEC3 d = P1 - P0 ; // displacement vector
@@ -1227,8 +1071,8 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 		// get the data
 		const Dart& vi = m.phi1(fi) ;
 		const Dart& vj = m.phi_1(fi) ;
-		const VEC3& Pi = this->m_position[vi] ;
-		const VEC3& Pj = this->m_position[vj] ;
+		const VEC3& Pi = m_position[vi] ;
+		const VEC3& Pj = m_position[vj] ;
 		const VEC3& ci = m_color[vi] ;
 		const VEC3& cj = m_color[vj] ;
 
@@ -1253,7 +1097,7 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 				grad /= denom ;
 
 			// color change error for channel i
-			count[c] += areaIJ0 * pow(d*grad,2) ;
+			count[c] += areaIJ0 * pow(d*grad, 2) ;
 		}
 	}
 

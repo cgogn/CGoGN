@@ -1,5 +1,10 @@
 #include "surface_radiance.h"
 
+#include "meshTableSurfaceRadiance.h"
+#include "halfEdgeSelectorRadiance.h"
+
+#include "Algo/Decimation/halfEdgeSelector.h"
+
 #include "mapHandler.h"
 #include "camera.h"
 
@@ -201,7 +206,7 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 			PFP2::MAP* map = mh->getMap();
 
 			MeshTablesSurface_Radiance importer(*map);
-			if (!importer.importPLY<SH_TYPE>(fileName.toStdString()))
+			if (!importer.importPLY<Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >(fileName.toStdString()))
 			{
 				std::cout << "could not import " << fileName.toStdString() << std::endl;
 				return NULL;
@@ -221,12 +226,12 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 
 			MapParameters& mapParams = h_mapParameterSet[mhg];
 
-			mapParams.radiance = map->getAttribute<SH_TYPE, VERTEX, PFP2::MAP>("radiance") ;
+			mapParams.radiance = map->getAttribute<Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>, VERTEX, PFP2::MAP>("radiance") ;
 			mapParams.radianceTexture = new Utils::Texture<2, Geom::Vec3f>(GL_FLOAT);
 			mapParams.param = map->checkAttribute<Geom::Vec2i, VERTEX, PFP2::MAP>("param");
 
 			// create texture
-			unsigned int nbv_nbc = Algo::Topo::getNbOrbits<VERTEX>(*map) * SH_TYPE::get_nb_coefs();
+			unsigned int nbv_nbc = Algo::Topo::getNbOrbits<VERTEX>(*map) * Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_nb_coefs();
 			unsigned int size = 1;
 			while (size * size < nbv_nbc)
 				size <<= 1;
@@ -240,7 +245,7 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 				unsigned int i = count / size;
 				unsigned int j = count % size;
 				mapParams.param[v] = Geom::Vec2i(i, j) ; // first index for current vertex
-				for (int l = 0 ; l <= SH_TYPE::get_resolution() ; ++l)
+				for (int l = 0 ; l <= Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_resolution() ; ++l)
 				{
 					for (int m = -l ; m <= l ; ++m)
 					{
@@ -260,7 +265,7 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 			mapParams.paramVBO = new Utils::VBO();
 			mapParams.paramVBO->updateData(mapParams.param);
 
-			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(SH_TYPE::get_resolution());
+			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_resolution());
 			registerShader(mapParams.radiancePerVertexShader);
 
 			mapParams.radiancePerVertexShader->setAttributeRadiance(mapParams.paramVBO, mapParams.radianceTexture, GL_TEXTURE1);
@@ -272,6 +277,57 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 	}
 	else
 		return NULL;
+}
+
+void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& positionAttributeName, const QString& normalAttributeName)
+{
+	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
+	if(mh == NULL)
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	if(!position.isValid())
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normal = mh->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName);
+	if(!normal.isValid())
+		return;
+
+	PFP2::MAP* map = mh->getMap();
+
+	unsigned int nbVertices = Algo::Topo::getNbOrbits<VERTEX>(*map);
+
+	MapParameters& mapParams = h_mapParameterSet[mh];
+
+	if (mapParams.positionApproximator == NULL)
+	{
+		mapParams.positionApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>(*map, position);
+	}
+
+	if (mapParams.normalApproximator == NULL)
+	{
+		mapParams.normalApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>(*map, normal);
+	}
+
+	if (mapParams.radianceApproximator == NULL)
+	{
+		mapParams.radianceApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >(*map, mapParams.radiance);
+	}
+
+	if (mapParams.selector == NULL)
+	{
+		mapParams.selector = new HalfEdgeSelector_Radiance<PFP2>(*map, position, normal, mapParams.radiance, *mapParams.positionApproximator, *mapParams.normalApproximator, *mapParams.radianceApproximator);
+//		mapParams.selector = new Algo::Surface::Decimation::HalfEdgeSelector_QEMml<PFP2>(*map, position, *mapParams.positionApproximator);
+	}
+
+	std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP2>*> approximators;
+	approximators.push_back(mapParams.positionApproximator);
+	approximators.push_back(mapParams.normalApproximator);
+	approximators.push_back(mapParams.radianceApproximator);
+	Algo::Surface::Decimation::decimate<PFP2>(*map, mapParams.selector, approximators, 0.5 * nbVertices);
+
+	mh->notifyConnectivityModification();
+	mh->notifyAttributeModification(position);
 }
 
 Q_EXPORT_PLUGIN2(Surface_Radiance_Plugin, Surface_Radiance_Plugin)

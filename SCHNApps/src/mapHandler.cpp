@@ -14,7 +14,6 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_frame(NULL),
 	m_bbDrawer(NULL),
 	m_render(NULL)
-
 {
 	m_frame = new qglviewer::ManipulatedFrame();
 	connect(m_frame, SIGNAL(manipulated()), this, SLOT(frameModified()));

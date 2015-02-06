@@ -51,6 +51,9 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 private:
+	const VertexAttribute<VEC3, MAP>& m_position ;
+	Approximator<PFP, VEC3, DART>& m_positionApproximator ;
+
 	typedef	struct
 	{
 		typename std::multimap<float,Dart>::iterator it ;
@@ -60,12 +63,10 @@ private:
 	typedef NoTypeNameAttribute<QEMhalfEdgeInfo> HalfEdgeInfo ;
 
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
-	VertexAttribute<Utils::Quadric<REAL>, MAP> quadric ;
+	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
-
-	Approximator<PFP, VEC3, DART>* m_positionApproximator ;
 
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d, bool recompute) ;
@@ -73,17 +74,20 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	HalfEdgeSelector_QEMml(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		Selector<PFP>(m, pos, approx),
-		m_positionApproximator(NULL)
+	HalfEdgeSelector_QEMml(MAP& m, VertexAttribute<VEC3, MAP>& pos, Approximator<PFP, VEC3, DART>& posApprox) :
+		Selector<PFP>(m),
+		m_position(pos),
+		m_positionApproximator(posApprox)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
-		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
+		std::string attrName = m_position.name();
+		attrName += '_QEM';
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	}
 	~HalfEdgeSelector_QEMml()
 	{
-		this->m_map.removeAttribute(quadric) ;
 		this->m_map.removeAttribute(halfEdgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
 	}
 	SelectorType getType() { return S_hQEMml ; }
 	bool init() ;
@@ -107,6 +111,11 @@ public:
 	typedef typename Geom::Vector<6,REAL> VEC6 ;
 
 private:
+	const VertexAttribute<VEC3, MAP>& m_position ;
+	const VertexAttribute<VEC3, MAP>& m_color ;
+	Approximator<PFP, VEC3, DART>& m_positionApproximator;
+	Approximator<PFP, VEC3, DART>& m_colorApproximator;
+
 	typedef	struct
 	{
 		typename std::multimap<float,Dart>::iterator it ;
@@ -118,12 +127,6 @@ private:
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
 	VertexAttribute<Utils::QuadricNd<REAL,6>, MAP> m_quadric ;
 
-	VertexAttribute<VEC3, MAP> m_pos, m_color ;
-	int m_approxindex_pos, m_attrindex_pos ;
-	int m_approxindex_color, m_attrindex_color ;
-
-	std::vector<Approximator<PFP, VEC3, DART>*> m_approx ;
-
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
 
@@ -133,20 +136,26 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	HalfEdgeSelector_QEMextColor(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		Selector<PFP>(m, pos, approx),
-		m_approxindex_pos(-1),
-		m_attrindex_pos(-1),
-		m_approxindex_color(-1),
-		m_attrindex_color(-1)
+	HalfEdgeSelector_QEMextColor(
+			MAP& m,
+			VertexAttribute<VEC3, MAP>& pos,
+			VertexAttribute<VEC3, MAP>& col,
+			Approximator<PFP, VEC3, DART>& posApprox,
+			Approximator<PFP, VEC3, DART>& colApprox
+		) :
+			Selector<PFP>(m),
+			m_position(pos),
+			m_color(col),
+			m_positionApproximator(posApprox),
+			m_colorApproximator(colApprox)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
 		m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,6>, VERTEX, MAP>("hQEMext-quadric") ;
 	}
 	~HalfEdgeSelector_QEMextColor()
 	{
-		this->m_map.removeAttribute(m_quadric) ;
 		this->m_map.removeAttribute(halfEdgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
 	}
 	SelectorType getType() { return S_hQEMextColor ; }
 	bool init() ;
@@ -194,6 +203,13 @@ public:
 	typedef typename Geom::Vector<9,REAL> VEC9 ;
 
 private:
+	const VertexAttribute<VEC3, MAP>& m_position ;
+	const VertexAttribute<VEC3, MAP>& m_color ;
+	const VertexAttribute<VEC3, MAP>& m_normal ;
+	Approximator<PFP, VEC3, DART>& m_positionApproximator;
+	Approximator<PFP, VEC3, DART>& m_colorApproximator;
+	Approximator<PFP, VEC3, DART>& m_normalApproximator;
+
 	typedef	struct
 	{
 		typename std::multimap<float,Dart>::iterator it ;
@@ -205,13 +221,6 @@ private:
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
 	VertexAttribute<Utils::QuadricNd<REAL,9>, MAP> m_quadric ;
 
-	VertexAttribute<VEC3, MAP> m_pos, m_color, m_normal ;
-	int m_approxindex_pos, m_attrindex_pos ;
-	int m_approxindex_color, m_attrindex_color ;
-	int m_approxindex_normal, m_attrindex_normal ;
-
-	std::vector<Approximator<PFP, VEC3, DART>*> m_approx ;
-
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
 
@@ -221,22 +230,30 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	HalfEdgeSelector_QEMextColorNormal(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		Selector<PFP>(m, pos, approx),
-		m_approxindex_pos(-1),
-		m_attrindex_pos(-1),
-		m_approxindex_color(-1),
-		m_attrindex_color(-1),
-		m_approxindex_normal(-1),
-		m_attrindex_normal(-1)
+	HalfEdgeSelector_QEMextColorNormal(
+			MAP& m,
+			VertexAttribute<VEC3, MAP>& pos,
+			VertexAttribute<VEC3, MAP>& col,
+			VertexAttribute<VEC3, MAP>& norm,
+			Approximator<PFP, VEC3, DART>& posApprox,
+			Approximator<PFP, VEC3, DART>& colApprox,
+			Approximator<PFP, VEC3, DART>& normApprox
+		) :
+			Selector<PFP>(m),
+			m_position(pos),
+			m_color(col),
+			m_normal(norm),
+			m_positionApproximator(posApprox),
+			m_colorApproximator(colApprox),
+			m_normalApproximator(normApprox)
 	{
         halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
         m_quadric = m.template addAttribute<Utils::QuadricNd<REAL,9>, VERTEX, MAP>("hQEMextNormal-quadric") ;
 	}
 	~HalfEdgeSelector_QEMextColorNormal()
 	{
-		this->m_map.removeAttribute(m_quadric) ;
 		this->m_map.removeAttribute(halfEdgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
 	}
 	SelectorType getType() { return S_hQEMextColorNormal ; }
 	bool init() ;
@@ -283,6 +300,11 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 
 private:
+	const VertexAttribute<VEC3, MAP>& m_position ;
+	const VertexAttribute<VEC3, MAP>& m_color ;
+	Approximator<PFP, VEC3, DART>& m_positionApproximator;
+	Approximator<PFP, VEC3, DART>& m_colorApproximator;
+
 	typedef	struct
 	{
 		typename std::multimap<float,Dart>::iterator it ;
@@ -293,12 +315,6 @@ private:
 
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
-
-	VertexAttribute<VEC3, MAP> m_pos, m_color ;
-	int m_approxindex_pos, m_attrindex_pos ;
-	int m_approxindex_color, m_attrindex_color ;
-
-	std::vector<Approximator<PFP, VEC3, DART>*> m_approx ;
 
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -312,20 +328,28 @@ private:
 	VEC3 computeGradientColorError(const Dart& v0, const Dart& v1) const ;
 
 public:
-	HalfEdgeSelector_ColorGradient(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		Selector<PFP>(m, pos, approx),
-		m_approxindex_pos(-1),
-		m_attrindex_pos(-1),
-		m_approxindex_color(-1),
-		m_attrindex_color(-1)
+	HalfEdgeSelector_ColorGradient(
+			MAP& m,
+			VertexAttribute<VEC3, MAP>& pos,
+			VertexAttribute<VEC3, MAP>& col,
+			Approximator<PFP, VEC3, DART>& posApprox,
+			Approximator<PFP, VEC3, DART>& colApprox
+		) :
+			Selector<PFP>(m),
+			m_position(pos),
+			m_color(col),
+			m_positionApproximator(posApprox),
+			m_colorApproximator(colApprox)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
-		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
+		std::string attrName = m_position.name();
+		attrName += '_QEM';
+		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	}
 	~HalfEdgeSelector_ColorGradient()
 	{
-		this->m_map.removeAttribute(m_quadric) ;
 		this->m_map.removeAttribute(halfEdgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
 	}
 	SelectorType getType() { return S_hColorGradient ; }
 	bool init() ;

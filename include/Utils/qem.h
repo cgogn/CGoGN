@@ -97,7 +97,6 @@ public:
 	 */
 	Quadric(const VEC3& p1, const VEC3& p2, const VEC3& p3) ;
 
-
 	/*!
 	 * \brief destructor
 	 */
@@ -656,6 +655,6 @@ private:
 
 } // CGOGN
 
-#include "qem.hpp"
+#include "Utils/qem.hpp"
 
 #endif

@@ -433,10 +433,10 @@ void View::init()
 	const float max = m_textureWallpaper->size()[0];
 	for (unsigned int ki = 0; ki < m_textureWallpaper->size()[0]; ++ki)
 	{
-		for (unsigned int kj = 0; kj <  m_textureWallpaper->size()[1]; ++kj)
+		for (unsigned int kj = 0; kj < m_textureWallpaper->size()[1]; ++kj)
 		{
-			float col = 255 - (255 * (ki/max));//*0.85 + 0.15;
-			(*m_textureWallpaper)(kj, ki) = Geom::Vec3f(col, col, col);
+			float col = 255 - (255 * ((kj/max)*0.6 + 0.2));
+			(*m_textureWallpaper)(ki, kj) = Geom::Vec3f(col, col, col);
 		}
 	}
 	m_textureWallpaper->update();
@@ -665,8 +665,6 @@ void View::ui_mapsListView(int x, int y, int globalX, int globalY)
 		m_dialogCameras->hide();
 		m_dialogPlugins->hide();
 	}
-	else
-		m_dialogMaps->hide();
 }
 
 void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
@@ -678,8 +676,6 @@ void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
 		m_dialogMaps->hide();
 		m_dialogCameras->hide();
 	}
-	else
-		m_dialogPlugins->hide();
 }
 
 void View::ui_camerasListView(int x, int y, int globalX, int globalY)
@@ -691,8 +687,6 @@ void View::ui_camerasListView(int x, int y, int globalX, int globalY)
 		m_dialogPlugins->hide();
 		m_dialogMaps->hide();
 	}
-	else
-		m_dialogCameras->hide();
 }
 
 void View::mapAdded(MapHandlerGen* mh )
@@ -757,13 +751,10 @@ void View::mapCheckStateChanged(QListWidgetItem* item)
 		return;
 
 	DEBUG_SLOT();
-
-	if (item->checkState()==Qt::Checked)
+	if (item->checkState() == Qt::Checked)
 		linkMap(item->text());
 	else
 		unlinkMap(item->text());
-
-
 }
 
 void View::pluginCheckStateChanged(QListWidgetItem* item)
@@ -772,7 +763,7 @@ void View::pluginCheckStateChanged(QListWidgetItem* item)
 		return;
 
 	DEBUG_SLOT();
-	if (item->checkState()==Qt::Checked)
+	if (item->checkState() == Qt::Checked)
 		linkPlugin(item->text());
 	else
 		unlinkPlugin(item->text());
@@ -784,10 +775,9 @@ void View::cameraCheckStateChanged(QListWidgetItem* item)
 		return;
 
 	DEBUG_SLOT();
-	if (item->checkState()==Qt::Checked)
+	if (item->checkState() == Qt::Checked)
 		setCurrentCamera(item->text());
 }
-
 
 } // namespace SCHNApps
 

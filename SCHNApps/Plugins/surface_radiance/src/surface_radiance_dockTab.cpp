@@ -19,6 +19,7 @@ Surface_Radiance_DockTab::Surface_Radiance_DockTab(SCHNApps* s, Surface_Radiance
 
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
 	connect(combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(normalVBOChanged(int)));
+	connect(button_decimate, SIGNAL(clicked()), this, SLOT(decimateClicked()));
 }
 
 
@@ -47,6 +48,11 @@ void Surface_Radiance_DockTab::normalVBOChanged(int index)
 			m_plugin->h_mapParameterSet[map].normalVBO = map->getVBO(combo_normalVBO->currentText());
 		}
 	}
+}
+
+void Surface_Radiance_DockTab::decimateClicked()
+{
+	m_plugin->decimate(m_schnapps->getSelectedMap()->getName(), combo_positionVBO->currentText(), combo_normalVBO->currentText());
 }
 
 

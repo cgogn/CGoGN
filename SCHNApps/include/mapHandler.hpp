@@ -97,13 +97,6 @@ void MapHandler<PFP>::updateBB(const VertexAttribute<VEC3, MAP>& position)
 {
 	m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<MAP*>(m_map)), position);
 	m_bbDiagSize = m_bb.diagSize();
-
-	const typename PFP::VEC3& bmin = m_bb.min();
-	m_bbMin = qglviewer::Vec(bmin[0],bmin[1],bmin[2]);
-
-	const typename PFP::VEC3& bmax = m_bb.max();
-	m_bbMax = qglviewer::Vec(bmax[0],bmax[1],bmax[2]);
-
 	updateBBDrawer();
 }
 

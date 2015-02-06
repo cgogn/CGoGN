@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #include "Algo/Topo/embedding.h"
 
 namespace CGoGN
@@ -41,13 +42,11 @@ namespace Decimation
 template <typename PFP>
 bool Approximator_QEM<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
+	std::string attrName = this->m_attr.name();
+	attrName += '_QEM';
+	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName);
 	// Does not require to be valid (if it is not, altenatives will be used).
 
-	if(this->m_predictor)
-	{
-		return false ;
-	}
 	return true ;
 }
 
@@ -66,7 +65,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		Dart it = d ;
 		do
 		{
-			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attr[it], this->m_attr[m.phi1(it)], this->m_attr[m.phi_1(it)]) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -75,7 +74,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		it = dd ;
 		do
 		{
-			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attr[it], this->m_attr[m.phi1(it)], this->m_attr[m.phi_1(it)]) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -94,19 +93,19 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 	bool opt = quad.findOptimizedPos(res) ; // try to compute an optimized position for the contraction of this edge
 	if(!opt)
 	{
-		VEC3 p1 = this->m_attrV[0]->operator[](d) ;    // let the new vertex lie
-		VEC3 p2 = this->m_attrV[0]->operator[](dd) ;   // on either one of the two endpoints
-		VEC3 p12 = (p1 + p2) / 2.0f ;   // or the middle of the edge
+		VEC3 p1 = this->m_attr[d] ;    // let the new vertex lie
+		VEC3 p2 = this->m_attr[dd] ;   // on either one of the two endpoints
+		VEC3 p12 = (p1 + p2) / 2.0f ;  // or the middle of the edge
 		REAL e1 = quad(p1) ;
 		REAL e2 = quad(p2) ;
 		REAL e12 = quad(p12) ;
 		REAL minerr = std::min(std::min(e1, e2), e12) ; // consider only the one for
-		if(minerr == e12) this->m_approx[0][d] = p12 ;             // which the error is minimal
-		else if(minerr == e1) this->m_approx[0][d] = p1 ;
-		else this->m_approx[0][d] = p2 ;
+		if(minerr == e12) this->m_approx[d] = p12 ;             // which the error is minimal
+		else if(minerr == e1) this->m_approx[d] = p1 ;
+		else this->m_approx[d] = p2 ;
 	}
 	else
-		this->m_approx[0][d] = res ;
+		this->m_approx[d] = res ;
 }
 
 /************************************************************************************
@@ -116,12 +115,11 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 template <typename PFP>
 bool Approximator_QEMhalfEdge<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX, MAP>("QEMquadric") ;
+	std::string attrName = this->m_attr.name();
+	attrName += '_QEM';
+	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
+	// Does not require to be valid (if it is not, altenatives will be used).
 
-	if(this->m_predictor)
-	{
-		return false ;
-	}
 	return true ;
 }
 
@@ -140,7 +138,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		Dart it = d ;
 		do
 		{
-			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attr[it], this->m_attr[m.phi1(it)], this->m_attr[m.phi_1(it)]) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -149,7 +147,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		it = dd ;
 		do
 		{
-			Utils::Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
+			Utils::Quadric<REAL> q(this->m_attr[it], this->m_attr[m.phi1(it)], this->m_attr[m.phi_1(it)]) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -167,17 +165,17 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 	VEC3 res ;
 	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
 	if(!opt)
-		this->m_approx[0][d] = this->m_attrV[0]->operator[](d) ;
+		this->m_approx[d] = this->m_attr[d] ;
 	else
-		this->m_approx[0][d] = res ;
+		this->m_approx[d] = res ;
 }
 
 /************************************************************************************
  *							         MID EDGE                                       *
  ************************************************************************************/
 
-template <typename PFP>
-bool Approximator_MidEdge<PFP>::init()
+template <typename PFP, typename T>
+bool Approximator_MidEdge<PFP,T>::init()
 {
 	if(this->m_predictor)
 	{
@@ -190,8 +188,8 @@ bool Approximator_MidEdge<PFP>::init()
 	return true ;
 }
 
-template <typename PFP>
-void Approximator_MidEdge<PFP>::approximate(Dart d)
+template <typename PFP, typename T>
+void Approximator_MidEdge<PFP,T>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
 
@@ -199,11 +197,11 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 	Dart dd = m.phi2(d) ;
 
 	// get the contracted edge vertices positions
-	VEC3 v1 = this->m_attrV[0]->operator[](d) ;
-	VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
+	const T& v1 = this->m_attr[d] ;
+	const T& v2 = this->m_attr[dd] ;
 
 	// Compute the approximated position
-	this->m_approx[0][d] = (v1 + v2) / REAL(2) ;
+	this->m_approx[d] = (v1 + v2) / REAL(2) ;
 
 	if(this->m_predictor)
 	{
@@ -211,17 +209,17 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 		Dart d2 = m.phi2(m.phi_1(d)) ;
 		Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
-		// VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
+		// VEC3 v2 = (*this->m_attrV[0])[dd] ;
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
 //		unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
-		unsigned int newV = Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(m,d2);
-		this->m_attrV[0]->operator[](newV) = this->m_approx[0][d] ;
+		unsigned int newV = Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(m, d2);
+		this->m_attr[newV] = this->m_approx[d] ;
 
 		// compute the detail vector
 		this->m_predictor->predict(d2, dd2) ;
-		this->m_detail[0][d] = v1 - this->m_predictor->getPredict(0) ;
+		this->m_detail[d] = v1 - this->m_predictor->getPredict(0) ;
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
@@ -236,8 +234,8 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
  *							       HALF COLLAPSE                                    *
  ************************************************************************************/
 
-template <typename PFP>
-bool Approximator_HalfCollapse<PFP>::init()
+template <typename PFP, typename T>
+bool Approximator_HalfCollapse<PFP,T>::init()
 {
 	if(this->m_predictor)
 	{
@@ -249,13 +247,12 @@ bool Approximator_HalfCollapse<PFP>::init()
 	return true ;
 }
 
-template <typename PFP>
-void Approximator_HalfCollapse<PFP>::approximate(Dart d)
+template <typename PFP, typename T>
+void Approximator_HalfCollapse<PFP,T>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
-		this->m_approx[i][d] = this->m_attrV[i]->operator[](d) ;
+	this->m_approx[d] = this->m_attr[d] ;
 
 	if(this->m_predictor)
 	{
@@ -263,23 +260,17 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 		Dart d2 = m.phi2(m.phi_1(d)) ;
 		Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
-		VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
+		const T& v2 = this->m_attr[dd] ;
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
 //		unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 		unsigned int newV = Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(m,d2) ;
-		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
-		{
-			this->m_attrV[i]->operator[](newV) = this->m_approx[i][d] ;
-		}
+		this->m_attr[newV] = this->m_approx[d] ;
 
 		// compute the detail vector
 		this->m_predictor->predict(d2, dd2) ;
-		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
-		{
-			this->m_detail[i][d] = v2 - this->m_predictor->getPredict(1) ;
-		}
+		this->m_detail[d] = v2 - this->m_predictor->getPredict(1) ;
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
@@ -287,7 +278,6 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 //		m.template setOrbitEmbedding<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
 		Algo::Topo::setOrbitEmbedding<VERTEX>(m, d, m.template getEmbedding<VERTEX>(d)) ;
 		Algo::Topo::setOrbitEmbedding<VERTEX>(m, dd, m.template getEmbedding<VERTEX>(dd)) ;
-
 	}
 }
 
@@ -321,8 +311,8 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
 	// get the contracted edge vertices positions
-	VEC3 v1 = this->m_attrV[0]->operator[](d) ;
-	VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
+	const VEC3& v1 = this->m_attr[d] ;
+	const VEC3& v2 = this->m_attr[dd] ;
 
 	// compute the alpha value according to vertices valences
 	REAL k1 = 0 ;
@@ -347,7 +337,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	it = d2 ;
 	do
 	{
-		m1 += this->m_attrV[0]->operator[](m.phi1(it));
+		m1 += this->m_attr[m.phi1(it)];
 		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != d) ;
@@ -359,7 +349,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	it = dd2 ;
 	do
 	{
-		m2 += this->m_attrV[0]->operator[](m.phi1(it));
+		m2 += this->m_attr[m.phi1(it)];
 		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != dd) ;
@@ -371,11 +361,11 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	VEC3 a2 = ( REAL(1) / (REAL(1) - alpha) ) * ( v2 - (alpha * m2) ) ;
 
 	// Compute the final approximated position
-	this->m_approx[0][d] = (a1 + a2) / REAL(2) ;
+	this->m_approx[d] = (a1 + a2) / REAL(2) ;
 
 	if(this->m_predictor)
 	{
-		this->m_detail[0][d] = (REAL(1) - alpha) * ( (a1 - a2) / REAL(2) ) ;
+		this->m_detail[d] = (REAL(1) - alpha) * ( (a1 - a2) / REAL(2) ) ;
 	}
 }
 
@@ -388,17 +378,12 @@ bool Approximator_NormalArea<PFP>::init()
 	edgeMatrix = this->m_map.template getAttribute<Geom::Matrix<3,3,REAL>, EDGE, MAP>("NormalAreaMatrix") ;
 	assert(edgeMatrix.isValid());
 
-	if(this->m_predictor)
-	{
-		return false ;
-	}
 	return true ;
 }
 
 template <typename PFP>
 void Approximator_NormalArea<PFP>::approximate(Dart d)
 {
-	typedef typename PFP::REAL REAL;
 	typedef Geom::Matrix<3,3,REAL> MATRIX;
 	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
 	typedef Eigen::Matrix<REAL,3,3> E_MATRIX;
@@ -408,9 +393,9 @@ void Approximator_NormalArea<PFP>::approximate(Dart d)
 	MATRIX M1; // init zero included
 	MATRIX M2; // init zero included
 
-	assert(! m.isBoundaryEdge(d));
+	assert(!m.isBoundaryEdge(d));
 
-	Traversor2VF<MAP> td (m,d);
+	Traversor2VF<MAP> td(m, d);
 	Dart it = td.begin();
 	it = td.next();
 	Dart it2 = td.next();
@@ -421,19 +406,19 @@ void Approximator_NormalArea<PFP>::approximate(Dart d)
 		it2 = td.next();
 	}
 
-	Traversor2VF<MAP> tdd (m,dd);
+	Traversor2VF<MAP> tdd(m, dd);
 	it = tdd.begin();
 	it = tdd.next();
 	it2 = tdd.next();
-	while( it2 != tdd.end())
+	while(it2 != tdd.end())
 	{
 		M2 += edgeMatrix[m.phi1(it)];
 		it = it2;
 		it2 = tdd.next();
 	}
 
-	const VEC3 & v1 = (*this->m_attrV[0])[d] ;
-	const VEC3 & v2 = (*this->m_attrV[0])[dd] ;
+	const VEC3& v1 = this->m_attr[d] ;
+	const VEC3& v2 = this->m_attr[dd] ;
 
 	/* version plus sûre : sans cast avec recopie
 	E_MATRIX A ;
@@ -445,7 +430,7 @@ void Approximator_NormalArea<PFP>::approximate(Dart d)
 	Eigen::LDLT<E_MATRIX> decompo (A);
 	E_VEC3 x = decompo.solve(b);
 
-	this->m_approx[0][d] = VEC3 (x(0),x(1),x(2)) ;
+	this->m_approx[d] = VEC3 (x(0),x(1),x(2)) ;
 	 */
 
 	/* version legerement moins gourmande et plus risquee : avec cast sans recopie */
@@ -455,14 +440,13 @@ void Approximator_NormalArea<PFP>::approximate(Dart d)
 	Eigen::LDLT<E_MATRIX> decompo (Utils::convertRef<E_MATRIX>(M1));
 	E_VEC3 x = decompo.solve(Utils::convertRef<E_VEC3>(mb));
 
-	this->m_approx[0][d] = Utils::convertRef<VEC3>(x) ;
+	this->m_approx[d] = Utils::convertRef<VEC3>(x) ;
 }
 
+} // namespace Decimation
 
-} //namespace Decimation
+} // namespace Surface
 
-}
+} // namespace Algo
 
-} //namespace Algo
-
-} //namespace CGoGN
+} // namespace CGoGN

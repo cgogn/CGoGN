@@ -70,28 +70,26 @@ enum ApproximatorType
 template <typename PFP>
 class ApproximatorGen
 {
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
 protected:
-	MAP& m_map ;
+	typename PFP::MAP& m_map ;
 
 public:
-	ApproximatorGen(MAP& m) : m_map(m)
+	ApproximatorGen(typename PFP::MAP& m) : m_map(m)
 	{}
 	virtual ~ApproximatorGen()
 	{}
-	virtual const std::string& getApproximatedAttributeName(unsigned int index = 0) const = 0 ;
+	virtual const std::string& getApproximatedAttributeName() const = 0 ;
 	virtual ApproximatorType getType() const = 0 ;
-	virtual unsigned int getNbApproximated() const = 0 ;
+
 	virtual bool init() = 0 ;
 	virtual void approximate(Dart d) = 0 ;
+
 	virtual void saveApprox(Dart d) = 0 ;
 	virtual void affectApprox(Dart d) = 0 ;
+
 	virtual const PredictorGen<PFP>* getPredictor() const = 0 ;
 //	virtual REAL detailMagnitude(Dart d) = 0 ;
-	virtual void addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform) = 0 ;
+//	virtual void addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform) = 0 ;
 } ;
 
 /*!
@@ -102,35 +100,34 @@ template <typename PFP, typename T, unsigned int ORBIT>
 class Approximator : public ApproximatorGen<PFP>
 {
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
 
 protected:
+	VertexAttribute<T, MAP>& m_attr ;	// vertex attribute to be approximated
+	AttributeHandler<T, ORBIT, MAP> m_approx ;	// attribute to store approximation result
+	AttributeHandler<T, ORBIT, MAP> m_detail ;	// attribute to store detail information for reconstruction
+	T m_app ;
+
 	Predictor<PFP, T>* m_predictor ;
 
-	std::vector<VertexAttribute<T, MAP>* > m_attrV ;	// vertex attributes to be approximated
-	std::vector<AttributeHandler<T, ORBIT, MAP> > m_approx ;	// attributes to store approximation result
-	std::vector<AttributeHandler<T, ORBIT, MAP> > m_detail ;	// attributes to store detail information for reconstruction
-	std::vector<T> m_app ;
-
 public:
-	Approximator(MAP& m, std::vector<VertexAttribute<T, MAP>* > va, Predictor<PFP, T>* predictor) ;
+	Approximator(MAP& m, VertexAttribute<T, MAP>& attr, Predictor<PFP, T>* predictor) ;
 	virtual ~Approximator() ;
-	const std::string& getApproximatedAttributeName(unsigned int index = 0) const ;
-	unsigned int getNbApproximated() const ;
+
+	const VertexAttribute<T, MAP>& getApproximatedAttribute() const ;
+	VertexAttribute<T, MAP>& getApproximatedAttribute() ;
+	const std::string& getApproximatedAttributeName() const ;
+
+	const AttributeHandler<T, ORBIT, MAP>& getApproximationResultAttribute() const;
+
 	void saveApprox(Dart d) ;
 	void affectApprox(Dart d) ;
-	const T& getApprox(Dart d, unsigned int index = 0) const ;
-	const VertexAttribute<T, MAP>& getAttr(unsigned int index = 0) const ;
-	VertexAttribute<T, MAP>& getAttr(unsigned int index = 0) ;
-	std::vector<T> getAllApprox(Dart d) const ;
+	const T& getApprox(Dart d) const ;
+
 	const Predictor<PFP, T>* getPredictor() const ;
-	const T& getDetail(Dart d, unsigned int index = 0) const ;
-	std::vector<T> getAllDetail(Dart d) const ;
-	void setDetail(Dart d, unsigned int index, T& val) ;
-	void setDetail(Dart d, std::vector<T>& val) ;
-	// REAL detailMagnitude(Dart d) ; // TODO works only for vector types !!
-	void addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform) ;
+	const T& getDetail(Dart d) const ;
+	void setDetail(Dart d, const T& val) ;
+//	REAL detailMagnitude(Dart d) ; // TODO works only for vector types !!
+//	void addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform) ; // TODO works only for vector types !!
 } ;
 
 } // namespace Decimation
