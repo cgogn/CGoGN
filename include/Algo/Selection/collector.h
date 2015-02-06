@@ -88,10 +88,14 @@ public:
 	virtual void collectAll(Dart d) = 0;
 	virtual void collectBorder(Dart d) = 0;
 
-	bool applyOnInsideVertices(FunctorType& f);
-	bool applyOnInsideEdges(FunctorType& f);
-	bool applyOnInsideFaces(FunctorType& f);
-	bool applyOnBorder(FunctorType& f);
+	template <typename FUNC>
+	void applyOnInsideVertices(FUNC& f);
+	template <typename FUNC>
+	void applyOnInsideEdges(FUNC& f);
+	template <typename FUNC>
+	void applyOnInsideFaces(FUNC& f);
+	template <typename FUNC>
+	void applyOnBorder(FUNC& f);
 
 	inline void sort()
 	{
@@ -488,7 +492,7 @@ public:
 		edge_cost(c),
 		maxDist(d)
 	{
-		vertexInfo = m.template addAttribute<VertexInfo, VERTEX>("vertexInfo");
+		vertexInfo = m.template addAttribute<VertexInfo, VERTEX, typename PFP::MAP>("vertexInfo");
 	}
 	~Collector_Dijkstra_Vertices()
 	{

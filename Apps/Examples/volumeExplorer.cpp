@@ -29,7 +29,9 @@
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/volume.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 #include "Algo/Geometry/area.h"
+
 
 #include "Utils/chrono.h"
 
@@ -172,12 +174,14 @@ void MyQT::cb_Open()
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
 //		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
+		color[d] = PFP::VEC3(1.0,0,0);
 //		color[d] = VEC3(v,0,0);
+
 //		if (v>maxV)
 //			maxV=v;
 
 		if(myMap.isVolumeIncidentToBoundary(d))
-			color[d] = VEC3(0,0,0);
+            color[d] = VEC3(1,0.41,0.706);
 	}
 //	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
 //	{
@@ -399,7 +403,7 @@ int main(int argc, char **argv)
 		{
 */
 
-		if(extension == std::string(".map"))
+		if(extension == std::string(".mapbin"))
 		{
 			myMap.loadMapBin(filename);
 			position = myMap.getAttribute<VEC3, VERTEX,MAP>("position") ;
@@ -421,6 +425,17 @@ int main(int argc, char **argv)
 		float maxV = 0.0f;
 		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 		{
+
+//			float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
+			color[d] = PFP::VEC3(1.0,0,0);
+//			if (v>maxV)
+//				maxV=v;
+
+            if(myMap.isVolumeIncidentToBoundary(d))
+                color[d] = PFP::VEC3(1,0.41,0.706);
+			//else
+			//    color[d] = PFP::VEC3(1.0,0,0);
+/*
 			float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
 			color[d] = VEC3(v,0,0);
 			if (v>maxV)
@@ -435,6 +450,7 @@ int main(int argc, char **argv)
 		{
 			color[i][0] /= maxV;
 			color[i][2] = 1.0f - color[i][0];
+*/
 		}
 
 	}
@@ -460,6 +476,9 @@ int main(int argc, char **argv)
 //		Algo::Volume::Export::exportNAS<PFP>(myMap,position,"/tmp/test1.nas");
 //		Algo::Volume::Export::exportVTU<PFP>(myMap,position,"/tmp/test3.vtu");
 	}
+
+    myMap.check();
+
     // un peu d'interface
 	QApplication app(argc, argv);
 	MyQT sqt;

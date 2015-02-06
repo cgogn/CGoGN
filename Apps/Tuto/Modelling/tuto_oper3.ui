@@ -155,6 +155,16 @@
         <string>deleteVolume</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>splitVolume</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>cutVolume</string>
+       </property>
+      </item>
      </widget>
     </item>
     <item row="6" column="0">

@@ -853,6 +853,81 @@ bool exportMesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3
 	}
 }
 
+
+template <typename PFP>
+bool exportBoundaryOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+	unsigned int nbDarts = map.getNbDarts() ;
+	std::vector<unsigned int> facesSize ;
+	std::vector<std::vector<unsigned int> > facesIdx ;
+	facesSize.reserve(nbDarts/3) ;
+	facesIdx.reserve(nbDarts/3) ;
+	std::map<unsigned int, unsigned int> vIndex ;
+	unsigned int vCpt = 0 ;
+	std::vector<unsigned int> vertices ;
+	vertices.reserve(nbDarts/6) ;
+
+	CellMarker<typename PFP::MAP,VERTEX> markV(map) ;
+	TraversorF<MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		if(map.isBoundaryFace(d))
+		{
+			Dart db = d;
+			if(!map.template isBoundaryMarked<3>(db))
+				db = map.phi3(db);
+
+			std::vector<unsigned int> fidx ;
+			fidx.reserve(8) ;
+			unsigned int degree = 0 ;
+			Traversor2FV<typename PFP::MAP> tfv(map, db) ;
+			for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
+			{
+				++degree ;
+				unsigned int vNum = map.template getEmbedding<VERTEX>(it) ;
+				if(!markV.isMarked(it))
+				{
+					markV.mark(it) ;
+					vIndex[vNum] = vCpt++ ;
+					vertices.push_back(vNum) ;
+				}
+				fidx.push_back(vIndex[vNum]) ;
+			}
+			facesSize.push_back(degree) ;
+			facesIdx.push_back(fidx) ;
+		}
+	}
+
+	out << "OFF" << std::endl ;
+	out << vertices.size() << " " << facesSize.size() << " " << 0 << std::endl ;
+
+	for(unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		const VEC3& v = position[vertices[i]] ;
+		out << v[0] << " " << v[1] << " " << v[2] << std::endl ;
+	}
+	for(unsigned int i = 0; i < facesSize.size(); ++i)
+	{
+		out << facesSize[i] ;
+		for(unsigned int j = 0; j < facesIdx[i].size(); ++j)
+			out << " " << facesIdx[i][j] ;
+		out << std::endl ;
+	}
+
+	out.close() ;
+	return true ;
+}
+
 } // namespace Export
 
 } // namespace Volume

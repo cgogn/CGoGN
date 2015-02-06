@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 #include "Topology/generic/traversor/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 namespace CGoGN
 {
@@ -79,6 +79,7 @@ void computeNewPositionsFromFaceNormals(
 template <typename PFP>
 void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
 {
+	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -93,14 +94,14 @@ void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename
 	FaceAutoAttribute<VEC3, MAP> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
-	TraversorF<typename PFP::MAP> tf(map) ;
+	TraversorF<MAP> tf(map) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
 		REAL sumArea = 0 ;
 		VEC3 meanFilter(0) ;
 
 		// traversal of adjacent faces (by edges and vertices)
-		Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
+		Traversor2FFaV<MAP> taf(map, d) ;
 		for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
 		{
 			sumArea += faceArea[it] ;

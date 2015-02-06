@@ -168,7 +168,8 @@ void MCMesh::updateRender()
 void MCMesh::fromFile(char* fname)
 {
 	myImg = new SAlgo::MC::Image<DATATYPE>();
-	myImg->loadInrgz(fname);
+	//myImg->loadInrgz(fname);
+	myImg->loadVox(fname);
 	CGoGNout << "Image chargee"<<CGoGNendl;
 	CGoGNout << myImg->getWidthX() <<"x"<< myImg->getWidthY() <<"x"<< myImg->getWidthZ() << "voxels"<<CGoGNendl;
 }
