@@ -306,7 +306,7 @@ void EarTriangulation<PFP>::triangule()
 //        //check if all vertices degree is equal to 3 (= no direct adjacent vertex has been split)
 //        for(std::vector<Dart>::iterator it=dov.begin();vertToTet && it!=dov.end();++it)
 //        {
-//            if(!cmv.isMarked(*it) && !map.isBoundaryMarked3(*it))
+//            if(!cmv.isMarked(*it) && !map.isBoundaryMarked(3,*it))
 //            {
 //                cmv.mark(*it);
 //                vertToTet = (map.phi1(map.phi2(map.phi1(map.phi2(map.phi1(map.phi2(*it))))))==*it); //degree = 3
@@ -318,7 +318,7 @@ void EarTriangulation<PFP>::triangule()
 //        {
 //            for(std::vector<Dart>::iterator it=dov.begin();it!=dov.end();++it)
 //            {
-//                if(cmv.isMarked(*it) && !map.isBoundaryMarked3(*it))
+//                if(cmv.isMarked(*it) && !map.isBoundaryMarked(3,*it))
 //                {
 //                    cmv.unmark(*it);
 //                    cut3Ear<PFP>(map,*it);
@@ -922,7 +922,7 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d)
     std::vector<Dart> edges;
     do
     {
-        if(!map.isBoundaryMarked3(dit))
+		if(!map.isBoundaryMarked(3,dit))
         {
             edges.push_back(map.phi_1(dit));
             edges.push_back(map.phi_1(map.phi2(map.phi_1(edges[0]))));

@@ -48,10 +48,10 @@ class LerpVertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& m_position ;
 
 public:
-	LerpVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	LerpVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -74,10 +74,10 @@ class LerpEdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& m_position ;
 
 public:
-	LerpEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	LerpEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -100,10 +100,10 @@ class LerpFaceVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& m_position ;
 
 public:
-	LerpFaceVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	LerpFaceVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)

@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Zinri)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+find_package(ZLIB REQUIRED)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS})
 
 file(
 	GLOB_RECURSE
@@ -11,3 +13,4 @@ file(
 )
 
 add_library( Zinri ${source_files} )
+target_link_libraries(Zinri ${ZLIB_LIBRARIES})

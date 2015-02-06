@@ -89,7 +89,6 @@ IF(WIN32)
 ENDIF(WIN32)
 
 find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS regex REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GLEW REQUIRED)
 
@@ -130,16 +129,14 @@ SET (CGoGN_EXT_INCLUDES
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
-	${Boost_INCLUDE_DIRS}
 )
 
 # define libs for external libs
 SET (CGoGN_EXT_LIBS
-    nl
+    	nl
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
-	${Boost_REGEX_LIBRARY}
 	tinyxml2
 )
 
