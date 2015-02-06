@@ -17,4 +17,4 @@ ADD_SUBDIRECTORY(surface_radiance)
 ADD_SUBDIRECTORY(volume_import)
 #ADD_SUBDIRECTORY(volume_render)
 
-ADD_SUBDIRECTORY(volumetric)
+#ADD_SUBDIRECTORY(volumetric)
