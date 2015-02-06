@@ -12,8 +12,9 @@ ADD_SUBDIRECTORY(surface_deformation)
 ADD_SUBDIRECTORY(surface_modelisation)
 #ADD_SUBDIRECTORY(surface_tilings)
 ADD_SUBDIRECTORY(surface_distance)
+ADD_SUBDIRECTORY(surface_radiance)
 
 ADD_SUBDIRECTORY(volume_import)
 #ADD_SUBDIRECTORY(volume_render)
 
-ADD_SUBDIRECTORY(volumetric)
+#ADD_SUBDIRECTORY(volumetric)

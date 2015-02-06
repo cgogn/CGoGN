@@ -29,7 +29,6 @@
 #undef toupper
 
 #include "Utils/cgognStream.h"
-#include <boost/regex.hpp>
 #include <string>
 #include <sstream>
 

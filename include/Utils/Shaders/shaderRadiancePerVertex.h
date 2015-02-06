@@ -22,7 +22,13 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/Shaders/shaderSimpleColor.h"
+#ifndef __CGOGN_SHADER_RADIANCEPERVERTEX__
+#define __CGOGN_SHADER_RADIANCEPERVERTEX__
+
+#include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
+#include "Utils/textures.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -30,80 +36,49 @@ namespace CGoGN
 namespace Utils
 {
 
-#include "shaderSimpleColor.vert"
-#include "shaderSimpleColor.frag"
-
-//std::string ShaderSimpleColor::vertexShaderText =
-//		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-//		"uniform mat4 ModelViewProjectionMatrix;\n"
-////		"INVARIANT_POS;\n"
-//		"void main ()\n"
-//		"{\n"
-//		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-//		"}";
-//
-//
-//std::string ShaderSimpleColor::fragmentShaderText =
-//		"PRECISION;\n"
-//		"uniform vec4 color;\n"
-//		"FRAG_OUT_DEF;\n"
-//		"void main()\n"
-//		"{\n"
-//		"	FRAG_OUT = color;\n"
-//		"}";
-
-
-ShaderSimpleColor::ShaderSimpleColor(bool black_is_transparent)
+class ShaderRadiancePerVertex : public ClippingShader
 {
-	m_nameVS = "ShaderSimpleColor_vs";
-	m_nameFS = "ShaderSimpleColor_fs";
-	m_nameGS = "ShaderSimpleColor_gs";
+protected:
+	// shader sources
+    static std::string vertexShaderText;
+    static std::string geometryShaderText;
+    static std::string fragmentShaderText;
 
-	// chose GL defines (2 or 3)
-	// and compile shaders
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
+	CGoGNGLuint m_uniform_resolution;
+	CGoGNGLuint m_uniform_tex;
+	CGoGNGLuint m_uniform_K_tab;
+	CGoGNGLuint m_uniform_cam;
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	if (black_is_transparent)
-		glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
-	glxfrag.append(fragmentShaderText);
+    VBO* m_vboPos;
+	VBO* m_vboNorm;
+	VBO* m_vboParam;
+	Utils::Texture<2, Geom::Vec3f>* m_tex_ptr;
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+	unsigned int m_tex_unit;
+	int m_resolution;
+	float* K_tab;
+	Geom::Vec3f m_camera;
 
-	*m_unif_color = glGetUniformLocation(this->program_handler(),"color");
+	static int index (int l, int m) { return l*(l+1)+m; } // compute indices in K_tab
 
-	//Default values
-	Geom::Vec4f color(0.1f, 0.9f, 0.1f, 0.0f);
-	setColor(color);
-}
+public:
+	ShaderRadiancePerVertex(int resolution);
 
-void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
-{
-	m_color = color;
-	bind();
-	glUniform4fv(*m_unif_color, 1, color.data());
-	unbind();
-}
+	~ShaderRadiancePerVertex() ;
 
-unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
-{
-	m_vboPos = vbo;
-	bind();
-	unsigned int id = bindVA_VBO("VertexPosition", vbo);
-	unbind();
-	return id;
-}
+	void compile();
 
-void ShaderSimpleColor::restoreUniformsAttribs()
-{
-	*m_unif_color = glGetUniformLocation(this->program_handler(), "color");
-	bind();
-	glUniform4fv(*m_unif_color, 1, m_color.data());
-	bindVA_VBO("VertexPosition", m_vboPos);
-	unbind();
-}
+	void setCamera(Geom::Vec3f camera) ;
+
+	unsigned int setAttributePosition(VBO* vbo);
+
+	unsigned int setAttributeNormal(VBO* vbo);
+
+	unsigned int setAttributeRadiance(VBO* vbo, Utils::Texture<2, Geom::Vec3f>* texture, GLenum texunit = GL_TEXTURE0);
+};
 
 } // namespace Utils
 
 } // namespace CGoGN
+
+#endif
