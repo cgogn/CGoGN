@@ -1,6 +1,9 @@
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
+#include "Utils/gl_def.h"
+#include <QSize>
+
 namespace CGoGN
 {
 

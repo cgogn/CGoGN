@@ -326,18 +326,14 @@ inline void ImplicitHierarchicalMap2::setCurrentLevel(unsigned int l)
 
 inline void ImplicitHierarchicalMap2::incCurrentLevel()
 {
-	if(m_curLevel < m_maxLevel)
-		++m_curLevel ;
-	else
-		CGoGNout << "incCurrentLevel : already at maximum resolution level" << CGoGNendl ;
+	assert(m_curLevel < m_maxLevel || "incCurrentLevel : already at maximum resolution level");
+	++m_curLevel ;
 }
 
 inline void ImplicitHierarchicalMap2::decCurrentLevel()
 {
-	if(m_curLevel > 0)
-		--m_curLevel ;
-	else
-		CGoGNout << "decCurrentLevel : already at minimum resolution level" << CGoGNendl ;
+	assert(m_curLevel > 0 || "decCurrentLevel : already at minimum resolution level");
+	--m_curLevel ;
 }
 
 inline unsigned int ImplicitHierarchicalMap2::getMaxLevel()

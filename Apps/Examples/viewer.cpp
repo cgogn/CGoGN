@@ -31,7 +31,7 @@ Viewer::Viewer() :
 	m_drawFaces(true),
 	m_drawNormals(false),
 	m_drawTopo(false),
-	m_drawBoundaryTopo(true),
+	m_drawBoundaryTopo(false),
 	m_render(NULL),
 	m_phongShader(NULL),
 	m_flatShader(NULL),
@@ -87,7 +87,7 @@ void Viewer::cb_initGL()
 	m_render = new Algo::Render::GL2::MapRender() ;
 	m_topoRender = new Algo::Render::GL2::TopoRender() ;
 
-	m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
+	m_topoRender->setInitialDartsColor(1.0f, 1.00f, 1.00f) ;
 
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
@@ -552,11 +552,14 @@ void Viewer::importMesh(std::string& filename)
 
 	//	myMap.enableQuickTraversal<VERTEX>() ;
 
+
+	std::cout << "The mesh is " << (myMap.isOpen() ? "open" : "closed") << std::endl;
+
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES) ;
 
-	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo) ;
+	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f, m_drawBoundaryTopo, true) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;

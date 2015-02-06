@@ -125,6 +125,9 @@ template <typename PFP>
 bool exportTetmesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename);
 
 
+template <typename PFP>
+bool exportBoundaryOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename);
+
 } // namespace Export
 
 } // namespace Volume

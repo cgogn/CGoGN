@@ -141,6 +141,20 @@ public:
 		return (*m_markVector)[d_index];
 	}
 
+//	template <unsigned int ORBIT>
+//	inline bool isMarked(Cell<ORBIT> c) const
+//	{
+//		assert(m_map.template getMarkerSet<DART>(m_thread).testMark(m_mark));
+//		m_map.foreach_dart_of_orbit(c, [&] (Dart d)
+//		{
+//			if(!(*m_markVector)[m_map.dartIndex(d)].testMark(m_mark))
+//				return false;
+//		}
+//		, m_thread) ;
+
+//		return true;
+//	}
+
 	/**
 	 * mark the darts of the given cell
 	 */

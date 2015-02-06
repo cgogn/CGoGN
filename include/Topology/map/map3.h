@@ -272,6 +272,11 @@ public:
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
 
+	//! Split a volume into two volumes along a edge path by creating a hole between them
+	/*! @param vd a vector of darts
+	 */
+	virtual void cutVolume(std::vector<Dart>& vd);
+
 	//! Split a volume into two volumes along a edge path and add the given face between
 	virtual void splitVolumeWithFace(std::vector<Dart>& vd, Dart d);
 
