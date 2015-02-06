@@ -201,7 +201,7 @@ public:
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 		std::string attrName = m_position.name();
-		attrName += '_QEM';
+		attrName += "_QEM";
 		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	}
 	~EdgeSelector_QEM()
@@ -257,7 +257,7 @@ public:
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 		std::string attrName = m_position.name();
-		attrName += '_QEM';
+		attrName += "_QEM";
 		quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	}
 	~EdgeSelector_QEMml()
@@ -661,7 +661,7 @@ public:
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 		std::string attrName = m_position.name();
-		attrName += '_QEM';
+		attrName += "_QEM";
 		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	}
 	~EdgeSelector_GeomColOptGradient()

@@ -81,7 +81,7 @@ public:
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
 		std::string attrName = m_position.name();
-		attrName += '_QEM';
+		attrName += "_QEM";
 		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	}
 	~HalfEdgeSelector_QEMml()
@@ -343,7 +343,7 @@ public:
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART, MAP>("halfEdgeInfo") ;
 		std::string attrName = m_position.name();
-		attrName += '_QEM';
+		attrName += "_QEM";
 		m_quadric = m.template addAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	}
 	~HalfEdgeSelector_ColorGradient()

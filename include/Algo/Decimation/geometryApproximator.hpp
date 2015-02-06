@@ -43,7 +43,7 @@ template <typename PFP>
 bool Approximator_QEM<PFP>::init()
 {
 	std::string attrName = this->m_attr.name();
-	attrName += '_QEM';
+	attrName += "_QEM";
 	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName);
 	// Does not require to be valid (if it is not, altenatives will be used).
 
@@ -116,7 +116,7 @@ template <typename PFP>
 bool Approximator_QEMhalfEdge<PFP>::init()
 {
 	std::string attrName = this->m_attr.name();
-	attrName += '_QEM';
+	attrName += "_QEM";
 	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX, MAP>(attrName) ;
 	// Does not require to be valid (if it is not, altenatives will be used).
 
