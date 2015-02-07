@@ -174,7 +174,7 @@ void SphericalHarmonics<Tscalar,Tcoef>::compute_y_tab (Tscalar phi)
 
 		for (int l=m; l<=resolution; l++)
 		{
-			F_tab[index(l,m)] *= sqrt(2.0); // remove for plotting
+            F_tab[index(l,m)] *= M_SQRT2; // sqrt(2.0); // remove for plotting
 			F_tab[index(l,m)] *= K_tab[index(l,m)]; // remove for plotting
 			F_tab[index(l,-m)] = F_tab[index(l,m)] * sin_m_phi ; // store the values for -m<0 in the upper triangle
 			F_tab[index(l,m)] *= cos_m_phi;
