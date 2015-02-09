@@ -41,13 +41,11 @@ private:
 
 	DartAttribute<HalfEdgeInfo, PFP2::MAP> halfEdgeInfo;
 	VertexAttribute<Utils::Quadric<PFP2::REAL>, PFP2::MAP> m_quadric;
-	VertexAttribute<PFP2::VEC3, PFP2::MAP> m_avgColor;
+//	VertexAttribute<PFP2::VEC3, PFP2::MAP> m_avgColor;
 
 	unsigned int m_nb_coefs;
 
 	SphericalFunctionIntegratorCartesian m_integrator;
-	double* m_n;
-	double* m_workspace;
 
 	std::multimap<float, Dart> halfEdges;
 	typename std::multimap<float, Dart>::iterator cur;
@@ -56,31 +54,22 @@ private:
 	void updateHalfEdgeInfo(Dart d);
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo);
 	void recomputeQuadric(const Dart d);
-/*
-	PFP2::VEC3 computeGradientLFerror(const Dart& v0, const Dart& v1) const;
-	PFP2::VEC3 computeDirDerivativeLFerror(const Dart& v0, const Dart& v1);
-	PFP2::VEC3 computeSquaredLightfieldDifferenceNumerical(const Dart& d1, const Dart& d2, const PFP2::VEC3& N) const;
-	PFP2::VEC3 computeSquaredLightfieldDifferenceAnalytical(const Dart& d1, const Dart& d2) const;
-	PFP2::VEC3 computeGradient(const PFP2::VEC3& P0, const PFP2::VEC3& Pi, const PFP2::VEC3& Pj, const Dart& v0, const Dart& v1, const Dart& vi, const Dart& vj, unsigned int channel) const;
-	PFP2::VEC3 integrateDscalGrad(const PFP2::VEC3& d, const unsigned int& K, const PFP2::VEC3& N, const PFP2::VEC3& ei, const PFP2::VEC3& ej,
-		const PFP2::VEC3* coefs1, const PFP2::VEC3& T1, const PFP2::VEC3& B1, const PFP2::VEC3& N1, const PFP2::VEC3& avg1,
-		const PFP2::VEC3* coefsi, const PFP2::VEC3& Ti, const PFP2::VEC3& Bi, const PFP2::VEC3& Ni, const PFP2::VEC3& avgi,
-		const PFP2::VEC3* coefsj, const PFP2::VEC3& Tj, const PFP2::VEC3& Bj, const PFP2::VEC3& Nj, const PFP2::VEC3& avgj) const;
-	PFP2::VEC3 integrateDlf(const PFP2::VEC3& d, const unsigned int& K, const PFP2::VEC3& N, const PFP2::VEC3& ei, const PFP2::VEC3& ej,
-		const std::vector<PFP2::VEC3*> coefs0, const PFP2::VEC3& T0, const PFP2::VEC3& B0, const PFP2::VEC3& N0, const PFP2::VEC3& avg0,
-		const std::vector<PFP2::VEC3*> coefs1, const PFP2::VEC3& T1, const PFP2::VEC3& B1, const PFP2::VEC3& N1, const PFP2::VEC3& avg1,
-		const std::vector<PFP2::VEC3*> coefsi, const PFP2::VEC3& Ti, const PFP2::VEC3& Bi, const PFP2::VEC3& Ni, const PFP2::VEC3& avgi,
-		const std::vector<PFP2::VEC3*> coefsj, const PFP2::VEC3& Tj, const PFP2::VEC3& Bj, const PFP2::VEC3& Nj, const PFP2::VEC3& avgj) const;
-	PFP2::REAL computeIntegral(const double *avgi, const PFP2::VEC3& ti, const PFP2::VEC3& bi, const PFP2::VEC3& ni, unsigned int nbCoefs, const std::vector<double>& coefs) const;
 
-	static double dispScalGrad (double x, double y, double z, void* data);
-	static double dlf (double x, double y, double z, void* data);
-	static double evalF(double* N, double* avg, unsigned int nb, bool isSH, double* T, double* B, double* coefs, double& x, double& y, double& z);
-	static void cart2spherical(double u, double v, double& theta, double& phi);
-	static double SquaredDifferenceOfCartesianFunctions (double x, double y, double z, void* data);
-	static bool isInDomain(double x, double y, double z, void *data);
-	static double CartesianFunction (double x, double y, double z, void* data);
-*/
+	typename PFP::REAL computeRadianceError(Dart d);
+
+	static bool isInHemisphere(double x, double y, double z, void* u)
+	{ // true iff [x,y,z] and u have the same direction
+		REAL* n = (REAL*)(u);
+		return x*n[0] + y*n[1] + z*n[2] >= 0.0;
+	}
+
+	static double SHEvalCartesian_Error(double x, double y, double z, void* u)
+	{
+		SH& e = *(SH*)(u);
+		VEC3 c = e.evaluate_at(x, y, z);
+		return c.norm2();
+	}
+
 public:
 	HalfEdgeSelector_Radiance(
 		MAP& m,
@@ -98,24 +87,19 @@ public:
 		m_positionApproximator(posApprox),
 		m_normalApproximator(normApprox),
 		m_radianceApproximator(radApprox),
-		m_nb_coefs(0),
-		m_n(NULL),
-		m_workspace(NULL)
+		m_nb_coefs(0)
 	{
 		halfEdgeInfo = m.template checkAttribute<HalfEdgeInfo, DART, PFP2::MAP>("halfEdgeInfo");
 		m_quadric = m.template checkAttribute<Utils::Quadric<PFP2::REAL>, VERTEX, PFP2::MAP>("QEMquadric");
-		m_avgColor = m.template checkAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("avgColor");
-		m_n = new double[3];
+//		m_avgColor = m.template checkAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("avgColor");
 	}
 
 	~HalfEdgeSelector_Radiance()
 	{
 		this->m_map.removeAttribute(halfEdgeInfo);
 		this->m_map.removeAttribute(m_quadric);
-		this->m_map.removeAttribute(m_avgColor);
+//		this->m_map.removeAttribute(m_avgColor);
 		m_integrator.Release();
-		delete[] m_n;
-		delete[] m_workspace;
 	}
 
 	Algo::Surface::Decimation::SelectorType getType() { return Algo::Surface::Decimation::S_OTHER; }
@@ -149,6 +133,65 @@ public:
 				(*errors)[d] = -1;
 		}
 	}
+
+	class ErrorEvaluator
+	{
+	private:
+		double wA;
+		double wB;
+		double wC;
+
+		SH* sA;
+		SH* sB;
+		SH* sC;
+		SH* sRef;
+
+		VEC3 nA;
+		VEC3 nB;
+		VEC3 nC;
+		VEC3 nRef;
+
+		VEC3 cA;
+		VEC3 cB;
+		VEC3 cC;
+		VEC3 cRef;
+
+	public:
+		ErrorEvaluator(
+			double p_wA,
+			double p_wB,
+			double p_wC,
+			SH* p_sA,
+			SH* p_sB,
+			SH* p_sC,
+			SH* p_sRef,
+			VEC3 p_nA,
+			VEC3 p_nB,
+			VEC3 p_nC,
+			VEC3 p_nRef,
+			VEC3 p_cA,
+			VEC3 p_cB,
+			VEC3 p_cC,
+			VEC3 p_cRef
+		)
+		{
+			wA = p_wA; wB = p_wB; wC = p_wC;
+			sA = p_sA; sB = p_sB; sC = p_sC; sRef = p_sRef;
+			nA = p_nA; nB = p_nB; nC = p_nC; nRef = p_nRef;
+			cA = p_cA; cB = p_cB; cC = p_cC; cRef = p_cRef;
+		}
+
+		void set_eval_direction (double x, double y, double z) // fix the direction in which the error has to be evaluated
+		{
+			SH::set_eval_direction (x,y,z);
+		}
+
+		double evaluate () // evaluates at a fixed direction
+		{
+			VEC3 color_difference ( sRef->evaluate() - wA*sA->evaluate()- wB*sB->evaluate() - wC*sC->evaluate() );
+			return color_difference.squaredNorm();
+		}
+	};
 };
 
 } // namespace SCHNApps

@@ -257,12 +257,12 @@ bool HalfEdgeSelector_QEMextColor<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(m_positionApproximator->getType() == A_hQEM
-		|| m_positionApproximator->getType() == A_hHalfCollapse
+	assert(m_positionApproximator.getType() == A_hQEM
+		|| m_positionApproximator.getType() == A_hHalfCollapse
 		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
-	assert(m_colorApproximator->getType() == A_hQEM
-		|| m_colorApproximator->getType() == A_hHalfCollapse
+	assert(m_colorApproximator.getType() == A_hQEM
+		|| m_colorApproximator.getType() == A_hHalfCollapse
 		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
 	if(m_positionApproximator.getApproximatedAttributeName() != m_position.name())
@@ -529,16 +529,16 @@ bool HalfEdgeSelector_QEMextColorNormal<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(m_positionApproximator->getType() == A_hQEM
-		|| m_positionApproximator->getType() == A_hHalfCollapse
+	assert(m_positionApproximator.getType() == A_hQEM
+		|| m_positionApproximator.getType() == A_hHalfCollapse
 		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
-	assert(m_colorApproximator->getType() == A_hQEM
-		|| m_colorApproximator->getType() == A_hHalfCollapse
+	assert(m_colorApproximator.getType() == A_hQEM
+		|| m_colorApproximator.getType() == A_hHalfCollapse
 		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
-	assert(m_normalApproximator->getType() == A_hQEM
-		|| m_normalApproximator->getType() == A_hHalfCollapse
+	assert(m_normalApproximator.getType() == A_hQEM
+		|| m_normalApproximator.getType() == A_hHalfCollapse
 		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
 	if(m_positionApproximator.getApproximatedAttributeName() != m_position.name())
@@ -819,12 +819,12 @@ bool HalfEdgeSelector_ColorGradient<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(m_positionApproximator->getType() == A_hQEM
-		|| m_positionApproximator->getType() == A_hHalfCollapse
+	assert(m_positionApproximator.getType() == A_hQEM
+		|| m_positionApproximator.getType() == A_hHalfCollapse
 		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
-	assert(m_colorApproximator->getType() == A_hQEM
-		|| m_colorApproximator->getType() == A_hHalfCollapse
+	assert(m_colorApproximator.getType() == A_hQEM
+		|| m_colorApproximator.getType() == A_hHalfCollapse
 		|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
 
 	if(m_positionApproximator.getApproximatedAttributeName() != m_position.name())
