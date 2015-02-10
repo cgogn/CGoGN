@@ -4,10 +4,10 @@
 #include "ui_schnapps.h"
 
 #include "types.h"
-#include "slot_debug.h"
 
-#include "PythonQt/PythonQt.h"
-#include "PythonQt/gui/PythonQtScriptingConsole.h"
+#include "PythonQt.h"
+#include "gui/PythonQtScriptingConsole.h"
+#include "slot_debug.h"
 
 class QVBoxLayout;
 class QSplitter;

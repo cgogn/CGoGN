@@ -14,6 +14,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
 
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
+SET (CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 
 SET( SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
 SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
@@ -24,7 +25,7 @@ find_package(OpenGL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(Qt4 REQUIRED)
-find_package(QGLViewer REQUIRED)
+#find_package(QGLViewer REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
 find_package(SuiteSparse REQUIRED)
 #find_package(SuperLU REQUIRED)
@@ -46,7 +47,7 @@ add_definitions(-DGLM_FORCE_RADIANS)
 #MESSAGE HERE FOR MORE EASY READING (MESSAGE AT THE END)
 MESSAGE("Build type = " ${CMAKE_BUILD_TYPE} " (for change -DCMAKE_BUILD_TYPE=Release|Debug)" )
 
-file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
+file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS cgogn)
 ELSE()
@@ -70,28 +71,28 @@ ENDIF()
 # define includes of external libs 
 SET (EXT_INCLUDES 
 	${CGoGN_ROOT_DIR}/ThirdParty/include
+	${CGoGN_ROOT_DIR}/ThirdParty/OpenNL/src
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
 	${QT_INCLUDE_DIR}
-	${QGLVIEWER_INCLUDE_DIR}
+	${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/
 	${PYTHON_INCLUDE_DIRS}
 	${SUITESPARSE_INCLUDE_DIRS}
-#	${SUPERLU_INCLUDE_DIRS}
+	${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2
 )
 
 # define libs for external libs
 SET (EXT_LIBS 
 	PythonQt
 	nl
-	${QGLVIEWER_LIBRARIES}
+	QGLViewer
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
 	${QT_LIBRARIES}
 	${PYTHON_LIBRARIES}
 	${SUITESPARSE_LIBRARIES}
-#	${SUPERLU_LIBRARIES}
 	tinyxml2
 )
 
@@ -113,11 +114,8 @@ if(APPLE)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-	if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
-	endif(GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 
@@ -167,7 +165,8 @@ link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 
 
 INCLUDE_DIRECTORIES(
-	${CGoGN_ROOT_DIR}/include
+	${CGoGN_SRC_DIR}/include
+	${CGoGN_ROOT_DIR}/ThirdParty/PythonQt/src/
 	${SCHNApps_ROOT_DIR}/include
 	${EXT_INCLUDES}
 	${CMAKE_CURRENT_SOURCE_DIR}
