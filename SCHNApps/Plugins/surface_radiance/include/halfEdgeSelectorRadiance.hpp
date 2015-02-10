@@ -82,28 +82,43 @@ void HalfEdgeSelector_Radiance<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	const Dart& v0 = m.phi1(d) ;
+	Dart dd = m.phi2(d);
 
-	Traversor2VVaE<MAP> tv(m, v0) ;
-	for (Dart v = tv.begin() ; v != tv.end() ; v = tv.next())
+	HalfEdgeInfo& edgeE = halfEdgeInfo[d];
+	if(edgeE.valid)
 	{
-		Traversor2VE<MAP> te(m, v) ;
-		for (Dart he = te.begin() ; he != te.end() ; he = te.next())
-		{
-			HalfEdgeInfo* edgeE = &(halfEdgeInfo[he]) ;
-			if(edgeE->valid)
-			{
-				edgeE->valid = false ;
-				halfEdges.erase(edgeE->it) ;
-			}
-			Dart de = m.phi2(he) ;
-			edgeE = &(halfEdgeInfo[de]) ;
-			if(edgeE->valid)
-			{
-				edgeE->valid = false ;
-				halfEdges.erase(edgeE->it) ;
-			}
-		}
+		edgeE.valid = false ;
+		halfEdges.erase(edgeE.it) ;
+	}
+	edgeE = halfEdgeInfo[dd];
+	if(edgeE.valid)
+	{
+		edgeE.valid = false ;
+		halfEdges.erase(edgeE.it) ;
+	}
+	edgeE = halfEdgeInfo[m.phi1(d)];
+	if(edgeE.valid)
+	{
+		edgeE.valid = false ;
+		halfEdges.erase(edgeE.it) ;
+	}
+	edgeE = halfEdgeInfo[m.phi_1(d)];
+	if(edgeE.valid)
+	{
+		edgeE.valid = false ;
+		halfEdges.erase(edgeE.it) ;
+	}
+	edgeE = halfEdgeInfo[m.phi1(dd)];
+	if(edgeE.valid)
+	{
+		edgeE.valid = false ;
+		halfEdges.erase(edgeE.it) ;
+	}
+	edgeE = halfEdgeInfo[m.phi_1(dd)];
+	if(edgeE.valid)
+	{
+		edgeE.valid = false ;
+		halfEdges.erase(edgeE.it) ;
 	}
 }
 
@@ -121,28 +136,57 @@ void HalfEdgeSelector_Radiance<PFP>::recomputeQuadric(const Dart d)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_Radiance<PFP>::updateAfterCollapse(Dart d2, Dart)
+void HalfEdgeSelector_Radiance<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	MAP& m = this->m_map ;
 
-	const Dart& v1 = d2 ;
+	Dart stop = m.phi2(m.phi_1(d2));
 
-	recomputeQuadric(v1) ;
-	Traversor2VVaE<MAP> tv(m, v1) ;
+	recomputeQuadric(d2);
+	Dart it = dd2;
+	do
+	{
+		recomputeQuadric(m.phi1(it));
+		it = m.phi2(m.phi_1(it));
+	} while (it != stop);
+
+	DartMarkerStore<MAP> dm(m);
+
+	Traversor2VVaE<MAP> tv(m, d2);
 	for (Dart v = tv.begin() ; v != tv.end() ; v = tv.next())
 	{
-		recomputeQuadric(v) ;
+		dm.mark(v);
+		updateHalfEdgeInfo(v, true);
 	}
-
-	for (Dart v = tv.begin() ; v != tv.end() ; v = tv.next())
+	it = dd2;
+	do
 	{
-		Traversor2VE<MAP> te(m,v) ;
-		for (Dart e = te.begin() ; e != te.end() ; e = te.next())
+		Traversor2VVaE<MAP> tv2(m, m.phi1(it));
+		for (Dart v = tv2.begin() ; v != tv2.end() ; v = tv2.next())
 		{
-			updateHalfEdgeInfo(e) ;
-			updateHalfEdgeInfo(m.phi2(e)) ;
+			dm.mark(v);
+			updateHalfEdgeInfo(v, true);
 		}
+		it = m.phi2(m.phi_1(it));
+	} while (it != stop);
+
+	Traversor2VE<MAP> te(m, d2);
+	for (Dart v = te.begin() ; v != te.end() ; v = te.next())
+	{
+		if (!dm.isMarked(v))
+			updateHalfEdgeInfo(v, false);
 	}
+	it = dd2;
+	do
+	{
+		Traversor2VE<MAP> te2(m, m.phi1(it));
+		for (Dart v = te2.begin() ; v != te2.end() ; v = te2.next())
+		{
+			if (!dm.isMarked(v))
+				updateHalfEdgeInfo(v, false);
+		}
+		it = m.phi2(m.phi_1(it));
+	} while (it != stop);
 
 	cur = halfEdges.begin() ; // set the current edge to the first one
 }
@@ -161,13 +205,36 @@ void HalfEdgeSelector_Radiance<PFP>::initHalfEdgeInfo(Dart d)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_Radiance<PFP>::updateHalfEdgeInfo(Dart d)
+void HalfEdgeSelector_Radiance<PFP>::updateHalfEdgeInfo(Dart d, bool recompute)
 {
 	MAP& m = this->m_map ;
 	HalfEdgeInfo& heinfo = halfEdgeInfo[d] ;
 
-	if(!heinfo.valid && m.edgeCanCollapse(d))
-		computeHalfEdgeInfo(d, heinfo) ;
+	if(recompute)
+	{
+		if (heinfo.valid)
+			halfEdges.erase(heinfo.it);
+		if (m.edgeCanCollapse(d))
+			computeHalfEdgeInfo(d, heinfo);
+		else
+			heinfo.valid = false;
+	}
+	else
+	{
+		if (m.edgeCanCollapse(d))
+		{									// if the edge can be collapsed now
+			if (!heinfo.valid)				// but it was not before
+				computeHalfEdgeInfo(d, heinfo) ;
+		}
+		else
+		{									// if the edge cannot be collapsed now
+			if (heinfo.valid)				// and it was before
+			{
+				halfEdges.erase(heinfo.it) ;
+				heinfo.valid = false ;
+			}
+		}
+	}
 }
 
 template <typename PFP>

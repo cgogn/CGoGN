@@ -51,7 +51,7 @@ private:
 	typename std::multimap<float, Dart>::iterator cur;
 
 	void initHalfEdgeInfo(Dart d);
-	void updateHalfEdgeInfo(Dart d);
+	void updateHalfEdgeInfo(Dart d, bool recompute);
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo);
 	void recomputeQuadric(const Dart d);
 
@@ -106,7 +106,7 @@ public:
 	bool init();
 	bool nextEdge(Dart& d) const;
 	void updateBeforeCollapse(Dart d);
-	void updateAfterCollapse(Dart d2, Dart);
+	void updateAfterCollapse(Dart d2, Dart dd2);
 
 	void updateWithoutCollapse() { }
 
@@ -133,65 +133,6 @@ public:
 				(*errors)[d] = -1;
 		}
 	}
-
-	class ErrorEvaluator
-	{
-	private:
-		double wA;
-		double wB;
-		double wC;
-
-		SH* sA;
-		SH* sB;
-		SH* sC;
-		SH* sRef;
-
-		VEC3 nA;
-		VEC3 nB;
-		VEC3 nC;
-		VEC3 nRef;
-
-		VEC3 cA;
-		VEC3 cB;
-		VEC3 cC;
-		VEC3 cRef;
-
-	public:
-		ErrorEvaluator(
-			double p_wA,
-			double p_wB,
-			double p_wC,
-			SH* p_sA,
-			SH* p_sB,
-			SH* p_sC,
-			SH* p_sRef,
-			VEC3 p_nA,
-			VEC3 p_nB,
-			VEC3 p_nC,
-			VEC3 p_nRef,
-			VEC3 p_cA,
-			VEC3 p_cB,
-			VEC3 p_cC,
-			VEC3 p_cRef
-		)
-		{
-			wA = p_wA; wB = p_wB; wC = p_wC;
-			sA = p_sA; sB = p_sB; sC = p_sC; sRef = p_sRef;
-			nA = p_nA; nB = p_nB; nC = p_nC; nRef = p_nRef;
-			cA = p_cA; cB = p_cB; cC = p_cC; cRef = p_cRef;
-		}
-
-		void set_eval_direction (double x, double y, double z) // fix the direction in which the error has to be evaluated
-		{
-			SH::set_eval_direction (x,y,z);
-		}
-
-		double evaluate () // evaluates at a fixed direction
-		{
-			VEC3 color_difference ( sRef->evaluate() - wA*sA->evaluate()- wB*sB->evaluate() - wC*sC->evaluate() );
-			return color_difference.squaredNorm();
-		}
-	};
 };
 
 } // namespace SCHNApps
