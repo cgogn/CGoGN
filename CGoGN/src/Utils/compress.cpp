@@ -51,6 +51,8 @@ void zlibVTUWriteCompressed( unsigned char* input, unsigned int nbBytes, std::of
 	strm.opaque = Z_NULL;
 	int ret = deflateInit(&strm, level);
 	assert(ret == Z_OK); 
+	if (ret != Z_OK)
+		return;
 
 	unsigned char* bufferOut = new unsigned char[nbBytes];
 	unsigned char* ptrBufferOut = bufferOut;
