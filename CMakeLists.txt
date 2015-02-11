@@ -238,3 +238,62 @@ include_directories(
 add_subdirectory(${CGoGN_SRC_DIR} CGoGN)
 
 add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
+
+
+# 
+# Add custom clean targets for cleaning without cleaning dependencies
+#
+if (WIN32)
+	add_custom_target(clean_cgogn 
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(TARGET clean_cgogn PRE_BUILD 
+			COMMAND del /q CCoGN
+			COMMAND cmake ..
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "cleaning CGoGN libs")
+
+	add_custom_target(clean_apps 
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(TARGET clean_apps PRE_BUILD 
+			COMMAND del /q Apps
+			COMMAND cmake ..
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "cleaning Apps")
+
+	add_custom_target(clean_cgogn_apps 
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(TARGET clean_cgogn_apps PRE_BUILD 
+			COMMAND del /q CGoGN
+			COMMAND del /q Apps
+			COMMAND cmake ..
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "cleaning Apps")
+
+ELSE()
+
+	add_custom_target(clean_cgogn 
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(TARGET clean_cgogn PRE_BUILD 
+			COMMAND rm -rf CGoGN
+			COMMAND cmake ..
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "cleaning CGoGN libs")
+
+	add_custom_target(clean_apps 
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(TARGET clean_apps PRE_BUILD 
+			COMMAND rm -rf Apps
+			COMMAND cmake ..
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "cleaning Apps")
+
+	add_custom_target(clean_cgogn_apps 
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(TARGET clean_cgogn_apps PRE_BUILD 
+			COMMAND rm -rf CGoGN
+			COMMAND rm -rf Apps
+			COMMAND cmake ..
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "cleaning Apps")
+
+ENDIF()
