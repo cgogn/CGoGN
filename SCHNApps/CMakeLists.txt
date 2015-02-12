@@ -16,9 +16,9 @@ SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 SET (CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 
-SET( SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
-SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
-
+SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
+SET( CGoGN_USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
+SET( CGoGN_ASSERT_ACTIVED OFF CACHE BOOL "assertion activated")
 
 
 find_package(OpenGL REQUIRED)
@@ -54,18 +54,14 @@ ELSE()
 	SET(CGoGN_LIBS topology algo container utils)
 ENDIF()
 
-IF(DEFINED ASSERTON)
-	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
-ELSE(DEFINED ASSERTON)
-	add_definitions(-DCGOGN_ASSERT_BOOL=false)
-ENDIF (DEFINED ASSERTON)
+add_definitions(-DCGOGN_ASSERT_BOOL=${CGoGN_ASSERT_ACTIVED})
 
-IF(SLOT_DEBUG_MODE)
-	add_definitions(-DSLOT_DEBUG_MODE=1)
+IF(CGoGN_SLOT_DEBUG_MODE)
+	add_definitions(-DCGoGN_SLOT_DEBUG_MODE=1)
 ENDIF()
 
-IF(USE_OGL_CORE_PROFILE)
-	add_definitions(-DUSE_OGL_CORE_PROFILE=1)
+IF(CGoGN_USE_OGL_CORE_PROFILE)
+	add_definitions(-DCGoGN_USE_OGL_CORE_PROFILE=1)
 ENDIF()
 
 # define includes of external libs 
@@ -96,17 +92,6 @@ SET (EXT_LIBS
 	tinyxml2
 )
 
-
-
-
-# qq definition specifiques pour mac
-#IF(APPLE)
-# attention a changer pour chercher la bonne version automatiquement
-#	SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.6.sdk" CACHE STRING "developer SDK")
-#	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
-#	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMAC_OSX")
-#	SET(CMAKE_OSX_ARCHITECTURES x86_64)
-#ENDIF(APPLE)
 
 if(APPLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")	

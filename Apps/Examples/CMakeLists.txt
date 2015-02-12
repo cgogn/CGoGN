@@ -2,19 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 project(examples)
 
-#SET(CMAKE_BUILD_TYPE Release)
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
-
 
 # define includes path
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-# define libs path
-#IF(WIN32)
-#	link_directories( ${CGoGN_ROOT_DIR}/lib/$(ConfigurationName) ${Boost_LIBRARY_DIRS} )
-#ELSE(WIN32)
-#	link_directories( ${CGoGN_ROOT_DIR}/lib/Release )
-#ENDIF(WIN32)
 
 
 #define exec to compile

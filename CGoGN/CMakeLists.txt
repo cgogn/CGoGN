@@ -67,7 +67,7 @@ file(
 	${CGoGN_SRC_DIR}/include/Utils/Shaders/*.h
 )
 
-IF(WITH_QT)
+IF(CGoGN_WITH_QT)
 	file(
 		GLOB
 		files_utils_qt
@@ -105,8 +105,8 @@ file(	GLOB_RECURSE
 
 link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 
-IF (ONELIB)
-	IF(WITH_QT)
+IF (CGoGN_ONELIB)
+	IF(CGoGN_WITH_QT)
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
 	ELSE()
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
@@ -115,7 +115,7 @@ IF (ONELIB)
 	target_link_libraries(cgogn ${CGoGN_EXT_LIBS})
 
 ELSE()
-	IF (WITH_QT)
+	IF (CGoGN_WITH_QT)
 		add_library( utils ${files_utils_withQt} )
 	ELSE()
 		add_library( utils ${files_utils} )

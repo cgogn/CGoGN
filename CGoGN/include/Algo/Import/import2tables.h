@@ -39,9 +39,9 @@
 #include "Algo/Modelisation/voxellisation.h"
 
 #ifdef WITH_ASSIMP
-#include "Assimp/assimp.h"
-#include "Assimp/aiPostProcess.h"
-#include "Assimp/aiScene.h"
+#include "assimp.h"
+#include "aiPostProcess.h"
+#include "aiScene.h"
 #endif
 
 namespace CGoGN

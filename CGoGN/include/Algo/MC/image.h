@@ -31,7 +31,7 @@
 #include "Utils/img3D_IO.h"
 
 #ifdef WITH_ZINRI
-#include "Zinri/Zinrimage.h"
+#include "Zinrimage.h"
 #endif
 
 namespace CGoGN
