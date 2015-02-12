@@ -4,9 +4,10 @@
 #include "ui_schnapps.h"
 
 #include "types.h"
+#include "slot_debug.h"
+
 #include "PythonQt/PythonQt.h"
 #include "PythonQt/gui/PythonQtScriptingConsole.h"
-#include "slot_debug.h"
 
 class QVBoxLayout;
 class QSplitter;
@@ -105,7 +106,7 @@ public slots:
 	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { DEBUG_EMIT("selectedCellSelectorChanged"); emit(selectedCellSelectorChanged(cs)); }
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
 
-	const StaticPointers& getStaticPointers() const {return m_sp;}
+	const StaticPointers& getStaticPointers() const { return m_sp; }
 
 	/*********************************************************
 	 * MANAGE TEXTURES

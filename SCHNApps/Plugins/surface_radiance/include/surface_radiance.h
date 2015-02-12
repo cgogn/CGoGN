@@ -28,6 +28,8 @@ struct MapParameters
 		selector(NULL)
 	{}
 
+	unsigned int nbVertices;
+
 	Utils::VBO* positionVBO;
 	Utils::VBO* normalVBO;
 
@@ -96,11 +98,26 @@ public slots:
 	void changePositionVBO(const QString& map, const QString& vbo);
 	void changeNormalVBO(const QString& map, const QString& vbo);
 	MapHandlerGen* importFromFile(const QString& fileName);
-	void decimate(const QString& mapName, const QString& positionAttributeName, const QString& normalAttributeName);
+	void decimate(
+		const QString& mapName,
+		const QString& positionAttributeName,
+		const QString& normalAttributeName,
+		float decimationGoal,
+		bool exportMeshes = false,
+		unsigned int nbExports = 0
+	);
+	void exportPLY(const QString& mapName, const QString& positionAttributeName, const QString& normalAttributeName, const QString& filename);
 
 protected:
+	MapHandlerGen* currentlyDecimatedMap() { return m_currentlyDecimatedMap; }
+	static void checkNbVerticesAndExport(Surface_Radiance_Plugin* p, const unsigned int* nbVertices);
+
 	Surface_Radiance_DockTab* m_dockTab;
 	QHash<MapHandlerGen*, MapParameters> h_mapParameterSet;
+
+	MapHandlerGen* m_currentlyDecimatedMap;
+	std::vector<unsigned int> exportNbVert;
+	unsigned int nextExportIndex;
 
 	QAction* m_importAction;
 };

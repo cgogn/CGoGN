@@ -93,8 +93,10 @@ int decimate(
 	std::vector<ApproximatorGen<PFP>*>& a,
 	unsigned int nbWantedVertices,
 	bool recomputePriorityList = true,
-	EdgeAttribute<typename PFP::REAL, typename PFP::MAP>* edgeErrors = NULL,
-	void (*callback_wrapper)(void*, const void*) = NULL, void* callback_object = NULL
+	EdgeAttribute<typename PFP::REAL,
+	typename PFP::MAP>* edgeErrors = NULL,
+	void (*callback_wrapper)(void*, const void*) = NULL,
+	void* callback_object = NULL
 ) ;
 
 } // namespace Decimation
