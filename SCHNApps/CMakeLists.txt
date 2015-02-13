@@ -17,7 +17,6 @@ SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 SET (CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 
 SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
-SET( CGoGN_USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
 SET( CGoGN_ASSERT_ACTIVED OFF CACHE BOOL "assertion activated")
 
 
@@ -54,15 +53,18 @@ ELSE()
 	SET(CGoGN_LIBS topology algo container utils)
 ENDIF()
 
+file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_coreprofile.h COREPROFILE_STR)
+IF (COREPROFILE_STR EQUAL 1)
+	add_definitions(-DCGoGN_USE_OGL_CORE_PROFILE=1)
+ENDIF()
+
+
 add_definitions(-DCGOGN_ASSERT_BOOL=${CGoGN_ASSERT_ACTIVED})
 
 IF(CGoGN_SLOT_DEBUG_MODE)
 	add_definitions(-DCGoGN_SLOT_DEBUG_MODE=1)
 ENDIF()
 
-IF(CGoGN_USE_OGL_CORE_PROFILE)
-	add_definitions(-DCGoGN_USE_OGL_CORE_PROFILE=1)
-ENDIF()
 
 # define includes of external libs 
 SET (EXT_INCLUDES 
