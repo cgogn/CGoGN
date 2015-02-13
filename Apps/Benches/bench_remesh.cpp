@@ -52,8 +52,8 @@ int main(int argc, char **argv)
 	Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position) ;
 	unsigned int nbVertices = Algo::Topo::getNbOrbits<VERTEX>(myMap) ;
 
-	std::vector<VertexAttribute<typename PFP::VEC3, MAP> *> attr;
-	attr.push_back(&position);
+	std::vector<VertexAttribute<typename PFP::VEC3, MAP> > attr;
+	attr.push_back(position);
 	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices * 0.1) ;
 
 	Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position) ;

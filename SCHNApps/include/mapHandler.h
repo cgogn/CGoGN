@@ -51,10 +51,7 @@ public slots:
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
-	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	float getBBdiagSize() const { return m_bbDiagSize; }
-
 	Utils::GLSLShader* getBBDrawerShader() const
 	{
 		if(m_bbDrawer)
@@ -195,8 +192,6 @@ protected:
 
 	qglviewer::ManipulatedFrame* m_frame;
 
-	qglviewer::Vec m_bbMin;
-	qglviewer::Vec m_bbMax;
 	float m_bbDiagSize;
 	Utils::Drawer* m_bbDrawer;
 
@@ -208,8 +203,6 @@ protected:
 	AttributeSet m_attribs[NB_ORBITS];
 
 	CellSelectorSet m_cellSelectors[NB_ORBITS];
-
-
 };
 
 
@@ -262,14 +255,13 @@ public:
 
 	void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax);
 
-
 	/*********************************************************
 	 * MANAGE TOPO DRAWING
 	 *********************************************************/
+
 	void createTopoRender(CGoGN::Utils::GLSLShader* sh1);
 	void updateTopoRender(const QString& positionName);
 	void drawTopoRender(int code);
-
 
 	/*********************************************************
 	 * MANAGE CELL SELECTORS

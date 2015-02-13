@@ -67,8 +67,6 @@ public:
 	~Surface_Render_Plugin()
 	{}
 
-
-
 private:
 	virtual bool enable();
 	virtual void disable();
@@ -99,7 +97,6 @@ private slots:
 
 	void appsFinished();
 
-
 public slots:
 	// slots for Python calls
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
@@ -113,8 +110,6 @@ public slots:
 	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeVertexColor(const QString& view, const QString& map, float r, float g, float b);
-
-
 
 protected:
 	Surface_Render_DockTab* m_dockTab;

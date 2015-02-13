@@ -70,8 +70,8 @@ int main(int argc, char **argv)
 	std::cout << "  NB Faces "<< Algo::Topo::getNbOrbits<FACE>(myMap) << std::endl;
 	std::cout << "  NB Vertices "<< nbVertices << std::endl;
 
-	std::vector<VertexAttribute<typename PFP::VEC3, MAP> *> attr;
-	attr.push_back(&position);
+	std::vector<VertexAttribute<typename PFP::VEC3, MAP> > attr;
+	attr.push_back(position);
 	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices * 0.05) ;
 
 	VertexAttribute<PFP::VEC3, MAP> normal = myMap.addAttribute<PFP::VEC3,VERTEX,MAP>( "normal") ;

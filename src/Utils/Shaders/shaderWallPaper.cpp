@@ -25,15 +25,14 @@
 #include <GL/glew.h>
 #include "Utils/Shaders/shaderWallPaper.h"
 
-
 namespace CGoGN
 {
 
 namespace Utils
 {
+
 #include "shaderWallPaper.vert"
 #include "shaderWallPaper.frag"
-
 
 ShaderWallPaper::ShaderWallPaper():
 	m_tex_ptr(NULL)
@@ -50,16 +49,15 @@ ShaderWallPaper::ShaderWallPaper():
 	m_unif_pos = glGetUniformLocation(this->program_handler(), "pos");
 	m_unif_sz = glGetUniformLocation(this->program_handler(), "sz");
 
-
 	m_vboPos = new Utils::VBO();
 	m_vboPos->setDataSize(2);
 	m_vboPos->allocate(4);
 	Geom::Vec2f* ptrPos = reinterpret_cast<Geom::Vec2f*>(m_vboPos->lockPtr());
 
-	ptrPos[0] = Geom::Vec2f(0.0f,0.0f);
-	ptrPos[1] = Geom::Vec2f(1.0f,0.0f);
-	ptrPos[2] = Geom::Vec2f(1.0f,1.0f);
-	ptrPos[3] = Geom::Vec2f(0.0f,1.0f);
+	ptrPos[0] = Geom::Vec2f(0.0f, 0.0f);
+	ptrPos[1] = Geom::Vec2f(1.0f, 0.0f);
+	ptrPos[2] = Geom::Vec2f(1.0f, 1.0f);
+	ptrPos[3] = Geom::Vec2f(0.0f, 1.0f);
 
 //	ptrPos[0] = Geom::Vec3f(-1,-1, 0.9999f);
 //	ptrPos[1] = Geom::Vec3f( 1,-1, 0.9999f);
@@ -78,10 +76,10 @@ ShaderWallPaper::ShaderWallPaper():
 	m_vboTexCoord->allocate(4);
 	Geom::Vec2f* ptrTex = reinterpret_cast<Geom::Vec2f*>(m_vboTexCoord->lockPtr());
 
-	ptrTex[0] = Geom::Vec2f(0.0f,0.0f);
-	ptrTex[1] = Geom::Vec2f(1.0f,0.0f);
-	ptrTex[2] = Geom::Vec2f(1.0f,1.0f);
-	ptrTex[3] = Geom::Vec2f(0.0f,1.0f);
+	ptrTex[0] = Geom::Vec2f(0.0f, 0.0f);
+	ptrTex[1] = Geom::Vec2f(1.0f, 0.0f);
+	ptrTex[2] = Geom::Vec2f(1.0f, 1.0f);
+	ptrTex[3] = Geom::Vec2f(0.0f, 1.0f);
 
 	m_vboTexCoord->releasePtr();
 
@@ -96,10 +94,11 @@ ShaderWallPaper::~ShaderWallPaper()
 
 void ShaderWallPaper::setTextureUnit(GLenum texture_unit)
 {
-	this->bind();
 	int unit = texture_unit - GL_TEXTURE0;
-	glUniform1i(*m_unif_unit,unit);
 	m_unit = unit;
+	bind();
+	glUniform1i(*m_unif_unit, unit);
+	unbind();
 }
 
 void ShaderWallPaper::setTexture(Utils::GTexture* tex)
@@ -123,12 +122,11 @@ void ShaderWallPaper::restoreUniformsAttribs()
 {
 	m_unif_unit = glGetUniformLocation(this->program_handler(), "textureUnit");
 
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexTexCoord", m_vboTexCoord);
-	
-	this->bind();
-	glUniform1i(*m_unif_unit,m_unit);
-	this->unbind();
+	glUniform1i(*m_unif_unit, m_unit);
+	unbind();
 }
 
 void ShaderWallPaper::draw()
@@ -140,15 +138,15 @@ void ShaderWallPaper::draw()
 	sz[0] = 2.0f;
 	sz[1] = 2.0f;
 
-	this->bind();
-	glUniform2fv(*m_unif_pos,1, pos);
-	glUniform2fv(*m_unif_sz,1, sz);
-	this->unbind();
+	bind();
+	glUniform2fv(*m_unif_pos, 1, pos);
+	glUniform2fv(*m_unif_sz, 1, sz);
+	activeTexture();
+	unbind();
 
-	this->activeTexture();
-	this->enableVertexAttribs();
+	enableVertexAttribs();
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	this->disableVertexAttribs();
+	disableVertexAttribs();
 }
 
 void ShaderWallPaper::drawBack(int window_w, int window_h, int x, int y, int w, int h, Utils::GTexture* button)
@@ -167,19 +165,17 @@ void ShaderWallPaper::drawBack(int window_w, int window_h, int x, int y, int w, 
 	glUniform2fv(*m_unif_sz,1, sz);
 	this->unbind();
 
-	this->setTexture(button);
-	this->activeTexture();
+	setTexture(button);
+	activeTexture();
 
-	this->enableVertexAttribs();
+	enableVertexAttribs();
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	this->disableVertexAttribs();
+	disableVertexAttribs();
 }
-
 
 void ShaderWallPaper::drawFront(int window_w, int window_h, int x, int y, int w, int h, Utils::GTexture* button)
 {
-
-	// tranform position to -1,1 and invert Y ( in GL O in left,bottom)
+	// tranform position to -1,1 and invert Y (in GL O in left,bottom)
 	float sz[2];
 	sz[0] = float(2*w)/float(window_w);
 	sz[1] = float(2*h)/float(window_h);
@@ -188,25 +184,22 @@ void ShaderWallPaper::drawFront(int window_w, int window_h, int x, int y, int w,
 	pos[0] = -1.0f + float(2*x)/float(window_w);
 	pos[1] = 1.0f - float(2*y)/float(window_h) - sz[1];
 
-	this->bind();
+	bind();
 	glUniform2fv(*m_unif_pos,1, pos);
 	glUniform2fv(*m_unif_sz,1, sz);
-	this->unbind();
+	unbind();
 
-
-	this->setTexture(button);
-	this->activeTexture();
+	setTexture(button);
+	activeTexture();
 
 	glDisable(GL_DEPTH_TEST);
 
-	this->enableVertexAttribs();
+	enableVertexAttribs();
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	this->disableVertexAttribs();
+	disableVertexAttribs();
 
 	glEnable(GL_DEPTH_TEST);
-
 }
-
 
 } // namespace Utils
 

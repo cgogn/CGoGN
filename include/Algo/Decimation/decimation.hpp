@@ -34,80 +34,75 @@ namespace Surface
 namespace Decimation
 {
 
-template <typename PFP>
+template <typename PFP, typename T>
 int decimate(
-	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	std::vector<VertexAttribute<typename PFP::VEC3, typename PFP::MAP>*>& attribs,
+	typename PFP::MAP& map,
+	SelectorType s,
+	ApproximatorType a,
+	std::vector<VertexAttribute<T, typename PFP::MAP> >& attribs,
 	unsigned int nbWantedVertices,
 	EdgeAttribute<typename PFP::REAL, typename PFP::MAP>* edgeErrors,
-	void (*callback_wrapper)(void*, const void*), void* callback_object
+	void (*callback_wrapper)(void*, const void*),
+	void* callback_object
 )
 {
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
 	assert(attribs.size() >= 1 || !"Decimate: not enough attribs provided") ;
-	assert(attribs[0]->name() == "position" || !"Decimate: first attribute should always be the position") ;
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = *(attribs[0]) ;
 
 	std::vector<ApproximatorGen<PFP>*> approximators ;
 	Selector<PFP>* selector = NULL ;
 
-	std::vector<VertexAttribute<typename PFP::VEC3, typename PFP::MAP>*>* v_approx = NULL ;
-
 	switch(a)
 	{
 		case A_QEM :
-			approximators.push_back(new Approximator_QEM<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_QEM<PFP>(map, attribs[0])) ;
 			break ;
 		case A_MidEdge :
-			approximators.push_back(new Approximator_MidEdge<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_MidEdge<PFP,VEC3>(map, attribs[0])) ;
 			break ;
 		case A_CornerCutting :
-			approximators.push_back(new Approximator_CornerCutting<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_CornerCutting<PFP>(map, attribs[0])) ;
 			break ;
 		case A_TangentPredict1 :
-			approximators.push_back(new Approximator_MidEdge<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_MidEdge<PFP,VEC3>(map, attribs[0])) ;
 			break ;
 		case A_TangentPredict2 :
-			approximators.push_back(new Approximator_MidEdge<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_MidEdge<PFP,VEC3>(map, attribs[0])) ;
 			break ;
 		case A_NormalArea :
-			approximators.push_back(new Approximator_NormalArea<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_NormalArea<PFP>(map, attribs[0])) ;
 			break ;
 		case A_hHalfCollapse :
-			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_HalfCollapse<PFP,VEC3>(map, attribs[0])) ;
 			break ;
-		case A_ColorNaive :
-		{
-			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3, typename PFP::MAP>*>[2] ;
-
-			// pos
-			v_approx[0].push_back(attribs[0]) ;
-			approximators.push_back(new Approximator_QEM<PFP>(map, v_approx[0])) ;
-
-			// col
+		case A_ColorNaive :	{
 			assert(attribs.size() >= 2 || !"Decimate: A_ColorNaive --> not enough attribs provided") ;
-			v_approx[1].push_back(attribs[1]) ;
-			approximators.push_back(new Approximator_ColorNaive<PFP>(map, v_approx[1])) ;
-		}
-		break ;
-		case A_ColorQEMext :
-		{
-			// pos + col
-			assert(attribs.size() >= 2 || !"Decimate: A_ColorQEMext --> not enough attribs provided") ;
-			approximators.push_back(new Approximator_ColorQEMext<PFP>(map, attribs)) ;
-		}
-		break;
-		case A_GeomColorOpt :
-		{
-			// pos + col
-			assert(attribs.size() >= 2 || !"Decimate: A_GeomColorOpt --> not enough attribs provided") ;
-			approximators.push_back(new Approximator_GeomColOpt<PFP>(map, attribs)) ;
-		}
-		break ;
+			// pos
+			Approximator_QEM<PFP>* attrib0Approx = new Approximator_QEM<PFP>(map, attribs[0]);
+			approximators.push_back(attrib0Approx) ;
+			const AttributeHandler<T, EDGE, MAP>& attrib0ApproxResult = attrib0Approx->getApproximationResultAttribute();
+			// col
+			approximators.push_back(new Approximator_ColorNaive<PFP>(map, attribs[1], attribs[0], attrib0ApproxResult)) ;
+			}
+			break ;
+//		case A_ColorQEMext : {
+//			// pos + col
+//			assert(attribs.size() >= 2 || !"Decimate: A_ColorQEMext --> not enough attribs provided") ;
+//			approximators.push_back(new Approximator_ColorQEMext<PFP>(map, attribs)) ;
+//			}
+//			break;
+//		case A_GeomColorOpt : {
+//			// pos + col
+//			assert(attribs.size() >= 2 || !"Decimate: A_GeomColorOpt --> not enough attribs provided") ;
+//			approximators.push_back(new Approximator_GeomColOpt<PFP>(map, attribs)) ;
+//			}
+//			break ;
 		case A_hQEM :
 			// pos
-			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs)) ;
+			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs[0])) ;
 			break ;
-
 		case A_OTHER:
 			break;
 	}
@@ -115,49 +110,85 @@ int decimate(
 	switch(s)
 	{
 		case S_MapOrder :
-			selector = new EdgeSelector_MapOrder<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_MapOrder<PFP>(map) ;
 			break ;
 		case S_Random :
-			selector = new EdgeSelector_Random<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_Random<PFP>(map) ;
 			break ;
 		case S_EdgeLength :
-			selector = new EdgeSelector_Length<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_Length<PFP>(map, attribs[0]) ;
 			break ;
-		case S_QEMml :
-			selector = new EdgeSelector_QEMml<PFP>(map, position, approximators) ;
+		case S_QEM : {
+			Approximator<PFP, VEC3, EDGE>* approx = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			selector = new EdgeSelector_QEM<PFP>(map, attribs[0], *approx) ;
+			}
 			break ;
-		case S_QEM :
-			selector = new EdgeSelector_QEM<PFP>(map, position, approximators) ;
+		case S_QEMml : {
+			Approximator<PFP, VEC3, EDGE>* approx = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			selector = new EdgeSelector_QEMml<PFP>(map, attribs[0], *approx) ;
+			}
 			break ;
-		case S_Curvature :
-			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators) ;
+		case S_Curvature : {
+			Approximator<PFP, VEC3, EDGE>* approx = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			selector = new EdgeSelector_Curvature<PFP>(map, attribs[0], *approx) ;
+			}
 			break ;
-		case S_NormalArea :
-			selector = new EdgeSelector_NormalArea<PFP>(map, position, approximators) ;
+		case S_NormalArea : {
+			Approximator<PFP, VEC3, EDGE>* approx = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			selector = new EdgeSelector_NormalArea<PFP>(map, attribs[0], *approx) ;
+			}
 			break ;
-		case S_CurvatureTensor :
-			selector = new EdgeSelector_CurvatureTensor<PFP>(map, position, approximators) ;
+		case S_CurvatureTensor : {
+			Approximator<PFP, VEC3, EDGE>* approx = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			selector = new EdgeSelector_CurvatureTensor<PFP>(map, attribs[0], *approx) ;
+			}
 			break ;
-		case S_MinDetail :
-			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators) ;
+		case S_MinDetail : {
+			Approximator<PFP, VEC3, EDGE>* approx = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			selector = new EdgeSelector_MinDetail<PFP>(map, attribs[0], *approx) ;
+			}
 			break ;
-		case S_ColorNaive :
-			selector = new EdgeSelector_ColorNaive<PFP>(map, position, approximators) ;
+		case S_ColorNaive : {
+			Approximator<PFP, VEC3, EDGE>* approx0 = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			Approximator<PFP, VEC3, EDGE>* approx1 = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[1]);
+			selector = new EdgeSelector_ColorNaive<PFP>(map, attribs[0], attribs[1], *approx0, *approx1) ;
+			}
 			break ;
-		case S_QEMextColor :
-			selector = new EdgeSelector_QEMextColor<PFP>(map, position, approximators) ;
+		case S_QEMextColor : {
+			Approximator<PFP, VEC3, EDGE>* approx0 = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			Approximator<PFP, VEC3, EDGE>* approx1 = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[1]);
+			selector = new EdgeSelector_QEMextColor<PFP>(map, attribs[0], attribs[1], *approx0, *approx1) ;
+			}
 			break ;
-		case S_hQEMextColor :
-			selector = new HalfEdgeSelector_QEMextColor<PFP>(map, position, approximators) ;
+		case S_GeomColOptGrad: {
+			Approximator<PFP, VEC3, EDGE>* approx0 = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[0]);
+			Approximator<PFP, VEC3, EDGE>* approx1 = dynamic_cast<Approximator<PFP, VEC3, EDGE>*>(approximators[1]);
+			selector = new EdgeSelector_GeomColOptGradient<PFP>(map, attribs[0], attribs[1], *approx0, *approx1) ;
+			}
 			break ;
-		case S_hQEMml :
-			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
+		case S_hQEMml : {
+			Approximator<PFP, VEC3, DART>* approx = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[0]);
+			selector = new HalfEdgeSelector_QEMml<PFP>(map, attribs[0], *approx) ;
+			}
 			break ;
-		case S_hColorGradient:
-			selector = new HalfEdgeSelector_ColorGradient<PFP>(map, position, approximators) ;
+		case S_hQEMextColor : {
+			Approximator<PFP, VEC3, DART>* approx0 = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[0]);
+			Approximator<PFP, VEC3, DART>* approx1 = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[1]);
+			selector = new HalfEdgeSelector_QEMextColor<PFP>(map, attribs[0], attribs[1], *approx0, *approx1) ;
+			}
 			break ;
-		case S_GeomColOptGrad:
-			selector = new EdgeSelector_GeomColOptGradient<PFP>(map, position, approximators) ;
+		case S_hQEMextColorNormal : {
+			Approximator<PFP, VEC3, DART>* approx0 = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[0]);
+			Approximator<PFP, VEC3, DART>* approx1 = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[1]);
+			Approximator<PFP, VEC3, DART>* approx2 = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[2]);
+			selector = new HalfEdgeSelector_QEMextColorNormal<PFP>(map, attribs[0], attribs[1], attribs[2], *approx0, *approx1, *approx2) ;
+			}
+			break ;
+		case S_hColorGradient: {
+			Approximator<PFP, VEC3, DART>* approx0 = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[0]);
+			Approximator<PFP, VEC3, DART>* approx1 = dynamic_cast<Approximator<PFP, VEC3, DART>*>(approximators[1]);
+			selector = new HalfEdgeSelector_ColorGradient<PFP>(map, attribs[0], attribs[1], *approx0, *approx1) ;
+			}
 			break ;
 		case S_OTHER:
 			break;
@@ -170,19 +201,19 @@ int decimate(
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
 		delete (*it) ;
 
-	delete[] v_approx ;
-
 	return status ;
 }
 
 template <typename PFP>
 int decimate(
-		typename PFP::MAP& map,
-		Selector<PFP>* selector, std::vector<ApproximatorGen<PFP>*>& approximators,
-		unsigned int nbWantedVertices,
-		bool recomputePriorityList,
-		EdgeAttribute<typename PFP::REAL, typename PFP::MAP>* edgeErrors,
-		void (*callback_wrapper)(void*, const void*), void* callback_object
+	typename PFP::MAP& map,
+	Selector<PFP>* selector,
+	std::vector<ApproximatorGen<PFP>*>& approximators,
+	unsigned int nbWantedVertices,
+	bool recomputePriorityList,
+	EdgeAttribute<typename PFP::REAL, typename PFP::MAP>* edgeErrors,
+	void (*callback_wrapper)(void*, const void*),
+	void* callback_object
 )
 {
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)

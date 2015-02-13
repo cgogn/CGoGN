@@ -53,11 +53,9 @@ protected:
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
 public:
-	Approximator_QEM(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
-	{
-		assert(pos.size() > 0 || !"Approximator_QEM: attribute vector is empty") ;
-	}
+	Approximator_QEM(MAP& m, VertexAttribute<VEC3, MAP>& attr, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
+	{}
 	~Approximator_QEM()
 	{}
 	ApproximatorType getType() const { return A_QEM ; }
@@ -77,11 +75,9 @@ protected:
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
 public:
-	Approximator_QEMhalfEdge(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, DART>(m, pos, pred)
-	{
-		assert(pos.size() > 0 || !"Approximator_QEMhalfEdge: attribute vector is empty") ;
-	}
+	Approximator_QEMhalfEdge(MAP& m, VertexAttribute<VEC3, MAP>& attr, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, DART>(m, attr, pred)
+	{}
 	~Approximator_QEMhalfEdge()
 	{}
 	ApproximatorType getType() const { return A_hQEM ; }
@@ -89,19 +85,16 @@ public:
 	void approximate(Dart d) ;
 } ;
 
-template <typename PFP>
-class Approximator_MidEdge : public Approximator<PFP, typename PFP::VEC3, EDGE>
+template <typename PFP, typename T>
+class Approximator_MidEdge : public Approximator<PFP, T, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_MidEdge(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
-	{
-		assert(pos.size() > 0 || !"Approximator_MidEdge: attribute vector is empty") ;
-	}
+	Approximator_MidEdge(MAP& m, VertexAttribute<T, MAP>& attr, Predictor<PFP, T>* pred = NULL) :
+		Approximator<PFP, T, EDGE>(m, attr, pred)
+	{}
 	~Approximator_MidEdge()
 	{}
 	ApproximatorType getType() const { return A_MidEdge ; }
@@ -109,19 +102,40 @@ public:
 	void approximate(Dart d) ;
 } ;
 
-template <typename PFP>
-class Approximator_HalfCollapse : public Approximator<PFP, typename PFP::VEC3, DART>
+template <typename PFP, typename T>
+class Approximator_InterpolateAlongEdge : public Approximator<PFP, T, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_HalfCollapse(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, DART>(m, pos, pred)
-	{
-		assert(pos.size() > 0 || !"Approximator_HalfCollapse: attribute vector is empty") ;
-	}
+protected:
+	const VertexAttribute<VEC3, MAP>& m_position ;
+	const EdgeAttribute<VEC3, MAP>& m_approximatedPosition ;
+
+public:
+	Approximator_InterpolateAlongEdge(MAP& m, VertexAttribute<T, MAP>& attr, const VertexAttribute<VEC3, MAP>& position, const EdgeAttribute<VEC3, MAP>& approximatedPosition, Predictor<PFP, T>* pred = NULL) :
+		Approximator<PFP, T, EDGE>(m, attr, pred),
+		m_position(position),
+		m_approximatedPosition(approximatedPosition)
+	{}
+	~Approximator_InterpolateAlongEdge()
+	{}
+	ApproximatorType getType() const { return A_OTHER ; }
+	bool init() ;
+	void approximate(Dart d) ;
+} ;
+
+template <typename PFP, typename T>
+class Approximator_HalfCollapse : public Approximator<PFP, T, DART>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+
+	Approximator_HalfCollapse(MAP& m, VertexAttribute<T, MAP>& attr, Predictor<PFP, T>* pred = NULL) :
+		Approximator<PFP, T, DART>(m, attr, pred)
+	{}
 	~Approximator_HalfCollapse() {}
 
 	ApproximatorType getType() const { return A_hHalfCollapse ; }
@@ -137,11 +151,9 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_CornerCutting(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
-	{
-		assert(pos.size() > 0 || !"Approximator_CornerCutting: attribute vector is empty") ;
-	}
+	Approximator_CornerCutting(MAP& m, VertexAttribute<VEC3, MAP>& attr, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
+	{}
 	~Approximator_CornerCutting()
 	{}
 	ApproximatorType getType() const { return A_CornerCutting ; }
@@ -161,11 +173,9 @@ protected:
 	EdgeAttribute<Geom::Matrix<3,3,REAL>, MAP> edgeMatrix ;
 
 public:
-	Approximator_NormalArea(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*> pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
-	{
-		assert(pos.size() > 0 || !"Approximator_NormalArea: attribute vector is empty") ;
-	}
+	Approximator_NormalArea(MAP& m, VertexAttribute<VEC3, MAP>& attr, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
+	{}
 	~Approximator_NormalArea()
 	{}
 	ApproximatorType getType() const { return A_NormalArea ; }

@@ -21,19 +21,24 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="combo_positionVBO">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="5" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <item>
-      <property name="text">
-       <string>- select VBO -</string>
-      </property>
-     </item>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QPushButton" name="button_decimate">
+     <property name="text">
+      <string>Decimate</string>
+     </property>
     </widget>
    </item>
    <item row="1" column="0">
@@ -58,18 +63,40 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="1">
-    <spacer name="verticalSpacer">
+   <item row="2" column="0" colspan="2">
+    <widget class="QSlider" name="slider_decimationGoal">
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>50</number>
+     </property>
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="combo_positionVBO">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-    </spacer>
+     <item>
+      <property name="text">
+       <string>- select VBO -</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QCheckBox" name="checkbox_halfCollapse">
+     <property name="text">
+      <string>Half Collapse</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

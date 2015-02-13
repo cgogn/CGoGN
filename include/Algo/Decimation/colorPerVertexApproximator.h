@@ -48,41 +48,22 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<VEC3, MAP> m_position ;
-	EdgeAttribute<VEC3, MAP> m_approxposition ;
-
-	VertexAttribute<VEC3, MAP> *m_color ;
+	const VertexAttribute<VEC3, MAP>& m_position ;
+	const EdgeAttribute<VEC3, MAP>& m_approximatedPosition ;
 
 public:
-	Approximator_ColorNaive(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*>& attr, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
-	{
-		m_color = this->m_attrV[0] ;
-	}
+	Approximator_ColorNaive(MAP& m, VertexAttribute<VEC3, MAP>& color, const VertexAttribute<VEC3, MAP>& position, const EdgeAttribute<VEC3, MAP>& approximatedPosition, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, EDGE>(m, color, pred),
+		m_position(position),
+		m_approximatedPosition(approximatedPosition)
+	{}
 	~Approximator_ColorNaive()
 	{}
-
-	ApproximatorType getType() const
-	{
-		return A_ColorNaive ;
-	}
-
-	bool init()
-	{
-		assert(m_color->isValid() || !"Approximator_ColorNaive: the approximated attribute is not valid") ;
-
-		m_position = this->m_map.template getAttribute<VEC3, VERTEX, MAP>("position") ;
-		assert(m_position.isValid() || !"Approximator_ColorNaive::init: the position attribute is not valid") ;
-
-		m_approxposition = this->m_map.template getAttribute<VEC3, EDGE, MAP>("approx_position") ;
-		assert(m_approxposition.isValid() || !"Approximator_ColorNaive::init: the approx_position attribute is not valid") ;
-
-		return m_color->isValid() && m_position.isValid() && m_approxposition.isValid() ;
-	}
-
+	ApproximatorType getType() const { return A_ColorNaive ; }
+	bool init();
 	void approximate(Dart d) ;
 } ;
-
+/*
 template <typename PFP>
 class Approximator_ColorQEMext : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
@@ -90,33 +71,23 @@ public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef Geom::Vector<6,REAL> VEC6 ;
+	typedef Geom::Vector<6, REAL> VEC6 ;
 
 protected:
 	VertexAttribute<Utils::QuadricNd<REAL,6>, MAP> m_quadric ;
-	VertexAttribute<VEC3, MAP> *m_position ;
-	VertexAttribute<VEC3, MAP> *m_color ;
+	VertexAttribute<VEC3, MAP>* m_position ;
+	VertexAttribute<VEC3, MAP>* m_color ;
 
 public:
-	Approximator_ColorQEMext(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*>& attr, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
-	{
-		assert(attr.size() > 1 || !"Approximator_ColorQEMext: there are not sufficient attributes provided") ;
-
-		m_position = this->m_attrV[0] ;
-		m_color = this->m_attrV[1] ;
-	}
-
+	Approximator_ColorQEMext(MAP& m, VertexAttribute<VEC3, MAP>& position, VertexAttribute<VEC3, MAP>& color, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3, EDGE>(m, position, pred),
+		m_position(position),
+		m_color(color)
+	{}
 	~Approximator_ColorQEMext()
 	{}
-
-	ApproximatorType getType() const
-	{
-		return A_ColorQEMext ;
-	}
-
+	ApproximatorType getType() const { return A_ColorQEMext ; }
 	bool init() ;
-
 	void approximate(Dart d) ;
 } ;
 
@@ -130,8 +101,8 @@ public:
 
 protected:
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
-	VertexAttribute<VEC3, MAP> *m_position ;
-	VertexAttribute<VEC3, MAP> *m_color ;
+	VertexAttribute<VEC3, MAP>* m_position ;
+	VertexAttribute<VEC3, MAP>* m_color ;
 
 public:
 	Approximator_GeomColOpt(MAP& m, std::vector<VertexAttribute<VEC3, MAP>*>& attr, Predictor<PFP, VEC3>* pred = NULL) :
@@ -155,8 +126,7 @@ public:
 
 	void approximate(Dart d) ;
 } ;
-
-
+*/
 } // namespace Decimation
 
 } // namespace Surface

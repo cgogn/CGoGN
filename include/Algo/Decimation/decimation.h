@@ -58,15 +58,16 @@ namespace Decimation
  *
  * \return >= 0 if finished correctly : 1 if no more edges are collapsible, 0 is nbWantedVertices achieved, -1 if the initialisation of the selector failed
  */
-template <typename PFP>
+template <typename PFP, typename T>
 int decimate(
 	typename PFP::MAP& map,
 	SelectorType s,
 	ApproximatorType a,
-	std::vector<VertexAttribute<typename PFP::VEC3, typename PFP::MAP>*>& attribs,
+	std::vector<VertexAttribute<T, typename PFP::MAP> >& attribs,
 	unsigned int nbWantedVertices,
 	EdgeAttribute<typename PFP::REAL, typename PFP::MAP>* edgeErrors = NULL,
-	void (*callback_wrapper)(void*, const void*) = NULL, void* callback_object = NULL
+	void (*callback_wrapper)(void*, const void*) = NULL,
+	void* callback_object = NULL
 ) ;
 
 /**
@@ -92,8 +93,10 @@ int decimate(
 	std::vector<ApproximatorGen<PFP>*>& a,
 	unsigned int nbWantedVertices,
 	bool recomputePriorityList = true,
-	EdgeAttribute<typename PFP::REAL, typename PFP::MAP>* edgeErrors = NULL,
-	void (*callback_wrapper)(void*, const void*) = NULL, void* callback_object = NULL
+	EdgeAttribute<typename PFP::REAL,
+	typename PFP::MAP>* edgeErrors = NULL,
+	void (*callback_wrapper)(void*, const void*) = NULL,
+	void* callback_object = NULL
 ) ;
 
 } // namespace Decimation

@@ -79,18 +79,15 @@ template <typename PFP>
 class Selector
 {
 public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::REAL REAL;
 
 protected:
 	MAP& m_map ;
-	VertexAttribute<VEC3, MAP>& m_position ;
-	std::vector<ApproximatorGen<PFP>*>& m_approximators ;
 
 public:
-	Selector(MAP& m, VertexAttribute<VEC3, MAP>& pos, std::vector<ApproximatorGen<PFP>*>& approx) :
-		m_map(m), m_position(pos), m_approximators(approx)
+	Selector(MAP& m) :
+		m_map(m)
 	{}
 	virtual ~Selector()
 	{}

@@ -35,184 +35,120 @@ namespace Decimation
 {
 
 template <typename PFP, typename T, unsigned int ORBIT>
-Approximator<PFP,T,ORBIT>::Approximator(MAP& m, std::vector<VertexAttribute<T, MAP>* > va, Predictor<PFP, T> * predictor) :
-	ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(va)
+Approximator<PFP,T,ORBIT>::Approximator(MAP& m, VertexAttribute<T, MAP>& attr, Predictor<PFP, T>* predictor) :
+	ApproximatorGen<PFP>(m),
+	m_attr(attr),
+	m_predictor(predictor)
 {
-	const unsigned int& size = m_attrV.size() ;
-	assert(size > 0 || !"Approximator: no attributes provided") ;
+	if (!m_attr.isValid())
+		std::cerr << "Approximator Warning: given attribute is not valid" << std::endl ;
 
-	m_approx.resize(size) ;
-	m_detail.resize(size) ;
-	m_app.resize(size) ;
+	std::stringstream aname ;
+	aname << "approx_" << m_attr.name() ;
+	m_approx = this->m_map.template addAttribute<T, ORBIT, MAP>(aname.str()) ;
 
-	for (unsigned int i = 0 ; i < size ; ++i)
-	{
-		if (!m_attrV[i]->isValid())
-			std::cerr << "Approximator Warning: attribute number " << i << " is not valid" << std::endl ;
-
-		std::stringstream aname ;
-		aname << "approx_" << m_attrV[i]->name() ;
-		m_approx[i] = this->m_map.template addAttribute<T, ORBIT, MAP>(aname.str()) ;
-
-		if(m_predictor)	// if predictors are associated to the approximator
-		{				// create attributes to store the details needed for reconstruction
-			std::stringstream dname ;
-			dname << "detail_" << m_attrV[i]->name() ;
-			m_detail[i] = this->m_map.template addAttribute<T, ORBIT, MAP>(dname.str()) ;
-		}
+	if (m_predictor)	// if a predictor is associated to the approximator
+	{					// create attribute to store the details needed for reconstruction
+		std::stringstream dname ;
+		dname << "detail_" << m_attr.name() ;
+		m_detail = this->m_map.template addAttribute<T, ORBIT, MAP>(dname.str()) ;
 	}
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
 Approximator<PFP,T,ORBIT>::~Approximator()
 {
-//	std::cout << "Approximator<PFP,T,ORBIT>::~Approximator()" << std::endl ;
-	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-	{
-		this->m_map.removeAttribute(m_approx[i]) ;
-		if(m_predictor)
-			this->m_map.removeAttribute(m_detail[i]) ;
-	}
+	this->m_map.removeAttribute(m_approx) ;
+	if (m_predictor)
+		this->m_map.removeAttribute(m_detail) ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-const std::string&
-Approximator<PFP,T,ORBIT>::getApproximatedAttributeName(unsigned int index) const
+const VertexAttribute<T, typename PFP::MAP>& Approximator<PFP,T,ORBIT>::getApproximatedAttribute() const
 {
-	return m_attrV[index]->name() ;
+	return m_attr ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-unsigned int
-Approximator<PFP,T,ORBIT>::getNbApproximated() const
+VertexAttribute<T, typename PFP::MAP>& Approximator<PFP,T,ORBIT>::getApproximatedAttribute()
 {
-	return m_attrV.size() ;
+	return m_attr ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-void
-Approximator<PFP,T,ORBIT>::saveApprox(Dart d)
+const std::string& Approximator<PFP,T,ORBIT>::getApproximatedAttributeName() const
 {
-	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-	{
-		m_app[i] = m_approx[i][d] ;
-	}
+	return m_attr.name() ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-void
-Approximator<PFP,T,ORBIT>::affectApprox(Dart d)
+const AttributeHandler<T, ORBIT, typename PFP::MAP>& Approximator<PFP,T,ORBIT>::getApproximationResultAttribute() const
 {
-	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-	{
-		m_attrV[i]->operator[](d) = m_app[i] ;
-	}
+	return m_approx ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-const T&
-Approximator<PFP,T,ORBIT>::getApprox(Dart d, unsigned int index) const
+void Approximator<PFP,T,ORBIT>::saveApprox(Dart d)
 {
-	return m_approx[index][d] ;
+	m_app = m_approx[d] ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-const VertexAttribute<T, typename PFP::MAP>&
-Approximator<PFP,T,ORBIT>::getAttr(unsigned int index) const
+void Approximator<PFP,T,ORBIT>::affectApprox(Dart d)
 {
-	return *(m_attrV[index]) ;
+	m_attr[d] = m_app ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-VertexAttribute<T, typename PFP::MAP>&
-Approximator<PFP,T,ORBIT>::getAttr(unsigned int index)
+const T& Approximator<PFP,T,ORBIT>::getApprox(Dart d) const
 {
-	return *(m_attrV[index]) ;
+	return m_approx[d] ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-std::vector<T>
-Approximator<PFP,T,ORBIT>::getAllApprox(Dart d) const
-{
-	std::vector<T> res ;
-	res.resize(m_attrV.size()) ;
-	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-		res[i] = m_approx[i][d] ;
-
-	return res ;
-}
-
-template <typename PFP, typename T, unsigned int ORBIT>
-const Predictor<PFP, T>*
-Approximator<PFP,T,ORBIT>::getPredictor() const
+const Predictor<PFP, T>* Approximator<PFP,T,ORBIT>::getPredictor() const
 {
 	return m_predictor ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-const T&
-Approximator<PFP,T,ORBIT>::getDetail(Dart d, unsigned int index) const
+const T& Approximator<PFP,T,ORBIT>::getDetail(Dart d) const
 {
 	assert(m_predictor || !"Trying to get detail on a non-predictive scheme") ;
-	return m_detail[index][d] ;
+	return m_detail[d] ;
 }
 
 template <typename PFP, typename T, unsigned int ORBIT>
-std::vector<T>
-Approximator<PFP,T,ORBIT>::getAllDetail(Dart d) const
-{
-	assert(m_predictor || !"Trying to get detail on a non-predictive scheme") ;
-
-	std::vector<T> res ;
-	res.resize(m_attrV.size()) ;
-	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-		res[i] = m_detail[i][d] ;
-	return res ;
-}
-
-template <typename PFP, typename T, unsigned int ORBIT>
-void
-Approximator<PFP,T,ORBIT>::setDetail(Dart d, unsigned int index, T& val)
+void Approximator<PFP,T,ORBIT>::setDetail(Dart d, const T& val)
 {
 	assert(m_predictor || !"Trying to set detail on a non-predictive scheme") ;
-	m_detail[index][d] = val ;
+	m_detail[d] = val ;
 }
 
-template <typename PFP, typename T, unsigned int ORBIT>
-void
-Approximator<PFP,T,ORBIT>::setDetail(Dart d, std::vector<T>& val)
-{
-	assert(m_predictor || !"Trying to set detail on a non-predictive scheme") ;
+// TODO works only for vector types !!
+//REAL detailMagnitude(Dart d)
+//{
+//	assert(m_predictor || !"Trying to get detail magnitude on a non-predictive scheme") ;
+//	return m_detail[d].norm2() ;
+//}
 
-	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-		m_detail[index][d] = val[i] ;
-}
+// TODO works only for vector types !!
+//template <typename PFP, typename T, unsigned int ORBIT>
+//void Approximator<PFP,T,ORBIT>::addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform)
+//{
+//	assert(m_predictor || !"Trying to add detail on a non-predictive scheme") ;
 
-
-//	// TODO works only for vector types !!
-//	REAL detailMagnitude(Dart d)
+//	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
 //	{
-//		assert(m_predictor || !"Trying to get detail magnitude on a non-predictive scheme") ;
-//		return m_detail[d].norm2() ;
+//		T det = m_detail[i][d] ;
+//		if(detailTransform)
+//			det = (*detailTransform) * det ;
+//		det *= amount ;
+//		if(!sign)
+//			det *= REAL(-1) ;
+//		m_attrV[i].operator[](d) += det ;
 //	}
-
-template <typename PFP, typename T, unsigned int ORBIT>
-void
-Approximator<PFP,T,ORBIT>::addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform)
-{
-	assert(m_predictor || !"Trying to add detail on a non-predictive scheme") ;
-
-	for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-	{
-		T det = m_detail[i][d] ;
-		if(detailTransform)
-			det = (*detailTransform) * det ;
-		det *= amount ;
-		if(!sign)
-			det *= REAL(-1) ;
-		m_attrV[i]->operator[](d) += det ;
-	}
-}
+//}
 
 } // namespace Decimation
 
