@@ -19,8 +19,7 @@ SET ( CGoGN_WITH_ASSIMP OFF CACHE BOOL "build CGoGN with Assimp" )
 SET ( CGoGN_WITH_ZINRI OFF CACHE BOOL "build CGoGN with Zinri lib" )
 SET ( CGoGN_WITH_QT ON CACHE BOOL "build CGoGN with Qt lib" )
 SET ( DESIRED_QT_VERSION "4" CACHE STRING "4: QT4/ 5 not yet implemented" )
-SET ( CGoGN_WITH_PYTHONQT ON CACHE BOOL "build PythonQt (for Schnapps)")
-SET ( CGoGN_WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW" )
+SET ( CGoGN_WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW (for VRJuggler)" )
 SET ( CGoGN_USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
 
 SET ( CGoGN_COMPILE_EXAMPLES OFF CACHE BOOL "compile examples" )
@@ -93,7 +92,7 @@ endif()
 add_definitions("-DCGOGN_ASSERT_BOOL=${ASSERT_ACTIVED}")
 
 IF(CGoGN_USE_OGL_CORE_PROFILE)
-        add_definitions("-DUSE_OGL_CORE_PROFILE=1")
+        add_definitions("-DCGoGN_USE_OGL_CORE_PROFILE=1")
 ENDIF()
 
 add_definitions("-DGLM_FORCE_RADIANS")
@@ -121,10 +120,6 @@ ENDIF ()
 INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/include)
 
 ADD_SUBDIRECTORY(ThirdParty/Tools)
-
-IF (CGoGN_WITH_PYTHONQT)
-	ADD_SUBDIRECTORY(ThirdParty/PythonQt)
-ENDIF ()
 
 ADD_SUBDIRECTORY(ThirdParty/OpenNL)
 INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/OpenNL/src)

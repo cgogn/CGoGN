@@ -41,11 +41,15 @@ SET( QT_USE_QTSVG TRUE )
 
 INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+# PythonQt dependency
+ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
+
+
+# for GLM
 add_definitions(-DGLM_FORCE_RADIANS)
 
-#MESSAGE HERE FOR MORE EASY READING (MESSAGE AT THE END)
-MESSAGE("Build type = " ${CMAKE_BUILD_TYPE} " (for change -DCMAKE_BUILD_TYPE=Release|Debug)" )
-
+# CGoGN compiled in one or several libs
 file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS cgogn)
@@ -53,11 +57,11 @@ ELSE()
 	SET(CGoGN_LIBS topology algo container utils)
 ENDIF()
 
+# use GL core profile 3.3
 file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_coreprofile.h COREPROFILE_STR)
 IF (COREPROFILE_STR EQUAL 1)
 	add_definitions(-DCGoGN_USE_OGL_CORE_PROFILE=1)
 ENDIF()
-
 
 add_definitions(-DCGOGN_ASSERT_BOOL=${CGoGN_ASSERT_ACTIVED})
 

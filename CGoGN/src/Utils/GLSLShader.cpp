@@ -39,14 +39,16 @@ namespace CGoGN
 namespace Utils
 {
 
-#ifdef USE_OGL_CORE_PROFILE
+#ifdef CGoGN_USE_OGL_CORE_PROFILE
 unsigned int GLSLShader::CURRENT_OGL_VERSION = 3;
-#else
-unsigned int GLSLShader::CURRENT_OGL_VERSION = 2;
-#endif
-
 unsigned int GLSLShader::MAJOR_OGL_CORE = 3;
 unsigned int GLSLShader::MINOR_OGL_CORE = 3;
+#else
+unsigned int GLSLShader::CURRENT_OGL_VERSION = 2;
+unsigned int GLSLShader::MAJOR_OGL_CORE = 2;
+unsigned int GLSLShader::MINOR_OGL_CORE = 1;
+#endif
+
 
 
 std::string GLSLShader::DEFINES_GL2=\

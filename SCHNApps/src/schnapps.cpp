@@ -44,7 +44,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 {
 	GenericMap::initAllStatics(&m_sp);
 
-#ifdef USE_OGL_CORE_PROFILE
+#ifdef CGoGN_USE_OGL_CORE_PROFILE
 	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(3);
 #else
 	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(2);
