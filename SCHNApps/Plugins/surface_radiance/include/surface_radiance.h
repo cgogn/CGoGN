@@ -42,9 +42,9 @@ struct MapParameters
 
 	DartAttribute<PFP2::REAL, PFP2::MAP> halfedgeError;
 
-	Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>* positionApproximator;
-	Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>* normalApproximator;
-	Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >* radianceApproximator;
+	Algo::Surface::Decimation::ApproximatorGen<PFP2>* positionApproximator;
+	Algo::Surface::Decimation::ApproximatorGen<PFP2>* normalApproximator;
+	Algo::Surface::Decimation::ApproximatorGen<PFP2>* radianceApproximator;
 
 	Algo::Surface::Decimation::Selector<PFP2>* selector;
 };
@@ -103,10 +103,15 @@ public slots:
 		const QString& positionAttributeName,
 		const QString& normalAttributeName,
 		float decimationGoal,
-		bool exportMeshes = false,
-		unsigned int nbExports = 0
+		bool halfCollapse = false,
+		bool exportMeshes = false
 	);
-	void exportPLY(const QString& mapName, const QString& positionAttributeName, const QString& normalAttributeName, const QString& filename);
+	void exportPLY(
+		const QString& mapName,
+		const QString& positionAttributeName,
+		const QString& normalAttributeName,
+		const QString& filename
+	);
 
 protected:
 	MapHandlerGen* currentlyDecimatedMap() { return m_currentlyDecimatedMap; }

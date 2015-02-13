@@ -231,6 +231,34 @@ void Approximator_MidEdge<PFP,T>::approximate(Dart d)
 }
 
 /************************************************************************************
+ *                      INTERPOLATE ALONG EDGE                                      *
+ ************************************************************************************/
+
+template <typename PFP, typename T>
+bool Approximator_InterpolateAlongEdge<PFP,T>::init()
+{
+	return this->m_approx.isValid() && m_position.isValid() && m_approximatedPosition.isValid() ;
+}
+
+template <typename PFP, typename T>
+void Approximator_InterpolateAlongEdge<PFP,T>::approximate(Dart d)
+{
+	Dart dd = this->m_map.phi1(d) ;
+
+	const VEC3& p1 = m_position[d] ;
+	const VEC3& p2 = m_position[dd] ;
+	const VEC3& p = m_approximatedPosition[d] ;
+
+	VEC3 p1p2 = p2 - p1;
+	VEC3 p1p  = p1 - p;
+	REAL s = p1p * p1p2;
+	s /= p1p2.norm2();
+	s = std::max(std::min(s, REAL(1)) , REAL(0));
+
+	this->m_approx[d] = this->m_attr[dd] * s + this->m_attr[d] * (REAL(1) - s) ;
+}
+
+/************************************************************************************
  *							       HALF COLLAPSE                                    *
  ************************************************************************************/
 

@@ -103,6 +103,31 @@ public:
 } ;
 
 template <typename PFP, typename T>
+class Approximator_InterpolateAlongEdge : public Approximator<PFP, T, EDGE>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+protected:
+	const VertexAttribute<VEC3, MAP>& m_position ;
+	const EdgeAttribute<VEC3, MAP>& m_approximatedPosition ;
+
+public:
+	Approximator_InterpolateAlongEdge(MAP& m, VertexAttribute<T, MAP>& attr, const VertexAttribute<VEC3, MAP>& position, const EdgeAttribute<VEC3, MAP>& approximatedPosition, Predictor<PFP, T>* pred = NULL) :
+		Approximator<PFP, T, EDGE>(m, attr, pred),
+		m_position(position),
+		m_approximatedPosition(approximatedPosition)
+	{}
+	~Approximator_InterpolateAlongEdge()
+	{}
+	ApproximatorType getType() const { return A_OTHER ; }
+	bool init() ;
+	void approximate(Dart d) ;
+} ;
+
+template <typename PFP, typename T>
 class Approximator_HalfCollapse : public Approximator<PFP, T, DART>
 {
 public:

@@ -52,7 +52,13 @@ void Surface_Radiance_DockTab::normalVBOChanged(int index)
 
 void Surface_Radiance_DockTab::decimateClicked()
 {
-	m_plugin->decimate(m_schnapps->getSelectedMap()->getName(), combo_positionVBO->currentText(), combo_normalVBO->currentText(), slider_decimationGoal->value() / 100.0f);
+	m_plugin->decimate(
+		m_schnapps->getSelectedMap()->getName(),
+		combo_positionVBO->currentText(),
+		combo_normalVBO->currentText(),
+		slider_decimationGoal->value() / 100.0f,
+		checkbox_halfCollapse->checkState() == Qt::Checked
+	);
 }
 
 

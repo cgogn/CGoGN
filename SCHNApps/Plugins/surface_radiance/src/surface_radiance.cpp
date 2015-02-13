@@ -2,8 +2,7 @@
 
 #include "meshTableSurfaceRadiance.h"
 #include "halfEdgeSelectorRadiance.h"
-
-#include "Algo/Decimation/halfEdgeSelector.h"
+#include "edgeSelectorRadiance.h"
 
 #include "mapHandler.h"
 #include "camera.h"
@@ -281,7 +280,7 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 		return NULL;
 }
 
-void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& positionAttributeName, const QString& normalAttributeName, float decimationGoal, bool exportMeshes, unsigned int nbExports)
+void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& positionAttributeName, const QString& normalAttributeName, float decimationGoal, bool halfCollapse, bool exportMeshes)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
 	if(mh == NULL)
@@ -301,25 +300,78 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 
 	MapParameters& mapParams = h_mapParameterSet[mh];
 
-	if (mapParams.positionApproximator == NULL)
+	if (halfCollapse)
 	{
-		mapParams.positionApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>(*map, position);
-	}
+		if (mapParams.positionApproximator == NULL)
+		{
+			mapParams.positionApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>(*map, position);
+		}
 
-	if (mapParams.normalApproximator == NULL)
-	{
-		mapParams.normalApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>(*map, normal);
-	}
+		if (mapParams.normalApproximator == NULL)
+		{
+			mapParams.normalApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, PFP2::VEC3>(*map, normal);
+		}
 
-	if (mapParams.radianceApproximator == NULL)
-	{
-		mapParams.radianceApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >(*map, mapParams.radiance);
-	}
+		if (mapParams.radianceApproximator == NULL)
+		{
+			mapParams.radianceApproximator = new Algo::Surface::Decimation::Approximator_HalfCollapse<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >(*map, mapParams.radiance);
+		}
 
-	if (mapParams.selector == NULL)
+		if (mapParams.selector == NULL)
+		{
+			mapParams.selector = new HalfEdgeSelector_Radiance<PFP2>(
+				*map,
+				position,
+				normal,
+				mapParams.radiance,
+				*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, DART>*)(mapParams.positionApproximator),
+				*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, DART>*)(mapParams.normalApproximator),
+				*(Algo::Surface::Decimation::Approximator<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>, DART>*)(mapParams.radianceApproximator)
+			);
+		}
+	}
+	else
 	{
-		mapParams.selector = new HalfEdgeSelector_Radiance<PFP2>(*map, position, normal, mapParams.radiance, *mapParams.positionApproximator, *mapParams.normalApproximator, *mapParams.radianceApproximator);
-//		mapParams.selector = new Algo::Surface::Decimation::HalfEdgeSelector_QEMml<PFP2>(*map, position, *mapParams.positionApproximator);
+		if (mapParams.positionApproximator == NULL)
+		{
+			mapParams.positionApproximator = new Algo::Surface::Decimation::Approximator_QEM<PFP2>(*map, position);
+		}
+
+		if (mapParams.normalApproximator == NULL)
+		{
+			mapParams.normalApproximator =
+				new Algo::Surface::Decimation::Approximator_InterpolateAlongEdge<PFP2, PFP2::VEC3>(
+					*map,
+					normal,
+					position,
+					((Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator))->getApproximationResultAttribute()
+				);
+		}
+
+		if (mapParams.radianceApproximator == NULL)
+		{
+			mapParams.radianceApproximator =
+				new Algo::Surface::Decimation::Approximator_InterpolateAlongEdge<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >(
+					*map,
+					mapParams.radiance,
+					position,
+					((Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator))->getApproximationResultAttribute()
+				);
+		}
+
+		if (mapParams.selector == NULL)
+		{
+			mapParams.selector =
+				new EdgeSelector_Radiance<PFP2>(
+					*map,
+					position,
+					normal,
+					mapParams.radiance,
+					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator),
+					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.normalApproximator),
+					*(Algo::Surface::Decimation::Approximator<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>, EDGE>*)(mapParams.radianceApproximator)
+				);
+		}
 	}
 
 	std::vector<Algo::Surface::Decimation::ApproximatorGen<PFP2>*> approximators;
@@ -330,13 +382,23 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 	exportNbVert.clear();
 	if (exportMeshes)
 	{
-		float decimationStep = (1.0 - decimationGoal) / nbExports;
-		for (unsigned int i = 1; i <= nbExports; ++i)
+		unsigned int goalNbV = decimationGoal * nbVertices;
+		unsigned int curNbV = nbVertices / 2;
+		while (curNbV > goalNbV)
 		{
-			exportNbVert.push_back( (1.0 - (i * decimationStep)) * nbVertices );
+			exportNbVert.push_back(curNbV);
+			curNbV /= 2;
 		}
+		exportNbVert.push_back(goalNbV);
 		nextExportIndex = 0;
 	}
+
+	std::cout << "nb vert -> " << nbVertices << std::endl;
+	for (unsigned int v : exportNbVert)
+	{
+		std::cout << v << std::endl;
+	}
+
 	m_currentlyDecimatedMap = mh;
 	Algo::Surface::Decimation::decimate<PFP2>(*map, mapParams.selector, approximators, decimationGoal * nbVertices, true, NULL, (void (*)(void*, const void*))(Surface_Radiance_Plugin::checkNbVerticesAndExport), (void*)(this));
 	m_currentlyDecimatedMap = NULL;
