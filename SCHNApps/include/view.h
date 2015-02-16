@@ -160,6 +160,8 @@ protected:
 
 	Utils::Texture<2, Geom::Vec3uc>* m_textureWallpaper;
 	Utils::ShaderWallPaper* m_shaderWallpaper;
+
+	bool b_saveSnapshots;
 };
 
 } // namespace SCHNApps

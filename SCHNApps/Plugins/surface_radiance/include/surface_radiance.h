@@ -40,7 +40,7 @@ struct MapParameters
 	VertexAttribute<Geom::Vec2i, PFP2::MAP> param;
 	Utils::VBO* paramVBO;
 
-	DartAttribute<PFP2::REAL, PFP2::MAP> halfedgeError;
+//	DartAttribute<PFP2::REAL, PFP2::MAP> halfedgeError;
 
 	Algo::Surface::Decimation::ApproximatorGen<PFP2>* positionApproximator;
 	Algo::Surface::Decimation::ApproximatorGen<PFP2>* normalApproximator;
@@ -115,12 +115,14 @@ public slots:
 
 protected:
 	MapHandlerGen* currentlyDecimatedMap() { return m_currentlyDecimatedMap; }
+	bool currentDecimationHalf() { return m_currentDecimationHalf; }
 	static void checkNbVerticesAndExport(Surface_Radiance_Plugin* p, const unsigned int* nbVertices);
 
 	Surface_Radiance_DockTab* m_dockTab;
 	QHash<MapHandlerGen*, MapParameters> h_mapParameterSet;
 
 	MapHandlerGen* m_currentlyDecimatedMap;
+	bool m_currentDecimationHalf;
 	std::vector<unsigned int> exportNbVert;
 	unsigned int nextExportIndex;
 

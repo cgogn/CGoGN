@@ -21,7 +21,7 @@ namespace SCHNApps
 {
 
 unsigned int View::viewCount = 0;
-View::View(const QString& name, SCHNApps* s,  QGLFormat& format) :
+View::View(const QString& name, SCHNApps* s, QGLFormat& format) :
 	QGLViewer(format, NULL, NULL),
 	b_updatingUI(false),
 	m_name(name),
@@ -41,9 +41,14 @@ View::View(const QString& name, SCHNApps* s,  QGLFormat& format) :
 	m_dialogCameras(NULL),
 	m_frameDrawer(NULL),
 	m_textureWallpaper(NULL),
-	m_shaderWallpaper(NULL)
+	m_shaderWallpaper(NULL),
+	b_saveSnapshots(false)
 {
 	++viewCount;
+
+	setSnapshotFormat("JPEG");
+	setSnapshotFileName(m_name);
+	setSnapshotQuality(95);
 
 	m_currentCamera = m_schnapps->addCamera();
 	m_currentCamera->linkView(this);
@@ -80,7 +85,7 @@ View::View(const QString& name, SCHNApps* s,  QGLFormat& format) :
 	m_dialogCameras->check(m_currentCamera->getName(),Qt::Checked);
 }
 
-View::View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget* shareWidget) :
+View::View(const QString& name, SCHNApps* s, QGLFormat& format, const QGLWidget* shareWidget) :
 	QGLViewer(format, NULL, shareWidget),
 	b_updatingUI(false),
 	m_name(name),
@@ -103,6 +108,10 @@ View::View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget
 	m_shaderWallpaper(NULL)
 {
 	++viewCount;
+
+	setSnapshotFormat("JPEG");
+	setSnapshotFileName(m_name);
+	setSnapshotQuality(95);
 
 	m_currentCamera = m_schnapps->addCamera();
 	m_currentCamera->linkView(this);
@@ -545,9 +554,20 @@ void View::drawFrame()
 
 void View::keyPressEvent(QKeyEvent* event)
 {
-	foreach(PluginInteraction* plugin, l_plugins)
-		plugin->keyPress(this, event);
-	QGLViewer::keyPressEvent(event);
+	if (event->key() == Qt::Key_S)
+	{
+		b_saveSnapshots = !b_saveSnapshots;
+		if (b_saveSnapshots)
+			connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+		else
+			disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+	}
+	else
+	{
+		foreach(PluginInteraction* plugin, l_plugins)
+			plugin->keyPress(this, event);
+		QGLViewer::keyPressEvent(event);
+	}
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
