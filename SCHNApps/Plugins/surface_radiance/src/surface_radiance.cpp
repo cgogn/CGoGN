@@ -60,6 +60,7 @@ void Surface_Radiance_Plugin::drawMap(View* view, MapHandlerGen* map)
 	{
 		p.radiancePerVertexShader->setAttributePosition(p.positionVBO);
 		p.radiancePerVertexShader->setAttributeNormal(p.normalVBO);
+		p.radiancePerVertexShader->setAttributeRadiance(p.paramVBO, p.radianceTexture, GL_TEXTURE1);
 
 		qglviewer::Vec c = view->getCurrentCamera()->position();
 		PFP2::VEC3 camera(c.x, c.y, c.z);
@@ -263,13 +264,13 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 
 			mapParams.radianceTexture->update();
 
+//			map->removeAttribute(mapParams.radiance);
+
 			mapParams.paramVBO = new Utils::VBO();
 			mapParams.paramVBO->updateData(mapParams.param);
 
 			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_resolution());
 			registerShader(mapParams.radiancePerVertexShader);
-
-			mapParams.radiancePerVertexShader->setAttributeRadiance(mapParams.paramVBO, mapParams.radianceTexture, GL_TEXTURE1);
 
 			// compute map bounding box
 			mh->updateBB(position);
@@ -400,6 +401,7 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 	}
 
 	m_currentlyDecimatedMap = mh;
+	m_currentDecimationHalf = halfCollapse;
 	Algo::Surface::Decimation::decimate<PFP2>(*map, mapParams.selector, approximators, decimationGoal * nbVertices, true, NULL, (void (*)(void*, const void*))(Surface_Radiance_Plugin::checkNbVerticesAndExport), (void*)(this));
 	m_currentlyDecimatedMap = NULL;
 
@@ -415,7 +417,7 @@ void Surface_Radiance_Plugin::checkNbVerticesAndExport(Surface_Radiance_Plugin* 
 		if (*nbVertices == p->exportNbVert[p->nextExportIndex])
 		{
 			std::stringstream exportName;
-			exportName << p->currentlyDecimatedMap()->getName().toStdString() << "_" << *nbVertices << ".ply";
+			exportName << p->currentlyDecimatedMap()->getName().toStdString() << "_" << (p->currentDecimationHalf() ? "half_" : "full_") << (*nbVertices) << ".ply";
 			std::cout << "export : " << exportName.str() << std::endl;
 			p->exportPLY(mhg->getName(), "position", "normal", QString::fromStdString(exportName.str()));
 			p->nextExportIndex++;
