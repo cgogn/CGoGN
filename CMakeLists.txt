@@ -52,6 +52,11 @@ ENDIF()
 #
 # External Libraries (not included a third party libraries)
 #
+
+IF(WIN32)
+	SET ( CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies" )
+ENDIF(WIN32)
+
 FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(ZLIB REQUIRED)
 FIND_PACKAGE(GLEW REQUIRED)
@@ -66,6 +71,14 @@ ELSE ()
 ENDIF()
 IF (NOT WIN32)
 	FIND_PACKAGE(SuiteSparse REQUIRED)
+ELSE()
+	set(SuiteSparse_SUITESPARSECONFIG_INCLUDE_DIR  ${CGoGN_ROOT_DIR}/windows_dependencies/include)
+	set(SuiteSparse_USE_LAPACK_BLAS ON)
+	find_package(SuiteSparse QUIET NO_MODULE)
+	if(NOT SuiteSparse_FOUND)
+        set(SuiteSparse_VERBOSE ON)
+        find_package(SuiteSparse REQUIRED) # 2nd: Use FindSuiteSparse.cmake module
+	endif()
 ENDIF()
 
 #
@@ -140,7 +153,7 @@ ENDIF ()
 ADD_SUBDIRECTORY(ThirdParty/TinyXml2)
 INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2)
 
-IF (CGoGN_WITH_QT)
+IF (CGoGN_WITH_QT AND (NOT WIN32))
 	ADD_SUBDIRECTORY(ThirdParty/libQGLViewer/QGLViewer)
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/)
 ENDIF()
@@ -193,10 +206,10 @@ LIST(INSERT CGoGN_EXT_INCLUDES 0
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
 	${ZLIB_INCLUDE_DIRS}
+	${SuiteSparse_INCLUDE_DIRS}
 )
 
 # define libs for external libs
-
 IF (CGoGN_WITH_ASSIMP)
 	LIST(APPEND CGoGN_EXT_LIBS assimp)
 ENDIF ()
@@ -211,25 +224,12 @@ LIST(APPEND CGoGN_EXT_LIBS
 	${OPENGL_LIBRARY}
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
+	${SuiteSparse_LIBRARIES}
 )
 
-# W32 specific libraries and includes
-IF(WIN32)
-	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/)
-	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
-	LIST(APPEND CGoGN_EXT_INCLUDES  ${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
-	LIST(APPEND CGoGN_EXT_LIBS 
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/suitesparse.lib
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/metis.lib
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/liblapack.lib
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/libblas.lib		)
-ELSE(WIN32)
-	LIST(APPEND CGoGN_EXT_INCLUDES  ${SUITESPARSE_INCLUDE_DIRS})
-	LIST(APPEND CGoGN_EXT_LIBS ${SUITESPARSE_LIBRARIES} pthread)
-ENDIF(WIN32)
-
-
-#LIST(REMOVE_DUPLICATES CGoGN_EXT_INCLUDES)
+IF(NOT WIN32)
+	LIST(APPEND CGoGN_EXT_LIBS pthread) #for c++11 thread
+ENDIF()
 
 include_directories( 
 	${CGoGN_SRC_DIR}/include
