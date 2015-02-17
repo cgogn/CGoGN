@@ -44,6 +44,10 @@ protected:
     static std::string geometryShaderText;
     static std::string fragmentShaderText;
 
+	static std::string vertexShaderInterpText;
+	static std::string geometryShaderInterpText;
+	static std::string fragmentShaderInterpText;
+
 	CGoGNGLuint m_uniform_resolution;
 	CGoGNGLuint m_uniform_tex;
 	CGoGNGLuint m_uniform_K_tab;
@@ -59,16 +63,21 @@ protected:
 	float* K_tab;
 	Geom::Vec3f m_camera;
 
+	bool m_fragInterp;
+
 	static int index (int l, int m) { return l*(l+1)+m; } // compute indices in K_tab
 
 public:
-	ShaderRadiancePerVertex(int resolution);
+	ShaderRadiancePerVertex(int resolution, bool fraginterp = false);
 
-	~ShaderRadiancePerVertex() ;
+	~ShaderRadiancePerVertex();
 
 	void compile();
 
-	void setCamera(Geom::Vec3f camera) ;
+	void setCamera(Geom::Vec3f& camera);
+
+	void setFragInterp(bool fraginterp);
+	bool getFragInterp() { return m_fragInterp; }
 
 	unsigned int setAttributePosition(VBO* vbo);
 

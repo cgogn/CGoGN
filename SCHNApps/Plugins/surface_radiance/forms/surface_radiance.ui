@@ -21,33 +21,6 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QPushButton" name="button_decimate">
-     <property name="text">
-      <string>Decimate</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Normal :</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="QComboBox" name="combo_normalVBO">
      <property name="sizePolicy">
@@ -61,19 +34,6 @@
        <string>- select VBO -</string>
       </property>
      </item>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QSlider" name="slider_decimationGoal">
-     <property name="maximum">
-      <number>100</number>
-     </property>
-     <property name="value">
-      <number>50</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
     </widget>
    </item>
    <item row="0" column="1">
@@ -91,10 +51,57 @@
      </item>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
+    <widget class="QPushButton" name="button_decimate">
+     <property name="text">
+      <string>Decimate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Normal :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
     <widget class="QCheckBox" name="checkbox_halfCollapse">
      <property name="text">
       <string>Half Collapse</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QSlider" name="slider_decimationGoal">
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>50</number>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QCheckBox" name="checkbox_fragInterp">
+     <property name="text">
+      <string>Fragment interpolation</string>
      </property>
     </widget>
    </item>
