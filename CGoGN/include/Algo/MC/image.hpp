@@ -197,7 +197,8 @@ void Image<DataType>::loadVox(const char *filename)
 	m_Data = new DataType[total];
 
 	int filename_s = strlen(filename) ;
-	char datafile[filename_s] ;
+//	char datafile[filename_s] ;
+	char* datafile = new char[filename_s] ;
 	strcpy(datafile, filename) ;
 	datafile[filename_s-3] = 'r' ;
 	datafile[filename_s-2] = 'a' ;
@@ -207,6 +208,7 @@ void Image<DataType>::loadVox(const char *filename)
 	fp.read(reinterpret_cast<char*>(m_Data), total*sizeof(DataType));
 
 	m_Alloc=true;
+	delete[] datafile;
 }
 
 #ifdef WITH_QT
