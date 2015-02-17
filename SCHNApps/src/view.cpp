@@ -48,7 +48,7 @@ View::View(const QString& name, SCHNApps* s, QGLFormat& format) :
 
 	setSnapshotFormat("JPEG");
 	setSnapshotFileName(m_name);
-	setSnapshotQuality(95);
+	setSnapshotQuality(100);
 
 	m_currentCamera = m_schnapps->addCamera();
 	m_currentCamera->linkView(this);
@@ -111,7 +111,7 @@ View::View(const QString& name, SCHNApps* s, QGLFormat& format, const QGLWidget*
 
 	setSnapshotFormat("JPEG");
 	setSnapshotFileName(m_name);
-	setSnapshotQuality(95);
+	setSnapshotQuality(100);
 
 	m_currentCamera = m_schnapps->addCamera();
 	m_currentCamera->linkView(this);

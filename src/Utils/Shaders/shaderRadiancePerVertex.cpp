@@ -34,14 +34,19 @@ namespace Utils
 #include "shaderRadiancePerVertex.geom"
 #include "shaderRadiancePerVertex.frag"
 
-ShaderRadiancePerVertex::ShaderRadiancePerVertex(int resolution) :
+#include "shaderRadiancePerVertexInterp.vert"
+#include "shaderRadiancePerVertexInterp.geom"
+#include "shaderRadiancePerVertexInterp.frag"
+
+ShaderRadiancePerVertex::ShaderRadiancePerVertex(int resolution, bool fraginterp) :
 	m_vboPos(NULL),
 	m_vboNorm(NULL),
 	m_vboParam(NULL),
 	m_tex_ptr(NULL),
 	m_tex_unit(-1),
 	m_resolution(resolution),
-	K_tab(NULL)
+	K_tab(NULL),
+	m_fragInterp(fraginterp)
 {
 	compile();
 }
@@ -54,9 +59,18 @@ ShaderRadiancePerVertex::~ShaderRadiancePerVertex()
 
 void ShaderRadiancePerVertex::compile()
 {
-	m_nameVS = "ShaderRadiancePerVertex_vs";
-	m_nameFS = "ShaderRadiancePerVertex_fs";
-	m_nameGS = "ShaderRadiancePerVertex_gs";
+	if (m_fragInterp)
+	{
+		m_nameVS = "ShaderRadiancePerVertexInterp_vs";
+		m_nameFS = "ShaderRadiancePerVertexInterp_fs";
+		m_nameGS = "ShaderRadiancePerVertexInterp_gs";
+	}
+	else
+	{
+		m_nameVS = "ShaderRadiancePerVertex_vs";
+		m_nameFS = "ShaderRadiancePerVertex_fs";
+		m_nameGS = "ShaderRadiancePerVertex_gs";
+	}
 
 	const int nb_coefs = (m_resolution+1)*(m_resolution+1);
 	if (m_resolution != -1)
@@ -80,20 +94,34 @@ void ShaderRadiancePerVertex::compile()
 		}
 	}
 
-	std::string glxvert(*GLSLShader::DEFINES_GL);
 	std::stringstream s ;
-	s << "\n#define M_PI " << std::setprecision(23) << M_PI << std::endl ;
 	s << "#define NB_COEFS " << nb_coefs << std::endl ;
-	glxvert.append(s.str()) ;
-	glxvert.append(vertexShaderText);
+
+	std::string glxvert(*GLSLShader::DEFINES_GL);
+	if (!m_fragInterp)
+	{
+		glxvert.append(s.str()) ;
+		glxvert.append(vertexShaderText);
+	}
+	else
+		glxvert.append(vertexShaderInterpText);
 
 	std::string glxgeom = GLSLShader::defines_Geom("triangles", "triangle_strip", 3) ;
-	glxgeom.append(geometryShaderText);
+	if (!m_fragInterp)
+		glxgeom.append(geometryShaderText);
+	else
+		glxgeom.append(geometryShaderInterpText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	glxfrag.append(fragmentShaderText);
+	if (!m_fragInterp)
+		glxfrag.append(fragmentShaderText) ;
+	else
+	{
+		glxfrag.append(s.str()) ;
+		glxfrag.append(fragmentShaderInterpText) ;
+	}
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_LINE_STRIP, 2);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES, GL_TRIANGLE_STRIP, 3);
 
 	bind();
 	*m_uniform_resolution = glGetUniformLocation(this->program_handler(), "resolution");
@@ -106,7 +134,7 @@ void ShaderRadiancePerVertex::compile()
 	unbind();
 }
 
-void ShaderRadiancePerVertex::setCamera(Geom::Vec3f camera)
+void ShaderRadiancePerVertex::setCamera(Geom::Vec3f& camera)
 {
 	m_camera = camera;
 	bind();
@@ -132,11 +160,18 @@ unsigned int ShaderRadiancePerVertex::setAttributeNormal(VBO* vbo)
 	return id;
 }
 
+void ShaderRadiancePerVertex::setFragInterp(bool fraginterp)
+{
+	m_fragInterp = fraginterp ;
+	compile() ;
+}
+
 unsigned int ShaderRadiancePerVertex::setAttributeRadiance(VBO* vbo, Utils::Texture<2, Geom::Vec3f>* texture, GLenum tex_unit)
 {
 	m_vboParam = vbo;
 	m_tex_ptr = texture;
 	m_tex_unit = tex_unit - GL_TEXTURE0;
+
 	bind();
 	unsigned int id = bindVA_VBO("VertexParam", vbo);
 	glUniform1iARB(*m_uniform_tex, m_tex_unit);

@@ -264,7 +264,7 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 
 			mapParams.radianceTexture->update();
 
-//			map->removeAttribute(mapParams.radiance);
+			map->removeAttribute(mapParams.radiance);
 
 			mapParams.paramVBO = new Utils::VBO();
 			mapParams.paramVBO->updateData(mapParams.param);
