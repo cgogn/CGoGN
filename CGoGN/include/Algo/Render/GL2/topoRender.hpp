@@ -53,6 +53,9 @@ namespace GL2
 template<typename MAP>
 void TopoRender::overdrawDart(MAP& map, Dart d, float width, float r, float g, float b)
 {
+	if (d == NIL)
+		return;
+
 	DartAttribute<unsigned int, MAP> attIndex = map.template getAttribute<unsigned int, DART, MAP>(m_nameIndex);
 	if (!attIndex.isValid())
 		attIndex  = map.template addAttribute<unsigned int, DART, MAP>(m_nameIndex);
