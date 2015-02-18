@@ -7,9 +7,14 @@ ENDIF ()
 
 
 IF (WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName})
 	link_directories( ${CGoGN_ROOT_DIR}/windows_dependencies/lib/)
-	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+	IF((CGoGN_WITH_QTCREATOR))
+		link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}) # Release/Debug added automatically by visual
+	ELSE()
+		link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName})
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+	ENDIF()
 ELSE()
 	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
