@@ -90,7 +90,7 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
         return importSTLAscii(filename, attrNames);
         break;
     default:
-    #ifdef WITH_ASSIMP
+    #ifdef CGOGN_WITH_ASSIMP
         CGoGNout << "TYPE: ASSIMP" << CGoGNendl;
         return importASSIMP(filename, attrNames);
     #else
@@ -1496,7 +1496,7 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
     return true;
 }
 
-#ifdef WITH_ASSIMP
+#ifdef CGOGN_WITH_ASSIMP
 template<typename PFP>
 void MeshTablesSurface<PFP>::extractMeshRec(AttributeContainer& container, VertexAttribute<VEC3, MAP>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo)
 {

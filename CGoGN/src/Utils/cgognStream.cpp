@@ -23,7 +23,7 @@
  *******************************************************************************/
 
 #include "Utils/cgognStream.h"
-#ifdef WITH_QT
+#ifdef CGOGN_WITH_QT
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtQGLV.h"
 #include <QtGui/QTextEdit>
@@ -56,7 +56,7 @@ void allToFile(const std::string& filename )
 
 }
 
-#ifdef WITH_QT
+#ifdef CGOGN_WITH_QT
 void allToStatusBar(Utils::QT::SimpleQT* sqt)
 {
 	CGoGNout.toStatusBar(sqt);
@@ -102,7 +102,7 @@ void allToBuffer(std::stringstream* ss)
 
 Out::Out():
 	m_out_mode(STDOUT),
-#ifdef WITH_QT
+#ifdef CGOGN_WITH_QT
 	m_sqt_bar(NULL),
 	m_sqt_console(NULL),
 	m_sqglv_bar(NULL),
@@ -161,7 +161,7 @@ void Out::toFile(const std::string& filename )
 	m_ofs = new std::ofstream(filename.c_str());
 }
 
-#ifdef WITH_QT
+#ifdef CGOGN_WITH_QT
 void Out::noStatusBar()
 {
 	m_out_mode &= ~QTSTATUSBAR;
@@ -264,7 +264,7 @@ Out&  Out::operator<< (Special& os  )
 				*m_ofs << bufc << std::endl;
 			}
 		}
-#ifdef WITH_QT
+#ifdef CGOGN_WITH_QT
 		if (m_out_mode & QTSTATUSBAR)
 		{
 			while (! m_buffer.eof())
@@ -341,7 +341,7 @@ Out&  Out::operator<< (Special& os  )
 						*m_ofs << bufc << std::flush;
 					}
 				}
-#ifdef WITH_QT
+#ifdef CGOGN_WITH_QT
 				if (m_out_mode & QTSTATUSBAR)
 				{
 					while (! m_buffer.eof())

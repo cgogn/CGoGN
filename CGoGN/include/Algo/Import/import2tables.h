@@ -38,7 +38,7 @@
 #include "Algo/Import/importFileTypes.h"
 #include "Algo/Modelisation/voxellisation.h"
 
-#ifdef WITH_ASSIMP
+#ifdef CGOGN_WITH_ASSIMP
 #include "assimp.h"
 #include "aiPostProcess.h"
 #include "aiScene.h"
@@ -84,7 +84,7 @@ protected:
 	*/
 	std::vector<unsigned int> m_emb;
 
-#ifdef WITH_ASSIMP
+#ifdef CGOGN_WITH_ASSIMP
 	void extractMeshRec(AttributeContainer& container, VertexAttribute<VEC3, MAP>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
 #endif
 
@@ -104,7 +104,7 @@ protected:
 
 	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
 
-#ifdef WITH_ASSIMP
+#ifdef CGOGN_WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	
 

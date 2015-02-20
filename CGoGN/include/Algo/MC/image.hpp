@@ -211,7 +211,7 @@ void Image<DataType>::loadVox(const char *filename)
 	delete[] datafile;
 }
 
-#ifdef WITH_QT
+#ifdef CGOGN_WITH_QT
 template< typename  DataType >
 bool Image<DataType>::loadPNG3D(const char* filename)
 {
@@ -236,7 +236,7 @@ bool Image<DataType>::loadPNG3D(const char* filename)
 }
 #endif
 
-#ifdef WITH_ZINRI
+#ifdef CGOGN_WITH_ZINRI
 template< typename  DataType >
 bool Image<DataType>::loadInrgz(const char* filename)
 {

@@ -2,22 +2,17 @@ cmake_minimum_required(VERSION 2.8)
 
 project(SCHNApps)
 
-IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
-	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
-		SET(CMAKE_BUILD_TYPE "Debug")
-	ELSE()
-		SET(CMAKE_BUILD_TYPE "Release")
-	ENDIF()
-ENDIF()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
 
+SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 SET (CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 
-SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
-SET( CGoGN_ASSERT_ACTIVED OFF CACHE BOOL "assertion activated")
+INCLUDE(${CGoGN_ROOT_DIR}/cmake_modules/functions.cmake)
+
+setBuildType()
 
 
 find_package(OpenGL REQUIRED)
@@ -40,14 +35,11 @@ SET( QT_USE_QTPLUGIN TRUE )
 SET( QT_USE_QTSVG TRUE )
 
 INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+#ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-# PythonQt dependency
+# PythonQt third-party dependency
 ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
 
-
-# for GLM
-add_definitions(-DGLM_FORCE_RADIANS)
 
 # CGoGN compiled in one or several libs
 file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
@@ -57,46 +49,20 @@ ELSE()
 	SET(CGoGN_LIBS topology algo container utils)
 ENDIF()
 
-# use GL core profile 3.3
-file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_coreprofile.h COREPROFILE_STR)
-IF (COREPROFILE_STR EQUAL 1)
-	add_definitions(-DCGoGN_USE_OGL_CORE_PROFILE=1)
-ENDIF()
-
-add_definitions(-DCGOGN_ASSERT_BOOL=${CGoGN_ASSERT_ACTIVED})
-
+# definitions from CGoGN
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_defs.h CGoGN_DEFS)
 IF(CGoGN_SLOT_DEBUG_MODE)
-	add_definitions(-DCGoGN_SLOT_DEBUG_MODE=1)
+	LIST (APPEND CGoGN_DEFS -DCGoGN_SLOT_DEBUG_MODE=1)
 ENDIF()
+ADD_DEFINITIONS(${CGoGN_DEFS})
 
+# includes from CGoGN + python
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_ext_includes.h EXT_INCLUDES)
+LIST(APPEND EXT_INCLUDES ${PYTHON_INCLUDE_DIRS})
 
-# define includes of external libs 
-SET (EXT_INCLUDES 
-	${CGoGN_ROOT_DIR}/ThirdParty/include
-	${CGoGN_ROOT_DIR}/ThirdParty/OpenNL/src
-	${OPENGL_INCLUDE_DIR}
-	${GLEW_INCLUDE_DIRS}
-	${ZLIB_INCLUDE_DIRS}
-	${QT_INCLUDE_DIR}
-	${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/
-	${PYTHON_INCLUDE_DIRS}
-	${SUITESPARSE_INCLUDE_DIRS}
-	${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2
-)
-
-# define libs for external libs
-SET (EXT_LIBS 
-	PythonQt
-	nl
-	QGLViewer
-	${OPENGL_LIBRARY}
-	${GLEW_LIBRARIES}
-	${ZLIB_LIBRARIES}
-	${QT_LIBRARIES}
-	${PYTHON_LIBRARIES}
-	${SUITESPARSE_LIBRARIES}
-	tinyxml2
-)
+# libs from CGoGN + python + PythonQt
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_ext_libs.h EXT_LIBS)
+LIST(APPEND EXT_LIBS PythonQt ${PYTHON_LIBRARIES})
 
 
 if(APPLE)
@@ -186,7 +152,6 @@ ADD_EXECUTABLE( SCHNApps
 TARGET_LINK_LIBRARIES( SCHNApps
 	${CGoGN_LIBS}
 	${EXT_LIBS}
-	pthread
 )
 
 

@@ -39,7 +39,7 @@ namespace CGoGN
 namespace Utils
 {
 
-#ifdef CGoGN_USE_OGL_CORE_PROFILE
+#ifdef CGOGN_USE_OGL_CORE_PROFILE
 unsigned int GLSLShader::CURRENT_OGL_VERSION = 3;
 unsigned int GLSLShader::MAJOR_OGL_CORE = 3;
 unsigned int GLSLShader::MINOR_OGL_CORE = 3;
@@ -687,7 +687,7 @@ std::string GLSLShader::findFile(const std::string filename)
 
 bool GLSLShader::init()
 {
-#ifndef GLEW_MX
+#ifndef CGOGN_GLEW_MX
 	GLenum error = glewInit();
 
 	if (error != GLEW_OK)

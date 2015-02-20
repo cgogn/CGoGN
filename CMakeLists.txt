@@ -53,7 +53,6 @@ ENDIF()
 #
 # External Libraries (not included a third party libraries)
 #
-
 IF(WIN32)
 	SET ( CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies" )
 ENDIF(WIN32)
@@ -73,14 +72,49 @@ ENDIF()
 IF (NOT WIN32)
 	FIND_PACKAGE(SuiteSparse REQUIRED)
 ELSE()
-	set(SuiteSparse_SUITESPARSECONFIG_INCLUDE_DIR  ${CGoGN_ROOT_DIR}/windows_dependencies/include)
-	set(SuiteSparse_USE_LAPACK_BLAS ON)
+	set(SUITESPARSE_SUITESPARSECONFIG_INCLUDE_DIR  ${CGoGN_ROOT_DIR}/windows_dependencies/include)
+	set(SUITESPARSE_USE_LAPACK_BLAS ON)
 	find_package(SuiteSparse QUIET NO_MODULE)
-	if(NOT SuiteSparse_FOUND)
-        set(SuiteSparse_VERBOSE ON)
+	if(NOT SUITESPARSE_FOUND)
+        set(SUITESPARSE_VERBOSE ON)
         find_package(SuiteSparse REQUIRED) # 2nd: Use FindSuiteSparse.cmake module
 	endif()
 ENDIF()
+MESSAGE (STATUS ${SUITESPARSE_LIBRARIES})
+MESSAGE (STATUS ${SUITESPARSE_INCLUDE_DIRS})
+
+
+#
+#	ThirdParty
+#
+
+INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/include)
+
+ADD_SUBDIRECTORY(ThirdParty/Tools)
+
+ADD_SUBDIRECTORY(ThirdParty/OpenNL)
+
+ADD_SUBDIRECTORY(ThirdParty/tetgen)
+
+IF (CGoGN_WITH_ZINRI)
+	ADD_SUBDIRECTORY(ThirdParty/Zinri)
+ENDIF()
+
+IF (CGoGN_WITH_ASSIMP)
+	ADD_SUBDIRECTORY(ThirdParty/Assimp)
+ENDIF ()
+
+ADD_SUBDIRECTORY(ThirdParty/TinyXml2)
+
+IF (CGoGN_WITH_QT AND (NOT WIN32))
+	ADD_SUBDIRECTORY(ThirdParty/libQGLViewer/QGLViewer)
+ENDIF()
+
+IF (NOT WIN32)
+	ADD_SUBDIRECTORY(ThirdParty/libuuid)
+ENDIF()
+
+
 
 #
 # COMPILER FLAGS
@@ -103,69 +137,116 @@ endif()
 #
 # COMPILE DEFINITIONS
 #
-add_definitions("-DCGOGN_ASSERT_BOOL=${ASSERT_ACTIVED}")
+LIST(APPEND CGoGN_DEFS -DGLM_FORCE_RADIANS)
+
+LIST(APPEND CGoGN_DEFS -DCGOGN_ASSERT_BOOL=${CGoGN_ASSERT_ACTIVED})
 
 IF(CGoGN_USE_OGL_CORE_PROFILE)
-        add_definitions("-DCGoGN_USE_OGL_CORE_PROFILE=1")
+	LIST(APPEND CGoGN_DEFS -DCGoGN_USE_OGL_CORE_PROFILE=1)
 ENDIF()
 
-add_definitions("-DGLM_FORCE_RADIANS")
-
-add_definitions("-DSHADERPATH=\"${CGoGN_ROOT_DIR}/lib/Shaders/\"")
+LIST(APPEND CGoGN_DEFS -DSHADERPATH=\"${CGoGN_ROOT_DIR}/lib/Shaders/\")
 
 IF (CGoGN_WITH_ASSIMP)
-	add_definitions(-DWITH_ASSIMP)	
+	LIST(APPEND CGoGN_DEFS -DCGOGN_WITH_ASSIMP)
 ENDIF ()
 
 IF (CGoGN_WITH_ZINRI)
-	add_definitions(-DWITH_ZINRI)
+	LIST(APPEND CGoGN_DEFS -DCGOGN_WITH_ZINRI)
 ENDIF ()
 
 IF (CGoGN_WITH_GLEWMX)
-	ADD_DEFINITIONS(-DGLEW_MX)
+	LIST(APPEND CGoGN_DEFS -DCGOGN_GLEW_MX)
 ENDIF ()
+
+IF (CGoGN_WITH_QT)
+	LIST(APPEND CGoGN_DEFS -DCGOGN_WITH_QT)
+#	LIST(APPEND CGoGN_DEFS ${QT_DEFINITIONS}) ???
+ENDIF()
+
+ADD_DEFINITIONS(${CGoGN_DEFS})
+
 
 
 #
-#	ThirdParty
+# INCLUDES AND LIBS
 #
-#add_subdirectory(ThirdParty)
-
-INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/include)
-
-ADD_SUBDIRECTORY(ThirdParty/Tools)
-
-ADD_SUBDIRECTORY(ThirdParty/OpenNL)
-INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/OpenNL/src)
-
-ADD_SUBDIRECTORY(ThirdParty/tetgen)
-INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/tetgen)
-
-IF (CGoGN_WITH_ZINRI)
-	ADD_SUBDIRECTORY(ThirdParty/Zinri)
-	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/Zinri)
-ENDIF()
-
-IF (CGoGN_WITH_ASSIMP)
-	ADD_SUBDIRECTORY(ThirdParty/Assimp)
-	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include/)
+SET (CGoGN_EXT_INCLUDES)
+SET (CGoGN_EXT_LIBS)
+IF (CGoGN_WITH_QT)
+		INCLUDE(${QT_USE_FILE})
+#        ADD_DEFINITIONS(-DCGOGN_WITH_QT)
+#        ADD_DEFINITIONS(${QT_DEFINITIONS})
+		LIST(APPEND CGoGN_DEFS -DCGOGN_WITH_QT)
+        LIST(APPEND CGoGN_EXT_INCLUDES ${QT_INCLUDE_DIR})
+        LIST(APPEND CGoGN_EXT_LIBS QGLViewer ${QT_LIBRARIES})
+        IF (NOT WIN32)
+			LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/)
+		ENDIF()
+ELSE ()
+	 LIST(APPEND CGoGN_EXT_INCLUDES ${IL_INCLUDE_DIR})
+	 LIST(APPEND CGoGN_EXT_LIBS ${IL_LIBRARIES})
 ENDIF ()
 
-ADD_SUBDIRECTORY(ThirdParty/TinyXml2)
-INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2)
+# define includes of external libs 
+LIST(INSERT CGoGN_EXT_INCLUDES 0
+    ${CGoGN_ROOT_DIR}/ThirdParty/include
+	${OPENGL_INCLUDE_DIR}
+	${GLEW_INCLUDE_DIRS}
+	${ZLIB_INCLUDE_DIRS}
+	${SUITESPARSE_INCLUDE_DIRS}
+)
 
-IF (CGoGN_WITH_QT AND (NOT WIN32))
-	ADD_SUBDIRECTORY(ThirdParty/libQGLViewer/QGLViewer)
-	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/)
-ENDIF()
+LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/OpenNL/src)
+LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/tetgen)
+LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/Zinri)
+LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include/)
+LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/TinyXml2)
 
 IF (NOT WIN32)
-	ADD_SUBDIRECTORY(ThirdParty/libuuid)
-	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/ThirdParty/libuuid)
+	LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/libuuid)
+ENDIF()
+
+list(REMOVE_DUPLICATES CGoGN_EXT_INCLUDES)
+
+
+# define libs for external libs
+IF (CGoGN_WITH_ASSIMP)
+	LIST(APPEND CGoGN_EXT_LIBS assimp)
+	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_assimp.h "1" )
+ELSE ()
+	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_assimp.h "0" )
+ENDIF ()
+
+IF (CGoGN_WITH_ZINRI)
+	LIST(APPEND CGoGN_EXT_LIBS Zinri)
+	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_zinri.h "1" )
+ELSE ()
+	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_zinri.h "0" )
+ENDIF ()
+
+LIST(APPEND CGoGN_EXT_LIBS
+    nl
+    tinyxml2
+	${OPENGL_LIBRARY}
+	${GLEW_LIBRARIES}
+	${ZLIB_LIBRARIES}
+	${SUITESPARSE_LIBRARIES}
+)
+
+IF(NOT WIN32)
+	LIST(APPEND CGoGN_EXT_LIBS pthread) #for c++11 thread
 ENDIF()
 
 
+include_directories( 
+	${CGoGN_SRC_DIR}/include
+	${CGoGN_EXT_INCLUDES} )
 
+
+#
+# save some infos for schnapps and apps
+#
 IF (CGoGN_ONELIB)
 	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_onelib.h "1" )
 ELSE ()
@@ -178,63 +259,21 @@ ELSE ()
 	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_gmx.h "0" )
 ENDIF ()
 
-IF (CGoGN_USE_OGL_CORE_PROFILE)
-	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_coreprofile.h "1" )
-ELSE ()
-	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_coreprofile.h "0" )
-ENDIF ()
+file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_ext_includes.h "" )
+foreach(VAR_INC ${CGoGN_EXT_INCLUDES})
+	file(APPEND ${CGoGN_SRC_DIR}/include/cgogn_ext_includes.h ${VAR_INC} \n )
+endforeach()
 
+file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_ext_libs.h "" )
+foreach(VAR_LIB ${CGoGN_EXT_LIBS})
+	file(APPEND ${CGoGN_SRC_DIR}/include/cgogn_ext_libs.h ${VAR_LIB} \n )
+endforeach()
 
-#
-# INCLUDES AND LIBS
-#
-SET (CGoGN_EXT_INCLUDES)
-SET (CGoGN_EXT_LIBS)
-IF (CGoGN_WITH_QT)
-		INCLUDE(${QT_USE_FILE})
-        ADD_DEFINITIONS(-DWITH_QT)
-        ADD_DEFINITIONS(${QT_DEFINITIONS})
-        LIST(APPEND CGoGN_EXT_INCLUDES ${QT_INCLUDE_DIR})
-        LIST(APPEND CGoGN_EXT_LIBS QGLViewer ${QT_LIBRARIES})
-ELSE ()
-	 LIST(APPEND CGoGN_EXT_INCLUDES ${IL_INCLUDE_DIR})
-	 LIST(APPEND CGoGN_EXT_LIBS ${IL_LIBRARIES})
-ENDIF ()
+file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_defs.h "" )
+foreach(VAR_DEF ${CGoGN_DEFS})
+	file(APPEND ${CGoGN_SRC_DIR}/include/cgogn_defs.h ${VAR_DEF} \n )
+endforeach()
 
-# define includes of external libs 
-LIST(INSERT CGoGN_EXT_INCLUDES 0
-    ${CGoGN_ROOT_DIR}/ThirdParty/include
-	${OPENGL_INCLUDE_DIR}
-	${GLEW_INCLUDE_DIRS}
-	${ZLIB_INCLUDE_DIRS}
-	${SuiteSparse_INCLUDE_DIRS}
-)
-
-# define libs for external libs
-IF (CGoGN_WITH_ASSIMP)
-	LIST(APPEND CGoGN_EXT_LIBS assimp)
-ENDIF ()
-
-IF (CGoGN_WITH_ZINRI)
-	LIST(APPEND CGoGN_EXT_LIBS Zinri)
-ENDIF ()
-
-LIST(APPEND CGoGN_EXT_LIBS
-    nl
-    tinyxml2
-	${OPENGL_LIBRARY}
-	${GLEW_LIBRARIES}
-	${ZLIB_LIBRARIES}
-	${SuiteSparse_LIBRARIES}
-)
-
-IF(NOT WIN32)
-	LIST(APPEND CGoGN_EXT_LIBS pthread) #for c++11 thread
-ENDIF()
-
-include_directories( 
-	${CGoGN_SRC_DIR}/include
-	${CGoGN_EXT_INCLUDES} )
 
 
 add_subdirectory(${CGoGN_SRC_DIR} CGoGN)
@@ -297,5 +336,4 @@ ELSE()
 			COMMAND cmake ..
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			COMMENT "cleaning Apps")
-
 ENDIF()
