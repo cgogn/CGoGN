@@ -90,13 +90,20 @@ set(FORM_FILES_GROUP "Generated")
 
 include_directories("..")
 
+# The code must be relocatable if we want to link a shared library against it
+#if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+#    add_definitions("-fPIC")
+#endif()
+
+if(WIN32)
+    ADD_DEFINITIONS(-DCREATE_QGLVIEWER_DLL -DNOMINMAX)
+else()
+	ADD_DEFINITIONS("-fPIC")
+endif() 
+
 add_library(QGLViewer SHARED ${HEADER_FILES} ${MOC_FILES} ${MOC_UI_FILES} ${FORM_FILES} ${SOURCE_FILES})
 target_link_libraries(QGLViewer ${QT_LIBRARIES} ${OPENGL_LIBRARY})
 
-# The code must be relocatable if we want to link a shared library against it
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-        OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    add_definitions("-fPIC")
-endif()
+
 
 

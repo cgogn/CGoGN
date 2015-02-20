@@ -81,7 +81,7 @@ void BSPSortMethod::sortPrimitives(std::vector<PtrPrimitive>& primitive_tab,VRen
 	BSPTree tree;
 	Polygone *P;
 
-        unsigned int N = primitive_tab.size()/200 +1;
+	unsigned int N = (unsigned int)(primitive_tab.size()/200 +1);
 	int nbinserted = 0;
 
 	vector<PtrPrimitive> segments_and_points;	// Store segments and points for pass 2, because polygons are deleted
@@ -313,7 +313,7 @@ void BSPNode::Classify(Polygone *P, Polygone * & moins_, Polygone * & plus_)
 		return;
 	}
 
-	int n = P->nbVertices();
+	int n = int(P->nbVertices());
 
 	int Smin = 1;
 	int Smax = -1;
@@ -596,13 +596,13 @@ void BSPNode::initEquation(const Polygone *P,double & a, double & b, double & c,
 
 	if(n.infNorm() <= 0.00001)
 	{
-                unsigned int ind = P->nbVertices();
+		unsigned int ind = (unsigned int)(P->nbVertices());
 
                 for(unsigned int i=0;i<P->nbVertices();i++)
 			if((P->vertex(i+1)-P->vertex(i)).infNorm() > 0.00001)
 			{
 				ind = i;
-				i = P->nbVertices();
+				i = (unsigned int)(P->nbVertices());
 			}
 
 		if(ind < P->nbVertices())	// the polygon is a true segment

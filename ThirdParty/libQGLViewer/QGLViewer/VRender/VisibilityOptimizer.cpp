@@ -61,7 +61,7 @@ void VisibilityOptimizer::optimize(vector<PtrPrimitive>& primitives,VRenderParam
 #ifdef DEBUG_VO
         cout << "Optimizing visibility." << endl ;
 #endif
-        unsigned long N = primitives.size()/200 + 1 ;
+        unsigned long N = (unsigned long)(primitives.size()/200 + 1) ;
 
 #ifdef DEBUG_EPSRENDER__SHOW1
 //	cout << "Showing viewer." << endl ;
@@ -178,7 +178,7 @@ void VisibilityOptimizer::optimize(vector<PtrPrimitive>& primitives,VRenderParam
                                         }
                                         else
                                         {
-                                                new_poly_verts->num_vertices = p->nbVertices() ;
+                                                new_poly_verts->num_vertices = long(p->nbVertices()) ;
                                                 new_poly_verts->vertex = new gpc_vertex[p->nbVertices()] ;
 
                                                 for(size_t i=0;i<p->nbVertices();++i)
@@ -191,7 +191,7 @@ void VisibilityOptimizer::optimize(vector<PtrPrimitive>& primitives,VRenderParam
                                                 mx /= p->nbVertices() ;
                                                 my /= p->nbVertices() ;
 
-                                                new_poly_reduced_verts->num_vertices = p->nbVertices() ;
+                                                new_poly_reduced_verts->num_vertices = long(p->nbVertices()) ;
                                                 new_poly_reduced_verts->vertex = new gpc_vertex[p->nbVertices()] ;
 
                                                 for(size_t j=0;j<p->nbVertices();++j)

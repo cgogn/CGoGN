@@ -181,7 +181,7 @@ void FIGExporter::spewPolygone(const Polygone *P, QTextStream& out)
 	int nvertices;
 	GLfloat red, green, blue;
 
-	nvertices = P->nbVertices() ;
+	nvertices = int(P->nbVertices()) ;
 
 	Feedback3DColor vertex(P->sommet3DColor(0)) ;
 

@@ -155,7 +155,7 @@ void EPSExporter::spewPolygone(const Polygone *P, QTextStream& out)
 	GLfloat red, green, blue;
 	bool smooth;
 
-	nvertices = P->nbVertices() ;
+	nvertices = int(P->nbVertices()) ;
 
     const Feedback3DColor& vertex = Feedback3DColor(P->sommet3DColor(0)) ;
 

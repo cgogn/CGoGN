@@ -73,7 +73,7 @@ void Exporter::exportToFile(const QString& filename,
 
 	writeHeader(out) ;
 
-		unsigned int N = primitive_tab.size()/200 + 1 ;
+	unsigned int N = (unsigned int)(primitive_tab.size() / 200 + 1);
 
 	for(unsigned int i=0;i<primitive_tab.size();++i)
 	{

@@ -306,7 +306,7 @@ void ParserUtils::NormalizePrimitiveCoordinates(GLfloat * & loc,GLfloat MaxSize,
 
 	token = int(*loc) ;
 	loc++;
-	int size = Feedback3DColor::sizeInBuffer() ;
+	int size = int(Feedback3DColor::sizeInBuffer()) ;
 
 	switch (token)
 	{
@@ -353,7 +353,7 @@ void ParserUtils::ComputePrimitiveBB(GLfloat * & loc,GLfloat & xmin,GLfloat & xm
 
 	token = int(*loc) ;
 	loc++;
-	int size = Feedback3DColor::sizeInBuffer() ;
+	int size = int(Feedback3DColor::sizeInBuffer()) ;
 
 	switch (token)
 	{

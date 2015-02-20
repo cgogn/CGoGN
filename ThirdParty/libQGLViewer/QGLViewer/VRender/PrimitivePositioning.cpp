@@ -404,7 +404,7 @@ gpc_polygon PrimitivePositioning::createGPCPolygon_XY(const Polygone *P)
 
 	gpc_vertex_list *gpc_p_verts = new gpc_vertex_list ;
 
-	gpc_p_verts->num_vertices = P->nbVertices() ;
+	gpc_p_verts->num_vertices = long(P->nbVertices()) ;
 	gpc_p_verts->vertex = new gpc_vertex[P->nbVertices()] ;
 
 		for(size_t i=0;i<P->nbVertices();++i)
