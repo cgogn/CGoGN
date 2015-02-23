@@ -117,6 +117,7 @@ void MyQT::cb_initGL()
 
 	m_render_topo->updateData(myMap, position,  0.95f, 0.9f, 0.8f);
 	m_dm_topo = new DartMarker<MAP>(myMap);
+	m_drawer = new Utils::Drawer();
 }
 
 void MyQT::cb_redraw()
@@ -136,7 +137,7 @@ void MyQT::cb_redraw()
         }
     }
 
-    m_drawer.callList();
+     m_drawer->callList();
 }
 
 void MyQT::cb_mousePress(int /*button*/, int x, int y)
@@ -162,11 +163,11 @@ void  MyQT::cb_Save()
 
     //	std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
     //	Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
-    //	m_drawer.toSVG(svg);
+    //	 m_drawer->toSVG(svg);
     //	m_render_topo->toSVG(svg);
 
     Utils::SVG::SVGOut svg1(filename1, modelViewMatrix(), projectionMatrix());
-    m_drawer.toSVG(svg1);
+     m_drawer->toSVG(svg1);
     svg1.write();
     //	svg1.addOpacityAnimation(1.0f);
     //	svg1.addOpacityAnimation(1.0f);
@@ -200,33 +201,33 @@ void MyQT::traverse2()
     m_last=2;
     //	int code = (m_ajd_or_inci2)*100+m_first2*10+m_second2;
 
-    m_drawer.newList(GL_COMPILE);
-    m_drawer.lineWidth(7.0f);
-    m_drawer.pointSize(9.0f);
-    m_drawer.color3f(0.0f,0.7f,0.0f);
+     m_drawer->newList(GL_COMPILE);
+     m_drawer->lineWidth(7.0f);
+     m_drawer->pointSize(9.0f);
+     m_drawer->color3f(0.0f,0.7f,0.0f);
 
     m_affDarts.clear();
 
     if (m_ajd_or_inci2 == 0) // incident
     {
-        Algo::Render::drawerCell<PFP>(VERTEX+m_second2, m_drawer, myMap, m_selected, position, m_expl);
-        m_drawer.color3f(1.0f,0.0f,0.0f);
+        Algo::Render::drawerCell<PFP>(VERTEX+m_second2, *m_drawer, myMap, m_selected, position, m_expl);
+         m_drawer->color3f(1.0f,0.0f,0.0f);
 		Traversor* tra = TraversorFactory<PFP::MAP>::createIncident(myMap, m_selected, 2, VERTEX+m_second2, VERTEX+m_first2);
         for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
             m_affDarts.push_back(d);
-        Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap, m_affDarts, position, m_expl);
+        Algo::Render::drawerCells<PFP>(VERTEX+m_first2, *m_drawer, myMap, m_affDarts, position, m_expl);
     }
     else	// adjacent
     {
-        Algo::Render::drawerCell<PFP>(VERTEX+m_first2, m_drawer, myMap, m_selected, position, m_expl);
-        m_drawer.color3f(1.0f,0.0f,0.0f);
+        Algo::Render::drawerCell<PFP>(VERTEX+m_first2, *m_drawer, myMap, m_selected, position, m_expl);
+         m_drawer->color3f(1.0f,0.0f,0.0f);
 		Traversor* tra = TraversorFactory<PFP::MAP>::createAdjacent(myMap, m_selected, 2, VERTEX+m_first2, VERTEX+m_second2);
         for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
             m_affDarts.push_back(d);
-        Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap, m_affDarts, position, m_expl);
+        Algo::Render::drawerCells<PFP>(VERTEX+m_first2, *m_drawer, myMap, m_affDarts, position, m_expl);
     }
 
-    m_drawer.endList();
+     m_drawer->endList();
 
     //	SelectorMarked sm(*m_dm_topo);
 	m_render_topo->updateData(myMap, position, 0.95f, 0.9f, 0.8f);
@@ -264,19 +265,19 @@ void MyQT::traverse3()
 
 
     m_affDarts.clear();
-    m_drawer.newList(GL_COMPILE);
-    m_drawer.lineWidth(7.0f);
-    m_drawer.pointSize(9.0f);
-    m_drawer.color3f(0.0f,0.7f,0.0f);
+     m_drawer->newList(GL_COMPILE);
+     m_drawer->lineWidth(7.0f);
+     m_drawer->pointSize(9.0f);
+     m_drawer->color3f(0.0f,0.7f,0.0f);
 
     m_dm_topo->unmarkAll();
     //SelectorMarked sm(*m_dm_topo);
 
     if (m_ajd_or_inci3 == 0) // incident
     {
-        Algo::Render::drawerCell<PFP>(VERTEX+m_second3, m_drawer,myMap,m_selected,position,m_expl);
+        Algo::Render::drawerCell<PFP>(VERTEX+m_second3, *m_drawer,myMap,m_selected,position,m_expl);
         dynamicMarkOrbit(VERTEX+m_second3);
-        m_drawer.color3f(1.0f,0.0f,0.0f);
+         m_drawer->color3f(1.0f,0.0f,0.0f);
 
 		Traversor* tra = TraversorFactory<PFP::MAP>::createIncident(myMap,m_selected, 3, VERTEX+m_second3, VERTEX+m_first3);
         for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
@@ -285,7 +286,7 @@ void MyQT::traverse3()
             dynamicMarkOrbit(VERTEX+m_first3);
         }
 
-        Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap, m_affDarts, position, m_expl);
+        Algo::Render::drawerCells<PFP>(VERTEX+m_first3, *m_drawer, myMap, m_affDarts, position, m_expl);
 
 		m_render_topo->updateData(myMap, position, 0.95f, 0.9f, 0.8f); //sm
 
@@ -295,9 +296,9 @@ void MyQT::traverse3()
     }
     else	// adjacent
     {
-        Algo::Render::drawerCell<PFP>(VERTEX+m_first3, m_drawer, myMap, m_selected, position, m_expl);
+        Algo::Render::drawerCell<PFP>(VERTEX+m_first3, *m_drawer, myMap, m_selected, position, m_expl);
         dynamicMarkOrbit(VERTEX+m_first3);
-        m_drawer.color3f(1.0f,0.0f,0.0f);
+         m_drawer->color3f(1.0f,0.0f,0.0f);
 
 		Traversor* tra = TraversorFactory<PFP::MAP>::createAdjacent(myMap,m_selected, 3, VERTEX+m_first3, VERTEX+m_second3);
         for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
@@ -306,7 +307,7 @@ void MyQT::traverse3()
             dynamicMarkOrbit(VERTEX+m_first3);
         }
 
-        Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,m_expl);
+        Algo::Render::drawerCells<PFP>(VERTEX+m_first3, *m_drawer, myMap,m_affDarts,position,m_expl);
 
 		m_render_topo->updateData(myMap, position,  0.95f, 0.9f, 0.8f); //sm
         for (std::vector<Dart>::iterator id=m_affDarts.begin(); id != m_affDarts.end(); ++id)
@@ -314,7 +315,7 @@ void MyQT::traverse3()
         m_render_topo->setDartColor(m_selected,0.0f,0.7f,0.0f);
     }
 
-    m_drawer.endList();
+     m_drawer->endList();
 
     updateGL();
 }
