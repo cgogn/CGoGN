@@ -1,5 +1,6 @@
+# How make separated applications 
 #
-# usage: insert line:
+# usage: insert this line in your CMakeLists.txt
 #	include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
 # just after defining CGoGN_ROOT_DIR
 # 
@@ -8,12 +9,12 @@
 #	cmake_minimum_required(VERSION 2.8)
 #	project(Pipo)
 #
-#	set(QT_USE_QTCORE TRUE)
-#	set(QT_USE_QTOPENGL TRUE)
+#	set(QT_USE_QTCORE TRUE) # for Qt
+#	set(QT_USE_QTOPENGL TRUE) # for Qt & OpenGL (!!)
+#	set(QT_USE_QTXML TRUE) # for QGLViewer
 #	find_package(Qt REQUIRED)
 #	include(${QT_USE_FILE})
 #
-#	set(CMAKE_BUILD_TYPE Release CACHE STRING "Release or Debug")
 #	set(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/../../CGoGN CACHE STRING "CGoGN root dir")
 #	include(${CGoGN_ROOT_DIR}/apps_cmake.txt)
 #
@@ -23,11 +24,13 @@
 #	add_executable( pipo pipo.cpp ${pipo_ui} ${pipo_moc} )
 #	target_link_libraries( pipo ${CGoGN_LIBS}  ${CGoGN_EXT_LIBS} )
 #
-
+#
+#	WARNING: to avoid problem of DLL loading, on windows executable are generated in CGoGN/bin/....
+#	Take care while choosing executable names
+#
 
 SET ( CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 SET ( CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/ )
-
 
 INCLUDE(${CGoGN_ROOT_DIR}/cmake_modules/functions.cmake)
 
@@ -56,19 +59,26 @@ IF(NOT WIN32)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
 	ENDIF()
-	if(APPLE)
+	IF(APPLE)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
-	endif()
+	ENDIF()
 ENDIF()
 
 
-IF(WIN32 AND (NOT CGoGN_WITH_QTCREATOR))
-	link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
-	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
-ELSE ()
-	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-	SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-ENDIF ()
+IF (WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/windows_dependencies/lib/)
+	IF((CGoGN_WITH_QTCREATOR))
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}) # Release/Debug added automatically by visual
+	ELSE()
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName})
+		message(STATUS ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+	ENDIF()
+ELSE()
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
+ENDIF()
 
 
 
@@ -96,7 +106,6 @@ include_directories(
         ${CGoGN_EXT_INCLUDES})
 
 #for compatibility
-
 SET (COMMON_INCLUDES ${CGoGN_EXT_INCLUDES})
 SET (COMMON_LIBS ${CGoGN_EXT_LIBS})
 
