@@ -309,7 +309,7 @@ public:
 	 * @brief get the number of groups in OBJ file
 	 * @return number of groups
 	 */
-	unsigned int nbObjGroups() { return m_groupFirstSub.size(); }
+	unsigned int nbObjGroups() { return uint32(m_groupFirstSub.size()); }
 
 	/**
 	 * @brief get the index of first group mat of obj

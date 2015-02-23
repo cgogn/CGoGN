@@ -692,7 +692,7 @@ Clipping::Clipping():
 	m_timer(NULL),
 	m_lastAnimatedClippingPreset(NULL)
 {
-	m_coeffTopoExplod = Geom::Vec3f(0.9,0.9,0.9);
+	m_coeffTopoExplod = Geom::Vec3f(0.9f,0.9f,0.9f);
 }
 
 void Clipping::initGUI()
@@ -856,10 +856,10 @@ void Clipping::cb_initGL()
 
 	// setup clipping shapes
 	m_planeDrawable = new Utils::Grid;
-	m_planeDrawable->setColor(Geom::Vec4f(1.0, 0.0, 0.0, 1.0));
+	m_planeDrawable->setColor(Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
 	m_planeDrawable->updatePrecisionDrawing(5);
 	m_sphereDrawable = new Utils::IcoSphere;
-	m_sphereDrawable->setColor(Geom::Vec4f(0.0, 0.4, 1.0, 1.0));
+	m_sphereDrawable->setColor(Geom::Vec4f(0.0f, 0.4f, 1.0f, 1.0f));
 	m_sphereDrawable->updatePrecisionDrawing(1);
 
 	// setup clipping picking frame

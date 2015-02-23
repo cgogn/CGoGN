@@ -25,7 +25,7 @@
 #ifndef EXTRUSION_H
 #define EXTRUSION_H
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include "Algo/Tiling/Surface/square.h"
 

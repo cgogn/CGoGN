@@ -25,7 +25,6 @@
 #ifndef __HISTOGRAM__
 #define __HISTOGRAM__
 
-#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include "Topology/generic/attributeHandler.h"

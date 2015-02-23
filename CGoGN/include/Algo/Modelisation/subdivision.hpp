@@ -26,8 +26,6 @@
 #include "Algo/Geometry/centroid.h"
 #include "Topology/generic/autoAttributeHandler.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 namespace CGoGN
 {

@@ -26,7 +26,7 @@
 #define _IMPORT_PLY_DATA_H
 
 #include <stdio.h>
-#include <math.h>
+#include <cmath>
 #include <string>
 
 #include "Algo/Import/ply.h"

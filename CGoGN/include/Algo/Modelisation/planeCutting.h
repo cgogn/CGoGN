@@ -25,7 +25,7 @@
 #ifndef __PLANE_CUTTING_H__
 #define __PLANE_CUTTING_H__
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include "Geometry/plane_3d.h"
 #include "Topology/generic/cellmarker.h"

@@ -177,7 +177,7 @@ void MyQT::cb_Open()
 //			maxV=v;
 
 		if(myMap.isVolumeIncidentToBoundary(d))
-            color[d] = VEC3(1,0.41,0.706);
+            color[d] = VEC3(1.0f,0.41f,0.706f);
 	}
 //	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
 //	{

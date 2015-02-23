@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <math.h>
+#include <cmath>
 #include "Topology/generic/traversor/traversorCell.h"
 
 namespace CGoGN

@@ -29,8 +29,7 @@
 
 #include <glm/ext.hpp>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 
 namespace CGoGN

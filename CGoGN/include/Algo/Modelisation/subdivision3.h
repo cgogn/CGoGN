@@ -25,7 +25,7 @@
 #ifndef __SUBDIVISION3_H__
 #define __SUBDIVISION3_H__
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include "Geometry/plane_3d.h"
 #include "Algo/Modelisation/tetrahedralization.h"

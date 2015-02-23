@@ -10,7 +10,6 @@
 	#include <windows.h>
 	#include <stdio.h>
 	#include <limits>
-	#define _USE_MATH_DEFINES
 	#include <cmath>
 	#define isnan(X) _isnan(X)
 

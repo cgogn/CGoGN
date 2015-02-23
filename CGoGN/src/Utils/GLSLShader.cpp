@@ -772,14 +772,16 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 
 	size_t sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
-	strcpy(m_vertex_shader_source, vs);
+	memcpy(m_vertex_shader_source, vs,sz+1);
+	
+
 
 	if (m_fragment_shader_source)
 		delete [] m_fragment_shader_source;
 
 	sz = strlen(fs);
 	m_fragment_shader_source = new char[sz+1];
-	strcpy(m_fragment_shader_source, fs);
+	memcpy(m_fragment_shader_source, fs,sz+1);
 
 	if(!loadVertexShaderSourceString(vs))
 		return false;
@@ -803,21 +805,21 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 
 	size_t sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
-	strcpy(m_vertex_shader_source,vs);
+	memcpy(m_vertex_shader_source,vs,sz+1);
 
 	if (m_fragment_shader_source)
 		delete [] m_fragment_shader_source;
 
 	sz = strlen(fs);
 	m_fragment_shader_source = new char[sz+1];
-	strcpy(m_fragment_shader_source,fs);
+	memcpy(m_fragment_shader_source,fs,sz+1);
 
 	if (m_geom_shader_source)
 		delete [] m_geom_shader_source;
 
 	sz = strlen(gs);
 	m_geom_shader_source = new char[sz+1];
-	strcpy(m_geom_shader_source,gs);
+	memcpy(m_geom_shader_source,gs,sz+1);
 
 	if(!loadVertexShaderSourceString(vs))
 		return false;
@@ -845,8 +847,7 @@ bool GLSLShader::reloadVertexShaderFromMemory(const char* vs)
 
 	size_t sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
-
-	strcpy(m_vertex_shader_source,vs);
+	memcpy(m_vertex_shader_source,vs,sz+1);
 
 	return true;
 }
@@ -858,7 +859,7 @@ bool GLSLShader::reloadFragmentShaderFromMemory(const char* fs)
 
 	unsigned int sz = uint32(strlen(fs));
 	m_fragment_shader_source = new char[sz+1];
-	strcpy(m_fragment_shader_source,fs);
+	memcpy(m_fragment_shader_source,fs,sz+1);
 
 	return true;
 }
@@ -870,7 +871,7 @@ bool GLSLShader::reloadGeometryShaderFromMemory(const char* gs)
 
 	unsigned int sz = uint32(strlen(gs));
 	m_geom_shader_source = new char[sz+1];
-	strcpy(m_geom_shader_source,gs);
+	memcpy(m_geom_shader_source,gs,sz+1);
 
 	return true;
 }

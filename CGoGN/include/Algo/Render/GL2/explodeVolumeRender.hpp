@@ -125,7 +125,7 @@ void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const EMBV
 		a = e;
 	} while (a != d);
 	
-	unsigned int nb = normals.size();
+	unsigned int nb = uint32(normals.size());
 	VEC3 Ntemp = normals[0];
 	normals[0] += normals[nb-1];
 	normals[0].normalize();
@@ -180,7 +180,7 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 		
 		VEC3F volCol = PFP::toVec3f(colorPerXXX[d.dart]);
 
-		unsigned int nbs = vertices.size();
+		unsigned int nbs = uint32(vertices.size());
 		// just to have more easy algo further
 		vertices.push_back(vertices.front());
 		normals.push_back(normals.front());
@@ -230,21 +230,21 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	});
 //	,false); ????
 
-	m_nbTris = buffer.size()/4;
+	m_nbTris = GLuint(buffer.size()/4);
 
-	m_vboPos->allocate(buffer.size());
+	m_vboPos->allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shaderS->setAttributePosition(m_vboPos);
 
-	m_vboColors->allocate(bufferColors.size());
+	m_vboColors->allocate(uint32(bufferColors.size()));
 	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
 	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
 	m_shaderS->setAttributeColor(m_vboColors);
 
-	m_vboNormals->allocate(bufferNormals.size());
+	m_vboNormals->allocate(uint32(bufferNormals.size()));
 	VEC3F* ptrNorm = reinterpret_cast<VEC3F*>(m_vboNormals->lockPtr());
 	memcpy(ptrNorm,&bufferNormals[0],bufferNormals.size()*sizeof(VEC3F));
 	m_vboNormals->releasePtr();
@@ -261,9 +261,9 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& posi
 	});
 	//	,false); ????
 
-	m_nbLines = buffer.size()/3;
+	m_nbLines = GLuint(buffer.size()/3);
 
-	m_vboPosLine->allocate(buffer.size());
+	m_vboPosLine->allocate(uint32(buffer.size()));
 
 	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
@@ -488,15 +488,15 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 		}
 	});
 
-	m_nbTris = buffer.size()/4;
+	m_nbTris = GLuint(buffer.size()/4);
 
-	m_vboPos->allocate(buffer.size());
+	m_vboPos->allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shader->setAttributePosition(m_vboPos);
 
-	m_vboColors->allocate(bufferColors.size());
+	m_vboColors->allocate(uint32(bufferColors.size()));
 	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
 	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
@@ -512,9 +512,9 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
 			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
 	}); // false ???
 
-	m_nbLines = buffer.size()/3;
+	m_nbLines = GLuint(buffer.size()/3);
 
-	m_vboPosLine->allocate(buffer.size());
+	m_vboPosLine->allocate(uint32(buffer.size()));
 
 	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));

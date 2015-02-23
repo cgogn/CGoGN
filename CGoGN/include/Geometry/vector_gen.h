@@ -109,9 +109,11 @@ public:
 
 	Vector<DIM, T>& operator-=(const Vector<DIM, T>& v) ;
 
-	Vector<DIM, T>& operator*=(T a) ;
+	template <typename T2>
+	Vector<DIM, T>& operator*=(T2 a) ;
 
-	Vector<DIM, T>& operator/=(T a) ;
+	template <typename T2>
+	Vector<DIM, T>& operator/=(T2 a) ;
 
 	/**********************************************/
 	/*            ARITHMETIC OPERATORS            */
@@ -123,12 +125,11 @@ public:
 	
 	Vector<DIM, T> operator-() const ;
 
-	Vector<DIM, T> operator*(T a) const ;
+	template <typename T2>
+	Vector<DIM, T> operator*(T2 a) const ;
 	
-	// 	template <typename T2>
-	// 	Vector<DIM, T> operator*(T2 a) const ;
-	
-	Vector<DIM, T> operator/(T a) const ;
+	template <typename T2>
+	Vector<DIM, T> operator/(T2 a) const ;
 
 	/**********************************************/
 	/*             UTILITY FUNCTIONS              */

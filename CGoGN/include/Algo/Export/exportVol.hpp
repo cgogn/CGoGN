@@ -150,8 +150,8 @@ bool exportNAS(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 	}
 
 	unsigned int countCell=1;
-	unsigned int nbhexa = hexa.size()/8;
-	unsigned int nbtetra = tetra.size()/4;
+	unsigned int nbhexa = uint32(hexa.size() / 8);
+	unsigned int nbtetra = uint32(tetra.size() / 4);
 
 	fout << std::right;
 	if (nbhexa!=0)
@@ -263,8 +263,8 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 		}
 	}
 
-	unsigned int nbhexa = hexa.size()/8;
-	unsigned int nbtetra = tetra.size()/4;
+	unsigned int nbhexa = uint32(hexa.size() / 8);
+	unsigned int nbtetra = uint32(tetra.size() / 4);
 
 	fout << "<?xml version=\"1.0\"?>" << std::endl;
 	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"BigEndian\">" << std::endl;
@@ -424,8 +424,8 @@ bool exportMSH(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 	fout << "$ELM" << std::endl;
 
 	unsigned int countCell=1;
-	unsigned int nbhexa = hexa.size()/8;
-	unsigned int nbtetra = tetra.size()/4;
+	unsigned int nbhexa = uint32(hexa.size() / 8);
+	unsigned int nbtetra = uint32(tetra.size() / 4);
 
 	fout << (nbhexa+nbtetra) << std::endl;
 	if (nbhexa!=0)
@@ -508,7 +508,7 @@ bool exportTet(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 		}
 	}
 
-	unsigned int nbtetra = tetra.size()/4;
+	unsigned int nbtetra = uint32(tetra.size() / 4);
 	fout << nbtetra << " tets" << std::endl;
 
 	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
@@ -603,7 +603,7 @@ bool exportNodeEle(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 	}
 
 	unsigned int countCell=0;
-	unsigned int nbtetra = tetra.size()/4;
+	unsigned int nbtetra = uint32(tetra.size() / 4);
 
 	foutEle << nbtetra << " 4  0" << std::endl;
 
@@ -709,8 +709,8 @@ bool exportVolBinGz(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 		}
 	}
 
-	unsigned int nbhexa = hexa.size()/8;
-	unsigned int nbtetra = tetra.size()/4;
+	unsigned int nbhexa = uint32(hexa.size() / 8);
+	unsigned int nbtetra = uint32(tetra.size() / 4);
 
 	unsigned int buffer[3];
 	buffer[0] = position.nbElements();
@@ -805,7 +805,7 @@ bool exportTetmesh(typename PFP::MAP& map, const VertexAttribute<typename PFP::V
 		}
 	}
 
-	unsigned int nbtetra = tetra.size()/4;
+	unsigned int nbtetra = uint32(tetra.size()/4);
 	fout << "Tetrahedra" << std::endl << nbtetra << std::endl;
 
 	for (unsigned int i=0; i<nbtetra; ++i)

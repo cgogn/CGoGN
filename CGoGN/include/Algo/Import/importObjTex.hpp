@@ -581,19 +581,19 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PTN(Utils::VBO* positionVBO, Utils::
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate(uint32(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
 
 	texcoordVBO->setDataSize(2);
-	texcoordVBO->allocate(TCBuff.size());
+	texcoordVBO->allocate(uint32(TCBuff.size()));
 	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
 	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
 	texcoordVBO->releasePtr();
 
 	normalVBO->setDataSize(3);
-	normalVBO->allocate(normalBuff.size());
+	normalVBO->allocate(uint32(normalBuff.size()));
 	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
@@ -1394,7 +1394,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN(
 			m_groupFirstSub[outGr] = inSg;
 		}
 	}
-	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+	m_groupNbSub[outGr+1] = uint32(m_sgMat.size()) - m_groupNbSub[outGr];
 
 	// now create VBOs
 
@@ -1407,7 +1407,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN(
 
 	unsigned int firstIndex = 0;
 
-	unsigned int sz = group_faces.size();
+	unsigned int sz = uint32(group_faces.size());
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
 	m_groupIdx.resize(sz);
@@ -1478,19 +1478,19 @@ bool OBJModel<PFP>::createGroupMatVBO_PTN(
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate(uint32(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
 
 	texcoordVBO->setDataSize(2);
-	texcoordVBO->allocate(TCBuff.size());
+	texcoordVBO->allocate(uint32(TCBuff.size()));
 	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
 	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
 	texcoordVBO->releasePtr();
 
 	normalVBO->setDataSize(3);
-	normalVBO->allocate(normalBuff.size());
+	normalVBO->allocate(uint32(normalBuff.size()));
 	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
@@ -1556,7 +1556,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 
 		if (tag == "mtllib")
 		{
-			unsigned found = filename.find_last_of("/\\");
+			size_t found = filename.find_last_of("/\\");
 			std::string mtfn;
 			oss >> mtfn;
 			m_matPath = filename.substr(0,found) + "/";
@@ -1795,7 +1795,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 		std::vector<unsigned int>& vn	= vecNormIndPerVertex[d];
 
 		// test if normal vertex or multi-attrib vertex
-		unsigned int nb = vtc.size();
+		unsigned int nb = uint32(vtc.size());
 		bool same=true;
 		for (unsigned int j=1; (j<nb)&&(same); ++j)
 		{

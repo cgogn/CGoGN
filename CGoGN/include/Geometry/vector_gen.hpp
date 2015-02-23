@@ -185,21 +185,43 @@ inline Vector<DIM, T>& Vector<DIM, T>::operator-=(const Vector<DIM, T>& v)
 	return *this ;
 }
 
+//template <unsigned int DIM, typename T>
+//inline Vector<DIM, T>& Vector<DIM, T>::operator*=(T a)
+//{
+//	for (unsigned int i = 0; i < DIM; ++i)
+//		m_data[i] *= a ;
+//	return *this ;
+//}
+//
+//template <unsigned int DIM, typename T>
+//inline Vector<DIM, T>& Vector<DIM, T>::operator/=(T a)
+//{
+//	for (unsigned int i = 0; i < DIM; ++i)
+//		m_data[i] /= a ;
+//	return *this ;
+//}
+
+
 template <unsigned int DIM, typename T>
-inline Vector<DIM, T>& Vector<DIM, T>::operator*=(T a)
+template <typename T2>
+inline Vector<DIM, T>& Vector<DIM, T>::operator*=(T2 a)
 {
+	T aa = T(a);
 	for (unsigned int i = 0; i < DIM; ++i)
-		m_data[i] *= a ;
-	return *this ;
+		m_data[i] *= aa;
+	return *this;
 }
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM, T>& Vector<DIM, T>::operator/=(T a)
+template <typename T2>
+inline Vector<DIM, T>& Vector<DIM, T>::operator/=(T2 a)
 {
+	T aa = T(a);
 	for (unsigned int i = 0; i < DIM; ++i)
-		m_data[i] /= a ;
-	return *this ;
+		m_data[i] /= aa;
+	return *this;
 }
+
 
 /**********************************************/
 /*            ARITHMETIC OPERATORS            */
@@ -234,20 +256,24 @@ inline Vector<DIM, T> Vector<DIM, T>::operator-() const
 
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM, T> Vector<DIM, T>::operator*(T a) const
+template <typename T2>
+inline Vector<DIM, T> Vector<DIM, T>::operator*(T2 a) const
 {
 	Vector<DIM, T> res ;
+	T aa = T(a);
 	for (unsigned int i = 0; i < DIM; ++i)
-		res[i] = m_data[i] * a ;
+		res[i] = m_data[i] * aa ;
 	return res ;
 }
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM, T> Vector<DIM, T>::operator/(T a) const
+template <typename T2>
+inline Vector<DIM, T> Vector<DIM, T>::operator/(T2 a) const
 {
 	Vector<DIM, T> res ;
+	T aa = T(a);
 	for (unsigned int i = 0; i < DIM; ++i)
-		res[i] = m_data[i] / a ;
+		res[i] = m_data[i] / T(a) ;
 	return res ;
 }
 

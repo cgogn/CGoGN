@@ -345,7 +345,7 @@ void renderTopoGMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::
 			center /= REAL(vecPos.size());
 
 			//shrink the face
-			unsigned int nb = vecPos.size();
+			unsigned int nb = uint32(vecPos.size());
 			float k = 1.0f - kf;
 			for (unsigned int i=0; i<nb; ++i)
 				vecPos[i] = center*k + vecPos[i]*kf;

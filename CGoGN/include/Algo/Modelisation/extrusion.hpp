@@ -160,18 +160,18 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 	if (profile_closed)
 	{
 		if (path_closed)
-            prim = new Algo::Surface::Tilings::Square::Tore<PFP>(the_map, profile.size(), path.size());
+			prim = new Algo::Surface::Tilings::Square::Tore<PFP>(the_map, uint32(profile.size()), uint32(path.size()));
 		else
-			prim = new Algo::Surface::Tilings::Square::Cylinder<PFP>(the_map, profile.size(), path.size()-1, false, false);
+			prim = new Algo::Surface::Tilings::Square::Cylinder<PFP>(the_map, uint32(profile.size()), uint32(path.size() - 1), false, false);
 	}
 	else
 	{
 		if (path_closed)
 		{
-			prim = new Algo::Surface::Tilings::Square::Grid<PFP>(the_map, profile.size()-1, path.size(), true);
+			prim = new Algo::Surface::Tilings::Square::Grid<PFP>(the_map, uint32(profile.size() - 1), uint32(path.size()), true);
 			// sewing boundaries correponding to path boundaries
 			std::vector<Dart>& darts = prim->getVertexDarts();
-			int index = profile.size()*path.size();
+			int index = int(profile.size()*path.size());
 			for (unsigned int i=0;i<profile.size()-1;++i)
 			{
 				Dart d = the_map.phi_1(darts[index++]);
@@ -182,7 +182,7 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 
 		}
 		else
-			prim = new Algo::Surface::Tilings::Square::Grid<PFP>(the_map, profile.size()-1, path.size()-1, true);
+			prim = new Algo::Surface::Tilings::Square::Grid<PFP>(the_map, uint32(profile.size()-1), uint32(path.size()-1), true);
 	}
 
 	glPushMatrix();

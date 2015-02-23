@@ -25,7 +25,8 @@
 #ifndef __SUBDIVISION_H__
 #define __SUBDIVISION_H__
 
-#include <math.h>
+#include <cmath>
+
 #include <vector>
 #include "Algo/Geometry/centroid.h"
 

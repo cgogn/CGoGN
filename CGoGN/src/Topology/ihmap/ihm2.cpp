@@ -23,7 +23,8 @@
 *******************************************************************************/
 
 #include "Topology/ihmap/ihm2.h"
-#include <math.h>
+
+#include <cmath>
 
 namespace CGoGN
 {

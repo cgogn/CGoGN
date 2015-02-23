@@ -25,7 +25,7 @@
 #ifndef _CGOGN_TRIANGULATION_H_
 #define _CGOGN_TRIANGULATION_H_
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <list>
 #include <set>

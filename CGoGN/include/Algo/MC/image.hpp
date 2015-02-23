@@ -26,7 +26,7 @@
 #include <fstream>
 #include <string.h>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <typeinfo>
 
 namespace CGoGN
@@ -196,10 +196,10 @@ void Image<DataType>::loadVox(const char *filename)
 
 	m_Data = new DataType[total];
 
-	int filename_s = strlen(filename) ;
+	int filename_s = int(strlen(filename))+1 ;
 //	char datafile[filename_s] ;
 	char* datafile = new char[filename_s] ;
-	strcpy(datafile, filename) ;
+	memcpy(datafile, filename, filename_s);
 	datafile[filename_s-3] = 'r' ;
 	datafile[filename_s-2] = 'a' ;
 	datafile[filename_s-1] = 'w' ;

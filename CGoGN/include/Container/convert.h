@@ -2,7 +2,7 @@
 #define _CONVERT_H_
 
 #include <limits>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include "Geometry/vector_gen.h"
 
