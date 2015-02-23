@@ -108,18 +108,18 @@ inline Geom::Vec3f color_map_cyan_white_red(float x)
 inline float scale_expand_within_0_1(float x, int n)
 {
 	for (int i = 1; i <= n; i++)
-		x = (1.0f - cos(M_PI * x)) / 2.0f;
+		x = float((1.0 - cos(M_PI * x)) / 2.0);
 	for (int i = -1; i >= n; i--)
-		x = acos(1.0f - 2.0f * x) / M_PI;
+		x = float(acos(1.0 - 2.0 * x) / M_PI);
 	return x;
 }
 
 inline float scale_expand_towards_1(float x, int n)
 {
 	for (int i = 1; i <= n; i++)
-		x = sin(x * M_PI / 2.0f);
+		x = float(sin(x * M_PI / 2.0));
 	for (int i = -1; i >= n; i--)
-		x = asin(x) * 2.0f / M_PI;
+		x = float(asin(x) * 2.0 / M_PI);
 	return x;
 }
 

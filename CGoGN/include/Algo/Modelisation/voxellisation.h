@@ -519,11 +519,11 @@ class Voxellisation
 		if((index_sommet=m_indexes.find(x + y*m_taille_x + z*m_taille_x*m_taille_y))==m_indexes.end())
 		{
 			//Si le sommet n'a pas encore t ajout
-			m_indexes[x + y*m_taille_x + z*m_taille_x*m_taille_y] = m_sommets.size();   //On prcise l'index du nouveau sommet
+			m_indexes[x + y*m_taille_x + z*m_taille_x*m_taille_y] = int(m_sommets.size());   //On prcise l'index du nouveau sommet
 			m_sommets.push_back(Geom::Vec3f(m_bb_min[0]+x*m_transfo[0], m_bb_min[1]+y*m_transfo[1], m_bb_min[2]+z*m_transfo[2]));    //On ajoute le sommet avec ses coordonnes relles
 		}
 		if(index_sommet==m_indexes.end())
-			m_faces.push_back(m_sommets.size()-1);  //On ajoute le sommet au tableau renseignant les faces
+			m_faces.push_back(int(m_sommets.size()-1));  //On ajoute le sommet au tableau renseignant les faces
 		else
 			m_faces.push_back(index_sommet->second);   //On ajoute le sommet au tableau renseignant les faces
 	}
@@ -631,12 +631,12 @@ class Voxellisation
 
 	int getNbSommets()
 	{
-		return m_sommets.size();
+		return int(m_sommets.size());
 	}
 
 	int getNbFaces()
 	{
-		return m_faces.size()/4;
+		return int(m_faces.size()/4);
 	}
 
 	void checkVoxels(int type=1)

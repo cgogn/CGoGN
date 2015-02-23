@@ -24,7 +24,7 @@
 
 #include <QtSvg/QSvgGenerator>
 #include <QPen>
-
+#include <cmath>
 #include "Utils/Qt/qthistodraw.h"
 
 namespace CGoGN
@@ -148,7 +148,7 @@ void RenderHistogram::drawHisto(QPainter& painter)
 
 	int widthAxl = 8*m_axl_nbd;
 	const std::vector<unsigned int>& pop = m_histo.getPopulation();
-	m_l = m_w/pop.size();
+	m_l = m_w/uint32(pop.size());
 
 	qreal op = painter.opacity();
 	painter.setOpacity(1.0);

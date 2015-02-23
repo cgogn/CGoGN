@@ -54,7 +54,7 @@ MapRender::~MapRender()
 
 void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 {
-	m_nbIndices[prim] = tableIndices.size();
+	m_nbIndices[prim] = uint32(tableIndices.size()) ;
 	m_indexBufferUpToDate[prim] = true;
 
 	// setup du buffer d'indices

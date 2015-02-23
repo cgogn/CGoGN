@@ -81,7 +81,7 @@ CGoGNDialog::CGoGNDialog(std::vector<const Var*>& params, const std::string& tit
 
 void CGoGNDialog::getResults(std::vector<const Var*>& params)
 {
-	unsigned int nb = params.size();
+	unsigned int nb = (unsigned int)(params.size());
 	for (unsigned int i = 0; i < nb; ++i)
 		params[i]->updateFrom(m_wid[i]);
 }

@@ -157,7 +157,7 @@ void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typena
 		if (withBoundary || !map.template isBoundaryMarked<2>(d))
 			vecDarts.push_back(d);
 	}
-	this->m_nbDarts = vecDarts.size();
+	this->m_nbDarts = GLuint(vecDarts.size());
 
 	// debut phi1
 	DartAutoAttribute<VEC3, MAP> fv1(map);
@@ -204,7 +204,7 @@ void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typena
 					}
 				}
 
-				unsigned int nb = vecPos.size();
+				unsigned int nb = uint32(vecPos.size());
 				vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 
 				k = 1.0f - ke;
@@ -246,7 +246,7 @@ void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typena
 					vecPos.push_back(P);
 				} while (dd != d);
 
-				unsigned int nb = vecPos.size()/2;
+				unsigned int nb = uint32(vecPos.size()/2);
 				float k = 1.0f - ke;
 				for (unsigned int i = 0; i < nb; ++i)
 				{
@@ -305,7 +305,7 @@ void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typena
 		*positionF1++ = PFP::toVec3f(fv1[d]);
 		*positionF1++ = PFP::toVec3f(fv11[e]);
 	}
-	this->m_nbRel1 = vecDarts.size();
+	this->m_nbRel1 = GLuint(vecDarts.size());
 
 	this->m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -357,7 +357,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& dmap, const VertexAttribute<t
 		if (withBoundary || !map.template isBoundaryMarked<2>(d))
 			vecDarts.push_back(d);
 	}
-	this->m_nbDarts = vecDarts.size();
+	this->m_nbDarts = uint32(vecDarts.size());
 
 	// debut phi1
 	DartAutoAttribute<VEC3, MAP> fv1(map);
@@ -403,7 +403,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& dmap, const VertexAttribute<t
 					*pit -= normal * this->m_normalShift;
 				}
 			}
-			unsigned int nb = vecPos.size();
+			unsigned int nb = uint32(vecPos.size());
 			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 
 			k = 1.0f - ke;
@@ -470,7 +470,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& dmap, const VertexAttribute<t
 		*positionF1++ = GPFP::toVec3f(fv1[d]);
 		*positionF1++ = GPFP::toVec3f(fv1[e]);
 	}
-	this->m_nbRel1 = vecDarts.size()/2;
+	this->m_nbRel1 = uint32(vecDarts.size()/2);
 
 	this->m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -534,7 +534,7 @@ Dart TopoRender::picking(MAP& map,int x, int y, bool withBoundary)
 	shaderCol.setAttributeColor(&vboCol);
 	shaderCol.updateMatrices(m_shader1);
 
-	unsigned int dw = m_topo_dart_width;
+	float dw = m_topo_dart_width;
 	m_topo_dart_width+=2;
 
 	// save clear color and set to zero

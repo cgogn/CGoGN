@@ -87,7 +87,7 @@ void zlibVTUWriteCompressed( unsigned char* input, unsigned int nbBytes, std::of
 	}
 	deflateEnd(&strm);
 
-	header[0] = header.size()-3;
+	header[0] = (unsigned int)(header.size()-3);
 	header[1] = CHUNK;
 	if (remain != 0)
 		header[2] = remain +CHUNK;

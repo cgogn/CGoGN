@@ -83,7 +83,7 @@ int gzstreambuf::underflow() { // used for input buffer only
     if ( ! (mode & std::ios::in) || ! opened)
         return EOF;
     // Josuttis' implementation of inbuf
-    int n_putback = gptr() - eback();
+    int n_putback = int(gptr() - eback());
     if ( n_putback > 4)
         n_putback = 4;
     memcpy( buffer + (4 - n_putback), gptr() - n_putback, n_putback);
@@ -104,7 +104,7 @@ int gzstreambuf::underflow() { // used for input buffer only
 int gzstreambuf::flush_buffer() {
     // Separate the writing of the buffer from overflow() and
     // sync() operation.
-    int w = pptr() - pbase();
+    int w = int(pptr() - pbase());
     if ( gzwrite( file, pbase(), w) != w)
         return EOF;
     pbump( -w);

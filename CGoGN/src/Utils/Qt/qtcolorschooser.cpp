@@ -52,7 +52,7 @@ unsigned int ColorsChooser::addColor(Geom::Vec3f* ptr, const std::string& name)
 {
 	m_colors.push_back(ptr);
 	m_list->addItem(QString(name.c_str()));
-	return m_colors.size()-1;
+	return (unsigned int)(m_colors.size()-1);
 }
 
 

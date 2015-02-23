@@ -79,7 +79,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			edgesBuffer.pop_back();
 
 		// create only non degenerated faces
-		nbe = edgesBuffer.size();
+		nbe = uint32(edgesBuffer.size());
 		if (nbe > 2)
 		{
 			Dart d = map.newFace(nbe, false);
@@ -471,7 +471,7 @@ bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurf
 			edgesBuffer.pop_back();
 
 		// create only non degenerated faces
-		nbe = edgesBuffer.size();
+		nbe = uint32(edgesBuffer.size());
 		if (nbe > 2)
 		{
 			Dart dprev = NIL;

@@ -412,7 +412,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 	if ((k == 'Y') && (event->modifiers() & Qt::ShiftModifier))
 	{
 		float X[3] = { 1.0f, 0.0f, 0.0f };
-		axis_to_quat(X, M_PI / 2.0f, m_cbs->curquat());
+		axis_to_quat(X, float(M_PI / 2.0), m_cbs->curquat());
 		newModel = 1;
 		updateGL();
 	}
@@ -420,7 +420,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 	if ((k == 'X') && (event->modifiers() & Qt::ShiftModifier))
 	{
 		float Y[3] = { 0.0f, 1.0f, 0.0f };
-		axis_to_quat(Y, -M_PI / 2.0f, m_cbs->curquat());
+		axis_to_quat(Y, float(-M_PI / 2.0), m_cbs->curquat());
 		newModel = 1;
 		updateGL();
 	}

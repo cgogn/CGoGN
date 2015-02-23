@@ -139,11 +139,11 @@ inline void Histogram::initData(const ATTR& attr)
 inline unsigned int Histogram::whichClass(double val) const
 {
 	if (val == m_max)
-		return m_populations.size()-1;
+		return uint32(m_populations.size()-1);
 	double x = (val - m_min)/m_interWidth;
 	if ((x<0) || (val>=m_max))
 		return -1;
-	return (unsigned int)(x);
+	return uint32(x);
 }
 
 inline unsigned int Histogram::whichQuantille(double val) const
@@ -217,7 +217,7 @@ unsigned int Histogram::markCellsOfHistogramColumn(unsigned int c, CELLMARKER& c
 	double bi = (m_max-m_min)/m_nbclasses * c + m_min;
 	double bs = (m_max-m_min)/m_nbclasses * (c+1) + m_min;
 
-	unsigned int nb=m_dataIdx.size();
+	unsigned int nb = uint32(m_dataIdx.size());
 	unsigned int i=0;
 
 	while ((i<nb) && (data(i)< bi))

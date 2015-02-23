@@ -92,8 +92,8 @@ void MapRender::recompute2Ears(const VertexAttribute<typename PFP::VEC3, typenam
 
 //	float dotpr1 = 1.0f - (v1*v2);
 //	float dotpr2 = 1.0f + (v1*v3);
-	float dotpr1 = acos(v1*v2) / (M_PI/2.0f);
-	float dotpr2 = acos(-(v1*v3)) / (M_PI/2.0f);
+	float dotpr1 = float(acos(v1*v2) / (M_PI/2.0));
+	float dotpr2 = float(acos(-(v1*v3)) / (M_PI/2.0));
 
 
 	if (!convex)	// if convex no need to test if vertex is an ear (yes)
@@ -143,7 +143,7 @@ float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PF
 	v2.normalize();
 
 //	float dotpr = 1.0f - (v1*v2);
-	float dotpr = acos(v1*v2) / (M_PI/2.0f);
+	float dotpr = float( acos(v1*v2) / (M_PI/2.0) );
 
 	VEC3 vn = v1^v2;
 	if (vn*normalPoly > 0.0f)
@@ -532,7 +532,7 @@ void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAtt
 			break;
 	}
 
-	m_nbIndices[prim] = tableIndices.size();
+	m_nbIndices[prim] = GLuint(tableIndices.size());
 	m_indexBufferUpToDate[prim] = true;
 
 	// setup du buffer d'indices

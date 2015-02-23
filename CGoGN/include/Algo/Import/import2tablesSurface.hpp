@@ -601,7 +601,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
         std::getline(fp, ligne);
     } while (!fp.eof());
 
-    m_nbVertices = verticesID.size();
+    m_nbVertices = uint32(verticesID.size());
 
     // close/clear/open only way to go back to beginning of file
     fp.close();
@@ -645,7 +645,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
                 }
             }
 
-            unsigned int n = table.size();
+            unsigned int n = uint32(table.size());
             m_nbEdges.push_back(short(n));
             for (unsigned int j = 0; j < n; ++j)
             {
@@ -1627,7 +1627,7 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
         float py = floor((P[1]/bbsize[1])*NBV);
         float px = floor((P[0]/bbsize[0])*NBV);
 
-        unsigned int index = NBV*NBV*pz + NBV*py + px;
+        unsigned int index = uint32(NBV*NBV*pz + NBV*py + px);
 
         if (pz==63)
             std::cout << "z 63 bb:"<<bb<<"  P="<<positions[i]<< std::endl;
@@ -1659,7 +1659,7 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
     }
     d /= double(nbf);
 
-    typename PFP::REAL epsilon = d/10000.0;
+	typename PFP::REAL epsilon = typename PFP::REAL(d / 10000.0);
 
 
     // traverse vertices
@@ -1780,7 +1780,7 @@ bool MeshTablesSurface<PFP>::importSTLAscii(const std::string& filename, std::ve
             typename std::vector<VEC3>::iterator it = find (m_points.begin(), m_points.end(), pos);
             if (it != m_points.end())
             {
-                unsigned int idP = it - m_points.begin();
+                unsigned int idP = uint32(it - m_points.begin());
                 m_emb.push_back(verticesID[idP]);
             }
             else
@@ -1804,8 +1804,8 @@ bool MeshTablesSurface<PFP>::importSTLAscii(const std::string& filename, std::ve
 
     }while (!fp.eof());
 
-    m_nbVertices = m_points.size();
-    m_nbFaces = m_nbEdges.size();
+    m_nbVertices = uint32(m_points.size());
+    m_nbFaces = uint32(m_nbEdges.size());
 
     fp.close();
     return true;
@@ -1864,7 +1864,7 @@ bool MeshTablesSurface<PFP>::importSTLBin(const std::string& filename, std::vect
             typename std::vector<VEC3>::iterator it = find (m_points.begin(), m_points.end(), pos);
             if (it != m_points.end())
             {
-                unsigned int idP = it - m_points.begin();
+                unsigned int idP = uint32(it - m_points.begin());
                 m_emb.push_back(verticesID[idP]);
             }
             else
@@ -1880,8 +1880,8 @@ bool MeshTablesSurface<PFP>::importSTLBin(const std::string& filename, std::vect
         m_nbEdges.push_back(3);
     }
 
-    m_nbVertices = m_points.size();
-    m_nbFaces = m_nbEdges.size();
+    m_nbVertices = uint32(m_points.size());
+    m_nbFaces = uint32(m_nbEdges.size());
 
     fp.close();
     return true;

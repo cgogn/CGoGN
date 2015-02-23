@@ -50,7 +50,7 @@ inline unsigned int GenericMap::getCurrentThreadIndex() const
 
 inline unsigned int GenericMap::addEmptyThreadIds(unsigned int n)
 {
-	unsigned int nb = m_thread_ids.size();
+	unsigned int nb = uint32(m_thread_ids.size());
 	m_thread_ids.resize(nb + n);
 	return nb;
 }

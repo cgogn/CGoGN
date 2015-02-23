@@ -53,7 +53,7 @@ typename V_ATT::DATA_TYPE volumeCentroid(typename PFP::MAP& map, Vol d, const V_
 	}
 	,false);
 
-	center /= double(count) ;
+	center /= float(count) ;
 	return center ;
 }
 
@@ -88,7 +88,7 @@ typename V_ATT::DATA_TYPE faceCentroid(typename PFP::MAP& map, Face f, const V_A
 		center += attributs[it];
 		++count ;
 	});
-	center /= double(count);
+	center /= float(count);
 	return center ;
 }
 

@@ -83,7 +83,7 @@ void MyQT::cb_explode(int x)
 void MyQT::cb_initGL()
 {
 	m_render_topo = new Algo::Render::GL2::TopoRender();
-	m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f);
+	m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f);
 	m_dm_topo = new DartMarker<MAP>(myMap);
 }
 
@@ -174,7 +174,7 @@ void MyQT::traverse2()
     m_drawer.endList();
 
     //	SelectorMarked sm(*m_dm_topo);
-	m_render_topo->updateData<PFP>(myMap, position, 0.95f, 0.9f, 0.8f);
+	m_render_topo->updateData<PFP>(myMap, position, 0.95f, 0.9f);
 
     updateGL();
 }

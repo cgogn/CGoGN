@@ -55,9 +55,9 @@ public :
 	/// constructor
 	ClippingPresetAnimated():
 		m_attachedClippingShader (NULL),
-		m_animationOneStepIncrement (0.01),
-		m_animationSpeedFactor (1.0),
-		m_animParam (0.0)
+		m_animationOneStepIncrement (0.01f),
+		m_animationSpeedFactor (1.0f),
+		m_animParam (0.0f)
 		{}
 
 public :

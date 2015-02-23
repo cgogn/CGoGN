@@ -296,7 +296,7 @@ void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 	}
 
 	// free memory and resize
-	for (int i = m_holesBlocks.size() - 1; i > int(nbb); --i)
+	for (int i = int(m_holesBlocks.size() - 1); i > int(nbb); --i)
 		delete m_holesBlocks[i];
 	m_holesBlocks.resize(nbb);
 
@@ -305,7 +305,7 @@ void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 	for(unsigned int j = 0; j < m_tableAttribs.size(); ++j)
 	{
 		if (m_tableAttribs[j] != NULL)
-			m_tableAttribs[j]->setNbBlocks(m_holesBlocks.size());
+			m_tableAttribs[j]->setNbBlocks(uint32(m_holesBlocks.size()));
 	}
 }
 
@@ -357,7 +357,7 @@ unsigned int AttributeContainer::insertLine()
 	if (m_tableBlocksWithFree.empty())
 	{
 		HoleBlockRef* ptr = new HoleBlockRef();					// new block
-		unsigned int numBlock = m_holesBlocks.size();
+		unsigned int numBlock = uint32(m_holesBlocks.size());
 		m_tableBlocksWithFree.push_back(numBlock);	// add its future position to block_free
 		m_holesBlocks.push_back(ptr);							// and add it to block table
 
@@ -399,7 +399,7 @@ unsigned int AttributeContainer::insertLine()
 		{
 			// we are filling the last line of capacity
 			HoleBlockRef* ptr = new HoleBlockRef();					// new block
-			unsigned int numBlock = m_holesBlocks.size();
+			unsigned int numBlock = uint32(m_holesBlocks.size());
 			m_tableBlocksWithFree.back() = numBlock;
 			m_tableBlocksWithFree.push_back(bf);
 			m_holesBlocks.push_back(ptr);
@@ -482,9 +482,9 @@ void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id) const
 
 	bufferui.push_back(id);
 	bufferui.push_back(_BLOCKSIZE_);
-	bufferui.push_back(m_holesBlocks.size());
-	bufferui.push_back(m_tableBlocksWithFree.size());
-	bufferui.push_back(bufferamv.size());
+	bufferui.push_back(uint32(m_holesBlocks.size()));
+	bufferui.push_back(uint32(m_tableBlocksWithFree.size()));
+	bufferui.push_back(uint32(bufferamv.size()));
 	bufferui.push_back(m_size);
 	bufferui.push_back(m_maxSize);
 	bufferui.push_back(m_orbit);
@@ -616,32 +616,32 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 	m_lineCost = cont.m_lineCost;
 
 	// blocks
-	unsigned int sz = cont.m_holesBlocks.size();
+	unsigned int sz = uint32(cont.m_holesBlocks.size());
 	m_holesBlocks.resize(sz);
 	for (unsigned int i = 0; i < sz; ++i)
 		m_holesBlocks[i] = new HoleBlockRef(*(cont.m_holesBlocks[i]));
 
 	//  free indices
-	sz = cont.m_freeIndices.size();
+	sz = uint32(cont.m_freeIndices.size());
 	m_freeIndices.resize(sz);
 	for (unsigned int i = 0; i < sz; ++i)
 		m_freeIndices[i] = cont.m_freeIndices[i];
 
 	// blocks with free
-	sz = cont.m_tableBlocksWithFree.size();
+	sz = uint32(cont.m_tableBlocksWithFree.size());
 	m_tableBlocksWithFree.resize(sz);
 	for (unsigned int i = 0; i < sz; ++i)
 		m_tableBlocksWithFree[i] = cont.m_tableBlocksWithFree[i];
 
 	// empty blocks
-	sz = cont.m_tableBlocksEmpty.size();
+	sz = uint32(cont.m_tableBlocksEmpty.size());
 	m_tableBlocksEmpty.resize(sz);
 	for (unsigned int i = 0; i < sz; ++i)
 		m_tableBlocksEmpty[i] = cont.m_tableBlocksEmpty[i];
 
 	//attributes (warning attribute can have different numbers than in original)
 	m_tableAttribs.reserve(m_nbAttributes);
-	sz = cont.m_tableAttribs.size();
+	sz = uint32(cont.m_tableAttribs.size());
 	for (unsigned int i = 0; i < sz; ++i)
 	{
 		if (cont.m_tableAttribs[i] != NULL)
@@ -649,20 +649,20 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
 			ptr->setName(cont.m_tableAttribs[i]->getName());
 			ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
-			ptr->setIndex(m_tableAttribs.size());
+			ptr->setIndex(uint32(m_tableAttribs.size()));
 			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
 			ptr->copy(cont.m_tableAttribs[i]);
 			m_tableAttribs.push_back(ptr);
 		}
 	}
-	sz = cont.m_tableMarkerAttribs.size();
+	sz = uint32(cont.m_tableMarkerAttribs.size());
 	for (unsigned int i = 0; i < sz; ++i)
 	{
 		AttributeMultiVector<MarkerBool>* ptr = new AttributeMultiVector<MarkerBool>;
 		ptr->setTypeName(cont.m_tableMarkerAttribs[i]->getTypeName());
 		ptr->setName(cont.m_tableMarkerAttribs[i]->getName());
 		ptr->setOrbit(cont.m_tableMarkerAttribs[i]->getOrbit());
-		ptr->setIndex(m_tableMarkerAttribs.size());
+		ptr->setIndex(uint32(m_tableMarkerAttribs.size()));
 		ptr->setNbBlocks(cont.m_tableMarkerAttribs[i]->getNbBlocks());
 		ptr->copy(cont.m_tableMarkerAttribs[i]);
 		m_tableMarkerAttribs.push_back(ptr);
@@ -672,40 +672,40 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 void AttributeContainer::dumpCSV() const
 {
 	CGoGNout << "Name ; ;";
-	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableAttribs.size(); ++i)
 	{
 		if (m_tableAttribs[i] != NULL)
 		{
 			CGoGNout << m_tableAttribs[i]->getName() << " ; ";
 		}
 	}
-	for (unsigned int i = 0; i < m_tableMarkerAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableMarkerAttribs.size(); ++i)
 	{
 		CGoGNout << m_tableMarkerAttribs[i]->getName() << " ; ";
 	}
 	CGoGNout << CGoGNendl;
 	CGoGNout << "Type  ; ;";
-	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableAttribs.size(); ++i)
 	{
 		if (m_tableAttribs[i] != NULL)
 		{
 			CGoGNout << m_tableAttribs[i]->getTypeName() << " ; ";
 		}
 	}
-	for (unsigned int i = 0; i < m_tableMarkerAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableMarkerAttribs.size(); ++i)
 	{
 		CGoGNout << m_tableMarkerAttribs[i]->getTypeName() << " ; ";
 	}
 	CGoGNout << CGoGNendl;
 	CGoGNout << "line ; refs ;";
-	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableAttribs.size(); ++i)
 	{
 		if (m_tableAttribs[i] != NULL)
 		{
 			CGoGNout << "value;";
 		}
 	}
-	for (unsigned int i = 0; i < m_tableMarkerAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableMarkerAttribs.size(); ++i)
 	{
 		CGoGNout << "value;";
 	}
@@ -722,7 +722,7 @@ void AttributeContainer::dumpCSV() const
 				CGoGNout << " ; ";
 			}
 		}
-		for (unsigned int i = 0; i < m_tableMarkerAttribs.size(); ++i)
+		for (size_t i = 0; i < m_tableMarkerAttribs.size(); ++i)
 		{
 				m_tableMarkerAttribs[i]->dump(l);
 				CGoGNout << " ; ";
@@ -736,7 +736,7 @@ void AttributeContainer::dumpCSV() const
 void AttributeContainer::dumpByLines() const
 {
 	CGoGNout << "Container of "<<orbitName(this->getOrbit())<< CGoGNendl;
-	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableAttribs.size(); ++i)
 	{
 		if (m_tableAttribs[i] != NULL)
 		{
@@ -750,7 +750,7 @@ void AttributeContainer::dumpByLines() const
 			}
 		}
 	}
-	for (unsigned int i = 0; i < m_tableMarkerAttribs.size(); ++i)
+	for (size_t i = 0; i < m_tableMarkerAttribs.size(); ++i)
 	{
 		CGoGNout << "Name: "<< m_tableMarkerAttribs[i]->getName();
 		CGoGNout << " / Type: "<< m_tableMarkerAttribs[i]->getTypeName();
@@ -810,14 +810,14 @@ AttributeMultiVector<MarkerBool>* AttributeContainer::addMarkerAttribute(const s
 	// create the new attribute
 	AttributeMultiVector<MarkerBool>* amv = new AttributeMultiVector<MarkerBool>(attribName, "MarkerBool") ;
 
-	index = m_tableMarkerAttribs.size() ;
+	index = uint32(m_tableMarkerAttribs.size()) ;
 	m_tableMarkerAttribs.push_back(amv) ;
 
 	amv->setOrbit(m_orbit) ;
 	amv->setIndex(index) ;
 
 	// resize the new attribute so that it has the same size than others
-	amv->setNbBlocks(m_holesBlocks.size()) ;
+	amv->setNbBlocks(uint32(m_holesBlocks.size())) ;
 
 	return amv ;
 }

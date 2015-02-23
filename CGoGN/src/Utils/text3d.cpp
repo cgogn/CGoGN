@@ -147,24 +147,24 @@ void Strings3D::clear()
 
 unsigned int Strings3D::addString(const std::string& str)
 {
-	unsigned int id = m_strings.size();
+	unsigned int id = uint32(m_strings.size());
 	m_strings.push_back(str);
-	m_nbChars += str.length();
+	m_nbChars += uint32(str.length());
 	return id;
 }
 
 unsigned int Strings3D::addString(const std::string& str, const Geom::Vec3f& pos)
 {
-	unsigned int id = m_strings.size();
+	unsigned int id = uint32(m_strings.size());
 	m_strings.push_back(str);
-	m_nbChars += str.length();
+	m_nbChars += uint32(str.length());
 	m_strTranslate.push_back(pos);
 	return id;
 }
 
 unsigned int Strings3D::sendOneStringToVBO(const std::string& str, float **buffervbo)
 {
-	unsigned int nbc = str.length();
+	unsigned int nbc = uint32(str.length());
 
 	float x = 0.0f;
 
@@ -219,7 +219,7 @@ void Strings3D::sendToVBO()
 
 	// fill buffer
 	unsigned int pos = 0; // pos of first index in vbo for current string
-	unsigned int nbw = m_strings.size();
+	unsigned int nbw = uint32(m_strings.size());
 	for (unsigned int i = 0; i < nbw; ++i)
 	{
 		unsigned int nb = sendOneStringToVBO(m_strings[i], &buffer);
@@ -275,7 +275,7 @@ void Strings3D::draw(unsigned int idSt, const Geom::Vec3f& pos)
 void Strings3D::drawAll(const Geom::Vec4f& color)
 {
 	m_color = color;
-	unsigned int nb = m_strpos.size();
+	unsigned int nb = uint32(m_strpos.size());
 	//  nothing to do if no string !
 	if (nb == 0)
 		return;
@@ -349,7 +349,7 @@ void Strings3D::toSVG(Utils::SVG::SVGOut& svg)
 {
 	Utils::SVG::SvgGroup* svg1 = new Utils::SVG::SvgGroup("strings3D", svg.m_model, svg.m_proj);
 	svg1->beginStrings(m_scale);
-	unsigned int nb = m_strings.size();
+	unsigned int nb = uint32(m_strings.size());
 	for(unsigned int i=0; i<nb; ++i)
 		svg1->addString(m_strTranslate[i],m_strings[i]);
 	svg1->endStrings();

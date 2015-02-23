@@ -142,12 +142,12 @@ void AttributeMultiVector<T>::setNbBlocks(unsigned int nbb)
 {
 	if (nbb >= m_tableData.size())
 	{
-		for (unsigned int i= m_tableData.size(); i <nbb; ++i)
+		for (size_t i= m_tableData.size(); i <nbb; ++i)
 			addBlock();
 	}
 	else
 	{
-		for (unsigned int i = nbb; i < m_tableData.size(); ++i)
+		for (size_t i = nbb; i < m_tableData.size(); ++i)
 			delete[] m_tableData[i];
 		m_tableData.resize(nbb);
 	}
@@ -156,7 +156,7 @@ void AttributeMultiVector<T>::setNbBlocks(unsigned int nbb)
 template <typename T>
 unsigned int AttributeMultiVector<T>::getNbBlocks() const
 {
-	return m_tableData.size();
+	return uint32(m_tableData.size());
 }
 
 template <typename T>
@@ -279,7 +279,7 @@ unsigned int AttributeMultiVector<T>::getBlocksPointers(std::vector<void*>& addr
 	for (typename std::vector<T*>::const_iterator it = m_tableData.begin(); it != m_tableData.end(); ++it)
 		addr.push_back(*it);
 
-	return addr.size();
+	return uint32(addr.size());
 }
 
 /**************************************
@@ -322,8 +322,8 @@ void AttributeMultiVector<T>::saveBin(CGoGNostream& fs, unsigned int id)
 {
 	unsigned int nbs[3];
 	nbs[0] = id;
-	int len1 = m_attrName.size()+1;
-	int len2 = m_typeName.size()+1;
+	int len1 = int(m_attrName.size()+1);
+	int len2 = int(m_typeName.size()+1);
 	nbs[1] = len1;
 	nbs[2] = len2;
 	fs.write(reinterpret_cast<const char*>(nbs),3*sizeof(unsigned int));
@@ -335,7 +335,7 @@ void AttributeMultiVector<T>::saveBin(CGoGNostream& fs, unsigned int id)
 	memcpy(buffer+len1,s2,len2);
 	fs.write(reinterpret_cast<const char*>(buffer),(len1+len2)*sizeof(char));
 
-	nbs[0] = m_tableData.size();
+	nbs[0] = int(m_tableData.size());
 	nbs[1] = nbs[0] * _BLOCKSIZE_* sizeof(T);
 	fs.write(reinterpret_cast<const char*>(nbs),2*sizeof(unsigned int));
 

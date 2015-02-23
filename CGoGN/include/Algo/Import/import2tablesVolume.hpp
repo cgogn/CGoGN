@@ -51,7 +51,7 @@ inline float floatFromNas(std::string& s_v)
 	if ((pos1!=std::string::npos) && (pos1!=0))
 	{
 		std::string res = s_v.substr(0,pos1) + "e" + s_v.substr(pos1,8-pos1);
-		x = atof(res.c_str());
+		x = float(atof(res.c_str()));
 	}
 	else
 	{
@@ -59,11 +59,11 @@ inline float floatFromNas(std::string& s_v)
 		if ((pos2!=std::string::npos) && (pos2!=0))
 		{
 			std::string res = s_v.substr(0,pos2) + "e" + s_v.substr(pos2,8-pos2);
-			x = atof(res.c_str());
+			x = float(atof(res.c_str()));
 		}
 		else
 		{
-			x = atof(s_v.c_str());
+			x = float(atof(s_v.c_str()));
 		}
 	}
 	return x;

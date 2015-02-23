@@ -188,7 +188,7 @@ char* GLSLShader::loadSourceFile(const std::string& filename)
 	{
 		/* get file size */
 		file.seekg( 0, std::ios::end );
-		file_size = file.tellg();
+		file_size = int(file.tellg());
 		file.seekg( 0, std::ios::beg );
 
 		/* allocate shader source table */
@@ -770,7 +770,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 		delete [] m_vertex_shader_source;
 	m_vertex_shader_source = NULL;
 
-	unsigned int sz = strlen(vs);
+	size_t sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
 	strcpy(m_vertex_shader_source, vs);
 
@@ -801,7 +801,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 		delete [] m_vertex_shader_source;
 	m_vertex_shader_source = NULL;
 
-	unsigned int sz = strlen(vs);
+	size_t sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
 	strcpy(m_vertex_shader_source,vs);
 
@@ -843,7 +843,7 @@ bool GLSLShader::reloadVertexShaderFromMemory(const char* vs)
 		delete [] m_vertex_shader_source;
 	m_vertex_shader_source = NULL;
 
-	unsigned int sz = strlen(vs);
+	size_t sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
 
 	strcpy(m_vertex_shader_source,vs);
@@ -856,7 +856,7 @@ bool GLSLShader::reloadFragmentShaderFromMemory(const char* fs)
 	if (m_fragment_shader_source)
 		delete [] m_fragment_shader_source;
 
-	unsigned int sz = strlen(fs);
+	unsigned int sz = uint32(strlen(fs));
 	m_fragment_shader_source = new char[sz+1];
 	strcpy(m_fragment_shader_source,fs);
 
@@ -868,7 +868,7 @@ bool GLSLShader::reloadGeometryShaderFromMemory(const char* gs)
 	if (m_geom_shader_source)
 		delete [] m_geom_shader_source;
 
-	unsigned int sz = strlen(gs);
+	unsigned int sz = uint32(strlen(gs));
 	m_geom_shader_source = new char[sz+1];
 	strcpy(m_geom_shader_source,gs);
 
@@ -997,7 +997,7 @@ unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 		if (it->va_id == idVA)
 		{
 			it->vbo_ptr = vbo;
-			return (it - m_va_vbo_binding.begin());
+			return uint32(it - m_va_vbo_binding.begin());
 		}
 	}
 	// new one:
@@ -1006,7 +1006,7 @@ unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 	temp.vbo_ptr = vbo;
 	m_va_vbo_binding.push_back(temp);
 
-	return (m_va_vbo_binding.size() -1);
+	return uint32(m_va_vbo_binding.size() -1);
 }
 
 void GLSLShader::changeVA_VBO(unsigned int id, VBO* vbo)
@@ -1024,7 +1024,7 @@ void GLSLShader::unbindVA(const std::string& name)
 		return;
 	}
 	// search if name already exist
-	unsigned int nb = m_va_vbo_binding.size();
+	unsigned int nb = uint32(m_va_vbo_binding.size());
 	for (unsigned int i = 0; i < nb; ++i)
 	{
 		if (m_va_vbo_binding[i].va_id == idVA)

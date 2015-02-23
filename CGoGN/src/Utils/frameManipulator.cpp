@@ -76,7 +76,7 @@ FrameManipulator::FrameManipulator():
 
 	for (unsigned int i=0; i<=nb_segments; ++i)
 	{
-		float alpha = float(i)*M_PI/float(nb_segments/2);
+		float alpha = float(M_PI*i)/float(nb_segments/2);
 		float x = (1.0f+ring_half_width) * cos(alpha);
 		float y = (1.0f+ring_half_width) * sin(alpha);
 		float xx = (1.0f-ring_half_width) * cos(alpha);
@@ -361,9 +361,9 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 	if (axisPickable(Xr))
 	{
 		if (inter == Geom::FACE_INTERSECTION)
-			dist_target[3] = Qx.norm() - 1.0f;
+			dist_target[3] = float(Qx.norm() - 1.0);
 		else if (inter == Geom::EDGE_INTERSECTION)
-			dist_target[3] = sqrt(dist2) - 1.0f;
+			dist_target[3] = float(sqrt(dist2) - 1.0);
 
 		if (fabs(dist_target[3]) < ring_half_width )
 			dist_cam[3] = (P-Qx)*(P-Qx);
@@ -376,7 +376,7 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 	if (axisPickable(Yr))
 	{
 		if (inter == Geom::FACE_INTERSECTION)
-			dist_target[4] = Qy.norm() - 1.0f;
+			dist_target[4] = float(Qy.norm() - 1.0);
 		else if (inter == Geom::EDGE_INTERSECTION)
 			dist_target[4] = sqrt(dist2) - 1.0f;
 
@@ -391,7 +391,7 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 	if (axisPickable(Zr))
 	{
 		if (inter == Geom::FACE_INTERSECTION)
-			dist_target[5] = Qz.norm() - 1.0f;
+			dist_target[5] = float(Qz.norm() - 1.0);
 		else if (inter == Geom::EDGE_INTERSECTION)
 			dist_target[5] = sqrt(dist2) - 1.0f;
 
@@ -653,7 +653,7 @@ void FrameManipulator::setTransformation( const glm::mat4& transfo)
 	Geom::Vec3f Ry(	transfo[1][0], transfo[1][1], transfo[1][2]);
 	Geom::Vec3f Rz(	transfo[2][0], transfo[2][1], transfo[2][2]);
 
-	setScale(Geom::Vec3f(Rx.normalize(), Ry.normalize(), Rz.normalize()));
+	setScale(Geom::Vec3f(float(Rx.normalize()), float(Ry.normalize()), float(Rz.normalize())));
 
 	m_rotations[0][0] = Rx[0];
 	m_rotations[0][1] = Rx[1];
@@ -817,7 +817,7 @@ float FrameManipulator::angleFromMouse(int x, int y, int dx, int dy)
 	Geom::Vec3f dV(float(dx), float(dy), 0.0f);
 	Geom::Vec3f W = V^dV;
 
-	float alpha=dV.norm()/4.0f;
+	float alpha=float(dV.norm()/4.0);
 	// which direction ?
 	if (W*m_projectedSelectedAxis > 0.0f)
 		alpha *= -1.0f;
@@ -829,9 +829,9 @@ float FrameManipulator::distanceFromMouse(int dx, int dy)
 	Geom::Vec3f dV(float(dx), float(dy), 0.0f);
 	float tr = dV*m_projectedSelectedAxis;
 	if (tr>0)
-		tr = dV.norm()/100.0f;
+		tr = float(dV.norm()/100.0);
 	else
-		tr = dV.norm()/-100.0f;
+		tr = float(dV.norm()/-100.0);
 	return tr;
 }
 

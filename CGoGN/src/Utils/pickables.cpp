@@ -295,7 +295,7 @@ std::vector<Pickable*> Pickable::sortedPick(std::vector<Pickable*>& picks, const
 			glm::vec4 IWglm = tr*ii;
 			Geom::Vec3f IW(IWglm[0]/IWglm[3],IWglm[1]/IWglm[3],IWglm[2]/IWglm[3]);
 			IW -= P;
-			float dist = IW.norm();
+			float dist = float(IW.norm());
 			sorted.push_back(std::pair<float, Pickable*>(dist,*it));
 		}
 	}
@@ -321,7 +321,7 @@ Geom::Vec3f Pickable::getPosition()
 Geom::Vec3f Pickable::getAxisScale(unsigned int ax, float& scale)
 {
 	Geom::Vec3f tempo(m_transfo[ax][0],m_transfo[ax][1],m_transfo[ax][2]);
-	scale = tempo.normalize();
+	scale = float(tempo.normalize());
 	return tempo;
 }
 
@@ -436,9 +436,9 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 		}
 	}
 	//poles
-	unsigned int north = points.size();
+	unsigned int north = uint32(points.size());
 	points.push_back(Geom::Vec3f(0.0f,0.0f,-1.0f));
-	unsigned int south = points.size();
+	unsigned int south = uint32(points.size());
 	points.push_back(Geom::Vec3f(0.0f,0.0f,1.0f));
 
 	m_vboPos->bind();
@@ -476,7 +476,7 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 		tableIndices.push_back(south);
 	}
 
-	m_nb=tableIndices.size();
+	m_nb = uint32(tableIndices.size());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
@@ -593,7 +593,7 @@ void Cone::changeTopo(unsigned int par, unsigned int mer)
 	}
 
 
-	m_nb=tableIndices.size();
+	m_nb = uint32(tableIndices.size());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
@@ -729,7 +729,7 @@ void Cylinder::changeTopo(unsigned int parp, unsigned int mer)
 	}
 
 
-	m_nb=tableIndices.size();
+	m_nb = uint32(tableIndices.size());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 
@@ -867,7 +867,7 @@ void Cube::changeTopo(unsigned int sub)
 		}
 	}
 
-	m_nb=tableIndices.size();
+	m_nb = uint32(tableIndices.size());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
@@ -938,7 +938,7 @@ unsigned int IcoSphere::insertPoint(std::vector<Geom::Vec3f>& points, const Geom
 		if (((P-points[i]).norm2())< 0.00000001f)
 			return i;
 	points.push_back(P);
-	return points.size()-1;
+	return uint32(points.size()-1);
 }
 
 void IcoSphere::subdivide(std::vector<unsigned int>& triangles, std::vector<Geom::Vec3f>& points)
@@ -946,7 +946,7 @@ void IcoSphere::subdivide(std::vector<unsigned int>& triangles, std::vector<Geom
 	std::vector<unsigned int> newTriangles;
 	newTriangles.reserve(triangles.size()*4);
 
-	unsigned int nbtris = triangles.size()/3;
+	unsigned int nbtris = uint32(triangles.size()/3);
 
 	for(unsigned int t=0; t<nbtris;++t)
 	{
@@ -1044,7 +1044,7 @@ void IcoSphere::changeTopoSubdivision(unsigned int sub)
 
 
 	// add some vertices on edges for nice round edges
-	unsigned int idxNewPoints=points.size();
+	unsigned int idxNewPoints = uint32(points.size());
 
 	for (unsigned int i=0; i<triangles.size()/3; ++i)
 	{
@@ -1135,7 +1135,7 @@ void IcoSphere::changeTopoSubdivision(unsigned int sub)
 		}
 	}
 
-	m_nb=tableIndices.size();
+	m_nb = uint32(tableIndices.size());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }

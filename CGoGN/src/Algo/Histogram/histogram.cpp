@@ -103,7 +103,7 @@ void Histogram::populateQuantiles(unsigned int nbquantiles)
 	}
 
 	// compute exact populations
-	unsigned int nb = m_dataIdx.size();
+	size_t nb = m_dataIdx.size();
 	double pop = double(nb)/nbquantiles;
 	m_pop_quantiles.resize(nbquantiles);
 
@@ -118,9 +118,9 @@ void Histogram::populateQuantiles(unsigned int nbquantiles)
 	for (unsigned int i = 0; i < nbquantiles; ++i)
 	{
 		cumul += m_pop_quantiles[i];
-		unsigned int icum = floor(cumul);
+		uint32 icum = uint32(floor(cumul));
 		double val = 0.0;
-		if (icum < m_dataIdx.size()-1)
+		if (icum < uint32(m_dataIdx.size()-1))
 			val = (data(icum)+ data(icum+1)) / 2.0;
 		else
 			val = m_dataIdx.back().first;
@@ -132,7 +132,7 @@ void Histogram::populateQuantiles(unsigned int nbquantiles)
 
 void Histogram::quantilesAreaCorrection()
 {
-	unsigned int nbquantiles = m_pop_quantiles.size();
+	unsigned int nbquantiles = uint32(m_pop_quantiles.size());
 
 	// constant area correction
 	double areaQ1 = 100.0f;	// use 100 as area if no histogram
@@ -156,7 +156,7 @@ void Histogram::quantilesAreaCorrection()
 
 void Histogram::histoColorizeVBO(Utils::VBO& vbo)
 {
-	unsigned int nb = m_dataIdx.size();
+	unsigned int nb = uint32(m_dataIdx.size());
 	vbo.setDataSize(3);
 	vbo.allocate(nb);
 	Geom::Vec3f* colors = static_cast<Geom::Vec3f*>(vbo.lockPtr());
@@ -184,7 +184,7 @@ unsigned int Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsig
 	double bi = (m_max-m_min)/m_nbclasses * c + m_min;
 	double bs = (m_max-m_min)/m_nbclasses * (c+1) + m_min;
 
-	unsigned int nb=m_dataIdx.size();
+	unsigned int nb = uint32(m_dataIdx.size());
 	unsigned int i=0;
 
 	while ((i<nb) && (data(i)< bi))
@@ -193,7 +193,7 @@ unsigned int Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsig
 	while ((i<nb) && (data(i)< bs))
 		vc.push_back(idx(i++));
 
-	return vc.size();
+	return uint32(vc.size());
 }
 
 unsigned int Histogram::cellsOfQuantilesColumn( unsigned int c, std::vector<unsigned int>& vc) const
@@ -203,7 +203,7 @@ unsigned int Histogram::cellsOfQuantilesColumn( unsigned int c, std::vector<unsi
 	double bi = m_interv[c];
 	double bs = m_interv[c+1];
 
-	unsigned int nb=m_dataIdx.size();
+	unsigned int nb = uint32(m_dataIdx.size());
 	unsigned int i=0;
 
 	while ((i<nb) && (data(i)< bi))
@@ -212,7 +212,7 @@ unsigned int Histogram::cellsOfQuantilesColumn( unsigned int c, std::vector<unsi
 	while ((i<nb) && (data(i)< bs))
 		vc.push_back(idx(i++));
 
-	return vc.size();
+	return uint32(vc.size());
 }
 
 

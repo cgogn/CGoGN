@@ -82,12 +82,12 @@ public:
 	{
 		if (nbb >= m_tableData.size())
 		{
-			for (unsigned int i= m_tableData.size(); i <nbb; ++i)
+			for (size_t i= m_tableData.size(); i <nbb; ++i)
 				addBlock();
 		}
 		else
 		{
-			for (unsigned int i = m_tableData.size()-1; i>=nbb; --i)
+			for (size_t i = m_tableData.size()-1; i>=nbb; --i)
 				delete[] m_tableData[i];
 
 			m_tableData.resize(nbb);
@@ -97,7 +97,7 @@ public:
 
 	unsigned int getNbBlocks() const
 	{
-		return m_tableData.size();
+		return uint32(m_tableData.size());
 	}
 
 //	void addBlocksBefore(unsigned int nbb);
@@ -288,7 +288,7 @@ public:
 		for (auto it = m_tableData.begin(); it != m_tableData.end(); ++it)
 			addr.push_back(NULL );
 
-		return addr.size();
+		return uint32(addr.size());
 	}
 
 
@@ -347,8 +347,8 @@ public:
 	{
 		unsigned int nbs[3];
 		nbs[0] = id;
-		int len1 = m_attrName.size()+1;
-		int len2 = m_typeName.size()+1;
+		int len1 = int(m_attrName.size()+1);
+		int len2 = int(m_typeName.size()+1);
 		nbs[1] = len1;
 		nbs[2] = len2;
 		fs.write(reinterpret_cast<const char*>(nbs),3*sizeof(unsigned int));
@@ -360,7 +360,7 @@ public:
 		memcpy(buffer+len1,s2,len2);
 		fs.write(reinterpret_cast<const char*>(buffer),(len1+len2)*sizeof(char));
 
-		nbs[0] = m_tableData.size();
+		nbs[0] = int(m_tableData.size());
 		nbs[1] = nbs[0] * _BLOCKSIZE_/32;
 		fs.write(reinterpret_cast<const char*>(nbs),2*sizeof(unsigned int));
 

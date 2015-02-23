@@ -135,7 +135,7 @@ ClippingPreset* ClippingPreset::CreateTubePreset(Geom::Vec3f center, float size,
 
 	// Add planes to preset
 	Geom::Vec3f direction (0.0f, 0.0f, 0.0f);
-	float dAngle = 2.0f * M_PI / precision;
+	float dAngle = float(2.0 * M_PI / precision);
 	for (int i = 0; i < precision; i++)
 	{
 		direction[(usedAxis + 1) % 3] = cos(i*dAngle);

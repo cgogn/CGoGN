@@ -363,7 +363,7 @@ inline void MapMulti::popLevel()
 
 inline unsigned int MapMulti::getMaxLevel()
 {
-	return m_mrDarts.size() - 1 ;
+	return uint32(m_mrDarts.size() - 1) ;
 }
 
 /****************************************

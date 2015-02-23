@@ -74,7 +74,7 @@ void MapMulti::addLevelBack()
 {
 	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
 
-	unsigned int newLevel = m_mrDarts.size() ;
+	unsigned int newLevel = uint32(m_mrDarts.size());
 	std::stringstream ss ;
 	ss << "MRdart_"<< newLevel ;
 	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
@@ -94,7 +94,7 @@ void MapMulti::addLevelFront()
 {
 	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
 
-	unsigned int newLevel = m_mrDarts.size() ;
+	unsigned int newLevel = uint32(m_mrDarts.size());
 	std::stringstream ss ;
 	ss << "MRdart_"<< newLevel ;
 	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
@@ -237,7 +237,7 @@ bool MapMulti::saveMapBin(const std::string& filename) const
 	fs.write(reinterpret_cast<const char*>(&m_mrCurrentLevel), sizeof(unsigned int));
 
 	// save table of nb darts per level
-	unsigned int nb = m_mrNbDarts.size();
+	size_t nb = m_mrNbDarts.size();
 	fs.write(reinterpret_cast<const char*>(&nb), sizeof(unsigned int));
 	fs.write(reinterpret_cast<const char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
 
@@ -492,7 +492,7 @@ void MapMulti::compactTopo()
 
 	m_mrattribs.compact(oldnewMR);
 
-	unsigned int nbl = m_mrDarts.size();
+	unsigned int nbl = uint32(m_mrDarts.size());
 	for (unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 	{
 		for (unsigned int level = 0; level < nbl; ++level)

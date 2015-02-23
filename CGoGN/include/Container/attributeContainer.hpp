@@ -86,7 +86,7 @@ AttributeMultiVector<T>* AttributeContainer::addAttribute(const std::string& att
 	}
 	else
 	{
-		index = m_tableAttribs.size() ;
+		index = uint32(m_tableAttribs.size()) ;
 		m_tableAttribs.push_back(amv) ;
 	}
 
@@ -105,7 +105,7 @@ AttributeMultiVector<T>* AttributeContainer::addAttribute(const std::string& att
 	m_lineCost += sizeof(T) ;
 
 	// resize the new attribute so that it has the same size than others
-	amv->setNbBlocks(m_holesBlocks.size()) ;
+	amv->setNbBlocks(uint32(m_holesBlocks.size())) ;
 
 	m_nbAttributes++ ;
 
@@ -214,17 +214,17 @@ inline unsigned int AttributeContainer::size() const
 
 inline unsigned int AttributeContainer::capacity() const
 {
-	return m_holesBlocks.size() * _BLOCKSIZE_;
+	return uint32(m_holesBlocks.size() * _BLOCKSIZE_);
 }
 
 inline unsigned int AttributeContainer::memoryTotalSize() const
 {
-	return capacity() * (m_lineCost + 8);
+	return uint32(capacity() * (m_lineCost + 8));
 }
 
 inline unsigned int AttributeContainer::memorySize() const
 {
-	return size() * (m_lineCost + 8);
+	return uint32(size() * (m_lineCost + 8));
 }
 
 inline bool AttributeContainer::used(unsigned int index) const

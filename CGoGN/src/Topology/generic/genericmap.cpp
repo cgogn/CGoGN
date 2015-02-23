@@ -445,7 +445,7 @@ void GenericMap::dumpAttributesAndMarkers()
 		std::vector<std::string> names;
 		names.reserve(32); 				//just to limit reallocation
 		m_attribs[i].getAttributesNames(names);
-		unsigned int nb = names.size();
+		unsigned int nb = uint32(names.size());
 		if (nb > 0)
 		{
 			CGoGNout << "ORBIT "<< i << CGoGNendl;

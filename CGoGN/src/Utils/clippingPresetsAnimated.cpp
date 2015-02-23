@@ -205,7 +205,7 @@ void ClippingPresetAnimatedRotatingPlane::step(unsigned int amount)
 
 	// Calculate new normal
 	Geom::Vec3f planeNormal = m_attachedClippingShader->getClipPlaneParamsNormal(m_planesIds[0]);
-	float angle = m_animParam*2.0*M_PI;
+	float angle = float(m_animParam*2.0*M_PI);
 	planeNormal[(m_axis + 1) % 3] = cos(angle);
 	planeNormal[(m_axis + 2) % 3] = sin(angle);
 	m_attachedClippingShader->setClipPlaneParamsNormal(m_planesIds[0], planeNormal);
@@ -293,10 +293,10 @@ ClippingPresetAnimatedSpheresCubeCollision::ClippingPresetAnimatedSpheresCubeCol
 
 	// Store spheres random directions
 	m_spheresDirections.resize(usedSpheresCount);
-	srand(time(NULL));
+	srand(uint32(time(NULL)));
 	for (size_t i = 0; i < m_spheresDirections.size(); i++)
 	{
-		Geom::Vec3f dir ((rand() % 1000) - 500, (rand() % 1000) - 500, (rand() % 1000) - 500);
+		Geom::Vec3f dir ((rand() % 1000) - 500.0f, (rand() % 1000) - 500.0f, (rand() % 1000) - 500.0f);
 		dir.normalize();
 		m_spheresDirections[i] = dir;
 	}

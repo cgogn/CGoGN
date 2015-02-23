@@ -116,7 +116,7 @@ Dart Grid<PFP>::grid2D(unsigned int x, unsigned int y)
 
     // add last row of vertices (y = ny)
 
-    int index = this->m_tableVertDarts.size()-(x+1); // pos of last inserted row of dart
+    int index = int(this->m_tableVertDarts.size())-(x+1); // pos of last inserted row of dart
     for (unsigned int i = 0; i < x; ++i)
     {
         Dart dd = this->m_tableVertDarts[index++];

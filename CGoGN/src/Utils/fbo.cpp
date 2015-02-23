@@ -146,7 +146,7 @@ int FBO::createAttachColorTexture(GLenum internalFormat, GLint filter)
 	GLenum type;
 	GLuint textureId;
 
-	attachment = GL_COLOR_ATTACHMENT0 + m_colorTexId.size();
+	attachment = GL_COLOR_ATTACHMENT0 + uint32(m_colorTexId.size());
 
 	switch (internalFormat)
 	{
@@ -214,7 +214,7 @@ int FBO::createAttachColorTexture(GLenum internalFormat, GLint filter)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	m_colorTexId.push_back(CGoGNGLuint(textureId));
-	unsigned int num  = m_colorTexId.size() - 1;
+	unsigned int num  = uint32(m_colorTexId.size() - 1);
 	(*m_colorAttachmentPoints)[num] = attachment;
 
 	return int(num);
@@ -236,7 +236,7 @@ int FBO::attachColorTexture(CGoGNGLuint textureId)
 
 	GLenum attachment;
 
-	attachment = GL_COLOR_ATTACHMENT0 + m_colorTexId.size();
+	attachment = GL_COLOR_ATTACHMENT0 + uint32(m_colorTexId.size());
 
 	// Attach texture to Fbo
 	glBindFramebuffer(GL_FRAMEBUFFER, *m_fboId);
@@ -244,7 +244,7 @@ int FBO::attachColorTexture(CGoGNGLuint textureId)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	m_colorTexId.push_back(textureId);
-	unsigned int num  = m_colorTexId.size() - 1;
+	unsigned int num  = uint32(m_colorTexId.size() - 1);
 	(*m_colorAttachmentPoints)[num] = attachment;
 
 	return int(num);
@@ -329,7 +329,7 @@ void FBO::enableAllColorAttachments()
 		return;
 	}
 
-	glDrawBuffers(m_colorTexId.size(), *m_colorAttachmentPoints);
+	glDrawBuffers(GLsizei(m_colorTexId.size()), *m_colorAttachmentPoints);
 }
 
 void FBO::enableColorAttachment(int num)

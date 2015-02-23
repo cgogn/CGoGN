@@ -250,7 +250,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 				me.template unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
 				it = map.phi1(it) ;
 			} while(it != d) ;
-			center /= double(count);
+			center /= float(count);
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
 			attributs[cf] = center;					// affect the data to the central vertex
 		}
@@ -302,10 +302,10 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		} while (x != *vert);
 
 		EMB emcp = attributs[*vert];
-		emcp *= double((n-2)*n);		// V' = (n-2)/n*V + 1/n2 *(F+E)
+		emcp *= float((n-2)*n);		// V' = (n-2)/n*V + 1/n2 *(F+E)
 		emcp += temp;
 		emcp += temp2;
-		emcp /= double(n*n);
+		emcp /= float(n*n);
 
 		attributs[*vert] = emcp ;
 	}

@@ -353,7 +353,7 @@ template<typename PFP>
 Dart Topo3Render<PFP>::pickColor(unsigned int x, unsigned int y)
 {
 	//more easy picking for
-	unsigned int dw = m_topo_dart_width;
+	float dw = m_topo_dart_width;
 	m_topo_dart_width+=2;
 
 	// save clear color and set to zero
@@ -651,7 +651,7 @@ void Topo3RenderMap<PFP>::updateData(MAP& mapx, const VertexAttribute<VEC3, MAP>
 			dd = mapx.phi1(dd);
 		} while (dd != d);
 
-		unsigned int nb = vecPos.size();
+		unsigned int nb = uint32(vecPos.size());
 
 		vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 

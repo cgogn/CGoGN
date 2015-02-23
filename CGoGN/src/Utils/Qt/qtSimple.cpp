@@ -21,7 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-
+#include <cmath>
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtgl.h"
 #include "Utils/GLSLShader.h"

@@ -787,8 +787,8 @@ void Map3<MAP_IMPL>::cutVolume(std::vector<Dart>& vd)
 	ParentMap::splitSurface(vd, true, true);
 
 	//create the boundary
-	Dart b1 = newBoundaryCycle(vd.size());
-	Dart b2 = newBoundaryCycle(vd.size());
+	Dart b1 = newBoundaryCycle(uint32(vd.size()));
+	Dart b2 = newBoundaryCycle(uint32(vd.size()));
 
 	Dart fit1 = this->phi2(e);
 	Dart fit2 = this->phi2(e2);

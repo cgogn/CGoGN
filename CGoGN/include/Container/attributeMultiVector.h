@@ -38,6 +38,8 @@
 namespace CGoGN
 {
 
+typedef unsigned int uint32;
+
 enum CGoGNCodeType
 	{CGoGNUNKNOWNTYPE=0,
 	 CGoGNINT,CGoGNUINT,
