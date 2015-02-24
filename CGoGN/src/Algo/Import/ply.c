@@ -30,9 +30,11 @@ EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
 WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.   
 
 */
-//#include "os_spec.h"
-#undef _SECURE_SCL
-#define _CRT_SECURE_NO_WARNINGS
+
+
+#ifdef WIN32
+#pragma warning(disable:4996)
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -200,7 +202,7 @@ PlyFile *open_for_writing_ply(
 
   /* tack on the extension .ply, if necessary */
 
-  name = (char *) myalloc (sizeof (char) * (strlen (filename) + 5));
+  name = (char *) myalloc (sizeof (char) * (int)(strlen (filename) + 5));
   strcpy (name, filename);
   if (strlen (name) < 4 ||
       strcmp (name + strlen (name) - 4, ".ply") != 0)
@@ -570,7 +572,7 @@ void put_element_ply(PlyFile *plyfile, void *elem_ptr)
 	str = (char **) item;
 
 	/* write the length */
-	len = strlen(*str) + 1;
+	len = (int)(strlen(*str) + 1);
 	fwrite (&len, sizeof(int), 1, fp);
 
 	/* write the string, including the null character */
@@ -627,7 +629,7 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
   if (fp == NULL)
     return (NULL);
 
-  /* create record for this object */
+   /* create record for this object */
 
   plyfile = (PlyFile *) myalloc (sizeof (PlyFile));
   plyfile->num_elem_types = 0;
@@ -679,6 +681,7 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
 
     words = get_words (plyfile->fp, &nwords, &orig_line);
   }
+
 
   /* create tags for each property of each element, to be used */
   /* later to say whether or not to store each property for the user */
@@ -734,7 +737,7 @@ PlyFile *ply_open_for_reading(
 
   /* tack on the extension .ply, if necessary */
 
-  name = (char *) myalloc (sizeof (char) * (strlen (filename) + 5));
+  name = (char *) myalloc (sizeof (char) * (int)(strlen (filename) + 5));
   strcpy (name, filename);
   if (strlen (name) < 4 ||
       strcmp (name + strlen (name) - 4, ".ply") != 0)
@@ -1338,7 +1341,7 @@ char *recreate_command_line (int argc, char *argv[])
 
   /* count total number of characters needed, including separating spaces */
   for (i = 0; i < argc; i++)
-    len += strlen(argv[i]) + 1;
+    len += (int)(strlen(argv[i]) + 1);
 
   /* create empty line */
   line = (char *) malloc (sizeof(char) * len);
@@ -1486,7 +1489,7 @@ void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
 
       /* allocate space for an array of items and store a ptr to the array */
       list_count = int_val;
-      item_size = ply_type_size[prop->internal_type];
+      item_size = store_it ? ply_type_size[prop->internal_type] : 0;
       store_array = (char **) (elem_data + prop->offset);
 
       if (list_count == 0) {
@@ -1566,8 +1569,10 @@ void binary_get_element(PlyFile *plyfile, char *elem_ptr)
   int list_count;
   int store_it;
   char **store_array;
-  char *other_data=NULL;
+  char *other_data;
   int other_flag;
+
+  other_data = NULL;
 
   /* the kind of element we're reading currently */
   elem = plyfile->which_elem;
@@ -1612,7 +1617,7 @@ void binary_get_element(PlyFile *plyfile, char *elem_ptr)
 
       /* allocate space for an array of items and store a ptr to the array */
       list_count = int_val;
-      item_size = ply_type_size[prop->internal_type];
+      item_size = store_it ? ply_type_size[prop->internal_type] : 0;
       store_array = (char **) (elem_data + prop->offset);
       if (list_count == 0) {
         if (store_it)
@@ -2030,13 +2035,13 @@ void get_stored_item(
       break;
     case PLY_Float32:
       *double_val = *((float *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+      *int_val = (int)(*double_val);
+	  *uint_val = (unsigned int)(*double_val);
       break;
     case PLY_Float64:
       *double_val = *((double *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+	  *int_val = (int)(*double_val);
+	  *uint_val = (unsigned int)(*double_val);
       break;
     default:
       fprintf (stderr, "get_stored_item: bad type = %d\n", type);
@@ -2078,6 +2083,8 @@ void get_binary_item(
   word = 1 ;
   byte = (char *) &word ;
   my_endianness = byte[0] ? PLY_BINARY_LE : PLY_BINARY_BE ;
+
+  long pos0 = ftell(fp);
 
   switch (type) {
     case PLY_Int8:
@@ -2145,7 +2152,7 @@ void get_binary_item(
         else
         	if (fread (ptr, 1, 4, fp) != 4)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
-        *int_val = *((int*) ptr) ;
+		*int_val = *((int*) ptr) ;
         *uint_val = *int_val;
         *double_val = *int_val;
       break;
@@ -2163,9 +2170,9 @@ void get_binary_item(
         	if (fread (cptr, 1, 1, fp) != 1)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
-        else
-        	if (fread (ptr, 1, 4, fp) != 4)
-        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+		else
+			if (fread (ptr, 1, 4, fp) != 4)
+				fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *uint_val = *((unsigned int*) ptr) ;
         *int_val = *uint_val;
         *double_val = *uint_val;
@@ -2184,12 +2191,12 @@ void get_binary_item(
         	if (fread (cptr, 1, 1, fp) != 1)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
-        else
-        	if (fread (ptr, 1, 4, fp) != 4)
-        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+		else
+			if (fread (ptr, 1, 4, fp) != 4)
+				fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *double_val = *((float*) ptr) ;
-        *int_val = *double_val;
-        *uint_val = *double_val;
+		*int_val = (int)(*double_val);
+		*uint_val = (unsigned int)(*double_val);
       break;
     case PLY_Float64:
     	if (my_endianness != file_type)
@@ -2217,8 +2224,8 @@ void get_binary_item(
         	if (fread (ptr, 1, 8, fp) != 8)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
       *double_val = *((double*) ptr) ;
-      *int_val = *double_val;
-      *uint_val = *double_val;
+	  *int_val = (int)(*double_val);
+	  *uint_val = (unsigned int)(*double_val);
       break;
     default:
       fprintf (stderr, "get_binary_item: bad type = %d\n", type);

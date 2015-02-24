@@ -26,6 +26,8 @@
 #include "Algo/Import/importPlyData.h"
 #include <stdlib.h>
 #include <locale.h>
+#include <fstream>
+
 
 namespace CGoGN
 {
@@ -99,18 +101,36 @@ PlyImportData::~PlyImportData()
 	
 bool PlyImportData::read_file(const std::string& filename)
 {
+	FILE* fp = NULL;
+
+	std::ifstream fs(filename.c_str());
+	if (!fs.good())
+	{
+		return false;
+	}
+
+	std::string ligne;
+	std::string tag;
+
+	do
+	{
+		fs >> tag;
+	} while ((tag != std::string("format")) && (tag != std::string("FORMAT")));
+	fs >> tag;
+	if ((tag == std::string("ascii")) || (tag == std::string("ASCII")))
+		fp = fopen(filename.c_str(), "r");
+	else
+		fp = fopen(filename.c_str(), "rb");
+
 
   /*** Read in the original PLY object ***/
 
-  FILE* fp = fopen(filename.c_str(),"r");
+  if (fp==NULL)
+	  return false;
 
-  if (fp==NULL) return false;
-  
   PlyFile *in_ply  = read_ply (fp);
-
-
-  if (in_ply==NULL) return false;
-
+  if (in_ply==NULL)
+	  return false;
 
   for (int i = 0; i < in_ply->num_elem_types; i++) 
   {
