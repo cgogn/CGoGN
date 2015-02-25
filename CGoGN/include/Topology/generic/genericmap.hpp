@@ -23,8 +23,6 @@
 *******************************************************************************/
 
 #include "Topology/generic/dartmarker.h"
-#include "Topology/generic/traversor/traversorCell.h"
-#include "Topology/generic/traversor/traversorFactory.h"
 
 namespace CGoGN
 {

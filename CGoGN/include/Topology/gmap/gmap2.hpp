@@ -876,7 +876,7 @@ bool GMap2<MAP_IMPL>::sameOrientedVolume(Dart d, Dart e) const
 	// For every face added to the list
 	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
-		if (!this->isBoundaryMarked2(*face) && !mark.isMarked(*face))	// Face has not been visited yet
+		if (!this->isBoundaryMarked<2>(*face) && !mark.isMarked(*face))	// Face has not been visited yet
 		{
 			Dart it = *face ;
 			do
@@ -886,7 +886,7 @@ bool GMap2<MAP_IMPL>::sameOrientedVolume(Dart d, Dart e) const
 
 				mark.mark(it);						// Mark
 				Dart adj = phi2(it);				// Get adjacent face
-				if (!this->isBoundaryMarked2(adj) && !mark.isMarked(adj))
+				if (!this->isBoundaryMarked<2>(adj) && !mark.isMarked(adj))
 					visitedFaces.push_back(adj);	// Add it
 				it = this->phi1(it);
 			} while(it != *face);
@@ -924,7 +924,7 @@ unsigned int GMap2<MAP_IMPL>::volumeDegree(Dart d) const
 			{
 				mark.mark(it);					// Mark
 				Dart adj = phi2(it);			// Get adjacent face
-				if ( !this->isBoundaryMarked2(adj) && !mark.isMarked(adj) )
+				if ( !this->isBoundaryMarked<2>(adj) && !mark.isMarked(adj) )
 					visitedFaces.push_back(adj);// Add it
 				it = this->phi1(it);
 			} while(it != df);
@@ -957,7 +957,7 @@ int GMap2<MAP_IMPL>::checkVolumeDegree(Dart d, unsigned int volDeg) const
 			{
 				mark.mark(it);					// Mark
 				Dart adj = phi2(it);			// Get adjacent face
-				if ( !this->isBoundaryMarked2(adj) && !mark.isMarked(adj) )
+				if ( !this->isBoundaryMarked<2>(adj) && !mark.isMarked(adj) )
 					visitedFaces.push_back(adj);// Add it
 				it = this->phi1(it);
 			} while(it != df);

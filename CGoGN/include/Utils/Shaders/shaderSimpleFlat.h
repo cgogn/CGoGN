@@ -31,13 +31,15 @@
 
 #include <string>
 
+#include "Utils/dll.h"
+
 namespace CGoGN
 {
 
 namespace Utils
 {
 
-class ShaderSimpleFlat : public ClippingShader
+class CGoGN_UTILS_API ShaderSimpleFlat : public ClippingShader
 {
 protected:
 	// flag color per vertex or not

@@ -39,6 +39,14 @@
 
 namespace CGoGN { namespace Utils { class GLSLShader; } }
 
+#ifdef WIN32
+#if defined CGoGN_QT_DLL_EXPORT
+#define CGoGN_UTILS_API __declspec(dllexport)
+#else
+#define CGoGN_UTILS_API __declspec(dllimport)
+#endif
+#endif
+
 namespace CGoGN
 {
 
@@ -51,7 +59,7 @@ namespace QT
 // forward definition
 class GLWidget;
 
-class SimpleQT : public QMainWindow
+class CGoGN_UTILS_API SimpleQT : public QMainWindow
 {
 	Q_OBJECT
 

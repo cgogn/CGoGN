@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#define CGoGN_ALGO_DLL_EXPORT 1
+
 #include "Algo/Render/GL2/topoRender.h"
 #include "Utils/GLSLShader.h"
 

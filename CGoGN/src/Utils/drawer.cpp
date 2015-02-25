@@ -23,6 +23,8 @@
 *******************************************************************************/
 
 #include "GL/glew.h"
+
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/drawer.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 

@@ -39,6 +39,16 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 
 
+#ifdef WIN32
+#ifndef CGoGN_ALGO_API
+#if defined CGoGN_ALGO_DLL_EXPORT
+#define CGoGN_ALGO_API __declspec(dllexport)
+#else
+#define CGoGN_ALGO_API __declspec(dllimport)
+#endif
+#endif
+#endif
+
 namespace CGoGN
 {
 
@@ -52,10 +62,7 @@ namespace GL2
 {
 
 
-
-
-
-class TopoGenRender
+class CGoGN_ALGO_API TopoGenRender
 {
 protected:
 	/**

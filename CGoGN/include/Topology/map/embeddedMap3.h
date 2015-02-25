@@ -28,12 +28,22 @@
 #include "Topology/map/map3.h"
 #include "Topology/generic/mapImpl/mapMono.h"
 
+#ifdef WIN32
+#ifndef CGoGN_TOPO_API
+#if defined CGoGN_TOPO_DLL_EXPORT
+#define CGoGN_TOPO_API __declspec(dllexport)
+#else
+#define CGoGN_TOPO_API __declspec(dllimport)
+#endif
+#endif
+#endif
+
 namespace CGoGN
 {
 
 /*! Class of 3-dimensional maps with managed embeddings
  */
-class EmbeddedMap3 : public Map3<MapMono>
+class CGoGN_TOPO_API EmbeddedMap3 : public Map3<MapMono>
 {
 	EmbeddedMap3(const EmbeddedMap3& m) : Map3<MapMono>(m) {}
 public:

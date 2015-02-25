@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#define CGoGN_ALGO_DLL_EXPORT 1
+
 #include "Algo/ImplicitHierarchicalMesh/ihm3.h"
 #include "Topology/generic/traversor/traversor3.h"
 

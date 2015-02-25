@@ -30,13 +30,15 @@
 
 namespace CGoGN { namespace Utils { class VBO; } }
 
+#include "Utils/dll.h"
+
 namespace CGoGN
 {
 
 namespace Utils
 {
 
-class PointSprite : public Utils::GLSLShader
+class CGoGN_UTILS_API PointSprite : public Utils::GLSLShader
 {
 protected:
 	static std::string vertexShaderText;

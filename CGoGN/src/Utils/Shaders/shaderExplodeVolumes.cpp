@@ -21,7 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include <string.h>
 #include "Utils/Shaders/shaderExplodeVolumes.h"
 

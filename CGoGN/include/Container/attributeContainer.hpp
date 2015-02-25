@@ -197,6 +197,17 @@ bool AttributeContainer::removeAttribute(unsigned int index)
 	return true ;
 }
 
+template <typename T>
+unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrIndex, std::vector<T*>& vect_ptr, unsigned int& byteBlockSize)
+{
+	assert(attrIndex < m_tableAttribs.size() || !"getAttributeBlocksPointers: attribute index out of bounds");
+	assert(m_tableAttribs[attrIndex] != NULL || !"getAttributeBlocksPointers: attribute does not exist");
+
+	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[attrIndex]);
+	assert((atm != NULL) || !"getAttributeBlocksPointers: wrong type");
+	return atm->getBlocksPointers(vect_ptr, byteBlockSize);
+}
+
 
 /**************************************
  *      INFO ABOUT THE CONTAINER      *

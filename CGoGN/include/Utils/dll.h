@@ -21,61 +21,14 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#define CGoGN_UTILS_DLL_EXPORT 1
-#include "vector"
 
-#include "Utils/vboRender.h"
-#include "Utils/GLSLShader.h"
 
-namespace CGoGN
-{
-
-namespace Utils
-{
-
-VBORender::VBORender()
-{
-	glGenBuffers(1, &m_indexBuffer) ;
-	m_nbIndices = 0 ;
-	m_primitiveType = POINTS;
-}
-
-VBORender::~VBORender()
-{
-	glDeleteBuffers(1, &m_indexBuffer) ;
-}
-
-void VBORender::setConnectivity(std::vector<GLuint>& tableIndices, int primitiveType)
-{
-	m_primitiveType = primitiveType ;
-	m_nbIndices = GLuint(tableIndices.size()) ;
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer) ;
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW) ;
-}
-
-void VBORender::draw(Utils::GLSLShader* sh)
-{
-	sh->enableVertexAttribs() ;
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer) ;
-	switch(m_primitiveType)
-	{
-		case POINTS:
-			glDrawElements(GL_POINTS, m_nbIndices, GL_UNSIGNED_INT, 0) ;
-			break;
-		case LINES:
-			glDrawElements(GL_LINES, m_nbIndices, GL_UNSIGNED_INT, 0);
-			break;
-		case TRIANGLES:
-			glDrawElements(GL_TRIANGLES, m_nbIndices, GL_UNSIGNED_INT, 0);
-			break;
-		default:
-			break;
-	}
-
-	sh->disableVertexAttribs() ;
-}
-
-} // namespace Utils
-
-} // namespace CGoGN
+#ifdef WIN32
+#ifndef CGoGN_UTILS_API
+#if defined CGoGN_UTILS_DLL_EXPORT
+#define CGoGN_UTILS_API __declspec(dllexport)
+#else
+#define CGoGN_UTILS_API __declspec(dllimport)
+#endif
+#endif
+#endif

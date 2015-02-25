@@ -469,7 +469,7 @@ void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP
 
 		*positionDartBuf++ = P;
 		*positionDartBuf++ = PP;
-		if (map.isBoundaryMarked2(d))
+		if (map.isBoundaryMarked<2>(d))
 		{
 			*colorDartBuf++ = m_boundaryDartsColor;
 			*colorDartBuf++ = m_boundaryDartsColor;
@@ -488,7 +488,7 @@ void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP
 		*positionDartBuf++ = QQ;
 
 		Dart dx = map.phi2(d);
-		if (map.isBoundaryMarked2(dx))
+		if (map.isBoundaryMarked<2>(dx))
 		{
 			*colorDartBuf++ = m_boundaryDartsColor;
 			*colorDartBuf++ = m_boundaryDartsColor;

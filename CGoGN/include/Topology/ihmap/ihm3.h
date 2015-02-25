@@ -27,6 +27,16 @@
 
 #include "Topology/map/embeddedMap3.h"
 
+#ifdef WIN32
+#ifndef CGoGN_TOPO_API
+#if defined CGoGN_TOPO_DLL_EXPORT
+#define CGoGN_TOPO_API __declspec(dllexport)
+#else
+#define CGoGN_TOPO_API __declspec(dllimport)
+#endif
+#endif
+#endif
+
 namespace CGoGN
 {
 
@@ -34,7 +44,7 @@ template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
 
 
-class ImplicitHierarchicalMap3 : public EmbeddedMap3
+class CGoGN_TOPO_API ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
     template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
 	typedef EmbeddedMap3::TOPO_MAP TOPO_MAP;

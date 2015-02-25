@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#define CGoGN_ALGO_DLL_EXPORT 1
 
 #include "Algo/MC/tables.h"
 

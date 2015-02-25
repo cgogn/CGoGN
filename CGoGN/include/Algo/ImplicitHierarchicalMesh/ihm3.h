@@ -28,6 +28,18 @@
 #include "Topology/map/embeddedMap3.h"
 #include "Algo/Multiresolution/filter.h"
 
+
+
+#ifdef WIN32
+#ifndef CGoGN_ALGO_API
+#if defined CGoGN_ALGO_DLL_EXPORT
+#define CGoGN_ALGO_API __declspec(dllexport)
+#else
+#define CGoGN_ALGO_API __declspec(dllimport)
+#endif
+#endif
+#endif
+
 namespace CGoGN
 {
 
@@ -42,7 +54,7 @@ namespace IHM
 
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
-class ImplicitHierarchicalMap3 : public EmbeddedMap3
+CGoGN_ALGO_API class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
     template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
 

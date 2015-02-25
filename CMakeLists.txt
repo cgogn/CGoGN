@@ -30,13 +30,11 @@ SET ( CGoGN_COMPILE_SANDBOX OFF CACHE BOOL "compile all in sandbox" )
 SET ( CGoGN_ASSERT_ACTIVED OFF CACHE BOOL "assertion activated")
 SET ( CGoGN_ONELIB OFF CACHE BOOL "build CGoGN in one lib" )
 IF (WIN32)
-	SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
 	SET ( CMAKE_CONFIGURATION_TYPES Release Debug)
 	SET ( CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
 	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile" )
-ELSE (WIN32)
-	SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
 ENDIF ()
+SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
 
 
 checkCpp11Support()
@@ -135,6 +133,8 @@ IF(NOT WIN32)
 	IF(APPLE)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
 	ENDIF()
+ELSE()
+	ADD_DEFINITIONS("/wd4251")
 ENDIF()
 
 
@@ -283,7 +283,6 @@ file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_defs.h "" )
 foreach(VAR_DEF ${CGoGN_DEFS})
 	file(APPEND ${CGoGN_SRC_DIR}/include/cgogn_defs.h ${VAR_DEF} \n )
 endforeach()
-
 
 
 add_subdirectory(${CGoGN_SRC_DIR} CGoGN)

@@ -43,6 +43,7 @@
 #include <vector>
 #include <set>
 
+#include "Utils/dll.h"
 
 namespace CGoGN
 {
@@ -50,7 +51,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class GLSLShader
+class CGoGN_UTILS_API GLSLShader
 {
 public:
 	struct VAStr

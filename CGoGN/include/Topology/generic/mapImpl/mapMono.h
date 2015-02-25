@@ -27,10 +27,20 @@
 
 #include "Topology/generic/genericmap.h"
 
+#ifdef WIN32
+//#ifndef CGoGN_TOPO_API
+#if defined CGoGN_TOPO_DLL_EXPORT
+#define CGoGN_TOPO_API __declspec(dllexport)
+#else
+#define CGoGN_TOPO_API __declspec(dllimport)
+#endif
+//#endif
+#endif
+
 namespace CGoGN
 {
 
-class MapMono : public GenericMap
+class CGoGN_TOPO_API MapMono : public GenericMap
 {
 	template<typename MAP> friend class DartMarkerTmpl ;
 	template<typename MAP> friend class DartMarkerStore ;

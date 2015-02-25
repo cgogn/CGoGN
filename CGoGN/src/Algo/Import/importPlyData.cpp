@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#define CGoGN_ALGO_DLL_EXPORT 1
+
 #include "Utils/os_spec.h"
 #include "Algo/Import/importPlyData.h"
 #include <stdlib.h>

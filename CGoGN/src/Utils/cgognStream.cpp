@@ -22,25 +22,30 @@
  *                                                                              *
  *******************************************************************************/
 
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/cgognStream.h"
+
 #ifdef CGOGN_WITH_QT
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtQGLV.h"
 #include <QtGui/QTextEdit>
 #endif
+
+
+
 namespace CGoGN
 {
 
-CGoGNStream::Out CGoGNout;
-CGoGNStream::Err CGoGNerr;
-CGoGNStream::Dbg CGoGNdbg;
-CGoGNStream::Special CGoGNendl;
-CGoGNStream::Special CGoGNflush;
+CGoGN_UTILS_API CGoGNStream::Out CGoGNout;
+CGoGN_UTILS_API CGoGNStream::Err CGoGNerr;
+CGoGN_UTILS_API CGoGNStream::Dbg CGoGNdbg;
+CGoGN_UTILS_API CGoGNStream::Special CGoGNendl;
+CGoGN_UTILS_API CGoGNStream::Special CGoGNflush;
 
 namespace CGoGNStream
 {
 
-void allToStd(bool yes)
+CGoGN_UTILS_API void allToStd(bool yes)
 {
 	CGoGNout.toStd(yes);
 	CGoGNerr.toStd(yes);
@@ -48,7 +53,7 @@ void allToStd(bool yes)
 
 }
 
-void allToFile(const std::string& filename )
+CGoGN_UTILS_API void allToFile(const std::string& filename)
 {
 	CGoGNout.toFile(filename);
 	CGoGNerr.toFile(filename);
@@ -57,14 +62,14 @@ void allToFile(const std::string& filename )
 }
 
 #ifdef CGOGN_WITH_QT
-void allToStatusBar(Utils::QT::SimpleQT* sqt)
+CGoGN_UTILS_API void allToStatusBar(Utils::QT::SimpleQT* sqt)
 {
 	CGoGNout.toStatusBar(sqt);
 	CGoGNerr.toStatusBar(sqt);
 	CGoGNdbg.toStatusBar(sqt);
 }
 
-void allToConsole(Utils::QT::SimpleQT* sqt)
+CGoGN_UTILS_API void allToConsole(Utils::QT::SimpleQT* sqt)
 {
 	CGoGNout.toConsole(sqt);
 	CGoGNerr.toConsole(sqt);
@@ -72,14 +77,14 @@ void allToConsole(Utils::QT::SimpleQT* sqt)
 
 }
 
-void allToStatusBar(Utils::QT::SimpleQGLV* sqglv)
+CGoGN_UTILS_API void allToStatusBar(Utils::QT::SimpleQGLV* sqglv)
 {
 	CGoGNout.toStatusBar(sqglv);
 	CGoGNerr.toStatusBar(sqglv);
 	CGoGNdbg.toStatusBar(sqglv);
 }
 
-void allToConsole(Utils::QT::SimpleQGLV* sqglv)
+CGoGN_UTILS_API void allToConsole(Utils::QT::SimpleQGLV* sqglv)
 {
 	CGoGNout.toConsole(sqglv);
 	CGoGNerr.toConsole(sqglv);
@@ -88,7 +93,7 @@ void allToConsole(Utils::QT::SimpleQGLV* sqglv)
 }
 #endif
 
-void allToBuffer(std::stringstream* ss)
+CGoGN_UTILS_API void allToBuffer(std::stringstream* ss)
 {
 	CGoGNout.toBuffer(ss);
 	CGoGNerr.toBuffer(ss);

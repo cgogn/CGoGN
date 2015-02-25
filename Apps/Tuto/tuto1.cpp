@@ -94,6 +94,8 @@ void MyQT::createMap()
 	// render the topo of the map without boundary darts
 	m_render_topo->setInitialBoundaryDartsColor(0,1,0);
 	m_render_topo->updateDataGMap<PFP>(myMap, position, 0.9f, 0.9f,true);
+
+	CGoGNout << "hopla" << CGoGNendl;
 }
 
 // initialization GL callback

@@ -21,6 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/svg.h"
 #include "Utils/cgognStream.h"
 #include <algorithm>

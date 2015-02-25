@@ -22,6 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/clippingPresets.h"
 
 #include <cmath>

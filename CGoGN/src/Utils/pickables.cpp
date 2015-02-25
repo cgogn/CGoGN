@@ -21,7 +21,7 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/pickables.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/norm.hpp"

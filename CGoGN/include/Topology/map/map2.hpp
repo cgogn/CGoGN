@@ -866,7 +866,7 @@ bool Map2<MAP_IMPL>::sameOrientedVolume(Vol v1, Vol v2) const
 
 				mark.mark(it);						// Mark
 				Dart adj = phi2(it);				// Get adjacent face
-				if (!this->isBoundaryMarked2(adj) && !mark.isMarked(adj))
+				if (!this->isBoundaryMarked<2>(adj) && !mark.isMarked(adj))
 					visitedFaces.push_back(adj);	// Add it
 				it = this->phi1(it);
 			} while(it != *face);
@@ -903,7 +903,7 @@ unsigned int Map2<MAP_IMPL>::volumeDegree(Vol v) const
 			{
 				mark.mark(it);					// Mark
 				Dart adj = phi2(it);			// Get adjacent face
-				if ( !this->isBoundaryMarked2(adj) && !mark.isMarked(adj) )
+				if ( !this->isBoundaryMarked<2>(adj) && !mark.isMarked(adj) )
 					visitedFaces.push_back(adj);// Add it
 				it = this->phi1(it);
 			} while(it != df);
@@ -935,7 +935,7 @@ int Map2<MAP_IMPL>::checkVolumeDegree(Vol v, unsigned int vd) const
 			{
 				mark.mark(it);					// Mark
 				Dart adj = phi2(it);			// Get adjacent face
-				if ( !this->isBoundaryMarked2(adj) && !mark.isMarked(adj) )
+				if ( !this->isBoundaryMarked<2>(adj) && !mark.isMarked(adj) )
 					visitedFaces.push_back(adj);// Add it
 				it = this->phi1(it);
 			} while(it != df);
@@ -951,7 +951,7 @@ template <typename MAP_IMPL>
 bool Map2<MAP_IMPL>::isTriangular() const
 {
 	bool tri = true;
-	foreach_cell_until<FACE>(this, [&] (Face f)
+	foreach_cell_until<FACE>(*this, [&] (Face f)
 	{
 		if (this->faceDegree(f) != 3)
 			tri = false;

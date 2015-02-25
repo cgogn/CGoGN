@@ -45,6 +45,17 @@
 #include <thread>
 #include <mutex>
 
+#ifdef WIN32
+//#ifndef CGoGN_TOPO_API
+#if defined CGoGN_TOPO_DLL_EXPORT
+#define CGoGN_TOPO_API __declspec(dllexport)
+#else
+#define CGoGN_TOPO_API __declspec(dllimport)
+#endif
+//#endif
+#endif
+
+
 namespace CGoGN
 {
 
@@ -53,7 +64,7 @@ namespace Parallel
 /**
  * @brief Number of threads used for // traversal foreach
  */
-extern int NumberOfThreads;
+CGoGN_TOPO_API extern int NumberOfThreads;
 
 /**
  * @brief get number of cores of computer (threads, /2 if hyperthreading)
@@ -86,7 +97,7 @@ class DartMarkerGen ;
 class CellMarkerGen ;
 class MapManipulator;
 
-class GenericMap
+class CGoGN_TOPO_API GenericMap
 {
 	template<typename T, unsigned int ORBIT, typename MAP> friend class AttributeHandler ;
 	template<typename T, typename MAP> friend class DartAutoAttribute ;

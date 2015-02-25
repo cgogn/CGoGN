@@ -33,9 +33,17 @@
 #include <stack>
 
 #include "glm/glm.hpp"
-//#include "glm/gtc/matrix_projection.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "Geometry/vector_gen.h"
+
+
+#ifdef WIN32
+#if defined CGoGN_QT_DLL_EXPORT
+#define CGoGN_UTILS_API __declspec(dllexport)
+#else
+#define CGoGN_UTILS_API __declspec(dllimport)
+#endif
+#endif
 
 namespace CGoGN
 {
@@ -48,7 +56,7 @@ namespace QT
 
 class SimpleQT;
 
-class GLWidget : public QGLWidget
+class CGoGN_UTILS_API GLWidget : public QGLWidget
 {
 	Q_OBJECT
 

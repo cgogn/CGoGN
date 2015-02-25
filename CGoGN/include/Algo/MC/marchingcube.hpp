@@ -1182,7 +1182,7 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(VertexAttribu
 	DartMarker<L_MAP> mf(*m_map);
 	for (Dart d = m_map->begin(); d != m_map->end();)	// next done inside loop because of deleteFace
 	{
-		if (!mf.isMarked(d) && !m_map->isBoundaryMarked2(d))
+		if (!mf.isMarked(d) && !m_map->isBoundaryMarked<2>(d))
 		{
 			Dart dd = d;
 			Dart e = m_map->phi1(d);

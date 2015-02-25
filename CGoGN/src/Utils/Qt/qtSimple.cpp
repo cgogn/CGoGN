@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include <cmath>
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtgl.h"

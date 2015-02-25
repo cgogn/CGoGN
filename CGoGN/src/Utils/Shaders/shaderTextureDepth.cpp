@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include <GL/glew.h>
 #include "Utils/Shaders/shaderTextureDepth.h"
 

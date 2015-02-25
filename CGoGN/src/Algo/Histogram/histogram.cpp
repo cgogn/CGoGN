@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#define CGoGN_ALGO_DLL_EXPORT 1
+
 #include "Algo/Histogram/histogram.h"
 
 
@@ -130,7 +132,7 @@ void Histogram::populateQuantiles(unsigned int nbquantiles)
 }
 
 
-void Histogram::quantilesAreaCorrection()
+ void Histogram::quantilesAreaCorrection()
 {
 	unsigned int nbquantiles = uint32(m_pop_quantiles.size());
 
@@ -196,7 +198,7 @@ unsigned int Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsig
 	return uint32(vc.size());
 }
 
-unsigned int Histogram::cellsOfQuantilesColumn( unsigned int c, std::vector<unsigned int>& vc) const
+unsigned int Histogram::cellsOfQuantilesColumn(unsigned int c, std::vector<unsigned int>& vc) const
 {
 	vc.clear();
 

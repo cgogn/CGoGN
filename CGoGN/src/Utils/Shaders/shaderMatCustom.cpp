@@ -1,3 +1,5 @@
+#define CGoGN_UTILS_DLL_EXPORT 1
+
 #include <GL/glew.h>
 #include <string.h>
 #include "Utils/Shaders/shaderMatCustom.h"

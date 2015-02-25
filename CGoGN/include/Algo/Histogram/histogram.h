@@ -33,6 +33,16 @@
 #include "Utils/colorMaps.h"
 #include "Utils/vbo_base.h"
 
+#ifdef WIN32
+#ifndef CGoGN_ALGO_API
+#if defined CGoGN_ALGO_DLL_EXPORT
+#define CGoGN_ALGO_API __declspec(dllexport)
+#else
+#define CGoGN_ALGO_API __declspec(dllimport)
+#endif
+#endif
+#endif
+
 namespace CGoGN
 {
 
@@ -42,7 +52,7 @@ namespace Algo
 namespace Histogram
 {
 
-class HistoColorMap
+class CGoGN_ALGO_API HistoColorMap
 {
 protected:
 	double m_min;
@@ -121,7 +131,7 @@ public:
  * Histogram class
  * T must have operators -, / ,< ,>
  */
-class Histogram
+class CGoGN_ALGO_API Histogram
 {
 //	std::vector<double> m_data;
 
@@ -196,22 +206,22 @@ public:
 	/**
 	 * get min value of attribute (perhaps modified by user)
 	 */
-	double getMin() const;
+	inline double getMin() const;
 
 	/**
 	 * get max value of attribute (perhaps modified by user)
 	 */
-	double getMax() const;
+	inline double getMax() const;
 
 	/**
 	 * get real min value of attribute
 	 */
-	double getQMin() const;
+	inline double getQMin() const;
 
 	/**
 	 * get real max value of attribute
 	 */
-	double getQMax() const;
+	inline double getQMax() const;
 
 
 	/**

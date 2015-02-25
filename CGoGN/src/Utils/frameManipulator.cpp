@@ -22,6 +22,8 @@
  *                                                                              *
  *******************************************************************************/
 
+#define CGoGN_UTILS_DLL_EXPORT 1
+
 #include "Utils/frameManipulator.h"
 
 #include "Geometry/distances.h"

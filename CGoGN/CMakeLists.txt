@@ -116,19 +116,20 @@ IF (CGoGN_ONELIB)
 
 ELSE()
 	IF (CGoGN_WITH_QT)
+		add_definitions(-DCGoGN_QT_DLL_EXPORT)
 		add_library( utils ${files_utils_withQt} )
 	ELSE()
 		add_library( utils ${files_utils} )
 	ENDIF()
 	target_link_libraries(utils ${CGoGN_EXT_LIBS})
 
-	add_library( container	${files_container})
+	add_library( container ${files_container})
 	target_link_libraries(container utils)
 
-	add_library( topology	${files_topology})
+	add_library( topology ${files_topology})
 	target_link_libraries(topology container)
 
-	add_library( algo		${files_algo})
+	add_library( algo	${files_algo})
 	target_link_libraries(algo utils topology)
 
 

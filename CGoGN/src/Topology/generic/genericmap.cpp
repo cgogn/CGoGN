@@ -22,9 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
+#define CGoGN_TOPO_DLL_EXPORT 1
+
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/traversor/traversorCell.h"
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -38,7 +39,7 @@ namespace CGoGN
 namespace Parallel
 {
 //int NumberOfThreads=1;
-int NumberOfThreads = getSystemNumberOfCores();
+CGoGN_TOPO_API int NumberOfThreads = getSystemNumberOfCores();
 }
 
 

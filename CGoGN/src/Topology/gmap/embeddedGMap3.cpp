@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#define CGoGN_TOPO_DLL_EXPORT 1
+
 #include <vector>
 #include <algorithm>
 

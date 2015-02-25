@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/GLSLShader.h"
 #include "Utils/Qt/qtQGLV.h"
 #include "glm/gtc/matrix_transform.hpp"

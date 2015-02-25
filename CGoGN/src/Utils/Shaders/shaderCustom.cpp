@@ -1,3 +1,6 @@
+
+#define CGoGN_UTILS_DLL_EXPORT 1
+
 #include <string.h>
 #include "Utils/Shaders/shaderCustom.h"
 

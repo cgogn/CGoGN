@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 //#ifdef CGOGN_WITH_QT
-
+#define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/Shaders/shaderTextureMask.h"
 
 

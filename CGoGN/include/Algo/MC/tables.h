@@ -26,6 +26,18 @@
 #define __MC_TABLE__
 
 #include "type.h"
+
+#ifdef WIN32
+#ifndef CGoGN_ALGO_API
+#if defined CGoGN_ALGO_DLL_EXPORT
+#define CGoGN_ALGO_API __declspec(dllexport)
+#else
+#define CGoGN_ALGO_API __declspec(dllimport)
+#endif
+#endif
+#endif
+
+
 namespace CGoGN
 {
 
@@ -47,7 +59,7 @@ namespace MC
 * file. It can not be included in the marching-cube files
 * because it is template
 */
-class  accelMCTable
+class CGoGN_ALGO_API accelMCTable
 {
 public:
 /**

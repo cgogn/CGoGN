@@ -28,7 +28,7 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/cells.h"
 #include "Topology/generic/cellmarker.h"
-#include "Topology/generic/traversor/traversorCell.h"
+//#include "Topology/generic/traversor/traversorCell.h"
 #include "Topology/generic/traversor/traversorDoO.h"
 #include "Topology/generic/traversor/iterTrav.h"
 
