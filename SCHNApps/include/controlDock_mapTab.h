@@ -5,6 +5,16 @@
 
 #include "mapHandler.h"
 
+
+#ifdef WIN32
+#if defined SCHNAPPSLIB_DLL_EXPORT
+#define SCHNAPPS_API __declspec(dllexport)
+#else
+#define SCHNAPPS_API __declspec(dllimport)
+#endif
+#endif
+
+
 namespace CGoGN
 {
 
@@ -19,7 +29,7 @@ namespace SCHNApps
 class SCHNApps;
 class View;
 
-class ControlDock_MapTab : public QWidget, public Ui::ControlDock_MapTabWidget
+class SCHNAPPS_API ControlDock_MapTab : public QWidget, public Ui::ControlDock_MapTabWidget
 {
 	Q_OBJECT
 

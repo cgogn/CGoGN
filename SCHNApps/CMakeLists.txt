@@ -7,12 +7,39 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
 
 SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
+IF(WIN32)
+	SET ( CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies" )
+ENDIF(WIN32)
+
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 SET (CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 
 INCLUDE(${CGoGN_ROOT_DIR}/cmake_modules/functions.cmake)
 
 setBuildType()
+
+SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
+IF(WIN32)
+	IF (CGoGN_WITH_QTCREATOR)
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+	ELSE()
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/)
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
+	ENDIF()
+#	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
+#	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
+	link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
+ELSE()
+	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+#	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
+#	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+ENDIF()
+
+
+
+# PythonQt third-party dependency
+ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
 
 
 find_package(OpenGL REQUIRED)
@@ -21,7 +48,7 @@ find_package(GLEW REQUIRED)
 find_package(Qt4 REQUIRED)
 #find_package(QGLViewer REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
-find_package(SuiteSparse REQUIRED)
+#find_package(SuiteSparse REQUIRED)
 #find_package(SuperLU REQUIRED)
 
 
@@ -37,8 +64,6 @@ SET( QT_USE_QTSVG TRUE )
 INCLUDE(${QT_USE_FILE})
 #ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-# PythonQt third-party dependency
-ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
 
 
 # CGoGN compiled in one or several libs
@@ -77,85 +102,41 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 
 
-SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
-SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
-SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-
-# for application auto selection of plugin directory
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
-
-file(
-	GLOB_RECURSE
-	SCHNApps_FILES
-	${SCHNApps_ROOT_DIR}/src/*.cpp
-	${SCHNApps_ROOT_DIR}/include/*.h
-	${SCHNApps_ROOT_DIR}/include/*.hpp
-)
-
-file(
-	GLOB_RECURSE
-	SCHNApps_UI_FILES
-	${SCHNApps_ROOT_DIR}/forms/*.ui
-)
-
-SET(SCHNApps_QOBJECT_FILES
-	${SCHNApps_ROOT_DIR}/include/camera.h
-	${SCHNApps_ROOT_DIR}/include/mapHandler.h
-	${SCHNApps_ROOT_DIR}/include/cellSelector.h
-	${SCHNApps_ROOT_DIR}/include/plugin.h
-	${SCHNApps_ROOT_DIR}/include/plugin_interaction.h
-	${SCHNApps_ROOT_DIR}/include/plugin_processing.h
-	${SCHNApps_ROOT_DIR}/include/view.h
-	${SCHNApps_ROOT_DIR}/include/schnapps.h
-	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
-	${SCHNApps_ROOT_DIR}/include/controlDock_cameraTab.h
-	${SCHNApps_ROOT_DIR}/include/controlDock_pluginTab.h
-	${SCHNApps_ROOT_DIR}/include/controlDock_mapTab.h
-	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
-	${SCHNApps_ROOT_DIR}/include/dialogList.h
-)
-
-
-
-link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
-
-
 INCLUDE_DIRECTORIES(
 	${CGoGN_SRC_DIR}/include
 	${CGoGN_ROOT_DIR}/ThirdParty/PythonQt/src/
 	${SCHNApps_ROOT_DIR}/include
 	${EXT_INCLUDES}
+#	${CMAKE_CURRENT_SOURCE_DIR}
+#	${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}/Plugins/schnapps/
+)
+
+ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
+
+INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_BINARY_DIR}
 )
 
-QT4_WRAP_UI( UIC_FILES
-	${SCHNApps_UI_FILES}
-)
 
-QT4_WRAP_CPP( MOC_FILES
-	${SCHNApps_QOBJECT_FILES}
-)
-
-QT4_ADD_RESOURCES( RCC_FILES
-	${SCHNApps_ROOT_DIR}/resources/resources.qrc
+# SCHNApps main application
+file(
+	GLOB_RECURSE
+	SCHNApps_FILES
+	${SCHNApps_ROOT_DIR}/src/main.cpp
+#	${SCHNApps_ROOT_DIR}/include/*.h
+#	${SCHNApps_ROOT_DIR}/include/*.hpp
 )
 
 ADD_EXECUTABLE( SCHNApps
 	${SCHNApps_FILES}
-	${UIC_FILES}
-	${MOC_FILES}
-	${RCC_FILES}
 )
 
 TARGET_LINK_LIBRARIES( SCHNApps
+	SCHNAppsLib
 	${CGoGN_LIBS}
 	${EXT_LIBS}
 )
-
-
-ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
 
 IF(IS_DIRECTORY ${SCHNApps_ROOT_DIR}/../../Plugins)
 	ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/../../Plugins ExtPlugins)

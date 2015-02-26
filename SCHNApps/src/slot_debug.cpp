@@ -1,6 +1,5 @@
 #include "slot_debug.h"
 
-
 namespace CGoGN
 {
 
@@ -16,8 +15,7 @@ PrettyPrintShiftMessage::PrettyPrintShiftMessage(const char *fname):
 	{
 		std::cout << "    ";
 	}
-	std::cout << "Entering slot "<< m_msg << std::endl;
-
+	std::cout << "Entering slot " << m_msg << std::endl;
 	s_nb++;
 }
 
@@ -28,7 +26,7 @@ PrettyPrintShiftMessage::~PrettyPrintShiftMessage()
 	{
 		std::cout << "    ";
 	}
-	std::cout << "Exiting slot "<< m_msg  << std::endl;
+	std::cout << "Exiting slot " << m_msg  << std::endl;
 	s_nb--;
 }
 

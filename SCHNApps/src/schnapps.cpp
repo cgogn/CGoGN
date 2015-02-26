@@ -769,7 +769,7 @@ void SCHNApps::aboutSCHNApps()
 	QString str("SCHNApps:\nS... CGoGN Holder for Nice Applications\n"
 	            "Web site: http://cgogn.unistra.fr \n"
 	            "Contact information: cgogn@unistra.fr");
-	QMessageBox::about(this, tr("About SCHNApps"), str);
+	QMessageBox::about(this, "About SCHNApps", str);
 }
 
 void SCHNApps::aboutCGoGN()
@@ -778,7 +778,7 @@ void SCHNApps::aboutCGoGN()
 	            "with Generic N-dimensional Maps\n"
 	            "Web site: http://cgogn.unistra.fr \n"
 	            "Contact information: cgogn@unistra.fr");
-	QMessageBox::about(this, tr("About CGoGN"), str);
+	QMessageBox::about(this, "About CGoGN", str);
 }
 
 void SCHNApps::showHideControlDock()

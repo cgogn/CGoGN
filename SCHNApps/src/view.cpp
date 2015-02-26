@@ -377,7 +377,7 @@ void View::init()
 
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
-	delete c;
+//	delete c;
 
 	this->setBackgroundColor(QColor(0,0,0));
 	glEnable(GL_DEPTH_TEST);

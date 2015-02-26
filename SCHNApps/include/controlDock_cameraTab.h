@@ -3,6 +3,14 @@
 
 #include "ui_controlDock_CameraTabWidget.h"
 
+#ifdef WIN32
+#if defined SCHNAPPSLIB_DLL_EXPORT
+#define SCHNAPPS_API __declspec(dllexport)
+#else
+#define SCHNAPPS_API __declspec(dllimport)
+#endif
+#endif
+
 namespace CGoGN
 {
 
@@ -13,7 +21,7 @@ class SCHNApps;
 class Camera;
 class View;
 
-class ControlDock_CameraTab : public QWidget, public Ui::ControlDock_CameraTabWidget
+class SCHNAPPS_API ControlDock_CameraTab : public QWidget, public Ui::ControlDock_CameraTabWidget
 {
 	Q_OBJECT
 

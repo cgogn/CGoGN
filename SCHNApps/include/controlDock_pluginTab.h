@@ -3,6 +3,15 @@
 
 #include "ui_controlDock_PluginTabWidget.h"
 
+#ifdef WIN32
+#if defined SCHNAPPSLIB_DLL_EXPORT
+#define SCHNAPPS_API __declspec(dllexport)
+#else
+#define SCHNAPPS_API __declspec(dllimport)
+#endif
+#endif
+
+
 namespace CGoGN
 {
 
@@ -14,7 +23,7 @@ class Plugin;
 class PluginInteraction;
 class View;
 
-class ControlDock_PluginTab : public QWidget, public Ui::ControlDock_PluginTabWidget
+class SCHNAPPS_API ControlDock_PluginTab : public QWidget, public Ui::ControlDock_PluginTabWidget
 {
 	Q_OBJECT
 

@@ -5,6 +5,15 @@
 #include <QGLViewer/camera.h>
 #include <QGLViewer/manipulatedCameraFrame.h>
 
+
+#ifdef WIN32
+#if defined SCHNAPPSLIB_DLL_EXPORT
+#define SCHNAPPS_API __declspec(dllexport)
+#else
+#define SCHNAPPS_API __declspec(dllimport)
+#endif
+#endif
+
 namespace CGoGN
 {
 
@@ -13,7 +22,7 @@ namespace SCHNApps
 
 class SCHNApps;
 
-class Camera : public qglviewer::Camera
+class SCHNAPPS_API Camera : public qglviewer::Camera
 {
 	Q_OBJECT
 

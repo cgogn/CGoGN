@@ -3,10 +3,19 @@
 
 #include <QComboBox>
 
+#ifdef WIN32
+#if defined SCHNAPPSLIB_DLL_EXPORT
+#define SCHNAPPS_API __declspec(dllexport)
+#else
+#define SCHNAPPS_API __declspec(dllimport)
+#endif
+#endif
+
+
 class QColor;
 class QWidget;
 
-class ColorComboBox : public QComboBox
+class SCHNAPPS_API ColorComboBox : public QComboBox
 {
 	Q_OBJECT
 	Q_PROPERTY(QColor color READ color WRITE setColor USER true)

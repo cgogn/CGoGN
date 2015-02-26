@@ -3,8 +3,19 @@
 
 #include <QtPlugin>
 #include <QAction>
+#include <GL/glew.h>
+
 
 #include "types.h"
+
+#ifdef WIN32
+#if defined SCHNAPPSLIB_DLL_EXPORT
+#define SCHNAPPS_API __declspec(dllexport)
+#else
+#define SCHNAPPS_API __declspec(dllimport)
+#endif
+#endif
+
 
 namespace CGoGN
 {
@@ -12,7 +23,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Plugin : public QObject
+class SCHNAPPS_API Plugin : public QObject
 {
 	Q_OBJECT
 

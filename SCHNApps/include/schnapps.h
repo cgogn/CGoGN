@@ -1,6 +1,15 @@
 #ifndef _SCHNAPPS_H_
 #define _SCHNAPPS_H_
 
+
+#ifdef WIN32
+#if defined SCHNAPPSLIB_DLL_EXPORT
+#define SCHNAPPS_API __declspec(dllexport)
+#else
+#define SCHNAPPS_API __declspec(dllimport)
+#endif
+#endif
+
 #include "ui_schnapps.h"
 
 #include "types.h"
@@ -12,6 +21,9 @@
 class QVBoxLayout;
 class QSplitter;
 
+
+
+
 namespace CGoGN
 {
 
@@ -22,7 +34,7 @@ class ControlDock_CameraTab;
 class ControlDock_MapTab;
 class ControlDock_PluginTab;
 
-class SCHNApps : public QMainWindow, Ui::SCHNApps
+class SCHNAPPS_API SCHNApps : public QMainWindow, Ui::SCHNApps
 {
 	Q_OBJECT
 

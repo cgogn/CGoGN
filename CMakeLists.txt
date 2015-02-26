@@ -43,10 +43,10 @@ setBuildType()
 
 SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/)
 IF(WIN32)
-	IF (NOT CGoGN_WITH_QTCREATOR)
-		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/)
-	ELSE()
+	IF (CGoGN_WITH_QTCREATOR)
 		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+	ELSE()
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/)
 	ENDIF()
 ELSE()
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
@@ -134,7 +134,7 @@ IF(NOT WIN32)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
 	ENDIF()
 ELSE()
-	ADD_DEFINITIONS("/wd4251")
+	ADD_DEFINITIONS("/wd4251") #dll export warnings
 ENDIF()
 
 
@@ -185,14 +185,10 @@ SET (CGoGN_EXT_INCLUDES)
 SET (CGoGN_EXT_LIBS)
 IF (CGoGN_WITH_QT)
 		INCLUDE(${QT_USE_FILE})
-#        ADD_DEFINITIONS(-DCGOGN_WITH_QT)
-#        ADD_DEFINITIONS(${QT_DEFINITIONS})
 		LIST(APPEND CGoGN_DEFS -DCGOGN_WITH_QT)
         LIST(APPEND CGoGN_EXT_INCLUDES ${QT_INCLUDE_DIR})
         LIST(APPEND CGoGN_EXT_LIBS QGLViewer ${QT_LIBRARIES})
-#        IF (NOT WIN32)
-			LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/)
-#		ENDIF()
+		LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/)
 ELSE ()
 	 LIST(APPEND CGoGN_EXT_INCLUDES ${IL_INCLUDE_DIR})
 	 LIST(APPEND CGoGN_EXT_LIBS ${IL_LIBRARIES})
@@ -294,30 +290,30 @@ add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 # Add custom clean targets for cleaning without cleaning dependencies
 #
 if (WIN32)
-	add_custom_target(clean_cgogn 
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_command(TARGET clean_cgogn PRE_BUILD 
-			COMMAND del /q CCoGN
-			COMMAND cmake ..
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-			COMMENT "cleaning CGoGN libs")
-
-	add_custom_target(clean_apps 
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_command(TARGET clean_apps PRE_BUILD 
-			COMMAND del /q Apps
-			COMMAND cmake ..
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-			COMMENT "cleaning Apps")
-
-	add_custom_target(clean_cgogn_apps 
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_command(TARGET clean_cgogn_apps PRE_BUILD 
-			COMMAND del /q CGoGN
-			COMMAND del /q Apps
-			COMMAND cmake ..
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-			COMMENT "cleaning Apps")
+#	add_custom_target(clean_cgogn 
+#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+#	add_custom_command(TARGET clean_cgogn PRE_BUILD 
+#			COMMAND del /q CCoGN
+#			COMMAND cmake ..
+#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#			COMMENT "cleaning CGoGN libs")
+#
+#	add_custom_target(clean_apps 
+#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+#	add_custom_command(TARGET clean_apps PRE_BUILD 
+#			COMMAND del /q Apps
+#			COMMAND cmake ..
+#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#			COMMENT "cleaning Apps")
+#
+#	add_custom_target(clean_cgogn_apps 
+#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+#	add_custom_command(TARGET clean_cgogn_apps PRE_BUILD 
+#			COMMAND del /q CGoGN
+#			COMMAND del /q Apps
+#			COMMAND cmake ..
+#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#			COMMENT "cleaning Apps")
 
 ELSE()
 
