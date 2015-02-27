@@ -28,15 +28,8 @@
 #include "Topology/map/map2.h"
 #include "Topology/generic/mapImpl/mapMono.h"
 
-#ifdef WIN32
-//#ifndef CGoGN_TOPO_API
-#if defined CGoGN_TOPO_DLL_EXPORT
-#define CGoGN_TOPO_API __declspec(dllexport)
-#else
-#define CGoGN_TOPO_API __declspec(dllimport)
-#endif
-//#endif
-#endif
+#include "Topology/dll.h"
+
 
 namespace CGoGN
 {

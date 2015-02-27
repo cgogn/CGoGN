@@ -53,7 +53,7 @@ public:
 	virtual void keyPress(View* view, QKeyEvent* event);
 	virtual void keyRelease(View* view, QKeyEvent* event);
 	virtual void mousePress(View* view, QMouseEvent* event);
-	virtual void mouseRelease(View* view, QMouseEvent* event) {}
+	virtual void mouseRelease(View* , QMouseEvent* ) {}
 	virtual void mouseMove(View* view, QMouseEvent* event);
 	virtual void wheelEvent(View* view, QWheelEvent* event);
 

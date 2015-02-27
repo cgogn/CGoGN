@@ -29,9 +29,7 @@
 #include "glm/gtc/type_precision.hpp"
 #include "Utils/GLSLShader.h"
 
-#ifdef MAC_OSX
-  #include "Utils/Qt/macgl3.h"
-#endif
+
 namespace CGoGN
 {
 

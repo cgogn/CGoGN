@@ -40,10 +40,12 @@
 namespace CGoGN { namespace Utils { class GLSLShader; } }
 
 #ifdef WIN32
+#ifndef CGoGN_UTILS_API
 #if defined CGoGN_QT_DLL_EXPORT
 #define CGoGN_UTILS_API __declspec(dllexport)
 #else
 #define CGoGN_UTILS_API __declspec(dllimport)
+#endif
 #endif
 #endif
 

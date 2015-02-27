@@ -90,7 +90,7 @@ public:
 
 	inline const std::vector<CELL>& getSelectedCells() { return m_cells; }
 
-	inline unsigned int getNbSelectedCells() const { return m_cells.size(); }
+	inline unsigned int getNbSelectedCells() const { return (unsigned int)(m_cells.size()); }
 
 	inline void select(CELL c, bool emitSignal = true)
 	{

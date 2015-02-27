@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 
-IF(WIN32)
+project(SCHNAppsLib)
+
+IF(WIN32 AND (NOT (CGoGN_WITH_QTCREATOR)))
 	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
+	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${ConfigurationName}\" )
 ELSE()
 	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
+	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
 ENDIF()
-
 
 # SCHNApps files to compile in a lib for dll access from plugins
 file(

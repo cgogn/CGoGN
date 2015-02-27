@@ -22,27 +22,13 @@
 *                                                                              *
 *******************************************************************************/
 
-namespace CGoGN
-{
 
-namespace Utils
-{
-
-template <typename T>
-void VBO::updateData(std::vector<T>& data)
-{
-	if (m_lock)
-	{
-		CGoGNerr << "Error locked VBO" << CGoGNendl;
-		return;
-	}
-	m_data_size = sizeof(T) / sizeof(float);
-	m_nbElts = uint32(data.size());
-
-	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
-	glBufferData(GL_ARRAY_BUFFER, m_nbElts * sizeof(T), &(data[0]), GL_STREAM_DRAW);
-}
-
-} // namespace Utils
-
-} // namespace CGoGN
+#ifdef WIN32
+#ifndef CGoGN_TOPO_API
+#if defined CGoGN_TOPO_DLL_EXPORT
+#define CGoGN_TOPO_API __declspec(dllexport)
+#else
+#define CGoGN_TOPO_API __declspec(dllimport)
+#endif
+#endif
+#endif

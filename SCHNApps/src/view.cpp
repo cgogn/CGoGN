@@ -661,17 +661,17 @@ void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 	updateGL();
 }
 
-void View::ui_verticalSplitView(int x, int y, int globalX, int globalY)
+void View::ui_verticalSplitView(int x, int y, int /*globalX*/, int /*globalY*/)
 {
 	m_schnapps->splitView(m_name, Qt::Horizontal);
 }
 
-void View::ui_horizontalSplitView(int x, int y, int globalX, int globalY)
+void View::ui_horizontalSplitView(int x, int y, int /*globalX*/, int /*globalY*/)
 {
 	m_schnapps->splitView(m_name, Qt::Vertical);
 }
 
-void View::ui_closeView(int x, int y, int globalX, int globalY)
+void View::ui_closeView(int x, int y, int /*globalX*/, int /*globalY*/)
 {
 	m_schnapps->removeView(m_name);
 }

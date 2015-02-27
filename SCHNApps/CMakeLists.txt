@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 project(SCHNApps)
 
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
-
 SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 IF(WIN32)
@@ -22,17 +20,15 @@ SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
 IF(WIN32)
 	IF (CGoGN_WITH_QTCREATOR)
 		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
 	ELSE()
 		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/)
 		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
 	ENDIF()
-#	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-#	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
-	link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
 ELSE()
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-#	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-#	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
 	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 ENDIF()
 
@@ -90,15 +86,20 @@ FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_ext_libs.h EXT_LIBS)
 LIST(APPEND EXT_LIBS PythonQt ${PYTHON_LIBRARIES})
 
 
-if(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")	
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
-endif()
+
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+	LIST(APPEND CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
+endif()
+
+if(WIN32)
+	LIST(APPEND CMAKE_CXX_FLAGS "/W3")
+else()
+	LIST(APPEND CMAKE_CXX_FLAGS "-Wall -fPIC -std=c++11")
+	if(APPLE)
+		LIST(APPEND CMAKE_CXX_FLAGS "-Wno-deprecated -Wno-overloaded-virtual")	
+	endif()
+endif()
 
 
 
@@ -107,10 +108,10 @@ INCLUDE_DIRECTORIES(
 	${CGoGN_ROOT_DIR}/ThirdParty/PythonQt/src/
 	${SCHNApps_ROOT_DIR}/include
 	${EXT_INCLUDES}
-#	${CMAKE_CURRENT_SOURCE_DIR}
-#	${CMAKE_CURRENT_BINARY_DIR}
-	${CMAKE_CURRENT_BINARY_DIR}/Plugins/schnapps/
+	${CMAKE_CURRENT_BINARY_DIR}/SCHNAppsLib
 )
+
+ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins/schnapps/ SCHNAppsLib)
 
 ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
 
@@ -124,8 +125,6 @@ file(
 	GLOB_RECURSE
 	SCHNApps_FILES
 	${SCHNApps_ROOT_DIR}/src/main.cpp
-#	${SCHNApps_ROOT_DIR}/include/*.h
-#	${SCHNApps_ROOT_DIR}/include/*.hpp
 )
 
 ADD_EXECUTABLE( SCHNApps
