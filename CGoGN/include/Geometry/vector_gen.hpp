@@ -273,7 +273,7 @@ inline Vector<DIM, T> Vector<DIM, T>::operator/(T2 a) const
 	Vector<DIM, T> res ;
 	T aa = T(a);
 	for (unsigned int i = 0; i < DIM; ++i)
-		res[i] = m_data[i] / T(a) ;
+		res[i] = m_data[i] / aa ;
 	return res ;
 }
 

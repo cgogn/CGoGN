@@ -39,6 +39,8 @@
 #define CGoGN_ALGO_API __declspec(dllimport)
 #endif
 #endif
+#else
+#define CGoGN_ALGO_API
 #endif
 
 namespace CGoGN

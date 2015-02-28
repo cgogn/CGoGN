@@ -6,13 +6,7 @@
 #include <QGLViewer/manipulatedCameraFrame.h>
 
 
-#ifdef WIN32
-#if defined SCHNAPPSLIB_DLL_EXPORT
-#define SCHNAPPS_API __declspec(dllexport)
-#else
-#define SCHNAPPS_API __declspec(dllimport)
-#endif
-#endif
+#include "dll.h"
 
 namespace CGoGN
 {

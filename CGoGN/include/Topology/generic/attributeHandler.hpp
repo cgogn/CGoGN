@@ -23,6 +23,8 @@
 *******************************************************************************/
 
 #include "Utils/threadbarrier.h"
+#include "Algo/Topo/embedding.h"
+
 
 #include <vector>
 
@@ -196,7 +198,6 @@ inline T& AttributeHandler<T, ORB, MAP>::operator[](Cell<ORB> c)
 
 	if (a == EMBNULL)
 		a = Algo::Topo::setOrbitEmbeddingOnNewCell(*m_map, c) ;
-
 	return m_attrib->operator[](a) ;
 }
 

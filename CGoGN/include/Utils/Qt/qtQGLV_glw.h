@@ -46,6 +46,8 @@ namespace CGoGN { namespace Utils { class GLSLShader; } }
 #else
 #define CGoGN_UTILS_API __declspec(dllimport)
 #endif
+#else
+#define CGoGN_UTILS_API
 #endif
 
 namespace CGoGN

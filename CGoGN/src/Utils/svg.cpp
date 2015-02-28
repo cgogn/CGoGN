@@ -39,7 +39,7 @@ namespace Utils
 namespace SVG
 {
 
-#define uint32 unsigned int 
+typedef unsigned int uint32;
 
 const std::vector<Geom::Vec3f>& SvgObj::vertices() const
 {

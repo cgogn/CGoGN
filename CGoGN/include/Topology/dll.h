@@ -31,4 +31,6 @@
 #define CGoGN_TOPO_API __declspec(dllimport)
 #endif
 #endif
+#else
+#define CGoGN_TOPO_API
 #endif

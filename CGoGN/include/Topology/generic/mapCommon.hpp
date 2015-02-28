@@ -22,6 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Topology/generic/traversor/traversorFactory.h"
 namespace CGoGN
 {
 

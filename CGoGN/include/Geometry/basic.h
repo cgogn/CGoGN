@@ -94,7 +94,7 @@ typename VEC::DATA_TYPE angle(const VEC& a, const VEC& b)
 template <typename VEC3>
 typename VEC3::DATA_TYPE triangleArea(const VEC3& p1, const VEC3& p2, const VEC3& p3)
 {
-	return VEC3::DATA_TYPE(0.5 * ((p2 - p1) ^ (p3 - p1)).norm()); 
+	return typename VEC3::DATA_TYPE (0.5 * ((p2 - p1) ^ (p3 - p1)).norm());
 }
 
 // normal of the plane spanned by 3 points in 3D

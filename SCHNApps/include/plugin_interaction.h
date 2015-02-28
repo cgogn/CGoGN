@@ -19,8 +19,8 @@ class SCHNAPPS_API PluginInteraction : public Plugin
 	friend class View;
 
 public:
-	inline PluginInteraction();
-	inline virtual ~PluginInteraction();
+	PluginInteraction();
+	virtual ~PluginInteraction();
 
 public slots:
 	inline const QList<View*>& getLinkedViews() const { return l_views; }
@@ -47,16 +47,16 @@ private:
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
 
-	inline void linkView(View* view);
-	inline void unlinkView(View* view);
+	void linkView(View* view);
+	void unlinkView(View* view);
 
 	/*********************************************************
 	 * MANAGE SHADERS
 	 *********************************************************/
 
 protected:
-	inline void registerShader(Utils::GLSLShader* shader);
-	inline void unregisterShader(Utils::GLSLShader* shader);
+	void registerShader(Utils::GLSLShader* shader);
+	void unregisterShader(Utils::GLSLShader* shader);
 
 protected:
 	QList<View*> l_views;

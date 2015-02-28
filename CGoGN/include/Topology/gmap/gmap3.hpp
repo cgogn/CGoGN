@@ -857,7 +857,7 @@ bool GMap3<MAP_IMPL>::isBoundaryAdjacentVolume(Dart d) const
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		if (isBoundaryMarked<3>(beta3(visitedFaces[i])))
+		if (this->isBoundaryMarked<3>(beta3(visitedFaces[i])))
 			return true ;
 
 		Dart e = visitedFaces[i] ;
