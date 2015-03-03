@@ -1,16 +1,22 @@
 #ifndef _SCHNAPPS_H_
 #define _SCHNAPPS_H_
 
+
+#include "dll.h"
+
 #include "ui_schnapps.h"
 
 #include "types.h"
-#include "slot_debug.h"
 
-#include "PythonQt/PythonQt.h"
-#include "PythonQt/gui/PythonQtScriptingConsole.h"
+#include "PythonQt.h"
+#include "gui/PythonQtScriptingConsole.h"
+#include "slot_debug.h"
 
 class QVBoxLayout;
 class QSplitter;
+
+
+
 
 namespace CGoGN
 {
@@ -22,7 +28,7 @@ class ControlDock_CameraTab;
 class ControlDock_MapTab;
 class ControlDock_PluginTab;
 
-class SCHNApps : public QMainWindow, Ui::SCHNApps
+class SCHNAPPS_API SCHNApps : public QMainWindow, Ui::SCHNApps
 {
 	Q_OBJECT
 

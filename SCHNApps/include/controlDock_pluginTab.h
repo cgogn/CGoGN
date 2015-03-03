@@ -3,6 +3,8 @@
 
 #include "ui_controlDock_PluginTabWidget.h"
 
+#include "dll.h"
+
 namespace CGoGN
 {
 
@@ -14,7 +16,7 @@ class Plugin;
 class PluginInteraction;
 class View;
 
-class ControlDock_PluginTab : public QWidget, public Ui::ControlDock_PluginTabWidget
+class SCHNAPPS_API ControlDock_PluginTab : public QWidget, public Ui::ControlDock_PluginTabWidget
 {
 	Q_OBJECT
 

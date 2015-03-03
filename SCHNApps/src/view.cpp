@@ -377,7 +377,7 @@ void View::init()
 
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
-	delete c;
+//	delete c;
 
 	this->setBackgroundColor(QColor(0,0,0));
 	glEnable(GL_DEPTH_TEST);
@@ -661,17 +661,17 @@ void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 	updateGL();
 }
 
-void View::ui_verticalSplitView(int x, int y, int globalX, int globalY)
+void View::ui_verticalSplitView(int x, int y, int /*globalX*/, int /*globalY*/)
 {
 	m_schnapps->splitView(m_name, Qt::Horizontal);
 }
 
-void View::ui_horizontalSplitView(int x, int y, int globalX, int globalY)
+void View::ui_horizontalSplitView(int x, int y, int /*globalX*/, int /*globalY*/)
 {
 	m_schnapps->splitView(m_name, Qt::Vertical);
 }
 
-void View::ui_closeView(int x, int y, int globalX, int globalY)
+void View::ui_closeView(int x, int y, int /*globalX*/, int /*globalY*/)
 {
 	m_schnapps->removeView(m_name);
 }

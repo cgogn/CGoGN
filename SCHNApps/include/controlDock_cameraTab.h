@@ -3,6 +3,8 @@
 
 #include "ui_controlDock_CameraTabWidget.h"
 
+#include "dll.h"
+
 namespace CGoGN
 {
 
@@ -13,7 +15,7 @@ class SCHNApps;
 class Camera;
 class View;
 
-class ControlDock_CameraTab : public QWidget, public Ui::ControlDock_CameraTabWidget
+class SCHNAPPS_API ControlDock_CameraTab : public QWidget, public Ui::ControlDock_CameraTabWidget
 {
 	Q_OBJECT
 

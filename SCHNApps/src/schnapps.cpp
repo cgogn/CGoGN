@@ -44,7 +44,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 {
 	GenericMap::initAllStatics(&m_sp);
 
-#ifdef USE_OGL_CORE_PROFILE
+#ifdef CGoGN_USE_OGL_CORE_PROFILE
 	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(3);
 #else
 	CGoGN::Utils::GLSLShader::setCurrentOGLVersion(2);
@@ -769,7 +769,7 @@ void SCHNApps::aboutSCHNApps()
 	QString str("SCHNApps:\nS... CGoGN Holder for Nice Applications\n"
 	            "Web site: http://cgogn.unistra.fr \n"
 	            "Contact information: cgogn@unistra.fr");
-	QMessageBox::about(this, tr("About SCHNApps"), str);
+	QMessageBox::about(this, "About SCHNApps", str);
 }
 
 void SCHNApps::aboutCGoGN()
@@ -778,7 +778,7 @@ void SCHNApps::aboutCGoGN()
 	            "with Generic N-dimensional Maps\n"
 	            "Web site: http://cgogn.unistra.fr \n"
 	            "Contact information: cgogn@unistra.fr");
-	QMessageBox::about(this, tr("About CGoGN"), str);
+	QMessageBox::about(this, "About CGoGN", str);
 }
 
 void SCHNApps::showHideControlDock()

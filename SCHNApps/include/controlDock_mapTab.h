@@ -5,6 +5,9 @@
 
 #include "mapHandler.h"
 
+
+#include "dll.h"
+
 namespace CGoGN
 {
 
@@ -19,7 +22,7 @@ namespace SCHNApps
 class SCHNApps;
 class View;
 
-class ControlDock_MapTab : public QWidget, public Ui::ControlDock_MapTabWidget
+class SCHNAPPS_API ControlDock_MapTab : public QWidget, public Ui::ControlDock_MapTabWidget
 {
 	Q_OBJECT
 

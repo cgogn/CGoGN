@@ -3,23 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 project(SandBox)
 
 
-#SET (CMAKE_BUILD_TYPE Debug)
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-#	${CGoGN_ROOT_DIR}/include
-#	${CGoGN_EXT_INCLUDES})
-
-# define libs path
-#IF(WIN32)
-#	link_directories(${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)
-#	${Boost_LIBRARY_DIRS})
-#ELSE(WIN32)
-#	link_directories(${CGoGN_ROOT_DIR}/lib/Release ${CGoGN_ROOT_DIR}/lib/Debug)
-#ENDIF(WIN32)
-
-
-#define exec to compile
 
 add_executable(multi_att multi_att.cpp)
 target_link_libraries(multi_att ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
@@ -27,7 +10,10 @@ target_link_libraries(multi_att ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
 add_executable(trav3_test trav3_test.cpp)
 target_link_libraries(trav3_test ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
 
-IF (WITH_QT)
+IF (CGoGN_WITH_QT)
+
+	include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 	QT4_WRAP_CPP(tilings_moc tilings.h)
 	add_executable(tilings tilings.cpp  ${tilings_moc})
 	target_link_libraries(tilings ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})

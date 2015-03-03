@@ -36,14 +36,14 @@
 #include "Algo/Render/GL2/explodeVolumeRender.h"
 
 #include "Utils/cgognStream.h"
-#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtQGLV.h"
 #include "Utils/frameManipulator.h"
 
 #include "ui_volumeExplorer.h"
 #include "Utils/Qt/qtui.h"
 
 #include "Algo/Export/exportVol.h"
-
+#include "Utils/chrono.h"
 
 using namespace CGoGN ;
 
@@ -66,7 +66,7 @@ using namespace CGoGN ;
  * Ajouter les widgets necessaires, mettre des noms clairs pour
  * les utiliser dans le .cpp (pour les call back principalement)
  */
-class MyQT: public Utils::QT::SimpleQT
+class MyQT: public Utils::QT::SimpleQGLV
 {
 	Q_OBJECT
 
@@ -95,6 +95,8 @@ class MyQT: public Utils::QT::SimpleQT
 	// shader of toporender3
 	Utils::ClippingShader* m_sh1;
 	Utils::ClippingShader* m_sh2;
+	Utils::Chrono m_frame_ch;
+	unsigned int m_nbFrames;
 
 public:
 	float m_WidthObj;
@@ -110,7 +112,8 @@ public:
 		hide_clipping(false),
 		m_topo_render(NULL),
 		m_explode_render(NULL),
-		m_explode_factor(0.8f)
+		m_explode_factor(0.8f),
+		m_nbFrames(0)
 	{}
 
 protected:

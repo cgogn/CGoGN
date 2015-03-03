@@ -1,8 +1,8 @@
 #include <QSplashScreen>
 #include "schnapps.h"
 #include <QFileInfo>
-#include "PythonQt/PythonQt.h"
-#include "PythonQt/gui/PythonQtScriptingConsole.h"
+#include "PythonQt.h"
+#include "gui/PythonQtScriptingConsole.h"
 
 int main(int argc, char* argv[])
 {

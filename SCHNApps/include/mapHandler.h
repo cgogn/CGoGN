@@ -22,13 +22,15 @@
 
 #include "Utils/vbo.h"
 
+#include "dll.h"
+
 namespace CGoGN
 {
 
 namespace SCHNApps
 {
 
-class MapHandlerGen : public QObject
+class SCHNAPPS_API MapHandlerGen : public QObject
 {
 	Q_OBJECT
 

@@ -8,8 +8,11 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversor/traversorCell.h"
 
 #include "slot_debug.h"
+
+#include "dll.h"
 
 namespace CGoGN
 {
@@ -17,7 +20,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class CellSelectorGen : public QObject
+class SCHNAPPS_API CellSelectorGen : public QObject
 {
 	Q_OBJECT
 
@@ -81,7 +84,7 @@ public:
 
 	inline const std::vector<CELL>& getSelectedCells() { return m_cells; }
 
-	inline unsigned int getNbSelectedCells() const { return m_cells.size(); }
+	inline unsigned int getNbSelectedCells() const { return (unsigned int)(m_cells.size()); }
 
 	inline void select(CELL c, bool emitSignal = true)
 	{

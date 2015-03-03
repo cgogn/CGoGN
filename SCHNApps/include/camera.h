@@ -5,6 +5,9 @@
 #include <QGLViewer/camera.h>
 #include <QGLViewer/manipulatedCameraFrame.h>
 
+
+#include "dll.h"
+
 namespace CGoGN
 {
 
@@ -13,7 +16,7 @@ namespace SCHNApps
 
 class SCHNApps;
 
-class Camera : public qglviewer::Camera
+class SCHNAPPS_API Camera : public qglviewer::Camera
 {
 	Q_OBJECT
 

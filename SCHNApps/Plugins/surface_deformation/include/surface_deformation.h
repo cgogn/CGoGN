@@ -69,11 +69,11 @@ public:
 	virtual void drawMap(View* view, MapHandlerGen* map) {}
 
 	virtual void keyPress(View* view, QKeyEvent* event);
-	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event) {}
-	virtual void mouseRelease(View* view, QMouseEvent* event) {}
+	virtual void keyRelease(View* , QKeyEvent* ) {}
+	virtual void mousePress(View* , QMouseEvent* ) {}
+	virtual void mouseRelease(View* , QMouseEvent* ) {}
 	virtual void mouseMove(View* view, QMouseEvent* event);
-	virtual void wheelEvent(View* view, QWheelEvent* event) {}
+	virtual void wheelEvent(View* , QWheelEvent* ) {}
 
 	virtual void viewLinked(View *view) {}
 	virtual void viewUnlinked(View *view) {}

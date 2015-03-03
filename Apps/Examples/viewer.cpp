@@ -542,7 +542,7 @@ void Viewer::importMesh(std::string& filename)
 	else
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+		if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
