@@ -4,10 +4,23 @@ project(SCHNAppsLib)
 
 IF(WIN32 AND (NOT (CGoGN_WITH_QTCREATOR)))
 	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${CGoGN_ROOT_DIR}/bin/\" ) # NOT POSSIBLE TO KNOW IF WE ARE IN DEBUG OR RELEASE
+	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/plugins/\" )
 ELSE()
 	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
+	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/plugins/${CMAKE_BUILD_TYPE}\" )
+ENDIF()
+
+IF(WIN32)
+	IF (CGoGN_WITH_QTCREATOR)
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
+	ELSE()
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
+	ENDIF()
+ELSE()
+	SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 ENDIF()
 
 # SCHNApps files to compile in a lib for dll access from plugins

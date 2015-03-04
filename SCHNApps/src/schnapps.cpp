@@ -364,7 +364,16 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 
 void SCHNApps::registerPluginsDirectory(const QString& path)
 {
+
+#ifdef WIN32
+#ifdef _DEBUG
+	QDir directory(path+QString("Debug/");
+#else
+	QDir directory(path + QString("Release/"));
+#endif
+#else
 	QDir directory(path);
+#endif
 	if(directory.exists())
 	{
 		QStringList filters;
