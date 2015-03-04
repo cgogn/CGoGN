@@ -261,8 +261,12 @@ void Surface_RenderScalar_Plugin::changeExpansion(const QString& view, const QSt
 		}
 	}
 }
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_RenderScalar_Plugin, Surface_RenderScalar_Plugin)
+#endif
 
-Q_EXPORT_PLUGIN2(Surface_RenderScalar_Plugin, Surface_RenderScalar_Plugin)
 
 } // namespace SCHNApps
 

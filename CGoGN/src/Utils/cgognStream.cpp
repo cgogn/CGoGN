@@ -28,7 +28,7 @@
 #ifdef CGOGN_WITH_QT
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtQGLV.h"
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 #endif
 
 

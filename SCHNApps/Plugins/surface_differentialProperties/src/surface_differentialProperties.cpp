@@ -315,8 +315,11 @@ void Surface_DifferentialProperties_Plugin::appsFinished()
 	m_computeCurvatureDialog->close();
 }
 
-
-Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
+#endif
 
 } // namespace SCHNApps
 

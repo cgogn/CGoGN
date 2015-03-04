@@ -56,15 +56,15 @@ SET(SCHNAppsLib_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/dialogList.h
 )
 
-QT4_WRAP_UI( UIC_FILES
+qt_wrap_ui( UIC_FILES
 	${SCHNAppsLib_UI_FILES}
 )
 
-QT4_WRAP_CPP( MOC_FILES
+qt_wrap_cpp( MOC_FILES
 	${SCHNAppsLib_QOBJECT_FILES}
 )
 
-QT4_ADD_RESOURCES( RCC_FILES
+qt_add_resources( RCC_FILES
 	${SCHNApps_ROOT_DIR}/resources/resources.qrc
 )
 
@@ -80,3 +80,5 @@ TARGET_LINK_LIBRARIES( SCHNAppsLib
 	${CGoGN_LIBS}
 	${EXT_LIBS}
 )
+
+qt_use_modules(SCHNAppsLib Core Gui OpenGL Xml Svg Designer)

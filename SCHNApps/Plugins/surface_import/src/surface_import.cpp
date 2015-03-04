@@ -65,7 +65,11 @@ void Surface_Import_Plugin::importFromFileDialog()
 	}
 }
 
-Q_EXPORT_PLUGIN2(Surface_Import_Plugin, Surface_Import_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Import_Plugin, Surface_Import_Plugin)
+#endif
 
 } // namespace SCHNApps
 

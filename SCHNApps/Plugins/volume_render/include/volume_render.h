@@ -51,7 +51,9 @@ class Volume_Render_Plugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
-
+#if CGOGN_QT_DESIRED_VERSION == 5
+        Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 	friend class Volume_Render_DockTab;
 
 public:

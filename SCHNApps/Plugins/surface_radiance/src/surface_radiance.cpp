@@ -574,7 +574,12 @@ void Surface_Radiance_Plugin::exportPLY(
 	out.close() ;
 }
 
-Q_EXPORT_PLUGIN2(Surface_Radiance_Plugin, Surface_Radiance_Plugin)
+
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Radiance_Plugin, Surface_Radiance_Plugin)
+#endif
 
 } // namespace SCHNApps
 

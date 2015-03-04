@@ -22,12 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Utils/GLSLShader.h"
+
 #include <iostream>
 #include "Utils/trackball.h"
 #include "Utils/Qt/qtgl.h"
 #include "Utils/Qt/qtSimple.h"
 #include "glm/gtc/type_precision.hpp"
-#include "Utils/GLSLShader.h"
+
 
 
 namespace CGoGN

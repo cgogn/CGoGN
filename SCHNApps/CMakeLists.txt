@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(SCHNApps)
 
-
 SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 IF(WIN32)
@@ -34,6 +33,14 @@ ELSE()
 ENDIF()
 
 
+# choose same Qt version than in CGoGN
+file(STRINGS ${CGoGN_ROOT_DIR}/CGoGN/include/cgogn_qt.h CGoGN_DESIRED_QT_VERSION)
+ADD_DEFINITIONS("-DCGOGN_QT_DESIRED_VERSION=${CGoGN_DESIRED_QT_VERSION}")
+IF(CGoGN_DESIRED_QT_VERSION STREQUAL 5)
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_5x.cmake)
+ELSE()
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_4x.cmake)
+ENDIF()
 
 # PythonQt third-party dependency
 ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
@@ -42,24 +49,7 @@ ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
 find_package(OpenGL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Qt4 REQUIRED)
-#find_package(QGLViewer REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
-#find_package(SuiteSparse REQUIRED)
-#find_package(SuperLU REQUIRED)
-
-
-add_definitions(-DWITH_QT)
-
-SET( QT_USE_QTOPENGL TRUE )
-SET( QT_USE_QTXML TRUE )
-SET( QT_USE_QTDESIGNER TRUE )
-SET( QT_USE_QTGUI TRUE )
-SET( QT_USE_QTPLUGIN TRUE )
-SET( QT_USE_QTSVG TRUE )
-
-INCLUDE(${QT_USE_FILE})
-#ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 
@@ -138,6 +128,8 @@ TARGET_LINK_LIBRARIES( SCHNApps
 	${CGoGN_LIBS}
 	${EXT_LIBS}
 )
+
+qt_use_modules(SCHNApps Core Gui  OpenGL Xml Svg Designer)
 
 IF(IS_DIRECTORY ${SCHNApps_ROOT_DIR}/../../Plugins)
 	ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/../../Plugins ExtPlugins)

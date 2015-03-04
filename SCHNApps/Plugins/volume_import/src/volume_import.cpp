@@ -65,7 +65,12 @@ void Volume_Import_Plugin::importFromFileDialog()
 	}
 }
 
-Q_EXPORT_PLUGIN2(Volume_Import_Plugin, Volume_Import_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Volume_Import_Plugin, Volume_Import_Plugin)
+#endif
+
 
 } // namespace SCHNApps
 

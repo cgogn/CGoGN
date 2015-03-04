@@ -138,7 +138,12 @@ void Surface_Distance_Plugin::appsFinished()
 	m_computeDistanceDialog->close();
 }
 
-Q_EXPORT_PLUGIN2(Surface_Distance_Plugin, Surface_Distance_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Distance_Plugin, Surface_Distance_Plugin)
+#endif
+//
 
 } // namespace SCHNApps
 

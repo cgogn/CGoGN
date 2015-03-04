@@ -28,8 +28,11 @@
 #include "glm/gtc/type_precision.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 #include <QImage>
+#include <QKeyEvent>
+#include <QMouseEvent>
+
 
 namespace CGoGN
 {
