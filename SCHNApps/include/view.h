@@ -13,9 +13,7 @@
 #include "Utils/Shaders/shaderWallPaper.h"
 #include "Utils/drawer.h"
 
-
 #include "dll.h"
-
 
 namespace CGoGN
 {
@@ -27,7 +25,6 @@ class Camera;
 class ViewButtonArea;
 class ViewButton;
 class PluginInteraction;
-
 
 class SCHNAPPS_API View : public QGLViewer
 {

@@ -141,6 +141,8 @@ template <typename VEC>
 void BoundingBox<VEC>::reset()
 {
 	m_initialized = false;
+	m_pMin = VEC(0);
+	m_pMax = VEC(0);
 }
 
 template <typename VEC>

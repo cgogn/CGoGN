@@ -53,7 +53,6 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-//	connect(m_schnapps, SIGNAL(selectedViewChanged(View*,View*)), this, SLOT(selectedViewChanged(View*,View*)));
 }
 
 unsigned int ControlDock_MapTab::getCurrentOrbit()

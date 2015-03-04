@@ -1,7 +1,6 @@
 #ifndef _SCHNAPPS_H_
 #define _SCHNAPPS_H_
 
-
 #include "dll.h"
 
 #include "ui_schnapps.h"
@@ -14,9 +13,6 @@
 
 class QVBoxLayout;
 class QSplitter;
-
-
-
 
 namespace CGoGN
 {

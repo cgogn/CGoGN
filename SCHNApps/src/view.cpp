@@ -287,14 +287,13 @@ void View::linkMap(MapHandlerGen* map)
 		DEBUG_EMIT("mapLinked");
 		emit(mapLinked(map));
 
-		m_currentCamera->updateParams();
-		updateGL();
-
 		connect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
 		connect(map, SIGNAL(boundingBoxModified()), this, SLOT(updateBoundingBox()));
 
 		if(map->isSelectedMap())
 			setManipulatedFrame(map->getFrame());
+
+		updateBoundingBox();
 
 		b_updatingUI = true;
 		m_dialogMaps->check(map->getName(), Qt::Checked);
@@ -319,19 +318,17 @@ void View::unlinkMap(MapHandlerGen* map)
 		DEBUG_EMIT("mapUnlinked");
 		emit(mapUnlinked(map));
 
-		m_currentCamera->updateParams();
-		updateGL();
-
-		disconnect(map->getFrame(), SIGNAL(modified()), this, SLOT(updateGL()));
 		disconnect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(updateGL()));
+		disconnect(map, SIGNAL(boundingBoxModified()), this, SLOT(updateBoundingBox()));
 
 		if(map == m_schnapps->getSelectedMap())
 			setManipulatedFrame(NULL);
 
+		updateBoundingBox();
+
 		b_updatingUI = true;
 		m_dialogMaps->check(map->getName(), Qt::Unchecked);
 		b_updatingUI = false;
-
 	}
 }
 
@@ -418,6 +415,8 @@ void View::init()
 	m_frameDrawer->vertex3f(-1.0f, 1.0f, 0.0f);
 	m_frameDrawer->end();
 	m_frameDrawer->endList();
+
+	// WALLPAPER
 
 	m_textureWallpaper = new Utils::Texture<2, Geom::Vec3uc>(GL_UNSIGNED_BYTE);
 	m_textureWallpaper->create(Geom::Vec2ui(1024, 1024));
