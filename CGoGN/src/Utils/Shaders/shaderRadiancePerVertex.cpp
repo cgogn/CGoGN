@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#define CGoGN_UTILS_DLL_EXPORT 1
 
 #include "Utils/Shaders/shaderRadiancePerVertex.h"
 
@@ -134,7 +135,7 @@ void ShaderRadiancePerVertex::compile()
 	unbind();
 }
 
-void ShaderRadiancePerVertex::setCamera(Geom::Vec3f& camera)
+void ShaderRadiancePerVertex::setCamera(const Geom::Vec3f& camera)
 {
 	m_camera = camera;
 	bind();
