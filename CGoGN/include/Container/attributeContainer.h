@@ -64,7 +64,7 @@ public:
  * the management of holes is shared by all attributes
  */
 
-class CGoGN_CONTAINER_API  AttributeContainer
+class CGoGN_CONTAINER_API AttributeContainer
 {
 public:
 	/**
@@ -156,7 +156,7 @@ public:
 
 	void setRegistry(std::map<std::string, RegisteredBaseAttribute*>* re);
 
-	void setContainerBrowser(ContainerBrowser* bro) { m_currentBrowser = bro;}
+	void setContainerBrowser(ContainerBrowser* bro) { m_currentBrowser = bro; }
 
 	bool hasBrowser() { return m_currentBrowser != NULL; }
 
@@ -176,7 +176,6 @@ public:
 	/// special version for marker
 	AttributeMultiVector<MarkerBool>* addMarkerAttribute(const std::string& attribName);
 
-
 	/**
 	 * add a new attribute to the container
 	 * @param typeName type of the new attribute in a string
@@ -184,7 +183,6 @@ public:
 	 * @return pointer to the new AttributeMultiVectorGen (unknown type inside)
 	 */
 	AttributeMultiVectorGen* addAttribute(const std::string& typeName, const std::string& attribName);
-
 
 protected:
 	/**
@@ -275,8 +273,6 @@ public:
 	 */
 	void next(unsigned int &it) const;
 
-
-
 	/**
 	 * return the index of the first line of the container
 	 */
@@ -292,7 +288,6 @@ public:
 	 * MUST BE USED INSTEAD OF ++ !
 	 */
 	void realNext(unsigned int &it) const;
-
 
 	/**
 	 * return the index of the last line of the container
@@ -334,7 +329,7 @@ public:
 	 * @return number of blocks
 	 */
 	template<typename T>
-	unsigned int getAttributeBlocksPointers(unsigned int attrIndex, std::vector<T*>& vect_ptr, unsigned int& byteBlockSize);
+	unsigned int getAttributeBlocksPointers(unsigned int attrIndex, std::vector<T*>& vect_ptr, unsigned int& byteBlockSize) const;
 
 	/**
 	 * fill a vector with attributes names
@@ -343,13 +338,12 @@ public:
 	 */
 	unsigned int getAttributesNames(std::vector<std::string>& names) const;
 
-
 	/**
 	 * fill a vector with attribute type names
 	 * @param types vector of type names
 	 * @return number of attributes
 	 */
-	unsigned int getAttributesTypes(std::vector<std::string>& types);
+	unsigned int getAttributesTypes(std::vector<std::string>& types) const;
 
 	std::vector<AttributeMultiVector<MarkerBool>*>& getMarkerAttributes();
 
@@ -468,7 +462,6 @@ public:
 
 	inline AttributeMultiVectorGen* getVirtualDataVector(unsigned int attrIndex);
 
-
 	/**
 	* get an AttributeMultiVector
 	* @param attribName name of the attribute
@@ -508,8 +501,6 @@ public:
 	template <typename T>
 	void setData(unsigned int attrIndex, unsigned int eltIndex, const T& data);
 
-
-
 	/**************************************
 	 *            SAVE & LOAD             *
 	 **************************************/
@@ -548,18 +539,13 @@ public:
 	void dumpCSV() const;
 
 	void dumpByLines() const;
-
-
 };
-
 
 } // namespace CGoGN
 
-#include "attributeContainer.hpp"
+#include "Container/attributeContainer.hpp"
 
 #endif
-
-
 
 ///**
 //* Container for AttributeMultiVectors

@@ -72,7 +72,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
 			view->updateGL();
@@ -89,7 +89,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].simpleColor = rgbCol;
 			view->updateGL();
@@ -106,7 +106,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
 			view->updateGL();
@@ -120,11 +120,11 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 
 void Surface_Render_DockTab::positionVBOChanged(int index)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
 			view->updateGL();
@@ -134,11 +134,11 @@ void Surface_Render_DockTab::positionVBOChanged(int index)
 
 void Surface_Render_DockTab::normalVBOChanged(int index)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].normalVBO = map->getVBO(combo_normalVBO->currentText());
 			view->updateGL();
@@ -148,11 +148,11 @@ void Surface_Render_DockTab::normalVBOChanged(int index)
 
 void Surface_Render_DockTab::renderVerticesChanged(bool b)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].renderVertices = b;
 			view->updateGL();
@@ -162,11 +162,11 @@ void Surface_Render_DockTab::renderVerticesChanged(bool b)
 
 void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].verticesScaleFactor = i / 50.0;
 			view->updateGL();
@@ -176,11 +176,11 @@ void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
 
 void Surface_Render_DockTab::renderEdgesChanged(bool b)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].renderEdges = b;
 			view->updateGL();
@@ -190,11 +190,11 @@ void Surface_Render_DockTab::renderEdgesChanged(bool b)
 
 void Surface_Render_DockTab::renderFacesChanged(bool b)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].renderFaces = b;
 			view->updateGL();
@@ -204,15 +204,15 @@ void Surface_Render_DockTab::renderFacesChanged(bool b)
 
 void Surface_Render_DockTab::faceStyleChanged(QAbstractButton* b)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
-			if(radio_flatShading->isChecked())
+			if (radio_flatShading->isChecked())
 				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::FLAT;
-			else if(radio_phongShading->isChecked())
+			else if (radio_phongShading->isChecked())
 				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::PHONG;
 			view->updateGL();
 		}
@@ -221,11 +221,11 @@ void Surface_Render_DockTab::faceStyleChanged(QAbstractButton* b)
 
 void Surface_Render_DockTab::renderBoundaryChanged(bool b)
 {
-	if(!b_updatingUI)
+	if (!b_updatingUI)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
 			m_plugin->h_viewParameterSet[view][map].renderBoundary = b;
 			view->updateGL();
@@ -249,7 +249,7 @@ void Surface_Render_DockTab::removePositionVBO(QString name)
 	b_updatingUI = true;
 	int curIndex = combo_positionVBO->currentIndex();
 	int index = combo_positionVBO->findText(name, Qt::MatchExactly);
-	if(curIndex == index)
+	if (curIndex == index)
 		combo_positionVBO->setCurrentIndex(0);
 	combo_positionVBO->removeItem(index);
 	b_updatingUI = false;
@@ -267,7 +267,7 @@ void Surface_Render_DockTab::removeNormalVBO(QString name)
 	b_updatingUI = true;
 	int curIndex = combo_normalVBO->currentIndex();
 	int index = combo_normalVBO->findText(name, Qt::MatchExactly);
-	if(curIndex == index)
+	if (curIndex == index)
 		combo_normalVBO->setCurrentIndex(0);
 	combo_normalVBO->removeItem(index);
 	b_updatingUI = false;
@@ -286,21 +286,21 @@ void Surface_Render_DockTab::updateMapParameters()
 	View* view = m_schnapps->getSelectedView();
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
 
-	if(view && map)
+	if (view && map)
 	{
 		const MapParameters& p = m_plugin->h_viewParameterSet[view][map];
 
 		unsigned int i = 1;
 		foreach(Utils::VBO* vbo, map->getVBOSet().values())
 		{
-			if(vbo->dataSize() == 3)
+			if (vbo->dataSize() == 3)
 			{
 				combo_positionVBO->addItem(QString::fromStdString(vbo->name()));
-				if(vbo == p.positionVBO)
+				if (vbo == p.positionVBO)
 					combo_positionVBO->setCurrentIndex(i);
 
 				combo_normalVBO->addItem(QString::fromStdString(vbo->name()));
-				if(vbo == p.normalVBO)
+				if (vbo == p.normalVBO)
 					combo_normalVBO->setCurrentIndex(i);
 
 				++i;

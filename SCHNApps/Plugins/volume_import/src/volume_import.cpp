@@ -17,7 +17,7 @@ namespace SCHNApps
 bool Volume_Import_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
-		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
 	importAction = new QAction("import", this);
 	m_schnapps->addMenuAction(this, "Volume;Import", importAction);
@@ -39,15 +39,15 @@ MapHandlerGen* Volume_Import_Plugin::importFromFile(const QString& fileName)
 			std::vector<std::string> attrNames ;
 			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toStdString(), attrNames);
 
-			// get vertex position attribute
-			VertexAttribute<PFP3::VEC3, PFP3::MAP> position = map->getAttribute<PFP3::VEC3, VERTEX, PFP3::MAP>(attrNames[0]);
-			mh->registerAttribute(position);
+//			// get vertex position attribute
+//			VertexAttribute<PFP3::VEC3, PFP3::MAP> position = map->getAttribute<PFP3::VEC3, VERTEX, PFP3::MAP>(attrNames[0]);
+//			mh->registerAttribute(position);
 
-			// update corresponding VBO & emit attribute update signal
-			mh->notifyAttributeModification(position);
+//			// update corresponding VBO & emit attribute update signal
+//			mh->notifyAttributeModification(position);
 
-			// compute map bounding box
-			mh->updateBB(position);
+//			// compute map bounding box
+//			mh->updateBB(position);
 		}
 		return mhg;
 	}

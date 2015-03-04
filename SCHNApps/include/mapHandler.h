@@ -76,14 +76,35 @@ public slots:
 		return matrix;
 	}
 
-	void frameModified() { DEBUG_EMIT("frameModified");emit(BBisModified());}
+	void frameModified()
+	{
+		DEBUG_EMIT("frameModified");
+		emit(boundingBoxModified());
+	}
+
+	void setBBVertexAttribute(const QString& name)
+	{
+		m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
+		updateBB();
+	}
+	AttributeMultiVectorGen* getBBVertexAttribute() { return m_bbVertexAttribute; }
+	QString getBBVertexAttributeName()
+	{
+		if (m_bbVertexAttribute)
+			return QString::fromStdString(m_bbVertexAttribute->getName());
+		else
+			return QString();
+	}
 
 public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
 	virtual void drawBB() = 0;
 	virtual void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
-	virtual void initBBDrawer() = 0;
 
+protected:
+	virtual void updateBB() = 0;
+
+public:
 	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
 	/*********************************************************
@@ -98,13 +119,12 @@ public:
 	 *********************************************************/
 
 	inline void registerAttribute(const AttributeHandlerGen& ah);
+	inline void registerAttribute(unsigned int orbit, const QString& name, const QString& typeName);
 
 	inline QString getAttributeTypeName(unsigned int orbit, const QString& nameAttr) const;
-
 	const AttributeSet& getAttributeSet(unsigned int orbit) const { return m_attribs[orbit]; }
 
 	void notifyAttributeModification(const AttributeHandlerGen& attr);
-
 	void notifyConnectivityModification();
 
 	void clear(bool removeAttrib);
@@ -156,15 +176,12 @@ private:
 	 *********************************************************/
 public:
 
-	virtual void createTopoRender(CGoGN::Utils::GLSLShader* sh1) = 0;
+	virtual void createTopoRender(CGoGN::Utils::GLSLShader* s) = 0;
 	void deleteTopoRender();
-	virtual void updateTopoRender(const QString& name) = 0;
+	virtual void updateTopoRender(const QString& positionAttributeName) = 0;
 	virtual void drawTopoRender(int code) = 0;
 
-	inline Algo::Render::GL2::TopoRender* getTopoRender() { return m_topoRender;}
-
-protected:
-	Algo::Render::GL2::TopoRender* m_topoRender;
+	inline Algo::Render::GL2::TopoRender* getTopoRender() { return m_topoRender; }
 
 	/*********************************************************
 	 * SIGNALS
@@ -184,7 +201,7 @@ signals:
 	void cellSelectorRemoved(unsigned int orbit, const QString& name);
 	void selectedCellsChanged(CellSelectorGen* cs);
 
-	void BBisModified();
+	void boundingBoxModified();
 
 protected:
 	QString m_name;
@@ -194,10 +211,12 @@ protected:
 
 	qglviewer::ManipulatedFrame* m_frame;
 
+	AttributeMultiVectorGen* m_bbVertexAttribute;
 	float m_bbDiagSize;
 	Utils::Drawer* m_bbDrawer;
 
 	Algo::Render::GL2::MapRender* m_render;
+	Algo::Render::GL2::TopoRender* m_topoRender;
 
 	QList<View*> l_views;
 
@@ -251,8 +270,7 @@ public:
 	void draw(Utils::GLSLShader* shader, int primitive);
 	void drawBB();
 
-	void updateBB(const VertexAttribute<VEC3, MAP>& position);
-	void initBBDrawer();
+	void updateBB();
 	void updateBBDrawer();
 
 	void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax);
@@ -261,8 +279,8 @@ public:
 	 * MANAGE TOPO DRAWING
 	 *********************************************************/
 
-	void createTopoRender(CGoGN::Utils::GLSLShader* sh1);
-	void updateTopoRender(const QString& positionName);
+	void createTopoRender(CGoGN::Utils::GLSLShader* s);
+	void updateTopoRender(const QString& positionAttributeName);
 	void drawTopoRender(int code);
 
 	/*********************************************************
@@ -281,7 +299,6 @@ protected:
 } // namespace SCHNApps
 
 } // namespace CGoGN
-
 
 #include "mapHandler.hpp"
 

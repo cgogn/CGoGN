@@ -106,16 +106,9 @@ void ControlDock_PluginTab::pluginEnabled(Plugin *plugin)
 	b_updatingUI = true;
 	const QString& pluginName = plugin->getName();
 	QList<QListWidgetItem*> av = list_pluginsAvailable->findItems(pluginName, Qt::MatchExactly);
-	if(!av.empty())
+	if (!av.empty())
 		delete av[0];
-
-//	QListWidgetItem* item = new QListWidgetItem(pluginName, list_pluginsEnabled);
-	new QListWidgetItem(pluginName, list_pluginsEnabled);
-
-	// only interaction plugins are checkable (i.e. can be associated to a view)
-//	PluginInteraction* p = dynamic_cast<PluginInteraction*>(plugin);
-//	if(p)
-//		item->setCheckState(Qt::Unchecked);
+	list_pluginsEnabled->addItem(pluginName);
 	b_updatingUI = false;
 }
 

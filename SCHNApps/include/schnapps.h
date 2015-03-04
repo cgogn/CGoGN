@@ -160,7 +160,7 @@ signals:
 	void pluginEnabled(Plugin* plugin);
 	void pluginDisabled(Plugin* plugin);
 
-	void appsFinished();
+	void schnappsClosing();
 
 protected:
 	QString m_appPath;

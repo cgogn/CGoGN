@@ -14,6 +14,11 @@ inline void MapHandlerGen::registerAttribute(const AttributeHandlerGen& ah)
 	m_attribs[ah.getOrbit()].insert(QString::fromStdString(ah.name()), QString::fromStdString(ah.typeName()));
 }
 
+inline void MapHandlerGen::registerAttribute(unsigned int orbit, const QString& name, const QString& typeName)
+{
+	m_attribs[orbit].insert(name, typeName);
+}
+
 inline QString MapHandlerGen::getAttributeTypeName(unsigned int orbit, const QString& nameAttr) const
 {
 	if(m_attribs[orbit].contains(nameAttr))
@@ -21,6 +26,7 @@ inline QString MapHandlerGen::getAttributeTypeName(unsigned int orbit, const QSt
 	else
 		return "";
 }
+
 
 
 
@@ -76,48 +82,49 @@ void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 		m_render->initPrimitives<PFP>(*(static_cast<MAP*>(m_map)), primitive) ;
 
 	m_render->draw(shader, primitive);
-
 }
 
 template <typename PFP>
 void MapHandler<PFP>::drawBB()
 {
-//	if(!m_bbDrawer)
-//	{
-//		m_bbDrawer = new Utils::Drawer();
-//		updateBBDrawer();
-//	}
-
-//	QGLViewer::drawAxis();
-	m_bbDrawer->callList();
+	if (m_bbDrawer)
+		m_bbDrawer->callList();
 }
 
 template <typename PFP>
-void MapHandler<PFP>::updateBB(const VertexAttribute<VEC3, MAP>& position)
+void MapHandler<PFP>::updateBB()
 {
-	m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(static_cast<MAP*>(m_map)), position);
-	m_bbDiagSize = m_bb.diagSize();
+	if (m_bbVertexAttribute)
+	{
+		MAP* map = static_cast<MAP*>(m_map);
+		VertexAttribute<VEC3, MAP> bbVertexAttribute(map, dynamic_cast<AttributeMultiVector<VEC3>*>(m_bbVertexAttribute));
+
+		m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*map, bbVertexAttribute);
+		m_bbDiagSize = m_bb.diagSize();
+	}
+	else
+	{
+		m_bb.reset();
+		m_bbDiagSize = 0;
+	}
+
 	updateBBDrawer();
-}
 
-template <typename PFP>
-void MapHandler<PFP>::initBBDrawer()
-{
-	if(!m_bbDrawer)
-		m_bbDrawer = new Utils::Drawer();
+	DEBUG_EMIT("frameModified");
+	emit(boundingBoxModified());
 }
 
 template <typename PFP>
 void MapHandler<PFP>::updateBBDrawer()
 {
-	if(!m_bbDrawer)
+	if (!m_bbDrawer)
 		m_bbDrawer = new Utils::Drawer();
 
 	Geom::Vec3f bbmin = m_bb.min();
 	Geom::Vec3f bbmax = m_bb.max();
-	float shift = 0.005f*(bbmax - bbmin).norm();
-	bbmin -= Geom::Vec3f(shift,shift,shift);
-	bbmax += Geom::Vec3f(shift,shift,shift);
+	float shift = 0.005f * (bbmax - bbmin).norm();
+	bbmin -= Geom::Vec3f(shift, shift, shift);
+	bbmax += Geom::Vec3f(shift, shift, shift);
 
 	m_bbDrawer->newList(GL_COMPILE);
 	m_bbDrawer->color3f(0.0f,1.0f,0.0f);
@@ -147,6 +154,89 @@ void MapHandler<PFP>::updateBBDrawer()
 	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
 	m_bbDrawer->end();
 	m_bbDrawer->endList();
+}
+
+template <typename PFP>
+void MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax)
+{
+	const Geom::Vec3f& BBmin = m_bb.min();
+	const Geom::Vec3f& BBmax = m_bb.max();
+
+	CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb;
+
+	qglviewer::Vec v  = qglviewer::Vec(BBmin[0], BBmin[1], BBmin[2]);
+	qglviewer::Vec vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	v  = qglviewer::Vec(BBmax[0], BBmin[1], BBmin[2]);
+	vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	v  = qglviewer::Vec(BBmin[0], BBmax[1], BBmin[2]);
+	vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	v  = qglviewer::Vec(BBmin[0], BBmin[1], BBmax[2]);
+	vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	v  = qglviewer::Vec(BBmax[0], BBmax[1], BBmin[2]);
+	vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	v  = qglviewer::Vec(BBmax[0], BBmin[1], BBmax[2]);
+	vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	v  = qglviewer::Vec(BBmin[0], BBmax[1], BBmax[2]);
+	vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	v  = qglviewer::Vec(BBmax[0], BBmax[1], BBmax[2]);
+	vt = m_frame->inverseCoordinatesOf(v);
+	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
+
+	bbMin = qglviewer::Vec(bb.min()[0], bb.min()[1], bb.min()[2]);
+	bbMax = qglviewer::Vec(bb.max()[0], bb.max()[1], bb.max()[2]);
+}
+
+template <typename PFP>
+void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* s)
+{
+//	std::cout << "MH:createTopo"<< std::endl;
+	if (m_topoRender)
+		return;
+
+	if (m_map->dimension() == 2)
+	{
+		CGoGN::Utils::ShaderSimpleColor* ssc = static_cast<CGoGN::Utils::ShaderSimpleColor*>(s);
+		m_topoRender = new Algo::Render::GL2::TopoRender(ssc);
+		m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
+	}
+	else
+		std::cerr << "TOPO3 NOT SUPPORTED"<< std::endl;
+}
+
+template <typename PFP>
+void MapHandler<PFP>::updateTopoRender(const QString& positionAttributeName)
+{
+	if (!m_topoRender)
+		return;
+
+	typename PFP::MAP* map = this->getMap();
+
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map->template getAttribute<VEC3, VERTEX, MAP>(positionAttributeName.toStdString());
+	if(position.isValid())
+		m_topoRender->updateData<PFP>(*map, position, false);
+}
+
+template <typename PFP>
+void MapHandler<PFP>::drawTopoRender(int code)
+{
+	if (!m_topoRender)
+		return;
+
+	m_topoRender->drawTopo(code);
 }
 
 template <typename PFP>
@@ -187,97 +277,6 @@ CellSelector<typename PFP::MAP, ORBIT>* MapHandler<PFP>::getCellSelector(const Q
 		return static_cast<CellSelector<MAP, ORBIT>*>(m_cellSelectors[ORBIT][name]);
 	else
 		return NULL;
-}
-
-template <typename PFP>
-void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* sh1)
-{
-//	std::cout << "MH:createTopo"<< std::endl;
-	if (m_topoRender)
-		return;
-
-	if (m_map->dimension() == 2)
-	{
-		CGoGN::Utils::ShaderSimpleColor* ssc = static_cast<CGoGN::Utils::ShaderSimpleColor*>(sh1);
-
-		m_topoRender = new Algo::Render::GL2::TopoRender(ssc);
-		m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
-	}
-	else
-		std::cerr << "TOPO3 NOT SUPPORTED"<< std::endl;
-}
-
-template <typename PFP>
-void MapHandler<PFP>::updateTopoRender(const QString& positionName)
-{
-	if (m_topoRender==NULL)
-		return;
-
-	typename PFP::MAP* map = this->getMap();
-
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map->template getAttribute<VEC3, VERTEX, MAP>(positionName.toStdString()) ;
-	if(position.isValid())
-	{
-		m_topoRender->updateData<PFP>(*map,position,false);
-
-	}
-}
-
-template <typename PFP>
-void MapHandler<PFP>::drawTopoRender(int code)
-{
-	if (m_topoRender == NULL)
-		return;
-	m_topoRender->drawTopo(code);
-}
-
-
-
-template <typename PFP>
-void MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax)
-{
-
-	const Geom::Vec3f& BBmin = m_bb.min();
-	const Geom::Vec3f& BBMax = m_bb.max();
-
-	CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb;
-
-	qglviewer::Vec v  = qglviewer::Vec(BBmin[0], BBmin[1], BBmin[2]);
-	qglviewer::Vec vt = m_frame->inverseCoordinatesOf(v);
-
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-	v  = qglviewer::Vec(BBMax[0], BBmin[1], BBmin[2]);
-	vt = m_frame->inverseCoordinatesOf(v);
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-
-	v  = qglviewer::Vec(BBmin[0], BBMax[1], BBmin[2]);
-	vt = m_frame->inverseCoordinatesOf(v);
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-	v  = qglviewer::Vec(BBmin[0], BBmin[1], BBMax[2]);
-	vt = m_frame->inverseCoordinatesOf(v);
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-	v  = qglviewer::Vec(BBMax[0], BBMax[1], BBmin[2]);
-	vt = m_frame->inverseCoordinatesOf(v);
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-	v  = qglviewer::Vec(BBMax[0], BBmin[1], BBMax[2]);
-	vt = m_frame->inverseCoordinatesOf(v);
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-	v  = qglviewer::Vec(BBmin[0], BBMax[1], BBMax[2]);
-	vt = m_frame->inverseCoordinatesOf(v);
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-	v  = qglviewer::Vec(BBMax[0], BBMax[1], BBMax[2]);
-	vt = m_frame->inverseCoordinatesOf(v);
-	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
-
-	bbMin = qglviewer::Vec(bb.min()[0], bb.min()[1], bb.min()[2]);
-	bbMax = qglviewer::Vec(bb.max()[0], bb.max()[1], bb.max()[2]);
 }
 
 } // namespace SCHNApps

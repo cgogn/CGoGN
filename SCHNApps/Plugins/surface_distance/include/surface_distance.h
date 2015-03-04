@@ -30,7 +30,7 @@ private slots:
 	void openComputeDistanceDialog();
 	void computeDistanceFromDialog();
 
-	void appsFinished();
+	void schnappsClosing();
 
 public slots:
 	void computeDistance(

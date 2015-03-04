@@ -92,7 +92,6 @@ namespace CGoGN
 	return m_tableAttribs[index]->getName() ;
 }
 
-
  unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names) const
 {
 	names.clear() ;
@@ -107,22 +106,19 @@ namespace CGoGN
 	return m_nbAttributes ;
 }
 
-
-
- unsigned int AttributeContainer::getAttributesTypes(std::vector<std::string>& types)
+ unsigned int AttributeContainer::getAttributesTypes(std::vector<std::string>& types) const
 {
 	types.clear() ;
 	types.reserve(m_nbAttributes) ;
 
 	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
 	{
-		if(m_tableAttribs[i] != NULL)
+		if (m_tableAttribs[i] != NULL)
 			types.push_back(m_tableAttribs[i]->getTypeName()) ;
 	}
 
 	return m_nbAttributes ;
 }
-
 
 /**************************************
  *        CONTAINER MANAGEMENT        *

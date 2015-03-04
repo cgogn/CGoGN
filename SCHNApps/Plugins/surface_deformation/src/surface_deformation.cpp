@@ -35,25 +35,25 @@ void MapParameters::start(MapHandlerGen* mhg)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 
-			positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit", false);
+			positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit");
 			if(!positionInit.isValid())
-				positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit", false);
+				positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit");
 
-			diffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("diffCoord", false);
+			diffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("diffCoord");
 			if(!diffCoord.isValid())
-				diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord", false);
+				diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord");
 
-			vertexRotationMatrix = mh->getAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix", false);
+			vertexRotationMatrix = mh->getAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix");
 			if(!vertexRotationMatrix.isValid())
-				vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix", false);
+				vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix");
 
-			rotatedDiffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord", false);
+			rotatedDiffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord");
 			if(!rotatedDiffCoord.isValid())
-				rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord", false);
+				rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord");
 
-			vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex", false);
+			vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex");
 			if(!vIndex.isValid())
-				vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex", false);
+				vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex");
 
 			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 
@@ -174,7 +174,6 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 				{
 					asRigidAsPossible(mh);
 					mh->notifyAttributeModification(p.positionAttribute);
-					static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
 					view->updateGL();
 				}
 			}
@@ -225,7 +224,6 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 			{
 				asRigidAsPossible(mh);
 				mh->notifyAttributeModification(p.positionAttribute);
-				static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
 			}
 		}
 
