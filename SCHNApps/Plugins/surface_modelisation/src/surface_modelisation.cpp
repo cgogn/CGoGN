@@ -240,7 +240,7 @@ void Surface_Modelisation_Plugin::createNewFace(MapHandlerGen* mhg)
 		VertexAttribute<PFP2::VEC3, PFP2::MAP>& position = h_parameterSet[mhg].positionAttribute;
         if (collectedVertices.size() >= 3)
         {
-            Dart d = map->newFace(collectedVertices.size());
+            Dart d = map->newFace((unsigned int)(collectedVertices.size()));
 
             int i = 0;
             Traversor2FV<PFP2::MAP> t(*map, d);

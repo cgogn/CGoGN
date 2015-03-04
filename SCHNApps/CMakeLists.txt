@@ -34,7 +34,7 @@ ENDIF()
 
 
 # choose same Qt version than in CGoGN
-file(STRINGS ${CGoGN_ROOT_DIR}/CGoGN/include/cgogn_qt.h CGoGN_DESIRED_QT_VERSION)
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_qt.h CGoGN_DESIRED_QT_VERSION)
 ADD_DEFINITIONS("-DCGOGN_QT_DESIRED_VERSION=${CGoGN_DESIRED_QT_VERSION}")
 IF(CGoGN_DESIRED_QT_VERSION STREQUAL 5)
 	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_5x.cmake)
@@ -54,7 +54,7 @@ find_package(PythonLibs 2.7 REQUIRED)
 
 
 # CGoGN compiled in one or several libs
-file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS cgogn)
 ELSE()

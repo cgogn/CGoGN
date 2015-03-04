@@ -431,9 +431,9 @@ void Surface_Radiance_Plugin::exportPLY(
 	const QString& normalAttributeName,
 	const QString& filename)
 {
-	typedef typename PFP2::MAP MAP;
-	typedef typename PFP2::REAL REAL;
-	typedef typename PFP2::VEC3 VEC3;
+	typedef PFP2::MAP MAP;
+	typedef PFP2::REAL REAL;
+	typedef PFP2::VEC3 VEC3;
 
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
 	if(mh == NULL)

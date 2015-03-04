@@ -106,7 +106,7 @@ void facesRaySelection(
 		typedef std::pair<typename PFP::REAL, FaceInter<PFP> > faceInterDist;
 		std::vector<faceInterDist> dist;
 
-		unsigned int nbi = vecFaces.size();
+		unsigned int nbi = (unsigned int)(vecFaces.size());
 		dist.resize(nbi);
 		for (unsigned int i = 0; i < nbi; ++i)
 		{

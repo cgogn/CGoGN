@@ -33,9 +33,9 @@ struct MapParameters
 		renderEdges(false),
 		renderFaces(true),
 		faceStyle(FLAT),
-		diffuseColor(0.8,0.9,0.7,0.0),
-		simpleColor(0.0,0.0,0.0,0.0),
-		vertexColor(0.0,0.0,1.0,0.0)
+		diffuseColor(0.8f,0.9f,0.7f,0.0f),
+		simpleColor(0.0f,0.0f,0.0f,0.0f),
+		vertexColor(0.0f,0.0f,1.0f,0.0f)
 
 	{}
 

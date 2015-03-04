@@ -377,7 +377,11 @@ void SCHNApps::registerPluginsDirectory(const QString& path)
 		foreach(QString pluginFile, pluginFiles)
 		{
 			QFileInfo pfi(pluginFile);
+#ifdef WIN32
+			QString pluginName = pfi.baseName();
+#else
 			QString pluginName = pfi.baseName().remove(0, 3);
+#endif
 			QString pluginFilePath = directory.absoluteFilePath(pluginFile);
 
 			if(!m_availablePlugins.contains(pluginName))
