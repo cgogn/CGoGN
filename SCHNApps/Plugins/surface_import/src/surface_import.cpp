@@ -39,13 +39,16 @@ MapHandlerGen* Surface_Import_Plugin::importFromFile(const QString& fileName)
 			std::vector<std::string> attrNames;
 			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toStdString(), attrNames);
 
-			AttributeContainer& cont = map->getAttributeContainer<VERTEX>();
-			std::vector<std::string> names;
-			std::vector<std::string> types;
-			cont.getAttributesNames(names);
-			cont.getAttributesTypes(types);
-			for(unsigned int i = 0; i < names.size(); ++i)
-				mhg->registerAttribute(VERTEX, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+			for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
+			{
+				AttributeContainer& cont = map->getAttributeContainer(orbit);
+				std::vector<std::string> names;
+				std::vector<std::string> types;
+				cont.getAttributesNames(names);
+				cont.getAttributesTypes(types);
+				for(unsigned int i = 0; i < names.size(); ++i)
+					mhg->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+			}
 		}
 		return mhg;
 	}

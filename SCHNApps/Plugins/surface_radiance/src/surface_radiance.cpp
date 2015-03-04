@@ -216,10 +216,8 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 			// get vertex position attribute
 			VertexAttribute<PFP2::VEC3, PFP2::MAP> position = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("position") ;
 			VertexAttribute<PFP2::VEC3, PFP2::MAP> normal = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("normal");
-
-			// update corresponding VBO & emit attribute update signal
-			mh->notifyAttributeModification(position);
-			mh->notifyAttributeModification(normal);
+			mh->registerAttribute(position);
+			mh->registerAttribute(normal);
 
 			MapParameters& mapParams = h_mapParameterSet[mhg];
 
