@@ -97,11 +97,11 @@ endif()
 
 
 add_library(QGLViewer SHARED ${HEADER_FILES} ${MOC_FILES} ${MOC_UI_FILES} ${FORM_FILES} ${SOURCE_FILES})
+target_link_libraries(QGLViewer  ${OPENGL_LIBRARY})
 qt_use_modules(QGLViewer Core OpenGL Xml Svg Gui)
 IF(${CGoGN_DESIRED_QT_VERSION} STREQUAL "5")
 	qt_use_modules(QGLViewer Widgets)
 ENDIF()
-#target_link_libraries(QGLViewer ${QT_LIBRARIES} ${OPENGL_LIBRARY})
 
 
 
