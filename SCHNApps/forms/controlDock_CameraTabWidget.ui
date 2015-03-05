@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>200</width>
+    <width>0</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>200</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -48,7 +48,7 @@
       </sizepolicy>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
     </widget>
    </item>

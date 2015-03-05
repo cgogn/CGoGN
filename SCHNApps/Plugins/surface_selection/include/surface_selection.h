@@ -47,7 +47,7 @@ public:
 	virtual bool enable();
 	virtual void disable();
 
-	virtual void draw(View *view);
+	virtual void draw(View *view) {}
 	virtual void drawMap(View* view, MapHandlerGen* map);
 
 	virtual void keyPress(View* view, QKeyEvent* event);
@@ -57,7 +57,7 @@ public:
 	virtual void mouseMove(View* view, QMouseEvent* event);
 	virtual void wheelEvent(View* view, QWheelEvent* event);
 
-	virtual void viewLinked(View *view);
+	virtual void viewLinked(View *view) {}
 	virtual void viewUnlinked(View *view) {}
 
 private slots:
@@ -69,6 +69,7 @@ private slots:
 	void selectedMapAttributeAdded(unsigned int orbit, const QString& name);
 	void selectedMapAttributeModified(unsigned int orbit, const QString& name);
 	void selectedMapConnectivityModified();
+	void selectedMapBoundingBoxModified();
 
 public slots:
 	// slots for Python calls
@@ -96,9 +97,14 @@ protected:
 
 	Utils::Drawer* m_selectingCellDrawer;
 
+	bool m_selectedVertices_dirty;
+	bool m_selectedEdges_dirty;
+	bool m_selectedFaces_dirty;
+
 	// WithinSphere parameters
 	Utils::VBO* m_selectionSphereVBO;
-	PFP2::REAL m_selectionRadius;
+	PFP2::REAL m_selectionRadiusBase;
+	PFP2::REAL m_selectionRadiusCoeff;
 
 	// NormalAngle parameters
 	PFP2::REAL m_normalAngleThreshold;

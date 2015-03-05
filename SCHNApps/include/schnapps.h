@@ -1,7 +1,6 @@
 #ifndef _SCHNAPPS_H_
 #define _SCHNAPPS_H_
 
-
 #include "dll.h"
 
 #include "ui_schnapps.h"
@@ -14,9 +13,6 @@
 
 class QVBoxLayout;
 class QSplitter;
-
-
-
 
 namespace CGoGN
 {
@@ -160,7 +156,7 @@ signals:
 	void pluginEnabled(Plugin* plugin);
 	void pluginDisabled(Plugin* plugin);
 
-	void appsFinished();
+	void schnappsClosing();
 
 protected:
 	QString m_appPath;

@@ -81,7 +81,6 @@ template <typename VEC>
 typename VEC::DATA_TYPE BoundingBox<VEC>::maxSize() const
 {
 	assert(m_initialized || !"Bounding box not initialized");
-
 	typename VEC::DATA_TYPE max = m_pMax[0] - m_pMin[0] ;
 	for(unsigned int i = 1; i < m_pMax.dimension(); ++i)
 	{
@@ -96,7 +95,6 @@ template <typename VEC>
 typename VEC::DATA_TYPE BoundingBox<VEC>::minSize() const
 {
 	assert(m_initialized || !"Bounding box not initialized");
-
 	typename VEC::DATA_TYPE min = m_pMax[0] - m_pMin[0] ;
 	for(unsigned int i = 1; i < m_pMax.dimension(); ++i)
 	{
@@ -143,6 +141,8 @@ template <typename VEC>
 void BoundingBox<VEC>::reset()
 {
 	m_initialized = false;
+	m_pMin = VEC(0);
+	m_pMax = VEC(0);
 }
 
 template <typename VEC>

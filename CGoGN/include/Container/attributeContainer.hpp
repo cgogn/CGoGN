@@ -198,7 +198,7 @@ bool AttributeContainer::removeAttribute(unsigned int index)
 }
 
 template <typename T>
-unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrIndex, std::vector<T*>& vect_ptr, unsigned int& byteBlockSize)
+unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrIndex, std::vector<T*>& vect_ptr, unsigned int& byteBlockSize) const
 {
 	assert(attrIndex < m_tableAttribs.size() || !"getAttributeBlocksPointers: attribute index out of bounds");
 	assert(m_tableAttribs[attrIndex] != NULL || !"getAttributeBlocksPointers: attribute does not exist");
@@ -207,7 +207,6 @@ unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrInd
 	assert((atm != NULL) || !"getAttributeBlocksPointers: wrong type");
 	return atm->getBlocksPointers(vect_ptr, byteBlockSize);
 }
-
 
 /**************************************
  *      INFO ABOUT THE CONTAINER      *
@@ -316,7 +315,6 @@ inline void AttributeContainer::realNext(unsigned int &it) const
 	} while ((it < m_maxSize) && (!used(it)));
 }
 
-
 inline unsigned int AttributeContainer::realRBegin() const
 {
 	unsigned int it = m_maxSize-1;
@@ -337,9 +335,6 @@ inline void AttributeContainer::realRNext(unsigned int &it) const
 		--it;
 	} while ((it !=0xffffffff) && (!used(it)));
 }
-
-
-
 
 /**************************************
  *          LINES MANAGEMENT          *
@@ -362,7 +357,6 @@ inline void AttributeContainer::initMarkersOfLine(unsigned int index)
 	}
 }
 
-
 inline void AttributeContainer::copyLine(unsigned int dstIndex, unsigned int srcIndex)
 {
 	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
@@ -375,7 +369,6 @@ inline void AttributeContainer::copyLine(unsigned int dstIndex, unsigned int src
 	{
 		m_tableMarkerAttribs[i]->copyElt(dstIndex, srcIndex);
 	}
-
 }
 
 inline void AttributeContainer::refLine(unsigned int index)
@@ -452,7 +445,6 @@ AttributeMultiVector<T>* AttributeContainer::getDataVector(const std::string& at
 	return atm;
 }
 
-
 inline CGoGNCodeType AttributeContainer::getTypeCode(const std::string& attribName) const
 {
 	unsigned int index = getAttributeIndex(attribName) ;
@@ -460,8 +452,6 @@ inline CGoGNCodeType AttributeContainer::getTypeCode(const std::string& attribNa
 		return CGoGNUNKNOWNTYPE ;
 	return m_tableAttribs[index]->getTypeCode();
 }
-
-
 
 inline AttributeMultiVectorGen* AttributeContainer::getVirtualDataVector(const std::string& attribName)
 {
@@ -511,12 +501,9 @@ inline void AttributeContainer::setData(unsigned int attrIndex, unsigned int elt
 	atm->operator[](eltIndex) = data;
 }
 
-
 inline std::vector<AttributeMultiVector<MarkerBool>*>& AttributeContainer::getMarkerAttributes()
 {
 	return m_tableMarkerAttribs;
 }
-
-
 
 } // namespace CGoGN

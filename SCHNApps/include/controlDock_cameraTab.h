@@ -26,31 +26,25 @@ public:
 private slots:
 	// slots called from UI actions
 	void addCameraButtonClicked();
-	void cameraCheckStateChanged(QListWidgetItem* item);
+	void selectedCameraChanged();
 	void cameraProjectionChanged(QAbstractButton* b);
 	void cameraDrawClicked(bool b);
 	void cameraDrawPathClicked(bool b);
-	void cameraSelectionChanged();
 
 	// slots called from SCHNApps signals
 	void cameraAdded(Camera* c);
 	void cameraRemoved(Camera* c);
-//	void selectedViewChanged(View* prev, View* cur);
 
-
-	// slots called from selected View signals
-//	void selectedViewCurrentCameraChanged(Camera* prev, Camera* cur);
-
-	// slots called from current Camera signals
-//	void currentCameraProjectionTypeChanged(int t);
-//	void currentCameraDrawChanged(bool b);
-//	void currentCameraDrawPathChanged(bool b);
+	// slots called from selected Camera signals
+	void selectedCameraProjectionTypeChanged(int t);
+	void selectedCameraDrawChanged(bool b);
+	void selectedCameraDrawPathChanged(bool b);
 
 private:
-	void updateCurrentCameraInfo();
-	Camera* currentCam();
+	void updateSelectedCameraInfo();
 
 	SCHNApps* m_schnapps;
+	Camera* m_selectedCamera;
 	bool b_updatingUI;
 };
 

@@ -38,7 +38,7 @@ private slots:
 	void computeNormalFromDialog();
 	void computeCurvatureFromDialog();
 
-	void appsFinished();
+	void schnappsClosing();
 
 public slots:
 	void computeNormal(const QString& mapName,

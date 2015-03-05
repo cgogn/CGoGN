@@ -95,7 +95,7 @@ private slots:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
-	void appsFinished();
+	void schnappsClosing();
 
 public slots:
 	// slots for Python calls

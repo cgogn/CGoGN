@@ -33,7 +33,6 @@
 # plateforms.
 ##################################################################
 
-
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules)
 
 # build exemple programs
@@ -69,6 +68,7 @@ SET(USE_CHOLMOD TRUE)
 IF (NOT WIN32)
 	find_package(SuiteSparse REQUIRED)
 ENDIF (NOT WIN32)
+
 ###########
 #  CNC
 ###########

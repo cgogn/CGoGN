@@ -26,6 +26,8 @@ bool Surface_Subdivision_Plugin::enable()
 	connect(m_subdivisionDialog, SIGNAL(accepted()), this, SLOT(subdivideFromDialog()));
 	connect(m_subdivisionDialog->button_apply, SIGNAL(clicked()), this, SLOT(subdivideFromDialog()));
 
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
+
 	return true;
 }
 
@@ -35,6 +37,8 @@ void Surface_Subdivision_Plugin::disable()
 
 	disconnect(m_subdivisionDialog, SIGNAL(accepted()), this, SLOT(subdivideFromDialog()));
 	disconnect(m_subdivisionDialog->button_apply, SIGNAL(clicked()), this, SLOT(subdivideFromDialog()));
+
+	disconnect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 }
 
 void Surface_Subdivision_Plugin::openSubdivisionDialog()
@@ -125,7 +129,7 @@ void Surface_Subdivision_Plugin::trianguleFaces(
 		view->updateGL();
 }
 
-void Surface_Subdivision_Plugin::appsFinished()
+void Surface_Subdivision_Plugin::schnappsClosing()
 {
 	m_subdivisionDialog->close();
 }
