@@ -367,7 +367,7 @@ void SCHNApps::registerPluginsDirectory(const QString& path)
 
 #ifdef WIN32
 #ifdef _DEBUG
-	QDir directory(path+QString("Debug/");
+	QDir directory(path+QString("Debug/"));
 #else
 	QDir directory(path + QString("Release/"));
 #endif
@@ -811,9 +811,30 @@ void SCHNApps::showHidePythonDock()
 
 void SCHNApps::loadPythonScriptFromFile(const QString& fileName)
 {
+#ifdef WIN32
+	// NOT VERY NICE BUT ONLY WAY ON WINDOWS TO LOAD SCRIPT FILES
+	QFile file(fileName);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return;
+	QTextStream in(&file);
+	while (!in.atEnd())
+	{
+		QString line = in.readLine();
+		if (line.size() >= 2)
+		{
+			int j = 0;
+			while (line[j] == ' ') ++j;
+			QString spaces(4 - j, QChar(' ')); // need 4 spaces at begin of line
+			line.replace(QChar('\\'), QChar('/')); // replace \ by / in win path
+			m_pythonConsole.consoleMessage(spaces + line);
+			m_pythonConsole.executeLine(false);
+		}
+	}
+#else
 	QFileInfo fi(fileName);
 	if(fi.exists())
 		m_pythonContext.evalFile(fi.filePath());
+#endif
 }
 
 void SCHNApps::loadPythonScriptFromFileDialog()
@@ -829,7 +850,7 @@ void SCHNApps::closeEvent(QCloseEvent *event)
 		v->closeDialogs();
 	}
 
-		emit(appsFinished());
+	emit(appsFinished());
 
 	QMainWindow::closeEvent(event);
 }
