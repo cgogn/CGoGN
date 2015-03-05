@@ -18,6 +18,9 @@ namespace SCHNApps
 
 Surface_Selection_Plugin::Surface_Selection_Plugin() :
 	m_selecting(false),
+	m_selectedVertices_dirty(false),
+	m_selectedEdges_dirty(false),
+	m_selectedFaces_dirty(false),
 	m_selectionRadiusBase(1),
 	m_selectionRadiusCoeff(1),
 	m_normalAngleThreshold(10)
@@ -79,10 +82,6 @@ void Surface_Selection_Plugin::disable()
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 }
 
-void Surface_Selection_Plugin::draw(View *view)
-{
-}
-
 void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	if(map->isSelectedMap())
@@ -98,14 +97,20 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 				switch(orbit)
 				{
 					case VERTEX : {
-						m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
-						m_pointSprite->setSize(20 * map->getBBdiagSize() / nbCells);
-						m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-						m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+						if (selector->getNbSelectedCells() > 0)
+						{
+							if (m_selectedVertices_dirty)
+								updateSelectedCellsRendering();
 
-						m_pointSprite->enableVertexAttribs();
-						glDrawArrays(GL_POINTS, 0, selector->getNbSelectedCells());
-						m_pointSprite->disableVertexAttribs();
+							m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
+							m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+							m_pointSprite->setSize(20 * map->getBBdiagSize() / nbCells);
+
+							m_pointSprite->enableVertexAttribs();
+							glDrawArrays(GL_POINTS, 0, selector->getNbSelectedCells());
+							m_pointSprite->disableVertexAttribs();
+						}
 
 						if(m_selecting && m_selectingVertex.valid())
 						{
@@ -140,7 +145,12 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						break;
 					}
 					case EDGE : {
-						m_selectedEdgesDrawer->callList();
+						if (selector->getNbSelectedCells() > 0)
+						{
+							if (m_selectedEdges_dirty)
+								updateSelectedCellsRendering();
+							m_selectedEdgesDrawer->callList();
+						}
 
 						if(m_selecting && m_selectingEdge.valid())
 						{
@@ -182,7 +192,12 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						break;
 					}
 					case FACE : {
-						m_selectedFacesDrawer->callList();
+						if (selector->getNbSelectedCells() > 0)
+						{
+							if (m_selectedFaces_dirty)
+								updateSelectedCellsRendering();
+							m_selectedFacesDrawer->callList();
+						}
 
 						if(m_selecting && m_selectingFace.valid())
 						{
@@ -269,6 +284,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 						CellSelector<PFP2::MAP, VERTEX>* cs = static_cast<CellSelector<PFP2::MAP, VERTEX>*>(selector);
 						if(m_selectingVertex.valid())
 						{
+							m_selectedVertices_dirty = true;
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
@@ -300,7 +316,6 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 							}
-							updateSelectedCellsRendering();
 						}
 						break;
 					}
@@ -308,6 +323,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 						CellSelector<PFP2::MAP, EDGE>* cs = static_cast<CellSelector<PFP2::MAP, EDGE>*>(selector);
 						if(m_selectingEdge.valid())
 						{
+							m_selectedEdges_dirty = true;
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
@@ -339,7 +355,6 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 							}
-							updateSelectedCellsRendering();
 						}
 						break;
 					}
@@ -347,6 +362,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 						CellSelector<PFP2::MAP, FACE>* cs = static_cast<CellSelector<PFP2::MAP, FACE>*>(selector);
 						if(m_selectingFace.valid())
 						{
+							m_selectedFaces_dirty = true;
 							switch(p.selectionMethod)
 							{
 								case SingleCell : {
@@ -378,7 +394,6 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 							}
-							updateSelectedCellsRendering();
 						}
 						break;
 					}
@@ -494,11 +509,13 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 void Surface_Selection_Plugin::updateSelectedCellsRendering()
 {
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
+
 	const MapParameters& p = h_parameterSet[map];
 	if(p.positionAttribute.isValid())
 	{
 		unsigned int orbit = m_schnapps->getCurrentOrbit();
 		CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
+
 		switch(orbit)
 		{
 			case VERTEX : {
@@ -508,6 +525,7 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 				for(std::vector<Vertex>::const_iterator v = selectedCells.begin(); v != selectedCells.end(); ++v)
 					selectedPoints.push_back(p.positionAttribute[*v]);
 				m_selectedVerticesVBO->updateData(selectedPoints);
+				m_selectedVertices_dirty = false;
 				break;
 			}
 			case EDGE : {
@@ -527,6 +545,7 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 				}
 				m_selectedEdgesDrawer->end();
 				m_selectedEdgesDrawer->endList();
+				m_selectedEdges_dirty = false;
 				break;
 			}
 			case FACE : {
@@ -546,15 +565,10 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 				}
 				m_selectedFacesDrawer->end();
 				m_selectedFacesDrawer->endList();
+				m_selectedFaces_dirty = false;
 				break;
 			}
 		}
-	}
-
-	foreach(View* view, l_views)
-	{
-		if(view->isLinkedToMap(map))
-			view->updateGL();
 	}
 }
 

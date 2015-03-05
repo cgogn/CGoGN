@@ -47,7 +47,7 @@ public:
 	virtual bool enable();
 	virtual void disable();
 
-	virtual void draw(View *view);
+	virtual void draw(View *view) {}
 	virtual void drawMap(View* view, MapHandlerGen* map);
 
 	virtual void keyPress(View* view, QKeyEvent* event);
@@ -96,6 +96,10 @@ protected:
 	Utils::Drawer* m_selectedFacesDrawer;
 
 	Utils::Drawer* m_selectingCellDrawer;
+
+	bool m_selectedVertices_dirty;
+	bool m_selectedEdges_dirty;
+	bool m_selectedFaces_dirty;
 
 	// WithinSphere parameters
 	Utils::VBO* m_selectionSphereVBO;
