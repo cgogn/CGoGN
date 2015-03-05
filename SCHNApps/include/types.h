@@ -17,6 +17,20 @@ class VBO;
 class GLSLShader;
 }
 
+#ifdef SCHNAPPS_USE_DOUBLE
+
+struct PFP2: public PFP_DOUBLE
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+struct PFP3: public PFP_DOUBLE
+{
+	typedef EmbeddedMap3 MAP;
+};
+
+#else
+
 struct PFP2: public PFP_STANDARD
 {
 	typedef EmbeddedMap2 MAP;
@@ -26,6 +40,8 @@ struct PFP3: public PFP_STANDARD
 {
 	typedef EmbeddedMap3 MAP;
 };
+
+#endif
 
 namespace SCHNApps
 {

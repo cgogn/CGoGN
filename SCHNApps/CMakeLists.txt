@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 project(SCHNApps)
 
 SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
+SET( CGoGN_SCHNApps_USE_DOUBLE OFF CACHE BOOL "build with doubled instead of floats" )
+SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile" )
+
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 IF(WIN32)
 	SET ( CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies" )
@@ -63,8 +66,13 @@ ENDIF()
 
 # definitions from CGoGN
 FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_defs.h CGoGN_DEFS)
+
+#and schnapps options
 IF(CGoGN_SLOT_DEBUG_MODE)
 	LIST (APPEND CGoGN_DEFS -DCGoGN_SLOT_DEBUG_MODE=1)
+ENDIF()
+IF (${CGoGN_SCHNApps_USE_DOUBLE})
+	LIST (APPEND CGoGN_DEFS -DSCHNAPPS_USE_DOUBLE=1)
 ENDIF()
 ADD_DEFINITIONS(${CGoGN_DEFS})
 
@@ -80,7 +88,7 @@ LIST(APPEND EXT_LIBS PythonQt ${PYTHON_LIBRARIES})
 
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-Wno-unused-local-typedefs")
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
 endif()
 
 if(WIN32)
