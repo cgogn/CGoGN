@@ -37,8 +37,9 @@ int main(int argc, char* argv[])
 	{
 		QString filename(argv[1]);
 		QFileInfo fi(filename);
-		if(fi.exists())
-			pythonContext.evalFile(fi.filePath());
+		if (fi.exists())
+			//pythonContext.evalFile(fi.filePath());
+			schnapps.loadPythonScriptFromFile(fi.filePath());
 	}
 
 	splash->finish(&schnapps);
