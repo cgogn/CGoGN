@@ -18,6 +18,8 @@ namespace SCHNApps
 
 Surface_Selection_Plugin::Surface_Selection_Plugin() :
 	m_selecting(false),
+	m_selectionRadiusBase(1),
+	m_selectionRadiusCoeff(1),
 	m_normalAngleThreshold(10)
 {}
 
@@ -53,7 +55,8 @@ bool Surface_Selection_Plugin::enable()
 		connect(cur, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
-		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
+		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+		m_selectionRadiusBase = cur->getBBdiagSize() / 50.0f;
 	}
 
 	m_dockTab->updateMapParameters();
@@ -122,7 +125,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									break;
 								}
 								case WithinSphere : {
-									m_pointSprite->setSize(m_selectionRadius);
+									m_pointSprite->setSize(m_selectionRadiusBase * m_selectionRadiusCoeff);
 									break;
 								}
 							}
@@ -164,7 +167,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
 									m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
 									m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-									m_pointSprite->setSize(m_selectionRadius);
+									m_pointSprite->setSize(m_selectionRadiusBase * m_selectionRadiusCoeff);
 
 									m_pointSprite->enableVertexAttribs();
 									glEnable(GL_BLEND);
@@ -206,7 +209,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
 									m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
 									m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-									m_pointSprite->setSize(m_selectionRadius);
+									m_pointSprite->setSize(m_selectionRadiusBase * m_selectionRadiusCoeff);
 
 									m_pointSprite->enableVertexAttribs();
 									glEnable(GL_BLEND);
@@ -276,7 +279,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 								case WithinSphere : {
-									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
+									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadiusBase * m_selectionRadiusCoeff);
 									neigh.collectAll(m_selectingVertex);
 									if(event->button() == Qt::LeftButton)
 										cs->select(neigh.getInsideVertices());
@@ -315,7 +318,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 								case WithinSphere : {
-									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
+									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadiusBase * m_selectionRadiusCoeff);
 									neigh.collectAll(m_selectingEdge);
 									if(event->button() == Qt::LeftButton)
 										cs->select(neigh.getInsideEdges());
@@ -354,7 +357,7 @@ void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 									break;
 								}
 								case WithinSphere : {
-									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadius);
+									Algo::Surface::Selection::Collector_WithinSphere<PFP2> neigh(*map, p.positionAttribute, m_selectionRadiusBase * m_selectionRadiusCoeff);
 									neigh.collectAll(m_selectingFace);
 									if(event->button() == Qt::LeftButton)
 										cs->select(neigh.getInsideFaces());
@@ -446,9 +449,9 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 			}
 			case WithinSphere : {
 				if(event->delta() > 0)
-					m_selectionRadius *= 0.9f;
+					m_selectionRadiusCoeff *= 0.9f;
 				else
-					m_selectionRadius *= 1.1f;
+					m_selectionRadiusCoeff *= 1.1f;
 				view->updateGL();
 				break;
 			}
@@ -457,18 +460,11 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 					m_normalAngleThreshold *= 0.9f;
 				else
 					m_normalAngleThreshold *= 1.1f;
-				// view->displayMessage(QString("Angle threshold : ") + m_normalAngleThreshold);
+//				view->displayMessage(QString("Angle threshold : ") + m_normalAngleThreshold);
 				break;
 			}
 		}
 	}
-}
-
-void Surface_Selection_Plugin::viewLinked(View *view)
-{
-	MapHandlerGen* map = m_schnapps->getSelectedMap();
-	if(map)
-		m_selectionRadius = map->getBBdiagSize() / 50.0f;
 }
 
 
@@ -483,13 +479,15 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 		disconnect(prev, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 		disconnect(prev, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
 		disconnect(prev, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
+		disconnect(prev, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
 	}
 	if(cur)
 	{
 		connect(cur, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
-		m_selectionRadius = cur->getBBdiagSize() / 50.0f;
+		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+		m_selectionRadiusBase = cur->getBBdiagSize() / 50.0f;
 	}
 }
 
@@ -587,6 +585,12 @@ void Surface_Selection_Plugin::selectedMapConnectivityModified()
 	const MapParameters& p = h_parameterSet[map];
 	if(p.positionAttribute.isValid())
 		updateSelectedCellsRendering();
+}
+
+void Surface_Selection_Plugin::selectedMapBoundingBoxModified()
+{
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
+	m_selectionRadiusBase = map->getBBdiagSize() / 50.0f;
 }
 
 
