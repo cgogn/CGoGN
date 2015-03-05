@@ -314,16 +314,14 @@ void Surface_Render_DockTab::updateMapParameters()
 		radio_flatShading->setChecked(p.faceStyle == MapParameters::FLAT);
 		radio_phongShading->setChecked(p.faceStyle == MapParameters::PHONG);
 
-		m_diffuseColor = QColor(255*p.diffuseColor[0],255*p.diffuseColor[1],255*p.diffuseColor[2]);
-		dcolorButton->setStyleSheet("QPushButton { background-color:"+m_diffuseColor.name()+ " }");
+		m_diffuseColor = QColor(255 * p.diffuseColor[0], 255 * p.diffuseColor[1], 255 * p.diffuseColor[2]);
+		dcolorButton->setStyleSheet("QPushButton { background-color:" + m_diffuseColor.name() + " }");
 
-		m_simpleColor = QColor(255*p.simpleColor[0],255*p.simpleColor[1],255*p.simpleColor[2]);
-		scolorButton->setStyleSheet("QPushButton { background-color:"+m_simpleColor.name()+ " }");
+		m_simpleColor = QColor(255 * p.simpleColor[0], 255 * p.simpleColor[1], 255 * p.simpleColor[2]);
+		scolorButton->setStyleSheet("QPushButton { background-color:" + m_simpleColor.name() + " }");
 
-		m_vertexColor = QColor(255*p.vertexColor[0],255*p.vertexColor[1],255*p.vertexColor[2]);
-		vcolorButton->setStyleSheet("QPushButton { background-color:"+m_vertexColor.name()+ " }");
-
-
+		m_vertexColor = QColor(255 * p.vertexColor[0], 255 * p.vertexColor[1], 255 * p.vertexColor[2]);
+		vcolorButton->setStyleSheet("QPushButton { background-color:" + m_vertexColor.name() + " }");
 	}
 
 	b_updatingUI = false;
