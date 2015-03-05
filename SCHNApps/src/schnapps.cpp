@@ -75,7 +75,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_controlPluginTab = new ControlDock_PluginTab(this);
 	m_controlDockTabWidget->addTab(m_controlPluginTab, m_controlPluginTab->title());
 
-	m_controlDockTabWidget->setMaximumWidth(m_controlCameraTab->width());
+//	m_controlDockTabWidget->setMaximumWidth(m_controlCameraTab->width());
 
 	connect(action_ShowHideControlDock, SIGNAL(triggered()), this, SLOT(showHideControlDock()));
 

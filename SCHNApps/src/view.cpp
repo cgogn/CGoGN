@@ -419,7 +419,7 @@ void View::init()
 	// WALLPAPER
 
 	m_textureWallpaper = new Utils::Texture<2, Geom::Vec3uc>(GL_UNSIGNED_BYTE);
-	m_textureWallpaper->create(Geom::Vec2ui(1024, 1024));
+	m_textureWallpaper->create(Geom::Vec2ui(16, 16));
 	const float max = m_textureWallpaper->size()[0];
 	for (unsigned int ki = 0; ki < m_textureWallpaper->size()[0]; ++ki)
 	{
@@ -457,14 +457,16 @@ void View::draw()
 		glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
 	}
 
+	m_shaderWallpaper->draw();
+
 	const CameraSet& cams = m_schnapps->getCameraSet();
 	QList<Camera*> lc = cams.values();
-	foreach(Camera* camera, lc)
+	foreach (Camera* camera, lc)
 	{
-		if(camera != m_currentCamera)
+		if (camera != m_currentCamera)
 		{
-			if(camera->getDraw()) camera->draw();
-			if(camera->getDrawPath()) camera->drawAllPaths();
+			if (camera->getDraw()) camera->draw();
+			if (camera->getDrawPath()) camera->drawAllPaths();
 		}
 	}
 
@@ -495,8 +497,6 @@ void View::draw()
 
 	foreach(PluginInteraction* plugin, l_plugins)
 		plugin->draw(this);
-
-	m_shaderWallpaper->draw();
 }
 
 void View::postDraw()

@@ -20,9 +20,6 @@ ControlDock_PluginTab::ControlDock_PluginTab(SCHNApps* s) :
 {
 	setupUi(this);
 
-	button_enablePlugins->setIcon(QIcon(":icons/icons/arrow_down.png"));
-	button_disablePlugins->setIcon(QIcon(":icons/icons/arrow_up.png"));
-
 	connect(button_addPluginDirectory, SIGNAL(clicked()), this, SLOT(addPluginDirectoryClicked()));
 	connect(button_enablePlugins, SIGNAL(clicked()), this, SLOT(enableSelectedPluginsClicked()));
 	connect(button_disablePlugins, SIGNAL(clicked()), this, SLOT(disableSelectedPluginsClicked()));
