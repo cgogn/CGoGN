@@ -201,7 +201,7 @@ void View::setCurrentCamera(Camera* c)
 			}
 		}
 
-		m_currentCamera->updateParams();
+		m_currentCamera->fitToViewsBoundingBox();
 		updateGL();
 	}
 }

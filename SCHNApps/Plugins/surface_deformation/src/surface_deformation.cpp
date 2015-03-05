@@ -5,6 +5,8 @@
 
 #include "Algo/Topo/basic.h"
 
+#include "camera.h"
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 
@@ -153,6 +155,7 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 						m_dragging = true;
 						m_draginit = false;
 						view->setMouseTracking(true);
+						view->getCurrentCamera()->disableViewsBoundingBoxFitting();
 					}
 				}
 				else
@@ -160,6 +163,7 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 					m_dragging = false;
 					m_draginit = false;
 					view->setMouseTracking(false);
+					view->getCurrentCamera()->enableViewsBoundingBoxFitting();
 				}
 			}
 			break;
@@ -184,17 +188,17 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 
 void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 {
-	if(m_dragging)
+	if (m_dragging)
 	{
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
 
 		MapParameters& p = h_parameterSet[mh];
 		const std::vector<Vertex>& handle = p.handleSelector->getSelectedCells();
 
-		if(!m_draginit)
+		if (!m_draginit)
 		{
 			m_dragZ = 0;
-			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for (std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 			{
 				const PFP2::VEC3& pp = p.positionAttribute[*it];
 				qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(pp[0],pp[1],pp[2]));
@@ -214,13 +218,13 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 
 			qglviewer::Vec vec = qq - m_dragPrevious;
 			PFP2::VEC3 t(vec.x, vec.y, vec.z);
-			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for (std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 				p.positionAttribute[*it] += t;
 
 			m_dragPrevious = qq;
 
 //			matchDiffCoord(map);
-			if(p.initialized)
+			if (p.initialized)
 			{
 				asRigidAsPossible(mh);
 				mh->notifyAttributeModification(p.positionAttribute);

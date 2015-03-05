@@ -289,7 +289,7 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 
 	combo_bbVertexAttribute->clear();
 	combo_bbVertexAttribute->addItem("- select attribute -");
-	QString vec3TypeName = QString::fromStdString(nameOfType(PFP_STANDARD::VEC3()));
+	QString vec3TypeName = QString::fromStdString(nameOfType(PFP_SCHNAPPS::VEC3()));
 
 	list_dartAttributes->clear();
 	list_vertexAttributes->clear();

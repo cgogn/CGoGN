@@ -14,8 +14,9 @@ unsigned int Camera::cameraCount = 0;
 Camera::Camera(const QString& name, SCHNApps* s) :
 	m_name(name),
 	m_schnapps(s),
-	m_draw(false),
-	m_drawPath(false)
+	b_draw(false),
+	b_drawPath(false),
+	b_fitToViewsBoundingBox(true)
 {
 	++cameraCount;
 	connect(this->frame(), SIGNAL(modified()), this, SLOT(frameModified()));
@@ -35,7 +36,7 @@ void Camera::setProjectionType(int t)
 
 void Camera::setDraw(bool b)
 {
-	m_draw = b;
+	b_draw = b;
 	DEBUG_EMIT("drawChanged");
 	emit(drawChanged(b));
 	foreach(View* view, m_schnapps->getViewSet().values())
@@ -44,7 +45,7 @@ void Camera::setDraw(bool b)
 
 void Camera::setDrawPath(bool b)
 {
-	m_drawPath = b;
+	b_drawPath = b;
 	DEBUG_EMIT("drawPathChanged");
 	emit(drawPathChanged(b));
 	foreach(View* view, m_schnapps->getViewSet().values())
@@ -56,8 +57,8 @@ void Camera::linkView(View* view)
 	if(view && !l_views.contains(view))
 	{
 		l_views.push_back(view);
-		updateParams();
-		connect(view, SIGNAL(boundingBoxChanged()), this, SLOT(updateParams()));
+		fitToViewsBoundingBox();
+		connect(view, SIGNAL(boundingBoxChanged()), this, SLOT(fitToViewsBoundingBox()));
 	}
 }
 
@@ -65,14 +66,14 @@ void Camera::unlinkView(View* view)
 {
 	if (l_views.removeOne(view))
 	{
-		updateParams();
-		disconnect(view, SIGNAL(boundingBoxChanged()), this, SLOT(updateParams()));
+		fitToViewsBoundingBox();
+		disconnect(view, SIGNAL(boundingBoxChanged()), this, SLOT(fitToViewsBoundingBox()));
 	}
 }
 
 void Camera::frameModified()
 {
-	if(m_draw || m_drawPath)
+	if(b_draw || b_drawPath)
 	{
 		foreach(View* view, m_schnapps->getViewSet().values())
 			view->updateGL();
@@ -84,37 +85,40 @@ void Camera::frameModified()
 	}
 }
 
-void Camera::updateParams()
+void Camera::fitToViewsBoundingBox()
 {
-	qglviewer::Vec bbMin;
-	qglviewer::Vec bbMax;
-
-	if (!l_views.empty())
+	if (b_fitToViewsBoundingBox)
 	{
-		l_views.first()->getBB(bbMin, bbMax);
+		qglviewer::Vec bbMin;
+		qglviewer::Vec bbMax;
 
-		foreach(View* v, l_views)
+		if (!l_views.empty())
 		{
-			qglviewer::Vec minbb;
-			qglviewer::Vec maxbb;
-			v->getBB(minbb, maxbb);
-			for(unsigned int dim = 0; dim < 3; ++dim)
+			l_views.first()->getBB(bbMin, bbMax);
+
+			foreach(View* v, l_views)
 			{
-				if(minbb[dim] < bbMin[dim])
-					bbMin[dim] = minbb[dim];
-				if(maxbb[dim] > bbMax[dim])
-					bbMax[dim] = maxbb[dim];
+				qglviewer::Vec minbb;
+				qglviewer::Vec maxbb;
+				v->getBB(minbb, maxbb);
+				for(unsigned int dim = 0; dim < 3; ++dim)
+				{
+					if(minbb[dim] < bbMin[dim])
+						bbMin[dim] = minbb[dim];
+					if(maxbb[dim] > bbMax[dim])
+						bbMax[dim] = maxbb[dim];
+				}
 			}
 		}
-	}
-	else
-	{
-		bbMin.setValue(0, 0, 0);
-		bbMax.setValue(0, 0, 0);
-	}
+		else
+		{
+			bbMin.setValue(0, 0, 0);
+			bbMax.setValue(0, 0, 0);
+		}
 
-	this->setSceneBoundingBox(bbMin, bbMax);
-	this->showEntireScene();
+		this->setSceneBoundingBox(bbMin, bbMax);
+		this->showEntireScene();
+	}
 }
 
 } // namespace SCHNApps

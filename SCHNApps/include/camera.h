@@ -37,8 +37,8 @@ public slots:
 	bool isShared()	const { return l_views.size() > 1; }
 
 	qglviewer::Camera::Type getProjectionType() { return type(); }
-	bool getDraw() const { return m_draw; }
-	bool getDrawPath() const { return m_drawPath; }
+	bool getDraw() const { return b_draw; }
+	bool getDrawPath() const { return b_drawPath; }
 
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
@@ -47,13 +47,16 @@ public slots:
 	void setDraw(bool b);
 	void setDrawPath(bool b);
 
+	void enableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = true; }
+	void disableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = false; }
+
 private:
 	void linkView(View* view);
 	void unlinkView(View* view);
 
 private slots:
 	void frameModified();
-	void updateParams();
+	void fitToViewsBoundingBox();
 
 signals:
 	void projectionTypeChanged(int);
@@ -66,8 +69,10 @@ protected:
 
 	QList<View*> l_views;
 
-	bool m_draw;
-	bool m_drawPath;
+	bool b_draw;
+	bool b_drawPath;
+
+	bool b_fitToViewsBoundingBox;
 };
 
 } // namespace SCHNApps

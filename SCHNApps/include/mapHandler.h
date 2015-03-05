@@ -50,19 +50,13 @@ public slots:
 
 	GenericMap* getGenericMap() const { return m_map; }
 
-	const QList<View*>& getLinkedViews() const { return l_views; }
-	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+	/*********************************************************
+	 * MANAGE FRAME
+	 *********************************************************/
 
-	float getBBdiagSize() const { return m_bbDiagSize; }
-	Utils::GLSLShader* getBBDrawerShader() const
-	{
-		if(m_bbDrawer)
-			return m_bbDrawer->getShader();
-		else
-			return NULL;
-	}
-
+public slots:
 	qglviewer::ManipulatedFrame* getFrame() const { return m_frame; }
+
 	glm::mat4 getFrameMatrix() const
 	{
 		GLdouble m[16];
@@ -76,19 +70,27 @@ public slots:
 		return matrix;
 	}
 
+private slots:
 	void frameModified()
 	{
 		DEBUG_EMIT("frameModified");
 		emit(boundingBoxModified());
 	}
 
+	/*********************************************************
+	 * MANAGE BOUNDING BOX
+	 *********************************************************/
+
+public slots:
 	void setBBVertexAttribute(const QString& name)
 	{
 		m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
 		updateBB();
 	}
-	AttributeMultiVectorGen* getBBVertexAttribute() { return m_bbVertexAttribute; }
-	QString getBBVertexAttributeName()
+
+	AttributeMultiVectorGen* getBBVertexAttribute() const { return m_bbVertexAttribute; }
+
+	QString getBBVertexAttributeName() const
 	{
 		if (m_bbVertexAttribute)
 			return QString::fromStdString(m_bbVertexAttribute->getName());
@@ -96,15 +98,29 @@ public slots:
 			return QString();
 	}
 
-public:
-	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
-	virtual void drawBB() = 0;
+	float getBBdiagSize() const { return m_bbDiagSize; }
+
+	Utils::GLSLShader* getBBDrawerShader() const
+	{
+		if(m_bbDrawer)
+			return m_bbDrawer->getShader();
+		else
+			return NULL;
+	}
+
 	virtual void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
 
 protected:
 	virtual void updateBB() = 0;
 
+	/*********************************************************
+	 * MANAGE DRAWING
+	 *********************************************************/
+
 public:
+	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
+	virtual void drawBB() = 0;
+
 	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
 	/*********************************************************
@@ -171,11 +187,15 @@ private:
 	void linkView(View* view);
 	void unlinkView(View* view);
 
+public slots:
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
 	/*********************************************************
 	 * MANAGE TOPO_RENDERING
 	 *********************************************************/
-public:
 
+public:
 	virtual void createTopoRender(CGoGN::Utils::GLSLShader* s) = 0;
 	void deleteTopoRender();
 	virtual void updateTopoRender(const QString& positionAttributeName) = 0;
