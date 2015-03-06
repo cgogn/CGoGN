@@ -453,9 +453,9 @@ Dart extrudeRegion(
 	   dist = dist + (position[contours[i][contours[i].size()-1]] - position[contours[i][0]]).norm();
    }
    int size = 0;
-   for (unsigned int i = 0; i < contours.size(); i++)
+   for (size_t i = 0; i < contours.size(); i++)
    {
-	   size = size + contours[i].size();
+	   size = size + int(contours[i].size());
    }
    dist = dist / size; // height
 
