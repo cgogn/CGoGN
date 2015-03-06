@@ -26,6 +26,10 @@
 #include "Utils/vbo.h"
 #include "Utils/static_assert.h"
 
+#include <QColorDialog>
+#include <QTimer>
+
+
 /*******************************************************************************
  *														MISCELLANOUS
  *******************************************************************************/

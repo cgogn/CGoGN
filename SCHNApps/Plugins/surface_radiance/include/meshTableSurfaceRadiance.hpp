@@ -239,10 +239,10 @@ unsigned int MeshTablesSurface_Radiance::readVerticesPLY(
 				coefno += 3 ;
 			}
 	}
-	this->m_nbVertices = verticesID.size() ;
+	this->m_nbVertices = (unsigned int)(verticesID.size());
 	delete[] properties ;
 
-	return verticesID.size() ;
+	return (unsigned int)(verticesID.size()) ;
 }
 
 } // namespace SCHNApps

@@ -13,6 +13,11 @@
 #include "Utils/Shaders/shaderWallPaper.h"
 #include "Utils/drawer.h"
 
+
+#include "camera.h"
+#include "viewButtonArea.h"
+#include "plugin_interaction.h"
+
 #include "dll.h"
 
 namespace CGoGN
@@ -21,10 +26,10 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Camera;
-class ViewButtonArea;
-class ViewButton;
-class PluginInteraction;
+//class Camera;
+//class ViewButtonArea;
+//class ViewButton;
+//class PluginInteraction;
 
 class SCHNAPPS_API View : public QGLViewer
 {

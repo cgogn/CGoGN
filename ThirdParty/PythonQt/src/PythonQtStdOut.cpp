@@ -60,6 +60,9 @@ static PyObject *PythonQtStdOutRedirect_write(PyObject *self, PyObject *args)
     if (PyTuple_GET_SIZE(args)>=1) {
       PyObject* obj = PyTuple_GET_ITEM(args,0);
       if (PyUnicode_Check(obj)) {
+#ifdef PY3K
+        output = QString::fromUtf8(PyUnicode_AsUTF8(obj));
+#else
         PyObject *tmp = PyUnicode_AsUTF8String(obj);
         if(tmp) {
           output = QString::fromUtf8(PyString_AS_STRING(tmp));
@@ -67,6 +70,7 @@ static PyObject *PythonQtStdOutRedirect_write(PyObject *self, PyObject *args)
         } else {
           return NULL;
         }
+#endif
       } else {
         char *string;
         if (!PyArg_ParseTuple(args, "s", &string)) {
@@ -91,13 +95,20 @@ static PyObject *PythonQtStdOutRedirect_flush(PyObject * /*self*/, PyObject * /*
   return Py_BuildValue("");
 }
 
-
+static PyObject *PythonQtStdOutRedirect_isatty(PyObject * /*self*/, PyObject * /*args*/)
+{
+  Py_INCREF(Py_False);
+  return Py_False;
+}
 
 static PyMethodDef PythonQtStdOutRedirect_methods[] = {
   {"write", (PyCFunction)PythonQtStdOutRedirect_write, METH_VARARGS,
   "redirect the writing to a callback"},
   {"flush", (PyCFunction)PythonQtStdOutRedirect_flush, METH_VARARGS,
   "flush the output, currently not implemented but needed for logging framework"
+  },
+  {"isatty", (PyCFunction)PythonQtStdOutRedirect_isatty,   METH_NOARGS,
+  "return False since this object is not a tty-like device. Needed for logging framework"
   },
   {NULL,    NULL, 0 , NULL} /* sentinel */
 };
@@ -110,8 +121,7 @@ static PyMemberDef PythonQtStdOutRedirect_members[] = {
 };
 
 PyTypeObject PythonQtStdOutRedirectType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
+    PyVarObject_HEAD_INIT(NULL, 0)
     "PythonQtStdOutRedirect",             /*tp_name*/
     sizeof(PythonQtStdOutRedirect),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/

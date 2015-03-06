@@ -249,7 +249,13 @@ void Surface_RenderTopo_Plugin::attributeAdded(unsigned int orbit, const QString
 //	}
 //}
 
-Q_EXPORT_PLUGIN2(Surface_RenderTopo_Plugin, Surface_RenderTopo_Plugin)
+
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_RenderTopo_Plugin, Surface_RenderTopo_Plugin)
+#endif
+
 
 } // namespace SCHNApps
 

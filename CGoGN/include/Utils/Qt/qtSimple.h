@@ -25,12 +25,15 @@
 #ifndef __SIMPLE_QT_GL2__
 #define __SIMPLE_QT_GL2__
 
+#include "Utils/Qt/qtgl.h"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMainWindow>
 #include <QWidget>
-#include <QtGui>
-#include "Utils/Qt/qtgl.h"
+//#include <QtGui>
+#include <QTextEdit>
+
 
 #include <set>
 #include <string>

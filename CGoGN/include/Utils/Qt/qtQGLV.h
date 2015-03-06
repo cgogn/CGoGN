@@ -25,13 +25,20 @@
 #ifndef __QTQGLVIEWER_H
 #define __QTQGLVIEWER_H
 
+#include "Utils/Qt/qtQGLV_glw.h"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMainWindow>
 #include <QWidget>
-#include <QtGui>
+//#include <QtGui>
+#include <QTextEdit>
+#include <QMenu>
+#include <QAction>
+#include <QDockWidget>
+#include <QMenuBar>
 
-#include "Utils/Qt/qtQGLV_glw.h"
+
 
 #include <set>
 #include <string>

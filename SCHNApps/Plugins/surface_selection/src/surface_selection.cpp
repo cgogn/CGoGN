@@ -645,8 +645,12 @@ void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigne
 			m_dockTab->updateMapParameters();
 	}
 }
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Selection_Plugin, Surface_Selection_Plugin)
+#endif
 
-Q_EXPORT_PLUGIN2(Surface_Selection_Plugin, Surface_Selection_Plugin)
 
 } // namespace SCHNApps
 

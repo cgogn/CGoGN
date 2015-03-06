@@ -30,6 +30,7 @@
 #include "Utils/gl_def.h"
 #include "Container/convert.h"
 #include "Topology/generic/attributeHandler.h"
+#include <GL/glew.h>
 
 #include "Utils/dll.h"
 

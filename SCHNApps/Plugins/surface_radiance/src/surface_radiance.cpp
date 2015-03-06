@@ -423,9 +423,9 @@ void Surface_Radiance_Plugin::exportPLY(
 	const QString& normalAttributeName,
 	const QString& filename)
 {
-	typedef typename PFP2::MAP MAP;
-	typedef typename PFP2::REAL REAL;
-	typedef typename PFP2::VEC3 VEC3;
+	typedef PFP2::MAP MAP;
+	typedef PFP2::REAL REAL;
+	typedef PFP2::VEC3 VEC3;
 
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
 	if(mh == NULL)
@@ -566,7 +566,12 @@ void Surface_Radiance_Plugin::exportPLY(
 	out.close() ;
 }
 
-Q_EXPORT_PLUGIN2(Surface_Radiance_Plugin, Surface_Radiance_Plugin)
+
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Radiance_Plugin, Surface_Radiance_Plugin)
+#endif
 
 } // namespace SCHNApps
 

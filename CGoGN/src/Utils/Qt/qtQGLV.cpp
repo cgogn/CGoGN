@@ -29,8 +29,14 @@
 #include "glm/gtc/type_precision.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 #include <QImage>
+#include <QStatusBar>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QKeyEvent>
+#include <QMouseEvent>
+
 
 namespace CGoGN
 {
@@ -40,7 +46,6 @@ namespace Utils
 
 namespace QT
 {
-
 
 SimpleQGLV::SimpleQGLV() :
 	m_dock(NULL),

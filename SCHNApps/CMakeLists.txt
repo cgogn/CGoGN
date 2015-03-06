@@ -2,8 +2,12 @@ cmake_minimum_required(VERSION 2.8)
 
 project(SCHNApps)
 
-
 SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
+SET( CGoGN_SCHNApps_USE_DOUBLE OFF CACHE BOOL "build with doubled instead of floats" )
+IF(WIN32)
+	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile" )
+ENDIF(WIN32)
+
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 IF(WIN32)
 	SET ( CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies" )
@@ -29,11 +33,19 @@ IF(WIN32)
 	ENDIF()
 ELSE()
 	SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
-	SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+#	SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
 	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 ENDIF()
 
 
+# choose same Qt version than in CGoGN
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_qt.h CGoGN_DESIRED_QT_VERSION)
+ADD_DEFINITIONS("-DCGOGN_QT_DESIRED_VERSION=${CGoGN_DESIRED_QT_VERSION}")
+IF(CGoGN_DESIRED_QT_VERSION STREQUAL 5)
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_5x.cmake)
+ELSE()
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_4x.cmake)
+ENDIF()
 
 # PythonQt third-party dependency
 ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
@@ -42,29 +54,12 @@ ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
 find_package(OpenGL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Qt4 REQUIRED)
-#find_package(QGLViewer REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
-#find_package(SuiteSparse REQUIRED)
-#find_package(SuperLU REQUIRED)
-
-
-add_definitions(-DWITH_QT)
-
-SET( QT_USE_QTOPENGL TRUE )
-SET( QT_USE_QTXML TRUE )
-SET( QT_USE_QTDESIGNER TRUE )
-SET( QT_USE_QTGUI TRUE )
-SET( QT_USE_QTPLUGIN TRUE )
-SET( QT_USE_QTSVG TRUE )
-
-INCLUDE(${QT_USE_FILE})
-#ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 
 # CGoGN compiled in one or several libs
-file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS cgogn)
 ELSE()
@@ -73,8 +68,13 @@ ENDIF()
 
 # definitions from CGoGN
 FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_defs.h CGoGN_DEFS)
+
+#and schnapps options
 IF(CGoGN_SLOT_DEBUG_MODE)
 	LIST (APPEND CGoGN_DEFS -DCGoGN_SLOT_DEBUG_MODE=1)
+ENDIF()
+IF (${CGoGN_SCHNApps_USE_DOUBLE})
+	LIST (APPEND CGoGN_DEFS -DSCHNAPPS_USE_DOUBLE=1)
 ENDIF()
 ADD_DEFINITIONS(${CGoGN_DEFS})
 
@@ -90,7 +90,7 @@ LIST(APPEND EXT_LIBS PythonQt ${PYTHON_LIBRARIES})
 
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-Wno-unused-local-typedefs")
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
 endif()
 
 if(WIN32)
@@ -138,6 +138,8 @@ TARGET_LINK_LIBRARIES( SCHNApps
 	${CGoGN_LIBS}
 	${EXT_LIBS}
 )
+
+qt_use_modules(SCHNApps Core Gui  OpenGL Xml Svg Designer)
 
 IF(IS_DIRECTORY ${SCHNApps_ROOT_DIR}/../../Plugins)
 	ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/../../Plugins ExtPlugins)

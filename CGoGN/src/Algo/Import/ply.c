@@ -2084,8 +2084,6 @@ void get_binary_item(
   byte = (char *) &word ;
   my_endianness = byte[0] ? PLY_BINARY_LE : PLY_BINARY_BE ;
 
-  long pos0 = ftell(fp);
-
   switch (type) {
     case PLY_Int8:
     	if (fread (ptr, 1, 1, fp) != 1)

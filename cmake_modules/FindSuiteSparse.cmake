@@ -73,10 +73,7 @@ if(NOT SUITESPARSE_VERBOSE OR SUITESPARSE_FIND_QUIETLY)
 	set(SUITESPARSE_VERBOSE OFF)
 endif()
 
-if(SUITESPARSE_VERBOSE)
-	message(STATUS "Start to FindSuiteSparse.cmake :")
-endif()
-
+MESSAGE (STATUS "Looking for SuiteSparse ..")
 
 ## set the LIB POSTFIX to find in a right directory according to what kind of compiler we use (32/64bits)
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)  # Size in bytes!
@@ -179,41 +176,18 @@ macro(SUITESPARSE_FIND_COMPONENTS )
 							${${suitesparseCompUC}_DIR}
 			PATH_SUFFIXES	Release
 		)
-		find_library(SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG 
-			NAMES 			${suitesparseComp}d		${suitesparseCompLC}d 		${suitesparseCompUC}d
-							lib${suitesparseComp}d 	lib${suitesparseCompLC}d 	lib${suitesparseCompUC}d
-			PATHS 			/opt/local/lib${SUITESPARSE_SEARCH_LIB_POSTFIX} 		
-							/usr/lib${SUITESPARSE_SEARCH_LIB_POSTFIX}
-							/usr/local/lib${SUITESPARSE_SEARCH_LIB_POSTFIX}
-							${SUITESPARSE_DIR}/lib${SUITESPARSE_SEARCH_LIB_POSTFIX}
-							${${suitesparseCompUC}_DIR}/lib${SUITESPARSE_SEARCH_LIB_POSTFIX}
-							${${suitesparseCompUC}_DIR}
-			PATH_SUFFIXES	Debug
-		)
-		
-		## check and auto complete release with debug if release missing and vice versa
-		if(SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE)
-			if(NOT SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG)
-				set(SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG ${SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE} CACHE PATH "Path to a library." FORCE)
-			endif()
-		endif()
-		if(SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG)
-			if(NOT SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE)
-				set(SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE ${SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG} CACHE PATH "Path to a library." FORCE)
-			endif()
-		endif()
 		
 		## check and append the and SUITESPARSE_LIBRARIES list, and warn if not found (release and debug) otherwise
-		if(NOT SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE AND NOT SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG)
+		if(NOT SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE )
 			if (SUITESPARSE_VERBOSE)
 			message(WARNING "   Failed to find ${suitesparseComp} :
 			Check you write correctly the component name (case sensitive),
 			or set the SUITESPARSE_${suitesparseCompUC}_DIR to look inside,
-			or set directly SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG and SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE
+			or set directly SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE
 			")
 			endif ()
 		else()
-			list(APPEND SUITESPARSE_LIBRARIES	optimized "${SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE}" debug "${SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG}")
+			list(APPEND SUITESPARSE_LIBRARIES	"${SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE}" )
 		endif()
 		
 		## here we allow to find at least the include OR the lib dir and just warn if one of both missing
@@ -229,7 +203,6 @@ macro(SUITESPARSE_FIND_COMPONENTS )
 		else()
 			mark_as_advanced(SUITESPARSE_${suitesparseCompUC}_INCLUDE_DIR)
 			mark_as_advanced(SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE)
-			mark_as_advanced(SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG)
 			if(DEFINED SUITESPARSE_${suitesparseCompUC}_DIR)
 				mark_as_advanced(SUITESPARSE_${suitesparseCompUC}_DIR)
 			endif()
@@ -238,7 +211,6 @@ macro(SUITESPARSE_FIND_COMPONENTS )
 		if(SUITESPARSE_VERBOSE)
 			message(STATUS "   SUITESPARSE_${suitesparseCompUC}_FOUND = ${SUITESPARSE_${suitesparseCompUC}_FOUND} : ")
 			message(STATUS "      * SUITESPARSE_${suitesparseCompUC}_INCLUDE_DIR = ${SUITESPARSE_${suitesparseCompUC}_INCLUDE_DIR}")
-			message(STATUS "      * SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG = ${SUITESPARSE_${suitesparseCompUC}_LIBRARY_DEBUG}")
 			message(STATUS "      * SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE = ${SUITESPARSE_${suitesparseCompUC}_LIBRARY_RELEASE}")
 		endif()
 		
@@ -341,6 +313,19 @@ if(SUITESPARSE_USE_LAPACK_BLAS)
 		list(APPEND SUITESPARSE_LAPACK_BLAS_LIBRARIES ${SUITESPARSE_LAPACK_LIBRARY})
 	endif()
 		
+	find_library(F2C_LIBRARY 
+		NAMES 			f2c libf2c
+		PATHS 			/opt/local/lib${SUITESPARSE_SEARCH_LIB_POSTFIX}		
+						/usr/lib${SUITESPARSE_SEARCH_LIB_POSTFIX}
+						/usr/local/lib${SUITESPARSE_SEARCH_LIB_POSTFIX}
+						${SUITESPARSE_DIR}
+		PATH_SUFFIXES	Release Debug
+	)	
+	
+	if (F2C_LIBRARY)
+		list(APPEND SUITESPARSE_LAPACK_BLAS_LIBRARIES ${F2C_LIBRARY})
+	endif()
+	
 	## well, now append to the SUITESPARSE_LIBRARIES and print infos if VERBOSE
 	if(SUITESPARSE_LAPACK_BLAS_LIBRARIES)
 		list(APPEND SUITESPARSE_LIBRARIES	${SUITESPARSE_LAPACK_BLAS_LIBRARIES})
@@ -435,4 +420,6 @@ IF(NOT SUITESPARSE_FOUND)
       MESSAGE(STATUS "ERROR: SuiteSparse was not found.")
     ENDIF()
   ENDIF()
+ELSE()
+	message (STATUS ".. SuiteSparse Found")
 ENDIF()

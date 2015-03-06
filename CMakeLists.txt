@@ -18,7 +18,7 @@ INCLUDE(${CGoGN_ROOT_DIR}/cmake_modules/functions.cmake)
 SET ( CGoGN_WITH_ASSIMP OFF CACHE BOOL "build CGoGN with Assimp" )
 SET ( CGoGN_WITH_ZINRI OFF CACHE BOOL "build CGoGN with Zinri lib" )
 SET ( CGoGN_WITH_QT ON CACHE BOOL "build CGoGN with Qt lib" )
-SET ( DESIRED_QT_VERSION "4" CACHE STRING "4: QT4/ 5 not yet implemented" )
+SET ( CGoGN_DESIRED_QT_VERSION "4" CACHE STRING "4: QT4/5" )
 SET ( CGoGN_WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW (for VRJuggler)" )
 SET ( CGoGN_USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
 
@@ -32,7 +32,7 @@ SET ( CGoGN_ONELIB OFF CACHE BOOL "build CGoGN in one lib" )
 IF (WIN32)
 	SET ( CMAKE_CONFIGURATION_TYPES Release Debug)
 	SET ( CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
-	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile" )
+	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile (Experimental" )
 ENDIF ()
 SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
 
@@ -63,28 +63,20 @@ FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(ZLIB REQUIRED)
 FIND_PACKAGE(GLEW REQUIRED)
 IF (CGoGN_WITH_QT)
-	SET(QT_USE_QTCORE TRUE)
-	SET(QT_USE_QTOPENGL TRUE)
-	SET(QT_USE_QTSVG TRUE)
-	SET(QT_USE_QTXML TRUE )
-	FIND_PACKAGE(Qt REQUIRED)
+	IF(${CGoGN_DESIRED_QT_VERSION} STREQUAL "5")
+		include(cmake_modules/Qt_5x.cmake)
+	ELSE()
+		include(cmake_modules/Qt_4x.cmake)
+	ENDIF()
 ELSE ()
 	FIND_PACKAGE(DevIL REQUIRED)
 ENDIF()
-IF (NOT WIN32)
-	FIND_PACKAGE(SuiteSparse REQUIRED)
-ELSE()
+
+IF (WIN32)
 	set(SUITESPARSE_SUITESPARSECONFIG_INCLUDE_DIR  ${CGoGN_ROOT_DIR}/windows_dependencies/include)
 	set(SUITESPARSE_USE_LAPACK_BLAS ON)
-	find_package(SuiteSparse QUIET NO_MODULE)
-	if(NOT SUITESPARSE_FOUND)
-        set(SUITESPARSE_VERBOSE ON)
-        find_package(SuiteSparse REQUIRED) # 2nd: Use FindSuiteSparse.cmake module
-	endif()
 ENDIF()
-MESSAGE (STATUS ${SUITESPARSE_LIBRARIES})
-MESSAGE (STATUS ${SUITESPARSE_INCLUDE_DIRS})
-
+FIND_PACKAGE(SuiteSparse REQUIRED)
 
 #
 #	ThirdParty
@@ -167,7 +159,7 @@ ENDIF ()
 
 IF (CGoGN_WITH_QT)
 	LIST(APPEND CGoGN_DEFS -DCGOGN_WITH_QT)
-#	LIST(APPEND CGoGN_DEFS ${QT_DEFINITIONS}) ???
+#	LIST(APPEND CGoGN_DEFS("-DCGOGN_QT_DESIRED_VERSION=${CGoGN_DESIRED_QT_VERSION}"))
 ENDIF()
 
 IF(WIN32)
@@ -184,8 +176,6 @@ ADD_DEFINITIONS(${CGoGN_DEFS})
 SET (CGoGN_EXT_INCLUDES)
 SET (CGoGN_EXT_LIBS)
 IF (CGoGN_WITH_QT)
-		INCLUDE(${QT_USE_FILE})
-		LIST(APPEND CGoGN_DEFS -DCGOGN_WITH_QT)
         LIST(APPEND CGoGN_EXT_INCLUDES ${QT_INCLUDE_DIR})
         LIST(APPEND CGoGN_EXT_LIBS QGLViewer ${QT_LIBRARIES})
 		LIST(APPEND CGoGN_EXT_INCLUDES ${CGoGN_ROOT_DIR}/ThirdParty/libQGLViewer/)
@@ -249,7 +239,6 @@ include_directories(
 	${CGoGN_SRC_DIR}/include
 	${CGoGN_EXT_INCLUDES} )
 
-
 #
 # save some infos for schnapps and apps
 #
@@ -264,6 +253,11 @@ IF (CGoGN_WITH_GLEWMX)
 ELSE ()
 	file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_gmx.h "0" )
 ENDIF ()
+
+IF (CGoGN_WITH_QT)
+    file(WRITE ${CGoGN_ROOT_DIR}/CGoGN/include/cgogn_qt.h ${CGoGN_DESIRED_QT_VERSION})
+ENDIF ()
+
 
 file(WRITE ${CGoGN_SRC_DIR}/include/cgogn_ext_includes.h "" )
 foreach(VAR_INC ${CGoGN_EXT_INCLUDES})
@@ -289,34 +283,7 @@ add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 # 
 # Add custom clean targets for cleaning without cleaning dependencies
 #
-if (WIN32)
-#	add_custom_target(clean_cgogn 
-#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-#	add_custom_command(TARGET clean_cgogn PRE_BUILD 
-#			COMMAND del /q CCoGN
-#			COMMAND cmake ..
-#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#			COMMENT "cleaning CGoGN libs")
-#
-#	add_custom_target(clean_apps 
-#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-#	add_custom_command(TARGET clean_apps PRE_BUILD 
-#			COMMAND del /q Apps
-#			COMMAND cmake ..
-#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#			COMMENT "cleaning Apps")
-#
-#	add_custom_target(clean_cgogn_apps 
-#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-#	add_custom_command(TARGET clean_cgogn_apps PRE_BUILD 
-#			COMMAND del /q CGoGN
-#			COMMAND del /q Apps
-#			COMMAND cmake ..
-#			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#			COMMENT "cleaning Apps")
-
-ELSE()
-
+if (NOT WIN32)
 	add_custom_target(clean_cgogn 
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	add_custom_command(TARGET clean_cgogn PRE_BUILD 

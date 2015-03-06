@@ -1,10 +1,8 @@
+PROJECT(QGLViewer)
+FIND_PACKAGE(OpenGL REQUIRED)
+
 # in order to be able to include generated files (ui and moc)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-FIND_PACKAGE(Qt REQUIRED)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
-FIND_PACKAGE(OpenGL REQUIRED)
 
 set(HEADER_FILES
 
@@ -52,8 +50,8 @@ set(UI_FILES
 	VRenderInterface.ui
 	)	
 	
-QT4_WRAP_CPP(MOC_FILES ${HEADER_FILES})
-QT4_WRAP_UI(FORM_FILES ${UI_FILES})
+qt_wrap_cpp(MOC_FILES ${HEADER_FILES})
+qt_wrap_ui(FORM_FILES ${UI_FILES})
 
 
 # make mocced header / form files path from absolute to relative
@@ -90,19 +88,20 @@ set(FORM_FILES_GROUP "Generated")
 
 include_directories("..")
 
-# The code must be relocatable if we want to link a shared library against it
-#if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-#    add_definitions("-fPIC")
-#endif()
 
 if(WIN32)
     ADD_DEFINITIONS(-DCREATE_QGLVIEWER_DLL -DNOMINMAX)
 else()
-	ADD_DEFINITIONS("-fPIC")
+	ADD_DEFINITIONS(-fPIC)
 endif() 
 
+
 add_library(QGLViewer SHARED ${HEADER_FILES} ${MOC_FILES} ${MOC_UI_FILES} ${FORM_FILES} ${SOURCE_FILES})
-target_link_libraries(QGLViewer ${QT_LIBRARIES} ${OPENGL_LIBRARY})
+target_link_libraries(QGLViewer  ${OPENGL_LIBRARY})
+qt_use_modules(QGLViewer Core OpenGL Xml Svg Gui)
+IF(${CGoGN_DESIRED_QT_VERSION} STREQUAL "5")
+	qt_use_modules(QGLViewer Widgets)
+ENDIF()
 
 
 

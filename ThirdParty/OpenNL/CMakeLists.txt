@@ -46,7 +46,7 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fPIC")
 IF (EXISTS ${CMAKE_SOURCE_DIR}/ThirdParty/OpenNL/CMakeOptions.txt)
    MESSAGE(INFO: "Using local options file: " ${CMAKE_SOURCE_DIR}/ThirdParty/OpenNL/CMakeOptions.txt)
    INCLUDE(${CMAKE_SOURCE_DIR}/ThirdParty/OpenNL/CMakeOptions.txt)
-ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/ThirdParty/OpenNL/CMakeOptions.txt)
+ENDIF()
 
 IF(USE_CNC)
     ADD_DEFINITIONS(-DNL_USE_CNC)

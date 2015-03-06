@@ -19,9 +19,14 @@ class VBO;
 class GLSLShader;
 }
 
+
 struct PFP_SCHNAPPS
 {
+#ifdef SCHNAPPS_USE_DOUBLE
+	typedef double REAL;
+#else
 	typedef float REAL;
+#endif
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<4,REAL> VEC4;
 	typedef Geom::Vector<6,REAL> VEC6;
@@ -31,7 +36,12 @@ struct PFP_SCHNAPPS
 
 	static inline Geom::Vec3f toVec3f(const VEC3& P)
 	{
+#ifdef SCHNAPPS_USE_DOUBLE
+		return Geom::Vec3f(float(P[0]),float(P[1]),float(P[2]));
+#else
 		return P;
+#endif
+		
 	}
 };
 
@@ -44,6 +54,7 @@ struct PFP3 : public PFP_SCHNAPPS
 {
 	typedef EmbeddedMap3 MAP;
 };
+
 
 namespace SCHNApps
 {
