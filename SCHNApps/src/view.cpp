@@ -431,8 +431,6 @@ void View::init()
 	m_frameDrawer->end();
 	m_frameDrawer->endList();
 
-	std::cout << "end INIT of " << this->getName().toStdString() << std::endl;
-
 //	qglviewer::Camera* c = this->camera();
 //	this->setCamera(m_currentCamera);
 //	delete c;

@@ -4,7 +4,9 @@ project(SCHNApps)
 
 SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
 SET( CGoGN_SCHNApps_USE_DOUBLE OFF CACHE BOOL "build with doubled instead of floats" )
-SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile" )
+IF(WIN32)
+	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile" )
+ENDIF(WIN32)
 
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 IF(WIN32)
