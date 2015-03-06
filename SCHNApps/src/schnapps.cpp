@@ -57,7 +57,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_controlDock = new QDockWidget("Control Dock", this);
 	m_controlDock->setAllowedAreas(Qt::LeftDockWidgetArea);
 	m_controlDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
-	m_controlDock->setMaximumWidth(200);
+	m_controlDock->setMaximumWidth(250);
 
 	m_controlDockTabWidget = new QTabWidget(m_controlDock);
 	m_controlDockTabWidget->setObjectName("ControlDockTabWidget");
