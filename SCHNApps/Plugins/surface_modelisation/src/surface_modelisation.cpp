@@ -251,8 +251,7 @@ void Surface_Modelisation_Plugin::createNewFace(MapHandlerGen* mhg)
             }
 
             mh->notifyConnectivityModification();
-            mh->notifyAttributeModification(position);
-            mh->updateBB(position);
+			mh->notifyAttributeModification(position);
             collectedVertices.clear();
         }
         else QMessageBox::information(0, "Attention", "To create a face you need at least 3 vertices");
@@ -271,9 +270,7 @@ void Surface_Modelisation_Plugin::addCube(MapHandlerGen *mhg)
         Algo::Surface::Modelisation::embedPrism<PFP2>(*map, position, 4, true, 0.7f, 0.7f, 1.0f);
 
         mh->notifyAttributeModification(position);
-        mh->notifyConnectivityModification();
-        // compute map bounding box
-        mh->updateBB(position);
+		mh->notifyConnectivityModification();
     }
 }
 
@@ -417,8 +414,7 @@ void Surface_Modelisation_Plugin::extrudeRegion(MapHandlerGen *mhg)
         Algo::Surface::Modelisation::extrudeRegion<PFP2>(*map, p.positionAttribute, selectedDarts[0], p.faceSelector->getMarker());
 
         mh->notifyConnectivityModification();
-        mh->notifyAttributeModification(p.positionAttribute);
-        mh->updateBB(p.positionAttribute);
+		mh->notifyAttributeModification(p.positionAttribute);
     }
 }
 
@@ -739,8 +735,7 @@ void Surface_Modelisation_Plugin::extrudeFace(MapHandlerGen *mhg)
 
         Algo::Surface::Modelisation::extrudeFace<PFP2>(*map, p.positionAttribute, d, dist);
         mh->notifyConnectivityModification();
-        mh->notifyAttributeModification(p.positionAttribute);
-        mh->updateBB(p.positionAttribute);
+		mh->notifyAttributeModification(p.positionAttribute);
     }
 }
 
@@ -790,12 +785,10 @@ void Surface_Modelisation_Plugin::pathExtrudeFace(MapHandlerGen *mhg)
         }
 
         mh->notifyConnectivityModification();
-        mh->notifyAttributeModification(position);
-        mh->updateBB(position);
+		mh->notifyAttributeModification(position);
         collectedVertices.clear();
     }
 }
-
 
 Q_EXPORT_PLUGIN2(Surface_Modelisation_Plugin, Surface_Modelisation_Plugin)
 

@@ -75,7 +75,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_controlPluginTab = new ControlDock_PluginTab(this);
 	m_controlDockTabWidget->addTab(m_controlPluginTab, m_controlPluginTab->title());
 
-	m_controlDockTabWidget->setMaximumWidth(m_controlCameraTab->width());
+//	m_controlDockTabWidget->setMaximumWidth(m_controlCameraTab->width());
 
 	connect(action_ShowHideControlDock, SIGNAL(triggered()), this, SLOT(showHideControlDock()));
 
@@ -296,42 +296,12 @@ void SCHNApps::setSelectedView(View* view)
 
 	m_pluginDockTabWidget->setCurrentIndex(currentTab);
 
-
 	DEBUG_EMIT("selectedViewChanged");
 	emit(selectedViewChanged(oldSelected, m_selectedView));
 
 	if(oldSelected)
 		oldSelected->updateGL();
 	m_selectedView->updateGL();
-
-	// check if selected map is correct
-//	if( (view->lastSelectedMap() != NULL) && (view->lastSelectedMap()->isLinkedToView(view)))
-//	{
-//		this->setSelectedMap(view->lastSelectedMap()->getName());
-//	}
-//	else
-//	{
-//		MapHandlerGen* map = this->getSelectedMap();
-//		if ((map == NULL) || (! map->isLinkedToView(view)))
-//		{
-//			bool changed = false;
-//			const MapSet& ms = this->getMapSet();
-//			foreach(MapHandlerGen* mhg, ms)
-//			{
-//				if (mhg->isLinkedToView(view))
-//				{
-//					this->setSelectedMap(mhg->getName());
-//					changed = true;
-//					break; // out of the loop, not nice but ...
-//				}
-//			}
-//			if (!changed)// no possibility to selected a map automatically so none
-//			{
-//				setSelectedMap(QString("NONE"));
-//			}
-//		}
-//	}
-
 }
 
 void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
@@ -811,13 +781,7 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 
 void SCHNApps::closeEvent(QCloseEvent *event)
 {
-	foreach(View *v, m_views)
-	{
-		v->closeDialogs();
-	}
-
-		emit(appsFinished());
-
+	emit(schnappsClosing());
 	QMainWindow::closeEvent(event);
 }
 

@@ -13,9 +13,7 @@
 #include "Utils/Shaders/shaderWallPaper.h"
 #include "Utils/drawer.h"
 
-
 #include "dll.h"
-
 
 namespace CGoGN
 {
@@ -28,7 +26,6 @@ class ViewButtonArea;
 class ViewButton;
 class PluginInteraction;
 
-
 class SCHNAPPS_API View : public QGLViewer
 {
 	Q_OBJECT
@@ -39,14 +36,12 @@ public:
 	static unsigned int viewCount;
 
 	View(const QString& name, SCHNApps* s, QGLFormat& format);
-	View(const QString& name, SCHNApps* s,  QGLFormat& format, const QGLWidget* shareWidget);
+	View(const QString& name, SCHNApps* s, QGLFormat& format, const QGLWidget* shareWidget);
 	~View();
 
 	const QString& getName() const { return m_name; }
 
-	MapHandlerGen* lastSelectedMap() { return m_lastSelectedMap;}
-
-	void closeDialogs();
+	void getBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) const { bbMin = m_bbMin; bbMax = m_bbMax; }
 
 public slots:
 	QString getName() { return m_name; }
@@ -58,7 +53,8 @@ public slots:
 	void setCurrentCamera(const QString& name);
 
 	Camera* getCurrentCamera() const { return m_currentCamera; }
-	bool usesCamera(const QString& cameraName) const;
+	bool usesCamera(Camera* c) const { return m_currentCamera == c; }
+	bool usesCamera(const QString& name) const;
 
 	void linkPlugin(PluginInteraction* plugin);
 	void linkPlugin(const QString& name);
@@ -101,9 +97,9 @@ private:
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
-//	void updateCurrentCameraBB();
-
 private slots:
+	void closeDialogs();
+
 	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
 
 	void ui_verticalSplitView(int x, int y, int globalX, int globalY);
@@ -116,14 +112,17 @@ private slots:
 
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
+	void mapCheckStateChanged(QListWidgetItem* item);
+
 	void pluginEnabled(Plugin *plugin);
 	void pluginDisabled(Plugin *plugin);
+	void pluginCheckStateChanged(QListWidgetItem* item);
+
 	void cameraAdded(Camera* camera);
 	void cameraRemoved(Camera* camera);
-
-	void mapCheckStateChanged(QListWidgetItem* item);
-	void pluginCheckStateChanged(QListWidgetItem* item);
 	void cameraCheckStateChanged(QListWidgetItem* item);
+
+	void updateBoundingBox();
 
 signals:
 	void currentCameraChanged(Camera*, Camera*);
@@ -134,6 +133,8 @@ signals:
 	void pluginLinked(PluginInteraction*);
 	void pluginUnlinked(PluginInteraction*);
 
+	void boundingBoxChanged();
+
 protected:
 	QString m_name;
 	SCHNApps* m_schnapps;
@@ -141,7 +142,9 @@ protected:
 	Camera* m_currentCamera;
 	QList<PluginInteraction*> l_plugins;
 	QList<MapHandlerGen*> l_maps;
-	MapHandlerGen* m_lastSelectedMap;
+
+	qglviewer::Vec m_bbMin;
+	qglviewer::Vec m_bbMax;
 
 	ViewButtonArea* m_buttonArea;
 

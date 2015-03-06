@@ -47,7 +47,6 @@
 
 #include "Topology/dll.h"
 
-
 namespace CGoGN
 {
 

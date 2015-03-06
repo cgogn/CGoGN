@@ -26,7 +26,7 @@ bool Surface_Distance_Plugin::enable()
 	connect(m_computeDistanceDialog, SIGNAL(accepted()), this, SLOT(computeDistanceFromDialog()));
 	connect(m_computeDistanceDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeDistanceFromDialog()));
 
-	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 	return true;
 }
@@ -38,7 +38,7 @@ void Surface_Distance_Plugin::disable()
 	disconnect(m_computeDistanceDialog, SIGNAL(accepted()), this, SLOT(computeDistanceFromDialog()));
 	disconnect(m_computeDistanceDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeDistanceFromDialog()));
 
-	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	disconnect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 }
 
 void Surface_Distance_Plugin::openComputeDistanceDialog()
@@ -133,7 +133,7 @@ void Surface_Distance_Plugin::computeDistance(
 	mh2->notifyAttributeModification(distance2);
 }
 
-void Surface_Distance_Plugin::appsFinished()
+void Surface_Distance_Plugin::schnappsClosing()
 {
 	m_computeDistanceDialog->close();
 }
