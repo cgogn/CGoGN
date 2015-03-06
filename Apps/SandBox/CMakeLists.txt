@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(SandBox)
 
-
-
 add_executable(multi_att multi_att.cpp)
 target_link_libraries(multi_att ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
 
@@ -17,7 +15,7 @@ IF (CGoGN_WITH_QT)
 	qt_wrap_cpp(tilings_moc tilings.h)
 	add_executable(tilings tilings.cpp  ${tilings_moc})
 	target_link_libraries(tilings ${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
-	qt_use_modules(tilings Gui OpenGL Xml Svg)
+	qt_use_cgogn_modules(tilings)
 
 	qt_wrap_ui( test_traversor2_ui test_traversor2.ui )
 	qt_wrap_cpp(test_traversor2_moc test_traversor2.h)

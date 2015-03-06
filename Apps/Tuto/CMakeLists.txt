@@ -2,12 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Tutos)
 
-
-if(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
-endif()
-
-
 #define exec to compile
 IF (CGoGN_WITH_QT)
 
@@ -17,7 +11,7 @@ IF (CGoGN_WITH_QT)
 	add_executable( tuto1 tuto1.cpp ${tuto1_moc})
 	target_link_libraries( tuto1
 		${CGoGN_LIBS}  ${CGoGN_EXT_LIBS} )
-	qt_use_modules(tuto1 Gui OpenGL Xml Svg)
+	qt_use_cgogn_modules(tuto1)
 
 	qt_wrap_ui( tuto2_ui tuto2.ui )
 	qt_wrap_cpp(tuto2_moc tuto2.h)

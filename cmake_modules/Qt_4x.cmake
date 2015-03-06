@@ -45,6 +45,11 @@ macro(qt_use_modules _target _link_type)
 	endif()
 endmacro()
 
+# macro that include module need by cgogn
+macro(qt_use_cgogn_modules _target )
+  qt_use_modules(${_target} Gui OpenGL Xml Svg)
+endmacro()
+
 # aliases to make it work across Qt4/Qt5
 macro(qt_add_resources)
   qt4_add_resources(${ARGN})

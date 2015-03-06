@@ -12,11 +12,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 qt_wrap_cpp( frame_manip_moc frame_manip.h )
 add_executable( frame_manip frame_manip.cpp ${frame_manip_moc} )
 target_link_libraries( frame_manip ${CGoGN_LIBS} ${CGoGN_EXT_LIBS} )
-
-qt_use_modules(frame_manip Gui OpenGL Xml Svg)
-#IF(${CGoGN_DESIRED_QT_VERSION} STREQUAL "5")
-#	qt_use_modules(frame_manip Widgets)
-#ENDIF()
+#need to define that we use Qt (only once per cmake directory!)
+qt_use_cgogn_modules(frame_manip)
 		
 qt_wrap_cpp( texturesExample_moc texturesExample.h )
 add_executable( texturesExample texturesExample.cpp ${texturesExample_moc} )

@@ -4,9 +4,14 @@ find_package(Qt5Core REQUIRED)
 #Qt5Widgets required for qt5_wrap_ui
 find_package(Qt5Widgets REQUIRED)
 
-# aliases
+# aliases (module Widgets included by default)
 macro(qt_use_modules)
   qt5_use_modules(${ARGN} Widgets)
+endmacro()
+
+# macro that include module need by cgogn
+macro(qt_use_cgogn_modules)
+  qt5_use_modules(${ARGN} Gui OpenGL Xml Svg Widgets)
 endmacro()
 
 macro(qt_wrap_cpp)

@@ -9,18 +9,14 @@
 #	cmake_minimum_required(VERSION 2.8)
 #	project(Pipo)
 #
-#	set(QT_USE_QTCORE TRUE) # for Qt
-#	set(QT_USE_QTOPENGL TRUE) # for Qt & OpenGL (!!)
-#	set(QT_USE_QTXML TRUE) # for QGLViewer
-#	find_package(Qt REQUIRED)
-#	include(${QT_USE_FILE})
+#	LoadQtPackage()
 #
 #	set(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/../../CGoGN CACHE STRING "CGoGN root dir")
 #	include(${CGoGN_ROOT_DIR}/apps_cmake.txt)
 #
 #	include_directories( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} )
-#	QT4_WRAP_UI( pipo_ui pipo.ui )
-#	QT4_WRAP_CPP( pipo_moc pipo.h )
+#	qt_wrap_ui( pipo_ui pipo.ui )
+#	qt_wrap_cpp( pipo_moc pipo.h )
 #	add_executable( pipo pipo.cpp ${pipo_ui} ${pipo_moc} )
 #	target_link_libraries( pipo ${CGoGN_LIBS}  ${CGoGN_EXT_LIBS} )
 #
@@ -80,7 +76,14 @@ ELSE()
 	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
 ENDIF()
 
-
+# Qt version from CGoGN
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_qt.h CGoGN_DESIRED_QT_VERSION)
+ADD_DEFINITIONS("-DCGOGN_QT_DESIRED_VERSION=${CGoGN_DESIRED_QT_VERSION}")
+IF(CGoGN_DESIRED_QT_VERSION STREQUAL 5)
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_5x.cmake)
+ELSE()
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_4x.cmake)
+ENDIF()
 
 # CGoGN compiled in one or several libs
 file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
