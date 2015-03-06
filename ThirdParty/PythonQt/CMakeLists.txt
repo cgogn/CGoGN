@@ -45,6 +45,10 @@ else()
   remove_definitions(-DPYTHONQT_DEBUG)
 endif()
 
+if(WIN32)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+endif() 
+
 #-----------------------------------------------------------------------------
 # Setup Qt
 
