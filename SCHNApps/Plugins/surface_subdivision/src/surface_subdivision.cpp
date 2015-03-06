@@ -134,8 +134,12 @@ void Surface_Subdivision_Plugin::schnappsClosing()
 	m_subdivisionDialog->close();
 }
 
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Subdivision_Plugin, Surface_Subdivision_Plugin)
+#endif
 
-Q_EXPORT_PLUGIN2(Surface_Subdivision_Plugin, Surface_Subdivision_Plugin)
 
 } // namespace SCHNApps
 

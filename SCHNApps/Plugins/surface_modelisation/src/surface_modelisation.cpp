@@ -240,7 +240,7 @@ void Surface_Modelisation_Plugin::createNewFace(MapHandlerGen* mhg)
 		VertexAttribute<PFP2::VEC3, PFP2::MAP>& position = h_parameterSet[mhg].positionAttribute;
         if (collectedVertices.size() >= 3)
         {
-            Dart d = map->newFace(collectedVertices.size());
+            Dart d = map->newFace((unsigned int)(collectedVertices.size()));
 
             int i = 0;
             Traversor2FV<PFP2::MAP> t(*map, d);
@@ -790,7 +790,11 @@ void Surface_Modelisation_Plugin::pathExtrudeFace(MapHandlerGen *mhg)
     }
 }
 
-Q_EXPORT_PLUGIN2(Surface_Modelisation_Plugin, Surface_Modelisation_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Modelisation_Plugin, Surface_Modelisation_Plugin)
+#endif
 
 } // namespace SCHNApps
 

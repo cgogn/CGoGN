@@ -4,10 +4,23 @@ project(SCHNAppsLib)
 
 IF(WIN32 AND (NOT (CGoGN_WITH_QTCREATOR)))
 	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${ConfigurationName}\" )
+	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/plugins/\" )
 ELSE()
 	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
+	\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/plugins/${CMAKE_BUILD_TYPE}\" )
+ENDIF()
+
+IF(WIN32)
+	IF (CGoGN_WITH_QTCREATOR)
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
+	ELSE()
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
+	ENDIF()
+ELSE()
+	SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 ENDIF()
 
 # SCHNApps files to compile in a lib for dll access from plugins
@@ -56,19 +69,19 @@ SET(SCHNAppsLib_QOBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/dialogList.h
 )
 
-QT4_WRAP_UI( UIC_FILES
+qt_wrap_ui( UIC_FILES
 	${SCHNAppsLib_UI_FILES}
 )
 
-QT4_WRAP_CPP( MOC_FILES
+qt_wrap_cpp( MOC_FILES
 	${SCHNAppsLib_QOBJECT_FILES}
 )
 
-QT4_ADD_RESOURCES( RCC_FILES
+qt_add_resources( RCC_FILES
 	${SCHNApps_ROOT_DIR}/resources/resources.qrc
 )
 
-ADD_DEFINITIONS(-DSCHNAPPSLIB_DLL_EXPORT -DQ_DECL_EXPORT)
+ADD_DEFINITIONS(-DSCHNAPPSLIB_DLL_EXPORT)
 
 ADD_LIBRARY( SCHNAppsLib SHARED
 	${SCHNAppsLib_FILES}
@@ -80,3 +93,5 @@ TARGET_LINK_LIBRARIES( SCHNAppsLib
 	${CGoGN_LIBS}
 	${EXT_LIBS}
 )
+
+qt_use_modules(SCHNAppsLib Core Gui OpenGL Xml Svg Designer)

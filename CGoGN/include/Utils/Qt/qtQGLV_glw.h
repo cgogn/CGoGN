@@ -25,12 +25,13 @@
 #ifndef __QTQGLVIEWER_GLW_H
 #define __QTQGLVIEWER_GLW_H
 
+#include <GL/glew.h>
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMainWindow>
 #include <QWidget>
-#include <QtGui>
-#include <GL/glew.h>
+//#include <QtGui>
 #include <QGLViewer/qglviewer.h>
 
 #include <set>

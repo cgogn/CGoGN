@@ -42,7 +42,7 @@
 */
 //----------------------------------------------------------------------------------
 
-#include "../PythonQt.h"
+#include "PythonQt.h"
 #include <QVariant>
 #include <QTextEdit>
 
@@ -59,7 +59,7 @@ public:
 
   ~PythonQtScriptingConsole();
 
-public slots:
+public Q_SLOTS:
   //! execute current line
   void executeLine(bool storeOnly);
 

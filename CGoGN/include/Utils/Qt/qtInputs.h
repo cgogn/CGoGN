@@ -29,7 +29,7 @@
 #include <QDesktopWidget>
 //#include <QMainWindow>
 #include <QWidget>
-#include <QtGui>
+//#include <QtGui>
 #include <QDialog>
 #include <QLabel>
 

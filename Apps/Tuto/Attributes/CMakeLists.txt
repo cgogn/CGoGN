@@ -15,8 +15,8 @@ IF(CGoGN_WITH_QT)
 
 	include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-	QT4_WRAP_UI(vbo_attribs_ui vbo_attribs.ui)
-	QT4_WRAP_CPP(vbo_attribs_moc vbo_attribs.h)
+	qt_wrap_ui(vbo_attribs_ui vbo_attribs.ui)
+	qt_wrap_cpp(vbo_attribs_moc vbo_attribs.h)
 	add_executable( vbo_attribs vbo_attribs.cpp ${vbo_attribs_ui} ${vbo_attribs_moc})
 	target_link_libraries( vbo_attribs ${CGoGN_LIBS}  ${CGoGN_EXT_LIBS} )
 

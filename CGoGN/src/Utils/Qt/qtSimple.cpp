@@ -23,15 +23,21 @@
 *******************************************************************************/
 #define CGoGN_UTILS_DLL_EXPORT 1
 #include <cmath>
+#include "Utils/GLSLShader.h"
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/Qt/qtgl.h"
-#include "Utils/GLSLShader.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_precision.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 #include <QImage>
+#include <QMenuBar>
+#include <QAction>
+#include <QDockWidget>
+#include <QStatusBar>
+#include <QFileDialog>
+#include <QMessageBox>
 
 namespace CGoGN
 {

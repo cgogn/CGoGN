@@ -25,6 +25,15 @@
 #include "Utils/Qt/qtInputs.h"
 #include <iostream>
 
+#include<QLayout>
+#include<QPushButton>
+#include<QCheckBox>
+#include<QSpinBox>
+#include<QDoubleSpinBox>
+#include<QSlider>
+#include<QComboBox>
+
+
 namespace CGoGN
 {
 

@@ -216,7 +216,12 @@ void Surface_RenderVector_Plugin::changeVectorsScaleFactor(const QString& view, 
 	}
 }
 
-Q_EXPORT_PLUGIN2(Surface_RenderVector_Plugin, Surface_RenderVector_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_RenderVector_Plugin, Surface_RenderVector_Plugin)
+#endif
+
 
 } // namespace SCHNApps
 

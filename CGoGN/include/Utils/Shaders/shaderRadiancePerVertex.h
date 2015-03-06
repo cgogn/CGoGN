@@ -30,13 +30,15 @@
 #include "Utils/textures.h"
 #include "Geometry/vector_gen.h"
 
+#include "Utils/dll.h"
+
 namespace CGoGN
 {
 
 namespace Utils
 {
 
-class ShaderRadiancePerVertex : public ClippingShader
+class CGoGN_UTILS_API ShaderRadiancePerVertex : public ClippingShader
 {
 protected:
 	// shader sources
@@ -74,7 +76,7 @@ public:
 
 	void compile();
 
-	void setCamera(Geom::Vec3f& camera);
+	void setCamera(const Geom::Vec3f& camera);
 
 	void setFragInterp(bool fraginterp);
 	bool getFragInterp() { return m_fragInterp; }

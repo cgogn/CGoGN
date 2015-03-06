@@ -64,7 +64,7 @@ void Surface_Radiance_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 		qglviewer::Vec c = view->getCurrentCamera()->position();
 		PFP2::VEC3 camera(c.x, c.y, c.z);
-		p.radiancePerVertexShader->setCamera(camera);
+		p.radiancePerVertexShader->setCamera(Geom::Vec3f(camera[0], camera[1], camera[2])); // convert to Vec3f because PFP2 can hold Vec3d !
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_POLYGON_OFFSET_FILL);
@@ -423,9 +423,9 @@ void Surface_Radiance_Plugin::exportPLY(
 	const QString& normalAttributeName,
 	const QString& filename)
 {
-	typedef typename PFP2::MAP MAP;
-	typedef typename PFP2::REAL REAL;
-	typedef typename PFP2::VEC3 VEC3;
+	typedef PFP2::MAP MAP;
+	typedef PFP2::REAL REAL;
+	typedef PFP2::VEC3 VEC3;
 
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
 	if(mh == NULL)
@@ -566,7 +566,12 @@ void Surface_Radiance_Plugin::exportPLY(
 	out.close() ;
 }
 
-Q_EXPORT_PLUGIN2(Surface_Radiance_Plugin, Surface_Radiance_Plugin)
+
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Radiance_Plugin, Surface_Radiance_Plugin)
+#endif
 
 } // namespace SCHNApps
 

@@ -1,4 +1,6 @@
 
+project(Apps)
+
 IF (CGoGN_ONELIB)
 	SET(CGoGN_LIBS cgogn)
 ELSE ()
