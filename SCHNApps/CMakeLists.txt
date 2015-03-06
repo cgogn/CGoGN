@@ -139,7 +139,7 @@ TARGET_LINK_LIBRARIES( SCHNApps
 	${EXT_LIBS}
 )
 
-qt_use_modules(SCHNApps Core Gui  OpenGL Xml Svg Designer)
+qt_use_modules(SCHNApps Core Gui OpenGL Xml Svg)
 
 IF(IS_DIRECTORY ${SCHNApps_ROOT_DIR}/../../Plugins)
 	ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/../../Plugins ExtPlugins)
