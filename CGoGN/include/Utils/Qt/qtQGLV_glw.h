@@ -74,7 +74,7 @@ protected:
 	int m_current_button;
 
 public:
-	QGLView(SimpleQGLV* ptr, QGLFormat& format, QWidget *parent = 0);
+	QGLView(SimpleQGLV* ptr, QWidget *parent = 0);
 	~QGLView();
 
 	void setObjectBB(float* bbmin, float* bbmax);

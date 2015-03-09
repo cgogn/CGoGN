@@ -56,16 +56,14 @@ SimpleQGLV::SimpleQGLV() :
 	QGLFormat format;
 	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
 	{
-		format.setProfile(QGLFormat::CoreProfile);
-		format.setVersion(GLSLShader::MAJOR_OGL_CORE, GLSLShader::MINOR_OGL_CORE);
-		format.setDepth(true);
-		format.setDepthBufferSize(24);
-		format.setDoubleBuffer(true);
+		QGLFormat glFormat;
+		glFormat.setVersion( Utils::GLSLShader::MAJOR_OGL_CORE, Utils::GLSLShader::MINOR_OGL_CORE);
+		glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+		glFormat.setSampleBuffers( true );
+		QGLFormat::setDefaultFormat(glFormat);
 	}
-	else
-		format = QGLFormat::defaultFormat();
 
-	m_qglWidget = new QGLView(this,format);
+	m_qglWidget = new QGLView(this);
 
 	setCentralWidget(m_qglWidget);
 	setWindowTitle(tr("CGoGN"));
@@ -143,7 +141,7 @@ SimpleQGLV::SimpleQGLV(const SimpleQGLV& sqt):
 	m_transfo_matrix(m_mat.m_matrices[2])
 {
 	QGLFormat format = sqt.m_qglWidget->format();
-	m_qglWidget = new QGLView(this,format);
+	m_qglWidget = new QGLView(this);
 
 	setCentralWidget(m_qglWidget);
 
@@ -172,8 +170,7 @@ SimpleQGLV::~SimpleQGLV()
 
 void SimpleQGLV::operator=(const SimpleQGLV& sqt)
 {
-	QGLFormat format = sqt.m_qglWidget->format();
-	m_qglWidget = new QGLView(this,format);
+	m_qglWidget = new QGLView(this);
 
 	setCentralWidget(m_qglWidget) ;
 
