@@ -94,4 +94,4 @@ TARGET_LINK_LIBRARIES( SCHNAppsLib
 	${EXT_LIBS}
 )
 
-qt_use_modules(SCHNAppsLib Core Gui OpenGL Xml Svg Designer)
+qt_use_modules(SCHNAppsLib Core Gui OpenGL Xml Svg)

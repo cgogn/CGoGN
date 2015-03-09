@@ -40,7 +40,6 @@ class SCHNAPPS_API View : public QGLViewer
 public:
 	static unsigned int viewCount;
 
-	View(const QString& name, SCHNApps* s);
 	View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget);
 	~View();
 

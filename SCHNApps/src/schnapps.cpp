@@ -51,6 +51,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_controlDock = new QDockWidget("Control Dock", this);
 	m_controlDock->setAllowedAreas(Qt::LeftDockWidgetArea);
 	m_controlDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+	m_controlDock->setMaximumWidth(250);
 
 	m_controlDockTabWidget = new QTabWidget(m_controlDock);
 	m_controlDockTabWidget->setObjectName("ControlDockTabWidget");
@@ -68,8 +69,6 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	m_controlDockTabWidget->addTab(m_controlMapTab, m_controlMapTab->title());
 	m_controlPluginTab = new ControlDock_PluginTab(this);
 	m_controlDockTabWidget->addTab(m_controlPluginTab, m_controlPluginTab->title());
-
-//	m_controlDockTabWidget->setMaximumWidth(m_controlCameraTab->width());
 
 	connect(action_ShowHideControlDock, SIGNAL(triggered()), this, SLOT(showHideControlDock()));
 
@@ -798,6 +797,7 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 
 void SCHNApps::closeEvent(QCloseEvent *event)
 {
+	DEBUG_EMIT("schnappsClosing");
 	emit(schnappsClosing());
 	QMainWindow::closeEvent(event);
 }
