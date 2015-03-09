@@ -77,6 +77,8 @@ void MyQT::cb_initGL()
 	glEnable(GL_TEXTURE_2D);
 
 
+	std::cout << Utils::GLSLShader::MAJOR_OGL_CORE << " / "<< Utils::GLSLShader::MINOR_OGL_CORE << std::endl;
+	std::cout << glGetString(GL_VERSION)<< std::endl;
 }
 
 void MyQT::cb_redraw()

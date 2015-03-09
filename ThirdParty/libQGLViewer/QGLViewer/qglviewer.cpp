@@ -363,8 +363,8 @@ void QGLViewer::postDraw()
 	glEnable(GL_RESCALE_NORMAL);
 #endif
 
-	glDisable(GL_COLOR_MATERIAL);
-	qglColor(foregroundColor());
+//	glDisable(GL_COLOR_MATERIAL);
+//	qglColor(foregroundColor());
 
 	if (cameraIsEdited())
 		camera()->drawAllPaths();
