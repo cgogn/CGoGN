@@ -21,8 +21,9 @@ namespace SCHNApps
 {
 
 unsigned int View::viewCount = 0;
-View::View(const QString& name, SCHNApps* s) :
-	QGLViewer(),
+
+View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
+	QGLViewer( NULL, shareWidget),
 	b_updatingUI(false),
 	m_name(name),
 	m_schnapps(s),
@@ -49,13 +50,14 @@ View::View(const QString& name, SCHNApps* s) :
 	setSnapshotFileName(m_name);
 	setSnapshotQuality(100);
 
+	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
+
 	m_dialogMaps = new ListPopUp("Linked Maps");
 	m_dialogPlugins = new ListPopUp("Enabled Plugins");
 	m_dialogCameras = new ListPopUp("Cameras");
 
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
 	connect(m_dialogMaps->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
@@ -80,66 +82,6 @@ View::View(const QString& name, SCHNApps* s) :
 	m_dialogCameras->check(m_currentCamera->getName(),Qt::Checked);
 
 	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(closeDialogs()));
-}
-
-View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
-	QGLViewer( NULL, shareWidget),
-	b_updatingUI(false),
-	m_name(name),
-	m_schnapps(s),
-	m_currentCamera(NULL),
-	m_buttonArea(NULL),
-	m_closeButton(NULL),
-	m_VsplitButton(NULL),
-	m_HsplitButton(NULL),
-	m_buttonAreaLeft(NULL),
-	m_mapsButton(NULL),
-	m_pluginsButton(NULL),
-	m_camerasButton(NULL),
-	m_dialogMaps(NULL),
-	m_dialogPlugins(NULL),
-	m_dialogCameras(NULL),
-	m_frameDrawer(NULL),
-	m_textureWallpaper(NULL),
-	m_shaderWallpaper(NULL)
-{
-	++viewCount;
-
-	setSnapshotFormat("BMP");
-	setSnapshotFileName(m_name);
-	setSnapshotQuality(100);
-
-	m_currentCamera = m_schnapps->addCamera();
-	m_currentCamera->linkView(this);
-
-	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*,MapHandlerGen*)));
-
-	m_dialogMaps = new ListPopUp("Linked Maps");
-	m_dialogPlugins = new ListPopUp("Enabled Plugins");
-	m_dialogCameras = new ListPopUp("Cameras");
-
-	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-	connect(m_dialogMaps->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(mapCheckStateChanged(QListWidgetItem*)));
-
-	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
-		mapAdded(map);
-
-	connect(m_schnapps, SIGNAL(pluginEnabled(Plugin*)), this, SLOT(pluginEnabled(Plugin*)));
-	connect(m_schnapps, SIGNAL(pluginDisabled(Plugin*)), this, SLOT(pluginDisabled(Plugin*)));
-	connect(m_dialogPlugins->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(pluginCheckStateChanged(QListWidgetItem*)));
-
-	foreach(Plugin* plug, m_schnapps->getPluginSet().values())
-		pluginEnabled(plug);
-
-	connect(m_schnapps, SIGNAL(cameraAdded(Camera*)), this, SLOT(cameraAdded(Camera*)));
-	connect(m_schnapps, SIGNAL(cameraRemoved(Camera*)), this, SLOT(cameraRemoved(Camera*)));
-	connect(m_dialogCameras->list(), SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(cameraCheckStateChanged(QListWidgetItem*)));
-
-	foreach(Camera* cam, m_schnapps->getCameraSet().values())
-		cameraAdded(cam);
-
-	m_dialogCameras->check(m_currentCamera->getName(),Qt::Checked);
 }
 
 View::~View()
