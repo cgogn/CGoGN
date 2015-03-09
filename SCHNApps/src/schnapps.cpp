@@ -797,6 +797,7 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 
 void SCHNApps::closeEvent(QCloseEvent *event)
 {
+	DEBUG_EMIT("schnappsClosing");
 	emit(schnappsClosing());
 	QMainWindow::closeEvent(event);
 }
