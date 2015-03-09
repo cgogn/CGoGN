@@ -21,9 +21,8 @@ namespace SCHNApps
 {
 
 unsigned int View::viewCount = 0;
-
-View::View(const QString& name, SCHNApps* s, QGLFormat& format) :
-	QGLViewer(format, NULL, NULL),
+View::View(const QString& name, SCHNApps* s) :
+	QGLViewer(),
 	b_updatingUI(false),
 	m_name(name),
 	m_schnapps(s),
@@ -83,8 +82,8 @@ View::View(const QString& name, SCHNApps* s, QGLFormat& format) :
 	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(closeDialogs()));
 }
 
-View::View(const QString& name, SCHNApps* s, QGLFormat& format, const QGLWidget* shareWidget) :
-	QGLViewer(format, NULL, shareWidget),
+View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
+	QGLViewer( NULL, shareWidget),
 	b_updatingUI(false),
 	m_name(name),
 	m_schnapps(s),
@@ -354,11 +353,8 @@ void View::init()
 	glewExperimental = GL_TRUE; // needed for GL Core Profile 3.3
 	glewInit();
 
-//	int major = 0;
-//	int minor = 0;
-//	glGetIntegerv(GL_MAJOR_VERSION, &major);
-//	glGetIntegerv(GL_MINOR_VERSION, &minor);
-//	std::cout << this->getName().toStdString() << "is using GL "<< major <<"."<< minor << std::endl;
+	std::cout << "using " << glGetString(GL_VERSION) << std::endl;
+
 
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);

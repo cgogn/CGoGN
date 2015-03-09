@@ -44,8 +44,8 @@ namespace QT
 {
 
 
-QGLView::QGLView(SimpleQGLV* ptr, QGLFormat& format, QWidget *parent):
-	QGLViewer(format,parent),
+QGLView::QGLView(SimpleQGLV* ptr, QWidget *parent):
+	QGLViewer(parent),
 	m_sqgl(ptr),m_state_modifier(0)
 {
 }

@@ -56,17 +56,13 @@ SimpleQT::SimpleQT() :
 {
 	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
 	{
-		QGLFormat format;
-		format.setProfile(QGLFormat::CoreProfile);
-		format.setVersion(GLSLShader::MAJOR_OGL_CORE, GLSLShader::MINOR_OGL_CORE);
-		format.setDepth(true);
-//		format.setDepthBufferSize(24);
-		format.setDoubleBuffer(true);
-
-		m_glWidget = new GLWidget(this,format);
+		QGLFormat glFormat;
+		glFormat.setVersion( Utils::GLSLShader::MAJOR_OGL_CORE, Utils::GLSLShader::MINOR_OGL_CORE);
+		glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+		glFormat.setSampleBuffers( true );
+		QGLFormat::setDefaultFormat(glFormat);
 	}
-	else
-		m_glWidget = new GLWidget(this);
+	m_glWidget = new GLWidget(this);
 
 
 	setCentralWidget(m_glWidget);

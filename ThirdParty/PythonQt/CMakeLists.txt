@@ -16,7 +16,7 @@ project(PythonQt)
 find_package(PythonLibs 2.7 REQUIRED)
 include_directories("${PYTHON_INCLUDE_DIR}")
 add_definitions("-DPYTHONQT_USE_RELEASE_PYTHON_FALLBACK")
-FILE(WRITE ${CGoGN_ROOT_DIR}/include/python_version.h ${PYTHONLIBS_VERSION_STRING})
+
 #-----------------------------------------------------------------------------
 # Build options
 
