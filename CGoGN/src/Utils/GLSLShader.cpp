@@ -59,7 +59,9 @@ std::string GLSLShader::DEFINES_GL2=\
 "#define VARYING_FRAG varying\n"
 "#define FRAG_OUT_DEF float pipo_FRAGDEF\n"
 "#define FRAG_OUT gl_FragColor\n"
-"#define INVARIANT_POS float pipo_INVARIANT\n";
+"#define INVARIANT_POS float pipo_INVARIANT\n"
+"#define TEXTURE2D texture2D\n"
+;
 
 
 std::string GLSLShader::DEFINES_GL3=\
@@ -70,7 +72,8 @@ std::string GLSLShader::DEFINES_GL3=\
 "#define VARYING_FRAG in\n"
 "#define FRAG_OUT_DEF out vec4 outFragColor\n"
 "#define FRAG_OUT outFragColor\n"
-"#define INVARIANT_POS invariant gl_Position\n";
+"#define INVARIANT_POS invariant gl_Position\n"
+"#define TEXTURE2D texture\n";
 
 
 std::string* GLSLShader::DEFINES_GL = NULL;
@@ -98,7 +101,7 @@ GLSLShader::GLSLShader() :
 	*m_uniMat_Normal = -1;
 
 	if (DEFINES_GL == NULL)
-		DEFINES_GL = &DEFINES_GL2;
+		setCurrentOGLVersion(MAJOR_OGL_CORE,MINOR_OGL_CORE);
 
 	m_nbMaxVertices = 16;
 
