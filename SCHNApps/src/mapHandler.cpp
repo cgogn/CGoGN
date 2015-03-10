@@ -45,7 +45,7 @@ void MapHandlerGen::notifyAttributeModification(const AttributeHandlerGen& attr)
 	if (m_vbo.contains(nameAttr))
 		m_vbo[nameAttr]->updateData(attr);
 
-	if (m_bbVertexAttribute->getName() == attr.name())
+	if (m_bbVertexAttribute && m_bbVertexAttribute->getName() == attr.name())
 		updateBB();
 
 	DEBUG_EMIT("attributeModified");

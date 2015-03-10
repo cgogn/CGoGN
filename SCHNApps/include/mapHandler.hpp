@@ -110,7 +110,7 @@ void MapHandler<PFP>::updateBB()
 
 	updateBBDrawer();
 
-	DEBUG_EMIT("frameModified");
+	DEBUG_EMIT("boundingBoxModified");
 	emit(boundingBoxModified());
 }
 
@@ -157,8 +157,11 @@ void MapHandler<PFP>::updateBBDrawer()
 }
 
 template <typename PFP>
-void MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax)
+bool MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax)
 {
+	if (!m_bb.isInitialized())
+		return false;
+
 	const Geom::Vec3f& BBmin = m_bb.min();
 	const Geom::Vec3f& BBmax = m_bb.max();
 
@@ -198,6 +201,8 @@ void MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax
 
 	bbMin = qglviewer::Vec(bb.min()[0], bb.min()[1], bb.min()[2]);
 	bbMax = qglviewer::Vec(bb.max()[0], bb.max()[1], bb.max()[2]);
+
+	return true;
 }
 
 template <typename PFP>
