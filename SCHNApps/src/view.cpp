@@ -28,6 +28,8 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	m_name(name),
 	m_schnapps(s),
 	m_currentCamera(NULL),
+	m_bbMin(0.0, 0.0, 0.0),
+	m_bbMax(0.0, 0.0, 0.0),
 	m_buttonArea(NULL),
 	m_closeButton(NULL),
 	m_VsplitButton(NULL),
@@ -716,20 +718,40 @@ void View::updateBoundingBox()
 {
 	if (!l_maps.empty())
 	{
-		l_maps.first()->transformedBB(m_bbMin, m_bbMax);
+		bool initialized = false;
 
 		foreach (MapHandlerGen* mhg, l_maps)
 		{
 			qglviewer::Vec minbb;
 			qglviewer::Vec maxbb;
-			mhg->transformedBB(minbb, maxbb);
-			for (unsigned int dim = 0; dim < 3; ++dim)
+			if (mhg->transformedBB(minbb, maxbb))
 			{
-				if (minbb[dim] < m_bbMin[dim])
-					m_bbMin[dim] = minbb[dim];
-				if (maxbb[dim] > m_bbMax[dim])
-					m_bbMax[dim] = maxbb[dim];
+				if (initialized)
+				{
+					for (unsigned int dim = 0; dim < 3; ++dim)
+					{
+						if (minbb[dim] < m_bbMin[dim])
+							m_bbMin[dim] = minbb[dim];
+						if (maxbb[dim] > m_bbMax[dim])
+							m_bbMax[dim] = maxbb[dim];
+					}
+				}
+				else
+				{
+					for (unsigned int dim = 0; dim < 3; ++dim)
+					{
+						m_bbMin[dim] = minbb[dim];
+						m_bbMax[dim] = maxbb[dim];
+					}
+					initialized = true;
+				}
 			}
+		}
+
+		if (!initialized)
+		{
+			m_bbMin.setValue(0, 0, 0);
+			m_bbMax.setValue(0, 0, 0);
 		}
 	}
 	else
