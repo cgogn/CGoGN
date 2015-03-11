@@ -1,6 +1,6 @@
 // ShaderRadiancePerVertex::vertexShaderText
 
-#extension GL_EXT_gpu_shader4 : enable // need GLSL v1.30 -> if not available, use a uniform for passing textureSize instead of calling textureSize2D
+//#extension GL_EXT_gpu_shader4 : enable // need GLSL v1.30 -> if not available, use a uniform for passing textureSize instead of calling textureSize2D
 
 ATTRIBUTE vec3 VertexPosition;
 ATTRIBUTE vec3 VertexNormal;
@@ -69,7 +69,7 @@ void set_eval_direction (vec3 v)
 
 void main ()
 {
-    int size = (textureSize2D(texture,0)).x; // supposed square matrix
+    int size = (textureSize(texture,0)).x; // supposed square matrix
 
     //init_K_tab();
     vec3 eyeV = normalize(camera - VertexPosition); // normalized outgoing line-of-sight vector

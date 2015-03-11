@@ -65,7 +65,7 @@ std::string GLSLShader::DEFINES_GL2=\
 
 
 std::string GLSLShader::DEFINES_GL3=\
-"#version 150\n"
+"#version 330\n"
 "#define PRECISION precision highp float\n"
 "#define ATTRIBUTE in\n"
 "#define VARYING_VERT out\n"
