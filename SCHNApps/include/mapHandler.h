@@ -108,7 +108,7 @@ public slots:
 			return NULL;
 	}
 
-	virtual void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
+	virtual bool transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
 
 protected:
 	virtual void updateBB() = 0;
@@ -293,7 +293,7 @@ public:
 	void updateBB();
 	void updateBBDrawer();
 
-	void transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax);
+	bool transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax);
 
 	/*********************************************************
 	 * MANAGE TOPO DRAWING
