@@ -1,6 +1,6 @@
 // ShaderRadiancePerVertex::fragmentShaderInterpText
 
-#extension GL_EXT_gpu_shader4 : enable // need GLSL v1.30 -> if not available, use a uniform for passing textureSize instead of calling textureSize2D
+//#extension GL_EXT_gpu_shader4 : enable // need GLSL v1.30 -> if not available, use a uniform for passing textureSize instead of calling textureSize2D
 
 PRECISION;
 
@@ -75,7 +75,7 @@ void set_eval_direction (vec3 v)
 
 void main (void)
 {
-	int size = (textureSize2D(texture,0)).x; // supposed square matrix
+        int size = (textureSize(texture,0)).x; // supposed square matrix
 
 	vec3 eyeV = normalize(camera - vxPos); // normalized outgoing line-of-sight vector
 	eyeV = 2*dot(vxNorm,eyeV)*vxNorm-eyeV ; // symmetrize
