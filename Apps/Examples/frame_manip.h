@@ -27,9 +27,11 @@
 #include <iostream>
 
 
-#include "Utils/Qt/qtSimple.h"
+//#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtQGLV.h"
 #include "Utils/frameManipulator.h"
 #include "Utils/drawer.h"
+#include "Utils/chrono.h"
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
@@ -43,10 +45,11 @@ using namespace CGoGN ;
  * A class for a little interface and rendering
  */
 
-class MyQT: public Utils::QT::SimpleQT
+class MyQT: public Utils::QT::SimpleQGLV
 {
 	Q_OBJECT
 public:
+
 	// render
 	Algo::Render::GL2::MapRender* m_render;
 
@@ -68,7 +71,10 @@ public:
 	// width of cube of pickable
 	unsigned int NBP;
 
-	MyQT():m_render(NULL), m_positionVBO(NULL),NBP(2){}
+	Utils::Chrono m_frame_ch;
+	unsigned int m_nbFrames;
+
+	MyQT():m_render(NULL), m_positionVBO(NULL),NBP(2),m_nbFrames(0){}
 
 	// callbacks of simpleQT to overdefine:
 	void cb_redraw();

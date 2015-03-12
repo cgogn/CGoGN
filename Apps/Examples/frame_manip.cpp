@@ -140,6 +140,13 @@ void MyQT::cb_redraw()
 		(*it)->draw();
 	}
 
+	m_nbFrames++;
+	if (m_nbFrames >=40)
+	{
+		std::cout << 40000.0/m_frame_ch.elapsed()<< " fps"<<std::endl;
+		m_nbFrames = 0;
+		m_frame_ch.start();
+	}
 }
 
 void  MyQT::cb_mousePress(int /*button*/, int x, int y)
