@@ -28,8 +28,8 @@ Dialog_ComputeDistance::Dialog_ComputeDistance(SCHNApps* s) :
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 	{
-		QListWidgetItem* item1 = new QListWidgetItem(map->getName(), list_maps_1);
-		QListWidgetItem* item2 = new QListWidgetItem(map->getName(), list_maps_2);
+		list_maps_1->addItem(map->getName());
+		list_maps_2->addItem(map->getName());
 	}
 }
 
@@ -109,8 +109,8 @@ void Dialog_ComputeDistance::selectedMap2Changed()
 
 void Dialog_ComputeDistance::addMapToList(MapHandlerGen* map)
 {
-	QListWidgetItem* item1 = new QListWidgetItem(map->getName(), list_maps_1);
-	QListWidgetItem* item2 = new QListWidgetItem(map->getName(), list_maps_2);
+	list_maps_1->addItem(map->getName());
+	list_maps_2->addItem(map->getName());
 }
 
 void Dialog_ComputeDistance::removeMapFromList(MapHandlerGen* map)

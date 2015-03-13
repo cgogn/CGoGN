@@ -5,6 +5,9 @@
 #include <QGLViewer/camera.h>
 #include <QGLViewer/manipulatedCameraFrame.h>
 
+
+#include "dll.h"
+
 namespace CGoGN
 {
 
@@ -13,7 +16,7 @@ namespace SCHNApps
 
 class SCHNApps;
 
-class Camera : public qglviewer::Camera
+class SCHNAPPS_API Camera : public qglviewer::Camera
 {
 	Q_OBJECT
 
@@ -26,12 +29,6 @@ public:
 	~Camera();
 	const QString& getName() const { return m_name; }
 
-	void updateParams();
-
-	void drawBBCam();
-
-	bool m_drawBB;
-
 public slots:
 	QString getName() { return m_name; }
 	SCHNApps* getSCHNApps() const { return m_schnapps; }
@@ -40,13 +37,18 @@ public slots:
 	bool isShared()	const { return l_views.size() > 1; }
 
 	qglviewer::Camera::Type getProjectionType() { return type(); }
-	bool getDraw() const { return m_draw; }
-	bool getDrawPath() const { return m_drawPath; }
+	bool getDraw() const { return b_draw; }
+	bool getDrawPath() const { return b_drawPath; }
 
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
-	bool isLinkedToMap(MapHandlerGen* mhg) const;
+	void setProjectionType(int t);
+	void setDraw(bool b);
+	void setDrawPath(bool b);
+
+	void enableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = true; }
+	void disableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = false; }
 
 private:
 	void linkView(View* view);
@@ -54,15 +56,7 @@ private:
 
 private slots:
 	void frameModified();
-	void mapAdded(MapHandlerGen* mhg);
-	void mapRemoved(MapHandlerGen* mhg);
-	void BBModified();
-
-public slots:
-	void setProjectionType(int t);
-	void setDraw(bool b);
-	void setDrawPath(bool b);
-
+	void fitToViewsBoundingBox();
 
 signals:
 	void projectionTypeChanged(int);
@@ -70,16 +64,15 @@ signals:
 	void drawPathChanged(bool);
 
 protected:
-	qglviewer::Vec m_bbMin;
-	qglviewer::Vec m_bbMax;
-
 	QString m_name;
 	SCHNApps* m_schnapps;
 
 	QList<View*> l_views;
 
-	bool m_draw;
-	bool m_drawPath;
+	bool b_draw;
+	bool b_drawPath;
+
+	bool b_fitToViewsBoundingBox;
 };
 
 } // namespace SCHNApps

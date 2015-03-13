@@ -32,6 +32,8 @@ private:
 private slots:
 	void positionVBOChanged(int index);
 	void normalVBOChanged(int index);
+	void fragmentInterpolationChanged(int state);
+	void decimateClicked();
 
 private:
 	void addPositionVBO(QString name);
@@ -46,4 +48,4 @@ private:
 
 } // namespace CGoGN
 
-#endif
+#endif // _SURFACE_RADIANCE_DOCK_TAB_H_

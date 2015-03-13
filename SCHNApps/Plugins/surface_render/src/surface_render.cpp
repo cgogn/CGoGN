@@ -12,7 +12,7 @@ namespace SCHNApps
 bool Surface_Render_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
-		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
 	m_dockTab = new Surface_Render_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Render");
@@ -41,7 +41,7 @@ bool Surface_Render_Plugin::enable()
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapAdded(map);
@@ -62,7 +62,7 @@ void Surface_Render_Plugin::disable()
 	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
-	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	disconnect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 		mapRemoved(map);
@@ -108,8 +108,6 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 		if(p.renderEdges)
 		{
 			glLineWidth(1.0f);
-			CGoGN::Geom::Vec4f c(0.1f, 0.1f, 0.1f, 1.0f);
-			m_simpleColorShader->setColor(c);
 			m_simpleColorShader->setAttributePosition(p.positionVBO);
 			m_simpleColorShader->setColor(p.simpleColor);
 			map->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
@@ -140,10 +138,6 @@ void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGe
 {
 	DEBUG_SLOT();
 	m_dockTab->updateMapParameters();
-	if (cur==NULL)
-		m_dockTab->setDisabled(true);
-	else
-		m_dockTab->setDisabled(false);
 }
 
 void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
@@ -401,12 +395,16 @@ void Surface_Render_Plugin::changeVertexColor(const QString& view, const QString
 
 
 
-void Surface_Render_Plugin::appsFinished()
+void Surface_Render_Plugin::schnappsClosing()
 {
 	m_dockTab->m_colorDial->close();
 }
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)
+#endif
 
-Q_EXPORT_PLUGIN2(Surface_Render_Plugin, Surface_Render_Plugin)
 
 } // namespace SCHNApps
 

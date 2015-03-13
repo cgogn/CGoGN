@@ -3,8 +3,12 @@
 
 #include <QtPlugin>
 #include <QAction>
+#include <GL/glew.h>
+
 
 #include "types.h"
+
+#include "dll.h"
 
 namespace CGoGN
 {
@@ -12,7 +16,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Plugin : public QObject
+class SCHNAPPS_API Plugin : public QObject
 {
 	Q_OBJECT
 

@@ -16,7 +16,9 @@ class Surface_DifferentialProperties_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
-
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 public:
 	Surface_DifferentialProperties_Plugin()
 	{}
@@ -38,7 +40,7 @@ private slots:
 	void computeNormalFromDialog();
 	void computeCurvatureFromDialog();
 
-	void appsFinished();
+	void schnappsClosing();
 
 public slots:
 	void computeNormal(const QString& mapName,

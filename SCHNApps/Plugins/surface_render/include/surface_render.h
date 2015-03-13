@@ -33,9 +33,9 @@ struct MapParameters
 		renderEdges(false),
 		renderFaces(true),
 		faceStyle(FLAT),
-		diffuseColor(0.8,0.9,0.7,0.0),
-		simpleColor(0.0,0.0,0.0,0.0),
-		vertexColor(0.0,0.0,1.0,0.0)
+		diffuseColor(0.8f,0.9f,0.7f,0.0f),
+		simpleColor(0.0f,0.0f,0.0f,0.0f),
+		vertexColor(0.0f,0.0f,1.0f,0.0f)
 
 	{}
 
@@ -57,7 +57,9 @@ class Surface_Render_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
-
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 	friend class Surface_Render_DockTab;
 
 public:
@@ -67,8 +69,6 @@ public:
 	~Surface_Render_Plugin()
 	{}
 
-
-
 private:
 	virtual bool enable();
 	virtual void disable();
@@ -76,12 +76,12 @@ private:
 	virtual void draw(View *view) {}
 	virtual void drawMap(View* view, MapHandlerGen* map);
 
-	virtual void keyPress(View* view, QKeyEvent* event) {}
-	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event) {}
-	virtual void mouseRelease(View* view, QMouseEvent* event) {}
-	virtual void mouseMove(View* view, QMouseEvent* event) {}
-	virtual void wheelEvent(View* view, QWheelEvent* event) {}
+	virtual void keyPress(View* , QKeyEvent* ) {}
+	virtual void keyRelease(View* , QKeyEvent* ) {}
+	virtual void mousePress(View* , QMouseEvent* ) {}
+	virtual void mouseRelease(View* , QMouseEvent* ) {}
+	virtual void mouseMove(View* , QMouseEvent* ) {}
+	virtual void wheelEvent(View* , QWheelEvent* ) {}
 
 	virtual void viewLinked(View *view) {}
 	virtual void viewUnlinked(View *view) {}
@@ -97,8 +97,7 @@ private slots:
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
 
-	void appsFinished();
-
+	void schnappsClosing();
 
 public slots:
 	// slots for Python calls
@@ -113,8 +112,6 @@ public slots:
 	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeVertexColor(const QString& view, const QString& map, float r, float g, float b);
-
-
 
 protected:
 	Surface_Render_DockTab* m_dockTab;

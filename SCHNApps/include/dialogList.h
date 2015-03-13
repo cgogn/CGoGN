@@ -7,6 +7,7 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 
+#include "dll.h"
 
 namespace CGoGN
 {
@@ -14,7 +15,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class ListPopUp : public QDialog
+class SCHNAPPS_API ListPopUp : public QDialog
 {
 	Q_OBJECT
 	QVBoxLayout* m_layout;

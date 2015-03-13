@@ -15,7 +15,9 @@ class Surface_Subdivision_Plugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
-
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 public:
 	Surface_Subdivision_Plugin()
 	{}
@@ -29,7 +31,7 @@ public:
 private slots:
 	void openSubdivisionDialog();
 	void subdivideFromDialog();
-	void appsFinished();
+	void schnappsClosing();
 
 public slots:
 	void loopSubdivision(

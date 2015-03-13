@@ -43,10 +43,10 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fPIC")
 #SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}${BINARIES_RELATIVE_PATH})
 
 
-IF (EXISTS ${CMAKE_SOURCE_DIR}/OpenNL/CMakeOptions.txt)
-   MESSAGE(INFO: "Using local options file: " ${CMAKE_SOURCE_DIR}/OpenNL/CMakeOptions.txt)
-   INCLUDE(${CMAKE_SOURCE_DIR}/OpenNL/CMakeOptions.txt)
-ENDIF(EXISTS ${CMAKE_SOURCE_DIR}/OpenNL/CMakeOptions.txt)
+IF (EXISTS ${CMAKE_SOURCE_DIR}/ThirdParty/OpenNL/CMakeOptions.txt)
+   MESSAGE(INFO: "Using local options file: " ${CMAKE_SOURCE_DIR}/ThirdParty/OpenNL/CMakeOptions.txt)
+   INCLUDE(${CMAKE_SOURCE_DIR}/ThirdParty/OpenNL/CMakeOptions.txt)
+ENDIF()
 
 IF(USE_CNC)
     ADD_DEFINITIONS(-DNL_USE_CNC)

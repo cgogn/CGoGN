@@ -2,6 +2,9 @@
 #define _SLOT_DBG_H_
 
 #include <iostream>
+#include <string>
+
+#include "dll.h"
 
 namespace CGoGN
 {
@@ -14,7 +17,7 @@ namespace SCHNApps
 // USE cmake .. -DSLOT_DEBUG_MODE=1
 
 
-class PrettyPrintShiftMessage
+class SCHNAPPS_API PrettyPrintShiftMessage
 {
 protected:
 	static unsigned int s_nb;

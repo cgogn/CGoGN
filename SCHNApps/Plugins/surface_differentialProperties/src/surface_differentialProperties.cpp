@@ -37,7 +37,7 @@ bool Surface_DifferentialProperties_Plugin::enable()
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
-	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
@@ -60,7 +60,7 @@ void Surface_DifferentialProperties_Plugin::disable()
 	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
-	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	disconnect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 }
 
 void Surface_DifferentialProperties_Plugin::mapAdded(MapHandlerGen *map)
@@ -309,14 +309,17 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 	}
 }
 
-void Surface_DifferentialProperties_Plugin::appsFinished()
+void Surface_DifferentialProperties_Plugin::schnappsClosing()
 {
 	m_computeNormalDialog->close();
 	m_computeCurvatureDialog->close();
 }
 
-
-Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
+#endif
 
 } // namespace SCHNApps
 

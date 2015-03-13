@@ -2,29 +2,14 @@ cmake_minimum_required(VERSION 2.6)
 
 project(testing)
 
-#SET(CMAKE_BUILD_TYPE Debug)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-#	${CGoGN_ROOT_DIR}/include
-#	${CGoGN_EXT_INCLUDES}
-#)
-
-
-#IF(WIN32)
-#	link_directories( 
-#		${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)
-#		${Boost_LIBRARY_DIRS} )
-#ELSE(WIN32)
-#	link_directories(
-#		${CGoGN_ROOT_DIR}/lib/Debug
-#		${CGoGN_ROOT_DIR}/lib/Release )
-#ENDIF(WIN32)
 
 #define exec to compile
 
 add_executable( Geom_orientation ./Geom_orientation.cpp)
 target_link_libraries( Geom_orientation
 	${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
+qt_use_modules(Geom_orientation Gui OpenGL Xml Svg)
 
 add_executable( Geom_inclusion ./Geom_inclusion.cpp)
 target_link_libraries( Geom_inclusion

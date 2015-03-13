@@ -7,14 +7,14 @@ namespace SCHNApps
 {
 
 MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) :
-	m_topoRender(NULL),
 	m_name(name),
 	m_schnapps(s),
 	m_map(map),
 	m_frame(NULL),
+	m_bbVertexAttribute(NULL),
 	m_bbDrawer(NULL),
-	m_render(NULL)
-
+	m_render(NULL),
+	m_topoRender(NULL)
 {
 	m_frame = new qglviewer::ManipulatedFrame();
 	connect(m_frame, SIGNAL(manipulated()), this, SLOT(frameModified()));
@@ -41,8 +41,12 @@ MapHandlerGen::~MapHandlerGen()
 void MapHandlerGen::notifyAttributeModification(const AttributeHandlerGen& attr)
 {
 	QString nameAttr = QString::fromStdString(attr.name());
-	if(m_vbo.contains(nameAttr))
+
+	if (m_vbo.contains(nameAttr))
 		m_vbo[nameAttr]->updateData(attr);
+
+	if (m_bbVertexAttribute && m_bbVertexAttribute->getName() == attr.name())
+		updateBB();
 
 	DEBUG_EMIT("attributeModified");
 	emit(attributeModified(attr.getOrbit(), nameAttr));

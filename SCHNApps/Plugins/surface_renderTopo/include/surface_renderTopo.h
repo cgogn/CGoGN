@@ -19,7 +19,9 @@ class Surface_RenderTopo_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
-
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 	friend class Surface_RenderTopo_DockTab;
 
 public:
@@ -71,12 +73,12 @@ public:
 	virtual void draw(View *view) {}
 	virtual void drawMap(View* view, MapHandlerGen* map);
 
-	virtual void keyPress(View* view, QKeyEvent* event) {}
-	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event) {}
-	virtual void mouseRelease(View* view, QMouseEvent* event) {}
-	virtual void mouseMove(View* view, QMouseEvent* event) {}
-	virtual void wheelEvent(View* view, QWheelEvent* event) {}
+	virtual void keyPress(View* , QKeyEvent* ) {}
+	virtual void keyRelease(View* , QKeyEvent* ) {}
+	virtual void mousePress(View* , QMouseEvent* ) {}
+	virtual void mouseRelease(View* , QMouseEvent* ) {}
+	virtual void mouseMove(View* , QMouseEvent* ) {}
+	virtual void wheelEvent(View* , QWheelEvent* ) {}
 
 	virtual void viewLinked(View *view) {}
 	virtual void viewUnlinked(View *view) {}

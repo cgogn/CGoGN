@@ -19,6 +19,8 @@ Surface_Radiance_DockTab::Surface_Radiance_DockTab(SCHNApps* s, Surface_Radiance
 
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
 	connect(combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(normalVBOChanged(int)));
+	connect(checkbox_fragInterp, SIGNAL(stateChanged(int)), this, SLOT(fragmentInterpolationChanged(int)));
+	connect(button_decimate, SIGNAL(clicked()), this, SLOT(decimateClicked()));
 }
 
 
@@ -33,6 +35,8 @@ void Surface_Radiance_DockTab::positionVBOChanged(int index)
 		if(map)
 		{
 			m_plugin->h_mapParameterSet[map].positionVBO = map->getVBO(combo_positionVBO->currentText());
+			foreach (View* v, map->getLinkedViews())
+				v->updateGL();
 		}
 	}
 }
@@ -45,8 +49,35 @@ void Surface_Radiance_DockTab::normalVBOChanged(int index)
 		if(map)
 		{
 			m_plugin->h_mapParameterSet[map].normalVBO = map->getVBO(combo_normalVBO->currentText());
+			foreach (View* v, map->getLinkedViews())
+				v->updateGL();
 		}
 	}
+}
+
+void Surface_Radiance_DockTab::fragmentInterpolationChanged(int state)
+{
+	if(!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(map)
+		{
+			m_plugin->h_mapParameterSet[map].radiancePerVertexShader->setFragInterp(state == Qt::Checked);
+			foreach (View* v, map->getLinkedViews())
+				v->updateGL();
+		}
+	}
+}
+
+void Surface_Radiance_DockTab::decimateClicked()
+{
+	m_plugin->decimate(
+		m_schnapps->getSelectedMap()->getName(),
+		combo_positionVBO->currentText(),
+		combo_normalVBO->currentText(),
+		slider_decimationGoal->value() / 100.0f,
+		checkbox_halfCollapse->checkState() == Qt::Checked
+	);
 }
 
 
@@ -118,6 +149,8 @@ void Surface_Radiance_DockTab::updateMapParameters()
 				++i;
 			}
 		}
+
+		checkbox_fragInterp->setChecked(p.radiancePerVertexShader->getFragInterp());
 	}
 
 	b_updatingUI = false;

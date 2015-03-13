@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
+    <width>220</width>
     <height>673</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>200</width>
+    <width>0</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>200</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -41,6 +41,27 @@
       </sizepolicy>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>BBox</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="combo_bbVertexAttribute">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTabWidget" name="tabWidget_mapInfo">
@@ -498,62 +519,7 @@
        <string>W</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_volumeNbOrbits">
-         <property name="text">
-          <string>0</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" colspan="2">
-        <widget class="QLabel" name="label_volumeOrbits">
-         <property name="text">
-          <string>orbits</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_volumeNbCells">
-         <property name="text">
-          <string>0</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_volumeCells">
-         <property name="text">
-          <string>cells</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_volumeAttributes">
-         <property name="text">
-          <string>Attributes :</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="3">
-        <widget class="QListWidget" name="list_volumeAttributes">
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_volumeSelectors">
-         <property name="text">
-          <string>Selectors :</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
+       <item row="4" column="2">
         <widget class="QPushButton" name="button_volumeAddSelector">
          <property name="minimumSize">
           <size>
@@ -572,7 +538,21 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
+       <item row="0" column="2" colspan="2">
+        <widget class="QLabel" name="label_volumeOrbits">
+         <property name="text">
+          <string>orbits</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="4">
+        <widget class="QListWidget" name="list_volumeSelectors">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
         <widget class="QPushButton" name="button_volumeRemoveSelector">
          <property name="minimumSize">
           <size>
@@ -591,10 +571,51 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="3">
-        <widget class="QListWidget" name="list_volumeSelectors">
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_volumeSelectors">
+         <property name="text">
+          <string>Selectors :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="4">
+        <widget class="QListWidget" name="list_volumeAttributes">
          <property name="selectionMode">
-          <enum>QAbstractItemView::SingleSelection</enum>
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_volumeAttributes">
+         <property name="text">
+          <string>Attributes :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" colspan="2">
+        <widget class="QLabel" name="label_volumeCells">
+         <property name="text">
+          <string>cells</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_volumeNbOrbits">
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QLabel" name="label_volumeNbCells">
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>

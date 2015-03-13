@@ -1,11 +1,14 @@
 #ifndef _SCHNAPPS_H_
 #define _SCHNAPPS_H_
 
+#include "dll.h"
+
 #include "ui_schnapps.h"
 
 #include "types.h"
-#include "PythonQt/PythonQt.h"
-#include "PythonQt/gui/PythonQtScriptingConsole.h"
+
+#include "PythonQt.h"
+#include "gui/PythonQtScriptingConsole.h"
 #include "slot_debug.h"
 
 class QVBoxLayout;
@@ -21,7 +24,7 @@ class ControlDock_CameraTab;
 class ControlDock_MapTab;
 class ControlDock_PluginTab;
 
-class SCHNApps : public QMainWindow, Ui::SCHNApps
+class SCHNAPPS_API SCHNApps : public QMainWindow, Ui::SCHNApps
 {
 	Q_OBJECT
 
@@ -105,7 +108,7 @@ public slots:
 	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { DEBUG_EMIT("selectedCellSelectorChanged"); emit(selectedCellSelectorChanged(cs)); }
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
 
-	const StaticPointers& getStaticPointers() const {return m_sp;}
+	const StaticPointers& getStaticPointers() const { return m_sp; }
 
 	/*********************************************************
 	 * MANAGE TEXTURES
@@ -153,7 +156,7 @@ signals:
 	void pluginEnabled(Plugin* plugin);
 	void pluginDisabled(Plugin* plugin);
 
-	void appsFinished();
+	void schnappsClosing();
 
 protected:
 	QString m_appPath;

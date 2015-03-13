@@ -39,15 +39,16 @@ MapHandlerGen* Surface_Import_Plugin::importFromFile(const QString& fileName)
 			std::vector<std::string> attrNames;
 			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toStdString(), attrNames);
 
-			// get vertex position attribute
-			VertexAttribute<PFP2::VEC3, PFP2::MAP> position = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>(attrNames[0]);
-			mh->registerAttribute(position);
-
-			// update corresponding VBO & emit attribute update signal
-			mh->notifyAttributeModification(position);
-
-			// compute map bounding box
-			mh->updateBB(position);
+			for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
+			{
+				AttributeContainer& cont = map->getAttributeContainer(orbit);
+				std::vector<std::string> names;
+				std::vector<std::string> types;
+				cont.getAttributesNames(names);
+				cont.getAttributesTypes(types);
+				for(unsigned int i = 0; i < names.size(); ++i)
+					mhg->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+			}
 		}
 		return mhg;
 	}
@@ -65,7 +66,11 @@ void Surface_Import_Plugin::importFromFileDialog()
 	}
 }
 
-Q_EXPORT_PLUGIN2(Surface_Import_Plugin, Surface_Import_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Import_Plugin, Surface_Import_Plugin)
+#endif
 
 } // namespace SCHNApps
 

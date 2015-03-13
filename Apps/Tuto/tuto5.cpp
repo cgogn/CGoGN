@@ -33,6 +33,8 @@
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Algo/Render/SVG/mapSVGRender.h"
 
+#include <QTimer>
+
 MAP myMap;
 
 VertexAttribute<VEC3, MAP> position ;

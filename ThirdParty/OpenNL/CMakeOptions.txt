@@ -33,8 +33,7 @@
 # plateforms.
 ##################################################################
 
-
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/OpenNL/CMakeModules)
+SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules)
 
 # build exemple programs
 #SET(BUILD_EXAMPLES TRUE)
@@ -69,6 +68,7 @@ SET(USE_CHOLMOD TRUE)
 IF (NOT WIN32)
 	find_package(SuiteSparse REQUIRED)
 ENDIF (NOT WIN32)
+
 ###########
 #  CNC
 ###########

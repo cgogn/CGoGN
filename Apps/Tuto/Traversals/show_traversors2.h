@@ -92,7 +92,7 @@ public:
 	Dart m_selected;
 	std::vector<Dart> m_affDarts;
 
-	Utils::Drawer m_drawer;
+	Utils::Drawer* m_drawer;
 
 	DartMarker<MAP>* m_dm_topo;
 
