@@ -67,9 +67,6 @@ public:
 	unsigned int setAttributePosition(VBO* vbo);
 
 	void setClippingPlane(const Geom::Vec4f& plane);
-
-	inline void setNoClippingPlane() { setClippingPlane(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f)); }
-
 };
 
 } // namespace Utils
