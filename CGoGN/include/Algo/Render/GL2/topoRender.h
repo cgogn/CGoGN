@@ -177,6 +177,10 @@ public:
 	*/
 	~TopoGenRender();
 
+	void setClippingPlane(const Geom::Vec4f& plane);
+	void setNoClippingPlane();
+
+
 	/**
 	 * set the with of line use to draw darts (default val is 2)
 	 * @param dw width

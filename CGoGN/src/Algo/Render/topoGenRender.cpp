@@ -66,7 +66,7 @@ TopoGenRender::TopoGenRender(float bs):
 	m_vbo1->setDataSize(3);
 	m_vbo2->setDataSize(3);
 
-	m_shader1 = new Utils::ShaderSimpleColor();
+	m_shader1 = new Utils::ShaderSimpleColor(true,false);
 
 	// binding VBO - VA
 	m_vaId = m_shader1->setAttributePosition(m_vbo1);
@@ -131,6 +131,19 @@ TopoGenRender::~TopoGenRender()
 
 	if (m_bufferDartPosition!=NULL)
 		delete[] m_bufferDartPosition;
+}
+
+
+
+void TopoGenRender::setClippingPlane(const Geom::Vec4f& plane)
+{
+	m_shader1->setClippingPlane(plane);
+}
+
+
+void TopoGenRender::setNoClippingPlane()
+{
+	this->setClippingPlane(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f));
 }
 
 

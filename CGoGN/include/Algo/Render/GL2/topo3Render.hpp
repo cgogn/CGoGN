@@ -71,8 +71,8 @@ Topo3Render<PFP>::Topo3Render():
 	m_vbo3->setDataSize(3);
 	m_vbo4->setDataSize(3);
 
-	m_shader1 = new Utils::ShaderSimpleColor();
-	m_shader2 = new Utils::ShaderColorPerVertex();
+	m_shader1 = new Utils::ShaderSimpleColor(true,false);
+	m_shader2 = new Utils::ShaderColorPerVertex(true,false);
 
 	// binding VBO - VA
 	m_vaId = m_shader1->setAttributePosition(m_vbo1);
@@ -108,6 +108,22 @@ Topo3Render<PFP>::~Topo3Render()
 	if (m_bufferDartPosition != NULL)
 		delete[] m_bufferDartPosition;
 }
+
+
+template<typename PFP>
+void Topo3Render<PFP>::setClippingPlane(const Geom::Vec4f& plane)
+{
+	m_shader1->setClippingPlane(plane);
+	m_shader2->setClippingPlane(plane);
+}
+
+template<typename PFP>
+void Topo3Render<PFP>::setNoClippingPlane()
+{
+	this->setClippingPlane(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f));
+}
+
+
 
 template<typename PFP>
 void Topo3Render<PFP>::setDartWidth(float dw)
