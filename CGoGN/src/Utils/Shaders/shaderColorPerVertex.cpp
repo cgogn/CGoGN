@@ -21,9 +21,9 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/Shaders/shaderColorPerVertex.h"
-
 
 namespace CGoGN
 {
@@ -36,7 +36,6 @@ namespace Utils
 #include "shaderColorPerVertexClip.vert"
 #include "shaderColorPerVertexClip.frag"
 
-
 ShaderColorPerVertex::ShaderColorPerVertex(bool withClipping, bool black_is_transparent)
 {
 	if (withClipping)
@@ -45,10 +44,10 @@ ShaderColorPerVertex::ShaderColorPerVertex(bool withClipping, bool black_is_tran
 		m_nameFS = "ShaderColorPerVertexClip_fs";
 		m_nameGS = "";
 
-		std::string glxvert(GLSLShader::defines_gl());
+		std::string glxvert(*GLSLShader::DEFINES_GL);
 		glxvert.append(vertexShaderClipText);
 
-		std::string glxfrag(GLSLShader::defines_gl());
+		std::string glxfrag(*GLSLShader::DEFINES_GL);
 		if (black_is_transparent)
 			glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
 		glxfrag.append(fragmentShaderClipText);
@@ -65,10 +64,10 @@ ShaderColorPerVertex::ShaderColorPerVertex(bool withClipping, bool black_is_tran
 		m_nameFS = "ShaderColorPerVertex_fs";
 		m_nameGS = "ShaderColorPerVertex_gs";
 
-		std::string glxvert(GLSLShader::defines_gl());
+		std::string glxvert(*GLSLShader::DEFINES_GL);
 		glxvert.append(vertexShaderText);
 
-		std::string glxfrag(GLSLShader::defines_gl());
+		std::string glxfrag(*GLSLShader::DEFINES_GL);
 		if (black_is_transparent)
 			glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
 		glxfrag.append(fragmentShaderText);
@@ -102,7 +101,6 @@ unsigned int ShaderColorPerVertex::setAttributeColor(VBO* vbo)
 	return id;
 }
 
-
 void ShaderColorPerVertex::restoreUniformsAttribs()
 {
 	bind();
@@ -128,8 +126,6 @@ void ShaderColorPerVertex::setClippingPlane(const Geom::Vec4f& plane)
 	glUniform4fv(*m_unif_planeClip, 1, plane.data());
 	unbind();
 }
-
-
 
 } // namespace Utils
 

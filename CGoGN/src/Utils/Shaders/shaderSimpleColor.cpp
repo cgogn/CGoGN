@@ -46,10 +46,10 @@ ShaderSimpleColor::ShaderSimpleColor(bool withClipping, bool black_is_transparen
 
 		// chose GL defines (2 or 3)
 		// and compile shaders
-		std::string glxvert(GLSLShader::defines_gl());
+		std::string glxvert(*GLSLShader::DEFINES_GL);
 		glxvert.append(vertexShaderClipText);
 
-		std::string glxfrag(GLSLShader::defines_gl());
+		std::string glxfrag(*GLSLShader::DEFINES_GL);
 		if (black_is_transparent)
 			glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
 		glxfrag.append(fragmentShaderClipText);
@@ -67,10 +67,10 @@ ShaderSimpleColor::ShaderSimpleColor(bool withClipping, bool black_is_transparen
 
 		// chose GL defines (2 or 3)
 		// and compile shaders
-		std::string glxvert(GLSLShader::defines_gl());
+		std::string glxvert(*GLSLShader::DEFINES_GL);
 		glxvert.append(vertexShaderText);
 
-		std::string glxfrag(GLSLShader::defines_gl());
+		std::string glxfrag(*GLSLShader::DEFINES_GL);
 		if (black_is_transparent)
 			glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
 		glxfrag.append(fragmentShaderText);
@@ -92,7 +92,6 @@ void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
 	unbind();
 }
 
-
 void ShaderSimpleColor::setClippingPlane(const Geom::Vec4f& plane)
 {
 	m_planeClip = plane;
@@ -100,7 +99,6 @@ void ShaderSimpleColor::setClippingPlane(const Geom::Vec4f& plane)
 	glUniform4fv(*m_unif_planeClip, 1, plane.data());
 	unbind();
 }
-
 
 unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
 {

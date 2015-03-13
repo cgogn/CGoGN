@@ -35,6 +35,12 @@ IF (WIN32)
 	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile (Experimental" )
 ENDIF()
 
+IF (LINUX)
+	SET ( CGoGN_GCC_4_9 OFF CACHE BOOL "using gcc version > 4.9 (std::regex ok !)" )
+ENDIF()
+
+SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
+
 
 checkCpp11Support()
 checkCpp11Feature("regex" HAS_CPP11_REGEX "False")
@@ -166,12 +172,8 @@ IF(WIN32)
 ENDIF ()
 
 
-IF (APPLE)
-	LIST(APPEND CGoGN_DEFS -DCGOGN_APPLE)
-ENDIF ()
-
-IF (HAS_CPP11_REGEX)
-	LIST(APPEND CGoGN_DEFS -DHAS_CPP11_REGEX)
+IF (CGoGN_GCC_4_9)
+	LIST(APPEND CGoGN_DEFS -DCGOGN_GCC_4_9)
 ENDIF ()
 
 
