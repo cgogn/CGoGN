@@ -43,6 +43,8 @@ protected:
 	// shader sources
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
+	static std::string vertexShaderClipText;
+	static std::string fragmentShaderClipText;
 
     VBO* m_vboPos;
     VBO* m_vboCol;
@@ -50,10 +52,15 @@ protected:
     CGoGNGLuint m_unif_alpha;
     float m_opacity;
 
+	/// clipping
+	CGoGNGLuint m_unif_planeClip;
+	Geom::Vec4f m_planeClip;
+
+
     void restoreUniformsAttribs();
 
 public:
-    ShaderColorPerVertex(bool black_is_transparent = false);
+	ShaderColorPerVertex(bool withClipping = false, bool black_is_transparent = false);
 
 	/**
 	 * set the VBO of position (vec3)
@@ -71,6 +78,8 @@ public:
 	void setOpacity(float op);
 
 	float getOpacity() const  { return m_opacity;}
+
+	void setClippingPlane(const Geom::Vec4f& plane);
 };
 
 } // namespace Utils

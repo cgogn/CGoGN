@@ -158,6 +158,10 @@ public:
 	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
 	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
 
+
+	void setClippingPlane(const Geom::Vec4f& plane);
+	void setNoClippingPlane();
+
 	/**
 	 * set the with of line use to draw darts (default val is 2)
 	 * @param dw width
