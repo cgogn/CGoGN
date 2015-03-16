@@ -33,9 +33,11 @@ namespace Utils
 
 #include "shaderPhong.vert"
 #include "shaderPhong.frag"
+#include "shaderPhongClip.vert"
+#include "shaderPhongClip.frag"
 
 
-ShaderPhong::ShaderPhong(bool doubleSided, bool withEyePosition):
+ShaderPhong::ShaderPhong(bool withClipping, bool doubleSided, bool withEyePosition):
 	m_with_color(false),
 	m_with_eyepos(withEyePosition),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
@@ -43,25 +45,39 @@ ShaderPhong::ShaderPhong(bool doubleSided, bool withEyePosition):
 	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
 	m_shininess(100.0f),
 	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
+	m_backColor(0.0f,0.0f,0.0f,0.0f),
 	m_vboPos(NULL),
 	m_vboNormal(NULL),
-	m_vboColor(NULL)
+	m_vboColor(NULL),
+	m_planeClip(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f))
 {
-	m_nameVS = "ShaderPhong_vs";
-	m_nameFS = "ShaderPhong_fs";
-//	m_nameGS = "ShaderPhong_gs";
-
-	// get choose GL defines (2 or 3)
-	// ans compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
-	if (m_with_eyepos)
-		glxvert.append("#define WITH_EYEPOSITION");
-	glxvert.append(vertexShaderText);
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	// Use double sided lighting if set
-	if (doubleSided)
-		glxfrag.append("#define DOUBLE_SIDED\n");
-	glxfrag.append(fragmentShaderText);
+
+	if (withClipping)
+	{
+		m_nameVS = "ShaderPhongClip_vs";
+		m_nameFS = "ShaderPhongClip_fs";
+		if (m_with_eyepos)
+			glxvert.append("#define WITH_EYEPOSITION");
+		glxvert.append(vertexShaderClipText);
+		// Use double sided lighting if set
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderClipText);
+	}
+	else
+	{
+		m_nameVS = "ShaderPhong_vs";
+		m_nameFS = "ShaderPhong_fs";
+		if (m_with_eyepos)
+			glxvert.append("#define WITH_EYEPOSITION");
+		glxvert.append(vertexShaderText);
+		// Use double sided lighting if set
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderText);
+	}
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
@@ -80,6 +96,9 @@ void ShaderPhong::getLocations()
 	*m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
 	if (m_with_eyepos)
 		*m_unif_eyePos  = glGetUniformLocation(this->program_handler(), "eyePosition");
+	*m_unif_backColor  = glGetUniformLocation(this->program_handler(), "backColor");
+	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
+
 	unbind();
 }
 
@@ -93,6 +112,9 @@ void ShaderPhong::sendParams()
 	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
 	if (m_with_eyepos)
 		glUniform3fv(*m_unif_eyePos, 1, m_eyePos.data());
+	glUniform4fv(*m_unif_backColor,  1, m_backColor.data());
+	if (*m_unif_planeClip > 0)
+		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 	unbind();
 }
 
@@ -127,6 +149,15 @@ void ShaderPhong::setShininess(float shininess)
 	m_shininess = shininess;
 	unbind();
 }
+
+void ShaderPhong::setBackColor(const Geom::Vec4f& back)
+{
+	bind();
+	glUniform4fv(*m_unif_backColor,1, back.data());
+	m_backColor = back;
+	unbind();
+}
+
 
 void ShaderPhong::setLightPosition(const Geom::Vec3f& lightPos)
 {
@@ -202,6 +233,17 @@ void ShaderPhong::unsetAttributeColor()
 		// and treat uniforms
 		getLocations();
 		sendParams();
+	}
+}
+
+void ShaderPhong::setClippingPlane(const Geom::Vec4f& plane)
+{
+	if (*m_unif_planeClip > 0)
+	{
+		m_planeClip = plane;
+		bind();
+		glUniform4fv(*m_unif_planeClip, 1, plane.data());
+		unbind();
 	}
 }
 

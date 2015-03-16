@@ -35,7 +35,7 @@ IF (WIN32)
 	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile (Experimental" )
 ENDIF()
 
-IF (LINUX)
+IF (NOT(WIN32 OR APPLE))
 	SET ( CGoGN_GCC_4_9 OFF CACHE BOOL "using gcc version > 4.9 (std::regex ok !)" )
 ENDIF()
 
