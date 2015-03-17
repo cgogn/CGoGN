@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #define CGoGN_UTILS_DLL_EXPORT 1
 #include <GL/glew.h>
 #include "Utils/Shaders/shaderSimpleFlat.h"
@@ -36,8 +37,6 @@ namespace Utils
 #include "shaderSimpleFlatClip.vert"
 #include "shaderSimpleFlatClip.frag"
 
-
-
 ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	m_with_color(false),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
@@ -48,8 +47,18 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	m_vboColor(NULL),
 	m_planeClip(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f))
 {
+	m_nameVS = "ShaderSimpleFlat_vs";
+	m_nameFS = "ShaderSimpleFlat_fs";
+//	m_nameGS = "ShaderSimpleFlat_gs";
+
+	// get choose GL defines (2 or 3)
+	// ans compile shaders
 	std::string glxvert(GLSLShader::defines_gl());
+	glxvert.append(vertexShaderText);
 	std::string glxfrag(GLSLShader::defines_gl());
+	if (doubleSided)
+		glxfrag.append("#define DOUBLE_SIDED\n");
+	glxfrag.append(fragmentShaderText);
 
 	if (withClipping)
 	{
@@ -117,7 +126,6 @@ void ShaderSimpleFlat::setDiffuse(const Geom::Vec4f& diffuse)
 	unbind();
 }
 
-
 void ShaderSimpleFlat::setLightPosition(const Geom::Vec3f& lightPos)
 {
 	bind();
@@ -126,7 +134,6 @@ void ShaderSimpleFlat::setLightPosition(const Geom::Vec3f& lightPos)
 	unbind();
 }
 
-
 void ShaderSimpleFlat::setBackColor(const Geom::Vec4f& back)
 {
 	bind();
@@ -134,7 +141,6 @@ void ShaderSimpleFlat::setBackColor(const Geom::Vec4f& back)
 	m_backColor = back;
 	unbind();
 }
-
 
 void ShaderSimpleFlat::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos)
 {
@@ -224,8 +230,6 @@ void ShaderSimpleFlat::setClippingPlane(const Geom::Vec4f& plane)
 		unbind();
 	}
 }
-
-
 
 } // namespace Utils
 
