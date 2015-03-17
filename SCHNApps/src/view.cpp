@@ -337,7 +337,6 @@ void View::init()
 	m_buttonArea = new ViewButtonArea(this);
 	m_buttonArea->setTopRightPosition(this->width(), 0);
 
-	std::cout << this->width() << std::endl;
 	m_VsplitButton = new ViewButton(":icons/icons/Vsplit.png", this);
 	m_buttonArea->addButton(m_VsplitButton);
 	connect(m_VsplitButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_verticalSplitView(int, int, int, int)));
