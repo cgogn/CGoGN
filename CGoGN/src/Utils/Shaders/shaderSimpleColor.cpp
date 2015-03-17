@@ -46,10 +46,10 @@ ShaderSimpleColor::ShaderSimpleColor(bool withClipping, bool black_is_transparen
 
 		// chose GL defines (2 or 3)
 		// and compile shaders
-		std::string glxvert(*GLSLShader::DEFINES_GL);
+		std::string glxvert(GLSLShader::defines_gl());
 		glxvert.append(vertexShaderClipText);
 
-		std::string glxfrag(*GLSLShader::DEFINES_GL);
+		std::string glxfrag(GLSLShader::defines_gl());
 		if (black_is_transparent)
 			glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
 		glxfrag.append(fragmentShaderClipText);
@@ -67,10 +67,10 @@ ShaderSimpleColor::ShaderSimpleColor(bool withClipping, bool black_is_transparen
 
 		// chose GL defines (2 or 3)
 		// and compile shaders
-		std::string glxvert(*GLSLShader::DEFINES_GL);
+		std::string glxvert(GLSLShader::defines_gl());
 		glxvert.append(vertexShaderText);
 
-		std::string glxfrag(*GLSLShader::DEFINES_GL);
+		std::string glxfrag(GLSLShader::defines_gl());
 		if (black_is_transparent)
 			glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
 		glxfrag.append(fragmentShaderText);

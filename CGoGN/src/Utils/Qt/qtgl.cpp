@@ -256,14 +256,14 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 	m_current_button = event->button();
 
 	if (m_cbs)
-		m_cbs->cb_mousePress(event->button(), event->x(), getHeight() - event->y());
+		m_cbs->cb_mousePress(event->button(), event->x()*pixelRatio(), getHeight() - event->y()*pixelRatio());
 	setFocus(Qt::MouseFocusReason);
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	if (m_cbs)
-		m_cbs->cb_mouseRelease(event->button(), event->x(), getHeight() - event->y());
+		m_cbs->cb_mouseRelease(event->button(), event->x()*pixelRatio(), getHeight() - event->y()*pixelRatio());
 
 	if(event->pos() == clickPoint)
 		mouseClickEvent(event) ;
@@ -273,15 +273,15 @@ void GLWidget::mouseClickEvent(QMouseEvent* event)
 {
 
 	if (m_cbs)
-		m_cbs->cb_mouseClick(event->button(), event->x(), getHeight() - event->y());
+		m_cbs->cb_mouseClick(event->button(), event->x()*pixelRatio(), getHeight() - event->y()*pixelRatio());
 }
 
 void GLWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
 	if (event->button()==1)
 	{
-		GLint x = event->x();
-		GLint y = getHeight() - event->y();
+		GLint x = event->x()*pixelRatio();
+		GLint y = getHeight() - event->y()*pixelRatio();
 		GLfloat depth;
 		glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
 		if (depth < 1.0f)

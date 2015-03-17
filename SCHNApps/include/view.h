@@ -173,6 +173,15 @@ protected:
 	Utils::ShaderWallPaper* m_shaderWallpaper;
 
 	bool b_saveSnapshots;
+
+	inline int pixelRatio() const
+	{
+		#if (QT_VERSION>>16) == 5
+			return this->devicePixelRatio();
+		#else
+			return 1;
+		#endif
+	}
 };
 
 } // namespace SCHNApps

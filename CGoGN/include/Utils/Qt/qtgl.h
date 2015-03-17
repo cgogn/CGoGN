@@ -250,6 +250,15 @@ protected:
 	 * get the focale distance
 	 */
 	float getScale() { return scalefactor / foc; }
+
+	inline int pixelRatio() const
+	{
+		#if (QT_VERSION>>16) == 5
+			return this->devicePixelRatio();
+		#else
+			return 1;
+		#endif
+	}
 };
 
 } // namespace QT

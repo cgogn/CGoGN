@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QWindow>
 
 namespace CGoGN
 {
@@ -299,7 +300,6 @@ void View::init()
 
 	std::cout << "using " << glGetString(GL_VERSION) << std::endl;
 
-
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
 //	delete c;
@@ -311,6 +311,7 @@ void View::init()
 	m_buttonArea = new ViewButtonArea(this);
 	m_buttonArea->setTopRightPosition(this->width(), 0);
 
+	std::cout << this->width() << std::endl;
 	m_VsplitButton = new ViewButton(":icons/icons/Vsplit.png", this);
 	m_buttonArea->addButton(m_VsplitButton);
 	connect(m_VsplitButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(ui_verticalSplitView(int, int, int, int)));
@@ -450,8 +451,9 @@ void View::postDraw()
 void View::resizeGL(int width, int height)
 {
 	QGLViewer::resizeGL(width, height);
+
 	if(m_buttonArea)
-		m_buttonArea->setTopRightPosition(width, 0);
+		m_buttonArea->setTopRightPosition(width/ this->pixelRatio(), 0);
 
 	if(m_buttonAreaLeft)
 		m_buttonAreaLeft->setTopLeftPosition(0, 0);
