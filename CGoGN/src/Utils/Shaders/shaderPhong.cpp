@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #define CGoGN_UTILS_DLL_EXPORT 1
 #include <GL/glew.h>
 #include "Utils/Shaders/shaderPhong.h"
@@ -35,7 +36,6 @@ namespace Utils
 #include "shaderPhong.frag"
 #include "shaderPhongClip.vert"
 #include "shaderPhongClip.frag"
-
 
 ShaderPhong::ShaderPhong(bool withClipping, bool doubleSided, bool withEyePosition):
 	m_with_color(false),
@@ -54,30 +54,17 @@ ShaderPhong::ShaderPhong(bool withClipping, bool doubleSided, bool withEyePositi
 	std::string glxvert(GLSLShader::defines_gl());
 	std::string glxfrag(GLSLShader::defines_gl());
 
-	if (withClipping)
-	{
-		m_nameVS = "ShaderPhongClip_vs";
-		m_nameFS = "ShaderPhongClip_fs";
-		if (m_with_eyepos)
-			glxvert.append("#define WITH_EYEPOSITION");
-		glxvert.append(vertexShaderClipText);
-		// Use double sided lighting if set
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
-		glxfrag.append(fragmentShaderClipText);
-	}
-	else
-	{
-		m_nameVS = "ShaderPhong_vs";
-		m_nameFS = "ShaderPhong_fs";
-		if (m_with_eyepos)
-			glxvert.append("#define WITH_EYEPOSITION");
-		glxvert.append(vertexShaderText);
-		// Use double sided lighting if set
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
-		glxfrag.append(fragmentShaderText);
-	}
+	// get choose GL defines (2 or 3)
+	// ans compile shaders
+	std::string glxvert(GLSLShader::defines_gl());
+	if (m_with_eyepos)
+		glxvert.append("#define WITH_EYEPOSITION");
+	glxvert.append(vertexShaderText);
+	std::string glxfrag(GLSLShader::defines_gl());
+	// Use double sided lighting if set
+	if (doubleSided)
+		glxfrag.append("#define DOUBLE_SIDED\n");
+	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
