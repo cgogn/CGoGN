@@ -79,6 +79,7 @@ void PointSprite::getLocations()
 	*m_uniform_lightPos = glGetUniformLocation(program_handler(),"lightPos");
 	if (plane)
 		*m_uniform_eyePos = glGetUniformLocation(program_handler(),"eyePos");
+	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
 	unbind();
 }
 
@@ -92,6 +93,8 @@ void PointSprite::sendParams()
 	glUniform3fv(*m_uniform_lightPos, 1, m_lightPos.data());
 	if (plane)
 		glUniform3fv(*m_uniform_eyePos, 1, m_eyePos.data());
+	if (*m_unif_planeClip > 0)
+		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 	unbind();
 }
 
@@ -162,6 +165,15 @@ void PointSprite::setEyePosition(const Geom::Vec3f& ep)
 		unbind();
 	}
 }
+
+void PointSprite::setClippingPlane(const Geom::Vec4f& plane)
+{
+	m_planeClip = plane;
+	bind();
+	glUniform4fv(*m_unif_planeClip, 1, plane.data());
+	unbind();
+}
+
 
 void PointSprite::restoreUniformsAttribs()
 {
