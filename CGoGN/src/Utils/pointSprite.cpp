@@ -38,10 +38,11 @@ PointSprite::PointSprite(bool withColorPerVertex, bool withPlane) :
 	colorPerVertex(withColorPerVertex),
 	plane(withPlane),
 	m_size(1.0f),
-	m_color(Geom::Vec4f(0.0f, 0.0f, 1.0f, 1.0f)),
-	m_lightPos(Geom::Vec3f(100.0f, 100.0f, 100.0f)),
-	m_ambiant(Geom::Vec3f(0.1f, 0.1f, 0.1f)),
-	m_eyePos(Geom::Vec3f(0.0f, 0.0f, 0.0f))
+	m_color(0.0f, 0.0f, 1.0f, 1.0f),
+	m_lightPos(100.0f, 100.0f, 100.0f),
+	m_ambiant(0.1f, 0.1f, 0.1f),
+	m_eyePos(0.0f, 0.0f, 0.0f),
+	m_planeClip(0.0f,0.0f,0.0f,0.0f)
 {
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	if (withColorPerVertex)

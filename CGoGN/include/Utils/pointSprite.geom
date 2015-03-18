@@ -40,7 +40,7 @@ void corner( vec4 center, float x, float y)
 
 void main()
 {
-	if (dot(planeClip,vec4(posClip[0],1.0))<0.0)
+	if (dot(planeClip,vec4(posClip[0],1.0))<=0.0)
 	{
 #ifdef WITH_COLOR_PER_VERTEX 
 	colorsprite = color[0];
