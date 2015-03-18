@@ -44,12 +44,7 @@ namespace QT
 float GLWidget::FAR_PLANE = 500.0f;
 
 GLWidget::GLWidget(SimpleQT* cbs, QWidget *parent) :
-#ifdef MAC_OSX
-//	QGLWidget(new Core3_2_context(QGLFormat::defaultFormat()),parent),
-	QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
-#else
-	QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
-#endif
+	QGLWidget(parent),
 	m_cbs(cbs),
 	m_state_modifier(0),
 	allow_rotation(true)
@@ -69,28 +64,6 @@ GLWidget::GLWidget(SimpleQT* cbs, QWidget *parent) :
 	trackball(m_cbs->curquat(), 0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-
-GLWidget::GLWidget(SimpleQT* cbs, QGLFormat& format, QWidget *parent) :
-	QGLWidget(format, parent),
-	m_cbs(cbs),
-	m_state_modifier(0),
-	allow_rotation(true)
-{
-	makeCurrent();
-	glewExperimental = GL_TRUE;
-	glewInit();
-
-	newModel = 1;
-	m_cbs->trans_x() = 0.;
-	m_cbs->trans_y() = 0.;
-	float f = FAR_PLANE;
-	m_cbs->trans_z() = -f / 5.0f;
-	foc = 2.0f;
-
-	// init trackball
-	trackball(m_cbs->curquat(), 0.0f, 0.0f, 0.0f, 0.0f);
-
-}
 
 GLWidget::~GLWidget()
 {

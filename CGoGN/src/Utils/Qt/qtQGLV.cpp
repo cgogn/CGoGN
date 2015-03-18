@@ -53,7 +53,6 @@ SimpleQGLV::SimpleQGLV() :
 	m_modelView_matrix(m_mat.m_matrices[1]),
 	m_transfo_matrix(m_mat.m_matrices[2])
 {
-	QGLFormat format;
 	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
 	{
 		QGLFormat glFormat;
