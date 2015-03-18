@@ -53,7 +53,7 @@ ELSE()
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_src} )
 ENDIF()
-
+add_dependencies(shader_target shader_to_h) #ensure that shader_to_h is compiled
 
 file(
 	GLOB		# WARNING NO MORE RECURSE TO AVOID TAKING QT FILES

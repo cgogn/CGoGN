@@ -48,8 +48,8 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	m_vboColor(NULL),
 	m_planeClip(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f))
 {
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	std::string glxvert(GLSLShader::defines_gl());
+	std::string glxfrag(GLSLShader::defines_gl());
 
 	if (withClipping)
 	{
@@ -151,10 +151,10 @@ unsigned int ShaderSimpleFlat::setAttributeColor(VBO* vbo)
 	{
 		m_with_color=true;
 		// set the define and recompile shader
-		std::string gl3vert(*GLSLShader::DEFINES_GL);
+		std::string gl3vert(GLSLShader::defines_gl());
 		gl3vert.append("#define WITH_COLOR 1\n");
 		gl3vert.append(vertexShaderText);
-		std::string gl3frag(*GLSLShader::DEFINES_GL);
+		std::string gl3frag(GLSLShader::defines_gl());
 		gl3frag.append("#define WITH_COLOR 1\n");
 		gl3frag.append(fragmentShaderText);
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
@@ -181,9 +181,9 @@ void ShaderSimpleFlat::unsetAttributeColor()
 		unbindVA("VertexColor");
 		unbind();
 		// recompile shader
-		std::string gl3vert(*GLSLShader::DEFINES_GL);
+		std::string gl3vert(GLSLShader::defines_gl());
 		gl3vert.append(vertexShaderText);
-		std::string gl3frag(*GLSLShader::DEFINES_GL);
+		std::string gl3frag(GLSLShader::defines_gl());
 		gl3frag.append(fragmentShaderText);
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
 		// and treat uniforms

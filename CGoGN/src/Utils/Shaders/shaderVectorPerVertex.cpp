@@ -44,13 +44,13 @@ ShaderVectorPerVertex::ShaderVectorPerVertex() :
 	m_nameFS = "ShaderVectorPerVertex_fs";
 	m_nameGS = "ShaderVectorPerVertex_gs";
 
-	std::string glxvert(*GLSLShader::DEFINES_GL);
+	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
 
 	std::string glxgeom = GLSLShader::defines_Geom("points", "line_strip", 4);
 	glxgeom.append(geometryShaderText);
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	std::string glxfrag(GLSLShader::defines_gl());
 	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_LINE_STRIP,2);

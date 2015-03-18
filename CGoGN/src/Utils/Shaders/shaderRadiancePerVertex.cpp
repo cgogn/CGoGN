@@ -98,7 +98,7 @@ void ShaderRadiancePerVertex::compile()
 	std::stringstream s ;
 	s << "#define NB_COEFS " << nb_coefs << std::endl ;
 
-	std::string glxvert(*GLSLShader::DEFINES_GL);
+	std::string glxvert(GLSLShader::defines_gl());
 	if (!m_fragInterp)
 	{
 		glxvert.append(s.str()) ;
@@ -113,7 +113,7 @@ void ShaderRadiancePerVertex::compile()
 	else
 		glxgeom.append(geometryShaderInterpText);
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	std::string glxfrag(GLSLShader::defines_gl());
 	if (!m_fragInterp)
 		glxfrag.append(fragmentShaderText) ;
 	else

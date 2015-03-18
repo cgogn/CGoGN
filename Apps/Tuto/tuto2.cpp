@@ -124,7 +124,6 @@ void MyQT::createMap()
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
 

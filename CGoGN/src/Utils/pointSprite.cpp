@@ -44,7 +44,7 @@ PointSprite::PointSprite(bool withColorPerVertex, bool withPlane) :
 	m_eyePos(0.0f, 0.0f, 0.0f),
 	m_planeClip(0.0f,0.0f,0.0f,0.0f)
 {
-	std::string glxvert(*GLSLShader::DEFINES_GL);
+	std::string glxvert(GLSLShader::defines_gl());
 	if (withColorPerVertex)
 		glxvert.append("#define WITH_COLOR_PER_VERTEX 1\n");
 	glxvert.append(vertexShaderText);
@@ -56,7 +56,7 @@ PointSprite::PointSprite(bool withColorPerVertex, bool withPlane) :
 		glxgeom.append("#define WITH_PLANE 1\n");
 	glxgeom.append(geometryShaderText);
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	std::string glxfrag(GLSLShader::defines_gl());
 	if (withColorPerVertex)
 		glxfrag.append("#define WITH_COLOR_PER_VERTEX 1\n");
 	if (withPlane)
