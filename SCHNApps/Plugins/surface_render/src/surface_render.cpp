@@ -19,14 +19,14 @@ bool Surface_Render_Plugin::enable()
 
 	m_flatShader = new CGoGN::Utils::ShaderFlat();
 	m_flatShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
-	m_flatShader->setDiffuse(CGoGN::Geom::Vec4f(0.8f, 0.9f, 0.7f, 1.0f));
 	m_flatShader->setExplode(1.0f);
 
-	m_phongShader = new CGoGN::Utils::ShaderPhong() ;
-	m_phongShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f)) ;
-	m_phongShader->setDiffuse(CGoGN::Geom::Vec4f(0.8f, 0.9f, 0.7f, 1.0f)) ;
-	m_phongShader->setSpecular(CGoGN::Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f)) ;
-	m_phongShader->setShininess(80.0f) ;
+	m_phongShader = new CGoGN::Utils::ShaderPhong();
+	m_phongShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
+	m_phongShader->setSpecular(CGoGN::Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f));
+	m_phongShader->setShininess(80.0f);
+
+	m_colorPerVertexShader = new CGoGN::Utils::ShaderColorPerVertex();
 
 	m_simpleColorShader = new CGoGN::Utils::ShaderSimpleColor();
 
@@ -34,6 +34,7 @@ bool Surface_Render_Plugin::enable()
 
 	registerShader(m_flatShader);
 	registerShader(m_phongShader);
+	registerShader(m_colorPerVertexShader);
 	registerShader(m_simpleColorShader);
 	registerShader(m_pointSprite);
 
@@ -82,9 +83,18 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
             switch(p.faceStyle)
             {
                 case MapParameters::FLAT :
-                    m_flatShader->setAttributePosition(p.positionVBO);
-                    m_flatShader->setDiffuse(p.diffuseColor);
-                    map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+					if(p.colorVBO)
+					{
+						m_colorPerVertexShader->setAttributePosition(p.positionVBO);
+						m_colorPerVertexShader->setAttributeColor(p.colorVBO);
+						map->draw(m_colorPerVertexShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+					}
+					else
+					{
+						m_flatShader->setAttributePosition(p.positionVBO);
+						m_flatShader->setDiffuse(p.diffuseColor);
+						map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+					}
                     break;
                 case MapParameters::PHONG :
                     if(p.normalVBO != NULL)
@@ -98,13 +108,15 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
             }
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
-            if(p.renderVertices)
+
+		if(p.renderVertices)
 		{
 			m_pointSprite->setSize(map->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
 			m_pointSprite->setAttributePosition(p.positionVBO);
 			m_pointSprite->setColor(p.vertexColor);
 			map->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
 		}
+
 		if(p.renderEdges)
 		{
 			glLineWidth(1.0f);
@@ -169,6 +181,7 @@ void Surface_Render_Plugin::vboAdded(Utils::VBO *vbo)
 		{
 			m_dockTab->addPositionVBO(QString::fromStdString(vbo->name()));
 			m_dockTab->addNormalVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->addColorVBO(QString::fromStdString(vbo->name()));
 		}
 	}
 }
@@ -241,6 +254,23 @@ void Surface_Render_Plugin::changeNormalVBO(const QString& view, const QString& 
 	{
 		Utils::VBO* vbuf = m->getVBO(vbo);
 		h_viewParameterSet[v][m].normalVBO = vbuf;
+		if(v->isSelectedView())
+		{
+			if(v->isLinkedToMap(m))	v->updateGL();
+			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Render_Plugin::changeColorVBO(const QString& view, const QString& map, const QString& vbo)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if(v && m)
+	{
+		Utils::VBO* vbuf = m->getVBO(vbo);
+		h_viewParameterSet[v][m].colorVBO = vbuf;
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
