@@ -299,7 +299,6 @@ void View::init()
 
 	std::cout << "using " << glGetString(GL_VERSION) << std::endl;
 
-
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
 //	delete c;
@@ -450,8 +449,9 @@ void View::postDraw()
 void View::resizeGL(int width, int height)
 {
 	QGLViewer::resizeGL(width, height);
+
 	if(m_buttonArea)
-		m_buttonArea->setTopRightPosition(width, 0);
+		m_buttonArea->setTopRightPosition(width/ this->pixelRatio(), 0);
 
 	if(m_buttonAreaLeft)
 		m_buttonAreaLeft->setTopLeftPosition(0, 0);

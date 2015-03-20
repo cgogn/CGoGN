@@ -33,31 +33,46 @@ namespace Utils
 
 #include "shaderSimpleFlat.vert"
 #include "shaderSimpleFlat.frag"
+#include "shaderSimpleFlatClip.vert"
+#include "shaderSimpleFlatClip.frag"
 
 
-ShaderSimpleFlat::ShaderSimpleFlat(bool doubleSided):
+
+ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	m_with_color(false),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
+	m_backColor(0.0f,0.0f,0.0f,0.0f),
 	m_vboPos(NULL),
-	m_vboColor(NULL)
+	m_vboColor(NULL),
+	m_planeClip(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f))
 {
-	m_nameVS = "ShaderSimpleFlat_vs";
-	m_nameFS = "ShaderSimpleFlat_fs";
-//	m_nameGS = "ShaderSimpleFlat_gs";
+	std::string glxvert(GLSLShader::defines_gl());
+	std::string glxfrag(GLSLShader::defines_gl());
 
-	// get choose GL defines (2 or 3)
-	// ans compile shaders
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	if (doubleSided)
-		glxfrag.append("#define DOUBLE_SIDED\n");
-	glxfrag.append(fragmentShaderText);
+	if (withClipping)
+	{
+		m_nameVS = "ShaderSimpleFlatClip_vs";
+		m_nameFS = "ShaderSimpleFlatClip_fs";
+		glxvert.append(vertexShaderClipText);
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderClipText);
+	}
+	else
+	{
+		m_nameVS = "ShaderSimpleFlat_vs";
+		m_nameFS = "ShaderSimpleFlat_fs";
+		// get choose GL defines (2 or 3)
+		// ans compile shaders
+		glxvert.append(vertexShaderText);
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderText);
+	}
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
-
 	// and get and fill uniforms
 	getLocations();
 	sendParams();
@@ -69,6 +84,8 @@ void ShaderSimpleFlat::getLocations()
 	*m_unif_ambiant   = glGetUniformLocation(this->program_handler(), "materialAmbient");
 	*m_unif_diffuse   = glGetUniformLocation(this->program_handler(), "materialDiffuse");
 	*m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
+	*m_unif_backColor  = glGetUniformLocation(this->program_handler(), "backColor");
+	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
 	unbind();
 }
 
@@ -78,6 +95,9 @@ void ShaderSimpleFlat::sendParams()
 	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
 	glUniform4fv(*m_unif_diffuse,  1, m_diffuse.data());
 	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
+	glUniform4fv(*m_unif_backColor,  1, m_backColor.data());
+	if (*m_unif_planeClip > 0)
+		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 	unbind();
 }
 
@@ -107,6 +127,15 @@ void ShaderSimpleFlat::setLightPosition(const Geom::Vec3f& lightPos)
 }
 
 
+void ShaderSimpleFlat::setBackColor(const Geom::Vec4f& back)
+{
+	bind();
+	glUniform4fv(*m_unif_backColor,1, back.data());
+	m_backColor = back;
+	unbind();
+}
+
+
 void ShaderSimpleFlat::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos)
 {
 	m_ambiant = ambiant;
@@ -122,10 +151,10 @@ unsigned int ShaderSimpleFlat::setAttributeColor(VBO* vbo)
 	{
 		m_with_color=true;
 		// set the define and recompile shader
-		std::string gl3vert(*GLSLShader::DEFINES_GL);
+		std::string gl3vert(GLSLShader::defines_gl());
 		gl3vert.append("#define WITH_COLOR 1\n");
 		gl3vert.append(vertexShaderText);
-		std::string gl3frag(*GLSLShader::DEFINES_GL);
+		std::string gl3frag(GLSLShader::defines_gl());
 		gl3frag.append("#define WITH_COLOR 1\n");
 		gl3frag.append(fragmentShaderText);
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
@@ -152,9 +181,9 @@ void ShaderSimpleFlat::unsetAttributeColor()
 		unbindVA("VertexColor");
 		unbind();
 		// recompile shader
-		std::string gl3vert(*GLSLShader::DEFINES_GL);
+		std::string gl3vert(GLSLShader::defines_gl());
 		gl3vert.append(vertexShaderText);
-		std::string gl3frag(*GLSLShader::DEFINES_GL);
+		std::string gl3frag(GLSLShader::defines_gl());
 		gl3frag.append(fragmentShaderText);
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
 		// and treat uniforms
@@ -184,6 +213,18 @@ unsigned int ShaderSimpleFlat::setAttributePosition(VBO* vbo)
 	unbind();
 	return id;
 }
+
+void ShaderSimpleFlat::setClippingPlane(const Geom::Vec4f& plane)
+{
+	if (*m_unif_planeClip > 0)
+	{
+		m_planeClip = plane;
+		bind();
+		glUniform4fv(*m_unif_planeClip, 1, plane.data());
+		unbind();
+	}
+}
+
 
 
 } // namespace Utils

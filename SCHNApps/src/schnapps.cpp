@@ -385,7 +385,7 @@ Plugin* SCHNApps::enablePlugin(const QString& pluginName)
 				statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
 				DEBUG_EMIT("pluginEnabled");
 				emit(pluginEnabled(plugin));
-
+//				menubar->repaint();
 				// method success
 				return plugin;
 			}
@@ -692,7 +692,11 @@ void SCHNApps::addMenuAction(Plugin* plugin, const QString& menuPath, QAction* a
 				}
 			}
 		}
-
+		// just for update the menu in buggy Qt5 on macOS
+		#if (defined CGOGN_APPLE) && ((QT_VERSION>>16) == 5)
+		QMenu* fakemenu = menuBar()->addMenu("X");
+		delete fakemenu;
+		#endif
 		m_pluginMenuActions[plugin].append(action);
 	}
 }

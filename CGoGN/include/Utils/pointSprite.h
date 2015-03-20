@@ -63,6 +63,11 @@ protected:
 	Geom::Vec3f m_ambiant;
 	Geom::Vec3f m_eyePos;
 
+	/// clipping
+	CGoGNGLuint m_unif_planeClip;
+	Geom::Vec4f m_planeClip;
+
+
 	void getLocations();
 
 	void sendParams();
@@ -93,6 +98,11 @@ public:
 	* set the plane of rendering for VR rendering
 	*/
 	void setEyePosition(const Geom::Vec3f& ep);
+
+	void setClippingPlane(const Geom::Vec4f& plane);
+
+	inline void setNoClippingPlane() { setClippingPlane(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f)); }
+
 };
 
 } // namespace Utils
