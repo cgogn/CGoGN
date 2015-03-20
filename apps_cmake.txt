@@ -1,15 +1,17 @@
-# How make separated applications 
+####################################################################################################
+# How make a separated application
 #
-# usage: insert this line in your CMakeLists.txt
-#	include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
-# just after defining CGoGN_ROOT_DIR
+# usage:
+#	- create a directory
+#	- place your sources and CMakeLists.txt inside
+#	- insert this line in your CMakeLists.txt
+#		include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
+# 	  just after defining CGoGN_ROOT_DIR
 # 
 # Example:
 # ========
 #	cmake_minimum_required(VERSION 2.8)
 #	project(Pipo)
-#
-#	LoadQtPackage()
 #
 #	set(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/../../CGoGN CACHE STRING "CGoGN root dir")
 #	include(${CGoGN_ROOT_DIR}/apps_cmake.txt)
@@ -24,6 +26,7 @@
 #	WARNING: to avoid problem of DLL loading, on windows executable are generated in CGoGN/bin/....
 #	Take care while choosing executable names
 #
+####################################################################################################
 
 SET ( CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 SET ( CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/ )
@@ -68,7 +71,6 @@ IF (WIN32)
 		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}) # Release/Debug added automatically by visual
 	ELSE()
 		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName})
-		message(STATUS ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
 		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
 	ENDIF()
 ELSE()

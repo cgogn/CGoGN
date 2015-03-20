@@ -37,7 +37,8 @@ namespace Utils
 
 ShaderVectorPerVertex::ShaderVectorPerVertex() :
 	m_scale(1.0f),
-	m_color(Geom::Vec4f(1.0f, 0.0f, 0.0f, 0.0f))
+	m_color	(1.0f, 0.0f, 0.0f, 0.0f),
+	m_planeClip(0.0f,0.0f,0.0f,0.0f)
 {
 	m_nameVS = "ShaderVectorPerVertex_vs";
 	m_nameFS = "ShaderVectorPerVertex_fs";
@@ -64,6 +65,7 @@ void ShaderVectorPerVertex::getLocations()
 	bind();
 	*m_uniform_scale = glGetUniformLocation(this->program_handler(), "vectorScale");
 	*m_uniform_color = glGetUniformLocation(this->program_handler(), "vectorColor");
+	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
 	unbind();
 }
 
@@ -72,6 +74,9 @@ void ShaderVectorPerVertex::sendParams()
 	bind();
 	glUniform1f(*m_uniform_scale, m_scale);
 	glUniform4fv(*m_uniform_color, 1, m_color.data());
+	if (*m_unif_planeClip > 0)
+		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
+
 	unbind();
 }
 
@@ -119,6 +124,18 @@ void ShaderVectorPerVertex::restoreUniformsAttribs()
 	bindVA_VBO("VertexVector", m_vboVec);
 	unbind();
 }
+
+void ShaderVectorPerVertex::setClippingPlane(const Geom::Vec4f& plane)
+{
+	if (*m_unif_planeClip > 0)
+	{
+		m_planeClip = plane;
+		bind();
+		glUniform4fv(*m_unif_planeClip, 1, plane.data());
+		unbind();
+	}
+}
+
 
 } // namespace Utils
 
