@@ -107,6 +107,14 @@ public:
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
 
+	inline int pixelRatio() const
+	{
+		#if (QT_VERSION>>16) == 5
+			return this->devicePixelRatio();
+		#else
+			return 1;
+		#endif
+	}
 };
 
 

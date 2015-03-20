@@ -41,10 +41,10 @@ ShaderTextureDepth::ShaderTextureDepth()
 	m_nameVS = "ShaderTextureDepth_vs";
 	m_nameFS = "ShaderTextureDepth_fs";
 
-	std::string glxvert(*GLSLShader::DEFINES_GL);
+	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	std::string glxfrag(GLSLShader::defines_gl());
 
 	std::stringstream ss;
 	glxfrag.append(fragmentShaderText);

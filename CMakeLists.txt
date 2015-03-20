@@ -33,7 +33,12 @@ IF (WIN32)
 	SET ( CMAKE_CONFIGURATION_TYPES Release Debug)
 	SET ( CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
 	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile (Experimental" )
-ENDIF ()
+ENDIF()
+
+IF (NOT(WIN32 OR APPLE))
+	SET ( CGoGN_GCC_4_9 OFF CACHE BOOL "using gcc version > 4.9 (std::regex ok !)" )
+ENDIF()
+
 SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
 
 
@@ -165,6 +170,16 @@ ENDIF()
 IF(WIN32)
 	LIST(APPEND CGoGN_DEFS -D_USE_MATH_DEFINES)
 ENDIF ()
+
+
+IF (APPLE)
+	LIST(APPEND CGoGN_DEFS -DCGOGN_APPLE)
+ENDIF ()
+
+IF (CGoGN_GCC_4_9)
+	LIST(APPEND CGoGN_DEFS -DCGOGN_GCC_4_9)
+ENDIF ()
+
 
 ADD_DEFINITIONS(${CGoGN_DEFS})
 

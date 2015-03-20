@@ -53,7 +53,7 @@ ELSE()
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_src} )
 ENDIF()
-
+add_dependencies(shader_target shader_to_h) #ensure that shader_to_h is compiled
 
 file(
 	GLOB		# WARNING NO MORE RECURSE TO AVOID TAKING QT FILES
@@ -107,11 +107,9 @@ link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 
 IF (CGoGN_ONELIB)
 	IF(CGoGN_WITH_QT)
+		add_definitions(-DCGoGN_QT_DLL_EXPORT)
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
 		qt_use_modules(cgogn Gui OpenGL Xml Svg)
-		IF(${CGoGN_DESIRED_QT_VERSION} STREQUAL "5")
-			qt_use_modules(cgogn Widgets)
-		ENDIF()
 	ELSE()
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
 	ENDIF()

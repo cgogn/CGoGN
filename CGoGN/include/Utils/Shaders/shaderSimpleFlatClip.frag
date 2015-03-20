@@ -1,7 +1,8 @@
-//ShaderPhong::fragmentShaderText
+//ShaderSimpleFlat::fragmentShaderClipText
 
 PRECISION;
-VARYING_FRAG vec3 EyeVector, Normal, LightDir;
+VARYING_FRAG vec3 LightDir;
+VARYING_FRAG vec3 Position;
 #ifdef WITH_COLOR
 VARYING_FRAG vec3 Color;
 #endif
@@ -12,11 +13,20 @@ uniform float shininess;
 uniform vec4 backColor;
 
 FRAG_OUT_DEF;
+
+uniform vec4 planeClip;
+VARYING_FRAG vec3 posClip;
+
 void main()
 {
-	vec3 N = normalize (Normal);
+	if (dot(planeClip,vec4(posClip,1.0))>0.0)
+		discard;
+		
+	vec3 DX = dFdx(Position);
+	vec3 DY = dFdy(Position);
+	vec3 N=normalize(cross(DX,DY));
+
 	vec3 L = normalize (LightDir);
-	//float lambertTerm = clamp(dot(N,L),0.0,1.0);
 
 	vec4 finalColor = materialAmbient;
 
@@ -35,10 +45,6 @@ void main()
 #else
 	finalColor += vec4((Color*lambertTerm),0.0) ;
 #endif
-	vec3 E = normalize(EyeVector);
-	vec3 R = reflect(-L, N);
-	float specular = pow( max(dot(R, E), 0.0), shininess );
-	finalColor += materialSpecular * specular;
 #else
 	float lambertTerm = clamp(dot(N,L),0.0,1.0);
 	if (gl_FrontFacing)
@@ -48,10 +54,6 @@ void main()
 #else
 		finalColor += vec4((Color*lambertTerm),0.0) ;
 #endif
-		vec3 E = normalize(EyeVector);
-		vec3 R = reflect(-L, N);
-		float specular = pow( max(dot(R, E), 0.0), shininess );
-		finalColor += materialSpecular * specular;
 	}
 	else
 	{

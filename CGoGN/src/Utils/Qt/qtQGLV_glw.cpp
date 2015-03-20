@@ -167,15 +167,14 @@ void QGLView::mousePressEvent(QMouseEvent* event)
 //	clickPoint = event->pos();
 	m_current_button = event->button();
 	if (m_sqgl)
-		m_sqgl->cb_mousePress(event->button(), event->x(), getHeight() - event->y());
-
+		m_sqgl->cb_mousePress(event->button(), event->x()*pixelRatio(), getHeight() - event->y()*pixelRatio());
 	QGLViewer::mousePressEvent(event);
 }
 
 void QGLView::mouseReleaseEvent(QMouseEvent* event)
 {
 	if (m_sqgl)
-		m_sqgl->cb_mouseRelease(event->button(), event->x(), getHeight() - event->y());
+		m_sqgl->cb_mouseRelease(event->button(), event->x()*pixelRatio(), getHeight() - event->y()*pixelRatio());
 	m_current_button = 0;
 	QGLViewer::mouseReleaseEvent(event);
 }
@@ -183,13 +182,13 @@ void QGLView::mouseReleaseEvent(QMouseEvent* event)
 void QGLView::mouseClickEvent(QMouseEvent* event)
 {
 	if (m_sqgl)
-		m_sqgl->cb_mouseClick(event->button(), event->x(), getHeight() - event->y());
+		m_sqgl->cb_mouseClick(event->button(), event->x()*pixelRatio(), getHeight() - event->y()*pixelRatio());
 }
 
 void QGLView::mouseMoveEvent(QMouseEvent* event)
 {
 	if (m_sqgl)
-		m_sqgl->cb_mouseMove(m_current_button, event->x(), getHeight() - event->y());
+		m_sqgl->cb_mouseMove(m_current_button, event->x()*pixelRatio(), getHeight() - event->y()*pixelRatio());
 
 	QGLViewer::mouseMoveEvent(event);
 }

@@ -93,8 +93,8 @@ class MyQT: public Utils::QT::SimpleQGLV
 	int clip_id2;
 
 	// shader of toporender3
-	Utils::ClippingShader* m_sh1;
-	Utils::ClippingShader* m_sh2;
+//	Utils::ClippingShader* m_sh1;
+//	Utils::ClippingShader* m_sh2;
 	Utils::Chrono m_frame_ch;
 	unsigned int m_nbFrames;
 

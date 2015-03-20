@@ -39,44 +39,43 @@ namespace CGoGN
 namespace Utils
 {
 
-#ifdef CGOGN_USE_OGL_CORE_PROFILE
-unsigned int GLSLShader::CURRENT_OGL_VERSION = 3;
-unsigned int GLSLShader::MAJOR_OGL_CORE = 3;
-unsigned int GLSLShader::MINOR_OGL_CORE = 3;
-#else
-unsigned int GLSLShader::CURRENT_OGL_VERSION = 2;
-unsigned int GLSLShader::MAJOR_OGL_CORE = 2;
-unsigned int GLSLShader::MINOR_OGL_CORE = 1;
-#endif
+//#ifdef CGOGN_USE_OGL_CORE_PROFILE
+//unsigned int GLSLShader::CURRENT_OGL_VERSION = 3;
+//unsigned int GLSLShader::MAJOR_OGL_CORE = 3;
+//unsigned int GLSLShader::MINOR_OGL_CORE = 3;
+//#else
+//unsigned int GLSLShader::CURRENT_OGL_VERSION = 2;
+//unsigned int GLSLShader::MAJOR_OGL_CORE = 2;
+//unsigned int GLSLShader::MINOR_OGL_CORE = 1;
+//#endif
 
 
 
-std::string GLSLShader::DEFINES_GL2=\
-"#version 110\n"
-"#define PRECISION float pipo_PRECISION\n"
-"#define ATTRIBUTE attribute\n"
-"#define VARYING_VERT varying\n"
-"#define VARYING_FRAG varying\n"
-"#define FRAG_OUT_DEF float pipo_FRAGDEF\n"
-"#define FRAG_OUT gl_FragColor\n"
-"#define INVARIANT_POS float pipo_INVARIANT\n"
-"#define TEXTURE2D texture2D\n"
-;
+//std::string GLSLShader::DEFINES_GL2=\
+//"#version 110\n"
+//"#define PRECISION float pipo_PRECISION\n"
+//"#define ATTRIBUTE attribute\n"
+//"#define VARYING_VERT varying\n"
+//"#define VARYING_FRAG varying\n"
+//"#define FRAG_OUT_DEF float pipo_FRAGDEF\n"
+//"#define FRAG_OUT gl_FragColor\n"
+//"#define INVARIANT_POS float pipo_INVARIANT\n"
+//"#define TEXTURE2D texture2D\n";
 
 
-std::string GLSLShader::DEFINES_GL3=\
-"#version 330\n"
-"#define PRECISION precision highp float\n"
-"#define ATTRIBUTE in\n"
-"#define VARYING_VERT out\n"
-"#define VARYING_FRAG in\n"
-"#define FRAG_OUT_DEF out vec4 outFragColor\n"
-"#define FRAG_OUT outFragColor\n"
-"#define INVARIANT_POS invariant gl_Position\n"
-"#define TEXTURE2D texture\n";
+//std::string GLSLShader::DEFINES_GL3=\
+//"#version 150\n"
+//"#define PRECISION precision highp float\n"
+//"#define ATTRIBUTE in\n"
+//"#define VARYING_VERT out\n"
+//"#define VARYING_FRAG in\n"
+//"#define FRAG_OUT_DEF out vec4 outFragColor\n"
+//"#define FRAG_OUT outFragColor\n"
+//"#define INVARIANT_POS invariant gl_Position\n"
+//"#define TEXTURE2D texture\n";
 
 
-std::string* GLSLShader::DEFINES_GL = NULL;
+//std::string* GLSLShader::DEFINES_GL = NULL;
 
 std::vector<std::string> GLSLShader::m_pathes;
 
@@ -100,8 +99,8 @@ GLSLShader::GLSLShader() :
 	*m_uniMat_ModelProj = -1;
 	*m_uniMat_Normal = -1;
 
-	if (DEFINES_GL == NULL)
-		setCurrentOGLVersion(MAJOR_OGL_CORE,MINOR_OGL_CORE);
+//	if (DEFINES_GL == NULL)
+//		setCurrentOGLVersion(MAJOR_OGL_CORE,MINOR_OGL_CORE);
 
 	m_nbMaxVertices = 16;
 
@@ -119,11 +118,36 @@ void GLSLShader::unregisterShader(void* ptr, GLSLShader* shader)
 	m_registeredShaders->erase(std::pair<void*,GLSLShader*>(ptr, shader));
 }
 
+std::string GLSLShader::defines_gl()
+{
+#ifdef CGOGN_USE_OGL_CORE_PROFILE
+	return std::string("#version 330\n\
+#define PRECISION precision highp float\n\
+#define ATTRIBUTE in\n\
+#define VARYING_VERT out\n\
+#define VARYING_FRAG in\n\
+#define FRAG_OUT_DEF out vec4 outFragColor\n\
+#define FRAG_OUT outFragColor\n\
+#define INVARIANT_POS invariant gl_Position\n\
+#define TEXTURE2D texture\n");
+#else
+	return std::string("#version 110\n \
+#define PRECISION float pipo_PRECISION\n\
+#define ATTRIBUTE attribute\n\
+#define VARYING_VERT varying\n\
+#define VARYING_FRAG varying\n\
+#define FRAG_OUT_DEF float pipo_FRAGDEF\n\
+#define FRAG_OUT gl_FragColor\n\
+#define INVARIANT_POS float pipo_INVARIANT\n\
+#define TEXTURE2D texture2D\n");
+#endif
+}
+
 std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std::string& primitivesOut, int maxVert)
 {
 	if (CURRENT_OGL_VERSION >= 3)
 	{
-		std::string str("#version 150\n");
+		std::string str("#version 330\n");
 		str.append("precision highp float;\n");
 		str.append("layout (");
 		str.append(primitivesIn);
@@ -1042,26 +1066,26 @@ void GLSLShader::unbindVA(const std::string& name)
 	CGoGNerr << "GLSLShader: Attribute "<<name<< " not binded"<< CGoGNendl;
 }
 
-void GLSLShader::setCurrentOGLVersion(unsigned int version)
-{
-	CURRENT_OGL_VERSION = version;
-	switch(version)
-	{
-	case 2:
-		DEFINES_GL = &DEFINES_GL2;
-		break;
-	case 3:
-		DEFINES_GL = &DEFINES_GL3;
-		break;
-	}
-}
+//void GLSLShader::setCurrentOGLVersion(unsigned int version)
+//{
+//	CURRENT_OGL_VERSION = version;
+//	switch(version)
+//	{
+//	case 2:
+//		DEFINES_GL = &DEFINES_GL2;
+//		break;
+//	case 3:
+//		DEFINES_GL = &DEFINES_GL3;
+//		break;
+//	}
+//}
 
-void GLSLShader::setCurrentOGLVersion(unsigned int major,unsigned int minor)
-{
-	setCurrentOGLVersion(major);
-	MAJOR_OGL_CORE = major;
-	MINOR_OGL_CORE = minor;
-}
+//void GLSLShader::setCurrentOGLVersion(unsigned int major,unsigned int minor)
+//{
+//	setCurrentOGLVersion(major);
+//	MAJOR_OGL_CORE = major;
+//	MINOR_OGL_CORE = minor;
+//}
 
 /**
  * update projection, modelview, ... matrices

@@ -1,4 +1,4 @@
-//ShaderPhong::fragmentShaderText
+//ShaderPhong::fragmentShaderClipText
 
 PRECISION;
 VARYING_FRAG vec3 EyeVector, Normal, LightDir;
@@ -11,9 +11,16 @@ uniform vec4 materialAmbient;
 uniform float shininess;
 uniform vec4 backColor;
 
+uniform vec4 planeClip;
+VARYING_FRAG vec3 posClip;
+
 FRAG_OUT_DEF;
+
 void main()
 {
+	if (dot(planeClip,vec4(posClip,1.0))>0.0)
+		discard;
+
 	vec3 N = normalize (Normal);
 	vec3 L = normalize (LightDir);
 	//float lambertTerm = clamp(dot(N,L),0.0,1.0);

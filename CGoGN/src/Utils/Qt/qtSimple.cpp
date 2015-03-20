@@ -137,11 +137,14 @@ SimpleQT::SimpleQT(const SimpleQT& sqt):
 {
 	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
 	{
-		QGLFormat format = sqt.m_glWidget->format();
-		m_glWidget = new GLWidget(this,format);
+		QGLFormat glFormat;
+		glFormat.setVersion( Utils::GLSLShader::MAJOR_OGL_CORE, Utils::GLSLShader::MINOR_OGL_CORE);
+		glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+		glFormat.setSampleBuffers( true );
+		QGLFormat::setDefaultFormat(glFormat);
 	}
-	else
-		m_glWidget = new GLWidget(this);
+
+	m_glWidget = new GLWidget(this);
 
 	setCentralWidget(m_glWidget);
 
@@ -172,11 +175,14 @@ void SimpleQT::operator=(const SimpleQT& sqt)
 {
 	if (GLSLShader::CURRENT_OGL_VERSION >= 3)
 	{
-		QGLFormat format = sqt.m_glWidget->format();
-		m_glWidget = new GLWidget(this,format);
+		QGLFormat glFormat;
+		glFormat.setVersion( Utils::GLSLShader::MAJOR_OGL_CORE, Utils::GLSLShader::MINOR_OGL_CORE);
+		glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+		glFormat.setSampleBuffers( true );
+		QGLFormat::setDefaultFormat(glFormat);
 	}
-	else
-		m_glWidget = new GLWidget(this);
+
+	m_glWidget = new GLWidget(this);
 
 	setCentralWidget(m_glWidget) ;
 

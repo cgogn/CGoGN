@@ -65,8 +65,6 @@ class CGoGN_UTILS_API GLWidget : public QGLWidget
 public:
 	GLWidget(SimpleQT* cbs, QWidget *parent = 0);
 
-	GLWidget(SimpleQT* cbs, QGLFormat& format, QWidget *parent = 0);
-
 	~GLWidget();
 
     QSize minimumSizeHint() const;
@@ -250,6 +248,15 @@ protected:
 	 * get the focale distance
 	 */
 	float getScale() { return scalefactor / foc; }
+
+	inline int pixelRatio() const
+	{
+		#if (QT_VERSION>>16) == 5
+			return this->devicePixelRatio();
+		#else
+			return 1;
+		#endif
+	}
 };
 
 } // namespace QT
