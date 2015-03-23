@@ -10,9 +10,12 @@
 #include "PythonQt.h"
 #include "gui/PythonQtScriptingConsole.h"
 #include "slot_debug.h"
+#include <QTextStream>
 
 class QVBoxLayout;
 class QSplitter;
+class QFile;
+
 
 namespace CGoGN
 {
@@ -139,6 +142,22 @@ public slots:
 private slots:
 	void loadPythonScriptFromFileDialog();
 
+
+	/*********************************************************
+	* MANAGE PYTHON RECORDING
+	*********************************************************/
+protected:
+	QTextStream* m_pyRecording;
+	QFile* m_pyRecFile;
+
+private slots:
+	void beginPyRecording();
+	void endPyRecording();
+
+public:
+	inline QTextStream* pythonStreamRecorder()  { return m_pyRecording; }
+
+
 signals:
 	void cameraAdded(Camera* camera);
 	void cameraRemoved(Camera* camera);
@@ -195,6 +214,8 @@ protected:
 	StaticPointers m_sp;
 
 	void closeEvent(QCloseEvent *event);
+
+
 };
 
 } // namespace SCHNApps

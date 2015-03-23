@@ -216,6 +216,10 @@ void Surface_DifferentialProperties_Plugin::computeNormal(
 		ComputeNormalParameters(positionAttributeName, normalAttributeName, autoUpdate);
 
 	mh->notifyAttributeModification(normal);
+
+	//this->pythonRecording("computeNormal", "", mh->getName(), QString(position.name().c_str()), QString(normal.name().c_str()), autoUpdate);
+	this->pythonRecording("computeNormal", "", mh->getName(), positionAttributeName, normalAttributeName, autoUpdate);
+
 }
 
 
@@ -307,6 +311,9 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 
 		mh->notifyAttributeModification(kgaussian);
 	}
+
+	this->pythonRecording("computeCurvature", "", mh->getName(),
+		positionAttributeName, normalAttributeName, KmaxAttributeName, kmaxAttributeName, KminAttributeName, kminAttributeName, KnormalAttributeName, compute_kmean, compute_kgaussian, autoUpdate);
 }
 
 void Surface_DifferentialProperties_Plugin::schnappsClosing()

@@ -77,6 +77,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeFaceColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 	}
 
 	if (m_currentColorDial == 2)
@@ -94,6 +95,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 			m_plugin->h_viewParameterSet[view][map].simpleColor = rgbCol;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeEdgeColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 	}
 
 	if (m_currentColorDial == 3)
@@ -111,6 +113,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changVertexColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 	}
 }
 
@@ -129,6 +132,7 @@ void Surface_Render_DockTab::positionVBOChanged(int index)
 			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changePositionVBO", "", view->getName(), map->getName(), combo_positionVBO->currentText());
 	}
 }
 
@@ -143,6 +147,7 @@ void Surface_Render_DockTab::normalVBOChanged(int index)
 			m_plugin->h_viewParameterSet[view][map].normalVBO = map->getVBO(combo_normalVBO->currentText());
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeNormalVBO","", view->getName(), map->getName(), combo_normalVBO->currentText());
 	}
 }
 
@@ -157,6 +162,7 @@ void Surface_Render_DockTab::renderVerticesChanged(bool b)
 			m_plugin->h_viewParameterSet[view][map].renderVertices = b;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeRenderVertices", "", view->getName(), map->getName(), b);
 	}
 }
 
@@ -171,6 +177,7 @@ void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
 			m_plugin->h_viewParameterSet[view][map].verticesScaleFactor = i / 50.0;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeVerticesScaleFactor", "", view->getName(), map->getName(), i / 50.0);
 	}
 }
 
@@ -185,6 +192,7 @@ void Surface_Render_DockTab::renderEdgesChanged(bool b)
 			m_plugin->h_viewParameterSet[view][map].renderEdges = b;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeRenderEdges", "", view->getName(), map->getName(), b);
 	}
 }
 
@@ -199,6 +207,7 @@ void Surface_Render_DockTab::renderFacesChanged(bool b)
 			m_plugin->h_viewParameterSet[view][map].renderFaces = b;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeRenderFaces", "", view->getName(), map->getName(), b);
 	}
 }
 
@@ -216,6 +225,7 @@ void Surface_Render_DockTab::faceStyleChanged(QAbstractButton* b)
 				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::PHONG;
 			view->updateGL();
 		}
+		m_plugin->pythonRecording("changeFacesStyle", "", view->getName(), map->getName(), m_plugin->h_viewParameterSet[view][map].faceStyle);
 	}
 }
 
