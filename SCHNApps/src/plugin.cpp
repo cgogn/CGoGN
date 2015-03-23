@@ -1,6 +1,8 @@
 #include "plugin.h"
 
 #include <GL/glew.h>
+#include <QTextStream>
+#include "schnapps.h"
 
 namespace CGoGN
 {
@@ -39,6 +41,7 @@ void Plugin::setFilePath(const QString& f)
 
 void Plugin::setSCHNApps(SCHNApps* s)
 { m_schnapps = s; }
+
 
 } // namespace SCHNApps
 

@@ -30,6 +30,14 @@ MapHandlerGen* Surface_Import_Plugin::importFromFile(const QString& fileName)
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
+		// RECORDING
+		//QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		//if (rec)
+		//	*rec << fi.baseName() << " = " << this->getName() << ".importFromFile(\"" << fileName << "\");" << endl;
+
+		pythonRecording("importFromFile", fi.baseName(), fileName);
+
+
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
 		if(mhg)
 		{

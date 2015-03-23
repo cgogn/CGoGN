@@ -111,6 +111,11 @@ void View::setCurrentCamera(Camera* c)
 //	DEBUG_SLOT();
 	if(c != m_currentCamera && c)
 	{
+		// RECORDING
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << this->getName() << ".setCurrentCamera(\"" << c->getName() << "\");" << endl;
+
 		Camera* prev = m_currentCamera;
 		if(prev)
 			prev->unlinkView(this);
@@ -164,6 +169,11 @@ bool View::usesCamera(const QString& name) const
 
 void View::linkPlugin(PluginInteraction* plugin)
 {
+	// RECORDING
+	QTextStream* rec = m_schnapps->pythonStreamRecorder();
+	if (rec)
+		*rec << this->getName() << ".linkPlugin(\"" << plugin->getName() << "\");" << endl;
+
 	DEBUG_SLOT();
 	if(plugin && !l_plugins.contains(plugin))
 	{
@@ -193,6 +203,12 @@ void View::unlinkPlugin(PluginInteraction* plugin)
 	DEBUG_SLOT();
 	if(l_plugins.removeOne(plugin))
 	{
+		// RECORDING
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << this->getName() << ".unlinkPlugin(\"" << plugin->getName() << "\");" << endl;
+
+
 		plugin->unlinkView(this);
 
 		DEBUG_EMIT("pluginUnlinked");
@@ -221,6 +237,11 @@ bool View::isLinkedToPlugin(const QString& name) const
 
 void View::linkMap(MapHandlerGen* map)
 {
+	// RECORDING
+	QTextStream* rec = m_schnapps->pythonStreamRecorder();
+	if (rec)
+		*rec << this->getName() << ".linkMap(\"" << map->getName() << "\");" << endl;
+
 	DEBUG_SLOT();
 	if(map && !l_maps.contains(map))
 	{
@@ -256,6 +277,11 @@ void View::unlinkMap(MapHandlerGen* map)
 	DEBUG_SLOT();
 	if(l_maps.removeOne(map))
 	{
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << this->getName() << ".unlinkMap(\"" << map->getName() << "\");" << endl;
+
+
 		map->unlinkView(this);
 
 		DEBUG_EMIT("mapUnlinked");

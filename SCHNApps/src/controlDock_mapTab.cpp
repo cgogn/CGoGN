@@ -114,6 +114,11 @@ void ControlDock_MapTab::selectedMapChanged()
 			QString selectedMapName = items[0]->text();
 			m_selectedMap = m_schnapps->getMap(selectedMapName);
 
+			// RECORDING
+			QTextStream* rec = m_schnapps->pythonStreamRecorder();
+			if (rec)
+				*rec << "schnapps.setSelectedMap(\"" << m_selectedMap->getName() << "\");" << endl;
+
 			connect(m_selectedMap, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(selectedMapAttributeAdded(unsigned int, const QString&)));
 			connect(m_selectedMap, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(selectedMapVBOAdded(Utils::VBO*)));
 			connect(m_selectedMap, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(selectedMapVBORemoved(Utils::VBO*)));
@@ -132,6 +137,11 @@ void ControlDock_MapTab::bbVertexAttributeChanged(int index)
 {
 	if (!b_updatingUI)
 	{
+		// RECORDING
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << m_selectedMap->getName() << ".setBBVertexAttribute(\"" << combo_bbVertexAttribute->currentText() << "\");" << endl;
+
 		m_selectedMap->setBBVertexAttribute(combo_bbVertexAttribute->currentText());
 	}
 }
