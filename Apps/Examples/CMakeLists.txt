@@ -40,7 +40,7 @@ qt_wrap_cpp( viewer_moc viewer.h )
 add_executable( viewer viewer.cpp ${viewer_moc} ${viewer_ui} )
 target_link_libraries( viewer ${CGoGN_LIBS} ${NUMERICAL_LIBS} ${CGoGN_EXT_LIBS} )
 
-IF (CGoGN_GCC_4_9)
+IF (HAS_CPP11_REGEX)
 	qt_wrap_ui( clipping_ui clipping.ui )
 	qt_wrap_cpp( clipping_moc clipping.h )
 	add_executable( clipping clipping.cpp ${clipping_ui} ${clipping_moc} )
