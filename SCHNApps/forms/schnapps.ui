@@ -32,8 +32,8 @@
     <addaction name="action_ShowHidePluginDock"/>
     <addaction name="action_ShowHidePythonDock"/>
     <addaction name="action_LoadPythonScript"/>
-    <addaction name="action_Begin_Python_Recording"/>
-    <addaction name="action_End_Python_Recording"/>
+    <addaction name="action_Python_Recording"/>
+    <addaction name="action_Append_Python_Recording"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -82,14 +82,19 @@
     <string>Show/Hide Control Dock</string>
    </property>
   </action>
-  <action name="action_Begin_Python_Recording">
+  <action name="action_Python_Recording">
    <property name="text">
-    <string>Begin Python Recording</string>
+    <string>Python Recording</string>
    </property>
   </action>
   <action name="action_End_Python_Recording">
    <property name="text">
     <string>End Python Recording</string>
+   </property>
+  </action>
+  <action name="action_Append_Python_Recording">
+   <property name="text">
+    <string>Append Python Recording</string>
    </property>
   </action>
  </widget>

@@ -107,7 +107,7 @@ public slots:
 	void changeVerticesScaleFactor(const QString&view, const QString& map, float f);
 	void changeRenderEdges(const QString& view, const QString& map, bool b);
 	void changeRenderFaces(const QString& view, const QString& map, bool b);
-	void changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style);
+	void changeFacesStyle(const QString& view, const QString& map, int);
 	void changeRenderBoundary(const QString& view, const QString& map, bool b);
 	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);

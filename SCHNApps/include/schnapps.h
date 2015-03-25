@@ -152,7 +152,8 @@ protected:
 
 private slots:
 	void beginPyRecording();
-	void endPyRecording();
+	void appendPyRecording();
+	//void endPyRecording();
 
 public:
 	inline QTextStream* pythonStreamRecorder()  { return m_pyRecording; }

@@ -163,8 +163,8 @@ void Surface_RenderVector_Plugin::changePositionVBO(const QString& view, const Q
 		h_viewParameterSet[v][m].positionVBO = vbuf;
 		if(v->isSelectedView())
 		{
-			if(v->isLinkedToMap(m))	v->updateGL();
-			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
 }

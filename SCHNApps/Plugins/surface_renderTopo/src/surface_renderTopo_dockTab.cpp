@@ -40,17 +40,11 @@ void Surface_RenderTopo_DockTab::positionAttributeChanged(int index)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if(view && map)
 		{
-//			if(index == 0)
-//				;
-//			else
-
-//			m_plugin->h_viewParameterSet[view][map].positionAttribute = map->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
-//		QString pos = this->combo_positionAttribute->currentText();
-
 			QString& pos = m_plugin->h_parameterSet[map].posAttName;
 			pos = this->combo_positionAttribute->currentText();
 			map->updateTopoRender(pos);
 			view->updateGL();
+			m_plugin->pythonRecording("changePositionAttribute", "", map->getName(), pos);
 		}
 	}
 }
@@ -65,6 +59,7 @@ void Surface_RenderTopo_DockTab::drawDartsChanged(bool b)
 		{
 			m_plugin->h_viewParameterSet[view][map].drawDarts = b;
 			view->updateGL();
+			m_plugin->pythonRecording("changeDrawDarts", "", view->getName(), map->getName(), b);
 		}
 	}
 }
@@ -79,6 +74,7 @@ void Surface_RenderTopo_DockTab::dartsColorChanged(int i)
 		{
 			m_plugin->h_viewParameterSet[view][map].dartsColor = combo_dartsColor->color();
 			view->updateGL();
+			m_plugin->pythonRecording("changeDartsColor", "", view->getName(), map->getName(), combo_dartsColor->currentText());
 		}
 	}
 }
@@ -93,6 +89,7 @@ void Surface_RenderTopo_DockTab::drawPhi1Changed(bool b)
 		{
 			m_plugin->h_viewParameterSet[view][map].drawPhi1 = b;
 			view->updateGL();
+			m_plugin->pythonRecording("changeDrawPhi1", "", view->getName(), map->getName(), b);
 		}
 	}
 }
@@ -107,6 +104,7 @@ void Surface_RenderTopo_DockTab::phi1ColorChanged(int i)
 		{
 			m_plugin->h_viewParameterSet[view][map].phi1Color = combo_phi1Color->color();
 			view->updateGL();
+			m_plugin->pythonRecording("changePhi1Color", "", view->getName(), map->getName(), combo_phi1Color->currentText());
 		}
 	}
 }
@@ -121,6 +119,7 @@ void Surface_RenderTopo_DockTab::drawPhi2Changed(bool b)
 		{
 			m_plugin->h_viewParameterSet[view][map].drawPhi2 = b;
 			view->updateGL();
+			m_plugin->pythonRecording("changeDrawPhi2", "", view->getName(), map->getName(), b);
 		}
 	}
 }
@@ -135,6 +134,7 @@ void Surface_RenderTopo_DockTab::phi2ColorChanged(int i)
 		{
 			m_plugin->h_viewParameterSet[view][map].phi2Color = combo_phi2Color->color();
 			view->updateGL();
+			m_plugin->pythonRecording("changePhi2Color", "", view->getName(), map->getName(), combo_phi2Color->currentText());
 		}
 	}
 }
@@ -152,6 +152,7 @@ void Surface_RenderTopo_DockTab::facesScaleFactorChanged(int i)
 			m_plugin->h_parameterSet[map].facesScaleFactor = i / 100.0f;
 			m_plugin->h_parameterSet[map].needUpdate = true;
 			map->updateTopoRender(m_plugin->h_parameterSet[map].posAttName);
+			m_plugin->pythonRecording("changeFacesScaleFactor", "", map->getName(), i / 100.0f);
 		}
 		const ViewSet& vs= m_schnapps->getViewSet();
 		foreach (View* pv, vs)
@@ -178,6 +179,7 @@ void Surface_RenderTopo_DockTab::edgesScaleFactorChanged(int i)
 		{
 			m_plugin->h_parameterSet[map].edgesScaleFactor = i / 100.0f;
 			m_plugin->h_parameterSet[map].needUpdate = true;
+			m_plugin->pythonRecording("changeEdgesScaleFactor", "", map->getName(), i / 100.0f);
 		}
 		const ViewSet& vs= m_schnapps->getViewSet();
 		foreach (View* pv, vs)

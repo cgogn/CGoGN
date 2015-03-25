@@ -21,7 +21,6 @@ class SCHNAPPS_API ListPopUp : public QDialog
 	QVBoxLayout* m_layout;
 	QListWidget* m_list_items;
 
-
 public:
 	ListPopUp(const QString& name, QWidget* parent = NULL);
 

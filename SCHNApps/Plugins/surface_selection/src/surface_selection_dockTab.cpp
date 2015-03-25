@@ -34,6 +34,7 @@ void Surface_Selection_DockTab::positionAttributeChanged(int index)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 			m_plugin->h_parameterSet[map].positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+			m_plugin->pythonRecording("changePositionAttribute", "", map->getName(), combo_positionAttribute->currentText());
 		}
 	}
 }
@@ -47,6 +48,7 @@ void Surface_Selection_DockTab::normalAttributeChanged(int index)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 			m_plugin->h_parameterSet[map].normalAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_normalAttribute->currentText());
+			m_plugin->pythonRecording("changeNormalAttribute", "", map->getName(), combo_normalAttribute->currentText());
 		}
 	}
 }
@@ -56,8 +58,12 @@ void Surface_Selection_DockTab::selectionMethodChanged(int index)
 	if(!b_updatingUI)
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(map)
+		if (map)
+		{
 			m_plugin->h_parameterSet[map].selectionMethod = SelectionMethod(index);
+			m_plugin->pythonRecording("changeSelectionMethod", "", map->getName(), index);
+		}
+
 	}
 }
 

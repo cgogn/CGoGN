@@ -12,7 +12,7 @@ ListPopUp::ListPopUp(const QString& name, QWidget* parent):
 	QDialog(parent)
 {
 	setWindowTitle(name);
-	setWindowFlags(windowFlags() & Qt::WindowCloseButtonHint);
+	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 	m_layout = new QVBoxLayout(this);
 	setLayout(m_layout);
 	m_list_items = new QListWidget();

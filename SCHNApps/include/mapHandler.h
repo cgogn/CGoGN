@@ -86,6 +86,13 @@ public slots:
 	{
 		m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
 		updateBB();
+		// for update of interface
+		if (m_schnapps->getSelectedMap() == this)
+		{
+			m_schnapps->setSelectedMap("NONE");
+			m_schnapps->setSelectedMap(this->getName());
+		}
+
 	}
 
 	AttributeMultiVectorGen* getBBVertexAttribute() const { return m_bbVertexAttribute; }

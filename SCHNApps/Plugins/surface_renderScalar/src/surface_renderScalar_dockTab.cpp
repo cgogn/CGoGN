@@ -37,6 +37,7 @@ void Surface_RenderScalar_DockTab::positionVBOChanged(int index)
 		{
 			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
 			view->updateGL();
+			m_plugin->pythonRecording("changePositionVBO", "", view->getName(), map->getName(), combo_positionVBO->currentText());
 		}
 	}
 }
@@ -59,6 +60,7 @@ void Surface_RenderScalar_DockTab::selectedScalarVBOChanged()
 
 				if(vbo)
 				{
+					m_plugin->pythonRecording("changeScalarVBO", "", view->getName(), map->getName(), selectedItems[0]->text());
 					MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 					const VertexAttribute<PFP2::REAL, PFP2::MAP>& attr = mh->getAttribute<PFP2::REAL, VERTEX>(QString::fromStdString(vbo->name()));
 					p.scalarMin = std::numeric_limits<float>::max();
@@ -87,6 +89,7 @@ void Surface_RenderScalar_DockTab::colorMapChanged(int index)
 		{
 			m_plugin->h_viewParameterSet[view][map].colorMap = index;
 			view->updateGL();
+			m_plugin->pythonRecording("changeColorMap", "", view->getName(), map->getName(), index);
 		}
 	}
 }
@@ -101,6 +104,7 @@ void Surface_RenderScalar_DockTab::expansionChanged(int i)
 		{
 			m_plugin->h_viewParameterSet[view][map].expansion = i;
 			view->updateGL();
+			m_plugin->pythonRecording("changeExpansion", "", view->getName(), map->getName(), i);
 		}
 	}
 }
@@ -166,15 +170,15 @@ void Surface_RenderScalar_DockTab::updateMapParameters()
 			if(dataSize == 3)
 			{
 				combo_positionVBO->addItem(QString::fromStdString(vbo->name()));
-				if(vbo == p.positionVBO)
+				if (vbo == p.positionVBO)
 					combo_positionVBO->setCurrentIndex(i);
 				++i;
 			}
 			else if(dataSize == 1)
 			{
 				list_scalarVBO->addItem(QString::fromStdString(vbo->name()));
-				if(vbo == p.scalarVBO)
-					list_scalarVBO->item(j)->setSelected(true);
+				if (vbo == p.scalarVBO)
+					list_scalarVBO->item(j)->setSelected(true);	
 				++j;
 			}
 		}
