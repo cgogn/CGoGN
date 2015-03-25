@@ -75,6 +75,8 @@ void Surface_Subdivision_Plugin::loopSubdivision(
 	if(!position.isValid())
 		return;
 
+	pythonRecording("loopSubdivision", "", mapName, positionAttributeName);
+
 	PFP2::MAP* map = mh->getMap();
 	Algo::Surface::Modelisation::LoopSubdivision<PFP2>(*map, position);
 
@@ -97,6 +99,8 @@ void Surface_Subdivision_Plugin::CCSubdivision(
 	if(!position.isValid())
 		return;
 
+	pythonRecording("CCSubdivision", "", mapName, positionAttributeName);
+
 	PFP2::MAP* map = mh->getMap();
 	Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP2>(*map, position);
 
@@ -118,6 +122,8 @@ void Surface_Subdivision_Plugin::trianguleFaces(
 	VertexAttribute<PFP2::VEC3, PFP2::MAP> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
 	if(!position.isValid())
 		return;
+
+	pythonRecording("trianguleFaces", "", mapName, positionAttributeName);
 
 	PFP2::MAP* map = mh->getMap();
 	Algo::Surface::Modelisation::trianguleFaces<PFP2>(*map, position);

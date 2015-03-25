@@ -523,17 +523,23 @@ void View::keyReleaseEvent(QKeyEvent *event)
 
 void View::mousePressEvent(QMouseEvent* event)
 {
-	if(m_buttonArea->isClicked(event->x(), event->y()))
-		m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
-	else if(m_buttonAreaLeft->isClicked(event->x(), event->y()))
+	if (!isSelectedView())
+		m_schnapps->setSelectedView(this);
+
+	if (m_buttonAreaLeft->isClicked(event->x(), event->y()))
 		m_buttonAreaLeft->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
 	else
 	{
-		if(!isSelectedView())
-			m_schnapps->setSelectedView(this);
-		foreach(PluginInteraction* plugin, l_plugins)
-			plugin->mousePress(this, event);
-		QGLViewer::mousePressEvent(event);
+		hideDialogs();
+		if (m_buttonArea->isClicked(event->x(), event->y()))
+			m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
+		else
+		{
+			foreach(PluginInteraction* plugin, l_plugins)
+				plugin->mousePress(this, event);
+
+			QGLViewer::mousePressEvent(event);
+		}
 	}
 }
 
@@ -608,6 +614,17 @@ void View::closeDialogs()
 	m_dialogCameras->close();
 }
 
+void View::hideDialogs()
+{
+	if (m_dialogCameras->isVisible())
+		m_dialogCameras->hide();
+	if (m_dialogMaps->isVisible())
+		m_dialogMaps->hide();
+	if (m_dialogPlugins->isVisible())
+		m_dialogPlugins->hide();
+}
+
+
 void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 {
 	DEBUG_SLOT();
@@ -640,6 +657,11 @@ void View::ui_mapsListView(int x, int y, int globalX, int globalY)
 		m_dialogCameras->hide();
 		m_dialogPlugins->hide();
 	}
+	else
+	{
+		m_dialogMaps->hide();
+	}
+
 }
 
 void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
@@ -651,6 +673,10 @@ void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
 		m_dialogMaps->hide();
 		m_dialogCameras->hide();
 	}
+	else
+	{
+		m_dialogPlugins->hide();
+	}
 }
 
 void View::ui_camerasListView(int x, int y, int globalX, int globalY)
@@ -661,6 +687,10 @@ void View::ui_camerasListView(int x, int y, int globalX, int globalY)
 		m_dialogCameras->move(QPoint(globalX,globalY+8));
 		m_dialogPlugins->hide();
 		m_dialogMaps->hide();
+	}
+	else
+	{
+		m_dialogCameras->hide();
 	}
 }
 
