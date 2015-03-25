@@ -243,6 +243,12 @@ IF(NOT WIN32)
 	LIST(APPEND CGoGN_EXT_LIBS pthread) #for c++11 thread
 ENDIF()
 
+IF (NOT HAS_CPP11_REGEX)
+       find_package(Boost COMPONENTS regex REQUIRED)
+       include_directories( ${Boost_INCLUDE_DIR} )
+       list(APPEND CGoGN_EXT_LIBS ${Boost_LIBRARIES})
+ENDIF ()
+
 
 include_directories( 
 	${CGoGN_SRC_DIR}/include
