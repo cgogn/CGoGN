@@ -7,6 +7,7 @@
 
 
 #include "types.h"
+#include "schnapps.h"
 
 #include "dll.h"
 
