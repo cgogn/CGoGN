@@ -38,10 +38,11 @@ namespace SCHNApps
 
 SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQtScriptingConsole& pythonConsole) :
 	QMainWindow(),
+	m_pyRecording(NULL),
+	m_pyRecFile(NULL),
 	m_appPath(appPath),
 	m_pythonContext(pythonContext),
 	m_pythonConsole(pythonConsole),
-	m_pyRecording(NULL),
 	m_firstView(NULL),
 	m_selectedView(NULL)
 {
@@ -888,7 +889,7 @@ void SCHNApps::appendPyRecording()
 		return;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", this->getAppPath(), " python script (*.py)");
+	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", this->getAppPath(), " python script (*.py)");
 	if (fileName.size() != 0)
 	{
 		m_pyRecFile = new QFile(fileName);
