@@ -267,6 +267,9 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_resolution());
 			registerShader(mapParams.radiancePerVertexShader);
 		}
+
+		this->pythonRecording("importFile", mhg->getName(), fi.baseName());
+
 		return mhg;
 	}
 	else
@@ -564,6 +567,8 @@ void Surface_Radiance_Plugin::exportPLY(
 	}
 
 	out.close() ;
+
+	this->pythonRecording("exportPLY", "", mapName, positionAttributeName, normalAttributeName, filename);
 }
 
 

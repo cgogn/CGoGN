@@ -440,10 +440,6 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 {
 	if (m_plugins.contains(pluginName))
 	{
-		// RECORDING
-		if (m_pyRecording)
-			*m_pyRecording << "schnapps.disablePlugin(\"" << pluginName << "\");" << endl;
-
 		Plugin* plugin = m_plugins[pluginName];
 
 		// remove plugin dock tabs
@@ -473,6 +469,12 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 		emit(pluginDisabled(plugin));
 
 		delete plugin;
+
+		// RECORDING
+		if (m_pyRecording)
+			*m_pyRecording << "schnapps.disablePlugin(\"" << pluginName << "\");" << endl;
+
+
 	}
 }
 
