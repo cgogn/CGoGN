@@ -22,8 +22,16 @@
 *                                                                              *
 *******************************************************************************/
 #define CGoGN_UTILS_DLL_EXPORT 1
-#include "Utils/shaderMutator.h"
+
+#ifndef HAS_CPP11_REGEX
+#include <boost/regex.hpp>
+#define REGEX_NAMESPACE boost
+#else
 #include <regex>
+#define REGEX_NAMESPACE std
+#endif
+#include "Utils/shaderMutator.h"
+
 
 namespace CGoGN
 {
@@ -37,8 +45,6 @@ namespace Utils
  * 		Public Section
  *
  ***********************************************/
-
-#ifdef CGOGN_GCC_4_9
 
 
 ShaderMutator::ShaderMutator(const std:: string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc)
@@ -454,15 +460,15 @@ bool ShaderMutator::srcContainsVariableDeclaration(const std::string& variableNa
 {
 	// Regular expression for variable declaration
 	// <',' OR white-space[1 or more times]> <variableName> <',' OR ';' OR white-space>
-	std::regex var_re("(,|\\s+)" + variableName + "(,|;|\\s)");
+    REGEX_NAMESPACE::regex var_re("(,|\\s+)" + variableName + "(,|;|\\s)");
 	
 	// Matches results
-	std::match_results <std::string::iterator> matches;
+    REGEX_NAMESPACE::match_results <std::string::iterator> matches;
 	
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = src.begin();
 	std::string::iterator end = src.end();
-	while (std::regex_search(start, end, matches, var_re, std::regex_constants::format_first_only))
+    while (REGEX_NAMESPACE::regex_search(start, end, matches, var_re, REGEX_NAMESPACE::regex_constants::format_first_only))
 	{
 		// Start position of the match
 		size_t startPosition = std::distance(src.begin(), matches[0].first);
@@ -483,10 +489,10 @@ bool ShaderMutator::srcSetMinShadingLanguageVersion(int version, std::string& mo
 {
 	// Regular expression for shading language version
 	// <#version> <white-space>[1 or more times] <digit>[1 or more times]
-	std::regex version_re("#version\\s+(\\d+)");
+    REGEX_NAMESPACE::regex version_re("#version\\s+(\\d+)");
 
 	// Matches results
-	std::match_results <std::string::iterator> matches;
+    REGEX_NAMESPACE::match_results <std::string::iterator> matches;
 
 	// Build the version string
 	std::string versionStr;
@@ -497,7 +503,7 @@ bool ShaderMutator::srcSetMinShadingLanguageVersion(int version, std::string& mo
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = modifiedSrc.begin();
 	std::string::iterator end = modifiedSrc.end();
-	while (std::regex_search(start, end, matches, version_re, std::regex_constants::format_first_only))
+    while (REGEX_NAMESPACE::regex_search(start, end, matches, version_re, REGEX_NAMESPACE::regex_constants::format_first_only))
 	{
 		// Start position of the match
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
@@ -538,10 +544,10 @@ bool ShaderMutator::srcChangeIntConstantValue(int newVal, const std::string& con
 {
 	// Regular expression for constant expression
 	// <#define> <white-space>[1 or more times] <constant name> <white-space>[1 or more times] <digit>[1 or more times]
-	std::regex const_re("#define\\s+" + constantName + "\\s+(\\d+)");
+    REGEX_NAMESPACE::regex const_re("#define\\s+" + constantName + "\\s+(\\d+)");
 
 	// Matches results
-	std::match_results <std::string::iterator> matches;
+    REGEX_NAMESPACE::match_results <std::string::iterator> matches;
 
 	// Build the constant value string
 	std::string newValStr;
@@ -552,7 +558,7 @@ bool ShaderMutator::srcChangeIntConstantValue(int newVal, const std::string& con
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = modifiedSrc.begin();
 	std::string::iterator end = modifiedSrc.end();
-	while (std::regex_search(start, end, matches, const_re, std::regex_constants::format_first_only))
+    while (REGEX_NAMESPACE::regex_search(start, end, matches, const_re, REGEX_NAMESPACE::regex_constants::format_first_only))
 	{
 		// Start position of the match
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
@@ -585,10 +591,10 @@ bool ShaderMutator::srcChangeFloatConstantValue(float newVal, const std::string&
 	// Regular expression for constant expression
 	// <#define> <white-space>[1 or more times] <constant name> <white-space>[1 or more times]
 	// <digit>[1 or more times] <.>[0 or 1 time] <digit>[0 or more times]
-	std::regex const_re("#define\\s+" + constantName + "\\s+(\\d+\\.?\\d*)");
+    REGEX_NAMESPACE::regex const_re("#define\\s+" + constantName + "\\s+(\\d+\\.?\\d*)");
 
 	// Matches results
-	std::match_results <std::string::iterator> matches;
+    REGEX_NAMESPACE::match_results <std::string::iterator> matches;
 
 	// Build the constant value string
 	std::string newValStr;
@@ -599,7 +605,7 @@ bool ShaderMutator::srcChangeFloatConstantValue(float newVal, const std::string&
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = modifiedSrc.begin();
 	std::string::iterator end = modifiedSrc.end();
-	while (std::regex_search(start, end, matches, const_re, std::regex_constants::format_first_only))
+    while (REGEX_NAMESPACE::regex_search(start, end, matches, const_re, REGEX_NAMESPACE::regex_constants::format_first_only))
 	{
 		// Start position of the match
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
@@ -631,15 +637,15 @@ bool ShaderMutator::srcInsertCodeBeforeMainFunction(const std::string& insertedC
 {
 	// Regular expression for main function
 	// <void> <white-space>[1 or more times] <main> <white-space>[0 or more times] <'('>
-	std::regex main_re("(void)\\s+(main)\\s*\\(");
+    REGEX_NAMESPACE::regex main_re("(void)\\s+(main)\\s*\\(");
 	
 	// Matches results
-	std::match_results <std::string::iterator> matches;
+    REGEX_NAMESPACE::match_results <std::string::iterator> matches;
 	
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = modifiedSrc.begin();
 	std::string::iterator end = modifiedSrc.end();
-	while (std::regex_search(start, end, matches, main_re, std::regex_constants::format_first_only))
+    while (REGEX_NAMESPACE::regex_search(start, end, matches, main_re, REGEX_NAMESPACE::regex_constants::format_first_only))
 	{
 		// Start position of the match
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
@@ -667,15 +673,15 @@ bool ShaderMutator::srcInsertCodeAtMainFunctionBeginning(const std::string& inse
 	// <void> <white-space>[1 or more times] <main> <white-space>[0 or more times]
 	// <'('> <white-space>[0 or more times] <')'>
 	// <white-space>[0 or more times] <'{'>
-	std::regex main_re("(void)\\s+(main)\\s*\\(\\s*\\)\\s*\\{");
+    REGEX_NAMESPACE::regex main_re("(void)\\s+(main)\\s*\\(\\s*\\)\\s*\\{");
 	
 	// Matches results
-	std::match_results <std::string::iterator> matches;
+    REGEX_NAMESPACE::match_results <std::string::iterator> matches;
 	
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = modifiedSrc.begin();
 	std::string::iterator end = modifiedSrc.end();
-	while (std::regex_search(start, end, matches, main_re, std::regex_constants::format_first_only))
+    while (REGEX_NAMESPACE::regex_search(start, end, matches, main_re, REGEX_NAMESPACE::regex_constants::format_first_only))
 	{
 		// Start position of the match
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
@@ -706,16 +712,16 @@ bool ShaderMutator::srcInsertCodeAtMainFunctionEnd(const std::string& insertedCo
 	// <void> <white-space>[1 or more times] <main> <white-space>[0 or more times]
 	// <'('> <white-space>[0 or more times] <')'>
 	// <white-space>[0 or more times] <'{'>
-	std::regex main_re("(void)\\s+(main)\\s*\\(\\s*\\)\\s*\\{");
+    REGEX_NAMESPACE::regex main_re("(void)\\s+(main)\\s*\\(\\s*\\)\\s*\\{");
 	
 	// Matches results
-	std::match_results <std::string::iterator> matches;
+    REGEX_NAMESPACE::match_results <std::string::iterator> matches;
 	
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = modifiedSrc.begin();
 	std::string::iterator end = modifiedSrc.end();
 	size_t mainFirstBracePos = 0;  // The aim is first to find this position
-	while (std::regex_search(start, end, matches, main_re, std::regex_constants::format_first_only) && (mainFirstBracePos == 0))
+    while (REGEX_NAMESPACE::regex_search(start, end, matches, main_re, REGEX_NAMESPACE::regex_constants::format_first_only) && (mainFirstBracePos == 0))
 	{
 		// Start position of the match
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
@@ -781,106 +787,6 @@ bool ShaderMutator::srcInsertCodeAtMainFunctionEnd(const std::string& insertedCo
 
 	return true;
 }
-
-#else
-
-
-ShaderMutator::ShaderMutator(const std:: string& /*shaderName*/, const std::string& /*vertShaderSrc*/, const std::string& /*fragShaderSrc*/, const std::string& /*geomShaderSrc*/)
-{
-}
-
-bool ShaderMutator::containsVariableDeclaration(shaderSrcType /*srcType*/, const std::string& /*variableName*/)
-{
-	bool result = false;
-	return result;
-}
-
-bool ShaderMutator::setMinShadingLanguageVersion(shaderSrcType /*srcType*/, int /*version*/)
-{
-	bool result = false;
-	return result;
-}
-
-bool ShaderMutator::changeIntConstantValue(shaderSrcType /*srcType*/, const std::string& /*constantName*/, int /*newVal*/)
-{
-	return true;
-}
-
-bool ShaderMutator::changeFloatConstantValue(shaderSrcType /*srcType*/, const std::string& /*constantName*/, float /*newVal*/)
-{
-	return true;
-}
-
-bool ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType /*srcType*/, const std::string& /*insertedCode*/)
-{
-	return true;
-}
-
-bool ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType /*srcType*/, const std::string& /*insertedCode*/)
-{
-	return true;
-}
-
-bool ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType /*srcType*/, const std::string& /*insertedCode*/)
-{
-	return true;
-}
-
-
-/***********************************************
- *
- * 		Private Section
- *
- ***********************************************/
-
-
-bool ShaderMutator::srcIsCommented(size_t /*pos*/, const std::string& /*src*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcIsOneLineCommented(size_t /*pos*/, const std::string& /*src*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcContainsVariableDeclaration(const std::string& /*variableName*/, std::string& /*src*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcSetMinShadingLanguageVersion(int /*version*/, std::string& /*modifiedSrc*/)
-{
-	return true;
-}
-
-bool ShaderMutator::srcChangeIntConstantValue(int /*newVal*/, const std::string& /*constantName*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcChangeFloatConstantValue(float /*newVal*/, const std::string& /*constantName*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcInsertCodeBeforeMainFunction(const std::string& /*insertedCode*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcInsertCodeAtMainFunctionBeginning(const std::string& /*insertedCode*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcInsertCodeAtMainFunctionEnd(const std::string& /*insertedCode*/, std::string& /*modifiedSrc*/)
-{
-	return true;
-}
-
-
-#endif
 
 } // namespace Utils
 
