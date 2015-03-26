@@ -51,13 +51,29 @@ void Surface_RenderVector_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	const MapParameters& p = h_viewParameterSet[view][map];
 
-	m_vectorShader->setScale(map->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
-	if(p.positionVBO)
+	//m_vectorShader->setScale(map->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
+	//if(p.positionVBO)
+	//{
+	//	m_vectorShader->setAttributePosition(p.positionVBO);
+	//	for(QList<Utils::VBO*>::const_iterator it = p.vectorVBOs.begin(); it != p.vectorVBOs.end(); ++it)
+	//	{
+	//		m_vectorShader->setAttributeVector(*it);
+	//		glLineWidth(1.0f);
+	//		map->draw(m_vectorShader, Algo::Render::GL2::POINTS);
+	//	}
+	//}
+
+	
+	if (p.positionVBO)
 	{
 		m_vectorShader->setAttributePosition(p.positionVBO);
-		for(QList<Utils::VBO*>::const_iterator it = p.vectorVBOs.begin(); it != p.vectorVBOs.end(); ++it)
+		int nb = p.vectorVBOs.size();
+		for (int i = 0; i < nb; ++i)
 		{
-			m_vectorShader->setAttributeVector(*it);
+			m_vectorShader->setAttributeVector(p.vectorVBOs[i]);
+			m_vectorShader->setScale(map->getBBdiagSize() / 100.0f * p.scaleFactors[i]);
+			const QColor& col = p.colors[i];
+			m_vectorShader->setColor(Geom::Vec4f(col.redF(), col.greenF(), col.blueF(), 0.0f));
 			glLineWidth(1.0f);
 			map->draw(m_vectorShader, Algo::Render::GL2::POINTS);
 		}
@@ -177,6 +193,8 @@ void Surface_RenderVector_Plugin::addVectorVBO(const QString& view, const QStrin
 	{
 		Utils::VBO* vbuf = m->getVBO(vbo);
 		h_viewParameterSet[v][m].vectorVBOs.append(vbuf);
+		h_viewParameterSet[v][m].colors.append(QColor("red"));
+		h_viewParameterSet[v][m].scaleFactors.append(1.0f);
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
@@ -192,7 +210,10 @@ void Surface_RenderVector_Plugin::removeVectorVBO(const QString& view, const QSt
 	if(v && m)
 	{
 		Utils::VBO* vbuf = m->getVBO(vbo);
-		h_viewParameterSet[v][m].vectorVBOs.removeOne(vbuf);
+		int idx = h_viewParameterSet[v][m].vectorVBOs.indexOf(vbuf);
+		h_viewParameterSet[v][m].vectorVBOs.removeAt(idx);
+		h_viewParameterSet[v][m].colors.removeAt(idx);
+		h_viewParameterSet[v][m].scaleFactors.removeAt(idx);
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
@@ -201,17 +222,38 @@ void Surface_RenderVector_Plugin::removeVectorVBO(const QString& view, const QSt
 	}
 }
 
-void Surface_RenderVector_Plugin::changeVectorsScaleFactor(const QString& view, const QString& map, float f)
+void Surface_RenderVector_Plugin::changeVectorScaleFactor(const QString& view, const QString& map, const QString& vbo, float f)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
 	{
-		h_viewParameterSet[v][m].vectorsScaleFactor = f;
+		Utils::VBO* vboPtr = m->getVBO(vbo);
+		
+		int idx = h_viewParameterSet[v][m].vectorVBOs.indexOf(vboPtr);
+		h_viewParameterSet[v][m].scaleFactors[idx] = f;
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
 			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_RenderVector_Plugin::changeVectorColor(const QString& view, const QString& map, const QString& vbo, float r, float g, float b)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (v && m)
+	{
+		Utils::VBO* vboPtr = m->getVBO(vbo);
+
+		int idx = h_viewParameterSet[v][m].vectorVBOs.indexOf(vboPtr);
+		h_viewParameterSet[v][m].colors[idx] = QColor(r,g,b);
+		if (v->isSelectedView())
+		{
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
 }

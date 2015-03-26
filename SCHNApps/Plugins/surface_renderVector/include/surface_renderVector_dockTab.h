@@ -26,11 +26,14 @@ private:
 	SCHNApps* m_schnapps;
 	Surface_RenderVector_Plugin* m_plugin;
 	bool b_updatingUI;
+	int m_current_vbo;
 
 private slots:
 	void positionVBOChanged(int index);
-	void selectedVectorsVBOChanged();
+	void selectedVectorVBOChanged(QListWidgetItem* item, QListWidgetItem* old);
+	void vectorsVBOChecked(QListWidgetItem* item);
 	void vectorsScaleFactorChanged(int i);
+	void colorChanged(int i);
 
 private:
 	void addPositionVBO(QString name);

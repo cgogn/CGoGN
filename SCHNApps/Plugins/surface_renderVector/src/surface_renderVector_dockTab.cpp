@@ -15,17 +15,37 @@ namespace SCHNApps
 Surface_RenderVector_DockTab::Surface_RenderVector_DockTab(SCHNApps* s, Surface_RenderVector_Plugin* p) :
 	m_schnapps(s),
 	m_plugin(p),
-	b_updatingUI(false)
+	b_updatingUI(false),
+	m_current_vbo(-1)
 {
 	setupUi(this);
 
+	list_vectorVBO->setSelectionMode(QAbstractItemView::SingleSelection);
+	slider_vectorsScaleFactor->hide();
+	combo_color->hide();
+
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
-	connect(list_vectorVBO, SIGNAL(itemSelectionChanged()), this, SLOT(selectedVectorsVBOChanged()));
 	connect(slider_vectorsScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(vectorsScaleFactorChanged(int)));
+	connect(list_vectorVBO, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(vectorsVBOChecked(QListWidgetItem*)));
+	connect(list_vectorVBO, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(selectedVectorVBOChanged(QListWidgetItem*, QListWidgetItem*)));
+
+	connect(combo_color, SIGNAL(currentIndexChanged(int)), this, SLOT(colorChanged(int)));
 }
 
 
-
+void Surface_RenderVector_DockTab::colorChanged(int i)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map && (m_current_vbo >= 0))
+		{
+			m_plugin->h_viewParameterSet[view][map].colors[m_current_vbo] = combo_color->color();;
+			view->updateGL();
+		}
+	}
+}
 
 
 void Surface_RenderVector_DockTab::positionVBOChanged(int index)
@@ -43,36 +63,77 @@ void Surface_RenderVector_DockTab::positionVBOChanged(int index)
 	}
 }
 
-void Surface_RenderVector_DockTab::selectedVectorsVBOChanged()
+void Surface_RenderVector_DockTab::selectedVectorVBOChanged(QListWidgetItem* item, QListWidgetItem* old)
 {
 	if(!b_updatingUI)
 	{
+		if ((item->checkState() == Qt::Checked))
+		{
+			slider_vectorsScaleFactor->show();
+			combo_color->show();
+			View* view = m_schnapps->getSelectedView();
+			MapHandlerGen* map = m_schnapps->getSelectedMap();
+			if (view && map)
+			{
+				const MapParameters& p = m_plugin->h_viewParameterSet[view][map];
+				Utils::VBO* v = map->getVBO(item->text());
+				m_current_vbo = p.vectorVBOs.indexOf(v);
+				if (m_current_vbo >= 0)
+				{
+					slider_vectorsScaleFactor->setSliderPosition(p.scaleFactors[m_current_vbo] * 50.0);
+					combo_color->setColor(p.colors[m_current_vbo]);
+				}
+			}
+		}
+		else
+		{
+			slider_vectorsScaleFactor->hide();
+			combo_color->hide();
+		}
+	}
+}
+
+
+void Surface_RenderVector_DockTab::vectorsVBOChecked(QListWidgetItem* item)
+{
+	if (!b_updatingUI)
+	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map)
 		{
-			QList<QListWidgetItem*> currentItems = list_vectorVBO->selectedItems();
-			QList<Utils::VBO*> vbos;
-			const QList<Utils::VBO*>& vboList = m_plugin->h_viewParameterSet[view][map].vectorVBOs;
-			foreach(QListWidgetItem* item, currentItems)
+			MapParameters& p = m_plugin->h_viewParameterSet[view][map];
+			Utils::VBO* vbo = map->getVBO(item->text());
+			if (item->checkState() == Qt::Checked)
 			{
-				Utils::VBO* vbo = map->getVBO(item->text());
-				vbos.append(vbo);
-				if (!vboList.contains(vbo))
-					m_plugin->pythonRecording("addVectorVBO", "", view->getName(), map->getName(), item->text());
+				p.vectorVBOs.append(vbo);
+				p.scaleFactors.append(1.0f);
+				p.colors.append(QColor("red"));
+				if (list_vectorVBO->currentItem() == item)
+					selectedVectorVBOChanged(item, NULL);
+				else
+					list_vectorVBO->setCurrentItem(item);
+				m_plugin->pythonRecording("addVectorVBO", "", view->getName(), map->getName(), item->text());
 			}
-
-			foreach(Utils::VBO* vbo, vboList)
+			else
 			{
-				if (!vbos.contains(vbo))
-					m_plugin->pythonRecording("removeVectorVBO", "", view->getName(), map->getName(), QString(vbo->name().c_str()));
+				int idx = p.vectorVBOs.indexOf(vbo);
+				p.vectorVBOs.removeAt(idx);
+				p.scaleFactors.removeAt(idx);
+				p.colors.removeAt(idx);
+				list_vectorVBO->setCurrentItem(item);
+				list_vectorVBO->clearSelection();
+				slider_vectorsScaleFactor->hide();
+				combo_color->hide();
+				m_current_vbo = -1;
+				m_plugin->pythonRecording("removeVectorVBO", "", view->getName(), map->getName(), QString(item->text()));
 			}
-
-			m_plugin->h_viewParameterSet[view][map].vectorVBOs = vbos;
 			view->updateGL();
 		}
 	}
 }
+
+
 
 void Surface_RenderVector_DockTab::vectorsScaleFactorChanged(int i)
 {
@@ -80,16 +141,13 @@ void Surface_RenderVector_DockTab::vectorsScaleFactorChanged(int i)
 	{
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if(view && map)
+		if (view && map && (m_current_vbo>=0))
 		{
-			m_plugin->h_viewParameterSet[view][map].vectorsScaleFactor = i / 50.0;
+			m_plugin->h_viewParameterSet[view][map].scaleFactors[m_current_vbo] = i / 50.0;
 			view->updateGL();
 		}
 	}
 }
-
-
-
 
 
 void Surface_RenderVector_DockTab::addPositionVBO(QString name)
@@ -114,6 +172,9 @@ void Surface_RenderVector_DockTab::addVectorVBO(QString name)
 {
 	b_updatingUI = true;
 	list_vectorVBO->addItem(name);
+	QListWidgetItem* item = list_vectorVBO->item(list_vectorVBO->count() - 1);
+	item->setFlags(item->flags() | Qt::ItemIsEditable);
+	item->setCheckState(Qt::Unchecked);
 	b_updatingUI = false;
 }
 
@@ -151,14 +212,17 @@ void Surface_RenderVector_DockTab::updateMapParameters()
 					combo_positionVBO->setCurrentIndex(i);
 
 				list_vectorVBO->addItem(QString::fromStdString(vbo->name()));
+				QListWidgetItem* item = list_vectorVBO->item(list_vectorVBO->count() - 1);
+				item->setFlags(item->flags() | Qt::ItemIsEditable);
+				item->setCheckState(Qt::Unchecked);
 				if(p.vectorVBOs.contains(vbo))
-					list_vectorVBO->item(i)->setSelected(true);
-
+					list_vectorVBO->item(i)->setCheckState(Qt::Checked);
 				++i;
 			}
 		}
-
-		slider_vectorsScaleFactor->setSliderPosition(p.vectorsScaleFactor * 50.0);
+		if (m_current_vbo>=0)
+			slider_vectorsScaleFactor->setSliderPosition(p.scaleFactors[m_current_vbo] * 50.0);
+		// set color
 	}
 
 	b_updatingUI = false;
