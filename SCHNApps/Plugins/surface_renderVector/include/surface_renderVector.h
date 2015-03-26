@@ -12,16 +12,34 @@ namespace CGoGN
 namespace SCHNApps
 {
 
+//struct SVectorInfo
+//{
+//	Utils::VBO* vbo;
+//	QColor color;
+//	float scaleFactor;
+//	SVectorInfo() :
+//		vbo(NULL), color(QColor("red")), scaleFactor(1.0f)
+//	{}
+//	SVectorInfo(Utils::VBO* ptr) :
+//		vbo(ptr), color(QColor("red")), scaleFactor(1.0f)
+//	{}
+//};
+
 struct MapParameters
 {
+
 	MapParameters() :
-		positionVBO(NULL),
-		vectorsScaleFactor(1.0f)
+		positionVBO(NULL)
 	{}
 
 	Utils::VBO* positionVBO;
 	QList<Utils::VBO*> vectorVBOs;
-	float vectorsScaleFactor;
+	QList<QColor> colors;
+	QList<float> scaleFactors;
+
+	//float vectorsScaleFactor;
+
+
 };
 
 class Surface_RenderVector_Plugin : public PluginInteraction
@@ -72,7 +90,8 @@ public slots:
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
 	void addVectorVBO(const QString& view, const QString& map, const QString& vbo);
 	void removeVectorVBO(const QString& view, const QString& map, const QString& vbo);
-	void changeVectorsScaleFactor(const QString& view, const QString& map, float f);
+	void changeVectorScaleFactor(const QString& view, const QString& map, const QString& vbo, float f);
+	void changeVectorColor(const QString& view, const QString& map, const QString& vbo, float r, float g, float b);
 
 protected:
 	Surface_RenderVector_DockTab* m_dockTab;
