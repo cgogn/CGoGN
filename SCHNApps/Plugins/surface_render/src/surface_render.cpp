@@ -313,8 +313,9 @@ void Surface_Render_Plugin::changeRenderFaces(const QString& view, const QString
 	}
 }
 
-void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style)
+void Surface_Render_Plugin::changeFacesStyle(const QString& view, const QString& map, int iStyle)
 {
+	MapParameters::FaceShadingStyle style = MapParameters::FaceShadingStyle(iStyle);
 	DEBUG_SLOT();
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);

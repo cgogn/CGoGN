@@ -38,6 +38,7 @@ void Surface_RenderVector_DockTab::positionVBOChanged(int index)
 		{
 			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
 			view->updateGL();
+			m_plugin->pythonRecording("changePositionVBO", "", view->getName(), map->getName(), combo_positionVBO->currentText());
 		}
 	}
 }
@@ -52,8 +53,21 @@ void Surface_RenderVector_DockTab::selectedVectorsVBOChanged()
 		{
 			QList<QListWidgetItem*> currentItems = list_vectorVBO->selectedItems();
 			QList<Utils::VBO*> vbos;
+			const QList<Utils::VBO*>& vboList = m_plugin->h_viewParameterSet[view][map].vectorVBOs;
 			foreach(QListWidgetItem* item, currentItems)
-				vbos.append(map->getVBO(item->text()));
+			{
+				Utils::VBO* vbo = map->getVBO(item->text());
+				vbos.append(vbo);
+				if (!vboList.contains(vbo))
+					m_plugin->pythonRecording("addVectorVBO", "", view->getName(), map->getName(), item->text());
+			}
+
+			foreach(Utils::VBO* vbo, vboList)
+			{
+				if (!vbos.contains(vbo))
+					m_plugin->pythonRecording("removeVectorVBO", "", view->getName(), map->getName(), QString(vbo->name().c_str()));
+			}
+
 			m_plugin->h_viewParameterSet[view][map].vectorVBOs = vbos;
 			view->updateGL();
 		}
@@ -127,7 +141,7 @@ void Surface_RenderVector_DockTab::updateMapParameters()
 	{
 		const MapParameters& p = m_plugin->h_viewParameterSet[view][map];
 
-		unsigned int i = 1;
+		unsigned int i = 0;
 		foreach(Utils::VBO* vbo, map->getVBOSet().values())
 		{
 			if(vbo->dataSize() == 3)

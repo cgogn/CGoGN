@@ -10,6 +10,8 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QFile>
+
 
 #include "mapHandler.h"
 #include "schnapps.h"
@@ -36,6 +38,8 @@ namespace SCHNApps
 
 SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, PythonQtScriptingConsole& pythonConsole) :
 	QMainWindow(),
+	m_pyRecording(NULL),
+	m_pyRecFile(NULL),
 	m_appPath(appPath),
 	m_pythonContext(pythonContext),
 	m_pythonConsole(pythonConsole),
@@ -102,6 +106,15 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 
 	connect(action_ShowHidePythonDock, SIGNAL(triggered()), this, SLOT(showHidePythonDock()));
 	connect(action_LoadPythonScript, SIGNAL(triggered()), this, SLOT(loadPythonScriptFromFileDialog()));
+
+	connect(action_Python_Recording, SIGNAL(triggered()), this, SLOT(beginPyRecording()));
+	connect(action_Append_Python_Recording, SIGNAL(triggered()), this, SLOT(appendPyRecording()));
+
+	action_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
+	action_Append_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
+
+
+
 
 	// create & setup central widget (views)
 	m_centralLayout = new QVBoxLayout(centralwidget);
@@ -206,6 +219,10 @@ View* SCHNApps::addView(const QString& name)
 	DEBUG_EMIT("viewAdded");
 	emit(viewAdded(view));
 
+	// RECORDING
+	if (m_pyRecording)
+		*m_pyRecording << view->getName() << " = schnapps.getView(\"" << view->getName() << "\");" << endl;
+
 	return view;
 }
 
@@ -270,6 +287,8 @@ void SCHNApps::setSelectedView(View* view)
 
 	View* oldSelected = m_selectedView;
 	m_selectedView = view;
+	if (oldSelected)
+		oldSelected->hideDialogs();
 
 	foreach(PluginInteraction* p, m_selectedView->getLinkedPlugins())
 		enablePluginTabWidgets(p);
@@ -288,6 +307,10 @@ void SCHNApps::setSelectedView(View* view)
 
 void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 {
+	// RECORDING
+	if (m_pyRecording)
+		*m_pyRecording << "schnapps.splitView(\"" << name << "\", " << orientation << ");" << endl;
+
 	View* newView = addView();
 
 	View* view = m_views[name];
@@ -308,6 +331,7 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 		spl->addWidget(newView);
 		parent->insertWidget(idx, spl);
 	}
+	
 }
 
 /*********************************************************
@@ -357,6 +381,10 @@ void SCHNApps::registerPluginsDirectory(const QString& path)
 
 Plugin* SCHNApps::enablePlugin(const QString& pluginName)
 {
+	// RECORDING
+	if (m_pyRecording)
+		*m_pyRecording << pluginName << " = schnapps.enablePlugin(\"" << pluginName << "\");" << endl;
+
 	if (m_plugins.contains(pluginName))
 		return m_plugins[pluginName];
 
@@ -441,6 +469,12 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 		emit(pluginDisabled(plugin));
 
 		delete plugin;
+
+		// RECORDING
+		if (m_pyRecording)
+			*m_pyRecording << "schnapps.disablePlugin(\"" << pluginName << "\");" << endl;
+
+
 	}
 }
 
@@ -799,12 +833,96 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 	loadPythonScriptFromFile(fileName);
 }
 
+
+void SCHNApps::beginPyRecording()
+{
+	if (m_pyRecording != NULL) //  WRITE & CLOSE
+	{
+		QTextStream out(m_pyRecFile);
+		out << m_pyRecording->readAll();
+		m_pyRecFile->close();
+
+		delete m_pyRecording;
+		delete m_pyRecFile;
+		m_pyRecording = NULL;
+		m_pyRecFile = NULL;
+		statusbar->showMessage(QString(" Stop recording python"), 2000);
+		return;
+	}
+
+	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", this->getAppPath(), " python script (*.py)");
+	if (fileName.size() != 0)
+	{
+		m_pyRecFile = new QFile(fileName);
+		if (!m_pyRecFile->open(QIODevice::WriteOnly | QIODevice::Text))
+			return;
+		m_pyRecording = new QTextStream(m_pyRecFile);
+
+		foreach(View *v, m_views)
+			*m_pyRecording << v->getName() << " = schnapps.getView(\"" << v->getName() << "\");" << endl;
+
+		foreach(MapHandlerGen *m, m_maps)
+			*m_pyRecording << m->getName() << " = schnapps.getMap(\"" << m->getName() << "\");" << endl;
+
+		statusbar->showMessage(QString(" Recording python in ") + fileName);
+	}
+	else
+	{
+		m_pyRecFile = NULL;
+		m_pyRecording = NULL;
+		statusbar->showMessage(QString(" Cancel recording python"), 2000);
+	}
+}
+
+
+void SCHNApps::appendPyRecording()
+{
+	if (m_pyRecording != NULL)	//  WRITE & CLOSE
+	{
+		QTextStream out(m_pyRecFile);
+		out << m_pyRecording->readAll();
+		m_pyRecFile->close();
+
+		delete m_pyRecording;
+		delete m_pyRecFile;
+		m_pyRecording = NULL;
+		m_pyRecFile = NULL;
+		statusbar->showMessage(QString(" Stop recording python"), 2000);
+		return;
+	}
+
+	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", this->getAppPath(), " python script (*.py)");
+	if (fileName.size() != 0)
+	{
+		m_pyRecFile = new QFile(fileName);
+		if (!m_pyRecFile->open(QIODevice::Append | QIODevice::Text))
+			return;	
+		m_pyRecording = new QTextStream(m_pyRecFile);
+
+		foreach(View *v, m_views)
+			*m_pyRecording << v->getName() << " = schnapps.getView(\"" << v->getName() << "\");" << endl;
+
+		foreach(MapHandlerGen *m, m_maps)
+			*m_pyRecording << m->getName() << " = schnapps.getMap(\"" << m->getName() << "\");" << endl;
+
+		statusbar->showMessage(QString(" Append recording python in ") + fileName);
+	}
+	else
+	{
+		m_pyRecFile = NULL;
+		m_pyRecording = NULL;
+		statusbar->showMessage(QString(" Cancel recording python"), 2000);
+	}
+}
+
+
 void SCHNApps::closeEvent(QCloseEvent *event)
 {
 	DEBUG_EMIT("schnappsClosing");
 	emit(schnappsClosing());
 	QMainWindow::closeEvent(event);
 }
+
 
 } // namespace SCHNApps
 
