@@ -15,13 +15,24 @@ ListPopUp::ListPopUp(const QString& name, QWidget* parent):
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 	m_layout = new QVBoxLayout(this);
 	setLayout(m_layout);
+	m_layout->setContentsMargins(1, 1, 1, 1);
 	m_list_items = new QListWidget();
+
+	QSizePolicy test;
+	test.setHorizontalPolicy(QSizePolicy::Preferred);
+	m_list_items->setSizePolicy(test);
+
 	m_list_items->setSelectionMode(QAbstractItemView::NoSelection);
 	m_layout->addWidget(m_list_items);
 }
 
 ListPopUp::~ListPopUp()
 {
+}
+
+QSize ListPopUp::sizeHint() const
+{
+	return QSize(150,150);
 }
 
 QListWidget* ListPopUp::list()
