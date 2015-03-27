@@ -26,6 +26,8 @@ public:
 
 	virtual ~ListPopUp();
 
+	virtual void show();
+
 	QListWidget* list();
 
 	QListWidgetItem* addItem(const QString& str, Qt::CheckState checked = Qt::Unchecked);

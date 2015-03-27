@@ -8,20 +8,15 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-ListPopUp::ListPopUp(const QString& name, QWidget* parent):
+ListPopUp::ListPopUp(const QString& name, QWidget* parent) :
 	QDialog(parent)
 {
 	setWindowTitle(name);
-	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 	m_layout = new QVBoxLayout(this);
 	setLayout(m_layout);
 	m_layout->setContentsMargins(1, 1, 1, 1);
 	m_list_items = new QListWidget();
-
-	QSizePolicy test;
-	test.setHorizontalPolicy(QSizePolicy::Preferred);
-	m_list_items->setSizePolicy(test);
-
 	m_list_items->setSelectionMode(QAbstractItemView::NoSelection);
 	m_layout->addWidget(m_list_items);
 }
@@ -32,7 +27,7 @@ ListPopUp::~ListPopUp()
 
 QSize ListPopUp::sizeHint() const
 {
-	return QSize(150,150);
+	return QSize(170,100);
 }
 
 QListWidget* ListPopUp::list()
@@ -40,11 +35,33 @@ QListWidget* ListPopUp::list()
 	return m_list_items;
 }
 
+void ListPopUp::show()
+{
+	int rows = m_list_items->model()->rowCount();
+	int rowSize = m_list_items->sizeHintForRow(0);
+	int height = rows * rowSize + 6;
+	if (height < 96)
+		height = 96;
+	m_list_items->setFixedHeight(height);
+	QDialog::show();
+}
 
 QListWidgetItem* ListPopUp::addItem(const QString& str, Qt::CheckState checked)
 {
 	QListWidgetItem* item = new QListWidgetItem(str, m_list_items);
 	item->setCheckState(checked);
+	int rows = m_list_items->model()->rowCount();
+	int rowSize = m_list_items->sizeHintForRow(0);
+	int height = rows * rowSize;
+	if (height >= m_list_items->size().height())
+		m_list_items->setFixedHeight(height + 6);
+		
+	//QFontMetrics fm(m_list_items->font());
+	//int maxTextWidth = fm.width(item->text());
+	//if (maxTextWidth < 140)
+	//	maxTextWidth = 140;
+	//m_list_items->setFixedWidth(maxTextWidth + 40);
+	
 	return item;
 }
 
@@ -72,6 +89,7 @@ bool ListPopUp::removeItem(const QString& str)
 	if(items.empty())
 		return false;
 	m_list_items->takeItem(m_list_items->row(items[0]));
+
 	return true;
 }
 
