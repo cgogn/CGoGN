@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QMessageBox>
 
 namespace CGoGN
 {
@@ -510,7 +511,18 @@ void View::keyPressEvent(QKeyEvent* event)
 	{
 		foreach(PluginInteraction* plugin, l_plugins)
 			plugin->keyPress(this, event);
-		QGLViewer::keyPressEvent(event);
+
+		if (event->key() == Qt::Key_Escape)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Really quit SCHNApps ?");
+			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			if (msgBox.exec() == QMessageBox::Ok)
+				exit(0);
+		}
+		else
+			QGLViewer::keyPressEvent(event);
 	}
 }
 
