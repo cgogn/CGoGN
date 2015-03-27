@@ -91,7 +91,7 @@ public slots:
 	void addVectorVBO(const QString& view, const QString& map, const QString& vbo);
 	void removeVectorVBO(const QString& view, const QString& map, const QString& vbo);
 	void changeVectorScaleFactor(const QString& view, const QString& map, const QString& vbo, float f);
-	void changeVectorColor(const QString& view, const QString& map, const QString& vbo, float r, float g, float b);
+	void changeVectorColor(const QString& view, const QString& map, const QString& vbo, const QString& col);
 
 protected:
 	Surface_RenderVector_DockTab* m_dockTab;

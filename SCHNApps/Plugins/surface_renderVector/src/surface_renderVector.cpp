@@ -235,12 +235,12 @@ void Surface_RenderVector_Plugin::changeVectorScaleFactor(const QString& view, c
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
-			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
 }
 
-void Surface_RenderVector_Plugin::changeVectorColor(const QString& view, const QString& map, const QString& vbo, float r, float g, float b)
+void Surface_RenderVector_Plugin::changeVectorColor(const QString& view, const QString& map, const QString& vbo, const QString& col)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
@@ -249,7 +249,7 @@ void Surface_RenderVector_Plugin::changeVectorColor(const QString& view, const Q
 		Utils::VBO* vboPtr = m->getVBO(vbo);
 
 		int idx = h_viewParameterSet[v][m].vectorVBOs.indexOf(vboPtr);
-		h_viewParameterSet[v][m].colors[idx] = QColor(r,g,b);
+		h_viewParameterSet[v][m].colors[idx] = QColor(col);
 		if (v->isSelectedView())
 		{
 			if (v->isLinkedToMap(m))	v->updateGL();
