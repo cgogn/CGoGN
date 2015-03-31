@@ -923,6 +923,10 @@ void SCHNApps::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 }
 
+void SCHNApps::statusBarMessage(const QString& msg, int msec)
+{
+	statusbar->showMessage(msg, msec);
+}
 
 } // namespace SCHNApps
 

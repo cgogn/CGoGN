@@ -12,7 +12,7 @@ ListPopUp::ListPopUp(const QString& name, QWidget* parent) :
 	QDialog(parent)
 {
 	setWindowTitle(name);
-	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+	setWindowFlags(windowFlags()/* | Qt::FramelessWindowHint*/ | Qt::SplashScreen | Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 	m_layout = new QVBoxLayout(this);
 	setLayout(m_layout);
 	m_layout->setContentsMargins(1, 1, 1, 1);
@@ -25,11 +25,6 @@ ListPopUp::~ListPopUp()
 {
 }
 
-QSize ListPopUp::sizeHint() const
-{
-	return QSize(170,100);
-}
-
 QListWidget* ListPopUp::list()
 {
 	return m_list_items;
@@ -40,7 +35,7 @@ void ListPopUp::show()
 	int rows = m_list_items->model()->rowCount();
 	int rowSize = m_list_items->sizeHintForRow(0);
 	int height = rows * rowSize + 6;
-	if (height < 96)
+	if (height < 96) // 96??
 		height = 96;
 	m_list_items->setFixedHeight(height);
 	QDialog::show();
