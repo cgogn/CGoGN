@@ -129,6 +129,8 @@ public:
 	void addMenuAction(Plugin* plugin, const QString& menuPath, QAction* action);
 	void removeMenuAction(Plugin* plugin, QAction* action);
 
+	void statusBarMessage(const QString& msg, int msec);
+
 public slots:
 	void aboutSCHNApps();
 	void aboutCGoGN();

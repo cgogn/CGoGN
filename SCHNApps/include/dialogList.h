@@ -44,8 +44,6 @@ public:
 
 	bool isChecked(const QString& str);
 
-	virtual QSize sizeHint() const;
-
 };
 
 
