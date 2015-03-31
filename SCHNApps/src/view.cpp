@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QMessageBox>
 
 namespace CGoGN
 {
@@ -501,16 +502,47 @@ void View::keyPressEvent(QKeyEvent* event)
 	if (event->key() == Qt::Key_S)
 	{
 		b_saveSnapshots = !b_saveSnapshots;
+
 		if (b_saveSnapshots)
-			connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Snapshot every frame?");
+			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			if (msgBox.exec() == QMessageBox::Ok)
+			{
+				m_schnapps->statusBarMessage("frame snapshot !!", 2000);
+				connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+			}
+			else
+			{
+				m_schnapps->statusBarMessage("cancel frame snapshot", 2000);
+				b_saveSnapshots = false;
+			}
+		}
 		else
+		{
 			disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+			m_schnapps->statusBarMessage("Stop frame snapshot", 2000);
+		}
+			
 	}
 	else
 	{
 		foreach(PluginInteraction* plugin, l_plugins)
 			plugin->keyPress(this, event);
-		QGLViewer::keyPressEvent(event);
+
+		if (event->key() == Qt::Key_Escape)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Really quit SCHNApps ?");
+			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			if (msgBox.exec() == QMessageBox::Ok)
+				exit(0);
+		}
+		else
+			QGLViewer::keyPressEvent(event);
 	}
 }
 
