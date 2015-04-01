@@ -156,6 +156,8 @@ private slots:
 protected:
 	QTextStream* m_pyRecording;
 	QFile* m_pyRecFile;
+	QList<QString> m_pyVarNames;
+	QString m_pyBuffer;
 
 private slots:
 	void beginPyRecording();
@@ -164,7 +166,8 @@ private slots:
 
 public:
 	inline QTextStream* pythonStreamRecorder()  { return m_pyRecording; }
-
+	inline void pythonVarDeclare(const QString& var) { m_pyVarNames.push_back(var); }
+	inline void pythonVarsClear() { m_pyVarNames.clear(); }
 
 signals:
 	void cameraAdded(Camera* camera);
