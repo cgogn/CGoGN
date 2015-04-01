@@ -928,6 +928,21 @@ void SCHNApps::statusBarMessage(const QString& msg, int msec)
 	statusbar->showMessage(msg, msec);
 }
 
+
+QString SCHNApps::openFileDialog(const QString& title, const QString& dir, const QString& filter)
+{
+	return QFileDialog::getOpenFileName(this, title, dir, filter);
+}
+
+
+QString SCHNApps::saveFileDialog(const QString& title, const QString& dir, const QString& filter)
+{
+	return QFileDialog::getSaveFileName(this, title, dir, filter);
+}
+
+
+
+
 } // namespace SCHNApps
 
 } // namespace CGoGN

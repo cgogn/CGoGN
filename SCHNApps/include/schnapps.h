@@ -129,8 +129,6 @@ public:
 	void addMenuAction(Plugin* plugin, const QString& menuPath, QAction* action);
 	void removeMenuAction(Plugin* plugin, QAction* action);
 
-	void statusBarMessage(const QString& msg, int msec);
-
 public slots:
 	void aboutSCHNApps();
 	void aboutCGoGN();
@@ -140,6 +138,13 @@ public slots:
 	void showHidePythonDock();
 
 	void loadPythonScriptFromFile(const QString& fileName);
+
+	void statusBarMessage(const QString& msg, int msec);
+
+	QString openFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
+
+	QString saveFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
+
 
 private slots:
 	void loadPythonScriptFromFileDialog();
