@@ -13,8 +13,8 @@ namespace SCHNApps
 Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugin* p) :
 	m_schnapps(s),
 	m_plugin(p),
-	b_updatingUI(false),
-	m_currentColorDial(0)
+	m_currentColorDial(0),
+	b_updatingUI(false)
 
 {
 	setupUi(this);
@@ -325,6 +325,9 @@ void Surface_Render_DockTab::updateMapParameters()
 
 	combo_normalVBO->clear();
 	combo_normalVBO->addItem("- select VBO -");
+
+	combo_colorVBO->clear();
+	combo_colorVBO->addItem("- select VBO -");
 
 	View* view = m_schnapps->getSelectedView();
 	MapHandlerGen* map = m_schnapps->getSelectedMap();

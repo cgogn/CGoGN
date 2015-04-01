@@ -197,6 +197,7 @@ void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 		{
 			m_dockTab->removePositionVBO(QString::fromStdString(vbo->name()));
 			m_dockTab->removeNormalVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->removeColorVBO(QString::fromStdString(vbo->name()));
 		}
 	}
 
@@ -216,6 +217,11 @@ void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 		if(mapParam.normalVBO == vbo)
 		{
 			mapParam.normalVBO = NULL;
+			if(view->isLinkedToMap(map)) viewsToUpdate.insert(view);
+		}
+		if(mapParam.colorVBO == vbo)
+		{
+			mapParam.colorVBO = NULL;
 			if(view->isLinkedToMap(map)) viewsToUpdate.insert(view);
 		}
 	}

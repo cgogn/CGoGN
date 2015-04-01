@@ -100,7 +100,10 @@ void MapHandler<PFP>::updateBB()
 		VertexAttribute<VEC3, MAP> bbVertexAttribute(map, dynamic_cast<AttributeMultiVector<VEC3>*>(m_bbVertexAttribute));
 
 		m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*map, bbVertexAttribute);
-		m_bbDiagSize = m_bb.diagSize();
+		if (m_bb.isInitialized())
+			m_bbDiagSize = m_bb.diagSize();
+		else
+			m_bbDiagSize = 0;
 	}
 	else
 	{
@@ -117,6 +120,9 @@ void MapHandler<PFP>::updateBB()
 template <typename PFP>
 void MapHandler<PFP>::updateBBDrawer()
 {
+	if (!m_bb.isInitialized())
+		return;
+
 	if (!m_bbDrawer)
 		m_bbDrawer = new Utils::Drawer();
 
