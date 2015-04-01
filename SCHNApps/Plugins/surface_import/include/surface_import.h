@@ -29,11 +29,15 @@ private:
 	virtual void disable() {}
 
 public slots:
-	MapHandlerGen* importFromFile(const QString& fileName);
-	void importFromFileDialog();
+	MapHandlerGen* importMeshFromFile(const QString& fileName);
+	void importMeshFromFileDialog();
+
+	MapHandlerGen* importImageFromFile(const QString& fileName);
+	void importImageFromFileDialog();
 
 private:
-	QAction* importAction;
+	QAction* importMeshAction;
+	QAction* importImageAction;
 };
 
 } // namespace SCHNApps
@@ -41,4 +45,3 @@ private:
 } // namespace CGoGN
 
 #endif
-

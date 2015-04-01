@@ -13,7 +13,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
-#include <QMessageBox>
+#include <QWindow>
 
 namespace CGoGN
 {

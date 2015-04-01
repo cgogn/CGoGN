@@ -11,7 +11,7 @@ namespace SCHNApps
 bool Surface_RenderVector_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
-		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
 	m_dockTab = new Surface_RenderVector_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_RenderVector");
@@ -51,19 +51,6 @@ void Surface_RenderVector_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	const MapParameters& p = h_viewParameterSet[view][map];
 
-	//m_vectorShader->setScale(map->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
-	//if(p.positionVBO)
-	//{
-	//	m_vectorShader->setAttributePosition(p.positionVBO);
-	//	for(QList<Utils::VBO*>::const_iterator it = p.vectorVBOs.begin(); it != p.vectorVBOs.end(); ++it)
-	//	{
-	//		m_vectorShader->setAttributeVector(*it);
-	//		glLineWidth(1.0f);
-	//		map->draw(m_vectorShader, Algo::Render::GL2::POINTS);
-	//	}
-	//}
-
-	
 	if (p.positionVBO)
 	{
 		m_vectorShader->setAttributePosition(p.positionVBO);
@@ -92,10 +79,6 @@ void Surface_RenderVector_Plugin::selectedViewChanged(View *prev, View *cur)
 void Surface_RenderVector_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
-	if (cur==NULL)
-		m_dockTab->setDisabled(true);
-	else
-		m_dockTab->setDisabled(false);
 }
 
 void Surface_RenderVector_Plugin::mapAdded(MapHandlerGen* map)

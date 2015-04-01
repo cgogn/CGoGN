@@ -13,14 +13,15 @@ namespace SCHNApps
 Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugin* p) :
 	m_schnapps(s),
 	m_plugin(p),
-	b_updatingUI(false),
-	m_currentColorDial(0)
+	m_currentColorDial(0),
+	b_updatingUI(false)
 
 {
 	setupUi(this);
 
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
 	connect(combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(normalVBOChanged(int)));
+	connect(combo_colorVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(colorVBOChanged(int)));
 	connect(check_renderVertices, SIGNAL(toggled(bool)), this, SLOT(renderVerticesChanged(bool)));
 	connect(slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(verticesScaleFactorChanged(int)));
 	connect(check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(renderEdgesChanged(bool)));
@@ -33,88 +34,6 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(scolorButton,SIGNAL(clicked()),this,SLOT(simpleColorClicked()));
 	connect(vcolorButton,SIGNAL(clicked()),this,SLOT(vertexColorClicked()));
 	connect(m_colorDial,SIGNAL(colorSelected(const QColor&)),this,SLOT(colorSelected(const QColor&)));
-
-}
-
-
-
-void Surface_Render_DockTab::diffuseColorClicked()
-{
-	m_colorDial->show();
-	m_colorDial->setCurrentColor(m_diffuseColor);
-	m_currentColorDial = 1;
-}
-
-void Surface_Render_DockTab::simpleColorClicked()
-{
-	m_colorDial->show();
-	m_colorDial->setCurrentColor(m_simpleColor);
-	m_currentColorDial = 2;
-}
-
-void Surface_Render_DockTab::vertexColorClicked()
-{
-	m_colorDial->show();
-	m_colorDial->setCurrentColor(m_vertexColor);
-	m_currentColorDial = 3;
-}
-
-
-void Surface_Render_DockTab::colorSelected(const QColor& col)
-{
-	if (m_currentColorDial == 1)
-	{
-
-		m_diffuseColor = col;
-		dcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
-
-		Geom::Vec4f rgbCol(1.0/255.0*m_diffuseColor.red(), 1.0/255.0*m_diffuseColor.green(),1.0/255.0*m_diffuseColor.blue(),0.0f);
-
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
-			view->updateGL();
-			m_plugin->pythonRecording("changeFaceColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
-		}
-	}
-
-	if (m_currentColorDial == 2)
-	{
-
-		m_simpleColor = col;
-		scolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
-
-		Geom::Vec4f rgbCol(1.0/255.0*m_simpleColor.red(), 1.0/255.0*m_simpleColor.green(),1.0/255.0*m_simpleColor.blue(),0.0f);
-
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].simpleColor = rgbCol;
-			view->updateGL();
-			m_plugin->pythonRecording("changeEdgeColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
-		}
-	}
-
-	if (m_currentColorDial == 3)
-	{
-
-		m_vertexColor = col;
-		vcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
-
-		Geom::Vec4f rgbCol(1.0/255.0*m_vertexColor.red(), 1.0/255.0*m_vertexColor.green(),1.0/255.0*m_vertexColor.blue(),0.0f);
-
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
-			view->updateGL();
-			m_plugin->pythonRecording("changeVertexColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
-		}
-	}
 }
 
 
@@ -147,6 +66,21 @@ void Surface_Render_DockTab::normalVBOChanged(int index)
 			m_plugin->h_viewParameterSet[view][map].normalVBO = map->getVBO(combo_normalVBO->currentText());
 			view->updateGL();
 			m_plugin->pythonRecording("changeNormalVBO", "", view->getName(), map->getName(), combo_normalVBO->currentText());
+		}
+	}
+}
+
+void Surface_Render_DockTab::colorVBOChanged(int index)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].colorVBO = map->getVBO(combo_colorVBO->currentText());
+			view->updateGL();
+			m_plugin->pythonRecording("changeColorVBO", "", view->getName(), map->getName(), combo_colorVBO->currentText());
 		}
 	}
 }
@@ -248,6 +182,86 @@ void Surface_Render_DockTab::renderBoundaryChanged(bool b)
 
 
 
+void Surface_Render_DockTab::diffuseColorClicked()
+{
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_diffuseColor);
+	m_currentColorDial = 1;
+}
+
+void Surface_Render_DockTab::simpleColorClicked()
+{
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_simpleColor);
+	m_currentColorDial = 2;
+}
+
+void Surface_Render_DockTab::vertexColorClicked()
+{
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_vertexColor);
+	m_currentColorDial = 3;
+}
+
+
+void Surface_Render_DockTab::colorSelected(const QColor& col)
+{
+	if (m_currentColorDial == 1)
+	{
+		m_diffuseColor = col;
+		dcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0/255.0*m_diffuseColor.red(), 1.0/255.0*m_diffuseColor.green(),1.0/255.0*m_diffuseColor.blue(),0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
+			view->updateGL();
+			m_plugin->pythonRecording("changeFaceColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
+		}
+	}
+
+	if (m_currentColorDial == 2)
+	{
+		m_simpleColor = col;
+		scolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0/255.0*m_simpleColor.red(), 1.0/255.0*m_simpleColor.green(),1.0/255.0*m_simpleColor.blue(),0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].simpleColor = rgbCol;
+			view->updateGL();
+			m_plugin->pythonRecording("changeEdgeColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
+		}
+	}
+
+	if (m_currentColorDial == 3)
+	{
+		m_vertexColor = col;
+		vcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0/255.0*m_vertexColor.red(), 1.0/255.0*m_vertexColor.green(),1.0/255.0*m_vertexColor.blue(),0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
+			view->updateGL();
+			m_plugin->pythonRecording("changeVertexColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
+		}
+	}
+}
+
+
+
+
+
 void Surface_Render_DockTab::addPositionVBO(QString name)
 {
 	b_updatingUI = true;
@@ -284,6 +298,24 @@ void Surface_Render_DockTab::removeNormalVBO(QString name)
 	b_updatingUI = false;
 }
 
+void Surface_Render_DockTab::addColorVBO(QString name)
+{
+	b_updatingUI = true;
+	combo_colorVBO->addItem(name);
+	b_updatingUI = false;
+}
+
+void Surface_Render_DockTab::removeColorVBO(QString name)
+{
+	b_updatingUI = true;
+	int curIndex = combo_colorVBO->currentIndex();
+	int index = combo_colorVBO->findText(name, Qt::MatchExactly);
+	if (curIndex == index)
+		combo_colorVBO->setCurrentIndex(0);
+	combo_colorVBO->removeItem(index);
+	b_updatingUI = false;
+}
+
 void Surface_Render_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -293,6 +325,9 @@ void Surface_Render_DockTab::updateMapParameters()
 
 	combo_normalVBO->clear();
 	combo_normalVBO->addItem("- select VBO -");
+
+	combo_colorVBO->clear();
+	combo_colorVBO->addItem("- select VBO -");
 
 	View* view = m_schnapps->getSelectedView();
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
@@ -313,6 +348,10 @@ void Surface_Render_DockTab::updateMapParameters()
 				combo_normalVBO->addItem(QString::fromStdString(vbo->name()));
 				if (vbo == p.normalVBO)
 					combo_normalVBO->setCurrentIndex(i);
+
+				combo_colorVBO->addItem(QString::fromStdString(vbo->name()));
+				if (vbo == p.colorVBO)
+					combo_colorVBO->setCurrentIndex(i);
 
 				++i;
 			}
