@@ -50,7 +50,7 @@ void Surface_Render_DockTab::positionVBOChanged(int index)
 		{
 			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
 			view->updateGL();
-			m_plugin->pythonRecording("changeVertexColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
+			m_plugin->pythonRecording("changePositionVBO", "", view->getName(), map->getName(), combo_positionVBO->currentText());
 		}
 	}
 }
@@ -65,7 +65,7 @@ void Surface_Render_DockTab::normalVBOChanged(int index)
 		{
 			m_plugin->h_viewParameterSet[view][map].normalVBO = map->getVBO(combo_normalVBO->currentText());
 			view->updateGL();
-			m_plugin->pythonRecording("changePositionVBO", "", view->getName(), map->getName(), combo_positionVBO->currentText());
+			m_plugin->pythonRecording("changeNormalVBO", "", view->getName(), map->getName(), combo_normalVBO->currentText());
 		}
 	}
 }
@@ -80,7 +80,7 @@ void Surface_Render_DockTab::colorVBOChanged(int index)
 		{
 			m_plugin->h_viewParameterSet[view][map].colorVBO = map->getVBO(combo_colorVBO->currentText());
 			view->updateGL();
-			m_plugin->pythonRecording("changeNormalVBO", "", view->getName(), map->getName(), combo_normalVBO->currentText());
+			m_plugin->pythonRecording("changeColorVBO", "", view->getName(), map->getName(), combo_colorVBO->currentText());
 		}
 	}
 }
@@ -208,7 +208,6 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 {
 	if (m_currentColorDial == 1)
 	{
-
 		m_diffuseColor = col;
 		dcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
 
@@ -220,12 +219,12 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 		{
 			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
 			view->updateGL();
+			m_plugin->pythonRecording("changeFaceColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 
 	if (m_currentColorDial == 2)
 	{
-
 		m_simpleColor = col;
 		scolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
 
@@ -237,12 +236,12 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 		{
 			m_plugin->h_viewParameterSet[view][map].simpleColor = rgbCol;
 			view->updateGL();
+			m_plugin->pythonRecording("changeEdgeColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 
 	if (m_currentColorDial == 3)
 	{
-
 		m_vertexColor = col;
 		vcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
 
@@ -254,6 +253,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 		{
 			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
 			view->updateGL();
+			m_plugin->pythonRecording("changeVertexColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 }

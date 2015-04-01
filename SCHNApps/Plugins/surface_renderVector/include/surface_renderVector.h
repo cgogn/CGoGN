@@ -12,22 +12,8 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-//struct SVectorInfo
-//{
-//	Utils::VBO* vbo;
-//	QColor color;
-//	float scaleFactor;
-//	SVectorInfo() :
-//		vbo(NULL), color(QColor("red")), scaleFactor(1.0f)
-//	{}
-//	SVectorInfo(Utils::VBO* ptr) :
-//		vbo(ptr), color(QColor("red")), scaleFactor(1.0f)
-//	{}
-//};
-
 struct MapParameters
 {
-
 	MapParameters() :
 		positionVBO(NULL)
 	{}
@@ -36,10 +22,6 @@ struct MapParameters
 	QList<Utils::VBO*> vectorVBOs;
 	QList<QColor> colors;
 	QList<float> scaleFactors;
-
-	//float vectorsScaleFactor;
-
-
 };
 
 class Surface_RenderVector_Plugin : public PluginInteraction

@@ -26,8 +26,6 @@ private:
 	SCHNApps* m_schnapps;
 	Surface_RenderVector_Plugin* m_plugin;
 	bool b_updatingUI;
-	int m_current_vbo;
-	QString m_currentVBOName;
 
 private slots:
 	void positionVBOChanged(int index);

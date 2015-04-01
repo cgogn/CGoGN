@@ -335,50 +335,43 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 			mapParams.positionApproximator = new Algo::Surface::Decimation::Approximator_QEM<PFP2>(*map, position);
 		}
 
-//		if (mapParams.normalApproximator == NULL)
-//		{
-//			mapParams.normalApproximator =
-//				new Algo::Surface::Decimation::Approximator_InterpolateAlongEdge<PFP2, PFP2::VEC3>(
-//					*map,
-//					normal,
-//					position,
-//					((Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator))->getApproximationResultAttribute()
-//				);
-//		}
+		if (mapParams.normalApproximator == NULL)
+		{
+			mapParams.normalApproximator =
+				new Algo::Surface::Decimation::Approximator_InterpolateAlongEdge<PFP2, PFP2::VEC3>(
+					*map,
+					normal,
+					position,
+					((Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator))->getApproximationResultAttribute()
+				);
+		}
 
-//		if (mapParams.radianceApproximator == NULL)
-//		{
-//			mapParams.radianceApproximator =
-//				new Algo::Surface::Decimation::Approximator_InterpolateAlongEdge<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >(
-//					*map,
-//					mapParams.radiance,
-//					position,
-//					((Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator))->getApproximationResultAttribute()
-//				);
-//		}
+		if (mapParams.radianceApproximator == NULL)
+		{
+			mapParams.radianceApproximator =
+				new Algo::Surface::Decimation::Approximator_InterpolateAlongEdge<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> >(
+					*map,
+					mapParams.radiance,
+					position,
+					((Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator))->getApproximationResultAttribute()
+				);
+		}
 
 		if (mapParams.selector == NULL)
 		{
-//			mapParams.selector =
-//				new EdgeSelector_Radiance<PFP2>(
-//					*map,
-//					position,
-//					normal,
-//					mapParams.radiance,
-//					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator),
-//					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.normalApproximator),
-//					*(Algo::Surface::Decimation::Approximator<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>, EDGE>*)(mapParams.radianceApproximator)
-//				);
-
-//			mapParams.selector =
-//				new Algo::Surface::Decimation::EdgeSelector_QEM<PFP2>(
-//					*map,
-//					position,
-//					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator)
-//				);
+			mapParams.selector =
+				new EdgeSelector_Radiance<PFP2>(
+					*map,
+					position,
+					normal,
+					mapParams.radiance,
+					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator),
+					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.normalApproximator),
+					*(Algo::Surface::Decimation::Approximator<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>, EDGE>*)(mapParams.radianceApproximator)
+				);
 
 			mapParams.selector =
-				new Algo::Surface::Decimation::EdgeSelector_ColorNaive<PFP2>(
+				new Algo::Surface::Decimation::EdgeSelector_QEM<PFP2>(
 					*map,
 					position,
 					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator)

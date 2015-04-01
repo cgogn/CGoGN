@@ -51,19 +51,6 @@ void Surface_RenderVector_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	const MapParameters& p = h_viewParameterSet[view][map];
 
-	//m_vectorShader->setScale(map->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
-	//if(p.positionVBO)
-	//{
-	//	m_vectorShader->setAttributePosition(p.positionVBO);
-	//	for(QList<Utils::VBO*>::const_iterator it = p.vectorVBOs.begin(); it != p.vectorVBOs.end(); ++it)
-	//	{
-	//		m_vectorShader->setAttributeVector(*it);
-	//		glLineWidth(1.0f);
-	//		map->draw(m_vectorShader, Algo::Render::GL2::POINTS);
-	//	}
-	//}
-
-	
 	if (p.positionVBO)
 	{
 		m_vectorShader->setAttributePosition(p.positionVBO);
