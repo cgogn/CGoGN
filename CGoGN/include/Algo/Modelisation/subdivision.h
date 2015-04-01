@@ -95,6 +95,12 @@ template <typename PFP, typename EMBV>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs) ;
 
 /**
+* Interpolant Catmull-Clark subdivision scheme
+*/
+template <typename PFP, typename EMBV>
+void CatmullClarkInterpolSubdivision(typename PFP::MAP& map, EMBV& attributs);
+
+/**
  * Loop subdivision scheme
  */
 template <typename PFP, typename EMBV>

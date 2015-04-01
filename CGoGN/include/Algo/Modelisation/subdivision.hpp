@@ -180,9 +180,142 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs)
 //	quadranguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position) ;
 //}
 
+
+// ORIGINALE
+//template <typename PFP, typename EMBV>
+//void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
+//{
+//	typedef typename PFP::MAP MAP;
+//	typedef typename EMBV::DATA_TYPE EMB;
+//
+//	std::vector<Dart> l_middles;
+//	std::vector<Dart> l_verts;
+//
+//	CellMarkerNoUnmark<MAP, VERTEX> m0(map);
+//	DartMarkerNoUnmark<MAP> mf(map);
+//	DartMarkerNoUnmark<MAP> me(map);
+//
+//	// first pass: cut edges
+//	for (Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if ( !map.template isBoundaryMarked<2>(d) && !me.isMarked(d))
+//		{
+//			if (!m0.isMarked(d))
+//			{
+//				m0.mark(d);
+//				l_verts.push_back(d);
+//			}
+//			Dart d2 = map.phi2(d);
+//			if (!m0.isMarked(d2))
+//			{
+//				m0.mark(d2);
+//				l_verts.push_back(d2);
+//			}
+//
+//			Dart f = map.phi1(d);
+//			Dart e = map.cutEdge(d);
+//
+//			attributs[e] = attributs[d];
+//			attributs[e] += attributs[f];
+//			attributs[e] *= 0.5;
+//
+//			me.template markOrbit<EDGE>(d);
+//			me.template markOrbit<EDGE>(e);
+//
+//			mf.mark(d) ;
+//			mf.mark(map.phi2(e)) ;
+//
+//			l_middles.push_back(e);
+//		}
+//	}
+//
+//	// second pass: quandrangule faces
+//	for (Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if ( !map.template isBoundaryMarked<2>(d) && mf.isMarked(d)) // for each face not subdivided
+//		{
+//			// compute center skip darts of new vertices non embedded
+////			EMB center = AttribOps::zero<EMB,PFP>();
+//			EMB center(0.0);
+//			unsigned int count = 0 ;
+//			mf.template unmarkOrbit<FACE>(d) ;
+//			Dart it = d;
+//			do
+//			{
+//				center += attributs[it];
+//				++count ;
+//				me.template unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
+//
+//				it = map.phi1(it) ;
+//				me.template unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
+//				it = map.phi1(it) ;
+//			} while(it != d) ;
+//			center /= float(count);
+//			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
+//			attributs[cf] = center;					// affect the data to the central vertex
+//		}
+//	}
+//
+//	// Compute edge points
+//	for(typename std::vector<Dart>::iterator mid = l_middles.begin(); mid != l_middles.end(); ++mid)
+//	{
+//		Dart x = *mid;
+//		// other side of the edge
+//		if (!map.isBoundaryEdge(x))
+//		{
+//			Dart f1 = map.phi_1(x);
+//			Dart f2 = map.phi2(map.phi1(map.phi2(x)));
+////			EMB temp = AttribOps::zero<EMB,PFP>();
+////			temp = attributs[f1];
+//			EMB temp = attributs[f1];
+//			temp += attributs[f2];			// E' = (V0+V1+F1+F2)/4
+//			temp *= 0.25;
+//			attributs[x] *= 0.5;
+//			attributs[x] += temp;
+//		}
+//		// else nothing to do point already in the middle of segment
+//	}
+//
+//	// Compute vertex points
+//	for(typename std::vector<Dart>::iterator vert = l_verts.begin(); vert != l_verts.end(); ++vert)
+//	{
+//		m0.unmark(*vert);
+//
+////		EMB temp = AttribOps::zero<EMB,PFP>();
+////		EMB temp2 = AttribOps::zero<EMB,PFP>();
+//		EMB temp(0.0);
+//		EMB temp2(0.0);
+//
+//		unsigned int n = 0;
+//		Dart x = *vert;
+//		do
+//		{
+//			Dart m = map.phi1(x);
+//			Dart f = map.phi2(m);
+//			Dart v = map.template phi<11>(f);
+//
+//			temp += attributs[f];
+//			temp2 += attributs[v];
+//
+//			++n;
+//			x = map.phi2_1(x);
+//		} while (x != *vert);
+//
+//		EMB emcp = attributs[*vert];
+//		emcp *= float((n-2)*n);		// V' = (n-2)/n*V + 1/n2 *(F+E)
+//		emcp += temp;
+//		emcp += temp2;
+//		emcp /= float(n*n);
+//
+//		attributs[*vert] = emcp ;
+//	}
+//}
+
+
 template <typename PFP, typename EMBV>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 {
+
 	typedef typename PFP::MAP MAP;
 	typedef typename EMBV::DATA_TYPE EMB;
 
@@ -233,7 +366,6 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		if ( !map.template isBoundaryMarked<2>(d) && mf.isMarked(d)) // for each face not subdivided
 		{
 			// compute center skip darts of new vertices non embedded
-//			EMB center = AttribOps::zero<EMB,PFP>();
 			EMB center(0.0);
 			unsigned int count = 0 ;
 			mf.template unmarkOrbit<FACE>(d) ;
@@ -251,11 +383,12 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 			center /= float(count);
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
 			attributs[cf] = center;					// affect the data to the central vertex
+
 		}
 	}
 
 	// Compute edge points
-	for(typename std::vector<Dart>::iterator mid = l_middles.begin(); mid != l_middles.end(); ++mid)
+	for (typename std::vector<Dart>::iterator mid = l_middles.begin(); mid != l_middles.end(); ++mid)
 	{
 		Dart x = *mid;
 		// other side of the edge
@@ -263,51 +396,194 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		{
 			Dart f1 = map.phi_1(x);
 			Dart f2 = map.phi2(map.phi1(map.phi2(x)));
-//			EMB temp = AttribOps::zero<EMB,PFP>();
-//			temp = attributs[f1];
-			EMB temp = attributs[f1];
-			temp += attributs[f2];			// E' = (V0+V1+F1+F2)/4
-			temp *= 0.25;
-			attributs[x] *= 0.5;
-			attributs[x] += temp;
+			attributs[x] += (attributs[f1] + attributs[f2]) / 4.0 - (attributs[x] / 2.0);
 		}
 		// else nothing to do point already in the middle of segment
 	}
 
 	// Compute vertex points
-	for(typename std::vector<Dart>::iterator vert = l_verts.begin(); vert != l_verts.end(); ++vert)
+	for (typename std::vector<Dart>::iterator vert = l_verts.begin(); vert != l_verts.end(); ++vert)
 	{
 		m0.unmark(*vert);
 
-//		EMB temp = AttribOps::zero<EMB,PFP>();
-//		EMB temp2 = AttribOps::zero<EMB,PFP>();
-		EMB temp(0.0);
-		EMB temp2(0.0);
+		EMB sumFace(0.0); // Sum_F
+		EMB sumEdge(0.0);// Sum_E
 
-		unsigned int n = 0;
+		int n = 0;
 		Dart x = *vert;
 		do
 		{
 			Dart m = map.phi1(x);
 			Dart f = map.phi2(m);
-			Dart v = map.template phi<11>(f);
 
-			temp += attributs[f];
-			temp2 += attributs[v];
-
+			sumFace += attributs[f];
+			sumEdge += attributs[m];
 			++n;
 			x = map.phi2_1(x);
 		} while (x != *vert);
 
-		EMB emcp = attributs[*vert];
-		emcp *= float((n-2)*n);		// V' = (n-2)/n*V + 1/n2 *(F+E)
-		emcp += temp;
-		emcp += temp2;
-		emcp /= float(n*n);
+		EMB deltaV = attributs[*vert] * float(-3*n);	// (-3 * attributs[*vert]
+		deltaV += sumFace;								// + sumFace/n
+		deltaV += 2.0*sumEdge;							// + sumEdge/n)
+		deltaV /= float(n*n);								// /n
 
-		attributs[*vert] = emcp ;
+		attributs[*vert] += deltaV;
 	}
 }
+
+
+
+
+
+
+template <typename PFP, typename EMBV>
+void CatmullClarkInterpolSubdivision(typename PFP::MAP& map, EMBV& attributs)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename EMBV::DATA_TYPE EMB;
+
+	VertexAutoAttribute<EMB, PFP::MAP> facesAverage(map);
+
+	std::vector<Dart> l_vertices;
+	std::vector<Dart> l_edges;
+	std::vector<Dart> l_faces;
+	l_vertices.reserve(attributs.nbElements() + 10);
+	l_faces.reserve(l_vertices.capacity() / 2);
+	l_edges.reserve(l_faces.capacity() * 2);
+
+	DartMarker<MAP> mf(map);
+	DartMarker<MAP> me(map);
+
+	for (Vertex v : allVerticesOf(map))
+	{
+		l_vertices.push_back(v);
+	}
+
+	// first step: cut edges
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (!me.isMarked(d))
+		{
+			mf.markOrbit<EDGE>(d);
+			Dart f = map.phi1(d);
+			Dart e = map.cutEdge(d);
+			attributs[e] = (attributs[d] + attributs[f]) /2.0;
+			me.template markOrbit<EDGE>(d);
+			me.template markOrbit<EDGE>(e);
+			// warning store the dart that does not belong to the boundary
+			if (map.isBoundaryMarked<2>(e))
+				l_edges.push_back(map.phi2(d));
+			else
+				l_edges.push_back(e);
+		}
+	}
+
+
+	// second step: quandrangule faces
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (!map.template isBoundaryMarked<2>(d) && mf.isMarked(d)) 
+		{
+			EMB center(0.0);
+			unsigned int count = 0;
+			mf.template unmarkOrbit<FACE>(d);
+			Dart it = d;
+			do
+			{
+				center += attributs[it];
+				++count;
+				// unmark me on the fly 
+				me.template unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
+				it = map.phi1(it);
+				me.template unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
+				it = map.phi1(it); // do not forget to skip the middle edge vertices
+			} while (it != d);
+			center /= float(count);
+			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
+			attributs[cf] = center;					// affect the data to the central vertex
+			l_faces.push_back(cf);
+		}
+	}
+	
+	// compute face average of "vertices"
+	for (Dart v : l_vertices)
+	{
+		EMB average(0.0);
+		int n = 0;
+		for (Face x : facesIncidentToVertex2(map, v))
+		{
+			Dart f = map.template phi<11>(x);
+			++n;
+			average += attributs[f];
+		}
+		facesAverage[v] = average / float(n);
+	}
+
+	// compute face average of "edges"
+	for (Dart e : l_edges)
+	{
+		if (!map.isBoundaryMarked<2>(map.phi2(e))) // faster than map.isBoundaryEdge(e)
+		{
+			Dart ff = map.phi_1(e);
+			Dart f = map.template phi<211>(e);
+			facesAverage[e] = (attributs[ff] + attributs[f]) / 2.0;
+		}
+		else
+			facesAverage[e] = attributs[e];
+	}
+
+	// Move edge points
+	for (Dart x: l_edges)
+	{
+		Dart xb = map.phi2(x);
+
+		if (map.isBoundaryMarked<2>(x))
+			std::cout << "ERROR " << attributs[x];
+
+		if (!map.isBoundaryMarked<2>(xb))
+		{
+			Dart v1 = map.phi1(x);
+			Dart v2 = map.phi_1(map.phi2(map.phi_1(x)));
+			attributs[x] -= (facesAverage[v1] + facesAverage[v2]) / 4.0 - facesAverage[x] / 2.0;
+		}
+		else // do the 4 point scheme
+		{
+			Dart a = map.template phi<1112>(xb); 
+			Dart b = map.template phi<12>(xb);
+			Dart c = map.phi1(x);
+			Dart d = map.phi2(map.phi_1(map.phi_1(map.phi_1(xb))));
+			// use the 4 old vertices and not the two edge-points because we are writing on edge-points
+			attributs[x] -= (attributs[a] + attributs[b] + attributs[c] + attributs[d]) / 16.0  - attributs[x] / 4.0;
+		}
+	}
+
+	// Move face points
+	for (Dart f : l_faces)
+	{
+		EMB sumVert(0.0); 
+		EMB sumEdge(0.0);
+
+		int n = 0;
+		Dart x = f;
+		do
+		{
+			Dart m = map.phi1(x);
+			Dart v = map.phi1(m);
+			sumVert += facesAverage[v];
+			sumEdge += facesAverage[m];
+			++n;
+			x = map.phi2_1(x);
+		} while (x != f);
+
+		EMB deltaF = (double(-3 * n)*attributs[f] + sumVert + 2.0*sumEdge) / double(n*n);
+		attributs[f] -= deltaF;
+	}
+}
+
+
+
+
+
 
 //template <typename PFP>
 //void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
