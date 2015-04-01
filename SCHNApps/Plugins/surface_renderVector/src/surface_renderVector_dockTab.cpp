@@ -243,7 +243,7 @@ void Surface_RenderVector_DockTab::updateMapParameters()
 				++i;
 			}
 		}
-		if (m_current_vbo >= 0)
+		if ((m_current_vbo >= 0) && (m_current_vbo<p.vectorVBOs.size()))
 		{
 			slider_vectorsScaleFactor->setSliderPosition(p.scaleFactors[m_current_vbo] * 50.0f);
 			combo_color->setColor(p.colors[m_current_vbo]);
