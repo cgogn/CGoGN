@@ -442,7 +442,7 @@ void CatmullClarkInterpolSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	typedef typename PFP::MAP MAP;
 	typedef typename EMBV::DATA_TYPE EMB;
 
-	VertexAutoAttribute<EMB, PFP::MAP> facesAverage(map);
+	VertexAutoAttribute<EMB, typename PFP::MAP> facesAverage(map);
 
 	std::vector<Dart> l_vertices;
 	std::vector<Dart> l_edges;

@@ -87,7 +87,7 @@ void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 template <typename PFP>
 void MapHandler<PFP>::drawBB()
 {
-	if (m_bbDrawer)
+	if (m_showBB && m_bbDrawer)
 		m_bbDrawer->callList();
 }
 

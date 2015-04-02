@@ -99,6 +99,9 @@ private slots:
 public slots:
 	MapHandlerGen* addMap(const QString& name, unsigned int dim);
 	void removeMap(const QString& name);
+	MapHandlerGen* duplicateMap(const QString& name, bool properties);
+
+
 	void setSelectedMap(const QString& mapName);
 
 	MapHandlerGen* getMap(const QString& name) const;

@@ -21,6 +21,10 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 
 	connect(list_maps, SIGNAL(itemSelectionChanged()), this, SLOT(selectedMapChanged()));
 
+	connect(button_duplicate, SIGNAL(clicked()), this, SLOT(duplicateCurrentMap()));
+	connect(button_remove, SIGNAL(clicked()), this, SLOT(removeCurrentMap()));
+
+	connect(check_drawBB, SIGNAL(toggled(bool)), this, SLOT(showBBChanged(bool)));
 	connect(combo_bbVertexAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(bbVertexAttributeChanged(int)));
 	connect(list_vertexAttributes, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(vertexAttributeCheckStateChanged(QListWidgetItem*)));
 
@@ -79,6 +83,7 @@ void ControlDock_MapTab::setSelectedMap(const QString& mapName)
 			items[0]->setSelected(false);
 			m_selectedMap = NULL;
 		}
+		updateSelectedMapInfo();
 		return;
 	}
 
@@ -132,6 +137,57 @@ void ControlDock_MapTab::selectedMapChanged()
 		m_schnapps->notifySelectedMapChanged(old, m_selectedMap);
 	}
 }
+
+void ControlDock_MapTab::showBBChanged(bool b)
+{
+	if (!b_updatingUI)
+	{
+
+		if (m_selectedMap)
+		{
+			m_selectedMap->showBB(b);
+			// RECORDING
+			QTextStream* rec = m_schnapps->pythonStreamRecorder();
+			if (rec)
+				*rec << m_selectedMap->getName() << ".showBB(\"" << b << "\");" << endl;
+		}
+			
+	}
+}
+
+
+void ControlDock_MapTab::duplicateCurrentMap()
+{
+	if (!b_updatingUI)
+	{
+		if (m_selectedMap)
+		{
+			m_schnapps->duplicateMap(m_selectedMap->getName(),true);
+			// RECORDING
+			QTextStream* rec = m_schnapps->pythonStreamRecorder();
+			if (rec)
+				*rec << "schnapps.duplicateMap(" << m_selectedMap->getName() << ".getName(),1);" << endl;
+		}
+	}
+}
+
+void ControlDock_MapTab::removeCurrentMap()
+{
+	if (!b_updatingUI)
+	{
+		if (m_selectedMap)
+		{
+			m_schnapps->removeMap(m_selectedMap->getName());
+			// RECORDING
+			QTextStream* rec = m_schnapps->pythonStreamRecorder();
+			if (rec)
+				*rec << "schnapps.removeMap(" << m_selectedMap->getName() << ".getName());" << endl;
+			setSelectedMap("NONE");
+		}
+	}
+}
+
+
 
 void ControlDock_MapTab::bbVertexAttributeChanged(int index)
 {
@@ -319,6 +375,8 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 
 		for (unsigned int orbit = DART; orbit <= VOLUME; ++orbit)
 		{
+			check_drawBB->setChecked(m_selectedMap->isBBshown());
+
 			unsigned int nbc = m->getNbCells(orbit);
 
 			QListWidget* selectorList = NULL;

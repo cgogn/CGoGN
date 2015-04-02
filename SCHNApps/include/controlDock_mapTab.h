@@ -40,6 +40,10 @@ private slots:
 	// slots called from UI actions
 	void selectedMapChanged();
 
+	void duplicateCurrentMap();
+	void removeCurrentMap();
+
+	void showBBChanged(bool b);
 	void bbVertexAttributeChanged(int index);
 	void vertexAttributeCheckStateChanged(QListWidgetItem* item);
 

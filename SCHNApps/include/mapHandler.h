@@ -82,6 +82,19 @@ private slots:
 	 *********************************************************/
 
 public slots:
+
+	void showBB(bool b)
+	{
+		m_showBB = b;
+		foreach(View* view, l_views)
+			view->updateGL();
+	}
+	
+	bool isBBshown() const
+	{
+		return m_showBB;
+	}
+
 	void setBBVertexAttribute(const QString& name)
 	{
 		m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
@@ -118,6 +131,7 @@ public slots:
 	virtual bool transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
 
 protected:
+	bool m_showBB;
 	virtual void updateBB() = 0;
 
 	/*********************************************************

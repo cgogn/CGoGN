@@ -543,6 +543,60 @@ void SCHNApps::disablePluginTabWidgets(PluginInteraction* plugin)
  * MANAGE MAPS
  *********************************************************/
 
+MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
+{
+	if (! m_maps.contains(name))
+		return NULL;
+
+	QString newName = name + "_copy";
+
+	if (m_maps.contains(newName))
+		return NULL;
+
+	MapHandlerGen* maph = m_maps[name];
+	MapHandlerGen* new_mh;
+
+	unsigned int dim = maph->getGenericMap()->dimension();
+
+	switch (dim)
+	{
+	case 2: {
+				PFP2::MAP* map = new PFP2::MAP();
+				map->copyFrom(*(maph->getGenericMap()));
+				new_mh = new MapHandler<PFP2>(newName, this, map);
+				break;
+			}
+	case 3: {
+				PFP3::MAP* map = new PFP3::MAP();
+				map->copyFrom(*(maph->getGenericMap()));
+				new_mh = new MapHandler<PFP3>(newName, this, map);
+				break;
+			}
+	}
+
+	m_maps.insert(newName, new_mh);
+	DEBUG_EMIT("mapAdded");
+	emit(mapAdded(new_mh));
+
+	if (properties)
+	{
+		// BB
+		new_mh->setBBVertexAttribute(maph->getBBVertexAttributeName());
+
+		//VBOs
+		const VBOSet& vbos = maph->getVBOSet();
+		foreach(QString s, vbos.keys())
+		{
+			new_mh->createVBO(s);
+		}
+	}
+
+	return new_mh;
+}
+
+
+
+
 MapHandlerGen* SCHNApps::addMap(const QString& name, unsigned int dim)
 {
 	if (m_maps.contains(name))
