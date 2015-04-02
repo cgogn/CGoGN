@@ -36,7 +36,7 @@ MapHandlerGen* Surface_Import_Plugin::importMeshFromFile(const QString& fileName
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
-		pythonRecording("importFromFile", fi.baseName(), fileName);
+		pythonRecording("importMeshFromFile", fi.baseName(), fileName);
 
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
 		if(mhg)
@@ -80,6 +80,8 @@ MapHandlerGen* Surface_Import_Plugin::importImageFromFile(const QString& fileNam
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
+		pythonRecording("importImageFromFile", fi.baseName(), fileName);
+
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
 		if(mhg)
 		{

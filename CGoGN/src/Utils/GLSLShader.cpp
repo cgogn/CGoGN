@@ -39,41 +39,43 @@ namespace CGoGN
 namespace Utils
 {
 
-#ifdef CGOGN_USE_OGL_CORE_PROFILE
-unsigned int GLSLShader::CURRENT_OGL_VERSION = 3;
-unsigned int GLSLShader::MAJOR_OGL_CORE = 3;
-unsigned int GLSLShader::MINOR_OGL_CORE = 3;
-#else
-unsigned int GLSLShader::CURRENT_OGL_VERSION = 2;
-unsigned int GLSLShader::MAJOR_OGL_CORE = 2;
-unsigned int GLSLShader::MINOR_OGL_CORE = 1;
-#endif
+//#ifdef CGOGN_USE_OGL_CORE_PROFILE
+//unsigned int GLSLShader::CURRENT_OGL_VERSION = 3;
+//unsigned int GLSLShader::MAJOR_OGL_CORE = 3;
+//unsigned int GLSLShader::MINOR_OGL_CORE = 3;
+//#else
+//unsigned int GLSLShader::CURRENT_OGL_VERSION = 2;
+//unsigned int GLSLShader::MAJOR_OGL_CORE = 2;
+//unsigned int GLSLShader::MINOR_OGL_CORE = 1;
+//#endif
 
-std::string GLSLShader::DEFINES_GL2=\
-"#version 110\n"
-"#define PRECISION float pipo_PRECISION\n"
-"#define ATTRIBUTE attribute\n"
-"#define VARYING_VERT varying\n"
-"#define VARYING_FRAG varying\n"
-"#define FRAG_OUT_DEF float pipo_FRAGDEF\n"
-"#define FRAG_OUT gl_FragColor\n"
-"#define INVARIANT_POS float pipo_INVARIANT\n"
-"#define TEXTURE2D texture2D\n"
-;
 
-std::string GLSLShader::DEFINES_GL3=\
-"#version 330\n"
-"#define PRECISION precision highp float\n"
-"#define ATTRIBUTE in\n"
-"#define VARYING_VERT out\n"
-"#define VARYING_FRAG in\n"
-"#define FRAG_OUT_DEF out vec4 outFragColor\n"
-"#define FRAG_OUT outFragColor\n"
-"#define INVARIANT_POS invariant gl_Position\n"
-"#define TEXTURE2D texture\n"
-;
 
-std::string* GLSLShader::DEFINES_GL = NULL;
+//std::string GLSLShader::DEFINES_GL2=\
+//"#version 110\n"
+//"#define PRECISION float pipo_PRECISION\n"
+//"#define ATTRIBUTE attribute\n"
+//"#define VARYING_VERT varying\n"
+//"#define VARYING_FRAG varying\n"
+//"#define FRAG_OUT_DEF float pipo_FRAGDEF\n"
+//"#define FRAG_OUT gl_FragColor\n"
+//"#define INVARIANT_POS float pipo_INVARIANT\n"
+//"#define TEXTURE2D texture2D\n";
+
+
+//std::string GLSLShader::DEFINES_GL3=\
+//"#version 150\n"
+//"#define PRECISION precision highp float\n"
+//"#define ATTRIBUTE in\n"
+//"#define VARYING_VERT out\n"
+//"#define VARYING_FRAG in\n"
+//"#define FRAG_OUT_DEF out vec4 outFragColor\n"
+//"#define FRAG_OUT outFragColor\n"
+//"#define INVARIANT_POS invariant gl_Position\n"
+//"#define TEXTURE2D texture\n";
+
+
+//std::string* GLSLShader::DEFINES_GL = NULL;
 
 std::vector<std::string> GLSLShader::m_pathes;
 

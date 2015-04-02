@@ -120,46 +120,51 @@ void MapHandler<PFP>::updateBB()
 template <typename PFP>
 void MapHandler<PFP>::updateBBDrawer()
 {
-	if (!m_bb.isInitialized())
-		return;
-
 	if (!m_bbDrawer)
 		m_bbDrawer = new Utils::Drawer();
 
-	Geom::Vec3f bbmin = m_bb.min();
-	Geom::Vec3f bbmax = m_bb.max();
-	float shift = 0.005f * (bbmax - bbmin).norm();
-	bbmin -= Geom::Vec3f(shift, shift, shift);
-	bbmax += Geom::Vec3f(shift, shift, shift);
+	if (m_bb.isInitialized())
+	{
+		Geom::Vec3f bbmin = m_bb.min();
+		Geom::Vec3f bbmax = m_bb.max();
+		float shift = 0.005f * (bbmax - bbmin).norm();
+		bbmin -= Geom::Vec3f(shift, shift, shift);
+		bbmax += Geom::Vec3f(shift, shift, shift);
 
-	m_bbDrawer->newList(GL_COMPILE);
-	m_bbDrawer->color3f(0.0f,1.0f,0.0f);
-	m_bbDrawer->lineWidth(1.0f);
-	m_bbDrawer->begin(GL_LINE_LOOP);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->end();
-	m_bbDrawer->begin(GL_LINE_LOOP);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->end();
-	m_bbDrawer->begin(GL_LINES);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->end();
-	m_bbDrawer->endList();
+		m_bbDrawer->newList(GL_COMPILE);
+		m_bbDrawer->color3f(0.0f, 1.0f, 0.0f);
+		m_bbDrawer->lineWidth(1.0f);
+		m_bbDrawer->begin(GL_LINE_LOOP);
+		m_bbDrawer->vertex(bbmin);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
+		m_bbDrawer->vertex(bbmin);
+		m_bbDrawer->end();
+		m_bbDrawer->begin(GL_LINE_LOOP);
+		m_bbDrawer->vertex(bbmax);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
+		m_bbDrawer->vertex(bbmax);
+		m_bbDrawer->end();
+		m_bbDrawer->begin(GL_LINES);
+		m_bbDrawer->vertex(bbmin);
+		m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex(bbmax);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->end();
+		m_bbDrawer->endList();
+	}
+	else
+	{
+		m_bbDrawer->newList();
+		m_bbDrawer->endList();
+	}
 }
 
 template <typename PFP>

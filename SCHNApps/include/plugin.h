@@ -96,7 +96,10 @@ void Plugin::pythonRecording(QString slotName, QString returned, T1 param1)
 	if (rec)
 	{
 		if (!returned.isEmpty())
+		{
+			m_schnapps->pythonVarDeclare(returned);
 			*rec << returned << " = ";
+		}
 		*rec << this->getName() << "." << slotName << "(" << pyR_stringify(param1) << ");" << endl;
 	}
 }
@@ -108,7 +111,10 @@ void Plugin::pythonRecording(QString slotName, QString returned, T1 param1, T2 p
 	if (rec)
 	{
 		if (!returned.isEmpty())
+		{
+			m_schnapps->pythonVarDeclare(returned);
 			*rec << returned << " = ";
+		}
 		*rec << this->getName() << "." << slotName << "(" << pyR_stringify(param1) << ", " << pyR_stringify(param2) << ");" << endl;
 	}
 }
@@ -120,7 +126,10 @@ void Plugin::pythonRecording(QString slotName, QString returned, T1 param1, T2 p
 	if (rec)
 	{
 		if (!returned.isEmpty())
+		{
+			m_schnapps->pythonVarDeclare(returned);
 			*rec << returned << " = ";
+		}
 		*rec << this->getName() << "." << slotName << "(" << pyR_stringify(param1) << ", " << pyR_stringify(param2) << ", " << pyR_stringify(param3) << ");" << endl;
 	}
 }
@@ -133,7 +142,10 @@ void Plugin::pythonRecording(QString slotName, QString returned, T1 param1, T2 p
 	if (rec)
 	{
 		if (!returned.isEmpty())
+		{
+			m_schnapps->pythonVarDeclare(returned);
 			*rec << returned << " = ";
+		}
 		*rec << this->getName() << "." << slotName << "(" << pyR_stringify(param1) << ", " << pyR_stringify(param2) << ", " << pyR_stringify(param3) << ", " << pyR_stringify(param4) << ");" << endl;
 	}
 }
@@ -145,7 +157,10 @@ void Plugin::pythonRecording(QString slotName, QString returned, T1 param1, T2 p
 	if (rec)
 	{
 		if (!returned.isEmpty())
+		{
+			m_schnapps->pythonVarDeclare(returned);
 			*rec << returned << " = ";
+		}
 		*rec << this->getName() << "." << slotName << "(" << pyR_stringify(param1) << ", " << pyR_stringify(param2) << ", ";
 		*rec << pyR_stringify(param3) << ", " << pyR_stringify(param4) << ", " << pyR_stringify(param5) << ");" << endl;
 	}
@@ -159,7 +174,10 @@ void Plugin::pythonRecording(QString slotName, QString returned, T1 param1, T2 p
 	if (rec)
 	{
 		if (!returned.isEmpty())
+		{
+			m_schnapps->pythonVarDeclare(returned);
 			*rec << returned << " = ";
+		}
 		*rec << this->getName() << "." << slotName << "(" << pyR_stringify(param1) << ", " << pyR_stringify(param2) << ", ";
 		*rec << pyR_stringify(param3) << ", " << pyR_stringify(param4) << ", " << pyR_stringify(param5) << ", " << pyR_stringify(param6)  << ");" << endl;
 	}
@@ -174,7 +192,10 @@ void Plugin::pythonRecording(QString slotName, QString returned, T1 param1, T2 p
 	if (rec)
 	{
 		if (!returned.isEmpty())
+		{
+			m_schnapps->pythonVarDeclare(returned);
 			*rec << returned << " = ";
+		}
 		*rec << this->getName() << "." << slotName << "(" << pyR_stringify(param1) << ", " << pyR_stringify(param2) << ", ";
 		*rec << pyR_stringify(param3) << ", " << pyR_stringify(param4) << ", " << pyR_stringify(param5) << ", ";
 		*rec << pyR_stringify(param6) << ", " << pyR_stringify(param7) << ", " << pyR_stringify(param8) << ", ";

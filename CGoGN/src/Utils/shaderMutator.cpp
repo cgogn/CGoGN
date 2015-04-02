@@ -46,8 +46,6 @@ namespace Utils
  *
  ***********************************************/
 
-#ifdef CGOGN_GCC_4_9
-
 
 ShaderMutator::ShaderMutator(const std:: string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc)
 {
@@ -789,106 +787,6 @@ bool ShaderMutator::srcInsertCodeAtMainFunctionEnd(const std::string& insertedCo
 
 	return true;
 }
-
-#else
-
-
-ShaderMutator::ShaderMutator(const std:: string& /*shaderName*/, const std::string& /*vertShaderSrc*/, const std::string& /*fragShaderSrc*/, const std::string& /*geomShaderSrc*/)
-{
-}
-
-bool ShaderMutator::containsVariableDeclaration(shaderSrcType /*srcType*/, const std::string& /*variableName*/)
-{
-	bool result = false;
-	return result;
-}
-
-bool ShaderMutator::setMinShadingLanguageVersion(shaderSrcType /*srcType*/, int /*version*/)
-{
-	bool result = false;
-	return result;
-}
-
-bool ShaderMutator::changeIntConstantValue(shaderSrcType /*srcType*/, const std::string& /*constantName*/, int /*newVal*/)
-{
-	return true;
-}
-
-bool ShaderMutator::changeFloatConstantValue(shaderSrcType /*srcType*/, const std::string& /*constantName*/, float /*newVal*/)
-{
-	return true;
-}
-
-bool ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType /*srcType*/, const std::string& /*insertedCode*/)
-{
-	return true;
-}
-
-bool ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType /*srcType*/, const std::string& /*insertedCode*/)
-{
-	return true;
-}
-
-bool ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType /*srcType*/, const std::string& /*insertedCode*/)
-{
-	return true;
-}
-
-
-/***********************************************
- *
- * 		Private Section
- *
- ***********************************************/
-
-
-bool ShaderMutator::srcIsCommented(size_t /*pos*/, const std::string& /*src*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcIsOneLineCommented(size_t /*pos*/, const std::string& /*src*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcContainsVariableDeclaration(const std::string& /*variableName*/, std::string& /*src*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcSetMinShadingLanguageVersion(int /*version*/, std::string& /*modifiedSrc*/)
-{
-	return true;
-}
-
-bool ShaderMutator::srcChangeIntConstantValue(int /*newVal*/, const std::string& /*constantName*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcChangeFloatConstantValue(float /*newVal*/, const std::string& /*constantName*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcInsertCodeBeforeMainFunction(const std::string& /*insertedCode*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcInsertCodeAtMainFunctionBeginning(const std::string& /*insertedCode*/, std::string& /*modifiedSrc*/)
-{
-	return false;
-}
-
-bool ShaderMutator::srcInsertCodeAtMainFunctionEnd(const std::string& /*insertedCode*/, std::string& /*modifiedSrc*/)
-{
-	return true;
-}
-
-
-#endif
 
 } // namespace Utils
 

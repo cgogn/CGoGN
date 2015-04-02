@@ -839,7 +839,11 @@ void SCHNApps::beginPyRecording()
 	if (m_pyRecording != NULL) //  WRITE & CLOSE
 	{
 		QTextStream out(m_pyRecFile);
-		out << m_pyRecording->readAll();
+		foreach(QString var, m_pyVarNames)
+		{
+			m_pyBuffer.replace("\"" + var + "\"", var + ".getName()");
+		}
+		out << m_pyBuffer << endl;
 		m_pyRecFile->close();
 
 		delete m_pyRecording;
@@ -856,7 +860,10 @@ void SCHNApps::beginPyRecording()
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::WriteOnly | QIODevice::Text))
 			return;
-		m_pyRecording = new QTextStream(m_pyRecFile);
+
+		m_pyBuffer.clear();
+		m_pyRecording = new QTextStream(&m_pyBuffer);
+		
 
 		foreach(View *v, m_views)
 			*m_pyRecording << v->getName() << " = schnapps.getView(\"" << v->getName() << "\");" << endl;
@@ -865,6 +872,7 @@ void SCHNApps::beginPyRecording()
 			*m_pyRecording << m->getName() << " = schnapps.getMap(\"" << m->getName() << "\");" << endl;
 
 		statusbar->showMessage(QString(" Recording python in ") + fileName);
+		pythonVarsClear();
 	}
 	else
 	{
@@ -880,7 +888,11 @@ void SCHNApps::appendPyRecording()
 	if (m_pyRecording != NULL)	//  WRITE & CLOSE
 	{
 		QTextStream out(m_pyRecFile);
-		out << m_pyRecording->readAll();
+		foreach(QString var, m_pyVarNames)
+		{
+			m_pyBuffer.replace("\"" + var + "\"", var + ".getName()");
+		}
+		out << m_pyBuffer << endl;
 		m_pyRecFile->close();
 
 		delete m_pyRecording;
@@ -897,15 +909,22 @@ void SCHNApps::appendPyRecording()
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::Append | QIODevice::Text))
 			return;	
-		m_pyRecording = new QTextStream(m_pyRecFile);
+
+		m_pyBuffer.clear();
+		m_pyRecording = new QTextStream(&m_pyBuffer);
+		pythonVarsClear();
 
 		foreach(View *v, m_views)
 			*m_pyRecording << v->getName() << " = schnapps.getView(\"" << v->getName() << "\");" << endl;
 
 		foreach(MapHandlerGen *m, m_maps)
-			*m_pyRecording << m->getName() << " = schnapps.getMap(\"" << m->getName() << "\");" << endl;
+		{
+			*m_pyRecording << m->getName() << " = schnapps.getMap(\"" << m->getName() << "\");  #replace by  = previous_var if appending" << endl;
+			pythonVarDeclare(m->getName());
+		}
 
 		statusbar->showMessage(QString(" Append recording python in ") + fileName);
+		
 	}
 	else
 	{
@@ -927,6 +946,21 @@ void SCHNApps::statusBarMessage(const QString& msg, int msec)
 {
 	statusbar->showMessage(msg, msec);
 }
+
+
+QString SCHNApps::openFileDialog(const QString& title, const QString& dir, const QString& filter)
+{
+	return QFileDialog::getOpenFileName(this, title, dir, filter);
+}
+
+
+QString SCHNApps::saveFileDialog(const QString& title, const QString& dir, const QString& filter)
+{
+	return QFileDialog::getSaveFileName(this, title, dir, filter);
+}
+
+
+
 
 } // namespace SCHNApps
 

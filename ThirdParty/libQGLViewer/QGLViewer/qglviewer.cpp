@@ -338,68 +338,68 @@ draw(), the user can rely on the OpenGL context he defined. Respect this convent
 different attributes) if you overload this method. */
 void QGLViewer::postDraw()
 {
-	// Reset model view matrix to world coordinates origin
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	camera()->loadModelViewMatrix();
-	// TODO restore model loadProjectionMatrixStereo
-
-	// Save OpenGL state
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-	// Set neutral GL state
-	glDisable(GL_TEXTURE_1D);
-	glDisable(GL_TEXTURE_2D);
-#ifdef GL_TEXTURE_3D  // OpenGL 1.2 Only...
-	glDisable(GL_TEXTURE_3D);
-#endif
-
-	glDisable(GL_TEXTURE_GEN_Q);
-	glDisable(GL_TEXTURE_GEN_R);
-	glDisable(GL_TEXTURE_GEN_S);
-	glDisable(GL_TEXTURE_GEN_T);
-
-#ifdef GL_RESCALE_NORMAL  // OpenGL 1.2 Only...
-	glEnable(GL_RESCALE_NORMAL);
-#endif
-
-//	glDisable(GL_COLOR_MATERIAL);
-//	qglColor(foregroundColor());
-
-	if (cameraIsEdited())
-		camera()->drawAllPaths();
-
-	// Pivot point, line when camera rolls, zoom region
-	drawVisualHints();
-
-	if (gridIsDrawn()) { glLineWidth(1.0); drawGrid(camera()->sceneRadius()); }
-	if (axisIsDrawn()) { glLineWidth(2.0); drawAxis(camera()->sceneRadius()); }
-
-	// FPS computation
-	const unsigned int maxCounter = 20;
-	if (++fpsCounter_ == maxCounter)
-	{
-		f_p_s_ = 1000.0 * maxCounter / fpsTime_.restart();
-		fpsString_ = tr("%1Hz", "Frames per seconds, in Hertz").arg(f_p_s_, 0, 'f', ((f_p_s_ < 10.0)?1:0));
-		fpsCounter_ = 0;
-	}
-
-	// Restore foregroundColor
-	float color[4];
-	color[0] = foregroundColor().red()   / 255.0f;
-	color[1] = foregroundColor().green() / 255.0f;
-	color[2] = foregroundColor().blue()  / 255.0f;
-	color[3] = 1.0;
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-
-	if (FPSIsDisplayed()) displayFPS();
-	if (displayMessage_) drawText(10, height()-10,  message_);
-
-	// Restore GL state
-	glPopAttrib();
-	glPopMatrix();
+//	// Reset model view matrix to world coordinates origin
+//	glMatrixMode(GL_MODELVIEW);
+//	glPushMatrix();
+//	camera()->loadModelViewMatrix();
+//	// TODO restore model loadProjectionMatrixStereo
+//
+//	// Save OpenGL state
+//	glPushAttrib(GL_ALL_ATTRIB_BITS);
+//
+//	// Set neutral GL state
+//	glDisable(GL_TEXTURE_1D);
+//	glDisable(GL_TEXTURE_2D);
+//#ifdef GL_TEXTURE_3D  // OpenGL 1.2 Only...
+//	glDisable(GL_TEXTURE_3D);
+//#endif
+//
+//	glDisable(GL_TEXTURE_GEN_Q);
+//	glDisable(GL_TEXTURE_GEN_R);
+//	glDisable(GL_TEXTURE_GEN_S);
+//	glDisable(GL_TEXTURE_GEN_T);
+//
+//#ifdef GL_RESCALE_NORMAL  // OpenGL 1.2 Only...
+//	glEnable(GL_RESCALE_NORMAL);
+//#endif
+//
+////	glDisable(GL_COLOR_MATERIAL);
+////	qglColor(foregroundColor());
+//
+//	if (cameraIsEdited())
+//		camera()->drawAllPaths();
+//
+//	// Pivot point, line when camera rolls, zoom region
+//	drawVisualHints();
+//
+//	if (gridIsDrawn()) { glLineWidth(1.0); drawGrid(camera()->sceneRadius()); }
+//	if (axisIsDrawn()) { glLineWidth(2.0); drawAxis(camera()->sceneRadius()); }
+//
+//	// FPS computation
+//	const unsigned int maxCounter = 20;
+//	if (++fpsCounter_ == maxCounter)
+//	{
+//		f_p_s_ = 1000.0 * maxCounter / fpsTime_.restart();
+//		fpsString_ = tr("%1Hz", "Frames per seconds, in Hertz").arg(f_p_s_, 0, 'f', ((f_p_s_ < 10.0)?1:0));
+//		fpsCounter_ = 0;
+//	}
+//
+//	// Restore foregroundColor
+//	float color[4];
+//	color[0] = foregroundColor().red()   / 255.0f;
+//	color[1] = foregroundColor().green() / 255.0f;
+//	color[2] = foregroundColor().blue()  / 255.0f;
+//	color[3] = 1.0;
+//	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+//	glDisable(GL_LIGHTING);
+//	glDisable(GL_DEPTH_TEST);
+//
+//	if (FPSIsDisplayed()) displayFPS();
+//	if (displayMessage_) drawText(10, height()-10,  message_);
+//
+//	// Restore GL state
+//	glPopAttrib();
+//	glPopMatrix();
 }
 
 /*! Called before draw() (instead of preDraw()) when viewer displaysInStereo().

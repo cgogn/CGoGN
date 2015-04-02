@@ -75,7 +75,7 @@ void set_eval_direction (vec3 v)
 
 void main (void)
 {
-        int size = (textureSize(texture,0)).x; // supposed square matrix
+	int size = (textureSize(texture,0)).x; // supposed square matrix
 
 	vec3 eyeV = normalize(camera - vxPos); // normalized outgoing line-of-sight vector
 	eyeV = 2*dot(vxNorm,eyeV)*vxNorm-eyeV ; // symmetrize
