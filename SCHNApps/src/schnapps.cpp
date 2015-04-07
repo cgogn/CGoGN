@@ -553,6 +553,11 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 	if (m_maps.contains(newName))
 		return NULL;
 
+	// RECORDING
+	QTextStream* rec = this->pythonStreamRecorder();
+	if (rec)
+		*rec << newName << " = schnapps.duplicateMap(" << name << ".getName(),1);" << endl;
+
 	MapHandlerGen* maph = m_maps[name];
 	MapHandlerGen* new_mh;
 
@@ -564,15 +569,39 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 				PFP2::MAP* map = new PFP2::MAP();
 				map->copyFrom(*(maph->getGenericMap()));
 				new_mh = new MapHandler<PFP2>(newName, this, map);
+
+				for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
+				{
+					AttributeContainer& cont = map->getAttributeContainer(orbit);
+					std::vector<std::string> names;
+					std::vector<std::string> types;
+					cont.getAttributesNames(names);
+					cont.getAttributesTypes(types);
+					for (unsigned int i = 0; i < names.size(); ++i)
+						new_mh->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+				}
 				break;
 			}
 	case 3: {
 				PFP3::MAP* map = new PFP3::MAP();
 				map->copyFrom(*(maph->getGenericMap()));
 				new_mh = new MapHandler<PFP3>(newName, this, map);
+				for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
+				{
+					AttributeContainer& cont = map->getAttributeContainer(orbit);
+					std::vector<std::string> names;
+					std::vector<std::string> types;
+					cont.getAttributesNames(names);
+					cont.getAttributesTypes(types);
+					for (unsigned int i = 0; i < names.size(); ++i)
+						new_mh->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+				}
 				break;
 			}
 	}
+
+
+
 
 	m_maps.insert(newName, new_mh);
 	DEBUG_EMIT("mapAdded");
@@ -590,6 +619,8 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 			new_mh->createVBO(s);
 		}
 	}
+
+	pythonVarDeclare(new_mh->getName());
 
 	return new_mh;
 }
@@ -642,8 +673,9 @@ void SCHNApps::removeMap(const QString& name)
 
 		// unselect map if it is removed
 		if (this->getSelectedMap() == map)
+		{
 			setSelectedMap(QString("NONE"));
-
+		}
 		delete map;
 	}
 }
@@ -905,6 +937,7 @@ void SCHNApps::beginPyRecording()
 		m_pyRecording = NULL;
 		m_pyRecFile = NULL;
 		statusbar->showMessage(QString(" Stop recording python"), 2000);
+		action_Python_Recording->setText("Python Recording");
 		return;
 	}
 
@@ -927,6 +960,7 @@ void SCHNApps::beginPyRecording()
 
 		statusbar->showMessage(QString(" Recording python in ") + fileName);
 		pythonVarsClear();
+		action_Python_Recording->setText("Stop Python Recording");
 	}
 	else
 	{
@@ -954,6 +988,7 @@ void SCHNApps::appendPyRecording()
 		m_pyRecording = NULL;
 		m_pyRecFile = NULL;
 		statusbar->showMessage(QString(" Stop recording python"), 2000);
+		action_Append_Python_Recording->setText("Append Python Recording");
 		return;
 	}
 
@@ -978,7 +1013,7 @@ void SCHNApps::appendPyRecording()
 		}
 
 		statusbar->showMessage(QString(" Append recording python in ") + fileName);
-		
+		action_Append_Python_Recording->setText("Stop Append Python Recording");
 	}
 	else
 	{

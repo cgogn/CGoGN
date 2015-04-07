@@ -81,8 +81,8 @@ void ControlDock_MapTab::setSelectedMap(const QString& mapName)
 		if(!items.empty())
 		{
 			items[0]->setSelected(false);
-			m_selectedMap = NULL;
 		}
+		m_selectedMap = NULL;
 		updateSelectedMapInfo();
 		return;
 	}
@@ -149,7 +149,7 @@ void ControlDock_MapTab::showBBChanged(bool b)
 			// RECORDING
 			QTextStream* rec = m_schnapps->pythonStreamRecorder();
 			if (rec)
-				*rec << m_selectedMap->getName() << ".showBB(\"" << b << "\");" << endl;
+				*rec << m_selectedMap->getName() << ".showBB(" << b << ");" << endl;
 		}
 			
 	}
@@ -162,11 +162,7 @@ void ControlDock_MapTab::duplicateCurrentMap()
 	{
 		if (m_selectedMap)
 		{
-			m_schnapps->duplicateMap(m_selectedMap->getName(),true);
-			// RECORDING
-			QTextStream* rec = m_schnapps->pythonStreamRecorder();
-			if (rec)
-				*rec << "schnapps.duplicateMap(" << m_selectedMap->getName() << ".getName(),1);" << endl;
+			/*MapHandlerGen* mhg = */m_schnapps->duplicateMap(m_selectedMap->getName(), true);
 		}
 	}
 }
@@ -182,7 +178,6 @@ void ControlDock_MapTab::removeCurrentMap()
 			QTextStream* rec = m_schnapps->pythonStreamRecorder();
 			if (rec)
 				*rec << "schnapps.removeMap(" << m_selectedMap->getName() << ".getName());" << endl;
-			setSelectedMap("NONE");
 		}
 	}
 }
