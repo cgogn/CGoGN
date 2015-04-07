@@ -464,14 +464,14 @@ void CatmullClarkInterpolSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	{
 		if (!me.isMarked(d))
 		{
-			mf.markOrbit<EDGE>(d);
+			mf.template markOrbit<EDGE>(d);
 			Dart f = map.phi1(d);
 			Dart e = map.cutEdge(d);
 			attributs[e] = (attributs[d] + attributs[f]) /2.0;
 			me.template markOrbit<EDGE>(d);
 			me.template markOrbit<EDGE>(e);
 			// warning store the dart that does not belong to the boundary
-			if (map.isBoundaryMarked<2>(e))
+			if (map.template isBoundaryMarked<2>(e))
 				l_edges.push_back(map.phi2(d));
 			else
 				l_edges.push_back(e);
@@ -522,7 +522,7 @@ void CatmullClarkInterpolSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	// compute face average of "edges"
 	for (Dart e : l_edges)
 	{
-		if (!map.isBoundaryMarked<2>(map.phi2(e))) // faster than map.isBoundaryEdge(e)
+		if (!map.template isBoundaryMarked<2>(map.phi2(e))) // faster than map.isBoundaryEdge(e)
 		{
 			Dart ff = map.phi_1(e);
 			Dart f = map.template phi<211>(e);
@@ -537,10 +537,10 @@ void CatmullClarkInterpolSubdivision(typename PFP::MAP& map, EMBV& attributs)
 	{
 		Dart xb = map.phi2(x);
 
-		if (map.isBoundaryMarked<2>(x))
+		if (map.template isBoundaryMarked<2>(x))
 			std::cout << "ERROR " << attributs[x];
 
-		if (!map.isBoundaryMarked<2>(xb))
+		if (!map.template isBoundaryMarked<2>(xb))
 		{
 			Dart v1 = map.phi1(x);
 			Dart v2 = map.phi_1(map.phi2(map.phi_1(x)));
@@ -860,11 +860,11 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 						Algo::Topo::setOrbitEmbedding<VERTEX>(map, map.template phi<11>(nf), map.template getEmbedding<EDGE>(e2));
 					}
 
-					dm.markOrbit<FACE>(nf);
+					dm.template markOrbit<FACE>(nf);
 					fp.push_back(map.phi1(nf));
 					fp.push_back(map.phi_1(nf));
 				}
-				dm.markOrbit<EDGE1>(e);
+				dm.template markOrbit<EDGE1>(e);
 				e = map.phi1(e);
 			} while (e!=d);
 		}
