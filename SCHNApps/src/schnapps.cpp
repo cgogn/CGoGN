@@ -1136,6 +1136,10 @@ void SCHNApps::appendPyRecording()
 void SCHNApps::closeEvent(QCloseEvent *event)
 {
 	DEBUG_EMIT("schnappsClosing");
+	if (m_pyRecording != NULL)	//  WRITE & CLOSE
+	{
+		pyRecording();
+	}
 	emit(schnappsClosing());
 	QMainWindow::closeEvent(event);
 }

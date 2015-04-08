@@ -541,7 +541,7 @@ void View::keyPressEvent(QKeyEvent* event)
 			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 			msgBox.setDefaultButton(QMessageBox::Ok);
 			if (msgBox.exec() == QMessageBox::Ok)
-				exit(0);
+				m_schnapps->close();
 		}
 		else
 			QGLViewer::keyPressEvent(event);
