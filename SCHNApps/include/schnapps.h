@@ -56,6 +56,7 @@ public slots:
 public:
 	void redrawAllViews();
 
+
 public slots:
 	View* addView(const QString& name);
 	View* addView();
@@ -68,6 +69,10 @@ public slots:
 	void setSelectedView(View* view);
 
 	void splitView(const QString& name, Qt::Orientation orientation);
+
+	QString saveSplitViewPositions();
+	void restoreSplitViewPositions(QString stringStates);
+
 
 	/*********************************************************
 	 * MANAGE PLUGINS
@@ -148,6 +153,7 @@ public slots:
 
 	QString saveFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
 
+	void setWindowSize(int w, int h) { this->setFixedSize(w, h); }
 
 private slots:
 	void loadPythonScriptFromFileDialog();
@@ -163,7 +169,7 @@ protected:
 	QString m_pyBuffer;
 
 private slots:
-	void beginPyRecording();
+	void pyRecording();
 	void appendPyRecording();
 	//void endPyRecording();
 

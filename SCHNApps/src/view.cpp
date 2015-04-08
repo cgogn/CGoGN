@@ -168,6 +168,8 @@ bool View::usesCamera(const QString& name) const
 	return usesCamera(c);
 }
 
+
+
 void View::linkPlugin(PluginInteraction* plugin)
 {
 	// RECORDING

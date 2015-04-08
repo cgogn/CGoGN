@@ -11,7 +11,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QFile>
-
+#include <QByteArray>
 
 #include "mapHandler.h"
 #include "schnapps.h"
@@ -107,7 +107,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	connect(action_ShowHidePythonDock, SIGNAL(triggered()), this, SLOT(showHidePythonDock()));
 	connect(action_LoadPythonScript, SIGNAL(triggered()), this, SLOT(loadPythonScriptFromFileDialog()));
 
-	connect(action_Python_Recording, SIGNAL(triggered()), this, SLOT(beginPyRecording()));
+	connect(action_Python_Recording, SIGNAL(triggered()), this, SLOT(pyRecording()));
 	connect(action_Append_Python_Recording, SIGNAL(triggered()), this, SLOT(appendPyRecording()));
 
 	action_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
@@ -320,8 +320,18 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 		m_rootSplitter->setOrientation(orientation);
 		b_rootSplitterInitialized = true;
 	}
-	if(parent->orientation() == orientation)
-		parent->insertWidget(parent->indexOf(view)+1, newView);
+	if (parent->orientation() == orientation)
+	{
+		parent->insertWidget(parent->indexOf(view) + 1, newView);
+		QList<int> sz = parent->sizes();
+		int tot = 0;
+		for (int i = 0; i < parent->count(); ++i)
+			tot += sz[i];
+		sz[0] = tot / parent->count() + tot % parent->count();
+		for (int i = 1; i < parent->count(); ++i)
+			sz[i] = tot / parent->count();
+		parent->setSizes(sz);
+	}
 	else
 	{
 		int idx = parent->indexOf(view);
@@ -330,9 +340,81 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 		spl->addWidget(view);
 		spl->addWidget(newView);
 		parent->insertWidget(idx, spl);
+
+		QList<int> sz = spl->sizes();
+		int tot = sz[0] + sz[1];
+		sz[0] = tot / 2;
+		sz[1] = tot - sz[0];
+		spl->setSizes(sz);
 	}
-	
 }
+
+QString SCHNApps::saveSplitViewPositions()
+{
+	QList<QSplitter*> liste;
+	liste.push_back(m_rootSplitter);
+
+	QString result;
+	QTextStream qts(&result);
+	while (!liste.empty())
+	{
+		QSplitter* spl = liste.first();
+		for (int i = 0; i < spl->count(); ++i)
+		{
+			QWidget *w = spl->widget(i);
+			QSplitter* qw = dynamic_cast<QSplitter*>(w);
+			if (qw != NULL)
+				liste.push_back(qw);
+		}
+		QByteArray ba = spl->saveState();
+		qts << ba.count() << " ";
+		for (int j = 0; j < ba.count(); ++j)
+			qts << int(ba[j]) << " ";
+		//qts << endl;
+		liste.pop_front();
+	}
+	return result;
+}
+
+
+void SCHNApps::restoreSplitViewPositions(QString stringStates)
+{
+	QList<QSplitter*> liste;
+	liste.push_back(m_rootSplitter);
+
+	QTextStream qts(&stringStates);
+	while (!liste.empty())
+	{
+		QSplitter* spl = liste.first();
+		for (int i = 0; i < spl->count(); ++i)
+		{
+			QWidget *w = spl->widget(i);
+			QSplitter* qw = dynamic_cast<QSplitter*>(w);
+			if (qw != NULL)
+				liste.push_back(qw);
+		}
+		if (qts.atEnd())
+		{
+			std::cerr << "Problem restoring view split configuration" << std::endl;
+			return;
+		}
+
+		int nb;
+		qts >> nb;
+		QByteArray ba(nb + 1, 0);
+		for (int j = 0; j < nb; ++j)
+		{
+			int v;
+			qts >> v;
+			ba[j] = char(v);
+		}
+		spl->restoreState(ba);
+		liste.pop_front();
+	}
+}
+
+
+
 
 /*********************************************************
  * MANAGE PLUGINS
@@ -920,7 +1002,7 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 }
 
 
-void SCHNApps::beginPyRecording()
+void SCHNApps::pyRecording()
 {
 	if (m_pyRecording != NULL) //  WRITE & CLOSE
 	{
@@ -929,7 +1011,21 @@ void SCHNApps::beginPyRecording()
 		{
 			m_pyBuffer.replace("\"" + var + "\"", var + ".getName()");
 		}
+
 		out << m_pyBuffer << endl;
+
+		// split view positions
+		out << "schnapps.restoreSplitViewPositions(\"" << saveSplitViewPositions() << "\")" << endl;
+
+		// cameras
+		foreach(Camera* cam, m_cameras)
+		{
+			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
+		}
+
+		//windows
+		out << "schnapps.setWindowSize(" << this->width() << ", "<< this->height() << ")" << endl;
+
 		m_pyRecFile->close();
 
 		delete m_pyRecording;
@@ -981,6 +1077,19 @@ void SCHNApps::appendPyRecording()
 			m_pyBuffer.replace("\"" + var + "\"", var + ".getName()");
 		}
 		out << m_pyBuffer << endl;
+
+		// split view positions
+		out << "schnapps.restoreSplitViewPositions(\"" << saveSplitViewPositions() << "\")" << endl;
+
+		// cameras
+		foreach(Camera* cam, m_cameras)
+		{
+			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
+		}
+
+		//windows
+		out << "schnapps.setWindowSize(" << this->width() << ", " << this->height() << ")" << endl;
+
 		m_pyRecFile->close();
 
 		delete m_pyRecording;

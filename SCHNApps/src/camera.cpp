@@ -121,6 +121,35 @@ void Camera::fitToViewsBoundingBox()
 	}
 }
 
+
+QString Camera::toString()
+{
+	QString res;
+	QTextStream str(&res);
+	qglviewer::Vec pos = this->position();
+	qglviewer::Quaternion ori = this->orientation();
+	str << pos[0] << " " << pos[1] << " " << pos[2] << " ";
+	str << ori[0] << " " << ori[1] << " " << ori[2] << " " << ori[3];
+	return res;
+}
+
+void Camera::fromString(QString cam)
+{
+	QTextStream str(&cam);
+	qglviewer::Vec pos = this->position();
+	qglviewer::Quaternion ori = this->orientation();
+	str >> pos[0];
+	str >> pos[1];
+	str >> pos[2];
+	str >> ori[0];
+	str >> ori[1];
+	str >> ori[2];
+	str >> ori[3];
+	this->setPosition(pos);
+	this->setOrientation(ori);
+}
+
+
 } // namespace SCHNApps
 
 } // namespace CGoGN
