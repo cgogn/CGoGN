@@ -120,12 +120,9 @@ public slots:
 
 	float getBBdiagSize() const { return m_bbDiagSize; }
 
-	Utils::GLSLShader* getBBDrawerShader() const
+	inline Utils::Drawer* getBBDrawer() const
 	{
-		if(m_bbDrawer)
-			return m_bbDrawer->getShader();
-		else
-			return NULL;
+		return m_bbDrawer;
 	}
 
 	virtual bool transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
