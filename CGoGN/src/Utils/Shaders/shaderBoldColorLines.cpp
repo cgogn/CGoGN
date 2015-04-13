@@ -88,7 +88,7 @@ void ShaderBoldColorLines::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	float lw = float((0.5*pix)/double(viewport[2]));
+	float lw = float(double(pix)/double(viewport[2]));
 
 	bind();
 	glUniform1f(*m_uniform_lineWidth, lw);
@@ -101,7 +101,7 @@ void ShaderBoldColorLines::updatePixelWidth()
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	float lw = float((0.5*m_pixWidth)/double(viewport[2]));
+	float lw = float(double(m_pixWidth)/double(viewport[2]));
 
 	bind();
 	glUniform1f(*m_uniform_lineWidth, lw);

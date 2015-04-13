@@ -153,7 +153,7 @@ public slots:
 
 	QString saveFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
 
-	void setWindowSize(int w, int h) { this->setFixedSize(w, h); }
+	void setWindowSize(int w, int h) { this->resize(w, h); }
 
 private slots:
 	void loadPythonScriptFromFileDialog();

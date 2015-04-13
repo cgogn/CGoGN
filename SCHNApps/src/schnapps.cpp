@@ -118,6 +118,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 
 	// create & setup central widget (views)
 	m_centralLayout = new QVBoxLayout(centralwidget);
+	m_centralLayout->setMargin(2);
 
 	m_rootSplitter = new QSplitter(centralwidget);
 	b_rootSplitterInitialized = false;
