@@ -72,7 +72,7 @@ void ShaderBoldLines::getLocations()
 void ShaderBoldLines::sendParams()
 {
 	bind();
-	glUniform1f(*m_uniform_lineWidth, m_lineWidth);
+	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	glUniform4fv(*m_uniform_color, 1, m_color.data());
 
 	if (*m_unif_planeClip > 0)
@@ -86,12 +86,11 @@ void ShaderBoldLines::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	float lw = float(double(pix)/double(viewport[2]));
-
+	m_pixWidth = pix;
+	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
+	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
 	bind();
-	glUniform1f(*m_uniform_lineWidth, lw);
-	m_lineWidth = lw;
-	m_pixWidth =pix;
+	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	unbind();
 }
 
@@ -99,11 +98,10 @@ void ShaderBoldLines::updatePixelWidth()
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	float lw = float(double(m_pixWidth)/double(viewport[2]));
-
+	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
+	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
 	bind();
-	glUniform1f(*m_uniform_lineWidth, lw);
-	m_lineWidth = lw;
+	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	unbind();
 }
 
@@ -122,8 +120,6 @@ unsigned int ShaderBoldLines::setAttributePosition(VBO* vbo)
 	m_vboPos = vbo;
 	bind();
 	unsigned int id = bindVA_VBO("VertexPosition", vbo);
-
-	std::cout << "setAttributePosition => " << id << std::endl;
 	unbind();
 	return id;
 }

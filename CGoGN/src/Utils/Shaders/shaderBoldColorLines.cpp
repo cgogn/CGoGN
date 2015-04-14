@@ -23,6 +23,7 @@
 *******************************************************************************/
 #define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/Shaders/shaderBoldColorLines.h"
+#include <algorithm>
 
 namespace CGoGN
 {
@@ -74,7 +75,7 @@ void ShaderBoldColorLines::getLocations()
 void ShaderBoldColorLines::sendParams()
 {
 	bind();
-	glUniform1f(*m_uniform_lineWidth, m_lineWidth);
+	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	glUniform1f (*m_unif_alpha, m_opacity);
 
 	if (*m_unif_planeClip > 0)
@@ -88,12 +89,11 @@ void ShaderBoldColorLines::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	float lw = float(double(pix)/double(viewport[2]));
-
-	bind();
-	glUniform1f(*m_uniform_lineWidth, lw);
-	m_lineWidth = lw;
 	m_pixWidth = pix;
+	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
+	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
+	bind();
+	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	unbind();
 }
 
@@ -101,11 +101,10 @@ void ShaderBoldColorLines::updatePixelWidth()
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	float lw = float(double(m_pixWidth)/double(viewport[2]));
-
+	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
+	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
 	bind();
-	glUniform1f(*m_uniform_lineWidth, lw);
-	m_lineWidth = lw;
+	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	unbind();
 }
 

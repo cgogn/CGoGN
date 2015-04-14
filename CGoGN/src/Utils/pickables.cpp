@@ -36,16 +36,20 @@ namespace CGoGN
 namespace Utils
 {
 
+	Utils::ShaderBoldLines* LineDrawable::s_shader = NULL;
+//	Utils::ShaderSimpleColor* LineDrawable::s_shader = NULL;
+
 LineDrawable::LineDrawable()
 {
 	m_vboPos = new VBO();
 	m_vboPos->setDataSize(3);
 
-	m_shader = new ShaderSimpleColor();
-
-	m_shader->setAttributePosition(m_vboPos);
-	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
-	GLSLShader::registerShader(NULL, m_shader);
+	if (s_shader == NULL)
+	{
+//		s_shader = new ShaderSimpleColor();
+		s_shader = new ShaderBoldLines();
+		GLSLShader::registerShader(NULL, s_shader);
+	}
 
 	glGenBuffers(1, &(*m_ind));
 }
@@ -53,8 +57,8 @@ LineDrawable::LineDrawable()
 LineDrawable::~LineDrawable()
 {
 	delete m_vboPos;
-	GLSLShader::unregisterShader(NULL, m_shader);
-	delete m_shader;
+//	GLSLShader::unregisterShader(NULL, s_shader);
+//	delete s_shader;
 
 	glDeleteBuffers(1, &(*m_ind));
 }
@@ -63,7 +67,7 @@ LineDrawable::~LineDrawable()
 void LineDrawable::setColor(const Geom::Vec4f& col)
 {
 	m_color=col;
-	m_shader->setColor(col);
+//	s_shader->setColor(col);
 }
 
 const Geom::Vec4f&  LineDrawable::getColor()
@@ -73,9 +77,12 @@ const Geom::Vec4f&  LineDrawable::getColor()
 
 void LineDrawable::draw()
 {
-	m_shader->enableVertexAttribs();
+	s_shader->setAttributePosition(m_vboPos);
+	s_shader->setColor(m_color);
+	s_shader->setLineWidth(m_lineWidth);
+	s_shader->enableVertexAttribs();
 	glDrawArrays(GL_LINES, 0, m_nb);
-	m_shader->disableVertexAttribs();
+	s_shader->disableVertexAttribs();
 }
 
 void LineDrawable::getPrecisionDrawing(unsigned int& sub, unsigned int& sub2)
@@ -495,10 +502,13 @@ void Sphere::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 
 void Sphere::draw()
 {
-	m_shader->enableVertexAttribs();
+	s_shader->setAttributePosition(m_vboPos);
+	s_shader->setColor(m_color);
+	s_shader->setLineWidth(m_lineWidth);
+	s_shader->enableVertexAttribs();
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glDrawElements(GL_LINES, m_nb, GL_UNSIGNED_INT, 0);
-	m_shader->disableVertexAttribs();
+	s_shader->disableVertexAttribs();
 }
 
 
@@ -884,10 +894,13 @@ void Cube::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 
 void Cube::draw()
 {
-	m_shader->enableVertexAttribs();
+	s_shader->setAttributePosition(m_vboPos);
+	s_shader->setColor(m_color);
+	s_shader->setLineWidth(m_lineWidth);
+	s_shader->enableVertexAttribs();
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glDrawElements(GL_LINES, m_nb, GL_UNSIGNED_INT, 0);
-	m_shader->disableVertexAttribs();
+	s_shader->disableVertexAttribs();
 }
 
 

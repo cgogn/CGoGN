@@ -48,7 +48,7 @@ protected:
     CGoGNGLuint m_uniform_lineWidth;
 	CGoGNGLuint m_unif_alpha;
 
-	float m_lineWidth;
+	Geom::Vec2f m_lineWidth;
 	float m_pixWidth;
 
     VBO* m_vboPos;

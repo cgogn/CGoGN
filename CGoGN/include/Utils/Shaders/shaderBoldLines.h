@@ -48,7 +48,7 @@ protected:
     CGoGNGLuint m_uniform_lineWidth;
     CGoGNGLuint m_uniform_color;
 
-	float m_lineWidth;
+	Geom::Vec2f m_lineWidth;
 	float m_pixWidth;
 
 	Geom::Vec4f m_color;

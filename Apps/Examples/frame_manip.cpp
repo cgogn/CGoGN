@@ -134,9 +134,9 @@ void MyQT::cb_redraw()
 	for (std::vector<Utils::Pickable*>::iterator it=m_pickables.begin(); it != m_pickables.end(); ++it)
 	{
 		if (*it == m_lastPickedObject)
-			glLineWidth(2.0);
+			(*it)->setLineWidth(3.0);
 		else
-			glLineWidth(1.0);
+			(*it)->setLineWidth(1.0);
 		(*it)->draw();
 	}
 

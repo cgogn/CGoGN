@@ -59,16 +59,14 @@ void MCMesh::cb_initGL()
 	m_flatShader->setDiffuse(colDif);
 	m_flatShader->setExplode(1.0f);
 
-	m_simpleColorShader = new Utils::ShaderSimpleColor();
-	m_simpleColorShader->setAttributePosition(m_positionVBO);
+	//m_simpleColorShader = new Utils::ShaderSimpleColor();
+	//m_simpleColorShader->setAttributePosition(m_positionVBO);
 
-	m_colorVBO = new Utils::VBO();
 	m_linesShader = new Utils::ShaderBoldLines();
 	m_linesShader->setAttributePosition(m_positionVBO);
-//	m_linesShader->setAttributeColor(m_colorVBO);
 
 	registerShader(m_flatShader);
-	registerShader(m_simpleColorShader);
+//	registerShader(m_simpleColorShader);
 	registerShader(m_linesShader);
 
 	m_dr = new Utils::Drawer();
@@ -90,7 +88,7 @@ void MCMesh::cb_initGL()
 void MCMesh::cb_redraw()
 {
 glEnable(GL_BLEND);
-	m_dr->callList(0.5f);
+	m_dr->callList(0.1f);
 	if (m_drawEdges)
 //	{
 //		glLineWidth(1.0f);
@@ -107,10 +105,7 @@ glEnable(GL_BLEND);
 //		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES);
 //	}
 	{
-//		glLineWidth(1.0f);
-//		m_linesShader->setClippingPlane(Geom::Vec4f(0.03,0.03,-1.1,64));
-
-		m_linesShader->setLineWidth(12.0f);
+		m_linesShader->setLineWidth(2.0f);
 		if (m_drawFaces)
 		{
 			Geom::Vec4f c(0.0f, 0.0f, 0.0f, 0.0f);
@@ -200,11 +195,6 @@ void MCMesh::updateRender()
 	m_render->initPrimitives<PFP>(myMap, Algo::Render::GL2::TRIANGLES);
 
 	m_positionVBO->updateData(position);
-	m_colorVBO->updateData(position);
-	Geom::Vec3f *ptr = reinterpret_cast<Geom::Vec3f*>(m_colorVBO->lockPtr());
-	for (unsigned int i=0; i<m_colorVBO->nbElts();++i)
-		*ptr++ /= 130.0f;
-	m_colorVBO->releasePtr();
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 
