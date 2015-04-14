@@ -58,6 +58,10 @@ protected:
 	void registerShader(Utils::GLSLShader* shader);
 	void unregisterShader(Utils::GLSLShader* shader);
 
+	void registerShader(const std::vector<Utils::GLSLShader*>& shaders);
+	void unregisterShader(const std::vector<Utils::GLSLShader*>& shaders);
+
+
 protected:
 	QList<View*> l_views;
 	QList<Utils::GLSLShader*> l_shaders;

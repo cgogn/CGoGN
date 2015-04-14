@@ -50,6 +50,9 @@ public slots:
 	void enableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = true; }
 	void disableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = false; }
 
+	QString toString();
+	void fromString(QString cam);
+
 private:
 	void linkView(View* view);
 	void unlinkView(View* view);

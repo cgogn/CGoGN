@@ -29,6 +29,7 @@
 #include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderBoldColorLines.h"
 
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { namespace SVG { class SVGOut ; } } }
@@ -65,10 +66,12 @@ protected:
 	std::vector<Geom::Vec3f> m_dataPos;
 	std::vector<Geom::Vec3f> m_dataCol;
 	std::vector<PrimParam> m_begins;
+
 	float m_currentWidth;
 	float m_currentSize;
 	GLenum m_compile;
 	Utils::ShaderColorPerVertex* m_shader;
+	Utils::ShaderBoldColorLines* m_shader2;
 
 public:
 
@@ -83,7 +86,11 @@ public:
 	 */
 	~Drawer();
 
-	Utils::ShaderColorPerVertex* getShader();
+//	Utils::ShaderColorPerVertex* getShader();
+	std::vector<Utils::GLSLShader*> getShaders();
+
+	void updateMatrices(const glm::mat4& projection, const glm::mat4& modelview);
+
 
 	/**
 	 * init the data structure
@@ -144,12 +151,12 @@ public:
 	/**
 	 * call a set of sub-lists
 	 */
-	void callSubLists(std::vector<int> indices, float opacity);
+//	void callSubLists(std::vector<int> indices, float opacity);
 
 	/**
 	 * call a set of sub-lists
 	 */
-	void callSubLists(int first, int nb, float opacity);
+//	void callSubLists(int first, int nb, float opacity);
 
 
 	/**

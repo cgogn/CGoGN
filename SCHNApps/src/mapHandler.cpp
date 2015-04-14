@@ -7,6 +7,7 @@ namespace SCHNApps
 {
 
 MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) :
+	m_showBB(true),
 	m_name(name),
 	m_schnapps(s),
 	m_map(map),

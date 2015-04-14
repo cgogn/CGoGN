@@ -59,14 +59,17 @@ FrameManipulator::FrameManipulator():
 	m_vboPos = new VBO();
 	m_vboPos->setDataSize(3);
 
-	m_vboCol = new VBO();
-	m_vboCol->setDataSize(3);
+//	m_vboCol = new VBO();
+//	m_vboCol->setDataSize(3);
 
 	m_shader = new ShaderSimpleColor();
-
 	m_shader->setAttributePosition(m_vboPos);
-
 	GLSLShader::registerShader(NULL, m_shader);
+
+	m_shaderBL = new ShaderBoldLines();
+	m_shaderBL->setAttributePosition(m_vboPos);
+	GLSLShader::registerShader(NULL, m_shaderBL);
+
 
 	std::vector<Geom::Vec3f> points;
 	points.reserve(6*nb_segments+30);
@@ -157,7 +160,7 @@ void FrameManipulator::draw()
 	Utils::GLSLShader::applyTransfo(transfoRenderFrame());
 	Utils::GLSLShader::updateCurrentMatrices();
 
- 	glPushAttrib(GL_LINE_BIT);
+ //	glPushAttrib(GL_LINE_BIT);
 	m_shader->enableVertexAttribs();
 
 	if (!m_locked_axis[Xr])
@@ -190,11 +193,49 @@ void FrameManipulator::draw()
 		glDrawArrays(GL_TRIANGLE_STRIP, 4*nb_segments+4, 2*nb_segments+2);
 	}
 
+	if (!m_locked_axis[Xt])
+	{
+		if (m_highlighted == Xt)
+			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+		else
+			m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
+		m_shader->bind();
+		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+14, 6);
+	}
+
+	if (!m_locked_axis[Yt])
+	{
+		if (m_highlighted == Yt)
+			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+		else
+			m_shader->setColor(Geom::Vec4f(0.0f,1.0f,0.0f,0.0f));
+		m_shader->bind();
+		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+22, 6);
+	}
+
+	if (!m_locked_axis[Zt])
+	{
+		if (m_highlighted == Zt)
+			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+		else
+			m_shader->setColor(Geom::Vec4f(0.0f,0.0f,1.0f,0.0f));
+		m_shader->bind();
+		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+30, 6);
+	}
+
+
+	m_shader->disableVertexAttribs();
+
+
+
+
+
+	m_shaderBL->enableVertexAttribs();
 	if ((!m_locked_axis[CENTER]) && (m_highlighted == CENTER))
 	{
-		glLineWidth(6.0f);
-		m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
-		m_shader->bind();
+		m_shaderBL->setLineWidth(6.0f);
+		m_shaderBL->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+		m_shaderBL->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+6, 6);
 	}
 	else
@@ -203,15 +244,15 @@ void FrameManipulator::draw()
 		{
 			if (m_highlighted == Xs)
 			{
-				glLineWidth(6.0f);
-				m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+				m_shaderBL->setLineWidth(6.0f);
+				m_shaderBL->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 			}
 			else
 			{
-				glLineWidth(3.0f);
-				m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
+				m_shaderBL->setLineWidth(3.0f);
+				m_shaderBL->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
 			}
-			m_shader->bind();
+			m_shaderBL->bind();
 			glDrawArrays(GL_LINES, 6*nb_segments+6, 2);
 		}
 
@@ -219,15 +260,15 @@ void FrameManipulator::draw()
 		{
 			if (m_highlighted == Ys)
 			{
-				glLineWidth(6.0f);
-				m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+				m_shaderBL->setLineWidth(6.0f);
+				m_shaderBL->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 			}
 			else
 			{
-				glLineWidth(3.0f);
-				m_shader->setColor(Geom::Vec4f(0.0f,0.7f,0.0f,0.0f));
+				m_shaderBL->setLineWidth(3.0f);
+				m_shaderBL->setColor(Geom::Vec4f(0.0f,0.7f,0.0f,0.0f));
 			}
-			m_shader->bind();
+			m_shaderBL->bind();
 			glDrawArrays(GL_LINES, 6*nb_segments+8, 2);
 		}
 
@@ -235,74 +276,69 @@ void FrameManipulator::draw()
 		{
 			if (m_highlighted == Zs)
 			{
-				glLineWidth(6.0f);
-				m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+				m_shaderBL->setLineWidth(6.0f);
+				m_shaderBL->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 			}
 			else
 			{
-				glLineWidth(3.0f);
-				m_shader->setColor(Geom::Vec4f(0.0f,0.0f,0.7f,0.0f));
+				m_shaderBL->setLineWidth(3.0f);
+				m_shaderBL->setColor(Geom::Vec4f(0.0f,0.0f,0.7f,0.0f));
 			}
-			m_shader->bind();
+			m_shaderBL->bind();
 			glDrawArrays(GL_LINES, 6*nb_segments+10, 2);
 		}
 	}
-
 
 	if (!m_locked_axis[Xt])
 	{
 		if (m_highlighted == Xt)
 		{
-			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
-			glLineWidth(6.0f);
+			m_shaderBL->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			m_shaderBL->setLineWidth(6.0f);
 		}
 		else
 		{
-			glLineWidth(3.0f);
-			m_shader->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
+			m_shaderBL->setLineWidth(3.0f);
+			m_shaderBL->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
 		}
-
-		m_shader->bind();
+		m_shaderBL->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+12, 2);
-		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+14, 6);
 	}
 
 	if (!m_locked_axis[Yt])
 	{
 		if (m_highlighted == Yt)
 		{
-			glLineWidth(6.0f);
-			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			m_shaderBL->setLineWidth(6.0f);
+			m_shaderBL->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 		}
 		else
 		{
-			glLineWidth(3.0f);
-			m_shader->setColor(Geom::Vec4f(0.0f,1.0f,0.0f,0.0f));
+			m_shaderBL->setLineWidth(3.0f);
+			m_shaderBL->setColor(Geom::Vec4f(0.0f,1.0f,0.0f,0.0f));
 		}
-		m_shader->bind();
+		m_shaderBL->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+20, 2);
-		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+22, 6);
 	}
 
 	if (!m_locked_axis[Zt])
 	{
 		if (m_highlighted == Zt)
 		{
-			glLineWidth(6.0f);
-			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+			m_shaderBL->setLineWidth(6.0f);
+			m_shaderBL->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 		}
 		else
 		{
-			glLineWidth(3.0f);
-			m_shader->setColor(Geom::Vec4f(0.0f,0.0f,1.0f,0.0f));
+			m_shaderBL->setLineWidth(3.0f);
+			m_shaderBL->setColor(Geom::Vec4f(0.0f,0.0f,1.0f,0.0f));
 		}
-		m_shader->bind();
+		m_shaderBL->bind();
 		glDrawArrays(GL_LINES, 6*nb_segments+28, 2);
-		glDrawArrays(GL_TRIANGLE_FAN, 6*nb_segments+30, 6);
 	}
 
- 	m_shader->disableVertexAttribs();
- 	glPopAttrib();
+	m_shaderBL->disableVertexAttribs();
+// 	glPopAttrib();
 
  	Utils::GLSLShader::popTransfo();
 	Utils::GLSLShader::updateCurrentMatrices();

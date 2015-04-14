@@ -218,6 +218,7 @@ void MyQT::cb_initGL()
 	registerShader(m_explode_render->shaderLines());
 
     m_PlanePick = new Utils::Pickable(Utils::Pickable::GRID,1);
+	m_PlanePick->drawable()->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 	m_frame = new Utils::FrameManipulator();
 	m_frame->setSize(m_WidthObj/2.0f);
 
@@ -254,6 +255,7 @@ void MyQT::cb_redraw()
 	if (clip_volume && !hide_clipping)
 	{
 		m_frame->draw();
+		m_PlanePick->setLineWidth(2.0f);
 		m_PlanePick->draw();
 	}
 

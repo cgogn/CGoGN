@@ -22,19 +22,67 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _SIZEBLOCK_H_
-#define _SIZEBLOCK_H_
+#ifndef __CGOGN_SHADER_BOLDLINES__
+#define __CGOGN_SHADER_BOLDLINES__
 
-#include "Utils/gzstream.h"
-#include "Utils/cgognStream.h"
+#include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
+#include "Geometry/vector_gen.h"
 
-const unsigned int _BLOCKSIZE_ = 4096;
+#include "Utils/dll.h"
 
-//typedef std::ifstream CGoGNistream;
-//typedef std::ofstream CGoGNostream;
+namespace CGoGN
+{
 
-/// use everywhere in save/load compressed stream
-typedef igzstream CGoGNistream;
-typedef ogzstream CGoGNostream;
+namespace Utils
+{
 
-#endif /* SIZEBLOCK_H_ */
+class CGoGN_UTILS_API ShaderBoldLines : public ClippingShader
+{
+protected:
+	// shader sources
+    static std::string vertexShaderText;
+    static std::string geometryShaderText;
+    static std::string fragmentShaderText;
+
+    CGoGNGLuint m_uniform_lineWidth;
+    CGoGNGLuint m_uniform_color;
+
+	Geom::Vec2f m_lineWidth;
+	float m_pixWidth;
+
+	Geom::Vec4f m_color;
+
+    VBO* m_vboPos;
+
+	/// clipping
+	CGoGNGLuint m_unif_planeClip;
+	Geom::Vec4f m_planeClip;
+
+	void getLocations();
+
+	void sendParams();
+
+	void restoreUniformsAttribs();
+
+public:
+	ShaderBoldLines();
+
+	void setLineWidth(float pix);
+
+	void updatePixelWidth();
+
+	void setColor(const Geom::Vec4f& color);
+
+	unsigned int setAttributePosition(VBO* vbo);
+
+	void setClippingPlane(const Geom::Vec4f& plane);
+	inline void setNoClippingPlane() { setClippingPlane(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f)); }
+
+};
+
+} // namespace Utils
+
+} // namespace CGoGN
+
+#endif

@@ -40,7 +40,7 @@ bool Surface_Modelisation_Plugin::enable()
 	m_dockTab->updateMapParameters();
 
     m_drawer = new Utils::Drawer();
-    registerShader(m_drawer->getShader());
+	registerShader(m_drawer->getShaders());
 
     mapNumber = 1;
 
@@ -53,6 +53,7 @@ void Surface_Modelisation_Plugin::disable()
     disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
     disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
+	unregisterShader(m_drawer->getShaders());
     delete m_drawer;
 }
 

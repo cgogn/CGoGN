@@ -39,9 +39,11 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderBoldLines.h"
 #include "Utils/vbo.h"
 #include "Algo/Geometry/boundingbox.h"
 
+#include "Utils/drawer.h"
 
 using namespace CGoGN ;
 
@@ -79,8 +81,13 @@ public:
 	Algo::Render::GL2::MapRender* m_render ;
 
 	Utils::VBO* m_positionVBO ;
+	Utils::VBO* m_colorVBO ;
 	Utils::ShaderFlat* m_flatShader ;
 	Utils::ShaderSimpleColor* m_simpleColorShader ;
+
+	Utils::ShaderBoldLines* m_linesShader ;
+
+	Utils::Drawer* m_dr;
 
 	DATATYPE valLabel;
 	SAlgo::MC::Image<DATATYPE>* myImg;
