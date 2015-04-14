@@ -39,7 +39,9 @@ namespace Utils
 
 Drawer::Drawer() :
 	m_currentWidth(1.0f),
-	m_currentSize(1.0f)
+	m_currentSize(1.0f),
+	m_shader(NULL),
+	m_shader2(NULL)
 {
 	m_vboPos = new Utils::VBO();
 	m_vboPos->setDataSize(3);
