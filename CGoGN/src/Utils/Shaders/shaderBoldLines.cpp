@@ -47,13 +47,13 @@ ShaderBoldLines::ShaderBoldLines() :
 	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 6);
+	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 4);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(GLSLShader::defines_gl());
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP,6);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP,4);
 
 	// get and fill uniforms
 	getLocations();
@@ -63,7 +63,7 @@ ShaderBoldLines::ShaderBoldLines() :
 void ShaderBoldLines::getLocations()
 {
 	bind();
-	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidth");
+	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidths");
 	*m_uniform_color = glGetUniformLocation(this->program_handler(), "lineColor");
 	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
 	unbind();
@@ -86,22 +86,10 @@ void ShaderBoldLines::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	m_pixWidth = pix;
-	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
-	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
+	m_lineWidth[0] = pix / float(viewport[2]);
+	m_lineWidth[1] = pix / float(viewport[3]);
 	bind();
-	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
-	unbind();
-}
-
-void ShaderBoldLines::updatePixelWidth()
-{
-	glm::i32vec4 viewport;
-	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
-	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
-	bind();
-	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
+	glUniform2fv(*m_uniform_lineWidth,1, m_lineWidth.data());
 	unbind();
 }
 

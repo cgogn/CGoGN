@@ -133,7 +133,6 @@ void MapHandler<PFP>::updateBBDrawer()
 
 		m_bbDrawer->newList(GL_COMPILE);
 		m_bbDrawer->color3f(0.0f, 1.0f, 0.0f);
-		m_bbDrawer->lineWidth(1.0f);
 		m_bbDrawer->begin(GL_LINE_LOOP);
 		m_bbDrawer->vertex(bbmin);
 		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);

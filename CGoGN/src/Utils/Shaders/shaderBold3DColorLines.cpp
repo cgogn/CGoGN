@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 #define CGoGN_UTILS_DLL_EXPORT 1
-#include "Utils/Shaders/shaderBoldColorLines.h"
+#include "Utils/Shaders/shaderBold3DColorLines.h"
 #include <algorithm>
 
 namespace CGoGN
@@ -31,51 +31,51 @@ namespace CGoGN
 namespace Utils
 {
 
-#include "ShaderBoldColorLines.vert"
-#include "ShaderBoldColorLines.geom"
-#include "ShaderBoldColorLines.frag"
+#include "ShaderBold3DColorLines.vert"
+#include "ShaderBold3DColorLines.geom"
+#include "ShaderBold3DColorLines.frag"
 
 
-ShaderBoldColorLines::ShaderBoldColorLines() :
+ShaderBold3DColorLines::ShaderBold3DColorLines() :
 	m_lineWidth(0.01f),
 	m_opacity(1.0f),
 	m_planeClip(0.0f,0.0f,0.0f,0.0f)
 
 {
-	m_nameVS = "ShaderBoldColorLines_vs";
-	m_nameFS = "ShaderBoldColorLines_fs";
-	m_nameGS = "ShaderBoldColorLines_gs";
+	m_nameVS = "ShaderBold3DColorLines_vs";
+	m_nameFS = "ShaderBold3DColorLines_fs";
+	m_nameGS = "ShaderBold3DColorLines_gs";
 
 	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 4);
+	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 6);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(GLSLShader::defines_gl());
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP, 4);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP, 6);
 
 	// get and fill uniforms
 	getLocations();
 	sendParams();
 }
 
-void ShaderBoldColorLines::getLocations()
+void ShaderBold3DColorLines::getLocations()
 {
 	bind();
-	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidths");
+	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidth");
 	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
 	*m_unif_alpha = glGetUniformLocation(this->program_handler(), "alpha");
 
 	unbind();
 }
 
-void ShaderBoldColorLines::sendParams()
+void ShaderBold3DColorLines::sendParams()
 {
 	bind();
-	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
+	glUniform1f(*m_uniform_lineWidth, m_lineWidth);
 	glUniform1f (*m_unif_alpha, m_opacity);
 
 	if (*m_unif_planeClip > 0)
@@ -85,21 +85,20 @@ void ShaderBoldColorLines::sendParams()
 }
 
 
-void ShaderBoldColorLines::setLineWidth(float pix)
+void ShaderBold3DColorLines::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	m_lineWidth[0] = pix / float(viewport[2]);
-	m_lineWidth[1] = pix / float(viewport[3]);
+	m_lineWidth = pix;
 	bind();
-	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
+	glUniform1f(*m_uniform_lineWidth, m_lineWidth);
 	unbind();
 }
 
 
 
 
-unsigned int ShaderBoldColorLines::setAttributeColor(VBO* vbo)
+unsigned int ShaderBold3DColorLines::setAttributeColor(VBO* vbo)
 {
 	m_vboCol = vbo;
 	bind();
@@ -108,7 +107,7 @@ unsigned int ShaderBoldColorLines::setAttributeColor(VBO* vbo)
 	return id;
 }
 
-unsigned int ShaderBoldColorLines::setAttributePosition(VBO* vbo)
+unsigned int ShaderBold3DColorLines::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
 	bind();
@@ -119,7 +118,7 @@ unsigned int ShaderBoldColorLines::setAttributePosition(VBO* vbo)
 
 
 
-void ShaderBoldColorLines::restoreUniformsAttribs()
+void ShaderBold3DColorLines::restoreUniformsAttribs()
 {
 	getLocations();
 	sendParams();
@@ -130,7 +129,7 @@ void ShaderBoldColorLines::restoreUniformsAttribs()
 	unbind();
 }
 
-void ShaderBoldColorLines::setOpacity(float op)
+void ShaderBold3DColorLines::setOpacity(float op)
 {
 	m_opacity = op;
 	bind();
@@ -138,7 +137,7 @@ void ShaderBoldColorLines::setOpacity(float op)
 	unbind();
 }
 
-void ShaderBoldColorLines::setClippingPlane(const Geom::Vec4f& plane)
+void ShaderBold3DColorLines::setClippingPlane(const Geom::Vec4f& plane)
 {
 	if (*m_unif_planeClip > 0)
 	{

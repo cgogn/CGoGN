@@ -49,7 +49,6 @@ protected:
 	CGoGNGLuint m_unif_alpha;
 
 	Geom::Vec2f m_lineWidth;
-	float m_pixWidth;
 
     VBO* m_vboPos;
 	VBO* m_vboCol;
@@ -70,8 +69,6 @@ public:
 	ShaderBoldColorLines();
 
 	void setLineWidth(float pix);
-
-	void updatePixelWidth();
 
 	void setOpacity(float op);
 

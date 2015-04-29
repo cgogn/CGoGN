@@ -1,4 +1,4 @@
-// ShaderBoldLines::vertexShaderText
+// ShaderBold3DLines::vertexShaderText
 
 ATTRIBUTE vec3 VertexPosition;
 uniform mat4 ModelViewMatrix;

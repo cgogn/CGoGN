@@ -368,7 +368,7 @@ void View::init()
 
 	// FRAME DRAWER
 
-	m_frameDrawer = new Utils::Drawer();
+	m_frameDrawer = new Utils::Drawer(1);
 	glm::mat4 mm(1.0);
 	glm::mat4 pm(1.0);
 //	m_frameDrawer->getShader()->updateMatrices(mm, pm);
