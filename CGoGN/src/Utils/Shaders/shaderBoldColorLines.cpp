@@ -49,13 +49,13 @@ ShaderBoldColorLines::ShaderBoldColorLines() :
 	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 4);
+	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 6);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(GLSLShader::defines_gl());
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP, 4);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP, 6);
 
 	// get and fill uniforms
 	getLocations();

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_BOLD3DCOLORLINES__
-#define __CGOGN_SHADER_BOLD3DCOLORLINES__
+#ifndef __CGOGN_SHADER_DARTS__
+#define __CGOGN_SHADER_DARTS__
 
 #include "Utils/GLSLShader.h"
 #include "Utils/Shaders/shaderPointsLines.h"
@@ -37,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderBold3DColorLines : public ShaderPointsLines
+class CGoGN_UTILS_API ShaderDarts : public ClippingShader
 {
 protected:
 	// shader sources
@@ -46,14 +46,13 @@ protected:
     static std::string fragmentShaderText;
 
     CGoGNGLuint m_uniform_lineWidth;
-	CGoGNGLuint m_unif_alpha;
+    CGoGNGLuint m_uniform_color;
 
-	float m_lineWidth;
+	Geom::Vec2f m_lineWidth;
+
+	Geom::Vec4f m_color;
 
     VBO* m_vboPos;
-	VBO* m_vboCol;
-
-	float m_opacity;
 
 	/// clipping
 	CGoGNGLuint m_unif_planeClip;
@@ -66,13 +65,13 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderBold3DColorLines();
+	ShaderDarts();
 
 	void setLineWidth(float pix);
 
-	void setOpacity(float op);
+	void setColor(const Geom::Vec4f& color);
 
-	unsigned int setAttributeColor(VBO* vbo);
+	void directColor(const Geom::Vec4f& color);
 
 	unsigned int setAttributePosition(VBO* vbo);
 

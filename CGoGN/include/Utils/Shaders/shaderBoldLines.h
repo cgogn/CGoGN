@@ -26,7 +26,7 @@
 #define __CGOGN_SHADER_BOLDLINES__
 
 #include "Utils/GLSLShader.h"
-#include "Utils/clippingShader.h"
+#include "Utils/Shaders/shaderPointsLines.h"
 #include "Geometry/vector_gen.h"
 
 #include "Utils/dll.h"
@@ -37,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderBoldLines : public ClippingShader
+class CGoGN_UTILS_API ShaderBoldLines : public ShaderPointsLines
 {
 protected:
 	// shader sources

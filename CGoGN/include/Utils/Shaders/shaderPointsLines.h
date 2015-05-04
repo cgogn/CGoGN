@@ -22,11 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_BOLD3DCOLORLINES__
-#define __CGOGN_SHADER_BOLD3DCOLORLINES__
+#ifndef __CGOGN_SHADER_POINTLINES__
+#define __CGOGN_SHADER_POINTLINES__
 
 #include "Utils/GLSLShader.h"
-#include "Utils/Shaders/shaderPointsLines.h"
+#include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
 
 #include "Utils/dll.h"
@@ -37,47 +37,16 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderBold3DColorLines : public ShaderPointsLines
+class CGoGN_UTILS_API ShaderPointsLines : public ClippingShader
 {
-protected:
-	// shader sources
-    static std::string vertexShaderText;
-    static std::string geometryShaderText;
-    static std::string fragmentShaderText;
-
-    CGoGNGLuint m_uniform_lineWidth;
-	CGoGNGLuint m_unif_alpha;
-
-	float m_lineWidth;
-
-    VBO* m_vboPos;
-	VBO* m_vboCol;
-
-	float m_opacity;
-
-	/// clipping
-	CGoGNGLuint m_unif_planeClip;
-	Geom::Vec4f m_planeClip;
-
-	void getLocations();
-
-	void sendParams();
-
-	void restoreUniformsAttribs();
-
 public:
-	ShaderBold3DColorLines();
-
-	void setLineWidth(float pix);
-
-	void setOpacity(float op);
-
-	unsigned int setAttributeColor(VBO* vbo);
-
-	unsigned int setAttributePosition(VBO* vbo);
-
-	void setClippingPlane(const Geom::Vec4f& plane);
-	inline void setNoClippingPlane() { setClippingPlane(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f)); }
+	virtual void setLineWidth(float pix) = 0;
+	virtual void setOpacity(float op) {}
+	virtual unsigned int setAttributePosition(VBO* vbo) = 0;
+	virtual unsigned int setAttributeColor(VBO* vbo) { return 0; }
+	virtual void setColor(const Geom::Vec4f& color) {}
+	virtual void setClippingPlane(const Geom::Vec4f& plane) = 0 ;
+	virtual void setNoClippingPlane() = 0;
 
 };
 

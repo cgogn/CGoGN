@@ -14,7 +14,6 @@ void main()
 	vec4 A = POSITION_IN(0);
 	vec4 B = POSITION_IN(1);
 	
-//	float nearZ = - ProjectionMatrix[3][2] / (ProjectionMatrix[2][2] - 1.0); 
 	float nearZ = 1.0;
 	if (ProjectionMatrix[2][2] !=  1.0)
 		nearZ = - ProjectionMatrix[3][2] / (ProjectionMatrix[2][2] - 1.0); 
@@ -36,11 +35,13 @@ void main()
 		vec3 U = vec3(lineWidths*U2,0.0);
 		vec3 V = vec3(lineWidths*vec2(U2[1], -U2[0]), 0.0);
 
-		U2 *= (lineWidths[0]+lineWidths[1])/4.0;
+//		U2 *= (lineWidths[0]+lineWidths[1])/2.0;
 		
 		fragClip = posClip[0];
 		fragColor = vcolor[0];
-		A -= vec4(U2,0.0,0.0);
+//		A -= vec4(U2,0.0,0.0);
+		gl_Position = vec4(A.xyz-U, 1.0);
+		EmitVertex();
 		gl_Position = vec4(A.xyz+V, 1.0);
 		EmitVertex();
 		gl_Position = vec4(A.xyz-V, 1.0);
@@ -48,10 +49,12 @@ void main()
 
 		fragClip = posClip[1];
 		fragColor = vcolor[1];
-		B += vec4(U2,0.0,0.0);
+//		B += vec4(U2,0.0,0.0);
 		gl_Position = vec4(B.xyz+V, 1.0);
 		EmitVertex();
 		gl_Position = vec4(B.xyz-V, 1.0);
+		EmitVertex();
+		gl_Position = vec4(B.xyz+U, 1.0);
 		EmitVertex();
 		
 		EndPrimitive();

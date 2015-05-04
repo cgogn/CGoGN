@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_BOLD3DCOLORLINES__
-#define __CGOGN_SHADER_BOLD3DCOLORLINES__
+#ifndef __CGOGN_SHADER_COLOR_DARTS__
+#define __CGOGN_SHADER_COLOR_DARTS__
 
 #include "Utils/GLSLShader.h"
 #include "Utils/Shaders/shaderPointsLines.h"
@@ -37,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderBold3DColorLines : public ShaderPointsLines
+class CGoGN_UTILS_API ShaderColorDarts : public ClippingShader
 {
 protected:
 	// shader sources
@@ -48,12 +48,12 @@ protected:
     CGoGNGLuint m_uniform_lineWidth;
 	CGoGNGLuint m_unif_alpha;
 
-	float m_lineWidth;
+	Geom::Vec2f m_lineWidth;
+
+	float m_opacity;
 
     VBO* m_vboPos;
 	VBO* m_vboCol;
-
-	float m_opacity;
 
 	/// clipping
 	CGoGNGLuint m_unif_planeClip;
@@ -66,15 +66,15 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderBold3DColorLines();
+	ShaderColorDarts();
 
 	void setLineWidth(float pix);
 
 	void setOpacity(float op);
 
-	unsigned int setAttributeColor(VBO* vbo);
-
 	unsigned int setAttributePosition(VBO* vbo);
+
+	unsigned int setAttributeColor(VBO* vbo);
 
 	void setClippingPlane(const Geom::Vec4f& plane);
 	inline void setNoClippingPlane() { setClippingPlane(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f)); }

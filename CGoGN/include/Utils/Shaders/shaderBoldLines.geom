@@ -30,22 +30,21 @@ void main()
 		vec3 U = vec3(lineWidths*U2,0.0);
 		vec3 V = vec3(lineWidths*vec2(U2[1], -U2[0]), 0.0);
 
-		U2 *= (lineWidths[0]+lineWidths[1])/4.0;
-		
 		fragClip = posClip[0];
-		A -= vec4(U2,0.0,0.0);
+		gl_Position = vec4(A.xyz-U, 1.0);
+		EmitVertex();
 		gl_Position = vec4(A.xyz+V, 1.0);
 		EmitVertex();
 		gl_Position = vec4(A.xyz-V, 1.0);
 		EmitVertex();
 
 		fragClip = posClip[1];
-		B += vec4(U2,0.0,0.0);
 		gl_Position = vec4(B.xyz+V, 1.0);
 		EmitVertex();
 		gl_Position = vec4(B.xyz-V, 1.0);
 		EmitVertex();
-		
+		gl_Position = vec4(B.xyz+U, 1.0);
+		EmitVertex();
 		EndPrimitive();
 	}
 }

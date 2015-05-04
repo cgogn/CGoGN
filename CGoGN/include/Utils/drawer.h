@@ -72,8 +72,9 @@ protected:
 	float m_currentSize;
 	GLenum m_compile;
 	Utils::ShaderColorPerVertex* m_shader;
-	Utils::ShaderBoldColorLines* m_shaderCL;
-	Utils::ShaderBold3DColorLines* m_shader3DCL;
+	Utils::ShaderPointsLines* m_shaderL;
+	//Utils::ShaderBoldColorLines* m_shaderCL;
+	//Utils::ShaderBold3DColorLines* m_shader3DCL;
 
 	int m_lineMode;
 
