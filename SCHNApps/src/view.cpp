@@ -168,6 +168,8 @@ bool View::usesCamera(const QString& name) const
 	return usesCamera(c);
 }
 
+
+
 void View::linkPlugin(PluginInteraction* plugin)
 {
 	// RECORDING
@@ -369,11 +371,12 @@ void View::init()
 	m_frameDrawer = new Utils::Drawer();
 	glm::mat4 mm(1.0);
 	glm::mat4 pm(1.0);
-	m_frameDrawer->getShader()->updateMatrices(mm, pm);
+//	m_frameDrawer->getShader()->updateMatrices(mm, pm);
+	m_frameDrawer->updateMatrices(mm, pm);
 
 	m_frameDrawer->newList(GL_COMPILE);
 	m_frameDrawer->color3f(0.0f,1.0f,0.0f);
-	m_frameDrawer->lineWidth(4.0f);
+	m_frameDrawer->lineWidth(6.0f);
 	m_frameDrawer->begin(GL_LINE_LOOP);
 	m_frameDrawer->vertex3f(-1.0f,-1.0f, 0.0f);
 	m_frameDrawer->vertex3f( 1.0f,-1.0f, 0.0f);
@@ -447,9 +450,9 @@ void View::draw()
 
 		if(map == selectedMap)
 		{
-			Utils::GLSLShader* bbShader = map->getBBDrawerShader();
-			if(bbShader)
-				bbShader->updateMatrices(pm, map_mm);
+			Utils::Drawer* bbDr = map->getBBDrawer();
+			if(bbDr)
+				bbDr->updateMatrices(pm, map_mm);
 			map->drawBB();
 		}
 
@@ -539,7 +542,7 @@ void View::keyPressEvent(QKeyEvent* event)
 			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 			msgBox.setDefaultButton(QMessageBox::Ok);
 			if (msgBox.exec() == QMessageBox::Ok)
-				exit(0);
+				m_schnapps->close();
 		}
 		else
 			QGLViewer::keyPressEvent(event);

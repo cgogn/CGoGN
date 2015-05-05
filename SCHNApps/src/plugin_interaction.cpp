@@ -49,6 +49,19 @@ void PluginInteraction::unregisterShader(Utils::GLSLShader* shader)
 	l_shaders.removeOne(shader);
 }
 
+void PluginInteraction::registerShader(const std::vector<Utils::GLSLShader*>& shaders)
+{
+	for (auto shader: shaders)
+		if(shader && !l_shaders.contains(shader))
+			l_shaders.push_back(shader);
+}
+
+void PluginInteraction::unregisterShader(const std::vector<Utils::GLSLShader*>& shaders)
+{
+	for (auto shader: shaders)
+		l_shaders.removeOne(shader);
+}
+
 } // namespace SCHNApps
 
 } // namespace CGoGN

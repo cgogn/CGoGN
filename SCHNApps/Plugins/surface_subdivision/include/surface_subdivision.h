@@ -36,16 +36,24 @@ private slots:
 public slots:
 	void loopSubdivision(
 		const QString& mapName,
-		const QString& positionAttributeName = "position"
-	);
+		const QString& positionAttributeName = "position");
+
 	void CCSubdivision(
 		const QString& mapName,
-		const QString& positionAttributeName = "position"
-	);
+		const QString& positionAttributeName = "position",
+		bool interp = false );
+
+	void DoSabinSubdivision(
+		const QString& mapName,
+		const QString& positionAttributeName = "position");
+
 	void trianguleFaces(
 		const QString& mapName,
-		const QString& positionAttributeName = "position"
-	);
+		const QString& positionAttributeName = "position");
+
+	void quadranguleFaces(
+		const QString& mapName,
+		const QString& positionAttributeName = "position");
 
 private:
 	Dialog_Surface_Subdivision* m_subdivisionDialog;

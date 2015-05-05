@@ -28,8 +28,8 @@
 
 #include "Utils/vbo_base.h"
 #include "glm/glm.hpp"
-#include "Utils/Shaders/shaderColorPerVertex.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
+//#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderBoldLines.h"
 
 #include "Utils/dll.h"
 
@@ -56,7 +56,8 @@ protected:
 	/**
 	 * Shader
 	 */
-	Utils::ShaderSimpleColor* m_shader;
+//	static Utils::ShaderSimpleColor* s_shader;
+	static Utils::ShaderBoldLines* s_shader;
 
 	/**
 	 * number of indices in vbo
@@ -69,6 +70,8 @@ protected:
 	unsigned int m_sub1;
 
 	unsigned int m_sub2;
+
+	float m_lineWidth;
 
 
 public:
@@ -124,6 +127,7 @@ public:
 	 */
 	void getPrecisionDrawing(unsigned int& sub, unsigned int& sub2);
 
+	inline void setLineWidth(float lw) { m_lineWidth = lw; }
 
 };
 
@@ -288,7 +292,7 @@ public:
 	 */
 	Geom::Vec3f getAxisScale(unsigned int ax, float& scale);
 
-
+	inline void setLineWidth(float lw) { m_drawable->setLineWidth(lw); }
 };
 
 

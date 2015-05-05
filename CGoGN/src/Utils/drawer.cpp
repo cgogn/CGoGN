@@ -37,7 +37,11 @@ namespace CGoGN
 namespace Utils
 {
 
-Drawer::Drawer() : m_currentWidth(1.0f)
+Drawer::Drawer() :
+	m_currentWidth(1.0f),
+	m_currentSize(1.0f),
+	m_shader(NULL),
+	m_shader2(NULL)
 {
 	m_vboPos = new Utils::VBO();
 	m_vboPos->setDataSize(3);
@@ -46,11 +50,19 @@ Drawer::Drawer() : m_currentWidth(1.0f)
 	m_vboCol->setDataSize(3);
 
 	m_shader = new Utils::ShaderColorPerVertex();
-
 	m_shader->setAttributePosition(m_vboPos);
 	m_shader->setAttributeColor(m_vboCol);
 
 	Utils::GLSLShader::registerShader(NULL, m_shader);
+
+	if (GLSLShader::CURRENT_OGL_VERSION >=3)
+	{
+		m_shader2 = new Utils::ShaderBoldColorLines();
+		m_shader2->setAttributePosition(m_vboPos);
+		m_shader2->setAttributeColor(m_vboCol);
+		m_shader2->setNoClippingPlane();
+		Utils::GLSLShader::registerShader(NULL, m_shader2);
+	}
 
 	m_dataPos.reserve(128);
 	m_dataCol.reserve(128);
@@ -64,12 +76,31 @@ Drawer::~Drawer()
 	delete m_vboPos;
 	delete m_vboCol;
 	delete m_shader;
+	if (m_shader2)
+		delete m_shader2;
 }
 
-Utils::ShaderColorPerVertex* Drawer::getShader()
+//Utils::ShaderColorPerVertex* Drawer::getShader()
+//{
+//	return m_shader;
+//}
+
+std::vector<Utils::GLSLShader*> Drawer::getShaders()
 {
-	return m_shader;
+	std::vector<Utils::GLSLShader*> shaders;
+	shaders.push_back(m_shader);
+	if (m_shader2)
+		shaders.push_back(m_shader2);
+	return shaders;
 }
+
+void Drawer::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview)
+{
+	m_shader->updateMatrices(projection,modelview);
+	if (m_shader2)
+		m_shader2->updateMatrices(projection,modelview);
+}
+
 
 void Drawer::lineWidth(float lw)
 {
@@ -84,18 +115,17 @@ void Drawer::pointSize(float ps)
 int Drawer::begin(GLenum mode)
 {
 	int res = int(m_begins.size());
+
 	if (mode == GL_POINTS)
 		m_begins.push_back(PrimParam(uint32(m_dataPos.size()), mode, m_currentSize));
 	else
 		m_begins.push_back(PrimParam(uint32(m_dataPos.size()), mode, m_currentWidth));
+
 	return res;
 }
 
 void Drawer::end()
 {
-	if (m_begins.empty())
-		return;
-
 	m_begins.back().nb = uint32(m_dataPos.size() - m_begins.back().begin);
 }
 
@@ -180,18 +210,47 @@ void Drawer::callList(float opacity)
 	if (m_begins.empty())
 		return;
 
-	m_shader->setOpacity(opacity);
-
-	m_shader->enableVertexAttribs();
-	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+	if (GLSLShader::CURRENT_OGL_VERSION >=3)
 	{
-		if (pp->mode == GL_POINTS)
-			glPointSize(pp->width);
-		if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
-			glLineWidth(pp->width);
-		glDrawArrays(pp->mode, pp->begin, pp->nb);
+		m_shader->setOpacity(opacity);
+		m_shader->enableVertexAttribs();
+		for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+		{
+			if (pp->mode == GL_POINTS)
+			{
+				glPointSize(pp->width);
+				glDrawArrays(GL_POINTS, pp->begin, pp->nb);
+			}
+		}
+		m_shader->disableVertexAttribs();
+
+		m_shader2->setOpacity(opacity);
+		m_shader2->enableVertexAttribs();
+		for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+		{
+			if (pp->mode != GL_POINTS)
+			{
+				m_shader2->setLineWidth(pp->width);
+				m_shader2->bind();
+				glDrawArrays(pp->mode, pp->begin, pp->nb);
+			}
+		}
+		m_shader2->disableVertexAttribs();
 	}
- 	m_shader->disableVertexAttribs();
+	else
+	{
+		m_shader->setOpacity(opacity);
+		m_shader->enableVertexAttribs();
+		for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+		{
+			if (pp->mode == GL_POINTS)
+				glPointSize(pp->width);
+			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
+				glLineWidth(pp->width);
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
+		m_shader->disableVertexAttribs();
+	}
 }
 
 
@@ -199,63 +258,81 @@ void Drawer::callSubList(int index, float opacity)
 {
 	if (index >= int(m_begins.size()))
 		return;
-
-	m_shader->setOpacity(opacity);
-
-	m_shader->enableVertexAttribs();
-
 	PrimParam* pp = & (m_begins[index]);
 
-	if (pp->mode == GL_POINTS)
-		glPointSize(pp->width);
-	if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
-		glLineWidth(pp->width);
-	glDrawArrays(pp->mode, pp->begin, pp->nb);
-
-	m_shader->disableVertexAttribs();
-}
-
-void Drawer::callSubLists(int first, int nb, float opacity)
-{
-	m_shader->setOpacity(opacity);
-	m_shader->enableVertexAttribs();
-
-	int last = first+nb;
-	for (int i = first; i< last; ++i)
-		if (i < int(m_begins.size()))
+	if (GLSLShader::CURRENT_OGL_VERSION >=3)
+	{
+		if (pp->mode == GL_POINTS)
 		{
-			PrimParam* pp = & (m_begins[i]);
-
-			if (pp->mode == GL_POINTS)
-				glPointSize(pp->width);
-			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
-				glLineWidth(pp->width);
+			m_shader->setOpacity(opacity);
+			m_shader->enableVertexAttribs();
+			glPointSize(pp->width);
 			glDrawArrays(pp->mode, pp->begin, pp->nb);
+			m_shader->disableVertexAttribs();
 		}
-
-	m_shader->disableVertexAttribs();
-}
-
-void Drawer::callSubLists(std::vector<int> indices, float opacity)
-{
-	m_shader->setOpacity(opacity);
-
-	m_shader->enableVertexAttribs();
-
-	for (std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
-		if (*it < int(m_begins.size()))
+		else
 		{
-			PrimParam* pp = & (m_begins[*it]);
-
-			if (pp->mode == GL_POINTS)
-				glPointSize(pp->width);
-			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
-				glLineWidth(pp->width);
+			m_shader2->setOpacity(opacity);
+			m_shader2->enableVertexAttribs();
+			m_shader2->setLineWidth(pp->width);
 			glDrawArrays(pp->mode, pp->begin, pp->nb);
+			m_shader2->disableVertexAttribs();
 		}
-
-	m_shader->disableVertexAttribs();
+	}
+	else
+	{
+		m_shader->setOpacity(opacity);
+		m_shader->enableVertexAttribs();
+		if (pp->mode == GL_POINTS)
+			glPointSize(pp->width);
+		if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
+			glLineWidth(pp->width);
+		glDrawArrays(pp->mode, pp->begin, pp->nb);
+		m_shader->disableVertexAttribs();
+	}
 }
+
+//void Drawer::callSubLists(int first, int nb, float opacity)
+//{
+//	m_shader->setOpacity(opacity);
+//	m_shader->enableVertexAttribs();
+
+//	int last = first+nb;
+//	for (int i = first; i< last; ++i)
+//		if (i < int(m_begins.size()))
+//		{
+//			PrimParam* pp = & (m_begins[i]);
+
+//			if (pp->mode == GL_POINTS)
+//				glPointSize(pp->width);
+//			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
+//				glLineWidth(pp->width);
+//			glDrawArrays(pp->mode, pp->begin, pp->nb);
+//		}
+
+//	m_shader->disableVertexAttribs();
+//}
+
+//void Drawer::callSubLists(std::vector<int> indices, float opacity)
+//{
+//	m_shader->setOpacity(opacity);
+
+//	m_shader->enableVertexAttribs();
+
+//	for (std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
+//		if (*it < int(m_begins.size()))
+//		{
+//			PrimParam* pp = & (m_begins[*it]);
+
+//			if (pp->mode == GL_POINTS)
+//				glPointSize(pp->width);
+//			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP) || (pp->mode == GL_LINE_STRIP))
+//				glLineWidth(pp->width);
+//			glDrawArrays(pp->mode, pp->begin, pp->nb);
+//		}
+
+//	m_shader->disableVertexAttribs();
+//}
 
 
 void Drawer::toSVG(Utils::SVG::SVGOut& svg)

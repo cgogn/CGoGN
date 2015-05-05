@@ -11,7 +11,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QFile>
-
+#include <QByteArray>
 
 #include "mapHandler.h"
 #include "schnapps.h"
@@ -107,7 +107,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 	connect(action_ShowHidePythonDock, SIGNAL(triggered()), this, SLOT(showHidePythonDock()));
 	connect(action_LoadPythonScript, SIGNAL(triggered()), this, SLOT(loadPythonScriptFromFileDialog()));
 
-	connect(action_Python_Recording, SIGNAL(triggered()), this, SLOT(beginPyRecording()));
+	connect(action_Python_Recording, SIGNAL(triggered()), this, SLOT(pyRecording()));
 	connect(action_Append_Python_Recording, SIGNAL(triggered()), this, SLOT(appendPyRecording()));
 
 	action_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
@@ -118,6 +118,7 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 
 	// create & setup central widget (views)
 	m_centralLayout = new QVBoxLayout(centralwidget);
+	m_centralLayout->setMargin(2);
 
 	m_rootSplitter = new QSplitter(centralwidget);
 	b_rootSplitterInitialized = false;
@@ -320,8 +321,18 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 		m_rootSplitter->setOrientation(orientation);
 		b_rootSplitterInitialized = true;
 	}
-	if(parent->orientation() == orientation)
-		parent->insertWidget(parent->indexOf(view)+1, newView);
+	if (parent->orientation() == orientation)
+	{
+		parent->insertWidget(parent->indexOf(view) + 1, newView);
+		QList<int> sz = parent->sizes();
+		int tot = 0;
+		for (int i = 0; i < parent->count(); ++i)
+			tot += sz[i];
+		sz[0] = tot / parent->count() + tot % parent->count();
+		for (int i = 1; i < parent->count(); ++i)
+			sz[i] = tot / parent->count();
+		parent->setSizes(sz);
+	}
 	else
 	{
 		int idx = parent->indexOf(view);
@@ -330,9 +341,81 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 		spl->addWidget(view);
 		spl->addWidget(newView);
 		parent->insertWidget(idx, spl);
+
+		QList<int> sz = spl->sizes();
+		int tot = sz[0] + sz[1];
+		sz[0] = tot / 2;
+		sz[1] = tot - sz[0];
+		spl->setSizes(sz);
 	}
-	
 }
+
+QString SCHNApps::saveSplitViewPositions()
+{
+	QList<QSplitter*> liste;
+	liste.push_back(m_rootSplitter);
+
+	QString result;
+	QTextStream qts(&result);
+	while (!liste.empty())
+	{
+		QSplitter* spl = liste.first();
+		for (int i = 0; i < spl->count(); ++i)
+		{
+			QWidget *w = spl->widget(i);
+			QSplitter* qw = dynamic_cast<QSplitter*>(w);
+			if (qw != NULL)
+				liste.push_back(qw);
+		}
+		QByteArray ba = spl->saveState();
+		qts << ba.count() << " ";
+		for (int j = 0; j < ba.count(); ++j)
+			qts << int(ba[j]) << " ";
+		//qts << endl;
+		liste.pop_front();
+	}
+	return result;
+}
+
+
+void SCHNApps::restoreSplitViewPositions(QString stringStates)
+{
+	QList<QSplitter*> liste;
+	liste.push_back(m_rootSplitter);
+
+	QTextStream qts(&stringStates);
+	while (!liste.empty())
+	{
+		QSplitter* spl = liste.first();
+		for (int i = 0; i < spl->count(); ++i)
+		{
+			QWidget *w = spl->widget(i);
+			QSplitter* qw = dynamic_cast<QSplitter*>(w);
+			if (qw != NULL)
+				liste.push_back(qw);
+		}
+		if (qts.atEnd())
+		{
+			std::cerr << "Problem restoring view split configuration" << std::endl;
+			return;
+		}
+
+		int nb;
+		qts >> nb;
+		QByteArray ba(nb + 1, 0);
+		for (int j = 0; j < nb; ++j)
+		{
+			int v;
+			qts >> v;
+			ba[j] = char(v);
+		}
+		spl->restoreState(ba);
+		liste.pop_front();
+	}
+}
+
+
+
 
 /*********************************************************
  * MANAGE PLUGINS
@@ -543,6 +626,91 @@ void SCHNApps::disablePluginTabWidgets(PluginInteraction* plugin)
  * MANAGE MAPS
  *********************************************************/
 
+MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
+{
+	if (! m_maps.contains(name))
+		return NULL;
+
+	QString newName = name + "_copy";
+
+	if (m_maps.contains(newName))
+		return NULL;
+
+	// RECORDING
+	QTextStream* rec = this->pythonStreamRecorder();
+	if (rec)
+		*rec << newName << " = schnapps.duplicateMap(" << name << ".getName(),1);" << endl;
+
+	MapHandlerGen* maph = m_maps[name];
+	MapHandlerGen* new_mh;
+
+	unsigned int dim = maph->getGenericMap()->dimension();
+
+	switch (dim)
+	{
+	case 2: {
+				PFP2::MAP* map = new PFP2::MAP();
+				map->copyFrom(*(maph->getGenericMap()));
+				new_mh = new MapHandler<PFP2>(newName, this, map);
+
+				for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
+				{
+					AttributeContainer& cont = map->getAttributeContainer(orbit);
+					std::vector<std::string> names;
+					std::vector<std::string> types;
+					cont.getAttributesNames(names);
+					cont.getAttributesTypes(types);
+					for (unsigned int i = 0; i < names.size(); ++i)
+						new_mh->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+				}
+				break;
+			}
+	case 3: {
+				PFP3::MAP* map = new PFP3::MAP();
+				map->copyFrom(*(maph->getGenericMap()));
+				new_mh = new MapHandler<PFP3>(newName, this, map);
+				for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
+				{
+					AttributeContainer& cont = map->getAttributeContainer(orbit);
+					std::vector<std::string> names;
+					std::vector<std::string> types;
+					cont.getAttributesNames(names);
+					cont.getAttributesTypes(types);
+					for (unsigned int i = 0; i < names.size(); ++i)
+						new_mh->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+				}
+				break;
+			}
+	}
+
+
+
+
+	m_maps.insert(newName, new_mh);
+	DEBUG_EMIT("mapAdded");
+	emit(mapAdded(new_mh));
+
+	if (properties)
+	{
+		// BB
+		new_mh->setBBVertexAttribute(maph->getBBVertexAttributeName());
+
+		//VBOs
+		const VBOSet& vbos = maph->getVBOSet();
+		foreach(QString s, vbos.keys())
+		{
+			new_mh->createVBO(s);
+		}
+	}
+
+	pythonVarDeclare(new_mh->getName());
+
+	return new_mh;
+}
+
+
+
+
 MapHandlerGen* SCHNApps::addMap(const QString& name, unsigned int dim)
 {
 	if (m_maps.contains(name))
@@ -588,8 +756,9 @@ void SCHNApps::removeMap(const QString& name)
 
 		// unselect map if it is removed
 		if (this->getSelectedMap() == map)
+		{
 			setSelectedMap(QString("NONE"));
-
+		}
 		delete map;
 	}
 }
@@ -834,7 +1003,7 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 }
 
 
-void SCHNApps::beginPyRecording()
+void SCHNApps::pyRecording()
 {
 	if (m_pyRecording != NULL) //  WRITE & CLOSE
 	{
@@ -843,7 +1012,21 @@ void SCHNApps::beginPyRecording()
 		{
 			m_pyBuffer.replace("\"" + var + "\"", var + ".getName()");
 		}
+
 		out << m_pyBuffer << endl;
+
+		// split view positions
+		out << "schnapps.restoreSplitViewPositions(\"" << saveSplitViewPositions() << "\")" << endl;
+
+		// cameras
+		foreach(Camera* cam, m_cameras)
+		{
+			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
+		}
+
+		//windows
+		out << "schnapps.setWindowSize(" << this->width() << ", "<< this->height() << ")" << endl;
+
 		m_pyRecFile->close();
 
 		delete m_pyRecording;
@@ -851,6 +1034,7 @@ void SCHNApps::beginPyRecording()
 		m_pyRecording = NULL;
 		m_pyRecFile = NULL;
 		statusbar->showMessage(QString(" Stop recording python"), 2000);
+		action_Python_Recording->setText("Python Recording");
 		return;
 	}
 
@@ -873,6 +1057,7 @@ void SCHNApps::beginPyRecording()
 
 		statusbar->showMessage(QString(" Recording python in ") + fileName);
 		pythonVarsClear();
+		action_Python_Recording->setText("Stop Python Recording");
 	}
 	else
 	{
@@ -893,6 +1078,19 @@ void SCHNApps::appendPyRecording()
 			m_pyBuffer.replace("\"" + var + "\"", var + ".getName()");
 		}
 		out << m_pyBuffer << endl;
+
+		// split view positions
+		out << "schnapps.restoreSplitViewPositions(\"" << saveSplitViewPositions() << "\")" << endl;
+
+		// cameras
+		foreach(Camera* cam, m_cameras)
+		{
+			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
+		}
+
+		//windows
+		out << "schnapps.setWindowSize(" << this->width() << ", " << this->height() << ")" << endl;
+
 		m_pyRecFile->close();
 
 		delete m_pyRecording;
@@ -900,6 +1098,7 @@ void SCHNApps::appendPyRecording()
 		m_pyRecording = NULL;
 		m_pyRecFile = NULL;
 		statusbar->showMessage(QString(" Stop recording python"), 2000);
+		action_Append_Python_Recording->setText("Append Python Recording");
 		return;
 	}
 
@@ -924,7 +1123,7 @@ void SCHNApps::appendPyRecording()
 		}
 
 		statusbar->showMessage(QString(" Append recording python in ") + fileName);
-		
+		action_Append_Python_Recording->setText("Stop Append Python Recording");
 	}
 	else
 	{
@@ -938,6 +1137,10 @@ void SCHNApps::appendPyRecording()
 void SCHNApps::closeEvent(QCloseEvent *event)
 {
 	DEBUG_EMIT("schnappsClosing");
+	if (m_pyRecording != NULL)	//  WRITE & CLOSE
+	{
+		pyRecording();
+	}
 	emit(schnappsClosing());
 	QMainWindow::closeEvent(event);
 }

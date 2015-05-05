@@ -206,7 +206,7 @@ void EdgeSelector_Radiance<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	const REAL rad = computeRadianceError(d, newPos, newN, newRad);
 
-	const REAL t = 0.01 ;
+	const REAL t = 0.01f ;
 	const REAL err = t*geom + (1-t)*rad ;
 
 	// Check if errated values appear

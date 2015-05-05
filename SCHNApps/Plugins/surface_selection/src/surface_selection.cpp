@@ -45,9 +45,9 @@ bool Surface_Selection_Plugin::enable()
 	m_selectionSphereVBO = new Utils::VBO();
 
 	registerShader(m_pointSprite);
-	registerShader(m_selectedEdgesDrawer->getShader());
-	registerShader(m_selectedFacesDrawer->getShader());
-	registerShader(m_selectingCellDrawer->getShader());
+	registerShader(m_selectedEdgesDrawer->getShaders());
+	registerShader(m_selectedFacesDrawer->getShaders());
+	registerShader(m_selectingCellDrawer->getShaders());
 
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateSelectedCellsRendering()));
@@ -69,6 +69,11 @@ bool Surface_Selection_Plugin::enable()
 
 void Surface_Selection_Plugin::disable()
 {
+	unregisterShader(m_pointSprite);
+	unregisterShader(m_selectedEdgesDrawer->getShaders());
+	unregisterShader(m_selectedFacesDrawer->getShaders());
+	unregisterShader(m_selectingCellDrawer->getShaders());
+
 	delete m_pointSprite;
 	delete m_selectedVerticesVBO;
 

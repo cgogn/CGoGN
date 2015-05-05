@@ -267,7 +267,7 @@ void HalfEdgeSelector_Radiance<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& h
 
 	const REAL rad = computeRadianceError(d);
 
-	const REAL t = 0.01 ;
+	const REAL t = 0.01f ;
 	const REAL err = t*geom + (1-t)*rad ;
 
 	// Check if errated values appear
