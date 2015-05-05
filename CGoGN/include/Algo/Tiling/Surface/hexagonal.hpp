@@ -44,10 +44,12 @@ template <typename PFP>
 void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
 {
     // nb vertices
-    int nb = x*y +1;
+	unsigned int nbV = x*y +1;
+	unsigned int nbF = x*y;
 
     // vertice reservation
-    this->m_tableVertDarts.reserve(nb);
+	this->m_tableVertDarts.reserve(nbV);
+	this->m_tableFaceDarts.reserve(nbF);
 
     // creation of triangles and storing vertices
     for (unsigned int i = 0; i < y; ++i)
@@ -61,6 +63,7 @@ void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
                 this->m_tableVertDarts.push_back(this->m_map.phi_1(d));
             if (j == x)
                 this->m_tableVertDarts.push_back(this->m_map.phi1(this->m_map.phi1(d)));
+			this->m_tableFaceDarts.push_back(d);
         }
     }
 
