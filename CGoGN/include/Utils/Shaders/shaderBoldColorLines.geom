@@ -31,15 +31,14 @@ void main()
 		
 		A = A/A.w;
 		B = B/B.w;
-		vec2 U2 = normalize((B.xyz - A.xyz).xy);
-		vec3 U = vec3(lineWidths*U2,0.0);
-		vec3 V = vec3(lineWidths*vec2(U2[1], -U2[0]), 0.0);
-
-//		U2 *= (lineWidths[0]+lineWidths[1])/2.0;
 		
+		vec2 U2 = normalize(vec2(lineWidths[1],lineWidths[0])*(B.xy - A.xy));
+		vec2 LWCorr =lineWidths * max(abs(U2.x),abs(U2.y));
+		vec3 U = vec3(LWCorr*U2,0.0);
+		vec3 V = vec3(LWCorr*vec2(U2[1], -U2[0]), 0.0);
+
 		fragClip = posClip[0];
 		fragColor = vcolor[0];
-//		A -= vec4(U2,0.0,0.0);
 		gl_Position = vec4(A.xyz-U, 1.0);
 		EmitVertex();
 		gl_Position = vec4(A.xyz+V, 1.0);
@@ -49,7 +48,6 @@ void main()
 
 		fragClip = posClip[1];
 		fragColor = vcolor[1];
-//		B += vec4(U2,0.0,0.0);
 		gl_Position = vec4(B.xyz+V, 1.0);
 		EmitVertex();
 		gl_Position = vec4(B.xyz-V, 1.0);

@@ -23,6 +23,7 @@
 *******************************************************************************/
 #define CGoGN_UTILS_DLL_EXPORT 1
 #include "Utils/Shaders/shaderBoldLines.h"
+#include <algorithm>
 
 namespace CGoGN
 {
@@ -88,6 +89,7 @@ void ShaderBoldLines::setLineWidth(float pix)
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
 	m_lineWidth[0] = pix / float(viewport[2]);
 	m_lineWidth[1] = pix / float(viewport[3]);
+
 	bind();
 	glUniform2fv(*m_uniform_lineWidth,1, m_lineWidth.data());
 	unbind();

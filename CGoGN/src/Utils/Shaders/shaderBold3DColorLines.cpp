@@ -31,9 +31,9 @@ namespace CGoGN
 namespace Utils
 {
 
-#include "ShaderBold3DColorLines.vert"
-#include "ShaderBold3DColorLines.geom"
-#include "ShaderBold3DColorLines.frag"
+#include "shaderBold3DColorLines.vert"
+#include "shaderBold3DColorLines.geom"
+#include "shaderBold3DColorLines.frag"
 
 
 ShaderBold3DColorLines::ShaderBold3DColorLines() :
