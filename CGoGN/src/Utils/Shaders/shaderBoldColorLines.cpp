@@ -31,9 +31,9 @@ namespace CGoGN
 namespace Utils
 {
 
-#include "ShaderBoldColorLines.vert"
-#include "ShaderBoldColorLines.geom"
-#include "ShaderBoldColorLines.frag"
+#include "shaderBoldColorLines.vert"
+#include "shaderBoldColorLines.geom"
+#include "shaderBoldColorLines.frag"
 
 
 ShaderBoldColorLines::ShaderBoldColorLines() :
@@ -42,9 +42,9 @@ ShaderBoldColorLines::ShaderBoldColorLines() :
 	m_planeClip(0.0f,0.0f,0.0f,0.0f)
 
 {
-	m_nameVS = "ShaderBoldColorLines_vs";
-	m_nameFS = "ShaderBoldColorLines_fs";
-	m_nameGS = "ShaderBoldColorLines_gs";
+	m_nameVS = "shaderBoldColorLines_vs";
+	m_nameFS = "shaderBoldColorLines_fs";
+	m_nameGS = "shaderBoldColorLines_gs";
 
 	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
