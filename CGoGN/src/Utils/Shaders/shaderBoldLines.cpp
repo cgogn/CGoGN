@@ -41,9 +41,9 @@ ShaderBoldLines::ShaderBoldLines() :
 	m_color	(0.0f, 0.0f, 0.0f, 0.0f),
 	m_planeClip(0.0f,0.0f,0.0f,0.0f)
 {
-	m_nameVS = "ShaderBoldLines_vs";
-	m_nameFS = "ShaderBoldLines_fs";
-	m_nameGS = "ShaderBoldLines_gs";
+	m_nameVS = "shaderBoldLines_vs";
+	m_nameFS = "shaderBoldLines_fs";
+	m_nameGS = "shaderBoldLines_gs";
 
 	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
