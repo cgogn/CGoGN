@@ -46,10 +46,12 @@ template <typename PFP>
 void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
 {
     // nb vertices
-    int nb = (x+1)*(y+1);
+	unsigned int nbV = (x+1)*(y+1);
+	unsigned int nbF = x*y;
 
     // vertice reservation
-    this->m_tableVertDarts.reserve(nb);
+	this->m_tableVertDarts.reserve(nbV);
+	this->m_tableFaceDarts.reserve(nbF);
 
     // creation of quads and storing vertices
     for (unsigned int i = 0; i < y; ++i)
@@ -60,6 +62,7 @@ void Grid<PFP>::grid(unsigned int x, unsigned int y, bool close)
             this->m_tableVertDarts.push_back(d);
             if (j == x)
                 this->m_tableVertDarts.push_back(this->m_map.phi1(d));
+			this->m_tableFaceDarts.push_back(d);
         }
     }
 
@@ -174,10 +177,12 @@ void Grid<PFP>::embedIntoHelicoid(VertexAttribute<VEC3, MAP>& position, float ra
 template <typename PFP>
 void Cylinder<PFP>::cylinder(unsigned int n, unsigned int z)
 {
-    int nb = (n)*(z+1)+2;
+	unsigned int nbV = (n)*(z+1)+2;
+	unsigned int nbF = n*z;
 
     // vertice reservation
-    this->m_tableVertDarts.reserve(nb);
+	this->m_tableVertDarts.reserve(nbV);
+	this->m_tableFaceDarts.reserve(nbF);
 
     // creation of quads and storing vertices
     for (unsigned int i = 0; i < z; ++i)
@@ -186,6 +191,7 @@ void Cylinder<PFP>::cylinder(unsigned int n, unsigned int z)
         {
             Dart d = this->m_map.newFace(4, false);
             this->m_tableVertDarts.push_back(d);
+			this->m_tableFaceDarts.push_back(d);
         }
     }
 
@@ -405,13 +411,16 @@ void Cube<PFP>::cube(unsigned int x, unsigned int y, unsigned int z)
     this->m_ny = y;
     this->m_nz = z;
 
-    int nb = 2*(x+y)*(z+1) + 2*(x-1)*(y-1);
-    this->m_tableVertDarts.reserve(nb);
+	unsigned int nbV = 2*(x+y)*(z+1) + 2*(x-1)*(y-1);
+	unsigned int nbF = 2*(x+y)*z + 2*x*y;
+
+	this->m_tableVertDarts.reserve(nbV);
+	this->m_tableFaceDarts.reserve(nbF);
 
     // we now have the 4 sides, just need to create store and sew top & bottom
     // the top
-    Grid<PFP> gtop(this->m_map,x,y,false);
-    std::vector<Dart>& tableTop = gtop.getVertexDarts();
+	Grid<PFP> gTop(this->m_map,x,y,false);
+	std::vector<Dart>& tableTop = gTop.getVertexDarts();
 
     int index_side = 2*(x+y)*z;
     for(unsigned int i = 0; i < x; ++i)
@@ -488,6 +497,17 @@ void Cube<PFP>::cube(unsigned int x, unsigned int y, unsigned int z)
             this->m_tableVertDarts.push_back(tableBottom[i*(x+1)+j]);
     }
 
+	const std::vector<Dart>& tableTopFaces = gTop.getFaceDarts();
+	for (Dart f : tableTopFaces)
+	{
+		this->m_tableFaceDarts.push_back(f);
+	}
+
+	const std::vector<Dart>& tableBottomFaces = gBottom.getFaceDarts();
+	for (Dart f : tableBottomFaces)
+	{
+		this->m_tableFaceDarts.push_back(f);
+	}
 }
 
 template <typename PFP>
