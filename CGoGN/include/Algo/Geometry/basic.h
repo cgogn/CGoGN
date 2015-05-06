@@ -57,6 +57,58 @@ inline typename PFP::REAL edgeLength(typename PFP::MAP& map, Dart d, const Verte
 	return v.norm() ;
 }
 
+namespace Parallel
+{
+
+template <typename PFP>
+typename PFP::REAL meanEdgeLength(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
+{
+	std::vector<typename PFP::REAL> lengths;
+	std::vector<unsigned int> nbedges;
+	lengths.resize(CGoGN::Parallel::NumberOfThreads);
+	nbedges.resize(CGoGN::Parallel::NumberOfThreads);
+
+	CGoGN::Parallel::foreach_cell<EDGE>(map, [&] (Edge e, unsigned int thr)
+	{
+		lengths[thr-1] += edgeLength<PFP>(map, e, position);
+		++nbedges[thr-1];
+	}
+	,AUTO);
+
+	typename PFP::REAL length(0);
+	unsigned int nbe = 0;
+	for (unsigned int i = 0; i < CGoGN::Parallel::NumberOfThreads; ++i)
+	{
+		length += lengths[i];
+		nbe += nbedges[i];
+	}
+
+	return length / nbe;
+}
+
+} // namespace Parallel
+
+template <typename PFP>
+inline typename PFP::REAL meanEdgeLength(typename PFP::MAP& map,const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
+{
+	if (CGoGN::Parallel::NumberOfThreads > 1)
+	{
+		return Parallel::meanEdgeLength<PFP>(map, position);
+	}
+
+	typename PFP::REAL length(0);
+	unsigned int nbe = 0;
+
+	foreach_cell<EDGE>(map, [&] (Edge e)
+	{
+		length += edgeLength<PFP>(map, e, position);
+		++nbe;
+	}
+	,AUTO);
+
+	return length / nbe;
+}
+
 template <typename PFP>
 inline float angle(typename PFP::MAP& map, Dart d1, Dart d2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
