@@ -122,16 +122,12 @@ public:
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
 
-	virtual REAL computeArea (const VertexAttribute<VEC3, MAP>& /*pos*/)
+	virtual REAL computeArea (const VertexAttribute<VEC3, MAP>& /*pos*/, const EdgeAttribute<REAL, MAP>& /*edgearea*/)
 	{
 		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
 		return 0.0;
 	}
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& /*pos*/, const EdgeAttribute<REAL, MAP>& /*edgeangle*/, typename PFP::MATRIX33&)
-	{
-		assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes");
-	}
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& /*pos*/, typename PFP::MATRIX33&)
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& /*pos*/, const EdgeAttribute<REAL, MAP>& /*edgeangle*/, const EdgeAttribute<REAL, MAP>& /*edgearea*/, typename PFP::MATRIX33&)
 	{
 		assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes");
 	}
@@ -162,9 +158,8 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, typename PFP::MATRIX33&);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, typename PFP::MATRIX33&);
+	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgearea);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, const EdgeAttribute<REAL, MAP>& edgearea, typename PFP::MATRIX33&);
 };
 
 /*********************************************************
@@ -194,10 +189,8 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, typename PFP::MATRIX33&);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, typename PFP::MATRIX33&);
-
+	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgearea);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, const EdgeAttribute<REAL, MAP>& edgearea, typename PFP::MATRIX33&);
 };
 
 /*********************************************************
@@ -234,9 +227,8 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, typename PFP::MATRIX33&);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, typename PFP::MATRIX33&);
+	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgearea);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, const EdgeAttribute<REAL, MAP>& edgearea, typename PFP::MATRIX33&);
 };
 
 /*********************************************************

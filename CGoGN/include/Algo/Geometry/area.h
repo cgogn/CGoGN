@@ -75,7 +75,13 @@ template <typename PFP>
 typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position) ;
 
 template <typename PFP>
+typename PFP::REAL  edgeArea(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
+
+template <typename PFP>
 void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, FaceAttribute<typename PFP::REAL, typename PFP::MAP>& face_area) ;
+
+template <typename PFP>
+void computeAreaEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& edge_area);
 
 template <typename PFP>
 void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP>& vertex_area) ;
@@ -88,8 +94,15 @@ void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<ty
 
 namespace Parallel
 {
+
+template <typename PFP>
+typename PFP::REAL totalArea(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position) ;
+
 template <typename PFP>
 void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, FaceAttribute<typename PFP::REAL, typename PFP::MAP>& area);
+
+template <typename PFP>
+void computeAreaEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, EdgeAttribute<typename PFP::REAL, typename PFP::MAP>& area);
 
 template <typename PFP>
 void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP>& area);
@@ -99,7 +112,9 @@ void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribut
 
 template <typename PFP>
 void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::REAL, typename PFP::MAP>& area);
+
 } // namespace Parallel
+
 
 } // namespace Geometry
 
