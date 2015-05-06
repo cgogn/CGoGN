@@ -5,8 +5,8 @@
 #include "surface_renderTopo_dockTab.h"
 
 #include "Algo/Render/GL2/topoRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-#include "Utils/Shaders/shaderColorPerVertex.h"
+//#include "Utils/Shaders/shaderSimpleColor.h"
+//#include "Utils/Shaders/shaderColorPerVertex.h"
 
 namespace CGoGN
 {
@@ -119,7 +119,8 @@ protected:
 	QHash<MapHandlerGen*, MapParam> h_parameterSet;
 
 	/// shader used in TopoRender
-	CGoGN::Utils::ShaderSimpleColor* m_shaderTopo1;
+//	CGoGN::Utils::ShaderSimpleColor* m_shaderTopo1;
+	std::vector<CGoGN::Utils::GLSLShader*> m_shadersTopo;
 
 };
 

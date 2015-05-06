@@ -21,8 +21,10 @@ bool Surface_RenderTopo_Plugin::enable()
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
-	m_shaderTopo1 = new CGoGN::Utils::ShaderSimpleColor();
-	registerShader(m_shaderTopo1);
+	// m_shaderTopo1 = new CGoGN::Utils::ShaderSimpleColor();
+
+	CGoGN::Algo::Render::GL2::TopoGenRender::createShaders(m_shadersTopo); // TODO DESTRUCTION ?
+	registerShader(m_shadersTopo);
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
 	{
@@ -96,7 +98,7 @@ void Surface_RenderTopo_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandl
 void Surface_RenderTopo_Plugin::mapAdded(MapHandlerGen* map)
 {
 	connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
-	map->createTopoRender(m_shaderTopo1);
+	map->createTopoRender(m_shadersTopo);
 }
 
 void Surface_RenderTopo_Plugin::mapRemoved(MapHandlerGen* map)

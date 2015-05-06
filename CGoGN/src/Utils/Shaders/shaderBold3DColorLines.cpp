@@ -77,10 +77,7 @@ void ShaderBold3DColorLines::sendParams()
 	bind();
 	glUniform1f(*m_uniform_lineWidth, m_lineWidth);
 	glUniform1f (*m_unif_alpha, m_opacity);
-
-	if (*m_unif_planeClip > 0)
-		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
-
+	glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 	unbind();
 }
 
@@ -141,9 +138,13 @@ void ShaderBold3DColorLines::setClippingPlane(const Geom::Vec4f& plane)
 {
 	if (*m_unif_planeClip > 0)
 	{
-		m_planeClip = plane;
+		double Nn = sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
+		if ((fabs(Nn - 1.0) > 0.0000001) && (fabs(Nn)>0.000001))
+			m_planeClip = plane / Nn;
+		else
+			m_planeClip = plane;
 		bind();
-		glUniform4fv(*m_unif_planeClip, 1, plane.data());
+		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 		unbind();
 	}
 }

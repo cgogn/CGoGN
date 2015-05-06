@@ -214,7 +214,7 @@ public slots:
 	 *********************************************************/
 
 public:
-	virtual void createTopoRender(CGoGN::Utils::GLSLShader* s) = 0;
+	virtual void createTopoRender(std::vector<CGoGN::Utils::GLSLShader*> s) = 0;
 	void deleteTopoRender();
 	virtual void updateTopoRender(const QString& positionAttributeName) = 0;
 	virtual void drawTopoRender(int code) = 0;
@@ -317,7 +317,7 @@ public:
 	 * MANAGE TOPO DRAWING
 	 *********************************************************/
 
-	void createTopoRender(CGoGN::Utils::GLSLShader* s);
+	void createTopoRender(std::vector<CGoGN::Utils::GLSLShader*> s);
 	void updateTopoRender(const QString& positionAttributeName);
 	void drawTopoRender(int code);
 

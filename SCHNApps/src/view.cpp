@@ -376,7 +376,7 @@ void View::init()
 
 	m_frameDrawer->newList(GL_COMPILE);
 	m_frameDrawer->color3f(0.0f,1.0f,0.0f);
-	m_frameDrawer->lineWidth(6.0f);
+	m_frameDrawer->lineWidth(4.0f);
 	m_frameDrawer->begin(GL_LINE_LOOP);
 	m_frameDrawer->vertex3f(-1.0f,-1.0f, 0.0f);
 	m_frameDrawer->vertex3f( 1.0f,-1.0f, 0.0f);
