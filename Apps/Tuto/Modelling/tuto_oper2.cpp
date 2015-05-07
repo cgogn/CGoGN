@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	// example code itself
 	sqt.createMap(n);
 
-	sqt.width(5);
+	sqt.width(4.0);
 
 	// set help message in menu
 	sqt.setHelpMsg("First Tuto: \nCreate two faces\nsew them\nand affect positions");
@@ -236,14 +236,11 @@ void MyQT::cb_redraw()
 	glDepthFunc(GL_LESS);
 	m_render_topo->drawTopo();
 
-	glDepthFunc(GL_LEQUAL);
-
-	m_render_topo->drawColoredDarts<MAP>(myMap);
-
 	if (m_selected != NIL)
 		m_render_topo->overdrawDart(myMap, m_selected, 11, 1.0f, 0.0f, 0.0f);
 
 	if (m_selected2 != NIL)
+		m_render_topo->overdrawDart(myMap, m_selected2, 11, 0.0f, 1.0f, 0.0f);
 
 	if(!m_selecteds.empty())
 	{
@@ -251,7 +248,7 @@ void MyQT::cb_redraw()
 			m_render_topo->overdrawDart(myMap, *it, 11, 0.0f, 0.0f, 1.0f);
 	}
 
-		m_render_topo->overdrawDart(myMap, m_selected2, 11, 0.0f, 1.0f, 0.0f);
+		
 
 }
 

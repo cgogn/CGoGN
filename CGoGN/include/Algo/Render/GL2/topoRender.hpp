@@ -36,7 +36,7 @@
 #include "Algo/Geometry/normal.h"
 
 #include "Container/containerBrowser.h"
-#include "Utils/Shaders/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderColorDarts.h"
 
 namespace CGoGN
 {
@@ -60,19 +60,12 @@ void TopoRender::overdrawDart(MAP& map, Dart d, float width, float r, float g, f
 	if (!attIndex.isValid())
 		attIndex  = map.template addAttribute<unsigned int, DART, MAP>(m_nameIndex);
 
-
 	unsigned int indexDart = attIndex[d];
 
-	m_shader1->changeVA_VBO(m_vaId, m_vbo0);
 	m_shader1->setColor(Geom::Vec4f(r,g,b,0.0f));
+	m_shader1->setLineWidth(width);
 	m_shader1->enableVertexAttribs();
-
-	glLineWidth(width);
 	glDrawArrays(GL_LINES, indexDart, 2);
-
-	glPointSize(2.0f*width);
-	glDrawArrays(GL_POINTS, indexDart, 1);
-
 	m_shader1->disableVertexAttribs();
 }
 
@@ -84,25 +77,16 @@ void TopoRender::drawColoredDarts(MAP& map)
 	if (!attIndex.isValid())
 		return;
 
-	glLineWidth(m_topo_dart_width);
-	float ps = 2.0f*m_topo_dart_width;
-
-	m_shader1->changeVA_VBO(m_vaId, m_vbo0);
 	m_shader1->enableVertexAttribs();
-
 	for (auto it=m_coloredDarts.begin(); it != m_coloredDarts.end(); ++it)
 	{
 		unsigned int indexDart = attIndex[it->d];
 
-		m_shader1->setColor(Geom::Vec4f(it->r,it->g,it->b,0.0f));
-		m_shader1->enableVertexAttribs();
+		m_shader1->directColor(Geom::Vec4f(it->r,it->g,it->b,0.0f));
+//		m_shader1->bind(); // because of unbind, do a set color without bind/unbind
 		glDrawArrays(GL_LINES, indexDart, 2);
-
-		glPointSize(ps);
-		glDrawArrays(GL_POINTS, indexDart, 1);
 	}
 	m_shader1->disableVertexAttribs();
-
 }
 
 
@@ -528,52 +512,39 @@ Dart TopoRender::picking(MAP& map,int x, int y, bool withBoundary)
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
-
-	Utils::ShaderColorPerVertex shaderCol;
+	Utils::ShaderColorDarts shaderCol;
 	shaderCol.setAttributePosition(m_vbo0);
 	shaderCol.setAttributeColor(&vboCol);
 	shaderCol.updateMatrices(m_shader1);
-
-	float dw = m_topo_dart_width;
-	m_topo_dart_width+=2;
 
 	// save clear color and set to zero
 	float cc[4];
 	glGetFloatv(GL_COLOR_CLEAR_VALUE,cc);
 
+	bool multi = glIsEnabled(GL_MULTISAMPLE);
+	if (multi)
+		glDisable(GL_MULTISAMPLE);
+
 	glClearColor(0.0f,0.0f,0.0f,0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDisable(GL_LIGHTING);
-	// draw in back buffer (not shown on screen)
-
+	shaderCol.setLineWidth(m_topo_dart_width + 2);
 	shaderCol.enableVertexAttribs();
-
-	glLineWidth(m_topo_dart_width);
 	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
-
-	// change the stride to take 1/2 vertices
-	shaderCol.enableVertexAttribs(6*sizeof(GL_FLOAT));
-
-	glPointSize(2.0f*m_topo_dart_width);
-	glDrawArrays(GL_POINTS, 0, m_nbDarts);
-
 	shaderCol.disableVertexAttribs();
-
-	// restore dart width
-	m_topo_dart_width = dw;
 
 	// read the pixel under the mouse in back buffer
 	glReadBuffer(GL_BACK);
 	float color[3];
 	glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,color);
 
+	if (multi)
+		glEnable(GL_MULTISAMPLE);
+
 	glClearColor(cc[0], cc[1], cc[2], cc[3]);
 
 	Dart d = colToDart(color);
-
 	return d;
-
 
 }
 

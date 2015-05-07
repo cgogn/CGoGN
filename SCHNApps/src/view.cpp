@@ -368,7 +368,7 @@ void View::init()
 
 	// FRAME DRAWER
 
-	m_frameDrawer = new Utils::Drawer();
+	m_frameDrawer = new Utils::Drawer(1);
 	glm::mat4 mm(1.0);
 	glm::mat4 pm(1.0);
 //	m_frameDrawer->getShader()->updateMatrices(mm, pm);
@@ -376,7 +376,7 @@ void View::init()
 
 	m_frameDrawer->newList(GL_COMPILE);
 	m_frameDrawer->color3f(0.0f,1.0f,0.0f);
-	m_frameDrawer->lineWidth(6.0f);
+	m_frameDrawer->lineWidth(4.0f);
 	m_frameDrawer->begin(GL_LINE_LOOP);
 	m_frameDrawer->vertex3f(-1.0f,-1.0f, 0.0f);
 	m_frameDrawer->vertex3f( 1.0f,-1.0f, 0.0f);

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_BOLDLINES__
-#define __CGOGN_SHADER_BOLDLINES__
+#ifndef __CGOGN_SHADER_BOLD3DLINES__
+#define __CGOGN_SHADER_BOLD3DLINES__
 
 #include "Utils/GLSLShader.h"
 #include "Utils/Shaders/shaderPointsLines.h"
@@ -37,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderBoldLines : public ShaderPointsLines
+class CGoGN_UTILS_API ShaderBold3DLines : public ShaderPointsLines
 {
 protected:
 	// shader sources
@@ -48,7 +48,7 @@ protected:
     CGoGNGLuint m_uniform_lineWidth;
     CGoGNGLuint m_uniform_color;
 
-	Geom::Vec2f m_lineWidth;
+	float m_lineWidth;
 
 	Geom::Vec4f m_color;
 
@@ -65,7 +65,7 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderBoldLines();
+	ShaderBold3DLines();
 
 	void setLineWidth(float pix);
 

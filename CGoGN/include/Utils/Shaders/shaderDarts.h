@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_BOLDLINES__
-#define __CGOGN_SHADER_BOLDLINES__
+#ifndef __CGOGN_SHADER_DARTS__
+#define __CGOGN_SHADER_DARTS__
 
 #include "Utils/GLSLShader.h"
 #include "Utils/Shaders/shaderPointsLines.h"
@@ -37,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderBoldLines : public ShaderPointsLines
+class CGoGN_UTILS_API ShaderDarts : public ClippingShader
 {
 protected:
 	// shader sources
@@ -65,11 +65,13 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderBoldLines();
+	ShaderDarts();
 
 	void setLineWidth(float pix);
 
 	void setColor(const Geom::Vec4f& color);
+
+	void directColor(const Geom::Vec4f& color);
 
 	unsigned int setAttributePosition(VBO* vbo);
 

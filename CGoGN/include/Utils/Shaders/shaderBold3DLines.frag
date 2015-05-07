@@ -1,7 +1,9 @@
-// ShaderBoldLines::fragmentShaderText
+// ShaderBold3DLines::fragmentShaderText
 
 PRECISION;
+
 uniform vec4 lineColor;
+
 FRAG_OUT_DEF;
 
 void main()

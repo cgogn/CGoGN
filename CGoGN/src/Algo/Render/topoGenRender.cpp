@@ -39,6 +39,13 @@ namespace Render
 namespace GL2
 {
 
+void TopoGenRender::createShaders(std::vector<Utils::GLSLShader*>& shaders)
+{
+	shaders.clear();
+	shaders.push_back(new Utils::ShaderDarts());
+	shaders.push_back(new Utils::ShaderBoldLines());
+}
+
 TopoGenRender::TopoGenRender(float bs):
 	m_nbDarts(0),
 	m_nbRel2(0),
@@ -66,17 +73,21 @@ TopoGenRender::TopoGenRender(float bs):
 	m_vbo1->setDataSize(3);
 	m_vbo2->setDataSize(3);
 
-	m_shader1 = new Utils::ShaderSimpleColor(true,false);
-
+	m_shader1 = new Utils::ShaderDarts();
+	
 	// binding VBO - VA
-	m_vaId = m_shader1->setAttributePosition(m_vbo1);
+	m_vaId1 = m_shader1->setAttributePosition(m_vbo0);
 
 	// registering for auto matrices update
 	Utils::GLSLShader::registerShader(NULL, m_shader1);
+
+	m_shader2 = new Utils::ShaderBoldLines();
+	m_vaId2 = m_shader2->setAttributePosition(m_vbo1);
+	Utils::GLSLShader::registerShader(NULL, m_shader2);
 }
 
 
-TopoGenRender::TopoGenRender(Utils::ShaderSimpleColor* ssc, float bs):
+TopoGenRender::TopoGenRender(const std::vector<Utils::GLSLShader*>& shaders, float bs) :
 	m_nbDarts(0),
 	m_nbRel2(0),
 	m_topo_dart_width(2.0f),
@@ -88,7 +99,6 @@ TopoGenRender::TopoGenRender(Utils::ShaderSimpleColor* ssc, float bs):
 	m_colorPhi2(1.0f,0.0f,0.0f,0.0f),
 	m_dartsBoundaryColor(0.7f,1.0f,0.7f,0.0f),
 	m_bufferDartPosition(NULL),
-	m_shader1(ssc),
 	m_sharedShaders(true),
 	m_nameIndex("dart_index2"),
 	m_ke(0.9f),
@@ -104,12 +114,13 @@ TopoGenRender::TopoGenRender(Utils::ShaderSimpleColor* ssc, float bs):
 	m_vbo1->setDataSize(3);
 	m_vbo2->setDataSize(3);
 
-	// binding VBO - VA
-	m_vaId = m_shader1->setAttributePosition(m_vbo1);
+	// we consider that shaders vector is ok
+	m_shader1 = static_cast<Utils::ShaderDarts*>(shaders[0]);
+	m_vaId1 = m_shader1->setAttributePosition(m_vbo0);
+	m_shader2 = static_cast<Utils::ShaderBoldLines*>(shaders[1]);
+	m_vaId2 = m_shader2->setAttributePosition(m_vbo1);
 
-	// registering for auto matrices update
-	Utils::GLSLShader::registerShader(NULL, m_shader1);
-
+	// registering for auto matrices update ?? No shared shaders -> matrice update outside
 }
 
 
@@ -118,12 +129,17 @@ TopoGenRender::~TopoGenRender()
 	if (m_shader1)
 		Utils::GLSLShader::unregisterShader(NULL, m_shader1);
 
+	if (m_shader2)
+		Utils::GLSLShader::unregisterShader(NULL, m_shader2);
+
 	if (!m_sharedShaders)
 	{
 		if (m_shader1)
 			delete m_shader1;
-	}
+		if (m_shader2)
+			delete m_shader2;
 
+	}
 
 	delete m_vbo2;
 	delete m_vbo1;
@@ -138,6 +154,7 @@ TopoGenRender::~TopoGenRender()
 void TopoGenRender::setClippingPlane(const Geom::Vec4f& plane)
 {
 	m_shader1->setClippingPlane(plane);
+	m_shader2->setClippingPlane(plane);
 }
 
 
@@ -188,19 +205,10 @@ void TopoGenRender::drawDarts()
 	if (m_nbDarts==0)
 		return;
 
-	m_shader1->changeVA_VBO(m_vaId, m_vbo0);
+	m_shader1->setLineWidth(m_topo_dart_width);
 	m_shader1->setColor(m_dartsColor);
 	m_shader1->enableVertexAttribs();
-
-	glLineWidth(m_topo_dart_width);
 	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
-
-	// change the stride to take 1/2 vertices
-	m_shader1->enableVertexAttribs(6*sizeof(GL_FLOAT));
-
-	glPointSize(2.0f*m_topo_dart_width);
-	glDrawArrays(GL_POINTS, 0, m_nbDarts);
-
 	m_shader1->disableVertexAttribs();
 }
 
@@ -210,16 +218,12 @@ void TopoGenRender::drawRelation1()
 	if (m_nbDarts==0)
 		return;
 
-
-	glLineWidth(m_topo_relation_width);
-
-	m_shader1->changeVA_VBO(m_vaId, m_vbo1);
-	m_shader1->setColor(m_colorPhi1);
-	m_shader1->enableVertexAttribs();
-
+	m_shader2->setLineWidth(m_topo_relation_width);
+	m_shader2->changeVA_VBO(m_vaId2, m_vbo1);
+	m_shader2->setColor(m_colorPhi1);
+	m_shader2->enableVertexAttribs();
 	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
-
-	m_shader1->disableVertexAttribs();
+	m_shader2->disableVertexAttribs();
 }
 
 
@@ -228,14 +232,11 @@ void TopoGenRender::drawRelation2()
 	if (m_nbRel2==0)
 		return;
 
-	glLineWidth(m_topo_relation_width);
-
-	m_shader1->changeVA_VBO(m_vaId, m_vbo2);
-	m_shader1->setColor(m_colorPhi2);
-	m_shader1->enableVertexAttribs();
-
+	m_shader2->setLineWidth(m_topo_relation_width);
+	m_shader2->changeVA_VBO(m_vaId2, m_vbo2);
+	m_shader2->setColor(m_colorPhi2);
+	m_shader2->enableVertexAttribs();
 	glDrawArrays(GL_LINES, 0, m_nbRel2*2);
-
 	m_shader1->disableVertexAttribs();
 }
 

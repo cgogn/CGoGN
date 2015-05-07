@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 #define CGoGN_UTILS_DLL_EXPORT 1
-#include "Utils/Shaders/shaderBoldLines.h"
+#include "Utils/Shaders/shaderBold3DColorLines.h"
 #include <algorithm>
 
 namespace CGoGN
@@ -31,19 +31,20 @@ namespace CGoGN
 namespace Utils
 {
 
-#include "shaderBoldLines.vert"
-#include "shaderBoldLines.geom"
-#include "shaderBoldLines.frag"
+#include "shaderBold3DColorLines.vert"
+#include "shaderBold3DColorLines.geom"
+#include "shaderBold3DColorLines.frag"
 
 
-ShaderBoldLines::ShaderBoldLines() :
+ShaderBold3DColorLines::ShaderBold3DColorLines() :
 	m_lineWidth(0.01f),
-	m_color	(0.0f, 0.0f, 0.0f, 0.0f),
+	m_opacity(1.0f),
 	m_planeClip(0.0f,0.0f,0.0f,0.0f)
+
 {
-	m_nameVS = "shaderBoldLines_vs";
-	m_nameFS = "shaderBoldLines_fs";
-	m_nameGS = "shaderBoldLines_gs";
+	m_nameVS = "ShaderBold3DColorLines_vs";
+	m_nameFS = "ShaderBold3DColorLines_fs";
+	m_nameGS = "ShaderBold3DColorLines_gs";
 
 	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
@@ -54,55 +55,56 @@ ShaderBoldLines::ShaderBoldLines() :
 	std::string glxfrag(GLSLShader::defines_gl());
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP,6);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP, 6);
 
 	// get and fill uniforms
 	getLocations();
 	sendParams();
 }
 
-void ShaderBoldLines::getLocations()
+void ShaderBold3DColorLines::getLocations()
 {
 	bind();
-	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidths");
-	*m_uniform_color = glGetUniformLocation(this->program_handler(), "lineColor");
+	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidth");
 	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
+	*m_unif_alpha = glGetUniformLocation(this->program_handler(), "alpha");
+
 	unbind();
 }
 
-void ShaderBoldLines::sendParams()
+void ShaderBold3DColorLines::sendParams()
 {
 	bind();
-	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
-	glUniform4fv(*m_uniform_color, 1, m_color.data());
+	glUniform1f(*m_uniform_lineWidth, m_lineWidth);
+	glUniform1f (*m_unif_alpha, m_opacity);
 	glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 	unbind();
 }
 
 
-void ShaderBoldLines::setLineWidth(float pix)
+void ShaderBold3DColorLines::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	m_lineWidth[0] = pix / float(viewport[2]);
-	m_lineWidth[1] = pix / float(viewport[3]);
-
+	m_lineWidth = pix;
 	bind();
-	glUniform2fv(*m_uniform_lineWidth,1, m_lineWidth.data());
+	glUniform1f(*m_uniform_lineWidth, m_lineWidth);
 	unbind();
 }
 
 
 
-void ShaderBoldLines::setColor(const Geom::Vec4f& color)
+
+unsigned int ShaderBold3DColorLines::setAttributeColor(VBO* vbo)
 {
+	m_vboCol = vbo;
 	bind();
-	glUniform4fv(*m_uniform_color, 1, color.data());
-	m_color = color;
+	unsigned int id = bindVA_VBO("VertexColor", vbo);
 	unbind();
+	return id;
 }
 
-unsigned int ShaderBoldLines::setAttributePosition(VBO* vbo)
+unsigned int ShaderBold3DColorLines::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
 	bind();
@@ -112,18 +114,27 @@ unsigned int ShaderBoldLines::setAttributePosition(VBO* vbo)
 }
 
 
-void ShaderBoldLines::restoreUniformsAttribs()
+
+void ShaderBold3DColorLines::restoreUniformsAttribs()
 {
 	getLocations();
 	sendParams();
 
 	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
+	bindVA_VBO("VertexColor", m_vboCol);
 	unbind();
 }
 
+void ShaderBold3DColorLines::setOpacity(float op)
+{
+	m_opacity = op;
+	bind();
+	glUniform1f (*m_unif_alpha, m_opacity);
+	unbind();
+}
 
-void ShaderBoldLines::setClippingPlane(const Geom::Vec4f& plane)
+void ShaderBold3DColorLines::setClippingPlane(const Geom::Vec4f& plane)
 {
 	if (*m_unif_planeClip > 0)
 	{
@@ -136,7 +147,6 @@ void ShaderBoldLines::setClippingPlane(const Geom::Vec4f& plane)
 		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 		unbind();
 	}
-
 }
 
 

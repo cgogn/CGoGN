@@ -30,6 +30,7 @@
 #include "Geometry/vector_gen.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 #include "Utils/Shaders/shaderBoldColorLines.h"
+#include "Utils/Shaders/shaderBold3DColorLines.h"
 
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { namespace SVG { class SVGOut ; } } }
@@ -71,20 +72,26 @@ protected:
 	float m_currentSize;
 	GLenum m_compile;
 	Utils::ShaderColorPerVertex* m_shader;
-	Utils::ShaderBoldColorLines* m_shader2;
+	Utils::ShaderPointsLines* m_shaderL;
+	//Utils::ShaderBoldColorLines* m_shaderCL;
+	//Utils::ShaderBold3DColorLines* m_shader3DCL;
+
+	int m_lineMode;
 
 public:
 
 	/**
 	 * constructor, init all buffers (data and OpenGL) and shader
+	 * @param lineMode 0:simple thin Line / 1:line with possible width /2:3D Lines
 	 * @Warning need OpenGL context
 	 */
-	Drawer();
+	Drawer(int lineMode=0);
 
 	/**
 	 * release buffers and shader
 	 */
 	~Drawer();
+
 
 //	Utils::ShaderColorPerVertex* getShader();
 	std::vector<Utils::GLSLShader*> getShaders();

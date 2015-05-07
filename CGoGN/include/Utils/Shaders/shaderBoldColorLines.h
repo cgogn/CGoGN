@@ -26,7 +26,7 @@
 #define __CGOGN_SHADER_BOLDCOLORLINES__
 
 #include "Utils/GLSLShader.h"
-#include "Utils/clippingShader.h"
+#include "Utils/Shaders/shaderPointsLines.h"
 #include "Geometry/vector_gen.h"
 
 #include "Utils/dll.h"
@@ -37,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderBoldColorLines : public ClippingShader
+class CGoGN_UTILS_API ShaderBoldColorLines : public ShaderPointsLines
 {
 protected:
 	// shader sources
@@ -49,7 +49,6 @@ protected:
 	CGoGNGLuint m_unif_alpha;
 
 	Geom::Vec2f m_lineWidth;
-	float m_pixWidth;
 
     VBO* m_vboPos;
 	VBO* m_vboCol;
@@ -70,8 +69,6 @@ public:
 	ShaderBoldColorLines();
 
 	void setLineWidth(float pix);
-
-	void updatePixelWidth();
 
 	void setOpacity(float op);
 

@@ -1,4 +1,4 @@
-// ShaderBoldLines::vertexShaderText
+// ShaderDarts::vertexShaderText
 
 ATTRIBUTE vec3 VertexPosition;
 

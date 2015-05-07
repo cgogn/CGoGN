@@ -1,4 +1,4 @@
-// ShaderBoldColorLines::fragmentShaderText
+// ShaderBold3DColorLines::fragmentShaderText
 
 PRECISION;
 

@@ -22,8 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 #define CGoGN_UTILS_DLL_EXPORT 1
-#include "Utils/Shaders/shaderBoldLines.h"
-#include <algorithm>
+#include "Utils/Shaders/shaderDarts.h"
 
 namespace CGoGN
 {
@@ -31,37 +30,37 @@ namespace CGoGN
 namespace Utils
 {
 
-#include "shaderBoldLines.vert"
-#include "shaderBoldLines.geom"
-#include "shaderBoldLines.frag"
+#include "shaderDarts.vert"
+#include "shaderDarts.geom"
+#include "shaderDarts.frag"
 
 
-ShaderBoldLines::ShaderBoldLines() :
+ShaderDarts::ShaderDarts() :
 	m_lineWidth(0.01f),
 	m_color	(0.0f, 0.0f, 0.0f, 0.0f),
 	m_planeClip(0.0f,0.0f,0.0f,0.0f)
 {
-	m_nameVS = "shaderBoldLines_vs";
-	m_nameFS = "shaderBoldLines_fs";
-	m_nameGS = "shaderBoldLines_gs";
+	m_nameVS = "ShaderDarts_vs";
+	m_nameFS = "ShaderDarts_fs";
+	m_nameGS = "ShaderDarts_gs";
 
 	std::string glxvert(GLSLShader::defines_gl());
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 6);
+	std::string glxgeom = GLSLShader::defines_Geom("lines", "triangle_strip", 8);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(GLSLShader::defines_gl());
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP,6);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES, GL_TRIANGLE_STRIP,8);
 
 	// get and fill uniforms
 	getLocations();
 	sendParams();
 }
 
-void ShaderBoldLines::getLocations()
+void ShaderDarts::getLocations()
 {
 	bind();
 	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidths");
@@ -70,7 +69,7 @@ void ShaderBoldLines::getLocations()
 	unbind();
 }
 
-void ShaderBoldLines::sendParams()
+void ShaderDarts::sendParams()
 {
 	bind();
 	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
@@ -80,13 +79,12 @@ void ShaderBoldLines::sendParams()
 }
 
 
-void ShaderBoldLines::setLineWidth(float pix)
+void ShaderDarts::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
 	m_lineWidth[0] = pix / float(viewport[2]);
 	m_lineWidth[1] = pix / float(viewport[3]);
-
 	bind();
 	glUniform2fv(*m_uniform_lineWidth,1, m_lineWidth.data());
 	unbind();
@@ -94,7 +92,7 @@ void ShaderBoldLines::setLineWidth(float pix)
 
 
 
-void ShaderBoldLines::setColor(const Geom::Vec4f& color)
+void ShaderDarts::setColor(const Geom::Vec4f& color)
 {
 	bind();
 	glUniform4fv(*m_uniform_color, 1, color.data());
@@ -102,7 +100,12 @@ void ShaderBoldLines::setColor(const Geom::Vec4f& color)
 	unbind();
 }
 
-unsigned int ShaderBoldLines::setAttributePosition(VBO* vbo)
+void ShaderDarts::directColor(const Geom::Vec4f& color)
+{
+	glUniform4fv(*m_uniform_color, 1, color.data());
+}
+
+unsigned int ShaderDarts::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
 	bind();
@@ -112,7 +115,7 @@ unsigned int ShaderBoldLines::setAttributePosition(VBO* vbo)
 }
 
 
-void ShaderBoldLines::restoreUniformsAttribs()
+void ShaderDarts::restoreUniformsAttribs()
 {
 	getLocations();
 	sendParams();
@@ -123,7 +126,7 @@ void ShaderBoldLines::restoreUniformsAttribs()
 }
 
 
-void ShaderBoldLines::setClippingPlane(const Geom::Vec4f& plane)
+void ShaderDarts::setClippingPlane(const Geom::Vec4f& plane)
 {
 	if (*m_unif_planeClip > 0)
 	{

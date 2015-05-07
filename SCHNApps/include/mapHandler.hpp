@@ -121,7 +121,7 @@ template <typename PFP>
 void MapHandler<PFP>::updateBBDrawer()
 {
 	if (!m_bbDrawer)
-		m_bbDrawer = new Utils::Drawer();
+		m_bbDrawer = new Utils::Drawer(1);
 
 	if (m_bb.isInitialized())
 	{
@@ -133,7 +133,8 @@ void MapHandler<PFP>::updateBBDrawer()
 
 		m_bbDrawer->newList(GL_COMPILE);
 		m_bbDrawer->color3f(0.0f, 1.0f, 0.0f);
-		m_bbDrawer->lineWidth(1.0f);
+		m_bbDrawer->lineWidth(2.0f);
+//		m_bbDrawer->lineWidth(shift);
 		m_bbDrawer->begin(GL_LINE_LOOP);
 		m_bbDrawer->vertex(bbmin);
 		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
@@ -217,7 +218,7 @@ bool MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax
 }
 
 template <typename PFP>
-void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* s)
+void MapHandler<PFP>::createTopoRender(std::vector<CGoGN::Utils::GLSLShader*> s)
 {
 //	std::cout << "MH:createTopo"<< std::endl;
 	if (m_topoRender)
@@ -225,8 +226,8 @@ void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* s)
 
 	if (m_map->dimension() == 2)
 	{
-		CGoGN::Utils::ShaderSimpleColor* ssc = static_cast<CGoGN::Utils::ShaderSimpleColor*>(s);
-		m_topoRender = new Algo::Render::GL2::TopoRender(ssc);
+//		CGoGN::Utils::ShaderSimpleColor* ssc = static_cast<CGoGN::Utils::ShaderSimpleColor*>(s);
+		m_topoRender = new Algo::Render::GL2::TopoRender(s);
 		m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
 	}
 	else

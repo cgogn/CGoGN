@@ -204,7 +204,7 @@ void Viewer::cb_keyPress(int keycode)
 		{
 
 			std::cout << "PlaneCut"<< std::endl;
-			Geom::Vec3f n(0.1,0.1,1.0);
+			Geom::Vec3f n(0.1f,0.1f,1.0f);
 			Geom::Vec3f o = bb.center();
 
 			Geom::Plane3D<PFP::REAL> plan(n,o);
@@ -239,7 +239,7 @@ void Viewer::cb_keyPress(int keycode)
 		{
 
 			std::cout << "PlaneCut"<< std::endl;
-			Geom::Vec3f n(0.1,0.1,1.0);
+			Geom::Vec3f n(0.1f,0.1f,1.0f);
 			Geom::Vec3f o = bb.center();
 
             Geom::Plane3D<PFP::REAL> plan(n,o);

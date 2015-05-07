@@ -81,9 +81,11 @@ int main()
 			});
 			centerFace /=nbVert;
 			centerVol += centerFace;
+			nbFaces++;
 		});
 		centerVol /= nbFaces;
 		centerMesh += centerVol;
+		nbVols++;
 	});
 	centerMesh /= nbVols;
 	CGoGNout<< "Traverse with foreach in " << ch.elapsed()<< " ms"<< CGoGNendl;
@@ -110,9 +112,11 @@ int main()
 			}
 			centerFace /=nbVert;
 			centerVol += centerFace;
+			nbFaces++;
 		}
 		centerVol /= nbFaces;
 		centerMesh += centerVol;
+		nbVols++;
 	}
 	CGoGNout<< "Traverse with traversor in " << ch.elapsed()<< " ms"<< CGoGNendl;
 

@@ -36,7 +36,10 @@
 #include "Utils/vbo_base.h"
 #include "Utils/svg.h"
 
-#include "Utils/Shaders/shaderSimpleColor.h"
+//#include "Utils/Shaders/shaderSimpleColor.h"
+
+#include "Utils/Shaders/shaderBoldLines.h"
+#include "Utils/Shaders/shaderDarts.h"
 
 
 #ifdef WIN32
@@ -79,7 +82,8 @@ protected:
 	Utils::VBO* m_vbo2;
 
 
-	unsigned int m_vaId;
+	unsigned int m_vaId1;
+	unsigned int m_vaId2;
 
 	/**
 	*number of darts to draw
@@ -121,7 +125,11 @@ protected:
 
 	Geom::Vec3f* m_bufferDartPosition;
 
-	Utils::ShaderSimpleColor* m_shader1;
+	//Utils::ShaderSimpleColor* m_shader1;
+	//Utils::ShaderPointsLines* m_shader2;
+
+	Utils::ShaderDarts* m_shader1;
+	Utils::ShaderBoldLines* m_shader2;
 
 	bool m_sharedShaders;
 
@@ -164,13 +172,16 @@ protected:
 
 
 public:
+
+	static void createShaders(std::vector<Utils::GLSLShader*>& shaders);
+
 	/**
 	* Constructor
 	* @param bs shift for boundary drawing
 	*/
 	TopoGenRender(float bs = 0.01f);
 
-	TopoGenRender(Utils::ShaderSimpleColor* ssc, float bs = 0.01f);
+	TopoGenRender(const std::vector<Utils::GLSLShader*>& shaders, float bs = 0.01f);
 
 	/**
 	* Destructor
@@ -221,7 +232,9 @@ public:
 	/**
 	 * get shader objects
 	 */
-	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
+	//Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
+	std::vector<Utils::GLSLShader*> shaders();
+
 
 
 	/**
@@ -308,7 +321,7 @@ public:
 	*/
 	TopoRender(float bs = 0.01f): TopoGenRender(bs) {}
 
-	TopoRender(Utils::ShaderSimpleColor* ssc, float bs = 0.01f) :TopoGenRender(ssc,bs) {}
+	TopoRender(const std::vector<Utils::GLSLShader*>& shaders, float bs = 0.01f) : TopoGenRender(shaders, bs) {}
 
 	/**
 	* Destructor

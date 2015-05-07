@@ -65,7 +65,7 @@ ShaderBoldColorLines::ShaderBoldColorLines() :
 void ShaderBoldColorLines::getLocations()
 {
 	bind();
-	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidth");
+	*m_uniform_lineWidth = glGetUniformLocation(this->program_handler(), "lineWidths");
 	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
 	*m_unif_alpha = glGetUniformLocation(this->program_handler(), "alpha");
 
@@ -77,9 +77,7 @@ void ShaderBoldColorLines::sendParams()
 	bind();
 	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	glUniform1f (*m_unif_alpha, m_opacity);
-
-	if (*m_unif_planeClip > 0)
-		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
+	glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 
 	unbind();
 }
@@ -89,24 +87,13 @@ void ShaderBoldColorLines::setLineWidth(float pix)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	m_pixWidth = pix;
-	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
-	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
+	m_lineWidth[0] = pix / float(viewport[2]);
+	m_lineWidth[1] = pix / float(viewport[3]);
 	bind();
 	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
 	unbind();
 }
 
-void ShaderBoldColorLines::updatePixelWidth()
-{
-	glm::i32vec4 viewport;
-	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-	m_lineWidth[0] = float(double(m_pixWidth) / double(viewport[2]));
-	m_lineWidth[1] = float(double(m_pixWidth) / double(viewport[3]));
-	bind();
-	glUniform2fv(*m_uniform_lineWidth, 1, m_lineWidth.data());
-	unbind();
-}
 
 
 
@@ -153,9 +140,13 @@ void ShaderBoldColorLines::setClippingPlane(const Geom::Vec4f& plane)
 {
 	if (*m_unif_planeClip > 0)
 	{
-		m_planeClip = plane;
+		double Nn = sqrt(plane[0] * plane[0] + plane[1] * plane[1] + plane[2] * plane[2]);
+		if ((fabs(Nn - 1.0) > 0.0000001) && (fabs(Nn)>0.000001))
+			m_planeClip = plane / Nn;
+		else
+			m_planeClip = plane;
 		bind();
-		glUniform4fv(*m_unif_planeClip, 1, plane.data());
+		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 		unbind();
 	}
 }
