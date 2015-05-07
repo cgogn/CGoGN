@@ -40,12 +40,12 @@ namespace Utils
 class CGoGN_UTILS_API ShaderPointsLines : public ClippingShader
 {
 public:
-	virtual void setLineWidth(float pix) = 0;
-	virtual void setOpacity(float op) {}
-	virtual unsigned int setAttributePosition(VBO* vbo) = 0;
-	virtual unsigned int setAttributeColor(VBO* vbo) { return 0; }
-	virtual void setColor(const Geom::Vec4f& color) {}
-	virtual void setClippingPlane(const Geom::Vec4f& plane) = 0 ;
+	virtual void setLineWidth(float) = 0;
+	virtual void setOpacity(float) {}
+	virtual unsigned int setAttributePosition(VBO*) = 0;
+	virtual unsigned int setAttributeColor(VBO*) { return 0; }
+	virtual void setColor(const Geom::Vec4f&) {}
+	virtual void setClippingPlane(const Geom::Vec4f&) = 0 ;
 	virtual void setNoClippingPlane() = 0;
 
 };
