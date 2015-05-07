@@ -34,8 +34,11 @@
 #include "Geometry/vector_gen.h"
 
 #include "Utils/GLSLShader.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-#include "Utils/Shaders/shaderColorPerVertex.h"
+//#include "Utils/Shaders/shaderSimpleColor.h"
+//#include "Utils/Shaders/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderBoldLines.h"
+#include "Utils/Shaders/shaderColorDarts.h"
+#include "Utils/Shaders/shaderDarts.h"
 
 #include "Utils/vbo_base.h"
 #include "Utils/svg.h"
@@ -75,8 +78,14 @@ protected:
 
 	unsigned int m_vaId;
 
-	Utils::ShaderSimpleColor* m_shader1;
-	Utils::ShaderColorPerVertex* m_shader2;
+	//Utils::ShaderSimpleColor* m_shader1;
+	//Utils::ShaderColorPerVertex* m_shader2;
+
+	Utils::ShaderBoldLines* m_shader1;
+	Utils::ShaderColorDarts* m_shader2;
+	Utils::ShaderDarts* m_shader3;
+
+	std::vector<Utils::GLSLShader*> m_shadersVector;
 
 	/**
 	*number of darts to draw
@@ -157,6 +166,8 @@ public:
 
 	Utils::GLSLShader* shader1() { return static_cast<Utils::GLSLShader*>(m_shader1); }
 	Utils::GLSLShader* shader2() { return static_cast<Utils::GLSLShader*>(m_shader2); }
+	Utils::GLSLShader* shader3() { return static_cast<Utils::GLSLShader*>(m_shader3); }
+	const std::vector<Utils::GLSLShader*>& shaders() const { return m_shadersVector; }
 
 
 	void setClippingPlane(const Geom::Vec4f& plane);

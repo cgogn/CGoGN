@@ -26,7 +26,7 @@
 #define __CGOGN_SHADER_SIMPLECOLOR__
 
 #include "Utils/GLSLShader.h"
-#include "Utils/clippingShader.h"
+#include "Utils/Shaders/shaderPointsLines.h"
 #include "Geometry/vector_gen.h"
 
 #include "Utils/dll.h"
@@ -37,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class CGoGN_UTILS_API ShaderSimpleColor : public ClippingShader
+class CGoGN_UTILS_API ShaderSimpleColor : public ShaderPointsLines
 {
 protected:
 	// shader sources
@@ -65,6 +65,9 @@ public:
 	void setColor(const Geom::Vec4f& color);
 
 	unsigned int setAttributePosition(VBO* vbo);
+
+	/// just for uniform interface with gl3 BoldLines shaders
+	inline void setLineWidth(float pix) { glLineWidth(pix); }
 
 	void setClippingPlane(const Geom::Vec4f& plane);
 

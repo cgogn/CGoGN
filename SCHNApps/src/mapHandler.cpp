@@ -7,6 +7,7 @@ namespace SCHNApps
 {
 
 MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) :
+	m_showBB(true),
 	m_name(name),
 	m_schnapps(s),
 	m_map(map),
@@ -141,6 +142,11 @@ Utils::VBO* MapHandlerGen::createVBO(const AttributeMultiVectorGen* attr)
 {
 	if(attr)
 	{
+		// RECORDING
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << this->getName() << ".createVBO(\"" << QString(attr->getName().c_str()) << "\");" << endl;
+
 		QString name = QString::fromStdString(attr->getName());
 		Utils::VBO* vbo = getVBO(name);
 		if(!vbo)

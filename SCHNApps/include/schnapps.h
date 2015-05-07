@@ -10,9 +10,12 @@
 #include "PythonQt.h"
 #include "gui/PythonQtScriptingConsole.h"
 #include "slot_debug.h"
+#include <QTextStream>
 
 class QVBoxLayout;
 class QSplitter;
+class QFile;
+
 
 namespace CGoGN
 {
@@ -53,6 +56,7 @@ public slots:
 public:
 	void redrawAllViews();
 
+
 public slots:
 	View* addView(const QString& name);
 	View* addView();
@@ -65,6 +69,10 @@ public slots:
 	void setSelectedView(View* view);
 
 	void splitView(const QString& name, Qt::Orientation orientation);
+
+	QString saveSplitViewPositions();
+	void restoreSplitViewPositions(QString stringStates);
+
 
 	/*********************************************************
 	 * MANAGE PLUGINS
@@ -96,6 +104,9 @@ private slots:
 public slots:
 	MapHandlerGen* addMap(const QString& name, unsigned int dim);
 	void removeMap(const QString& name);
+	MapHandlerGen* duplicateMap(const QString& name, bool properties);
+
+
 	void setSelectedMap(const QString& mapName);
 
 	MapHandlerGen* getMap(const QString& name) const;
@@ -136,8 +147,36 @@ public slots:
 
 	void loadPythonScriptFromFile(const QString& fileName);
 
+	void statusBarMessage(const QString& msg, int msec);
+
+	QString openFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
+
+	QString saveFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
+
+	void setWindowSize(int w, int h) { this->resize(w, h); }
+
 private slots:
 	void loadPythonScriptFromFileDialog();
+
+
+	/*********************************************************
+	* MANAGE PYTHON RECORDING
+	*********************************************************/
+protected:
+	QTextStream* m_pyRecording;
+	QFile* m_pyRecFile;
+	QList<QString> m_pyVarNames;
+	QString m_pyBuffer;
+
+private slots:
+	void pyRecording();
+	void appendPyRecording();
+	//void endPyRecording();
+
+public:
+	inline QTextStream* pythonStreamRecorder()  { return m_pyRecording; }
+	inline void pythonVarDeclare(const QString& var) { m_pyVarNames.push_back(var); }
+	inline void pythonVarsClear() { m_pyVarNames.clear(); }
 
 signals:
 	void cameraAdded(Camera* camera);
@@ -195,6 +234,8 @@ protected:
 	StaticPointers m_sp;
 
 	void closeEvent(QCloseEvent *event);
+
+
 };
 
 } // namespace SCHNApps

@@ -118,7 +118,7 @@ public:
 //		}
 
 		for (unsigned int i = 0; i < atmv->m_tableData.size(); ++i)
-			memcpy(m_tableData[i],atmv->m_tableData[i],_BLOCKSIZE_/32);
+			memcpy(m_tableData[i],atmv->m_tableData[i],_BLOCKSIZE_/8);
 
 		return true;
 	}

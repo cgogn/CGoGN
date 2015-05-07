@@ -67,7 +67,7 @@ void ControlDock_CameraTab::selectedCameraChanged()
 
 void ControlDock_CameraTab::cameraProjectionChanged(QAbstractButton* b)
 {
-	if (!b_updatingUI)
+	if (!b_updatingUI && m_selectedCamera)
 	{
 		if(radio_orthographicProjection->isChecked())
 			m_selectedCamera->setProjectionType(qglviewer::Camera::ORTHOGRAPHIC);

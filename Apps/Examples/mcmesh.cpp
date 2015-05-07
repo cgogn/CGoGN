@@ -29,7 +29,8 @@ MCMesh::MCMesh() :
 	m_drawFaces(true),
 	m_render(NULL),
 	m_flatShader(NULL),
-	m_simpleColorShader(NULL)
+	m_simpleColorShader(NULL),
+	m_linesShader(NULL)
 {}
 
 void MCMesh::initGUI()
@@ -58,30 +59,66 @@ void MCMesh::cb_initGL()
 	m_flatShader->setDiffuse(colDif);
 	m_flatShader->setExplode(1.0f);
 
-	m_simpleColorShader = new Utils::ShaderSimpleColor();
-	m_simpleColorShader->setAttributePosition(m_positionVBO);
+	//m_simpleColorShader = new Utils::ShaderSimpleColor();
+	//m_simpleColorShader->setAttributePosition(m_positionVBO);
+
+	m_linesShader = new Utils::ShaderBoldLines();
+	m_linesShader->setAttributePosition(m_positionVBO);
 
 	registerShader(m_flatShader);
-	registerShader(m_simpleColorShader);
+//	registerShader(m_simpleColorShader);
+	registerShader(m_linesShader);
+
+	m_dr = new Utils::Drawer();
+	m_dr->newList();
+	m_dr->pointSize(4.0f);
+	m_dr->lineWidth(25.0f);
+	m_dr->begin(GL_LINES);
+	m_dr->color3f(1.0,0.0,0.0);
+	m_dr->vertex3f(15.0,15.0,65.0);
+	m_dr->vertex3f(110.0,110.0,65.0);
+	m_dr->color3f(0.0,1.0,0.0);
+	m_dr->vertex3f(110.0,15.0,75.0);
+	m_dr->vertex3f(15.0,110.0,75.0);
+	m_dr->end();
+	m_dr->endList();
+
 }
 
 void MCMesh::cb_redraw()
 {
+glEnable(GL_BLEND);
+	m_dr->callList(0.1f);
 	if (m_drawEdges)
+//	{
+//		glLineWidth(1.0f);
+//		if (m_drawFaces)
+//		{
+//			Geom::Vec4f c(0.0f, 0.0f, 0.0f, 0.0f);
+//			m_simpleColorShader->setColor(c);
+//		}
+//		else
+//		{
+//			Geom::Vec4f c(1.0f, 1.0f, 0.0f, 0.0f);
+//			m_simpleColorShader->setColor(c);
+//		}
+//		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES);
+//	}
 	{
-		glLineWidth(1.0f);
+		m_linesShader->setLineWidth(2.0f);
 		if (m_drawFaces)
 		{
 			Geom::Vec4f c(0.0f, 0.0f, 0.0f, 0.0f);
-			m_simpleColorShader->setColor(c);
+			m_linesShader->setColor(c);
 		}
 		else
 		{
 			Geom::Vec4f c(1.0f, 1.0f, 0.0f, 0.0f);
-			m_simpleColorShader->setColor(c);
+			m_linesShader->setColor(c);
 		}
-		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES);
+		m_render->draw(m_linesShader, Algo::Render::GL2::LINES);
 	}
+
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_LIGHTING);

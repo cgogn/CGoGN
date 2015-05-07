@@ -82,7 +82,7 @@ int main()
 	std::cout << "Check arePointsEquals : Start" << std::endl;
 
 	VEC3 p1(0,0,0);
-	VEC3 p2(0.1,0.1,0.1);
+	VEC3 p2(0.1f,0.1f,0.1f);
 	if(!Geom::arePointsEquals<VEC3>(p1,p1) || !Geom::arePointsEquals<VEC3>(p2,p2) 
 		|| Geom::arePointsEquals<VEC3>(p1,p2) || Geom::arePointsEquals<VEC3>(p2,p1))
 	{

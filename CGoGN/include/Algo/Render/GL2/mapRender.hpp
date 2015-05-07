@@ -536,8 +536,11 @@ void MapRender::initPrimitives(typename PFP::MAP& map, int prim, const VertexAtt
 	m_indexBufferUpToDate[prim] = true;
 
 	// setup du buffer d'indices
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+	if (m_nbIndices[prim] > 0)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[prim]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices[prim] * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+	}
 }
 
 template <typename PFP>

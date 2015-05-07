@@ -21,7 +21,7 @@
 #	qt_wrap_cpp( pipo_moc pipo.h )
 #	add_executable( pipo pipo.cpp ${pipo_ui} ${pipo_moc} )
 #	target_link_libraries( pipo ${CGoGN_LIBS}  ${CGoGN_EXT_LIBS} )
-#
+#	qt_use_cgogn_modules(pipo)
 #
 #	WARNING: to avoid problem of DLL loading, on windows executable are generated in CGoGN/bin/....
 #	Take care while choosing executable names
@@ -75,7 +75,11 @@ IF (WIN32)
 	ENDIF()
 ELSE()
 	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
-	SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE} )
+	IF(APPLE)
+		SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}/Contents/MacOS/ )
+	ELSE()
+		SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE} )
+	ENDIF()
 ENDIF()
 
 # Qt version from CGoGN

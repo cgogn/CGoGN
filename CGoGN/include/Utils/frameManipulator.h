@@ -29,6 +29,7 @@
 #include "Utils/vbo_base.h"
 #include "glm/glm.hpp"
 #include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderBoldLines.h"
 #include "Utils/pickables.h"
 
 #include "Utils/dll.h"
@@ -71,12 +72,13 @@ protected:
 	/**
 	 * VBO for color
 	 */
-	Utils::VBO* m_vboCol;
+//	Utils::VBO* m_vboCol;
 
 	/**
 	 * Shader
 	 */
 	Utils::ShaderSimpleColor* m_shader;
+	Utils::ShaderBoldLines* m_shaderBL;
 
 	/**
 	 * the axis to be highlighted

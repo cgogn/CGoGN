@@ -87,7 +87,7 @@ void MapHandler<PFP>::draw(Utils::GLSLShader* shader, int primitive)
 template <typename PFP>
 void MapHandler<PFP>::drawBB()
 {
-	if (m_bbDrawer)
+	if (m_showBB && m_bbDrawer)
 		m_bbDrawer->callList();
 }
 
@@ -100,7 +100,10 @@ void MapHandler<PFP>::updateBB()
 		VertexAttribute<VEC3, MAP> bbVertexAttribute(map, dynamic_cast<AttributeMultiVector<VEC3>*>(m_bbVertexAttribute));
 
 		m_bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*map, bbVertexAttribute);
-		m_bbDiagSize = m_bb.diagSize();
+		if (m_bb.isInitialized())
+			m_bbDiagSize = m_bb.diagSize();
+		else
+			m_bbDiagSize = 0;
 	}
 	else
 	{
@@ -118,42 +121,51 @@ template <typename PFP>
 void MapHandler<PFP>::updateBBDrawer()
 {
 	if (!m_bbDrawer)
-		m_bbDrawer = new Utils::Drawer();
+		m_bbDrawer = new Utils::Drawer(1);
 
-	Geom::Vec3f bbmin = m_bb.min();
-	Geom::Vec3f bbmax = m_bb.max();
-	float shift = 0.005f * (bbmax - bbmin).norm();
-	bbmin -= Geom::Vec3f(shift, shift, shift);
-	bbmax += Geom::Vec3f(shift, shift, shift);
+	if (m_bb.isInitialized())
+	{
+		Geom::Vec3f bbmin = m_bb.min();
+		Geom::Vec3f bbmax = m_bb.max();
+		float shift = 0.005f * (bbmax - bbmin).norm();
+		bbmin -= Geom::Vec3f(shift, shift, shift);
+		bbmax += Geom::Vec3f(shift, shift, shift);
 
-	m_bbDrawer->newList(GL_COMPILE);
-	m_bbDrawer->color3f(0.0f,1.0f,0.0f);
-	m_bbDrawer->lineWidth(1.0f);
-	m_bbDrawer->begin(GL_LINE_LOOP);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->end();
-	m_bbDrawer->begin(GL_LINE_LOOP);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->end();
-	m_bbDrawer->begin(GL_LINES);
-	m_bbDrawer->vertex(bbmin);
-	m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
-	m_bbDrawer->vertex(bbmax);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
-	m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
-	m_bbDrawer->end();
-	m_bbDrawer->endList();
+		m_bbDrawer->newList(GL_COMPILE);
+		m_bbDrawer->color3f(0.0f, 1.0f, 0.0f);
+		m_bbDrawer->lineWidth(2.0f);
+//		m_bbDrawer->lineWidth(shift);
+		m_bbDrawer->begin(GL_LINE_LOOP);
+		m_bbDrawer->vertex(bbmin);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
+		m_bbDrawer->vertex(bbmin);
+		m_bbDrawer->end();
+		m_bbDrawer->begin(GL_LINE_LOOP);
+		m_bbDrawer->vertex(bbmax);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
+		m_bbDrawer->vertex(bbmax);
+		m_bbDrawer->end();
+		m_bbDrawer->begin(GL_LINES);
+		m_bbDrawer->vertex(bbmin);
+		m_bbDrawer->vertex3f(bbmin[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmin[0], bbmax[1], bbmax[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmax[1], bbmin[2]);
+		m_bbDrawer->vertex(bbmax);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmin[2]);
+		m_bbDrawer->vertex3f(bbmax[0], bbmin[1], bbmax[2]);
+		m_bbDrawer->end();
+		m_bbDrawer->endList();
+	}
+	else
+	{
+		m_bbDrawer->newList();
+		m_bbDrawer->endList();
+	}
 }
 
 template <typename PFP>
@@ -206,7 +218,7 @@ bool MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax
 }
 
 template <typename PFP>
-void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* s)
+void MapHandler<PFP>::createTopoRender(std::vector<CGoGN::Utils::GLSLShader*> s)
 {
 //	std::cout << "MH:createTopo"<< std::endl;
 	if (m_topoRender)
@@ -214,8 +226,8 @@ void MapHandler<PFP>::createTopoRender(CGoGN::Utils::GLSLShader* s)
 
 	if (m_map->dimension() == 2)
 	{
-		CGoGN::Utils::ShaderSimpleColor* ssc = static_cast<CGoGN::Utils::ShaderSimpleColor*>(s);
-		m_topoRender = new Algo::Render::GL2::TopoRender(ssc);
+//		CGoGN::Utils::ShaderSimpleColor* ssc = static_cast<CGoGN::Utils::ShaderSimpleColor*>(s);
+		m_topoRender = new Algo::Render::GL2::TopoRender(s);
 		m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
 	}
 	else

@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QMessageBox>
 
 namespace CGoGN
 {
@@ -111,6 +112,11 @@ void View::setCurrentCamera(Camera* c)
 //	DEBUG_SLOT();
 	if(c != m_currentCamera && c)
 	{
+		// RECORDING
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << this->getName() << ".setCurrentCamera(\"" << c->getName() << "\");" << endl;
+
 		Camera* prev = m_currentCamera;
 		if(prev)
 			prev->unlinkView(this);
@@ -162,8 +168,15 @@ bool View::usesCamera(const QString& name) const
 	return usesCamera(c);
 }
 
+
+
 void View::linkPlugin(PluginInteraction* plugin)
 {
+	// RECORDING
+	QTextStream* rec = m_schnapps->pythonStreamRecorder();
+	if (rec)
+		*rec << this->getName() << ".linkPlugin(\"" << plugin->getName() << "\");" << endl;
+
 	DEBUG_SLOT();
 	if(plugin && !l_plugins.contains(plugin))
 	{
@@ -193,6 +206,12 @@ void View::unlinkPlugin(PluginInteraction* plugin)
 	DEBUG_SLOT();
 	if(l_plugins.removeOne(plugin))
 	{
+		// RECORDING
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << this->getName() << ".unlinkPlugin(\"" << plugin->getName() << "\");" << endl;
+
+
 		plugin->unlinkView(this);
 
 		DEBUG_EMIT("pluginUnlinked");
@@ -221,6 +240,11 @@ bool View::isLinkedToPlugin(const QString& name) const
 
 void View::linkMap(MapHandlerGen* map)
 {
+	// RECORDING
+	QTextStream* rec = m_schnapps->pythonStreamRecorder();
+	if (rec)
+		*rec << this->getName() << ".linkMap(\"" << map->getName() << "\");" << endl;
+
 	DEBUG_SLOT();
 	if(map && !l_maps.contains(map))
 	{
@@ -256,6 +280,11 @@ void View::unlinkMap(MapHandlerGen* map)
 	DEBUG_SLOT();
 	if(l_maps.removeOne(map))
 	{
+		QTextStream* rec = m_schnapps->pythonStreamRecorder();
+		if (rec)
+			*rec << this->getName() << ".unlinkMap(\"" << map->getName() << "\");" << endl;
+
+
 		map->unlinkView(this);
 
 		DEBUG_EMIT("mapUnlinked");
@@ -339,10 +368,11 @@ void View::init()
 
 	// FRAME DRAWER
 
-	m_frameDrawer = new Utils::Drawer();
+	m_frameDrawer = new Utils::Drawer(1);
 	glm::mat4 mm(1.0);
 	glm::mat4 pm(1.0);
-	m_frameDrawer->getShader()->updateMatrices(mm, pm);
+//	m_frameDrawer->getShader()->updateMatrices(mm, pm);
+	m_frameDrawer->updateMatrices(mm, pm);
 
 	m_frameDrawer->newList(GL_COMPILE);
 	m_frameDrawer->color3f(0.0f,1.0f,0.0f);
@@ -420,9 +450,9 @@ void View::draw()
 
 		if(map == selectedMap)
 		{
-			Utils::GLSLShader* bbShader = map->getBBDrawerShader();
-			if(bbShader)
-				bbShader->updateMatrices(pm, map_mm);
+			Utils::Drawer* bbDr = map->getBBDrawer();
+			if(bbDr)
+				bbDr->updateMatrices(pm, map_mm);
 			map->drawBB();
 		}
 
@@ -475,16 +505,47 @@ void View::keyPressEvent(QKeyEvent* event)
 	if (event->key() == Qt::Key_S)
 	{
 		b_saveSnapshots = !b_saveSnapshots;
+
 		if (b_saveSnapshots)
-			connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Snapshot every frame?");
+			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			if (msgBox.exec() == QMessageBox::Ok)
+			{
+				m_schnapps->statusBarMessage("frame snapshot !!", 2000);
+				connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+			}
+			else
+			{
+				m_schnapps->statusBarMessage("cancel frame snapshot", 2000);
+				b_saveSnapshots = false;
+			}
+		}
 		else
+		{
 			disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+			m_schnapps->statusBarMessage("Stop frame snapshot", 2000);
+		}
+			
 	}
 	else
 	{
 		foreach(PluginInteraction* plugin, l_plugins)
 			plugin->keyPress(this, event);
-		QGLViewer::keyPressEvent(event);
+
+		if (event->key() == Qt::Key_Escape)
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Really quit SCHNApps ?");
+			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			if (msgBox.exec() == QMessageBox::Ok)
+				m_schnapps->close();
+		}
+		else
+			QGLViewer::keyPressEvent(event);
 	}
 }
 
@@ -497,17 +558,23 @@ void View::keyReleaseEvent(QKeyEvent *event)
 
 void View::mousePressEvent(QMouseEvent* event)
 {
-	if(m_buttonArea->isClicked(event->x(), event->y()))
-		m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
-	else if(m_buttonAreaLeft->isClicked(event->x(), event->y()))
+	if (!isSelectedView())
+		m_schnapps->setSelectedView(this);
+
+	if (m_buttonAreaLeft->isClicked(event->x(), event->y()))
 		m_buttonAreaLeft->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
 	else
 	{
-		if(!isSelectedView())
-			m_schnapps->setSelectedView(this);
-		foreach(PluginInteraction* plugin, l_plugins)
-			plugin->mousePress(this, event);
-		QGLViewer::mousePressEvent(event);
+		hideDialogs();
+		if (m_buttonArea->isClicked(event->x(), event->y()))
+			m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
+		else
+		{
+			foreach(PluginInteraction* plugin, l_plugins)
+				plugin->mousePress(this, event);
+
+			QGLViewer::mousePressEvent(event);
+		}
 	}
 }
 
@@ -582,6 +649,17 @@ void View::closeDialogs()
 	m_dialogCameras->close();
 }
 
+void View::hideDialogs()
+{
+	if (m_dialogCameras->isVisible())
+		m_dialogCameras->hide();
+	if (m_dialogMaps->isVisible())
+		m_dialogMaps->hide();
+	if (m_dialogPlugins->isVisible())
+		m_dialogPlugins->hide();
+}
+
+
 void View::selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur)
 {
 	DEBUG_SLOT();
@@ -614,6 +692,11 @@ void View::ui_mapsListView(int x, int y, int globalX, int globalY)
 		m_dialogCameras->hide();
 		m_dialogPlugins->hide();
 	}
+	else
+	{
+		m_dialogMaps->hide();
+	}
+
 }
 
 void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
@@ -625,6 +708,10 @@ void View::ui_pluginsListView(int x, int y, int globalX, int globalY)
 		m_dialogMaps->hide();
 		m_dialogCameras->hide();
 	}
+	else
+	{
+		m_dialogPlugins->hide();
+	}
 }
 
 void View::ui_camerasListView(int x, int y, int globalX, int globalY)
@@ -635,6 +722,10 @@ void View::ui_camerasListView(int x, int y, int globalX, int globalY)
 		m_dialogCameras->move(QPoint(globalX,globalY+8));
 		m_dialogPlugins->hide();
 		m_dialogMaps->hide();
+	}
+	else
+	{
+		m_dialogCameras->hide();
 	}
 }
 

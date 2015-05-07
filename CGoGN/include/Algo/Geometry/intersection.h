@@ -83,7 +83,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const 
  * et v1 et v2 les deux sommets de l'arête
  */
 template <typename PFP>
-bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, typename PFP::REAL& alpha) ;
+bool intersectionSphereEdge(typename PFP::MAP& map, const typename PFP::VEC3& center, typename PFP::REAL radius, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, typename PFP::REAL& alpha) ;
 
 } // namespace Geometry
 

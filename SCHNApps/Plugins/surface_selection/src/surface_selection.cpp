@@ -45,9 +45,9 @@ bool Surface_Selection_Plugin::enable()
 	m_selectionSphereVBO = new Utils::VBO();
 
 	registerShader(m_pointSprite);
-	registerShader(m_selectedEdgesDrawer->getShader());
-	registerShader(m_selectedFacesDrawer->getShader());
-	registerShader(m_selectingCellDrawer->getShader());
+	registerShader(m_selectedEdgesDrawer->getShaders());
+	registerShader(m_selectedFacesDrawer->getShaders());
+	registerShader(m_selectingCellDrawer->getShaders());
 
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateSelectedCellsRendering()));
@@ -69,6 +69,11 @@ bool Surface_Selection_Plugin::enable()
 
 void Surface_Selection_Plugin::disable()
 {
+	unregisterShader(m_pointSprite);
+	unregisterShader(m_selectedEdgesDrawer->getShaders());
+	unregisterShader(m_selectedFacesDrawer->getShaders());
+	unregisterShader(m_selectingCellDrawer->getShaders());
+
 	delete m_pointSprite;
 	delete m_selectedVerticesVBO;
 
@@ -105,7 +110,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 							m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
 							m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
 							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-							m_pointSprite->setSize(20 * map->getBBdiagSize() / nbCells);
+							m_pointSprite->setSize(map->getBBdiagSize() / 75.0f);
 
 							m_pointSprite->enableVertexAttribs();
 							glDrawArrays(GL_POINTS, 0, selector->getNbSelectedCells());
@@ -126,7 +131,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 							{
 								case NormalAngle :
 								case SingleCell : {
-									m_pointSprite->setSize(30 * map->getBBdiagSize() / nbCells);
+									m_pointSprite->setSize(map->getBBdiagSize() / 60.0f);
 									break;
 								}
 								case WithinSphere : {

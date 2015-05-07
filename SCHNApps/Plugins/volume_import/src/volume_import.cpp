@@ -30,6 +30,7 @@ MapHandlerGen* Volume_Import_Plugin::importFromFile(const QString& fileName)
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
+		pythonRecording("importFromFile", fi.baseName(), fileName);
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 3);
 		if(mhg)
 		{

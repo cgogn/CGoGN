@@ -28,6 +28,8 @@ ADD_SUBDIRECTORY(surface_modelisation)
 ADD_SUBDIRECTORY(surface_distance)
 ADD_SUBDIRECTORY(surface_radiance)
 
+#ADD_SUBDIRECTORY(cage2D_deformation)
+
 ADD_SUBDIRECTORY(volume_import)
 #ADD_SUBDIRECTORY(volume_render)
 

@@ -15,13 +15,13 @@ namespace SCHNApps
 struct MapParameters
 {
 	MapParameters() :
-		positionVBO(NULL),
-		vectorsScaleFactor(1.0f)
+		positionVBO(NULL)
 	{}
 
 	Utils::VBO* positionVBO;
 	QList<Utils::VBO*> vectorVBOs;
-	float vectorsScaleFactor;
+	QList<QColor> colors;
+	QList<float> scaleFactors;
 };
 
 class Surface_RenderVector_Plugin : public PluginInteraction
@@ -72,7 +72,8 @@ public slots:
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
 	void addVectorVBO(const QString& view, const QString& map, const QString& vbo);
 	void removeVectorVBO(const QString& view, const QString& map, const QString& vbo);
-	void changeVectorsScaleFactor(const QString& view, const QString& map, float f);
+	void changeVectorScaleFactor(const QString& view, const QString& map, const QString& vbo, float f);
+	void changeVectorColor(const QString& view, const QString& map, const QString& vbo, const QString& col);
 
 protected:
 	Surface_RenderVector_DockTab* m_dockTab;

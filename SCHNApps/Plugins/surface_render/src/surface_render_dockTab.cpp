@@ -13,14 +13,15 @@ namespace SCHNApps
 Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugin* p) :
 	m_schnapps(s),
 	m_plugin(p),
-	b_updatingUI(false),
-	m_currentColorDial(0)
+	m_currentColorDial(0),
+	b_updatingUI(false)
 
 {
 	setupUi(this);
 
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
 	connect(combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(normalVBOChanged(int)));
+	connect(combo_colorVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(colorVBOChanged(int)));
 	connect(check_renderVertices, SIGNAL(toggled(bool)), this, SLOT(renderVerticesChanged(bool)));
 	connect(slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(verticesScaleFactorChanged(int)));
 	connect(check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(renderEdgesChanged(bool)));
@@ -33,8 +34,151 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(scolorButton,SIGNAL(clicked()),this,SLOT(simpleColorClicked()));
 	connect(vcolorButton,SIGNAL(clicked()),this,SLOT(vertexColorClicked()));
 	connect(m_colorDial,SIGNAL(colorSelected(const QColor&)),this,SLOT(colorSelected(const QColor&)));
-
 }
+
+
+
+
+
+void Surface_Render_DockTab::positionVBOChanged(int index)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
+			view->updateGL();
+			m_plugin->pythonRecording("changePositionVBO", "", view->getName(), map->getName(), combo_positionVBO->currentText());
+		}
+	}
+}
+
+void Surface_Render_DockTab::normalVBOChanged(int index)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].normalVBO = map->getVBO(combo_normalVBO->currentText());
+			view->updateGL();
+			m_plugin->pythonRecording("changeNormalVBO", "", view->getName(), map->getName(), combo_normalVBO->currentText());
+		}
+	}
+}
+
+void Surface_Render_DockTab::colorVBOChanged(int index)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].colorVBO = map->getVBO(combo_colorVBO->currentText());
+			view->updateGL();
+			m_plugin->pythonRecording("changeColorVBO", "", view->getName(), map->getName(), combo_colorVBO->currentText());
+		}
+	}
+}
+
+void Surface_Render_DockTab::renderVerticesChanged(bool b)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].renderVertices = b;
+			view->updateGL();
+			m_plugin->pythonRecording("changeRenderVertices", "", view->getName(), map->getName(), b);
+		}
+	}
+}
+
+void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].verticesScaleFactor = i / 50.0;
+			view->updateGL();
+			m_plugin->pythonRecording("changeVerticesScaleFactor", "", view->getName(), map->getName(), i / 50.0);
+		}
+	}
+}
+
+void Surface_Render_DockTab::renderEdgesChanged(bool b)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].renderEdges = b;
+			view->updateGL();
+			m_plugin->pythonRecording("changeRenderEdges", "", view->getName(), map->getName(), b);
+		}
+	}
+}
+
+void Surface_Render_DockTab::renderFacesChanged(bool b)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].renderFaces = b;
+			view->updateGL();
+			m_plugin->pythonRecording("changeRenderFaces", "", view->getName(), map->getName(), b);
+		}
+	}
+}
+
+void Surface_Render_DockTab::faceStyleChanged(QAbstractButton* b)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			if (radio_flatShading->isChecked())
+				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::FLAT;
+			else if (radio_phongShading->isChecked())
+				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::PHONG;
+			view->updateGL();
+			m_plugin->pythonRecording("changeFacesStyle", "", view->getName(), map->getName(), m_plugin->h_viewParameterSet[view][map].faceStyle);
+		}
+	}
+}
+
+void Surface_Render_DockTab::renderBoundaryChanged(bool b)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].renderBoundary = b;
+			view->updateGL();
+			m_plugin->pythonRecording("changeRenderBoundary", "", view->getName(), map->getName(), b);
+		}
+	}
+}
+
+
 
 
 
@@ -64,7 +208,6 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 {
 	if (m_currentColorDial == 1)
 	{
-
 		m_diffuseColor = col;
 		dcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
 
@@ -76,12 +219,12 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 		{
 			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
 			view->updateGL();
+			m_plugin->pythonRecording("changeFaceColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 
 	if (m_currentColorDial == 2)
 	{
-
 		m_simpleColor = col;
 		scolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
 
@@ -93,12 +236,12 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 		{
 			m_plugin->h_viewParameterSet[view][map].simpleColor = rgbCol;
 			view->updateGL();
+			m_plugin->pythonRecording("changeEdgeColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 
 	if (m_currentColorDial == 3)
 	{
-
 		m_vertexColor = col;
 		vcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
 
@@ -110,125 +253,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 		{
 			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
 			view->updateGL();
-		}
-	}
-}
-
-
-
-
-
-void Surface_Render_DockTab::positionVBOChanged(int index)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
-			view->updateGL();
-		}
-	}
-}
-
-void Surface_Render_DockTab::normalVBOChanged(int index)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].normalVBO = map->getVBO(combo_normalVBO->currentText());
-			view->updateGL();
-		}
-	}
-}
-
-void Surface_Render_DockTab::renderVerticesChanged(bool b)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].renderVertices = b;
-			view->updateGL();
-		}
-	}
-}
-
-void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].verticesScaleFactor = i / 50.0;
-			view->updateGL();
-		}
-	}
-}
-
-void Surface_Render_DockTab::renderEdgesChanged(bool b)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].renderEdges = b;
-			view->updateGL();
-		}
-	}
-}
-
-void Surface_Render_DockTab::renderFacesChanged(bool b)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].renderFaces = b;
-			view->updateGL();
-		}
-	}
-}
-
-void Surface_Render_DockTab::faceStyleChanged(QAbstractButton* b)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			if (radio_flatShading->isChecked())
-				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::FLAT;
-			else if (radio_phongShading->isChecked())
-				m_plugin->h_viewParameterSet[view][map].faceStyle = MapParameters::PHONG;
-			view->updateGL();
-		}
-	}
-}
-
-void Surface_Render_DockTab::renderBoundaryChanged(bool b)
-{
-	if (!b_updatingUI)
-	{
-		View* view = m_schnapps->getSelectedView();
-		MapHandlerGen* map = m_schnapps->getSelectedMap();
-		if (view && map)
-		{
-			m_plugin->h_viewParameterSet[view][map].renderBoundary = b;
-			view->updateGL();
+			m_plugin->pythonRecording("changeVertexColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 }
@@ -273,6 +298,24 @@ void Surface_Render_DockTab::removeNormalVBO(QString name)
 	b_updatingUI = false;
 }
 
+void Surface_Render_DockTab::addColorVBO(QString name)
+{
+	b_updatingUI = true;
+	combo_colorVBO->addItem(name);
+	b_updatingUI = false;
+}
+
+void Surface_Render_DockTab::removeColorVBO(QString name)
+{
+	b_updatingUI = true;
+	int curIndex = combo_colorVBO->currentIndex();
+	int index = combo_colorVBO->findText(name, Qt::MatchExactly);
+	if (curIndex == index)
+		combo_colorVBO->setCurrentIndex(0);
+	combo_colorVBO->removeItem(index);
+	b_updatingUI = false;
+}
+
 void Surface_Render_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -282,6 +325,9 @@ void Surface_Render_DockTab::updateMapParameters()
 
 	combo_normalVBO->clear();
 	combo_normalVBO->addItem("- select VBO -");
+
+	combo_colorVBO->clear();
+	combo_colorVBO->addItem("- select VBO -");
 
 	View* view = m_schnapps->getSelectedView();
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
@@ -302,6 +348,10 @@ void Surface_Render_DockTab::updateMapParameters()
 				combo_normalVBO->addItem(QString::fromStdString(vbo->name()));
 				if (vbo == p.normalVBO)
 					combo_normalVBO->setCurrentIndex(i);
+
+				combo_colorVBO->addItem(QString::fromStdString(vbo->name()));
+				if (vbo == p.colorVBO)
+					combo_colorVBO->setCurrentIndex(i);
 
 				++i;
 			}

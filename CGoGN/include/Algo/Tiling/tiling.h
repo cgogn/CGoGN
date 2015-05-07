@@ -69,6 +69,12 @@ protected:
     */
     std::vector<Dart> m_tableVertDarts;
 
+	/**
+	* Table of vertex darts (one dart per vertex)
+	* Order depend on tiling kind
+	*/
+	std::vector<Dart> m_tableFaceDarts;
+
 public:
     Tiling(MAP& map, unsigned int x, unsigned int y, unsigned int z):
         m_map(map),
@@ -83,9 +89,14 @@ public:
     Tiling(const Tiling<PFP>& t1, const Tiling<PFP> t2);
 
     /**
-    * get the table of darts (one per vertex)
+	* get the table of vertex darts (one per vertex)
     */
     std::vector<Dart>& getVertexDarts() { return m_tableVertDarts; }
+
+	/**
+	* get the table of face darts (one per face)
+	*/
+	std::vector<Dart>& getFaceDarts() { return m_tableFaceDarts; }
 
 	void computeCenter(VertexAttribute<VEC3, MAP>& position);
 

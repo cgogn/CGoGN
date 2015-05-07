@@ -37,95 +37,95 @@ namespace Geom
 template <typename VEC>
 class BoundingBox
 {
-	public:
-		/**********************************************/
-		/*                CONSTRUCTORS                */
-		/**********************************************/
+public:
+	/**********************************************/
+	/*                CONSTRUCTORS                */
+	/**********************************************/
 
-		BoundingBox() ;
+	BoundingBox() ;
 
-		// initialize the bounding box with one first point
-		BoundingBox(const VEC& p) ;
+	// initialize the bounding box with one first point
+	BoundingBox(const VEC& p) ;
 
-		/**********************************************/
-		/*                 ACCESSORS                  */
-		/**********************************************/
+	/**********************************************/
+	/*                 ACCESSORS                  */
+	/**********************************************/
 
-		VEC& min() ;
+	VEC& min() ;
 
-		const VEC& min() const ;
+	const VEC& min() const ;
 
-		VEC& max() ;
+	VEC& max() ;
 
-		const VEC& max() const ;
+	const VEC& max() const ;
 
-		typename VEC::DATA_TYPE size(unsigned int coord) const ;
+	typename VEC::DATA_TYPE size(unsigned int coord) const ;
 
-		typename VEC::DATA_TYPE maxSize() const ;
+	typename VEC::DATA_TYPE maxSize() const ;
 
-		typename VEC::DATA_TYPE minSize() const ;
+	typename VEC::DATA_TYPE minSize() const ;
 
-		VEC diag() const ;
+	VEC diag() const ;
 
-		typename VEC::DATA_TYPE diagSize() const ;
+	typename VEC::DATA_TYPE diagSize() const ;
 
-		VEC center() const ;
+	VEC center() const ;
 
-		bool isInitialized() const ;
+	bool isInitialized() const ;
 
-		/**********************************************/
-		/*                 FUNCTIONS                  */
-		/**********************************************/
+	/**********************************************/
+	/*                 FUNCTIONS                  */
+	/**********************************************/
 
-		// reinitialize the bounding box
-		void reset() ;
+	// reinitialize the bounding box
+	void reset() ;
 
-		// add a point to the bounding box
-		void addPoint(const VEC& p) ;
+	// add a point to the bounding box
+	void addPoint(const VEC& p) ;
 
-		// return true if bb intersects the bounding box
-		bool intersects(const BoundingBox<VEC>& bb) ;
+	// return true if bb intersects the bounding box
+	bool intersects(const BoundingBox<VEC>& bb) ;
 
-		// fusion with the given bounding box
-		void fusion(const BoundingBox<VEC>& bb) ;
+	// fusion with the given bounding box
+	void fusion(const BoundingBox<VEC>& bb) ;
 
-		// return true if the point belongs strictly to a bounding box
-		bool contains(const VEC& p);
+	// return true if the point belongs strictly to a bounding box
+	bool contains(const VEC& p);
 
-		// return true if the segment belongs strictly to a bounding box
-		bool contains(const VEC& a, const VEC& b);
+	// return true if the segment belongs strictly to a bounding box
+	bool contains(const VEC& a, const VEC& b);
 
-		// return true if the bounding box belongs strictly to a bounding box
-		bool contains(const BoundingBox<VEC> & bb);
+	// return true if the bounding box belongs strictly to a bounding box
+	bool contains(const BoundingBox<VEC> & bb);
 
-		// scale the bounding box
-		void scale(typename VEC::DATA_TYPE size);
+	// scale the bounding box
+	void scale(typename VEC::DATA_TYPE size);
 
-		// 0-centered scale of the bounding box
-		void centeredScale(typename VEC::DATA_TYPE size);
+	// 0-centered scale of the bounding box
+	void centeredScale(typename VEC::DATA_TYPE size);
 
-		/// test if bb is intersected by a ray
-		bool rayIntersect(const VEC& P, const VEC& V) const;
+	/// test if bb is intersected by a ray
+	bool rayIntersect(const VEC& P, const VEC& V) const;
 
-		/**********************************************/
-		/*             STREAM OPERATORS               */
-		/**********************************************/
+	/**********************************************/
+	/*             STREAM OPERATORS               */
+	/**********************************************/
 
-		friend std::ostream& operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
-		{
-			out << bb.min() << " " << bb.max() ;
-			return out ;
-		}
+	friend std::ostream& operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
+	{
+		out << bb.min() << " " << bb.max() ;
+		return out ;
+	}
 
-		friend std::istream& operator>>(std::istream& in, BoundingBox<VEC>& bb)
-		{
-			in >> bb.min() >> bb.max() ;
-			return in ;
-		}
+	friend std::istream& operator>>(std::istream& in, BoundingBox<VEC>& bb)
+	{
+		in >> bb.min() >> bb.max() ;
+		return in ;
+	}
 
-	private:
-		bool m_initialized ;
-		VEC m_pMin, m_pMax ;
+private:
+	bool m_initialized ;
+	VEC m_pMin, m_pMax ;
 } ;
 
 } // namespace Geom

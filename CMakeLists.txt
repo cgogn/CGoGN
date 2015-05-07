@@ -35,16 +35,10 @@ IF (WIN32)
 	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile (Experimental" )
 ENDIF()
 
-IF (NOT(WIN32 OR APPLE))
-	SET ( CGoGN_GCC_4_9 OFF CACHE BOOL "using gcc version > 4.9 (std::regex ok !)" )
-ENDIF()
-
-SET ( BUILD_SHARED_LIBS ON CACHE BOOL "if used all library are build as shared type (.so/.dylib/.dll)" )
-
 
 checkCpp11Support()
+checkCpp11Feature("regex" HAS_CPP11_REGEX "False")
 setBuildType()
-
 
 SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/)
 IF(WIN32)
@@ -176,8 +170,8 @@ IF (APPLE)
 	LIST(APPEND CGoGN_DEFS -DCGOGN_APPLE)
 ENDIF ()
 
-IF (CGoGN_GCC_4_9)
-	LIST(APPEND CGoGN_DEFS -DCGOGN_GCC_4_9)
+IF (HAS_CPP11_REGEX)
+	LIST(APPEND CGoGN_DEFS -DHAS_CPP11_REGEX)
 ENDIF ()
 
 
@@ -248,6 +242,12 @@ LIST(APPEND CGoGN_EXT_LIBS
 IF(NOT WIN32)
 	LIST(APPEND CGoGN_EXT_LIBS pthread) #for c++11 thread
 ENDIF()
+
+IF (NOT HAS_CPP11_REGEX)
+       find_package(Boost COMPONENTS regex REQUIRED)
+       include_directories( ${Boost_INCLUDE_DIR} )
+       list(APPEND CGoGN_EXT_LIBS ${Boost_LIBRARIES})
+ENDIF ()
 
 
 include_directories( 

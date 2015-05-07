@@ -259,7 +259,9 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 
 			mapParams.radianceTexture->update();
 
-			map->removeAttribute(mapParams.radiance);
+			// uncomment this line to be able to load multiple objects with different SH basis
+			// (decimation will be unavailable)
+//			map->removeAttribute(mapParams.radiance);
 
 			mapParams.paramVBO = new Utils::VBO();
 			mapParams.paramVBO->updateData(mapParams.param);
@@ -267,6 +269,9 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_resolution());
 			registerShader(mapParams.radiancePerVertexShader);
 		}
+
+		this->pythonRecording("importFile", mhg->getName(), fi.baseName());
+
 		return mhg;
 	}
 	else
@@ -363,6 +368,13 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator),
 					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.normalApproximator),
 					*(Algo::Surface::Decimation::Approximator<PFP2, Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>, EDGE>*)(mapParams.radianceApproximator)
+				);
+
+			mapParams.selector =
+				new Algo::Surface::Decimation::EdgeSelector_QEM<PFP2>(
+					*map,
+					position,
+					*(Algo::Surface::Decimation::Approximator<PFP2, PFP2::VEC3, EDGE>*)(mapParams.positionApproximator)
 				);
 		}
 	}
@@ -564,6 +576,8 @@ void Surface_Radiance_Plugin::exportPLY(
 	}
 
 	out.close() ;
+
+	this->pythonRecording("exportPLY", "", mapName, positionAttributeName, normalAttributeName, filename);
 }
 
 

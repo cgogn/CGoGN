@@ -84,8 +84,8 @@ bool EdgeSelector_Random<PFP>::init()
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 		darts.push_back(d) ;
 
-	srand(time(NULL)) ;
-	int remains = darts.size() ;
+	srand((unsigned int )(time(NULL))) ;
+	int remains = int(darts.size()) ;
 	for(unsigned int i = 0; i < darts.size()-1; ++i) // generate the random permutation
 	{
 		int r = (rand() % remains) + i ;
@@ -1022,14 +1022,14 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	MAP& m = this->m_map ;
 
 	normal[d2] = Algo::Surface::Geometry::vertexNormal<PFP>(m, d2, m_position) ;
-	Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+	Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, m_position, normal, edgeangle, edgearea, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 	Dart vit = d2 ;
 	do
 	{
 		Dart nVert = m.phi1(vit) ;
 		normal[nVert] = Algo::Surface::Geometry::vertexNormal<PFP>(m, nVert, m_position) ;
-		Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, nVert, radius, m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+		Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, nVert, radius, m_position, normal, edgeangle, edgearea, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 		updateEdgeInfo(m.phi1(vit), false) ;		// must recompute some edge infos in the
 		if(vit == d2 || vit == dd2)					// neighborhood of the collapsed edge
@@ -1131,7 +1131,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// compute things on the coarse version of the mesh
 	normal[newV] = Algo::Surface::Geometry::vertexNormal<PFP>(m, d2, m_position) ;
-	Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+	Algo::Surface::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, m_position, normal, edgeangle, edgearea, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 //	VEC3 norm = normal[newV] ;
 	REAL mCurv = (kmax[newV] + kmin[newV]) / REAL(2) ;
@@ -1330,7 +1330,7 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MATRIX tens1;
 	Algo::Surface::Selection::Collector_OneRing_AroundEdge<PFP> col1(m);
 	col1.collectAll(d);
-	col1.computeNormalCyclesTensor(m_position, edgeangle, tens1); // edgeangle is up to date here
+	Algo::Surface::Geometry::normalCycles_computeTensor(col1, m_position, edgeangle, tens1); // edgeangle is up to date here
 	tens1 *= col1.computeArea(m_position); // mean tensor * area = integral of the tensor
 	Algo::Surface::Geometry::normalCycles_SortTensor<PFP>(tens1);
 
@@ -1345,7 +1345,7 @@ void EdgeSelector_CurvatureTensor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MATRIX tens2;
 	Algo::Surface::Selection::Collector_OneRing<PFP> col2(m);
 	col2.collectAll(d);
-	col2.computeNormalCyclesTensor(m_position, tens2); // edgeangle is not up to date here
+	Algo::Surface::Geometry::normalCycles_computeTensor(col2, m_position, tens2); // edgeangle is not up to date here
 	tens2 *= col2.computeArea(m_position); // mean tensor * area = integral of the tensor
 	Algo::Surface::Geometry::normalCycles_SortTensor<PFP>(tens2);
 
@@ -1979,11 +1979,10 @@ void EdgeSelector_GeomColOptGradient<PFP>::computeEdgeInfo(Dart d, EdgeInfo& ein
 	const VEC3& newCol = m_colorApproximator.getApprox(d) ;
 
 	// sum of QEM metric and color gradient metric
-	const REAL t = 0.01 ;
+	const REAL t = 0.01f ;
 	const REAL err =
 		t * quad(newPos) +
-		(1-t) * (computeEdgeGradientColorError(d, newPos, newCol) + computeEdgeGradientColorError(m.phi2(d), newPos, newCol)).norm() / sqrt(3)
-	;
+		(1-t) * (computeEdgeGradientColorError(d, newPos, newCol) + computeEdgeGradientColorError(m.phi2(d), newPos, newCol)).norm() / sqrt(3.0) ;
 
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;

@@ -82,10 +82,30 @@ private slots:
 	 *********************************************************/
 
 public slots:
+
+	void showBB(bool b)
+	{
+		m_showBB = b;
+		foreach(View* view, l_views)
+			view->updateGL();
+	}
+	
+	bool isBBshown() const
+	{
+		return m_showBB;
+	}
+
 	void setBBVertexAttribute(const QString& name)
 	{
 		m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
 		updateBB();
+		// for update of interface
+		if (m_schnapps->getSelectedMap() == this)
+		{
+			m_schnapps->setSelectedMap("NONE");
+			m_schnapps->setSelectedMap(this->getName());
+		}
+
 	}
 
 	AttributeMultiVectorGen* getBBVertexAttribute() const { return m_bbVertexAttribute; }
@@ -100,17 +120,15 @@ public slots:
 
 	float getBBdiagSize() const { return m_bbDiagSize; }
 
-	Utils::GLSLShader* getBBDrawerShader() const
+	inline Utils::Drawer* getBBDrawer() const
 	{
-		if(m_bbDrawer)
-			return m_bbDrawer->getShader();
-		else
-			return NULL;
+		return m_bbDrawer;
 	}
 
 	virtual bool transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
 
 protected:
+	bool m_showBB;
 	virtual void updateBB() = 0;
 
 	/*********************************************************
@@ -196,7 +214,7 @@ public slots:
 	 *********************************************************/
 
 public:
-	virtual void createTopoRender(CGoGN::Utils::GLSLShader* s) = 0;
+	virtual void createTopoRender(std::vector<CGoGN::Utils::GLSLShader*> s) = 0;
 	void deleteTopoRender();
 	virtual void updateTopoRender(const QString& positionAttributeName) = 0;
 	virtual void drawTopoRender(int code) = 0;
@@ -299,7 +317,7 @@ public:
 	 * MANAGE TOPO DRAWING
 	 *********************************************************/
 
-	void createTopoRender(CGoGN::Utils::GLSLShader* s);
+	void createTopoRender(std::vector<CGoGN::Utils::GLSLShader*> s);
 	void updateTopoRender(const QString& positionAttributeName);
 	void drawTopoRender(int code);
 

@@ -6,25 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>327</width>
-    <height>230</height>
+    <width>282</width>
+    <height>334</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Subdivide surface</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="5">
+   <item row="0" column="7" colspan="4">
     <widget class="QListWidget" name="list_maps"/>
    </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Position attribute :</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3" colspan="2">
+   <item row="2" column="10">
     <widget class="QComboBox" name="combo_positionAttribute">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -34,45 +27,66 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="10">
+    <widget class="QRadioButton" name="radio_trianguleFaces">
+     <property name="text">
+      <string>Triangule</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="7" colspan="2">
     <widget class="QRadioButton" name="radio_Loop">
      <property name="text">
       <string>Loop</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="3">
-    <widget class="QRadioButton" name="radio_CC">
+   <item row="4" column="10">
+    <widget class="QRadioButton" name="radio_quadranguleFaces">
      <property name="text">
-      <string>Catmull-Clark</string>
+      <string>Quadrangule</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="4">
-    <widget class="QRadioButton" name="radio_trianguleFaces">
+   <item row="2" column="7">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Triangule faces</string>
+      <string>Position attribute :</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QPushButton" name="button_cancel">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2" colspan="2">
+   <item row="6" column="10">
     <widget class="QPushButton" name="button_apply">
      <property name="text">
       <string>Apply</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="4">
+   <item row="6" column="7">
     <widget class="QPushButton" name="button_ok">
      <property name="text">
-      <string>OK</string>
+      <string>Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="7">
+    <widget class="QRadioButton" name="radio_DoSabin">
+     <property name="text">
+      <string>Do-Sabin</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="7">
+    <widget class="QRadioButton" name="radio_CC">
+     <property name="text">
+      <string>Catmull-Clark</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="8">
+    <widget class="QCheckBox" name="check_interp">
+     <property name="text">
+      <string>Interp</string>
      </property>
     </widget>
    </item>

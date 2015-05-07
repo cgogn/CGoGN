@@ -5,8 +5,8 @@
 #include "surface_renderTopo_dockTab.h"
 
 #include "Algo/Render/GL2/topoRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-#include "Utils/Shaders/shaderColorPerVertex.h"
+//#include "Utils/Shaders/shaderSimpleColor.h"
+//#include "Utils/Shaders/shaderColorPerVertex.h"
 
 namespace CGoGN
 {
@@ -95,16 +95,16 @@ private slots:
 
 public slots:
 	// slots for Python calls
-//	void changeDrawDarts(const QString& view, const QString& map, bool b);
-//	void changeDartsColor(const QString& view, const QString& map, QColor c);
-//	void changeDrawPhi1(const QString& view, const QString& map, bool b);
-//	void changePhi1Color(const QString& view, const QString& map, QColor c);
-//	void changeDrawPhi2(const QString& view, const QString& map, bool b);
-//	void changePhi2Color(const QString& view, const QString& map, QColor c);
+	void changeDrawDarts(const QString& view, const QString& map, bool b);
+	void changeDrawPhi1(const QString& view, const QString& map, bool b);
+	void changeDrawPhi2(const QString& view, const QString& map, bool b);
+	void changeDartsColor(const QString& view, const QString& map, const QString& color);
+	void changePhi1Color(const QString& view, const QString& map, const QString& color);
+	void changePhi2Color(const QString& view, const QString& map, const QString& color);
 
-//	void changePositionAttribute(const QString& map, const QString& attrName);
-//	void changeEdgesScaleFactor(const QString& map, int i);
-//	void changeFacesScaleFactor(const QString& map, int i);
+	void changePositionAttribute(const QString& map, const QString& attrName);
+	void changeEdgesScaleFactor(const QString& map, float s);
+	void changeFacesScaleFactor(const QString& map, float s);
 
 //signals:
 //	void dartSelected(Dart d);
@@ -119,7 +119,8 @@ protected:
 	QHash<MapHandlerGen*, MapParam> h_parameterSet;
 
 	/// shader used in TopoRender
-	CGoGN::Utils::ShaderSimpleColor* m_shaderTopo1;
+//	CGoGN::Utils::ShaderSimpleColor* m_shaderTopo1;
+	std::vector<CGoGN::Utils::GLSLShader*> m_shadersTopo;
 
 };
 

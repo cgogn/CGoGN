@@ -6,6 +6,7 @@
 
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderPhong.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/pointSprite.h"
 
@@ -28,19 +29,21 @@ struct MapParameters
 	MapParameters() :
 		positionVBO(NULL),
 		normalVBO(NULL),
+		colorVBO(NULL),
 		verticesScaleFactor(1.0f),
 		renderVertices(false),
 		renderEdges(false),
 		renderFaces(true),
 		faceStyle(FLAT),
-		diffuseColor(0.8f,0.9f,0.7f,0.0f),
+		diffuseColor(0.85f,0.25f,0.19f,0.0f),
 		simpleColor(0.0f,0.0f,0.0f,0.0f),
 		vertexColor(0.0f,0.0f,1.0f,0.0f)
-
 	{}
 
 	Utils::VBO* positionVBO;
 	Utils::VBO* normalVBO;
+	Utils::VBO* colorVBO;
+
 	float verticesScaleFactor;
 	bool renderVertices;
 	bool renderEdges;
@@ -56,10 +59,12 @@ struct MapParameters
 class Surface_Render_Plugin : public PluginInteraction
 {
 	Q_OBJECT
+
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 #if CGOGN_QT_DESIRED_VERSION == 5
 	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
 #endif
+
 	friend class Surface_Render_DockTab;
 
 public:
@@ -103,11 +108,12 @@ public slots:
 	// slots for Python calls
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
 	void changeNormalVBO(const QString& view, const QString& map, const QString& vbo);
+	void changeColorVBO(const QString& view, const QString& map, const QString& vbo);
 	void changeRenderVertices(const QString& view, const QString& map, bool b);
 	void changeVerticesScaleFactor(const QString&view, const QString& map, float f);
 	void changeRenderEdges(const QString& view, const QString& map, bool b);
 	void changeRenderFaces(const QString& view, const QString& map, bool b);
-	void changeFacesStyle(const QString& view, const QString& map, MapParameters::FaceShadingStyle style);
+	void changeFacesStyle(const QString& view, const QString& map, int);
 	void changeRenderBoundary(const QString& view, const QString& map, bool b);
 	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
@@ -119,6 +125,7 @@ protected:
 
 	CGoGN::Utils::ShaderFlat* m_flatShader;
 	CGoGN::Utils::ShaderPhong* m_phongShader;
+	CGoGN::Utils::ShaderColorPerVertex* m_colorPerVertexShader;
 	CGoGN::Utils::ShaderSimpleColor* m_simpleColorShader;
 	CGoGN::Utils::PointSprite* m_pointSprite;
 };

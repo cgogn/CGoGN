@@ -37,6 +37,7 @@ void Surface_Radiance_DockTab::positionVBOChanged(int index)
 			m_plugin->h_mapParameterSet[map].positionVBO = map->getVBO(combo_positionVBO->currentText());
 			foreach (View* v, map->getLinkedViews())
 				v->updateGL();
+			m_plugin->pythonRecording("changePositionVBO", "", map->getName(), combo_positionVBO->currentText());
 		}
 	}
 }
@@ -51,6 +52,7 @@ void Surface_Radiance_DockTab::normalVBOChanged(int index)
 			m_plugin->h_mapParameterSet[map].normalVBO = map->getVBO(combo_normalVBO->currentText());
 			foreach (View* v, map->getLinkedViews())
 				v->updateGL();
+			m_plugin->pythonRecording("changeNormalVBO", "", map->getName(), combo_normalVBO->currentText());
 		}
 	}
 }
@@ -78,6 +80,13 @@ void Surface_Radiance_DockTab::decimateClicked()
 		slider_decimationGoal->value() / 100.0f,
 		checkbox_halfCollapse->checkState() == Qt::Checked
 	);
+
+	m_plugin->pythonRecording("decimate", "",
+		m_schnapps->getSelectedMap()->getName(),
+		combo_positionVBO->currentText(),
+		combo_normalVBO->currentText(),
+		slider_decimationGoal->value() / 100.0f,
+		checkbox_halfCollapse->checkState() == Qt::Checked);
 }
 
 

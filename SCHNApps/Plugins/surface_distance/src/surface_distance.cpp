@@ -129,6 +129,9 @@ void Surface_Distance_Plugin::computeDistance(
 	// Algo::Geometry::computeDistance<PFP2>(map1, position1, distance1, map2, position2);
 	// Algo::Geometry::computeDistance<PFP2>(map2, position2, distance2, map1, position1);
 
+	this->pythonRecording("computeDistance", "", mapName1, positionAttributeName1, distanceAttributeName1, 
+							mapName2, positionAttributeName2, distanceAttributeName2);
+
 	mh1->notifyAttributeModification(distance1);
 	mh2->notifyAttributeModification(distance2);
 }

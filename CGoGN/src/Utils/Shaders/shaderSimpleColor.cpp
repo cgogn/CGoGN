@@ -92,7 +92,6 @@ void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
 	unbind();
 }
 
-
 void ShaderSimpleColor::setClippingPlane(const Geom::Vec4f& plane)
 {
 	m_planeClip = plane;
@@ -100,7 +99,6 @@ void ShaderSimpleColor::setClippingPlane(const Geom::Vec4f& plane)
 	glUniform4fv(*m_unif_planeClip, 1, plane.data());
 	unbind();
 }
-
 
 unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
 {

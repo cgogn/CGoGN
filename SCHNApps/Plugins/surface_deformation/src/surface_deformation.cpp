@@ -113,7 +113,7 @@ void MapParameters::stop(MapHandlerGen* mh)
 bool Surface_Deformation_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
-		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
 	m_dockTab = new Surface_Deformation_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Deformation");
@@ -380,16 +380,16 @@ void Surface_Deformation_Plugin::toggleMapDeformation(MapHandlerGen* map)
 	if(map)
 	{
 		MapParameters& p = h_parameterSet[map];
-		if(!p.initialized)
+		if (!p.initialized)
 		{
 			p.start(map);
-			if(p.initialized && map->isSelectedMap())
+			if (p.initialized && map->isSelectedMap())
 				m_dockTab->mapParametersInitialized(true);
 		}
 		else
 		{
 			p.stop(map);
-			if(!p.initialized && map->isSelectedMap())
+			if (!p.initialized && map->isSelectedMap())
 				m_dockTab->mapParametersInitialized(false);
 		}
 	}
@@ -401,9 +401,9 @@ void Surface_Deformation_Plugin::matchDiffCoord(MapHandlerGen* mh)
 	MapParameters& p = h_parameterSet[mh];
 
 	nlMakeCurrent(p.nlContext);
-	if(nlGetCurrentState() == NL_STATE_INITIAL)
+	if (nlGetCurrentState() == NL_STATE_INITIAL)
 		nlBegin(NL_SYSTEM) ;
-	for(int coord = 0; coord < 3; ++coord)
+	for (int coord = 0; coord < 3; ++coord)
 	{
 		LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 		nlBegin(NL_MATRIX);
@@ -421,13 +421,13 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 	MapParameters& p = h_parameterSet[mh];
 
-	if(p.initialized)
+	if (p.initialized)
 	{
 		CellMarkerNoUnmark<PFP2::MAP, VERTEX> m(*map) ;
 
-		for(Dart d = map->begin(); d != map->end(); map->next(d))
+		for (Dart d = map->begin(); d != map->end(); map->next(d))
 		{
-			if(!m.isMarked(d))
+			if (!m.isMarked(d))
 			{
 				m.mark(d) ;
 
@@ -441,11 +441,11 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 					Dart neigh = map->phi1(it) ;
 					PFP2::VEC3 v = p.positionAttribute[neigh] - pp ;
 					PFP2::VEC3 vv = p.positionInit[neigh] - ppInit ;
-					for(unsigned int i = 0; i < 3; ++i)
-						for(unsigned int j = 0; j < 3; ++j)
+					for (unsigned int i = 0; i < 3; ++i)
+						for (unsigned int j = 0; j < 3; ++j)
 							cov(i,j) += v[i] * vv[j];// * perMap->edgeWeight[it] / area ;
 					Dart dboundary = map->phi_1(it) ;
-					if(map->phi2(dboundary) == dboundary)
+					if (map->phi2(dboundary) == dboundary)
 					{
 						v = p.positionAttribute[dboundary] - pp ;
 						vv = p.positionInit[dboundary] - pp ;
@@ -454,15 +454,15 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 								cov(i,j) += v[i] * vv[j];// * perMap->edgeWeight[dboundary] / area ;
 					}
 					it = map->alpha1(it) ;
-				} while(it != d) ;
+				} while (it != d) ;
 
 				Eigen::JacobiSVD<Eigen::Matrix3f> svd(cov, Eigen::ComputeFullU | Eigen::ComputeFullV) ;
 				Eigen::Matrix3f R = svd.matrixU() * svd.matrixV().transpose() ;
 
-				if(R.determinant() < 0)
+				if (R.determinant() < 0)
 				{
 					Eigen::Matrix3f U = svd.matrixU() ;
-					for(unsigned int i = 0; i < 3; ++i)
+					for (unsigned int i = 0; i < 3; ++i)
 						U(i,2) *= -1 ;
 					R = U * svd.matrixV().transpose() ;
 				}
@@ -471,9 +471,9 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 			}
 		}
 
-		for(Dart d = map->begin(); d != map->end(); map->next(d))
+		for (Dart d = map->begin(); d != map->end(); map->next(d))
 		{
-			if(m.isMarked(d))
+			if (m.isMarked(d))
 			{
 				m.unmark(d) ;
 
@@ -491,7 +491,7 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 						++degree ;
 					}
 					it = map->alpha1(it) ;
-				} while(it != d) ;
+				} while (it != d) ;
 				r += p.vertexRotationMatrix[d] ;
 				r /= degree + 1 ;
 				PFP2::VEC3& dc = p.diffCoord[d] ;
@@ -531,9 +531,9 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 		}
 
 		nlMakeCurrent(p.nlContext);
-		if(nlGetCurrentState() == NL_STATE_INITIAL)
+		if (nlGetCurrentState() == NL_STATE_INITIAL)
 			nlBegin(NL_SYSTEM);
-		for(int coord = 0; coord < 3; ++coord)
+		for (int coord = 0; coord < 3; ++coord)
 		{
 			LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 			nlBegin(NL_MATRIX);
