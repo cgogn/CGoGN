@@ -512,16 +512,16 @@ void Cube<PFP>::cube(unsigned int x, unsigned int y, unsigned int z)
             this->m_tableVertDarts.push_back(tableBottom[i*(x+1)+j]);
     }
 
-	const std::vector<Dart>& tableTopFaces = gTop.getFaceDarts();
+	const std::vector<Dart>& tableTopFaces = gtop.getFaceDarts();
 	for (Dart f : tableTopFaces)
 	{
-		this-m_tableFaceDarts.push_back(f);
+		this->m_tableFaceDarts.push_back(f);
 	}
 
 	const std::vector<Dart>& tableBottomFaces = gBottom.getFaceDarts();
 	for (Dart f : tableBottomFaces)
 	{
-		this-m_tableFaceDarts.push_back(f);
+		this->m_tableFaceDarts.push_back(f);
 	}
 }
 
