@@ -133,10 +133,6 @@ protected:
 	int clip_id2;
 	int clip_id3;
 
-	Utils::ClippingShader* m_sh1;
-	Utils::ClippingShader* m_sh2;
-	Utils::ClippingShader* m_sh3;
-
 public:
 	// example of simple map creation
 	void createMap(int n);
