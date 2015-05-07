@@ -89,13 +89,13 @@ public:
 	virtual void collectBorder(Dart d) = 0;
 
 	template <typename FUNC>
-	void applyOnInsideVertices(FUNC& f);
+	void applyOnInsideVertices(FUNC& func);
 	template <typename FUNC>
-	void applyOnInsideEdges(FUNC& f);
+	void applyOnInsideEdges(FUNC& func);
 	template <typename FUNC>
-	void applyOnInsideFaces(FUNC& f);
+	void applyOnInsideFaces(FUNC& func);
 	template <typename FUNC>
-	void applyOnBorder(FUNC& f);
+	void applyOnBorder(FUNC& func);
 
 	inline void sort()
 	{
@@ -122,14 +122,22 @@ public:
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
 
-	virtual REAL computeArea (const VertexAttribute<VEC3, MAP>& /*pos*/, const EdgeAttribute<REAL, MAP>& /*edgearea*/)
+	virtual REAL computeArea(const VertexAttribute<VEC3, MAP>& /*pos*/)
 	{
 		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
 		return 0.0;
 	}
-	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& /*pos*/, const EdgeAttribute<REAL, MAP>& /*edgeangle*/, const EdgeAttribute<REAL, MAP>& /*edgearea*/, typename PFP::MATRIX33&)
+
+	virtual REAL computeArea(const VertexAttribute<VEC3, MAP>& /*pos*/, const EdgeAttribute<REAL, MAP>& /*edgearea*/)
 	{
-		assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes");
+		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
+		return 0.0;
+	}
+
+	virtual REAL borderEdgeRatio(Dart /*d*/, const VertexAttribute<VEC3, MAP>& /*pos*/)
+	{
+		assert(!"Warning: Collector<PFP>::borderEdgeRatio() should be overloaded in non-virtual derived classes");
+		return 1.0;
 	}
 };
 
@@ -158,8 +166,9 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
+	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos);
 	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgearea);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, const EdgeAttribute<REAL, MAP>& edgearea, typename PFP::MATRIX33&);
+	REAL borderEdgeRatio(Dart d, const VertexAttribute<VEC3, MAP>& pos);
 };
 
 /*********************************************************
@@ -189,8 +198,9 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
+	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos);
 	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgearea);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, const EdgeAttribute<REAL, MAP>& edgearea, typename PFP::MATRIX33&);
+	REAL borderEdgeRatio(Dart d, const VertexAttribute<VEC3, MAP>& pos);
 };
 
 /*********************************************************
@@ -227,8 +237,9 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
+	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos);
 	REAL computeArea(const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgearea);
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3, MAP>& pos, const EdgeAttribute<REAL, MAP>& edgeangle, const EdgeAttribute<REAL, MAP>& edgearea, typename PFP::MATRIX33&);
+	REAL borderEdgeRatio(Dart d, const VertexAttribute<VEC3, MAP>& pos);
 };
 
 /*********************************************************
@@ -309,7 +320,7 @@ public:
 
 class CollectorCriterion
 {
-public :
+public:
 	CollectorCriterion() {}
 	virtual ~CollectorCriterion() {}
 	virtual void init(Dart center) = 0;
@@ -324,12 +335,12 @@ class CollectorCriterion_VertexNormalAngle : public CollectorCriterion
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-private :
+private:
 	const VertexAttribute<VEC3, MAP>& vertexNormals;
 	REAL threshold;
 	VEC3 centerNormal;
 
-public :
+public:
 	CollectorCriterion_VertexNormalAngle(const VertexAttribute<VEC3, MAP>& n, REAL th) :
 		vertexNormals(n), threshold(th), centerNormal(0)
 	{}
@@ -349,12 +360,12 @@ class CollectorCriterion_TriangleNormalAngle : public CollectorCriterion
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-private :
+private:
 	const FaceAttribute<VEC3, MAP>& faceNormals;
 	REAL threshold;
 	VEC3 centerNormal;
 
-public :
+public:
 	CollectorCriterion_TriangleNormalAngle(const FaceAttribute<VEC3, MAP>& n, REAL th) :
 		faceNormals(n), threshold(th), centerNormal(0)
 	{}
@@ -374,12 +385,12 @@ class CollectorCriterion_VertexWithinSphere : public CollectorCriterion
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-private :
+private:
 	const VertexAttribute<VEC3, MAP>& vertexPositions;
 	REAL threshold;
 	VEC3 centerPosition;
 
-public :
+public:
 	CollectorCriterion_VertexWithinSphere(const VertexAttribute<VEC3, MAP>& p, REAL th) :
 		vertexPositions(p), threshold(th), centerPosition(0)
 	{}
