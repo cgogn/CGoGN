@@ -54,19 +54,19 @@ int main(int argc, char **argv)
 
 	std::vector<VertexAttribute<typename PFP::VEC3, MAP> > attr;
 	attr.push_back(position);
-	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices * 0.1) ;
+	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices / 10) ;
 
 	Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position) ;
 	Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position) ;
 	nbVertices = Algo::Topo::getNbOrbits<VERTEX>(myMap) ;
 
-	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices * 0.1) ;
+	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices / 10);
 
 	Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position) ;
 	Algo::Surface::Modelisation::LoopSubdivision<PFP>(myMap, position) ;
 	nbVertices = Algo::Topo::getNbOrbits<VERTEX>(myMap) ;
 
-	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices * 0.1) ;
+	Algo::Surface::Decimation::decimate<PFP>(myMap, Algo::Surface::Decimation::S_QEM, Algo::Surface::Decimation::A_QEM, attr, nbVertices / 10);
 
 	Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP>(myMap, position) ;
 	Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP>(myMap, position) ;

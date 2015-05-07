@@ -77,7 +77,7 @@ typename PFP::REAL meanEdgeLength(typename PFP::MAP& map, const VertexAttribute<
 
 	typename PFP::REAL length(0);
 	unsigned int nbe = 0;
-	for (unsigned int i = 0; i < CGoGN::Parallel::NumberOfThreads; ++i)
+	for (int i = 0; i < CGoGN::Parallel::NumberOfThreads; ++i)
 	{
 		length += lengths[i];
 		nbe += nbedges[i];

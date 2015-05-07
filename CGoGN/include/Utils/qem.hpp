@@ -285,7 +285,7 @@ REAL
 QuadricNd<REAL,N>::evaluate(const VECN& v) const
 {
 	Geom::Vector<N, double> v_d = v ;
-	return v_d*A*v_d + 2.*(b*v_d) + c ;
+	return v_d*(A*v_d) + 2.0*(b*v_d) + c ;
 }
 
 template <typename REAL, unsigned int N>
