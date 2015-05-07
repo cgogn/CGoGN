@@ -1031,10 +1031,10 @@ void HalfEdgeSelector_ColorGradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 
 	//std::cout << quadGeom(newPos) / (alpha/M_PI + quadHF(newHF)) << std::endl ;
 	// sum of QEM metric and color gradient metric
-	const REAL t = 0.01 ;
+	const REAL t = 0.01f ;
 	const REAL& err =
 		t * quadGeom(newPos) + // geom
-		(1-t) * computeGradientColorError(v0,v1).norm()/sqrt(3) // color
+		(1-t) * computeGradientColorError(v0,v1).norm()/sqrt(3.0) // color
 	;
 
 	/*std::cout << quadGeom(newPos) << std::endl ;

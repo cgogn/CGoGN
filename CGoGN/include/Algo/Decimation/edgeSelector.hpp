@@ -84,8 +84,8 @@ bool EdgeSelector_Random<PFP>::init()
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 		darts.push_back(d) ;
 
-	srand(time(NULL)) ;
-	int remains = darts.size() ;
+	srand((unsigned int )(time(NULL))) ;
+	int remains = int(darts.size()) ;
 	for(unsigned int i = 0; i < darts.size()-1; ++i) // generate the random permutation
 	{
 		int r = (rand() % remains) + i ;
@@ -1979,11 +1979,10 @@ void EdgeSelector_GeomColOptGradient<PFP>::computeEdgeInfo(Dart d, EdgeInfo& ein
 	const VEC3& newCol = m_colorApproximator.getApprox(d) ;
 
 	// sum of QEM metric and color gradient metric
-	const REAL t = 0.01 ;
+	const REAL t = 0.01f ;
 	const REAL err =
 		t * quad(newPos) +
-		(1-t) * (computeEdgeGradientColorError(d, newPos, newCol) + computeEdgeGradientColorError(m.phi2(d), newPos, newCol)).norm() / sqrt(3)
-	;
+		(1-t) * (computeEdgeGradientColorError(d, newPos, newCol) + computeEdgeGradientColorError(m.phi2(d), newPos, newCol)).norm() / sqrt(3.0) ;
 
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;

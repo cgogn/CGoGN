@@ -119,7 +119,7 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square grid twisted strip tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap, 10, 10, true);
-			g.embedIntoTwistedStrip(position, 0.2, 0.7, 5);
+			g.embedIntoTwistedStrip(position, 0.2f, 0.7f, 5);
 
 			Geom::Matrix44f trf;
 			trf.identity();
@@ -151,11 +151,11 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square cylinder tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
-			c.embedIntoCylinder(position,0.5,0.7,1.0);
+			c.embedIntoCylinder(position,0.5f,0.7f,1.0f);
 
 			Geom::Matrix44f trf;
 			trf.identity();
-			Geom::translate<float>(0.5,0.5,0.0,trf);
+			Geom::translate<float>(0.5f,0.5f,0.0f,trf);
 			c.transform(position, trf);
 
 
@@ -169,7 +169,7 @@ void MyQT::squareTiling(int code)
 			Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,20,20);
 			c.triangleBottom();
 			c.triangleTop();
-			c.embedIntoCylinder(position,0.5,0.7,1.0);
+			c.embedIntoCylinder(position,0.5f,0.7f,1.0f);
 
 			break;
 		}
@@ -212,7 +212,7 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square tore tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Tore<PFP> c(myMap,20,10);
-			c.embedIntoTore(position, 0.9, 0.5);
+			c.embedIntoTore(position, 0.9f, 0.5f);
 
 			c.exportPositions(position, "tore.bs");
 			break;
@@ -244,7 +244,7 @@ void MyQT::triangularTiling(int code)
 		{
 			std::cout << "triangle grid twisted strip tiling" << std::endl;
 			Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,10,10,true);
-			g.embedIntoTwistedStrip(position, 0.3, 0.8, 5);
+			g.embedIntoTwistedStrip(position, 0.3f, 0.8f, 5);
 
 			break;
 		}
@@ -252,7 +252,7 @@ void MyQT::triangularTiling(int code)
 		{
 			std::cout << "triangle grid helocoid tiling" << std::endl;
 			Algo::Surface::Tilings::Triangular::Grid<PFP> g(myMap,20,20,true);
-			g.embedIntoHelicoid(position, 0.3,  0.8, 5.0, 2.0);
+			g.embedIntoHelicoid(position, 0.3f,  0.8f, 5.0f, 2.0f);
 
 			break;
 		}
@@ -260,7 +260,7 @@ void MyQT::triangularTiling(int code)
 		{
 			std::cout << "triangle cylinder tiling" << std::endl;
 			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
-			c.embedIntoCylinder(position,0.5,0.7,5.0);
+			c.embedIntoCylinder(position,0.5f,0.7f,5.0f);
 
 			break;
 		}
@@ -270,7 +270,7 @@ void MyQT::triangularTiling(int code)
 			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
 			c.triangleBottom();
 			c.triangleTop();
-			c.embedIntoCylinder(position,0.5,0.7,5.0);
+			c.embedIntoCylinder(position,0.5f,0.7f,5.0f);
 
 			break;
 		}
@@ -280,7 +280,7 @@ void MyQT::triangularTiling(int code)
 			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
 			c.triangleTop();
 			c.triangleBottom();
-			c.embedIntoSphere(position,0.5);
+			c.embedIntoSphere(position,0.5f);
 
 			break;
 		}
@@ -290,7 +290,7 @@ void MyQT::triangularTiling(int code)
 			Algo::Surface::Tilings::Triangular::Cylinder<PFP> c(myMap,20,20);
 			c.triangleTop();
 			c.triangleBottom();
-			c.embedIntoCone(position,0.5, 5.0);
+			c.embedIntoCone(position,0.5f, 5.0f);
 
 			break;
 		}
@@ -298,7 +298,7 @@ void MyQT::triangularTiling(int code)
 		{
             std::cout << "triangle cube tiling" << std::endl;
             Algo::Surface::Tilings::Triangular::Cube<PFP> c(myMap,4,4,4);
-            c.embedIntoCube(position,5.0,5.0, 5.0);
+            c.embedIntoCube(position,5.0f,5.0f, 5.0f);
 
 			break;
 		}
@@ -306,7 +306,7 @@ void MyQT::triangularTiling(int code)
 		{
             std::cout << "triangle tore tiling" << std::endl;
             Algo::Surface::Tilings::Triangular::Tore<PFP> c(myMap,20,10);
-            c.embedIntoTore(position,5.0,2.0);
+            c.embedIntoTore(position,5.0f,2.0f);
 
 			break;
 		}

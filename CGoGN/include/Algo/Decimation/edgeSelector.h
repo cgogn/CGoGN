@@ -375,7 +375,7 @@ public:
 		m_positionApproximator(posApprox)
 	{
 		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
-		radius = bb.diagSize() * 0.003 ;
+		radius = bb.diagSize() * 0.003f ;
 
 		normal = m.template getAttribute<VEC3, VERTEX, MAP>("normal") ;
 		if(!normal.isValid())
