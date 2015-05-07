@@ -354,6 +354,7 @@ private:
 	VertexAttribute<VEC3, MAP> normal ;
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 	EdgeAttribute<REAL, MAP> edgeangle ;
+	EdgeAttribute<REAL, MAP> edgearea ;
 	VertexAttribute<REAL, MAP> kmax ;
 	VertexAttribute<REAL, MAP> kmin ;
 	VertexAttribute<VEC3, MAP> Kmax ;
@@ -390,6 +391,13 @@ public:
 			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
+		edgearea = m.template getAttribute<REAL, EDGE, MAP>("edgearea") ;
+		if(!edgearea.isValid())
+		{
+			edgearea = m.template addAttribute<REAL, EDGE, MAP>("edgearea") ;
+			Algo::Surface::Geometry::computeAreaEdges<PFP>(m, pos, edgearea) ;
+		}
+
 		kmax = m.template getAttribute<REAL, VERTEX, MAP>("kmax") ;
 		kmin = m.template getAttribute<REAL, VERTEX, MAP>("kmin") ;
 		Kmax = m.template getAttribute<VEC3, VERTEX, MAP>("Kmax") ;
@@ -404,7 +412,7 @@ public:
 			Kmax = m.template addAttribute<VEC3, VERTEX, MAP>("Kmax") ;
 			Kmin = m.template addAttribute<VEC3, VERTEX, MAP>("Kmin") ;
 			Knormal = m.template addAttribute<VEC3, VERTEX, MAP>("Knormal") ;
-			Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+			Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, edgearea, kmax, kmin, Kmax, Kmin, Knormal) ;
 		}
 
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
@@ -412,6 +420,7 @@ public:
 	~EdgeSelector_Curvature()
 	{
 //		this->m_map.removeAttribute(edgeangle) ;
+//		this->m_map.removeAttribute(edgearea) ;
 //		this->m_map.removeAttribute(kmax) ;
 //		this->m_map.removeAttribute(kmin) ;
 //		this->m_map.removeAttribute(Kmax) ;
@@ -452,6 +461,7 @@ private:
 
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 	EdgeAttribute<REAL, MAP> edgeangle ;
+	EdgeAttribute<REAL, MAP> edgearea ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -473,11 +483,19 @@ public:
 			Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
 		}
 
+		edgearea = m.template getAttribute<REAL, EDGE, MAP>("edgearea") ;
+		if(!edgearea.isValid())
+		{
+			edgearea = m.template addAttribute<REAL, EDGE, MAP>("edgearea") ;
+			Algo::Surface::Geometry::computeAreaEdges<PFP>(m, pos, edgearea) ;
+		}
+
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE, MAP>("edgeInfo") ;
 	}
 	~EdgeSelector_CurvatureTensor()
 	{
 //		this->m_map.removeAttribute(edgeangle) ;
+//		this->m_map.removeAttribute(edgearea) ;
 		this->m_map.removeAttribute(edgeInfo) ;
 	}
 	SelectorType getType() { return S_CurvatureTensor ; }
