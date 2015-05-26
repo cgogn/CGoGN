@@ -35,7 +35,7 @@ Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb)
 {
 
 	typedef typename VEC3::DATA_TYPE T ;
-	const T zero = 0.000001 ;
+	const T zero = T(0.000001) ;
 
 	T p = (P[0] - Pa[0]) * (Pb[1] - Pa[1]) - (Pb[0] - Pa[0]) * (P[1] - Pa[1]) ;
 
@@ -47,6 +47,24 @@ Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb)
 		return ALIGNED ;
 }
 
+template <typename VEC3>
+Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb, const VEC3& Np)
+{
+	typedef typename VEC3::DATA_TYPE T;
+	const T zero = T(0.000001);
+
+	VEC3 AB = Pb - Pa;
+	VEC3 ABN = AB ^ Np;
+
+	T ps = (P - Pa) * ABN;
+
+	if (ps > zero)
+		return RIGHT;
+	if (-ps > zero)
+		return LEFT;
+	return ALIGNED;
+}
+
 // TODO use triple product with a normal to the plane that contains u and v
 template <typename VEC3>
 int orientation2D(const VEC3& u, const VEC3& v)
@@ -54,7 +72,7 @@ int orientation2D(const VEC3& u, const VEC3& v)
 	typedef typename VEC3::DATA_TYPE T ;
 
 	T p = u[0] * v[1] - u[1] * v[0] ;
-	const T zero = 0.0001 ;
+	const T zero = T(0.0001) ;
 
 	if (p > zero)
 		return 1 ;
@@ -71,7 +89,7 @@ int aligned2D(const VEC3& u, const VEC3& v)
 	typedef typename VEC3::DATA_TYPE T ;
 
 	T p = u[0] * v[0] + u[1] * v[1] ;
-	const T zero = 0.0001 ;
+	const T zero = T(0.0001) ;
 
 	if (p > zero)
 		return 1 ;

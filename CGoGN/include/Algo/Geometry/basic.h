@@ -33,9 +33,6 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Surface
-{
-
 namespace Geometry
 {
 
@@ -54,7 +51,7 @@ template <typename PFP>
 inline typename PFP::REAL edgeLength(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typename PFP::VEC3 v = vectorOutOfDart<PFP>(map, d, position) ;
-	return v.norm() ;
+	return typename PFP::REAL(v.norm());
 }
 
 namespace Parallel
@@ -110,7 +107,7 @@ inline typename PFP::REAL meanEdgeLength(typename PFP::MAP& map,const VertexAttr
 }
 
 template <typename PFP>
-inline float angle(typename PFP::MAP& map, Dart d1, Dart d2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
+inline typename PFP::REAL angle(typename PFP::MAP& map, Dart d1, Dart d2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typename PFP::VEC3 v1 = vectorOutOfDart<PFP>(map, d1, position) ;
 	typename PFP::VEC3 v2 = vectorOutOfDart<PFP>(map, d2, position) ;
@@ -124,8 +121,6 @@ bool isTriangleObtuse(typename PFP::MAP& map, Dart d, const VertexAttribute<type
 }
 
 } // namespace Geometry
-
-} // namespace Surface
 
 } // namespace Algo
 

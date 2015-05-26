@@ -44,7 +44,7 @@ std::string Plane3D<T>::CGoGNnameOfType()
 /**********************************************/
 
 template <typename T>
-Plane3D<T>::Plane3D(int d) : m_normal(0), m_d(d)
+Plane3D<T>::Plane3D(T d) : m_normal(0), m_d(d)
 { }
 
 template <typename T>

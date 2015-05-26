@@ -22,7 +22,7 @@
  *                                                                              *
  *******************************************************************************/
 
-#include "Geometry/basic.h"
+#include "Algo/Geometry/basic.h"
 #include "Algo/Geometry/normal.h"
 
 #include <limits>
@@ -45,7 +45,7 @@ bool isEdgeConvex(typename PFP::MAP& map, Edge e, const VertexAttribute<typename
 	typedef typename PFP::VEC3 VEC3 ;
 
 	const VEC3 n = faceNormal<PFP>(map, e.dart, position);
-	const VEC3 ee = vectorOutOfDart<PFP>(map, map.phi1(map.phi2(e.dart)), position) ;
+	const VEC3 ee = Algo::Geometry::vectorOutOfDart<PFP>(map, map.phi1(map.phi2(e.dart)), position);
 
 	if((ee * n) < 0)
 		return true;

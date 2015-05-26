@@ -47,28 +47,29 @@ template <typename PFP>
 bool intersectionLineConvexFace(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
-	const float SMALL_NUM = std::numeric_limits<typename PFP::REAL>::min() * 5.0f;
+	const REAL SMALL_NUM = std::numeric_limits<typename PFP::REAL>::min() * 5.0f;
 
 	Dart d = f.dart;
 
 	VEC3 p1 = position[d];
 	VEC3 n = faceNormal<PFP>(map, d, position);
 	VEC3 w0 = P - p1;
-    float a = -(n*w0);
-    float b = n*Dir;
+	REAL a = -(n*w0);
+	REAL b = n*Dir;
 
     if (fabs(b) < SMALL_NUM)
 		return false;
 
-	float r = a / b;
+	REAL r = a / b;
 	Inter = P + r * Dir;           // intersect point of ray and plane
 
     // is I inside the face?
 	VEC3 p2 = position[map.phi1(d)];
 	VEC3 v = p2 - p1 ;
 	VEC3 vInter = Inter - p1;
-	float dirV = v * vInter;
+	REAL dirV = v * vInter;
 	if(fabs(dirV) < SMALL_NUM) // on an edge
 		return true;
 
@@ -79,7 +80,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Face f, const VertexAttr
 		p2 = position[map.phi1(it)];
 		v = p2 - p1;
 		vInter = Inter - p1;
-		float dirD = v * vInter;
+		REAL dirD = v * vInter;
 
 		if(fabs(dirD) < SMALL_NUM) // on an edge
 			return true;
@@ -97,7 +98,7 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Face f, const VertexA
 	typedef typename PFP::VEC3 VEC3 ;
 
 	VEC3 dir = PB - PA;
-	if (intersectionLineConvexFace(map, f, position, PA, dir, Inter))
+	if (intersectionLineConvexFace<PFP>(map, f, position, PA, dir, Inter))
 	{
 		VEC3 dirA = PA - Inter;
 		VEC3 dirB = PB - Inter;

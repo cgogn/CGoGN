@@ -400,7 +400,7 @@ void singularTriangle(
 	Traversor2FFaE<typename PFP::MAP> f(map, d) ;
 	for (Dart d2 = f.begin(); d2 != f.end(); d2 = f.next())
 	{
-		if(regularMarker.isMarked(d2) and ridge_segments[d2].type == SEGMENT)
+		if(regularMarker.isMarked(d2) && (ridge_segments[d2].type == SEGMENT))
 		{
 			if(isEdgeInTriangle<PFP>(map, ridge_segments[d2].p1.d, d))
 			{

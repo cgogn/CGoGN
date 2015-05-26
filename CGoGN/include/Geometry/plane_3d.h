@@ -54,7 +54,7 @@ class Plane3D
 		/*                CONSTRUCTORS                */
 		/**********************************************/
 
-		Plane3D(int d = 0);
+		Plane3D(T d = 0);
 
 		Plane3D(const Plane3D<T>& p);
 

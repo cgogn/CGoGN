@@ -23,6 +23,7 @@
  *******************************************************************************/
 
 #include <algorithm>
+#include <cassert>
 
 namespace CGoGN {
 namespace Geom {
@@ -160,7 +161,7 @@ template <unsigned int SIZE, typename REAL>
 unsigned int
 Tensor<SIZE, REAL>::nbElem() const
 {
-	return pow(SIZE,m_order) ;
+	return (unsigned int)(pow(SIZE, m_order));
 }
 
 template <unsigned int SIZE, typename REAL>
@@ -184,7 +185,7 @@ template <unsigned int SIZE, typename REAL>
 bool
 Tensor<SIZE, REAL>::incremIndex(std::vector<unsigned int>& p)
 {
-	int i = p.size() - 1 ;
+	int i = int(p.size()) - 1 ;
 	while (i >= 0)
 	{
 		p[i] = (p[i] + 1) % SIZE ;

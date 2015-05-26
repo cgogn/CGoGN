@@ -263,7 +263,7 @@ bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 	typedef typename PFP::REAL REAL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VEC3 v1 = vectorOutOfDart<PFP>(map, d, position);
+	VEC3 v1 = Algo::Geometry::vectorOutOfDart<PFP>(map, d, position);
 	VEC3 v2(point - position[d]);
 
 	v1.normalize();
@@ -291,12 +291,12 @@ bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Face f, con
 	}
 
 	VEC3 inter;
-	if( intersectionSegmentConvexFace(map, f, position, points[0], points[1], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[1], points[2], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[2], points[0], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[0], points[3], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[1], points[3], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[2], points[3], inter)
+	if( intersectionSegmentConvexFace<PFP>(map, f, position, points[0], points[1], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[1], points[2], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[2], points[0], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[0], points[3], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[1], points[3], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[2], points[3], inter)
 	)
 		return true;
 
