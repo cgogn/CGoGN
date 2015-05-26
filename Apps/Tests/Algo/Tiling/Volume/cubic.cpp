@@ -17,8 +17,8 @@ struct PFP2 : public PFP_DOUBLE
 };
 
 
-template Algo::Volume::Tilings::Cubic::Grid<PFP1>;
-template Algo::Volume::Tilings::Cubic::Grid<PFP2>;
+template class Algo::Volume::Tilings::Cubic::Grid<PFP1>;
+template class Algo::Volume::Tilings::Cubic::Grid<PFP2>;
 
 
 int test_cubic()

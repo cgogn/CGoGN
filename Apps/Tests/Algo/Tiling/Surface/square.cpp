@@ -23,20 +23,20 @@ struct PFP3 : public PFP_DOUBLE
 };
 
 
-template Algo::Surface::Tilings::Square::Grid<PFP1>;
-template Algo::Surface::Tilings::Square::Cylinder<PFP1>;
-template Algo::Surface::Tilings::Square::Cube<PFP1>;
-template Algo::Surface::Tilings::Square::Tore<PFP1>;
+template class Algo::Surface::Tilings::Square::Grid<PFP1>;
+template class Algo::Surface::Tilings::Square::Cylinder<PFP1>;
+template class Algo::Surface::Tilings::Square::Cube<PFP1>;
+template class Algo::Surface::Tilings::Square::Tore<PFP1>;
 
-template Algo::Surface::Tilings::Square::Grid<PFP2>;
-template Algo::Surface::Tilings::Square::Cylinder<PFP2>;
-template Algo::Surface::Tilings::Square::Cube<PFP2>;
-template Algo::Surface::Tilings::Square::Tore<PFP2>;
+template class Algo::Surface::Tilings::Square::Grid<PFP2>;
+template class Algo::Surface::Tilings::Square::Cylinder<PFP2>;
+template class Algo::Surface::Tilings::Square::Cube<PFP2>;
+template class Algo::Surface::Tilings::Square::Tore<PFP2>;
 
-template Algo::Surface::Tilings::Square::Grid<PFP3>;
-template Algo::Surface::Tilings::Square::Cylinder<PFP3>;
-template Algo::Surface::Tilings::Square::Cube<PFP3>;
-template Algo::Surface::Tilings::Square::Tore<PFP3>;
+template class Algo::Surface::Tilings::Square::Grid<PFP3>;
+template class Algo::Surface::Tilings::Square::Cylinder<PFP3>;
+template class Algo::Surface::Tilings::Square::Cube<PFP3>;
+template class Algo::Surface::Tilings::Square::Tore<PFP3>;
 
 
 int test_square()

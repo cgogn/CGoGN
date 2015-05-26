@@ -24,9 +24,9 @@ struct PFP3 : public PFP_DOUBLE
 
 
 // TODO implementation !!!
-template Algo::Surface::Tilings::Hexagonal::Grid<PFP1>;
-template Algo::Surface::Tilings::Hexagonal::Grid<PFP2>;
-template Algo::Surface::Tilings::Hexagonal::Grid<PFP3>;
+template class Algo::Surface::Tilings::Hexagonal::Grid<PFP1>;
+template class Algo::Surface::Tilings::Hexagonal::Grid<PFP2>;
+template class Algo::Surface::Tilings::Hexagonal::Grid<PFP3>;
 
 
 

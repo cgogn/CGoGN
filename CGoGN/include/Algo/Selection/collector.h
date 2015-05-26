@@ -30,6 +30,8 @@
 
 #include "Topology/generic/traversor/traversor2.h"
 
+#include <algorithm>
+
 /*****************************************
  * Class hierarchy :
  * Collector (virtual)
