@@ -30,7 +30,7 @@ void reverse2MapFaceKeepPhi2(MAP& map, Dart d)
 // private function
 inline Dart findOtherInCouplesOfDarts(const std::vector<Dart>& couples, Dart d)
 {
-	unsigned int nb = couples.size();
+	unsigned int nb = (unsigned int)(couples.size());
 	for (unsigned int i=0; i<nb; ++i)
 	{
 		if (couples[i] == d)
@@ -60,7 +60,7 @@ void uniformOrientationCC(MAP& map, Dart faceSeed)
 
 	// store couple of boundary edges the have same embedding
 	std::vector<Dart> couples;
-	int nb = boundEdges.size();
+	int nb = int(boundEdges.size());
 	int nbm = nb-1;
 	for (int i=0; i< nbm; ++i)
 	{

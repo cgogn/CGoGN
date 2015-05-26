@@ -219,7 +219,7 @@ void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typena
 				{
 					Dart ee = map.phi2(dd);
 					VEC3 normal = Algo::Surface::Geometry::newellNormal<PFP>(map,ee,positions);
-					VEC3 vd = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map,ee,positions);
+					VEC3 vd = Algo::Geometry::vectorOutOfDart<PFP>(map,ee,positions);
 					VEC3 v = vd ^ normal;
 					v.normalize();
 					VEC3 P = positions[map.phi1(ee)] + v* this->m_boundShift;

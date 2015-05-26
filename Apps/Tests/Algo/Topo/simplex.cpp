@@ -1,87 +1,26 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
+#include "Topology/map/embeddedMap3.h"
+
+#include "Algo/Topo/simplex.h"
+
+using namespace CGoGN;
+
+template bool Algo::Topo::isSimplex<VERTEX, EmbeddedMap2>(const EmbeddedMap2& map, Dart d);
+template bool Algo::Topo::isSimplex<EDGE, EmbeddedMap2>(const EmbeddedMap2& map, Dart d);
+template bool Algo::Topo::isSimplex<FACE, EmbeddedMap2>(const EmbeddedMap2& map, Dart d);
+template bool Algo::Topo::isSimplex<VOLUME, EmbeddedMap2>(const EmbeddedMap2& map, Dart d);
 
 
-#ifndef __SIMPLEX__
-#define __SIMPLEX__
+template bool Algo::Topo::isSimplex<VERTEX, EmbeddedMap3>(const EmbeddedMap3& map, Dart d);
+template bool Algo::Topo::isSimplex<EDGE, EmbeddedMap3>(const EmbeddedMap3& map, Dart d);
+template bool Algo::Topo::isSimplex<FACE, EmbeddedMap3>(const EmbeddedMap3& map, Dart d);
+template bool Algo::Topo::isSimplex<VOLUME, EmbeddedMap3>(const EmbeddedMap3& map, Dart d);
 
-#include "Topology/generic/cells.h"
 
-namespace CGoGN
+int test_simplex()
 {
-
-namespace Algo
-{
-
-namespace Topo
-{
-
-
-template <typename MAP, unsigned int ORBIT>
-bool isSimplex(const MAP& map, Dart d)
-{
-	if (ORBIT==VOLUME)
-	{
-		Dart d1 = map.phi2(d);
-		Dart e = map.phi1(d);
-		Dart d2 = map.phi2(e);
-		e = map.phi1(e);
-		Dart d3 = map.phi2(d);
-
-		if (map.phi1(e) != d)  // check that face of d is a triangle
-			return false;
-
-		if (map.phi_1(d1) != map.template phi<12>(d2))
-			return false;
-		if (map.phi_1(d2) != map.template phi<12>(d3))
-			return false;
-		if (map.phi_1(d3) != map.template phi<12>(d1))
-			return false;
-
-		if (! map.isCycleTriangle(d1))
-			return false;
-		if (! map.isCycleTriangle(d2))
-			return false;
-		if (! map.isCycleTriangle(d3))
-			return false;
-
-		return true;
-	}
-	if (ORBIT==FACE)
-	{
-		return map.isCycleTriangle(d);
-	}
-
-	return true;
+	return 0;
 }
 
-
-} // namespace Topo
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-
-#endif

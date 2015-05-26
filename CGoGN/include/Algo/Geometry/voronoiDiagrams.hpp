@@ -50,7 +50,7 @@ template <typename PFP>
 void VoronoiDiagram<PFP>::setSeeds_random (unsigned int nseeds)
 {
 	seeds.clear();
-	srand ( time(NULL) );
+	srand ( (unsigned int)(time(NULL)) );
 	const unsigned int nbv = map.getNbCells(VERTEX);
 
 	std::set<unsigned int> myVertices ;
@@ -101,11 +101,11 @@ void VoronoiDiagram<PFP>::initFrontWithSeeds ()
 	}
 }
 
-template <typename PFP>
-void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL,typename PFP::MAP>& c)
-{
-	edgeCost = c;
-}
+//template <typename PFP>
+//void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL,typename PFP::MAP>& c)
+//{
+//	edgeCost = c;
+//}
 
 template <typename PFP>
 void VoronoiDiagram<PFP>::collectVertexFromFront(Dart e)
@@ -416,13 +416,14 @@ typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateEnergyFromRoot(Dart e)
 template <typename PFP>
 void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned int numSeed)
 {
+	typedef typename PFP::REAL REAL;
 	// precondition : energyGrad.size() > numSeed
 	Dart e = this->seeds[numSeed];
 
 	std::vector<Dart> v;
 	v.reserve(8);
 
-	std::vector<float> da;
+	std::vector<REAL> da;
 	da.reserve(8);
 
 	distances[e] = 0.0;
@@ -432,7 +433,7 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned i
 	{
 		if ( pathOrigins[f] == this->map.phi2(f))
 		{
-			float distArea = cumulateEnergyFromRoot(f);
+			REAL distArea = cumulateEnergyFromRoot(f);
 			da.push_back(distArea);
 			distances[e] += distances[f];
 			v.push_back(f);
@@ -458,12 +459,13 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned i
 template <typename PFP>
 Dart CentroidalVoronoiDiagram<PFP>::selectBestNeighborFromSeed(unsigned int numSeed)
 {
+	typedef typename PFP::REAL REAL;
 	Dart e = this->seeds[numSeed];
 	Dart newSeed = e;
 	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3,VERTEX,typename PFP::MAP>("position");
 
 	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
-	float maxProj = 0.0;
+	REAL maxProj = 0;
 	Traversor2VVaE<MAP> tv (this->map, e);
 	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
 	{
@@ -471,7 +473,7 @@ Dart CentroidalVoronoiDiagram<PFP>::selectBestNeighborFromSeed(unsigned int numS
 		{
 			VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
 	//		edgeV.normalize();
-			float proj = edgeV * energyGrad[numSeed];
+			REAL proj = edgeV * energyGrad[numSeed];
 			if (proj > maxProj)
 			{
 				maxProj = proj;

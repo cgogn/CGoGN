@@ -1,133 +1,131 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
+#include "Topology/map/embeddedMap3.h"
 
-#ifndef __ALGO_TOPO_EMBEDDING__
-#define __ALGO_TOPO_EMBEDDING__
+#include "Algo/Topo/embedding.h"
 
-namespace CGoGN
+using namespace CGoGN;
+
+template void Algo::Topo::setOrbitEmbedding<VERTEX, EmbeddedMap2>(EmbeddedMap2& m, Cell<VERTEX> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<EDGE, EmbeddedMap2>(EmbeddedMap2& m, Cell<EDGE> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<FACE, EmbeddedMap2>(EmbeddedMap2& m, Cell<FACE> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<VOLUME, EmbeddedMap2>(EmbeddedMap2& m, Cell<VOLUME> c, unsigned int em);
+
+template void Algo::Topo::setOrbitEmbedding<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VERTEX> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<EDGE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<EDGE> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<FACE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<FACE> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VOLUME> c, unsigned int em);
+
+template void Algo::Topo::setOrbitEmbedding<VERTEX, EmbeddedMap3>(EmbeddedMap3& m, Cell<VERTEX> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<EDGE, EmbeddedMap3>(EmbeddedMap3& m, Cell<EDGE> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<FACE, EmbeddedMap3>(EmbeddedMap3& m, Cell<FACE> c, unsigned int em);
+template void Algo::Topo::setOrbitEmbedding<VOLUME, EmbeddedMap3>(EmbeddedMap3& m, Cell<VOLUME> c, unsigned int em);
+
+
+
+template void Algo::Topo::initOrbitEmbedding<VERTEX, EmbeddedMap2>(EmbeddedMap2& m, Cell<VERTEX> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<EDGE, EmbeddedMap2>(EmbeddedMap2& m, Cell<EDGE> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<FACE, EmbeddedMap2>(EmbeddedMap2& m, Cell<FACE> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<VOLUME, EmbeddedMap2>(EmbeddedMap2& m, Cell<VOLUME> c, unsigned int em);
+
+template void Algo::Topo::initOrbitEmbedding<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VERTEX> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<EDGE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<EDGE> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<FACE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<FACE> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VOLUME> c, unsigned int em);
+
+template void Algo::Topo::initOrbitEmbedding<VERTEX, EmbeddedMap3>(EmbeddedMap3& m, Cell<VERTEX> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<EDGE, EmbeddedMap3>(EmbeddedMap3& m, Cell<EDGE> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<FACE, EmbeddedMap3>(EmbeddedMap3& m, Cell<FACE> c, unsigned int em);
+template void Algo::Topo::initOrbitEmbedding<VOLUME, EmbeddedMap3>(EmbeddedMap3& m, Cell<VOLUME> c, unsigned int em);
+
+
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX, EmbeddedMap2>(EmbeddedMap2& m, Cell<VERTEX> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<EDGE, EmbeddedMap2>(EmbeddedMap2& m, Cell<EDGE> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<FACE, EmbeddedMap2>(EmbeddedMap2& m, Cell<FACE> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<VOLUME, EmbeddedMap2>(EmbeddedMap2& m, Cell<VOLUME> c);
+
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VERTEX> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<EDGE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<EDGE> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<FACE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<FACE> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VOLUME> c);
+
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX, EmbeddedMap3>(EmbeddedMap3& m, Cell<VERTEX> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<EDGE, EmbeddedMap3>(EmbeddedMap3& m, Cell<EDGE> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<FACE, EmbeddedMap3>(EmbeddedMap3& m, Cell<FACE> c);
+template unsigned int Algo::Topo::setOrbitEmbeddingOnNewCell<VOLUME, EmbeddedMap3>(EmbeddedMap3& m, Cell<VOLUME> c);
+
+
+
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<VERTEX, EmbeddedMap2>(EmbeddedMap2& m, Cell<VERTEX> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<EDGE, EmbeddedMap2>(EmbeddedMap2& m, Cell<EDGE> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<FACE, EmbeddedMap2>(EmbeddedMap2& m, Cell<FACE> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<VOLUME, EmbeddedMap2>(EmbeddedMap2& m, Cell<VOLUME> c);
+
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VERTEX> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<EDGE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<EDGE> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<FACE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<FACE> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VOLUME> c);
+
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<VERTEX, EmbeddedMap3>(EmbeddedMap3& m, Cell<VERTEX> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<EDGE, EmbeddedMap3>(EmbeddedMap3& m, Cell<EDGE> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<FACE, EmbeddedMap3>(EmbeddedMap3& m, Cell<FACE> c);
+template unsigned int Algo::Topo::initOrbitEmbeddingOnNewCell<VOLUME, EmbeddedMap3>(EmbeddedMap3& m, Cell<VOLUME> c);
+
+
+
+template void Algo::Topo::copyCellAttributes<VERTEX, EmbeddedMap2>(EmbeddedMap2& m, Cell<VERTEX> c, Cell<VERTEX> e);
+template void Algo::Topo::copyCellAttributes<EDGE, EmbeddedMap2>(EmbeddedMap2& m, Cell<EDGE> c, Cell<EDGE> e);
+template void Algo::Topo::copyCellAttributes<FACE, EmbeddedMap2>(EmbeddedMap2& m, Cell<FACE> c, Cell<FACE> e);
+template void Algo::Topo::copyCellAttributes<VOLUME, EmbeddedMap2>(EmbeddedMap2& m, Cell<VOLUME> c, Cell<VOLUME> e);
+
+template void Algo::Topo::copyCellAttributes<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VERTEX> c, Cell<VERTEX> e);
+template void Algo::Topo::copyCellAttributes<EDGE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<EDGE> c, Cell<EDGE> e);
+template void Algo::Topo::copyCellAttributes<FACE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<FACE> c, Cell<FACE> e);
+template void Algo::Topo::copyCellAttributes<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VOLUME> c, Cell<VOLUME> e);
+
+template void Algo::Topo::copyCellAttributes<VERTEX, EmbeddedMap3>(EmbeddedMap3& m, Cell<VERTEX> c, Cell<VERTEX> e);
+template void Algo::Topo::copyCellAttributes<EDGE, EmbeddedMap3>(EmbeddedMap3& m, Cell<EDGE> c, Cell<EDGE> e);
+template void Algo::Topo::copyCellAttributes<FACE, EmbeddedMap3>(EmbeddedMap3& m, Cell<FACE> c, Cell<FACE> e);
+template void Algo::Topo::copyCellAttributes<VOLUME, EmbeddedMap3>(EmbeddedMap3& m, Cell<VOLUME> c, Cell<VOLUME> e);
+
+
+
+template void Algo::Topo::boundaryMarkOrbit<2, VERTEX, EmbeddedMap2>(EmbeddedMap2& m, Cell<VERTEX> c);
+template void Algo::Topo::boundaryMarkOrbit<2, EDGE, EmbeddedMap2>(EmbeddedMap2& m, Cell<EDGE> c);
+template void Algo::Topo::boundaryMarkOrbit<2, FACE, EmbeddedMap2>(EmbeddedMap2& m, Cell<FACE> c);
+template void Algo::Topo::boundaryMarkOrbit<2, VOLUME, EmbeddedMap2>(EmbeddedMap2& m, Cell<VOLUME> c);
+
+template void Algo::Topo::boundaryMarkOrbit<2, VERTEX, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VERTEX> c);
+template void Algo::Topo::boundaryMarkOrbit<2, EDGE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<EDGE> c);
+template void Algo::Topo::boundaryMarkOrbit<2, FACE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<FACE> c);
+template void Algo::Topo::boundaryMarkOrbit<2, VOLUME, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VOLUME> c);
+
+template void Algo::Topo::boundaryMarkOrbit<3, VERTEX, EmbeddedMap3>(EmbeddedMap3& m, Cell<VERTEX> c);
+template void Algo::Topo::boundaryMarkOrbit<3, EDGE, EmbeddedMap3>(EmbeddedMap3& m, Cell<EDGE> c);
+template void Algo::Topo::boundaryMarkOrbit<3, FACE, EmbeddedMap3>(EmbeddedMap3& m, Cell<FACE> c);
+template void Algo::Topo::boundaryMarkOrbit<3, VOLUME, EmbeddedMap3>(EmbeddedMap3& m, Cell<VOLUME> c);
+
+
+
+template void Algo::Topo::boundaryUnmarkOrbit<2, VERTEX, EmbeddedMap2>(EmbeddedMap2& m, Cell<VERTEX> c);
+template void Algo::Topo::boundaryUnmarkOrbit<2, EDGE, EmbeddedMap2>(EmbeddedMap2& m, Cell<EDGE> c);
+template void Algo::Topo::boundaryUnmarkOrbit<2, FACE, EmbeddedMap2>(EmbeddedMap2& m, Cell<FACE> c);
+template void Algo::Topo::boundaryUnmarkOrbit<2, VOLUME, EmbeddedMap2>(EmbeddedMap2& m, Cell<VOLUME> c);
+
+template void Algo::Topo::boundaryUnmarkOrbit<2, VERTEX, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VERTEX> c);
+template void Algo::Topo::boundaryUnmarkOrbit<2, EDGE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<EDGE> c);
+template void Algo::Topo::boundaryUnmarkOrbit<2, FACE, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<FACE> c);
+template void Algo::Topo::boundaryUnmarkOrbit<2, VOLUME, EmbeddedGMap2>(EmbeddedGMap2& m, Cell<VOLUME> c);
+
+template void Algo::Topo::boundaryUnmarkOrbit<3, VERTEX, EmbeddedMap3>(EmbeddedMap3& m, Cell<VERTEX> c);
+template void Algo::Topo::boundaryUnmarkOrbit<3, EDGE, EmbeddedMap3>(EmbeddedMap3& m, Cell<EDGE> c);
+template void Algo::Topo::boundaryUnmarkOrbit<3, FACE, EmbeddedMap3>(EmbeddedMap3& m, Cell<FACE> c);
+template void Algo::Topo::boundaryUnmarkOrbit<3, VOLUME, EmbeddedMap3>(EmbeddedMap3& m, Cell<VOLUME> c);
+
+
+int test_embedding()
 {
-
-namespace Algo
-{
-
-namespace Topo
-{
-
-/**
-* Set the index of the associated cell to all the darts of an orbit
-* @param orbit orbit to embed
-* @param d a dart of the topological vertex
-* @param em index of attribute to store as embedding
-*/
-template <unsigned int ORBIT, typename MAP>
-inline void setOrbitEmbedding(MAP& m, Cell<ORBIT> c, unsigned int em)
-{
-	assert(m.template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	m.foreach_dart_of_orbit(c, [&] (Dart d) { m.template setDartEmbedding<ORBIT>(d, em); });
+	return 0;
 }
 
-/**
- * Set the index of the associated cell to all the darts of an orbit
- * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
- */
-template <unsigned int ORBIT, typename MAP>
-inline void initOrbitEmbedding(MAP& m, Cell<ORBIT> c, unsigned int em)
-{
-	assert(m.template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	m.foreach_dart_of_orbit(c, [&] (Dart d) { m.template initDartEmbedding<ORBIT>(d, em); });
-}
-
-/**
-* Associate an new cell to all darts of an orbit
-* @param orbit orbit to embed
-* @param d a dart of the topological cell
-* @return index of the attribute in table
-*/
-template <unsigned int ORBIT, typename MAP>
-inline unsigned int setOrbitEmbeddingOnNewCell(MAP& m, Cell<ORBIT> c)
-{
-	assert(m.template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int em = m.template newCell<ORBIT>();
-	setOrbitEmbedding<ORBIT>(m, c, em);
-	return em;
-}
-
-/**
- * Associate an new cell to all darts of an orbit
- * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding)!!! WARNING !!!
- */
-template <unsigned int ORBIT, typename MAP>
-inline unsigned int initOrbitEmbeddingOnNewCell(MAP& m, Cell<ORBIT> d)
-{
-	assert(m.template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int em = m.template newCell<ORBIT>();
-	initOrbitEmbedding<ORBIT>(m, d, em);
-	return em;
-}
-
-/**
- * Copy the cell associated to a dart over an other dart
- * @param orbit attribute orbit to use
- * @param d the dart to overwrite (dest)
- * @param e the dart to copy (src)
- */
-template <unsigned int ORBIT, typename MAP>
-inline void copyCellAttributes(MAP& m, Cell<ORBIT> d, Cell<ORBIT> e)
-{
-	assert(m.template isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	unsigned int dE = m.getEmbedding(d) ;
-	unsigned int eE = m.getEmbedding(e) ;
-	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
-	{
-		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-			dE = setOrbitEmbeddingOnNewCell(m, d) ;
-		AttributeContainer& cont = m.template getAttributeContainer<ORBIT>();
-		cont.copyLine(dE, eE) ;	// copy the data
-	}
-}
-
-template <unsigned int DIM, unsigned int ORBIT, typename MAP>
-void boundaryMarkOrbit(MAP& m, Cell<ORBIT> c)
-{
-	m.foreach_dart_of_orbit(c, [&] (Dart d) { m.template boundaryMark<DIM>(d); });
-}
-
-template <unsigned int DIM, unsigned int ORBIT, typename MAP>
-void boundaryUnmarkOrbit(MAP& m, Cell<ORBIT> c)
-{
-	m.foreach_dart_of_orbit(c, [&] (Dart d)	{ m.template boundaryUnmark<DIM>(d);	});
-}
-
-} // namespace Topo
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-#endif

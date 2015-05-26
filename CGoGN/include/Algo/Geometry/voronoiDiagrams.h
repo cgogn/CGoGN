@@ -57,7 +57,8 @@ public :
 	virtual void setSeeds_fromVector (const std::vector<Dart>&);
 	virtual void setSeeds_random (unsigned int nbseeds);
 	const std::vector<Dart>& getBorder () { return border; }
-	void setCost (const EdgeAttribute<REAL,MAP>& c);
+
+//	void setCost (const EdgeAttribute<REAL,MAP>& c); // impossible to reaffect a ref TODO pointer ?
 
 	Dart computeDiagram ();
 	virtual void computeDiagram_incremental (unsigned int nbseeds);
@@ -108,7 +109,7 @@ public :
 	// move each seed along one edge according to the energy gradient + check that the energy decreases
 	unsigned int moveSeedsToMedioid(); // returns the number of seeds that did move
 	// move each seed to the medioid of its region
-	REAL getGlobalEnergy() { return globalEnergy; }
+	REAL getGlobalEnergy() { return REAL(globalEnergy); }
 
 protected :
 	void clear();

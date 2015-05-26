@@ -38,7 +38,7 @@ namespace Topo
 {
 
 
-template <typename MAP, unsigned int ORBIT>
+template <unsigned int ORBIT, typename MAP>
 bool isSimplex(const MAP& map, Dart d)
 {
 	if (ORBIT==VOLUME)

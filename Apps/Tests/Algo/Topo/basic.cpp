@@ -1,136 +1,84 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
+#include "Topology/map/embeddedMap3.h"
 
-#ifndef __ALGO_TOPO_BASIC__
-#define __ALGO_TOPO_BASIC__
+#include "Algo/Topo/basic.h"
 
-#include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/traversor/traversorCell.h"
+using namespace CGoGN;
 
-namespace CGoGN
+template unsigned int Algo::Topo::getNbOrbits<VERTEX, EmbeddedMap2>(const EmbeddedMap2& map);
+template unsigned int Algo::Topo::getNbOrbits<EDGE, EmbeddedMap2>(const EmbeddedMap2& map);
+template unsigned int Algo::Topo::getNbOrbits<FACE, EmbeddedMap2>(const EmbeddedMap2& map);
+template unsigned int Algo::Topo::getNbOrbits<VOLUME, EmbeddedMap2>(const EmbeddedMap2& map);
+
+template unsigned int Algo::Topo::getNbOrbits<VERTEX, EmbeddedGMap2>(const EmbeddedGMap2& map);
+template unsigned int Algo::Topo::getNbOrbits<EDGE, EmbeddedGMap2>(const EmbeddedGMap2& map);
+template unsigned int Algo::Topo::getNbOrbits<FACE, EmbeddedGMap2>(const EmbeddedGMap2& map);
+template unsigned int Algo::Topo::getNbOrbits<VOLUME, EmbeddedGMap2>(const EmbeddedGMap2& map);
+
+template unsigned int Algo::Topo::getNbOrbits<VERTEX, EmbeddedMap3>(const EmbeddedMap3& map);
+template unsigned int Algo::Topo::getNbOrbits<EDGE, EmbeddedMap3>(const EmbeddedMap3& map);
+template unsigned int Algo::Topo::getNbOrbits<FACE, EmbeddedMap3>(const EmbeddedMap3& map);
+template unsigned int Algo::Topo::getNbOrbits<VOLUME, EmbeddedMap3>(const EmbeddedMap3& map);
+
+
+
+template unsigned int Algo::Topo::getNbOrbits<EmbeddedMap2>(const EmbeddedMap2& map, unsigned int orbit);
+template unsigned int Algo::Topo::getNbOrbits<EmbeddedGMap2>(const EmbeddedGMap2& map, unsigned int orbit);
+template unsigned int Algo::Topo::getNbOrbits<EmbeddedMap3>(const EmbeddedMap3& map, unsigned int orbit);
+
+
+template void Algo::Topo::initAllOrbitsEmbedding<VERTEX, EmbeddedMap2>(EmbeddedMap2& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<EDGE, EmbeddedMap2>(EmbeddedMap2& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<FACE, EmbeddedMap2>(EmbeddedMap2& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<VOLUME, EmbeddedMap2>(EmbeddedMap2& map, bool realloc);
+
+template void Algo::Topo::initAllOrbitsEmbedding<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<EDGE, EmbeddedGMap2>(EmbeddedGMap2& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<FACE, EmbeddedGMap2>(EmbeddedGMap2& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& map, bool realloc);
+
+template void Algo::Topo::initAllOrbitsEmbedding<VERTEX, EmbeddedMap3>(EmbeddedMap3& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<EDGE, EmbeddedMap3>(EmbeddedMap3& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<FACE, EmbeddedMap3>(EmbeddedMap3& map, bool realloc);
+template void Algo::Topo::initAllOrbitsEmbedding<VOLUME, EmbeddedMap3>(EmbeddedMap3& map, bool realloc);
+
+
+template unsigned int Algo::Topo::computeIndexCells<VERTEX, EmbeddedMap2>(EmbeddedMap2& map, AttributeHandler<unsigned int, VERTEX, EmbeddedMap2>& idx);
+template unsigned int Algo::Topo::computeIndexCells<EDGE, EmbeddedMap2>(EmbeddedMap2& map, AttributeHandler<unsigned int, EDGE, EmbeddedMap2>& idx);
+template unsigned int Algo::Topo::computeIndexCells<FACE, EmbeddedMap2>(EmbeddedMap2& map, AttributeHandler<unsigned int, FACE, EmbeddedMap2>& idx);
+template unsigned int Algo::Topo::computeIndexCells<VOLUME, EmbeddedMap2>(EmbeddedMap2& map, AttributeHandler<unsigned int, VOLUME, EmbeddedMap2>& idx);
+
+template unsigned int Algo::Topo::computeIndexCells<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& map, AttributeHandler<unsigned int, VERTEX, EmbeddedGMap2>& idx);
+template unsigned int Algo::Topo::computeIndexCells<EDGE, EmbeddedGMap2>(EmbeddedGMap2& map, AttributeHandler<unsigned int, EDGE, EmbeddedGMap2>& idx);
+template unsigned int Algo::Topo::computeIndexCells<FACE, EmbeddedGMap2>(EmbeddedGMap2& map, AttributeHandler<unsigned int, FACE, EmbeddedGMap2>& idx);
+template unsigned int Algo::Topo::computeIndexCells<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& map, AttributeHandler<unsigned int, VOLUME, EmbeddedGMap2>& idx);
+
+template unsigned int Algo::Topo::computeIndexCells<VERTEX, EmbeddedMap3>(EmbeddedMap3& map, AttributeHandler<unsigned int, VERTEX, EmbeddedMap3>& idx);
+template unsigned int Algo::Topo::computeIndexCells<EDGE, EmbeddedMap3>(EmbeddedMap3& map, AttributeHandler<unsigned int, EDGE, EmbeddedMap3>& idx);
+template unsigned int Algo::Topo::computeIndexCells<FACE, EmbeddedMap3>(EmbeddedMap3& map, AttributeHandler<unsigned int, FACE, EmbeddedMap3>& idx);
+template unsigned int Algo::Topo::computeIndexCells<VOLUME, EmbeddedMap3>(EmbeddedMap3& map, AttributeHandler<unsigned int, VOLUME, EmbeddedMap3>& idx);
+
+
+template void Algo::Topo::bijectiveOrbitEmbedding<VERTEX, EmbeddedMap2>(EmbeddedMap2& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<EDGE, EmbeddedMap2>(EmbeddedMap2& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<FACE, EmbeddedMap2>(EmbeddedMap2& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<VOLUME, EmbeddedMap2>(EmbeddedMap2& map);
+
+template void Algo::Topo::bijectiveOrbitEmbedding<VERTEX, EmbeddedGMap2>(EmbeddedGMap2& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<EDGE, EmbeddedGMap2>(EmbeddedGMap2& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<FACE, EmbeddedGMap2>(EmbeddedGMap2& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<VOLUME, EmbeddedGMap2>(EmbeddedGMap2& map);
+
+template void Algo::Topo::bijectiveOrbitEmbedding<VERTEX, EmbeddedMap3>(EmbeddedMap3& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<EDGE, EmbeddedMap3>(EmbeddedMap3& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<FACE, EmbeddedMap3>(EmbeddedMap3& map);
+template void Algo::Topo::bijectiveOrbitEmbedding<VOLUME, EmbeddedMap3>(EmbeddedMap3& map);
+
+
+
+int test_basic()
 {
-
-namespace Algo
-{
-
-namespace Topo
-{
-
-template <unsigned int ORBIT, typename MAP>
-unsigned int getNbOrbits(const MAP& map)
-{
-	unsigned int cpt = 0;
-	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT>) { ++cpt; }, FORCE_DART_MARKING);
-	return cpt;
-}
-
-template <typename MAP>
-unsigned int getNbOrbits(const MAP& map, unsigned int orbit)
-{
-	switch(orbit)
-	{
-		case DART:		return getNbOrbits<DART, MAP>(map);
-		case VERTEX: 	return getNbOrbits<VERTEX, MAP>(map);
-		case EDGE: 		return getNbOrbits<EDGE, MAP>(map);
-		case FACE: 		return getNbOrbits<FACE, MAP>(map);
-		case VOLUME: 	return getNbOrbits<VOLUME, MAP>(map);
-		case VERTEX1: 	return getNbOrbits<VERTEX1, MAP>(map);
-		case EDGE1: 	return getNbOrbits<EDGE1, MAP>(map);
-		case VERTEX2: 	return getNbOrbits<VERTEX2, MAP>(map);
-		case EDGE2:		return getNbOrbits<EDGE2, MAP>(map);
-		case FACE2:		return getNbOrbits<FACE2, MAP>(map);
-		default: 		assert(!"Cells of this dimension are not handled"); break;
-	}
 	return 0;
 }
-
-/**
- * Traverse the map and embed all orbits of the given dimension with a new cell
- * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
- */
-template <unsigned int ORBIT, typename MAP>
-void initAllOrbitsEmbedding(MAP& map, bool realloc = false)
-{
-	if(!map.template isOrbitEmbedded<ORBIT>())
-		map.template addEmbedding<ORBIT>() ;
-
-	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT> c)
-	{
-		if(realloc || map.template getEmbedding<ORBIT>(c) == EMBNULL)
-			Algo::Topo::setOrbitEmbeddingOnNewCell<ORBIT>(map, c) ;
-	});
-}
-
-/**
- * use the given attribute to store the indices of the cells of the corresponding orbit
- * @return the number of cells of the orbit
- */
-template <unsigned int ORBIT, typename MAP>
-unsigned int computeIndexCells(MAP& map, AttributeHandler<unsigned int, ORBIT, MAP>& idx)
-{
-	AttributeContainer& cont = map.template getAttributeContainer<ORBIT>();
-	unsigned int cpt = 0 ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		idx[i] = cpt++ ;
-	return cpt ;
-}
-
-/**
- * ensure that each embedding is pointed by only one orbit
- */
-template <unsigned int ORBIT, typename MAP>
-void bijectiveOrbitEmbedding(MAP& map)
-{
-	if(!map.template isOrbitEmbedded<ORBIT>())
-		map.template addEmbedding<ORBIT>() ;
-
-	AttributeHandler<int, ORBIT, MAP> counter = map.template addAttribute<int, ORBIT, MAP>("tmpCounter") ;
-	counter.setAllValues(int(0)) ;
-
-	foreach_cell<ORBIT>(map, [&] (Cell<ORBIT> d)
-	{
-		unsigned int emb = map.template getEmbedding<ORBIT>(d) ;
-		if (emb != EMBNULL)
-		{
-			if (counter[d] > 0)
-			{
-				unsigned int newEmb = Algo::Topo::setOrbitEmbeddingOnNewCell<ORBIT>(map, d) ;
-				map.template copyCell<ORBIT>(newEmb, emb) ;
-//				map.template getAttributeContainer<ORBIT>().copyLine(newEmb, emb) ;
-			}
-			counter[d]++ ;
-		}
-	},
-	FORCE_DART_MARKING);
-
-	map.removeAttribute(counter) ;
-}
-
-} // namespace Topo
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-#endif

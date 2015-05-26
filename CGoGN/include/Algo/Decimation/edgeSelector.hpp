@@ -290,7 +290,7 @@ void EdgeSelector_Length<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_Length<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->m_map, d, position) ;
+	VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(this->m_map, d, position) ;
 	einfo.it = edges.insert(std::make_pair(vec.norm2(), d)) ;
 	einfo.valid = true ;
 }
@@ -939,7 +939,7 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 template <typename PFP>
 void EdgeSelector_NormalArea<PFP>::computeEdgeMatrix(Dart d)
 {
-	const VEC3 e = Algo::Surface::Geometry::vectorOutOfDart<PFP>(this->m_map, d, m_position) ;
+	const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->m_map, d, m_position) ;
 	edgeMatrix[d].identity();
 	edgeMatrix[d] *= e.norm2();
 	edgeMatrix[d] -= Geom::transposed_vectors_mult(e,e) ;
