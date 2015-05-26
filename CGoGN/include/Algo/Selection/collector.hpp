@@ -1257,7 +1257,7 @@ void Collector_Dijkstra<PFP>::collectBorder(Dart dinit)
 template <typename PFP>
 inline float Collector_Dijkstra<PFP>::edgeLength (Dart d)
 {
-	typename PFP::VEC3 v = Geometry::vectorOutOfDart<PFP>(this->map, d, this->position);
+	typename PFP::VEC3 v = Algo::Geometry::vectorOutOfDart<PFP>(this->map, d, this->position);
 	return v.norm();
 }
 

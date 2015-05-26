@@ -128,7 +128,7 @@ void ridgeLines(
 	typename PFP::MAP& map,
 	Dart d,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_area,
+//	const FaceAttribute<typename PFP::VEC3, typename PFP::MAP>& face_area,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& K,
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,

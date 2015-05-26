@@ -41,7 +41,7 @@ namespace Geometry
 template <typename PFP>
 void featureEdgeDetection(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	CellMarker<typename PFP::MAP, EDGE>& featureEdge)
 {
 	typedef typename PFP::MAP MAP ;
@@ -50,9 +50,9 @@ void featureEdgeDetection(
 
 	featureEdge.unmarkAll() ;
 
-	FaceAttribute<VEC3, MAP> fNormal = map.template getAttribute<VEC3, FACE>("normal") ;
+	FaceAttribute<VEC3, MAP> fNormal = map.template getAttribute<VEC3, FACE, typename PFP::MAP>("normal") ;
 	if(!fNormal.isValid())
-		fNormal = map.template addAttribute<VEC3, FACE>("normal") ;
+		fNormal = map.template addAttribute<VEC3, FACE, typename PFP::MAP>("normal") ;
 	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
 	TraversorE<MAP> t(map) ;

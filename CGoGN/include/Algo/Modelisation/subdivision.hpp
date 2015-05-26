@@ -801,8 +801,8 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 			map.cutEdge(map.phi1(dd));
 			mCorner.mark(map.phi2(map.phi1(dd)));
 //			attributs[map.template phi<11>(dd)] = c*(1.0-size)+ attributs[dd]*size;
-			attributs[map.template phi<11>(dd)] = attributs[dd] 	+ Geometry::vectorOutOfDart<PFP>(map,dd,attributs)
-																	- Geometry::vectorOutOfDart<PFP>(map,map.phi_1(dd),attributs);
+			attributs[map.template phi<11>(dd)] = attributs[dd] 	+ Algo::Geometry::vectorOutOfDart<PFP>(map,dd,attributs)
+																	- Algo::Geometry::vectorOutOfDart<PFP>(map,map.phi_1(dd),attributs);
 			dd = map.phi1(map.phi1(map.phi1(map.phi2(map.phi1(dd)))));
 		} while(!mCorner.isMarked(dd));
 	}

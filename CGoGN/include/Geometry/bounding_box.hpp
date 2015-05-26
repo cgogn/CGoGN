@@ -118,7 +118,7 @@ template <typename VEC>
 typename VEC::DATA_TYPE BoundingBox<VEC>::diagSize() const
 {
 	assert(m_initialized || !"Bounding box not initialized");
-	return VEC::DATA_TYPE((m_pMax - m_pMin).norm());
+	return typename VEC::DATA_TYPE((m_pMax - m_pMin).norm());
 }
 
 template <typename VEC>

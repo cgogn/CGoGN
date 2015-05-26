@@ -142,7 +142,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC
 			else
 			{
 				VEC3 interP;
-				VEC3 vec(Surface::Geometry::vectorOutOfDart<PFP>(map,dd,position));
+				VEC3 vec(Algo::Geometry::vectorOutOfDart<PFP>(map,dd,position));
 				Geom::Intersection inter = Geom::intersectionLinePlane<VEC3, typename Geom::Plane3D<REAL> >(position[dd],vec,pl,interP);
 
 				if(inter==Geom::FACE_INTERSECTION)

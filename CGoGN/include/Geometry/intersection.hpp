@@ -522,19 +522,19 @@ Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3&
 	typename VEC3::DATA_TYPE panp = NormP * (PA-PlaneP);
 	typename VEC3::DATA_TYPE pbnp = NormP * (PB-PlaneP);
 
-	if(abs(panp) < EPSILON)
+	if(fabs(panp) < EPSILON)
 	{
 		Inter = PA;
 		return VERTEX_INTERSECTION;
 	}
-	else if(abs(pbnp) < EPSILON)
+	else if(fabs(pbnp) < EPSILON)
 	{
 		Inter = PB;
 		return VERTEX_INTERSECTION;
 	}
 	else if (panp*pbnp < 0)
 	{
-		Inter = (abs(panp)*PB + abs(pbnp)*PA)/(abs(panp)+abs(pbnp)) ;
+		Inter = (fabs(panp)*PB + fabs(pbnp)*PA)/(fabs(panp)+fabs(pbnp)) ;
 		return EDGE_INTERSECTION;
 	}
 	else

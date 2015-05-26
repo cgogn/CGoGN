@@ -67,7 +67,7 @@ bool isPointInSphere(const VEC3& point, const VEC3& center, const typename VEC3:
  * @param N the normal of the triangle
  */
 template <typename VEC3>
-Inclusion isSegmentInTriangle(const VEC3& P1, const VEC3& P2, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& N) ;
+Inclusion isSegmentInTriangle2D(const VEC3& P1, const VEC3& P2, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& N) ;
 
 /**
  * test if a point is inside a tetrahedron

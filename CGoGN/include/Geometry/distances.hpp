@@ -269,7 +269,7 @@ template <typename VEC3>
 bool lineLineClosestPoints(const VEC3& P1, const VEC3& V1, const VEC3& P2, const VEC3& V2, VEC3& Q1, VEC3& Q2)
 {
 	typedef typename VEC3::DATA_TYPE SCAL;
-	typename VEC3 P12 = P1 - P2;
+	VEC3 P12 = P1 - P2;
 
 	SCAL d1343 = P12 * V2;
 	SCAL d4321 = V2*V1;

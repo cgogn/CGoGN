@@ -76,11 +76,11 @@ template void Algo::Surface::Geometry::computeRidgeLines<PFP1>(
 	const VertexAttribute<PFP1::REAL, PFP1::MAP>& k2,
 	FaceAttribute<ridgeSegment, PFP1::MAP>& ridge_segments) ;
 
+
 template void Algo::Surface::Geometry::ridgeLines<PFP1>(
 	PFP1::MAP& map,
 	Dart d,
 	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
-	const FaceAttribute<PFP1::VEC3, PFP1::MAP>& face_area,
 	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& K,
 	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& vertex_gradient,
 	const VertexAttribute<PFP1::REAL, PFP1::MAP>& k,
@@ -174,7 +174,6 @@ template void Algo::Surface::Geometry::ridgeLines<PFP2>(
 	PFP2::MAP& map,
 	Dart d,
 	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
-	const FaceAttribute<PFP2::VEC3, PFP2::MAP>& face_area,
 	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& K,
 	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& vertex_gradient,
 	const VertexAttribute<PFP2::REAL, PFP2::MAP>& k,
