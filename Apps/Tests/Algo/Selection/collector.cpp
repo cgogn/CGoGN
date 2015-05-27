@@ -48,10 +48,7 @@ template class Algo::Surface::Selection::Collector_Vertices<PFP2>;
 template class Algo::Surface::Selection::Collector_Triangles<PFP2>;
 template class Algo::Surface::Selection::Collector_Dijkstra_Vertices<PFP2>;
 template class Algo::Surface::Selection::Collector_Dijkstra<PFP2>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP2>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP2>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP2>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP2>;
+
 
 template class Algo::Surface::Selection::Collector_OneRing<PFP3>;
 template class Algo::Surface::Selection::Collector_OneRing_AroundEdge<PFP3>;
@@ -65,10 +62,6 @@ template class Algo::Surface::Selection::Collector_Vertices<PFP3>;
 template class Algo::Surface::Selection::Collector_Triangles<PFP3>;
 template class Algo::Surface::Selection::Collector_Dijkstra_Vertices<PFP3>;
 template class Algo::Surface::Selection::Collector_Dijkstra<PFP3>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP3>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP3>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP3>;
-template class Algo::Surface::Selection::Collector_Vertices<PFP3>;
 
 
 int test_collector()
