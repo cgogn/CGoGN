@@ -153,7 +153,7 @@ Quadric<REAL>::optimize(VEC4& v) const
 		A2(3,i) = 0.0f ;
 	A2(3,3) = 1.0f ;
 	MATRIX44 Ainv ;
-	REAL det = A2.invert(Ainv) ;
+	REAL det = REAL(A2.invert(Ainv));
 	if(det > -1e-6 && det < 1e-6)
 		return false ;
 //	VEC4 right(0,0,0,1) ;
@@ -285,7 +285,7 @@ REAL
 QuadricNd<REAL,N>::evaluate(const VECN& v) const
 {
 	Geom::Vector<N, double> v_d = v ;
-	return v_d*(A*v_d) + 2.0*(b*v_d) + c ;
+	return REAL(v_d*(A*v_d) + 2.0*(b*v_d) + c );
 }
 
 template <typename REAL, unsigned int N>

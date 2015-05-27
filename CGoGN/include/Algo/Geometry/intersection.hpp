@@ -113,6 +113,7 @@ template <typename PFP>
 bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 	Dart tri1 = t1.dart;
 	Dart tri2 = t2.dart;
@@ -189,7 +190,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const 
 	for (unsigned int i = 0; i < 3 ; ++i)
 	{
 		VEC3 nTest = bary1 - tris2[i];
-		float scal = nTest * normale1;
+		REAL scal = nTest * normale1;
 		if (scal < 0)
 			++neg;
 		if (scal > 0)
@@ -208,7 +209,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const 
 	for (unsigned int i = 0; i < 3 ; ++i)
 	{
 		VEC3 nTest = bary2 - tris1[i];
-		float scal = nTest * normale2;
+		REAL scal = nTest * normale2;
 		if (scal<0)
 			++neg;
 		if (scal>0)
@@ -223,7 +224,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const 
 	for (unsigned int i = 0; i < 3 && !intersection; ++i)
 	{
 		VEC3 inter;
-		intersection = Geom::intersectionSegmentTriangle(tris1[i], tris1[(i+1)%3], tris2[0], tris2[1], tris2[2], inter);
+		intersection = Geom::intersectionSegmentTriangle(tris1[i], tris1[(i + 1) % 3], tris2[0], tris2[1], tris2[2], inter) != Geom::NO_INTERSECTION;
 	}
 
 	if (intersection)
@@ -232,7 +233,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Face t1, Face t2, const 
 	for (unsigned int i = 0; i < 3 && !intersection; ++i)
 	{
 		VEC3 inter;
-		intersection = Geom::intersectionSegmentTriangle(tris2[i], tris2[(i+1)%3], tris1[0], tris1[1], tris1[2], inter);
+		intersection = Geom::intersectionSegmentTriangle(tris2[i], tris2[(i + 1) % 3], tris1[0], tris1[1], tris1[2], inter) != Geom::NO_INTERSECTION;
 	}
 
 	return intersection;

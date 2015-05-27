@@ -310,7 +310,7 @@ public:
 	{}
 	inline void setAngleThreshold(REAL a) { angleThreshold = a; }
 	inline REAL getAngleThreshold() const { return angleThreshold; }
-	inline const VertexAttribute<VEC3, MAP>& getNormal() const { return normal ; }
+	inline const FaceAttribute<VEC3, MAP>& getNormal() const { return normal; }
 
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
@@ -548,7 +548,7 @@ public:
 		position(p),
 		maxDist(d)
 	{
-		vertexInfo = m.template addAttribute<VertexInfo, VERTEX>("vertexInfo");
+			vertexInfo = m.template addAttribute<VertexInfo, VERTEX, typename PFP::MAP>("vertexInfo");
 	}
 	~Collector_Dijkstra()
 	{

@@ -106,6 +106,12 @@ const T& Plane3D<T>::d() const
 /**********************************************/
 
 template <typename T>
+Vector<3, T> Plane3D<T>::point() const
+{
+	return -m_d * m_normal;
+}
+
+template <typename T>
 T Plane3D<T>::distance(const Vector<3,T>& p) const
 {
 	T k = m_normal * p ;

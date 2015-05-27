@@ -1,269 +1,204 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
-#ifndef RAYSELECTOR_H_
-#define RAYSELECTOR_H_
 
-#include <vector>
-#include "Algo/Selection/raySelectFunctor.hpp"
 
-namespace CGoGN
+using namespace CGoGN;
+#include "Algo/Selection/rayselector.h"
+
+
+struct PFP1 : public PFP_STANDARD
 {
+	typedef EmbeddedMap2 MAP;
+};
 
-namespace Algo
+struct PFP2 : public PFP_DOUBLE
 {
+	typedef EmbeddedMap2 MAP;
+};
 
-namespace Selection
+struct PFP3 : public PFP_DOUBLE
 {
+	typedef EmbeddedGMap2 MAP;
+};
 
-/**
- * Function that does the selection of faces, returned darts are sorted from closest to farthest
- * @param map the map we want to test
- * @param position the vertex attribute storing positions
- * @param rayA first point of ray (user side)
- * @param rayAB direction of ray (directed to the scene)
- * @param vecFaces (out) vector to store the intersected faces
- * @param iPoints (out) vector to store the intersection points
- */
-template<typename PFP>
-void facesRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		std::vector<Face>& vecFaces,
-		std::vector<typename PFP::VEC3>& iPoints);
+struct PFP4 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap3 MAP;
+};
 
-/**
- * Function that does the selection of faces, returned darts are sorted from closest to farthest
- * @param map the map we want to test
- * @param position the vertex attribute storing positions
- * @param rayA first point of ray (user side)
- * @param rayAB direction of ray (directed to the scene)
- * @param vecFaces (out) vector to store the intersected faces
- */
-template<typename PFP>
-void facesRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		std::vector<Face>& vecFaces);
 
-/**
- * Function that does the selection of one face
- * @param map the map we want to test
- * @param position the vertex attribute storing positions
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param face (out) selected face (set to NIL if no face selected)
- */
-template<typename PFP>
-void faceRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		Face& face);
+template void Algo::Selection::facesRaySelection<PFP1>(	PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA, const PFP1::VEC3& rayAB, std::vector<Face>& vecFaces, std::vector<PFP1::VEC3>& iPoints);
 
-/**
- * Function that does the selection of edges, returned darts are sorted from closest to farthest
- * @param map the map we want to test
- * @param position the vertex attribute storing positions
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param vecEdges (out) vector to store intersected edges
- * @param distMax radius of the cylinder of selection
- */
-template<typename PFP>
-void edgesRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		std::vector<Edge>& vecEdges,
-		float distMax);
+template void Algo::Selection::facesRaySelection<PFP1>(	PFP1::MAP& map,	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA,	const PFP1::VEC3& rayAB, std::vector<Face>& vecFaces);
 
-/**
- * Function that does the selection of one vertex
- * @param map the map we want to test
- * @param position the vertex attribute storing positions
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param edge (out) selected edge (set to NIL if no edge selected)
- */
-template<typename PFP>
-void edgeRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		Edge& edge);
+template void Algo::Selection::faceRaySelection<PFP1>( PFP1::MAP& map,	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA,	const PFP1::VEC3& rayAB, Face& face);
 
-/**
- * Function that does the selection of vertices, returned darts are sorted from closest to farthest
- * @param map the map we want to test
- * @param position the vertex attribute storing positions
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param vecVertices (out) vector to store intersected vertices
- * @param dist radius of the cylinder of selection
- */
-template<typename PFP>
-void verticesRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		std::vector<Vertex>& vecVertices,
-		float dist);
+template void Algo::Selection::edgesRaySelection<PFP1>( PFP1::MAP& map,	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA,	const PFP1::VEC3& rayAB, std::vector<Edge>& vecEdges, float distMax);
 
-/**
- * Function that does the selection of one vertex
- * @param map the map we want to test
- * @param position the vertex attribute storing positions
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param vertex (out) selected vertex (set to NIL if no vertex selected)
- */
-template<typename PFP>
-void vertexRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		Vertex& vertex);
+template void Algo::Selection::edgeRaySelection<PFP1>( PFP1::MAP& map,	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA, const PFP1::VEC3& rayAB, Edge& edge);
 
-/**
- * Volume selection, not yet functional
- */
-template<typename PFP>
-void volumesRaySelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		std::vector<Vol>& vecVolumes);
+template void Algo::Selection::verticesRaySelection<PFP1>( PFP1::MAP& map,	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA, const PFP1::VEC3& rayAB, std::vector<Vertex>& vecVertices, float dist);
 
-template<typename PFP>
-void facesPlanSelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename Geom::Plane3D<typename PFP::VEC3::DATA_TYPE>& plan,
-		std::vector<Face>& vecFaces);
+template void Algo::Selection::vertexRaySelection<PFP1>( PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA,	const PFP1::VEC3& rayAB, Vertex& vertex);
 
-/**
- * Function that does the selection of vertices in a cone, returned darts are sorted from closest to farthest
- * @param map the map we want to test
- * @param position the position attribute
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param angle angle of the cone in degree.
- * @param vecVertices (out) vector to store intersected vertices
- */
-template<typename PFP>
-void verticesConeSelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		float angle,
-		std::vector<Vertex>& vecVertices);
+template void Algo::Selection::volumesRaySelection<PFP1>( PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA,	const PFP1::VEC3& rayAB, std::vector<Vol>& vecVolumes);
 
-/**
- * Function that does the selection of edges, returned darts are sorted from closest to farthest
- * @param map the map we want to test
- * @param position the position attribute
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param angle radius of the cylinder of selection
- * @param vecEdges (out) vector to store intersected edges
- */
-template<typename PFP>
-void edgesConeSelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& rayA,
-		const typename PFP::VEC3& rayAB,
-		float angle,
-		std::vector<Edge>& vecEdges);
+template void Algo::Selection::facesPlanSelection<PFP1>( PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const Geom::Plane3D<PFP1::VEC3::DATA_TYPE>& plan,	std::vector<Face>& vecFaces);
 
-/**
- * Function that select the closest vertex in the bubble
- * @param map the map we want to test
- * @param position the position attribute
- * @param cursor the cursor position (center of bubble)
- * @param radiusMax max radius of selection
- */
-template<typename PFP>
-Vertex verticesBubbleSelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& cursor,
-		typename PFP::REAL radiusMax);
+template void Algo::Selection::verticesConeSelection<PFP1>(	PFP1::MAP& map,	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA,	const PFP1::VEC3& rayAB, float angle, std::vector<Vertex>& vecVertices);
 
-/**
- * Function that select the closest edge in the bubble
- * @param map the map we want to test
- * @param position the position attribute
- * @param cursor the cursor position (center of bubble)
- * @param radiusMax max radius of selection
- */
-template<typename PFP>
-Edge edgesBubbleSelection(
-		typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
-		const typename PFP::VEC3& cursor,
-		typename PFP::REAL radiusMax);
+template void Algo::Selection::edgesConeSelection<PFP1>(PFP1::MAP& map,	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& rayA,	const PFP1::VEC3& rayAB, float angle, std::vector<Edge>& vecEdges);
 
-/**
- * Fonction that do the selection of darts, returned darts are sorted from closest to farthest
- * Dart is here considered as a triangle formed by the 2 end vertices of the edge and the face centroid
- * @param map the map we want to test
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param vecDarts (out) vector to store dart of intersected darts
- */
-//template<typename PFP>
-//void dartsRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecDarts);
+template Vertex Algo::Selection::verticesBubbleSelection<PFP1>(	PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& cursor, 	PFP1::REAL radiusMax); 
 
-//namespace Parallel
-//{
-//template<typename PFP>
-//void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces, unsigned int nbth=0, unsigned int current_thread=0);
-//template<typename PFP>
-//void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float dist, unsigned int nbth=0, unsigned int current_thread=0);
-//template<typename PFP>
-//void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, unsigned int nbth=0, unsigned int current_thread=0);
-//}
+template Edge Algo::Selection::edgesBubbleSelection<PFP1>( PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position,
+		const PFP1::VEC3& cursor, PFP1::REAL radiusMax);
 
-} //namespace Selection
 
-} //namespace Algo
+// MAP2 DOUBLE
+template void Algo::Selection::facesRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, std::vector<Face>& vecFaces, std::vector<PFP2::VEC3>& iPoints);
 
-} //namespace CGoGN
+template void Algo::Selection::facesRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, std::vector<Face>& vecFaces);
 
-#include "Algo/Selection/raySelector.hpp"
+template void Algo::Selection::faceRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, Face& face);
 
-#endif /* RAYSELECTOR_H_ */
+template void Algo::Selection::edgesRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, std::vector<Edge>& vecEdges, float distMax);
+
+template void Algo::Selection::edgeRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, Edge& edge);
+
+template void Algo::Selection::verticesRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, std::vector<Vertex>& vecVertices, float dist);
+
+template void Algo::Selection::vertexRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, Vertex& vertex);
+
+template void Algo::Selection::volumesRaySelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, std::vector<Vol>& vecVolumes);
+
+template void Algo::Selection::facesPlanSelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const Geom::Plane3D<PFP2::VEC3::DATA_TYPE>& plan, std::vector<Face>& vecFaces);
+
+template void Algo::Selection::verticesConeSelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, float angle, std::vector<Vertex>& vecVertices);
+
+template void Algo::Selection::edgesConeSelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& rayA, const PFP2::VEC3& rayAB, float angle, std::vector<Edge>& vecEdges);
+
+template Vertex Algo::Selection::verticesBubbleSelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& cursor, PFP2::REAL radiusMax);
+
+template Edge Algo::Selection::edgesBubbleSelection<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position,
+	const PFP2::VEC3& cursor, PFP2::REAL radiusMax);
+
+// GMAP2
+
+template void Algo::Selection::facesRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, std::vector<Face>& vecFaces, std::vector<PFP3::VEC3>& iPoints);
+
+template void Algo::Selection::facesRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, std::vector<Face>& vecFaces);
+
+template void Algo::Selection::faceRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, Face& face);
+
+template void Algo::Selection::edgesRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, std::vector<Edge>& vecEdges, float distMax);
+
+template void Algo::Selection::edgeRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, Edge& edge);
+
+template void Algo::Selection::verticesRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, std::vector<Vertex>& vecVertices, float dist);
+
+template void Algo::Selection::vertexRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, Vertex& vertex);
+
+template void Algo::Selection::volumesRaySelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, std::vector<Vol>& vecVolumes);
+
+template void Algo::Selection::facesPlanSelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const Geom::Plane3D<PFP3::VEC3::DATA_TYPE>& plan, std::vector<Face>& vecFaces);
+
+template void Algo::Selection::verticesConeSelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, float angle, std::vector<Vertex>& vecVertices);
+
+template void Algo::Selection::edgesConeSelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& rayA, const PFP3::VEC3& rayAB, float angle, std::vector<Edge>& vecEdges);
+
+template Vertex Algo::Selection::verticesBubbleSelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& cursor, PFP3::REAL radiusMax);
+
+template Edge Algo::Selection::edgesBubbleSelection<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position,
+	const PFP3::VEC3& cursor, PFP3::REAL radiusMax);
+
+
+// MAP3 double
+
+template void Algo::Selection::facesRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, std::vector<Face>& vecFaces, std::vector<PFP4::VEC3>& iPoints);
+
+template void Algo::Selection::facesRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, std::vector<Face>& vecFaces);
+
+template void Algo::Selection::faceRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, Face& face);
+
+template void Algo::Selection::edgesRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, std::vector<Edge>& vecEdges, float distMax);
+
+template void Algo::Selection::edgeRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, Edge& edge);
+
+template void Algo::Selection::verticesRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, std::vector<Vertex>& vecVertices, float dist);
+
+template void Algo::Selection::vertexRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, Vertex& vertex);
+
+template void Algo::Selection::volumesRaySelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, std::vector<Vol>& vecVolumes);
+
+template void Algo::Selection::facesPlanSelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const Geom::Plane3D<PFP4::VEC3::DATA_TYPE>& plan, std::vector<Face>& vecFaces);
+
+template void Algo::Selection::verticesConeSelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, float angle, std::vector<Vertex>& vecVertices);
+
+template void Algo::Selection::edgesConeSelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& rayA, const PFP4::VEC3& rayAB, float angle, std::vector<Edge>& vecEdges);
+
+template Vertex Algo::Selection::verticesBubbleSelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& cursor, PFP4::REAL radiusMax);
+
+template Edge Algo::Selection::edgesBubbleSelection<PFP4>(PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position,
+	const PFP4::VEC3& cursor, PFP4::REAL radiusMax);
+
+
+
+
+
+int test_raySelector()
+{
+	return 0;
+}
+

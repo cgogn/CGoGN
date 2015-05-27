@@ -153,11 +153,11 @@ void vertexQuadraticFitting(
 	nlEnd(NL_SYSTEM) ;
 	nlSolve() ;
 
-	a = nlGetVariable(0) ;
-	b = nlGetVariable(1) ;
-	c = nlGetVariable(2) ;
-	d = nlGetVariable(3) ;
-	e = nlGetVariable(4) ;
+	a = typename PFP::REAL(nlGetVariable(0));
+	b = typename PFP::REAL(nlGetVariable(1));
+	c = typename PFP::REAL(nlGetVariable(2));
+	d = typename PFP::REAL(nlGetVariable(3));
+	e = typename PFP::REAL(nlGetVariable(4));
 
 	nlDeleteContext(nlContext) ;
 }
@@ -548,7 +548,7 @@ void normalCycles_computeTensor(
 	{
 		typename PFP::REAL edgeangle = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(col.getMap(), e, position);
 		typename PFP::VEC3 ev = Algo::Geometry::vectorOutOfDart<PFP>(col.getMap(), e, position);
-		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle * (1.0 / ev.norm());
+		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle * (1.0f / ev.norm());
 	}
 
 	// collect edges on the border
@@ -557,7 +557,7 @@ void normalCycles_computeTensor(
 		typename PFP::REAL edgeangle = Algo::Surface::Geometry::computeAngleBetweenNormalsOnEdge<PFP>(col.getMap(), d, position);
 		typename PFP::REAL alpha = col.borderEdgeRatio(d, position);
 		typename PFP::VEC3 ev = Algo::Geometry::vectorOutOfDart<PFP>(col.getMap(), d, position);
-		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle * (1.0 / ev.norm()) * alpha;
+		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle * (1.0f / ev.norm()) * alpha;
 	}
 
 	tensor /= col.computeArea(position);
@@ -576,7 +576,7 @@ void normalCycles_computeTensor(
 	for (Edge e : col.getInsideEdges())
 	{
 		typename PFP::VEC3 ev = Algo::Geometry::vectorOutOfDart<PFP>(col.getMap(), e, position);
-		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[e] * (1.0 / ev.norm());
+		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[e] * (1.0f / ev.norm());
 	}
 
 	// collect edges on the border
@@ -584,7 +584,7 @@ void normalCycles_computeTensor(
 	{
 		typename PFP::REAL alpha = col.borderEdgeRatio(d, position);
 		typename PFP::VEC3 ev = Algo::Geometry::vectorOutOfDart<PFP>(col.getMap(), d, position);
-		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[d] * (1.0 / ev.norm()) * alpha;
+		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[d] * (1.0f / ev.norm()) * alpha;
 	}
 
 	tensor /= col.computeArea(position);
@@ -604,7 +604,7 @@ void normalCycles_computeTensor(
 	for (Edge e : col.getInsideEdges())
 	{
 		typename PFP::VEC3 ev = Algo::Geometry::vectorOutOfDart<PFP>(col.getMap(), e, position);
-		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[e] * (1.0 / ev.norm());
+		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[e] * (1.0f / ev.norm());
 	}
 
 	// collect edges on the border
@@ -612,7 +612,7 @@ void normalCycles_computeTensor(
 	{
 		typename PFP::REAL alpha = col.borderEdgeRatio(d, position);
 		typename PFP::VEC3 ev = Algo::Geometry::vectorOutOfDart<PFP>(col.getMap(), d, position);
-		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[d] * (1.0 / ev.norm()) * alpha;
+		tensor += Geom::transposed_vectors_mult(ev,ev) * edgeangle[d] * (1.0f / ev.norm()) * alpha;
 	}
 
 	tensor /= col.computeArea(position, edgearea);

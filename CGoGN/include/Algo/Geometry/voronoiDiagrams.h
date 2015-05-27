@@ -30,7 +30,7 @@ class VoronoiDiagram
 protected :
 	typedef struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 //		unsigned int region;
 		Dart pathOrigin;
@@ -46,7 +46,7 @@ protected :
 	std::vector<Dart> seeds;
 
 	VertexAttribute<VertexInfo, MAP> vertexInfo;
-	std::multimap<float,Dart> front ;
+	std::multimap<REAL,Dart> front ;
 	CellMarker<MAP, VERTEX> vmReached;
 
 public :
@@ -68,8 +68,8 @@ protected :
 	virtual void clear ();
 	void initFrontWithSeeds();
 	virtual void collectVertexFromFront(Dart e);
-	void addVertexToFront(Dart f, float d);
-	void updateVertexInFront(Dart f, float d);
+	void addVertexToFront(Dart f, REAL d);
+	void updateVertexInFront(Dart f, REAL d);
 };
 
 template <typename PFP>

@@ -287,13 +287,13 @@ inline T Vector<DIM, T>::norm2() const
 	T n(0) ;
 	for (unsigned int i = 0; i < DIM; ++i)
 		n += m_data[i] * m_data[i] ;
-	return n ;
+	return n;
 }
 
 template <unsigned int DIM, typename T>
-inline double Vector<DIM, T>::norm() const
+inline T Vector<DIM, T>::norm() const
 {
-	return sqrt(norm2()) ;
+	return T(sqrt(norm2())) ;
 }
 
 template <unsigned int DIM, typename T>

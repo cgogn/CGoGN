@@ -99,13 +99,13 @@ void Viewer::cb_initGL()
 	m_phongShader->setDiffuse(colDif) ;
 	m_phongShader->setSpecular(colSpec) ;
 	m_phongShader->setShininess(shininess) ;
-	m_phongShader->setBackColor(Geom::Vec4f(0,0,0.2,0)) ;
+	m_phongShader->setBackColor(Geom::Vec4f(0,0,0.2f,0)) ;
 
 	m_flatShader = new Utils::ShaderSimpleFlat(true,false) ;
 	m_flatShader->setAttributePosition(m_positionVBO) ;
 	m_flatShader->setAmbiant(colClear) ;
 	m_flatShader->setDiffuse(colDif) ;
-	m_flatShader->setBackColor(Geom::Vec4f(0,0,0.2,0)) ;
+	m_flatShader->setBackColor(Geom::Vec4f(0,0,0.2f,0)) ;
 
 
 	m_vectorShader = new Utils::ShaderVectorPerVertex() ;

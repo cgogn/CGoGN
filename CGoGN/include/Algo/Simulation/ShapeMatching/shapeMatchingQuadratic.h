@@ -64,7 +64,7 @@ protected:
     std::vector<Vec9d > m_qtild;
 
 public:
-    ShapeMatchingQuadratic(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass, REAL beta):
+	ShapeMatchingQuadratic(MAP& map, VertexAttribute<VEC3, MAP>& position, VertexAttribute<REAL, MAP>& mass, REAL beta) :
         ShapeMatching<PFP>(map, position, mass),
         m_beta(beta)
     { }

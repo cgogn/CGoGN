@@ -365,9 +365,9 @@ void ridgeLines(
 
 		VEC3 Ktotal = Kv1 + Kv2 + Kv3 ;
 		REAL ktotal = k[v1] + k[v2] + k[v3] ;
-		ktotal = ktotal > 0 ? ktotal : -1.0 * ktotal ;
+		ktotal = ktotal > 0 ? ktotal : -1.0f * ktotal ;
 		REAL k2total = k2[v1] + k2[v2] + k2[v3] ;
-		k2total = k2total > 0 ? k2total : -1.0 * k2total ;
+		k2total = k2total > 0 ? k2total : -1.0f * k2total ;
 
 		if( ( (eg * Ktotal) < 0 ) && ( ktotal > k2total ) )
 			ridge_segments[d].type = FEATURE ;
@@ -407,13 +407,13 @@ void singularTriangle(
 				if(nbPoint == 0)
 				{
 					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p1.d) ;
-					ridge_segments[d].p1.w = 1.0 - ridge_segments[d2].p1.w ;
+					ridge_segments[d].p1.w = 1.0f - ridge_segments[d2].p1.w ;
 				}
 				else
 				{
 					ridge_segments[d].type ++ ;
 					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p1.d) ;
-					ridge_segments[d].p2.w = 1.0 - ridge_segments[d2].p1.w ;
+					ridge_segments[d].p2.w = 1.0f - ridge_segments[d2].p1.w ;
 				}
 				nbPoint ++ ;
 			}
@@ -422,13 +422,13 @@ void singularTriangle(
 				if(nbPoint == 0)
 				{
 					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p2.d) ;
-					ridge_segments[d].p1.w = 1.0 - ridge_segments[d2].p2.w ;
+					ridge_segments[d].p1.w = 1.0f - ridge_segments[d2].p2.w ;
 				}
 				else
 				{
 					ridge_segments[d].type ++ ;
 					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p2.d) ;
-					ridge_segments[d].p2.w = 1.0 - ridge_segments[d2].p2.w ;
+					ridge_segments[d].p2.w = 1.0f - ridge_segments[d2].p2.w ;
 				}
 				nbPoint ++ ;
 			}

@@ -884,8 +884,8 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MAP& m = this->m_map ;
 
 	Dart dd = m.phi2(d);
-	Geom::Matrix33f M1; // init zero included
-	Geom::Matrix33f M2; // init zero included
+	Geom::Matrix<3, 3, REAL> M1; // init zero included
+	Geom::Matrix<3, 3, REAL> M2; // init zero included
 
 	assert(! m.isBoundaryEdge(d));
 
@@ -1982,7 +1982,7 @@ void EdgeSelector_GeomColOptGradient<PFP>::computeEdgeInfo(Dart d, EdgeInfo& ein
 	const REAL t = 0.01f ;
 	const REAL err =
 		t * quad(newPos) +
-		(1-t) * (computeEdgeGradientColorError(d, newPos, newCol) + computeEdgeGradientColorError(m.phi2(d), newPos, newCol)).norm() / sqrt(3.0) ;
+		(1-t) * (computeEdgeGradientColorError(d, newPos, newCol) + computeEdgeGradientColorError(m.phi2(d), newPos, newCol)).norm() / REAL(sqrt(3.0)) ;
 
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
@@ -2017,7 +2017,7 @@ typename PFP::VEC3 EdgeSelector_GeomColOptGradient<PFP>::computeEdgeGradientColo
 		//const VEC3 e0 = Pj - Pi ;
 
 		const REAL areaIJ0sq = (ei ^ ej).norm2() ;
-		const REAL areaIJ0 = sqrt(areaIJ0sq)/2. ;
+		const REAL areaIJ0 = REAL(sqrt(areaIJ0sq)/2.0f) ;
 		areaSum += areaIJ0 ;
 
 		// per-channel treatment

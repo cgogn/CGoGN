@@ -47,6 +47,8 @@ enum
 
 typedef struct { Dart d ; float w ; } e0point ;
 typedef struct { e0point p1 ; e0point p2 ; unsigned char type ; } e0segment ;
+
+
 typedef NoTypeNameAttribute<e0segment> ridgeSegment ;
 
 template <typename PFP>

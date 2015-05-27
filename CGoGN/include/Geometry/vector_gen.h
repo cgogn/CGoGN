@@ -137,7 +137,7 @@ public:
 
 	T norm2() const ;
 
-	double norm() const ;
+	T norm() const ;
 
 	/*
 	 * normalize the vector and returns its norm

@@ -109,7 +109,7 @@ public:
 
 	void gotoLevel(unsigned int goal) ;
 	unsigned int& currentLevel() { return m_cur ; }
-	unsigned int nbSplits() { return m_splits.size() ; }
+	unsigned int nbSplits() { return (unsigned int)(m_splits.size()) ; }
 
 	void recomputeApproxAndDetails() ;
 

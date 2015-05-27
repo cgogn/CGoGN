@@ -69,6 +69,7 @@ template <typename PFP>
 bool isPointInVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& point)
 {
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
 	//number of intersection between a ray and the volume must be odd
 	int countInter = 0;
@@ -104,7 +105,7 @@ bool isPointInVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typena
 
 			if (!alreadyfound)
 			{
-				float v = dir * (inter - point);
+				REAL v = dir * (inter - point);
 				if (v > 0)
 					++countInter;
 				if (v < 0)

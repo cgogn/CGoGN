@@ -521,7 +521,7 @@ Dart TopoRender::picking(MAP& map,int x, int y, bool withBoundary)
 	float cc[4];
 	glGetFloatv(GL_COLOR_CLEAR_VALUE,cc);
 
-	bool multi = glIsEnabled(GL_MULTISAMPLE);
+	GLboolean multi = glIsEnabled(GL_MULTISAMPLE);
 	if (multi)
 		glDisable(GL_MULTISAMPLE);
 
