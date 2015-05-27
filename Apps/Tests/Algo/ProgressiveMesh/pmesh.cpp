@@ -22,10 +22,10 @@ struct PFP3 : public PFP_DOUBLE
 	typedef EmbeddedGMap2 MAP;
 };
 
-
-template class Algo::Surface::PMesh::ProgressiveMesh<PFP1>;
-template class Algo::Surface::PMesh::ProgressiveMesh<PFP2>;
-template class Algo::Surface::PMesh::ProgressiveMesh<PFP3>;
+// TODO modif ProgressiveMesh
+//template class Algo::Surface::PMesh::ProgressiveMesh<PFP1>;
+//template class Algo::Surface::PMesh::ProgressiveMesh<PFP2>;
+//template class Algo::Surface::PMesh::ProgressiveMesh<PFP3>;
 
 
 int test_pmesh()

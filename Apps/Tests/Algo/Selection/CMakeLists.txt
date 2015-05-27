@@ -5,7 +5,7 @@ project(testing_algo_selection)
 add_executable( test_algo_selection 
 algo_selection.cpp 
 collector.cpp
-rayselector.cpp
+raySelector.cpp
 )	
 
 target_link_libraries( test_algo_selection 
