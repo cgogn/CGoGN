@@ -481,7 +481,7 @@ protected:
 
 	typedef struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL, Dart>::iterator it;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
@@ -489,7 +489,7 @@ protected:
 
 	VertexAttribute<VertexInfo, MAP> vertexInfo ;
 
-	std::multimap<float, Dart> front ;
+	std::multimap<REAL, Dart> front;
 
 public:
 	Collector_Dijkstra_Vertices(MAP& m, const EdgeAttribute<REAL, MAP>& c, REAL d = 0) :
@@ -532,7 +532,7 @@ protected:
 
 	typedef struct
 	{
-		typename std::multimap<float, Dart>::iterator it ;
+		typename std::multimap<REAL, Dart>::iterator it;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
@@ -540,7 +540,7 @@ protected:
 
 	VertexAttribute<VertexInfo, MAP> vertexInfo ;
 
-	std::multimap<float, Dart> front ;
+	std::multimap<REAL, Dart> front;
 
 public:
 	Collector_Dijkstra(MAP& m, const VertexAttribute<VEC3, MAP>& p, REAL d = 0) :
@@ -563,7 +563,7 @@ public:
 	void collectBorder(Dart d);
 
 private :
-	inline float edgeLength (Dart d);
+	inline REAL edgeLength(Dart d);
 //	inline Dart oppositeVertex (Dart d);
 };
 

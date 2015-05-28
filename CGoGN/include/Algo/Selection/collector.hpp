@@ -948,14 +948,14 @@ void Collector_Dijkstra_Vertices<PFP>::collectAll(Dart dinit)
 	this->isInsideCollected = true;
 
 	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
-	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].it = front.insert(std::pair<REAL,Dart>(0.0f, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
 
 	while ( !front.empty() && front.begin()->first < this->maxDist)
 	{
 		Dart e = front.begin()->second;
-		float d = front.begin()->first;
+		REAL d = front.begin()->first;
 		front.erase(vertexInfo[e].it);
 		vertexInfo[e].valid=false;
 		this->insideVertices.push_back(e);
@@ -968,17 +968,17 @@ void Collector_Dijkstra_Vertices<PFP>::collectAll(Dart dinit)
 			{
 				if (vi.valid) // probably useless (because of distance test) but faster
 				{
-					float dist = d + edge_cost[f];
+					REAL dist = d + edge_cost[f];
 					if (dist < vi.it->first)
 					{
 						front.erase(vi.it);
-						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+						vi.it = front.insert(std::pair<REAL,Dart>(dist, f));
 					}
 				}
 			}
 			else
 			{
-				vi.it = front.insert(std::pair<float,Dart>(d + edge_cost[f], f));
+				vi.it = front.insert(std::pair<REAL,Dart>(d + edge_cost[f], f));
 				vi.valid=true;
 				vmReached.mark(f);
 			}
@@ -1033,14 +1033,14 @@ void Collector_Dijkstra_Vertices<PFP>::collectBorder(Dart dinit)
 	init(dinit);
 
 	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
-	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].it = front.insert(std::pair<REAL,Dart>(0.0f, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
 
 	while ( !front.empty() && front.begin()->first < this->maxDist)
 	{
 		Dart e = front.begin()->second;
-		float d = front.begin()->first;
+		REAL d = front.begin()->first;
 		front.erase(vertexInfo[e].it);
 		vertexInfo[e].valid=false;
 		this->insideVertices.push_back(e);
@@ -1053,17 +1053,17 @@ void Collector_Dijkstra_Vertices<PFP>::collectBorder(Dart dinit)
 			{
 				if (vi.valid) // probably useless (because of distance test) but faster
 				{
-					float dist = d + edge_cost[f];
+					REAL dist = d + edge_cost[f];
 					if (dist < vi.it->first)
 					{
 						front.erase(vi.it);
-						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+						vi.it = front.insert(std::pair<REAL,Dart>(dist, f));
 					}
 				}
 			}
 			else
 			{
-				vi.it = front.insert(std::pair<float,Dart>(d + edge_cost[f], f));
+				vi.it = front.insert(std::pair<REAL,Dart>(d + edge_cost[f], f));
 				vi.valid = true;
 				vmReached.mark(f);
 			}
@@ -1107,14 +1107,14 @@ void Collector_Dijkstra<PFP>::collectAll(Dart dinit)
 	this->isInsideCollected = true;
 
 	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
-	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].it = front.insert(std::pair<REAL,Dart>(0.0f, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
 
 	while ( !front.empty() && front.begin()->first < this->maxDist)
 	{
 		Dart e = front.begin()->second;
-		float d = front.begin()->first;
+		REAL d = front.begin()->first;
 		front.erase(vertexInfo[e].it);
 		vertexInfo[e].valid=false;
 		this->insideVertices.push_back(e);
@@ -1127,17 +1127,17 @@ void Collector_Dijkstra<PFP>::collectAll(Dart dinit)
 			{
 				if (vi.valid) // probably useless (because of distance test) but faster
 				{
-					float dist = d + edgeLength(f);
+					REAL dist = d + edgeLength(f);
 					if (dist < vi.it->first)
 					{
 						front.erase(vi.it);
-						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+						vi.it = front.insert(std::pair<REAL,Dart>(dist, f));
 					}
 				}
 			}
 			else
 			{
-				vi.it = front.insert(std::pair<float,Dart>(d + edgeLength(f), f));
+				vi.it = front.insert(std::pair<REAL,Dart>(d + edgeLength(f), f));
 				vi.valid = true;
 				vmReached.mark(f);
 			}
@@ -1190,14 +1190,14 @@ void Collector_Dijkstra<PFP>::collectBorder(Dart dinit)
 	init(dinit);
 
 	CellMarkerStore<MAP, VERTEX> vmReached (this->map);
-	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].it = front.insert(std::pair<REAL,Dart>(0.0f, this->centerDart));
 	vertexInfo[this->centerDart].valid = true;
 	vmReached.mark(this->centerDart);
 
 	while ( !front.empty() && front.begin()->first < this->maxDist)
 	{
 		Dart e = front.begin()->second;
-		float d = front.begin()->first;
+		REAL d = front.begin()->first;
 		front.erase(vertexInfo[e].it);
 		vertexInfo[e].valid=false;
 		this->insideVertices.push_back(e);
@@ -1210,17 +1210,17 @@ void Collector_Dijkstra<PFP>::collectBorder(Dart dinit)
 			{
 				if (vi.valid) // probably useless (because of distance test) but faster
 				{
-					float dist = d + edgeLength(f);
+					REAL dist = d + edgeLength(f);
 					if (dist < vi.it->first)
 					{
 						front.erase(vi.it);
-						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+						vi.it = front.insert(std::pair<REAL,Dart>(dist, f));
 					}
 				}
 			}
 			else
 			{
-				vi.it = front.insert(std::pair<float,Dart>(d + edgeLength(f), f));
+				vi.it = front.insert(std::pair<REAL,Dart>(d + edgeLength(f), f));
 				vi.valid = true;
 				vmReached.mark(f);
 			}
@@ -1255,7 +1255,7 @@ void Collector_Dijkstra<PFP>::collectBorder(Dart dinit)
 }
 
 template <typename PFP>
-inline float Collector_Dijkstra<PFP>::edgeLength (Dart d)
+inline typename PFP::REAL Collector_Dijkstra<PFP>::edgeLength(Dart d)
 {
 	typename PFP::VEC3 v = Algo::Geometry::vectorOutOfDart<PFP>(this->map, d, this->position);
 	return v.norm();
