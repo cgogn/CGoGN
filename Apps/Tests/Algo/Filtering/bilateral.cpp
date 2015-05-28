@@ -33,13 +33,13 @@ template void Algo::Surface::Filtering::filterSUSAN<PFP1>(PFP1::MAP& map, float 
 
 
 
-template void Algo::Surface::Filtering::filterBilateral<PFP1>(PFP1::MAP& map,
-	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positionIn, VertexAttribute<PFP1::VEC3, PFP1::MAP>& positionOut,
-	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& normal);
+template void Algo::Surface::Filtering::filterBilateral<PFP2>(PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positionIn, VertexAttribute<PFP2::VEC3, PFP2::MAP>& positionOut,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& normal);
 
-template void Algo::Surface::Filtering::filterSUSAN<PFP1>(PFP1::MAP& map, float SUSANthreshold,
-	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position, VertexAttribute<PFP1::VEC3, PFP1::MAP>& position2,
-	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& normal);
+template void Algo::Surface::Filtering::filterSUSAN<PFP2>(PFP2::MAP& map, float SUSANthreshold,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position, VertexAttribute<PFP2::VEC3, PFP2::MAP>& position2,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& normal);
 
 
 

@@ -710,7 +710,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typena
 		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
 		{
 			if(!map.isBoundaryFace(ditWF) && !m.isMarked(ditWF))
-				m.markOrbit<FACE>(ditWF);
+				m.template markOrbit<FACE>(ditWF);
 		}
 
 		VEC3 volCenter(0.0);
@@ -732,7 +732,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typena
 	{
 		if(m.isMarked(dit))
 		{
-			m.unmarkOrbit<FACE>(dit);
+			m.template unmarkOrbit<FACE>(dit);
 			Volume::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit);
 		}
 	}
@@ -750,7 +750,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typena
 			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
 			{
 				if(map.isBoundaryEdge(ditWE) && !m.isMarked(ditWE))
-					m.markOrbit<EDGE>(ditWE);
+					m.template markOrbit<EDGE>(ditWE);
 			}
 
 			VEC3 faceCenter(0.0);
@@ -762,7 +762,7 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typena
 			Dart dres = Volume::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit);
 			position[dres] = faceCenter;
 
-			newBoundaryV.markOrbit<VERTEX>(dres);
+			newBoundaryV.template markOrbit<VERTEX>(dres);
 		}
 	}
 

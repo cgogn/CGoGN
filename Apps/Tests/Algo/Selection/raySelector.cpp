@@ -4,7 +4,7 @@
 #include "Topology/gmap/embeddedGMap2.h"
 
 
-#include "Algo/Selection/rayselector.h"
+#include "Algo/Selection/raySelector.h"
 
 using namespace CGoGN;
 
