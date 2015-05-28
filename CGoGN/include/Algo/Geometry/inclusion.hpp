@@ -270,7 +270,7 @@ bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 	v1.normalize();
 	v2.normalize();
 
-	return abs(v1*v2) <= REAL(0.00001);
+	return std::abs(v1*v2) <= REAL(0.00001);
 }
 
 template <typename PFP>

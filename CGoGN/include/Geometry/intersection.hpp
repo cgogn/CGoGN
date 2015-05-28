@@ -504,7 +504,7 @@ Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3&
 	typename VEC3::DATA_TYPE panp = NormP * (PA-PlaneP);
 	typename VEC3::DATA_TYPE pbnp = NormP * (PB-PlaneP);
 
-	if(abs(panp) < EPSILON || abs(pbnp) < EPSILON)
+	if(std::abs(panp) < EPSILON || std::abs(pbnp) < EPSILON)
 		return VERTEX_INTERSECTION;
 //	else if((panp < 0 && pbnp > 0) || (panp > 0 && pbnp < 0))
 	else if (panp*pbnp < 0)
