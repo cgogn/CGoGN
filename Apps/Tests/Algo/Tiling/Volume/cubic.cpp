@@ -2,9 +2,9 @@
 #include "Topology/map/embeddedMap3.h"
 
 
-using namespace CGoGN;
 #include "Algo/Tiling/Volume/cubic.h"
 
+using namespace CGoGN;
 
 struct PFP1 : public PFP_STANDARD
 {

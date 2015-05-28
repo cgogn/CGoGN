@@ -42,11 +42,12 @@ void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, ty
 {
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 	Algo::Surface::Selection::Collector_OneRing<PFP> c(map) ;
 
-	const float lambda = 0.6307 ;
-	const float mu = -0.6732 ;
+	const REAL lambda = 0.6307f;
+	const REAL mu = -0.6732f;
 
 	CellMarkerNoUnmark<MAP, VERTEX> mv(map) ;
 
@@ -104,9 +105,10 @@ void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP:
 {
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
-	const float lambda = 0.6307 ;
-	const float mu = -0.6732 ;
+	const REAL lambda = 0.6307f ;
+	const REAL mu = -0.6732f ;
 
 	CellMarkerNoUnmark<MAP, VERTEX> mv(map) ;
 

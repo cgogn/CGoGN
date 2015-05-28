@@ -3,8 +3,9 @@
 #include "Topology/gmap/embeddedGMap2.h"
 
 
-using namespace CGoGN;
 #include "Algo/Decimation/halfEdgeSelector.h"
+
+using namespace CGoGN;
 
 
 struct PFP1 : public PFP_STANDARD

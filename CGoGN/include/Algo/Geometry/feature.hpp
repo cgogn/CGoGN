@@ -241,7 +241,7 @@ bool isTriangleRegular(
 template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -257,7 +257,7 @@ void computeRidgeLines(
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -276,7 +276,7 @@ void ridgeLines(
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -378,7 +378,7 @@ template <typename PFP>
 void computeSingularTriangle(
 	typename PFP::MAP& map,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -393,7 +393,7 @@ void singularTriangle(
 	typename PFP::MAP& map,
 	Dart d,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	int nbPoint = 0 ;
 

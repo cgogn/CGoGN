@@ -23,10 +23,12 @@
 *******************************************************************************/
 
 #include "Geometry/distances.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 #include <time.h>
 #include <stdlib.h>
 #include <limits>
+
 
 namespace CGoGN
 {
@@ -41,12 +43,13 @@ namespace Filtering
 {
 
 template <typename PFP>
-float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& originalPosition, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
+typename PFP::REAL computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& originalPosition, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
-	float dist_o = 0.0f ;
-	float dist_f = 0.0f ;
+	REAL dist_o = 0.0f;
+	REAL dist_f = 0.0f;
 
 	TraversorV<typename PFP::MAP> t(map) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -54,8 +57,8 @@ float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PF
 		const VEC3& posO = originalPosition[d] ;
 		const VEC3& posF = position2[d] ;
 
-		float dv_o = std::numeric_limits<float>::max();
-		float dv_f = std::numeric_limits<float>::max();
+		REAL dv_o = std::numeric_limits<REAL>::max();
+		REAL dv_f = std::numeric_limits<REAL>::max();
 
 		// just test the faces around the vertex => warning not real haussdorff distance!
 		Traversor2VF<typename PFP::MAP> tf(map, d) ;
@@ -68,7 +71,7 @@ float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PF
 			const VEC3& Co = originalPosition[e] ;
 			const VEC3& Cf = position2[e] ;
 
-			float d = Geom::squaredDistancePoint2Triangle(posO, posF, Bf, Cf) ;
+			REAL d = Geom::squaredDistancePoint2Triangle(posO, posF, Bf, Cf);
 			if(d < dv_o)
 				dv_o = d ;
 			d = Geom::squaredDistancePoint2Triangle(posF, posO, Bo, Co) ;
@@ -83,17 +86,18 @@ float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PF
 	}
 
 	if (dist_f > dist_o)
-		return sqrtf(dist_f) ;
-	return sqrtf(dist_o) ;
+		return REAL(std::sqrt(dist_f)) ;
+	return REAL(sqrt(dist_o)) ;
 }
 
 template <typename PFP>
 void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 	// init the seed for random
-	srand(time(NULL)) ;
+	srand((unsigned int)(time(NULL))) ;
 
 	// apply noise on each vertex
 	TraversorV<typename PFP::MAP> t(map) ;
@@ -102,14 +106,14 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
 		const VEC3& pos = position[d] ;
 		VEC3 norm = normal[d] ;
 
-		float r1 = float(rand() % amount) / 100.0f ;
-		float r2 = 0 ;
+		REAL r1 = REAL(rand() % amount) / 100.0f;
+		REAL r2 = 0;
 		if (amount >= 5)
-			r2 = float(rand() % (amount/5)) / 100.0f ;
+			r2 = REAL(rand() % (amount / 5)) / 100.0f;
 
 		long sign = rand() % 2 ;
 		if (sign == 1) norm *= -1.0f ;
-		float avEL = 0.0f ;
+		REAL avEL = 0.0f;
 		VEC3 td(0) ;
 
 		long nbE = 0 ;
@@ -118,14 +122,14 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
 		{
 			const VEC3& p = position[it] ;
 			VEC3 vec = p - pos ;
-			float el = vec.norm() ;
+			REAL el = vec.norm();
 			vec *= r2 ;
 			td += vec ;
 			avEL += el ;
 			nbE++ ;
 		}
 
-		avEL /= float(nbE) ;
+		avEL /= REAL(nbE);
 		norm *= avEL * r1 ;
 		norm += td ;
 		position2[d] = pos + norm ;
@@ -138,6 +142,7 @@ template <typename PFP>
 void computeUnfirmAdditiveNoise(typename PFP::MAP& map, float noiseIntensity, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 	// Compute mesh center
 	unsigned int count = 0;
@@ -164,15 +169,15 @@ void computeUnfirmAdditiveNoise(typename PFP::MAP& map, float noiseIntensity, co
 
 	// add random uniform-distributed (between [-noiseLevel, +noiseLevel])
 	srand((unsigned)time(NULL));
-    float noisex, noisey, noisez;
-    float noiseLevel = distanceCentroid * noiseIntensity;
+	REAL noisex, noisey, noisez;
+	REAL noiseLevel = REAL(distanceCentroid * noiseIntensity);
 
 
     for(Dart dit = tv.begin(); dit != tv.end(); dit = tv.next())
 	{
-    	noisex = noiseLevel * (1.0*rand()/RAND_MAX-0.5)*2;
-    	noisey = noiseLevel * (1.0*rand()/RAND_MAX-0.5)*2;
-    	noisez = noiseLevel * (1.0*rand()/RAND_MAX-0.5)*2;
+		noisex = noiseLevel * REAL(1.0*rand() / RAND_MAX - 0.5) * 2;
+		noisey = noiseLevel * REAL(1.0*rand() / RAND_MAX - 0.5) * 2;
+		noisez = noiseLevel * REAL(1.0*rand() / RAND_MAX - 0.5) * 2;
 
     	position2[dit] = position[dit] + VEC3(noisex,noisey,noisez);
 	}
@@ -185,6 +190,7 @@ template <typename PFP>
 void computeGaussianAdditiveNoise(typename PFP::MAP& map, float noiseIntensity, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 	// Compute mesh center
 	unsigned int count = 0;
@@ -205,30 +211,30 @@ void computeGaussianAdditiveNoise(typename PFP::MAP& map, float noiseIntensity, 
 	{
 		VEC3 dist = position[dit];
 		dist -= centroid;
-		distanceCentroid += float(dist.norm());
+		distanceCentroid += dist.norm();
 	}
 	distanceCentroid /= count;
 
 	// add random gaussian-distributed
 	srand((unsigned)time(NULL));
-    float noisex, noisey, noisez;
-    float gaussNumbers[3];
-    float noiseLevel = distanceCentroid * noiseIntensity;
+	REAL noisex, noisey, noisez;
+	REAL gaussNumbers[3];
+	REAL noiseLevel = REAL(distanceCentroid * noiseIntensity);
 
     for(Dart dit = tv.begin(); dit != tv.end(); dit = tv.next())
 	{
 
     	// pseudo-random Gaussian-distributed numbers generation from uniformly-distributed pseudo-random numbers
-    	float x, y, r2;
+		REAL x, y, r2;
     	for (int i=0; i<3; i++)
     	{
     		do
     		{
-    			x = -1.0 + 2.0 * 1.0*rand()/RAND_MAX;
-    			y = -1.0 + 2.0 * 1.0*rand()/RAND_MAX;
+				x = REAL(- 1.0 + 2.0 * 1.0*rand() / RAND_MAX);
+    			y = REAL(-1.0 + 2.0 * 1.0*rand()/RAND_MAX);
     			r2 = x * x + y * y;
-    		} while ((r2>1.0)||(r2==0.0));
-    		gaussNumbers[i] = y * sqrt(-2.0 * log(r2) / r2);
+    		} while ((r2>1.0f)||(r2==0.0f));
+    		gaussNumbers[i] = y * std::sqrt(-2.0f * std::log(r2) / r2);
     	}
 
     	noisex = noiseLevel * gaussNumbers[0];
@@ -255,11 +261,12 @@ template <typename PFP>
 void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 	// add random gaussian-distributed
 	srand((unsigned)time(NULL));
-    float noisex, noisey, noisez;
-    float gaussNumbers[3];
+//	float noisex, noisey, noisez;
+//	float gaussNumbers[3];
     float noiseLevel = 0.1f;
 
 //    TraversorV<typename PFP::MAP> tv(map) ;
@@ -288,7 +295,7 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
 
 
     // init the seed for random
-    srand(time(NULL)) ;
+    srand((unsigned int)(time(NULL))) ;
 
     // apply noise on each vertex
     TraversorV<typename PFP::MAP> t(map) ;
@@ -297,14 +304,14 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
         const VEC3& pos = position[d] ;
         VEC3 norm = position[d] ;
 
-        float r1 = float(rand() % amount) / 100.0f ;
-        float r2 = 0 ;
+		REAL r1 = REAL(rand() % amount) / 100.0f;
+		REAL r2 = 0;
         if (amount >= 5)
             r2 = float(rand() % (amount/5)) / 100.0f ;
 
         long sign = rand() % 2 ;
         if (sign == 1) norm *= -1.0f ;
-        float avEL = 0.0f ;
+		REAL avEL = 0.0f;
         VEC3 td(0) ;
 
         long nbE = 0 ;
@@ -313,14 +320,14 @@ void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typ
         {
             const VEC3& p = position[it] ;
             VEC3 vec = p - pos ;
-            float el = vec.norm() ;
+			REAL el = vec.norm();
             vec *= r2 ;
             td += vec ;
             avEL += el ;
             nbE++ ;
         }
 
-        avEL /= float(nbE) ;
+		avEL /= REAL(nbE);
         norm *= avEL * r1 ;
         norm += td ;
         position2[d] = pos + norm ;
@@ -332,28 +339,29 @@ template <typename PFP>
 void computeNoiseGaussian(typename PFP::MAP& map, long amount, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2)
 {
     typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
     // add random gaussian-distributed
     srand((unsigned)time(NULL));
-    float noisex, noisey, noisez;
-    float gaussNumbers[3];
-    float noiseLevel = 0.08f;
+	REAL noisex, noisey, noisez;
+	REAL gaussNumbers[3];
+	REAL noiseLevel = 0.08f;
 
     TraversorV<typename PFP::MAP> tv(map) ;
     for(Dart dit = tv.begin(); dit != tv.end(); dit = tv.next())
     {
 
         // pseudo-random Gaussian-distributed numbers generation from uniformly-distributed pseudo-random numbers
-        float x, y, r2;
+		REAL x, y, r2;
         for (int i=0; i<3; i++)
         {
             do
             {
-                x = -1.0 + 2.0 * 1.0*rand()/RAND_MAX;
-                y = -1.0 + 2.0 * 1.0*rand()/RAND_MAX;
+				x = REAL(- 1.0 + 2.0 * 1.0*rand() / RAND_MAX);
+                y = REAL(-1.0 + 2.0 * 1.0*rand()/RAND_MAX);
                 r2 = x * x + y * y;
             } while ((r2>1.0)||(r2==0.0));
-            gaussNumbers[i] = y * sqrt(-2.0 * log(r2) / r2);
+            gaussNumbers[i] = y * std::sqrt(-2.0f * std::log(r2) / r2);
         }
 
         noisex = noiseLevel * gaussNumbers[0];

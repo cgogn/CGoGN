@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Topology/generic/traversor/traversor3.h"
+
 namespace CGoGN
 {
 
@@ -421,7 +423,7 @@ bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread)
     unsigned int nbFaces = 0;
 
     //Test the number of faces end its valency
-    Traversor3WF<typename PFP::MAP> travWF(the_map, d, false, thread);
+	Traversor3WF<typename PFP::MAP> travWF(the_map, d, false);
     for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
     {
         //increase the number of faces

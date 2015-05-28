@@ -64,7 +64,7 @@ template bool Algo::Surface::Geometry::isTriangleRegular<PFP1>(
 
 template void Algo::Surface::Geometry::initRidgeSegments<PFP1>(
 	PFP1::MAP& map,
-	FaceAttribute<ridgeSegment, PFP1::MAP>& ridge_segments) ;
+	FaceAttribute<RidgeSegment<PFP1::REAL>, PFP1::MAP>& ridge_segments) ;
 
 template void Algo::Surface::Geometry::computeRidgeLines<PFP1>(
 	PFP1::MAP& map,
@@ -74,7 +74,7 @@ template void Algo::Surface::Geometry::computeRidgeLines<PFP1>(
 	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& vertex_gradient,
 	const VertexAttribute<PFP1::REAL, PFP1::MAP>& k,
 	const VertexAttribute<PFP1::REAL, PFP1::MAP>& k2,
-	FaceAttribute<ridgeSegment, PFP1::MAP>& ridge_segments) ;
+	FaceAttribute<RidgeSegment<PFP1::REAL>, PFP1::MAP>& ridge_segments) ;
 
 
 template void Algo::Surface::Geometry::ridgeLines<PFP1>(
@@ -85,18 +85,18 @@ template void Algo::Surface::Geometry::ridgeLines<PFP1>(
 	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& vertex_gradient,
 	const VertexAttribute<PFP1::REAL, PFP1::MAP>& k,
 	const VertexAttribute<PFP1::REAL, PFP1::MAP>& k2,
-	FaceAttribute<ridgeSegment, PFP1::MAP>& ridge_segments) ;
+	FaceAttribute<RidgeSegment<PFP1::REAL>, PFP1::MAP>& ridge_segments) ;
 
 template void Algo::Surface::Geometry::computeSingularTriangle<PFP1>(
 	PFP1::MAP& map,
 	CellMarker<PFP1::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, PFP1::MAP>& ridge_segments) ;
+	FaceAttribute<RidgeSegment<PFP1::REAL>, PFP1::MAP>& ridge_segments) ;
 
 template void Algo::Surface::Geometry::singularTriangle<PFP1>(
 	PFP1::MAP& map,
 	Dart d,
 	CellMarker<PFP1::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, PFP1::MAP>& ridge_segments) ;
+	FaceAttribute<RidgeSegment<PFP1::REAL>, PFP1::MAP>& ridge_segments) ;
 
 template bool Algo::Surface::Geometry::isEdgeInTriangle<PFP1>(
 	PFP1::MAP& map,
@@ -158,7 +158,7 @@ template bool Algo::Surface::Geometry::isTriangleRegular<PFP2>(
 
 template void Algo::Surface::Geometry::initRidgeSegments<PFP2>(
 	PFP2::MAP& map,
-	FaceAttribute<ridgeSegment, PFP2::MAP>& ridge_segments);
+	FaceAttribute<RidgeSegment<PFP2::REAL>, PFP2::MAP>& ridge_segments);
 
 template void Algo::Surface::Geometry::computeRidgeLines<PFP2>(
 	PFP2::MAP& map,
@@ -168,7 +168,7 @@ template void Algo::Surface::Geometry::computeRidgeLines<PFP2>(
 	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& vertex_gradient,
 	const VertexAttribute<PFP2::REAL, PFP2::MAP>& k,
 	const VertexAttribute<PFP2::REAL, PFP2::MAP>& k2,
-	FaceAttribute<ridgeSegment, PFP2::MAP>& ridge_segments);
+	FaceAttribute<RidgeSegment<PFP2::REAL>, PFP2::MAP>& ridge_segments);
 
 template void Algo::Surface::Geometry::ridgeLines<PFP2>(
 	PFP2::MAP& map,
@@ -178,18 +178,18 @@ template void Algo::Surface::Geometry::ridgeLines<PFP2>(
 	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& vertex_gradient,
 	const VertexAttribute<PFP2::REAL, PFP2::MAP>& k,
 	const VertexAttribute<PFP2::REAL, PFP2::MAP>& k2,
-	FaceAttribute<ridgeSegment, PFP2::MAP>& ridge_segments);
+	FaceAttribute<RidgeSegment<PFP2::REAL>, PFP2::MAP>& ridge_segments);
 
 template void Algo::Surface::Geometry::computeSingularTriangle<PFP2>(
 	PFP2::MAP& map,
 	CellMarker<PFP2::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, PFP2::MAP>& ridge_segments);
+	FaceAttribute<RidgeSegment<PFP2::REAL>, PFP2::MAP>& ridge_segments);
 
 template void Algo::Surface::Geometry::singularTriangle<PFP2>(
 	PFP2::MAP& map,
 	Dart d,
 	CellMarker<PFP2::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, PFP2::MAP>& ridge_segments);
+	FaceAttribute<RidgeSegment<PFP2::REAL>, PFP2::MAP>& ridge_segments);
 
 template bool Algo::Surface::Geometry::isEdgeInTriangle<PFP2>(
 	PFP2::MAP& map,

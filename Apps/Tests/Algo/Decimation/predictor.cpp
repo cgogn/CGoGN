@@ -2,9 +2,9 @@
 #include "Topology/map/embeddedMap2.h"
 #include "Topology/gmap/embeddedGMap2.h"
 
+#include "Algo/Decimation/predictor.h"
 
 using namespace CGoGN;
-#include "Algo/Decimation/predictor.h"
 
 
 struct PFP1 : public PFP_STANDARD

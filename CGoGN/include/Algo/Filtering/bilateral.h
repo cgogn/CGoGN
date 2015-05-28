@@ -24,6 +24,8 @@
 
 #include <cmath>
 #include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
+#include "Algo/Geometry/basic.h"
 
 namespace CGoGN
 {
@@ -38,25 +40,26 @@ namespace Filtering
 {
 
 template <typename PFP>
-void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal, float& sigmaC, float& sigmaS)
+void sigmaBilateral(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal, typename PFP::REAL& sigmaC, typename PFP::REAL& sigmaS)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
-	float sumLengths = 0.0f ;
-	float sumAngles = 0.0f ;
+	REAL sumLengths = 0.0f;
+	REAL sumAngles = 0.0f;
 	long nbEdges = 0 ;
 
 	TraversorE<typename PFP::MAP> t(map);
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		sumLengths += Algo::Surface::Geometry::edgeLength<PFP>(map, d, position) ;
+		sumLengths += Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 		sumAngles += Geom::angle(normal[d], normal[map.phi1(d)]) ;
 		++nbEdges ;
 	}
 
 	// update of returned values
-	sigmaC = 1.0f * ( sumLengths / float(nbEdges) ) ;
-	sigmaS = 2.5f * ( sumAngles / float(nbEdges) ) ;
+	sigmaC = 1.0f * (sumLengths / REAL(nbEdges));
+	sigmaS = 2.5f * (sumAngles / REAL(nbEdges));
 }
 
 /**
@@ -74,8 +77,9 @@ void filterBilateral(
         const VertexAttribute<typename PFP::VEC3,typename PFP::MAP>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
-	float sigmaC, sigmaS ;
+	REAL sigmaC, sigmaS;
     sigmaBilateral<PFP>(map, positionIn, normal, sigmaC, sigmaS) ;
 
 	TraversorV<typename PFP::MAP> t(map) ;
@@ -87,14 +91,14 @@ void filterBilateral(
 			const VEC3& normal_d = normal[d] ;
 
 			// traversal of incident edges
-			float sum = 0.0f, normalizer = 0.0f ;
+			REAL sum = 0.0f, normalizer = 0.0f;
 			Traversor2VE<typename PFP::MAP> te(map, d) ;
 			for(Dart it = te.begin(); it != te.end(); it = te.next())
 			{
-                VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, it, positionIn) ;
-				float h = normal_d * vec ;
-				float t = vec.norm() ;
-				float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) ) ;
+                VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, positionIn) ;
+				REAL h = normal_d * vec;
+				REAL t = vec.norm();
+				REAL wcs = std::exp((-1.0f * (t * t) / (2.0f * sigmaC * sigmaC)) + (-1.0f * (h * h) / (2.0f * sigmaS * sigmaS)));
 				sum += wcs * h ;
 				normalizer += wcs ;
 			}
@@ -110,8 +114,9 @@ template <typename PFP>
 void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position2, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
-	float sigmaC, sigmaS ;
+	REAL sigmaC, sigmaS;
 	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS) ;
 
 	long nbTot = 0 ;
@@ -127,19 +132,19 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const VertexAttri
 			const VEC3& normal_d = normal[d] ;
 
 			// traversal of incident edges
-			float sum = 0.0f, normalizer = 0.0f ;
+			REAL sum = 0.0f, normalizer = 0.0f;
 			bool SUSANregion = false ;
 			Traversor2VE<typename PFP::MAP> te(map, d) ;
 			for(Dart it = te.begin(); it != te.end(); it = te.next())
 			{
 				const VEC3& neighborNormal = normal[map.phi1(it)] ;
-				float angle = Geom::angle(normal_d, neighborNormal) ;
+				REAL angle = Geom::angle(normal_d, neighborNormal);
 				if( angle <= SUSANthreshold )
 				{
-					VEC3 vec = Algo::Surface::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
-					float h = normal_d * vec ;
-					float t = vec.norm() ;
-					float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) );
+					VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
+					REAL h = normal_d * vec;
+					REAL t = vec.norm();
+					REAL wcs = std::exp((-1.0f * (t * t) / (2.0f * sigmaC * sigmaC)) + (-1.0f * (h * h) / (2.0f * sigmaS * sigmaS)));
 					sum += wcs * h ;
 					normalizer += wcs ;
 				}

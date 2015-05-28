@@ -1,159 +1,80 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
-
-#ifndef POLYHEDRON_H
-#define POLYHEDRON_H
-
-#include <vector>
-#include "Algo/Modelisation/subdivision.h"
-#include "Geometry/transfo.h"
-#include "Topology/generic/cellmarker.h"
-
-#include "Utils/os_spec.h"
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
 
-namespace CGoGN
+#include "Algo/Modelisation/polyhedron.h"
+
+using namespace CGoGN;
+
+struct PFP1 : public PFP_STANDARD
 {
+	typedef EmbeddedMap2 MAP;
+};
 
-namespace Algo
+template void Algo::Surface::Modelisation::quads2TrianglesCC<PFP1>(PFP1::MAP& the_map, Dart primd);
+//template void Algo::Surface::Modelisation::explodPolyhedron<PFP1>(PFP1::MAP& map, Dart d, VertexAttribute<PFP1::VEC3, PFP1::MAP>& position);
+template Dart Algo::Surface::Modelisation::createPyramid<PFP1>(PFP1::MAP& map, unsigned int nbSides, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createPrism<PFP1>(PFP1::MAP& map, unsigned int nbSides, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createDiamond<PFP1>(PFP1::MAP& map, unsigned int nbSides, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createTetrahedron<PFP1>(PFP1::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createHexahedron<PFP1>(PFP1::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createTriangularPrism<PFP1>(PFP1::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createQuadrangularPyramid<PFP1>(PFP1::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createOctahedron<PFP1>(PFP1::MAP& map, bool withBoundary);
+template bool Algo::Surface::Modelisation::isPyra<PFP1>(PFP1::MAP& map, Dart d);
+template bool Algo::Surface::Modelisation::isPrism<PFP1>(PFP1::MAP& map, Dart d);
+template bool Algo::Surface::Modelisation::isHexahedron<PFP1>(PFP1::MAP& the_map, Dart d, unsigned int thread );
+template Dart Algo::Surface::Modelisation::embedPrism<PFP1>(PFP1::MAP& map, VertexAttribute<PFP1::VEC3, PFP1::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
+template Dart Algo::Surface::Modelisation::embedPyramid<PFP1>(PFP1::MAP& map, VertexAttribute<PFP1::VEC3, PFP1::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
+
+
+struct PFP2 : public PFP_DOUBLE
 {
+	typedef EmbeddedMap2 MAP;
+};
 
-namespace Surface
-{
+template void Algo::Surface::Modelisation::quads2TrianglesCC<PFP2>(PFP2::MAP& the_map, Dart primd);
+//template void Algo::Surface::Modelisation::explodPolyhedron<PFP2>(PFP2::MAP& map, Dart d, VertexAttribute<PFP2::VEC3, PFP2::MAP>& position);
+template Dart Algo::Surface::Modelisation::createPyramid<PFP2>(PFP2::MAP& map, unsigned int nbSides, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createPrism<PFP2>(PFP2::MAP& map, unsigned int nbSides, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createDiamond<PFP2>(PFP2::MAP& map, unsigned int nbSides, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createTetrahedron<PFP2>(PFP2::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createHexahedron<PFP2>(PFP2::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createTriangularPrism<PFP2>(PFP2::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createQuadrangularPyramid<PFP2>(PFP2::MAP& map, bool withBoundary);
+template Dart Algo::Surface::Modelisation::createOctahedron<PFP2>(PFP2::MAP& map, bool withBoundary);
+template bool Algo::Surface::Modelisation::isPyra<PFP2>(PFP2::MAP& map, Dart d);
+template bool Algo::Surface::Modelisation::isPrism<PFP2>(PFP2::MAP& map, Dart d);
+template bool Algo::Surface::Modelisation::isHexahedron<PFP2>(PFP2::MAP& the_map, Dart d, unsigned int thread);
+template Dart Algo::Surface::Modelisation::embedPrism<PFP2>(PFP2::MAP& map, VertexAttribute<PFP2::VEC3, PFP2::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
+template Dart Algo::Surface::Modelisation::embedPyramid<PFP2>(PFP2::MAP& map, VertexAttribute<PFP2::VEC3, PFP2::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
 
-namespace Modelisation
-{
 
-//enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
-
-//template <typename PFP>
-//void sewFaceEmb(typename PFP::MAP& map, Dart d, Dart e);
+//struct PFP3 : public PFP_DOUBLE
+//{
+//	typedef EmbeddedGMap2 MAP;
+//};
 //
-//template <typename PFP>
-//Dart newFaceEmb(typename PFP::MAP& map, unsigned int n);
-
-/**
-* sudivide the all quads of a CC into 2 triangles
-*/
- template <typename PFP>
- void quads2TrianglesCC(typename PFP::MAP& the_map, Dart primd);
-
-/**
-* Create a triangle fans (to close cylinders)
-* simple topo creation  no modification of Polyhedron
-* @param n nb of triangles in the fan in n
-* @return the dart
-*/
-// template <typename PFP>
-// Dart triangleFan_topo(typename PFP::MAP& the_map, int n);
+//template void Algo::Surface::Modelisation::quads2TrianglesCC<PFP3>(PFP3::MAP& the_map, Dart primd);
+//template void Algo::Surface::Modelisation::explodPolyhedron<PFP3>(PFP3::MAP& map, Dart d, VertexAttribute<PFP3::VEC3, PFP3::MAP>& position);
+//template Dart Algo::Surface::Modelisation::createPyramid<PFP3>(PFP3::MAP& map, unsigned int nbSides, bool withBoundary);
+//template Dart Algo::Surface::Modelisation::createPrism<PFP3>(PFP3::MAP& map, unsigned int nbSides, bool withBoundary);
+//template Dart Algo::Surface::Modelisation::createDiamond<PFP3>(PFP3::MAP& map, unsigned int nbSides, bool withBoundary);
+//template Dart Algo::Surface::Modelisation::createTetrahedron<PFP3>(PFP3::MAP& map, bool withBoundary);
+//template Dart Algo::Surface::Modelisation::createHexahedron<PFP3>(PFP3::MAP& map, bool withBoundary);
+//template Dart Algo::Surface::Modelisation::createTriangularPrism<PFP3>(PFP3::MAP& map, bool withBoundary);
+//template Dart Algo::Surface::Modelisation::createQuadrangularPyramid<PFP3>(PFP3::MAP& map, bool withBoundary);
+//template Dart Algo::Surface::Modelisation::createOctahedron<PFP3>(PFP3::MAP& map, bool withBoundary);
+//template bool Algo::Surface::Modelisation::isPyra<PFP3>(PFP3::MAP& map, Dart d);
+//template bool Algo::Surface::Modelisation::isPrism<PFP3>(PFP3::MAP& map, Dart d);
+//template bool Algo::Surface::Modelisation::isHexahedron<PFP3>(PFP3::MAP& the_map, Dart d, unsigned int thread);
+//template Dart Algo::Surface::Modelisation::embedPrism<PFP3>(PFP3::MAP& map, VertexAttribute<PFP3::VEC3, PFP3::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
+//template Dart Algo::Surface::Modelisation::embedPyramid<PFP3>(PFP3::MAP& map, VertexAttribute<PFP3::VEC3, PFP3::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
 
 
-/**
- * Unsex the Umbrella around a vertex, close the hole and then
- * create a symetric to construct a polyedron
- * @param d a dart from the vertex
- */
-template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
+int test_polyhedron()
+{
 
-
-
-
-/**
- * create a n-sided pyramid
- */
-template <typename PFP>
-Dart createPyramid(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary = true);
-
-/**
- * create a n-sided prism
- */
-template <typename PFP>
-Dart createPrism(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary = true);
-
-/**
- * create a n-sided diamond
- */
-template <typename PFP>
-Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary = true);
-
-/**
- * create a tetrahedron
- */
-template <typename PFP>
-Dart createTetrahedron(typename PFP::MAP& map, bool withBoundary = true);
-
-/**
- * create a hexahedron
- */
-template <typename PFP>
-Dart createHexahedron(typename PFP::MAP& map, bool withBoundary = true);
-
-/**
- * create a 3-sided prism
- */
-template <typename PFP>
-Dart createTriangularPrism(typename PFP::MAP& map, bool withBoundary = true);
-
-/**
- * create a 4-sided pyramid
- */
-template <typename PFP>
-Dart createQuadrangularPyramid(typename PFP::MAP& map, bool withBoundary = true);
-
-/**
- * create 4-sided diamond (i.e. an octahedron)
- */
-template <typename PFP>
-Dart createOctahedron(typename PFP::MAP& map, bool withBoundary = true);
-
-//TODO optimize
-template <typename PFP>
-bool isPyra(typename PFP::MAP& map, Dart d);
-
-//TODO optimize
-template <typename PFP>
-bool isPrism(typename PFP::MAP& map, Dart d);
-
-template <typename PFP>
-bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
-
-template <typename PFP>
-Dart embedPrism(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
-
-
-template <typename PFP>
-Dart embedPyramid(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
-
-} // namespace Modelisation
-
-} // namespace Surface
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-#include "Algo/Modelisation/polyhedron.hpp"
-
-#endif
+	return 0;
+}

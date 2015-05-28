@@ -29,6 +29,7 @@
 #include "NL/nl.h"
 //#include "Algo/LinearSolving/basic.h"
 #include "Algo/Geometry/laplacian.h"
+#include "Algo/Topo/basic.h"
 
 namespace CGoGN
 {
@@ -742,7 +743,8 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typena
 	TraversorW<MAP> tWb(map);
 	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
 	{
-		if(map.isBoundaryAdjacentVolume(dit))
+//		if(map.isBoundaryAdjacentVolume(dit))
+		if (map.isVolumeIncidentToBoundary(dit))
 		{
 			Traversor3WE<MAP> tWE(map, dit);
 			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
@@ -904,12 +906,13 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, type
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
-	VertexAttribute<unsigned int, MAP> indexV = map.template getAttribute<unsigned int, VERTEX>("indexV");
+	VertexAttribute<unsigned int, MAP> indexV = map.template getAttribute<unsigned int, VERTEX, MAP>("indexV");
 	if(!indexV.isValid())
-		indexV = map.template addAttribute<unsigned int, VERTEX>("indexV");
+		indexV = map.template addAttribute<unsigned int, VERTEX, MAP>("indexV");
 
-	unsigned int nb_vertices = map.template computeIndexCells<VERTEX>(indexV);
+	unsigned int nb_vertices =  Algo::Topo::computeIndexCells<VERTEX,MAP>(map, indexV);
 
 	//uniform weight
 	float weight = 1.0;
@@ -979,7 +982,7 @@ void relaxation(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, type
 		TraversorV<typename PFP::MAP> tv3(map);
 		for(Dart dit = tv3.begin() ; dit != tv3.end() ; dit = tv3.next())
 		{
-			position[dit][coord] = nlGetVariable(indexV[dit]);
+			position[dit][coord] = REAL(nlGetVariable(indexV[dit]));
 		}
 
 		nlReset(NL_TRUE) ;
@@ -996,9 +999,9 @@ void computeDual(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typ
 	typedef typename PFP::VEC3 VEC3;
 
 	// VolumeAttribute -> after dual new VertexAttribute
-	VolumeAttribute<VEC3, MAP> positionV  = map.template getAttribute<VEC3, VOLUME>("position") ;
+	VolumeAttribute<VEC3, MAP> positionV  = map.template getAttribute<VEC3, VOLUME, MAP>("position") ;
 	if(!positionV.isValid())
-		positionV = map.template addAttribute<VEC3, VOLUME>("position") ;
+		positionV = map.template addAttribute<VEC3, VOLUME, MAP>("position") ;
 
 	// Compute Centroid for the volumes
 	Algo::Volume::Geometry::computeCentroidVolumes<PFP>(map, position, positionV) ;
