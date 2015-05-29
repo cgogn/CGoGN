@@ -25,6 +25,8 @@
 #ifndef _IMPORT_FILE_TYPES_H
 #define _IMPORT_FILE_TYPES_H
 
+#include <string>
+
 namespace CGoGN
 {
 

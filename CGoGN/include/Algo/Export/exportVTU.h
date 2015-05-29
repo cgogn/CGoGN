@@ -52,7 +52,7 @@ namespace Export
 * @return true if ok
 */
 template <typename PFP>
-bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
+bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename);
 
 /**
 * simple export of the geometry of map into a binary VTU file (VTK unstructured grid xml format)
@@ -62,7 +62,7 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 * @return true if ok
 */
 template <typename PFP>
-bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
+bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename);
 
 //template <typename PFP>
 //bool exportVTUCompressed(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename);
@@ -79,7 +79,7 @@ protected:
 	typedef typename PFP::VEC3 VEC3;
 
 	typename PFP::MAP& m_map;
-	const VertexAttribute<typename PFP::VEC3>& m_position;
+	const VertexAttribute<VEC3, MAP>& m_position;
 
 	unsigned int nbtotal;
 	bool noPointData;
@@ -105,16 +105,16 @@ protected:
 
 
 	template<typename T>
-	void addBinaryVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addBinaryVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
 
 	template<typename T>
-	void addBinaryFaceAttribute(const FaceAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addBinaryFaceAttribute(const FaceAttribute<T, MAP>& attrib, const std::string& vtkType, unsigned int nbComp = 0, const std::string& name = "");
 
 	bool binaryClose();
 
 public:
 
-	VTUExporter(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position);
+	VTUExporter(typename PFP::MAP& map, const VertexAttribute<VEC3, MAP>& position);
 
 	~VTUExporter();
 
@@ -136,7 +136,7 @@ public:
 	 * @param name data name, if none then used attribute's name
 	 */
 	template<typename T>
-	void addVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
 
 
 	/**
@@ -152,7 +152,7 @@ public:
 	 * @param name data name, if none then used attribute's name
 	 */
 	template<typename T>
-	void addFaceAttribute(const FaceAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addFaceAttribute(const FaceAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
 
 
 	/**
@@ -190,7 +190,7 @@ protected:
 	typedef typename PFP::VEC3 VEC3;
 
 	typename PFP::MAP& m_map;
-	const VertexAttribute<typename PFP::VEC3>& m_position;
+	const VertexAttribute<VEC3,MAP>& m_position;
 
 	unsigned int nbtotal;
 	bool noPointData;
@@ -212,16 +212,16 @@ protected:
 	FILE* f_tempoBin_out ;
 
 	template<typename T>
-	void addBinaryVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addBinaryVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
 
 	template<typename T>
-	void addBinaryVolumeAttribute(const VolumeAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addBinaryVolumeAttribute(const VolumeAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
 
 	bool binaryClose();
 
 public:
 
-	VTUExporter(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position);
+	VTUExporter(MAP& map, const VertexAttribute<VEC3,MAP>& position);
 
 	~VTUExporter();
 
@@ -243,7 +243,7 @@ public:
 	 * @param name data name, if none then used attribute's name
 	 */
 	template<typename T>
-	void addVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
 
 
 	/**
@@ -259,7 +259,7 @@ public:
 	 * @param name data name, if none then used attribute's name
 	 */
 	template<typename T>
-	void addVolumeAttribute(const VolumeAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
+	void addVolumeAttribute(const VolumeAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp=0, const std::string& name="");
 
 
 	/**

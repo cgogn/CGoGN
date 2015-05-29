@@ -7,23 +7,12 @@
 
 using namespace CGoGN;
 
+
+// MAP2 / FLOAT instantiation
 struct PFP1 : public PFP_STANDARD
 {
 	typedef EmbeddedMap2 MAP;
 };
-
-struct PFP2 : public PFP_DOUBLE
-{
-	typedef EmbeddedMap2 MAP;
-};
-
-struct PFP3 : public PFP_DOUBLE
-{
-	typedef EmbeddedGMap2 MAP;
-};
-
-
-// MAP2 / FLOAT instantiation
 
 template Dart Algo::Surface::Modelisation::extrusion_scale<PFP1>(PFP1::MAP& the_map,
 	VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions,
@@ -90,6 +79,10 @@ template Dart Algo::Surface::Modelisation::extrudeRegion<PFP1>(PFP1::MAP& the_ma
 
 
 // MAP2 / DOUBLE instantiation
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap2 MAP;
+};
 
 template Dart Algo::Surface::Modelisation::extrusion_scale<PFP2>(PFP2::MAP& the_map,
 	VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions,
@@ -158,6 +151,10 @@ template Dart Algo::Surface::Modelisation::extrudeRegion<PFP2>(PFP2::MAP& the_ma
 
 
 // GMAP2 / DOUBLE instantiation
+struct PFP3 : public PFP_DOUBLE
+{
+	typedef EmbeddedGMap2 MAP;
+};
 
 template Dart Algo::Surface::Modelisation::extrusion_scale<PFP3>(PFP3::MAP& the_map,
 	VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions,

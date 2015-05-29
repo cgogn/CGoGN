@@ -1,132 +1,65 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
-#ifndef __IMPORT_H__
-#define __IMPORT_H__
 
-#include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/cellmarker.h"
-#include "Topology/generic/dartmarker.h"
+#include "Algo/Import/import.h"
 
-#include "Algo/Import/import2tables.h"
+using namespace CGoGN;
 
-namespace CGoGN
+struct PFP1 : public PFP_STANDARD
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+template bool Algo::Surface::Import::importMesh<PFP1>(PFP1::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices);
+template bool Algo::Surface::Import::importVoxellisation<PFP1>(PFP1::MAP& map, Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames, bool mergeCloseVertices);
+template bool Algo::Surface::Import::importChoupi<PFP1>(const std::string& filename, const std::vector<PFP1::VEC3>& tabV, const std::vector<unsigned int>& tabE);
+
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+template bool Algo::Surface::Import::importMesh<PFP2>(PFP2::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices);
+template bool Algo::Surface::Import::importVoxellisation<PFP2>(PFP2::MAP& map, Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames, bool mergeCloseVertices);
+template bool Algo::Surface::Import::importChoupi<PFP2>(const std::string& filename, const std::vector<PFP2::VEC3>& tabV, const std::vector<unsigned int>& tabE);
+
+struct PFP3 : public PFP_DOUBLE
+{
+	typedef EmbeddedGMap2 MAP;
+};
+
+template bool Algo::Surface::Import::importMesh<PFP3>(PFP3::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices);
+template bool Algo::Surface::Import::importVoxellisation<PFP3>(PFP3::MAP& map, Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames, bool mergeCloseVertices);
+template bool Algo::Surface::Import::importChoupi<PFP3>(const std::string& filename, const std::vector<PFP3::VEC3>& tabV, const std::vector<unsigned int>& tabE);
+
+
+
+
+struct PFP4 : public PFP_STANDARD
+{
+	typedef EmbeddedMap3 MAP;
+};
+
+template bool Algo::Volume::Import::importMesh<PFP4>(PFP4::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+template bool Algo::Volume::Import::importMeshToExtrude<PFP4>(PFP4::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scale, unsigned int nbStage);
+template bool Algo::Volume::Import::importMeshSAsV<PFP4>(PFP4::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+
+struct PFP5 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap3 MAP;
+};
+
+template bool Algo::Volume::Import::importMesh<PFP5>(PFP5::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+template bool Algo::Volume::Import::importMeshToExtrude<PFP5>(PFP5::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scale, unsigned int nbStage);
+template bool Algo::Volume::Import::importMeshSAsV<PFP5>(PFP5::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+
+
+
+int test_import()
 {
 
-namespace Algo
-{
-
-namespace Surface
-{
-
-namespace Import 
-{
-
-/**
-* import a mesh
-* @param map the map in which the function imports the mesh
-* @param filename
-* @param attrNames attribute names
-* @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
-* @return a boolean indicating if import was successful
-*/
-template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
-
-/**
-* import a voxellisation
-* @param map the map in which the function imports the mesh
-* @param voxellisation
-* @param attrNames attribute names
-* @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
-* @return a boolean indicating if import was successful
-*/
-template <typename PFP>
-bool importVoxellisation(typename PFP::MAP& map, Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames, bool mergeCloseVertices=false);
-
-/**
- * import a Choupi file
- * @param map
- * @param filename
- * @return
- */
-template <typename PFP>
-bool importChoupi(const std::string& filename, const std::vector<typename PFP::VEC3>& tabV, const std::vector<unsigned int>& tabE);
-
-} // namespace Import
-
-} // Surface
-
-
-namespace Volume
-{
-
-namespace Import
-{
-
-/**
- * import a volumetric mesh
- * @param map the map in which the function imports the mesh
- * @param filename
- * @param attrNames attribute names
- * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
- * @return a boolean indicating if import was successful
- */
-template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames/*, bool mergeCloseVertices = false*/);
-
-/**
- * import a mesh and extrude it
- * @param map the map in which the function imports the mesh
- * @param filename
- * @param attrNames attribute names
- * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
- * @return a boolean indicating if import was successful
- */
-template <typename PFP>
-bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scale = 5.0f, unsigned int nbStage = 1);
-
-/**
- *
- */
-template <typename PFP>
-bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
-
-} // Import
-
-} // Volume
-
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-#include "Algo/Import/import.hpp"
-#include "Algo/Import/importChoupi.hpp"
-
-
-//#include "Algo/Import/importMoka.hpp"
-//#include "Algo/Import/importObjTex.hpp"
-
-#endif
+	return 0;
+}

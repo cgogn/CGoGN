@@ -48,7 +48,6 @@ namespace MC
  * Windowing derived  classes are used as template,
  * and minimum interface are function
  * - inside
- * - insideWich
  * - interpole
  *
  */
@@ -111,14 +110,6 @@ public:
 	 */
 	WindowingEqual(const WindowingEqual& wind) : WindowingClass<DataType>(wind) {}
 
-	/**
-	 * @return a label corresponding to value
-	 * @param val voxel value
-	 * @return label
-	 */
-	int16 insideWich(DataType val) const {
-		return static_cast<int16>(val);
-	}
 
 	/**
 	 * @return true if voxel is inside the object
@@ -153,14 +144,7 @@ public:
 	 */
 	WindowingDiff(const WindowingDiff& wind) : WindowingClass<DataType>(wind) {}
 
-	/**
-	 * @return a label corresponding to value
-	 * @param val voxel value
-	 * @return label
-	 */
-	int16 insideWich(DataType val) const {
-		return static_cast<int16>(val);
-	}
+
 
 	/**
 	 * @return true if voxel is inside the object
@@ -195,14 +179,6 @@ public:
 	 */
 	WindowingGreater(const WindowingGreater& wind) : WindowingClass<DataType>(wind) {}
 
-	/**
-	 * @return a label corresponding to value
-	 * @param val voxel value
-	 * @return label
-	 */
-	int16 insideWich(DataType val) const {
-		return static_cast<int16>(val);
-	}
 
 	/**
 	 * @return true if voxel is inside the object
@@ -237,14 +213,6 @@ public:
 	 */
 	WindowingLess(const WindowingLess& wind) : WindowingClass<DataType>(wind) {}
 
-	/**
-	 * @return a label corresponding to value
-	 * @param val voxel value
-	 * @return label
-	 */
-	int16 insideWich(DataType val) const {
-		return static_cast<int16>(val);
-	}
 
 	/**
 	 * @return true if voxel is inside the object
@@ -280,14 +248,6 @@ public:
 	 */
 	WindowingInterval(const WindowingInterval& wind) : WindowingClass<DataType>(wind) {}
 
-	/**
-	 * @return a label corresponding to value
-	 * @param val voxel value
-	 * @return label
-	 */
-	int16 insideWich(DataType val) const {
-		return static_cast<int16>(val);
-	}
 
 	/**
 	 * @return true if voxel is inside the object
