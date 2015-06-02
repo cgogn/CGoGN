@@ -1,68 +1,41 @@
-#ifndef PARTCELL2DANDHALFMEMO_H
-#define PARTCELL2DANDHALFMEMO_H
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
-#include "Algo/MovingObjects/particle_cell_2DandHalf.h"
 
-#include "Algo/Geometry/inclusion.h"
-#include "Geometry/intersection.h"
-#include "Geometry/orientation.h"
+#include "Algo/MovingObjects/particle_cell_2DandHalf_memo.h"
 
-#include <iostream>
+using namespace CGoGN;
 
-/* A particle cell is a particle base within a map, within a precise cell, the displacement function should indicate
-   after each displacement wherein lies the new position of the particle */
-
-namespace CGoGN
+struct PFP1 : public PFP_STANDARD
 {
-
-namespace Algo
-{
-
-namespace Surface
-{
-
-namespace MovingObjects
-{
-
-template <typename PFP>
-class ParticleCell2DAndHalfMemo : public ParticleCell2DAndHalf<PFP>
-{
-public :
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef VertexAttribute<VEC3, MAP> TAB_POS;
-
-//	bool detect_vertex;
-//	bool detect_edge;
-//	bool detect_face;
-	ParticleCell2DAndHalfMemo() {};
-
-	ParticleCell2DAndHalfMemo(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		ParticleCell2DAndHalf<PFP>(map,belonging_cell,pos,tabPos)
-//		detect_vertex(false),detect_edge(false),detect_face(true)
-	{
-//	 memo_cross.push_back(this->d);
-	};
-
-	void vertexState(VEC3 current, CellMarkerMemo<MAP, FACE>& memo_cross);
-
-	void edgeState(VEC3 current, CellMarkerMemo<MAP, FACE>& memo_cross, Geom::Orientation3D sideOfEdge=Geom::ON);
-
-	void faceState(VEC3 current, CellMarkerMemo<MAP, FACE>& memo_cross);
-
-	std::vector<Dart> move(const VEC3& newCurrent, CellMarkerMemo<MAP, FACE>& memo_cross);
-
-	std::vector<Dart> move(const VEC3& newCurrent);
+	typedef EmbeddedMap2 MAP;
 };
 
-} // namespace MovingObjects
+template class Algo::Surface::MovingObjects::ParticleCell2DAndHalfMemo<PFP1>;
 
-} // namespace Surface
 
-} // namespace Algo
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap2 MAP;
+};
 
-} // namespace CGoGN
+template class Algo::Surface::MovingObjects::ParticleCell2DAndHalfMemo<PFP2>;
 
-#include "Algo/MovingObjects/particle_cell_2DandHalf_memo.hpp"
 
-#endif
+//
+//struct PFP3 : public PFP_DOUBLE
+//{
+//	typedef EmbeddedGMap2 MAP;
+//};
+//
+//template class Algo::Surface::MovingObjects::ParticleCell2DAndHalfMemo<PFP3>;
+
+
+int test_particle_cell_2DandHalf_memo()
+{
+
+	return 0;
+}
+

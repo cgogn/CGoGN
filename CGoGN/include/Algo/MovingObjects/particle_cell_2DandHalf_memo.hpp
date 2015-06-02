@@ -46,7 +46,7 @@ std::vector<Dart> ParticleCell2DAndHalfMemo<PFP>::move(const VEC3& goal)
 	this->crossCell = NO_CROSS ;
 	if (!Geom::arePointsEquals(goal, this->getPosition()))
 	{
-		CellMarkerMemo<FACE> memo_cross(this->m);
+		CellMarkerMemo<MAP,FACE> memo_cross(this->m);
 
 		switch (this->getState())
 		{
@@ -209,7 +209,7 @@ void ParticleCell2DAndHalfMemo<PFP>::edgeState(VEC3 current, CellMarkerMemo<MAP,
 			VEC3 n2 = Geometry::faceNormal<PFP>(this->m, this->m.phi2(this->d), this->m_positions);
 			VEC3 axis = n1 ^ n2 ;
 
-			float angle = Geom::angle(n1, n2) ;
+			REAL angle = Geom::angle(n1, n2) ;
 
 			displ = Geom::rotate(axis, angle, displ) ;
 			current = this->getPosition() + displ;
@@ -264,7 +264,7 @@ void ParticleCell2DAndHalfMemo<PFP>::faceState(VEC3 current, CellMarkerMemo<MAP,
 
 	//track new position within map
 	Dart dd = this->d;
-	float wsoe = this->getOrientationFace(current, this->getPosition(), this->m.phi1(this->d));
+	Geom::Orientation3D wsoe = this->getOrientationFace(current, this->getPosition(), this->m.phi1(this->d));
 
 	// orientation step
 	if(wsoe != Geom::UNDER)

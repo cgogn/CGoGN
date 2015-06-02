@@ -28,7 +28,7 @@
 #include "Topology/generic/cellmarker.h"
 #include "Topology/map/map3.h"
 
-#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor/traversorCell.h"
 #include "Geometry/distances.h"
 
 namespace CGoGN
@@ -277,7 +277,7 @@ template <typename PFP>
 Dart TopoPrimalRender<PFP>::pickColor(unsigned int x, unsigned int y)
 {
 	//more easy picking for
-	unsigned int dw = m_topo_dart_width;
+	float dw = m_topo_dart_width;
 	m_topo_dart_width+=2;
 
 	// save clear color and set to zero
@@ -436,9 +436,9 @@ template <typename PFP>
 void TopoPrimalRender<PFP>::updateData(MAP& map, const VertexAttribute<VEC3, MAP>& positions, float ke)
 {
 	if (m_attIndex.map() != &map)
-		m_attIndex  = map.template getAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = map.template getAttribute<unsigned int, DART,MAP>("dart_index");
 	if (!m_attIndex.isValid())
-		m_attIndex  = map.template addAttribute<unsigned int, DART>("dart_index");
+		m_attIndex  = map.template addAttribute<unsigned int, DART,MAP>("dart_index");
 
 //	m_nbDarts = 0;
 //	for (Dart d = map.begin(); d != map.end(); map.next(d))

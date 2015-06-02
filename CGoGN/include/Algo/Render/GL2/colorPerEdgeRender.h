@@ -70,7 +70,7 @@ public:
 	*/
 	template<typename PFP, typename ATTRIB>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX) ;
+		const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, const ATTRIB& colorPerXXX);
 
 	/**
 	 * draw

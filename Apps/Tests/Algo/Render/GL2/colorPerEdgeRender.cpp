@@ -1,93 +1,38 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
-
-#ifndef _COLOR_PER_EDGE_RENDER
-#define _COLOR_PER_EDGE_RENDER
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
 
-#include "Topology/generic/dart.h"
-#include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/functor.h"
-#include "Utils/vbo_base.h"
-#include "Utils/GLSLShader.h"
+#include "Algo/Render/GL2/colorPerEdgeRender.h"
+
+using namespace CGoGN;
 
 
-namespace CGoGN
+struct PFP1 : public PFP_STANDARD
 {
-
-namespace Algo
-{
-
-namespace Render
-{
-
-namespace GL2
-{
-
-/**
- * Class that update VBO to allow the rendering of per face color rendering
- * Use with ColorPerVertexShader
- */
-class ColorPerEdgeRender
-{
-protected:
-	GLuint m_nbEdges;
-
-public:
-	/**
-	* Constructor
-	*/
-	ColorPerEdgeRender() ;
-
-	/**
-	* update drawing buffers
-	* @param vboPosition vbo of positions to update
-	* @param vboColor vbo of colors to update
-	* @param map the map
-	* @param positions attribute of position vertices
-	* @param colorPerXXX attribute of color (per edge or per vertex per edge)
-	*/
-	template<typename PFP, typename ATTRIB>
-	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX) ;
-
-	/**
-	 * draw
-	 * @param sh shader use to draw (user ColorPerVertex or compatible)
-	 */
-	void draw(Utils::GLSLShader* sh) ;
-
+	typedef EmbeddedMap2 MAP;
 };
+typedef EdgeAttribute<Geom::Vec3d,PFP1::MAP> ATT1;
 
-}//end namespace GL2
+template void Algo::Render::GL2::ColorPerEdgeRender::updateVBO<PFP1, ATT1>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3,PFP1::MAP>& positions, const ATT1& colorPerXXX);
 
-}//end namespace Algo
 
-}//end namespace Render
 
-}//end namespace CGoGN
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap3 MAP;
+};
+typedef AttributeHandler<PFP2::VEC3, VERTEX2, PFP2::MAP> ATT2;
 
-#include "Algo/Render/GL2/colorPerEdgeRender.hpp"
+template void Algo::Render::GL2::ColorPerEdgeRender::updateVBO<PFP2, ATT2>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const ATT2& colorPerXXX);
 
-#endif
+
+
+int test_colorPerEdgeRender()
+{
+
+	return 0;
+}

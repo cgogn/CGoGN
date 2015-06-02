@@ -470,7 +470,7 @@ inline Iteratorize< Traversor3VF<MAP> > facesIncidentToVertex3(const MAP& m, Ver
 }
 
 template <typename MAP>
-inline Iteratorize< Traversor3VW<MAP> > VolumesIncidentToVertex3(const MAP& m, Vertex c)
+inline Iteratorize< Traversor3VW<MAP> > volumesIncidentToVertex3(const MAP& m, Vertex c)
 {
 	return Iteratorize< Traversor3VW<MAP> >(m, c);
 }

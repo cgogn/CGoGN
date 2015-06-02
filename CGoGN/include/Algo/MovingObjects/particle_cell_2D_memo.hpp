@@ -40,7 +40,7 @@ std::vector<Dart> ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 	this->crossCell = NO_CROSS ;
 	if (!Geom::arePointsEquals(goal, this->getPosition()))
 	{
-		CellMarkerMemo<FACE> memo_cross(this->m);
+		CellMarkerMemo<MAP,FACE> memo_cross(this->m);
 
 
 		switch (this->getState())
@@ -249,7 +249,7 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current, CellMarkerMemo<MAP,
 // 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 	memo_cross.mark(this->d);
 	Dart dd = this->d ;
-	float wsoe = this->getOrientationFace(current, this->m.phi1(this->d)) ;
+	Geom::Orientation2D wsoe = this->getOrientationFace(current, this->m.phi1(this->d)) ;
 
 // orientation step
 	if (wsoe != Geom::RIGHT)

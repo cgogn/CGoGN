@@ -92,7 +92,7 @@ typename PFP::VEC3 ParticleCell2DAndHalf<PFP>::intersectLineEdge(const VEC3& pA,
 
 	Geom::intersectionLinePlane(pA, pB - pA, q1, n, Inter) ;
 
-	Geom::Plane3D<float> pl = Geometry::facePlane<PFP>(m, d, m_positions);
+	Geom::Plane3D<REAL> pl = Geometry::facePlane<PFP>(m, d, m_positions);
 	pl.project(Inter);
 
 	return Inter;
@@ -221,7 +221,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 			VEC3 n2 = Geometry::faceNormal<PFP>(m, m.phi2(d), m_positions);
 			VEC3 axis = n1 ^ n2 ;
 
-			float angle = Geom::angle(n1, n2) ;
+			REAL angle = Geom::angle(n1, n2) ;
 
 			displ = Geom::rotate(axis, angle, displ) ;
 			goal = this->getPosition() + displ;
@@ -275,7 +275,7 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 
 	//track new position within map
 	Dart dd = d;
-	float wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d));
+	Geom::Orientation3D wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d));
 
 	// orientation step
 	if(wsoe != Geom::UNDER)

@@ -263,7 +263,7 @@ public:
 	 * @param map the map
 	 * @param posExpl the output positions
 	 */
-	template<typename VEC3>
+	//template<typename VEC3>
 	void computeDartMiddlePositions(MAP& map, DartAttribute<VEC3, MAP>& posExpl);
 
 	/**

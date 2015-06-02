@@ -1,109 +1,103 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
-
-#ifndef _COLOR_PER_FACE_RENDER
-#define _COLOR_PER_FACE_RENDER
-
-#include <GL/glew.h>
-
-#include "Topology/generic/dart.h"
-#include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/functor.h"
-#include "Utils/vbo_base.h"
-#include "Utils/GLSLShader.h"
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
 
-namespace CGoGN
+#include "Algo/Render/GL2/colorPerFaceRender.h"
+
+using namespace CGoGN;
+
+struct PFP1 : public PFP_STANDARD
 {
-
-namespace Algo
-{
-
-namespace Render
-{
-
-namespace GL2
-{
-
-/**
- * Class that update VBO to allow the rendering of per face colors
- * Use with ColorPerVertexShader
- */
-class ColorPerFaceRender
-{
-protected:
-	GLuint m_nbTris;
-
-public:
-	/**
-	* Constructor
-	*/
-	ColorPerFaceRender() ;
-
-	/**
-	* update drawing buffers
-	* @param vboPosition vbo of positions to update
-	* @param vboColor vbo of colors to update
-	* @param map the map
-	* @param positions attribute of position vertices
-	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
-	*/
-	template<typename PFP, unsigned int ORBIT>
-	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT,typename PFP::MAP>& colorPerXXX) ;
-
-	/**
-	* update drawing buffers
-	* @param vboPosition vbo of positions to update
-	* @param vboNormals vbo of positions to update
-	* @param vboColor vbo of colors to update
-	* @param map the map
-	* @param positions attribute of position vertices
-	* @param normals attribute of normal vertices
-	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
-	*/
-	template<typename PFP, unsigned int ORBIT>
-	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& normals, const AttributeHandler<typename PFP::VEC3,ORBIT,typename PFP::MAP>& colorPerXXX) ;
-
-
-	/**
-	 * draw
-	 * @param sh shader use to draw (here only ColorPerVertex)
-	 */
-	void draw(Utils::GLSLShader* sh) ;
-
+	typedef EmbeddedMap2 MAP;
 };
 
-}//end namespace GL2
 
-}//end namespace Algo
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP1,FACE>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const AttributeHandler<PFP1::VEC3, FACE, PFP1::MAP>& colorPerXXX);
 
-}//end namespace Render
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP1, FACE>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& normals,
+	const AttributeHandler<PFP1::VEC3, FACE, PFP1::MAP>& colorPerXXX);
 
-}//end namespace CGoGN
 
-#include "Algo/Render/GL2/colorPerFaceRender.hpp"
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP1, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const AttributeHandler<PFP1::VEC3, VERTEX2, PFP1::MAP>& colorPerXXX);
 
-#endif
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP1, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& normals,
+	const AttributeHandler<PFP1::VEC3, VERTEX2, PFP1::MAP>& colorPerXXX);
+
+
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP2, FACE>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const AttributeHandler<PFP2::VEC3, FACE, PFP2::MAP>& colorPerXXX);
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP2, FACE>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& normals,
+	const AttributeHandler<PFP2::VEC3, FACE, PFP2::MAP>& colorPerXXX);
+
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP2, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const AttributeHandler<PFP2::VEC3, VERTEX2, PFP2::MAP>& colorPerXXX);
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP2, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& normals,
+	const AttributeHandler<PFP2::VEC3, VERTEX2, PFP2::MAP>& colorPerXXX);
+
+
+
+struct PFP3 : public PFP_DOUBLE
+{
+	typedef EmbeddedGMap2 MAP;
+};
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP3, FACE>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP3::MAP& map,
+	const VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions, const AttributeHandler<PFP3::VEC3, FACE, PFP3::MAP>& colorPerXXX);
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP3, FACE>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP3::MAP& map,
+	const VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& normals,
+	const AttributeHandler<PFP3::VEC3, FACE, PFP3::MAP>& colorPerXXX);
+
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP3, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP3::MAP& map,
+	const VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions, const AttributeHandler<PFP3::VEC3, VERTEX2, PFP3::MAP>& colorPerXXX);
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP3, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP3::MAP& map,
+	const VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& normals,
+	const AttributeHandler<PFP3::VEC3, VERTEX2, PFP3::MAP>& colorPerXXX);
+
+
+
+
+struct PFP4 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap3 MAP;
+};
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP4, FACE>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP4::MAP& map,
+	const VertexAttribute<PFP4::VEC3, PFP4::MAP>& positions, const AttributeHandler<PFP4::VEC3, FACE, PFP4::MAP>& colorPerXXX);
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP4, FACE>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP4::MAP& map,
+	const VertexAttribute<PFP4::VEC3, PFP4::MAP>& positions, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& normals,
+	const AttributeHandler<PFP4::VEC3, FACE, PFP4::MAP>& colorPerXXX);
+
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP4, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboColor, PFP4::MAP& map,
+	const VertexAttribute<PFP4::VEC3, PFP4::MAP>& positions, const AttributeHandler<PFP4::VEC3, VERTEX2, PFP4::MAP>& colorPerXXX);
+
+template void Algo::Render::GL2::ColorPerFaceRender::updateVBO<PFP4, VERTEX2>(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, PFP4::MAP& map,
+	const VertexAttribute<PFP4::VEC3, PFP4::MAP>& positions, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& normals,
+	const AttributeHandler<PFP4::VEC3, VERTEX2, PFP4::MAP>& colorPerXXX);
+
+
+int test_colorPerFaceRender()
+{
+
+	return 0;
+}

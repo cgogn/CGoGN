@@ -22,7 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
+
 #include "Geometry/vector_gen.h"
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {

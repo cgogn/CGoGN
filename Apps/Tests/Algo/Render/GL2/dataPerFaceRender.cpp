@@ -1,93 +1,60 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
-
-#ifndef _DATA_PER_FACE_RENDER
-#define _DATA_PER_FACE_RENDER
-
-#include <GL/glew.h>
-
-#include "Topology/generic/dart.h"
-#include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/functor.h"
-#include "Utils/vbo.h"
-#include "Utils/GLSLShader.h"
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
 
-namespace CGoGN
+#include "Algo/Render/GL2/dataPerFaceRender.h"
+
+using namespace CGoGN;
+
+struct PFP1 : public PFP_STANDARD
 {
-
-namespace Algo
-{
-
-namespace Render
-{
-
-namespace GL2
-{
-
-/**
- * Class that update VBO to allow the rendering of per face data
- */
-class DataPerFaceRender
-{
-protected:
-	GLuint m_nbTris;
-
-public:
-	/**
-	* Constructor
-	*/
-	DataPerFaceRender() ;
-
-	/**
-	* update drawing buffers
-	* @param vboPosition vbo of positions to update
-	* @param vboData vbo of data to update
-	* @param map the map
-	* @param positions attribute of position vertices
-	* @param dataPerXXX attribute of data (per face, per vertex per face, per what you want)
-	*/
-	template<typename PFP, unsigned int ORBIT, typename T>
-	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typename PFP::MAP& map,
-            const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, const AttributeHandler<T,ORBIT, typename PFP::MAP>& dataPerXXX) ;
-
-	/**
-	 * draw
-	 * @param sh shader use to draw (here only ColorPerVertex)
-	 */
-	void draw(Utils::GLSLShader* sh) ;
-
+	typedef EmbeddedMap2 MAP;
 };
+typedef double SCAL;
 
-}//end namespace GL2
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP1, FACE, SCAL>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP1::MAP& map,
+const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const AttributeHandler<SCAL, FACE, PFP1::MAP>& dataPerXXX);
 
-}//end namespace Algo
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP1, VERTEX2, SCAL>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const AttributeHandler<SCAL, VERTEX2, PFP1::MAP>& dataPerXXX);
 
-}//end namespace Render
 
-}//end namespace CGoGN
+typedef Geom::Vec4d VEC;
 
-#include "Algo/Render/GL2/dataPerFaceRender.hpp"
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP1, FACE, VEC>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const AttributeHandler<VEC, FACE, PFP1::MAP>& dataPerXXX);
 
-#endif
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP1, VERTEX2, VEC>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP1::MAP& map,
+	const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, const AttributeHandler<VEC, VERTEX2, PFP1::MAP>& dataPerXXX);
+
+
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap3 MAP;
+};
+typedef float SCAL2;
+
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP2, FACE, SCAL2>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const AttributeHandler<SCAL2, FACE, PFP2::MAP>& dataPerXXX);
+
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP2, VERTEX2, SCAL2>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const AttributeHandler<SCAL2, VERTEX2, PFP2::MAP>& dataPerXXX);
+
+
+typedef Geom::Vec4f VEC2;
+
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP2, FACE, VEC2>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const AttributeHandler<VEC2, FACE, PFP2::MAP>& dataPerXXX);
+
+template void Algo::Render::GL2::DataPerFaceRender::updateVBO<PFP2, VERTEX2, VEC2>(Utils::VBO& vboPosition, Utils::VBO& vboData, PFP2::MAP& map,
+	const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, const AttributeHandler<VEC2, VERTEX2, PFP2::MAP>& dataPerXXX);
+
+
+
+int test_dataPerFaceRender()
+{
+
+	return 0;
+}

@@ -40,11 +40,12 @@ class ParticleCell2DAndHalf : public Algo::MovingObjects::ParticleBase<PFP>
 public :
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 	typedef VertexAttribute<VEC3, MAP> TAB_POS;
 
 	MAP& m;
 
-	const TAB_POS& m_positions;
+	/*const*/ TAB_POS& m_positions;
 
 	Dart d;
 	Dart lastCrossed;
@@ -53,12 +54,12 @@ public :
 
 	unsigned int crossCell ;
 
-	float distance;
+	REAL distance;
 
-	ParticleCell2DAndHalf(MAP& map) : m(map)
-	{}
+	//ParticleCell2DAndHalf(MAP& map) : m(map)
+	//{}
 
-	ParticleCell2DAndHalf(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
+	ParticleCell2DAndHalf(MAP& map, Dart belonging_cell, VEC3 pos, /*const*/ TAB_POS& tabPos) :
 		Algo::MovingObjects::ParticleBase<PFP>(pos),
 		m(map),
 		m_positions(tabPos),
@@ -71,7 +72,7 @@ public :
 
 	Dart getCell() { return d; }
 
-	float getDistance() { return distance; }
+	REAL getDistance() { return distance; }
 
 	Geom::Orientation3D getOrientationEdge(const VEC3& point, Dart d);
 

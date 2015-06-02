@@ -1,85 +1,74 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap2.h"
+#include "Topology/gmap/embeddedGMap3.h"
 
-#ifndef _MAP_SVG_RENDER_
-#define _MAP_SVG_RENDER_
 
-#include <vector>
-#include <fstream>
-#include <sstream>
+#include "Algo/Render/SVG/mapSVGRender.h"
 
-#include "Utils/svg.h"
-#include "Topology/generic/traversor/traversorCell.h"
 
-namespace CGoGN
+using namespace CGoGN;
+
+
+struct PFP1 : public PFP_STANDARD
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+template void Algo::Render::SVG::renderVertices<PFP1>(Utils::SVG::SVGOut& svg, PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position);
+template void Algo::Render::SVG::renderVertices<PFP1>(Utils::SVG::SVGOut& svg, PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& color);
+template void Algo::Render::SVG::renderEdges<PFP1>(Utils::SVG::SVGOut& svg, PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position);
+template void Algo::Render::SVG::renderEdges<PFP1>(Utils::SVG::SVGOut& svg, PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& position, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& color);
+
+
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+template void Algo::Render::SVG::renderVertices<PFP2>(Utils::SVG::SVGOut& svg, PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position);
+template void Algo::Render::SVG::renderVertices<PFP2>(Utils::SVG::SVGOut& svg, PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& color);
+template void Algo::Render::SVG::renderEdges<PFP2>(Utils::SVG::SVGOut& svg, PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position);
+template void Algo::Render::SVG::renderEdges<PFP2>(Utils::SVG::SVGOut& svg, PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& position, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& color);
+
+
+struct PFP3 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap3 MAP;
+};
+
+template void Algo::Render::SVG::renderVertices<PFP3>(Utils::SVG::SVGOut& svg, PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position);
+template void Algo::Render::SVG::renderVertices<PFP3>(Utils::SVG::SVGOut& svg, PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& color);
+template void Algo::Render::SVG::renderEdges<PFP3>(Utils::SVG::SVGOut& svg, PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position);
+template void Algo::Render::SVG::renderEdges<PFP3>(Utils::SVG::SVGOut& svg, PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& position, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& color);
+
+
+struct PFP4 : public PFP_DOUBLE
+{
+	typedef EmbeddedGMap2 MAP;
+};
+
+template void Algo::Render::SVG::renderVertices<PFP4>(Utils::SVG::SVGOut& svg, PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position);
+template void Algo::Render::SVG::renderVertices<PFP4>(Utils::SVG::SVGOut& svg, PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& color);
+template void Algo::Render::SVG::renderEdges<PFP4>(Utils::SVG::SVGOut& svg, PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position);
+template void Algo::Render::SVG::renderEdges<PFP4>(Utils::SVG::SVGOut& svg, PFP4::MAP& map, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& position, const VertexAttribute<PFP4::VEC3, PFP4::MAP>& color);
+
+
+struct PFP5 : public PFP_STANDARD
+{
+	typedef EmbeddedGMap3 MAP;
+};
+
+template void Algo::Render::SVG::renderVertices<PFP5>(Utils::SVG::SVGOut& svg, PFP5::MAP& map, const VertexAttribute<PFP5::VEC3, PFP5::MAP>& position);
+template void Algo::Render::SVG::renderVertices<PFP5>(Utils::SVG::SVGOut& svg, PFP5::MAP& map, const VertexAttribute<PFP5::VEC3, PFP5::MAP>& position, const VertexAttribute<PFP5::VEC3, PFP5::MAP>& color);
+template void Algo::Render::SVG::renderEdges<PFP5>(Utils::SVG::SVGOut& svg, PFP5::MAP& map, const VertexAttribute<PFP5::VEC3, PFP5::MAP>& position);
+template void Algo::Render::SVG::renderEdges<PFP5>(Utils::SVG::SVGOut& svg, PFP5::MAP& map, const VertexAttribute<PFP5::VEC3, PFP5::MAP>& position, const VertexAttribute<PFP5::VEC3, PFP5::MAP>& color);
+
+
+
+int test_mapSVGRender()
 {
 
-namespace Algo
-{
-
-namespace Render
-{
-
-namespace SVG
-{
-
-/**
- * render vertices in a SVGOut
- * @warning no depth ordering
- */
-template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
-
-/**
- * render colored vertices in a SVGOut
- * @warning no depth ordering
- */
-template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& color);
-
-/**
- * render edges in a SVGOut
- * @warning no depth ordering
- */
-template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position);
-
-/**
- * render colored edges in a SVGOut
- * @warning no depth ordering
- */
-template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& color);
-
-} // namespace SVG
-
-} // namespace Render
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-#include "Algo/Render/SVG/mapSVGRender.hpp"
-
-#endif
+	return 0;
+}
