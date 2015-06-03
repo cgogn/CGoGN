@@ -22,23 +22,6 @@ template unsigned int Algo::Histogram::Histogram::markCellsOfHistogramColumn<CM1
 template unsigned int  Algo::Histogram::Histogram::markCellsOfQuantilesColumn<CM1>(unsigned int c, CM1& cm) const;
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-struct PFP2 : public PFP_STANDARD
-{
-	typedef EmbeddedMap2 MAP;
-};
-typedef VertexAttribute<double, PFP2::MAP> VA2;
-typedef VertexAttribute<Geom::Vec3f, PFP2::MAP> VAC2;
-typedef CellMarker<PFP2::MAP, VERTEX> CM2;
-
-template void Algo::Histogram::Histogram::initData<VA2>(const VA2& attr);
-template void Algo::Histogram::Histogram::histoColorize<VAC2>(VAC2& colors);
-template void Algo::Histogram::Histogram::quantilesColorize<VAC2>(VAC2& colors, const std::vector<Geom::Vec3f>& tc);
-template unsigned int Algo::Histogram::Histogram::markCellsOfHistogramColumn<CM2>(unsigned int c, CM2& cm) const;
-template unsigned int  Algo::Histogram::Histogram::markCellsOfQuantilesColumn<CM2>(unsigned int c, CM2& cm) const;
-
-
 
 
 int test_histogram()
