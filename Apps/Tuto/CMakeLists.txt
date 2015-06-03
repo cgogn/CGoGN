@@ -42,10 +42,10 @@ IF (CGoGN_WITH_QT)
 	target_link_libraries( tuto_orbits
 		${CGoGN_LIBS}  ${CGoGN_EXT_LIBS}  )
 
-#	qt_wrap_cpp(tuto_histo_moc tuto_histo.h)
-#	add_executable( tuto_histo tuto_histo.cpp tuto_histo.h ${tuto_histo_ui}  ${tuto_histo_moc})
-#	target_link_libraries( tuto_histo
-#		${CGoGN_LIBS} ${CGoGN_EXT_LIBS} )
+	qt_wrap_cpp(tuto_histo_moc tuto_histo.h)
+	add_executable( tuto_histo tuto_histo.cpp tuto_histo.h ${tuto_histo_ui}  ${tuto_histo_moc})
+	target_link_libraries( tuto_histo
+		${CGoGN_LIBS} ${CGoGN_EXT_LIBS} )
 
 
 #	qt_wrap_cpp(tp_master_moc tp_master.h)

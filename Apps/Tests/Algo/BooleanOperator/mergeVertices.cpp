@@ -1,63 +1,47 @@
-/*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
-#ifndef __ALGO_BOOLEANOPERATOR_VERTICES_H__
-#define __ALGO_BOOLEANOPERATOR_VERTICES_H__
 
-#include "Geometry/basic.h"
-#include "Geometry/inclusion.h"
-#include "Geometry/orientation.h"
+#include "Algo/BooleanOperator/mergeVertices.h"
 
-namespace CGoGN
+using namespace CGoGN;
+
+
+struct PFP1 : public PFP_STANDARD
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+template bool Algo::Surface::BooleanOperator::isBetween<PFP1>(PFP1::MAP& map, const VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, Dart d, Dart e, Dart f);
+template void Algo::Surface::BooleanOperator::mergeVertex<PFP1>(PFP1::MAP& map, VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions, Dart d, Dart e);
+template void Algo::Surface::BooleanOperator::mergeVertices<PFP1>(PFP1::MAP& map, VertexAttribute<PFP1::VEC3, PFP1::MAP>& positions);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+struct PFP2 : public PFP_DOUBLE
+{
+	typedef EmbeddedMap2 MAP;
+};
+
+template bool Algo::Surface::BooleanOperator::isBetween<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, Dart d, Dart e, Dart f);
+template void Algo::Surface::BooleanOperator::mergeVertex<PFP2>(PFP2::MAP& map, VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, Dart d, Dart e);
+template void Algo::Surface::BooleanOperator::mergeVertices<PFP2>(PFP2::MAP& map, VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+struct PFP3 : public PFP_STANDARD
+{
+	typedef EmbeddedGMap2 MAP;
+};
+
+template bool Algo::Surface::BooleanOperator::isBetween<PFP3>(PFP3::MAP& map, const VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions, Dart d, Dart e, Dart f);
+template void Algo::Surface::BooleanOperator::mergeVertex<PFP3>(PFP3::MAP& map, VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions, Dart d, Dart e);
+template void Algo::Surface::BooleanOperator::mergeVertices<PFP3>(PFP3::MAP& map, VertexAttribute<PFP3::VEC3, PFP3::MAP>& positions);
+
+
+int test_mergeVertices()
 {
 
-namespace Algo
-{
-
-namespace Surface
-{
-
-namespace BooleanOperator
-{
-
-template <typename PFP>
-bool isBetween(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, Dart d, Dart e, Dart f) ;
-
-template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, Dart d, Dart e);
-
-template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions);
-
+	return 0;
 }
-
-}
-
-}
-
-}
-
-#include "mergeVertices.hpp"
-
-#endif

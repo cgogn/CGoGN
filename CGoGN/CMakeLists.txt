@@ -32,6 +32,11 @@ file(
 	${CGoGN_SRC_DIR}/include/Algo/*.h
 )
 
+IF(CGoGN_WITH_QT)
+	qt_wrap_cpp(ALGO_QT_HEADERS_MOC ${CGoGN_SRC_DIR}/include/Algo/Histogram/qthistodraw.h)
+	SET (files_algo_withQt ${files_algo}  ${ALGO_QT_HEADERS_MOC})
+ENDIF()
+
 file(
 	GLOB
 	shaders_src
@@ -108,7 +113,7 @@ file(	GLOB_RECURSE
 IF (CGoGN_ONELIB)
 	IF(CGoGN_WITH_QT)
 		add_definitions(-DCGoGN_QT_DLL_EXPORT)
-		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
+		add_library( cgogn ${files_topology} ${files_container} ${files_algo_withQt} ${files_utils_withQt}) 
 		qt_use_modules(cgogn Gui OpenGL Xml Svg)
 	ELSE()
 		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
@@ -132,7 +137,13 @@ ELSE()
 	add_library( topology ${files_topology})
 	target_link_libraries(topology container)
 
-	add_library( algo	${files_algo})
+	IF (CGoGN_WITH_QT)
+		add_definitions(-DCGoGN_QT_DLL_EXPORT)
+		add_library(  algo	${files_algo_withQt} )
+		qt_use_modules(algo Gui OpenGL Xml Svg)
+	ELSE()
+		add_library( algo	${files_algo} )
+	ENDIF()
 	target_link_libraries(algo utils topology)
 
 

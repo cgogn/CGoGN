@@ -36,7 +36,7 @@ namespace QT
 
 
 ColorsChooser::ColorsChooser(SimpleQT *interf):
-		QtPopUp(NULL,false),m_interf(interf),m_current(0)
+		QtPopUp(false),m_interf(interf),m_current(0)
 {
 	m_list = new QListWidget();
 	m_diag = new QColorDialog();
