@@ -24,7 +24,7 @@ template Dart Algo::Surface::Modelisation::createQuadrangularPyramid<PFP1>(PFP1:
 template Dart Algo::Surface::Modelisation::createOctahedron<PFP1>(PFP1::MAP& map, bool withBoundary);
 template bool Algo::Surface::Modelisation::isPyra<PFP1>(PFP1::MAP& map, Dart d);
 template bool Algo::Surface::Modelisation::isPrism<PFP1>(PFP1::MAP& map, Dart d);
-template bool Algo::Surface::Modelisation::isHexahedron<PFP1>(PFP1::MAP& the_map, Dart d, unsigned int thread );
+template bool Algo::Surface::Modelisation::isHexahedron<PFP1>(PFP1::MAP& the_map, Dart d);
 template Dart Algo::Surface::Modelisation::embedPrism<PFP1>(PFP1::MAP& map, VertexAttribute<PFP1::VEC3, PFP1::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
 template Dart Algo::Surface::Modelisation::embedPyramid<PFP1>(PFP1::MAP& map, VertexAttribute<PFP1::VEC3, PFP1::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
 
@@ -46,7 +46,7 @@ template Dart Algo::Surface::Modelisation::createQuadrangularPyramid<PFP2>(PFP2:
 template Dart Algo::Surface::Modelisation::createOctahedron<PFP2>(PFP2::MAP& map, bool withBoundary);
 template bool Algo::Surface::Modelisation::isPyra<PFP2>(PFP2::MAP& map, Dart d);
 template bool Algo::Surface::Modelisation::isPrism<PFP2>(PFP2::MAP& map, Dart d);
-template bool Algo::Surface::Modelisation::isHexahedron<PFP2>(PFP2::MAP& the_map, Dart d, unsigned int thread);
+template bool Algo::Surface::Modelisation::isHexahedron<PFP2>(PFP2::MAP& the_map, Dart d);
 template Dart Algo::Surface::Modelisation::embedPrism<PFP2>(PFP2::MAP& map, VertexAttribute<PFP2::VEC3, PFP2::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
 template Dart Algo::Surface::Modelisation::embedPyramid<PFP2>(PFP2::MAP& map, VertexAttribute<PFP2::VEC3, PFP2::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
 
@@ -68,7 +68,7 @@ template Dart Algo::Surface::Modelisation::embedPyramid<PFP2>(PFP2::MAP& map, Ve
 //template Dart Algo::Surface::Modelisation::createOctahedron<PFP3>(PFP3::MAP& map, bool withBoundary);
 //template bool Algo::Surface::Modelisation::isPyra<PFP3>(PFP3::MAP& map, Dart d);
 //template bool Algo::Surface::Modelisation::isPrism<PFP3>(PFP3::MAP& map, Dart d);
-//template bool Algo::Surface::Modelisation::isHexahedron<PFP3>(PFP3::MAP& the_map, Dart d, unsigned int thread);
+//template bool Algo::Surface::Modelisation::isHexahedron<PFP3>(PFP3::MAP& the_map, Dart d);
 //template Dart Algo::Surface::Modelisation::embedPrism<PFP3>(PFP3::MAP& map, VertexAttribute<PFP3::VEC3, PFP3::MAP>& position, unsigned int n, bool withBoundary, float bottom_radius, float top_radius, float height);
 //template Dart Algo::Surface::Modelisation::embedPyramid<PFP3>(PFP3::MAP& map, VertexAttribute<PFP3::VEC3, PFP3::MAP>& position, unsigned int n, bool withBoundary, float radius, float height);
 

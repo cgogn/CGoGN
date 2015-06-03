@@ -161,6 +161,8 @@ void LoopSubdivisionAttribName(typename PFP::MAP& map, const std::string& nameAt
 	case CGoGNVEC4D:
 		return LoopSubdivisionAttribNameTyped<PFP,Geom::Vec4d>(map,nameAttrib);
 		break;
+	default:
+		break;
 	}
 	CGoGNerr << "LoopSubdivision not supported on attribute "<< nameAttrib << CGoGNendl;
 }

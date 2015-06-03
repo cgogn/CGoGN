@@ -87,18 +87,20 @@ int decimate(
 			approximators.push_back(new Approximator_ColorNaive<PFP>(map, attribs[1], attribs[0], attrib0ApproxResult)) ;
 			}
 			break ;
-//		case A_ColorQEMext : {
+		case A_ColorQEMext :
+//            {
 //			// pos + col
 //			assert(attribs.size() >= 2 || !"Decimate: A_ColorQEMext --> not enough attribs provided") ;
 //			approximators.push_back(new Approximator_ColorQEMext<PFP>(map, attribs)) ;
 //			}
-//			break;
-//		case A_GeomColorOpt : {
+			break;
+		case A_GeomColorOpt :
+//          {
 //			// pos + col
 //			assert(attribs.size() >= 2 || !"Decimate: A_GeomColorOpt --> not enough attribs provided") ;
 //			approximators.push_back(new Approximator_GeomColOpt<PFP>(map, attribs)) ;
 //			}
-//			break ;
+			break ;
 		case A_hQEM :
 			// pos
 			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs[0])) ;
