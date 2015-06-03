@@ -123,7 +123,7 @@ public:
 	 * @param val1 voxel first value
 	 * @param val2 voxel second value
 	 */
-	float interpole(DataType val1, DataType val2) const {
+    float interpole(DataType /*val1*/, DataType /*val2*/) const {
 		return 0.5f;
 	}
 };

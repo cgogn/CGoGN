@@ -209,7 +209,7 @@ void ParticleCell2DAndHalfMemo<PFP>::edgeState(VEC3 current, CellMarkerMemo<MAP,
 			VEC3 n2 = Geometry::faceNormal<PFP>(this->m, this->m.phi2(this->d), this->m_positions);
 			VEC3 axis = n1 ^ n2 ;
 
-			REAL angle = Geom::angle(n1, n2) ;
+            typename PFP::REAL angle = Geom::angle(n1, n2) ;
 
 			displ = Geom::rotate(axis, angle, displ) ;
 			current = this->getPosition() + displ;

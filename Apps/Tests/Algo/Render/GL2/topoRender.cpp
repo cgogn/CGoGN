@@ -34,19 +34,10 @@ struct PFP2 : public PFP_DOUBLE
 {
 	typedef EmbeddedMap2 MAP;
 };
-typedef PFP2::MAP MAP2;
-
-template void Algo::Render::GL2::TopoRender::overdrawDart<MAP2>(MAP2& map, Dart d, float width, float r, float g, float b);
-template Dart Algo::Render::GL2::TopoRender::picking<MAP2>(MAP2& map, int x, int y, bool withBoundary = false);
-template Dart Algo::Render::GL2::TopoRender::coneSelection<MAP2>(MAP2& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
-template Dart Algo::Render::GL2::TopoRender::raySelection<MAP2>(MAP2& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
 template void Algo::Render::GL2::TopoRender::updateData<PFP2>(PFP2::MAP &map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary);
 template void Algo::Render::GL2::TopoRender::updateData<PFP2>(PFP2::MAP &map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, bool onlyBoundary);
 template void Algo::Render::GL2::TopoRender::updateDataBoundary<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, float ke, float kf, float ns);
 template void Algo::Render::GL2::TopoRender::updateDataBoundary<PFP2>(PFP2::MAP& map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions);
-//template void Algo::Render::GL2::TopoRender::updateDataGMap<PFP2>(PFP2::MAP &map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary);
-//template void Algo::Render::GL2::TopoRender::updateDataGMap<PFP2>(PFP2::MAP &map, const VertexAttribute<PFP2::VEC3, PFP2::MAP>& positions, bool onlyBoundary);
-template void Algo::Render::GL2::TopoRender::drawColoredDarts<MAP2>(MAP2& map);
 
 
 struct PFPG1 : public PFP_STANDARD
@@ -59,10 +50,6 @@ template void Algo::Render::GL2::TopoRender::overdrawDart<GMAP1>(GMAP1& map, Dar
 template Dart Algo::Render::GL2::TopoRender::picking<GMAP1>(GMAP1& map, int x, int y, bool withBoundary);
 template Dart Algo::Render::GL2::TopoRender::coneSelection<GMAP1>(GMAP1& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
 template Dart Algo::Render::GL2::TopoRender::raySelection<GMAP1>(GMAP1& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
-//template void Algo::Render::GL2::TopoRender::updateData<PFPG1>(PFPG1::MAP &map, const VertexAttribute<PFPG1::VEC3, PFPG1::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary);
-//template void Algo::Render::GL2::TopoRender::updateData<PFPG1>(PFPG1::MAP &map, const VertexAttribute<PFPG1::VEC3, PFPG1::MAP>& positions, bool onlyBoundary);
-//template void Algo::Render::GL2::TopoRender::updateDataBoundary<PFPG1>(PFPG1::MAP& map, const VertexAttribute<PFPG1::VEC3, PFPG1::MAP>& positions, float ke, float kf, float ns);
-//template void Algo::Render::GL2::TopoRender::updateDataBoundary<PFPG1>(PFPG1::MAP& map, const VertexAttribute<PFPG1::VEC3, PFPG1::MAP>& positions);
 template void Algo::Render::GL2::TopoRender::updateDataGMap<PFPG1>(PFPG1::MAP &map, const VertexAttribute<PFPG1::VEC3, PFPG1::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary);
 template void Algo::Render::GL2::TopoRender::updateDataGMap<PFPG1>(PFPG1::MAP &map, const VertexAttribute<PFPG1::VEC3, PFPG1::MAP>& positions, bool onlyBoundary);
 template void Algo::Render::GL2::TopoRender::drawColoredDarts<GMAP1>(GMAP1& map);
@@ -74,18 +61,8 @@ struct PFPG2 : public PFP_DOUBLE
 	typedef EmbeddedGMap2 MAP;
 };
 typedef PFPG2::MAP GMAP2;
-
-template void Algo::Render::GL2::TopoRender::overdrawDart<GMAP2>(GMAP2& map, Dart d, float width, float r, float g, float b);
-template Dart Algo::Render::GL2::TopoRender::picking<GMAP2>(GMAP2& map, int x, int y, bool withBoundary = false);
-template Dart Algo::Render::GL2::TopoRender::coneSelection<GMAP2>(GMAP2& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle);
-template Dart Algo::Render::GL2::TopoRender::raySelection<GMAP2>(GMAP2& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax);
-//template void Algo::Render::GL2::TopoRender::updateData<PFPG2>(PFPG2::MAP &map, const VertexAttribute<PFPG2::VEC3, PFPG2::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary);
-//template void Algo::Render::GL2::TopoRender::updateData<PFPG2>(PFPG2::MAP &map, const VertexAttribute<PFPG2::VEC3, PFPG2::MAP>& positions, bool onlyBoundary);
-//template void Algo::Render::GL2::TopoRender::updateDataBoundary<PFPG2>(PFPG2::MAP& map, const VertexAttribute<PFPG2::VEC3, PFPG2::MAP>& positions, float ke, float kf, float ns);
-//template void Algo::Render::GL2::TopoRender::updateDataBoundary<PFPG2>(PFPG2::MAP& map, const VertexAttribute<PFPG2::VEC3, PFPG2::MAP>& positions);
 template void Algo::Render::GL2::TopoRender::updateDataGMap<PFPG2>(PFPG2::MAP &map, const VertexAttribute<PFPG2::VEC3, PFPG2::MAP>& positions, float ke, float kf, bool withBoundary, bool onlyBoundary);
 template void Algo::Render::GL2::TopoRender::updateDataGMap<PFPG2>(PFPG2::MAP &map, const VertexAttribute<PFPG2::VEC3, PFPG2::MAP>& positions, bool onlyBoundary);
-template void Algo::Render::GL2::TopoRender::drawColoredDarts<GMAP2>(GMAP2& map);
 
 
 

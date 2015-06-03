@@ -9,8 +9,8 @@
 using namespace CGoGN;
 
 
-template Algo::LinearSolving::Coeff<float>;
-template Algo::LinearSolving::Coeff<double>;
+template class Algo::LinearSolving::Coeff<float>;
+template class Algo::LinearSolving::Coeff<double>;
 // Vec3 ?
 
 
@@ -135,8 +135,6 @@ template void Algo::LinearSolving::addRowsRHS_Equality<PFP1, VEC_2>(PFP1::MAP& m
 	float weight,
 	unsigned int coord);
 
-template void Algo::LinearSolving::addRows_Laplacian_Topo<PFP1>(PFP1::MAP& m,
-	const VertexAttribute<unsigned int, PFP1::MAP>& index);
 
 template void Algo::LinearSolving::addRowsRHS_Laplacian_Topo<PFP1, SCAL_2>(PFP1::MAP& m,
 	const VertexAttribute<unsigned int, PFP1::MAP>& index,
@@ -147,10 +145,6 @@ template void Algo::LinearSolving::addRowsRHS_Laplacian_Topo<PFP1, VEC_2>(PFP1::
 	const VertexAttribute<VEC_2, PFP1::MAP>& attr,
 	unsigned int coord);
 
-template void Algo::LinearSolving::addRows_Laplacian_Cotan<PFP1>(PFP1::MAP& m,
-	const VertexAttribute<unsigned int, PFP1::MAP>& index,
-	const EdgeAttribute<PFP1::REAL, PFP1::MAP>& edgeWeight,
-	const VertexAttribute<PFP1::REAL, PFP1::MAP>& vertexArea);
 
 template void Algo::LinearSolving::addRowsRHS_Laplacian_Cotan<PFP1, SCAL_2>(PFP1::MAP& m,
 	const VertexAttribute<unsigned int, PFP1::MAP>& index,

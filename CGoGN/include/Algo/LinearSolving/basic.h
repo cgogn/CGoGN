@@ -399,7 +399,7 @@ void getResult(
 {
 	foreach_cell<VERTEX>(m, [&] (Dart d)
 	{
-		attr[d] = typename ATTR_TYPE(nlGetVariable(index[d]));
+        attr[d] = ATTR_TYPE(nlGetVariable(index[d]));
 	});
 }
 

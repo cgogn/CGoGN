@@ -287,7 +287,7 @@ typename PFP::VEC3 MarchingCubeGen<DataType, ImgT, Windowing, PFP>::recalPoint(c
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge0(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge0(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/,  unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -306,7 +306,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge0(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge1(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge1(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/,  unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -322,7 +322,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge1(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge2(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge2(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/,  unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -338,7 +338,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge2(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge3(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge3(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 8)
@@ -353,7 +353,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge3(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge4(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge4(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -369,7 +369,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge4(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge5(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge5(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -385,7 +385,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge5(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge6(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge6(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -401,7 +401,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge6(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge7(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge7(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -418,7 +418,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge7(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge8(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge8(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -434,7 +434,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge8(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge9(const unsigned char _ucCubeIndex,  const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge9(const unsigned char _ucCubeIndex,  const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -450,7 +450,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge9(const uns
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge10(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge10(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -466,7 +466,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge10(const un
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge11(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge11(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/, unsigned int* const lVertTable, const typename PFP::VEC3& vPos)
 {
 // TODO parametre _LZ not used => a supprimer ?
 
@@ -1023,7 +1023,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::setNeighbour(L_DART d1, L_
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int const *_lVertTable, const unsigned short _usMask, float curv, unsigned char tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int /*_lZ*/,  unsigned int const *_lVertTable, const unsigned short _usMask, float /*curv*/, unsigned char /*tag*/)
 {
 // TODO parametre _LZ not used => a supprimer ?
 // TODO parametre curv not used => a supprimer ?

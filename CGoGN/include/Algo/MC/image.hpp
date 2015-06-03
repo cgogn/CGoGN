@@ -27,7 +27,7 @@
 #include <string.h>
 #include <vector>
 #include <cmath>
-//#include <typeinfo>
+#include <typeinfo>
 #include <algorithm>
 #include "Utils/cgognStream.h"
 

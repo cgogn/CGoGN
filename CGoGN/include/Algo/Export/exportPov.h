@@ -103,13 +103,13 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, VertexAt
 
 		if(!markF.isMarked(d) && map.phi3(d)==d)
 		{
-			markF.markOrbit<FACE>(d) ;
+            markF.template markOrbit<FACE>(d) ;
 			std::vector<unsigned int> fidx ;
 			fidx.reserve(4) ;
 			Dart dd = d ;
 			do
 			{
-				unsigned int vNum = map.getEmbedding<VERTEX>(dd) ;
+                unsigned int vNum = map.template getEmbedding<VERTEX>(dd) ;
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;

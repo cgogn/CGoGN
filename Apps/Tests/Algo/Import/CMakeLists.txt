@@ -15,3 +15,4 @@ importObjTex.cpp
 target_link_libraries( test_algo_import
 	${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
 
+qt_use_cgogn_modules(test_algo_import)

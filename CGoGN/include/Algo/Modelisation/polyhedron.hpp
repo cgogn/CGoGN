@@ -418,7 +418,7 @@ bool isPrism(typename PFP::MAP& map, Dart d)
 }
 
 template <typename PFP>
-bool isHexahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread)
+bool isHexahedron(typename PFP::MAP& the_map, Dart d)
 {
     unsigned int nbFaces = 0;
 

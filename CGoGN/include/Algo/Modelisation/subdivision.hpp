@@ -897,7 +897,7 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 	for (std::vector<Dart>::iterator di=faces.begin(); di != faces.end(); ++di)
 	{
 		Dart e = *di;
-		typename PFP::VEC3 center = Geometry::faceCentroid<PFP>(map,e,position);
+//		typename PFP::VEC3 center = Geometry::faceCentroid<PFP>(map,e,position);
 
 		do
 		{

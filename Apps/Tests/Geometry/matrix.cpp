@@ -27,10 +27,16 @@ int test_matrix()
 	Geom::Matrix<3, 3, float> Cf = Af*Bf;
 	Geom::Matrix<2, 2, float> Df = Bf*Af;
 
+	std::cout << Cf << std::endl;
+	std::cout << Df << std::endl;
+
 	Geom::Matrix<3, 2, double> Ad;
 	Geom::Matrix<2, 3, double> Bd;
 	Geom::Matrix<3, 3, double> Cd = Ad*Bd;
 	Geom::Matrix<2, 2, double> Dd = Bd*Ad;
+
+	std::cout << Cd << std::endl;
+	std::cout << Dd << std::endl;
 
 	return 0;
 }

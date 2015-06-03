@@ -154,7 +154,7 @@ inline Dart GMap2<MAP_IMPL>::phi2_1(Dart d) const
 template <typename MAP_IMPL>
 inline Dart GMap2<MAP_IMPL>::alpha_1(Dart d) const
 {
-	return beta1(beta2(d)) ;
+    return this->beta1(beta2(d)) ;
 }
 
 template <typename MAP_IMPL>

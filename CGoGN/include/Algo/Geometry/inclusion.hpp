@@ -274,7 +274,7 @@ bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 }
 
 template <typename PFP>
-bool isPointOnVertex(typename PFP::MAP& map, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& point)
+bool isPointOnVertex(typename PFP::MAP& /*map*/, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& point)
 {
 	return Geom::arePointsEquals(point, position[v]);
 }
