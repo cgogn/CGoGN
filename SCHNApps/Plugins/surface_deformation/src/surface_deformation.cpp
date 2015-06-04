@@ -2,6 +2,7 @@
 
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
+#include "Algo/LinearSolving/basic.h"
 
 #include "Algo/Topo/basic.h"
 
@@ -405,13 +406,13 @@ void Surface_Deformation_Plugin::matchDiffCoord(MapHandlerGen* mh)
 		nlBegin(NL_SYSTEM) ;
 	for (int coord = 0; coord < 3; ++coord)
 	{
-		LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
+		Algo::LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 		nlBegin(NL_MATRIX);
-		LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.diffCoord, coord);
+		Algo::LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.diffCoord, coord);
 		nlEnd(NL_MATRIX);
 		nlEnd(NL_SYSTEM);
 		nlSolve();
-		LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
+		Algo::LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
 		nlReset(NL_TRUE);
 	}
 }
@@ -535,14 +536,14 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 			nlBegin(NL_SYSTEM);
 		for (int coord = 0; coord < 3; ++coord)
 		{
-			LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
+			Algo::LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 			nlBegin(NL_MATRIX);
 	//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, p.vIndex, p.edgeWeight, p.vertexArea, p.rotatedDiffCoord, coord);
-			LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.rotatedDiffCoord, coord);
+			Algo::LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.rotatedDiffCoord, coord);
 			nlEnd(NL_MATRIX);
 			nlEnd(NL_SYSTEM);
 			nlSolve();
-			LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
+			Algo::LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
 			nlReset(NL_TRUE);
 		}
 	}
