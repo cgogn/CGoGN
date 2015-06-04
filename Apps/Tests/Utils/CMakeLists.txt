@@ -16,3 +16,4 @@ add_executable( test_utils
 target_link_libraries( test_utils 
 	${CGoGN_LIBS} ${CGoGN_EXT_LIBS})
 
+qt_use_cgogn_modules(test_utils)

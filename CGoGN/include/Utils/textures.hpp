@@ -109,7 +109,7 @@ void ImageData<DIM,TYPE>::computeSub()
 template < unsigned int DIM, typename TYPE >
 void ImageData<DIM,TYPE>::create(TYPE* data, const COORD& size)
 {
-	else if (m_data_ptr!=NULL)
+	if (m_data_ptr!=NULL)
 	{
 		delete[] m_data_ptr;
 	}

@@ -76,7 +76,7 @@ private:
 
 	std::vector<VEC3> originalDetailVectors ;
 	bool quantizationInitialized, quantizationApplied ;
-	Algo::PMesh::Quantization<VEC3>* q ;
+	Utils::Quantization<VEC3>* q ;
 
 public:
 	ProgressiveMesh(
