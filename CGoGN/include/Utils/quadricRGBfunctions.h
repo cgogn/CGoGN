@@ -30,10 +30,15 @@
 #include "Geometry/matrix.h"
 #include "Utils/cgognStream.h"
 
-using namespace CGoGN;
+namespace CGoGN
+{
+namespace Utils
+{
+
 
 enum channel {RED=0, GREEN, BLUE};
 #define COLCHANNELS 3
+
 
 template <typename REAL>
 class QuadricRGBfunctions {
@@ -91,6 +96,9 @@ private :
 
 };
 
+
+}
+}
 
 #include "quadricRGBfunctions.hpp"
 

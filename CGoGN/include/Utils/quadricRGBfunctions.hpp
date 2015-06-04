@@ -25,6 +25,12 @@
 #ifndef QUADRICLF_HPP_
 #define QUADRICLF_HPP_
 
+namespace CGoGN
+{
+
+namespace Utils
+{
+
 template <typename REAL>
 std::string QuadricRGBfunctions<REAL>::CGoGNnameOfType() {
 	return std::string("QuadricColFuncs");
@@ -447,4 +453,7 @@ void QuadricRGBfunctions<REAL>::zero () {
 	}
 }
 
+
+}
+}
 #endif /* QUADRICLF_HPP_ */

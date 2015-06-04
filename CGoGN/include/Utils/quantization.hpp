@@ -22,15 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Utils/cgognStream.h"
+
 #include <limits>
 
 namespace CGoGN
 {
 
-namespace Algo
-{
-
-namespace PMesh
+namespace Utils
 {
 
 template <typename VEC>
@@ -378,8 +377,6 @@ float Quantization<VEC>::determinant(float* matrice)
 	}
 }
 
-} //namespace PMesh
-
-} //namespace Algo
+} //namespace Utils
 
 } //namespace CGoGN

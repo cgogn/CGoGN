@@ -47,14 +47,10 @@ m_size(img.m_size),
 m_sizeSub(img.m_sizeSub),
 m_localAlloc(true)
 {
-	if (img.m_qimg == NULL)
+	if (img.m_data_ptr != NULL)
 	{
-		if (img.m_data_ptr != NULL)
-		{
-			m_data_ptr = new TYPE[m_sizeSub[DIM-1]];
-			memcpy(m_data_ptr, img.m_data_ptr, sizeof(TYPE)*m_sizeSub[DIM-1]);
-			this->m_qimg = NULL;
-		}
+		m_data_ptr = new TYPE[m_sizeSub[DIM-1]];
+		memcpy(m_data_ptr, img.m_data_ptr, sizeof(TYPE)*m_sizeSub[DIM-1]);
 	}
 }
 
@@ -113,11 +109,6 @@ void ImageData<DIM,TYPE>::computeSub()
 template < unsigned int DIM, typename TYPE >
 void ImageData<DIM,TYPE>::create(TYPE* data, const COORD& size)
 {
-	// first free old image if exist
-	if (this->m_qimg != NULL)
-	{
-		delete this->m_qmg;
-	}
 	else if (m_data_ptr!=NULL)
 	{
 		delete[] m_data_ptr;
@@ -126,7 +117,6 @@ void ImageData<DIM,TYPE>::create(TYPE* data, const COORD& size)
 	m_size = size;
 	computeSub();
 	m_data_ptr = data;
-	this->m_qimg = NULL;
 }
 
 template < unsigned int DIM, typename TYPE >
@@ -273,20 +263,6 @@ Image<DIM,TYPE>::~Image()
 //	this->m_data_ptr = NULL;
 }
 
-/*
-template < unsigned int DIM, typename TYPE >
-void Image<DIM,TYPE>::swap(Image<DIM,TYPE>& img)
-{
-	if ((this->m_qimg != NULL) && (img.m_qimg != NULL))
-	{
-		QImage* ptr = this->m_qimg;
-		this->m_qimg = img.m_qimg;
-		img.m_qimg = ptr;
-	}
-	
-	ImageData<DIM,TYPE>::swap(img);
-}
-*/
 
 template < unsigned int DIM, typename TYPE >
 bool Image<DIM,TYPE>::load(const unsigned char *ptr, unsigned int w, unsigned int h, unsigned int bpp)

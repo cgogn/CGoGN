@@ -263,7 +263,7 @@ QuadricNd<REAL,N>::operator() (const VECNp& v) const
 	for (unsigned int i = 0 ; i < N ; ++i)
 		hv[i] = v[i] ;
 
-	return evaluate(v) ;
+	return evaluate(hv) ; // v instead of hv !!!
 }
 
 template <typename REAL, unsigned int N>
@@ -340,7 +340,7 @@ template <typename REAL>
 QuadricHF<REAL>::QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REAL& alpha):
 m_noAlphaRot(fabs(alpha) < 1e-13)
 {
-	const unsigned int nbcoefs = ((T[0].order() + 1) * (T[0].order() + 2)) / 2. ;
+	const unsigned int nbcoefs = int(((T[0].order() + 1) * (T[0].order() + 2)) / 2.0f );
 
 	// 2D rotation
 	const Geom::Matrix33d R = buildRotateMatrix(gamma) ;
@@ -469,7 +469,7 @@ QuadricHF<REAL>&
 QuadricHF<REAL>::operator /= (const REAL& v)
 {
 	std::cout << "Warning: QuadricHF<REAL>::operator /= should not be used !" << std::endl ;
-	const REAL& inv = 1. / v ;
+	const REAL& inv = 1.0f / v ;
 
 	(*this) *= inv ;
 
@@ -538,7 +538,7 @@ QuadricHF<REAL>::evalR3(const std::vector<VEC3>& coefs) const
 		for (unsigned int i = 0 ; i < coefs.size() ; ++i)
 			tmp[i] = coefs[i][c] ;
 		res[c] = tmp.transpose() * m_A * tmp ;		// A
-		res[c] -= 2. * (m_b[c]).transpose() * tmp ;	// - 2b
+		res[c] -= 2.0f * (m_b[c]).transpose() * tmp ;	// - 2b
 		res[c] += m_c[c] ;							// + c
 	}
 
@@ -1192,8 +1192,8 @@ template <typename REAL>
 Geom::Tensor3d*
 QuadricHF<REAL>::tensorsFromCoefs(const std::vector<VEC3>& coefs)
 {
-	const unsigned int& N = coefs.size() ;
-	const unsigned int& degree = (sqrt(1+8*N) - 3) / REAL(2) ;
+	unsigned int N = (unsigned int)(coefs.size()) ;
+	unsigned int degree = (unsigned int)((sqrt(1 + 8 * N) - 3.0) / 2.0);
 	Geom::Tensor3d *A = new Geom::Tensor3d[3] ;
 
 	for (unsigned int col = 0 ; col < 3 ; ++col)

@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 
 project(testing)
 
-add_subdirectory(Geometry)
 add_subdirectory(Algo)
+add_subdirectory(Geometry)
+add_subdirectory(Utils)
 
 #define exec to compile
 

@@ -218,7 +218,7 @@ private : // private constants
 	//static const REAL Zy = -0.685222 ;
 	//static const REAL Zz = 0.339219 ;
 
-	// only integral static const cana be init inline in standard C++ (float init is gcc extension)
+	// only integral static const can be init inline in standard C++ (float init is gcc extension)
 	static const REAL Xx;
 	static const REAL Xy;
 	static const REAL Xz;

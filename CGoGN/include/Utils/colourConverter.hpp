@@ -22,11 +22,28 @@
 *                                                                              *
 *******************************************************************************/
 
+#include <algorithm>
+
 namespace CGoGN
 {
 
 namespace Utils
 {
+
+template<typename REAL>
+const REAL ColourConverter<REAL>::Xn = REAL(0.950456);
+
+template<typename REAL>
+const REAL ColourConverter<REAL>::Yn = REAL(1.0);
+
+template<typename REAL>
+const REAL ColourConverter<REAL>::Zn = REAL(1.088754);
+
+template<typename REAL>
+const REAL ColourConverter<REAL>::un = REAL(0.197832);
+
+template<typename REAL>
+const REAL ColourConverter<REAL>::vn = REAL(0.468340);
 
 template<typename REAL>
 ColourConverter<REAL>::ColourConverter(const VEC3& col, const enum ColourEncoding& enc) :
@@ -209,17 +226,17 @@ ColourConverter<REAL>::convertRGBtoXYZ()
 {
 	Geom::Matrix<3,3,REAL> M ;
 
-	M(0,0) = 0.412453 ;
-	M(0,1) = 0.357580 ;
-	M(0,2) = 0.180423 ;
+	M(0,0) = REAL(0.412453);
+	M(0, 1) = REAL(0.357580);
+	M(0, 2) = REAL(0.180423);
 
-	M(1,0) = 0.212671 ;
-	M(1,1) = 0.715160 ;
-	M(1,2) = 0.072169 ;
+	M(1, 0) = REAL(0.212671);
+	M(1, 1) = REAL(0.715160);
+	M(1, 2) = REAL(0.072169);
 
-	M(2,0) = 0.019334 ;
-	M(2,1) = 0.119193 ;
-	M(2,2) = 0.950227 ;
+	M(2, 0) = REAL(0.019334);
+	M(2, 1) = REAL(0.119193);
+	M(2, 2) = REAL(0.950227);
 
 	VEC3 c = M * (*RGB) ;
 
@@ -235,17 +252,17 @@ ColourConverter<REAL>::convertXYZtoRGB()
 {
 	Geom::Matrix<3,3,REAL> M ;
 
-	M(0,0) = 3.240479 ;
-	M(0,1) = -1.537150 ;
-	M(0,2) = -0.498535 ;
+	M(0, 0) = REAL(3.240479);
+	M(0, 1) = REAL(-1.537150);
+	M(0, 2) = REAL(-0.498535);
 
-	M(1,0) = -0.969256 ;
-	M(1,1) = 1.875992 ;
-	M(1,2) = 0.041556 ;
+	M(1, 0) = REAL(-0.969256);
+	M(1, 1) = REAL(1.875992);
+	M(1, 2) = REAL(0.041556);
 
-	M(2,0) = 0.055648 ;
-	M(2,1) = -0.204043 ;
-	M(2,2) = 1.057311 ;
+	M(2, 0) = REAL(0.055648);
+	M(2, 1) = REAL(-0.204043);
+	M(2, 2) = REAL(1.057311);
 
 	VEC3 c = M * (*XYZ) ;
 
@@ -274,7 +291,7 @@ ColourConverter<REAL>::convertRGBtoHSV()
 	const REAL diff = max - min ;
 
 	V = max ;
-	S = max == 0. ? 0 : diff / max ;
+	S = max == 0.0f ? 0.0f : diff / max ;
 
 
 	if (max == min)
@@ -312,7 +329,7 @@ ColourConverter<REAL>::convertHSVtoRGB()
 	const REAL& S = (*HSV)[1] ;
 	const REAL& V = (*HSV)[2] ;
 
-	const int i = std::floor(H * 6);
+	const int i = int(std::floor(H * 6));
 	const REAL f = H * 6 - i;
 	const REAL p = V * (1 - S);
 	const REAL q = V * (1 - f * S);
@@ -355,7 +372,7 @@ ColourConverter<REAL>::convertRGBtoHSL()
 	REAL& L = c[2] ;
 
 	const REAL sum = max + min ;
-	L = sum / 2. ;
+	L = sum / 2.0f ;
 
 	if (max == min)
 	{
@@ -365,7 +382,7 @@ ColourConverter<REAL>::convertRGBtoHSL()
 	else
 	{
 		const REAL diff = max - min ;
-		S = L > 0.5 ? diff / (2 - sum) : diff / sum ;
+		S = L > 0.5f ? diff / (2 - sum) : diff / sum ;
 
 		if (max == r)
 		{
@@ -401,7 +418,7 @@ ColourConverter<REAL>::hue2rgb(const REAL& p, const REAL& q, REAL t)
 	if(t < 1/2.)
 		return q ;
 	if(t < 2/3.)
-		return p + (q - p) * (2/3. - t) * 6 ;
+		return p + (q - p) * (REAL(2.0/3.0) - t) * 6.0f ;
 
 	return p ;
 }
@@ -429,9 +446,9 @@ ColourConverter<REAL>::convertHSLtoRGB()
     {
     	const REAL q = L < 0.5 ? L * (1 + S) : L + S - L * S;
     	const REAL p = 2 * L - q ;
-    	r = hue2rgb(p, q, H + 1/3.) ;
+		r = hue2rgb(p, q, H + REAL(1./3.));
     	g = hue2rgb(p, q, H) ;
-    	b = hue2rgb(p, q, H - 1/3.) ;
+    	b = hue2rgb(p, q, H - REAL(1./3.)) ;
     }
 
 	if (RGB != NULL)
@@ -452,13 +469,13 @@ ColourConverter<REAL>::convertXYZtoLuv()
 
 	REAL Ydiv = Y/Yn ;
 	if (Ydiv > 0.008856)
-		L = 116.0 * pow(Ydiv,1.0/3.0) - 16.0 ;
+		L = 116.0f* pow(Ydiv,1.0f/3.0f) - 16.0f ;
 	else // near black
-		L = 903.3 * Ydiv ;
+		L = 903.3f * Ydiv ;
 
-	REAL den = X + 15.0 * Y + 3 * Z ;
-	REAL u1 = (4.0 * X) / den ;
-	REAL v1 = (9.0 * Y) / den ;
+	REAL den = X + 15.0f * Y + 3 * Z ;
+	REAL u1 = (4.0f * X) / den ;
+	REAL v1 = (9.0f * Y) / den ;
 	u = 13*L * (u1 - un) ;
 	v = 13*L * (v1 - vn) ;
 
@@ -479,16 +496,16 @@ ColourConverter<REAL>::convertLuvToXYZ()
 	REAL &v = (*Luv)[2] ;
 
 	if (L > 8.0)
-		Y = pow(((L+16.0) / 116.0),3) ;
+		Y = pow(((L+16.0f) / 116.0f),3) ;
 	else // near black
-		Y = Yn * L / 903.3 ;
+		Y = Yn * L / 903.3f ;
 
-	REAL den = 13.0 * L ;
+	REAL den = 13.0f * L ;
 	REAL u1 = u/den + un ;
 	REAL v1 = v/den + vn ;
-	den = 4.0*v1 ;
-	X = Y * 9.0 * u1 / den ;
-	Z = Y * (12.0 - 3.0*u1 - 20.0*v1) / den ;
+	den = 4.0f*v1 ;
+	X = Y * 9.0f * u1 / den ;
+	Z = Y * (12.0f - 3.0f*u1 - 20.0f*v1) / den ;
 
 	if (XYZ != NULL)
 		*XYZ = VEC3(X,Y,Z) ;
@@ -511,19 +528,19 @@ ColourConverter<REAL>::convertXYZtoLab()
 		static REAL f(REAL x)
 		{
 			if (x > 0.008856)
-			return pow(x,1.0/3.0) ;
+			return pow(x,1.0f/3.0f) ;
 			else
-				return 7.787 * x + 16.0/116.0 ;
+				return 7.787f * x + 16.0f/116.0f ;
 		}
 	} ;
 
 	if (Y > 0.008856)
-		L = 116.0f * pow(Y,1.0f/3.0) - 16 ;
+		L = 116.0f * pow(Y,1.0f/3.0f) - 16 ;
 	else // near black
-		L = 903.3 * Y ;
+		L = 903.3f * Y ;
 
-	a = 500.0 * (Local::f(X/Xn) - Local::f(Y/Yn)) ;
-	b = 200.0 * (Local::f(Y/Yn) - Local::f(Z/Zn)) ;
+	a = 500.0f * (Local::f(X/Xn) - Local::f(Y/Yn)) ;
+	b = 200.0f * (Local::f(Y/Yn) - Local::f(Z/Zn)) ;
 
 	if (Lab != NULL)
 		*Lab = VEC3(L,a,b) ;
@@ -545,21 +562,21 @@ ColourConverter<REAL>::convertLabToXYZ()
 	{
 		static REAL f(REAL x)
 		{
-			if (x > 0.206893)
-			return pow(x,3.0) ;
+			if (x > 0.206893f)
+			return pow(x,3.0f) ;
 			else
-				return x / 7.787 - 16.0/903.3 ;
+				return x / 7.787f - REAL(16.0/903.3) ;
 		}
 	} ;
 
-	if (L > 8.0)
-		Y = pow(((L+16.0) / 116.0),3) ;
+	if (L > 8.0f)
+		Y = pow(((L+16.0f) / 116.0f),3) ;
 	else // near black
-		Y = L / 903.3 ;
+		Y = L / 903.3f ;
 
-	REAL nom = (L+16.0) / 116.0 ;
-	X = Xn * Local::f( nom +  a/500.0) ;
-	Z = Zn * Local::f( nom -  b/200.0) ;
+	REAL nom = (L+16.0f) / 116.0f ;
+	X = Xn * Local::f( nom +  a/500.0f) ;
+	Z = Zn * Local::f( nom -  b/200.0f) ;
 
 	if (XYZ != NULL)
 		*XYZ = VEC3(X,Y,Z) ;
