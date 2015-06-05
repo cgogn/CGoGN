@@ -709,7 +709,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		{
 			double beta = betaF(n) ;
 			temp *= (beta / double(n));
-			emcp *= (1.0 - beta);
+			emcp *= (1.0f - beta);
 			emcp += temp;
 		}
 		attributs[*vert] = emcp;

@@ -9,9 +9,8 @@
 using namespace CGoGN;
 
 
-template class Algo::LinearSolving::Coeff<float>;
-template class Algo::LinearSolving::Coeff<double>;
-// Vec3 ?
+template struct Algo::LinearSolving::Coeff<float>;
+template struct Algo::LinearSolving::Coeff<double>;
 
 
 struct PFP1 : public PFP_DOUBLE

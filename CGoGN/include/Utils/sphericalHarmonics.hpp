@@ -64,7 +64,7 @@ template <typename Tscalar,typename Tcoef>
 void SphericalHarmonics<Tscalar,Tcoef>::set_nb_coefs(int nbc)
 {
 	assert(nbc > 0);
-	int sq = ceil(sqrt(nbc)) ;
+	int sq = int(std::ceil(std::sqrt(nbc))) ;
 	assert(sq*sq == nbc || !"Number of coefs does not fill the last level") ;
 	set_level(sq-1) ;
 }
@@ -76,7 +76,7 @@ evaluation
 template <typename Tscalar,typename Tcoef>
 void SphericalHarmonics<Tscalar,Tcoef>::set_eval_direction (Tscalar theta, Tscalar phi)
 {
-	compute_P_tab(cos(theta));
+	compute_P_tab(std::cos(theta));
 	compute_y_tab(phi);
 }
 
@@ -123,7 +123,7 @@ void SphericalHarmonics<Tscalar,Tcoef>::init_K_tab ()
 	for(int l = 0; l <= resolution; l++)
 	{
 		// recursive computation of the squares
-		K_tab[index(l,0)] = (2*l+1) / (4*M_PI);
+		K_tab[index(l,0)] = Tscalar((2*l+1) / (4*M_PI));
 		for (int m = 1; m <= l; m++)
 			K_tab[index(l,m)] = K_tab[index(l,m-1)] / (l-m+1) / (l+m);
 		// square root + symmetry
@@ -173,12 +173,12 @@ void SphericalHarmonics<Tscalar,Tcoef>::compute_y_tab (Tscalar phi)
 
 	for (int m = 1; m <= resolution; m++)
 	{
-		Tscalar cos_m_phi = cos ( m * phi );
-		Tscalar sin_m_phi = sin ( m * phi );
+		Tscalar cos_m_phi = std::cos ( m * phi );
+		Tscalar sin_m_phi = std::sin ( m * phi );
 
 		for (int l = m; l <= resolution; l++)
 		{
-			F_tab[index(l,m)] *= sqrt(2.0); // remove for plotting
+			F_tab[index(l,m)] *= std::sqrt(2.0); // remove for plotting
 			F_tab[index(l,m)] *= K_tab[index(l,m)]; // remove for plotting
 			F_tab[index(l,-m)] = F_tab[index(l,m)] * sin_m_phi ; // store the values for -m<0 in the upper triangle
 			F_tab[index(l,m)] *= cos_m_phi;

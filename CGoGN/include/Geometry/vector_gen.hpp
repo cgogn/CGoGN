@@ -24,6 +24,7 @@
 
 #include <sstream>
 #include <cmath>
+#include <cstdlib>
 
 namespace CGoGN
 {
@@ -374,7 +375,7 @@ inline bool Vector<DIM, T>::isNormalized(const T& epsilon) const
 template <unsigned int DIM, typename T>
 inline bool Vector<DIM, T>::isOrthogonal(const Vector<DIM, T>& v, const T& epsilon) const
 {
-	return (fabs(v * (*this)) < epsilon) ;
+	return (std::abs(v * (*this)) < epsilon) ;
 }
 
 template <unsigned int DIM, typename T>
@@ -424,9 +425,9 @@ inline bool isNull(T x, int precision)
 	if (precision == 0)
 		return (x == 0) ;
 	else if (precision > 0)
-			return (fabs(x) < precision) ;
+			return (std::abs(x) < precision) ;
 	else
-		return (precision * fabs(x) < 1) ;
+		return (precision * std::abs(x) < 1) ;
 }
 
 /***

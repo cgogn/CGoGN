@@ -1,10 +1,25 @@
 #include <iostream>
 
-#include <Geometry/matrix.h>
+#define CGOGN_NO_STATIC_ASSERT 1
+#include "Geometry/vector_gen.h"
 
 using namespace CGoGN;
 
-// template instantiation not possible (static assert pb);
+template class Geom::Vector<2, short>;
+template class Geom::Vector<2, float>;
+template class Geom::Vector<2, double>;
+
+template class Geom::Vector<3, short>;
+template class Geom::Vector<3, float>;
+template class Geom::Vector<3, double>;
+
+template class Geom::Vector<4, short>;
+template class Geom::Vector<4, float>;
+template class Geom::Vector<4, double>;
+
+template class Geom::Vector<11, short>;
+template class Geom::Vector<11, float>;
+template class Geom::Vector<11, double>;
 
 int test_vector()
 {

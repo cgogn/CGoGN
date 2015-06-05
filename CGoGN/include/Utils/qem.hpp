@@ -501,7 +501,7 @@ QuadricHF<REAL>::findOptimizedCoefs(std::vector<VEC3>& coefs)
 		Eigen::VectorXd tmp(m_b[0].size()) ;
 		tmp = Ainv * m_b[c] ;
 		for (unsigned int i = 0 ; i < m_b[c].size() ; ++i)
-			coefs[i][c] = tmp[i] ;
+			coefs[i][c] = REAL(tmp[i]) ;
 	}
 
 	return true ;
@@ -522,9 +522,9 @@ QuadricHF<REAL>::evaluate(const std::vector<VEC3>& coefs) const
 		res[c] += m_c[c] ;							// + c
 	}
 
-	res /= 2*M_PI ; // max integral value over hemisphere
+	res /= REAL(2*M_PI) ; // max integral value over hemisphere
 
-	return (res[0] + res[1] + res[2]) / 3. ;
+	return (res[0] + res[1] + res[2]) / 3.0f ;
 }
 
 template <typename REAL>
@@ -537,9 +537,9 @@ QuadricHF<REAL>::evalR3(const std::vector<VEC3>& coefs) const
 		Eigen::VectorXd tmp(coefs.size()) ;
 		for (unsigned int i = 0 ; i < coefs.size() ; ++i)
 			tmp[i] = coefs[i][c] ;
-		res[c] = tmp.transpose() * m_A * tmp ;		// A
-		res[c] -= 2.0f * (m_b[c]).transpose() * tmp ;	// - 2b
-		res[c] += m_c[c] ;							// + c
+		res[c] = REAL(tmp.transpose() * m_A * tmp) ;		// A
+		res[c] -= REAL(2.0f * (m_b[c]).transpose() * tmp) ;	// - 2b
+		res[c] += REAL(m_c[c]) ;							// + c
 	}
 
 	res /= 2*M_PI ; // max integral value over hemisphere
@@ -573,7 +573,7 @@ QuadricHF<REAL>::rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R)
 		std::vector<unsigned int> q ; q.resize(T.order(), 0) ;
 		for (unsigned int j = 0 ; j < T.nbElem() ; ++j)
 		{
-			REAL P = T[j] ;
+			REAL P = REAL(T[j]) ;
 			for (unsigned int k = 0 ; k < T.order() ; ++k)
 				P *= R(q[k],p[k]) ;
 			S += P ;
@@ -1188,6 +1188,7 @@ QuadricHF<REAL>::buildLowerLeftIntegralMatrix_C(const REAL& alpha, unsigned int 
 	return C ;
 }
 
+
 template <typename REAL>
 Geom::Tensor3d*
 QuadricHF<REAL>::tensorsFromCoefs(const std::vector<VEC3>& coefs)
@@ -1283,7 +1284,7 @@ QuadricHF<REAL>::coefsFromTensors(Geom::Tensor3d* A)
 {
 	const unsigned int& degree = A[0].order() ;
 	std::vector<VEC3> coefs ;
-	coefs.resize(((degree + 1) * (degree + 2)) / REAL(2)) ;
+	coefs.resize(((degree + 1) * (degree + 2)) / 2) ;
 
 	std::vector<unsigned int> index ;
 	index.resize(degree,2) ;
@@ -1356,4 +1357,3 @@ QuadricHF<REAL>::coefsFromTensors(Geom::Tensor3d* A)
 } // Utils
 
 } // CGOGN
-
