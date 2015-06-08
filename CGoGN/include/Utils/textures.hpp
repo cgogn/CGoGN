@@ -501,7 +501,7 @@ template < unsigned int DIM, typename TYPE >
 void Image<DIM,TYPE>::crop(const COORD& origin, const COORD& sz)
 {
 	Image<DIM,TYPE>* newImg = subImage(origin,sz);
-	swap(*newImg);
+	this->swap(*newImg);
 	delete newImg;
 }
 
