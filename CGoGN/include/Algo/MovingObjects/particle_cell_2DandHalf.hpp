@@ -114,7 +114,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 	#ifdef DEBUG
 	CGoGNout << "vertexState" << d << CGoGNendl;
 	#endif
-	assert(goal.isFinite()) ;
+	assert(Geometry::isFinite(goal));
 
 	crossCell = CROSS_OTHER;
 
@@ -189,7 +189,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 	CGoGNout << "edgeState" <<  d << CGoGNendl;
 	#endif
 
-	assert(goal.isFinite()) ;
+	assert(Geometry::isFinite(goal));
 // 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if(crossCell == NO_CROSS)
@@ -261,8 +261,8 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 	CGoGNout << "faceState" <<  d << CGoGNendl;
 	#endif
 
-	assert(goal.isFinite()) ;
-	assert(this->getPosition().isFinite()) ;
+	assert(Geometry::isFinite(goal));
+	assert(Geometry::isFinite(this->getPosition()));
 
 	//project goal within face plane
 	VEC3 n1 = Geometry::faceNormal<PFP>(m,d,m_positions);

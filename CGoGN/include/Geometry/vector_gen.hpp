@@ -358,13 +358,13 @@ inline bool Vector<DIM, T>::hasNan() const
 	return false ;
 }
 
-template <unsigned int DIM, typename T>
-inline bool Vector<DIM, T>::isFinite() const
-{
-	for (unsigned int i = 0; i < DIM; ++i)
-		if (!std::isfinite(m_data[i])) return false ;
-	return true ;
-}
+//template <unsigned int DIM, typename T>
+//inline bool Vector<DIM, T>::isFinite() const
+//{
+//	for (unsigned int i = 0; i < DIM; ++i)
+//		if (!std::isfinite(m_data[i])) return false ;
+//	return true ;
+//}
 
 template <unsigned int DIM, typename T>
 inline bool Vector<DIM, T>::isNormalized(const T& epsilon) const
@@ -390,6 +390,16 @@ inline bool Vector<DIM, T>::isNear(const Vector<DIM, T>& v, int precision) const
 		norm2 += diff * diff ;
 	}
 	return isNull2(norm2, precision) ;
+}
+
+
+template <unsigned int DIM, typename T>
+inline bool isFinite(const Vector<DIM, T>& vec)
+{
+	for (unsigned int i = 0; i < DIM; ++i)
+	if (!std::isfinite(vec[i]))
+		return false;
+	return true;
 }
 
 /**********************************************/

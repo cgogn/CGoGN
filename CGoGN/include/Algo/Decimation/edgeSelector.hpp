@@ -2017,7 +2017,7 @@ typename PFP::VEC3 EdgeSelector_GeomColOptGradient<PFP>::computeEdgeGradientColo
 		//const VEC3 e0 = Pj - Pi ;
 
 		const REAL areaIJ0sq = (ei ^ ej).norm2() ;
-		const REAL areaIJ0 = REAL(sqrt(areaIJ0sq)/2.0f) ;
+		const REAL areaIJ0 = REAL(std::sqrt(areaIJ0sq)/2.0f) ;
 		areaSum += areaIJ0 ;
 
 		// per-channel treatment

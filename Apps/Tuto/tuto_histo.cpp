@@ -115,7 +115,7 @@ void MyQT::createMap(const std::string& filename)
 
 
 	// create a popup window
-	l_popup = new Utils::QT::QtPopUp(this);
+	l_popup = new Utils::QT::QtPopUp();
 
 	// create the widget to view histogram
 	l_histodraw = new Algo::Histogram::RenderHistogram(l_popup, *l_histo);

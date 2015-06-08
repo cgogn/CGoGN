@@ -24,7 +24,9 @@
 
 #include "Utils/cgognStream.h"
 
+#include <cmath>
 #include <limits>
+
 
 namespace CGoGN
 {
