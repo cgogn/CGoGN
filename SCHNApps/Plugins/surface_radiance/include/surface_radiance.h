@@ -108,6 +108,10 @@ public slots:
 		bool halfCollapse = false,
 		bool exportMeshes = false
 	);
+	void computeDistance(
+		const QString& mapName1,
+		const QString& mapName2
+	);
 	void exportPLY(
 		const QString& mapName,
 		const QString& positionAttributeName,

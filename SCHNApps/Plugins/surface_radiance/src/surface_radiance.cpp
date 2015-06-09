@@ -97,6 +97,8 @@ void Surface_Radiance_Plugin::mapAdded(MapHandlerGen* map)
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 	connect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+
+	m_dockTab->addObject(map->getName());
 }
 
 void Surface_Radiance_Plugin::mapRemoved(MapHandlerGen* map)
@@ -104,6 +106,8 @@ void Surface_Radiance_Plugin::mapRemoved(MapHandlerGen* map)
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 	disconnect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+
+	m_dockTab->removeObject(map->getName());
 }
 
 
@@ -411,6 +415,11 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 
 	mh->notifyConnectivityModification();
 	mh->notifyAttributeModification(position);
+}
+
+void Surface_Radiance_Plugin::computeDistance(const QString& mapName1, const QString& mapName2)
+{
+
 }
 
 void Surface_Radiance_Plugin::checkNbVerticesAndExport(Surface_Radiance_Plugin* p, const unsigned int* nbVertices)
