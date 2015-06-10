@@ -2,7 +2,8 @@
 #include "Geometry/vector_gen.h"
 
 
-using namespace CGoGN;
+namespace CGoGN
+{
 
 // char instantiation
 
@@ -59,7 +60,7 @@ template void AttributeContainer::setData<char>(unsigned int attrIndex, unsigned
 //template const Geom::Vec4f& AttributeContainer::getData<Geom::Vec4f>(unsigned int attrIndex, unsigned int eltIndex) const;
 //template void AttributeContainer::setData<Geom::Vec4f>(unsigned int attrIndex, unsigned int eltIndex, const Geom::Vec4f& data);
 
-
+}
 
 int test_attributeContainer()
 {

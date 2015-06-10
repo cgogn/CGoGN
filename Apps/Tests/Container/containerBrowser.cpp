@@ -6,7 +6,9 @@
 
 #include "Container/containerBrowser.h"
 
-using namespace CGoGN;
+namespace CGoGN
+{
+
 
 template class DartContainerBrowserSelector<EmbeddedMap2>;
 template class DartContainerBrowserSelector<EmbeddedMap3>;
@@ -26,6 +28,7 @@ template class ContainerBrowserCellMarked<EmbeddedMap3, EDGE>;
 template class ContainerBrowserCellMarked<EmbeddedMap3, FACE>;
 template class ContainerBrowserCellMarked<EmbeddedMap3, VOLUME>;
 
+}
 
 int test_containerBrowser()
 {
