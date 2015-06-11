@@ -37,7 +37,8 @@ struct MapParameters
 		faceStyle(FLAT),
 		diffuseColor(0.85f,0.25f,0.19f,0.0f),
 		simpleColor(0.0f,0.0f,0.0f,0.0f),
-		vertexColor(0.0f,0.0f,1.0f,0.0f)
+		vertexColor(0.0f,0.0f,1.0f,0.0f),
+		backColor(0.85f, 0.25f, 0.19f, 0.0f)
 	{}
 
 	Utils::VBO* positionVBO;
@@ -54,6 +55,7 @@ struct MapParameters
 	Geom::Vec4f diffuseColor;
 	Geom::Vec4f simpleColor;
 	Geom::Vec4f vertexColor;
+	Geom::Vec4f backColor;
 };
 
 class Surface_Render_Plugin : public PluginInteraction
@@ -118,6 +120,8 @@ public slots:
 	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeVertexColor(const QString& view, const QString& map, float r, float g, float b);
+	void changeBackColor(const QString& view, const QString& map, float r, float g, float b);
+
 
 protected:
 	Surface_Render_DockTab* m_dockTab;

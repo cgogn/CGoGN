@@ -32,6 +32,7 @@ private:
 	QColor m_diffuseColor;
 	QColor m_simpleColor;
 	QColor m_vertexColor;
+	QColor m_backColor;
 	int m_currentColorDial;
 
 	bool b_updatingUI;
@@ -50,6 +51,7 @@ private slots:
 	void diffuseColorClicked();
 	void simpleColorClicked();
 	void vertexColorClicked();
+	void backColorClicked();
 	void colorSelected(const QColor& col);
 
 private:

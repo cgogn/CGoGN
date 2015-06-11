@@ -40,6 +40,7 @@ namespace Utils
 
 ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	m_with_color(false),
+	m_doubleSided(doubleSided),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
@@ -77,6 +78,36 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	getLocations();
 	sendParams();
 }
+
+void ShaderSimpleFlat::setDoubleSided(bool doubleSided)
+{
+	if (doubleSided == m_doubleSided)
+		return;
+
+	std::string glxvert(GLSLShader::defines_gl());
+	std::string glxfrag(GLSLShader::defines_gl());
+
+	if (m_nameVS == "ShaderSimpleFlatClip_vs")
+	{
+		glxvert.append(vertexShaderClipText);
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderClipText);
+	}
+	else
+	{
+		glxvert.append(vertexShaderText);
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderText);
+	}
+
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+	// and get and fill uniforms
+	getLocations();
+	sendParams();
+}
+
 
 void ShaderSimpleFlat::getLocations()
 {

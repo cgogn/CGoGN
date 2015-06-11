@@ -18,13 +18,13 @@ bool Surface_Render_Plugin::enable()
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Render");
 
 	m_flatShader = new CGoGN::Utils::ShaderFlat();
-	m_flatShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
+	//m_flatShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
 	m_flatShader->setExplode(1.0f);
 
 	m_phongShader = new CGoGN::Utils::ShaderPhong();
-	m_phongShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
-	m_phongShader->setSpecular(CGoGN::Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f));
-	m_phongShader->setShininess(80.0f);
+	//m_phongShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
+	//m_phongShader->setSpecular(CGoGN::Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f));
+	//m_phongShader->setShininess(80.0f);
 
 	m_colorPerVertexShader = new CGoGN::Utils::ShaderColorPerVertex();
 
@@ -91,6 +91,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 					}
 					else
 					{
+						m_flatShader->setDiffuseBack(p.backColor);
 						m_flatShader->setAttributePosition(p.positionVBO);
 						m_flatShader->setDiffuse(p.diffuseColor);
 						map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
@@ -99,6 +100,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
                 case MapParameters::PHONG :
                     if(p.normalVBO != NULL)
                     {
+						m_phongShader->setBackColor(p.backColor);
                         m_phongShader->setAttributePosition(p.positionVBO);
                         m_phongShader->setAttributeNormal(p.normalVBO);
                         m_phongShader->setDiffuse(p.diffuseColor);
@@ -429,6 +431,24 @@ void Surface_Render_Plugin::changeVertexColor(const QString& view, const QString
 		}
 	}
 }
+
+
+void Surface_Render_Plugin::changeBackColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (v && m)
+	{
+		h_viewParameterSet[v][m].backColor = Geom::Vec4f(r, g, b, 0);
+		if (v->isSelectedView())
+		{
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
 
 
 

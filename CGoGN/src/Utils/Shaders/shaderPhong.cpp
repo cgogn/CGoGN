@@ -37,9 +37,10 @@ namespace Utils
 #include "shaderPhongClip.frag"
 
 
-ShaderPhong::ShaderPhong(bool withClipping, bool doubleSided, bool withEyePosition):
+	ShaderPhong::ShaderPhong(bool withClipping, bool doubleSided, bool withEyePosition) :
 	m_with_color(false),
 	m_with_eyepos(withEyePosition),
+	m_doubleSided(doubleSided),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
@@ -85,6 +86,47 @@ ShaderPhong::ShaderPhong(bool withClipping, bool doubleSided, bool withEyePositi
 	getLocations();
 	sendParams();
 }
+
+
+void ShaderPhong::setDoubleSided(bool doubleSided)
+{
+	if (doubleSided == m_doubleSided)
+		return;
+
+	m_doubleSided = doubleSided;
+
+	std::string glxvert(GLSLShader::defines_gl());
+	std::string glxfrag(GLSLShader::defines_gl());
+
+	if (m_nameVS == "ShaderPhongClip_vs")
+	{
+		if (m_with_eyepos)
+			glxvert.append("#define WITH_EYEPOSITION");
+		glxvert.append(vertexShaderClipText);
+		// Use double sided lighting if set
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderClipText);
+	}
+	else
+	{
+		if (m_with_eyepos)
+			glxvert.append("#define WITH_EYEPOSITION");
+		glxvert.append(vertexShaderText);
+		// Use double sided lighting if set
+		if (doubleSided)
+			glxfrag.append("#define DOUBLE_SIDED\n");
+		glxfrag.append(fragmentShaderText);
+	}
+
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+	// and get and fill uniforms
+	getLocations();
+	sendParams();
+}
+
+
+
 
 void ShaderPhong::getLocations()
 {

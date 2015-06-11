@@ -40,9 +40,9 @@ void main()
 	float specular = pow( max(dot(R, E), 0.0), shininess );
 	finalColor += materialSpecular * specular;
 #else
-	float lambertTerm = clamp(dot(N,L),0.0,1.0);
 	if (gl_FrontFacing)
 	{
+		float lambertTerm = clamp(dot(N,L),0.0,1.0);
 #ifndef WITH_COLOR
 		finalColor += materialDiffuse * lambertTerm;
 #else
@@ -55,7 +55,16 @@ void main()
 	}
 	else
 	{
-		finalColor = backColor;
+		float lambertTerm = clamp(-dot(N,L),0.0,1.0);
+#ifndef WITH_COLOR
+		finalColor += backColor * lambertTerm;
+#else
+		finalColor += vec4((Color*lambertTerm),0.0) ;
+#endif
+		vec3 E = normalize(EyeVector);
+		vec3 R = reflect(-L, N);
+		float specular = pow( max(dot(R, E), 0.0), shininess );
+		finalColor += materialSpecular * specular;
 	}
 #endif
 	FRAG_OUT=finalColor;

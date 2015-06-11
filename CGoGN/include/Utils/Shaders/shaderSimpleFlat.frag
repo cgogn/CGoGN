@@ -28,10 +28,7 @@ void main()
 	float lambertTerm;
 	vec4 diffuseColor = materialDiffuse;
 	if (!gl_FrontFacing)
-	{
-		N *= -1.0;
-		lambertTerm = clamp(dot(N,L),0.0,1.0);
-	}
+		lambertTerm = clamp(-dot(N,L),0.0,1.0);
 	else
 		lambertTerm = clamp(dot(N,L),0.0,1.0);
 #ifndef WITH_COLOR
@@ -40,9 +37,10 @@ void main()
 	finalColor += vec4((Color*lambertTerm),0.0) ;
 #endif
 #else
-	float lambertTerm = clamp(dot(N,L),0.0,1.0);
+	
 	if (gl_FrontFacing)
 	{
+		float lambertTerm = clamp(dot(N,L),0.0,1.0);
 #ifndef WITH_COLOR
 		finalColor += materialDiffuse * lambertTerm;
 #else
@@ -51,7 +49,12 @@ void main()
 	}
 	else
 	{
-		finalColor = backColor;
+		float lambertTerm = clamp(-dot(N,L),0.0,1.0);
+#ifndef WITH_COLOR
+		finalColor += backColor * lambertTerm;
+#else
+		finalColor += vec4((Color*lambertTerm),0.0) ;
+#endif
 	}
 #endif
 	FRAG_OUT=finalColor;

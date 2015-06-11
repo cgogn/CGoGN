@@ -80,6 +80,8 @@ public slots:
 	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
 	bool isLinkedToMap(const QString& name) const;
 
+	void setViewScaling(float sx, float sy, float sz);
+
 private:
 	bool b_updatingUI;
 
@@ -173,6 +175,10 @@ protected:
 
 	Utils::Texture<2, Geom::Vec3uc>* m_textureWallpaper;
 	Utils::ShaderWallPaper* m_shaderWallpaper;
+
+	glm::mat4 m_scaleView;
+	inline float scaleRealSlideVal(int v);
+	inline int scaleIntSlideVal(float v);
 
 	bool b_saveSnapshots;
 

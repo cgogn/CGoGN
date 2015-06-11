@@ -51,6 +51,7 @@ protected:
 	CGoGNGLuint m_unif_lightPos;
 	CGoGNGLuint m_unif_explode;
 
+	bool m_doubleSided;
 	float m_explode;
 	Geom::Vec4f m_ambiant;
 	Geom::Vec4f m_diffuse;
@@ -65,6 +66,8 @@ protected:
 
 public:
 	ShaderFlat();
+
+	void setDoubleSided(bool doubleSided);
 
 	void setExplode(float explode);
 

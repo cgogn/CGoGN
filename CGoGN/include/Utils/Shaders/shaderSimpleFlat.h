@@ -46,7 +46,7 @@ protected:
 	bool m_with_color;
 	// flag color per vertex or not
 	bool m_with_eyepos;	
-
+	bool m_doubleSided;
 	// shader sources OGL3
 	static std::string vertexShaderText;
 	static std::string fragmentShaderText;
@@ -81,6 +81,8 @@ protected:
 
 public:
 	ShaderSimpleFlat(bool withClipping = false, bool doubleSided = false);
+
+	void setDoubleSided(bool doubleSided);
 
 	// inviduals parameter setting functions
 	void setAmbiant(const Geom::Vec4f& ambiant);

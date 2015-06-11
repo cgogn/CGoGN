@@ -33,6 +33,7 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(dcolorButton,SIGNAL(clicked()),this,SLOT(diffuseColorClicked()));
 	connect(scolorButton,SIGNAL(clicked()),this,SLOT(simpleColorClicked()));
 	connect(vcolorButton,SIGNAL(clicked()),this,SLOT(vertexColorClicked()));
+	connect(bfcolorButton, SIGNAL(clicked()), this, SLOT(backColorClicked()));
 	connect(m_colorDial,SIGNAL(colorSelected(const QColor&)),this,SLOT(colorSelected(const QColor&)));
 }
 
@@ -180,8 +181,6 @@ void Surface_Render_DockTab::renderBoundaryChanged(bool b)
 
 
 
-
-
 void Surface_Render_DockTab::diffuseColorClicked()
 {
 	m_colorDial->show();
@@ -201,6 +200,13 @@ void Surface_Render_DockTab::vertexColorClicked()
 	m_colorDial->show();
 	m_colorDial->setCurrentColor(m_vertexColor);
 	m_currentColorDial = 3;
+}
+
+void Surface_Render_DockTab::backColorClicked()
+{
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_vertexColor);
+	m_currentColorDial = 4;
 }
 
 
@@ -254,6 +260,23 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 			m_plugin->h_viewParameterSet[view][map].vertexColor = rgbCol;
 			view->updateGL();
 			m_plugin->pythonRecording("changeVertexColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
+		}
+	}
+
+	if (m_currentColorDial == 4)
+	{
+		m_backColor = col;
+		bfcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0 / 255.0*m_backColor.red(), 1.0 / 255.0*m_backColor.green(), 1.0 / 255.0*m_backColor.blue(), 0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].backColor = rgbCol;
+			view->updateGL();
+			m_plugin->pythonRecording("changeBackColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 }
@@ -372,6 +395,9 @@ void Surface_Render_DockTab::updateMapParameters()
 
 		m_vertexColor = QColor(255 * p.vertexColor[0], 255 * p.vertexColor[1], 255 * p.vertexColor[2]);
 		vcolorButton->setStyleSheet("QPushButton { background-color:" + m_vertexColor.name() + " }");
+
+		m_backColor = QColor(255 * p.backColor[0], 255 * p.backColor[1], 255 * p.backColor[2]);
+		bfcolorButton->setStyleSheet("QPushButton { background-color:" + m_backColor.name() + " }");
 	}
 
 	b_updatingUI = false;

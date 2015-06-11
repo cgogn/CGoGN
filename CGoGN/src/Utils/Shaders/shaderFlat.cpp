@@ -36,7 +36,8 @@ namespace Utils
 #include "shaderFlat.geom"
 
 
-ShaderFlat::ShaderFlat()
+ShaderFlat::ShaderFlat():
+m_doubleSided(false)
 {
 	m_nameVS = "ShaderFlat_vs";
 	m_nameFS = "ShaderFlat_fs";
@@ -65,6 +66,31 @@ ShaderFlat::ShaderFlat()
 	m_light_pos = Geom::Vec3f(10.0f, 10.0f, 1000.0f);
 
 	setParams(m_explode, m_ambiant, m_diffuse, m_diffuseBack ,m_light_pos);
+}
+
+void ShaderFlat::setDoubleSided(bool doubleSided)
+{
+	if (doubleSided == m_doubleSided)
+		return;
+
+	std::string glxvert(GLSLShader::defines_gl());
+	glxvert.append(vertexShaderText);
+
+	std::string glxgeom = GLSLShader::defines_Geom("triangles", "triangle_strip", 3);
+	glxgeom.append(geometryShaderText);
+
+	std::string glxfrag(GLSLShader::defines_gl());
+	if (doubleSided)
+		glxfrag.append("#define DOUBLE_SIDED\n");
+	glxfrag.append(fragmentShaderText);
+
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES, GL_TRIANGLE_STRIP, 3);
+
+	bind();
+	getLocations();
+	unbind();
+
+	setParams(m_explode, m_ambiant, m_diffuse, m_diffuseBack, m_light_pos);
 }
 
 void ShaderFlat::getLocations()

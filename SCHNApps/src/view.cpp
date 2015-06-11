@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QMessageBox>
+#include "Utils/Qt/qtInputs.h"
 
 namespace CGoGN
 {
@@ -45,6 +46,7 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	m_frameDrawer(NULL),
 	m_textureWallpaper(NULL),
 	m_shaderWallpaper(NULL),
+	m_scaleView(1.0f),
 	b_saveSnapshots(false)
 {
 	++viewCount;
@@ -446,7 +448,8 @@ void View::draw()
 
 	foreach(MapHandlerGen* map, l_maps)
 	{
-		glm::mat4 map_mm = mm * map->getFrameMatrix();
+		glm::mat4 map_mm = mm * map->getFrameMatrix() * m_scaleView;;
+		//glm::mat4 map_mm = mm * map->getFrameMatrix();
 
 		if(map == selectedMap)
 		{
@@ -500,53 +503,178 @@ void View::drawFrame()
 	glEnable(GL_DEPTH_TEST);
 }
 
+
+void View::setViewScaling(float sx, float sy, float sz)
+{
+	m_scaleView[0][0] = sx;
+	m_scaleView[1][1] = sy;
+	m_scaleView[2][2] = sz;
+}
+
+float View::scaleRealSlideVal(int v)
+{
+	if (v < 50)
+		return 1.0f - ((50 - v) / 100.0f);
+	return 1.0f + ((v - 50) / 25.0f);
+}
+
+
+int View::scaleIntSlideVal(float v)
+{
+	if (v < 1.0f)
+		return int((v - 1.0f) * 100 + 50);
+	return int((v - 1.0f) * 25 + 50);
+}
+
+
 void View::keyPressEvent(QKeyEvent* event)
 {
-	if (event->key() == Qt::Key_S)
-	{
-		b_saveSnapshots = !b_saveSnapshots;
 
-		if (b_saveSnapshots)
+	switch (event->key())
+	{
+		case Qt::Key_Z:
 		{
-			QMessageBox msgBox;
-			msgBox.setText("Snapshot every frame?");
-			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-			msgBox.setDefaultButton(QMessageBox::Ok);
-			if (msgBox.exec() == QMessageBox::Ok)
+			int isX = scaleIntSlideVal(m_scaleView[0][0]);
+			int isY = scaleIntSlideVal(m_scaleView[1][1]);
+			int isZ = scaleIntSlideVal(m_scaleView[2][2]);
+
+			Utils::QT::inputValues(
+				Utils::QT::VarSlider(0, 100, isX, "Scale X",
+				Utils::QT::VarSlider(0, 100, isY, "Scale Y",
+				Utils::QT::VarSlider(0, 100, isZ, "Scale Z"))));
+
+			float sx = scaleRealSlideVal(isX);
+			float sy = scaleRealSlideVal(isY);
+			float sz = scaleRealSlideVal(isZ);
+
+			setViewScaling(sx, sy, sz);
+
+			QString msg = QString("Sx=") + QString::number(m_scaleView[0][0]) + QString(" / Sy=") + QString::number(m_scaleView[1][1]) + QString(" / Sz=") + QString::number(m_scaleView[2][2]);
+			m_schnapps->statusBar()->showMessage(msg, 2000);
+
+			QTextStream* rec = m_schnapps->pythonStreamRecorder();
+			if (rec)
+				*rec << this->getName() << ".setViewScaling(" << sx << ", " << sy << ", " << sz << ");" << endl;
+		}
+		break;
+
+		case Qt::Key_S:
+		{
+			b_saveSnapshots = !b_saveSnapshots;
+
+			if (b_saveSnapshots)
 			{
-				m_schnapps->statusBarMessage("frame snapshot !!", 2000);
-				connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+				QMessageBox msgBox;
+				msgBox.setText("Snapshot every frame?");
+				msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+				msgBox.setDefaultButton(QMessageBox::Ok);
+				if (msgBox.exec() == QMessageBox::Ok)
+				{
+					m_schnapps->statusBarMessage("frame snapshot !!", 2000);
+					connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+				}
+				else
+				{
+					m_schnapps->statusBarMessage("cancel frame snapshot", 2000);
+					b_saveSnapshots = false;
+				}
 			}
 			else
 			{
-				m_schnapps->statusBarMessage("cancel frame snapshot", 2000);
-				b_saveSnapshots = false;
+				disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+				m_schnapps->statusBarMessage("Stop frame snapshot", 2000);
 			}
-		}
-		else
-		{
-			disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
-			m_schnapps->statusBarMessage("Stop frame snapshot", 2000);
-		}
-			
-	}
-	else
-	{
-		foreach(PluginInteraction* plugin, l_plugins)
-			plugin->keyPress(this, event);
 
-		if (event->key() == Qt::Key_Escape)
-		{
-			QMessageBox msgBox;
-			msgBox.setText("Really quit SCHNApps ?");
-			msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-			msgBox.setDefaultButton(QMessageBox::Ok);
-			if (msgBox.exec() == QMessageBox::Ok)
-				m_schnapps->close();
 		}
-		else
-			QGLViewer::keyPressEvent(event);
+		break;
+
+		default:
+			foreach(PluginInteraction* plugin, l_plugins)
+				plugin->keyPress(this, event);
+
+			if (event->key() == Qt::Key_Escape)
+			{
+				QMessageBox msgBox;
+				msgBox.setText("Really quit SCHNApps ?");
+				msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+				msgBox.setDefaultButton(QMessageBox::Ok);
+				if (msgBox.exec() == QMessageBox::Ok)
+					m_schnapps->close();
+			}
+			else
+				QGLViewer::keyPressEvent(event);
 	}
+
+	//if (event->key() == Qt::Key_X)
+	//{
+	//	int isX = scaleIntSlideVal(m_scaleView[0][0]);
+	//	int isY = scaleIntSlideVal(m_scaleView[1][1]);
+	//	int isZ = scaleIntSlideVal(m_scaleView[2][2]);
+
+	//	Utils::QT::inputValues(
+	//		Utils::QT::VarSlider(0, 100, isX, "Scale X",
+	//		Utils::QT::VarSlider(0, 100, isY, "Scale Y",
+	//		Utils::QT::VarSlider(0, 100, isZ, "Scale Z"))));
+
+	//	float sx = scaleRealSlideVal(isX);
+	//	float sy = scaleRealSlideVal(isY);
+	//	float sz = scaleRealSlideVal(isZ);
+
+	//	setViewScaling(sx,sy,sz);
+
+	//	QString msg = QString("Sx=") + QString::number(m_scaleView[0][0]) + QString(" / Sy=") + QString::number(m_scaleView[1][1]) + QString(" / Sz=") + QString::number(m_scaleView[2][2]);
+	//	m_schnapps->statusBar()->showMessage(msg, 2000);
+
+	//	QTextStream* rec = m_schnapps->pythonStreamRecorder();
+	//	if (rec)
+	//		*rec << this->getName() << ".setViewScaling(" << sx << ", "<< sy << ", "<< sz << ");" << endl;
+	//}
+	//else
+	//if (event->key() == Qt::Key_S)
+	//{
+	//	b_saveSnapshots = !b_saveSnapshots;
+
+	//	if (b_saveSnapshots)
+	//	{
+	//		QMessageBox msgBox;
+	//		msgBox.setText("Snapshot every frame?");
+	//		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	//		msgBox.setDefaultButton(QMessageBox::Ok);
+	//		if (msgBox.exec() == QMessageBox::Ok)
+	//		{
+	//			m_schnapps->statusBarMessage("frame snapshot !!", 2000);
+	//			connect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+	//		}
+	//		else
+	//		{
+	//			m_schnapps->statusBarMessage("cancel frame snapshot", 2000);
+	//			b_saveSnapshots = false;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		disconnect(this, SIGNAL(drawFinished(bool)), this, SLOT(saveSnapshot(bool)));
+	//		m_schnapps->statusBarMessage("Stop frame snapshot", 2000);
+	//	}
+	//		
+	//}
+	//else
+	//{
+	//	foreach(PluginInteraction* plugin, l_plugins)
+	//		plugin->keyPress(this, event);
+
+	//	if (event->key() == Qt::Key_Escape)
+	//	{
+	//		QMessageBox msgBox;
+	//		msgBox.setText("Really quit SCHNApps ?");
+	//		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	//		msgBox.setDefaultButton(QMessageBox::Ok);
+	//		if (msgBox.exec() == QMessageBox::Ok)
+	//			m_schnapps->close();
+	//	}
+	//	else
+	//		QGLViewer::keyPressEvent(event);
+	//}
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
