@@ -332,6 +332,9 @@ public:
 
 protected:
 	Geom::BoundingBox<VEC3> m_bb;
+
+public:
+	const Geom::BoundingBox<VEC3>& getBB() const { return m_bb; }
 };
 
 } // namespace SCHNApps
