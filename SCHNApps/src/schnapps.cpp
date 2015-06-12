@@ -968,6 +968,27 @@ void SCHNApps::showHidePythonDock()
 	m_pythonDock->setVisible(m_pythonDock->isHidden());
 }
 
+
+
+void SCHNApps::execPythonCmd(const QString& cmd)
+{
+#ifdef WIN32
+	QString line = cmd;
+	if (line.size() >= 2)
+	{
+		int j = 0;
+		while (line[j] == ' ') ++j;
+		QString spaces(4 - j, QChar(' ')); // need 4 spaces at begin of line
+		line.replace(QChar('\\'), QChar('/')); // replace \ by / in win path
+		m_pythonConsole.consoleMessage(spaces + line);
+		m_pythonConsole.executeLine(false);
+	}
+#else
+	m_pythonConsole.consoleMessage(cmd);
+	m_pythonConsole.executeLine(false);
+#endif
+}
+
 void SCHNApps::loadPythonScriptFromFile(const QString& fileName)
 {
 #ifdef WIN32

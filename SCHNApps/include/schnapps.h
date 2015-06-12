@@ -147,6 +147,8 @@ public slots:
 
 	void loadPythonScriptFromFile(const QString& fileName);
 
+	void execPythonCmd(const QString& fileName);
+
 	void statusBarMessage(const QString& msg, int msec);
 
 	QString openFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
@@ -171,7 +173,7 @@ protected:
 private slots:
 	void pyRecording();
 	void appendPyRecording();
-	//void endPyRecording();
+//	void endPyRecording();
 
 public:
 	inline QTextStream* pythonStreamRecorder()  { return m_pyRecording; }
@@ -223,6 +225,9 @@ protected:
 	QMap<QString, QString> m_availablePlugins;
 	QMap<Plugin*, QList<QWidget*> > m_pluginTabs;
 	QMap<Plugin*, QList<QAction*> > m_pluginMenuActions;
+
+	QMap<int, QString > m_pythonShortCuts;
+
 
 	CameraSet m_cameras;
 	ViewSet m_views;

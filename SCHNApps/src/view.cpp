@@ -529,11 +529,11 @@ int View::scaleIntSlideVal(float v)
 
 void View::keyPressEvent(QKeyEvent* event)
 {
-
 	switch (event->key())
 	{
 		case Qt::Key_Z:
 		{
+//		  m_schnapps->execPythonCmd("schnapps.getSelectedView().setViewScaling(1.,0.5,1.0);schnapps.getSelectedView().updateGL()");
 			int isX = scaleIntSlideVal(m_scaleView[0][0]);
 			int isY = scaleIntSlideVal(m_scaleView[1][1]);
 			int isZ = scaleIntSlideVal(m_scaleView[2][2]);
@@ -541,7 +541,7 @@ void View::keyPressEvent(QKeyEvent* event)
 			Utils::QT::inputValues(
 				Utils::QT::VarSlider(0, 100, isX, "Scale X",
 				Utils::QT::VarSlider(0, 100, isY, "Scale Y",
-				Utils::QT::VarSlider(0, 100, isZ, "Scale Z"))));
+				Utils::QT::VarSlider(0, 100, isZ, "Scale Z"))),"Scaling view");
 
 			float sx = scaleRealSlideVal(isX);
 			float sy = scaleRealSlideVal(isY);
