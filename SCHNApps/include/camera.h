@@ -29,6 +29,8 @@ public:
 	~Camera();
 	const QString& getName() const { return m_name; }
 
+	const glm::mat4& getTransfoMatrix() const;
+
 public slots:
 	QString getName() { return m_name; }
 	SCHNApps* getSCHNApps() const { return m_schnapps; }
@@ -53,6 +55,8 @@ public slots:
 	QString toString();
 	void fromString(QString cam);
 
+	void setScaling(float sx, float sy, float sz);
+
 private:
 	void linkView(View* view);
 	void unlinkView(View* view);
@@ -72,10 +76,13 @@ protected:
 
 	QList<View*> l_views;
 
+	glm::mat4 m_transfoMatrix;
+
 	bool b_draw;
 	bool b_drawPath;
 
 	bool b_fitToViewsBoundingBox;
+
 };
 
 } // namespace SCHNApps

@@ -14,6 +14,7 @@ unsigned int Camera::cameraCount = 0;
 Camera::Camera(const QString& name, SCHNApps* s) :
 	m_name(name),
 	m_schnapps(s),
+	m_transfoMatrix(1.0f),
 	b_draw(false),
 	b_drawPath(false),
 	b_fitToViewsBoundingBox(true)
@@ -149,6 +150,19 @@ void Camera::fromString(QString cam)
 	this->setOrientation(ori);
 }
 
+void Camera::setScaling(float sx, float sy, float sz)
+{
+	m_transfoMatrix[0][0] = sx;
+	m_transfoMatrix[1][1] = sy;
+	m_transfoMatrix[2][2] = sz;
+	foreach(View* view, l_views)
+		view->updateGL();
+}
+
+const glm::mat4& Camera::getTransfoMatrix() const 
+{
+	return m_transfoMatrix;
+}
 
 } // namespace SCHNApps
 

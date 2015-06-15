@@ -59,6 +59,9 @@ e</string>
      <property name="selectionMode">
       <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="1">
@@ -162,6 +165,9 @@ d</string>
     <widget class="QListWidget" name="list_pluginsEnabled">
      <property name="selectionMode">
       <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

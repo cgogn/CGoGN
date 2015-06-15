@@ -109,6 +109,8 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 
 	connect(action_Python_Recording, SIGNAL(triggered()), this, SLOT(pyRecording()));
 	connect(action_Append_Python_Recording, SIGNAL(triggered()), this, SLOT(appendPyRecording()));
+	connect(action_Clean_All, SIGNAL(triggered()), this, SLOT(cleanAll()));
+
 
 	action_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 	action_Append_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
@@ -525,13 +527,6 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 	{
 		Plugin* plugin = m_plugins[pluginName];
 
-		// remove plugin dock tabs
-		foreach(QWidget* tab, m_pluginTabs[plugin])
-			removePluginDockTab(plugin, tab);
-		// remove plugin menu actions
-		foreach(QAction* action, m_pluginMenuActions[plugin])
-			removeMenuAction(plugin, action);
-
 		// unlink linked views (for interaction plugins)
 		PluginInteraction* pi = dynamic_cast<PluginInteraction*>(plugin);
 		if(pi)
@@ -543,6 +538,14 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 		// call disable() method and dereference plugin
 		plugin->disable();
 		m_plugins.remove(pluginName);
+
+		// remove plugin dock tabs
+		foreach(QWidget* tab, m_pluginTabs[plugin])
+			removePluginDockTab(plugin, tab);
+		// remove plugin menu actions
+		foreach(QAction* action, m_pluginMenuActions[plugin])
+			removeMenuAction(plugin, action);
+
 
 		QPluginLoader loader(plugin->getFilePath());
 		loader.unload();
@@ -1019,7 +1022,11 @@ void SCHNApps::loadPythonScriptFromFile(const QString& fileName)
 
 void SCHNApps::loadPythonScriptFromFileDialog()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", getAppPath(), "Python script (*.py)");
+	QString pypath = m_pyPathFile;
+	if (pypath.isEmpty())
+		pypath = this->getAppPath();
+
+	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", pypath, "Python script (*.py)");
 	loadPythonScriptFromFile(fileName);
 }
 
@@ -1059,7 +1066,11 @@ void SCHNApps::pyRecording()
 		return;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", this->getAppPath(), " python script (*.py)");
+	QString pypath = m_pyPathFile;
+	if (pypath.isEmpty())
+		pypath = this->getAppPath();
+
+	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
 		m_pyRecFile = new QFile(fileName);
@@ -1123,7 +1134,11 @@ void SCHNApps::appendPyRecording()
 		return;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", this->getAppPath(), " python script (*.py)");
+	QString pypath = m_pyPathFile;
+	if (pypath.isEmpty())
+		pypath = this->getAppPath();
+
+	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
 		m_pyRecFile = new QFile(fileName);
@@ -1152,6 +1167,52 @@ void SCHNApps::appendPyRecording()
 		m_pyRecording = NULL;
 		statusbar->showMessage(QString(" Cancel recording python"), 2000);
 	}
+}
+
+bool SCHNApps::execPythonShortcut(quint64 key)
+{
+	if (m_pythonShortCuts.contains(key))
+	{
+		execPythonCmd(m_pythonShortCuts[key]);
+		return true;
+	}
+	return false;
+}
+
+
+void SCHNApps::setPythonShortcut(const QString& keys, const QString& command)
+{
+	quint64 k = 0;
+
+	if (keys.length() == 0)
+		return;
+
+	if (keys.length() == 1)
+	{
+		k = keys[0].unicode();
+	}
+	else
+	{
+		if (keys.contains("control", Qt::CaseInsensitive))
+			k |= Qt::ControlModifier;
+		if (keys.contains("shift", Qt::CaseInsensitive))
+			k |= Qt::ShiftModifier;
+		if (keys.contains("alt", Qt::CaseInsensitive))
+			k |= Qt::AltModifier;
+		if (keys.contains("meta", Qt::CaseInsensitive))
+			k |= Qt::MetaModifier;
+		if (keys.contains("keypad", Qt::CaseInsensitive))
+			k |= Qt::KeypadModifier;
+		k <<= 32;
+
+		QChar c = keys[keys.length() - 1];
+		k |= c.unicode();
+	}
+
+	if (command.length() > 0)
+		m_pythonShortCuts[k] = command;
+	else
+		m_pythonShortCuts.erase(m_pythonShortCuts.find(k));
 }
 
 
@@ -1184,6 +1245,36 @@ QString SCHNApps::saveFileDialog(const QString& title, const QString& dir, const
 }
 
 
+void SCHNApps::cleanAll()
+{
+	//remove views
+	foreach(View* v, m_views)
+	{
+		if (v->getName() != QString("view_0"))
+			removeView(v->getName());
+		else
+			v->setCurrentCamera(QString("camera_0"));
+	}
+
+	//remove cameras
+	foreach(Camera* cam, m_cameras)
+	{
+		if (cam->getName() != QString("camera_0"))
+			removeCamera(cam->getName());
+	}
+
+	//remove maps
+	foreach(MapHandlerGen* m, m_maps)
+	{
+		removeMap(m->getName());
+	}
+
+	// remove plugins
+	foreach(Plugin* p, m_plugins)
+	{
+		disablePlugin(p->getName());
+	}
+}
 
 
 } // namespace SCHNApps

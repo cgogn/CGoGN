@@ -46,7 +46,6 @@ View::View(const QString& name, SCHNApps* s, const QGLWidget* shareWidget) :
 	m_frameDrawer(NULL),
 	m_textureWallpaper(NULL),
 	m_shaderWallpaper(NULL),
-	m_scaleView(1.0f),
 	b_saveSnapshots(false)
 {
 	++viewCount;
@@ -443,12 +442,13 @@ void View::draw()
 
 	glm::mat4 mm = getCurrentModelViewMatrix();
 	glm::mat4 pm = getCurrentProjectionMatrix();
+	const glm::mat4& tr = getCurrentTransfoMatrix();
 
 	MapHandlerGen* selectedMap = m_schnapps->getSelectedMap();
 
 	foreach(MapHandlerGen* map, l_maps)
 	{
-		glm::mat4 map_mm = mm * map->getFrameMatrix() * m_scaleView;;
+		glm::mat4 map_mm = mm * map->getFrameMatrix() * tr;;
 		//glm::mat4 map_mm = mm * map->getFrameMatrix();
 
 		if(map == selectedMap)
@@ -504,57 +504,37 @@ void View::drawFrame()
 }
 
 
-void View::setViewScaling(float sx, float sy, float sz)
-{
-	m_scaleView[0][0] = sx;
-	m_scaleView[1][1] = sy;
-	m_scaleView[2][2] = sz;
-}
-
-float View::scaleRealSlideVal(int v)
-{
-	if (v < 50)
-		return 1.0f - ((50 - v) / 100.0f);
-	return 1.0f + ((v - 50) / 25.0f);
-}
-
-
-int View::scaleIntSlideVal(float v)
-{
-	if (v < 1.0f)
-		return int((v - 1.0f) * 100 + 50);
-	return int((v - 1.0f) * 25 + 50);
-}
-
-
 void View::keyPressEvent(QKeyEvent* event)
 {
+	quint64 k = event->modifiers();
+	k <<= 32;
+	k |= event->key();
+
+	// exec python shortcuts if exist
+	m_schnapps->execPythonShortcut(k);
+
+
 	switch (event->key())
 	{
 		case Qt::Key_Z:
 		{
-//		  m_schnapps->execPythonCmd("schnapps.getSelectedView().setViewScaling(1.,0.5,1.0);schnapps.getSelectedView().updateGL()");
-			int isX = scaleIntSlideVal(m_scaleView[0][0]);
-			int isY = scaleIntSlideVal(m_scaleView[1][1]);
-			int isZ = scaleIntSlideVal(m_scaleView[2][2]);
-
+			const glm::mat4& msv = getCurrentCamera()->getTransfoMatrix();
+			float sx = msv[0][0];
+			float sy = msv[1][1];
+			float sz = msv[2][2];
 			Utils::QT::inputValues(
-				Utils::QT::VarSlider(0, 100, isX, "Scale X",
-				Utils::QT::VarSlider(0, 100, isY, "Scale Y",
-				Utils::QT::VarSlider(0, 100, isZ, "Scale Z"))),"Scaling view");
+				Utils::QT::VarFloat(0.1f, 10.0f, sx, "Scale X",
+				Utils::QT::VarFloat(0.1f, 10.0f, sy, "Scale Y",
+				Utils::QT::VarFloat(0.1f, 10.0f, sz,  "Scale Z"))), "Scaling view");
 
-			float sx = scaleRealSlideVal(isX);
-			float sy = scaleRealSlideVal(isY);
-			float sz = scaleRealSlideVal(isZ);
+			getCurrentCamera()->setScaling(sx, sy, sz);
 
-			setViewScaling(sx, sy, sz);
-
-			QString msg = QString("Sx=") + QString::number(m_scaleView[0][0]) + QString(" / Sy=") + QString::number(m_scaleView[1][1]) + QString(" / Sz=") + QString::number(m_scaleView[2][2]);
+			QString msg = QString("Sx=") + QString::number(msv[0][0]) + QString(" / Sy=") + QString::number(msv[1][1]) + QString(" / Sz=") + QString::number(msv[2][2]);
 			m_schnapps->statusBar()->showMessage(msg, 2000);
 
 			QTextStream* rec = m_schnapps->pythonStreamRecorder();
 			if (rec)
-				*rec << this->getName() << ".setViewScaling(" << sx << ", " << sy << ", " << sz << ");" << endl;
+				*rec << this->getName() << " getCurrentCamera().setScaling(" << sx << ", " << sy << ", " << sz << ");" << endl;
 		}
 		break;
 
@@ -767,7 +747,10 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 }
 
 
-
+const glm::mat4& View::getCurrentTransfoMatrix() const
+{
+	return getCurrentCamera()->getTransfoMatrix();
+}
 
 
 void View::closeDialogs()

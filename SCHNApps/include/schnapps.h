@@ -137,6 +137,9 @@ public:
 	void addMenuAction(Plugin* plugin, const QString& menuPath, QAction* action);
 	void removeMenuAction(Plugin* plugin, QAction* action);
 
+	bool execPythonShortcut(quint64 key);
+
+
 public slots:
 	void aboutSCHNApps();
 	void aboutCGoGN();
@@ -147,7 +150,12 @@ public slots:
 
 	void loadPythonScriptFromFile(const QString& fileName);
 
-	void execPythonCmd(const QString& fileName);
+	/**
+	* associated a python command with a key shortcut
+	* @param keys example "control a", "alt shift B" "control keypad +"
+	* @param a python cmd
+	*/
+	void setPythonShortcut(const QString& keys, const QString& command);
 
 	void statusBarMessage(const QString& msg, int msec);
 
@@ -155,7 +163,9 @@ public slots:
 
 	QString saveFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
 
-	void setWindowSize(int w, int h) { this->resize(w, h); }
+	inline void setWindowSize(int w, int h) { this->resize(w, h); }
+
+	inline void setPythonPath(const QString& path) { m_pyPathFile = path; }
 
 private slots:
 	void loadPythonScriptFromFileDialog();
@@ -169,16 +179,20 @@ protected:
 	QFile* m_pyRecFile;
 	QList<QString> m_pyVarNames;
 	QString m_pyBuffer;
+	QMap<quint64, QString > m_pythonShortCuts;
+	QString m_pyPathFile;
 
 private slots:
 	void pyRecording();
 	void appendPyRecording();
-//	void endPyRecording();
+	void cleanAll();
 
 public:
 	inline QTextStream* pythonStreamRecorder()  { return m_pyRecording; }
 	inline void pythonVarDeclare(const QString& var) { m_pyVarNames.push_back(var); }
 	inline void pythonVarsClear() { m_pyVarNames.clear(); }
+
+
 
 signals:
 	void cameraAdded(Camera* camera);
@@ -204,6 +218,8 @@ protected:
 	PythonQtObjectPtr& m_pythonContext;
 	PythonQtScriptingConsole& m_pythonConsole;
 
+	void execPythonCmd(const QString& fileName);
+
 	QDockWidget* m_controlDock;
 	QTabWidget* m_controlDockTabWidget;
 	ControlDock_CameraTab* m_controlCameraTab;
@@ -225,8 +241,6 @@ protected:
 	QMap<QString, QString> m_availablePlugins;
 	QMap<Plugin*, QList<QWidget*> > m_pluginTabs;
 	QMap<Plugin*, QList<QAction*> > m_pluginMenuActions;
-
-	QMap<int, QString > m_pythonShortCuts;
 
 
 	CameraSet m_cameras;
