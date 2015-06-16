@@ -37,7 +37,7 @@ namespace Utils
 
 
 ShaderFlat::ShaderFlat():
-m_doubleSided(false)
+m_doubleSided(1)
 {
 	m_nameVS = "ShaderFlat_vs";
 	m_nameFS = "ShaderFlat_fs";
@@ -70,27 +70,12 @@ m_doubleSided(false)
 
 void ShaderFlat::setDoubleSided(bool doubleSided)
 {
-	if (doubleSided == m_doubleSided)
-		return;
-
-	std::string glxvert(GLSLShader::defines_gl());
-	glxvert.append(vertexShaderText);
-
-	std::string glxgeom = GLSLShader::defines_Geom("triangles", "triangle_strip", 3);
-	glxgeom.append(geometryShaderText);
-
-	std::string glxfrag(GLSLShader::defines_gl());
-	if (doubleSided)
-		glxfrag.append("#define DOUBLE_SIDED\n");
-	glxfrag.append(fragmentShaderText);
-
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES, GL_TRIANGLE_STRIP, 3);
+	m_doubleSided = doubleSided;
 
 	bind();
-	getLocations();
+	glUniform1i(*m_unif_doubleSided, m_doubleSided);
 	unbind();
 
-	setParams(m_explode, m_ambiant, m_diffuse, m_diffuseBack, m_light_pos);
 }
 
 void ShaderFlat::getLocations()
@@ -100,6 +85,7 @@ void ShaderFlat::getLocations()
 	*m_unif_diffuse  = glGetUniformLocation(program_handler(), "diffuse");
 	*m_unif_diffuseback  = glGetUniformLocation(program_handler(), "diffuseBack");
 	*m_unif_lightPos = glGetUniformLocation(program_handler(), "lightPosition");
+	*m_unif_doubleSided = glGetUniformLocation(this->program_handler(), "doubleSided");
 }
 
 unsigned int ShaderFlat::setAttributePosition(VBO* vbo)
@@ -153,7 +139,7 @@ void ShaderFlat::setDiffuse(const Geom::Vec4f& diffuse)
 	unbind();
 }
 
-void ShaderFlat::setDiffuseBack(const Geom::Vec4f& diffuseb)
+void ShaderFlat::setBackColor(const Geom::Vec4f& diffuseb)
 {
 	m_diffuseBack = diffuseb;
 	bind();
@@ -176,6 +162,7 @@ void ShaderFlat::restoreUniformsAttribs()
 	*m_unif_diffuse     = glGetUniformLocation(program_handler(),"diffuse");
 	*m_unif_diffuseback = glGetUniformLocation(program_handler(),"diffuseBack");
 	*m_unif_lightPos    =  glGetUniformLocation(program_handler(),"lightPosition");
+	*m_unif_doubleSided = glGetUniformLocation(this->program_handler(), "doubleSided");
 
 	bind();
 
@@ -184,6 +171,7 @@ void ShaderFlat::restoreUniformsAttribs()
 	glUniform4fv(*m_unif_diffuse,  1, m_diffuse.data());
 	glUniform4fv(*m_unif_diffuseback,  1, m_diffuseBack.data());
 	glUniform3fv(*m_unif_lightPos, 1, m_light_pos.data());
+	glUniform1i(*m_unif_doubleSided, m_doubleSided);
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 

@@ -29,34 +29,32 @@ public:
 	~Camera();
 	const QString& getName() const { return m_name; }
 
-	const glm::mat4& getTransfoMatrix() const;
+//	const glm::mat4& getTransfoMatrix() const;
 
 public slots:
-	QString getName() { return m_name; }
-	SCHNApps* getSCHNApps() const { return m_schnapps; }
+	QString getName();
+	SCHNApps* getSCHNApps() const;
 
-	bool isUsed() const { return !l_views.empty(); }
-	bool isShared()	const { return l_views.size() > 1; }
+	bool isUsed() const;
+	bool isShared()	const;
 
-	qglviewer::Camera::Type getProjectionType() { return type(); }
-	bool getDraw() const { return b_draw; }
-	bool getDrawPath() const { return b_drawPath; }
+	qglviewer::Camera::Type getProjectionType();
+	bool getDraw() const;
+	bool getDrawPath() const;
 
-	const QList<View*>& getLinkedViews() const { return l_views; }
-	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+	const QList<View*>& getLinkedViews() const;
+	bool isLinkedToView(View* view) const;
 
 	void setProjectionType(int t);
 	void setDraw(bool b);
 	void setDrawPath(bool b);
 
-	void enableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = true; }
-	void disableViewsBoundingBoxFitting() { b_fitToViewsBoundingBox = false; }
+	void enableViewsBoundingBoxFitting();
+	void disableViewsBoundingBoxFitting();
 
 	QString toString();
 	void fromString(QString cam);
-
-	void setScaling(float sx, float sy, float sz);
-
+	
 private:
 	void linkView(View* view);
 	void unlinkView(View* view);
@@ -75,8 +73,6 @@ protected:
 	SCHNApps* m_schnapps;
 
 	QList<View*> l_views;
-
-	glm::mat4 m_transfoMatrix;
 
 	bool b_draw;
 	bool b_drawPath;

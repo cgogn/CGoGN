@@ -40,42 +40,24 @@ public:
 	MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map);
 	virtual ~MapHandlerGen();
 
-	const QString& getName() const { return m_name; }
+	inline const QString& getName() const { return m_name; }
 
 public slots:
-	QString getName() { return m_name; }
-	SCHNApps* getSCHNApps() const { return m_schnapps; }
-
-	bool isSelectedMap() const { return m_schnapps->getSelectedMap() == this; }
-
-	GenericMap* getGenericMap() const { return m_map; }
+	QString getName();
+	SCHNApps* getSCHNApps() const;
+	bool isSelectedMap() const;
+	GenericMap* getGenericMap() const;
 
 	/*********************************************************
 	 * MANAGE FRAME
 	 *********************************************************/
 
 public slots:
-	qglviewer::ManipulatedFrame* getFrame() const { return m_frame; }
-
-	glm::mat4 getFrameMatrix() const
-	{
-		GLdouble m[16];
-		m_frame->getMatrix(m);
-		glm::mat4 matrix;
-		for(unsigned int i = 0; i < 4; ++i)
-		{
-			for(unsigned int j = 0; j < 4; ++j)
-				matrix[i][j] = (float)m[i*4+j];
-		}
-		return matrix;
-	}
+	qglviewer::ManipulatedFrame* getFrame() const;
+	glm::mat4 getFrameMatrix() const;
 
 private slots:
-	void frameModified()
-	{
-		DEBUG_EMIT("frameModified");
-		emit(boundingBoxModified());
-	}
+	void frameModified();
 
 	/*********************************************************
 	 * MANAGE BOUNDING BOX
@@ -83,47 +65,19 @@ private slots:
 
 public slots:
 
-	void showBB(bool b)
-	{
-		m_showBB = b;
-		foreach(View* view, l_views)
-			view->updateGL();
-	}
-	
-	bool isBBshown() const
-	{
-		return m_showBB;
-	}
+	void showBB(bool b);
 
-	void setBBVertexAttribute(const QString& name)
-	{
-		m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
-		updateBB();
-		// for update of interface
-		if (m_schnapps->getSelectedMap() == this)
-		{
-			m_schnapps->setSelectedMap("NONE");
-			m_schnapps->setSelectedMap(this->getName());
-		}
+	bool isBBshown() const;
 
-	}
+	void setBBVertexAttribute(const QString& name);
 
-	AttributeMultiVectorGen* getBBVertexAttribute() const { return m_bbVertexAttribute; }
+	AttributeMultiVectorGen* getBBVertexAttribute() const;
 
-	QString getBBVertexAttributeName() const
-	{
-		if (m_bbVertexAttribute)
-			return QString::fromStdString(m_bbVertexAttribute->getName());
-		else
-			return QString();
-	}
+	QString getBBVertexAttributeName() const;
 
-	float getBBdiagSize() const { return m_bbDiagSize; }
+	float getBBdiagSize() const;
 
-	inline Utils::Drawer* getBBDrawer() const
-	{
-		return m_bbDrawer;
-	}
+	Utils::Drawer* getBBDrawer() const;
 
 	virtual bool transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) = 0;
 
@@ -139,7 +93,7 @@ public:
 	virtual void draw(Utils::GLSLShader* shader, int primitive) = 0;
 	virtual void drawBB() = 0;
 
-	void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
+	inline void setPrimitiveDirty(int primitive) {	m_render->setPrimitiveDirty(primitive);	}
 
 	/*********************************************************
 	 * MANAGE TOPOLOGICAL QUERIES
@@ -221,6 +175,17 @@ public:
 
 	inline Algo::Render::GL2::TopoRender* getTopoRender() { return m_topoRender; }
 
+
+	/*********************************************************
+	* MANAGE TRANSFO
+	*********************************************************/
+
+	inline const glm::mat4& getTransfoMatrix() const { return m_transfoMatrix; }
+
+public slots:
+	void setScaling(float sx, float sy, float sz);
+	
+
 	/*********************************************************
 	 * SIGNALS
 	 *********************************************************/
@@ -248,6 +213,7 @@ protected:
 	GenericMap* m_map;
 
 	qglviewer::ManipulatedFrame* m_frame;
+	glm::mat4 m_transfoMatrix;
 
 	AttributeMultiVectorGen* m_bbVertexAttribute;
 	float m_bbDiagSize;

@@ -35,6 +35,115 @@ MapHandlerGen::~MapHandlerGen()
 	deleteTopoRender();
 }
 
+
+
+
+
+QString MapHandlerGen::getName()
+{
+	return m_name;
+}
+
+SCHNApps* MapHandlerGen::getSCHNApps() const
+{
+	return m_schnapps;
+}
+
+bool MapHandlerGen::isSelectedMap() const
+{
+	return m_schnapps->getSelectedMap() == this;
+}
+
+GenericMap* MapHandlerGen::getGenericMap() const
+{
+	return m_map;
+}
+
+/*********************************************************
+* MANAGE FRAME
+*********************************************************/
+
+qglviewer::ManipulatedFrame* MapHandlerGen::getFrame() const
+{
+	return m_frame;
+}
+
+glm::mat4 MapHandlerGen::getFrameMatrix() const
+{
+	GLdouble m[16];
+	m_frame->getMatrix(m);
+	glm::mat4 matrix;
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		for (unsigned int j = 0; j < 4; ++j)
+			matrix[i][j] = (float)m[i * 4 + j];
+	}
+	return matrix;
+}
+
+void MapHandlerGen::frameModified()
+{
+	DEBUG_EMIT("frameModified");
+	emit(boundingBoxModified());
+}
+
+
+
+
+/*********************************************************
+* MANAGE BOUNDING BOX
+*********************************************************/
+
+void MapHandlerGen::showBB(bool b)
+{
+	m_showBB = b;
+	foreach(View* view, l_views)
+		view->updateGL();
+}
+
+bool MapHandlerGen::isBBshown() const
+{
+	return m_showBB;
+}
+
+void MapHandlerGen::setBBVertexAttribute(const QString& name)
+{
+	m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
+	updateBB();
+	// for update of interface
+	if (m_schnapps->getSelectedMap() == this)
+	{
+		m_schnapps->setSelectedMap("NONE");
+		m_schnapps->setSelectedMap(this->getName());
+	}
+
+}
+
+AttributeMultiVectorGen* MapHandlerGen::getBBVertexAttribute() const
+{
+	return m_bbVertexAttribute;
+}
+
+QString MapHandlerGen::getBBVertexAttributeName() const
+{
+	if (m_bbVertexAttribute)
+		return QString::fromStdString(m_bbVertexAttribute->getName());
+	else
+		return QString();
+}
+
+float MapHandlerGen::getBBdiagSize() const
+{
+	return m_bbDiagSize;
+}
+
+inline Utils::Drawer* MapHandlerGen::getBBDrawer() const
+{
+	return m_bbDrawer;
+}
+
+
+
 /*********************************************************
  * MANAGE ATTRIBUTES
  *********************************************************/
@@ -282,6 +391,29 @@ void MapHandlerGen::deleteTopoRender()
 	if (m_topoRender)
 		delete m_topoRender;
 }
+
+
+
+/*********************************************************
+* MANAGE TRANSFO
+*********************************************************/
+
+
+void MapHandlerGen::setScaling(float sx, float sy, float sz)
+{
+	m_transfoMatrix[0][0] = sx;
+	m_transfoMatrix[1][1] = sy;
+	m_transfoMatrix[2][2] = sz;
+	foreach(View* view, l_views)
+		view->updateGL();
+}
+
+
+
+
+
+
+
 
 
 } // namespace SCHNApps

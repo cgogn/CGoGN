@@ -57,8 +57,6 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 		m_nameVS = "ShaderSimpleFlatClip_vs";
 		m_nameFS = "ShaderSimpleFlatClip_fs";
 		glxvert.append(vertexShaderClipText);
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
 		glxfrag.append(fragmentShaderClipText);
 	}
 	else
@@ -68,8 +66,6 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 		// get choose GL defines (2 or 3)
 		// ans compile shaders
 		glxvert.append(vertexShaderText);
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
 		glxfrag.append(fragmentShaderText);
 	}
 
@@ -81,31 +77,11 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 
 void ShaderSimpleFlat::setDoubleSided(bool doubleSided)
 {
-	if (doubleSided == m_doubleSided)
-		return;
+	m_doubleSided = doubleSided;
 
-	std::string glxvert(GLSLShader::defines_gl());
-	std::string glxfrag(GLSLShader::defines_gl());
-
-	if (m_nameVS == "ShaderSimpleFlatClip_vs")
-	{
-		glxvert.append(vertexShaderClipText);
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
-		glxfrag.append(fragmentShaderClipText);
-	}
-	else
-	{
-		glxvert.append(vertexShaderText);
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
-		glxfrag.append(fragmentShaderText);
-	}
-
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
-	// and get and fill uniforms
-	getLocations();
-	sendParams();
+	bind();
+	glUniform1i(*m_unif_doubleSided, m_doubleSided);
+	unbind();
 }
 
 
@@ -117,6 +93,7 @@ void ShaderSimpleFlat::getLocations()
 	*m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
 	*m_unif_backColor  = glGetUniformLocation(this->program_handler(), "backColor");
 	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
+	*m_unif_doubleSided = glGetUniformLocation(this->program_handler(), "doubleSided");
 	unbind();
 }
 
@@ -127,6 +104,7 @@ void ShaderSimpleFlat::sendParams()
 	glUniform4fv(*m_unif_diffuse,  1, m_diffuse.data());
 	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
 	glUniform4fv(*m_unif_backColor,  1, m_backColor.data());
+	glUniform1i(*m_unif_doubleSided, m_doubleSided);
 	if (*m_unif_planeClip > 0)
 		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 	unbind();

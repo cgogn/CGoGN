@@ -5,6 +5,7 @@ uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 NormalMatrix;
 uniform mat4 ModelViewMatrix;
 uniform vec3 lightPosition;
+
 VARYING_OUT float lambertTerm;
 
 void main(void)

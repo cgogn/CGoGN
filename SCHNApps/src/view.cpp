@@ -442,14 +442,12 @@ void View::draw()
 
 	glm::mat4 mm = getCurrentModelViewMatrix();
 	glm::mat4 pm = getCurrentProjectionMatrix();
-	const glm::mat4& tr = getCurrentTransfoMatrix();
 
 	MapHandlerGen* selectedMap = m_schnapps->getSelectedMap();
 
 	foreach(MapHandlerGen* map, l_maps)
 	{
-		glm::mat4 map_mm = mm * map->getFrameMatrix() * tr;;
-		//glm::mat4 map_mm = mm * map->getFrameMatrix();
+		glm::mat4 map_mm = mm * map->getFrameMatrix() * map->getTransfoMatrix();
 
 		if(map == selectedMap)
 		{
@@ -518,7 +516,7 @@ void View::keyPressEvent(QKeyEvent* event)
 	{
 		case Qt::Key_Z:
 		{
-			const glm::mat4& msv = getCurrentCamera()->getTransfoMatrix();
+	/*		const glm::mat4& msv = getCurrentCamera()->getTransfoMatrix();
 			float sx = msv[0][0];
 			float sy = msv[1][1];
 			float sz = msv[2][2];
@@ -534,7 +532,7 @@ void View::keyPressEvent(QKeyEvent* event)
 
 			QTextStream* rec = m_schnapps->pythonStreamRecorder();
 			if (rec)
-				*rec << this->getName() << " getCurrentCamera().setScaling(" << sx << ", " << sy << ", " << sz << ");" << endl;
+				*rec << this->getName() << " getCurrentCamera().setScaling(" << sx << ", " << sy << ", " << sz << ");" << endl;*/
 		}
 		break;
 
@@ -746,11 +744,6 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 	return mvpm;
 }
 
-
-const glm::mat4& View::getCurrentTransfoMatrix() const
-{
-	return getCurrentCamera()->getTransfoMatrix();
-}
 
 
 void View::closeDialogs()

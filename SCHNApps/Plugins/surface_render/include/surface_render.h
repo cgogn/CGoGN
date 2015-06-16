@@ -50,6 +50,7 @@ struct MapParameters
 	bool renderEdges;
 	bool renderFaces;
 	bool renderBoundary;
+	bool renderBackfaces;
 	FaceShadingStyle faceStyle;
 
 	Geom::Vec4f diffuseColor;
@@ -121,6 +122,7 @@ public slots:
 	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeVertexColor(const QString& view, const QString& map, float r, float g, float b);
 	void changeBackColor(const QString& view, const QString& map, float r, float g, float b);
+	void changeRenderBackfaces(const QString& view, const QString& map, bool b);
 
 
 protected:

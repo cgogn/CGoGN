@@ -91,9 +91,10 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 					}
 					else
 					{
-						m_flatShader->setDiffuseBack(p.backColor);
+						m_flatShader->setBackColor(p.backColor);
 						m_flatShader->setAttributePosition(p.positionVBO);
 						m_flatShader->setDiffuse(p.diffuseColor);
+						m_flatShader->setDoubleSided(p.renderBackfaces);
 						map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
 					}
                     break;
@@ -104,6 +105,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
                         m_phongShader->setAttributePosition(p.positionVBO);
                         m_phongShader->setAttributeNormal(p.normalVBO);
                         m_phongShader->setDiffuse(p.diffuseColor);
+						m_phongShader->setDoubleSided(p.renderBackfaces);
                         map->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
                     }
                     break;
@@ -449,6 +451,21 @@ void Surface_Render_Plugin::changeBackColor(const QString& view, const QString& 
 	}
 }
 
+void Surface_Render_Plugin::changeRenderBackfaces(const QString& view, const QString& map, bool b)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (v && m)
+	{
+		h_viewParameterSet[v][m].renderBackfaces = b;
+		if (v->isSelectedView())
+		{
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
 
 
 

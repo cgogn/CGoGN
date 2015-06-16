@@ -14,7 +14,7 @@ unsigned int Camera::cameraCount = 0;
 Camera::Camera(const QString& name, SCHNApps* s) :
 	m_name(name),
 	m_schnapps(s),
-	m_transfoMatrix(1.0f),
+//	m_transfoMatrix(1.0f),
 	b_draw(false),
 	b_drawPath(false),
 	b_fitToViewsBoundingBox(true)
@@ -150,19 +150,69 @@ void Camera::fromString(QString cam)
 	this->setOrientation(ori);
 }
 
-void Camera::setScaling(float sx, float sy, float sz)
+
+QString Camera::getName()
 {
-	m_transfoMatrix[0][0] = sx;
-	m_transfoMatrix[1][1] = sy;
-	m_transfoMatrix[2][2] = sz;
-	foreach(View* view, l_views)
-		view->updateGL();
+	return m_name;
 }
 
-const glm::mat4& Camera::getTransfoMatrix() const 
+SCHNApps* Camera::getSCHNApps() const
 {
-	return m_transfoMatrix;
+	return m_schnapps;
 }
+
+bool Camera::isUsed() const
+{
+	return !l_views.empty();
+}
+
+bool Camera::isShared()	const
+{
+	return l_views.size() > 1;
+}
+
+qglviewer::Camera::Type Camera::getProjectionType()
+{
+	return type();
+}
+
+bool Camera::getDraw() const
+{
+	return b_draw;
+}
+
+bool Camera::getDrawPath() const
+{
+	return b_drawPath;
+}
+
+const QList<View*>& Camera::getLinkedViews() const 
+{
+	return l_views;
+}
+
+bool Camera::isLinkedToView(View* view) const
+{
+	return l_views.contains(view);
+}
+
+void Camera::enableViewsBoundingBoxFitting()
+{
+	b_fitToViewsBoundingBox = true;
+}
+
+void Camera::disableViewsBoundingBoxFitting()
+{
+	b_fitToViewsBoundingBox = false;
+}
+
+
+
+
+
+
+
+
 
 } // namespace SCHNApps
 

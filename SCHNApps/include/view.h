@@ -26,10 +26,6 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-//class Camera;
-//class ViewButtonArea;
-//class ViewButton;
-//class PluginInteraction;
 
 class SCHNAPPS_API View : public QGLViewer
 {
@@ -102,7 +98,6 @@ private:
 	glm::mat4 getCurrentModelViewMatrix() const;
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
-	const glm::mat4& getCurrentTransfoMatrix() const;
 
 private slots:
 	void closeDialogs();

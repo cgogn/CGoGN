@@ -46,7 +46,6 @@ protected:
 	bool m_with_color;
 	// flag color per vertex or not
 	bool m_with_eyepos;	
-	bool m_doubleSided;
 	// shader sources OGL3
 	static std::string vertexShaderText;
 	static std::string fragmentShaderText;
@@ -58,12 +57,14 @@ protected:
 	CGoGNGLuint m_unif_diffuse;
 	CGoGNGLuint m_unif_lightPos;
 	CGoGNGLuint m_unif_backColor;
+	CGoGNGLuint m_unif_doubleSided;
 
 	//values
 	Geom::Vec4f m_ambiant;
 	Geom::Vec4f m_diffuse;
 	Geom::Vec3f m_lightPos;
 	Geom::Vec4f m_backColor;
+	int m_doubleSided;
 
 	VBO* m_vboPos;
 	VBO* m_vboColor;

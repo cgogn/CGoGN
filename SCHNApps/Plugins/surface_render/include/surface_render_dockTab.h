@@ -47,11 +47,13 @@ private slots:
 	void renderFacesChanged(bool b);
 	void faceStyleChanged(QAbstractButton* b);
 	void renderBoundaryChanged(bool b);
+	void renderBackfaceChanged(bool b);
 
 	void diffuseColorClicked();
 	void simpleColorClicked();
 	void vertexColorClicked();
 	void backColorClicked();
+	void bothColorClicked();
 	void colorSelected(const QColor& col);
 
 private:

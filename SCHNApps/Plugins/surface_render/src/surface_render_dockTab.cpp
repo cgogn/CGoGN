@@ -28,12 +28,14 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(check_renderFaces, SIGNAL(toggled(bool)), this, SLOT(renderFacesChanged(bool)));
 	connect(group_faceShading, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(faceStyleChanged(QAbstractButton*)));
 	connect(check_renderBoundary, SIGNAL(toggled(bool)), this, SLOT(renderBoundaryChanged(bool)));
+	connect(check_doubleSided, SIGNAL(toggled(bool)), this, SLOT(renderBackfaceChanged(bool)));
 
 	m_colorDial  = new QColorDialog(m_diffuseColor,NULL);
 	connect(dcolorButton,SIGNAL(clicked()),this,SLOT(diffuseColorClicked()));
 	connect(scolorButton,SIGNAL(clicked()),this,SLOT(simpleColorClicked()));
 	connect(vcolorButton,SIGNAL(clicked()),this,SLOT(vertexColorClicked()));
 	connect(bfcolorButton, SIGNAL(clicked()), this, SLOT(backColorClicked()));
+	connect(bothcolorButton, SIGNAL(clicked()), this, SLOT(bothColorClicked()));
 	connect(m_colorDial,SIGNAL(colorSelected(const QColor&)),this,SLOT(colorSelected(const QColor&)));
 }
 
@@ -181,6 +183,21 @@ void Surface_Render_DockTab::renderBoundaryChanged(bool b)
 
 
 
+void Surface_Render_DockTab::renderBackfaceChanged(bool b)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].renderBackfaces = b;
+			view->updateGL();
+			m_plugin->pythonRecording("changeRenderBackfaces", "", view->getName(), map->getName(), b);
+		}
+	}
+}
+
 void Surface_Render_DockTab::diffuseColorClicked()
 {
 	m_currentColorDial = 1;
@@ -209,6 +226,14 @@ void Surface_Render_DockTab::backColorClicked()
 	m_colorDial->setCurrentColor(m_backColor);
 }
 
+void Surface_Render_DockTab::bothColorClicked()
+{
+	m_currentColorDial = 5;
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_diffuseColor);
+
+}
+
 
 void Surface_Render_DockTab::colorSelected(const QColor& col)
 {
@@ -216,6 +241,7 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 	{
 		m_diffuseColor = col;
 		dcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+		bothcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
 
 		Geom::Vec4f rgbCol(1.0/255.0*m_diffuseColor.red(), 1.0/255.0*m_diffuseColor.green(),1.0/255.0*m_diffuseColor.blue(),0.0f);
 
@@ -277,6 +303,30 @@ void Surface_Render_DockTab::colorSelected(const QColor& col)
 			m_plugin->h_viewParameterSet[view][map].backColor = rgbCol;
 			view->updateGL();
 			m_plugin->pythonRecording("changeBackColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
+		}
+	}
+
+	if (m_currentColorDial == 5)
+	{
+		m_backColor = col;
+		bfcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		m_diffuseColor = col;
+		dcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		bothcolorButton->setStyleSheet("QPushButton { background-color:" + col.name() + "}");
+
+		Geom::Vec4f rgbCol(1.0 / 255.0*m_backColor.red(), 1.0 / 255.0*m_backColor.green(), 1.0 / 255.0*m_backColor.blue(), 0.0f);
+
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].backColor = rgbCol;
+			m_plugin->h_viewParameterSet[view][map].diffuseColor = rgbCol;
+			view->updateGL();
+			m_plugin->pythonRecording("changeBackColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
+			m_plugin->pythonRecording("changeFaceColor", "", view->getName(), map->getName(), rgbCol[0], rgbCol[1], rgbCol[2]);
 		}
 	}
 }
@@ -389,6 +439,7 @@ void Surface_Render_DockTab::updateMapParameters()
 
 		m_diffuseColor = QColor(255 * p.diffuseColor[0], 255 * p.diffuseColor[1], 255 * p.diffuseColor[2]);
 		dcolorButton->setStyleSheet("QPushButton { background-color:" + m_diffuseColor.name() + " }");
+		bothcolorButton->setStyleSheet("QPushButton { background-color:" + m_diffuseColor.name() + "}");
 
 		m_simpleColor = QColor(255 * p.simpleColor[0], 255 * p.simpleColor[1], 255 * p.simpleColor[2]);
 		scolorButton->setStyleSheet("QPushButton { background-color:" + m_simpleColor.name() + " }");
