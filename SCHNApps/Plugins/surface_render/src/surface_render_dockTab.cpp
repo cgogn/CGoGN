@@ -183,30 +183,30 @@ void Surface_Render_DockTab::renderBoundaryChanged(bool b)
 
 void Surface_Render_DockTab::diffuseColorClicked()
 {
+	m_currentColorDial = 1;
 	m_colorDial->show();
 	m_colorDial->setCurrentColor(m_diffuseColor);
-	m_currentColorDial = 1;
 }
 
 void Surface_Render_DockTab::simpleColorClicked()
 {
+	m_currentColorDial = 2;
 	m_colorDial->show();
 	m_colorDial->setCurrentColor(m_simpleColor);
-	m_currentColorDial = 2;
 }
 
 void Surface_Render_DockTab::vertexColorClicked()
 {
+	m_currentColorDial = 3;
 	m_colorDial->show();
 	m_colorDial->setCurrentColor(m_vertexColor);
-	m_currentColorDial = 3;
 }
 
 void Surface_Render_DockTab::backColorClicked()
 {
-	m_colorDial->show();
-	m_colorDial->setCurrentColor(m_vertexColor);
 	m_currentColorDial = 4;
+	m_colorDial->show();
+	m_colorDial->setCurrentColor(m_backColor);
 }
 
 
