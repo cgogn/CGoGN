@@ -137,7 +137,7 @@ float MapHandlerGen::getBBdiagSize() const
 	return m_bbDiagSize;
 }
 
-inline Utils::Drawer* MapHandlerGen::getBBDrawer() const
+Utils::Drawer* MapHandlerGen::getBBDrawer() const
 {
 	return m_bbDrawer;
 }

@@ -26,17 +26,19 @@ void main()
 	//float lambertTerm = clamp(dot(N,L),0.0,1.0);
 
 	vec4 finalColor = materialAmbient;
+	vec4 currentColor = materialDiffuse;
 
 	if (!gl_FrontFacing)
 	{
 		if (!doubleSided)
 			discard;
 		N *= -1.0;
+		currentColor = backColor;
 	}
 		
 	float lambertTerm = clamp(dot(N,L),0.0,1.0);
 #ifndef WITH_COLOR
-	finalColor += materialDiffuse * lambertTerm;
+	finalColor += currentColor * lambertTerm;
 #else
 	finalColor += vec4((Color*lambertTerm),0.0) ;
 #endif
