@@ -36,7 +36,8 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(vcolorButton,SIGNAL(clicked()),this,SLOT(vertexColorClicked()));
 	connect(bfcolorButton, SIGNAL(clicked()), this, SLOT(backColorClicked()));
 	connect(bothcolorButton, SIGNAL(clicked()), this, SLOT(bothColorClicked()));
-	connect(m_colorDial,SIGNAL(colorSelected(const QColor&)),this,SLOT(colorSelected(const QColor&)));
+	connect(m_colorDial,SIGNAL(accepted()),this,SLOT(colorSelected()));
+
 }
 
 
@@ -235,8 +236,9 @@ void Surface_Render_DockTab::bothColorClicked()
 }
 
 
-void Surface_Render_DockTab::colorSelected(const QColor& col)
+void Surface_Render_DockTab::colorSelected()
 {
+	QColor col = m_colorDial->currentColor();
 	if (m_currentColorDial == 1)
 	{
 		m_diffuseColor = col;

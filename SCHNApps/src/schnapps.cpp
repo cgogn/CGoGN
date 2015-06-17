@@ -975,7 +975,6 @@ void SCHNApps::showHidePythonDock()
 
 void SCHNApps::execPythonCmd(const QString& cmd)
 {
-#ifdef WIN32
 	QString line = cmd;
 	if (line.size() >= 2)
 	{
@@ -986,10 +985,6 @@ void SCHNApps::execPythonCmd(const QString& cmd)
 		m_pythonConsole.consoleMessage(spaces + line);
 		m_pythonConsole.executeLine(false);
 	}
-#else
-	m_pythonConsole.consoleMessage(cmd);
-	m_pythonConsole.executeLine(false);
-#endif
 }
 
 void SCHNApps::loadPythonScriptFromFile(const QString& fileName)
@@ -1189,7 +1184,7 @@ void SCHNApps::setPythonShortcut(const QString& keys, const QString& command)
 
 	if (keys.length() == 1)
 	{
-		k = keys[0].unicode();
+		k = keys[0].toUpper().unicode();
 	}
 	else
 	{
@@ -1205,7 +1200,7 @@ void SCHNApps::setPythonShortcut(const QString& keys, const QString& command)
 			k |= Qt::KeypadModifier;
 		k <<= 32;
 
-		QChar c = keys[keys.length() - 1];
+		QChar c = keys[keys.length() - 1].toUpper();
 		k |= c.unicode();
 	}
 

@@ -54,7 +54,7 @@ private slots:
 	void vertexColorClicked();
 	void backColorClicked();
 	void bothColorClicked();
-	void colorSelected(const QColor& col);
+	void colorSelected();
 
 private:
 	void addPositionVBO(QString name);

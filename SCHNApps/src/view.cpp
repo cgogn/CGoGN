@@ -508,34 +508,12 @@ void View::keyPressEvent(QKeyEvent* event)
 	k <<= 32;
 	k |= event->key();
 
-	// exec python shortcuts if exist
-	m_schnapps->execPythonShortcut(k);
-
+	// exec python shortcuts if exist and stop propagation of event !
+	if (m_schnapps->execPythonShortcut(k))
+		return;
 
 	switch (event->key())
 	{
-		case Qt::Key_Z:
-		{
-	/*		const glm::mat4& msv = getCurrentCamera()->getTransfoMatrix();
-			float sx = msv[0][0];
-			float sy = msv[1][1];
-			float sz = msv[2][2];
-			Utils::QT::inputValues(
-				Utils::QT::VarFloat(0.1f, 10.0f, sx, "Scale X",
-				Utils::QT::VarFloat(0.1f, 10.0f, sy, "Scale Y",
-				Utils::QT::VarFloat(0.1f, 10.0f, sz,  "Scale Z"))), "Scaling view");
-
-			getCurrentCamera()->setScaling(sx, sy, sz);
-
-			QString msg = QString("Sx=") + QString::number(msv[0][0]) + QString(" / Sy=") + QString::number(msv[1][1]) + QString(" / Sz=") + QString::number(msv[2][2]);
-			m_schnapps->statusBar()->showMessage(msg, 2000);
-
-			QTextStream* rec = m_schnapps->pythonStreamRecorder();
-			if (rec)
-				*rec << this->getName() << " getCurrentCamera().setScaling(" << sx << ", " << sy << ", " << sz << ");" << endl;*/
-		}
-		break;
-
 		case Qt::Key_S:
 		{
 			b_saveSnapshots = !b_saveSnapshots;
