@@ -14,7 +14,6 @@ unsigned int Camera::cameraCount = 0;
 Camera::Camera(const QString& name, SCHNApps* s) :
 	m_name(name),
 	m_schnapps(s),
-//	m_transfoMatrix(1.0f),
 	b_draw(false),
 	b_drawPath(false),
 	b_fitToViewsBoundingBox(true)

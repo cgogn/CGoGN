@@ -145,6 +145,7 @@ public slots:
 	CellSelectorGen* getCellSelector(unsigned int orbit, const QString& name) const;
 	const CellSelectorSet& getCellSelectorSet(unsigned int orbit) const { return m_cellSelectors[orbit]; }
 
+
 private slots:
 	void selectedCellsChanged();
 
@@ -181,6 +182,7 @@ public:
 	*********************************************************/
 
 	inline const glm::mat4& getTransfoMatrix() const { return m_transfoMatrix; }
+	inline const glm::mat4& getInverseTransfoMatrix() const { return m_transfoMatrixInv; }
 
 public slots:
 	void setScaling(float sx, float sy, float sz);
@@ -214,6 +216,7 @@ protected:
 
 	qglviewer::ManipulatedFrame* m_frame;
 	glm::mat4 m_transfoMatrix;
+	glm::mat4 m_transfoMatrixInv;
 
 	AttributeMultiVectorGen* m_bbVertexAttribute;
 	float m_bbDiagSize;

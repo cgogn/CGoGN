@@ -253,6 +253,11 @@ void Surface_Selection_Plugin::keyPress(View* view, QKeyEvent* event)
 {
 	if(event->key() == Qt::Key_Shift)
 	{
+		// generated a false mouse move to update drawing on shift keypressed !
+		QPoint p = m_schnapps->getSelectedView()->mapFromGlobal(QCursor::pos());
+		QMouseEvent me = QMouseEvent(QEvent::MouseMove, QPointF(p), Qt::NoButton, Qt::NoButton, Qt::ShiftModifier);
+		mouseMove(view, &me);
+
 		view->setMouseTracking(true);
 		m_selecting = true;
 		view->updateGL();
@@ -425,11 +430,15 @@ void Surface_Selection_Plugin::mouseMove(View* view, QMouseEvent* event)
 				qglviewer::Vec dir;
 				view->camera()->convertClickToLine(pixel, orig, dir);
 
+				// compute coordinates of ray in map Frame
 				qglviewer::Vec orig_inv = mh->getFrame()->coordinatesOf(orig);
 				qglviewer::Vec dir_inv = mh->getFrame()->transformOf(dir);
-
-				PFP2::VEC3 rayA(orig_inv.x, orig_inv.y, orig_inv.z);
-				PFP2::VEC3 AB(dir_inv.x, dir_inv.y, dir_inv.z);
+				// apply inverse local map transfo
+				glm::vec4 glmRayA = mh->getInverseTransfoMatrix()*glm::vec4(orig_inv.x, orig_inv.y, orig_inv.z, 1.0f);
+				glm::vec4 glmAB = glm::transpose(mh->getInverseTransfoMatrix())*glm::vec4(dir_inv.x, dir_inv.y, dir_inv.z, 1.0f);
+				// put in PFP::VEC3 format
+				PFP2::VEC3 rayA(glmRayA.x, glmRayA.y, glmRayA.z);
+				PFP2::VEC3 AB(glmAB.x, glmAB.y, glmAB.z);
 
 				PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 
@@ -520,7 +529,8 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 	{
 		unsigned int orbit = m_schnapps->getCurrentOrbit();
 		CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
-
+		if (selector == NULL)
+			return;
 		switch(orbit)
 		{
 			case VERTEX : {

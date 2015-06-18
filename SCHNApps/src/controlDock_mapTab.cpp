@@ -236,8 +236,14 @@ void ControlDock_MapTab::selectedSelectorChanged()
 			{
 				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
 				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
+
+				//// RECORDING TODO
+				//QTextStream* rec = m_schnapps->pythonStreamRecorder();
+				//if (rec)
+				//	*rec << m_selectedMap->getName() << ".setSelectedSelector(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
 			}
 		}
+
 	}
 }
 
@@ -262,7 +268,14 @@ void ControlDock_MapTab::addSelector()
 		if (m_selectedMap)
 		{
 			unsigned int orbit = getCurrentOrbit();
-			m_selectedMap->addCellSelector(orbit, QString("selector_") + QString::number(CellSelectorGen::selectorCount));
+			QString sel_name = QString("selector_") + QString::number(CellSelectorGen::selectorCount);
+			m_selectedMap->addCellSelector(orbit, sel_name);
+
+			// RECORDING
+			QTextStream* rec = m_schnapps->pythonStreamRecorder();
+			if (rec)
+				*rec << m_selectedMap->getName() << ".addCellSelector(" << orbit << ", \"" << sel_name << "\");" << endl;
+
 		}
 	}
 }
@@ -284,12 +297,16 @@ void ControlDock_MapTab::removeSelector()
 				case VOLUME: items = list_volumeSelectors->selectedItems(); break;
 			}
 			if (!items.empty())
+			{
 				m_selectedMap->removeCellSelector(orbit, items[0]->text());
+				// RECORDING
+				QTextStream* rec = m_schnapps->pythonStreamRecorder();
+				if (rec)
+					*rec << m_selectedMap->getName() << ".removeCellSelector(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
+			}
 		}
 	}
 }
-
-
 
 
 

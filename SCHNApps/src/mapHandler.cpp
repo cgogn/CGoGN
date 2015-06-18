@@ -12,6 +12,8 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_schnapps(s),
 	m_map(map),
 	m_frame(NULL),
+	m_transfoMatrix(1.0f),
+	m_transfoMatrixInv(1.0f),
 	m_bbVertexAttribute(NULL),
 	m_bbDrawer(NULL),
 	m_render(NULL),
@@ -404,8 +406,16 @@ void MapHandlerGen::setScaling(float sx, float sy, float sz)
 	m_transfoMatrix[0][0] = sx;
 	m_transfoMatrix[1][1] = sy;
 	m_transfoMatrix[2][2] = sz;
+
 	foreach(View* view, l_views)
 		view->updateGL();
+
+
+	// replace by inverse compute if other transfo than scale
+	m_transfoMatrixInv[0][0] = 1.0f/sx;
+	m_transfoMatrixInv[1][1] = 1.0f/sy;
+	m_transfoMatrixInv[2][2] = 1.0f/sz;
+
 }
 
 
