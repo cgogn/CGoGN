@@ -97,6 +97,9 @@ void Surface_Render_DockTab::renderVerticesChanged(bool b)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if (view && map)
 		{
+			if (b)
+				m_plugin->h_viewParameterSet[view][map].basePSradius = map->getBBdiagSize() / (8 * std::sqrt(map->getNbOrbits(EDGE)));
+
 			m_plugin->h_viewParameterSet[view][map].renderVertices = b;
 			view->updateGL();
 			m_plugin->pythonRecording("changeRenderVertices", "", view->getName(), map->getName(), b);
@@ -112,7 +115,7 @@ void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if (view && map)
 		{
-			m_plugin->h_viewParameterSet[view][map].verticesScaleFactor = i / 50.0;
+			m_plugin->h_viewParameterSet[view][map].verticesScaleFactor = i / 50.0; 
 			view->updateGL();
 			m_plugin->pythonRecording("changeVerticesScaleFactor", "", view->getName(), map->getName(), i / 50.0);
 		}

@@ -46,6 +46,7 @@ struct MapParameters
 	Utils::VBO* colorVBO;
 
 	float verticesScaleFactor;
+	float basePSradius;
 	bool renderVertices;
 	bool renderEdges;
 	bool renderFaces;
@@ -134,6 +135,7 @@ protected:
 	CGoGN::Utils::ShaderColorPerVertex* m_colorPerVertexShader;
 	CGoGN::Utils::ShaderSimpleColor* m_simpleColorShader;
 	CGoGN::Utils::PointSprite* m_pointSprite;
+
 };
 
 } // namespace SCHNApps
