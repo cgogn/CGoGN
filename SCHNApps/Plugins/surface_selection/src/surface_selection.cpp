@@ -261,7 +261,7 @@ void Surface_Selection_Plugin::keyPress(View* view, QKeyEvent* event)
 
 		// generate a false mouse move to update drawing on shift keypressed !
 		QPoint p = m_schnapps->getSelectedView()->mapFromGlobal(QCursor::pos());
-		QMouseEvent me = QMouseEvent(QEvent::MouseMove, QPointF(p), Qt::NoButton, Qt::NoButton, Qt::ShiftModifier);
+		QMouseEvent me = QMouseEvent(QEvent::MouseMove, p, Qt::NoButton, Qt::NoButton, Qt::ShiftModifier);
 		mouseMove(view, &me);
 
 		view->updateGL();
