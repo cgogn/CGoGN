@@ -19,6 +19,8 @@ Surface_Selection_DockTab::Surface_Selection_DockTab(SCHNApps* s, Surface_Select
 	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
 	connect(combo_normalAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(normalAttributeChanged(int)));
 	connect(combo_selectionMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(selectionMethodChanged(int)));
+	connect(slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(verticesScaleFactorChanged(int)));
+	connect(slider_verticesScaleFactor, SIGNAL(sliderPressed()), this, SLOT(verticesScaleFactorPressed()));
 }
 
 
@@ -67,7 +69,41 @@ void Surface_Selection_DockTab::selectionMethodChanged(int index)
 	}
 }
 
+void Surface_Selection_DockTab::verticesScaleFactorPressed()
+{
+	if (!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (map)
+		{
+			m_plugin->h_parameterSet[map].basePSradius = map->getBBdiagSize() / (std::sqrt(map->getNbOrbits(EDGE)));
+			m_plugin->pythonRecording("changeVerticesBaseSize", "", map->getName(), m_plugin->h_parameterSet[map].basePSradius);
 
+			View* view = m_schnapps->getSelectedView();
+			if (view)
+				view->updateGL();
+		}
+	}
+}
+
+
+void Surface_Selection_DockTab::verticesScaleFactorChanged(int i)
+{
+	if (!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (map)
+		{
+			m_plugin->h_parameterSet[map].verticesScaleFactor = i / 50.0;
+			m_plugin->pythonRecording("changeVerticesScaleFactor", "", map->getName(), i / 50.0);
+
+			View* view = m_schnapps->getSelectedView();
+			if (view)
+				view->updateGL();
+
+		}
+	}
+}
 
 
 

@@ -43,6 +43,7 @@ private slots:
 	void colorVBOChanged(int index);
 	void renderVerticesChanged(bool b);
 	void verticesScaleFactorChanged(int i);
+	void verticesScaleFactorPressed();
 	void renderEdgesChanged(bool b);
 	void renderFacesChanged(bool b);
 	void faceStyleChanged(QAbstractButton* b);

@@ -60,6 +60,8 @@ bool Surface_Selection_Plugin::enable()
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
 		m_selectionRadiusBase = cur->getBBdiagSize() / 50.0f;
+		h_parameterSet[cur].basePSradius = cur->getBBdiagSize() / (std::sqrt(cur->getNbOrbits(EDGE)));
+		h_parameterSet[cur].verticesScaleFactor = m_dockTab->slider_verticesScaleFactor->value() / 50.0f;
 	}
 
 	m_dockTab->updateMapParameters();
@@ -110,7 +112,8 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 							m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
 							m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
 							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-							m_pointSprite->setSize(map->getBBdiagSize() / 75.0f);
+//							m_pointSprite->setSize(map->getBBdiagSize() / 75.0f);
+							m_pointSprite->setSize(p.basePSradius*p.verticesScaleFactor);
 
 							m_pointSprite->enableVertexAttribs();
 							glDrawArrays(GL_POINTS, 0, selector->getNbSelectedCells());
@@ -131,8 +134,8 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 							{
 								case NormalAngle :
 								case SingleCell : {
-									m_pointSprite->setSize(map->getBBdiagSize() / 60.0f);
-									break;
+//									m_pointSprite->setSize(map->getBBdiagSize() / 60.0f);
+									m_pointSprite->setSize(p.basePSradius*p.verticesScaleFactor);
 								}
 								case WithinSphere : {
 									m_pointSprite->setSize(m_selectionRadiusBase * m_selectionRadiusCoeff);
@@ -253,13 +256,14 @@ void Surface_Selection_Plugin::keyPress(View* view, QKeyEvent* event)
 {
 	if(event->key() == Qt::Key_Shift)
 	{
-		// generated a false mouse move to update drawing on shift keypressed !
+		view->setMouseTracking(true);
+		m_selecting = true;
+
+		// generate a false mouse move to update drawing on shift keypressed !
 		QPoint p = m_schnapps->getSelectedView()->mapFromGlobal(QCursor::pos());
 		QMouseEvent me = QMouseEvent(QEvent::MouseMove, QPointF(p), Qt::NoButton, Qt::NoButton, Qt::ShiftModifier);
 		mouseMove(view, &me);
 
-		view->setMouseTracking(true);
-		m_selecting = true;
 		view->updateGL();
 	}
 }
@@ -517,6 +521,8 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
 		m_selectionRadiusBase = cur->getBBdiagSize() / 50.0f;
+		h_parameterSet[cur].basePSradius = cur->getBBdiagSize() / (std::sqrt(cur->getNbOrbits(EDGE)));
+		h_parameterSet[cur].verticesScaleFactor = m_dockTab->slider_verticesScaleFactor->value() / 50.0f;
 	}
 }
 
@@ -660,6 +666,32 @@ void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigne
 			m_dockTab->updateMapParameters();
 	}
 }
+
+void Surface_Selection_Plugin::changeVerticesScaleFactor(const QString& map, float f)
+{
+	DEBUG_SLOT();
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (m)
+	{
+		h_parameterSet[m].verticesScaleFactor = f;
+		if (m->isSelectedMap())
+			m_dockTab->updateMapParameters();
+	}
+}
+
+void Surface_Selection_Plugin::changeVerticesBaseSize(const QString& map, float f)
+{
+	DEBUG_SLOT();
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (m)
+	{
+		h_parameterSet[m].basePSradius = f;
+	}
+}
+
+
+
+
 #if CGOGN_QT_DESIRED_VERSION == 5
 	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
 #else

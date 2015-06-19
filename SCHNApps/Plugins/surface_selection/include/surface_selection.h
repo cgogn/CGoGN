@@ -29,6 +29,8 @@ struct MapParameters
 	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionAttribute;
 	VertexAttribute<PFP2::VEC3, PFP2::MAP> normalAttribute;
 	SelectionMethod selectionMethod;
+	float verticesScaleFactor;
+	float basePSradius;
 };
 
 class Surface_Selection_Plugin : public PluginInteraction
@@ -78,6 +80,8 @@ public slots:
 	void changePositionAttribute(const QString& map, const QString& name);
 	void changeNormalAttribute(const QString& map, const QString& name);
 	void changeSelectionMethod(const QString& map, unsigned int method);
+	void changeVerticesScaleFactor(const QString& map, float f);
+	void changeVerticesBaseSize(const QString& map, float f);
 
 protected:
 	Surface_Selection_DockTab* m_dockTab;

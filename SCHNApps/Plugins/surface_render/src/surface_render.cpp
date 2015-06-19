@@ -115,8 +115,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 		if(p.renderVertices)
 		{
-//			m_pointSprite->setSize(map->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
-			m_pointSprite->setSize(p.basePSradius * 2 * p.verticesScaleFactor);
+			m_pointSprite->setSize(p.basePSradius * p.verticesScaleFactor); 
 			m_pointSprite->setAttributePosition(p.positionVBO);
 			m_pointSprite->setColor(p.vertexColor);
 			map->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
@@ -298,6 +297,8 @@ void Surface_Render_Plugin::changeRenderVertices(const QString& view, const QStr
 	if(v && m)
 	{
 		h_viewParameterSet[v][m].renderVertices = b;
+		if (b)
+			h_viewParameterSet[v][m].basePSradius = m->getBBdiagSize() / (2 * std::sqrt(m->getNbOrbits(EDGE)));
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
@@ -330,6 +331,8 @@ void Surface_Render_Plugin::changeRenderEdges(const QString& view, const QString
 	if(v && m)
 	{
 		h_viewParameterSet[v][m].renderEdges = b;
+		if (b)
+			h_viewParameterSet[v][m].basePSradius = m->getBBdiagSize() / (16 * std::sqrt(m->getNbOrbits(EDGE)));
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();

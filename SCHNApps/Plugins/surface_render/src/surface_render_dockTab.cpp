@@ -24,6 +24,7 @@ Surface_Render_DockTab::Surface_Render_DockTab(SCHNApps* s, Surface_Render_Plugi
 	connect(combo_colorVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(colorVBOChanged(int)));
 	connect(check_renderVertices, SIGNAL(toggled(bool)), this, SLOT(renderVerticesChanged(bool)));
 	connect(slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(verticesScaleFactorChanged(int)));
+	connect(slider_verticesScaleFactor, SIGNAL(sliderPressed()), this, SLOT(verticesScaleFactorPressed()));
 	connect(check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(renderEdgesChanged(bool)));
 	connect(check_renderFaces, SIGNAL(toggled(bool)), this, SLOT(renderFacesChanged(bool)));
 	connect(group_faceShading, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(faceStyleChanged(QAbstractButton*)));
@@ -98,7 +99,7 @@ void Surface_Render_DockTab::renderVerticesChanged(bool b)
 		if (view && map)
 		{
 			if (b)
-				m_plugin->h_viewParameterSet[view][map].basePSradius = map->getBBdiagSize() / (8 * std::sqrt(map->getNbOrbits(EDGE)));
+				m_plugin->h_viewParameterSet[view][map].basePSradius = map->getBBdiagSize() / (2 * std::sqrt(map->getNbOrbits(EDGE)));
 
 			m_plugin->h_viewParameterSet[view][map].renderVertices = b;
 			view->updateGL();
@@ -106,6 +107,21 @@ void Surface_Render_DockTab::renderVerticesChanged(bool b)
 		}
 	}
 }
+
+
+void Surface_Render_DockTab::verticesScaleFactorPressed()
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if (view && map)
+		{
+			m_plugin->h_viewParameterSet[view][map].basePSradius = map->getBBdiagSize() / (2 * std::sqrt(map->getNbOrbits(EDGE)));
+		}
+	}
+}
+
 
 void Surface_Render_DockTab::verticesScaleFactorChanged(int i)
 {
