@@ -119,6 +119,8 @@ public slots:
 	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { DEBUG_EMIT("selectedCellSelectorChanged"); emit(selectedCellSelectorChanged(cs)); }
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
 
+	void setSelectedSelectorCurrentMap(unsigned int orbit, const QString& name);
+
 	const StaticPointers& getStaticPointers() const { return m_sp; }
 
 	/*********************************************************

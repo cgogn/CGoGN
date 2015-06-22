@@ -794,6 +794,22 @@ CellSelectorGen* SCHNApps::getSelectedSelector(unsigned int orbit) const
 	return m_controlMapTab->getSelectedSelector(orbit);
 }
 
+
+void SCHNApps::setSelectedSelectorCurrentMap(unsigned int orbit, const QString& name)
+{
+	QList<QListWidgetItem*> items;
+	switch (orbit)
+	{
+	case DART: items = m_controlMapTab->list_dartSelectors->findItems(name,Qt::MatchExactly); break;
+	case VERTEX: items = m_controlMapTab->list_vertexSelectors->findItems(name, Qt::MatchExactly); break;
+	case EDGE: items = m_controlMapTab->list_edgeSelectors->findItems(name, Qt::MatchExactly); break;
+	case FACE: items = m_controlMapTab->list_faceSelectors->findItems(name, Qt::MatchExactly); break;
+	case VOLUME: items = m_controlMapTab->list_volumeSelectors->findItems(name, Qt::MatchExactly); break;
+	}
+	if (!items.empty())
+		items[0]->setSelected(true);
+}
+
 /*********************************************************
  * MANAGE TEXTURES
  *********************************************************/

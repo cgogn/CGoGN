@@ -339,7 +339,7 @@ void MapHandlerGen::removeCellSelector(unsigned int orbit, const QString& name)
 		DEBUG_EMIT("cellSelectorRemoved");
 		emit(cellSelectorRemoved(orbit, name));
 
-		disconnect(cs, SIGNAL(selectedCellsChanged()), this, SIGNAL(selectedCellsChanged()));
+		disconnect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));
 
 		delete cs;
 	}
@@ -371,6 +371,7 @@ void MapHandlerGen::updateMutuallyExclusiveSelectors(unsigned int orbit)
 	foreach(CellSelectorGen* cs, m_cellSelectors[orbit])
 		cs->setMutuallyExclusiveSet(mex);
 }
+
 
 /*********************************************************
  * MANAGE LINKED VIEWS

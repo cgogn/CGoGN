@@ -6,6 +6,7 @@
 
 #include "Algo/Selection/raySelector.h"
 #include "Algo/Selection/collector.h"
+#include "Algo/Geometry/centroid.h"
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -110,7 +111,9 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 								updateSelectedCellsRendering();
 
 							m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
-							m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+//							m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+							const QColor& col = p.color;
+							m_pointSprite->setColor(Geom::Vec4f(col.redF(), col.greenF(), col.blueF(), 0.0f));
 							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
 //							m_pointSprite->setSize(map->getBBdiagSize() / 75.0f);
 							m_pointSprite->setSize(p.basePSradius*p.verticesScaleFactor);
@@ -178,8 +181,10 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									break;
 								}
 								case WithinSphere : {
+									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									std::vector<PFP2::VEC3> selectionPoint;
-									selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
+									selectionPoint.push_back((p.positionAttribute[m_selectingEdge.dart] + (p.positionAttribute[m->phi1(m_selectingEdge.dart)])/2.0f));
+									//selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
@@ -225,8 +230,11 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									break;
 								}
 								case WithinSphere : {
+									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+
 									std::vector<PFP2::VEC3> selectionPoint;
-									selectionPoint.push_back(p.positionAttribute[m_selectingFace.dart]);
+									selectionPoint.push_back(Algo::Surface::Geometry::faceCentroid<PFP2>(*m, m_selectingFace, p.positionAttribute));
+//									selectionPoint.push_back(p.positionAttribute[m_selectingFace.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
@@ -557,7 +565,8 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 
 				m_selectedEdgesDrawer->newList(GL_COMPILE);
 				m_selectedEdgesDrawer->lineWidth(3.0f);
-				m_selectedEdgesDrawer->color3f(1.0f, 0.0f, 0.0f);
+//				m_selectedEdgesDrawer->color3f(1.0f, 0.0f, 0.0f);
+				m_selectedEdgesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
 				m_selectedEdgesDrawer->begin(GL_LINES);
 				for(std::vector<Edge>::const_iterator e = selectedCells.begin(); e != selectedCells.end(); ++e)
 				{
@@ -576,7 +585,8 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 				const std::vector<Face>& selectedCells = cs->getSelectedCells();
 
 				m_selectedFacesDrawer->newList(GL_COMPILE);
-				m_selectedFacesDrawer->color3f(1.0f, 0.0f, 0.0f);
+//				m_selectedFacesDrawer->color3f(1.0f, 0.0f, 0.0f);
+				m_selectedFacesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
 				m_selectedFacesDrawer->begin(GL_TRIANGLES);
 				for(std::vector<Face>::const_iterator f = selectedCells.begin(); f != selectedCells.end(); ++f)
 				{
@@ -686,6 +696,27 @@ void Surface_Selection_Plugin::changeVerticesBaseSize(const QString& map, float 
 	if (m)
 	{
 		h_parameterSet[m].basePSradius = f;
+		if (m->isSelectedMap())
+			m_dockTab->updateMapParameters();
+	}
+}
+
+
+void Surface_Selection_Plugin::changeSelectedColor( const QString& map, const QString& col)
+{
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (m)
+	{
+		h_parameterSet[m].color = QColor(col);
+		if (m->isSelectedMap())
+			m_dockTab->updateMapParameters();
+
+		View* v = m_schnapps->getSelectedView();
+		if (v)
+		{
+			if (v->isLinkedToMap(m))
+				v->updateGL();
+		}
 	}
 }
 

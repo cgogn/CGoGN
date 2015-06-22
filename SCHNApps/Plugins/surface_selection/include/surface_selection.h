@@ -31,6 +31,7 @@ struct MapParameters
 	SelectionMethod selectionMethod;
 	float verticesScaleFactor;
 	float basePSradius;
+	QColor color;
 };
 
 class Surface_Selection_Plugin : public PluginInteraction
@@ -82,6 +83,7 @@ public slots:
 	void changeSelectionMethod(const QString& map, unsigned int method);
 	void changeVerticesScaleFactor(const QString& map, float f);
 	void changeVerticesBaseSize(const QString& map, float f);
+	void changeSelectedColor(const QString& map, const QString& col);
 
 protected:
 	Surface_Selection_DockTab* m_dockTab;

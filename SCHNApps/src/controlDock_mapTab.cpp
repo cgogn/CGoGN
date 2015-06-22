@@ -237,10 +237,10 @@ void ControlDock_MapTab::selectedSelectorChanged()
 				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
 				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
 
-				//// RECORDING TODO
-				//QTextStream* rec = m_schnapps->pythonStreamRecorder();
-				//if (rec)
-				//	*rec << m_selectedMap->getName() << ".setSelectedSelector(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
+				// RECORDING TODO
+				QTextStream* rec = m_schnapps->pythonStreamRecorder();
+				if (rec)
+					*rec << m_selectedMap->getName() << ".setSelectedSelector(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
 			}
 		}
 

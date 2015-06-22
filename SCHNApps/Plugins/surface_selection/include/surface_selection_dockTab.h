@@ -33,6 +33,7 @@ private slots:
 	void selectionMethodChanged(int index);
 	void verticesScaleFactorChanged(int i);
 	void verticesScaleFactorPressed();
+	void colorChanged(int i);
 
 private:
 	void addVertexAttribute(const QString& name);

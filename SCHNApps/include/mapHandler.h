@@ -152,6 +152,7 @@ private slots:
 public:
 	void updateMutuallyExclusiveSelectors(unsigned int orbit);
 
+
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/

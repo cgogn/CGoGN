@@ -16,11 +16,17 @@ Surface_Selection_DockTab::Surface_Selection_DockTab(SCHNApps* s, Surface_Select
 {
 	setupUi(this);
 
+	combo_color->setEnabled(true);
+
 	connect(combo_positionAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(positionAttributeChanged(int)));
 	connect(combo_normalAttribute, SIGNAL(currentIndexChanged(int)), this, SLOT(normalAttributeChanged(int)));
 	connect(combo_selectionMethod, SIGNAL(currentIndexChanged(int)), this, SLOT(selectionMethodChanged(int)));
 	connect(slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(verticesScaleFactorChanged(int)));
 	connect(slider_verticesScaleFactor, SIGNAL(sliderPressed()), this, SLOT(verticesScaleFactorPressed()));
+	connect(combo_color, SIGNAL(currentIndexChanged(int)), this, SLOT(colorChanged(int)));
+
+	// force color for map parameter updating
+	combo_color->setCurrentIndex(0);
 }
 
 
@@ -120,6 +126,34 @@ void Surface_Selection_DockTab::addVertexAttribute(const QString& nameAttr)
 	b_updatingUI = false;
 }
 
+
+void Surface_Selection_DockTab::colorChanged(int i)
+{
+	if (!b_updatingUI)
+	{
+		View* view = m_schnapps->getSelectedView();
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+
+		std::cout << "colorChanged: " << combo_color->color().name().toStdString() << std::endl;
+		std::cout << "colorChanged: " << i << std::endl;
+
+		
+		if (view && map )
+		{
+//			MapParameters& p = m_plugin->h_parameterSet[map];
+			QColor& col = m_plugin->h_parameterSet[map].color;
+			if (col != combo_color->color())
+			{
+				col = combo_color->color();
+				m_plugin->updateSelectedCellsRendering();
+				m_plugin->pythonRecording("changeSelectedColor", "", map->getName(), combo_color->color().name());
+			}
+			view->updateGL();
+		}
+	}
+}
+
+
 void Surface_Selection_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -156,6 +190,7 @@ void Surface_Selection_DockTab::updateMapParameters()
 		}
 
 		combo_selectionMethod->setCurrentIndex(p.selectionMethod);
+		combo_color->setColor(p.color);
 	}
 
 	b_updatingUI = false;
