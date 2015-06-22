@@ -26,7 +26,7 @@ Surface_Selection_DockTab::Surface_Selection_DockTab(SCHNApps* s, Surface_Select
 	connect(combo_color, SIGNAL(currentIndexChanged(int)), this, SLOT(colorChanged(int)));
 
 	// force color for map parameter updating
-	combo_color->setCurrentIndex(0);
+//	combo_color->setCurrentIndex(0);
 }
 
 

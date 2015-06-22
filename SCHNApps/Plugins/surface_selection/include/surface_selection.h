@@ -23,7 +23,8 @@ enum SelectionMethod
 struct MapParameters
 {
 	MapParameters() :
-		selectionMethod(SingleCell)
+		selectionMethod(SingleCell),
+		color(255,0,0)
 	{}
 
 	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionAttribute;

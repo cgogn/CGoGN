@@ -237,10 +237,9 @@ void ControlDock_MapTab::selectedSelectorChanged()
 				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
 				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
 
-				// RECORDING TODO
 				QTextStream* rec = m_schnapps->pythonStreamRecorder();
 				if (rec)
-					*rec << m_selectedMap->getName() << ".setSelectedSelector(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
+					*rec << "schnapps.setSelectedSelectorCurrentMap(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
 			}
 		}
 
@@ -486,6 +485,35 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 						} break;
 					}
 				}
+			}
+		}
+	}
+	else
+	{
+		for (unsigned int orbit = DART; orbit <= VOLUME; ++orbit)
+		{
+			switch (orbit)
+			{
+				case DART :
+					label_dartNbOrbits->setText(QString::number(0));
+					label_dartNbCells->setText(QString::number(0));
+					break;
+				case VERTEX :
+					label_vertexNbOrbits->setText(QString::number(0));
+					label_vertexNbCells->setText(QString::number(0));
+					break;
+				case EDGE :
+					label_edgeNbOrbits->setText(QString::number(0));
+					label_edgeNbCells->setText(QString::number(0));
+					break;
+				case FACE :
+					label_faceNbOrbits->setText(QString::number(0));
+					label_faceNbCells->setText(QString::number(0));
+					break;
+				case VOLUME :
+					label_volumeNbOrbits->setText(QString::number(0));
+					label_volumeNbCells->setText(QString::number(0));
+					break;
 			}
 		}
 	}

@@ -183,8 +183,8 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 								case WithinSphere : {
 									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									std::vector<PFP2::VEC3> selectionPoint;
-									selectionPoint.push_back((p.positionAttribute[m_selectingEdge.dart] + (p.positionAttribute[m->phi1(m_selectingEdge.dart)])/2.0f));
-									//selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
+									selectionPoint.push_back((p.positionAttribute[m_selectingEdge.dart] + p.positionAttribute[m->phi1(m_selectingEdge.dart)])/2.0f);
+								//	selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
