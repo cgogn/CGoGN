@@ -134,13 +134,8 @@ void Surface_Selection_DockTab::colorChanged(int i)
 		View* view = m_schnapps->getSelectedView();
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 
-		std::cout << "colorChanged: " << combo_color->color().name().toStdString() << std::endl;
-		std::cout << "colorChanged: " << i << std::endl;
-
-		
 		if (view && map )
 		{
-//			MapParameters& p = m_plugin->h_parameterSet[map];
 			QColor& col = m_plugin->h_parameterSet[map].color;
 			if (col != combo_color->color())
 			{

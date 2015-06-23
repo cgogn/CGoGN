@@ -38,10 +38,10 @@ bool Surface_Selection_Plugin::enable()
 	m_pointSprite = new CGoGN::Utils::PointSprite();
 	m_selectedVerticesVBO = new Utils::VBO();
 
-	m_selectedEdgesDrawer = new Utils::Drawer();
+	m_selectedEdgesDrawer = new Utils::Drawer(1);
 	m_selectedFacesDrawer = new Utils::Drawer();
 
-	m_selectingCellDrawer = new Utils::Drawer();
+	m_selectingCellDrawer = new Utils::Drawer(1);
 
 	m_selectionSphereVBO = new Utils::VBO();
 
@@ -60,6 +60,8 @@ bool Surface_Selection_Plugin::enable()
 		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+		connect(cur, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(updateRemovedSelector(unsigned int, const QString&)));
+
 		m_selectionRadiusBase = cur->getBBdiagSize() / 50.0f;
 		h_parameterSet[cur].basePSradius = cur->getBBdiagSize() / (std::sqrt(cur->getNbOrbits(EDGE)));
 		h_parameterSet[cur].verticesScaleFactor = m_dockTab->slider_verticesScaleFactor->value() / 50.0f;
@@ -94,6 +96,9 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	if(map->isSelectedMap())
 	{
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(-1.0f, -1.0f);
+
 		const MapParameters& p = h_parameterSet[map];
 		if(p.positionAttribute.isValid())
 		{
@@ -111,11 +116,9 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 								updateSelectedCellsRendering();
 
 							m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
-//							m_pointSprite->setColor(CGoGN::Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
 							const QColor& col = p.color;
 							m_pointSprite->setColor(Geom::Vec4f(col.redF(), col.greenF(), col.blueF(), 0.0f));
 							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-//							m_pointSprite->setSize(map->getBBdiagSize() / 75.0f);
 							m_pointSprite->setSize(p.basePSradius*p.verticesScaleFactor);
 
 							m_pointSprite->enableVertexAttribs();
@@ -136,14 +139,12 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 							switch(p.selectionMethod)
 							{
 								case NormalAngle :
-								case SingleCell : {
-//									m_pointSprite->setSize(map->getBBdiagSize() / 60.0f);
-									m_pointSprite->setSize(p.basePSradius*p.verticesScaleFactor);
-								}
-								case WithinSphere : {
+								case SingleCell : 
+									m_pointSprite->setSize(p.basePSradius*p.verticesScaleFactor*2.0f);
+									break;
+								case WithinSphere : 
 									m_pointSprite->setSize(m_selectionRadiusBase * m_selectionRadiusCoeff);
 									break;
-								}
 							}
 
 							m_pointSprite->enableVertexAttribs();
@@ -183,8 +184,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 								case WithinSphere : {
 									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									std::vector<PFP2::VEC3> selectionPoint;
-									selectionPoint.push_back((p.positionAttribute[m_selectingEdge.dart] + p.positionAttribute[m->phi1(m_selectingEdge.dart)])/2.0f);
-								//	selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
+									selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
@@ -220,11 +220,15 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 								case SingleCell : {
 									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									m_selectingCellDrawer->newList(GL_COMPILE_AND_EXECUTE);
+									m_selectingCellDrawer->lineWidth(6.0f);
 									m_selectingCellDrawer->color3f(0.0f, 0.0f, 1.0f);
-									m_selectingCellDrawer->begin(GL_TRIANGLES);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m_selectingFace.dart]);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi1(m_selectingFace.dart)]);
-									m_selectingCellDrawer->vertex(p.positionAttribute[m->phi_1(m_selectingFace.dart)]);
+									m_selectingCellDrawer->begin(GL_LINE_LOOP);
+									Dart d = m_selectingFace.dart;
+									do
+									{
+										m_selectingCellDrawer->vertex(p.positionAttribute[d]);
+										d = m->phi1(d);
+									} while (d != m_selectingFace.dart);
 									m_selectingCellDrawer->end();
 									m_selectingCellDrawer->endList();
 									break;
@@ -233,8 +237,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 
 									std::vector<PFP2::VEC3> selectionPoint;
-									selectionPoint.push_back(Algo::Surface::Geometry::faceCentroid<PFP2>(*m, m_selectingFace, p.positionAttribute));
-//									selectionPoint.push_back(p.positionAttribute[m_selectingFace.dart]);
+									selectionPoint.push_back(p.positionAttribute[m_selectingFace.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
@@ -258,6 +261,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 			}
 		}
 	}
+	glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
 void Surface_Selection_Plugin::keyPress(View* view, QKeyEvent* event)
@@ -521,6 +525,7 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 		disconnect(prev, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
 		disconnect(prev, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		disconnect(prev, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+		disconnect(prev, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(updateRemovedSelector(unsigned int, const QString&)));
 	}
 	if(cur)
 	{
@@ -528,6 +533,7 @@ void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandle
 		connect(cur, SIGNAL(attributeModified(unsigned int, const QString&)), this, SLOT(selectedMapAttributeModified(unsigned int, const QString&)));
 		connect(cur, SIGNAL(connectivityModified()), this, SLOT(selectedMapConnectivityModified()));
 		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+		connect(cur, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(updateRemovedSelector(unsigned int, const QString&)));
 		m_selectionRadiusBase = cur->getBBdiagSize() / 50.0f;
 		h_parameterSet[cur].basePSradius = cur->getBBdiagSize() / (std::sqrt(cur->getNbOrbits(EDGE)));
 		h_parameterSet[cur].verticesScaleFactor = m_dockTab->slider_verticesScaleFactor->value() / 50.0f;
@@ -585,14 +591,20 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 				const std::vector<Face>& selectedCells = cs->getSelectedCells();
 
 				m_selectedFacesDrawer->newList(GL_COMPILE);
-//				m_selectedFacesDrawer->color3f(1.0f, 0.0f, 0.0f);
 				m_selectedFacesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
 				m_selectedFacesDrawer->begin(GL_TRIANGLES);
 				for(std::vector<Face>::const_iterator f = selectedCells.begin(); f != selectedCells.end(); ++f)
 				{
-					m_selectedFacesDrawer->vertex(p.positionAttribute[(*f).dart]);
-					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi1((*f).dart)]);
-					m_selectedFacesDrawer->vertex(p.positionAttribute[m->phi_1((*f).dart)]);
+					Dart d = m->phi1((*f).dart);
+					Dart e = m->phi1(d);
+					do
+					{
+						m_selectedFacesDrawer->vertex(p.positionAttribute[f->dart]);
+						m_selectedFacesDrawer->vertex(p.positionAttribute[d]);
+						m_selectedFacesDrawer->vertex(p.positionAttribute[e]);
+						d = e;
+						e = m->phi1(d);
+					} while (e != f->dart);
 				}
 				m_selectedFacesDrawer->end();
 				m_selectedFacesDrawer->endList();
@@ -604,6 +616,19 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 }
 
 
+void Surface_Selection_Plugin::updateRemovedSelector(unsigned int orbit, const QString& name)
+{
+	updateSelectedCellsRendering();
+	MapHandlerGen* m = m_schnapps->getSelectedMap();
+	View* v = m_schnapps->getSelectedView();
+	if (v && m)
+	{
+		if (v->isLinkedToMap(m))
+			v->updateGL();
+	}
+
+
+}
 
 
 
@@ -636,6 +661,8 @@ void Surface_Selection_Plugin::selectedMapBoundingBoxModified()
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 	m_selectionRadiusBase = map->getBBdiagSize() / 50.0f;
+	h_parameterSet[map].basePSradius = map->getBBdiagSize() / (std::sqrt(map->getNbOrbits(EDGE)));
+	h_parameterSet[map].verticesScaleFactor = m_dockTab->slider_verticesScaleFactor->value() / 50.0f;
 }
 
 
@@ -652,6 +679,12 @@ void Surface_Selection_Plugin::changePositionAttribute(const QString& map, const
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
+	//View* v = m_schnapps->getSelectedView();
+	//if (v)
+	//{
+	//	if (v->isLinkedToMap(m))
+	//		v->updateGL();
+	//}
 }
 
 void Surface_Selection_Plugin::changeNormalAttribute(const QString& map, const QString& name)
@@ -664,6 +697,12 @@ void Surface_Selection_Plugin::changeNormalAttribute(const QString& map, const Q
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
+	//View* v = m_schnapps->getSelectedView();
+	//if (v)
+	//{
+	//	if (v->isLinkedToMap(m))
+	//		v->updateGL();
+	//}
 }
 
 void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigned int method)
@@ -675,6 +714,12 @@ void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigne
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
+	//View* v = m_schnapps->getSelectedView();
+	//if (v)
+	//{
+	//	if (v->isLinkedToMap(m))
+	//		v->updateGL();
+	//}
 }
 
 void Surface_Selection_Plugin::changeVerticesScaleFactor(const QString& map, float f)
@@ -687,6 +732,13 @@ void Surface_Selection_Plugin::changeVerticesScaleFactor(const QString& map, flo
 		if (m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
+
+	//View* v = m_schnapps->getSelectedView();
+	//if (v)
+	//{
+	//	if (v->isLinkedToMap(m))
+	//		v->updateGL();
+	//}
 }
 
 void Surface_Selection_Plugin::changeVerticesBaseSize(const QString& map, float f)
@@ -699,6 +751,13 @@ void Surface_Selection_Plugin::changeVerticesBaseSize(const QString& map, float 
 		if (m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
+
+	//View* v = m_schnapps->getSelectedView();
+	//if (v)
+	//{
+	//	if (v->isLinkedToMap(m))
+	//		v->updateGL();
+	//}
 }
 
 
@@ -711,12 +770,12 @@ void Surface_Selection_Plugin::changeSelectedColor( const QString& map, const QS
 		if (m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 
-		View* v = m_schnapps->getSelectedView();
-		if (v)
-		{
-			if (v->isLinkedToMap(m))
-				v->updateGL();
-		}
+	//	View* v = m_schnapps->getSelectedView();
+	//	if (v)
+	//	{
+	//		if (v->isLinkedToMap(m))
+	//			v->updateGL();
+	//	}
 	}
 }
 

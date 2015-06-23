@@ -18,13 +18,13 @@ bool Surface_Render_Plugin::enable()
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Render");
 
 	m_flatShader = new CGoGN::Utils::ShaderFlat();
-	//m_flatShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
+	m_flatShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
 	m_flatShader->setExplode(1.0f);
 
 	m_phongShader = new CGoGN::Utils::ShaderPhong();
-	//m_phongShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
-	//m_phongShader->setSpecular(CGoGN::Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f));
-	//m_phongShader->setShininess(80.0f);
+	m_phongShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f));
+	m_phongShader->setSpecular(CGoGN::Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f));
+	m_phongShader->setShininess(80.0f);
 
 	m_colorPerVertexShader = new CGoGN::Utils::ShaderColorPerVertex();
 
@@ -153,6 +153,13 @@ void Surface_Render_Plugin::selectedViewChanged(View *prev, View *cur)
 void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	DEBUG_SLOT();
+
+	if (prev)
+		disconnect(prev, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+	if (cur)
+		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+
+
 	m_dockTab->updateMapParameters();
 }
 
@@ -161,6 +168,7 @@ void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
 	DEBUG_SLOT();
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
+	connect(map, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
 }
 
 void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
@@ -168,6 +176,7 @@ void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 	DEBUG_SLOT();
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
+	disconnect(map, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
 }
 
 
@@ -235,6 +244,18 @@ void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 }
 
 
+void Surface_Render_Plugin::selectedMapBoundingBoxModified()
+{
+	MapHandlerGen* m = m_schnapps->getSelectedMap();
+
+	QList<View*> views = m->getLinkedViews();
+	if (m)
+		foreach(View* v, views)
+		{
+			if (h_viewParameterSet.contains(v))
+				h_viewParameterSet[v][m].basePSradius = m->getBBdiagSize() / (2 * std::sqrt(m->getNbOrbits(EDGE)));
+		}
+}
 
 
 

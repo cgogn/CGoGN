@@ -297,6 +297,8 @@ void ControlDock_MapTab::removeSelector()
 			}
 			if (!items.empty())
 			{
+				if (m_selectedSelector[orbit]->getName() == items[0]->text())
+					m_selectedSelector[orbit] = NULL;
 				m_selectedMap->removeCellSelector(orbit, items[0]->text());
 				// RECORDING
 				QTextStream* rec = m_schnapps->pythonStreamRecorder();

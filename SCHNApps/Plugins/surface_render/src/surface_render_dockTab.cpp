@@ -53,9 +53,12 @@ void Surface_Render_DockTab::positionVBOChanged(int index)
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		if (view && map)
 		{
+			m_plugin->h_viewParameterSet[view][map].basePSradius = map->getBBdiagSize() / (2 * std::sqrt(map->getNbOrbits(EDGE)));
 			m_plugin->h_viewParameterSet[view][map].positionVBO = map->getVBO(combo_positionVBO->currentText());
 			view->updateGL();
 			m_plugin->pythonRecording("changePositionVBO", "", view->getName(), map->getName(), combo_positionVBO->currentText());
+// TODO write this slot ?			
+//			m_plugin->pythonRecording("changeVerticesBaseSize", "",view->getName(), map->getName(), h_viewParameterSet[view][map].basePSradius);
 		}
 	}
 }

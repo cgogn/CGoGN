@@ -70,6 +70,8 @@ private slots:
 	// slots called from SCHNApps signals
 	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
 	void updateSelectedCellsRendering();
+	
+	void updateRemovedSelector(unsigned int orbit, const QString& name);
 
 	// slots called from MapHandler signals
 	void selectedMapAttributeAdded(unsigned int orbit, const QString& name);
