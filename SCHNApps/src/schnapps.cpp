@@ -806,6 +806,7 @@ void SCHNApps::setSelectedSelectorCurrentMap(unsigned int orbit, const QString& 
 	case FACE: items = m_controlMapTab->list_faceSelectors->findItems(name, Qt::MatchExactly); break;
 	case VOLUME: items = m_controlMapTab->list_volumeSelectors->findItems(name, Qt::MatchExactly); break;
 	}
+	m_controlMapTab->tabWidget_mapInfo->setCurrentIndex(orbit);
 	if (!items.empty())
 		items[0]->setSelected(true);
 }

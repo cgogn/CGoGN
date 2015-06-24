@@ -235,12 +235,12 @@ void ControlDock_MapTab::selectedSelectorChanged()
 			if (!items.empty())
 			{
 				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
-				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
 
 				QTextStream* rec = m_schnapps->pythonStreamRecorder();
 				if (rec)
 					*rec << "schnapps.setSelectedSelectorCurrentMap(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
 			}
+			m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]); // notify even if nothing selected !
 		}
 
 	}

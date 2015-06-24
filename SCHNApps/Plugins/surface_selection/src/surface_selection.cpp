@@ -182,7 +182,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									break;
 								}
 								case WithinSphere : {
-									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+//									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									std::vector<PFP2::VEC3> selectionPoint;
 									selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
 									m_selectionSphereVBO->updateData(selectionPoint);
@@ -234,7 +234,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									break;
 								}
 								case WithinSphere : {
-									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+//									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 
 									std::vector<PFP2::VEC3> selectionPoint;
 									selectionPoint.push_back(p.positionAttribute[m_selectingFace.dart]);
@@ -549,72 +549,77 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 	{
 		unsigned int orbit = m_schnapps->getCurrentOrbit();
 		CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
-		if (selector == NULL)
-			return;
-		switch(orbit)
+		if (selector != NULL)
 		{
-			case VERTEX : {
-				CellSelector<PFP2::MAP, VERTEX>* cs = static_cast<CellSelector<PFP2::MAP, VERTEX>*>(selector);
-				const std::vector<Vertex>& selectedCells = cs->getSelectedCells();
-				std::vector<PFP2::VEC3> selectedPoints;
-				for(std::vector<Vertex>::const_iterator v = selectedCells.begin(); v != selectedCells.end(); ++v)
-					selectedPoints.push_back(p.positionAttribute[*v]);
-				m_selectedVerticesVBO->updateData(selectedPoints);
-				m_selectedVertices_dirty = false;
-				break;
-			}
-			case EDGE : {
-				PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
-
-				CellSelector<PFP2::MAP, EDGE>* cs = static_cast<CellSelector<PFP2::MAP, EDGE>*>(selector);
-				const std::vector<Edge>& selectedCells = cs->getSelectedCells();
-
-				m_selectedEdgesDrawer->newList(GL_COMPILE);
-				m_selectedEdgesDrawer->lineWidth(3.0f);
-//				m_selectedEdgesDrawer->color3f(1.0f, 0.0f, 0.0f);
-				m_selectedEdgesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
-				m_selectedEdgesDrawer->begin(GL_LINES);
-				for(std::vector<Edge>::const_iterator e = selectedCells.begin(); e != selectedCells.end(); ++e)
-				{
-					m_selectedEdgesDrawer->vertex(p.positionAttribute[(*e).dart]);
-					m_selectedEdgesDrawer->vertex(p.positionAttribute[m->phi1((*e).dart)]);
+			switch(orbit)
+			{
+				case VERTEX : {
+					CellSelector<PFP2::MAP, VERTEX>* cs = static_cast<CellSelector<PFP2::MAP, VERTEX>*>(selector);
+					const std::vector<Vertex>& selectedCells = cs->getSelectedCells();
+					std::vector<PFP2::VEC3> selectedPoints;
+					for(std::vector<Vertex>::const_iterator v = selectedCells.begin(); v != selectedCells.end(); ++v)
+						selectedPoints.push_back(p.positionAttribute[*v]);
+					m_selectedVerticesVBO->updateData(selectedPoints);
+					m_selectedVertices_dirty = false;
+					break;
 				}
-				m_selectedEdgesDrawer->end();
-				m_selectedEdgesDrawer->endList();
-				m_selectedEdges_dirty = false;
-				break;
-			}
-			case FACE : {
-				PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+				case EDGE : {
+					PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 
-				CellSelector<PFP2::MAP, FACE>* cs = static_cast<CellSelector<PFP2::MAP, FACE>*>(selector);
-				const std::vector<Face>& selectedCells = cs->getSelectedCells();
+					CellSelector<PFP2::MAP, EDGE>* cs = static_cast<CellSelector<PFP2::MAP, EDGE>*>(selector);
+					const std::vector<Edge>& selectedCells = cs->getSelectedCells();
 
-				m_selectedFacesDrawer->newList(GL_COMPILE);
-				m_selectedFacesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
-				m_selectedFacesDrawer->begin(GL_TRIANGLES);
-				for(std::vector<Face>::const_iterator f = selectedCells.begin(); f != selectedCells.end(); ++f)
-				{
-					Dart d = m->phi1((*f).dart);
-					Dart e = m->phi1(d);
-					do
+					m_selectedEdgesDrawer->newList(GL_COMPILE);
+					m_selectedEdgesDrawer->lineWidth(3.0f);
+	//				m_selectedEdgesDrawer->color3f(1.0f, 0.0f, 0.0f);
+					m_selectedEdgesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
+					m_selectedEdgesDrawer->begin(GL_LINES);
+					for(std::vector<Edge>::const_iterator e = selectedCells.begin(); e != selectedCells.end(); ++e)
 					{
-						m_selectedFacesDrawer->vertex(p.positionAttribute[f->dart]);
-						m_selectedFacesDrawer->vertex(p.positionAttribute[d]);
-						m_selectedFacesDrawer->vertex(p.positionAttribute[e]);
-						d = e;
-						e = m->phi1(d);
-					} while (e != f->dart);
+						m_selectedEdgesDrawer->vertex(p.positionAttribute[(*e).dart]);
+						m_selectedEdgesDrawer->vertex(p.positionAttribute[m->phi1((*e).dart)]);
+					}
+					m_selectedEdgesDrawer->end();
+					m_selectedEdgesDrawer->endList();
+					m_selectedEdges_dirty = false;
+					break;
 				}
-				m_selectedFacesDrawer->end();
-				m_selectedFacesDrawer->endList();
-				m_selectedFaces_dirty = false;
-				break;
+				case FACE : {
+					PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
+
+					CellSelector<PFP2::MAP, FACE>* cs = static_cast<CellSelector<PFP2::MAP, FACE>*>(selector);
+					const std::vector<Face>& selectedCells = cs->getSelectedCells();
+
+					m_selectedFacesDrawer->newList(GL_COMPILE);
+					m_selectedFacesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
+					m_selectedFacesDrawer->begin(GL_TRIANGLES);
+					for(std::vector<Face>::const_iterator f = selectedCells.begin(); f != selectedCells.end(); ++f)
+					{
+						Dart d = m->phi1((*f).dart);
+						Dart e = m->phi1(d);
+						do
+						{
+							m_selectedFacesDrawer->vertex(p.positionAttribute[f->dart]);
+							m_selectedFacesDrawer->vertex(p.positionAttribute[d]);
+							m_selectedFacesDrawer->vertex(p.positionAttribute[e]);
+							d = e;
+							e = m->phi1(d);
+						} while (e != f->dart);
+					}
+					m_selectedFacesDrawer->end();
+					m_selectedFacesDrawer->endList();
+					m_selectedFaces_dirty = false;
+					break;
+				}
 			}
 		}
 	}
+	const QList<View*>& lv = this->getLinkedViews();
+	foreach(View* v, lv)
+	{
+			v->updateGL();
+	}
 }
-
 
 void Surface_Selection_Plugin::updateRemovedSelector(unsigned int orbit, const QString& name)
 {
