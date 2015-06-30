@@ -46,34 +46,87 @@ public:
 	void hideDialogs();
 
 public slots:
+	/**
+	 * @brief get the name
+	 * @return name
+	 */
 	QString getName() { return m_name; }
 	SCHNApps* getSCHNApps() const { return m_schnapps; }
 
+	/**
+	 * @brief test if the view is the selected one
+	 * @return
+	 */
 	bool isSelectedView() const { return m_schnapps->getSelectedView() == this; }
 
 	void setCurrentCamera(Camera* c);
+
+	/**
+	* set the current camera of the view
+	* @param name the name of camera
+	*/
 	void setCurrentCamera(const QString& name);
 
+	/**
+	* get the current camera of the view
+	* @return the camera object
+	*/
 	Camera* getCurrentCamera() const { return m_currentCamera; }
+
 	bool usesCamera(Camera* c) const { return m_currentCamera == c; }
+
+	/**
+	* test if a camera is the current camera
+	* @param name the name of camera
+	*/
 	bool usesCamera(const QString& name) const;
 
 	void linkPlugin(PluginInteraction* plugin);
+
+	/**
+	* link a plugin with the view
+	* @param name the name of plugin
+	*/
 	void linkPlugin(const QString& name);
 	void unlinkPlugin(PluginInteraction* plugin);
+
+	/**
+	* unlink a plugin of the view
+	* @param name the name of plugin
+	*/
 	void unlinkPlugin(const QString& name);
 
 	const QList<PluginInteraction*>& getLinkedPlugins() const { return l_plugins; }
 	bool isLinkedToPlugin(PluginInteraction* plugin) const { return l_plugins.contains(plugin); }
+
+	/**
+	* test if the view is linked to a plugin
+	* @param name the name of plugin
+	*/
 	bool isLinkedToPlugin(const QString& name) const;
 
 	void linkMap(MapHandlerGen* map);
+
+	/**
+	* link a map with the view
+	* @param name the name of map
+	*/
 	void linkMap(const QString& name);
 	void unlinkMap(MapHandlerGen* map);
+
+	/**
+	* unlink a map of the view
+	* @param name the name of map
+	*/
 	void unlinkMap(const QString& name);
 
 	const QList<MapHandlerGen*>& getLinkedMaps() const { return l_maps; }
 	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
+
+	/**
+	* test if the view is linked to a lao
+	* @param name the name of map
+	*/
 	bool isLinkedToMap(const QString& name) const;
 
 private:

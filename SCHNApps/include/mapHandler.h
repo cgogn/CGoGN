@@ -43,9 +43,20 @@ public:
 	inline const QString& getName() const { return m_name; }
 
 public slots:
+	/**
+	 * @brief get the name
+	 * @return name
+	 */
 	QString getName();
+
 	SCHNApps* getSCHNApps() const;
+
+	/**
+	 * @brief test is map is the current selected map
+	 * @return selected / not selected
+	 */
 	bool isSelectedMap() const;
+
 	GenericMap* getGenericMap() const;
 
 	/*********************************************************
@@ -65,16 +76,35 @@ private slots:
 
 public slots:
 
+	/**
+	* @brief Fix if bounding box has to be drawn
+	* @param b yes or not
+	*/
 	void showBB(bool b);
 
+	/**
+	* @brief is bounding-box of map drawn
+	* @return is bounding-box of map drawn
+	*/
 	bool isBBshown() const;
 
+	/**
+	* @brief choose the vertex attribute used to compute the bounding-box
+	* @param name name of attribute
+	*/
 	void setBBVertexAttribute(const QString& name);
 
 	AttributeMultiVectorGen* getBBVertexAttribute() const;
 
+	/**
+	* @brief get the vertex attribute used to compute the bounding-box
+	* @return name of attribute
+	*/
 	QString getBBVertexAttributeName() const;
 
+	/**
+	* @brief get the length of diagonal of bounding-box of map
+	*/
 	float getBBdiagSize() const;
 
 	Utils::Drawer* getBBDrawer() const;
@@ -124,15 +154,33 @@ public:
 public slots:
 	Utils::VBO* createVBO(const AttributeMultiVectorGen* attr);
 	Utils::VBO* createVBO(const AttributeHandlerGen& attr);
+
+	/**
+	* @brief create a VBO from vertex attribute (with same name)
+	* @param name name of attribute
+	*/
 	Utils::VBO* createVBO(const QString& name);
 
 	void updateVBO(const AttributeMultiVectorGen* attr);
 	void updateVBO(const AttributeHandlerGen& attr);
+
+	/**
+	* @brief update VBO from attribute data
+	* @param name name of VBO (and corresponding attribute)
+	*/
 	void updateVBO(const QString& name);
 
+	/**
+	* @brief Get VBO object from its name
+	* @param name of VBO
+	*/
 	Utils::VBO* getVBO(const QString& name) const;
 	const VBOSet& getVBOSet() const { return m_vbo; }
 
+	/**
+	* @brief Delete a VBO
+	* @param name name of VBO
+	*/
 	void deleteVBO(const QString& name);
 
 	/*********************************************************
@@ -158,7 +206,16 @@ public:
 	 *********************************************************/
 
 private:
+	/**
+	 * @brief link a view to the map
+	 * @param view
+	 */
 	void linkView(View* view);
+
+	/**
+	 * @brief unlink a view from the map
+	 * @param view
+	 */
 	void unlinkView(View* view);
 
 public slots:
@@ -186,6 +243,12 @@ public:
 	inline const glm::mat4& getInverseTransfoMatrix() const { return m_transfoMatrixInv; }
 
 public slots:
+	/**
+	* @brief Set the scaling that apply on rendering the map
+	* @param sx scaling x factor
+	* @param sy scaling y factor
+	* @param sz scaling z factor
+	*/
 	void setScaling(float sx, float sy, float sz);
 	
 

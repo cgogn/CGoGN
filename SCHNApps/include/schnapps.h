@@ -36,6 +36,10 @@ public:
 	~SCHNApps();
 
 public slots:
+	/**
+	 * @brief  get the file path where application has been launched
+	 * @return the path
+	 */
 	const QString& getAppPath() { return m_appPath; }
 
 	/*********************************************************
@@ -43,10 +47,23 @@ public slots:
 	 *********************************************************/
 
 public slots:
+	/**
+	* @brief add a camera with a given name
+	* @param name name of camera
+	*/
 	Camera* addCamera(const QString& name);
 	Camera* addCamera();
+
+	/**
+	* @brief remove a camera
+	* @param name name of camera to remove
+	*/
 	void removeCamera(const QString& name);
 
+	/**
+	* @brief get camera object
+	* @param name of camera
+	*/
 	Camera* getCamera(const QString& name) const;
 	const CameraSet& getCameraSet() const { return m_cameras; }
 
@@ -58,20 +75,64 @@ public:
 
 
 public slots:
+	/**
+	* @brief add a view with name
+	* @param name name of view
+	*/
 	View* addView(const QString& name);
+
+	/**
+	* @brief add a view
+	*/
 	View* addView();
+
+	/**
+	* @brief remove a view
+	* @param name the name of the view
+	*/
 	void removeView(const QString& name);
 
+	/**
+	* @brief get view object
+	* @param name the name of view
+	*/
 	View* getView(const QString& name) const;
 	const ViewSet& getViewSet() const { return m_views; }
 
+	/**
+	* @brief get the selected view
+	*/
 	View* getSelectedView() const { return m_selectedView; }
+
+	/**
+	* @brief set the selected view
+	* @param view the view object
+	*/
 	void setSelectedView(View* view);
+
+	/**
+	* @brief set the selected view
+	* @param name the view name
+	*/
 	void setSelectedView(const QString& name);
 
+	/**
+	* @brief split the view in the current orientation
+	* @param orientation of split 0: Vertical Split 1:
+	* @return the new View added by the split
+	*/
 	View* splitView(const QString& name, Qt::Orientation orientation);
 
+	/**
+	* @brief save all split positions in a string
+	* @return the storage string
+	*/
 	QString saveSplitViewPositions();
+
+	/**
+	* @brief restore all split positions from a string storage,
+	* the split's sequence must the same than when saving
+	*/
 	void restoreSplitViewPositions(QString stringStates);
 
 
@@ -80,11 +141,28 @@ public slots:
 	 *********************************************************/
 
 public slots:
+	/**
+	* @brief Add a directory for searching available plugin
+	* @param path path od directory
+	*/
 	void registerPluginsDirectory(const QString& path);
 
+	/**
+	* @brief Load and enable a plugin
+	* @param pluginName plugin name
+	*/
 	Plugin* enablePlugin(const QString& pluginName);
+
+	/**
+	* @brief Disable and unload a plugin
+	* @param pluginName plugin name
+	*/
 	void disablePlugin(const QString& pluginName);
 
+	/**
+	* @brief Get plugin object from name
+	* @param name name of plugin
+	*/
 	Plugin* getPlugin(const QString& name) const;
 	const PluginSet& getPluginSet() const { return m_plugins; }
 
@@ -103,23 +181,65 @@ private slots:
 	 *********************************************************/
 
 public slots:
+	/**
+	* @brief add a new empty map
+	* @param name name given to the map
+	* @param dim dimension of the map
+	*/
 	MapHandlerGen* addMap(const QString& name, unsigned int dim);
+
+	/**
+	* @brief Remove a map
+	* @param name name of map
+	*/
 	void removeMap(const QString& name);
+
+	/**
+	* @brief Duplicated (copy) a map
+	* @param name of map to copy
+	* @param properties  copy BB & VBO
+	*/
 	MapHandlerGen* duplicateMap(const QString& name, bool properties);
 
-
+	/**
+	* @brief Set the current selected map
+	* @param mapName name of the map to be selected
+	*/
 	void setSelectedMap(const QString& mapName);
 
+	/**
+	* @brief Get a map object from its name
+	* @param name name of map
+	*/
 	MapHandlerGen* getMap(const QString& name) const;
 	const MapSet& getMapSet() const { return m_maps; }
 
 	void notifySelectedMapChanged(MapHandlerGen* old, MapHandlerGen* cur) { DEBUG_EMIT("selectedMapChanged"); emit(selectedMapChanged(old, cur)); }
+
+	/**
+	* @brief Get the current selected map
+	* @return the selected map
+	*/
 	MapHandlerGen* getSelectedMap() const;
 
+	/**
+	* @brief Get the current selected tab orbit in interface
+	* @return 0:Dart / 1:Vertex / 2:Edge / 3:Face / 4:Volume
+	*/
 	unsigned int getCurrentOrbit() const;
 	void notifySelectedCellSelectorChanged(CellSelectorGen* cs) { DEBUG_EMIT("selectedCellSelectorChanged"); emit(selectedCellSelectorChanged(cs)); }
+
+	/**
+	* @brief Get cell selector
+	* @param orbit Orbit (0:Dart / 1:Vertex / 2:Edge / 3:Face / 4:Volume)
+	*/
 	CellSelectorGen* getSelectedSelector(unsigned int orbit) const;
 
+	/**
+	* @brief Set the selector of the current map (warning change the current orbit)
+	* @param orbit the orbit (0:Dart / 1:Vertex / 2:Edge / 3:Face / 4:Volume)
+	* @param name name of selector (must exist)
+	*/
 	void setSelectedSelectorCurrentMap(unsigned int orbit, const QString& name);
 
 	const StaticPointers& getStaticPointers() const { return m_sp; }
@@ -151,6 +271,10 @@ public slots:
 	void showHidePluginDock();
 	void showHidePythonDock();
 
+	/**
+	* @brief Load a python script store in a file.
+	* @param fileName the filename
+	*/
 	void loadPythonScriptFromFile(const QString& fileName);
 
 	/**
@@ -160,14 +284,28 @@ public slots:
 	*/
 	void setPythonShortcut(const QString& keys, const QString& command);
 
+	/**
+	* @brief Print a message in the status bar
+	* @param msg the message
+	* @param msec number of milli-second that message stay printed
+	*/
 	void statusBarMessage(const QString& msg, int msec);
 
 	QString openFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
 
 	QString saveFileDialog(const QString& title, const QString& dir = QString(), const QString& filter = QString());
 
+	/**
+	* @brief Fix the window size
+	* @param w width of window
+	* @param h height of window
+	*/
 	inline void setWindowSize(int w, int h) { this->resize(w, h); }
 
+	/**
+	* @brief set the default path used when opening python file dialog.
+	* @param path the default path
+	*/
 	inline void setPythonPath(const QString& path) { m_pyPathFile = path; }
 
 private slots:

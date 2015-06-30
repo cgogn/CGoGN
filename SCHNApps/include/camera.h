@@ -29,30 +29,66 @@ public:
 	~Camera();
 	const QString& getName() const { return m_name; }
 
-//	const glm::mat4& getTransfoMatrix() const;
-
 public slots:
+	/**
+	 * @brief get the name
+	 * @return name
+	 */
 	QString getName();
+
 	SCHNApps* getSCHNApps() const;
 
+	/**
+	 * @brief  test if camera is used by one view
+	 * @return used / not used
+	 */
 	bool isUsed() const;
+
+	/**
+	 * @brief test is camera is used by several view
+	 * @return shared / not shared (by view)
+	 */
 	bool isShared()	const;
 
 	qglviewer::Camera::Type getProjectionType();
+	/// drawing of camera (do not use)
 	bool getDraw() const;
 	bool getDrawPath() const;
 
 	const QList<View*>& getLinkedViews() const;
 	bool isLinkedToView(View* view) const;
 
+	/**
+	* @briefset the projection type
+	* @param t 0:perspective / 1::orthogonal
+	*/
 	void setProjectionType(int t);
+
+	/// drawing of camera (do not use)
 	void setDraw(bool b);
 	void setDrawPath(bool b);
 
+	/**
+	* @brief Enable the camera to update automatically with view bounding box
+	*/
 	void enableViewsBoundingBoxFitting();
+
+	/**
+	* @brief Enable the camera to update automatically with view bounding box
+	*/
 	void disableViewsBoundingBoxFitting();
 
+	/**
+	* @brief store position and rotationof camera into a string
+	* @return the storage string
+	*/
 	QString toString();
+
+
+	/**
+	* @brief restore a camera from string storage
+	* @param cam the string containing data
+	*/
 	void fromString(QString cam);
 	
 private:
