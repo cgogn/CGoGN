@@ -29,10 +29,28 @@ private:
 	virtual void disable() {}
 
 public slots:
+	/**
+	 * @brief import a mesh from a file
+	 * @param fileName file name of mesh file
+	 * @return the new maphandler that handle the mesh
+	 */
 	MapHandlerGen* importMeshFromFile(const QString& fileName);
+
+	/**
+	 * @brief import a mesh by opening a FileDialog
+	 */
 	void importMeshFromFileDialog();
 
+	/**
+	 * @brief import an image into a mesh from a file
+	 * @param fileName file name of mesh file
+	 * @return
+	 */
 	MapHandlerGen* importImageFromFile(const QString& fileName);
+
+	/**
+	 * @brief import image into a mesh by opening a FileDialog
+	 */
 	void importImageFromFileDialog();
 
 private:

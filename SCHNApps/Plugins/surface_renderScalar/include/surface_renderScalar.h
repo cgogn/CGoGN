@@ -83,11 +83,37 @@ private slots:
 
 public slots:
 	// slots for Python calls
+	/**
+	 * @brief change the position VBO use for rendering (for specific view and map)
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo the position vbo name
+	 */
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
-	void changeScalarVBO(const QString& view, const QString& map, const QString& vbo);
-	void changeColorMap(const QString& view, const QString& map, int c);
-	void changeExpansion(const QString& view, const QString& map, int i);
 
+	/**
+	 * @brief change the scalar VBO use for rendering (for specific view and map)
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo the scalar vbo name
+	 */
+	void changeScalarVBO(const QString& view, const QString& map, const QString& vbo);
+
+	/**
+	 * @brief change the kind of colormap.
+	 * @param view the view name
+	 * @param map the map name
+	 * @param c 0:BWR 1:CWR 2:BCGYR 3:BGR
+	 */
+	void changeColorMap(const QString& view, const QString& map, int c);
+
+	/**
+	 * @brief change the expansion of color-map
+	 * @param view the view name
+	 * @param map the map name
+	 * @param i ????
+	 */
+	void changeExpansion(const QString& view, const QString& map, int i);
 
 protected:
 	Surface_RenderScalar_DockTab* m_dockTab;

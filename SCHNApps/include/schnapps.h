@@ -67,8 +67,9 @@ public slots:
 
 	View* getSelectedView() const { return m_selectedView; }
 	void setSelectedView(View* view);
+	void setSelectedView(const QString& name);
 
-	void splitView(const QString& name, Qt::Orientation orientation);
+	View* splitView(const QString& name, Qt::Orientation orientation);
 
 	QString saveSplitViewPositions();
 	void restoreSplitViewPositions(QString stringStates);
@@ -153,9 +154,9 @@ public slots:
 	void loadPythonScriptFromFile(const QString& fileName);
 
 	/**
-	* associated a python command with a key shortcut
+	* Associate a python command with a key shortcut
 	* @param keys example "control a", "alt shift B" "control keypad +"
-	* @param a python cmd
+	* @param command a python cmd
 	*/
 	void setPythonShortcut(const QString& keys, const QString& command);
 

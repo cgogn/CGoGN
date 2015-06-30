@@ -69,10 +69,46 @@ private slots:
 
 public slots:
 	// slots for Python calls
+	/**
+	 * @brief change the position VBO use for rendering for specific view and map
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo
+	 */
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
+
+	/**
+	 * @brief add a VBO use for rendering for specific view and map
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo
+	 */
 	void addVectorVBO(const QString& view, const QString& map, const QString& vbo);
+
+	/**
+	 * @brief removeVectorVBO
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo
+	 */
 	void removeVectorVBO(const QString& view, const QString& map, const QString& vbo);
+
+	/**
+	 * @brief changeVectorScaleFactor
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo
+	 * @param f
+	 */
 	void changeVectorScaleFactor(const QString& view, const QString& map, const QString& vbo, float f);
+
+	/**
+	 * @brief changeVectorColor
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo
+	 * @param col
+	 */
 	void changeVectorColor(const QString& view, const QString& map, const QString& vbo, const QString& col);
 
 protected:

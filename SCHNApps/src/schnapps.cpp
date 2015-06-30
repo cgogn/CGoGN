@@ -308,12 +308,14 @@ void SCHNApps::setSelectedView(View* view)
 	m_selectedView->updateGL();
 }
 
-void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
+void SCHNApps::setSelectedView(const QString& name)
 {
-	// RECORDING
-	if (m_pyRecording)
-		*m_pyRecording << "schnapps.splitView(\"" << name << "\", " << orientation << ");" << endl;
+	View* v = this->getView(name);
+	setSelectedView(v);
+}
 
+View* SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
+{
 	View* newView = addView();
 
 	View* view = m_views[name];
@@ -350,6 +352,12 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 		sz[1] = tot - sz[0];
 		spl->setSizes(sz);
 	}
+
+	// RECORDING
+	if (m_pyRecording)
+		*m_pyRecording << newView->getName() << " = schnapps.splitView(\"" << name << "\", " << orientation << ");" << endl;
+
+	return newView;
 }
 
 QString SCHNApps::saveSplitViewPositions()

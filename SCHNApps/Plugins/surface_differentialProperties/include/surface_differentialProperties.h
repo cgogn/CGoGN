@@ -43,11 +43,32 @@ private slots:
 	void schnappsClosing();
 
 public slots:
+	/**
+	 * @brief compute the normals of a mesh
+	 * @param mapName name of the 2d map (mesh)
+	 * @param positionAttributeName name of position attribute used for computation
+	 * @param normalAttributeName name of result attribute
+	 * @param autoUpdate automatically update the normal attribute when position attribute change.
+	 */
 	void computeNormal(const QString& mapName,
 		const QString& positionAttributeName = "position",
 		const QString& normalAttributeName = "normal",
 		bool autoUpdate = true);
 
+	/**
+	 * @brief compute curvatures of a mesh
+	 * @param mapName name of 2d map
+	 * @param positionAttributeName name of input position attribute
+	 * @param normalAttributeName name of input normal attributes
+	 * @param KmaxAttributeName ?? result attribute aname
+	 * @param kmaxAttributeName ?? result attribute aname
+	 * @param KminAttributeName ?? result attribute aname
+	 * @param kminAttributeName ?? result attribute aname
+	 * @param KnormalAttributeName ?? result attribute aname
+	 * @param compute_kmean compute the mean curvature
+	 * @param compute_kgaussian compute the gaussian curvature
+	 * @param autoUpdate automatically update the output attributes when input attribute change.
+	 */
 	void computeCurvature(
 		const QString& mapName,
 		const QString& positionAttributeName = "position",
