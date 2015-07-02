@@ -290,6 +290,9 @@ void Surface_Selection_Plugin::keyRelease(View* view, QKeyEvent* event)
 	}
 }
 
+
+
+
 void Surface_Selection_Plugin::mousePress(View* view, QMouseEvent* event)
 {
 	if(m_selecting && (event->button() == Qt::LeftButton || event->button() == Qt::RightButton))
@@ -514,8 +517,6 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 
 
 
-
-
 void Surface_Selection_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
@@ -684,12 +685,12 @@ void Surface_Selection_Plugin::changePositionAttribute(const QString& map, const
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
-	//View* v = m_schnapps->getSelectedView();
-	//if (v)
-	//{
-	//	if (v->isLinkedToMap(m))
-	//		v->updateGL();
-	//}
+	View* v = m_schnapps->getSelectedView();
+	if (v)
+	{
+		if (v->isLinkedToMap(m))
+			v->updateGL();
+	}
 }
 
 void Surface_Selection_Plugin::changeNormalAttribute(const QString& map, const QString& name)
@@ -702,12 +703,12 @@ void Surface_Selection_Plugin::changeNormalAttribute(const QString& map, const Q
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
-	//View* v = m_schnapps->getSelectedView();
-	//if (v)
-	//{
-	//	if (v->isLinkedToMap(m))
-	//		v->updateGL();
-	//}
+	View* v = m_schnapps->getSelectedView();
+	if (v)
+	{
+		if (v->isLinkedToMap(m))
+			v->updateGL();
+	}
 }
 
 void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigned int method)
@@ -719,12 +720,12 @@ void Surface_Selection_Plugin::changeSelectionMethod(const QString& map, unsigne
 		if(m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 	}
-	//View* v = m_schnapps->getSelectedView();
-	//if (v)
-	//{
-	//	if (v->isLinkedToMap(m))
-	//		v->updateGL();
-	//}
+	View* v = m_schnapps->getSelectedView();
+	if (v)
+	{
+		if (v->isLinkedToMap(m))
+			v->updateGL();
+	}
 }
 
 void Surface_Selection_Plugin::changeVerticesScaleFactor(const QString& map, float f)
@@ -738,12 +739,12 @@ void Surface_Selection_Plugin::changeVerticesScaleFactor(const QString& map, flo
 			m_dockTab->updateMapParameters();
 	}
 
-	//View* v = m_schnapps->getSelectedView();
-	//if (v)
-	//{
-	//	if (v->isLinkedToMap(m))
-	//		v->updateGL();
-	//}
+	View* v = m_schnapps->getSelectedView();
+	if (v)
+	{
+		if (v->isLinkedToMap(m))
+			v->updateGL();
+	}
 }
 
 void Surface_Selection_Plugin::changeVerticesBaseSize(const QString& map, float f)
@@ -757,12 +758,12 @@ void Surface_Selection_Plugin::changeVerticesBaseSize(const QString& map, float 
 			m_dockTab->updateMapParameters();
 	}
 
-	//View* v = m_schnapps->getSelectedView();
-	//if (v)
-	//{
-	//	if (v->isLinkedToMap(m))
-	//		v->updateGL();
-	//}
+	View* v = m_schnapps->getSelectedView();
+	if (v)
+	{
+		if (v->isLinkedToMap(m))
+			v->updateGL();
+	}
 }
 
 
@@ -775,16 +776,34 @@ void Surface_Selection_Plugin::changeSelectedColor( const QString& map, const QS
 		if (m->isSelectedMap())
 			m_dockTab->updateMapParameters();
 
-	//	View* v = m_schnapps->getSelectedView();
-	//	if (v)
-	//	{
-	//		if (v->isLinkedToMap(m))
-	//			v->updateGL();
-	//	}
+		View* v = m_schnapps->getSelectedView();
+		if (v)
+		{
+			if (v->isLinkedToMap(m))
+				v->updateGL();
+		}
 	}
 }
 
+void Surface_Selection_Plugin::clearSelection(const QString& map, unsigned int orbit, const QString& selectorName)
+{
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (m)
+	{
+		CellSelectorGen* selector = m->getCellSelector(orbit, selectorName);
+		if (selector)
+		{
+			selector->clearAll();
+		}
 
+		View* v = m_schnapps->getSelectedView();
+		if (v)
+		{
+			if (v->isLinkedToMap(m))
+				v->updateGL();
+		}
+	}
+}
 
 
 #if CGOGN_QT_DESIRED_VERSION == 5

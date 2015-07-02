@@ -1000,44 +1000,34 @@ void SCHNApps::showHidePythonDock()
 
 void SCHNApps::execPythonCmd(const QString& cmd)
 {
-	QString line = cmd;
-	if (line.size() >= 2)
-	{
-		int j = 0;
-		while (line[j] == ' ') ++j;
-		QString spaces(4 - j, QChar(' ')); // need 4 spaces at begin of line
-		line.replace(QChar('\\'), QChar('/')); // replace \ by / in win path
-		m_pythonConsole.consoleMessage(spaces + line);
-		m_pythonConsole.executeLine(false);
-	}
+	m_pythonContext.evalScript(cmd);
 }
 
-void SCHNApps::loadPythonScriptFromFile(const QString& fileName)
+bool SCHNApps::loadPythonScriptFromFile(const QString& fileName)
 {
-#ifdef WIN32
-	// NOT VERY NICE BUT ONLY WAY ON WINDOWS TO LOAD SCRIPT FILES
-	QFile file(fileName);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return;
-	QTextStream in(&file);
-	while (!in.atEnd())
+	QString fullName = fileName;
+	if (!QFile::exists(fullName))
 	{
-		QString line = in.readLine();
-		if (line.size() >= 2)
+		QString pypath = m_pyPathFile;
+		if (pypath.isEmpty())
+			pypath = this->getAppPath();
+		fullName = pypath + "/" + fileName;
+		if (!QFile::exists(fullName))
 		{
-			int j = 0;
-			while (line[j] == ' ') ++j;
-			QString spaces(4 - j, QChar(' ')); // need 4 spaces at begin of line
-			line.replace(QChar('\\'), QChar('/')); // replace \ by / in win path
-			m_pythonConsole.consoleMessage(spaces + line);
-			m_pythonConsole.executeLine(false);
+			std::cerr << "python script " << fullName.toStdString() << " not found" << std::endl;
+			return false;
 		}
 	}
+#ifdef WIN32
+	QFile file(fullName);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return false;
+	QTextStream in(&file);
+	m_pythonContext.evalScript(in.readAll());
 #else
-	QFileInfo fi(fileName);
-	if(fi.exists())
-		m_pythonContext.evalFile(fi.filePath());
+	m_pythonContext.evalFile(fullName);
 #endif
+	return true;
 }
 
 void SCHNApps::loadPythonScriptFromFileDialog()
@@ -1048,6 +1038,28 @@ void SCHNApps::loadPythonScriptFromFileDialog()
 
 	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", pypath, "Python script (*.py)");
 	loadPythonScriptFromFile(fileName);
+}
+
+QString SCHNApps::noBackSlash(const QString& name)
+{
+#ifdef WIN32
+	// if copy from interface need to replace \ by / !!
+	QString slashed = name;
+	slashed.replace(QString("\t"), QString("/t"));
+	slashed.replace(QString("\n"), QString("/n"));
+	slashed.replace(QString("\v"), QString("/v"));
+	slashed.replace(QString("\f"), QString("/f"));
+	slashed.replace(QString("\r"), QString("/r"));
+	slashed.replace(QChar('\\'), QChar('/'));
+	return slashed;
+#else
+	return name;
+#endif
+}
+
+void SCHNApps::setPythonPath(const QString& path)
+{
+	m_pyPathFile = SCHNApps::noBackSlash(path);
 }
 
 

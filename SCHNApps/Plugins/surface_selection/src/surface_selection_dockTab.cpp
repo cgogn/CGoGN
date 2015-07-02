@@ -24,6 +24,7 @@ Surface_Selection_DockTab::Surface_Selection_DockTab(SCHNApps* s, Surface_Select
 	connect(slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(verticesScaleFactorChanged(int)));
 	connect(slider_verticesScaleFactor, SIGNAL(sliderPressed()), this, SLOT(verticesScaleFactorPressed()));
 	connect(combo_color, SIGNAL(currentIndexChanged(int)), this, SLOT(colorChanged(int)));
+	connect(button_clear, SIGNAL(pressed()), this, SLOT(clearPressed()));
 
 	// force color for map parameter updating
 //	combo_color->setCurrentIndex(0);
@@ -149,6 +150,21 @@ void Surface_Selection_DockTab::colorChanged(int i)
 }
 
 
+void Surface_Selection_DockTab::clearPressed()
+{
+	if (!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		unsigned int orbit = m_schnapps->getCurrentOrbit();
+
+		if (map)
+		{
+			m_plugin->clearSelection(map->getName(), orbit, m_schnapps->getSelectedSelector(orbit)->getName());
+			m_plugin->pythonRecording("clearSelection", "", map->getName(), orbit, m_schnapps->getSelectedSelector(orbit)->getName());
+		}
+	}
+}
+
 void Surface_Selection_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -186,6 +202,8 @@ void Surface_Selection_DockTab::updateMapParameters()
 
 		combo_selectionMethod->setCurrentIndex(p.selectionMethod);
 		combo_color->setColor(p.color);
+
+		slider_verticesScaleFactor->setValue(int(50.0*p.verticesScaleFactor));
 	}
 
 	b_updatingUI = false;

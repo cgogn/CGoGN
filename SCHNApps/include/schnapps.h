@@ -273,9 +273,10 @@ public slots:
 
 	/**
 	* @brief Load a python script store in a file.
-	* @param fileName the filename
+	* @param fileName the filename with absolute path or relative to path set with setPythonPath
+	* #return true if reading file ok
 	*/
-	void loadPythonScriptFromFile(const QString& fileName);
+	bool loadPythonScriptFromFile(const QString& fileName);
 
 	/**
 	* Associate a python command with a key shortcut
@@ -306,7 +307,7 @@ public slots:
 	* @brief set the default path used when opening python file dialog.
 	* @param path the default path
 	*/
-	inline void setPythonPath(const QString& path) { m_pyPathFile = path; }
+	void setPythonPath(const QString& path);
 
 private slots:
 	void loadPythonScriptFromFileDialog();
@@ -333,6 +334,8 @@ public:
 	inline void pythonVarDeclare(const QString& var) { m_pyVarNames.push_back(var); }
 	inline void pythonVarsClear() { m_pyVarNames.clear(); }
 
+	/// replace \ by / in file path for window 
+	static QString noBackSlash(const QString& name);
 
 
 signals:

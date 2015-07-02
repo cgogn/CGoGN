@@ -80,13 +80,55 @@ private slots:
 	void selectedMapBoundingBoxModified();
 
 public slots:
-	// slots for Python calls
+	/**
+	 * @brief change the position attribute
+	 * @param map map name
+	 * @param name position attribute name
+	 */
 	void changePositionAttribute(const QString& map, const QString& name);
+
+	/**
+	 * @brief change the normal attribute
+	 * @param map map name
+	 * @param name normal attribute name
+	 */
 	void changeNormalAttribute(const QString& map, const QString& name);
+
+	/**
+	 * @brief change the selection
+	 * @param map map name
+	 * @param method selection method 0:single Cell / 1: WithinSphere / 2: Normal angle
+	 */
 	void changeSelectionMethod(const QString& map, unsigned int method);
+
+	/**
+	 * @brief change the vertices scale factor
+	 * @param map  map name
+	 * @param f scaling factor 0 - 2
+	 */
 	void changeVerticesScaleFactor(const QString& map, float f);
+
+	/**
+	 * @brief change the vertices rendering size (when scaling is 1)
+	 * @param map  map name
+	 * @param f vertex size ( in object frame)
+	 */
 	void changeVerticesBaseSize(const QString& map, float f);
+
+	/**
+	 * @brief change the color for rendering selected cells
+	 * @param map map name
+	 * @param col color in Qt string format "#rrggbb". Each component is given in hexa, for example red is #ff0000
+	 */
 	void changeSelectedColor(const QString& map, const QString& col);
+
+	/**
+	* @brief clear the selection 
+	* @param map map name
+	* @param orbit orbit selector 0:DART 1:VERTEX 2:EDGE 3:FACE
+	* @param selectorName name of selector
+	*/
+	void clearSelection(const QString& map, unsigned int orbit, const QString& selectorName);
 
 protected:
 	Surface_Selection_DockTab* m_dockTab;

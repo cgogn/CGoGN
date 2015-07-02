@@ -475,6 +475,7 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 								item->setCheckState(Qt::Checked);
 							else
 								item->setCheckState(Qt::Unchecked);
+//							item->setToolTip(QString("Check for VBO"));
 						} break;
 						case EDGE : {
 							list_edgeAttributes->addItem(name + " (" + type + ")");
