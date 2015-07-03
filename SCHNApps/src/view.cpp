@@ -643,7 +643,12 @@ void View::keyReleaseEvent(QKeyEvent *event)
 void View::mousePressEvent(QMouseEvent* event)
 {
 	if (!isSelectedView())
+	{
 		m_schnapps->setSelectedView(this);
+		m_schnapps->statusBarMessage(QString("Selecting ") + this->getName(), 2000);
+	}
+	else if (event->y() < 20)
+		m_schnapps->statusBarMessage(this->getName(), 2000);
 
 	if (m_buttonAreaLeft->isClicked(event->x(), event->y()))
 		m_buttonAreaLeft->clickButton(event->x(), event->y(), event->globalX(), event->globalY());

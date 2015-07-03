@@ -1282,17 +1282,24 @@ void SCHNApps::cleanAll()
 	//remove views
 	foreach(View* v, m_views)
 	{
-		if (v->getName() != QString("view_0"))
-			removeView(v->getName());
-		else
-			v->setCurrentCamera(QString("camera_0"));
+		removeView(v->getName());
+	}
+
+	//  set the camera to camera_0 
+	m_firstView->setCurrentCamera(QString("camera_0"));
+
+	// change name of first view to view 0 if needed
+	if (m_firstView->m_name != QString("view_0"))
+	{
+		m_views.remove(m_firstView->m_name);
+		m_firstView->m_name = QString("view_0");
+		m_views.insert(m_firstView->m_name, m_firstView);
 	}
 
 	//remove cameras
 	foreach(Camera* cam, m_cameras)
 	{
-		if (cam->getName() != QString("camera_0"))
-			removeCamera(cam->getName());
+		removeCamera(cam->getName());
 	}
 
 	//remove maps
@@ -1306,6 +1313,9 @@ void SCHNApps::cleanAll()
 	{
 		disablePlugin(p->getName());
 	}
+
+	Camera::cameraCount = 1;
+	View::viewCount = 1;
 }
 
 
