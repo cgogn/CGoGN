@@ -28,7 +28,7 @@ class ControlDock_MapTab;
 class ControlDock_PluginTab;
 
 /**
- * The SCHNApps central object application
+ * @brief The SCHNApps central object application
  * Manage:
  * - views
  * - cameras

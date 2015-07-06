@@ -16,7 +16,7 @@ namespace SCHNApps
 
 class SCHNApps;
 /**
-* The camera class inherit from [qglviewer::Camera](http://libqglviewer.com/refManual/classqglviewer_1_1Camera.html)
+* @brief The camera class inherit from [qglviewer::Camera](http://libqglviewer.com/refManual/classqglviewer_1_1Camera.html)
 * A camera object is generated with each new view (named camera_0 for view_O, etc..).
 * Cameras can be shared among views.
 *

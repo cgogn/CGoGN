@@ -9,7 +9,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 /**
-* Plugin for 2D mesh import. Supported mesh file format are: off/obj/ply.
+* @brief Plugin for 2D mesh import. Supported mesh file format are: off/obj/ply.
 * The import image function allow the creation of a mesh with a face by pixel.
 * Image format support is given by Qt.
 */

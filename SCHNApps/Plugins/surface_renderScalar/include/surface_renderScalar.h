@@ -39,7 +39,7 @@ struct MapParameters
 
 
 /**
-* Plugin for rendering a scalar attribute over a surface with colormap.
+* @brief Plugin for rendering a scalar attribute over a surface with colormap.
 * The scalar attribute to render must have its generated VBO.
 * A position VBO must be provided for surface rendering.
 * All parameters are per view / per map.

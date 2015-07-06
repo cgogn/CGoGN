@@ -11,7 +11,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 /**
- * Plugin that manage the subdivision of surface algorithms
+ * @brief Plugin that manage the subdivision of surface algorithms
  * Supported algorithms:
  * - Loop
  * - Catmull-Clark approximation

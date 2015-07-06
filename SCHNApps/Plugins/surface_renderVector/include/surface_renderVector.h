@@ -25,7 +25,7 @@ struct MapParameters
 };
 
 /**
-* Plugin for vector attributes rendering over a surface mesh
+* @brief Plugin for vector attributes rendering over a surface mesh
 * Each vector attribute to render must be of dim 3, and have a VBO
 * The length and color of each vector can be changed.
 * All parameters are per view / per map.

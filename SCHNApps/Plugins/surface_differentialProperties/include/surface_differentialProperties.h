@@ -11,7 +11,11 @@ namespace CGoGN
 
 namespace SCHNApps
 {
-
+/**
+ * @brief Plugin that manage the computation of differential properties
+ * - Normals
+ * - Curvatures
+ */
 class Surface_DifferentialProperties_Plugin : public PluginProcessing
 {
 	Q_OBJECT

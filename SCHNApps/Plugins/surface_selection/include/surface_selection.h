@@ -36,7 +36,7 @@ struct MapParameters
 };
 
 /**
-* Plugin for cell selection (in conjonction with CellSelectors of MapHandlers)
+* @brief Plugin for cell selection (in conjonction with CellSelectors of MapHandlers)
 * Selection of cells can be done:
 * - individually
 * - in a sphere

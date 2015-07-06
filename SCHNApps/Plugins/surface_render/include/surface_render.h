@@ -61,7 +61,7 @@ struct MapParameters
 };
 
 /**
-* Plugin for 2-Maps topology rendering.
+* @brief Plugin for 2-Maps topology rendering.
 * Some parameters are per view / per map:
 * - drawing of relations and dart
 * - colors

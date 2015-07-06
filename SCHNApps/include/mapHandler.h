@@ -27,7 +27,7 @@
 namespace CGoGN
 {
 /**
-* A MapHandlerGen is a generic class that encapsulate a map.
+* @brief A MapHandlerGen is a generic class that encapsulate a map.
 * It mainly allows the management of:
 * - Bounding-Box
 * - VBOs

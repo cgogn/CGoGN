@@ -27,7 +27,7 @@ namespace SCHNApps
 {
 
 /**
-* View class inherit from QGLViewer(http://libqglviewer.com/refManual/classQGLViewer.html) allow rendering of plugins.
+* @brief View class inherit from QGLViewer(http://libqglviewer.com/refManual/classQGLViewer.html) allow rendering of plugins.
 * It can be link with several:
 * - plugins
 * - maps
