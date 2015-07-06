@@ -60,6 +60,15 @@ struct MapParameters
 	Geom::Vec4f backColor;
 };
 
+/**
+* Plugin for 2-Maps topology rendering.
+* Some parameters are per view / per map:
+* - drawing of relations and dart
+* - colors
+* Others are only per map:
+* - position attribute
+* - scale factors
+*/
 class Surface_Render_Plugin : public PluginInteraction
 {
 	Q_OBJECT
@@ -112,7 +121,7 @@ private slots:
 public slots:
 	// slots for Python calls
 	/**
-	 * @brief change the position VBO use for rendering for specific view and map
+	 * @brief [PYTHON] change the position VBO use for rendering for specific view and map
 	 * @param view the view name
 	 * @param map the map name
 	 * @param vbo the positionvbo name
@@ -120,7 +129,7 @@ public slots:
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief change the normal VBO use for rendering (phong) for specific view and map
+	 * @brief [PYTHON] change the normal VBO use for rendering (phong) for specific view and map
 	 * @param view the view name
 	 * @param map the map name
 	 * @param vbo the normal vbo name
@@ -128,7 +137,7 @@ public slots:
 	void changeNormalVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief change the color VBO use for rendering for specific view and map
+	 * @brief [PYTHON] change the color VBO use for rendering for specific view and map
 	 * @param view the view name
 	 * @param map the map name
 	 * @param vbo the normal vbo name
@@ -136,7 +145,7 @@ public slots:
 	void changeColorVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief choice if vertices should be rendered (for specific view and map)
+	 * @brief [PYTHON] choice if vertices should be rendered (for specific view and map)
 	 * @param view the view name
 	 * @param map the map name
 	 * @param b rendered or not
@@ -144,7 +153,7 @@ public slots:
 	void changeRenderVertices(const QString& view, const QString& map, bool b);
 
 	/**
-	 * @brief change the size of vertices VerticesScaleFactor
+	 * @brief [PYTHON] change the size of vertices VerticesScaleFactor
 	 * @param view the view name
 	 * @param map the map name
 	 * @param f scale parameter [0,2]
@@ -152,7 +161,7 @@ public slots:
 	void changeVerticesScaleFactor(const QString&view, const QString& map, float f);
 
 	/**
-	 * @brief choice if edges should be rendered (for specific view and map)
+	 * @brief [PYTHON] choice if edges should be rendered (for specific view and map)
 	 * @param view the view name
 	 * @param map the map name
 	 * @param b rendered or not
@@ -160,7 +169,7 @@ public slots:
 	void changeRenderEdges(const QString& view, const QString& map, bool b);
 
 	/**
-	 * @brief choice if faces should be rendered (for specific view and map)
+	 * @brief [PYTHON] choice if faces should be rendered (for specific view and map)
 	 * @param view the view name
 	 * @param map the map name
 	 * @param b rendered or not
@@ -168,7 +177,7 @@ public slots:
 	void changeRenderFaces(const QString& view, const QString& map, bool b);
 
 	/**
-	 * @brief change the style of rendering of faces (flat of phong)
+	 * @brief [PYTHON] change the style of rendering of faces (flat of phong)
 	 * @param view the view name
 	 * @param map the map name
 	 * @param style 0:flat 1:phong
@@ -176,7 +185,7 @@ public slots:
 	void changeFacesStyle(const QString& view, const QString& map, int style);
 
 	/**
-	 * @brief choose if boundary should be rendered or not.
+	 * @brief [PYTHON] choose if boundary should be rendered or not.
 	 * @param view the view name
 	 * @param map the map name
 	 * @param b rendered or not
@@ -184,7 +193,7 @@ public slots:
 	void changeRenderBoundary(const QString& view, const QString& map, bool b);
 
 	/**
-	 * @brief change the color use for face rendering (when no volor VBO is used)
+	 * @brief [PYTHON] change the color use for face rendering (when no volor VBO is used)
 	 * @param view the view name
 	 * @param map the map name
 	 * @param r red value [0,1]
@@ -194,7 +203,7 @@ public slots:
 	void changeFaceColor(const QString& view, const QString& map, float r, float g, float b);
 
 	/**
-	 * @brief change the color use for edge line rendering.
+	 * @brief [PYTHON] change the color use for edge line rendering.
 	 * @param view the view name
 	 * @param map the map name
 	 * @param r red value [0,1]
@@ -204,7 +213,7 @@ public slots:
 	void changeEdgeColor(const QString& view, const QString& map, float r, float g, float b);
 
 	/**
-	 * @brief change the color use for vertices point sprite rendering.
+	 * @brief [PYTHON] change the color use for vertices point sprite rendering.
 	 * @param view the view name
 	 * @param map the map name
 	 * @param r red value [0,1]
@@ -214,7 +223,7 @@ public slots:
 	void changeVertexColor(const QString& view, const QString& map, float r, float g, float b);
 
 	/**
-	 * @brief change the color use for back-faces.
+	 * @brief [PYTHON] change the color use for back-faces.
 	 * @param view the view name
 	 * @param map the map name
 	 * @param r red value [0,1]
@@ -224,7 +233,7 @@ public slots:
 	void changeBackColor(const QString& view, const QString& map, float r, float g, float b);
 
 	/**
-	 * @brief choose if back-faces should be rendered.
+	 * @brief [PYTHON] choose if back-faces should be rendered.
 	 * @param view the view name
 	 * @param map the map name
 	 * @param b

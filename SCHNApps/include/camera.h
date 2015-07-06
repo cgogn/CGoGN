@@ -15,7 +15,13 @@ namespace SCHNApps
 {
 
 class SCHNApps;
-
+/**
+* The camera class inherit from [qglviewer::Camera](http://libqglviewer.com/refManual/classqglviewer_1_1Camera.html)
+* A camera object is generated with each new view (named camera_0 for view_O, etc..).
+* Cameras can be shared among views.
+*
+* Python callable slots are tagged with [PYTHON]
+*/
 class SCHNAPPS_API Camera : public qglviewer::Camera
 {
 	Q_OBJECT
@@ -23,70 +29,107 @@ class SCHNAPPS_API Camera : public qglviewer::Camera
 	friend class View;
 
 public:
+	/// camera counter for easy camera unique naming
 	static unsigned int cameraCount;
 
+	/**
+	 * @brief Camera constructor
+	 * @param name
+	 * @param s
+	 */
 	Camera(const QString& name, SCHNApps* s);
+
 	~Camera();
+
+	/**
+	 * @brief get the name of Camera object
+	 * @return const ref on name
+	 */
 	const QString& getName() const { return m_name; }
 
 public slots:
 	/**
-	 * @brief get the name
+	 * @brief [PYTHON] get the name of Camera object
 	 * @return name
 	 */
 	QString getName();
 
+	/**
+	 * @brief get the schnapps objet ptr
+	 * @return the ptr
+	 */
 	SCHNApps* getSCHNApps() const;
 
 	/**
-	 * @brief  test if camera is used by one view
+	 * @brief [PYTHON] test if camera is used by one view
 	 * @return used / not used
 	 */
 	bool isUsed() const;
 
 	/**
-	 * @brief test is camera is used by several view
+	 * @brief [PYTHON] test is camera is used by several view
 	 * @return shared / not shared (by view)
 	 */
 	bool isShared()	const;
 
+	/**
+	 * @brief get the projection type
+	 * @return PERSPECTIVE or ORTHOGRAPHIC
+	 */
 	qglviewer::Camera::Type getProjectionType();
-	/// drawing of camera (do not use)
+
+	/// is camera drawn ?
 	bool getDraw() const;
+
+	/// is camera path drawn ?
 	bool getDrawPath() const;
 
+	/**
+	 * @brief get the list of views linked with the camera
+	 * @warning not python callable
+	 * @return the list
+	 */
 	const QList<View*>& getLinkedViews() const;
+
+	/**
+	 * @brief is the camera linked to theiven view
+	 * @param view
+	 * @return
+	 */
 	bool isLinkedToView(View* view) const;
 
 	/**
-	* @briefset the projection type
+	* @brief [PYTHON] set the projection type
 	* @param t 0:perspective / 1::orthogonal
 	*/
 	void setProjectionType(int t);
 
-	/// drawing of camera (do not use)
+
+	/// [PYTHON] draw (or not) the camera (do not use)
 	void setDraw(bool b);
+
+	/// [PYTHON] draw (or not) the camera path (do not use)
 	void setDrawPath(bool b);
 
 	/**
-	* @brief Enable the camera to update automatically with view bounding box
+	* @brief [PYTHON] Enable the camera to update automatically with view bounding box
 	*/
 	void enableViewsBoundingBoxFitting();
 
 	/**
-	* @brief Enable the camera to update automatically with view bounding box
+	* @brief [PYTHON] Disable the camera to update automatically with view bounding box
 	*/
 	void disableViewsBoundingBoxFitting();
 
 	/**
-	* @brief store position and rotationof camera into a string
+	* @brief [PYTHON] store position and rotationof camera into a string
 	* @return the storage string
 	*/
 	QString toString();
 
 
 	/**
-	* @brief restore a camera from string storage
+	* @brief [PYTHON] restore a camera from string storage
 	* @param cam the string containing data
 	*/
 	void fromString(QString cam);
@@ -105,14 +148,20 @@ signals:
 	void drawPathChanged(bool);
 
 protected:
+	/// camera name
 	QString m_name;
+
+	/// pointer to schnapps object
 	SCHNApps* m_schnapps;
 
+	/// list of views that are using this camera
 	QList<View*> l_views;
+
 
 	bool b_draw;
 	bool b_drawPath;
 
+	/// fit the camera to the bounding box of view (xxxViewsBoundingBoxFitting())
 	bool b_fitToViewsBoundingBox;
 
 };

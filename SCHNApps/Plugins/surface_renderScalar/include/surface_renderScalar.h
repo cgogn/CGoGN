@@ -37,6 +37,13 @@ struct MapParameters
 	int expansion;
 };
 
+
+/**
+* Plugin for rendering a scalar attribute over a surface with colormap.
+* The scalar attribute to render must have its generated VBO.
+* A position VBO must be provided for surface rendering.
+* All parameters are per view / per map.
+*/
 class Surface_RenderScalar_Plugin : public PluginInteraction
 {
 	Q_OBJECT
@@ -84,7 +91,7 @@ private slots:
 public slots:
 	// slots for Python calls
 	/**
-	 * @brief change the position VBO use for rendering (for specific view and map)
+	 * @brief [PYTHON] change the position VBO use for rendering (for specific view and map)
 	 * @param view the view name
 	 * @param map the map name
 	 * @param vbo the position vbo name
@@ -92,7 +99,7 @@ public slots:
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief change the scalar VBO use for rendering (for specific view and map)
+	 * @brief [PYTHON] change the scalar VBO use for rendering (for specific view and map)
 	 * @param view the view name
 	 * @param map the map name
 	 * @param vbo the scalar vbo name
@@ -100,7 +107,7 @@ public slots:
 	void changeScalarVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief change the kind of colormap.
+	 * @brief [PYTHON] change the kind of colormap.
 	 * @param view the view name
 	 * @param map the map name
 	 * @param c 0:BWR 1:CWR 2:BCGYR 3:BGR
@@ -108,7 +115,7 @@ public slots:
 	void changeColorMap(const QString& view, const QString& map, int c);
 
 	/**
-	 * @brief change the expansion of color-map
+	 * @brief [PYTHON] change the expansion of color-map
 	 * @param view the view name
 	 * @param map the map name
 	 * @param i ????

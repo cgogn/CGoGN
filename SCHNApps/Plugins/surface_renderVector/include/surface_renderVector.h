@@ -24,6 +24,12 @@ struct MapParameters
 	QList<float> scaleFactors;
 };
 
+/**
+* Plugin for vector attributes rendering over a surface mesh
+* Each vector attribute to render must be of dim 3, and have a VBO
+* The length and color of each vector can be changed.
+* All parameters are per view / per map.
+*/
 class Surface_RenderVector_Plugin : public PluginInteraction
 {
 	Q_OBJECT
@@ -70,7 +76,7 @@ private slots:
 public slots:
 	// slots for Python calls
 	/**
-	 * @brief change the position VBO use for rendering for specific view and map
+	 * @brief [PYTHON] change the position VBO use for rendering for specific view and map
 	 * @param view the view name
 	 * @param map the map name
 	 * @param vbo
@@ -78,7 +84,7 @@ public slots:
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief add a VBO use for rendering for specific view and map
+	 * @brief [PYTHON] add a VBO use for rendering for specific view and map
 	 * @param view the view name
 	 * @param map the map name
 	 * @param vbo
@@ -86,28 +92,28 @@ public slots:
 	void addVectorVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief removeVectorVBO
+	 * @brief [PYTHON] remove VBO of the corresponding vector
 	 * @param view the view name
 	 * @param map the map name
-	 * @param vbo
+	 * @param vbo  the vbo name
 	 */
 	void removeVectorVBO(const QString& view, const QString& map, const QString& vbo);
 
 	/**
-	 * @brief changeVectorScaleFactor
+	 * @brief [PYTHON] change the vector scale factor
 	 * @param view the view name
 	 * @param map the map name
-	 * @param vbo
-	 * @param f
+	 * @param vbo vbo vector name on which apply the scale
+	 * @param f the floating point scale value
 	 */
 	void changeVectorScaleFactor(const QString& view, const QString& map, const QString& vbo, float f);
 
 	/**
-	 * @brief changeVectorColor
+	 * @brief [PYTHON] change thet vector color
 	 * @param view the view name
 	 * @param map the map name
-	 * @param vbo
-	 * @param col
+	 * @param vbo the vbo vector name
+	 * @param col the color in QString format ("red" or "#FF0000")
 	 */
 	void changeVectorColor(const QString& view, const QString& map, const QString& vbo, const QString& col);
 

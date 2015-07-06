@@ -26,7 +26,16 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-
+/**
+* View class inherit from QGLViewer(http://libqglviewer.com/refManual/classQGLViewer.html) allow rendering of plugins.
+* It can be link with several:
+* - plugins
+* - maps
+* - cameras (only one is used)
+* One view of SCHNApps is selected (green framed).
+*
+* Python callable slots are tagged with [PYTHON]
+*/
 class SCHNAPPS_API View : public QGLViewer
 {
 	Q_OBJECT
@@ -41,42 +50,59 @@ public:
 
 	const QString& getName() const { return m_name; }
 
+	/**
+	 * @brief get the min and max points of the bounding box of the scene
+	 * @param bbMin min to be filled
+	 * @param bbMax max to be filled
+	 */
 	void getBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) const { bbMin = m_bbMin; bbMax = m_bbMax; }
 
+	/// hide all dialogs of the view
 	void hideDialogs();
 
 public slots:
 	/**
-	 * @brief get the name
+	 * @brief get the name of view
 	 * @return name
 	 */
 	QString getName() { return m_name; }
+
+	/// get schnnapps ptr
 	SCHNApps* getSCHNApps() const { return m_schnapps; }
 
 	/**
-	 * @brief test if the view is the selected one
+	 * @brief [PYTHON] test if the view is the selected one
 	 * @return
 	 */
 	bool isSelectedView() const { return m_schnapps->getSelectedView() == this; }
 
+	/**
+	 * @brief set the current camera of the view
+	 * @param c the camera ptr
+	 */
 	void setCurrentCamera(Camera* c);
 
 	/**
-	* set the current camera of the view
+	* @brief [PYTHON] set the current camera of the view
 	* @param name the name of camera
 	*/
 	void setCurrentCamera(const QString& name);
 
 	/**
-	* get the current camera of the view
+	* @brief [PYTHON] get the current camera of the view
 	* @return the camera object
 	*/
 	Camera* getCurrentCamera() const { return m_currentCamera; }
 
+	/**
+	 * @brief test if this view use a camera
+	 * @param c camera ptr
+	 * @return
+	 */
 	bool usesCamera(Camera* c) const { return m_currentCamera == c; }
 
 	/**
-	* test if a camera is the current camera
+	* @brief [PYTHON] test if a camera is the current camera
 	* @param name the name of camera
 	*/
 	bool usesCamera(const QString& name) const;
@@ -84,14 +110,15 @@ public slots:
 	void linkPlugin(PluginInteraction* plugin);
 
 	/**
-	* link a plugin with the view
+	* @brief [PYTHON] link a plugin with the view
 	* @param name the name of plugin
 	*/
 	void linkPlugin(const QString& name);
+
 	void unlinkPlugin(PluginInteraction* plugin);
 
 	/**
-	* unlink a plugin of the view
+	* @brief [PYTHON] unlink a plugin of the view
 	* @param name the name of plugin
 	*/
 	void unlinkPlugin(const QString& name);
@@ -100,7 +127,7 @@ public slots:
 	bool isLinkedToPlugin(PluginInteraction* plugin) const { return l_plugins.contains(plugin); }
 
 	/**
-	* test if the view is linked to a plugin
+	* @brief [PYTHON] test if the view is linked to a plugin
 	* @param name the name of plugin
 	*/
 	bool isLinkedToPlugin(const QString& name) const;
@@ -108,14 +135,14 @@ public slots:
 	void linkMap(MapHandlerGen* map);
 
 	/**
-	* link a map with the view
+	* @brief [PYTHON] link a map with the view
 	* @param name the name of map
 	*/
 	void linkMap(const QString& name);
 	void unlinkMap(MapHandlerGen* map);
 
 	/**
-	* unlink a map of the view
+	* @brief [PYTHON] unlink a map of the view
 	* @param name the name of map
 	*/
 	void unlinkMap(const QString& name);
@@ -124,7 +151,7 @@ public slots:
 	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
 
 	/**
-	* test if the view is linked to a lao
+	* @brief [PYTHON] test if the view is linked to a lao
 	* @param name the name of map
 	*/
 	bool isLinkedToMap(const QString& name) const;

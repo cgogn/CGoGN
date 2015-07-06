@@ -44,7 +44,7 @@ private slots:
 
 public slots:
 	/**
-	 * @brief compute the normals of a mesh
+	 * @brief [PYTHON] compute the normals of a mesh
 	 * @param mapName name of the 2d map (mesh)
 	 * @param positionAttributeName name of position attribute used for computation
 	 * @param normalAttributeName name of result attribute
@@ -56,14 +56,14 @@ public slots:
 		bool autoUpdate = true);
 
 	/**
-	 * @brief compute curvatures of a mesh
+	 * @brief [PYTHON] compute curvatures of a mesh
 	 * @param mapName name of 2d map
 	 * @param positionAttributeName name of input position attribute
 	 * @param normalAttributeName name of input normal attributes
-	 * @param KmaxAttributeName ?? result attribute aname
-	 * @param kmaxAttributeName ?? result attribute aname
-	 * @param KminAttributeName ?? result attribute aname
-	 * @param kminAttributeName ?? result attribute aname
+	 * @param KmaxAttributeName ?? result attribute name
+	 * @param kmaxAttributeName ?? result attribute name
+	 * @param KminAttributeName ?? result attribute name
+	 * @param kminAttributeName ?? result attribute name
 	 * @param KnormalAttributeName ?? result attribute aname
 	 * @param compute_kmean compute the mean curvature
 	 * @param compute_kgaussian compute the gaussian curvature

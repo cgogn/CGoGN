@@ -653,7 +653,7 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 		*rec << newName << " = schnapps.duplicateMap(" << name << ".getName(),1);" << endl;
 
 	MapHandlerGen* maph = m_maps[name];
-	MapHandlerGen* new_mh;
+	MapHandlerGen* new_mh = NULL; // avoid warning
 
 	unsigned int dim = maph->getGenericMap()->dimension();
 
@@ -692,6 +692,9 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 				}
 				break;
 			}
+	default:
+		std::cerr << "Dimension " << dim << " not yet supported in map duplication" << std::endl;
+		break;
 	}
 
 
