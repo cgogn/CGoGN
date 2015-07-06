@@ -26,6 +26,10 @@
 
 namespace CGoGN
 {
+
+namespace SCHNApps
+{
+
 /**
 * @brief A MapHandlerGen is a generic class that encapsulate a map.
 * It mainly allows the management of:
@@ -39,9 +43,6 @@ namespace CGoGN
 *
 * Python callable slots are tagged with [PYTHON]
 */
-namespace SCHNApps
-{
-
 class SCHNAPPS_API MapHandlerGen : public QObject
 {
 	Q_OBJECT
