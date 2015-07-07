@@ -28,8 +28,13 @@ public:
 	virtual ~Plugin();
 
 public slots:
+	/// [PYTHON] get object name
 	QString getName();
+
+	/// [PYTHON] get file path to the shared library of plugin
 	QString getFilePath();
+
+	/// get schnapps object
 	SCHNApps* getSCHNApps();
 
 private:

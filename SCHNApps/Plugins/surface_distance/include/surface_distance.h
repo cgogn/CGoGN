@@ -36,6 +36,15 @@ private slots:
 	void schnappsClosing();
 
 public slots:
+	/**
+	 * @brief compute distance between 2 maps
+	 * @param mapName1 name of first map
+	 * @param positionAttributeName1 name of first map position attribute
+	 * @param distanceAttributeName1 name of first map distance attribute
+	 * @param mapName2 name of second map
+	 * @param positionAttributeName2 name of second map position attribute
+	 * @param distanceAttributeName2 name of second map distance attribute
+	 */
 	void computeDistance(
 		const QString& mapName1,
 		const QString& positionAttributeName1,

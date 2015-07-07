@@ -14,7 +14,15 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-
+/**
+* @brief Plugin for 2-Maps topology rendering.
+* Some parameters are per view / per map:
+* - drawing of relations and dart
+* - colors
+* Others are only per map (due to computation time):
+* - position attribute
+* - scale factors
+*/
 class Surface_RenderTopo_Plugin : public PluginInteraction
 {
 	Q_OBJECT
@@ -95,15 +103,73 @@ private slots:
 
 public slots:
 	// slots for Python calls
+	/**
+	 * @brief [PYTHON] choose to draw (or not) the darts
+	 * @param view the view name
+	 * @param map the map name
+	 * @param b draw or not
+	 */
 	void changeDrawDarts(const QString& view, const QString& map, bool b);
+
+	/**
+	 * @brief [PYTHON] choose to draw (or not) the phi1 relations
+	 * @param view the view name
+	 * @param map the map name
+	 * @param b draw or not
+	 */
 	void changeDrawPhi1(const QString& view, const QString& map, bool b);
+
+	/**
+	 * @brief [PYTHON] choose to draw (or not) the phi2 relations
+	 * @param view the view name
+	 * @param map the map name
+	 * @param b draw or not
+	 */
 	void changeDrawPhi2(const QString& view, const QString& map, bool b);
+
+	/**
+	 * @brief [PYTHON] change the color use for dart
+	 * @param view the view name
+	 * @param map the map name
+	 * @param color
+	 */
 	void changeDartsColor(const QString& view, const QString& map, const QString& color);
+
+	/**
+	 * @brief [PYTHON] change the color use for phi1
+	 * @param view the view name
+	 * @param map the map name
+	 * @param color
+	 */
 	void changePhi1Color(const QString& view, const QString& map, const QString& color);
+
+	/**
+	 * @brief [PYTHON] change the color use for phi2
+	 * @param view the view name
+	 * @param map the map name
+	 * @param color
+	 */
 	void changePhi2Color(const QString& view, const QString& map, const QString& color);
 
+	/**
+	 * @brief [PYTHON] change the position attribute of map for topo rendering
+	 * @param map the map name
+	 * @param attrName position attribute name
+	 */
 	void changePositionAttribute(const QString& map, const QString& attrName);
+
+	/**
+	 * @brief [PYTHON] change the edges scaling factor
+	 * @param map the map name
+	 * @param s scaling factor
+	 */
 	void changeEdgesScaleFactor(const QString& map, float s);
+
+	/**
+	 * @brief [PYTHON] change the faces scaling factor
+	 * @param map the map name
+	 * @param s scaling factor
+	 */
 	void changeFacesScaleFactor(const QString& map, float s);
 
 //signals:

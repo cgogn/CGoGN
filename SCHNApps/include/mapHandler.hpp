@@ -179,35 +179,51 @@ bool MapHandler<PFP>::transformedBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax
 
 	CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb;
 
-	qglviewer::Vec v  = qglviewer::Vec(BBmin[0], BBmin[1], BBmin[2]);
+//	qglviewer::Vec v  = qglviewer::Vec(BBmin[0], BBmin[1], BBmin[2]);
+	glm::vec4 v4 = this->m_transfoMatrix* glm::vec4(BBmin[0], BBmin[1], BBmin[2], 1.0f);
+	qglviewer::Vec v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	qglviewer::Vec vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 
-	v  = qglviewer::Vec(BBmax[0], BBmin[1], BBmin[2]);
+//	v  = qglviewer::Vec(BBmax[0], BBmin[1], BBmin[2]);
+	v4 = this->m_transfoMatrix* glm::vec4(BBmax[0], BBmin[1], BBmin[2], 1.0f);
+	v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 
-	v  = qglviewer::Vec(BBmin[0], BBmax[1], BBmin[2]);
+//	v  = qglviewer::Vec(BBmin[0], BBmax[1], BBmin[2]);
+	v4 = this->m_transfoMatrix* glm::vec4(BBmin[0], BBmax[1], BBmin[2], 1.0f);
+	v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 
-	v  = qglviewer::Vec(BBmin[0], BBmin[1], BBmax[2]);
+//	v  = qglviewer::Vec(BBmin[0], BBmin[1], BBmax[2]);
+	v4 = this->m_transfoMatrix* glm::vec4(BBmin[0], BBmin[1], BBmax[2], 1.0f);
+	v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 
-	v  = qglviewer::Vec(BBmax[0], BBmax[1], BBmin[2]);
+//	v  = qglviewer::Vec(BBmax[0], BBmax[1], BBmin[2]);
+	v4 = this->m_transfoMatrix* glm::vec4(BBmax[0], BBmax[1], BBmin[2], 1.0f);
+	v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 
-	v  = qglviewer::Vec(BBmax[0], BBmin[1], BBmax[2]);
+//	v  = qglviewer::Vec(BBmax[0], BBmin[1], BBmax[2]);
+	v4 = this->m_transfoMatrix* glm::vec4(BBmax[0], BBmin[1], BBmax[2], 1.0f);
+	v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 
-	v  = qglviewer::Vec(BBmin[0], BBmax[1], BBmax[2]);
+//	v  = qglviewer::Vec(BBmin[0], BBmax[1], BBmax[2]);
+	v4 = this->m_transfoMatrix* glm::vec4(BBmin[0], BBmax[1], BBmax[2], 1.0f);
+	v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 
-	v  = qglviewer::Vec(BBmax[0], BBmax[1], BBmax[2]);
+//	v  = qglviewer::Vec(BBmax[0], BBmax[1], BBmax[2]);
+	v4 = this->m_transfoMatrix* glm::vec4(BBmax[0], BBmax[1], BBmax[2], 1.0f);
+	v = qglviewer::Vec(v4[0], v4[1], v4[2]);
 	vt = m_frame->inverseCoordinatesOf(v);
 	bb.addPoint(Geom::Vec3f(vt[0], vt[1], vt[2]));
 

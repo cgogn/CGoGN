@@ -31,8 +31,10 @@ bool Surface_Import_Plugin::enable()
 	return true;
 }
 
-MapHandlerGen* Surface_Import_Plugin::importMeshFromFile(const QString& fileName)
+MapHandlerGen* Surface_Import_Plugin::importMeshFromFile(const QString& nameOfFile)
 {
+	QString fileName = SCHNApps::noBackSlash(nameOfFile);
+
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
@@ -75,8 +77,10 @@ void Surface_Import_Plugin::importMeshFromFileDialog()
 	}
 }
 
-MapHandlerGen* Surface_Import_Plugin::importImageFromFile(const QString& fileName)
+MapHandlerGen* Surface_Import_Plugin::importImageFromFile(const QString& nameOfFile)
 {
+	QString fileName = SCHNApps::noBackSlash(nameOfFile);
+
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{

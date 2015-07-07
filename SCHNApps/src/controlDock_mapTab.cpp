@@ -235,9 +235,14 @@ void ControlDock_MapTab::selectedSelectorChanged()
 			if (!items.empty())
 			{
 				m_selectedSelector[orbit] = m_selectedMap->getCellSelector(orbit, items[0]->text());
-				m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]);
+
+				QTextStream* rec = m_schnapps->pythonStreamRecorder();
+				if (rec)
+					*rec << "schnapps.setSelectedSelectorCurrentMap(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
 			}
+			m_schnapps->notifySelectedCellSelectorChanged(m_selectedSelector[orbit]); // notify even if nothing selected !
 		}
+
 	}
 }
 
@@ -262,7 +267,14 @@ void ControlDock_MapTab::addSelector()
 		if (m_selectedMap)
 		{
 			unsigned int orbit = getCurrentOrbit();
-			m_selectedMap->addCellSelector(orbit, QString("selector_") + QString::number(CellSelectorGen::selectorCount));
+			QString sel_name = QString("selector_") + QString::number(CellSelectorGen::selectorCount);
+			m_selectedMap->addCellSelector(orbit, sel_name);
+
+			// RECORDING
+			QTextStream* rec = m_schnapps->pythonStreamRecorder();
+			if (rec)
+				*rec << m_selectedMap->getName() << ".addCellSelector(" << orbit << ", \"" << sel_name << "\");" << endl;
+
 		}
 	}
 }
@@ -284,12 +296,18 @@ void ControlDock_MapTab::removeSelector()
 				case VOLUME: items = list_volumeSelectors->selectedItems(); break;
 			}
 			if (!items.empty())
+			{
+				if (m_selectedSelector[orbit]->getName() == items[0]->text())
+					m_selectedSelector[orbit] = NULL;
 				m_selectedMap->removeCellSelector(orbit, items[0]->text());
+				// RECORDING
+				QTextStream* rec = m_schnapps->pythonStreamRecorder();
+				if (rec)
+					*rec << m_selectedMap->getName() << ".removeCellSelector(" << orbit << ", \"" << items[0]->text() << "\");" << endl;
+			}
 		}
 	}
 }
-
-
 
 
 
@@ -457,6 +475,7 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 								item->setCheckState(Qt::Checked);
 							else
 								item->setCheckState(Qt::Unchecked);
+//							item->setToolTip(QString("Check for VBO"));
 						} break;
 						case EDGE : {
 							list_edgeAttributes->addItem(name + " (" + type + ")");
@@ -469,6 +488,35 @@ void ControlDock_MapTab::updateSelectedMapInfo()
 						} break;
 					}
 				}
+			}
+		}
+	}
+	else
+	{
+		for (unsigned int orbit = DART; orbit <= VOLUME; ++orbit)
+		{
+			switch (orbit)
+			{
+				case DART :
+					label_dartNbOrbits->setText(QString::number(0));
+					label_dartNbCells->setText(QString::number(0));
+					break;
+				case VERTEX :
+					label_vertexNbOrbits->setText(QString::number(0));
+					label_vertexNbCells->setText(QString::number(0));
+					break;
+				case EDGE :
+					label_edgeNbOrbits->setText(QString::number(0));
+					label_edgeNbCells->setText(QString::number(0));
+					break;
+				case FACE :
+					label_faceNbOrbits->setText(QString::number(0));
+					label_faceNbCells->setText(QString::number(0));
+					break;
+				case VOLUME :
+					label_volumeNbOrbits->setText(QString::number(0));
+					label_volumeNbCells->setText(QString::number(0));
+					break;
 			}
 		}
 	}
