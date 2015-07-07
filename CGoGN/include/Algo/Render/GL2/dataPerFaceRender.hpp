@@ -83,17 +83,17 @@ DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typen
 		} while (c != d);
 	}
 
-	m_nbTris = buffer.size()/3;
+	m_nbTris = uint32(buffer.size()/3);
 
 	vboPosition.setDataSize(3);
-	vboPosition.allocate(buffer.size());
+	vboPosition.allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	assert(sizeof(T) % sizeof(float) == 0 || !"DataPerFaceRender::updateVBO: VBO's only work with data types which are a multiple of 4 bytes") ;
 	vboData.setDataSize(sizeof(T) / sizeof(float)); // Warning : works only for data types of 4 bytes (as do the VBO's)
-	vboData.allocate(bufferData.size());
+	vboData.allocate(uint32(bufferData.size()));
 	T* ptrData = reinterpret_cast<T*>(vboData.lockPtr());
 	memcpy(ptrData,&bufferData[0],bufferData.size()*sizeof(T));
 	vboData.releasePtr();

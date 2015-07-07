@@ -89,8 +89,8 @@ bool exportOBJ(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3,
 * @param filename filename of trian file
 * @return true
 */
-template <typename PFP>
-bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, char* filename) ;
+//template <typename PFP>
+//bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, char* filename) ;
 
 
 

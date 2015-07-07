@@ -207,7 +207,7 @@ void edgesRaySelection(
 		const typename PFP::VEC3& P = position[e.dart];
 		const typename PFP::VEC3& Q = position[map.phi1(e.dart)];
 		// the three distance to P, Q and (PQ) not used here
-		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+		typename PFP::REAL ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
 		if (ld2 < dist2)
 			vecEdges.push_back(e);
 	});
@@ -217,7 +217,7 @@ void edgesRaySelection(
 		typedef std::pair<typename PFP::REAL, Edge> EdgeDist;
 		std::vector<EdgeDist> distnedge;
 
-		unsigned int nbi = vecEdges.size();
+		unsigned int nbi = (unsigned int)(vecEdges.size());
 		distnedge.resize(nbi);
 
 		// compute all distances to observer for each middle of intersected edge
@@ -318,7 +318,7 @@ void verticesRaySelection(
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		const typename PFP::VEC3& P = position[v];
-		float ld2 = Geom::squaredDistanceLine2Point(rayA, rayAB, AB2, P);
+		typename PFP::REAL ld2 = Geom::squaredDistanceLine2Point(rayA, rayAB, AB2, P);
 		if (ld2 < dist2)
 			vecVertices.push_back(v);
 	});
@@ -328,7 +328,7 @@ void verticesRaySelection(
 		typedef std::pair<typename PFP::REAL, Vertex> VertexDist;
 		std::vector<VertexDist> distnvertex;
 
-		unsigned int nbi = vecVertices.size();
+		unsigned int nbi = (unsigned int)(vecVertices.size());
 		distnvertex.resize(nbi);
 
 		// compute all distances to observer for each intersected vertex
@@ -473,7 +473,7 @@ void facesPlanSelection(
 				position[f.dart],
 				position[map.phi1(f.dart)],
 				position[map.phi_1(f.dart)],
-				plan.d(),
+				plan.point(),
 				plan.normal()
 			) == Geom::FACE_INTERSECTION)
 		{
@@ -514,7 +514,7 @@ void verticesConeSelection(
 	foreach_cell<VERTEX>(map, [&] (Vertex v)
 	{
 		const typename PFP::VEC3& P = position[v];
-		float ld2 = Geom::squaredDistanceLine2Point(rayA, rayAB, AB2, P);
+		typename PFP::REAL ld2 = Geom::squaredDistanceLine2Point(rayA, rayAB, AB2, P);
 		typename PFP::VEC3 V = P - rayA;
 		double s2 = double(ld2) / double(V*V);
 		if (s2 < sin2)
@@ -524,7 +524,7 @@ void verticesConeSelection(
 	typedef std::pair<typename PFP::REAL, Vertex> VertexDist;
 	std::vector<VertexDist> distnvertex;
 
-	unsigned int nbi = vecVertices.size();
+	unsigned int nbi = (unsigned int)(vecVertices.size());
 	distnvertex.resize(nbi);
 
 	// compute all distances to observer for each intersected vertex
@@ -578,7 +578,7 @@ void edgesConeSelection(
 		const typename PFP::VEC3& P = position[e.dart];
 		const typename PFP::VEC3& Q = position[map.phi1(e.dart)];
 		// the three distance to P, Q and (PQ) not used here
-		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+		typename PFP::REAL ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
 		typename PFP::VEC3 V = (P+Q)/2.0f - rayA;
 		double s2 = double(ld2) / double(V*V);
 		if (s2 < sin2)
@@ -588,7 +588,7 @@ void edgesConeSelection(
 	typedef std::pair<typename PFP::REAL, Edge> EdgeDist;
 	std::vector<EdgeDist> distnedge;
 
-	unsigned int nbi = vecEdges.size();
+	unsigned int nbi = (unsigned int)(vecEdges.size());
 	distnedge.resize(nbi);
 
 	// compute all distances to observer for each middle of intersected edge

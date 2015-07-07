@@ -125,10 +125,10 @@ void MapRender::recompute2Ears(const VertexAttribute<typename PFP::VEC3, typenam
 	}
 
 	vp->value  = dotpr1;
-	vp->length = (Tb-Tc).norm2();
+	vp->length = float((Tb-Tc).norm2());
 	vp->ear = ears.insert(vp);
 	vp2->value = dotpr2;
-	vp->length = (Td-Ta).norm2();
+	vp->length = float((Td-Ta).norm2());
 	vp2->ear = ears.insert(vp2);
 }
 
@@ -181,6 +181,7 @@ template<typename PFP>
 inline void MapRender::addEarTri(typename PFP::MAP& map, Face f, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* pos)
 {
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
 	bool(*fn_pt1)(VertexPoly*,VertexPoly*) = &(MapRender::cmpVP);
 	VPMS ears(fn_pt1);
@@ -205,7 +206,7 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Face f, std::vector<GLu
 		VEC3 P3 = position[map.getEmbedding(c)];
 
 		float val = computeEarAngle<PFP>(P1, P2, P3, normalPoly);
-		VertexPoly* vp = new VertexPoly(map.getEmbedding(b), val, (P3-P1).norm2(), vpp);
+		VertexPoly* vp = new VertexPoly(map.getEmbedding(b), val, float((P3-P1).norm2()), vpp);
 
 		if (vp->value < 5.0f)
 			nbe++;
@@ -600,7 +601,7 @@ void MapRender::addPrimitives(typename PFP::MAP& map, int prim, const VertexAttr
 	glDeleteBuffers(1,&(m_indexBuffers[prim]));
 	m_indexBuffers[prim] = newBuffer;
 
-	m_nbIndices[prim] += tableIndices.size();
+	m_nbIndices[prim] += GLuint(tableIndices.size());
 }
 
 } // namespace GL2

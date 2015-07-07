@@ -107,7 +107,6 @@ void Viewer::cb_initGL()
 	m_flatShader->setDiffuse(colDif) ;
 	m_flatShader->setBackColor(Geom::Vec4f(0.9f, 0.0f, 0.0f, 0.0f));
 
-
 	m_vectorShader = new Utils::ShaderVectorPerVertex() ;
 	m_vectorShader->setAttributePosition(m_positionVBO) ;
 	m_vectorShader->setAttributeVector(m_normalVBO) ;

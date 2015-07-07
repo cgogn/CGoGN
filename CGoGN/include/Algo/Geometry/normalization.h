@@ -27,6 +27,7 @@
 
 #include "Geometry/vector_gen.h"
 #include "Container/containerBrowser.h"
+#include "Topology/generic/attributeHandler.h"
 
 namespace CGoGN
 {

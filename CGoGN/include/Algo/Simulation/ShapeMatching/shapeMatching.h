@@ -53,15 +53,15 @@ public:
 
 protected:
     MAP& m_map;
-    VertexAttribute<VEC3>& m_position; // x_i : position
-    VertexAttribute<REAL>& m_mass;  // m_i : mass
-    VertexAttribute<VEC3> m_goal;
+	VertexAttribute<VEC3, MAP>& m_position; // x_i : position
+	VertexAttribute<REAL, MAP>& m_mass;  // m_i : mass
+	VertexAttribute<VEC3, MAP> m_goal;
 
     // q_{i} = x^{0} - x^{0}_{cm}
     std::vector<Eigen::Vector3d> m_q;
 
 public:
-    ShapeMatching(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass);
+	ShapeMatching(MAP& map, VertexAttribute<VEC3, MAP>& position, VertexAttribute<REAL, MAP>& mass);
 
     virtual ~ShapeMatching();
 
@@ -71,9 +71,9 @@ public:
 
     void shapeMatch();
 
-    void computeVelocities(VertexAttribute<VEC3>& velocity, VertexAttribute<VEC3>& fext, REAL h, REAL alpha);
+	void computeVelocities(VertexAttribute<VEC3, MAP>& velocity, VertexAttribute<VEC3, MAP>& fext, REAL h, REAL alpha);
 
-    void applyVelocities(VertexAttribute<VEC3>& velocity, REAL h);
+	void applyVelocities(VertexAttribute<VEC3, MAP>& velocity, REAL h);
 };
 
 } // namespace ShapeMatching

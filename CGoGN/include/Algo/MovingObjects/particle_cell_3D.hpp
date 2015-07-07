@@ -792,7 +792,7 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 	Dart d_min;
 
 	std::vector<Dart> dart_list;
-	std::vector<float> dist_list;
+	std::vector<REAL> dist_list;
 
 	std::list<Dart> visitedFaces;			// Faces that are traversed
 	visitedFaces.push_back(d);				// Start with the face of d
@@ -853,7 +853,7 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 	}
 
 	if(dist_list.size()>0) {
-		float min=dist_list[0];
+		REAL min=dist_list[0];
 		for(unsigned int i = 1;i<dist_list.size();++i)
 		{
 			if(dist_list[i]<min)

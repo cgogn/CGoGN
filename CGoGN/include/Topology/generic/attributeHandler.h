@@ -139,8 +139,8 @@ public:
 	 * Construct an attribute of Orbit from Orbit2
 	 * @param h the table attribute
 	 */
-	template <unsigned int ORBIT2>
-	AttributeHandler(const AttributeHandler<T, ORBIT2, MAP>& h) ;
+	//template <unsigned int ORBIT2>
+	//AttributeHandler(const AttributeHandler<T, ORBIT2, MAP>& h) ;
 
 	/**
 	 * affectation operator

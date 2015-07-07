@@ -22,16 +22,19 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Utils/cgognStream.h"
+
+#include <cmath>
 #include <limits>
+
 
 namespace CGoGN
 {
 
-namespace Algo
+namespace Utils
 {
 
-namespace PMesh
-{
+typedef unsigned int uint32;
 
 template <typename VEC>
 void zero(VEC& v)
@@ -70,14 +73,15 @@ void Quantization<VEC>::computeMeanSourceVector()
 template <typename VEC>
 typename Quantization<VEC>::CodeVectorID Quantization<VEC>::nearestNeighbour(int v)
 {
+	typedef typename VEC::DATA_TYPE REAL;
 	VEC x = sourceVectors[v] ;
-	float dist_min = std::numeric_limits<float>::max() ;
+	REAL dist_min = std::numeric_limits<REAL>::max();
 	CodeVectorID nearest = codeVectors.begin() ;
 	/* search minimum of squared length between v and each vector of codebook */
 	for(CodeVectorID cv = codeVectors.begin(); cv != codeVectors.end() ; ++cv)
 	{
 		VEC vec = x - cv->v ;
-		float l = vec.norm2() ;
+		REAL l = vec.norm2();
 		if(l < dist_min)
 		{
 			dist_min = l ;
@@ -193,7 +197,7 @@ void Quantization<VEC>::vectorQuantizationInit()
 
 	CodeVector<VEC> mcv ;
 	mcv.v = meanSourceVector ;
-	mcv.regionNbVectors = sourceVectors.size() ;
+	mcv.regionNbVectors = uint32(sourceVectors.size()) ;
 	mcv.regionDistortion = distortion ;
 	codeVectors.push_back(mcv) ;
 	++nbCodeVectors ;
@@ -206,7 +210,7 @@ void Quantization<VEC>::vectorQuantizationNbRegions(unsigned int nbRegions, std:
 	vectorQuantizationInit() ;
 
 	// do not want to have more codeVectors than sourceVectors
-	nbRegions = nbRegions > sourceVectors.size() ? sourceVectors.size() : nbRegions ;
+	nbRegions = nbRegions > uint32(sourceVectors.size()) ? uint32(sourceVectors.size()) : nbRegions;
 
 	VEC eps ;
 	set<VEC>(eps, epsSplitVector) ;
@@ -299,6 +303,7 @@ void Quantization<VEC>::computeDiscreteEntropy()
 template <typename VEC>
 void Quantization<VEC>::computeDifferentialEntropy()
 {
+	typedef typename VEC::DATA_TYPE REAL;
 	if(VEC::DIMENSION == 1) // unidimensional case
 	{
 		float variance = 0 ;
@@ -312,7 +317,7 @@ void Quantization<VEC>::computeDifferentialEntropy()
 
 		determinantSigma = variance ;
 		traceSigma = variance ;
-		differentialEntropy = log(variance * 2.0 * M_PI * exp(1.0)) / 2.0f ;
+		differentialEntropy = std::log(REAL(variance * 2 * M_PI * std::exp(1.0f))) / 2.0f ;
 	}
 	else // 2D or 3D case
 	{
@@ -335,7 +340,7 @@ void Quantization<VEC>::computeDifferentialEntropy()
 
 		determinantSigma = determinant(matrice) ;
 		traceSigma = trace ;
-		differentialEntropy = log(pow(2.0*M_PI*exp(1.0), VEC::DIMENSION)* determinantSigma) / 2.0f ;
+		differentialEntropy = REAL(std::log(std::pow(2.0*M_PI*std::exp(1.0), VEC::DIMENSION)* determinantSigma) / 2.0) ;
 
 		delete[] matrice ;
 	}
@@ -378,8 +383,6 @@ float Quantization<VEC>::determinant(float* matrice)
 	}
 }
 
-} //namespace PMesh
-
-} //namespace Algo
+} //namespace Utils
 
 } //namespace CGoGN

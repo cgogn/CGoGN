@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include <vector>
+
 namespace CGoGN
 {
 
@@ -226,7 +228,8 @@ bool BoundingBox<VEC>::contains(const VEC& a, const VEC& b)
 	VEC dir(b-a);		/*ray */
 
 	bool inside = true;
-	char quadrant[m_pMin.dimension()];
+//	char quadrant[m_pMin.dimension()];
+	std::vector<char> quadrant(m_pMin.dimension());
 
 	VEC candidatePlane;
 
@@ -264,7 +267,7 @@ bool BoundingBox<VEC>::contains(const VEC& a, const VEC& b)
 		if (quadrant[i] != MIDDLE && dir[i] !=0)
 			maxT[i] = (candidatePlane[i]-a[i]) / dir[i];
 		else
-			maxT[i] = -1.;
+			maxT[i] = -1;
 	}
 
 #undef LEFT
@@ -326,7 +329,7 @@ bool BoundingBox<VEC>::rayIntersect(const VEC& P, const VEC& V) const
 {
 	static float EPSILON = 0.000001f;
 
-	if (fabs(V[2]) > EPSILON)
+	if (fabs(double(V[2])) > EPSILON)
 	{
 		VEC Q = P + ((m_pMin[2] - P[2])/V[2])*V;
 		if ((Q[0]<m_pMax[0]) && (Q[0]>m_pMin[0]) && (Q[1]<m_pMax[1]) && (Q[1]>m_pMin[1]))
@@ -336,7 +339,7 @@ bool BoundingBox<VEC>::rayIntersect(const VEC& P, const VEC& V) const
 					return true;
 	}
 
-	if (fabs(V[1]) > EPSILON)
+	if (fabs(double(V[1])) > EPSILON)
 	{
 		VEC Q = P + ((m_pMin[1] - P[1])/V[1])*V;
 		if ((Q[0]<m_pMax[0]) && (Q[0]>m_pMin[0]) && (Q[2]<m_pMax[2]) && (Q[2]>m_pMin[2]))
@@ -347,7 +350,7 @@ bool BoundingBox<VEC>::rayIntersect(const VEC& P, const VEC& V) const
 	}
 
 
-	if (fabs(V[0]) > EPSILON)
+	if (fabs(double(V[0])) > EPSILON)
 	{
 		VEC Q = P + ((m_pMin[0] - P[0])/V[0])*V;
 		if ((Q[1]<m_pMax[1]) && (Q[1]>m_pMin[1]) && (Q[2]<m_pMax[2]) && (Q[2]>m_pMin[2]))

@@ -153,7 +153,7 @@ Quadric<REAL>::optimize(VEC4& v) const
 		A2(3,i) = 0.0f ;
 	A2(3,3) = 1.0f ;
 	MATRIX44 Ainv ;
-	REAL det = A2.invert(Ainv) ;
+	REAL det = REAL(A2.invert(Ainv));
 	if(det > -1e-6 && det < 1e-6)
 		return false ;
 //	VEC4 right(0,0,0,1) ;
@@ -263,7 +263,7 @@ QuadricNd<REAL,N>::operator() (const VECNp& v) const
 	for (unsigned int i = 0 ; i < N ; ++i)
 		hv[i] = v[i] ;
 
-	return evaluate(v) ;
+	return evaluate(hv) ; // v instead of hv !!!
 }
 
 template <typename REAL, unsigned int N>
@@ -285,7 +285,7 @@ REAL
 QuadricNd<REAL,N>::evaluate(const VECN& v) const
 {
 	Geom::Vector<N, double> v_d = v ;
-	return v_d*(A*v_d) + 2.0*(b*v_d) + c ;
+	return REAL(v_d*(A*v_d) + 2.0*(b*v_d) + c );
 }
 
 template <typename REAL, unsigned int N>
@@ -340,7 +340,7 @@ template <typename REAL>
 QuadricHF<REAL>::QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REAL& alpha):
 m_noAlphaRot(fabs(alpha) < 1e-13)
 {
-	const unsigned int nbcoefs = ((T[0].order() + 1) * (T[0].order() + 2)) / 2. ;
+	const unsigned int nbcoefs = int(((T[0].order() + 1) * (T[0].order() + 2)) / 2.0f );
 
 	// 2D rotation
 	const Geom::Matrix33d R = buildRotateMatrix(gamma) ;
@@ -469,7 +469,7 @@ QuadricHF<REAL>&
 QuadricHF<REAL>::operator /= (const REAL& v)
 {
 	std::cout << "Warning: QuadricHF<REAL>::operator /= should not be used !" << std::endl ;
-	const REAL& inv = 1. / v ;
+	const REAL& inv = 1.0f / v ;
 
 	(*this) *= inv ;
 
@@ -501,7 +501,7 @@ QuadricHF<REAL>::findOptimizedCoefs(std::vector<VEC3>& coefs)
 		Eigen::VectorXd tmp(m_b[0].size()) ;
 		tmp = Ainv * m_b[c] ;
 		for (unsigned int i = 0 ; i < m_b[c].size() ; ++i)
-			coefs[i][c] = tmp[i] ;
+			coefs[i][c] = REAL(tmp[i]) ;
 	}
 
 	return true ;
@@ -522,9 +522,9 @@ QuadricHF<REAL>::evaluate(const std::vector<VEC3>& coefs) const
 		res[c] += m_c[c] ;							// + c
 	}
 
-	res /= 2*M_PI ; // max integral value over hemisphere
+	res /= REAL(2*M_PI) ; // max integral value over hemisphere
 
-	return (res[0] + res[1] + res[2]) / 3. ;
+	return (res[0] + res[1] + res[2]) / 3.0f ;
 }
 
 template <typename REAL>
@@ -537,9 +537,9 @@ QuadricHF<REAL>::evalR3(const std::vector<VEC3>& coefs) const
 		Eigen::VectorXd tmp(coefs.size()) ;
 		for (unsigned int i = 0 ; i < coefs.size() ; ++i)
 			tmp[i] = coefs[i][c] ;
-		res[c] = tmp.transpose() * m_A * tmp ;		// A
-		res[c] -= 2. * (m_b[c]).transpose() * tmp ;	// - 2b
-		res[c] += m_c[c] ;							// + c
+		res[c] = REAL(tmp.transpose() * m_A * tmp) ;		// A
+		res[c] -= REAL(2.0f * (m_b[c]).transpose() * tmp) ;	// - 2b
+		res[c] += REAL(m_c[c]) ;							// + c
 	}
 
 	res /= 2*M_PI ; // max integral value over hemisphere
@@ -573,7 +573,7 @@ QuadricHF<REAL>::rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R)
 		std::vector<unsigned int> q ; q.resize(T.order(), 0) ;
 		for (unsigned int j = 0 ; j < T.nbElem() ; ++j)
 		{
-			REAL P = T[j] ;
+			REAL P = REAL(T[j]) ;
 			for (unsigned int k = 0 ; k < T.order() ; ++k)
 				P *= R(q[k],p[k]) ;
 			S += P ;
@@ -1188,12 +1188,13 @@ QuadricHF<REAL>::buildLowerLeftIntegralMatrix_C(const REAL& alpha, unsigned int 
 	return C ;
 }
 
+
 template <typename REAL>
 Geom::Tensor3d*
 QuadricHF<REAL>::tensorsFromCoefs(const std::vector<VEC3>& coefs)
 {
-	const unsigned int& N = coefs.size() ;
-	const unsigned int& degree = (sqrt(1+8*N) - 3) / REAL(2) ;
+	unsigned int N = (unsigned int)(coefs.size()) ;
+	unsigned int degree = (unsigned int)((sqrt(1 + 8 * N) - 3.0) / 2.0);
 	Geom::Tensor3d *A = new Geom::Tensor3d[3] ;
 
 	for (unsigned int col = 0 ; col < 3 ; ++col)
@@ -1283,7 +1284,7 @@ QuadricHF<REAL>::coefsFromTensors(Geom::Tensor3d* A)
 {
 	const unsigned int& degree = A[0].order() ;
 	std::vector<VEC3> coefs ;
-	coefs.resize(((degree + 1) * (degree + 2)) / REAL(2)) ;
+	coefs.resize(((degree + 1) * (degree + 2)) / 2) ;
 
 	std::vector<unsigned int> index ;
 	index.resize(degree,2) ;
@@ -1356,4 +1357,3 @@ QuadricHF<REAL>::coefsFromTensors(Geom::Tensor3d* A)
 } // Utils
 
 } // CGOGN
-

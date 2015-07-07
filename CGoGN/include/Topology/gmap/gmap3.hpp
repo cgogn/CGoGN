@@ -158,7 +158,7 @@ inline Dart GMap3<MAP_IMPL>::alpha2(Dart d) const
 template <typename MAP_IMPL>
 inline Dart GMap3<MAP_IMPL>::alpha_2(Dart d) const
 {
-	return beta2(beta3(d)) ;
+    return this->beta2(beta3(d)) ;
 }
 
 template <typename MAP_IMPL>
@@ -845,35 +845,48 @@ inline bool GMap3<MAP_IMPL>::isBoundaryFace(Dart d) const
 	return this->template isBoundaryMarked<3>(d) || this->template isBoundaryMarked<3>(beta3(d));
 }
 
+
 template <typename MAP_IMPL>
-bool GMap3<MAP_IMPL>::isBoundaryAdjacentVolume(Dart d) const
+bool GMap3<MAP_IMPL>::isVolumeIncidentToBoundary(Dart d) const
 {
-	DartMarkerStore<GMap3<MAP_IMPL> > mark(*this);	// Lock a marker
-
-	std::vector<Dart> visitedFaces ;
-	visitedFaces.reserve(128) ;
-	visitedFaces.push_back(d) ;
-	mark.markOrbit<FACE>(d) ;
-
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	Traversor3WF<GMap3<MAP_IMPL> > tra(*this, d);
+	for (Dart dit = tra.begin(); dit != tra.end(); dit = tra.next())
 	{
-		if (this->isBoundaryMarked<3>(beta3(visitedFaces[i])))
-			return true ;
-
-		Dart e = visitedFaces[i] ;
-		do	// add all face neighbours to the table
-		{
-			Dart ee = this->phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit<FACE>(ee) ;
-			}
-			e = this->phi1(e) ;
-		} while(e != visitedFaces[i]) ;
+		if (this->template isBoundaryMarked<3>(beta3(dit)))
+			return true;
 	}
 	return false;
 }
+
+//template <typename MAP_IMPL>
+//bool GMap3<MAP_IMPL>::isBoundaryAdjacentVolume(Dart d) const
+//{
+//	DartMarkerStore<GMap3<MAP_IMPL> > mark(*this);	// Lock a marker
+//
+//	std::vector<Dart> visitedFaces ;
+//	visitedFaces.reserve(128) ;
+//	visitedFaces.push_back(d) ;
+//	mark.markOrbit<FACE>(d) ;
+//
+//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+//	{
+//		if (this->isBoundaryMarked<3>(beta3(visitedFaces[i])))
+//			return true ;
+//
+//		Dart e = visitedFaces[i] ;
+//		do	// add all face neighbours to the table
+//		{
+//			Dart ee = this->phi2(e) ;
+//			if(!mark.isMarked(ee)) // not already marked
+//			{
+//				visitedFaces.push_back(ee) ;
+//				mark.markOrbit<FACE>(ee) ;
+//			}
+//			e = this->phi1(e) ;
+//		} while(e != visitedFaces[i]) ;
+//	}
+//	return false;
+//}
 
 template <typename MAP_IMPL>
 bool GMap3<MAP_IMPL>::check() const

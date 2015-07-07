@@ -46,7 +46,7 @@ namespace Render
  * @param k shrinking factor
  */
 template<typename PFP>
-void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions);
+void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float k);
 
 /**
  * add a set of volumes to a drawer
@@ -58,7 +58,7 @@ void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, s
  * @param k shrinking factor
  */
 template<typename PFP>
-void drawerCell(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions);
+void drawerCell(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, float k);
 
 /**
  * add a set of vertices to a drawer

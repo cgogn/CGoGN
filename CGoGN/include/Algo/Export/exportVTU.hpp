@@ -24,8 +24,8 @@
 
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/autoAttributeHandler.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
 #include "Topology/generic/cellmarker.h"
 
 #include "Utils/compress.h"
@@ -43,7 +43,7 @@ namespace Export
 {
 
 template <typename PFP>
-bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename)
 {
 	if (map.dimension() != 2)
 	{
@@ -64,7 +64,8 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 		return false ;
 	}
 
-	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+	VertexAutoAttribute<unsigned int,MAP> indices(map,"indices_vert");
+
 
 	unsigned int count=0;
 	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
@@ -101,7 +102,7 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 				break;
 
 			default:
-				others_begin.push_back(others.size());
+				others_begin.push_back((unsigned int)(others.size()));
 				do
 				{
 					others.push_back(indices[f]); f = map.phi1(f);
@@ -110,9 +111,9 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 				break;
 		}
 	}
-	others_begin.push_back(others.size());
+	others_begin.push_back(uint32(others.size()));
 
-	unsigned int nbtotal = triangles.size()/3 + quads.size()/4 + others_begin.size()-1;
+	unsigned int nbtotal = (unsigned int)(triangles.size() / 3 + quads.size() / 4 + others_begin.size() - 1);
 
 	fout << "<?xml version=\"1.0\"?>" << std::endl;
 	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"BigEndian\">" << std::endl;
@@ -217,7 +218,7 @@ bool exportVTU(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 
 
 template <typename PFP>
-bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const char* filename)
 {
 	if (map.dimension() != 2)
 	{
@@ -238,7 +239,7 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 		return false ;
 	}
 
-	VertexAutoAttribute<unsigned int> indices(map,"indices_vert");
+	VertexAutoAttribute<unsigned int,MAP> indices(map,"indices_vert");
 
 	unsigned int count=0;
 	for (unsigned int i = position.begin(); i != position.end(); position.next(i))
@@ -275,7 +276,7 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 				break;
 
 			default:
-				others_begin.push_back(others.size());
+				others_begin.push_back((unsigned int)(others.size()));
 				do
 				{
 					others.push_back(indices[f]); f = map.phi1(f);
@@ -284,9 +285,9 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 				break;
 		}
 	}
-	others_begin.push_back(others.size());
+	others_begin.push_back(uint32(others.size()));
 
-	unsigned int nbtotal = triangles.size()/3 + quads.size()/4 + others_begin.size()-1;
+	unsigned int nbtotal = uint32(triangles.size() / 3 + quads.size() / 4 + others_begin.size() - 1);
 
 	fout << "<?xml version=\"1.0\"?>" << std::endl;
 	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">" << std::endl;
@@ -328,10 +329,10 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 	}
 
 	fout << "<DataArray type =\"Int32\" Name =\"connectivity\" format =\"appended\" offset =\""<<offsetAppend<<"\"/>"  << std::endl;
-	offsetAppend +=bufferInt.size() * sizeof(unsigned int) + sizeof(unsigned int);
+	offsetAppend += uint32(bufferInt.size() * sizeof(unsigned int)+sizeof(unsigned int));
 
 	fout << "<DataArray type =\"Int32\" Name =\"offsets\" format =\"appended\" offset =\""<<offsetAppend<<"\"/>"  << std::endl;
-	offsetAppend += (triangles.size()/3 + quads.size()/4 + others_begin.size()-1) * sizeof(unsigned int) + sizeof(unsigned int);
+	offsetAppend += uint32((triangles.size() / 3 + quads.size() / 4 + others_begin.size() - 1) * sizeof(unsigned int)+sizeof(unsigned int));
 
 	fout << "<DataArray type =\"UInt8\" Name =\"types\" format =\"appended\" offset =\""<<offsetAppend<<"\"/>"  << std::endl;
 
@@ -352,14 +353,14 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 		for (unsigned int i = position.begin(); i != position.end(); position.next(i))
 			bufferV3.push_back(position[i]);
 
-		lengthBuff = bufferV3.size()*sizeof(VEC3);
+		lengthBuff = uint32(bufferV3.size()*sizeof(VEC3));
 		fout.write((char*)&lengthBuff,sizeof(unsigned int));
 
 		fout.write((char*)&bufferV3[0],lengthBuff);
 	}
 
 	// save already buffrized indices of primitives
-	lengthBuff = bufferInt.size()*sizeof(unsigned int);
+	lengthBuff = uint32(bufferInt.size()*sizeof(unsigned int));
 	fout.write((char*)&lengthBuff,sizeof(unsigned int));
 
 	fout.write((char*)&(bufferInt[0]),lengthBuff);
@@ -387,7 +388,7 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 		bufferInt.push_back(offset);
 	}
 
-	lengthBuff = bufferInt.size()*sizeof(unsigned int);
+	lengthBuff = uint32(bufferInt.size()*sizeof(unsigned int));
 	fout.write((char*)&lengthBuff,sizeof(unsigned int));
 
 	fout.write((char*)&(bufferInt[0]), lengthBuff);
@@ -406,7 +407,7 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 	for (unsigned int i=1; i<others_begin.size(); ++i)
 		bufferUC.push_back((unsigned char)7);
 
-	lengthBuff = bufferUC.size()*sizeof(unsigned char);
+	lengthBuff = uint32(bufferUC.size()*sizeof(unsigned char));
 	fout.write((char*)&lengthBuff,sizeof(unsigned int));
 
 	fout.write((char*)&(bufferUC[0]), lengthBuff);
@@ -425,7 +426,7 @@ bool exportVTUBinary(typename PFP::MAP& map, const VertexAttribute<typename PFP:
 
 /*
 template <typename PFP>
-bool exportVTUCompressed(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename)
+bool exportVTUCompressed(typename PFP::MAP& map, const VertexAttribute<VEC3,MAP>& position, const char* filename)
 {
 	if (map.dimension() != 2)
 	{
@@ -642,7 +643,7 @@ bool exportVTUCompressed(typename PFP::MAP& map, const VertexAttribute<typename 
 // COMPLETE VERSION
 
 template <typename PFP>
-VTUExporter<PFP>::VTUExporter(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position):
+VTUExporter<PFP>::VTUExporter(MAP& map, const VertexAttribute<VEC3,MAP>& position):
 	m_map(map),m_position(position),
 	nbtotal(0),noPointData(true),noCellData(true),closed(false),binaryMode(false),f_tempoBin_out(NULL)
 {
@@ -668,7 +669,7 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 		return false;
 	}
 
-	VertexAutoAttribute<unsigned int> indices(m_map,"indices_vert");
+	VertexAutoAttribute<unsigned int,MAP> indices(m_map,"indices_vert");
 
 	unsigned int count=0;
 	for (unsigned int i = m_position.begin(); i != m_position.end(); m_position.next(i))
@@ -708,7 +709,7 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 
 			default:
 				bufferOther.push_back(d);
-				others_begin.push_back(others.size());
+				others_begin.push_back(uint32(others.size()));
 				do
 				{
 					others.push_back(indices[f]); f = m_map.phi1(f);
@@ -717,9 +718,9 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 				break;
 		}
 	}
-	others_begin.push_back(others.size());
+	others_begin.push_back(uint32(others.size()));
 
-	nbtotal = triangles.size()/3 + quads.size()/4 + others_begin.size()-1;
+	nbtotal = uint32(triangles.size() / 3 + quads.size() / 4 + others_begin.size() - 1);
 
 	fout << "<?xml version=\"1.0\"?>" << std::endl;
 	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">" << std::endl;
@@ -739,7 +740,7 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
 {
 	if (binaryMode)
 		return addBinaryVertexAttribute(attrib,vtkType,nbComp,name);
@@ -803,7 +804,7 @@ void VTUExporter<PFP>::endVertexAttributes()
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addFaceAttribute(const FaceAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addFaceAttribute(const FaceAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
 {
 	if (binaryMode)
 		return addBinaryFaceAttribute(attrib,vtkType,nbComp,name);
@@ -983,7 +984,7 @@ bool VTUExporter<PFP>::close()
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addBinaryVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addBinaryVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
 {
 	if (!noCellData)
 	{
@@ -1038,7 +1039,7 @@ void VTUExporter<PFP>::addBinaryVertexAttribute(const VertexAttribute<T>& attrib
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addBinaryFaceAttribute(const FaceAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addBinaryFaceAttribute(const FaceAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
 {
 	if (!noPointData)
 	{
@@ -1111,7 +1112,7 @@ bool VTUExporter<PFP>::binaryClose()
 		for (unsigned int i = m_position.begin(); i != m_position.end(); m_position.next(i))
 			buffer.push_back(m_position[i]);
 
-		unsigned int sz = buffer.size()*sizeof(VEC3);
+		unsigned int sz = uint32(buffer.size()*sizeof(VEC3));
 
 		offsetAppend += sz + sizeof(unsigned int);
 
@@ -1152,7 +1153,7 @@ bool VTUExporter<PFP>::binaryClose()
 				bufferInt.push_back(others[j]);
 		}
 
-		unsigned int sz =  bufferInt.size() * sizeof(unsigned int);
+		unsigned int sz = uint32(bufferInt.size() * sizeof(unsigned int));
 		offsetAppend += sz + sizeof(unsigned int);
 		fwrite(&sz, sizeof(unsigned int), 1, f_tempoBin_out);			// size of block
 		fwrite(&bufferInt[0], sizeof(unsigned int), bufferInt.size(), f_tempoBin_out);	// block
@@ -1180,7 +1181,7 @@ bool VTUExporter<PFP>::binaryClose()
 			bufferInt.push_back(offset);
 		}
 
-		sz =  bufferInt.size() * sizeof(unsigned int);
+		sz = uint32(bufferInt.size() * sizeof(unsigned int));
 
 		offsetAppend += sz + sizeof(unsigned int);
 		fwrite(&sz, sizeof(unsigned int), 1, f_tempoBin_out);			// size of block
@@ -1201,9 +1202,9 @@ bool VTUExporter<PFP>::binaryClose()
 	for (unsigned int i=1; i<others_begin.size(); ++i)
 		bufferUC.push_back((unsigned char)7);
 
-	unsigned int sz =  bufferUC.size() * sizeof(unsigned char);
+	unsigned int sz = uint32(bufferUC.size() * sizeof(unsigned char));
 
-	offsetAppend += sz + sizeof(unsigned int);
+	offsetAppend += sz + uint32(sizeof(unsigned int));
 
 	fwrite(&sz, sizeof(unsigned int), 1, f_tempoBin_out);			// size of block
 	fwrite(&bufferUC[0], sizeof(unsigned char), bufferUC.size(), f_tempoBin_out);	// block
@@ -1271,7 +1272,7 @@ namespace Export
 {
 
 template <typename PFP>
-VTUExporter<PFP>::VTUExporter(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position):
+VTUExporter<PFP>::VTUExporter(MAP& map, const VertexAttribute<VEC3,MAP>& position):
 	m_map(map),m_position(position),
 	nbtotal(0),noPointData(true),noCellData(true),closed(false),binaryMode(false),f_tempoBin_out(NULL)
 {
@@ -1297,7 +1298,7 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 		return false;
 	}
 
-	VertexAutoAttribute<unsigned int> indices(m_map,"indices_vert");
+	VertexAutoAttribute<unsigned int,MAP> indices(m_map,"indices_vert");
 
 	unsigned int count=0;
 	for (unsigned int i = m_position.begin(); i != m_position.end(); m_position.next(i))
@@ -1316,7 +1317,7 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 	{
 		unsigned int degree = 0 ;
 
-		Traversor3WV<typename PFP::MAP> twv(m_map, d) ;
+		Traversor3WV<MAP> twv(m_map, d) ;
 		for(Dart it = twv.begin(); it != twv.end(); it = twv.next())
 		{
 			degree++;
@@ -1358,7 +1359,7 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 		}
 	}
 
-	nbtotal = tetras.size()/4 + hexas.size()/8;
+	nbtotal = uint32(tetras.size() / 4 + hexas.size() / 8);
 
 	fout << "<?xml version=\"1.0\"?>" << std::endl;
 	fout << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">" << std::endl;
@@ -1378,7 +1379,7 @@ bool VTUExporter<PFP>::init(const char* filename, bool bin)
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
 {
 	if (binaryMode)
 		return addBinaryVertexAttribute(attrib,vtkType,nbComp,name);
@@ -1442,7 +1443,7 @@ void VTUExporter<PFP>::endVertexAttributes()
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addVolumeAttribute(const VolumeAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addVolumeAttribute(const VolumeAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
 {
 	if (binaryMode)
 		return addBinaryVolumeAttribute(attrib,vtkType,nbComp,name);
@@ -1594,7 +1595,7 @@ bool VTUExporter<PFP>::close()
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addBinaryVertexAttribute(const VertexAttribute<T>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addBinaryVertexAttribute(const VertexAttribute<T,MAP>& attrib, const std::string& vtkType,  unsigned int nbComp, const std::string& name)
 {
 	if (!noCellData)
 	{
@@ -1649,7 +1650,7 @@ void VTUExporter<PFP>::addBinaryVertexAttribute(const VertexAttribute<T>& attrib
 
 template <typename PFP>
 template<typename T>
-void VTUExporter<PFP>::addBinaryVolumeAttribute(const VolumeAttribute<T>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
+void VTUExporter<PFP>::addBinaryVolumeAttribute(const VolumeAttribute<T,MAP>& attrib, const std::string& vtkType, unsigned int nbComp, const std::string& name)
 {
 	if (!noPointData)
 	{
@@ -1721,7 +1722,7 @@ bool VTUExporter<PFP>::binaryClose()
 		for (unsigned int i = m_position.begin(); i != m_position.end(); m_position.next(i))
 			buffer.push_back(m_position[i]);
 
-		unsigned int sz = buffer.size()*sizeof(VEC3);
+		unsigned int sz = uint32(buffer.size()*sizeof(VEC3));
 
 		offsetAppend += sz + sizeof(unsigned int);
 
@@ -1755,7 +1756,7 @@ bool VTUExporter<PFP>::binaryClose()
 			bufferInt.push_back(hexas[i+3]);
 		}
 
-		unsigned int sz =  bufferInt.size() * sizeof(unsigned int);
+		unsigned int sz = uint32(bufferInt.size() * sizeof(unsigned int));
 		offsetAppend += sz + sizeof(unsigned int);
 		fwrite(&sz, sizeof(unsigned int), 1, f_tempoBin_out);			// size of block
 		fwrite(&bufferInt[0], sizeof(unsigned int), bufferInt.size(), f_tempoBin_out);	// block
@@ -1776,7 +1777,7 @@ bool VTUExporter<PFP>::binaryClose()
 			bufferInt.push_back(offset);
 		}
 
-		sz =  bufferInt.size() * sizeof(unsigned int);
+		sz = uint32(bufferInt.size() * sizeof(unsigned int));
 
 		offsetAppend += sz + sizeof(unsigned int);
 		fwrite(&sz, sizeof(unsigned int), 1, f_tempoBin_out);			// size of block
@@ -1795,7 +1796,7 @@ bool VTUExporter<PFP>::binaryClose()
 		bufferUC.push_back((unsigned char)12);
 
 
-	unsigned int sz =  bufferUC.size() * sizeof(unsigned char);
+	unsigned int sz = uint32(bufferUC.size() * sizeof(unsigned char));
 
 	offsetAppend += sz + sizeof(unsigned int);
 

@@ -51,6 +51,7 @@ class EarTriangulation
 {
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 protected:
 	// forward declaration
@@ -65,13 +66,13 @@ protected:
 	{
 	public:
 		Dart dart;
-		float angle;
-		float length;
+		REAL angle;
+		REAL length;
 
 		VertexPoly()
 		{}
 
-		VertexPoly(Dart d, float v, float l) : dart(d), angle(v), length(l)
+		VertexPoly(Dart d, REAL v, REAL l) : dart(d), angle(v), length(l)
 		{}
 
 		bool operator()(const VertexPoly& vp1, const VertexPoly& vp2)
@@ -95,7 +96,7 @@ protected:
 
 	void recompute2Ears(Dart d, const VEC3& normalPoly, bool convex);
 
-	float computeEarInit(Dart d, const VEC3& normalPoly, float& val);
+	REAL computeEarInit(Dart d, const VEC3& normalPoly, REAL& val);
 
 public:
 

@@ -26,6 +26,9 @@
 #define __HALFEDGESELECTOR_H__
 
 #include "Algo/Decimation/selector.h"
+#include "Algo/Decimation/approximator.h"
+#include "Utils/qem.h"
+#include "Topology/generic/dart.h"
 
 namespace CGoGN
 {
@@ -56,7 +59,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL, Dart>::iterator it;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMhalfEdgeInfo" ; }
 	} QEMhalfEdgeInfo ;
@@ -65,8 +68,8 @@ private:
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
-	std::multimap<float,Dart> halfEdges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> halfEdges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d, bool recompute) ;
@@ -118,7 +121,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMextColorHalfEdgeInfo" ; }
 	} QEMextColorHalfEdgeInfo ;
@@ -127,8 +130,8 @@ private:
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
 	VertexAttribute<Utils::QuadricNd<REAL,6>, MAP> m_quadric ;
 
-	std::multimap<float,Dart> halfEdges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> halfEdges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d, bool recompute) ;
@@ -212,7 +215,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMextColorNormalHalfEdgeInfo" ; }
 	} QEMextColorNormalHalfEdgeInfo ;
@@ -221,8 +224,8 @@ private:
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
 	VertexAttribute<Utils::QuadricNd<REAL,9>, MAP> m_quadric ;
 
-	std::multimap<float,Dart> halfEdges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> halfEdges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d, bool recompute) ;
@@ -307,7 +310,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "ColorExperimentalHalfEdgeInfo" ; }
 	} QEMextColorHalfEdgeInfo ;
@@ -316,8 +319,8 @@ private:
 	DartAttribute<HalfEdgeInfo, MAP> halfEdgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
-	std::multimap<float,Dart> halfEdges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> halfEdges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d) ;

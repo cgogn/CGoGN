@@ -44,7 +44,7 @@ std::string Plane3D<T>::CGoGNnameOfType()
 /**********************************************/
 
 template <typename T>
-Plane3D<T>::Plane3D(int d) : m_normal(0), m_d(d)
+Plane3D<T>::Plane3D(T d) : m_normal(0), m_d(d)
 { }
 
 template <typename T>
@@ -104,6 +104,12 @@ const T& Plane3D<T>::d() const
 /**********************************************/
 /*             UTILITY FUNCTIONS              */
 /**********************************************/
+
+template <typename T>
+Vector<3, T> Plane3D<T>::point() const
+{
+	return -m_d * m_normal;
+}
 
 template <typename T>
 T Plane3D<T>::distance(const Vector<3,T>& p) const

@@ -24,6 +24,8 @@
 
 #include <Eigen/Dense>
 #include "Utils/convertType.h"
+#include "Geometry/orientation.h"
+#include "Geometry/intersection.h"
 
 namespace CGoGN
 {
@@ -126,22 +128,24 @@ Inclusion isSegmentInTriangle2D(const VEC3& P1, const VEC3& P2, const VEC3& Ta, 
 template <typename VEC3>
 bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool /*CCW*/)
 {
-	typedef typename VEC3::DATA_TYPE T ;
+	typedef typename VEC3::DATA_TYPE REAL ;
+	typedef Eigen::Matrix<REAL, 3, 1> EVEC3;
+	typedef Eigen::Matrix<REAL, 3, 3> EMAT3;
 
 	VEC3 AB = points[1] - points[0] ;
 	VEC3 AC = points[2] - points[0] ;
 	VEC3 AD = points[3] - points[0] ;
 
-	Eigen::Matrix3f A;
+	EMAT3 A;
 	A << AB[0], AB[1], AB[2],
 			AC[0], AC[1], AC[2],
 			AD[0], AD[1], AD[2];
 
-	Eigen::Matrix3f AInv = A.inverse();
+	EMAT3 AInv = A.inverse();
 
 	VEC3 v1(point-points[0]);
-	Eigen::Vector3f& v = Utils::convertRef<Eigen::Vector3f>(v1);
-	Eigen::Vector3f beta = AInv* v;
+	const EVEC3 &v = Utils::convertRef<EVEC3>(v1);
+	EVEC3 beta = AInv* v;
 	return (beta[0] >= 0.0f && beta[1] >= 0.0f && beta[2] >= 0.0f && beta[0]+beta[1]+beta[2]<=1.0f);
 }
 

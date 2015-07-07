@@ -33,13 +33,13 @@ namespace Geom
 template <typename VEC3>
 Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& PlaneP, const VEC3& NormP, VEC3& Inter)
 {
-	float b = NormP * Dir ;
+	double b = NormP * Dir ;
 
 #define PRECISION 1e-6
 	if (fabs(b) < PRECISION)		//ray parallel to triangle
 	{
 		VEC3 v = PlaneP - P;
-		float c = NormP * v;
+		double c = NormP * v;
 		if (fabs(c) < PRECISION )
 			return EDGE_INTERSECTION;
 
@@ -47,7 +47,7 @@ Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& P
 	}
 #undef PRECISION
 
-	float a = NormP * (PlaneP - P);
+	double a = NormP * (PlaneP - P);
 
 	Inter = P + (a / b) * Dir;
 
@@ -348,8 +348,8 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 template <typename VEC3>
 Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter)
 {
-	typedef typename VEC3::DATA_TYPE T ;
-	const T precision = 0.0001;//std::numeric_limits<T>::min();
+	typedef typename VEC3::DATA_TYPE REAL ;
+	const REAL precision = 0.0001f;//std::numeric_limits<T>::min();
 
 	VEC3 u = Tb - Ta ;
 	VEC3 v = Tc - Ta ;
@@ -358,52 +358,52 @@ Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const V
 	VEC3 n = u ^ v ;
 
 	VEC3 w0 = PA - Ta ;
-    float a = -(n * w0) ;
-    float b = (n * Dir) ;
+	REAL a = -(n * w0);
+	REAL b = (n * Dir);
 
     if(fabs(b) < precision)			//ray parallel to triangle
 		return NO_INTERSECTION ;
 
 	//compute intersection
-	T r = a / b ;
+	REAL r = a / b;
 
-	if((r < -precision) || (r > (T(1) + precision)))
+	if ((r < -precision) || (r >(REAL(1) + precision)))
 		return NO_INTERSECTION;
 
 	Inter = PA + r * Dir;			// intersect point of ray and plane
 
     // is I inside T?
-	T uu = u.norm2() ;
-	T uv = u * v ;
-	T vv = v.norm2() ;
+	REAL uu = u.norm2();
+	REAL uv = u * v;
+	REAL vv = v.norm2();
 	VEC3 w = Inter - Ta ;
-	T wu = w * u ;
-	T wv = w * v ;
-	T D = (uv * uv) - (uu * vv) ;
+	REAL wu = w * u;
+	REAL wv = w * v;
+	REAL D = (uv * uv) - (uu * vv);
 
     // get and test parametric coords
-	T s = ((uv * wv) - (vv * wu)) / D ;
+	REAL s = ((uv * wv) - (vv * wu)) / D;
 
 	if(s <= precision)
 		s = 0.0f;
 
-	if(s < T(0) || s > T(1))
+	if (s < REAL(0) || s > REAL(1))
 		return NO_INTERSECTION ;
 
-	T t = ((uv * wu) - (uu * wv)) / D ;
+	REAL t = ((uv * wu) - (uu * wv)) / D;
 
 	if(t <= precision)
 		t = 0.0f;
 
-	if(t < T(0) || (s + t) > T(1))
+	if (t < REAL(0) || (s + t) > REAL(1))
         return NO_INTERSECTION ;
 
-	if((s == T(0) || s == T(1)))
-		if(t == T(0) || t == T(1))
+	if ((s == REAL(0) || s == REAL(1)))
+		if (t == REAL(0) || t == REAL(1))
 			return VERTEX_INTERSECTION ;
 		else
 			return EDGE_INTERSECTION ;
-	else if(t == T(0) || t == T(1))
+	else if (t == REAL(0) || t == REAL(1))
 			return EDGE_INTERSECTION ;
 
     return FACE_INTERSECTION ;
@@ -504,7 +504,7 @@ Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3&
 	typename VEC3::DATA_TYPE panp = NormP * (PA-PlaneP);
 	typename VEC3::DATA_TYPE pbnp = NormP * (PB-PlaneP);
 
-	if(abs(panp) < EPSILON || abs(pbnp) < EPSILON)
+	if(std::abs(panp) < EPSILON || std::abs(pbnp) < EPSILON)
 		return VERTEX_INTERSECTION;
 //	else if((panp < 0 && pbnp > 0) || (panp > 0 && pbnp < 0))
 	else if (panp*pbnp < 0)
@@ -522,19 +522,19 @@ Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3&
 	typename VEC3::DATA_TYPE panp = NormP * (PA-PlaneP);
 	typename VEC3::DATA_TYPE pbnp = NormP * (PB-PlaneP);
 
-	if(abs(panp) < EPSILON)
+	if(fabs(panp) < EPSILON)
 	{
 		Inter = PA;
 		return VERTEX_INTERSECTION;
 	}
-	else if(abs(pbnp) < EPSILON)
+	else if(fabs(pbnp) < EPSILON)
 	{
 		Inter = PB;
 		return VERTEX_INTERSECTION;
 	}
 	else if (panp*pbnp < 0)
 	{
-		Inter = (abs(panp)*PB + abs(pbnp)*PA)/(abs(panp)+abs(pbnp)) ;
+		Inter = (fabs(panp)*PB + fabs(pbnp)*PA)/(fabs(panp)+fabs(pbnp)) ;
 		return EDGE_INTERSECTION;
 	}
 	else

@@ -24,6 +24,8 @@
 
 //#define DEBUG
 
+#include "Geometry/vector_gen.h"
+
 namespace CGoGN
 {
 
@@ -99,7 +101,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 #ifdef DEBUG
 	CGoGNout << "vertexState" << d << CGoGNendl ;
 #endif
-	assert(goal.isFinite()) ;
+	assert(Geom::isFinite(goal)) ;
 
 	crossCell = CROSS_OTHER ;
 
@@ -195,7 +197,7 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 	CGoGNout<<"goal :"<<goal<<CGoGNendl;
 #endif
 
-	assert(goal.isFinite()) ;
+	assert(Geom::isFinite(goal));
 // 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if (crossCell == NO_CROSS)
@@ -248,12 +250,13 @@ Dart ParticleCell2D<PFP>::faceOrientationState(const VEC3& toward)
 	CGoGNout << "faceOrientationState" << d << CGoGNendl ;
 #endif
 
-	assert(this->getPosition().isnormal());
-	assert(toward.isnormal());
+	// TODO what's isnormal
+	//assert(this->getPosition().isnormal());
+	//assert(toward.isnormal());
 
 	Dart res = d ;
 	Dart dd = d ;
-	float wsoe = getOrientationFace(toward, m.phi1(res)) ;
+	Geom::Orientation2D wsoe = getOrientationFace(toward, m.phi1(res)) ;
 
 	// orientation step
 	if (wsoe != Geom::RIGHT)
@@ -326,12 +329,12 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 	CGoGNout << "faceState" << d << CGoGNendl ;
 #endif
 
-	assert(this->getPosition().isFinite());
-	assert(goal.isFinite()) ;
+	assert(Geom::isFinite(this->getPosition()));
+	assert(Geom::isFinite(goal));
 // 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	Dart dd = d ;
-	float wsoe = getOrientationFace(goal, m.phi1(d)) ;
+	Geom::Orientation2D wsoe = getOrientationFace(goal, m.phi1(d));
 
 	// orientation step
 	if (wsoe != Geom::RIGHT)

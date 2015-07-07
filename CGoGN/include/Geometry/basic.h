@@ -80,7 +80,7 @@ typename VEC::DATA_TYPE cos_angle(const VEC& a, const VEC& b)
     typename VEC::DATA_TYPE nb2 = b.norm2() ;
 
     typename VEC::DATA_TYPE res = (a * b) / sqrt(na2 * nb2) ;
-    return res > 1.0 ? 1.0 : (res < -1.0 ? -1.0 : res) ;
+    return res > 1.0f ? 1.0f : (res < -1.0f ? -1.0f : res) ;
 }
 
 // angle formed by 2 vectors

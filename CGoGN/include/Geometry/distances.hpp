@@ -166,7 +166,7 @@ typename VEC3::DATA_TYPE squaredDistancePoint2Triangle(const VEC3& P, const VEC3
     if (fSqrDistance < 0.0f)
         fSqrDistance = 0.0f;
 
-    return fSqrDistance;
+	return typename VEC3::DATA_TYPE(fSqrDistance);
 }
 
 template <typename VEC3>
@@ -268,27 +268,28 @@ typename VEC3::DATA_TYPE squaredDistanceSeg2Point(const VEC3& A, const VEC3& AB,
 template <typename VEC3>
 bool lineLineClosestPoints(const VEC3& P1, const VEC3& V1, const VEC3& P2, const VEC3& V2, VEC3& Q1, VEC3& Q2)
 {
-	   Geom::Vec3f P12 = P1 - P2;
+	typedef typename VEC3::DATA_TYPE SCAL;
+	VEC3 P12 = P1 - P2;
 
-	   float d1343 = P12 * V2;
-	   float d4321 = V2*V1;
-	   float d1321 = P12*V1;
-	   float d4343 = V2*V2;
-	   float d2121 = V1*V1;
+	SCAL d1343 = P12 * V2;
+	SCAL d4321 = V2*V1;
+	SCAL d1321 = P12*V1;
+	SCAL d4343 = V2*V2;
+	SCAL d2121 = V1*V1;
 
-	   float denom = d2121 * d4343 - d4321 * d4321;
+	SCAL denom = d2121 * d4343 - d4321 * d4321;
 
-	   if (fabs(denom) < 0.0000001)
-	      return false;
+	if (fabs(denom) < 0.0000001)
+		return false;
 
-	   float numer = d1343 * d4321 - d1321 * d4343;
+	SCAL numer = d1343 * d4321 - d1321 * d4343;
 
-	   float mua = numer / denom;
-	   float mub = (d1343 + d4321 * mua) / d4343;
+	SCAL mua = numer / denom;
+	SCAL mub = (d1343 + d4321 * mua) / d4343;
 
-	   Q1 = P1 + mua*V1;
-	   Q2 = P2 + mub*V2;
-	   return true;
+	Q1 = P1 + mua*V1;
+	Q2 = P2 + mub*V2;
+	return true;
 }
 
 

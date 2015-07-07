@@ -25,6 +25,9 @@
 #ifndef __QUANTIZATION_H__
 #define __QUANTIZATION_H__
 
+#include <vector>
+#include <list>
+
 #define epsSplitVector 0.00001f
 
 #define epsilonDistortion 0.0001f
@@ -35,10 +38,7 @@
 namespace CGoGN
 {
 
-namespace Algo
-{
-
-namespace PMesh
+namespace Utils
 {
 
 template <typename VEC>
@@ -101,9 +101,7 @@ private:
 } ;
 
 
-} //namespace PMesh
-
-} //namespace Algo
+} //namespace Utils
 
 } //namespace CGoGN
 

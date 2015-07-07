@@ -56,7 +56,7 @@ void pliantRemeshing(
 		if(!m1.isMarked(d))
 		{
 			m1.template markOrbit<EDGE>(d) ;
-			meanEdgeLength += Geometry::edgeLength<PFP>(map, d, position) ;
+			meanEdgeLength += Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 			++nbEdges ;
 		}
 	}
@@ -73,7 +73,7 @@ void pliantRemeshing(
 		if(!m2.isMarked(d))
 		{
 			m2.template markOrbit<EDGE>(d) ;
-			REAL length = Geometry::edgeLength<PFP>(map, d, position) ;
+			REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 			if(length > edgeLengthSup)
 			{
 				Dart dd = map.phi2(d) ;
@@ -128,7 +128,7 @@ void pliantRemeshing(
 			if(!cornerVertex.isMarked(d) && !cornerVertex.isMarked(d1) &&
 				( (featureVertex.isMarked(d) && featureVertex.isMarked(d1)) || (!featureVertex.isMarked(d) && !featureVertex.isMarked(d1)) ))
 			{
-				REAL length = Geometry::edgeLength<PFP>(map, d, position) ;
+				REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position);
 				if(length < edgeLengthInf && map.edgeCanCollapse(d))
 				{
 					bool collapse = true ;
@@ -185,7 +185,7 @@ void pliantRemeshing(
 	Algo::Surface::Geometry::computeNormalVertices<PFP>(map, position, normal) ;
 
 	// tangential relaxation
-	VertexAttribute<VEC3, MAP> centroid = map.template addAttribute<VEC3, VERTEX>("centroid") ;
+	VertexAttribute<VEC3, MAP> centroid = map.template addAttribute<VEC3, VERTEX, MAP>("centroid") ;
 	Surface::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
 
 	CellMarker<MAP, VERTEX> vm(map) ;

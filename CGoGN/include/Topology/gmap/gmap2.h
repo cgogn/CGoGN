@@ -86,6 +86,8 @@ public:
 
 	Dart alpha_1(Dart d) const;
 
+	Dart phi2_1(Dart d) const;
+
 protected:
 	void beta2sew(Dart d, Dart e);
 

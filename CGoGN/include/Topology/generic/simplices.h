@@ -52,7 +52,7 @@ public:
 	inline operator Dart() {return dart;}
 	/// check if this simplex is really a simplex
 	template <typename MAP>
-	bool check(const MAP& map) const { return Algo::Topo::isSimplex<MAP,ORBIT>(map,dart);}
+	bool check(const MAP& map) const { return Algo::Topo::isSimplex<ORBIT, MAP>(map, dart); }
 };
 
 

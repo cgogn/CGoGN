@@ -21,19 +21,32 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#include "Utils/cgognStream.h"
+#include <algorithm>
 
 namespace CGoGN {
 
 namespace Geom {
 
-template<typename PFP>
-Frame<PFP>::Frame(const VEC3& X, const VEC3& Y, const VEC3& Z)
+
+template<typename REAL> const REAL Frame<REAL>::Xx = REAL(0.0766965) ;
+template<typename REAL> const REAL Frame<REAL>::Xy = REAL(0.383483);
+template<typename REAL> const REAL Frame<REAL>::Xz = REAL(0.920358);
+template<typename REAL> const REAL Frame<REAL>::Yx = REAL(-0.760734);
+template<typename REAL> const REAL Frame<REAL>::Yy = REAL(0.619202);
+template<typename REAL> const REAL Frame<REAL>::Yz = REAL(-0.194606);
+template<typename REAL> const REAL Frame<REAL>::Zx = REAL(-0.644516);
+template<typename REAL> const REAL Frame<REAL>::Zy = REAL(-0.685222);
+template<typename REAL> const REAL Frame<REAL>::Zz = REAL(0.339219);
+
+template<typename REAL>
+Frame<REAL>::Frame(const VEC3& X, const VEC3& Y, const VEC3& Z)
 {
 	const VEC3 refX(Xx,Xy,Xz) ;
 	const VEC3 refY(Yx,Yy,Yz) ;
 	const VEC3 refZ(Zx,Zy,Zz) ;
 
-	if (!isDirectOrthoNormalFrame<PFP>(X,Y,Z))
+	if (!isDirectOrthoNormalFrame<VEC3>(X,Y,Z))
 		return ;
 
 	REAL& alpha = m_EulerAngles[0] ;
@@ -60,14 +73,14 @@ Frame<PFP>::Frame(const VEC3& X, const VEC3& Y, const VEC3& Z)
 	beta = (Y*lineOfNodes > 0 ? -1 : 1) * std::acos(std::max(std::min(REAL(1.0), X*lineOfNodes ),REAL(-1.0))) ;
 }
 
-template<typename PFP>
-Frame<PFP>::Frame(const VEC3& EulerAngles)
+template<typename REAL>
+Frame<REAL>::Frame(const VEC3& EulerAngles)
 {
 	m_EulerAngles = EulerAngles ;
 }
 
-template<typename PFP>
-void Frame<PFP>::getFrame(VEC3& X, VEC3& Y, VEC3& Z) const
+template<typename REAL>
+void Frame<REAL>::getFrame(VEC3& X, VEC3& Y, VEC3& Z) const
 {
 	const VEC3 refX(Xx,Xy,Xz) ;
 	const VEC3 refZ(Zx,Zy,Zz) ;
@@ -83,62 +96,63 @@ void Frame<PFP>::getFrame(VEC3& X, VEC3& Y, VEC3& Z) const
 	Y = Z ^ X ;
 }
 
-template<typename PFP>
-bool Frame<PFP>::equals(const Geom::Frame<PFP>& lf, REAL epsilon) const
+template<typename REAL>
+bool Frame<REAL>::equals(const Geom::Frame<REAL>& lf, REAL epsilon) const
 {
 	return (m_EulerAngles - lf.m_EulerAngles).norm2() < epsilon ;
 }
 
-template<typename PFP>
-bool Frame<PFP>::operator==(const Frame<PFP>& lf) const
+template<typename REAL>
+bool Frame<REAL>::operator==(const Frame<REAL>& lf) const
 {
 	return this->equals(lf) ;
 }
 
-template<typename PFP>
-bool Frame<PFP>::operator!=(const Frame<PFP>& lf) const
+template<typename REAL>
+bool Frame<REAL>::operator!=(const Frame<REAL>& lf) const
 {
 	return !(this->equals(lf)) ;
 }
 
-template<typename PFP>
-bool isNormalizedFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
+template<typename VEC3>
+bool isNormalizedFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon)
 {
 	return X.isNormalized(epsilon) && Y.isNormalized(epsilon) && Z.isNormalized(epsilon) ;
 }
 
-template<typename PFP>
-bool isOrthogonalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
+template<typename VEC3>
+bool isOrthogonalFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon)
 {
 	return X.isOrthogonal(Y,epsilon) && X.isOrthogonal(Z,epsilon) && Y.isOrthogonal(Z,epsilon) ;
 }
 
-template<typename PFP>
-bool isDirectFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
+template<typename VEC3>
+bool isDirectFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon)
 {
-	typename PFP::VEC3 new_Y = Z ^ X ;		// direct
-	typename PFP::VEC3 diffs = new_Y - Y ;		// differences with existing B
-	typename PFP::REAL diffNorm = diffs.norm2() ;	// Norm of this differences vector
+	VEC3 new_Y = Z ^ X ;		// direct
+	VEC3 diffs = new_Y - Y ;		// differences with existing B
+	typename VEC3::DATA_TYPE diffNorm = diffs.norm2() ;	// Norm of this differences vector
 
 	return (diffNorm < epsilon) ;		// Verify that this difference is very small
 }
 
-template<typename PFP>
-bool isDirectOrthoNormalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
+template<typename VEC3>
+bool isDirectOrthoNormalFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon)
 {
-	if (!isNormalizedFrame<PFP>(X,Y,Z,epsilon))
+
+	if (!isNormalizedFrame<VEC3>(X,Y,Z,epsilon))
 	{
 		CGoGNerr << "The Frame you want to create and compress is not normalized" << CGoGNendl ;
 		return false ;
 	}
 
-	if (!isOrthogonalFrame<PFP>(X,Y,Z,epsilon))
+	if (!isOrthogonalFrame<VEC3>(X,Y,Z,epsilon))
 	{
 		CGoGNerr << "The Frame you want to create and compress is not orthogonal" << CGoGNendl ;
 		return false ;
 	}
 
-	if (!isDirectFrame<PFP>(X,Y,Z,epsilon))
+	if (!isDirectFrame<VEC3>(X,Y,Z,epsilon))
 	{
 		CGoGNerr << "The Frame you want to create and compress is not direct" << CGoGNendl ;
 		return false ;
@@ -161,7 +175,7 @@ Geom::Vector<3,REAL> cartToSpherical (const Geom::Vector<3,REAL>& cart)
 	REAL& theta = res[1] ;
 	REAL& phi = res[2] ;
 
-	rho = cart.norm() ;
+	rho = REAL(cart.norm());
 	theta = ((y < 0) ? -1 : 1) * std::acos(x / REAL(sqrt(x*x + y*y)) )  ;
 	if (isnan(theta))
 		theta = 0.0 ;
@@ -214,12 +228,12 @@ Geom::Vector<3,REAL> rotate (Geom::Vector<3,REAL> axis, REAL angle, Geom::Vector
 	REAL& zp = res[2] ;
 
 	const REAL tmp1 = u*x+v*y+w*z ;
-	const REAL cos = std::cos(angle) ;
-	const REAL sin = std::sin(angle) ;
+	const REAL cosinus = std::cos(angle) ;
+	const REAL sinus = std::sin(angle) ;
 
-	xp = u*tmp1*(1-cos) + x*cos+(v*z-w*y)*sin ;
-	yp = v*tmp1*(1-cos) + y*cos-(u*z-w*x)*sin ;
-	zp = w*tmp1*(1-cos) + z*cos+(u*y-v*x)*sin ;
+	xp = u*tmp1*(1 - cosinus) + x*cosinus + (v*z - w*y)*sinus;
+	yp = v*tmp1*(1 - cosinus) + y*cosinus - (u*z - w*x)*sinus;
+	zp = w*tmp1*(1 - cosinus) + z*cosinus + (u*y - v*x)*sinus;
 
 	return res ;
 }

@@ -26,6 +26,7 @@
 #define __ORIENTATION__
 
 #include "Geometry/basic.h"
+#include "Geometry/plane_3d.h"
 
 namespace CGoGN
 {
@@ -97,6 +98,19 @@ Orientation3D testOrientation3D(const VEC3& P, const VEC3& N, const VEC3& PP)
  */
 template <typename VEC3>
 Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb) ;
+
+/**
+* return the orientation of point P w.r.t. the vector (Pb-Pa)
+* --> tells if P is on/right/left of the line (Pa,Pb)
+* @param P the point
+* @param Pa origin point
+* @param Pb end point
+* @param Np normal defining the plan in which belong the 3 points
+* @return the orientation
+*/
+template <typename VEC3>
+Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb, const VEC3& Np);
+
 
 /**
  * return the relative orientation of two vectors in the plane (u,v)

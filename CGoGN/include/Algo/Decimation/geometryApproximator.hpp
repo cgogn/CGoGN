@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Algo/Topo/embedding.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 namespace CGoGN
 {

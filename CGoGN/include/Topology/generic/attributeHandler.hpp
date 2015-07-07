@@ -91,21 +91,21 @@ AttributeHandler<T, ORB, MAP>::AttributeHandler(const AttributeHandler<T, ORB, M
 		registerInMap() ;
 }
 
-template <typename T, unsigned int ORB, typename MAP>
-template <unsigned int ORBIT2>
-AttributeHandler<T, ORB, MAP>::AttributeHandler(const AttributeHandler<T, ORBIT2, MAP>& h) :
-	AttributeHandlerOrbit<ORB>(h.valid),
-	m_map(h.m_map),
-	m_attrib(h.m_attrib)
-{
-	if(m_attrib->getOrbit() == ORBIT2)
-	{
-		if(this->valid)
-			registerInMap() ;
-	}
-	else
-		this->valid = false;
-}
+//template <typename T, unsigned int ORB, typename MAP>
+//template <unsigned int ORBIT2>
+//AttributeHandler<T, ORB, MAP>::AttributeHandler(const AttributeHandler<T, ORBIT2, MAP>& h) :
+//	AttributeHandlerOrbit<ORB>(h.valid),
+//	m_map(h.m_map),
+//	m_attrib(h.m_attrib)
+//{
+//	if(m_attrib->getOrbit() == ORBIT2)
+//	{
+//		if(this->valid)
+//			registerInMap() ;
+//	}
+//	else
+//		this->valid = false;
+//}
 
 template <typename T, unsigned int ORB, typename MAP>
 inline AttributeHandler<T, ORB, MAP>& AttributeHandler<T, ORB, MAP>::operator=(const AttributeHandler<T, ORB, MAP>& ta)

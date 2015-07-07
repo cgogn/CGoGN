@@ -29,6 +29,7 @@
 #include "Topology/generic/cellmarker.h"
 #include "Utils/textures.h"
 #include "Geometry/bounding_box.h"
+#include "Utils/vbo.h"
 
 namespace CGoGN
 {
@@ -171,13 +172,13 @@ public:
 	 * @brief set position attribute
 	 * @param position attribute
 	 */
-	void setPositionAttribute(VertexAttribute<Geom::Vec3f, MAP> position);
+	void setPositionAttribute(VertexAttribute<VEC3, MAP> position);
 
 	/**
 	 * @brief set position attribute
 	 * @param position attribute
 	 */
-	void setNormalAttribute(VertexAttribute<Geom::Vec3f, MAP> normal);
+	void setNormalAttribute(VertexAttribute<VEC3, MAP> normal);
 
 	/**
 	 * @brief set texture coordinate attribute
@@ -226,13 +227,13 @@ public:
 	 * @param browsers vector of MapBrowers representing the groups
 	 * @return ok or not
 	 */
-	bool generateBrowsers(std::vector<ContainerBrowser*>& browsers);
+//	bool generateBrowsers(std::vector<ContainerBrowser*>& browsers);
 
 	/**
 	 * @brief getMaterialNames
 	 * @return
 	 */
-	std::vector<std::string>& getMaterialNames();
+//	std::vector<std::string>& getMaterialNames();
 
 	/**
 	 * @brief getMaterialIndex

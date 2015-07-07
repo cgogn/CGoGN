@@ -53,7 +53,7 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d);
 /**
  * Triangule all the faces of the mesh
  */
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void trianguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
 //template <typename PFP>
@@ -82,7 +82,7 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d);
 /**
  * Quadrangule all the faces of the mesh
  */
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs) ;
 
 //template <typename PFP>
@@ -161,6 +161,8 @@ void LoopSubdivisionAttribName(typename PFP::MAP& map, const std::string& nameAt
 	case CGoGNVEC4D:
 		return LoopSubdivisionAttribNameTyped<PFP,Geom::Vec4d>(map,nameAttrib);
 		break;
+	default:
+		break;
 	}
 	CGoGNerr << "LoopSubdivision not supported on attribute "<< nameAttrib << CGoGNendl;
 }
@@ -171,7 +173,7 @@ void LoopSubdivisionAttribName(typename PFP::MAP& map, const std::string& nameAt
  * Cut 1 face of degree n in 2n+1 faces (cut 2 times each edge and "insert" a face in the middle)
  * @param size indicates where to cut edges, its value must stay between 0 and 0.5 excluded
  */
-template <typename PFP, typename EMBV, typename EMB>
+template <typename PFP, typename EMBV>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size=1.0f/3.0f) ;
 
 /**
