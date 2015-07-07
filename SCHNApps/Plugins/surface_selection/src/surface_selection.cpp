@@ -40,6 +40,7 @@ bool Surface_Selection_Plugin::enable()
 
 	m_selectedEdgesDrawer = new Utils::Drawer(1);
 	m_selectedFacesDrawer = new Utils::Drawer();
+	m_selectedFacesDrawer->setFaceShading(true);
 
 	m_selectingCellDrawer = new Utils::Drawer(1);
 
@@ -609,6 +610,7 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 					}
 					m_selectedFacesDrawer->end();
 					m_selectedFacesDrawer->endList();
+					m_selectedFacesDrawer->setFaceShading(true);
 					m_selectedFaces_dirty = false;
 					break;
 				}
