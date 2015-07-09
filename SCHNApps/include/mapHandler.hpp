@@ -9,6 +9,8 @@ namespace CGoGN
 namespace SCHNApps
 {
 
+
+
 inline void MapHandlerGen::registerAttribute(const AttributeHandlerGen& ah)
 {
 	m_attribs[ah.getOrbit()].insert(QString::fromStdString(ah.name()), QString::fromStdString(ah.typeName()));
@@ -29,6 +31,29 @@ inline QString MapHandlerGen::getAttributeTypeName(unsigned int orbit, const QSt
 
 
 
+
+
+template <typename PFP>
+MapHandler<PFP>::~MapHandler()
+{
+	// clean  the cell selector
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		foreach(CellSelectorGen* cs, m_cellSelectors[orbit])
+		{
+			if (cs)
+			{
+				emit(cellSelectorRemoved(orbit, cs->getName()));
+				disconnect(cs, SIGNAL(selectedCellsChanged()), this, SLOT(selectedCellsChanged()));
+				delete cs;
+			}
+		}
+		m_cellSelectors[orbit].clear();
+	}
+
+	if (m_map)
+		delete m_map;
+}
 
 
 template <typename PFP>

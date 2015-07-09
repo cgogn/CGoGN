@@ -409,11 +409,7 @@ public:
 		MapHandlerGen(name, s, map)
 	{}
 
-	~MapHandler()
-	{
-		if (m_map)
-			delete m_map;
-	}
+	~MapHandler();
 
 	inline MAP* getMap() { return static_cast<MAP*>(m_map); }
 

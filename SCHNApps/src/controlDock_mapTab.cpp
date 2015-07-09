@@ -324,9 +324,31 @@ void ControlDock_MapTab::mapRemoved(MapHandlerGen* m)
 	if(!items.empty())
 	{
 		b_updatingUI = true;
+
 		delete items[0];
+		if (m_schnapps->getSelectedMap() == m)
+		{
+			std::cout << "Unselecting" << std::endl;
+			m_selectedSelector[DART] = NULL;
+			foreach(QListWidgetItem* item, list_dartSelectors->selectedItems())
+				item->setSelected(false);
+			m_selectedSelector[VERTEX] = NULL;
+			foreach(QListWidgetItem* item, list_vertexSelectors->selectedItems())
+				item->setSelected(false);
+			m_selectedSelector[EDGE] = NULL;
+			foreach(QListWidgetItem* item, list_edgeSelectors->selectedItems())
+				item->setSelected(false);
+			m_selectedSelector[FACE] = NULL;
+			foreach(QListWidgetItem* item, list_faceSelectors->selectedItems())
+				item->setSelected(false);
+			m_selectedSelector[VOLUME] = NULL;
+			foreach(QListWidgetItem* item, list_volumeSelectors->selectedItems())
+				item->setSelected(false);
+		}
+
 		b_updatingUI = false;
 	}
+
 }
 
 

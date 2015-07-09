@@ -1319,6 +1319,8 @@ void SCHNApps::cleanAll()
 
 	Camera::cameraCount = 1;
 	View::viewCount = 1;
+
+	m_pluginDock->setVisible(false);
 }
 
 

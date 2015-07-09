@@ -24,7 +24,7 @@ Surface_Selection_Plugin::Surface_Selection_Plugin() :
 	m_selectedFaces_dirty(false),
 	m_selectionRadiusBase(1),
 	m_selectionRadiusCoeff(1),
-	m_normalAngleThreshold(10)
+	m_normalAngleThreshold(float(10*M_PI/180))
 {}
 
 bool Surface_Selection_Plugin::enable()
@@ -89,8 +89,11 @@ void Surface_Selection_Plugin::disable()
 
 	delete m_selectionSphereVBO;
 
-	disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
-	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	//disconnect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
+	//disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
+	disconnect(m_schnapps, SIGNAL(selectedCellSelectorChanged(CellSelectorGen*)), this, SLOT(updateSelectedCellsRendering()));
+
 }
 
 void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
@@ -115,13 +118,11 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						{
 							if (m_selectedVertices_dirty)
 								updateSelectedCellsRendering();
-
 							m_pointSprite->setAttributePosition(m_selectedVerticesVBO);
 							const QColor& col = p.color;
 							m_pointSprite->setColor(Geom::Vec4f(col.redF(), col.greenF(), col.blueF(), 0.0f));
 							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
 							m_pointSprite->setSize(p.basePSradius*p.verticesScaleFactor);
-
 							m_pointSprite->enableVertexAttribs();
 							glDrawArrays(GL_POINTS, 0, selector->getNbSelectedCells());
 							m_pointSprite->disableVertexAttribs();
@@ -132,11 +133,9 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 							std::vector<PFP2::VEC3> selectionPoint;
 							selectionPoint.push_back(p.positionAttribute[m_selectingVertex]);
 							m_selectionSphereVBO->updateData(selectionPoint);
-
 							m_pointSprite->setAttributePosition(m_selectionSphereVBO);
 							m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
 							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-
 							switch(p.selectionMethod)
 							{
 								case NormalAngle :
@@ -147,7 +146,6 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 									m_pointSprite->setSize(m_selectionRadiusBase * m_selectionRadiusCoeff);
 									break;
 							}
-
 							m_pointSprite->enableVertexAttribs();
 							glEnable(GL_BLEND);
 							glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -502,14 +500,16 @@ void Surface_Selection_Plugin::wheelEvent(View* view, QWheelEvent* event)
 				else
 					m_selectionRadiusCoeff *= 1.1f;
 				view->updateGL();
+				m_dockTab->spin_angle_radius->setValue(m_selectionRadiusBase * m_selectionRadiusCoeff);
 				break;
 			}
 			case NormalAngle : {
 				if(event->delta() > 0)
-					m_normalAngleThreshold *= 0.9f;
+					m_normalAngleThreshold -= CGoGN::PFP_SCHNAPPS::REAL(M_PI / 180);
 				else
-					m_normalAngleThreshold *= 1.1f;
+					m_normalAngleThreshold += CGoGN::PFP_SCHNAPPS::REAL(M_PI / 180);
 //				view->displayMessage(QString("Angle threshold : ") + m_normalAngleThreshold);
+				m_dockTab->spin_angle_radius->setValue(m_normalAngleThreshold/M_PI*180);
 				break;
 			}
 		}
@@ -573,7 +573,6 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 
 					m_selectedEdgesDrawer->newList(GL_COMPILE);
 					m_selectedEdgesDrawer->lineWidth(3.0f);
-	//				m_selectedEdgesDrawer->color3f(1.0f, 0.0f, 0.0f);
 					m_selectedEdgesDrawer->color3f(p.color.redF(), p.color.greenF(), p.color.blueF());
 					m_selectedEdgesDrawer->begin(GL_LINES);
 					for(std::vector<Edge>::const_iterator e = selectedCells.begin(); e != selectedCells.end(); ++e)
