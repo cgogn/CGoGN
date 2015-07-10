@@ -16,6 +16,7 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_transfoMatrixInv(1.0f),
 	m_bbVertexAttribute(NULL),
 	m_bbDrawer(NULL),
+	m_bbColor(0,1,0),
 	m_render(NULL),
 	m_topoRender(NULL)
 {
@@ -107,6 +108,16 @@ bool MapHandlerGen::isBBshown() const
 {
 	return m_showBB;
 }
+
+void  MapHandlerGen::setBBColor(const QString& color)
+{
+	QColor col(color);
+	m_bbColor[0] = col.redF();
+	m_bbColor[1] = col.greenF();
+	m_bbColor[2] = col.blueF();
+	updateBB();
+}
+
 
 void MapHandlerGen::setBBVertexAttribute(const QString& name)
 {

@@ -317,9 +317,28 @@ public slots:
 	void showHidePythonDock();
 
 	/**
+	* @brief [PYTHON] set if control dock is floating or docked
+	* @param 1: floating / 0: docked
+	*/
+	void setFloatingControlDock(bool f);
+
+	/**
+	* @brief [PYTHON] set if plugin dock is floating or docked
+	* @param 1: floating / 0: docked
+	*/
+	void setFloatingPluginDock(bool f);
+
+	/**
+	* @brief [PYTHON] set if python dock is floating or docked
+	* @param 1: floating / 0: docked
+	*/
+	void setFloatingPythonDock(bool f);
+
+
+	/**
 	* @brief [PYTHON] Load a python script store in a file.
 	* @param fileName the filename with absolute path or relative to path set with setPythonPath
-	* #return true if reading file ok
+	* @return true if reading file ok
 	*/
 	bool loadPythonScriptFromFile(const QString& fileName);
 

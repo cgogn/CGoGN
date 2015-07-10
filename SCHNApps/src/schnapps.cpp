@@ -1000,6 +1000,22 @@ void SCHNApps::showHidePythonDock()
 }
 
 
+void SCHNApps::setFloatingControlDock(bool f)
+{
+	m_controlDock->setFloating(f);
+}
+
+void SCHNApps::setFloatingPluginDock(bool f)
+{
+	m_pluginDock->setFloating(f);
+}
+
+void SCHNApps::setFloatingPythonDock(bool f)
+{
+	if (m_pythonDock->isVisible())
+		m_pythonDock->setFloating(f);
+}
+
 
 void SCHNApps::execPythonCmd(const QString& cmd)
 {
@@ -1089,6 +1105,11 @@ void SCHNApps::pyRecording()
 
 		//windows
 		out << "schnapps.setWindowSize(" << this->width() << ", "<< this->height() << ")" << endl;
+
+		// docks
+		out << "schnapps.setFloatingControlDock(" << m_controlDock->isFloating() << ")" << endl;
+		out << "schnapps.setFloatingPluginDock(" << m_pluginDock->isFloating() << ")" << endl;
+		out << "schnapps.setFloatingPythonDock(" << m_pythonDock->isFloating() << ")" << endl;
 
 		m_pyRecFile->close();
 

@@ -107,6 +107,12 @@ public slots:
 	bool isBBshown() const;
 
 	/**
+	* @brief [PYTHON] set color for drawing BB the bounding-box
+	* @param color color name (red,green,...) or color format #rrggbb
+	*/
+	void setBBColor(const QString& color);
+
+	/**
 	* @brief [PYTHON] choose the vertex attribute used to compute the bounding-box
 	* @param name name of attribute
 	*/
@@ -385,6 +391,7 @@ protected:
 	AttributeMultiVectorGen* m_bbVertexAttribute;
 	float m_bbDiagSize;
 	Utils::Drawer* m_bbDrawer;
+	glm::vec3 m_bbColor;
 
 	Algo::Render::GL2::MapRender* m_render;
 	Algo::Render::GL2::TopoRender* m_topoRender;
