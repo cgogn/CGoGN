@@ -353,7 +353,19 @@ public slots:
 	* @param sz scaling z factor
 	*/
 	void setScaling(float sx, float sy, float sz);
-	
+
+	/**
+	* @brief [PYTHON] Save the frame into a string
+	* @return the storage string
+	*/
+	QString frameToString();
+
+	/**
+	* @brief [PYTHON] restore frame from string storage
+	* @param frame the string with frame info 
+	*/
+	void frameFromString(QString frame);
+
 
 	/*********************************************************
 	 * SIGNALS

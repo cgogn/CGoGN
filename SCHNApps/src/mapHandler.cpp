@@ -433,6 +433,29 @@ void MapHandlerGen::setScaling(float sx, float sy, float sz)
 
 
 
+QString MapHandlerGen::frameToString()
+{
+	QString res;
+	QTextStream str(&res);
+	const GLdouble* mat = m_frame->matrix();
+	for (int i = 0; i < 16; ++i)
+		str << mat[i] << " ";
+	return res;
+}
+
+void MapHandlerGen::frameFromString(QString frame)
+{
+	QTextStream str(&frame);
+
+	GLdouble mat[16];
+	for (int i = 0; i < 16; ++i)
+		str >> mat[i];
+
+	m_frame->setFromMatrix(mat);
+
+	frameModified();
+}
+
 
 
 

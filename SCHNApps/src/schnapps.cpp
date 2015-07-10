@@ -1111,6 +1111,12 @@ void SCHNApps::pyRecording()
 			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
 		}
 
+		// save frames of maps
+		foreach(MapHandlerGen* mhg, m_maps)
+		{
+			out << mhg->getName() << ".frameFromString(\"" << mhg->frameToString() << "\")" << endl;
+		}
+
 		//windows
 		out << "schnapps.setWindowSize(" << this->width() << ", "<< this->height() << ")" << endl;
 
@@ -1183,6 +1189,13 @@ void SCHNApps::appendPyRecording()
 		{
 			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
 		}
+
+		// save frames of maps
+		foreach(MapHandlerGen* mhg, m_maps)
+		{
+			out << mhg->getName() << ".frameFromString(\"" << mhg->frameToString() << "\")" << endl;
+		}
+
 
 		//windows
 		out << "schnapps.setWindowSize(" << this->width() << ", " << this->height() << ")" << endl;
