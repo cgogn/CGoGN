@@ -38,8 +38,6 @@ MapHandlerGen* Surface_Import_Plugin::importMeshFromFile(const QString& nameOfFi
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
-		pythonRecording("importMeshFromFile", fi.baseName(), fileName);
-
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
 		if(mhg)
 		{
@@ -60,6 +58,7 @@ MapHandlerGen* Surface_Import_Plugin::importMeshFromFile(const QString& nameOfFi
 					mhg->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
 			}
 		}
+		pythonRecording("importMeshFromFile", mhg->getName(), fileName);
 		return mhg;
 	}
 	else

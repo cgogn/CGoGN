@@ -727,25 +727,33 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 
 MapHandlerGen* SCHNApps::addMap(const QString& name, unsigned int dim)
 {
+	QString finalName = name;
 	if (m_maps.contains(name))
-		return NULL;
+	{
+		int i = 1;
+		do
+		{
+			finalName = name + QString("_") + QString::number(i);
+			++i;
+		} while (m_maps.contains(finalName));
+	}
 
 	MapHandlerGen* mh = NULL;
 	switch(dim)
 	{
 		case 2 : {
 			PFP2::MAP* map = new PFP2::MAP();
-			mh = new MapHandler<PFP2>(name, this, map);
+			mh = new MapHandler<PFP2>(finalName, this, map);
 			break;
 		}
 		case 3 : {
 			PFP3::MAP* map = new PFP3::MAP();
-			mh = new MapHandler<PFP3>(name, this, map);
+			mh = new MapHandler<PFP3>(finalName, this, map);
 			break;
 		}
 	}
 
-	m_maps.insert(name, mh);
+	m_maps.insert(finalName, mh);
 
 	DEBUG_EMIT("mapAdded");
 	emit(mapAdded(mh));
