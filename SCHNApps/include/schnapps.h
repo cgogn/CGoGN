@@ -415,6 +415,12 @@ public:
 	/// replace \ by / in file path for window 
 	static QString noBackSlash(const QString& name);
 
+	/// transform QString in std::string with 
+	static std::string niceStdString(const QString& qstr);
+
+	///  force QString contain to be ascii (non ascii char are replaced by '_')
+	static QString forceASCII(const QString& qstr);
+
 
 signals:
 	void cameraAdded(Camera* camera);

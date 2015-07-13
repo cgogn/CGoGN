@@ -33,19 +33,20 @@ bool Surface_Import_Plugin::enable()
 
 MapHandlerGen* Surface_Import_Plugin::importMeshFromFile(const QString& nameOfFile)
 {
+
 	QString fileName = SCHNApps::noBackSlash(nameOfFile);
 
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
-		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
+		MapHandlerGen* mhg = m_schnapps->addMap(SCHNApps::forceASCII(fi.baseName()), 2);
 		if(mhg)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 			PFP2::MAP* map = mh->getMap();
 
 			std::vector<std::string> attrNames;
-			Algo::Surface::Import::importMesh<PFP2>(*map, fileName.toStdString(), attrNames);
+			Algo::Surface::Import::importMesh<PFP2>(*map, SCHNApps::niceStdString(fileName), attrNames);
 
 			for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
 			{
@@ -83,9 +84,7 @@ MapHandlerGen* Surface_Import_Plugin::importImageFromFile(const QString& nameOfF
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
-		pythonRecording("importImageFromFile", fi.baseName(), fileName);
-
-		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
+		MapHandlerGen* mhg = m_schnapps->addMap(SCHNApps::forceASCII(fi.baseName()), 2);
 		if(mhg)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
@@ -122,6 +121,7 @@ MapHandlerGen* Surface_Import_Plugin::importImageFromFile(const QString& nameOfF
 			mh->registerAttribute(color);
 
 		}
+		pythonRecording("importImageFromFile", mhg->getName(), fileName);
 		return mhg;
 	}
 	else

@@ -1084,6 +1084,25 @@ QString SCHNApps::noBackSlash(const QString& name)
 #endif
 }
 
+
+std::string SCHNApps::niceStdString(const QString& qstr)
+{
+	return std::string(qstr.toLocal8Bit().data());
+}
+
+QString SCHNApps::forceASCII(const QString& qstr)
+{
+	QString str(qstr);
+
+	for (QString::iterator it = str.begin(); it != str.end(); ++it)
+	{
+		if (it->unicode() > 127)
+			*it = '_';
+	}
+	return str;
+}
+
+
 void SCHNApps::setPythonPath(const QString& path)
 {
 	m_pyPathFile = SCHNApps::noBackSlash(path);
