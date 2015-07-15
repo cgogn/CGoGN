@@ -33,7 +33,6 @@ bool Surface_Import_Plugin::enable()
 
 MapHandlerGen* Surface_Import_Plugin::importMeshFromFile(const QString& nameOfFile)
 {
-
 	QString fileName = SCHNApps::noBackSlash(nameOfFile);
 
 	QFileInfo fi(fileName);

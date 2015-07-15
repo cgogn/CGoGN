@@ -1045,15 +1045,16 @@ bool SCHNApps::loadPythonScriptFromFile(const QString& fileName)
 			return false;
 		}
 	}
-#ifdef WIN32
+
 	QFile file(fullName);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 	QTextStream in(&file);
 	m_pythonContext.evalScript(in.readAll());
-#else
-	m_pythonContext.evalFile(fullName);
-#endif
+
+// not using eval file because of pb with non ascii char in file name and path
+//	m_pythonContext.evalFile(fullName);
+
 	return true;
 }
 
@@ -1162,6 +1163,9 @@ void SCHNApps::pyRecording()
 	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
+		if (!fileName.endsWith(".py",Qt::CaseInsensitive))
+			fileName += ".py";
+
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::WriteOnly | QIODevice::Text))
 			return;
@@ -1237,6 +1241,9 @@ void SCHNApps::appendPyRecording()
 	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
+		if (!fileName.endsWith(".py",Qt::CaseInsensitive))
+			fileName += ".py";
+
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::Append | QIODevice::Text))
 			return;	
