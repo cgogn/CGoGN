@@ -366,6 +366,10 @@ public slots:
 	*/
 	void frameFromString(QString frame);
 
+	/**
+	 * @brief reset the frame manipulator to its initial position
+	 */
+	void frameReset();
 
 	/*********************************************************
 	 * SIGNALS

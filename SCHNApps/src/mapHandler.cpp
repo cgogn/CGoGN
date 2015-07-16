@@ -456,6 +456,22 @@ void MapHandlerGen::frameFromString(QString frame)
 	frameModified();
 }
 
+void MapHandlerGen::frameReset()
+{
+	GLdouble mat[16];
+	// Identity
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+			if (i==j)
+				mat[i*4+j] = 1;
+			else
+				mat[i*4+j] = 0;
+
+	m_frame->setFromMatrix(mat);
+
+	frameModified();
+}
+
 
 
 
