@@ -107,6 +107,12 @@ public slots:
 	bool isBBshown() const;
 
 	/**
+	* @brief [PYTHON] set color for drawing BB the bounding-box
+	* @param color color name (red,green,...) or color format #rrggbb
+	*/
+	void setBBColor(const QString& color);
+
+	/**
 	* @brief [PYTHON] choose the vertex attribute used to compute the bounding-box
 	* @param name name of attribute
 	*/
@@ -347,7 +353,23 @@ public slots:
 	* @param sz scaling z factor
 	*/
 	void setScaling(float sx, float sy, float sz);
-	
+
+	/**
+	* @brief [PYTHON] Save the frame into a string
+	* @return the storage string
+	*/
+	QString frameToString();
+
+	/**
+	* @brief [PYTHON] restore frame from string storage
+	* @param frame the string with frame info 
+	*/
+	void frameFromString(QString frame);
+
+	/**
+	 * @brief reset the frame manipulator to its initial position
+	 */
+	void frameReset();
 
 	/*********************************************************
 	 * SIGNALS
@@ -385,6 +407,7 @@ protected:
 	AttributeMultiVectorGen* m_bbVertexAttribute;
 	float m_bbDiagSize;
 	Utils::Drawer* m_bbDrawer;
+	glm::vec3 m_bbColor;
 
 	Algo::Render::GL2::MapRender* m_render;
 	Algo::Render::GL2::TopoRender* m_topoRender;
@@ -409,11 +432,7 @@ public:
 		MapHandlerGen(name, s, map)
 	{}
 
-	~MapHandler()
-	{
-		if (m_map)
-			delete m_map;
-	}
+	~MapHandler();
 
 	inline MAP* getMap() { return static_cast<MAP*>(m_map); }
 

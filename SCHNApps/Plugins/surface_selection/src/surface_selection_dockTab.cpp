@@ -43,6 +43,7 @@ void Surface_Selection_DockTab::positionAttributeChanged(int index)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 			m_plugin->h_parameterSet[map].positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+			m_plugin->updateSelectedCellsRendering();
 			m_plugin->pythonRecording("changePositionAttribute", "", map->getName(), combo_positionAttribute->currentText());
 		}
 	}
@@ -57,6 +58,7 @@ void Surface_Selection_DockTab::normalAttributeChanged(int index)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 			m_plugin->h_parameterSet[map].normalAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_normalAttribute->currentText());
+			m_plugin->updateSelectedCellsRendering();
 			m_plugin->pythonRecording("changeNormalAttribute", "", map->getName(), combo_normalAttribute->currentText());
 		}
 	}
@@ -71,6 +73,26 @@ void Surface_Selection_DockTab::selectionMethodChanged(int index)
 		{
 			m_plugin->h_parameterSet[map].selectionMethod = SelectionMethod(index);
 			m_plugin->pythonRecording("changeSelectionMethod", "", map->getName(), index);
+		}
+		
+		switch (index)
+		{
+		case 0:
+			this->spin_angle_radius->setHidden(true);
+			this->label_angle_radius->setText(QString());
+			break;
+		case 1:
+			this->spin_angle_radius->setHidden(false);
+			this->spin_angle_radius->setValue(m_plugin->m_selectionRadiusBase * m_plugin->m_selectionRadiusCoeff);
+			this->label_angle_radius->setText(QString("Radius:"));
+			break;
+		case 2:
+			this->spin_angle_radius->setHidden(false);
+			this->spin_angle_radius->setValue(m_plugin->m_normalAngleThreshold / M_PI * 180);
+			this->label_angle_radius->setText(QString("Angle:"));
+			break;
+		default:
+			break;
 		}
 
 	}
@@ -204,6 +226,27 @@ void Surface_Selection_DockTab::updateMapParameters()
 		combo_color->setColor(p.color);
 
 		slider_verticesScaleFactor->setValue(int(50.0*p.verticesScaleFactor));
+
+		switch (p.selectionMethod)
+		{
+		case 0:
+			this->spin_angle_radius->setHidden(true);
+			this->label_angle_radius->setText(QString());
+			break;
+		case 1:
+			this->spin_angle_radius->setHidden(false);
+			this->spin_angle_radius->setValue(m_plugin->m_selectionRadiusBase * m_plugin->m_selectionRadiusCoeff);
+			this->label_angle_radius->setText(QString("Radius:"));
+			break;
+		case 2:
+			this->spin_angle_radius->setHidden(false);
+			this->spin_angle_radius->setValue(m_plugin->m_normalAngleThreshold / M_PI * 180);
+			this->label_angle_radius->setText(QString("Angle:"));
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	b_updatingUI = false;

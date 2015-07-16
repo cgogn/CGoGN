@@ -16,6 +16,7 @@ MapHandlerGen::MapHandlerGen(const QString& name, SCHNApps* s, GenericMap* map) 
 	m_transfoMatrixInv(1.0f),
 	m_bbVertexAttribute(NULL),
 	m_bbDrawer(NULL),
+	m_bbColor(0,1,0),
 	m_render(NULL),
 	m_topoRender(NULL)
 {
@@ -107,6 +108,16 @@ bool MapHandlerGen::isBBshown() const
 {
 	return m_showBB;
 }
+
+void  MapHandlerGen::setBBColor(const QString& color)
+{
+	QColor col(color);
+	m_bbColor[0] = col.redF();
+	m_bbColor[1] = col.greenF();
+	m_bbColor[2] = col.blueF();
+	updateBB();
+}
+
 
 void MapHandlerGen::setBBVertexAttribute(const QString& name)
 {
@@ -421,6 +432,45 @@ void MapHandlerGen::setScaling(float sx, float sy, float sz)
 
 
 
+
+QString MapHandlerGen::frameToString()
+{
+	QString res;
+	QTextStream str(&res);
+	const GLdouble* mat = m_frame->matrix();
+	for (int i = 0; i < 16; ++i)
+		str << mat[i] << " ";
+	return res;
+}
+
+void MapHandlerGen::frameFromString(QString frame)
+{
+	QTextStream str(&frame);
+
+	GLdouble mat[16];
+	for (int i = 0; i < 16; ++i)
+		str >> mat[i];
+
+	m_frame->setFromMatrix(mat);
+
+	frameModified();
+}
+
+void MapHandlerGen::frameReset()
+{
+	GLdouble mat[16];
+	// Identity
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+			if (i==j)
+				mat[i*4+j] = 1;
+			else
+				mat[i*4+j] = 0;
+
+	m_frame->setFromMatrix(mat);
+
+	frameModified();
+}
 
 
 

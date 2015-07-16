@@ -727,25 +727,33 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 
 MapHandlerGen* SCHNApps::addMap(const QString& name, unsigned int dim)
 {
+	QString finalName = name;
 	if (m_maps.contains(name))
-		return NULL;
+	{
+		int i = 1;
+		do
+		{
+			finalName = name + QString("_") + QString::number(i);
+			++i;
+		} while (m_maps.contains(finalName));
+	}
 
 	MapHandlerGen* mh = NULL;
 	switch(dim)
 	{
 		case 2 : {
 			PFP2::MAP* map = new PFP2::MAP();
-			mh = new MapHandler<PFP2>(name, this, map);
+			mh = new MapHandler<PFP2>(finalName, this, map);
 			break;
 		}
 		case 3 : {
 			PFP3::MAP* map = new PFP3::MAP();
-			mh = new MapHandler<PFP3>(name, this, map);
+			mh = new MapHandler<PFP3>(finalName, this, map);
 			break;
 		}
 	}
 
-	m_maps.insert(name, mh);
+	m_maps.insert(finalName, mh);
 
 	DEBUG_EMIT("mapAdded");
 	emit(mapAdded(mh));
@@ -1000,6 +1008,22 @@ void SCHNApps::showHidePythonDock()
 }
 
 
+void SCHNApps::setFloatingControlDock(bool f)
+{
+	m_controlDock->setFloating(f);
+}
+
+void SCHNApps::setFloatingPluginDock(bool f)
+{
+	m_pluginDock->setFloating(f);
+}
+
+void SCHNApps::setFloatingPythonDock(bool f)
+{
+	if (m_pythonDock->isVisible())
+		m_pythonDock->setFloating(f);
+}
+
 
 void SCHNApps::execPythonCmd(const QString& cmd)
 {
@@ -1021,15 +1045,16 @@ bool SCHNApps::loadPythonScriptFromFile(const QString& fileName)
 			return false;
 		}
 	}
-#ifdef WIN32
+
 	QFile file(fullName);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 	QTextStream in(&file);
 	m_pythonContext.evalScript(in.readAll());
-#else
-	m_pythonContext.evalFile(fullName);
-#endif
+
+// not using eval file because of pb with non ascii char in file name and path
+//	m_pythonContext.evalFile(fullName);
+
 	return true;
 }
 
@@ -1060,6 +1085,25 @@ QString SCHNApps::noBackSlash(const QString& name)
 #endif
 }
 
+
+std::string SCHNApps::niceStdString(const QString& qstr)
+{
+	return std::string(qstr.toLocal8Bit().data());
+}
+
+QString SCHNApps::forceASCII(const QString& qstr)
+{
+	QString str(qstr);
+
+	for (QString::iterator it = str.begin(); it != str.end(); ++it)
+	{
+		if (it->unicode() > 127)
+			*it = '_';
+	}
+	return str;
+}
+
+
 void SCHNApps::setPythonPath(const QString& path)
 {
 	m_pyPathFile = SCHNApps::noBackSlash(path);
@@ -1087,8 +1131,19 @@ void SCHNApps::pyRecording()
 			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
 		}
 
+		// save frames of maps
+		foreach(MapHandlerGen* mhg, m_maps)
+		{
+			out << mhg->getName() << ".frameFromString(\"" << mhg->frameToString() << "\")" << endl;
+		}
+
 		//windows
 		out << "schnapps.setWindowSize(" << this->width() << ", "<< this->height() << ")" << endl;
+
+		// docks
+		out << "schnapps.setFloatingControlDock(" << m_controlDock->isFloating() << ")" << endl;
+		out << "schnapps.setFloatingPluginDock(" << m_pluginDock->isFloating() << ")" << endl;
+		out << "schnapps.setFloatingPythonDock(" << m_pythonDock->isFloating() << ")" << endl;
 
 		m_pyRecFile->close();
 
@@ -1108,6 +1163,9 @@ void SCHNApps::pyRecording()
 	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
+		if (!fileName.endsWith(".py",Qt::CaseInsensitive))
+			fileName += ".py";
+
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::WriteOnly | QIODevice::Text))
 			return;
@@ -1155,6 +1213,13 @@ void SCHNApps::appendPyRecording()
 			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
 		}
 
+		// save frames of maps
+		foreach(MapHandlerGen* mhg, m_maps)
+		{
+			out << mhg->getName() << ".frameFromString(\"" << mhg->frameToString() << "\")" << endl;
+		}
+
+
 		//windows
 		out << "schnapps.setWindowSize(" << this->width() << ", " << this->height() << ")" << endl;
 
@@ -1176,6 +1241,9 @@ void SCHNApps::appendPyRecording()
 	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
+		if (!fileName.endsWith(".py",Qt::CaseInsensitive))
+			fileName += ".py";
+
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::Append | QIODevice::Text))
 			return;	
@@ -1319,6 +1387,8 @@ void SCHNApps::cleanAll()
 
 	Camera::cameraCount = 1;
 	View::viewCount = 1;
+
+	m_pluginDock->setVisible(false);
 }
 
 
