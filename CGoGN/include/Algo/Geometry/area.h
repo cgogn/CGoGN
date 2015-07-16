@@ -25,6 +25,8 @@
 #ifndef __ALGO_GEOMETRY_AREA_H__
 #define __ALGO_GEOMETRY_AREA_H__
 
+#include "Topology/generic/attributeHandler.h"
+
 namespace CGoGN
 {
 

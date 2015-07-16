@@ -127,6 +127,7 @@ void bijectiveOrbitEmbedding(MAP& map)
 	map.removeAttribute(counter) ;
 }
 
+
 } // namespace Topo
 
 } // namespace Algo

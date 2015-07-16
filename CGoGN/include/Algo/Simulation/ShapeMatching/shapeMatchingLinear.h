@@ -60,7 +60,7 @@ private:
     void computeAqqMatrix();
 
 public:
-    ShapeMatchingLinear(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass, REAL beta):
+	ShapeMatchingLinear(MAP& map, VertexAttribute<VEC3, MAP>& position, VertexAttribute<REAL, MAP>& mass, REAL beta) :
         ShapeMatching<PFP>(map, position, mass),
         m_beta(beta)
     { }

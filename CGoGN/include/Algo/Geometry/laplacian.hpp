@@ -126,7 +126,7 @@ typename PFP::REAL computeCotanWeightEdge(
 		const VEC3& p3 = position[map.phi_1(d)] ;
 
 		REAL cot_alpha = 1 / tan(Geom::angle(p1 - p3, p2 - p3)) ;
-		return 0.5 * cot_alpha ;
+		return 0.5f * cot_alpha ;
 	}
 	else
 	{
@@ -137,7 +137,7 @@ typename PFP::REAL computeCotanWeightEdge(
 
 		REAL cot_alpha = 1 / tan(Geom::angle(p1 - p3, p2 - p3)) ;
 		REAL cot_beta = 1 / tan(Geom::angle(p2 - p4, p1 - p4)) ;
-		return 0.5 * ( cot_alpha + cot_beta ) ;
+		return 0.5f * ( cot_alpha + cot_beta ) ;
 	}
 }
 

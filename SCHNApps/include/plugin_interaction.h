@@ -23,10 +23,23 @@ public:
 	virtual ~PluginInteraction();
 
 public slots:
+	/**
+	 * @brief get thte list of views linked with this plugin
+	 * @return the list
+	 */
 	inline const QList<View*>& getLinkedViews() const { return l_views; }
 
+	/**
+	 * @brief [PYTHON] test if this plugin is linked to a view
+	 * @param view view object ptr
+	 * @return
+	 */
 	inline bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
+	/**
+	 * @brief get list of shaders used in this rendering plugin
+	 * @return  list of shaders ptr
+	 */
 	inline const QList<Utils::GLSLShader*> getShaders() const { return l_shaders; }
 
 private:

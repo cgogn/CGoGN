@@ -25,6 +25,7 @@
 //#define DEBUG
 
 #include "Geometry/frame.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -92,7 +93,7 @@ typename PFP::VEC3 ParticleCell2DAndHalf<PFP>::intersectLineEdge(const VEC3& pA,
 
 	Geom::intersectionLinePlane(pA, pB - pA, q1, n, Inter) ;
 
-	Geom::Plane3D<float> pl = Geometry::facePlane<PFP>(m, d, m_positions);
+	Geom::Plane3D<REAL> pl = Geometry::facePlane<PFP>(m, d, m_positions);
 	pl.project(Inter);
 
 	return Inter;
@@ -114,7 +115,7 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 	#ifdef DEBUG
 	CGoGNout << "vertexState" << d << CGoGNendl;
 	#endif
-	assert(goal.isFinite()) ;
+	assert(Geom::isFinite(goal));
 
 	crossCell = CROSS_OTHER;
 
@@ -189,7 +190,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 	CGoGNout << "edgeState" <<  d << CGoGNendl;
 	#endif
 
-	assert(goal.isFinite()) ;
+	assert(Geom::isFinite(goal));
 // 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if(crossCell == NO_CROSS)
@@ -221,7 +222,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 goal, Geom::Orientation3D sideOf
 			VEC3 n2 = Geometry::faceNormal<PFP>(m, m.phi2(d), m_positions);
 			VEC3 axis = n1 ^ n2 ;
 
-			float angle = Geom::angle(n1, n2) ;
+			REAL angle = Geom::angle(n1, n2) ;
 
 			displ = Geom::rotate(axis, angle, displ) ;
 			goal = this->getPosition() + displ;
@@ -261,8 +262,8 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 	CGoGNout << "faceState" <<  d << CGoGNendl;
 	#endif
 
-	assert(goal.isFinite()) ;
-	assert(this->getPosition().isFinite()) ;
+	assert(Geom::isFinite(goal));
+	assert(Geom::isFinite(this->getPosition()));
 
 	//project goal within face plane
 	VEC3 n1 = Geometry::faceNormal<PFP>(m,d,m_positions);
@@ -275,7 +276,7 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 goal)
 
 	//track new position within map
 	Dart dd = d;
-	float wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d));
+	Geom::Orientation3D wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d));
 
 	// orientation step
 	if(wsoe != Geom::UNDER)

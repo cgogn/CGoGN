@@ -709,7 +709,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs)
 		{
 			double beta = betaF(n) ;
 			temp *= (beta / double(n));
-			emcp *= (1.0 - beta);
+			emcp *= (1.0f - beta);
 			emcp += temp;
 		}
 		attributs[*vert] = emcp;
@@ -801,8 +801,8 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 			map.cutEdge(map.phi1(dd));
 			mCorner.mark(map.phi2(map.phi1(dd)));
 //			attributs[map.template phi<11>(dd)] = c*(1.0-size)+ attributs[dd]*size;
-			attributs[map.template phi<11>(dd)] = attributs[dd] 	+ Geometry::vectorOutOfDart<PFP>(map,dd,attributs)
-																	- Geometry::vectorOutOfDart<PFP>(map,map.phi_1(dd),attributs);
+			attributs[map.template phi<11>(dd)] = attributs[dd] 	+ Algo::Geometry::vectorOutOfDart<PFP>(map,dd,attributs)
+																	- Algo::Geometry::vectorOutOfDart<PFP>(map,map.phi_1(dd),attributs);
 			dd = map.phi1(map.phi1(map.phi1(map.phi2(map.phi1(dd)))));
 		} while(!mCorner.isMarked(dd));
 	}
@@ -821,6 +821,8 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, float size)
 }
 
 
+
+// remark do not compil with GMap !
 template <typename PFP, typename EMBV>
 void DooSabin(typename PFP::MAP& map, EMBV& position)
 {
@@ -895,7 +897,7 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 	for (std::vector<Dart>::iterator di=faces.begin(); di != faces.end(); ++di)
 	{
 		Dart e = *di;
-		typename PFP::VEC3 center = Geometry::faceCentroid<PFP>(map,e,position);
+//		typename PFP::VEC3 center = Geometry::faceCentroid<PFP>(map,e,position);
 
 		do
 		{
@@ -904,7 +906,7 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 			e = map.phi1(e);
 		}while (e != * di);
 
-		int N = buffer.size();
+		int N = int(buffer.size());
 		for (int i = 0; i < N; ++i)
 		{
 			EMB P(0);
@@ -912,12 +914,12 @@ void DooSabin(typename PFP::MAP& map, EMBV& position)
 			{
 				if (j==i)
 				{
-					/*float*/typename PFP::REAL c1 = double(N+5)/double(4*N);
+					/*float*/typename PFP::REAL c1 = typename PFP::REAL(double(N + 5) / double(4 * N));
 					P += buffer[j]*c1;
 				}
 				else
 				{
-					/*float*/typename PFP::REAL c2 = (3.0+2.0*cos(2.0*M_PI*(double(i-j))/double(N))) /(4.0*N);
+					/*float*/typename PFP::REAL c2 = typename PFP::REAL((3.0 + 2.0*std::cos(2.0*M_PI*(double(i - j)) / double(N))) / (4.0*N));
 					P+= c2*buffer[j];
 				}
 			}

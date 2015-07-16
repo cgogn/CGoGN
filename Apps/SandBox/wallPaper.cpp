@@ -31,7 +31,7 @@ void MyQT::cb_initGL()
 {
 	position = myMap.addAttribute<PFP::VEC3, VERTEX, MAP>("position");
 	Algo::Surface::Tilings::Square::Cylinder<PFP> c(myMap,50,50);
-	c.embedIntoCylinder(position,0.5,0.7,1.0);
+	c.embedIntoCylinder(position,0.5f,0.7f,1.0f);
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
 	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);

@@ -51,7 +51,7 @@ m_nbEdges(0)
 
 template<typename PFP, typename ATTRIB>
 void ColorPerEdgeRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-		const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX)
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& positions, const ATTRIB& colorPerXXX)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -67,23 +67,23 @@ void ColorPerEdgeRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 
 	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
 	{
-		buffer.push_back(PFP::toVec3f(positions[d]);
+		buffer.push_back(PFP::toVec3f(positions[d]));
 		bufferColors.push_back(PFP::toVec3f(colorPerXXX[d]));
 		Dart e = map.phi2(d);
 		buffer.push_back(PFP::toVec3f(positions[e]));
 		bufferColors.push_back(PFP::toVec3f(colorPerXXX[e]))	;
 	}
 
-	m_nbEdges = buffer.size()/2;
+	m_nbEdges = uint32(buffer.size()/2);
 
 	vboPosition.setDataSize(3);
-	vboPosition.allocate(buffer.size());
+	vboPosition.allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	vboColor.setDataSize(3);
-	vboColor.allocate(bufferColors.size());
+	vboColor.allocate(uint32(bufferColors.size()));
 	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(vboColor.lockPtr());
 	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	vboColor.releasePtr();

@@ -532,7 +532,7 @@ public:
 	 *
 	 * \return the stream reference
 	 */
-	friend std::istream& operator>>(std::istream& in, QuadricHF<REAL>& q)
+	friend std::istream& operator>>(std::istream& in, QuadricHF<REAL>& /*q*/)
 	{
 		// TODO
 		//		in >> q.A ;

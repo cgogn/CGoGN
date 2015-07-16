@@ -56,7 +56,7 @@ bool isConvex(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP:
 		Dart e = *it;
 		if (!m.isMarked(e))
 		{
-			m.markOrbit<EDGE>(e) ;
+			m.template markOrbit<EDGE>(e) ;
 			convex = isTetrahedronWellOriented<PFP>(map, e, position, CCW) ;
 		}
 	}
@@ -69,6 +69,7 @@ template <typename PFP>
 bool isPointInVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& point)
 {
 	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
 	//number of intersection between a ray and the volume must be odd
 	int countInter = 0;
@@ -104,7 +105,7 @@ bool isPointInVolume(typename PFP::MAP& map, Vol v, const VertexAttribute<typena
 
 			if (!alreadyfound)
 			{
-				float v = dir * (inter - point);
+				REAL v = dir * (inter - point);
 				if (v > 0)
 					++countInter;
 				if (v < 0)
@@ -263,17 +264,17 @@ bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 	typedef typename PFP::REAL REAL;
 	typedef typename PFP::VEC3 VEC3;
 
-	VEC3 v1 = vectorOutOfDart<PFP>(map, d, position);
+	VEC3 v1 = Algo::Geometry::vectorOutOfDart<PFP>(map, d, position);
 	VEC3 v2(point - position[d]);
 
 	v1.normalize();
 	v2.normalize();
 
-	return abs(v1*v2) <= REAL(0.00001);
+	return std::abs(v1*v2) <= REAL(0.00001);
 }
 
 template <typename PFP>
-bool isPointOnVertex(typename PFP::MAP& map, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& point)
+bool isPointOnVertex(typename PFP::MAP& /*map*/, Vertex v, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& point)
 {
 	return Geom::arePointsEquals(point, position[v]);
 }
@@ -291,12 +292,12 @@ bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Face f, con
 	}
 
 	VEC3 inter;
-	if( intersectionSegmentConvexFace(map, f, position, points[0], points[1], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[1], points[2], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[2], points[0], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[0], points[3], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[1], points[3], inter)
-	|| 	intersectionSegmentConvexFace(map, f, position, points[2], points[3], inter)
+	if( intersectionSegmentConvexFace<PFP>(map, f, position, points[0], points[1], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[1], points[2], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[2], points[0], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[0], points[3], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[1], points[3], inter)
+		|| intersectionSegmentConvexFace<PFP>(map, f, position, points[2], points[3], inter)
 	)
 		return true;
 

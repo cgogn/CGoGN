@@ -24,7 +24,7 @@
 //#define DEBUG
 
 #include "Geometry/frame.h"
-
+#include "Geometry/vector_gen.h"
 
 
 namespace CGoGN
@@ -46,7 +46,7 @@ std::vector<Dart> ParticleCell2DAndHalfMemo<PFP>::move(const VEC3& goal)
 	this->crossCell = NO_CROSS ;
 	if (!Geom::arePointsEquals(goal, this->getPosition()))
 	{
-		CellMarkerMemo<FACE> memo_cross(this->m);
+		CellMarkerMemo<MAP,FACE> memo_cross(this->m);
 
 		switch (this->getState())
 		{
@@ -106,7 +106,7 @@ void ParticleCell2DAndHalfMemo<PFP>::vertexState(VEC3 current, CellMarkerMemo<MA
 	#ifdef DEBUG
 	CGoGNout << "vertexState" << d << CGoGNendl;
 	#endif
-	assert(current.isFinite());
+	assert(Geom::isFinite(current));
 
 	this->crossCell = CROSS_OTHER;
 
@@ -177,7 +177,7 @@ void ParticleCell2DAndHalfMemo<PFP>::edgeState(VEC3 current, CellMarkerMemo<MAP,
 	CGoGNout << "edgeState" <<  d << CGoGNendl;
 	#endif
 
-	assert(current.isFinite());
+	assert(Geom::isFinite(current));
 // 	assert(Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if(this->crossCell == NO_CROSS)
@@ -209,7 +209,7 @@ void ParticleCell2DAndHalfMemo<PFP>::edgeState(VEC3 current, CellMarkerMemo<MAP,
 			VEC3 n2 = Geometry::faceNormal<PFP>(this->m, this->m.phi2(this->d), this->m_positions);
 			VEC3 axis = n1 ^ n2 ;
 
-			float angle = Geom::angle(n1, n2) ;
+            typename PFP::REAL angle = Geom::angle(n1, n2) ;
 
 			displ = Geom::rotate(axis, angle, displ) ;
 			current = this->getPosition() + displ;
@@ -249,8 +249,8 @@ void ParticleCell2DAndHalfMemo<PFP>::faceState(VEC3 current, CellMarkerMemo<MAP,
 	if(memo_cross.isMarked(this->d)) return ;
 	memo_cross.mark(this->d);
 
- 	assert(this->getPosition().isFinite());
- 	assert(current.isFinite());
+	assert(Geom::isFinite(this->getPosition()));
+	assert(Geom::isFinite(current));
 // 	assert(Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	//project current within face plane
@@ -264,7 +264,7 @@ void ParticleCell2DAndHalfMemo<PFP>::faceState(VEC3 current, CellMarkerMemo<MAP,
 
 	//track new position within map
 	Dart dd = this->d;
-	float wsoe = this->getOrientationFace(current, this->getPosition(), this->m.phi1(this->d));
+	Geom::Orientation3D wsoe = this->getOrientationFace(current, this->getPosition(), this->m.phi1(this->d));
 
 	// orientation step
 	if(wsoe != Geom::UNDER)

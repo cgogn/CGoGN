@@ -35,13 +35,13 @@ public:
 	typedef VertexAttribute<VEC3, MAP> TAB_POS ;
 
 private:
-	ParticleCell2DMemo()
-	{
-	}
+	//ParticleCell2DMemo()
+	//{
+	//}
 
 public:
 
-	ParticleCell2DMemo(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
+	ParticleCell2DMemo(MAP& map, Dart belonging_cell, VEC3 pos, /*const*/ TAB_POS& tabPos) :
 	ParticleCell2D<PFP>(map, belonging_cell, pos, tabPos)
 	{
 	}

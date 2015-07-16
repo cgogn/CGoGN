@@ -137,8 +137,8 @@ void ShapeMatchingLinear<PFP>::shapeMatch()
     //4.
     Eigen::Matrix3d A = apq * m_aqq; //
 
-    REAL det = A.determinant();
-    det = 1.0f/powf(det,1.0f/3.0f);
+    double det_d = A.determinant();
+	REAL det = REAL(1.0 / pow(det_d, 1.0 / 3.0));
 
     // \beta * A + (1 - \beta) * R
     if(std::isfinite(det))
@@ -170,7 +170,7 @@ void ShapeMatchingLinear<PFP>::shapeMatch()
 
         VEC3 g;
         for (unsigned int j = 0 ; j < 3 ; ++j)
-             g[j] = tmp(j);
+			g[j] = REAL(tmp(j));
 
          this->m_goal[i] = g;
     }

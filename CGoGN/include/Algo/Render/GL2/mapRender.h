@@ -120,6 +120,7 @@ protected:
 				prev->next = this;
 		}
 
+
 		static void close(VertexPoly* first, VertexPoly* last)
 		{
 			last->next = first;

@@ -30,7 +30,7 @@ class VoronoiDiagram
 protected :
 	typedef struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 //		unsigned int region;
 		Dart pathOrigin;
@@ -46,7 +46,7 @@ protected :
 	std::vector<Dart> seeds;
 
 	VertexAttribute<VertexInfo, MAP> vertexInfo;
-	std::multimap<float,Dart> front ;
+	std::multimap<REAL,Dart> front ;
 	CellMarker<MAP, VERTEX> vmReached;
 
 public :
@@ -57,7 +57,8 @@ public :
 	virtual void setSeeds_fromVector (const std::vector<Dart>&);
 	virtual void setSeeds_random (unsigned int nbseeds);
 	const std::vector<Dart>& getBorder () { return border; }
-	void setCost (const EdgeAttribute<REAL,MAP>& c);
+
+//	void setCost (const EdgeAttribute<REAL,MAP>& c); // impossible to reaffect a ref TODO pointer ?
 
 	Dart computeDiagram ();
 	virtual void computeDiagram_incremental (unsigned int nbseeds);
@@ -67,8 +68,8 @@ protected :
 	virtual void clear ();
 	void initFrontWithSeeds();
 	virtual void collectVertexFromFront(Dart e);
-	void addVertexToFront(Dart f, float d);
-	void updateVertexInFront(Dart f, float d);
+	void addVertexToFront(Dart f, REAL d);
+	void updateVertexInFront(Dart f, REAL d);
 };
 
 template <typename PFP>
@@ -108,7 +109,7 @@ public :
 	// move each seed along one edge according to the energy gradient + check that the energy decreases
 	unsigned int moveSeedsToMedioid(); // returns the number of seeds that did move
 	// move each seed to the medioid of its region
-	REAL getGlobalEnergy() { return globalEnergy; }
+	REAL getGlobalEnergy() { return REAL(globalEnergy); }
 
 protected :
 	void clear();

@@ -41,7 +41,7 @@ namespace Geometry
 template <typename PFP>
 void featureEdgeDetection(
 	typename PFP::MAP& map,
-	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
+	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position,
 	CellMarker<typename PFP::MAP, EDGE>& featureEdge)
 {
 	typedef typename PFP::MAP MAP ;
@@ -50,9 +50,9 @@ void featureEdgeDetection(
 
 	featureEdge.unmarkAll() ;
 
-	FaceAttribute<VEC3, MAP> fNormal = map.template getAttribute<VEC3, FACE>("normal") ;
+	FaceAttribute<VEC3, MAP> fNormal = map.template getAttribute<VEC3, FACE, typename PFP::MAP>("normal") ;
 	if(!fNormal.isValid())
-		fNormal = map.template addAttribute<VEC3, FACE>("normal") ;
+		fNormal = map.template addAttribute<VEC3, FACE, typename PFP::MAP>("normal") ;
 	Algo::Surface::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
 	TraversorE<MAP> t(map) ;
@@ -241,7 +241,7 @@ bool isTriangleRegular(
 template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -257,7 +257,7 @@ void computeRidgeLines(
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -276,7 +276,7 @@ void ridgeLines(
 	const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& vertex_gradient,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k,
 	const VertexAttribute<typename PFP::REAL, typename PFP::MAP>& k2,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -365,9 +365,9 @@ void ridgeLines(
 
 		VEC3 Ktotal = Kv1 + Kv2 + Kv3 ;
 		REAL ktotal = k[v1] + k[v2] + k[v3] ;
-		ktotal = ktotal > 0 ? ktotal : -1.0 * ktotal ;
+		ktotal = ktotal > 0 ? ktotal : -1.0f * ktotal ;
 		REAL k2total = k2[v1] + k2[v2] + k2[v3] ;
-		k2total = k2total > 0 ? k2total : -1.0 * k2total ;
+		k2total = k2total > 0 ? k2total : -1.0f * k2total ;
 
 		if( ( (eg * Ktotal) < 0 ) && ( ktotal > k2total ) )
 			ridge_segments[d].type = FEATURE ;
@@ -378,7 +378,7 @@ template <typename PFP>
 void computeSingularTriangle(
 	typename PFP::MAP& map,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	TraversorF<typename PFP::MAP> trav(map);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -393,27 +393,27 @@ void singularTriangle(
 	typename PFP::MAP& map,
 	Dart d,
 	CellMarker<typename PFP::MAP, FACE>& regularMarker,
-	FaceAttribute<ridgeSegment, typename PFP::MAP>& ridge_segments)
+	FaceAttribute<RidgeSegment<typename PFP::REAL>, typename PFP::MAP>& ridge_segments)
 {
 	int nbPoint = 0 ;
 
 	Traversor2FFaE<typename PFP::MAP> f(map, d) ;
 	for (Dart d2 = f.begin(); d2 != f.end(); d2 = f.next())
 	{
-		if(regularMarker.isMarked(d2) and ridge_segments[d2].type == SEGMENT)
+		if(regularMarker.isMarked(d2) && (ridge_segments[d2].type == SEGMENT))
 		{
 			if(isEdgeInTriangle<PFP>(map, ridge_segments[d2].p1.d, d))
 			{
 				if(nbPoint == 0)
 				{
 					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p1.d) ;
-					ridge_segments[d].p1.w = 1.0 - ridge_segments[d2].p1.w ;
+					ridge_segments[d].p1.w = 1.0f - ridge_segments[d2].p1.w ;
 				}
 				else
 				{
 					ridge_segments[d].type ++ ;
 					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p1.d) ;
-					ridge_segments[d].p2.w = 1.0 - ridge_segments[d2].p1.w ;
+					ridge_segments[d].p2.w = 1.0f - ridge_segments[d2].p1.w ;
 				}
 				nbPoint ++ ;
 			}
@@ -422,13 +422,13 @@ void singularTriangle(
 				if(nbPoint == 0)
 				{
 					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p2.d) ;
-					ridge_segments[d].p1.w = 1.0 - ridge_segments[d2].p2.w ;
+					ridge_segments[d].p1.w = 1.0f - ridge_segments[d2].p2.w ;
 				}
 				else
 				{
 					ridge_segments[d].type ++ ;
 					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p2.d) ;
-					ridge_segments[d].p2.w = 1.0 - ridge_segments[d2].p2.w ;
+					ridge_segments[d].p2.w = 1.0f - ridge_segments[d2].p2.w ;
 				}
 				nbPoint ++ ;
 			}

@@ -92,21 +92,20 @@ void Viewer::cb_initGL()
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
 
-	m_phongShader = new Utils::ShaderPhong(true,false,false) ;
+	m_phongShader = new Utils::ShaderPhong(true,false) ;
 	m_phongShader->setAttributePosition(m_positionVBO) ;
 	m_phongShader->setAttributeNormal(m_normalVBO) ;
 	m_phongShader->setAmbiant(colClear) ;
 	m_phongShader->setDiffuse(colDif) ;
 	m_phongShader->setSpecular(colSpec) ;
 	m_phongShader->setShininess(shininess) ;
-	m_phongShader->setBackColor(Geom::Vec4f(0,0,0.2,0)) ;
+	m_phongShader->setBackColor(Geom::Vec4f(0.9f, 0.0f, 0.0f, 0.0f));
 
-	m_flatShader = new Utils::ShaderSimpleFlat(true,false) ;
+	m_flatShader = new Utils::ShaderSimpleFlat() ;
 	m_flatShader->setAttributePosition(m_positionVBO) ;
 	m_flatShader->setAmbiant(colClear) ;
 	m_flatShader->setDiffuse(colDif) ;
-	m_flatShader->setBackColor(Geom::Vec4f(0,0,0.2,0)) ;
-
+	m_flatShader->setBackColor(Geom::Vec4f(0.9f, 0.0f, 0.0f, 0.0f));
 
 	m_vectorShader = new Utils::ShaderVectorPerVertex() ;
 	m_vectorShader->setAttributePosition(m_positionVBO) ;
@@ -182,7 +181,7 @@ void Viewer::cb_redraw()
 	}
 
 	m_nbFrames++;
-	if (m_nbFrames >=100)
+	if (m_nbFrames >=500)
 	{
 		std::cout << 100000.0/m_frame_ch.elapsed()<< " fps"<<std::endl;
 		m_nbFrames = 0;
@@ -214,6 +213,34 @@ void Viewer::cb_keyPress(int keycode)
 {
 	switch(keycode)
 	{
+	case 'd':
+	{
+		m_phongShader->setDoubleSided(true);
+		m_flatShader->setDoubleSided(true);
+		updateGL();
+	}
+	break;
+	case 'D':
+	{
+		m_phongShader->setDoubleSided(false);
+		m_flatShader->setDoubleSided(false);
+		updateGL();
+	}
+	break;
+
+	case 'q':
+	{
+		Utils::Chrono ch;
+		ch.start();
+
+		for (int i = 0; i < 1000; ++i)
+		{
+			m_render->draw(m_flatShader, Algo::Render::GL2::TRIANGLES);
+			glFlush();
+		}
+
+		std::cout << "speed render " << 1000.0*1000.0/ch.elapsed() << " fps " << std::endl;
+	}
 	case 'n':
 		m_flatShader->setNoClippingPlane();
 		m_phongShader->setNoClippingPlane();

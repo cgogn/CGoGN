@@ -53,6 +53,8 @@ public:
 	inline bool isMutuallyExclusive() const { return m_isMutuallyExclusive; }
 	virtual void setMutuallyExclusiveSet(const QList<CellSelectorGen*>& mex) = 0;
 
+	virtual void clearAll() = 0;
+
 signals:
 	void selectedCellsChanged();
 
@@ -182,6 +184,16 @@ public:
 					m_mutuallyExclusive.append(s);
 			}
 		}
+	}
+
+
+	inline void clearAll()
+	{
+		std::vector<CELL> tempo;
+		m_cells.swap(tempo);
+		m_cm.unmarkAll();
+		m_selectionChanged = true;
+		checkChange();
 	}
 
 private:

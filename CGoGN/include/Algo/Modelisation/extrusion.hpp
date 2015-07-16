@@ -48,9 +48,10 @@ Algo::Surface::Tilings::Tiling<PFP>* revolution_prim(
 	int nbSides)
 {
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
 	// find circle center
-	float k = (axis * (center-profile[0])) / (axis*axis);
+	REAL k = (axis * (center - profile[0])) / (axis*axis);
 	VEC3 circCenter = center + k*axis;
 
 	// compute vector base plane for the circle
@@ -64,7 +65,7 @@ Algo::Surface::Tilings::Tiling<PFP>* revolution_prim(
 	path.reserve(nbSides);
 	for(int i=0; i< nbSides; ++i)
 	{
-		float alpha = float(2.0*M_PI/nbSides*i);
+		REAL alpha = REAL(2.0*M_PI / nbSides*i);
 		VEC3 P = circCenter + cos(alpha)*V + sin(alpha)*U;
 		path.push_back(P);
 	}
@@ -152,6 +153,10 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 	bool path_closed,
 	const std::vector<float>& scalePath)
 {
+
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
 	// topological creation
     Algo::Surface::Tilings::Tiling<PFP>* prim;
 
@@ -188,23 +193,23 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 	glPushMatrix();
 	// embedding
 	std::vector<Dart>& vertD = prim->getVertexDarts();
-	typename PFP::VEC3 normalObj(normal);
+	VEC3 normalObj(normal);
 	normalObj.normalize();
 
 	// put profile at the beginning of path
-	std::vector<typename PFP::VEC3> localObj;
+	std::vector<VEC3> localObj;
 	localObj.reserve(profile.size());
-	for(typename std::vector<typename PFP::VEC3>::const_iterator ip=profile.begin(); ip!=profile.end(); ++ip)
+	for(typename std::vector<VEC3>::const_iterator ip=profile.begin(); ip!=profile.end(); ++ip)
 	{
-		typename PFP::VEC3 P = *ip + path[0] - centerProfile;
+		VEC3 P = *ip + path[0] - centerProfile;
 		localObj.push_back(P);
 	}
 
 	int index=0;
 	for(unsigned int i=0; i<path.size(); ++i)
 	{
-		typename PFP::VEC3 rot(0.0f,0.0f,0.0f);
-		typename PFP::VEC3 VP;
+		VEC3 rot(0.0f,0.0f,0.0f);
+		VEC3 VP;
 		if (i==0) //begin
 		{
 			// vector on path
@@ -226,8 +231,8 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 			}
 			else
 			{
-				typename PFP::VEC3 V1 =  path[0] - path[i];
-				typename PFP::VEC3 V2 =  path[i] - path[i-1];
+				VEC3 V1 =  path[0] - path[i];
+				VEC3 V2 =  path[i] - path[i-1];
 				V1.normalize();
 				V2.normalize();
 				// vector on path
@@ -239,8 +244,8 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 		}
 		else // middle nodes
 		{
-			typename PFP::VEC3 V1 =  path[i+1] - path[i];
-			typename PFP::VEC3 V2 =  path[i] - path[i-1];
+			VEC3 V1 =  path[i+1] - path[i];
+			VEC3 V2 =  path[i] - path[i-1];
 
 			V1.normalize();
 			V2.normalize();
@@ -254,15 +259,15 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 		}
 
 		// computing angle of rotation
-		float pscal = normalObj*VP;
-		float asinAlpha = rot.normalize();
-		float alpha;
+		REAL pscal = normalObj*VP;
+		REAL asinAlpha = REAL(rot.normalize());
+		REAL alpha;
 		if (pscal>=0)
-			alpha = asin(asinAlpha);
+			alpha = std::asin(asinAlpha);
 		else
-			alpha = float(M_PI) - asin(asinAlpha);
+			alpha = REAL(M_PI) - std::asin(asinAlpha);
 		// creation of transformation matrix
-		Geom::Matrix44f transf;
+		Geom::Matrix<4,4,REAL> transf;
 		transf.identity();
 		if (alpha>0.00001f)
 		{
@@ -273,7 +278,7 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 
 		CGoGNout << "PATH: "<< i<< CGoGNendl;
 		// apply transfo on object to embed Polyhedron.
-		for(typename std::vector<typename PFP::VEC3>::iterator ip = localObj.begin(); ip != localObj.end(); ++ip)
+		for(typename std::vector<VEC3>::iterator ip = localObj.begin(); ip != localObj.end(); ++ip)
 		{
 			if (i!=0) //exept for first point of path
 			{
@@ -284,7 +289,7 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 
 			unsigned int em = the_map.template newCell<VERTEX>();
 //			positions[em] = (*ip);
-			typename PFP::VEC3 P = (*ip); //positions.at(em);
+			VEC3 P = (*ip); //positions.at(em);
 
 			if (!scalePath.empty())
 				P = path[i] + (scalePath[i]*(P-path[i]));
@@ -292,12 +297,12 @@ Algo::Surface::Tilings::Tiling<PFP>* extrusion_scale_prim(
 			CGoGNout << "P: "<< P<< CGoGNendl;
 
 			// compute the scale factor for angle deformation
-			float coef = 1.0f/(float(sin(M_PI/2.0f - alpha))); // warning here is angle/2 but alpha is half of angle we want to use
+			REAL coef = 1.0f / (REAL(sin(M_PI / 2.0f - alpha))); // warning here is angle/2 but alpha is half of angle we want to use
 			if (fabs(coef-1.0f)>0.00001f)
 			{
 				// projection of path point on plane define par P and the rot vector
-				float k = (rot*(P-path[i])) / (rot*rot);
-				typename PFP::VEC3 X = path[i] + k*rot;
+				REAL k = (rot*(P - path[i])) / (rot*rot);
+				VEC3 X = path[i] + k*rot;
 				//and scale in the plane
 				position[em] = X + coef*(P-X);
 			}

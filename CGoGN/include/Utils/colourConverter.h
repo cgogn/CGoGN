@@ -167,13 +167,21 @@ private: // private members
 
 private: // private constants
 	// D65 reference white
-	static constexpr REAL Xn = 0.950456 ;
-	static constexpr REAL Yn = 1.0 ;
-	static constexpr REAL Zn = 1.088754 ;
+	//static constexpr REAL Xn = 0.950456 ;
+	//static constexpr REAL Yn = 1.0 ;
+	//static constexpr REAL Zn = 1.088754 ;
 
-	static constexpr REAL un = 0.197832 ;
-	static constexpr REAL vn = 0.468340 ;
+	//static constexpr REAL un = 0.197832 ;
+	//static constexpr REAL vn = 0.468340 ;
 
+
+	// constexpr not supported in VS2013
+	static const REAL Xn;
+	static const REAL Yn;
+	static const REAL Zn;
+
+	static const REAL un;
+	static const REAL vn;
 } ;
 
 } // namespace Utils

@@ -26,11 +26,16 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-//class Camera;
-//class ViewButtonArea;
-//class ViewButton;
-//class PluginInteraction;
-
+/**
+* @brief View class inherit from QGLViewer(http://libqglviewer.com/refManual/classQGLViewer.html) allow rendering of plugins.
+* It can be link with several:
+* - plugins
+* - maps
+* - cameras (only one is used)
+* One view of SCHNApps is selected (green framed).
+*
+* Python callable slots are tagged with [PYTHON]
+*/
 class SCHNAPPS_API View : public QGLViewer
 {
 	Q_OBJECT
@@ -45,39 +50,110 @@ public:
 
 	const QString& getName() const { return m_name; }
 
+	/**
+	 * @brief get the min and max points of the bounding box of the scene
+	 * @param bbMin min to be filled
+	 * @param bbMax max to be filled
+	 */
 	void getBB(qglviewer::Vec& bbMin, qglviewer::Vec& bbMax) const { bbMin = m_bbMin; bbMax = m_bbMax; }
 
+	/// hide all dialogs of the view
 	void hideDialogs();
 
 public slots:
+	/**
+	 * @brief get the name of view
+	 * @return name
+	 */
 	QString getName() { return m_name; }
+
+	/// get schnnapps ptr
 	SCHNApps* getSCHNApps() const { return m_schnapps; }
 
+	/**
+	 * @brief [PYTHON] test if the view is the selected one
+	 * @return
+	 */
 	bool isSelectedView() const { return m_schnapps->getSelectedView() == this; }
 
+	/**
+	 * @brief set the current camera of the view
+	 * @param c the camera ptr
+	 */
 	void setCurrentCamera(Camera* c);
+
+	/**
+	* @brief [PYTHON] set the current camera of the view
+	* @param name the name of camera
+	*/
 	void setCurrentCamera(const QString& name);
 
+	/**
+	* @brief [PYTHON] get the current camera of the view
+	* @return the camera object
+	*/
 	Camera* getCurrentCamera() const { return m_currentCamera; }
+
+	/**
+	 * @brief test if this view use a camera
+	 * @param c camera ptr
+	 * @return
+	 */
 	bool usesCamera(Camera* c) const { return m_currentCamera == c; }
+
+	/**
+	* @brief [PYTHON] test if a camera is the current camera
+	* @param name the name of camera
+	*/
 	bool usesCamera(const QString& name) const;
 
 	void linkPlugin(PluginInteraction* plugin);
+
+	/**
+	* @brief [PYTHON] link a plugin with the view
+	* @param name the name of plugin
+	*/
 	void linkPlugin(const QString& name);
+
 	void unlinkPlugin(PluginInteraction* plugin);
+
+	/**
+	* @brief [PYTHON] unlink a plugin of the view
+	* @param name the name of plugin
+	*/
 	void unlinkPlugin(const QString& name);
 
 	const QList<PluginInteraction*>& getLinkedPlugins() const { return l_plugins; }
 	bool isLinkedToPlugin(PluginInteraction* plugin) const { return l_plugins.contains(plugin); }
+
+	/**
+	* @brief [PYTHON] test if the view is linked to a plugin
+	* @param name the name of plugin
+	*/
 	bool isLinkedToPlugin(const QString& name) const;
 
 	void linkMap(MapHandlerGen* map);
+
+	/**
+	* @brief [PYTHON] link a map with the view
+	* @param name the name of map
+	*/
 	void linkMap(const QString& name);
 	void unlinkMap(MapHandlerGen* map);
+
+	/**
+	* @brief [PYTHON] unlink a map of the view
+	* @param name the name of map
+	*/
 	void unlinkMap(const QString& name);
 
 	const QList<MapHandlerGen*>& getLinkedMaps() const { return l_maps; }
 	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
+
+	/**
+	* @brief [PYTHON] test if the view is linked to a lao
+	* @param name the name of map
+	*/
 	bool isLinkedToMap(const QString& name) const;
 
 private:

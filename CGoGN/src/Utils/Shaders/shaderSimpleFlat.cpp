@@ -40,6 +40,7 @@ namespace Utils
 
 ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	m_with_color(false),
+	m_doubleSided(doubleSided),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
@@ -56,8 +57,6 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 		m_nameVS = "ShaderSimpleFlatClip_vs";
 		m_nameFS = "ShaderSimpleFlatClip_fs";
 		glxvert.append(vertexShaderClipText);
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
 		glxfrag.append(fragmentShaderClipText);
 	}
 	else
@@ -67,8 +66,6 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 		// get choose GL defines (2 or 3)
 		// ans compile shaders
 		glxvert.append(vertexShaderText);
-		if (doubleSided)
-			glxfrag.append("#define DOUBLE_SIDED\n");
 		glxfrag.append(fragmentShaderText);
 	}
 
@@ -78,6 +75,16 @@ ShaderSimpleFlat::ShaderSimpleFlat(bool withClipping, bool doubleSided):
 	sendParams();
 }
 
+void ShaderSimpleFlat::setDoubleSided(bool doubleSided)
+{
+	m_doubleSided = doubleSided;
+
+	bind();
+	glUniform1i(*m_unif_doubleSided, m_doubleSided);
+	unbind();
+}
+
+
 void ShaderSimpleFlat::getLocations()
 {
 	bind();
@@ -86,6 +93,7 @@ void ShaderSimpleFlat::getLocations()
 	*m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
 	*m_unif_backColor  = glGetUniformLocation(this->program_handler(), "backColor");
 	*m_unif_planeClip = glGetUniformLocation(this->program_handler(), "planeClip");
+	*m_unif_doubleSided = glGetUniformLocation(this->program_handler(), "doubleSided");
 	unbind();
 }
 
@@ -96,6 +104,7 @@ void ShaderSimpleFlat::sendParams()
 	glUniform4fv(*m_unif_diffuse,  1, m_diffuse.data());
 	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
 	glUniform4fv(*m_unif_backColor,  1, m_backColor.data());
+	glUniform1i(*m_unif_doubleSided, m_doubleSided);
 	if (*m_unif_planeClip > 0)
 		glUniform4fv(*m_unif_planeClip, 1, m_planeClip.data());
 	unbind();
