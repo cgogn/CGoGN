@@ -34,14 +34,14 @@ class ParticleCell2DSecured : public ParticleCell2DMemo<PFP>
 	typedef VertexAttribute<VEC3, MAP> TAB_POS ;
 
 private:
-	ParticleCell2DSecured()
-	{
-		std::cout << "Particle Secured : for debugging (unoptimized)" << std::endl;
-	}
+	//ParticleCell2DSecured()
+	//{
+	//	std::cout << "Particle Secured : for debugging (unoptimized)" << std::endl;
+	//}
 
 public:
 
-	ParticleCell2DSecured(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
+	ParticleCell2DSecured(MAP& map, Dart belonging_cell, VEC3 pos, /*const*/ TAB_POS& tabPos) :
 		ParticleCell2DMemo<PFP>(map, belonging_cell, pos, tabPos)
 	{
 //		std::cout << "Particle Memo : for debugging (unoptimized)" << std::endl;
@@ -58,8 +58,8 @@ public:
 	virtual void faceState(const VEC3& current, CellMarkerMemo<MAP, FACE>& memo_cross) ;
 
 	std::vector<Dart> move(const VEC3& goal) ;
-
-	std::vector<Dart> move(const VEC3& goal, CellMarkerMemo<MAP, FACE>& memo_cross) ;
+	// NOT IMPLEMENTED
+	//std::vector<Dart> move(const VEC3& goal, CellMarkerMemo<MAP, FACE>& memo_cross) ;
 } ;
 
 } // namespace MovingObjects

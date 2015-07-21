@@ -7,6 +7,9 @@
 #include "mapHandler.h"
 #include "camera.h"
 
+#include "Algo/Geometry/distances.h"
+#include "Algo/Geometry/plane.h"
+
 #include <QFileDialog>
 #include <QFileInfo>
 
@@ -24,6 +27,19 @@ bool Surface_Radiance_Plugin::enable()
 	m_dockTab = new Surface_Radiance_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Radiance");
 
+	m_importAction = new QAction("import", this);
+	m_schnapps->addMenuAction(this, "Radiance;Import", m_importAction);
+	connect(m_importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
+
+	m_computeRadianceDistanceDialog = new Dialog_ComputeRadianceDistance(m_schnapps);
+
+	m_computeRadianceDistanceAction = new QAction("Compute Radiance Distance", this);
+	m_schnapps->addMenuAction(this, "Radiance;Compute Distance", m_computeRadianceDistanceAction);
+	connect(m_computeRadianceDistanceAction, SIGNAL(triggered()), this, SLOT(openComputeRadianceDistanceDialog()));
+
+	connect(m_computeRadianceDistanceDialog, SIGNAL(accepted()), this, SLOT(computeRadianceDistanceFromDialog()));
+	connect(m_computeRadianceDistanceDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeRadianceDistanceFromDialog()));
+
 	connect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
@@ -34,9 +50,7 @@ bool Surface_Radiance_Plugin::enable()
 
 	m_dockTab->updateMapParameters();
 
-	m_importAction = new QAction("import", this);
-	m_schnapps->addMenuAction(this, "Radiance;Import", m_importAction);
-	connect(m_importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 	return true;
 }
@@ -97,8 +111,6 @@ void Surface_Radiance_Plugin::mapAdded(MapHandlerGen* map)
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 	connect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
-
-	m_dockTab->addObject(map->getName());
 }
 
 void Surface_Radiance_Plugin::mapRemoved(MapHandlerGen* map)
@@ -106,8 +118,11 @@ void Surface_Radiance_Plugin::mapRemoved(MapHandlerGen* map)
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
 	disconnect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
+}
 
-	m_dockTab->removeObject(map->getName());
+void Surface_Radiance_Plugin::schnappsClosing()
+{
+//	m_computeRadianceDistanceDialog->close();
 }
 
 
@@ -167,6 +182,52 @@ void Surface_Radiance_Plugin::importFromFileDialog()
 	while(it != fileNames.end()) {
 		importFromFile(*it);
 		++it;
+	}
+}
+
+void Surface_Radiance_Plugin::openComputeRadianceDistanceDialog()
+{
+	m_computeRadianceDistanceDialog->show();
+}
+
+void Surface_Radiance_Plugin::computeRadianceDistanceFromDialog()
+{
+	QList<QListWidgetItem*> currentItems1 = m_computeRadianceDistanceDialog->list_maps_1->selectedItems();
+	QList<QListWidgetItem*> currentItems2 = m_computeRadianceDistanceDialog->list_maps_2->selectedItems();
+
+	if(!currentItems1.empty() && !currentItems2.empty())
+	{
+		const QString& mapName1 = currentItems1[0]->text();
+		const QString& mapName2 = currentItems2[0]->text();
+
+		QString positionName1 = m_computeRadianceDistanceDialog->combo_positionAttribute_1->currentText();
+		QString positionName2 = m_computeRadianceDistanceDialog->combo_positionAttribute_2->currentText();
+
+		QString distanceName1;
+		if(m_computeRadianceDistanceDialog->distanceAttributeName_1->text().isEmpty())
+			distanceName1 = m_computeRadianceDistanceDialog->combo_distanceAttribute_1->currentText();
+		else
+			distanceName1 = m_computeRadianceDistanceDialog->distanceAttributeName_1->text();
+
+		QString distanceName2;
+		if(m_computeRadianceDistanceDialog->distanceAttributeName_2->text().isEmpty())
+			distanceName2 = m_computeRadianceDistanceDialog->combo_distanceAttribute_2->currentText();
+		else
+			distanceName2 = m_computeRadianceDistanceDialog->distanceAttributeName_2->text();
+
+		// create VBO if asked
+		if (m_computeRadianceDistanceDialog->enableVBO->isChecked())
+		{
+			MapHandlerGen* mhg1 = getSCHNApps()->getMap(mapName1);
+			if (mhg1)
+				mhg1->createVBO(distanceName1);
+
+			MapHandlerGen* mhg2 = getSCHNApps()->getMap(mapName2);
+			if (mhg2)
+				mhg2->createVBO(distanceName2);
+		}
+
+		computeRadianceDistance(mapName1, positionName1, distanceName1, mapName2, positionName2, distanceName2);
 	}
 }
 
@@ -417,9 +478,106 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 	mh->notifyAttributeModification(position);
 }
 
-void Surface_Radiance_Plugin::computeDistance(const QString& mapName1, const QString& mapName2)
+void Surface_Radiance_Plugin::computeRadianceDistance(
+	const QString& mapName1,
+	const QString& positionAttributeName1,
+	const QString& distanceAttributeName1,
+	const QString& mapName2,
+	const QString& positionAttributeName2,
+	const QString& distanceAttributeName2)
 {
+	MapHandler<PFP2>* mh1 = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName1));
+	if(mh1 == NULL)
+		return;
 
+	MapHandler<PFP2>* mh2 = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName2));
+	if(mh2 == NULL)
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position1 = mh1->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName1);
+	if(!position1.isValid())
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position2 = mh2->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName2);
+	if(!position2.isValid())
+		return;
+
+	VertexAttribute<PFP2::REAL, PFP2::MAP> distance1 = mh1->getAttribute<PFP2::REAL, VERTEX>(distanceAttributeName1);
+	if(!distance1.isValid())
+		distance1 = mh1->addAttribute<PFP2::REAL, VERTEX>(distanceAttributeName1);
+
+	VertexAttribute<PFP2::REAL, PFP2::MAP> distance2 = mh2->getAttribute<PFP2::REAL, VERTEX>(distanceAttributeName2);
+	if(!distance2.isValid())
+		distance2 = mh2->addAttribute<PFP2::REAL, VERTEX>(distanceAttributeName2);
+
+	PFP2::MAP* map1 = mh1->getMap();
+	PFP2::MAP* map2 = mh2->getMap();
+
+	// compute distance between map1 and map2 here
+	//   distance from map1 to map2 is stored in map1 vertex attribute distance1
+	//   distance from map2 to map1 is stored in map2 vertex attribute distance2
+
+	// for each vertex of map1
+
+	for (Vertex v : allVerticesOf(*map1))
+	{
+		const PFP2::VEC3& P = position1[v];
+
+		// find closest point on map2
+		PFP2::REAL minDistPerThread[Parallel::NumberOfThreads];
+		Face closestFacePerThread[Parallel::NumberOfThreads];
+		for (unsigned int i = 0; i < Parallel::NumberOfThreads; ++i)
+		{
+			minDistPerThread[i] = std::numeric_limits<PFP2::REAL>::max();
+		}
+
+		PFP2::REAL minDist = std::numeric_limits<PFP2::REAL>::max();
+		Face closestFace;
+
+		Parallel::foreach_cell<FACE>(*map2, [&] (Face f, unsigned int id)
+		{
+			PFP2::REAL dist = Algo::Geometry::squaredDistancePoint2Face<PFP2>(*map2, f, position2, P);
+			if (dist < minDistPerThread[id])
+			{
+				minDistPerThread[id] = dist;
+				closestFacePerThread[id] = f;
+			}
+		});
+
+		for (unsigned int i = 0; i < Parallel::NumberOfThreads; ++i)
+		{
+			if (minDistPerThread[i] < minDist)
+			{
+				minDist = minDistPerThread[i];
+				closestFace = closestFacePerThread[i];
+			}
+		}
+
+		double l1, l2, l3;
+		Algo::Geometry::closestPointInTriangle<PFP2>(*map2, closestFace, position2, P, l1, l2, l3);
+		const PFP2::VEC3& P1 = position2[closestFace.dart];
+		const PFP2::VEC3& P2 = position2[map2->phi1(closestFace.dart)];
+		const PFP2::VEC3& P3 = position2[map2->phi_1(closestFace.dart)];
+		PFP2::VEC3 closestPoint = l1*P1 + l2*P2 + l3*P3;
+
+		minDist = sqrt(minDist);
+
+		PFP2::VEC3 vect = closestPoint - P;
+		PFP2::REAL dist = vect.norm();
+		if (fabs(dist - minDist) > 0.001)
+		{
+			std::cout << "l1 -> " << l1 << " / l2 -> " << l2 << " / l3 -> " << l3 << std::endl;
+			std::cout << "diff -> " << fabs(dist - minDist) << std::endl;
+		}
+
+		distance1[v] = minDist;
+	}
+
+	this->pythonRecording("computeRadianceDistance", "", mapName1, positionAttributeName1, distanceAttributeName1,
+							mapName2, positionAttributeName2, distanceAttributeName2);
+
+	mh1->notifyAttributeModification(distance1);
+	mh2->notifyAttributeModification(distance2);
 }
 
 void Surface_Radiance_Plugin::checkNbVerticesAndExport(Surface_Radiance_Plugin* p, const unsigned int* nbVertices)

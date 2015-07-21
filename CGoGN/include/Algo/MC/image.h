@@ -25,10 +25,9 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-
 #include "Geometry/vector_gen.h"
-
 #include "Utils/img3D_IO.h"
+#include <vector>
 
 #ifdef CGOGN_WITH_ZINRI
 #include "Zinrimage.h"
@@ -152,12 +151,13 @@ public:
 	template< typename  DataTypeIn >
 	void createMask(const Image<DataTypeIn>& img );
 
+#ifdef CGOGN_WITH_QT
 	/**
 	* Load a file (png) in an empty image
 	* @param _cName file to open
 	*/
 	bool loadPNG3D(const char *_cName);
-
+#endif
 
 	/**
 	* Load an ipb-format file in an empty image
@@ -165,12 +165,13 @@ public:
 	*/
 	bool loadIPB(const char* _cName);
 
+#ifdef CGOGN_WITH_ZINRI
 	/**
 	* Load an inr.gz format file in an empty image
 	* @param filname file to open
 	*/
 	bool loadInrgz(const char* filename);
-
+#endif
 	/**
 	 * @brief load VTK binary mask image
 	 * @param filename
@@ -202,12 +203,13 @@ public:
 	 */
 	void loadVox(const char *filename);
 
+#ifdef CGOGN_WITH_ZINRI
 	/**
 	* save current image into file
 	* @param _cName file to save
 	*/
     void saveInrMask(const char* _cName);
-
+#endif
     /**
 	* get the width along X axis
 	*/
@@ -313,7 +315,7 @@ public:
 	* @param   _lWidth width of filtering
 	* @return the new image
 	*/
-	Image<DataType>* filtering(int _lWidth);
+//	Image<DataType>* filtering(int _lWidth);
 
 	/**
 	*  add Frame of zero around the image

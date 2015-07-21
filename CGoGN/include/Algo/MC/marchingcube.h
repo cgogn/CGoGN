@@ -53,6 +53,7 @@ template <typename DataType, template <typename D2> class Windowing, typename PF
 class MarchingCube
 {
 protected:
+	typedef typename PFP::REAL REAL;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::MAP L_MAP ;
 	typedef Dart L_DART ;
@@ -209,7 +210,7 @@ public:
 	* constructor from filename
 	* @param _cName name of file to open
 	*/
-	MarchingCube(const char* _cName);
+//	MarchingCube(const char* _cName);
 
 	/**
 	* constructor from image
@@ -217,10 +218,10 @@ public:
 	* @param wind the windowing class (for inside/outside distinguish)
 	* @param boundRemoved true is bound is going to be removed
 	*/
-	MarchingCube(Image<DataType>* img, Windowing<DataType> wind, bool boundRemoved);
+//	MarchingCube(Image<DataType>* img, Windowing<DataType> wind, bool boundRemoved);
 
 	/**
-	* constructor from filename
+	* constructor 
 	* @param img voxel image
 	* @param map ptr to the map use to store the mesh
 	* @param idPos id of attribute position

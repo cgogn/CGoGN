@@ -305,15 +305,16 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 
 //	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
 //	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
-	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> d)
+	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> fop)
 	{
+		Dart d = fop.dart;
 		// compute normals
 		VEC3 centerFace = Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions);
 		VEC3 centerNormalFace = Algo::Surface::Geometry::newellNormal<PFP>(map, d, positions);
 
 		computeFace<PFP>(map,d,positions,centerFace,centerNormalFace,vertices,normals);
 		
-		unsigned int nbs = vertices.size();
+		unsigned int nbs = uint32(vertices.size());
 		// just to have more easy algo further
 		vertices.push_back(vertices.front());
 		normals.push_back(normals.front());
@@ -362,21 +363,21 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 		}
 	}); // false) ???
 	
-	m_nbTris = buffer.size()/4;
+	m_nbTris = uint32(buffer.size()/4);
 
-	m_vboPos->allocate(buffer.size());
+	m_vboPos->allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shaderS->setAttributePosition(m_vboPos);
 
-	m_vboColors->allocate(bufferColors.size());
+	m_vboColors->allocate(uint32(bufferColors.size()));
 	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
 	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
 	m_shaderS->setAttributeColor(m_vboColors);
 
-	m_vboNormals->allocate(bufferNormals.size());
+	m_vboNormals->allocate(uint32(bufferNormals.size()));
 	VEC3F* ptrNorm = reinterpret_cast<VEC3F*>(m_vboNormals->lockPtr());
 	memcpy(ptrNorm,&bufferNormals[0],bufferNormals.size()*sizeof(VEC3F));
 	m_vboNormals->releasePtr();
@@ -393,9 +394,9 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 			buffer.push_back(PFP::toVec3f(positions[map.phi1(c.dart)]));
 	});
 
-	m_nbLines = buffer.size()/3;
+	m_nbLines = GLuint(buffer.size()/3);
 
-	m_vboPosLine->allocate(buffer.size());
+	m_vboPosLine->allocate(uint32(buffer.size()));
 
 	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
@@ -553,8 +554,9 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	bufferColors.reserve(16384);
 
 //	TraversorCell<MAP, MAP::FACE_OF_PARENT> traFace(map);
-	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> d)
+	foreach_cell<MAP::FACE_OF_PARENT>(map, [&] (Cell<MAP::FACE_OF_PARENT> fop)
 	{
+		Dart d = fop.dart;
 		VEC3F centerFace = PFP::toVec3f(Algo::Surface::Geometry::faceCentroidELW<PFP>(map, d, positions));
 
 		Dart b = d;
@@ -597,15 +599,15 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 	});
 
 
-	m_nbTris = buffer.size()/4;
+	m_nbTris = uint32(buffer.size()/4);
 
-	m_vboPos->allocate(buffer.size());
+	m_vboPos->allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(m_vboPos->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	m_vboPos->releasePtr();
 	m_shader->setAttributePosition(m_vboPos);
 
-	m_vboColors->allocate(bufferColors.size());
+	m_vboColors->allocate(uint32(bufferColors.size()));
 	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(m_vboColors->lockPtr());
 	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	m_vboColors->releasePtr();
@@ -621,9 +623,9 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 			buffer.push_back(PFP::toVec3f(positions[map.phi1(c)]));
 	});
 
-	m_nbLines = buffer.size()/3;
+	m_nbLines = GLuint(buffer.size()/3);
 
-	m_vboPosLine->allocate(buffer.size());
+	m_vboPosLine->allocate(uint32(buffer.size()));
 
 	ptrPos = reinterpret_cast<VEC3F*>(m_vboPosLine->lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));

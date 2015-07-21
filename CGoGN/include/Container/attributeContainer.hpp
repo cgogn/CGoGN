@@ -142,7 +142,7 @@ void AttributeContainer::addAttribute(const std::string& attribName, const std::
 	m_lineCost += sizeof(T) ;
 
 	// resize the new attribute so that it has the same size than others
-	amv->setNbBlocks(m_holesBlocks.size()) ;
+	amv->setNbBlocks(uint32(m_holesBlocks.size())) ;
 
 	m_nbAttributes++;
 }
@@ -205,7 +205,7 @@ unsigned int AttributeContainer::getAttributeBlocksPointers(unsigned int attrInd
 
 	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[attrIndex]);
 	assert((atm != NULL) || !"getAttributeBlocksPointers: wrong type");
-	return atm->getBlocksPointers(vect_ptr, byteBlockSize);
+	return atm->getBlocksPointers(reinterpret_cast<std::vector<void*>&>(vect_ptr), byteBlockSize);
 }
 
 /**************************************

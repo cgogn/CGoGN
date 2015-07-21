@@ -75,10 +75,10 @@ void UniversalLoader<MapType, AttrTypeLoader>::ImportAttribute(	MapType& map,
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>::UnpackOnVertex(MapType& map, const unsigned int* verticesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	VertexAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, VERTEX>(attrName);
+	VertexAttribute<typename AttrTypeLoader::ATTR_TYPE, MapType> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, VERTEX, MapType>(attrName);
 
 	if (!attr.isValid())
-		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, VERTEX>(attrName);
+		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, VERTEX, MapType>(attrName);
 
 	char* p = (char*)buffer;
 
@@ -92,10 +92,10 @@ void UniversalLoader<MapType, AttrTypeLoader>::UnpackOnVertex(MapType& map, cons
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnFace(MapType& map, const Dart* facesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	FaceAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE>, FACE(attrName);
+	FaceAttribute<typename AttrTypeLoader::ATTR_TYPE, MapType> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, MapType>, FACE(attrName);
 
 	if (!attr.isValid())
-		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE>(FACE, attrName);
+		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, MapType>(FACE, attrName);
 
 	char* p = (char*)buffer;
 
@@ -109,7 +109,7 @@ void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnFace(MapType& map, const
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHE(MapType& map, const Dart* facesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	DartAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
+	DartAttribute<typename AttrTypeLoader::ATTR_TYPE,MapType> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, DART, MapType>(attrName);
 
 	if (!attr.isValid())
 		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
@@ -134,10 +134,10 @@ void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHE(MapType& map, const D
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHEFC(MapType& map, const Dart* facesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	DartAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
+	DartAttribute<typename AttrTypeLoader::ATTR_TYPE, MapType> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, DART, MapType>(attrName);
 
 	if (!attr.isValid())
-		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
+		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, DART, MapType>(attrName);
 
 	char* p = (char*)buffer;
 

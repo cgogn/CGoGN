@@ -137,7 +137,7 @@ public:
 
 	T norm2() const ;
 
-	double norm() const ;
+	T norm() const ;
 
 	/*
 	 * normalize the vector and returns its norm
@@ -163,7 +163,7 @@ public:
 
 	bool hasNan() const ;
 
-	bool isFinite() const ;
+	//bool isFinite() const ;
 
 	/**
 	 * Tests if the vector is normalized
@@ -235,6 +235,8 @@ Vector<DIM, T> slerp(const Vector<DIM, T> &v1, const Vector<DIM, T> &v2, const T
 template <unsigned int DIM, typename T, typename T2>
 Vector<DIM, T> operator*(T2 b, const Vector<DIM, T>& v);
 
+template <unsigned int DIM, typename T>
+bool isFinite(const Vector<DIM, T>& vec);
 
 /**********************************************/
 /*           SOME USEFUL TYPEDEFS             */

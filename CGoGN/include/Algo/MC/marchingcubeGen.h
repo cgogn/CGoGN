@@ -55,6 +55,7 @@ template< typename  DataType, typename ImgT, template < typename D2 > class Wind
 class MarchingCubeGen
 {
 protected:
+	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::MAP L_MAP;
 	typedef Dart L_DART;
 
@@ -81,7 +82,7 @@ protected:
 	/**
 	 * position attribute table
 	 */
-	VertexAttribute<typename PFP::VEC3> m_positions;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& m_positions;
 
 	/**
 	* Origin of image
@@ -203,13 +204,13 @@ protected:
 	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3);
 
 public:
-	/**
-	* constructor from image
-	* @param img voxel image
-	* @param wind the windowing class (for inside/outside distinguish)
-	* @param boundRemoved true is bound is going to be removed
-	*/
-	MarchingCubeGen(ImgT* img, Windowing<DataType> wind, bool boundRemoved);
+	///**
+	//* constructor from image
+	//* @param img voxel image
+	//* @param wind the windowing class (for inside/outside distinguish)
+	//* @param boundRemoved true is bound is going to be removed
+	//*/
+	//MarchingCubeGen(ImgT* img, Windowing<DataType> wind, bool boundRemoved);
 
 	/**
 	* constructor from filename
@@ -218,7 +219,7 @@ public:
 	* @param wind the windowing class (for inside/outside distinguish)
 	* @param boundRemoved true is bound is going to be removed
 	*/
-	MarchingCubeGen(ImgT* img, L_MAP* map, unsigned int idPos, Windowing<DataType> wind, bool boundRemoved);
+	MarchingCubeGen(ImgT* img, L_MAP* map, VertexAttribute<VEC3, L_MAP>& position, Windowing<DataType> wind, bool boundRemoved);
 
 	/**
 	* destructor
@@ -246,15 +247,15 @@ public:
 	 */
 	ImgT* getImg() { return m_Image; }
 
-	/**
-	 * Get the lower corner of bounding AABB
-	 */
-	typename PFP::VEC3 boundMin() const { return m_Image->boundMin(); }
+	///**
+	// * Get the lower corner of bounding AABB
+	// */
+	//typename PFP::VEC3 boundMin() const { return m_Image->boundMin(); }
 
-	/**
-	 * Get the upper corner of bounding AABB
-	 */
-	typename PFP::VEC3 boundMax() const {return m_Image->boundMax();}
+	///**
+	// * Get the upper corner of bounding AABB
+	// */
+	//typename PFP::VEC3 boundMax() const {return m_Image->boundMax();}
 };
 
 

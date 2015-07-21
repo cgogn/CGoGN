@@ -84,16 +84,16 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 		} while (c != d);
 	}
 
-	m_nbTris = buffer.size()/3;
+	m_nbTris = GLuint(buffer.size()/3);
 
 	vboPosition.setDataSize(3);
-	vboPosition.allocate(buffer.size());
+	vboPosition.allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
 	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	vboColor.setDataSize(3);
-	vboColor.allocate(bufferColors.size());
+	vboColor.allocate(uint32(bufferColors.size()));
 	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(vboColor.lockPtr());
 	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3F));
 	vboColor.releasePtr();
@@ -141,22 +141,22 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 		} while (c != d);
 	}
 
-	m_nbTris = buffer.size()/3;
+	m_nbTris = GLuint(buffer.size()/3);
 
 	vboPosition.setDataSize(3);
-	vboPosition.allocate(buffer.size());
+	vboPosition.allocate(uint32(buffer.size()));
 	VEC3F* ptrPos = reinterpret_cast<VEC3F*>(vboPosition.lockPtr());
 	memcpy(ptrPos, &buffer[0], buffer.size()*sizeof(VEC3F));
 	vboPosition.releasePtr();
 
 	vboNormal.setDataSize(3);
-	vboNormal.allocate(bufferColors.size());
+	vboNormal.allocate(uint32(bufferColors.size()));
 	VEC3F* ptrNorm = reinterpret_cast<VEC3F*>(vboNormal.lockPtr());
 	memcpy(ptrNorm, &bufferColors[0], bufferColors.size()*sizeof(VEC3F));
 	vboNormal.releasePtr();
 
 	vboColor.setDataSize(3);
-	vboColor.allocate(bufferColors.size());
+	vboColor.allocate(uint32(bufferColors.size()));
 	VEC3F* ptrCol = reinterpret_cast<VEC3F*>(vboColor.lockPtr());
 	memcpy(ptrCol, &bufferColors[0], bufferColors.size()*sizeof(VEC3F));
 	vboColor.releasePtr();

@@ -109,6 +109,8 @@ SCHNApps::SCHNApps(const QString& appPath, PythonQtObjectPtr& pythonContext, Pyt
 
 	connect(action_Python_Recording, SIGNAL(triggered()), this, SLOT(pyRecording()));
 	connect(action_Append_Python_Recording, SIGNAL(triggered()), this, SLOT(appendPyRecording()));
+	connect(action_Clean_All, SIGNAL(triggered()), this, SLOT(cleanAll()));
+
 
 	action_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 	action_Append_Python_Recording->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
@@ -306,12 +308,14 @@ void SCHNApps::setSelectedView(View* view)
 	m_selectedView->updateGL();
 }
 
-void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
+void SCHNApps::setSelectedView(const QString& name)
 {
-	// RECORDING
-	if (m_pyRecording)
-		*m_pyRecording << "schnapps.splitView(\"" << name << "\", " << orientation << ");" << endl;
+	View* v = this->getView(name);
+	setSelectedView(v);
+}
 
+View* SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
+{
 	View* newView = addView();
 
 	View* view = m_views[name];
@@ -348,6 +352,12 @@ void SCHNApps::splitView(const QString& name, Qt::Orientation orientation)
 		sz[1] = tot - sz[0];
 		spl->setSizes(sz);
 	}
+
+	// RECORDING
+	if (m_pyRecording)
+		*m_pyRecording << newView->getName() << " = schnapps.splitView(\"" << name << "\", " << orientation << ");" << endl;
+
+	return newView;
 }
 
 QString SCHNApps::saveSplitViewPositions()
@@ -525,13 +535,6 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 	{
 		Plugin* plugin = m_plugins[pluginName];
 
-		// remove plugin dock tabs
-		foreach(QWidget* tab, m_pluginTabs[plugin])
-			removePluginDockTab(plugin, tab);
-		// remove plugin menu actions
-		foreach(QAction* action, m_pluginMenuActions[plugin])
-			removeMenuAction(plugin, action);
-
 		// unlink linked views (for interaction plugins)
 		PluginInteraction* pi = dynamic_cast<PluginInteraction*>(plugin);
 		if(pi)
@@ -543,6 +546,14 @@ void SCHNApps::disablePlugin(const QString& pluginName)
 		// call disable() method and dereference plugin
 		plugin->disable();
 		m_plugins.remove(pluginName);
+
+		// remove plugin dock tabs
+		foreach(QWidget* tab, m_pluginTabs[plugin])
+			removePluginDockTab(plugin, tab);
+		// remove plugin menu actions
+		foreach(QAction* action, m_pluginMenuActions[plugin])
+			removeMenuAction(plugin, action);
+
 
 		QPluginLoader loader(plugin->getFilePath());
 		loader.unload();
@@ -642,7 +653,7 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 		*rec << newName << " = schnapps.duplicateMap(" << name << ".getName(),1);" << endl;
 
 	MapHandlerGen* maph = m_maps[name];
-	MapHandlerGen* new_mh;
+	MapHandlerGen* new_mh = NULL; // avoid warning
 
 	unsigned int dim = maph->getGenericMap()->dimension();
 
@@ -681,6 +692,9 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 				}
 				break;
 			}
+	default:
+		std::cerr << "Dimension " << dim << " not yet supported in map duplication" << std::endl;
+		break;
 	}
 
 
@@ -713,25 +727,33 @@ MapHandlerGen* SCHNApps::duplicateMap(const QString& name, bool properties)
 
 MapHandlerGen* SCHNApps::addMap(const QString& name, unsigned int dim)
 {
+	QString finalName = name;
 	if (m_maps.contains(name))
-		return NULL;
+	{
+		int i = 1;
+		do
+		{
+			finalName = name + QString("_") + QString::number(i);
+			++i;
+		} while (m_maps.contains(finalName));
+	}
 
 	MapHandlerGen* mh = NULL;
 	switch(dim)
 	{
 		case 2 : {
 			PFP2::MAP* map = new PFP2::MAP();
-			mh = new MapHandler<PFP2>(name, this, map);
+			mh = new MapHandler<PFP2>(finalName, this, map);
 			break;
 		}
 		case 3 : {
 			PFP3::MAP* map = new PFP3::MAP();
-			mh = new MapHandler<PFP3>(name, this, map);
+			mh = new MapHandler<PFP3>(finalName, this, map);
 			break;
 		}
 	}
 
-	m_maps.insert(name, mh);
+	m_maps.insert(finalName, mh);
 
 	DEBUG_EMIT("mapAdded");
 	emit(mapAdded(mh));
@@ -789,6 +811,23 @@ unsigned int SCHNApps::getCurrentOrbit() const
 CellSelectorGen* SCHNApps::getSelectedSelector(unsigned int orbit) const
 {
 	return m_controlMapTab->getSelectedSelector(orbit);
+}
+
+
+void SCHNApps::setSelectedSelectorCurrentMap(unsigned int orbit, const QString& name)
+{
+	QList<QListWidgetItem*> items;
+	switch (orbit)
+	{
+	case DART: items = m_controlMapTab->list_dartSelectors->findItems(name,Qt::MatchExactly); break;
+	case VERTEX: items = m_controlMapTab->list_vertexSelectors->findItems(name, Qt::MatchExactly); break;
+	case EDGE: items = m_controlMapTab->list_edgeSelectors->findItems(name, Qt::MatchExactly); break;
+	case FACE: items = m_controlMapTab->list_faceSelectors->findItems(name, Qt::MatchExactly); break;
+	case VOLUME: items = m_controlMapTab->list_volumeSelectors->findItems(name, Qt::MatchExactly); break;
+	}
+	m_controlMapTab->tabWidget_mapInfo->setCurrentIndex(orbit);
+	if (!items.empty())
+		items[0]->setSelected(true);
 }
 
 /*********************************************************
@@ -968,38 +1007,106 @@ void SCHNApps::showHidePythonDock()
 	m_pythonDock->setVisible(m_pythonDock->isHidden());
 }
 
-void SCHNApps::loadPythonScriptFromFile(const QString& fileName)
+
+void SCHNApps::setFloatingControlDock(bool f)
 {
-#ifdef WIN32
-	// NOT VERY NICE BUT ONLY WAY ON WINDOWS TO LOAD SCRIPT FILES
-	QFile file(fileName);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return;
-	QTextStream in(&file);
-	while (!in.atEnd())
+	m_controlDock->setFloating(f);
+}
+
+void SCHNApps::setFloatingPluginDock(bool f)
+{
+	m_pluginDock->setFloating(f);
+}
+
+void SCHNApps::setFloatingPythonDock(bool f)
+{
+	if (m_pythonDock->isVisible())
+		m_pythonDock->setFloating(f);
+}
+
+
+void SCHNApps::execPythonCmd(const QString& cmd)
+{
+	m_pythonContext.evalScript(cmd);
+}
+
+bool SCHNApps::loadPythonScriptFromFile(const QString& fileName)
+{
+	QString fullName = fileName;
+	if (!QFile::exists(fullName))
 	{
-		QString line = in.readLine();
-		if (line.size() >= 2)
+		QString pypath = m_pyPathFile;
+		if (pypath.isEmpty())
+			pypath = this->getAppPath();
+		fullName = pypath + "/" + fileName;
+		if (!QFile::exists(fullName))
 		{
-			int j = 0;
-			while (line[j] == ' ') ++j;
-			QString spaces(4 - j, QChar(' ')); // need 4 spaces at begin of line
-			line.replace(QChar('\\'), QChar('/')); // replace \ by / in win path
-			m_pythonConsole.consoleMessage(spaces + line);
-			m_pythonConsole.executeLine(false);
+			std::cerr << "python script " << fullName.toStdString() << " not found" << std::endl;
+			return false;
 		}
 	}
-#else
-	QFileInfo fi(fileName);
-	if(fi.exists())
-		m_pythonContext.evalFile(fi.filePath());
-#endif
+
+	QFile file(fullName);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return false;
+	QTextStream in(&file);
+	m_pythonContext.evalScript(in.readAll());
+
+// not using eval file because of pb with non ascii char in file name and path
+//	m_pythonContext.evalFile(fullName);
+
+	return true;
 }
 
 void SCHNApps::loadPythonScriptFromFileDialog()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", getAppPath(), "Python script (*.py)");
+	QString pypath = m_pyPathFile;
+	if (pypath.isEmpty())
+		pypath = this->getAppPath();
+
+	QString fileName = QFileDialog::getOpenFileName(this, "Load Python script", pypath, "Python script (*.py)");
 	loadPythonScriptFromFile(fileName);
+}
+
+QString SCHNApps::noBackSlash(const QString& name)
+{
+#ifdef WIN32
+	// if copy from interface need to replace \ by / !!
+	QString slashed = name;
+	slashed.replace(QString("\t"), QString("/t"));
+	slashed.replace(QString("\n"), QString("/n"));
+	slashed.replace(QString("\v"), QString("/v"));
+	slashed.replace(QString("\f"), QString("/f"));
+	slashed.replace(QString("\r"), QString("/r"));
+	slashed.replace(QChar('\\'), QChar('/'));
+	return slashed;
+#else
+	return name;
+#endif
+}
+
+
+std::string SCHNApps::niceStdString(const QString& qstr)
+{
+	return std::string(qstr.toLocal8Bit().data());
+}
+
+QString SCHNApps::forceASCII(const QString& qstr)
+{
+	QString str(qstr);
+
+	for (QString::iterator it = str.begin(); it != str.end(); ++it)
+	{
+		if (it->unicode() > 127)
+			*it = '_';
+	}
+	return str;
+}
+
+
+void SCHNApps::setPythonPath(const QString& path)
+{
+	m_pyPathFile = SCHNApps::noBackSlash(path);
 }
 
 
@@ -1024,8 +1131,19 @@ void SCHNApps::pyRecording()
 			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
 		}
 
+		// save frames of maps
+		foreach(MapHandlerGen* mhg, m_maps)
+		{
+			out << mhg->getName() << ".frameFromString(\"" << mhg->frameToString() << "\")" << endl;
+		}
+
 		//windows
 		out << "schnapps.setWindowSize(" << this->width() << ", "<< this->height() << ")" << endl;
+
+		// docks
+		out << "schnapps.setFloatingControlDock(" << m_controlDock->isFloating() << ")" << endl;
+		out << "schnapps.setFloatingPluginDock(" << m_pluginDock->isFloating() << ")" << endl;
+		out << "schnapps.setFloatingPythonDock(" << m_pythonDock->isFloating() << ")" << endl;
 
 		m_pyRecFile->close();
 
@@ -1038,9 +1156,16 @@ void SCHNApps::pyRecording()
 		return;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", this->getAppPath(), " python script (*.py)");
+	QString pypath = m_pyPathFile;
+	if (pypath.isEmpty())
+		pypath = this->getAppPath();
+
+	QString fileName = QFileDialog::getSaveFileName(this, "Save python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
+		if (!fileName.endsWith(".py",Qt::CaseInsensitive))
+			fileName += ".py";
+
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::WriteOnly | QIODevice::Text))
 			return;
@@ -1088,6 +1213,13 @@ void SCHNApps::appendPyRecording()
 			out << "schnapps.getCamera(\"" << cam->getName() << "\").fromString(\"" << cam->toString() << "\")" << endl;
 		}
 
+		// save frames of maps
+		foreach(MapHandlerGen* mhg, m_maps)
+		{
+			out << mhg->getName() << ".frameFromString(\"" << mhg->frameToString() << "\")" << endl;
+		}
+
+
 		//windows
 		out << "schnapps.setWindowSize(" << this->width() << ", " << this->height() << ")" << endl;
 
@@ -1102,9 +1234,16 @@ void SCHNApps::appendPyRecording()
 		return;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", this->getAppPath(), " python script (*.py)");
+	QString pypath = m_pyPathFile;
+	if (pypath.isEmpty())
+		pypath = this->getAppPath();
+
+	QString fileName = QFileDialog::getSaveFileName(this, "Append python script", pypath, " python script (*.py)");
 	if (fileName.size() != 0)
 	{
+		if (!fileName.endsWith(".py",Qt::CaseInsensitive))
+			fileName += ".py";
+
 		m_pyRecFile = new QFile(fileName);
 		if (!m_pyRecFile->open(QIODevice::Append | QIODevice::Text))
 			return;	
@@ -1131,6 +1270,52 @@ void SCHNApps::appendPyRecording()
 		m_pyRecording = NULL;
 		statusbar->showMessage(QString(" Cancel recording python"), 2000);
 	}
+}
+
+bool SCHNApps::execPythonShortcut(quint64 key)
+{
+	if (m_pythonShortCuts.contains(key))
+	{
+		execPythonCmd(m_pythonShortCuts[key]);
+		return true;
+	}
+	return false;
+}
+
+
+void SCHNApps::setPythonShortcut(const QString& keys, const QString& command)
+{
+	quint64 k = 0;
+
+	if (keys.length() == 0)
+		return;
+
+	if (keys.length() == 1)
+	{
+		k = keys[0].toUpper().unicode();
+	}
+	else
+	{
+		if (keys.contains("control", Qt::CaseInsensitive))
+			k |= Qt::ControlModifier;
+		if (keys.contains("shift", Qt::CaseInsensitive))
+			k |= Qt::ShiftModifier;
+		if (keys.contains("alt", Qt::CaseInsensitive))
+			k |= Qt::AltModifier;
+		if (keys.contains("meta", Qt::CaseInsensitive))
+			k |= Qt::MetaModifier;
+		if (keys.contains("keypad", Qt::CaseInsensitive))
+			k |= Qt::KeypadModifier;
+		k <<= 32;
+
+		QChar c = keys[keys.length() - 1].toUpper();
+		k |= c.unicode();
+	}
+
+	if (command.length() > 0)
+		m_pythonShortCuts[k] = command;
+	else
+		m_pythonShortCuts.erase(m_pythonShortCuts.find(k));
 }
 
 
@@ -1163,6 +1348,48 @@ QString SCHNApps::saveFileDialog(const QString& title, const QString& dir, const
 }
 
 
+void SCHNApps::cleanAll()
+{
+	//remove views
+	foreach(View* v, m_views)
+	{
+		removeView(v->getName());
+	}
+
+	//  set the camera to camera_0 
+	m_firstView->setCurrentCamera(QString("camera_0"));
+
+	// change name of first view to view 0 if needed
+	if (m_firstView->m_name != QString("view_0"))
+	{
+		m_views.remove(m_firstView->m_name);
+		m_firstView->m_name = QString("view_0");
+		m_views.insert(m_firstView->m_name, m_firstView);
+	}
+
+	//remove cameras
+	foreach(Camera* cam, m_cameras)
+	{
+		removeCamera(cam->getName());
+	}
+
+	//remove maps
+	foreach(MapHandlerGen* m, m_maps)
+	{
+		removeMap(m->getName());
+	}
+
+	// remove plugins
+	foreach(Plugin* p, m_plugins)
+	{
+		disablePlugin(p->getName());
+	}
+
+	Camera::cameraCount = 1;
+	View::viewCount = 1;
+
+	m_pluginDock->setVisible(false);
+}
 
 
 } // namespace SCHNApps

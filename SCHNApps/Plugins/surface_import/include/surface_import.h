@@ -8,7 +8,11 @@ namespace CGoGN
 
 namespace SCHNApps
 {
-
+/**
+* @brief Plugin for 2D mesh import. Supported mesh file format are: off/obj/ply.
+* The import image function allow the creation of a mesh with a face by pixel.
+* Image format support is given by Qt.
+*/
 class Surface_Import_Plugin : public PluginProcessing
 {
 	Q_OBJECT
@@ -29,10 +33,28 @@ private:
 	virtual void disable() {}
 
 public slots:
+	/**
+	 * @brief [PYTHON] import a mesh from a file
+	 * @param fileName file name of mesh file
+	 * @return the new maphandler that handle the mesh
+	 */
 	MapHandlerGen* importMeshFromFile(const QString& fileName);
+
+	/**
+	 * @brief [PYTHON] import a mesh by opening a FileDialog
+	 */
 	void importMeshFromFileDialog();
 
+	/**
+	 * @brief [PYTHON] import an image into a mesh from a file
+	 * @param fileName file name of mesh file
+	 * @return
+	 */
 	MapHandlerGen* importImageFromFile(const QString& fileName);
+
+	/**
+	 * @brief [PYTHON] import image into a mesh by opening a FileDialog
+	 */
 	void importImageFromFileDialog();
 
 private:

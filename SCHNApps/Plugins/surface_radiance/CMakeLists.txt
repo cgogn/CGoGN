@@ -27,6 +27,7 @@ SET(
 	PLUGIN_QOBJECT_FILES
 	${PLUGIN_ROOT_DIR}/include/surface_radiance.h
 	${PLUGIN_ROOT_DIR}/include/surface_radiance_dockTab.h
+	${PLUGIN_ROOT_DIR}/include/dialog_computeRadianceDistance.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

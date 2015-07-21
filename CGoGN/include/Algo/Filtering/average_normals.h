@@ -24,6 +24,10 @@
 
 #include "Topology/generic/traversor/traversorCell.h"
 #include "Topology/generic/traversor/traversor2.h"
+#include "Topology/generic/autoAttributeHandler.h"
+#include "Algo/Geometry/area.h"
+#include "Algo/Geometry/normal.h"
+
 
 namespace CGoGN
 {
@@ -248,7 +252,7 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 			// get info from face embedding and sum
 			const VEC3& normal = faceNormal[it] ;
 
-			float angle = Geom::angle(normF, normal) ;
+			REAL angle = Geom::angle(normF, normal) ;
 			if(angle <= SUSANthreshold)
 			{
 				REAL area = faceArea[it] ;
@@ -366,7 +370,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 		for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 		{
 			const VEC3& neighborNormal = normal[it] ;
-			float angle = Geom::angle(normV, neighborNormal) ;
+			REAL angle = Geom::angle(normV, neighborNormal) ;
 			if( angle <= SUSANthreshold )
 			{
 				REAL umbArea = Algo::Surface::Geometry::vertexOneRingArea<PFP>(map, it, position) ;

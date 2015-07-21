@@ -29,6 +29,7 @@
 #include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderSimpleFlat.h"
 #include "Utils/Shaders/shaderBoldColorLines.h"
 #include "Utils/Shaders/shaderBold3DColorLines.h"
 
@@ -67,16 +68,22 @@ protected:
 	std::vector<Geom::Vec3f> m_dataPos;
 	std::vector<Geom::Vec3f> m_dataCol;
 	std::vector<PrimParam> m_begins;
+	std::vector<PrimParam> m_begins_point;
+	std::vector<PrimParam> m_begins_line;
+	std::vector<PrimParam> m_begins_face;
 
 	float m_currentWidth;
 	float m_currentSize;
 	GLenum m_compile;
 	Utils::ShaderColorPerVertex* m_shader;
 	Utils::ShaderPointsLines* m_shaderL;
+	Utils::ShaderSimpleFlat* m_shaderSF;
+
 	//Utils::ShaderBoldColorLines* m_shaderCL;
 	//Utils::ShaderBold3DColorLines* m_shader3DCL;
 
 	int m_lineMode;
+	bool m_withShading;
 
 public:
 
@@ -98,6 +105,12 @@ public:
 
 	void updateMatrices(const glm::mat4& projection, const glm::mat4& modelview);
 
+
+	/**
+	* @brief choose if faces are rendered with shading or not. Can change at each callList
+	* @param s shaded or not
+	*/
+	inline void setFaceShading(bool s) { m_withShading = s; }
 
 	/**
 	 * init the data structure
@@ -153,7 +166,7 @@ public:
 	/**
 	 * call a sub-list (index return by begin (0,1,...)
 	 */
-	void callSubList(int index, float opacity = 1.0f);
+//	void callSubList(int index, float opacity = 1.0f);
 
 	/**
 	 * call a set of sub-lists

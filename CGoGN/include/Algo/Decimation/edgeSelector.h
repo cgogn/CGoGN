@@ -109,7 +109,7 @@ private:
 
 	typedef struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "LengthEdgeInfo" ; }
 	} LengthEdgeInfo ;
@@ -117,8 +117,8 @@ private:
 
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
@@ -176,7 +176,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMedgeInfo" ; }
 	} QEMedgeInfo ;
@@ -186,8 +186,8 @@ private:
 	VertexAttribute<Utils::Quadric<REAL>, MAP> quadric ;
 	Utils::Quadric<REAL> tmpQ ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
@@ -232,7 +232,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMedgeInfo" ; }
 	} QEMedgeInfo ;
@@ -241,8 +241,8 @@ private:
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL>, MAP> quadric ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
@@ -288,7 +288,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "NormalAreaEdgeInfo" ; }
 	} NormalAreaEdgeInfo ;
@@ -297,8 +297,8 @@ private:
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 	EdgeAttribute<Geom::Matrix<3,3,REAL>, MAP> edgeMatrix ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d) ;
@@ -342,7 +342,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "CurvatureEdgeInfo" ; }
 	} CurvatureEdgeInfo ;
@@ -361,8 +361,8 @@ private:
 	VertexAttribute<VEC3, MAP> Kmin ;
 	VertexAttribute<VEC3, MAP> Knormal ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
@@ -453,7 +453,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "CurvatureTensorEdgeInfo" ; }
 	} CurvatureTensorEdgeInfo ;
@@ -463,8 +463,8 @@ private:
 	EdgeAttribute<REAL, MAP> edgeangle ;
 	EdgeAttribute<REAL, MAP> edgearea ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d) ; // TODO : usually has a 2nd arg (, bool recompute) : why ??
@@ -521,7 +521,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "MinDetailEdgeInfo" ; }
 	} MinDetailEdgeInfo ;
@@ -529,8 +529,8 @@ private:
 
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
@@ -577,7 +577,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "ColorNaiveEdgeInfo" ; }
 	} ColorNaiveedgeInfo ;
@@ -586,8 +586,8 @@ private:
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
@@ -645,7 +645,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "GeomColOptGradEdgeInfo" ; }
 	} ColorNaiveedgeInfo ;
@@ -654,8 +654,8 @@ private:
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 	VertexAttribute<Utils::Quadric<REAL>, MAP> m_quadric ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d) ;
@@ -735,7 +735,7 @@ private:
 
 	typedef	struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL,Dart>::iterator it ;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "QEMextColorEdgeInfo" ; }
 	} QEMextColorEdgeInfo ;
@@ -744,8 +744,8 @@ private:
 	EdgeAttribute<EdgeInfo, MAP> edgeInfo ;
 	VertexAttribute<Utils::QuadricNd<REAL,6>, MAP> m_quadric ;
 
-	std::multimap<float,Dart> edges ;
-	typename std::multimap<float,Dart>::iterator cur ;
+	std::multimap<REAL,Dart> edges ;
+	typename std::multimap<REAL,Dart>::iterator cur ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;

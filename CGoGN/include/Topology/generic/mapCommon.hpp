@@ -239,8 +239,7 @@ template <typename T, unsigned int ORBIT, typename MAP>
 inline bool MapCommon<MAP_IMPL>::swapAttributes(AttributeHandler<T, ORBIT, MAP>& attr1, AttributeHandler<T, ORBIT, MAP>& attr2)
 {
 	assert((attr1.isValid() && attr2.isValid()) || !"Invalid attribute handler") ;
-//	assert(attr1.getOrbit() == attr2.getOrbit() || !"Cannot swap attributes of different orbits") ;
-//	unsigned int orbit = attr1.getOrbit() ;
+	assert(((attr1.map() == this) && (attr2.map() == this)) || !"Cannot swap attributes of different maps");
 	unsigned int index1 = attr1.getIndex() ;
 	unsigned int index2 = attr2.getIndex() ;
 	if(index1 != index2)

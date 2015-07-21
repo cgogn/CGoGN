@@ -35,16 +35,11 @@ private slots:
 	void fragmentInterpolationChanged(int state);
 	void decimateClicked();
 
-	void computeDistanceClicked();
-
 private:
 	void addPositionVBO(QString name);
 	void removePositionVBO(QString name);
 	void addNormalVBO(QString name);
 	void removeNormalVBO(QString name);
-
-	void addObject(QString name);
-	void removeObject(QString name);
 
 	void updateMapParameters();
 };

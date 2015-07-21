@@ -150,6 +150,69 @@ void Camera::fromString(QString cam)
 }
 
 
+QString Camera::getName()
+{
+	return m_name;
+}
+
+SCHNApps* Camera::getSCHNApps() const
+{
+	return m_schnapps;
+}
+
+bool Camera::isUsed() const
+{
+	return !l_views.empty();
+}
+
+bool Camera::isShared()	const
+{
+	return l_views.size() > 1;
+}
+
+qglviewer::Camera::Type Camera::getProjectionType()
+{
+	return type();
+}
+
+bool Camera::getDraw() const
+{
+	return b_draw;
+}
+
+bool Camera::getDrawPath() const
+{
+	return b_drawPath;
+}
+
+const QList<View*>& Camera::getLinkedViews() const 
+{
+	return l_views;
+}
+
+bool Camera::isLinkedToView(View* view) const
+{
+	return l_views.contains(view);
+}
+
+void Camera::enableViewsBoundingBoxFitting()
+{
+	b_fitToViewsBoundingBox = true;
+}
+
+void Camera::disableViewsBoundingBoxFitting()
+{
+	b_fitToViewsBoundingBox = false;
+}
+
+
+
+
+
+
+
+
+
 } // namespace SCHNApps
 
 } // namespace CGoGN

@@ -31,9 +31,12 @@ namespace CGoGN
 	template <> struct CompileTimeError<true> {};
 }
 
-#define CGoGN_STATIC_ASSERT(expr, msg) \
-	{ CGoGN::CompileTimeError<((expr) != 0)> STATIC_ASSERT_ERROR_##msg; (void)STATIC_ASSERT_ERROR_##msg; }
-
+#ifdef CGOGN_NO_STATIC_ASSERT
+	#define CGoGN_STATIC_ASSERT(expr, msg)
+#else
+	#define CGoGN_STATIC_ASSERT(expr, msg) \
+		{ CGoGN::CompileTimeError<((expr) != 0)> STATIC_ASSERT_ERROR_##msg; (void)STATIC_ASSERT_ERROR_##msg; }
+#endif
 
 #define CGoGN_ASSERT(expr) if (CGOGN_ASSERT_BOOL) assert(expr);
 

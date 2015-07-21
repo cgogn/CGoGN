@@ -157,7 +157,7 @@ inline unsigned int Histogram::whichQuantille(double val) const
 template<typename ATTC>
 void Histogram::histoColorize(ATTC& colors)
 {
-	unsigned int nb = m_dataIdx.size();
+	unsigned int nb = uint32(m_dataIdx.size());
 	for (unsigned int i = 0; i<nb; ++i)
 	{
 		unsigned int j = idx(i);
@@ -171,8 +171,8 @@ template<typename ATTC>
 void Histogram::quantilesColorize(ATTC& colors, const std::vector<Geom::Vec3f>& tc)
 {
 
-	unsigned int nb = m_dataIdx.size();
-	unsigned int nbi = m_interv.size()-1;
+	unsigned int nb = uint32(m_dataIdx.size());
+	unsigned int nbi = uint32(m_interv.size() - 1);
 
 	assert(tc.size() >= nbi);
 
@@ -239,7 +239,7 @@ unsigned int Histogram::markCellsOfQuantilesColumn(unsigned int c, CELLMARKER& c
 	double bi = m_interv[c];
 	double bs = m_interv[c+1];
 
-	unsigned int nb=m_dataIdx.size();
+	unsigned int nb = uint32(m_dataIdx.size());
 	unsigned int i=0;
 
 	while ((i<nb) && (data(i)< bi))

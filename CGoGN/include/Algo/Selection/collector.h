@@ -30,6 +30,8 @@
 
 #include "Topology/generic/traversor/traversor2.h"
 
+#include <algorithm>
+
 /*****************************************
  * Class hierarchy :
  * Collector (virtual)
@@ -308,7 +310,7 @@ public:
 	{}
 	inline void setAngleThreshold(REAL a) { angleThreshold = a; }
 	inline REAL getAngleThreshold() const { return angleThreshold; }
-	inline const VertexAttribute<VEC3, MAP>& getNormal() const { return normal ; }
+	inline const FaceAttribute<VEC3, MAP>& getNormal() const { return normal; }
 
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
@@ -479,7 +481,7 @@ protected:
 
 	typedef struct
 	{
-		typename std::multimap<float,Dart>::iterator it ;
+		typename std::multimap<REAL, Dart>::iterator it;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
@@ -487,7 +489,7 @@ protected:
 
 	VertexAttribute<VertexInfo, MAP> vertexInfo ;
 
-	std::multimap<float, Dart> front ;
+	std::multimap<REAL, Dart> front;
 
 public:
 	Collector_Dijkstra_Vertices(MAP& m, const EdgeAttribute<REAL, MAP>& c, REAL d = 0) :
@@ -530,7 +532,7 @@ protected:
 
 	typedef struct
 	{
-		typename std::multimap<float, Dart>::iterator it ;
+		typename std::multimap<REAL, Dart>::iterator it;
 		bool valid ;
 		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
 	} DijkstraVertexInfo ;
@@ -538,7 +540,7 @@ protected:
 
 	VertexAttribute<VertexInfo, MAP> vertexInfo ;
 
-	std::multimap<float, Dart> front ;
+	std::multimap<REAL, Dart> front;
 
 public:
 	Collector_Dijkstra(MAP& m, const VertexAttribute<VEC3, MAP>& p, REAL d = 0) :
@@ -546,7 +548,7 @@ public:
 		position(p),
 		maxDist(d)
 	{
-		vertexInfo = m.template addAttribute<VertexInfo, VERTEX>("vertexInfo");
+			vertexInfo = m.template addAttribute<VertexInfo, VERTEX, typename PFP::MAP>("vertexInfo");
 	}
 	~Collector_Dijkstra()
 	{
@@ -561,7 +563,7 @@ public:
 	void collectBorder(Dart d);
 
 private :
-	inline float edgeLength (Dart d);
+	inline REAL edgeLength(Dart d);
 //	inline Dart oppositeVertex (Dart d);
 };
 

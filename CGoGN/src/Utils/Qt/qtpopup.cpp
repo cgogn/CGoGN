@@ -35,8 +35,8 @@ namespace QT
 {
 
 
-QtPopUp::QtPopUp(SimpleQT* sqt, bool withButtons):
-m_cbs(sqt)
+QtPopUp::QtPopUp(/*SimpleQT* sqt,*/ bool withButtons)/*:
+m_cbs(sqt)*/
 {
 	if (withButtons)
 	{
@@ -82,8 +82,8 @@ void QtPopUp::keyPressEvent ( QKeyEvent * event )
 	if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
 		k += 32;
 
-	if (m_cbs)
-		m_cbs->cb_keyPress(k);
+	//if (m_cbs)
+	//	m_cbs->cb_keyPress(k);
 }
 
 }

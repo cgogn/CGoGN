@@ -58,7 +58,7 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Face d, const VertexAt
 		return triangleArea<PFP>(map, d, position) ;
 	else
 	{
-		float area = 0.0f ;
+		typename PFP::REAL area = 0;
 		VEC3 centroid = faceCentroid<PFP>(map, d, position) ;
 		Traversor2FE<typename PFP::MAP> t(map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
@@ -119,7 +119,7 @@ typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Vertex v, const Ver
 	typename PFP::REAL area(0) ;
 	foreach_incident2<FACE>(map, v, [&] (Face it)
 	{
-		const typename PFP::VEC3& p1 = position[it] ;
+		const typename PFP::VEC3& p1 = position[it.dart] ;
 		const typename PFP::VEC3& p2 = position[map.phi1(it)] ;
 		const typename PFP::VEC3& p3 = position[map.phi_1(it)] ;
 		if(!Geom::isTriangleObtuse(p1, p2, p3))

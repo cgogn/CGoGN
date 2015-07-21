@@ -36,6 +36,10 @@ void VBO::updateData(std::vector<T>& data)
 		CGoGNerr << "Error locked VBO" << CGoGNendl;
 		return;
 	}
+
+	if (data.empty())
+		return;
+
 	m_data_size = sizeof(T) / sizeof(float);
 	m_nbElts = uint32(data.size());
 

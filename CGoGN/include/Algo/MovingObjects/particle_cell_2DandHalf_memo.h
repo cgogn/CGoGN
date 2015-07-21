@@ -35,9 +35,9 @@ public :
 //	bool detect_vertex;
 //	bool detect_edge;
 //	bool detect_face;
-	ParticleCell2DAndHalfMemo() {};
+	//ParticleCell2DAndHalfMemo() {};
 
-	ParticleCell2DAndHalfMemo(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
+	ParticleCell2DAndHalfMemo(MAP& map, Dart belonging_cell, VEC3 pos, /*const*/ TAB_POS& tabPos) :
 		ParticleCell2DAndHalf<PFP>(map,belonging_cell,pos,tabPos)
 //		detect_vertex(false),detect_edge(false),detect_face(true)
 	{

@@ -21,7 +21,6 @@ Surface_Radiance_DockTab::Surface_Radiance_DockTab(SCHNApps* s, Surface_Radiance
 	connect(combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(normalVBOChanged(int)));
 	connect(checkbox_fragInterp, SIGNAL(stateChanged(int)), this, SLOT(fragmentInterpolationChanged(int)));
 	connect(button_decimate, SIGNAL(clicked()), this, SLOT(decimateClicked()));
-	connect(button_computeDistance, SIGNAL(clicked()), this, SLOT(computeDistanceClicked()));
 }
 
 
@@ -90,14 +89,6 @@ void Surface_Radiance_DockTab::decimateClicked()
 		checkbox_halfCollapse->checkState() == Qt::Checked);
 }
 
-void Surface_Radiance_DockTab::computeDistanceClicked()
-{
-	m_plugin->computeDistance(
-		combo_object1->currentText(),
-		combo_object2->currentText()
-	);
-}
-
 
 
 
@@ -138,30 +129,6 @@ void Surface_Radiance_DockTab::removeNormalVBO(QString name)
 	b_updatingUI = false;
 }
 
-void Surface_Radiance_DockTab::addObject(QString name)
-{
-	b_updatingUI = true;
-	combo_object1->addItem(name);
-	combo_object2->addItem(name);
-	b_updatingUI = false;
-}
-
-void Surface_Radiance_DockTab::removeObject(QString name)
-{
-	b_updatingUI = true;
-	int curIndex1 = combo_object1->currentIndex();
-	int index1 = combo_object1->findText(name, Qt::MatchExactly);
-	if(curIndex1 == index1)
-		combo_object1->setCurrentIndex(0);
-	combo_object1->removeItem(index1);
-	int curIndex2 = combo_object2->currentIndex();
-	int index2 = combo_object2->findText(name, Qt::MatchExactly);
-	if(curIndex2 == index2)
-		combo_object2->setCurrentIndex(0);
-	combo_object2->removeItem(index2);
-	b_updatingUI = false;
-}
-
 void Surface_Radiance_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -170,10 +137,6 @@ void Surface_Radiance_DockTab::updateMapParameters()
 	combo_positionVBO->addItem("- select VBO -");
 	combo_normalVBO->clear();
 	combo_normalVBO->addItem("- select VBO -");
-	combo_object1->clear();
-	combo_object1->addItem("- select map -");
-	combo_object2->clear();
-	combo_object2->addItem("- select map -");
 
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
 	if(map)
@@ -197,12 +160,6 @@ void Surface_Radiance_DockTab::updateMapParameters()
 		}
 
 		checkbox_fragInterp->setChecked(p.radiancePerVertexShader->getFragInterp());
-	}
-
-	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
-	{
-		combo_object1->addItem(map->getName());
-		combo_object2->addItem(map->getName());
 	}
 
 	b_updatingUI = false;

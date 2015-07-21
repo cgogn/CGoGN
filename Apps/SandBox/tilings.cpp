@@ -135,7 +135,7 @@ void MyQT::squareTiling(int code)
 		{
 			std::cout << "square grid helicoid tiling" << std::endl;
 			Algo::Surface::Tilings::Square::Grid<PFP> g(myMap,20,20,true);
-			g.embedIntoHelicoid(position, 0.2,  0.3, 0.8, 2.0);
+			g.embedIntoHelicoid(position, 0.2f,  0.3f, 0.8f, 2.0f);
 
 //			Geom::Matrix44f trf;
 //			trf.identity();

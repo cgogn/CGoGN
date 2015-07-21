@@ -27,8 +27,12 @@
 
 #include "NL/nl.h"
 #include "Topology/generic/traversor/traversorCell.h"
+#include "Topology/generic/traversor/traversor2.h"
 
 namespace CGoGN
+{
+
+namespace Algo
 {
 
 namespace LinearSolving
@@ -395,7 +399,7 @@ void getResult(
 {
 	foreach_cell<VERTEX>(m, [&] (Dart d)
 	{
-		attr[d] = nlGetVariable(index[d]) ;
+        attr[d] = ATTR_TYPE(nlGetVariable(index[d]));
 	});
 }
 
@@ -408,11 +412,13 @@ void getResult(
 {
 	foreach_cell<VERTEX>(m, [&] (Dart d)
 	{
-		(attr[d])[coord] = nlGetVariable(index[d]) ;
+		(attr[d])[coord] = typename ATTR_TYPE::DATA_TYPE(nlGetVariable(index[d]));
 	});
 }
 
 } // namespace LinearSolving
+
+} // Algo
 
 } // namespace CGoGN
 

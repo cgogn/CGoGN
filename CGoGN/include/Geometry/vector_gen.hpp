@@ -24,6 +24,7 @@
 
 #include <sstream>
 #include <cmath>
+#include <cstdlib>
 
 namespace CGoGN
 {
@@ -287,13 +288,13 @@ inline T Vector<DIM, T>::norm2() const
 	T n(0) ;
 	for (unsigned int i = 0; i < DIM; ++i)
 		n += m_data[i] * m_data[i] ;
-	return n ;
+	return n;
 }
 
 template <unsigned int DIM, typename T>
-inline double Vector<DIM, T>::norm() const
+inline T Vector<DIM, T>::norm() const
 {
-	return sqrt(norm2()) ;
+	return T(sqrt(norm2())) ;
 }
 
 template <unsigned int DIM, typename T>
@@ -357,13 +358,13 @@ inline bool Vector<DIM, T>::hasNan() const
 	return false ;
 }
 
-template <unsigned int DIM, typename T>
-inline bool Vector<DIM, T>::isFinite() const
-{
-	for (unsigned int i = 0; i < DIM; ++i)
-		if (!std::isfinite(m_data[i])) return false ;
-	return true ;
-}
+//template <unsigned int DIM, typename T>
+//inline bool Vector<DIM, T>::isFinite() const
+//{
+//	for (unsigned int i = 0; i < DIM; ++i)
+//		if (!std::isfinite(m_data[i])) return false ;
+//	return true ;
+//}
 
 template <unsigned int DIM, typename T>
 inline bool Vector<DIM, T>::isNormalized(const T& epsilon) const
@@ -374,7 +375,7 @@ inline bool Vector<DIM, T>::isNormalized(const T& epsilon) const
 template <unsigned int DIM, typename T>
 inline bool Vector<DIM, T>::isOrthogonal(const Vector<DIM, T>& v, const T& epsilon) const
 {
-	return (fabs(v * (*this)) < epsilon) ;
+	return (std::abs(v * (*this)) < epsilon) ;
 }
 
 template <unsigned int DIM, typename T>
@@ -389,6 +390,16 @@ inline bool Vector<DIM, T>::isNear(const Vector<DIM, T>& v, int precision) const
 		norm2 += diff * diff ;
 	}
 	return isNull2(norm2, precision) ;
+}
+
+
+template <unsigned int DIM, typename T>
+inline bool isFinite(const Vector<DIM, T>& vec)
+{
+	for (unsigned int i = 0; i < DIM; ++i)
+	if (!std::isfinite(vec[i]))
+		return false;
+	return true;
 }
 
 /**********************************************/
@@ -424,9 +435,9 @@ inline bool isNull(T x, int precision)
 	if (precision == 0)
 		return (x == 0) ;
 	else if (precision > 0)
-			return (fabs(x) < precision) ;
+			return (std::abs(x) < precision) ;
 	else
-		return (precision * fabs(x) < 1) ;
+		return (precision * std::abs(x) < 1) ;
 }
 
 /***

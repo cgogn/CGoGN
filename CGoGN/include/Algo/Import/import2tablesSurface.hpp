@@ -340,14 +340,14 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importVoxellisation(Algo::Surface::Modelisation::Voxellisation& voxellisation, std::vector<std::string>& attrNames)
 {
-	VertexAttribute<VEC3, MAP> positions = m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3, MAP> positions = m_map.template getAttribute<VEC3, VERTEX, MAP>("position");
 
     if (!positions.isValid())
-		positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;
+		positions = m_map.template addAttribute<VEC3, VERTEX, MAP>("position");
 
     attrNames.push_back(positions.name()) ;
 
-    AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
+	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>();
 
     // lecture des nombres de sommets/faces
     m_nbVertices = voxellisation.getNbSommets();
@@ -1623,9 +1623,9 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
     {
         typename PFP::VEC3 P = positions[i];
         P -= bb.min();
-        float pz = floor((P[2]/bbsize[2])*NBV);
-        float py = floor((P[1]/bbsize[1])*NBV);
-        float px = floor((P[0]/bbsize[0])*NBV);
+		typename PFP::REAL pz = floor((P[2] / bbsize[2])*NBV);
+		typename PFP::REAL py = floor((P[1] / bbsize[1])*NBV);
+		typename PFP::REAL px = floor((P[0] / bbsize[0])*NBV);
 
         unsigned int index = uint32(NBV*NBV*pz + NBV*py + px);
 

@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Algo/Modelisation/subdivision.h"
+
 namespace CGoGN
 {
 
