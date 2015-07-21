@@ -53,11 +53,14 @@ SphericalHarmonics<Tscalar,Tcoef>::~SphericalHarmonics()
 template <typename Tscalar,typename Tcoef>
 void SphericalHarmonics<Tscalar,Tcoef>::set_level(int res_level)
 {
-	assert(res_level >= 0 && res_level < max_resolution);
-	assert(cpt_instances == 0);
-	resolution = res_level;
-	nb_coefs = (resolution + 1) * (resolution + 1);
-	init_K_tab();
+	if (res_level != resolution)
+	{
+		assert(res_level >= 0 && res_level < max_resolution);
+		assert(cpt_instances == 0);
+		resolution = res_level;
+		nb_coefs = (resolution + 1) * (resolution + 1);
+		init_K_tab();
+	}
 }
 
 template <typename Tscalar,typename Tcoef>
