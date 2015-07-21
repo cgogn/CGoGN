@@ -164,6 +164,9 @@ void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 	DEBUG_SLOT();
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
+
+	if(map == m_schnapps->getSelectedMap())
+		m_dockTab->updateMapParameters();
 }
 
 
