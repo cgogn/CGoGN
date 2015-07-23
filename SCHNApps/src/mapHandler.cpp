@@ -118,7 +118,6 @@ void  MapHandlerGen::setBBColor(const QString& color)
 	updateBB();
 }
 
-
 void MapHandlerGen::setBBVertexAttribute(const QString& name)
 {
 	m_bbVertexAttribute = m_map->getAttributeVectorGen(VERTEX, name.toStdString());
@@ -129,7 +128,6 @@ void MapHandlerGen::setBBVertexAttribute(const QString& name)
 		m_schnapps->setSelectedMap("NONE");
 		m_schnapps->setSelectedMap(this->getName());
 	}
-
 }
 
 AttributeMultiVectorGen* MapHandlerGen::getBBVertexAttribute() const

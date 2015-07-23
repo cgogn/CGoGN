@@ -3,9 +3,11 @@
 
 #include "plugin_interaction.h"
 #include "surface_radiance_dockTab.h"
+#include "dialog_computeRadianceDistance.h"
 
 #include "Utils/sphericalHarmonics.h"
 #include "Utils/Shaders/shaderRadiancePerVertex.h"
+#include "Utils/drawer.h"
 
 #include "Algo/Decimation/decimation.h"
 
@@ -56,6 +58,7 @@ class Surface_Radiance_Plugin : public PluginInteraction
 #if CGOGN_QT_DESIRED_VERSION == 5
 	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
 #endif
+
 	friend class Surface_Radiance_DockTab;
 
 public:
@@ -87,6 +90,7 @@ private slots:
 	void selectedMapChanged(MapHandlerGen* prev, MapHandlerGen* cur);
 	void mapAdded(MapHandlerGen* map);
 	void mapRemoved(MapHandlerGen* map);
+	void schnappsClosing();
 
 	// slots called from MapHandler signals
 	void vboAdded(Utils::VBO* vbo);
@@ -94,6 +98,9 @@ private slots:
 	void attributeModified(unsigned int orbit, QString nameAttr);
 
 	void importFromFileDialog();
+
+	void openComputeRadianceDistanceDialog();
+	void computeRadianceDistanceFromDialog();
 
 public slots:
 	// slots for Python calls
@@ -108,6 +115,14 @@ public slots:
 		bool halfCollapse = false,
 		bool exportMeshes = false
 	);
+	void computeRadianceDistance(
+		const QString& mapName1,
+		const QString& positionAttributeName1,
+		const QString& distanceAttributeName1,
+		const QString& mapName2,
+		const QString& positionAttributeName2,
+		const QString& distanceAttributeName2
+	);
 	void exportPLY(
 		const QString& mapName,
 		const QString& positionAttributeName,
@@ -121,6 +136,10 @@ protected:
 	static void checkNbVerticesAndExport(Surface_Radiance_Plugin* p, const unsigned int* nbVertices);
 
 	Surface_Radiance_DockTab* m_dockTab;
+
+	Dialog_ComputeRadianceDistance* m_computeRadianceDistanceDialog;
+	QAction* m_computeRadianceDistanceAction;
+
 	QHash<MapHandlerGen*, MapParameters> h_mapParameterSet;
 
 	MapHandlerGen* m_currentlyDecimatedMap;

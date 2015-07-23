@@ -58,6 +58,19 @@ template <typename PFP>
 typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P) ;
 
 /**
+* compute the barycentric coordinates of the point in the triangle f that is closest to point P
+* @param map the map
+* @param f a triangle face
+* @param position the vertex attribute storing positions
+* @param P the point
+* @param u barycentric coordinate 1 of closest point
+* @param v barycentric coordinate 2 of closest point
+* @param w barycentric coordinate 3 of closest point
+*/
+template <typename PFP>
+void closestPointInTriangle(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P, double& u, double& v, double& w) ;
+
+/**
 * compute squared distance from point to an edge
 * @param map the map
 * @param e an edge

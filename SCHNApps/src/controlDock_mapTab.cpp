@@ -129,6 +129,9 @@ void ControlDock_MapTab::selectedMapChanged()
 			connect(m_selectedMap, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(selectedMapVBORemoved(Utils::VBO*)));
 			connect(m_selectedMap, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorAdded(unsigned int, const QString&)));
 			connect(m_selectedMap, SIGNAL(cellSelectorRemoved(unsigned int, const QString&)), this, SLOT(selectedMapCellSelectorRemoved(unsigned int, const QString&)));
+
+			for(unsigned int i = 0; i < NB_ORBITS; ++i)
+				m_selectedSelector[i] = NULL;
 		}
 		else
 			m_selectedMap = NULL;

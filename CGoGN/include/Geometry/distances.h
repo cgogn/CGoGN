@@ -56,7 +56,7 @@ template <typename VEC3>
 typename VEC3::DATA_TYPE distancePoint2TrianglePlane(const VEC3& P, const VEC3& A, const VEC3& B, const VEC3& C) ;
 
 /**
-* compute squared distance from point to triangle
+* compute squared distance from point P to triangle ABC
 * @param P the point
 * @param A triangle point 1
 * @param B triangle point 2
@@ -65,6 +65,19 @@ typename VEC3::DATA_TYPE distancePoint2TrianglePlane(const VEC3& P, const VEC3& 
 */
 template <typename VEC3>
 typename VEC3::DATA_TYPE squaredDistancePoint2Triangle(const VEC3& P, const VEC3& A, const VEC3& B, const VEC3& C) ;
+
+/**
+* compute the barycentric coordinates of the point in the triangle ABC that is closest to point P
+* @param P the point
+* @param A triangle point 1
+* @param B triangle point 2
+* @param C triangle point 3
+* @param u barycentric coordinate 1 of closest point
+* @param v barycentric coordinate 2 of closest point
+* @param w barycentric coordinate 3 of closest point
+*/
+template <typename VEC3>
+void closestPointInTriangle(const VEC3& P, const VEC3& A, const VEC3& B, const VEC3& C, double& u, double& v, double& w) ;
 
 /**
 * compute squared distance from point to line
