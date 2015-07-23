@@ -153,13 +153,6 @@ void Surface_Render_Plugin::selectedViewChanged(View *prev, View *cur)
 void Surface_Render_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	DEBUG_SLOT();
-
-	if (prev)
-		disconnect(prev, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
-	if (cur)
-		connect(cur, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
-
-
 	m_dockTab->updateMapParameters();
 }
 
@@ -168,7 +161,7 @@ void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
 	DEBUG_SLOT();
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
-	connect(map, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+	connect(map, SIGNAL(boundingBoxModified()), this, SLOT(boundingBoxModified()));
 }
 
 void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
@@ -176,7 +169,7 @@ void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 	DEBUG_SLOT();
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
-	disconnect(map, SIGNAL(boundingBoxModified()), this, SLOT(selectedMapBoundingBoxModified()));
+	disconnect(map, SIGNAL(boundingBoxModified()), this, SLOT(boundingBoxModified()));
 
 	if(map == m_schnapps->getSelectedMap())
 		m_dockTab->updateMapParameters();
@@ -246,21 +239,18 @@ void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 		v->updateGL();
 }
 
-
-void Surface_Render_Plugin::selectedMapBoundingBoxModified()
+void Surface_Render_Plugin::boundingBoxModified()
 {
-	MapHandlerGen* m = m_schnapps->getSelectedMap();
+	DEBUG_SLOT();
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
-	QList<View*> views = m->getLinkedViews();
-	if (m)
-		foreach(View* v, views)
-		{
-			if (h_viewParameterSet.contains(v))
-				h_viewParameterSet[v][m].basePSradius = m->getBBdiagSize() / (2 * std::sqrt(m->getNbOrbits(EDGE)));
-		}
+	QList<View*> views = map->getLinkedViews();
+	foreach(View* v, views)
+	{
+		if (h_viewParameterSet.contains(v))
+			h_viewParameterSet[v][map].basePSradius = map->getBBdiagSize() / (2 * std::sqrt(map->getNbOrbits(EDGE)));
+	}
 }
-
-
 
 void Surface_Render_Plugin::changePositionVBO(const QString& view, const QString& map, const QString& vbo)
 {

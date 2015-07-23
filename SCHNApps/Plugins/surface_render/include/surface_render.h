@@ -114,7 +114,7 @@ private slots:
 	// slots called from MapHandler signals
 	void vboAdded(Utils::VBO* vbo);
 	void vboRemoved(Utils::VBO* vbo);
-	void selectedMapBoundingBoxModified();
+	void boundingBoxModified();
 
 	void schnappsClosing();
 

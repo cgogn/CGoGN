@@ -519,8 +519,12 @@ void Surface_Radiance_Plugin::computeRadianceDistance(
 
 	// for each vertex of map1
 
+	unsigned int nbVertices = 0;
+	unsigned int nbVerticesWithDistanceDeviation = 0;
+
 	for (Vertex v : allVerticesOf(*map1))
 	{
+		nbVertices++;
 		const PFP2::VEC3& P = position1[v];
 
 		// find closest point on map2
@@ -553,25 +557,30 @@ void Surface_Radiance_Plugin::computeRadianceDistance(
 			}
 		}
 
+		minDist = sqrt(minDist);
+
 		double l1, l2, l3;
 		Algo::Geometry::closestPointInTriangle<PFP2>(*map2, closestFace, position2, P, l1, l2, l3);
+
 		const PFP2::VEC3& P1 = position2[closestFace.dart];
 		const PFP2::VEC3& P2 = position2[map2->phi1(closestFace.dart)];
 		const PFP2::VEC3& P3 = position2[map2->phi_1(closestFace.dart)];
 		PFP2::VEC3 closestPoint = l1*P1 + l2*P2 + l3*P3;
 
-		minDist = sqrt(minDist);
-
 		PFP2::VEC3 vect = closestPoint - P;
 		PFP2::REAL dist = vect.norm();
 		if (fabs(dist - minDist) > 0.001)
 		{
-			std::cout << "l1 -> " << l1 << " / l2 -> " << l2 << " / l3 -> " << l3 << std::endl;
-			std::cout << "diff -> " << fabs(dist - minDist) << std::endl;
+			nbVerticesWithDistanceDeviation++;
+//			std::cout << "l1 -> " << l1 << " / l2 -> " << l2 << " / l3 -> " << l3 << std::endl;
+//			std::cout << "diff -> " << fabs(dist - minDist) << std::endl;
 		}
 
 		distance1[v] = minDist;
 	}
+
+	std::cout << "nbVertices => " << nbVertices << std::endl;
+	std::cout << "nbVertices with closest point deviation > 0.001 => " << nbVerticesWithDistanceDeviation << std::endl;
 
 	this->pythonRecording("computeRadianceDistance", "", mapName1, positionAttributeName1, distanceAttributeName1,
 							mapName2, positionAttributeName2, distanceAttributeName2);
