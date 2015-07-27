@@ -34,7 +34,7 @@ namespace CGoGN
 const unsigned int EMBNULL = 0xffffffff;
 const unsigned int MRNULL = 0xffffffff;
 
-const unsigned int NB_THREAD = 16;
+const unsigned int NB_THREADS = 16;
 
 // DO NOT MODIFY (ORBIT_IN_PARENT function in Map classes)
 

@@ -104,24 +104,42 @@ protected:
 	// protected copy constructor to prevent the copy of map
 	GenericMap(const GenericMap& ) {}
 
+	/**
+	 * @brief m_thread_ids
+	 * vector of known thread ids, i.e. threads for which a mark vector,
+	 * a Dart buffer or a uint buffer will be given when asked
+	 */
+	mutable std::vector<std::thread::id> m_thread_ids;
 
 	/**
-	 *
+	 * @brief m_authorizeExternalThreads
+	 * if true, getCurrentThreadIndex will give an index to an unknown thread
 	 */
-	std::vector<std::thread::id> m_thread_ids;
+	bool m_authorizeExternalThreads;
+
 public:
 	/// compute thread index in the table of thread
 	inline unsigned int getCurrentThreadIndex() const;
 
-	/// add place for n new threads in the table of thread return index of first
-	inline unsigned int addEmptyThreadIds(unsigned int n);
+//	/// register the given thread ID for access to resources on this map
+//	inline void addThreadId(const std::thread::id id);
 
-	/// remove  the n last added threads from table
-	inline void popThreadIds(unsigned int nb);
+	/// unregister the given thread to access resources on this map
+	inline void removeThreadId(const std::thread::id id);
 
-	/// get ref to jth threadId for updating (in thread)
-	inline std::thread::id& getThreadId(unsigned int j);
+	/// add room for a new thread ID (will be set on thread start)
+	inline std::thread::id& addEmptyThreadId();
 
+	/// get a threadId based on its index
+	inline std::thread::id getThreadId(unsigned int index) const;
+
+	/**
+	 * @brief setExternalThreadsAuthorization
+	 * @param b
+	 * if true, threads that did not created the map will be able to traverse it
+	 * if false, traversal of the map by other threads will fail
+	 */
+	inline void setExternalThreadsAuthorization(bool b);
 
 protected:
 	/**
@@ -132,14 +150,14 @@ protected:
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
 
 	/// buffer for less memory allocation
-	static  std::vector< std::vector<Dart>* >* s_vdartsBuffers;
-	static  std::vector< std::vector<unsigned int>* >* s_vintsBuffers;
+	mutable std::vector< std::vector<Dart>* > s_vdartsBuffers[NB_THREADS];
+	mutable std::vector< std::vector<unsigned int>* > s_vintsBuffers[NB_THREADS];
 
 public:
 	/// table of instancied maps for Dart/CellMarker release
 	static std::vector<GenericMap*>* s_instances;
-protected:
 
+protected:
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
 	 * (only initialized when necessary, i.e. addEmbedding function)
@@ -154,7 +172,7 @@ protected:
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalIncidentTraversal[NB_ORBITS][NB_ORBITS] ;
 	AttributeMultiVector<NoTypeNameAttribute<std::vector<Dart> > >* m_quickLocalAdjacentTraversal[NB_ORBITS][NB_ORBITS] ;
 
-	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS][NB_THREAD] ;
+	std::vector< AttributeMultiVector<MarkerBool>* > m_markVectors_free[NB_ORBITS][NB_THREADS] ;
 	std::mutex m_MarkerStorageMutex[NB_ORBITS];
 
 	unsigned int m_nextMarkerId;
