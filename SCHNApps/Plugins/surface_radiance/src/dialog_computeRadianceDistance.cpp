@@ -56,6 +56,7 @@ void Dialog_ComputeRadianceDistance::selectedMap1Changed()
 			if(i.value() == vec3TypeName)
 			{
 				combo_positionAttribute_1->addItem(i.key());
+				combo_normalAttribute_1->addItem(i.key());
 			}
 			if(i.value() == realTypeName)
 			{
@@ -93,6 +94,7 @@ void Dialog_ComputeRadianceDistance::selectedMap2Changed()
 			if(i.value() == vec3TypeName)
 			{
 				combo_positionAttribute_2->addItem(i.key());
+				combo_normalAttribute_2->addItem(i.key());
 			}
 			if(i.value() == realTypeName)
 			{
@@ -148,6 +150,7 @@ void Dialog_ComputeRadianceDistance::addAttributeToList1(unsigned int orbit, con
 		if(typeAttr == vec3TypeName)
 		{
 			combo_positionAttribute_1->addItem(nameAttr);
+			combo_normalAttribute_1->addItem(nameAttr);
 		}
 		if(typeAttr == realTypeName)
 		{
@@ -168,6 +171,7 @@ void Dialog_ComputeRadianceDistance::addAttributeToList2(unsigned int orbit, con
 		if(typeAttr == vec3TypeName)
 		{
 			combo_positionAttribute_2->addItem(nameAttr);
+			combo_normalAttribute_2->addItem(nameAttr);
 		}
 		if(typeAttr == realTypeName)
 		{

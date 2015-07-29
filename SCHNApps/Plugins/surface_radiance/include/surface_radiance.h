@@ -115,12 +115,13 @@ public slots:
 		bool halfCollapse = false,
 		bool exportMeshes = false
 	);
-	void computeRadianceDistance(
-		const QString& mapName1,
+	void computeRadianceDistance(const QString& mapName1,
 		const QString& positionAttributeName1,
+		const QString& normalAttributeName1,
 		const QString& distanceAttributeName1,
 		const QString& mapName2,
 		const QString& positionAttributeName2,
+		const QString& normalAttributeName2,
 		const QString& distanceAttributeName2
 	);
 	void exportPLY(
@@ -148,6 +149,19 @@ protected:
 	unsigned int nextExportIndex;
 
 	QAction* m_importAction;
+
+	static bool isInHemisphere(double x, double y, double z, void* u)
+	{ // true iff [x,y,z] and u have the same direction
+		PFP2::REAL* n = (PFP2::REAL*)(u);
+		return x*n[0] + y*n[1] + z*n[2] >= 0.0;
+	}
+
+	static double SHEvalCartesian_Error(double x, double y, double z, void* u)
+	{
+		Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& e = *(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>*)(u);
+		PFP2::VEC3 c = e.evaluate_at(x, y, z);
+		return c.norm2();
+	}
 };
 
 } // namespace SCHNApps

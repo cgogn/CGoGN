@@ -26,43 +26,79 @@
 
 namespace CGoGN
 {
+
 /****************************************
  *         THREAD ID MANAGEMENT         *
  ****************************************/
+
 inline unsigned int GenericMap::getCurrentThreadIndex() const
 {
 	std::thread::id id = std::this_thread::get_id();
-	unsigned int i=0;
-	while (id != m_thread_ids[i])
+	for (unsigned int i = 0; i < m_thread_ids.size(); ++i)
 	{
-		i++;
-		assert(i<m_thread_ids.size());
+		if (id == m_thread_ids[i])
+			return i;
 	}
-	return i;
+	assert(m_thread_ids.size() < NB_THREADS + 1);
+	if (m_authorizeExternalThreads)
+	{
+		m_thread_ids.push_back(id);
+		return m_thread_ids.size() - 1;
+	}
+	else
+	{
+		return -1;
+	}
 }
 
-//inline void GenericMap::addThreadId(const std::thread::id& id)
+//inline void GenericMap::addThreadId(const std::thread::id id)
 //{
-//	m_thread_ids.push_back(id);
+//	for (unsigned int i = 0; i < m_thread_ids.size(); ++i)
+//	{
+//		if (m_thread_ids[i] == id)
+//			return;
+//	}
+//	assert(m_thread_ids.size() < NB_THREADS + 1);
+//	if (m_authorizeExternalThreads)
+//		m_thread_ids.push_back(id);
 //}
 
-inline unsigned int GenericMap::addEmptyThreadIds(unsigned int n)
+inline void GenericMap::removeThreadId(const std::thread::id id)
 {
-	unsigned int nb = uint32(m_thread_ids.size());
-	m_thread_ids.resize(nb + n);
-	return nb;
+	for (unsigned int i = 0; i < m_thread_ids.size(); ++i)
+	{
+		if (m_thread_ids[i] == id)
+		{
+			m_thread_ids[i] = m_thread_ids.back();
+			m_thread_ids.pop_back();
+			break;
+		}
+	}
 }
 
-inline void GenericMap::popThreadIds(unsigned int nb)
+inline std::thread::id& GenericMap::addEmptyThreadId()
 {
-	assert(nb<m_thread_ids.size());
-	for ( unsigned int i=0; i<nb; ++i)
-		m_thread_ids.pop_back();
+	assert(m_thread_ids.size() < NB_THREADS + 1);
+	unsigned int size = uint32(m_thread_ids.size());
+	m_thread_ids.resize(size + 1);
+	return m_thread_ids.back();
 }
 
-inline std::thread::id& GenericMap::getThreadId(unsigned int j)
+inline std::thread::id GenericMap::getThreadId(unsigned int index) const
 {
-	return m_thread_ids[j];
+	assert(index < m_thread_ids.size());
+	return m_thread_ids[index];
+}
+
+inline void GenericMap::setExternalThreadsAuthorization(bool b)
+{
+	m_authorizeExternalThreads = b;
+	if (!m_authorizeExternalThreads)
+	{
+		// keep only the thread that created the map
+		while (m_thread_ids.size() > 1)
+			m_thread_ids.pop_back();
+	}
 }
 
 
@@ -90,7 +126,7 @@ inline void GenericMap::releaseDartBuffer(std::vector<Dart>* vd) const
 {
 	unsigned int thread = getCurrentThreadIndex();
 
-	if (vd->capacity()>1024)
+	if (vd->capacity() > 1024)
 	{
 		std::vector<Dart> v;
 		vd->swap(v);
@@ -99,7 +135,6 @@ inline void GenericMap::releaseDartBuffer(std::vector<Dart>* vd) const
 	vd->clear();
 	s_vdartsBuffers[thread].push_back(vd);
 }
-
 
 inline std::vector<unsigned int>* GenericMap::askUIntBuffer() const
 {
@@ -121,7 +156,7 @@ inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui) const
 {
 	unsigned int thread = getCurrentThreadIndex();
 
-	if (vui->capacity()>1024)
+	if (vui->capacity() > 1024)
 	{
 		std::vector<unsigned int> v;
 		vui->swap(v);
@@ -130,7 +165,6 @@ inline void GenericMap::releaseUIntBuffer(std::vector<unsigned int>* vui) const
 	vui->clear();
 	s_vintsBuffers[thread].push_back(vui);
 }
-
 
 
 /****************************************
@@ -280,19 +314,18 @@ AttributeMultiVector<MarkerBool>* GenericMap::askMarkVector()
 	{
 		std::lock_guard<std::mutex> lockMV(m_MarkerStorageMutex[ORBIT]);
 
-		unsigned int x=m_nextMarkerId++;
+		unsigned int x = m_nextMarkerId++;
 		std::string number("___");
-		number[2]= '0'+x%10;
+		number[2] = '0'+x%10;
 		x = x/10;
-		number[1]= '0'+x%10;
+		number[1] = '0'+x%10;
 		x = x/10;
-		number[0]= '0'+x%10;
+		number[0] = '0'+x%10;
 
 		AttributeMultiVector<MarkerBool>* amv = m_attribs[ORBIT].addMarkerAttribute("marker_" + orbitName(ORBIT) + number);
 		return amv;
 	}
 }
-
 
 template <unsigned int ORBIT>
 inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv)
@@ -300,7 +333,6 @@ inline void GenericMap::releaseMarkVector(AttributeMultiVector<MarkerBool>* amv)
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 
 	unsigned int thread = getCurrentThreadIndex();
-
 	m_markVectors_free[ORBIT][thread].push_back(amv);
 }
 

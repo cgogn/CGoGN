@@ -10,6 +10,8 @@
 #include "Algo/Geometry/distances.h"
 #include "Algo/Geometry/plane.h"
 
+#include "SphericalFunctionIntegratorCartesian.h"
+
 #include <QFileDialog>
 #include <QFileInfo>
 
@@ -203,6 +205,9 @@ void Surface_Radiance_Plugin::computeRadianceDistanceFromDialog()
 		QString positionName1 = m_computeRadianceDistanceDialog->combo_positionAttribute_1->currentText();
 		QString positionName2 = m_computeRadianceDistanceDialog->combo_positionAttribute_2->currentText();
 
+		QString normalName1 = m_computeRadianceDistanceDialog->combo_normalAttribute_1->currentText();
+		QString normalName2 = m_computeRadianceDistanceDialog->combo_normalAttribute_2->currentText();
+
 		QString distanceName1;
 		if(m_computeRadianceDistanceDialog->distanceAttributeName_1->text().isEmpty())
 			distanceName1 = m_computeRadianceDistanceDialog->combo_distanceAttribute_1->currentText();
@@ -227,7 +232,7 @@ void Surface_Radiance_Plugin::computeRadianceDistanceFromDialog()
 				mhg2->createVBO(distanceName2);
 		}
 
-		computeRadianceDistance(mapName1, positionName1, distanceName1, mapName2, positionName2, distanceName2);
+		computeRadianceDistance(mapName1, positionName1, normalName1, distanceName1, mapName2, positionName2, normalName2, distanceName2);
 	}
 }
 
@@ -481,9 +486,11 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 void Surface_Radiance_Plugin::computeRadianceDistance(
 	const QString& mapName1,
 	const QString& positionAttributeName1,
+	const QString& normalAttributeName1,
 	const QString& distanceAttributeName1,
 	const QString& mapName2,
 	const QString& positionAttributeName2,
+	const QString& normalAttributeName2,
 	const QString& distanceAttributeName2)
 {
 	MapHandler<PFP2>* mh1 = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName1));
@@ -498,8 +505,16 @@ void Surface_Radiance_Plugin::computeRadianceDistance(
 	if(!position1.isValid())
 		return;
 
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normal1 = mh1->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName1);
+	if(!normal1.isValid())
+		return;
+
 	VertexAttribute<PFP2::VEC3, PFP2::MAP> position2 = mh2->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName2);
 	if(!position2.isValid())
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normal2 = mh2->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName2);
+	if(!normal2.isValid())
 		return;
 
 	VertexAttribute<PFP2::REAL, PFP2::MAP> distance1 = mh1->getAttribute<PFP2::REAL, VERTEX>(distanceAttributeName1);
@@ -510,6 +525,12 @@ void Surface_Radiance_Plugin::computeRadianceDistance(
 	if(!distance2.isValid())
 		distance2 = mh2->addAttribute<PFP2::REAL, VERTEX>(distanceAttributeName2);
 
+	MapParameters& mapParams1 = h_mapParameterSet[mh1];
+	MapParameters& mapParams2 = h_mapParameterSet[mh2];
+
+	SphericalFunctionIntegratorCartesian integrator;
+	integrator.Init(29);
+
 	PFP2::MAP* map1 = mh1->getMap();
 	PFP2::MAP* map2 = mh2->getMap();
 
@@ -519,68 +540,84 @@ void Surface_Radiance_Plugin::computeRadianceDistance(
 
 	// for each vertex of map1
 
-	unsigned int nbVertices = 0;
-	unsigned int nbVerticesWithDistanceDeviation = 0;
+	std::vector<PFP2::REAL> errors;
+	errors.reserve(100000);
 
-	for (Vertex v : allVerticesOf(*map1))
+	map2->setExternalThreadsAuthorization(true);
+
+	Parallel::foreach_cell<VERTEX>(*map1, [&] (Vertex v, unsigned int threadIndex)
 	{
-		nbVertices++;
 		const PFP2::VEC3& P = position1[v];
+		PFP2::VEC3& N = normal1[v];
 
 		// find closest point on map2
-		PFP2::REAL minDistPerThread[Parallel::NumberOfThreads];
-		Face closestFacePerThread[Parallel::NumberOfThreads];
-		for (unsigned int i = 0; i < Parallel::NumberOfThreads; ++i)
-		{
-			minDistPerThread[i] = std::numeric_limits<PFP2::REAL>::max();
-		}
 
-		PFP2::REAL minDist = std::numeric_limits<PFP2::REAL>::max();
+		PFP2::REAL minDist2 = std::numeric_limits<PFP2::REAL>::max();
 		Face closestFace;
 
-		Parallel::foreach_cell<FACE>(*map2, [&] (Face f, unsigned int id)
+		for (Face f : allFacesOf(*map2))
 		{
 			PFP2::REAL dist = Algo::Geometry::squaredDistancePoint2Face<PFP2>(*map2, f, position2, P);
-			if (dist < minDistPerThread[id])
+			if (dist < minDist2)
 			{
-				minDistPerThread[id] = dist;
-				closestFacePerThread[id] = f;
-			}
-		});
-
-		for (unsigned int i = 0; i < Parallel::NumberOfThreads; ++i)
-		{
-			if (minDistPerThread[i] < minDist)
-			{
-				minDist = minDistPerThread[i];
-				closestFace = closestFacePerThread[i];
+				minDist2 = dist;
+				closestFace = f;
 			}
 		}
 
-		minDist = sqrt(minDist);
+//		PFP2::REAL minDist = sqrt(minDist2);
 
 		double l1, l2, l3;
 		Algo::Geometry::closestPointInTriangle<PFP2>(*map2, closestFace, position2, P, l1, l2, l3);
 
+		// compute radiance error
+
 		const PFP2::VEC3& P1 = position2[closestFace.dart];
 		const PFP2::VEC3& P2 = position2[map2->phi1(closestFace.dart)];
 		const PFP2::VEC3& P3 = position2[map2->phi_1(closestFace.dart)];
-		PFP2::VEC3 closestPoint = l1*P1 + l2*P2 + l3*P3;
+		PFP2::VEC3 CP = l1*P1 + l2*P2 + l3*P3;
 
-		PFP2::VEC3 vect = closestPoint - P;
-		PFP2::REAL dist = vect.norm();
-		if (fabs(dist - minDist) > 0.001)
-		{
-			nbVerticesWithDistanceDeviation++;
-//			std::cout << "l1 -> " << l1 << " / l2 -> " << l2 << " / l3 -> " << l3 << std::endl;
-//			std::cout << "diff -> " << fabs(dist - minDist) << std::endl;
-		}
+		const PFP2::VEC3& N1 = normal2[closestFace.dart];
+		const PFP2::VEC3& N2 = normal2[map2->phi1(closestFace.dart)];
+		const PFP2::VEC3& N3 = normal2[map2->phi_1(closestFace.dart)];
+		PFP2::VEC3 CPN = l1*N1 + l2*N2 + l3*N3;
 
-		distance1[v] = minDist;
+		const Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& R1 = mapParams2.radiance[closestFace.dart];
+		const Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& R2 = mapParams2.radiance[map2->phi1(closestFace.dart)];
+		const Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& R3 = mapParams2.radiance[map2->phi_1(closestFace.dart)];
+		Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> CPR = R1*l1 + R2*l2 + R3*l3;
+
+		Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> diffRad(mapParams1.radiance[v]);
+		diffRad -= CPR;
+
+		double integral;
+		double area;
+		integrator.Compute(&integral, &area, SHEvalCartesian_Error, &diffRad, isInHemisphere, N.data());
+
+		PFP2::REAL radError = integral / area;
+
+		distance1[v] = radError;
+
+		errors.push_back(radError);
+	}
+	);
+
+	map2->setExternalThreadsAuthorization(false);
+
+	std::sort(errors.begin(), errors.end());
+	PFP2::REAL Q1 = errors[int(errors.size() / 4)];
+//	PFP2::REAL Q2 = errors[int(errors.size() / 2)];
+	PFP2::REAL Q3 = errors[int(errors.size() * 3 / 4)];
+	PFP2::REAL IQrange = Q3 - Q1;
+	PFP2::REAL lowerBound = Q1 - 1.5*IQrange;
+	PFP2::REAL upperBound = Q3 + 1.5*IQrange;
+	for (PFP2::REAL& dist : distance1.iterable())
+	{
+		if (dist < lowerBound) { dist = lowerBound; }
+		if (dist > upperBound) { dist = upperBound; }
 	}
 
-	std::cout << "nbVertices => " << nbVertices << std::endl;
-	std::cout << "nbVertices with closest point deviation > 0.001 => " << nbVerticesWithDistanceDeviation << std::endl;
+	integrator.Release();
 
 	this->pythonRecording("computeRadianceDistance", "", mapName1, positionAttributeName1, distanceAttributeName1,
 							mapName2, positionAttributeName2, distanceAttributeName2);
