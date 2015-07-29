@@ -26,6 +26,9 @@ bool Surface_Subdivision_Plugin::enable()
 	connect(m_subdivisionDialog, SIGNAL(accepted()), this, SLOT(subdivideFromDialog()));
 	connect(m_subdivisionDialog->button_apply, SIGNAL(clicked()), this, SLOT(subdivideFromDialog()));
 
+	connect(m_subdivisionDialog->button_ok, SIGNAL(clicked()), this, SLOT(schnappsClosing()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
+
 	return true;
 }
 
@@ -35,6 +38,8 @@ void Surface_Subdivision_Plugin::disable()
 
 	disconnect(m_subdivisionDialog, SIGNAL(accepted()), this, SLOT(subdivideFromDialog()));
 	disconnect(m_subdivisionDialog->button_apply, SIGNAL(clicked()), this, SLOT(subdivideFromDialog()));
+
+	disconnect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 }
 
 void Surface_Subdivision_Plugin::openSubdivisionDialog()
@@ -52,10 +57,20 @@ void Surface_Subdivision_Plugin::subdivideFromDialog()
 
 		if(m_subdivisionDialog->radio_Loop->isChecked())
 			loopSubdivision(mapName, positionName);
-		else if(m_subdivisionDialog->radio_CC->isChecked())
-			CCSubdivision(mapName, positionName);
+		else if (m_subdivisionDialog->radio_CC->isChecked())
+		{
+			if (m_subdivisionDialog->check_interp->isChecked())
+				CCSubdivision(mapName, positionName, true);
+			else
+				CCSubdivision(mapName, positionName, false);
+		}
+		else if (m_subdivisionDialog->radio_DoSabin->isChecked())
+			DoSabinSubdivision(mapName, positionName);
 		else if(m_subdivisionDialog->radio_trianguleFaces->isChecked())
 			trianguleFaces(mapName, positionName);
+		else if (m_subdivisionDialog->radio_quadranguleFaces->isChecked())
+			quadranguleFaces(mapName, positionName);
+
 	}
 }
 
@@ -71,6 +86,8 @@ void Surface_Subdivision_Plugin::loopSubdivision(
 	if(!position.isValid())
 		return;
 
+	pythonRecording("loopSubdivision", "", mapName, positionAttributeName);
+
 	PFP2::MAP* map = mh->getMap();
 	Algo::Surface::Modelisation::LoopSubdivision<PFP2>(*map, position);
 
@@ -83,7 +100,7 @@ void Surface_Subdivision_Plugin::loopSubdivision(
 
 void Surface_Subdivision_Plugin::CCSubdivision(
 	const QString& mapName,
-	const QString& positionAttributeName)
+	const QString& positionAttributeName, bool interp)
 {
 	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
 	if(mh == NULL)
@@ -93,8 +110,13 @@ void Surface_Subdivision_Plugin::CCSubdivision(
 	if(!position.isValid())
 		return;
 
+	pythonRecording("CCSubdivision", "", mapName, positionAttributeName,interp);
+
 	PFP2::MAP* map = mh->getMap();
-	Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP2>(*map, position);
+	if (interp)
+		Algo::Surface::Modelisation::CatmullClarkInterpolSubdivision<PFP2>(*map, position);
+	else
+		Algo::Surface::Modelisation::CatmullClarkSubdivision<PFP2>(*map, position);
 
 	mh->notifyAttributeModification(position);
 	mh->notifyConnectivityModification();
@@ -102,6 +124,32 @@ void Surface_Subdivision_Plugin::CCSubdivision(
 	foreach(View* view, mh->getLinkedViews())
 		view->updateGL();
 }
+
+
+void Surface_Subdivision_Plugin::DoSabinSubdivision(
+	const QString& mapName,
+	const QString& positionAttributeName)
+{
+	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
+	if (mh == NULL)
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	if (!position.isValid())
+		return;
+
+	pythonRecording("DoSabinSubdivision", "", mapName, positionAttributeName);
+
+	PFP2::MAP* map = mh->getMap();
+	Algo::Surface::Modelisation::DooSabin<PFP2>(*map, position);
+
+	mh->notifyAttributeModification(position);
+	mh->notifyConnectivityModification();
+
+	foreach(View* view, mh->getLinkedViews())
+		view->updateGL();
+}
+
 
 void Surface_Subdivision_Plugin::trianguleFaces(
 	const QString& mapName,
@@ -115,6 +163,8 @@ void Surface_Subdivision_Plugin::trianguleFaces(
 	if(!position.isValid())
 		return;
 
+	pythonRecording("trianguleFaces", "", mapName, positionAttributeName);
+
 	PFP2::MAP* map = mh->getMap();
 	Algo::Surface::Modelisation::trianguleFaces<PFP2>(*map, position);
 
@@ -125,13 +175,43 @@ void Surface_Subdivision_Plugin::trianguleFaces(
 		view->updateGL();
 }
 
-void Surface_Subdivision_Plugin::appsFinished()
+void Surface_Subdivision_Plugin::quadranguleFaces(
+	const QString& mapName,
+	const QString& positionAttributeName)
+{
+	MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName));
+	if (mh == NULL)
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position = mh->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName);
+	if (!position.isValid())
+		return;
+
+	pythonRecording("quadranguleFaces", "", mapName, positionAttributeName);
+
+	PFP2::MAP* map = mh->getMap();
+	Algo::Surface::Modelisation::quadranguleFaces<PFP2>(*map, position);
+
+	mh->notifyAttributeModification(position);
+	mh->notifyConnectivityModification();
+
+	foreach(View* view, mh->getLinkedViews())
+		view->updateGL();
+}
+
+
+
+void Surface_Subdivision_Plugin::schnappsClosing()
 {
 	m_subdivisionDialog->close();
 }
 
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Subdivision_Plugin, Surface_Subdivision_Plugin)
+#endif
 
-Q_EXPORT_PLUGIN2(Surface_Subdivision_Plugin, Surface_Subdivision_Plugin)
 
 } // namespace SCHNApps
 

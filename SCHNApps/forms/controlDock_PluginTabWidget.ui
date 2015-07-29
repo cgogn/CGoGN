@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>200</width>
+    <width>0</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>200</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -59,10 +59,45 @@ e</string>
      <property name="selectionMode">
       <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="1">
     <widget class="QPushButton" name="button_enablePlugins">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+	background-color: #bbb;
+	border: 2px solid black;
+	border-radius: 5px;
+	background-image: url(':icons/icons/arrow_down.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	margin-right: 5px;
+}
+QPushButton:pressed {
+	background-color: #eee;
+}</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -76,6 +111,38 @@ e</string>
    </item>
    <item row="2" column="2">
     <widget class="QPushButton" name="button_disablePlugins">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+	background-color: #bbb;
+	border: 2px solid black;
+	border-radius: 5px;
+	background-image: url(':icons/icons/arrow_up.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	margin-left: 5px;
+}
+QPushButton:pressed {
+	background-color: #eee;
+}</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -98,6 +165,9 @@ d</string>
     <widget class="QListWidget" name="list_pluginsEnabled">
      <property name="selectionMode">
       <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

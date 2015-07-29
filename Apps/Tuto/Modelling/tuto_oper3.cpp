@@ -61,6 +61,7 @@ int main(int argc, char **argv)
     // final show for redraw
     sqt.show();
     // and wait for the end
+	sqt.clipping_onoff(true);
     return app.exec();
 }
 
@@ -73,21 +74,14 @@ void MyQT::clipping_onoff(bool x)
         Geom::Vec3f pos = m_PlanePick->getPosition();
         float pipo;
         Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
-        m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
-        m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
-        m_sh3->setClipPlaneParamsAll(clip_id3, normal, pos);
+		float d = -(pos*normal);
+		m_render_topo->setClippingPlane(Geom::Vec4f(normal[0], normal[1], normal[2], d));
+		m_render_topo_boundary->setClippingPlane(Geom::Vec4f(normal[0], normal[1], normal[2], d));
     }
     else
-    {
-        m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-        m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-        m_sh3->setClipPlaneParamsAll(clip_id3, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-
-        m_sh1->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-        m_sh2->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-        m_sh3->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-
-    }
+	{
+		m_render_topo->setNoClippingPlane();
+	}
     updateMap();
     updateGL();
 }
@@ -377,23 +371,6 @@ void MyQT::cb_initGL()
     m_PlanePick = new Utils::Pickable(Utils::Pickable::GRID,1);
     m_frame = new Utils::FrameManipulator();
     m_frame->setSize(bb.maxSize());
-
-    m_sh1 = static_cast<Utils::ClippingShader*>(m_render_topo->shader1());
-    m_sh2 = static_cast<Utils::ClippingShader*>(m_render_topo->shader2());
-    m_sh3 = static_cast<Utils::ClippingShader*>(m_render_topo_boundary->shader1());
-
-    m_sh1->insertClippingCode();
-    m_sh2->insertClippingCode();
-    m_sh3->insertClippingCode();
-
-    clip_id1 = m_sh1->addClipPlane();
-    clip_id2 = m_sh2->addClipPlane();
-    clip_id3 = m_sh3->addClipPlane();
-
-    m_sh1->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), bb.center());
-    m_sh2->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), bb.center());
-    m_sh3->setClipPlaneParamsAll(clip_id3, Geom::Vec3f(0,0,1), bb.center());
-
 }
 
 // redraw GL callback (clear and swap already done)
@@ -554,11 +531,9 @@ void  MyQT::cb_mouseMove(int buttons, int x, int y)
     Geom::Vec3f pos = m_PlanePick->getPosition();
     float pipo;
     Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
-
-    m_sh1->setClipPlaneParamsAll(clip_id1, normal, pos);
-    m_sh2->setClipPlaneParamsAll(clip_id2, normal, pos);
-    m_sh3->setClipPlaneParamsAll(clip_id3, normal, pos);
-
+	float d = -(pos*normal);
+	m_render_topo->setClippingPlane(Geom::Vec4f(normal[0], normal[1], normal[2], d));
+	m_render_topo_boundary->setClippingPlane(Geom::Vec4f(normal[0], normal[1], normal[2], d));
 
     m_begX = x;
     m_begY = y;

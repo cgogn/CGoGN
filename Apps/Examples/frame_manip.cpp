@@ -134,12 +134,19 @@ void MyQT::cb_redraw()
 	for (std::vector<Utils::Pickable*>::iterator it=m_pickables.begin(); it != m_pickables.end(); ++it)
 	{
 		if (*it == m_lastPickedObject)
-			glLineWidth(2.0);
+			(*it)->setLineWidth(3.0);
 		else
-			glLineWidth(1.0);
+			(*it)->setLineWidth(1.0);
 		(*it)->draw();
 	}
 
+	m_nbFrames++;
+	if (m_nbFrames >=40)
+	{
+		std::cout << 40000.0/m_frame_ch.elapsed()<< " fps"<<std::endl;
+		m_nbFrames = 0;
+		m_frame_ch.start();
+	}
 }
 
 void  MyQT::cb_mousePress(int /*button*/, int x, int y)

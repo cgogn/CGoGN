@@ -1,154 +1,121 @@
-# A mettre juste apres la definition de CGoGN_ROOT_DIR a la racine du CGoGN_Apps
-# include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
+####################################################################################################
+# How make a separated application
+#
+# usage:
+#	- create a directory
+#	- place your sources and CMakeLists.txt inside
+#	- insert this line in your CMakeLists.txt
+#		include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
+# 	  just after defining CGoGN_ROOT_DIR
+# 
+# Example:
+# ========
+#	cmake_minimum_required(VERSION 2.8)
+#	project(Pipo)
+#
+#	set(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/../../CGoGN CACHE STRING "CGoGN root dir")
+#	include(${CGoGN_ROOT_DIR}/apps_cmake.txt)
+#
+#	include_directories( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} )
+#	qt_wrap_ui( pipo_ui pipo.ui )
+#	qt_wrap_cpp( pipo_moc pipo.h )
+#	add_executable( pipo pipo.cpp ${pipo_ui} ${pipo_moc} )
+#	target_link_libraries( pipo ${CGoGN_LIBS}  ${CGoGN_EXT_LIBS} )
+#	qt_use_cgogn_modules(pipo)
+#
+#	WARNING: to avoid problem of DLL loading, on windows executable are generated in CGoGN/bin/....
+#	Take care while choosing executable names
+#
+####################################################################################################
 
-SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
+SET ( CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
+SET ( CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/ )
 
-#SET ( WITH_ASSIMP ON CACHE BOOL "need Assimp")
-#SET ( WITH_ZINRI ON CACHE BOOL "need Zinri lib")
+INCLUDE(${CGoGN_ROOT_DIR}/cmake_modules/functions.cmake)
 
-IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Assimp")
-	SET ( WITH_ASSIMP ON CACHE BOOL "build CGoGN with Assimp" )
-ELSE()
-	SET ( WITH_ASSIMP OFF CACHE BOOL "build CGoGN with Assimp" )
-ENDIF()
+checkCpp11Support()
+setBuildType()
 
-IF(EXISTS "${CGoGN_ROOT_DIR}/ThirdParty/include/Zinri")
-	SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib" )
-ELSE()
-	SET ( WITH_ZINRI OFF CACHE BOOL "build CGoGN with Zinri lib" )
-ENDIF()
+IF (WIN32)
+	SET ( CMAKE_CONFIGURATION_TYPES Release Debug)
+	SET ( CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
+	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile (instead of Visual Studio" )
+ENDIF ()
 
-SET ( WITH_QT ON CACHE BOOL "need Qt lib")
-
-
-# for CGoGN in one lib or not
-file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
-IF (ONELIB_STR EQUAL 1)
-	SET(CGoGN_LIBS cgogn)
-ELSE()
-	SET(CGoGN_LIBS algo topology container utils)
-ENDIF()
 
 IF(WIN32)
-	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
+	SET ( CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies" )
 ENDIF(WIN32)
 
-find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS regex REQUIRED)
-find_package(ZLIB REQUIRED)
-find_package(LibXml2 REQUIRED)
-find_package(GLEW REQUIRED)
-
-IF (DEFINED ASSERTON)
-	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
-ELSE (DEFINED ASSERTON)
-	add_definitions(-DCGOGN_ASSERT_BOOL=false)
-ENDIF (DEFINED ASSERTON)
-
-add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
-
-add_definitions(-DGLM_FORCE_RADIANS)
-
-
-# define includes of external libs 
-SET(COMMON_INCLUDES 
-	${CGoGN_ROOT_DIR}/ThirdParty/include
-	${OPENGL_INCLUDE_DIR}
-	${GLEW_INCLUDE_DIRS}
-	${ZLIB_INCLUDE_DIRS}
-	${LIBXML2_INCLUDE_DIR}
-	${Boost_INCLUDE_DIRS}
-)
-
-# define libs for external libs
-SET (COMMON_LIBS 
-	nl
-	${OPENGL_LIBRARY}
-	${GLEW_LIBRARIES}
-	${ZLIB_LIBRARIES}
-	${LIBXML2_LIBRARIES}
-	${Boost_SYSTEM_LIBRARY}
-	${Boost_REGEX_LIBRARY}
-	tinyxml2
-)
-
-IF(WIN32)
-	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${CGoGN_ROOT_DIR}/windows_dependencies/include/suitesparse)
-	SET (COMMON_LIBS ${COMMON_LIBS} 
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/suitesparse.lib
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/metis.lib
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/liblapack.lib
-		${CGoGN_ROOT_DIR}/windows_dependencies/lib/libblas.lib		)
-ELSE(WIN32)
-	find_package(SuiteSparse REQUIRED)
-	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${SUITESPARSE_INCLUDE_DIRS})
-	SET (COMMON_LIBS ${SUITESPARSE_LIBRARIES} lapack blas ${COMMON_LIBS} pthread )
-ENDIF(WIN32)
-
-#optionnal libs
-IF (WITH_ASSIMP)
-	add_definitions(-DWITH_ASSIMP)	
-	SET (COMMON_LIBS ${COMMON_LIBS} assimp)
-ENDIF (WITH_ASSIMP)
-
-IF (WITH_ZINRI)
-	add_definitions(-DWITH_ZINRI)
-	SET (COMMON_LIBS ${COMMON_LIBS} Zinri)
-ENDIF (WITH_ZINRI)
-
-IF (WITH_QT)
-	add_definitions(-DWITH_QT)
-	find_package(Qt4 REQUIRED)
-	SET(QT_USE_QTCORE TRUE)
-	SET(QT_USE_QTOPENGL TRUE)
-	SET(QT_USE_QTSVG TRUE)
-	SET(QT_USE_QTXML TRUE )
-	INCLUDE(${QT_USE_FILE})
-	ADD_DEFINITIONS(${QT_DEFINITIONS})
-	find_package(QGLViewer REQUIRED)
-	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${QT_INCLUDE_DIR} ${QGLVIEWER_INCLUDE_DIR})
-	SET (COMMON_LIBS ${COMMON_LIBS} ${QT_LIBRARIES} ${QGLVIEWER_LIBRARIES})
-ENDIF (WITH_QT)
-
-#IF(APPLE)
-#	SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L/usr/local/lib")
-#ENDIF(APPLE)
-
-# qq definition specifiques pour windows
-IF(WIN32)
-	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
-	set(CMAKE_CONFIGURATION_TYPES Release Debug)
-	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
-ELSE()
+#
+# COMPILER FLAGS
+#
+IF(NOT WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -fPIC -std=c++11")
-	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
-
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-		if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-			SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-			SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
-		endif()
-	endif()
-	
-ENDIF()
-
-IF(NOT CMAKE_BUILD_TYPE)
-	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug")
-		set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
-	ELSE()
-		set(CMAKE_BUILD_TYPE "Release" CACHE STRING "options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Woverride-init -fPIC")
+	# remove the 60000+ "no unused local typedefs" warnings with GCC4.8+
+	IF(CMAKE_COMPILER_IS_GNUCXX)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
+	ENDIF()
+	IF(APPLE)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")
 	ENDIF()
 ENDIF()
 
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 
-IF(WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/${ConfigurationName}  ${Boost_LIBRARY_DIRS})
-	SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
-ELSE ()
-	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-	SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-ENDIF ()
+IF (WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/windows_dependencies/lib/)
+	IF((CGoGN_WITH_QTCREATOR))
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}) # Release/Debug added automatically by visual
+	ELSE()
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName})
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
+	ENDIF()
+ELSE()
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+	IF(APPLE)
+		SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}/Contents/MacOS/ )
+	ELSE()
+		SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE} )
+	ENDIF()
+ENDIF()
+
+# Qt version from CGoGN
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_qt.h CGoGN_DESIRED_QT_VERSION)
+ADD_DEFINITIONS("-DCGOGN_QT_DESIRED_VERSION=${CGoGN_DESIRED_QT_VERSION}")
+IF(CGoGN_DESIRED_QT_VERSION STREQUAL 5)
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_5x.cmake)
+ELSE()
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_4x.cmake)
+ENDIF()
+
+# CGoGN compiled in one or several libs
+file(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
+IF (ONELIB_STR EQUAL 1)
+	SET(CGoGN_LIBS cgogn)
+ELSE()
+	SET(CGoGN_LIBS topology algo container utils)
+ENDIF()
+
+# definitions from CGoGN
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_defs.h CGoGN_DEFS)
+ADD_DEFINITIONS(${CGoGN_DEFS})
+
+# includes from CGoGN
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_ext_includes.h CGoGN_EXT_INCLUDES)
+
+# libs from CGoGN
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_ext_libs.h CGoGN_EXT_LIBS)
+
+
+include_directories(
+        ${CGoGN_SRC_DIR}/include
+        ${CGoGN_EXT_INCLUDES})
+
+#for compatibility
+SET (COMMON_INCLUDES ${CGoGN_EXT_INCLUDES})
+SET (COMMON_LIBS ${CGoGN_EXT_LIBS})
 
 

@@ -5,6 +5,9 @@
 
 #include "mapHandler.h"
 
+
+#include "dll.h"
+
 namespace CGoGN
 {
 
@@ -19,7 +22,7 @@ namespace SCHNApps
 class SCHNApps;
 class View;
 
-class ControlDock_MapTab : public QWidget, public Ui::ControlDock_MapTabWidget
+class SCHNAPPS_API ControlDock_MapTab : public QWidget, public Ui::ControlDock_MapTabWidget
 {
 	Q_OBJECT
 
@@ -36,7 +39,12 @@ public:
 private slots:
 	// slots called from UI actions
 	void selectedMapChanged();
-//	void mapCheckStateChanged(QListWidgetItem* item);
+
+	void duplicateCurrentMap();
+	void removeCurrentMap();
+
+	void showBBChanged(bool b);
+	void bbVertexAttributeChanged(int index);
 	void vertexAttributeCheckStateChanged(QListWidgetItem* item);
 
 	void selectedSelectorChanged();
@@ -47,11 +55,6 @@ private slots:
 	// slots called from SCHNApps signals
 	void mapAdded(MapHandlerGen* m);
 	void mapRemoved(MapHandlerGen* m);
-//	void selectedViewChanged(View* prev, View* cur);
-
-	// slots called from selected View signals
-//	void selectedViewMapLinked(MapHandlerGen* plugin);
-//	void selectedViewMapUnlinked(MapHandlerGen* plugin);
 
 	// slots called from selected MapHandler signals
 	void selectedMapAttributeAdded(unsigned int orbit, const QString& name);

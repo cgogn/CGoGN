@@ -194,8 +194,8 @@ void Surface_RenderScalar_Plugin::changePositionVBO(const QString& view, const Q
 		h_viewParameterSet[v][m].positionVBO = vbuf;
 		if(v->isSelectedView())
 		{
-			if(v->isLinkedToMap(m))	v->updateGL();
-			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+			if (v->isLinkedToMap(m)) v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
 }
@@ -209,7 +209,7 @@ void Surface_RenderScalar_Plugin::changeScalarVBO(const QString& view, const QSt
 		MapParameters& p = h_viewParameterSet[v][m];
 
 		Utils::VBO* vbuf = m->getVBO(vbo);
-		p.positionVBO = vbuf;
+		p.scalarVBO = vbuf;
 
 		if(vbuf)
 		{
@@ -261,8 +261,12 @@ void Surface_RenderScalar_Plugin::changeExpansion(const QString& view, const QSt
 		}
 	}
 }
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_RenderScalar_Plugin, Surface_RenderScalar_Plugin)
+#endif
 
-Q_EXPORT_PLUGIN2(Surface_RenderScalar_Plugin, Surface_RenderScalar_Plugin)
 
 } // namespace SCHNApps
 

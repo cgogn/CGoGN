@@ -11,12 +11,18 @@ namespace CGoGN
 
 namespace SCHNApps
 {
-
+/**
+ * @brief Plugin that manage the computation of differential properties
+ * - Normals
+ * - Curvatures
+ */
 class Surface_DifferentialProperties_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
-
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 public:
 	Surface_DifferentialProperties_Plugin()
 	{}
@@ -38,14 +44,35 @@ private slots:
 	void computeNormalFromDialog();
 	void computeCurvatureFromDialog();
 
-	void appsFinished();
+	void schnappsClosing();
 
 public slots:
+	/**
+	 * @brief [PYTHON] compute the normals of a mesh
+	 * @param mapName name of the 2d map (mesh)
+	 * @param positionAttributeName name of position attribute used for computation
+	 * @param normalAttributeName name of result attribute
+	 * @param autoUpdate automatically update the normal attribute when position attribute change.
+	 */
 	void computeNormal(const QString& mapName,
 		const QString& positionAttributeName = "position",
 		const QString& normalAttributeName = "normal",
 		bool autoUpdate = true);
 
+	/**
+	 * @brief [PYTHON] compute curvatures of a mesh
+	 * @param mapName name of 2d map
+	 * @param positionAttributeName name of input position attribute
+	 * @param normalAttributeName name of input normal attributes
+	 * @param KmaxAttributeName ?? result attribute name
+	 * @param kmaxAttributeName ?? result attribute name
+	 * @param KminAttributeName ?? result attribute name
+	 * @param kminAttributeName ?? result attribute name
+	 * @param KnormalAttributeName ?? result attribute aname
+	 * @param compute_kmean compute the mean curvature
+	 * @param compute_kgaussian compute the gaussian curvature
+	 * @param autoUpdate automatically update the output attributes when input attribute change.
+	 */
 	void computeCurvature(
 		const QString& mapName,
 		const QString& positionAttributeName = "position",

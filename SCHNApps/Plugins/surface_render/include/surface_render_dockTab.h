@@ -27,35 +27,43 @@ public:
 private:
 	SCHNApps* m_schnapps;
 	Surface_Render_Plugin* m_plugin;
-	bool b_updatingUI;
+
 	QColorDialog* m_colorDial;
 	QColor m_diffuseColor;
 	QColor m_simpleColor;
 	QColor m_vertexColor;
+	QColor m_backColor;
 	int m_currentColorDial;
+
+	bool b_updatingUI;
 
 private slots:
 	void positionVBOChanged(int index);
 	void normalVBOChanged(int index);
+	void colorVBOChanged(int index);
 	void renderVerticesChanged(bool b);
 	void verticesScaleFactorChanged(int i);
+	void verticesScaleFactorPressed();
 	void renderEdgesChanged(bool b);
 	void renderFacesChanged(bool b);
 	void faceStyleChanged(QAbstractButton* b);
 	void renderBoundaryChanged(bool b);
+	void renderBackfaceChanged(bool b);
 
 	void diffuseColorClicked();
 	void simpleColorClicked();
 	void vertexColorClicked();
-	void colorSelected(const QColor& col);
-
-
+	void backColorClicked();
+	void bothColorClicked();
+	void colorSelected();
 
 private:
 	void addPositionVBO(QString name);
 	void removePositionVBO(QString name);
 	void addNormalVBO(QString name);
 	void removeNormalVBO(QString name);
+	void addColorVBO(QString name);
+	void removeColorVBO(QString name);
 
 	void updateMapParameters();
 };

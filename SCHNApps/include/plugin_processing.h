@@ -11,14 +11,15 @@ namespace SCHNApps
 
 class SCHNApps;
 
-class PluginProcessing : public Plugin
+class SCHNAPPS_API PluginProcessing : public Plugin
 {
 	Q_OBJECT
 
 public:
-	PluginProcessing();
-	virtual ~PluginProcessing();
+	PluginProcessing() ;
+	virtual ~PluginProcessing() ;
 };
+
 
 } // namespace SCHNApps
 

@@ -37,7 +37,7 @@ bool Surface_DifferentialProperties_Plugin::enable()
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
-	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 
 	foreach(MapHandlerGen* map, m_schnapps->getMapSet().values())
@@ -60,7 +60,7 @@ void Surface_DifferentialProperties_Plugin::disable()
 	disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
-	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	disconnect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 }
 
 void Surface_DifferentialProperties_Plugin::mapAdded(MapHandlerGen *map)
@@ -216,6 +216,10 @@ void Surface_DifferentialProperties_Plugin::computeNormal(
 		ComputeNormalParameters(positionAttributeName, normalAttributeName, autoUpdate);
 
 	mh->notifyAttributeModification(normal);
+
+	//this->pythonRecording("computeNormal", "", mh->getName(), QString(position.name().c_str()), QString(normal.name().c_str()), autoUpdate);
+	this->pythonRecording("computeNormal", "", mh->getName(), positionAttributeName, normalAttributeName, autoUpdate);
+
 }
 
 
@@ -268,9 +272,19 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 	if(!edgeAngle.isValid())
 		edgeAngle = mh->addAttribute<PFP2::REAL, EDGE>("edgeAngle");
 
+	EdgeAttribute<PFP2::REAL, PFP2::MAP> edgeArea = mh->getAttribute<PFP2::REAL, EDGE>("edgeArea");
+	if(!edgeArea.isValid())
+		edgeArea = mh->addAttribute<PFP2::REAL, EDGE>("edgeArea");
+
 	PFP2::MAP* map = mh->getMap();
+
 	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, position, edgeAngle);
-	Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP2>(*map, 0.01f * mh->getBBdiagSize(), position, normal, edgeAngle, kmax, kmin, Kmax, Kmin, Knormal);
+	Algo::Surface::Geometry::computeAreaEdges<PFP2>(*map, position, edgeArea);
+
+	PFP2::REAL meanEdgeLength = Algo::Geometry::meanEdgeLength<PFP2>(*map, position);
+
+	float radius = 2.0f * meanEdgeLength;
+	Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP2>(*map, radius, position, normal, edgeAngle, edgeArea, kmax, kmin, Kmax, Kmin, Knormal);
 
 	computeCurvatureLastParameters[mapName] =
 		ComputeCurvatureParameters(
@@ -307,16 +321,22 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 
 		mh->notifyAttributeModification(kgaussian);
 	}
+
+	this->pythonRecording("computeCurvature", "", mh->getName(),
+		positionAttributeName, normalAttributeName, KmaxAttributeName, kmaxAttributeName, KminAttributeName, kminAttributeName, KnormalAttributeName, compute_kmean, compute_kgaussian, autoUpdate);
 }
 
-void Surface_DifferentialProperties_Plugin::appsFinished()
+void Surface_DifferentialProperties_Plugin::schnappsClosing()
 {
 	m_computeNormalDialog->close();
 	m_computeCurvatureDialog->close();
 }
 
-
-Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_DifferentialProperties_Plugin, Surface_DifferentialProperties_Plugin)
+#endif
 
 } // namespace SCHNApps
 

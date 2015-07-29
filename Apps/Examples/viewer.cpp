@@ -45,7 +45,7 @@ Viewer::Viewer() :
 	faceShrinkage = 1.0f ;
 
 	colClear = Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f) ;
-	colDif = Geom::Vec4f(0.8f, 0.9f, 0.7f, 1.0f) ;
+	colDif = Geom::Vec4f(0.3f, 0.5f, 0.2f, 1.0f) ;
 	colSpec = Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f) ;
 	colNormal = Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f) ;
 	shininess = 80.0f ;
@@ -92,30 +92,31 @@ void Viewer::cb_initGL()
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
 
-	m_phongShader = new Utils::ShaderPhong() ;
+	m_phongShader = new Utils::ShaderPhong(true,false) ;
 	m_phongShader->setAttributePosition(m_positionVBO) ;
 	m_phongShader->setAttributeNormal(m_normalVBO) ;
 	m_phongShader->setAmbiant(colClear) ;
 	m_phongShader->setDiffuse(colDif) ;
 	m_phongShader->setSpecular(colSpec) ;
 	m_phongShader->setShininess(shininess) ;
+	m_phongShader->setBackColor(Geom::Vec4f(0.9f, 0.0f, 0.0f, 0.0f));
 
 	m_flatShader = new Utils::ShaderSimpleFlat() ;
 	m_flatShader->setAttributePosition(m_positionVBO) ;
 	m_flatShader->setAmbiant(colClear) ;
 	m_flatShader->setDiffuse(colDif) ;
-//	m_flatShader->setDiffuseBack(Geom::Vec4f(0,0,0,0)) ;
-//	m_flatShader->setExplode(faceShrinkage) ;
+	m_flatShader->setBackColor(Geom::Vec4f(0.9f, 0.0f, 0.0f, 0.0f));
 
 	m_vectorShader = new Utils::ShaderVectorPerVertex() ;
 	m_vectorShader->setAttributePosition(m_positionVBO) ;
 	m_vectorShader->setAttributeVector(m_normalVBO) ;
 	m_vectorShader->setColor(colNormal) ;
 
-	m_simpleColorShader = new Utils::ShaderSimpleColor() ;
+	m_simpleColorShader = new Utils::ShaderSimpleColor(true) ;
 	m_simpleColorShader->setAttributePosition(m_positionVBO) ;
 	Geom::Vec4f c(0.0f, 0.0f, 0.0f, 1.0f) ;
 	m_simpleColorShader->setColor(c) ;
+
 
 	m_pointSprite = new Utils::PointSprite() ;
 	m_pointSprite->setAttributePosition(m_positionVBO) ;
@@ -132,25 +133,31 @@ void Viewer::cb_redraw()
 {
 	if(m_drawVertices)
 	{
-		glDepthFunc(GL_LEQUAL);
 		m_pointSprite->setSize(vertexScaleFactor) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
 	}
 
 	if(m_drawEdges)
 	{
-		glDepthFunc(GL_LEQUAL);
+		m_simpleColorShader->setColor(Geom::Vec4f(1.,1.,0.,0.));
 		glLineWidth(1.0f) ;
 		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES) ;
+	}
+
+	if(m_drawTopo)
+	{
+		glDepthFunc(GL_LEQUAL);
+		m_topoRender->drawTopo() ;
 	}
 
 	if(m_drawFaces)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) ;
-		glEnable(GL_LIGHTING) ;
-		glEnable(GL_POLYGON_OFFSET_FILL) ;
-		glPolygonOffset(1.0f, 1.0f) ;
-		glDepthFunc(GL_LESS);
+		if (m_drawEdges||m_drawTopo)
+		{
+			glEnable(GL_POLYGON_OFFSET_FILL) ;
+			glPolygonOffset(1.0f, 1.0f) ;
+		}
 		switch(m_renderStyle)
 		{
 			case FLAT :
@@ -163,11 +170,7 @@ void Viewer::cb_redraw()
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
 	}
 
-	if(m_drawTopo)
-	{
-		glDepthFunc(GL_LEQUAL);
-		m_topoRender->drawTopo() ;
-	}
+
 
 	if(m_drawNormals)
 	{
@@ -178,7 +181,7 @@ void Viewer::cb_redraw()
 	}
 
 	m_nbFrames++;
-	if (m_nbFrames >=100)
+	if (m_nbFrames >=500)
 	{
 		std::cout << 100000.0/m_frame_ch.elapsed()<< " fps"<<std::endl;
 		m_nbFrames = 0;
@@ -210,6 +213,60 @@ void Viewer::cb_keyPress(int keycode)
 {
 	switch(keycode)
 	{
+	case 'd':
+	{
+		m_phongShader->setDoubleSided(true);
+		m_flatShader->setDoubleSided(true);
+		updateGL();
+	}
+	break;
+	case 'D':
+	{
+		m_phongShader->setDoubleSided(false);
+		m_flatShader->setDoubleSided(false);
+		updateGL();
+	}
+	break;
+
+	case 'q':
+	{
+		Utils::Chrono ch;
+		ch.start();
+
+		for (int i = 0; i < 1000; ++i)
+		{
+			m_render->draw(m_flatShader, Algo::Render::GL2::TRIANGLES);
+			glFlush();
+		}
+
+		std::cout << "speed render " << 1000.0*1000.0/ch.elapsed() << " fps " << std::endl;
+	}
+	case 'n':
+		m_flatShader->setNoClippingPlane();
+		m_phongShader->setNoClippingPlane();
+		m_topoRender->setNoClippingPlane();
+		m_simpleColorShader->setNoClippingPlane();
+		m_pointSprite->setNoClippingPlane();
+		m_vectorShader->setNoClippingPlane();
+
+		break;
+	case 'N':
+	{
+		const Geom::Vec3f& Pc = bb.center();
+		const Geom::Vec3f& Nc = bb.diag();
+		Geom::Vec4f planeClip(Nc[0],Nc[1],Nc[2],-(Pc*Nc));
+
+		m_flatShader->setClippingPlane(planeClip);
+		m_phongShader->setClippingPlane(planeClip);
+		m_topoRender->setClippingPlane(planeClip);
+		m_simpleColorShader->setClippingPlane(planeClip);
+		m_pointSprite->setClippingPlane(planeClip);
+		m_vectorShader->setClippingPlane(planeClip);
+
+	}
+		break;
+
+
 		case 'c' :
 			myMap.check();
 			break;
@@ -542,7 +599,7 @@ void Viewer::importMesh(std::string& filename)
 	else
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+		if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
@@ -578,6 +635,18 @@ void Viewer::importMesh(std::string& filename)
 	m_normalVBO->updateData(normal) ;
 
 	setParamObject(bb.maxSize(), bb.center().data()) ;
+
+	const Geom::Vec3f& Pc = bb.center();
+	const Geom::Vec3f& Nc = bb.diag();
+	Geom::Vec4f planeClip(Nc[0],Nc[1],Nc[2],-(Pc*Nc));
+
+//	m_flatShader->setClippingPlane(planeClip);
+//	m_phongShader->setClippingPlane(planeClip);
+//	m_topoRender->setClippingPlane(planeClip);
+//	m_simpleColorShader->setClippingPlane(planeClip);
+//	m_pointSprite->setClippingPlane(planeClip);
+//	m_vectorShader->setClippingPlane(planeClip);
+
 	updateGLMatrices() ;
 
 	std::cout << "#vertices -> " << Algo::Topo::getNbOrbits<VERTEX>(myMap) << std::endl;

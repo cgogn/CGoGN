@@ -2,8 +2,11 @@
 
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
+#include "Algo/LinearSolving/basic.h"
 
 #include "Algo/Topo/basic.h"
+
+#include "camera.h"
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -35,25 +38,25 @@ void MapParameters::start(MapHandlerGen* mhg)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 
-			positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit", false);
+			positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit");
 			if(!positionInit.isValid())
-				positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit", false);
+				positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit");
 
-			diffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("diffCoord", false);
+			diffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("diffCoord");
 			if(!diffCoord.isValid())
-				diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord", false);
+				diffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("diffCoord");
 
-			vertexRotationMatrix = mh->getAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix", false);
+			vertexRotationMatrix = mh->getAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix");
 			if(!vertexRotationMatrix.isValid())
-				vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix", false);
+				vertexRotationMatrix = mh->addAttribute<Eigen_Matrix3f, VERTEX>("vertexRotationMatrix");
 
-			rotatedDiffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord", false);
+			rotatedDiffCoord = mh->getAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord");
 			if(!rotatedDiffCoord.isValid())
-				rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord", false);
+				rotatedDiffCoord = mh->addAttribute<PFP2::VEC3, VERTEX>("rotatedDiffCoord");
 
-			vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex", false);
+			vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex");
 			if(!vIndex.isValid())
-				vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex", false);
+				vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex");
 
 			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 
@@ -111,7 +114,7 @@ void MapParameters::stop(MapHandlerGen* mh)
 bool Surface_Deformation_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
-		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
 	m_dockTab = new Surface_Deformation_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Deformation");
@@ -153,6 +156,7 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 						m_dragging = true;
 						m_draginit = false;
 						view->setMouseTracking(true);
+						view->getCurrentCamera()->disableViewsBoundingBoxFitting();
 					}
 				}
 				else
@@ -160,6 +164,7 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 					m_dragging = false;
 					m_draginit = false;
 					view->setMouseTracking(false);
+					view->getCurrentCamera()->enableViewsBoundingBoxFitting();
 				}
 			}
 			break;
@@ -174,7 +179,6 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 				{
 					asRigidAsPossible(mh);
 					mh->notifyAttributeModification(p.positionAttribute);
-					static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
 					view->updateGL();
 				}
 			}
@@ -185,17 +189,17 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 
 void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 {
-	if(m_dragging)
+	if (m_dragging)
 	{
 		MapHandlerGen* mh = m_schnapps->getSelectedMap();
 
 		MapParameters& p = h_parameterSet[mh];
 		const std::vector<Vertex>& handle = p.handleSelector->getSelectedCells();
 
-		if(!m_draginit)
+		if (!m_draginit)
 		{
 			m_dragZ = 0;
-			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for (std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 			{
 				const PFP2::VEC3& pp = p.positionAttribute[*it];
 				qglviewer::Vec q = view->camera()->projectedCoordinatesOf(qglviewer::Vec(pp[0],pp[1],pp[2]));
@@ -215,17 +219,16 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 
 			qglviewer::Vec vec = qq - m_dragPrevious;
 			PFP2::VEC3 t(vec.x, vec.y, vec.z);
-			for(std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
+			for (std::vector<Vertex>::const_iterator it = handle.begin(); it != handle.end(); ++it)
 				p.positionAttribute[*it] += t;
 
 			m_dragPrevious = qq;
 
 //			matchDiffCoord(map);
-			if(p.initialized)
+			if (p.initialized)
 			{
 				asRigidAsPossible(mh);
 				mh->notifyAttributeModification(p.positionAttribute);
-				static_cast<MapHandler<PFP2>*>(mh)->updateBB(p.positionAttribute);
 			}
 		}
 
@@ -378,16 +381,16 @@ void Surface_Deformation_Plugin::toggleMapDeformation(MapHandlerGen* map)
 	if(map)
 	{
 		MapParameters& p = h_parameterSet[map];
-		if(!p.initialized)
+		if (!p.initialized)
 		{
 			p.start(map);
-			if(p.initialized && map->isSelectedMap())
+			if (p.initialized && map->isSelectedMap())
 				m_dockTab->mapParametersInitialized(true);
 		}
 		else
 		{
 			p.stop(map);
-			if(!p.initialized && map->isSelectedMap())
+			if (!p.initialized && map->isSelectedMap())
 				m_dockTab->mapParametersInitialized(false);
 		}
 	}
@@ -399,17 +402,17 @@ void Surface_Deformation_Plugin::matchDiffCoord(MapHandlerGen* mh)
 	MapParameters& p = h_parameterSet[mh];
 
 	nlMakeCurrent(p.nlContext);
-	if(nlGetCurrentState() == NL_STATE_INITIAL)
+	if (nlGetCurrentState() == NL_STATE_INITIAL)
 		nlBegin(NL_SYSTEM) ;
-	for(int coord = 0; coord < 3; ++coord)
+	for (int coord = 0; coord < 3; ++coord)
 	{
-		LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
+		Algo::LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 		nlBegin(NL_MATRIX);
-		LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.diffCoord, coord);
+		Algo::LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.diffCoord, coord);
 		nlEnd(NL_MATRIX);
 		nlEnd(NL_SYSTEM);
 		nlSolve();
-		LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
+		Algo::LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
 		nlReset(NL_TRUE);
 	}
 }
@@ -419,13 +422,13 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 	MapParameters& p = h_parameterSet[mh];
 
-	if(p.initialized)
+	if (p.initialized)
 	{
 		CellMarkerNoUnmark<PFP2::MAP, VERTEX> m(*map) ;
 
-		for(Dart d = map->begin(); d != map->end(); map->next(d))
+		for (Dart d = map->begin(); d != map->end(); map->next(d))
 		{
-			if(!m.isMarked(d))
+			if (!m.isMarked(d))
 			{
 				m.mark(d) ;
 
@@ -439,11 +442,11 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 					Dart neigh = map->phi1(it) ;
 					PFP2::VEC3 v = p.positionAttribute[neigh] - pp ;
 					PFP2::VEC3 vv = p.positionInit[neigh] - ppInit ;
-					for(unsigned int i = 0; i < 3; ++i)
-						for(unsigned int j = 0; j < 3; ++j)
+					for (unsigned int i = 0; i < 3; ++i)
+						for (unsigned int j = 0; j < 3; ++j)
 							cov(i,j) += v[i] * vv[j];// * perMap->edgeWeight[it] / area ;
 					Dart dboundary = map->phi_1(it) ;
-					if(map->phi2(dboundary) == dboundary)
+					if (map->phi2(dboundary) == dboundary)
 					{
 						v = p.positionAttribute[dboundary] - pp ;
 						vv = p.positionInit[dboundary] - pp ;
@@ -452,15 +455,15 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 								cov(i,j) += v[i] * vv[j];// * perMap->edgeWeight[dboundary] / area ;
 					}
 					it = map->alpha1(it) ;
-				} while(it != d) ;
+				} while (it != d) ;
 
 				Eigen::JacobiSVD<Eigen::Matrix3f> svd(cov, Eigen::ComputeFullU | Eigen::ComputeFullV) ;
 				Eigen::Matrix3f R = svd.matrixU() * svd.matrixV().transpose() ;
 
-				if(R.determinant() < 0)
+				if (R.determinant() < 0)
 				{
 					Eigen::Matrix3f U = svd.matrixU() ;
-					for(unsigned int i = 0; i < 3; ++i)
+					for (unsigned int i = 0; i < 3; ++i)
 						U(i,2) *= -1 ;
 					R = U * svd.matrixV().transpose() ;
 				}
@@ -469,9 +472,9 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 			}
 		}
 
-		for(Dart d = map->begin(); d != map->end(); map->next(d))
+		for (Dart d = map->begin(); d != map->end(); map->next(d))
 		{
-			if(m.isMarked(d))
+			if (m.isMarked(d))
 			{
 				m.unmark(d) ;
 
@@ -489,7 +492,7 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 						++degree ;
 					}
 					it = map->alpha1(it) ;
-				} while(it != d) ;
+				} while (it != d) ;
 				r += p.vertexRotationMatrix[d] ;
 				r /= degree + 1 ;
 				PFP2::VEC3& dc = p.diffCoord[d] ;
@@ -529,24 +532,27 @@ void Surface_Deformation_Plugin::asRigidAsPossible(MapHandlerGen* mh)
 		}
 
 		nlMakeCurrent(p.nlContext);
-		if(nlGetCurrentState() == NL_STATE_INITIAL)
+		if (nlGetCurrentState() == NL_STATE_INITIAL)
 			nlBegin(NL_SYSTEM);
-		for(int coord = 0; coord < 3; ++coord)
+		for (int coord = 0; coord < 3; ++coord)
 		{
-			LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
+			Algo::LinearSolving::setupVariables<PFP2>(*map, p.vIndex, p.freeSelector->getMarker(), p.positionAttribute, coord);
 			nlBegin(NL_MATRIX);
 	//		LinearSolving::addRowsRHS_Laplacian_Cotan<PFP2>(*map, p.vIndex, p.edgeWeight, p.vertexArea, p.rotatedDiffCoord, coord);
-			LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.rotatedDiffCoord, coord);
+			Algo::LinearSolving::addRowsRHS_Laplacian_Topo<PFP2>(*map, p.vIndex, p.rotatedDiffCoord, coord);
 			nlEnd(NL_MATRIX);
 			nlEnd(NL_SYSTEM);
 			nlSolve();
-			LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
+			Algo::LinearSolving::getResult<PFP2>(*map, p.vIndex, p.positionAttribute, coord);
 			nlReset(NL_TRUE);
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(Surface_Deformation_Plugin, Surface_Deformation_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Deformation_Plugin, Surface_Deformation_Plugin)
+#endif
 
 } // namespace SCHNApps
 

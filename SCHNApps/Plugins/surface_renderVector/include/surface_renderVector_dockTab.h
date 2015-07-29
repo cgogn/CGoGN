@@ -29,8 +29,10 @@ private:
 
 private slots:
 	void positionVBOChanged(int index);
-	void selectedVectorsVBOChanged();
+	void selectedVectorVBOChanged(QListWidgetItem* item, QListWidgetItem* old);
+	void vectorsVBOChecked(QListWidgetItem* item);
 	void vectorsScaleFactorChanged(int i);
+	void colorChanged(int i);
 
 private:
 	void addPositionVBO(QString name);

@@ -40,6 +40,7 @@ void Surface_Deformation_DockTab::positionAttributeChanged(int index)
 			{
 				MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 				m_plugin->h_parameterSet[map].positionAttribute = mh->getAttribute<PFP2::VEC3, VERTEX>(combo_positionAttribute->currentText());
+				m_plugin->pythonRecording("changePositionVBO", "", map->getName(), combo_positionAttribute->currentText());
 			}
 		}
 	}
@@ -54,6 +55,8 @@ void Surface_Deformation_DockTab::handleSelectorChanged(int index)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 			m_plugin->h_parameterSet[map].handleSelector = mh->getCellSelector<VERTEX>(combo_handleSelector->currentText());
+			m_plugin->pythonRecording("changeHandleSelector", "", map->getName(), combo_handleSelector->currentText());
+
 		}
 	}
 }
@@ -67,6 +70,7 @@ void Surface_Deformation_DockTab::freeSelectorChanged(int index)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(map);
 			m_plugin->h_parameterSet[map].freeSelector = mh->getCellSelector<VERTEX>(combo_freeSelector->currentText());
+			m_plugin->pythonRecording("changeFreeSelector", "", map->getName(), combo_freeSelector->currentText());
 		}
 	}
 }

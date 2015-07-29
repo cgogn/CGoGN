@@ -1,4 +1,18 @@
 cmake_minimum_required(VERSION 2.8)
+Project(Plugins)
+
+IF(WIN32)
+	IF (CGoGN_WITH_QTCREATOR)
+		SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/plugins/${CMAKE_BUILD_TYPE})
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
+	ELSE()
+		SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/plugins)
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
+	ENDIF()
+ELSE()
+	SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/plugins/${CMAKE_BUILD_TYPE})
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+ENDIF()
 
 ADD_SUBDIRECTORY(surface_import)
 ADD_SUBDIRECTORY(surface_render)
@@ -13,6 +27,9 @@ ADD_SUBDIRECTORY(surface_modelisation)
 #ADD_SUBDIRECTORY(surface_tilings)
 ADD_SUBDIRECTORY(surface_distance)
 ADD_SUBDIRECTORY(surface_radiance)
+
+ADD_SUBDIRECTORY(cage2D_deformation)
+ADD_SUBDIRECTORY(cage3D_deformation)
 
 ADD_SUBDIRECTORY(volume_import)
 #ADD_SUBDIRECTORY(volume_render)

@@ -2,205 +2,148 @@ cmake_minimum_required(VERSION 2.8)
 
 project(SCHNApps)
 
-IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
-	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
-		SET(CMAKE_BUILD_TYPE "Debug")
-	ELSE()
-		SET(CMAKE_BUILD_TYPE "Release")
-	ENDIF()
-ENDIF()
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
+SET( CGoGN_SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
+SET( CGoGN_SCHNApps_USE_DOUBLE OFF CACHE BOOL "build with doubled instead of floats" )
+IF(WIN32)
+	SET ( CGoGN_WITH_QTCREATOR OFF CACHE BOOL "use QtCreator to compile" )
+ENDIF(WIN32)
 
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
+IF(WIN32)
+	SET ( CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies" )
+ENDIF(WIN32)
+
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
+SET (CGoGN_SRC_DIR ${CGoGN_ROOT_DIR}/CGoGN)
 
-SET( SLOT_DEBUG_MODE OFF CACHE BOOL "build with slot debugging mode" )
-SET( USE_OGL_CORE_PROFILE OFF CACHE BOOL "use OpenGL 3.3 core profile (do not work on mac)" )
+INCLUDE(${CGoGN_ROOT_DIR}/cmake_modules/functions.cmake)
 
+setBuildType()
+
+SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
+IF(WIN32)
+	IF (CGoGN_WITH_QTCREATOR)
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE} )
+	ELSE()
+		SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
+		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
+		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName} )
+	ENDIF()
+ELSE()
+	IF(APPLE)
+		SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}/Contents/MacOS/ )
+	ELSE()
+		SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
+	ENDIF()
+#	SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
+	link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
+ENDIF()
+
+
+# choose same Qt version than in CGoGN
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_qt.h CGoGN_DESIRED_QT_VERSION)
+ADD_DEFINITIONS("-DCGOGN_QT_DESIRED_VERSION=${CGoGN_DESIRED_QT_VERSION}")
+IF(CGoGN_DESIRED_QT_VERSION STREQUAL 5)
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_5x.cmake)
+ELSE()
+	include(${CGoGN_ROOT_DIR}/cmake_modules/Qt_4x.cmake)
+ENDIF()
+
+# PythonQt third-party dependency
+ADD_SUBDIRECTORY(${CGoGN_ROOT_DIR}/ThirdParty/PythonQt ThirdParty_PythonQt)
 
 
 find_package(OpenGL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Qt4 REQUIRED)
-find_package(QGLViewer REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
-find_package(SuiteSparse REQUIRED)
-#find_package(SuperLU REQUIRED)
 
 
-add_definitions(-DWITH_QT)
 
-SET( QT_USE_QTOPENGL TRUE )
-SET( QT_USE_QTXML TRUE )
-SET( QT_USE_QTDESIGNER TRUE )
-SET( QT_USE_QTGUI TRUE )
-SET( QT_USE_QTPLUGIN TRUE )
-SET( QT_USE_QTSVG TRUE )
-
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-add_definitions(-DGLM_FORCE_RADIANS)
-
-#MESSAGE HERE FOR MORE EASY READING (MESSAGE AT THE END)
-MESSAGE("Build type = " ${CMAKE_BUILD_TYPE} " (for change -DCMAKE_BUILD_TYPE=Release|Debug)" )
-
-file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
+# CGoGN compiled in one or several libs
+file(READ ${CGoGN_SRC_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS cgogn)
 ELSE()
 	SET(CGoGN_LIBS topology algo container utils)
 ENDIF()
 
-IF(DEFINED ASSERTON)
-	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
-ELSE(DEFINED ASSERTON)
-	add_definitions(-DCGOGN_ASSERT_BOOL=false)
-ENDIF (DEFINED ASSERTON)
+# definitions from CGoGN
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_defs.h CGoGN_DEFS)
 
-IF(SLOT_DEBUG_MODE)
-	add_definitions(-DSLOT_DEBUG_MODE=1)
+#and schnapps options
+IF(CGoGN_SLOT_DEBUG_MODE)
+	LIST (APPEND CGoGN_DEFS -DCGoGN_SLOT_DEBUG_MODE=1)
 ENDIF()
-
-IF(USE_OGL_CORE_PROFILE)
-	add_definitions(-DUSE_OGL_CORE_PROFILE=1)
+IF (${CGoGN_SCHNApps_USE_DOUBLE})
+	LIST (APPEND CGoGN_DEFS -DSCHNAPPS_USE_DOUBLE=1)
 ENDIF()
+ADD_DEFINITIONS(${CGoGN_DEFS})
 
-# define includes of external libs 
-SET (EXT_INCLUDES 
-	${CGoGN_ROOT_DIR}/ThirdParty/include
-	${OPENGL_INCLUDE_DIR}
-	${GLEW_INCLUDE_DIRS}
-	${ZLIB_INCLUDE_DIRS}
-	${QT_INCLUDE_DIR}
-	${QGLVIEWER_INCLUDE_DIR}
-	${PYTHON_INCLUDE_DIRS}
-	${SUITESPARSE_INCLUDE_DIRS}
-#	${SUPERLU_INCLUDE_DIRS}
-)
+# includes from CGoGN + python
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_ext_includes.h EXT_INCLUDES)
+LIST(APPEND EXT_INCLUDES ${PYTHON_INCLUDE_DIRS})
 
-# define libs for external libs
-SET (EXT_LIBS 
-	PythonQt
-	nl
-	${QGLVIEWER_LIBRARIES}
-	${OPENGL_LIBRARY}
-	${GLEW_LIBRARIES}
-	${ZLIB_LIBRARIES}
-	${QT_LIBRARIES}
-	${PYTHON_LIBRARIES}
-	${SUITESPARSE_LIBRARIES}
-#	${SUPERLU_LIBRARIES}
-	tinyxml2
-)
+# libs from CGoGN + python + PythonQt
+FILE(STRINGS ${CGoGN_SRC_DIR}/include/cgogn_ext_libs.h EXT_LIBS)
+LIST(APPEND EXT_LIBS PythonQt ${PYTHON_LIBRARIES})
 
 
 
-
-# qq definition specifiques pour mac
-#IF(APPLE)
-# attention a changer pour chercher la bonne version automatiquement
-#	SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.6.sdk" CACHE STRING "developer SDK")
-#	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
-#	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMAC_OSX")
-#	SET(CMAKE_OSX_ARCHITECTURES x86_64)
-#ENDIF(APPLE)
-
-if(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-overloaded-virtual")	
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined -Wl,dynamic_lookup")
-endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-	if (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-local-typedefs")
-	endif(GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-endif(CMAKE_COMPILER_IS_GNUCXX)
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+endif()
 
+if(WIN32)
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3")
+else()
+	if(APPLE)
+		SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11 -Wno-deprecated -Wno-overloaded-virtual")
+	else()
+		SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=c++11")
+	endif()
+endif()
 
-
-SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
-SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
-SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE})
-
-# for application auto selection of plugin directory
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/plugins_default_directory.h 
-\#define\ PLUGINS_DEFAULT_DIRECTORY\ \"${SCHNApps_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE}\" )
-
-file(
-	GLOB_RECURSE
-	SCHNApps_FILES
-	${SCHNApps_ROOT_DIR}/src/*.cpp
-	${SCHNApps_ROOT_DIR}/include/*.h
-	${SCHNApps_ROOT_DIR}/include/*.hpp
-)
-
-file(
-	GLOB_RECURSE
-	SCHNApps_UI_FILES
-	${SCHNApps_ROOT_DIR}/forms/*.ui
-)
-
-SET(SCHNApps_QOBJECT_FILES
-	${SCHNApps_ROOT_DIR}/include/camera.h
-	${SCHNApps_ROOT_DIR}/include/mapHandler.h
-	${SCHNApps_ROOT_DIR}/include/cellSelector.h
-	${SCHNApps_ROOT_DIR}/include/plugin.h
-	${SCHNApps_ROOT_DIR}/include/plugin_interaction.h
-	${SCHNApps_ROOT_DIR}/include/plugin_processing.h
-	${SCHNApps_ROOT_DIR}/include/view.h
-	${SCHNApps_ROOT_DIR}/include/schnapps.h
-	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
-	${SCHNApps_ROOT_DIR}/include/controlDock_cameraTab.h
-	${SCHNApps_ROOT_DIR}/include/controlDock_pluginTab.h
-	${SCHNApps_ROOT_DIR}/include/controlDock_mapTab.h
-	${SCHNApps_ROOT_DIR}/include/colorComboBox.h
-	${SCHNApps_ROOT_DIR}/include/dialogList.h
-)
-
-
-
-link_directories( ${CGoGN_ROOT_DIR}/lib/${CMAKE_BUILD_TYPE} )
 
 
 INCLUDE_DIRECTORIES(
-	${CGoGN_ROOT_DIR}/include
+	${CGoGN_SRC_DIR}/include
+	${CGoGN_ROOT_DIR}/ThirdParty/PythonQt/src/
 	${SCHNApps_ROOT_DIR}/include
 	${EXT_INCLUDES}
+	${CMAKE_CURRENT_BINARY_DIR}/SCHNAppsLib
+)
+
+ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins/schnapps/ SCHNAppsLib)
+
+ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
+
+INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_BINARY_DIR}
 )
 
-QT4_WRAP_UI( UIC_FILES
-	${SCHNApps_UI_FILES}
-)
 
-QT4_WRAP_CPP( MOC_FILES
-	${SCHNApps_QOBJECT_FILES}
-)
-
-QT4_ADD_RESOURCES( RCC_FILES
-	${SCHNApps_ROOT_DIR}/resources/resources.qrc
+# SCHNApps main application
+file(
+	GLOB_RECURSE
+	SCHNApps_FILES
+	${SCHNApps_ROOT_DIR}/src/main.cpp
 )
 
 ADD_EXECUTABLE( SCHNApps
 	${SCHNApps_FILES}
-	${UIC_FILES}
-	${MOC_FILES}
-	${RCC_FILES}
 )
 
 TARGET_LINK_LIBRARIES( SCHNApps
+	SCHNAppsLib
 	${CGoGN_LIBS}
 	${EXT_LIBS}
-	pthread
 )
 
-
-ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
+qt_use_modules(SCHNApps Core Gui OpenGL Xml Svg)
 
 IF(IS_DIRECTORY ${SCHNApps_ROOT_DIR}/../../Plugins)
 	ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/../../Plugins ExtPlugins)

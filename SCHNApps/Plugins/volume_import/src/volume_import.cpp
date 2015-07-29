@@ -17,7 +17,7 @@ namespace SCHNApps
 bool Volume_Import_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
-		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
 	importAction = new QAction("import", this);
 	m_schnapps->addMenuAction(this, "Volume;Import", importAction);
@@ -30,6 +30,7 @@ MapHandlerGen* Volume_Import_Plugin::importFromFile(const QString& fileName)
 	QFileInfo fi(fileName);
 	if(fi.exists())
 	{
+		pythonRecording("importFromFile", fi.baseName(), fileName);
 		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 3);
 		if(mhg)
 		{
@@ -39,15 +40,16 @@ MapHandlerGen* Volume_Import_Plugin::importFromFile(const QString& fileName)
 			std::vector<std::string> attrNames ;
 			Algo::Volume::Import::importMesh<PFP3>(*map, fileName.toStdString(), attrNames);
 
-			// get vertex position attribute
-			VertexAttribute<PFP3::VEC3, PFP3::MAP> position = map->getAttribute<PFP3::VEC3, VERTEX, PFP3::MAP>(attrNames[0]);
-			mh->registerAttribute(position);
-
-			// update corresponding VBO & emit attribute update signal
-			mh->notifyAttributeModification(position);
-
-			// compute map bounding box
-			mh->updateBB(position);
+			for (unsigned int orbit = VERTEX; orbit <= VOLUME; orbit++)
+			{
+				AttributeContainer& cont = map->getAttributeContainer(orbit);
+				std::vector<std::string> names;
+				std::vector<std::string> types;
+				cont.getAttributesNames(names);
+				cont.getAttributesTypes(types);
+				for(unsigned int i = 0; i < names.size(); ++i)
+					mhg->registerAttribute(orbit, QString::fromStdString(names[i]), QString::fromStdString(types[i]));
+			}
 		}
 		return mhg;
 	}
@@ -65,7 +67,12 @@ void Volume_Import_Plugin::importFromFileDialog()
 	}
 }
 
-Q_EXPORT_PLUGIN2(Volume_Import_Plugin, Volume_Import_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Volume_Import_Plugin, Volume_Import_Plugin)
+#endif
+
 
 } // namespace SCHNApps
 

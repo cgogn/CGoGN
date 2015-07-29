@@ -26,7 +26,7 @@ bool Surface_Distance_Plugin::enable()
 	connect(m_computeDistanceDialog, SIGNAL(accepted()), this, SLOT(computeDistanceFromDialog()));
 	connect(m_computeDistanceDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeDistanceFromDialog()));
 
-	connect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 	return true;
 }
@@ -38,7 +38,7 @@ void Surface_Distance_Plugin::disable()
 	disconnect(m_computeDistanceDialog, SIGNAL(accepted()), this, SLOT(computeDistanceFromDialog()));
 	disconnect(m_computeDistanceDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeDistanceFromDialog()));
 
-	disconnect(m_schnapps, SIGNAL(appsFinished()), this, SLOT(appsFinished()));
+	disconnect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 }
 
 void Surface_Distance_Plugin::openComputeDistanceDialog()
@@ -129,16 +129,24 @@ void Surface_Distance_Plugin::computeDistance(
 	// Algo::Geometry::computeDistance<PFP2>(map1, position1, distance1, map2, position2);
 	// Algo::Geometry::computeDistance<PFP2>(map2, position2, distance2, map1, position1);
 
+	this->pythonRecording("computeDistance", "", mapName1, positionAttributeName1, distanceAttributeName1, 
+							mapName2, positionAttributeName2, distanceAttributeName2);
+
 	mh1->notifyAttributeModification(distance1);
 	mh2->notifyAttributeModification(distance2);
 }
 
-void Surface_Distance_Plugin::appsFinished()
+void Surface_Distance_Plugin::schnappsClosing()
 {
 	m_computeDistanceDialog->close();
 }
 
-Q_EXPORT_PLUGIN2(Surface_Distance_Plugin, Surface_Distance_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Distance_Plugin, Surface_Distance_Plugin)
+#endif
+//
 
 } // namespace SCHNApps
 

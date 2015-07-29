@@ -11,7 +11,7 @@ namespace SCHNApps
 bool Surface_RenderVector_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
-		GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
+	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
 	m_dockTab = new Surface_RenderVector_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_RenderVector");
@@ -51,13 +51,16 @@ void Surface_RenderVector_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	const MapParameters& p = h_viewParameterSet[view][map];
 
-	m_vectorShader->setScale(map->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
-	if(p.positionVBO)
+	if (p.positionVBO)
 	{
 		m_vectorShader->setAttributePosition(p.positionVBO);
-		for(QList<Utils::VBO*>::const_iterator it = p.vectorVBOs.begin(); it != p.vectorVBOs.end(); ++it)
+		int nb = p.vectorVBOs.size();
+		for (int i = 0; i < nb; ++i)
 		{
-			m_vectorShader->setAttributeVector(*it);
+			m_vectorShader->setAttributeVector(p.vectorVBOs[i]);
+			m_vectorShader->setScale(map->getBBdiagSize() / 100.0f * p.scaleFactors[i]);
+			const QColor& col = p.colors[i];
+			m_vectorShader->setColor(Geom::Vec4f(col.redF(), col.greenF(), col.blueF(), 0.0f));
 			glLineWidth(1.0f);
 			map->draw(m_vectorShader, Algo::Render::GL2::POINTS);
 		}
@@ -76,10 +79,6 @@ void Surface_RenderVector_Plugin::selectedViewChanged(View *prev, View *cur)
 void Surface_RenderVector_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
-	if (cur==NULL)
-		m_dockTab->setDisabled(true);
-	else
-		m_dockTab->setDisabled(false);
 }
 
 void Surface_RenderVector_Plugin::mapAdded(MapHandlerGen* map)
@@ -163,8 +162,8 @@ void Surface_RenderVector_Plugin::changePositionVBO(const QString& view, const Q
 		h_viewParameterSet[v][m].positionVBO = vbuf;
 		if(v->isSelectedView())
 		{
-			if(v->isLinkedToMap(m))	v->updateGL();
-			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
 }
@@ -177,6 +176,8 @@ void Surface_RenderVector_Plugin::addVectorVBO(const QString& view, const QStrin
 	{
 		Utils::VBO* vbuf = m->getVBO(vbo);
 		h_viewParameterSet[v][m].vectorVBOs.append(vbuf);
+		h_viewParameterSet[v][m].colors.append(QColor("red"));
+		h_viewParameterSet[v][m].scaleFactors.append(1.0f);
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
@@ -192,7 +193,10 @@ void Surface_RenderVector_Plugin::removeVectorVBO(const QString& view, const QSt
 	if(v && m)
 	{
 		Utils::VBO* vbuf = m->getVBO(vbo);
-		h_viewParameterSet[v][m].vectorVBOs.removeOne(vbuf);
+		int idx = h_viewParameterSet[v][m].vectorVBOs.indexOf(vbuf);
+		h_viewParameterSet[v][m].vectorVBOs.removeAt(idx);
+		h_viewParameterSet[v][m].colors.removeAt(idx);
+		h_viewParameterSet[v][m].scaleFactors.removeAt(idx);
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
@@ -201,22 +205,48 @@ void Surface_RenderVector_Plugin::removeVectorVBO(const QString& view, const QSt
 	}
 }
 
-void Surface_RenderVector_Plugin::changeVectorsScaleFactor(const QString& view, const QString& map, float f)
+void Surface_RenderVector_Plugin::changeVectorScaleFactor(const QString& view, const QString& map, const QString& vbo, float f)
 {
 	View* v = m_schnapps->getView(view);
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(v && m)
 	{
-		h_viewParameterSet[v][m].vectorsScaleFactor = f;
+		Utils::VBO* vboPtr = m->getVBO(vbo);
+		
+		int idx = h_viewParameterSet[v][m].vectorVBOs.indexOf(vboPtr);
+		h_viewParameterSet[v][m].scaleFactors[idx] = f;
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
-			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
 }
 
-Q_EXPORT_PLUGIN2(Surface_RenderVector_Plugin, Surface_RenderVector_Plugin)
+void Surface_RenderVector_Plugin::changeVectorColor(const QString& view, const QString& map, const QString& vbo, const QString& col)
+{
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (v && m)
+	{
+		Utils::VBO* vboPtr = m->getVBO(vbo);
+
+		int idx = h_viewParameterSet[v][m].vectorVBOs.indexOf(vboPtr);
+		h_viewParameterSet[v][m].colors[idx] = QColor(col);
+		if (v->isSelectedView())
+		{
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_RenderVector_Plugin, Surface_RenderVector_Plugin)
+#endif
+
 
 } // namespace SCHNApps
 

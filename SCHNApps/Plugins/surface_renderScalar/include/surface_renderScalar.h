@@ -37,11 +37,20 @@ struct MapParameters
 	int expansion;
 };
 
+
+/**
+* @brief Plugin for rendering a scalar attribute over a surface with colormap.
+* The scalar attribute to render must have its generated VBO.
+* A position VBO must be provided for surface rendering.
+* All parameters are per view / per map.
+*/
 class Surface_RenderScalar_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
-
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 	friend class Surface_RenderScalar_DockTab;
 
 public:
@@ -57,12 +66,12 @@ public:
 	virtual void draw(View *view) {}
 	virtual void drawMap(View* view, MapHandlerGen* map);
 
-	virtual void keyPress(View* view, QKeyEvent* event) {}
-	virtual void keyRelease(View* view, QKeyEvent* event) {}
-	virtual void mousePress(View* view, QMouseEvent* event) {}
-	virtual void mouseRelease(View* view, QMouseEvent* event) {}
-	virtual void mouseMove(View* view, QMouseEvent* event) {}
-	virtual void wheelEvent(View* view, QWheelEvent* event) {}
+	virtual void keyPress(View* , QKeyEvent* ) {}
+	virtual void keyRelease(View* , QKeyEvent* ) {}
+	virtual void mousePress(View* , QMouseEvent* ) {}
+	virtual void mouseRelease(View* , QMouseEvent* ) {}
+	virtual void mouseMove(View* , QMouseEvent* ) {}
+	virtual void wheelEvent(View* , QWheelEvent* ) {}
 
 	virtual void viewLinked(View *view) {}
 	virtual void viewUnlinked(View *view) {}
@@ -81,11 +90,37 @@ private slots:
 
 public slots:
 	// slots for Python calls
+	/**
+	 * @brief [PYTHON] change the position VBO use for rendering (for specific view and map)
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo the position vbo name
+	 */
 	void changePositionVBO(const QString& view, const QString& map, const QString& vbo);
-	void changeScalarVBO(const QString& view, const QString& map, const QString& vbo);
-	void changeColorMap(const QString& view, const QString& map, int c);
-	void changeExpansion(const QString& view, const QString& map, int i);
 
+	/**
+	 * @brief [PYTHON] change the scalar VBO use for rendering (for specific view and map)
+	 * @param view the view name
+	 * @param map the map name
+	 * @param vbo the scalar vbo name
+	 */
+	void changeScalarVBO(const QString& view, const QString& map, const QString& vbo);
+
+	/**
+	 * @brief [PYTHON] change the kind of colormap.
+	 * @param view the view name
+	 * @param map the map name
+	 * @param c 0:BWR 1:CWR 2:BCGYR 3:BGR
+	 */
+	void changeColorMap(const QString& view, const QString& map, int c);
+
+	/**
+	 * @brief [PYTHON] change the expansion of color-map
+	 * @param view the view name
+	 * @param map the map name
+	 * @param i ????
+	 */
+	void changeExpansion(const QString& view, const QString& map, int i);
 
 protected:
 	Surface_RenderScalar_DockTab* m_dockTab;

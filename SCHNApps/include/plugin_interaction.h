@@ -12,7 +12,7 @@ namespace SCHNApps
 class SCHNApps;
 class View;
 
-class PluginInteraction : public Plugin
+class SCHNAPPS_API PluginInteraction : public Plugin
 {
 	Q_OBJECT
 
@@ -23,10 +23,24 @@ public:
 	virtual ~PluginInteraction();
 
 public slots:
-	const QList<View*>& getLinkedViews() const { return l_views; }
-	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+	/**
+	 * @brief get thte list of views linked with this plugin
+	 * @return the list
+	 */
+	inline const QList<View*>& getLinkedViews() const { return l_views; }
 
-	const QList<Utils::GLSLShader*> getShaders() const { return l_shaders; }
+	/**
+	 * @brief [PYTHON] test if this plugin is linked to a view
+	 * @param view view object ptr
+	 * @return
+	 */
+	inline bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
+	/**
+	 * @brief get list of shaders used in this rendering plugin
+	 * @return  list of shaders ptr
+	 */
+	inline const QList<Utils::GLSLShader*> getShaders() const { return l_shaders; }
 
 private:
 	virtual void draw(View* view) = 0;
@@ -57,10 +71,15 @@ protected:
 	void registerShader(Utils::GLSLShader* shader);
 	void unregisterShader(Utils::GLSLShader* shader);
 
+	void registerShader(const std::vector<Utils::GLSLShader*>& shaders);
+	void unregisterShader(const std::vector<Utils::GLSLShader*>& shaders);
+
+
 protected:
 	QList<View*> l_views;
 	QList<Utils::GLSLShader*> l_shaders;
 };
+
 
 } // namespace SCHNApps
 

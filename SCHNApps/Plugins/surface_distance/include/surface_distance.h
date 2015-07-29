@@ -15,6 +15,9 @@ class Surface_Distance_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#endif
 
 public:
 	Surface_Distance_Plugin()
@@ -30,9 +33,18 @@ private slots:
 	void openComputeDistanceDialog();
 	void computeDistanceFromDialog();
 
-	void appsFinished();
+	void schnappsClosing();
 
 public slots:
+	/**
+	 * @brief compute distance between 2 maps
+	 * @param mapName1 name of first map
+	 * @param positionAttributeName1 name of first map position attribute
+	 * @param distanceAttributeName1 name of first map distance attribute
+	 * @param mapName2 name of second map
+	 * @param positionAttributeName2 name of second map position attribute
+	 * @param distanceAttributeName2 name of second map distance attribute
+	 */
 	void computeDistance(
 		const QString& mapName1,
 		const QString& positionAttributeName1,

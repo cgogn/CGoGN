@@ -40,7 +40,7 @@ bool Surface_Modelisation_Plugin::enable()
 	m_dockTab->updateMapParameters();
 
     m_drawer = new Utils::Drawer();
-    registerShader(m_drawer->getShader());
+	registerShader(m_drawer->getShaders());
 
     mapNumber = 1;
 
@@ -53,6 +53,7 @@ void Surface_Modelisation_Plugin::disable()
     disconnect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
     disconnect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 
+	unregisterShader(m_drawer->getShaders());
     delete m_drawer;
 }
 
@@ -240,7 +241,7 @@ void Surface_Modelisation_Plugin::createNewFace(MapHandlerGen* mhg)
 		VertexAttribute<PFP2::VEC3, PFP2::MAP>& position = h_parameterSet[mhg].positionAttribute;
         if (collectedVertices.size() >= 3)
         {
-            Dart d = map->newFace(collectedVertices.size());
+            Dart d = map->newFace((unsigned int)(collectedVertices.size()));
 
             int i = 0;
             Traversor2FV<PFP2::MAP> t(*map, d);
@@ -251,8 +252,7 @@ void Surface_Modelisation_Plugin::createNewFace(MapHandlerGen* mhg)
             }
 
             mh->notifyConnectivityModification();
-            mh->notifyAttributeModification(position);
-            mh->updateBB(position);
+			mh->notifyAttributeModification(position);
             collectedVertices.clear();
         }
         else QMessageBox::information(0, "Attention", "To create a face you need at least 3 vertices");
@@ -271,9 +271,7 @@ void Surface_Modelisation_Plugin::addCube(MapHandlerGen *mhg)
         Algo::Surface::Modelisation::embedPrism<PFP2>(*map, position, 4, true, 0.7f, 0.7f, 1.0f);
 
         mh->notifyAttributeModification(position);
-        mh->notifyConnectivityModification();
-        // compute map bounding box
-        mh->updateBB(position);
+		mh->notifyConnectivityModification();
     }
 }
 
@@ -417,8 +415,7 @@ void Surface_Modelisation_Plugin::extrudeRegion(MapHandlerGen *mhg)
         Algo::Surface::Modelisation::extrudeRegion<PFP2>(*map, p.positionAttribute, selectedDarts[0], p.faceSelector->getMarker());
 
         mh->notifyConnectivityModification();
-        mh->notifyAttributeModification(p.positionAttribute);
-        mh->updateBB(p.positionAttribute);
+		mh->notifyAttributeModification(p.positionAttribute);
     }
 }
 
@@ -739,8 +736,7 @@ void Surface_Modelisation_Plugin::extrudeFace(MapHandlerGen *mhg)
 
         Algo::Surface::Modelisation::extrudeFace<PFP2>(*map, p.positionAttribute, d, dist);
         mh->notifyConnectivityModification();
-        mh->notifyAttributeModification(p.positionAttribute);
-        mh->updateBB(p.positionAttribute);
+		mh->notifyAttributeModification(p.positionAttribute);
     }
 }
 
@@ -790,14 +786,16 @@ void Surface_Modelisation_Plugin::pathExtrudeFace(MapHandlerGen *mhg)
         }
 
         mh->notifyConnectivityModification();
-        mh->notifyAttributeModification(position);
-        mh->updateBB(position);
+		mh->notifyAttributeModification(position);
         collectedVertices.clear();
     }
 }
 
-
-Q_EXPORT_PLUGIN2(Surface_Modelisation_Plugin, Surface_Modelisation_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
+#else
+	Q_EXPORT_PLUGIN2(Surface_Modelisation_Plugin, Surface_Modelisation_Plugin)
+#endif
 
 } // namespace SCHNApps
 

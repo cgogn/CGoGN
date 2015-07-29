@@ -32,6 +32,7 @@ private:
 private slots:
 	void positionVBOChanged(int index);
 	void normalVBOChanged(int index);
+	void fragmentInterpolationChanged(int state);
 	void decimateClicked();
 
 private:

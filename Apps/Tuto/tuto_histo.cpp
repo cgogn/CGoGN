@@ -115,10 +115,10 @@ void MyQT::createMap(const std::string& filename)
 
 
 	// create a popup window
-	l_popup = new Utils::QT::QtPopUp(this);
+	l_popup = new Utils::QT::QtPopUp();
 
 	// create the widget to view histogram
-	l_histodraw = new Utils::QT::RenderHistogram(l_popup, *l_histo);
+	l_histodraw = new Algo::Histogram::RenderHistogram(l_popup, *l_histo);
 
 	// some simple parameters
 	l_histodraw->setQuantilesDraw(true);
@@ -274,7 +274,7 @@ void MyQT::clickHisto(unsigned int i,unsigned int j)
 {
 	std::cout << "CLICK on column Histo: " << i << " / Quantiles: " << j <<std::endl;
 
-	if (i != Utils::QT::RenderHistogram::NONE)
+	if (i != Algo::Histogram::RenderHistogram::NONE)
 	{
 		std::vector<unsigned int > vc;
 		l_histo->cellsOfHistogramColumn(i,vc);
@@ -287,7 +287,7 @@ void MyQT::clickHisto(unsigned int i,unsigned int j)
 		std::cout << l_histo->markCellsOfHistogramColumn(i,cm) << " marked cells" << std::endl;
 	}
 
-	if (j != Utils::QT::RenderHistogram::NONE)
+	if (j != Algo::Histogram::RenderHistogram::NONE)
 	{
 		std::vector<unsigned int > vc;
 		l_histo->cellsOfHistogramColumn(j,vc);

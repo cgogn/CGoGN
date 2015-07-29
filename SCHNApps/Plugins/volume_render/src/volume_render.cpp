@@ -119,12 +119,16 @@ void Volume_Render_Plugin::changeFacesStyle(const QString& view, const QString& 
 {
 
 }
-
-#ifndef DEBUG
-Q_EXPORT_PLUGIN2(Volume_Render_Plugin, Volume_Render_Plugin)
+#if CGOGN_QT_DESIRED_VERSION == 5
+	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
 #else
-Q_EXPORT_PLUGIN2(Volume_Render_PluginD, Volume_Render_Plugin)
+    #ifndef DEBUG
+		Q_EXPORT_PLUGIN2(Volume_Render_Plugin, Volume_Render_Plugin)
+    #else
+		Q_EXPORT_PLUGIN2(Volume_Render_PluginD, Volume_Render_Plugin)
+    #endif
 #endif
+
 
 } // namespace SCHNApps
 

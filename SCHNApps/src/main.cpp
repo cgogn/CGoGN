@@ -1,8 +1,8 @@
 #include <QSplashScreen>
 #include "schnapps.h"
 #include <QFileInfo>
-#include "PythonQt/PythonQt.h"
-#include "PythonQt/gui/PythonQtScriptingConsole.h"
+#include "PythonQt.h"
+#include "gui/PythonQtScriptingConsole.h"
 
 int main(int argc, char* argv[])
 {
@@ -37,8 +37,9 @@ int main(int argc, char* argv[])
 	{
 		QString filename(argv[1]);
 		QFileInfo fi(filename);
-		if(fi.exists())
-			pythonContext.evalFile(fi.filePath());
+		if (fi.exists())
+			//pythonContext.evalFile(fi.filePath());
+			schnapps.loadPythonScriptFromFile(fi.filePath());
 	}
 
 	splash->finish(&schnapps);

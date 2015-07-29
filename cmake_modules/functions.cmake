@@ -1,0 +1,68 @@
+function(checkCpp11Support)
+	# ====== Check GCC VERSION FOR C++11 ======
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+		if (GCC_VERSION VERSION_LESS 4.8)
+			message(FATAL_ERROR "Full support of C++11 needed. Therefore a gcc/g++ compiler with a version at least 4.8 is needed.")
+		endif()
+	endif()
+
+	# ====== Check CLANG VERSION FOR C++11 ======
+	if (APPLE)
+		execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
+		if (CLANG_VERSION VERSION_LESS 3.1)
+			message(FATAL_ERROR "Full support of C++11 needed. Therefore a clang compiler with a version at least 3.1 is needed !!")
+		endif()
+	endif()
+
+	# ====== Check MSVC VERSION FOR C++11 ======
+	if(WIN32)
+		if(MSVC_VERSION LESS 1800)
+			message(FATAL_ERROR "Full support of C++11 needed. Therefore a microsoft compiler with a version at least 12 is needed.")
+		endif()
+	endif()
+endfunction(checkCpp11Support)
+
+
+function(checkCpp11Feature FEATURE RESULT IS_FATAL)
+	set(definitions "")
+	if (NOT MSVC)
+		set(definitions "-std=c++11")
+	endif(NOT MSVC)
+	set(source "${CMAKE_MODULE_PATH}/tests/cxx11-test-${FEATURE}.cpp")
+	set(bindir "${CMAKE_CURRENT_BINARY_DIR}/cxx11/cxx11_${FEATURE}")
+	try_run(run_result compile_result
+	${bindir} ${source}
+	COMPILE_DEFINITIONS ${definitions})
+	if (${run_result} EQUAL "1")
+		set(${RESULT} "True" PARENT_SCOPE)
+		message("Checking cpp11 feature support ${FEATURE} : OK")
+	else()
+		set(${RESULT} "False" PARENT_SCOPE)
+		if (${IS_FATAL})
+			message(FATAL_ERROR "Checking cpp11 feature support ${FEATURE} : Fail. Please update your compiler (GCC >= 4.9, Clang >= 3.5, VS 2013).")
+		else()
+			message("Checking cpp11 feature support ${FEATURE} : Fail.")
+		endif()
+	endif()
+endfunction(checkCpp11Feature)
+
+function(setBuildType)
+IF (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug|Release"))
+	IF (${CMAKE_CURRENT_BINARY_DIR} MATCHES "(.*)Debug|(.*)debug|(.*)DEBUG")
+		SET(CMAKE_BUILD_TYPE "Debug" PARENT_SCOPE)
+	ELSE()
+		SET(CMAKE_BUILD_TYPE "Release" PARENT_SCOPE)
+	ENDIF()
+ENDIF()
+endfunction(setBuildType)
+
+macro(ToRelativePath outFiles fromDirectory inFiles)
+	unset(tmpFiles)
+	foreach(inFile ${inFiles})
+		file(RELATIVE_PATH outFile "${fromDirectory}" "${inFile}")
+		list(APPEND tmpFiles "${outFile}")
+	endforeach()
+
+	set(${outFiles} ${tmpFiles})
+endmacro()

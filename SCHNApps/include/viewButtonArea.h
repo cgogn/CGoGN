@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#define WITH_QT 1
+#define CGOGN_WITH_QT 1
 #include "Utils/textures.h"
 #include "Utils/Shaders/shaderWallPaper.h"
 

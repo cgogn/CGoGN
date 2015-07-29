@@ -21,7 +21,7 @@
      <x>0</x>
      <y>0</y>
      <width>1106</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -32,6 +32,9 @@
     <addaction name="action_ShowHidePluginDock"/>
     <addaction name="action_ShowHidePythonDock"/>
     <addaction name="action_LoadPythonScript"/>
+    <addaction name="action_Python_Recording"/>
+    <addaction name="action_Append_Python_Recording"/>
+    <addaction name="action_Clean_All"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -78,6 +81,26 @@
   <action name="action_ShowHideControlDock">
    <property name="text">
     <string>Show/Hide Control Dock</string>
+   </property>
+  </action>
+  <action name="action_Python_Recording">
+   <property name="text">
+    <string>Python Recording</string>
+   </property>
+  </action>
+  <action name="action_End_Python_Recording">
+   <property name="text">
+    <string>End Python Recording</string>
+   </property>
+  </action>
+  <action name="action_Append_Python_Recording">
+   <property name="text">
+    <string>Append Python Recording</string>
+   </property>
+  </action>
+  <action name="action_Clean_All">
+   <property name="text">
+    <string>Clean All</string>
    </property>
   </action>
  </widget>
