@@ -6,7 +6,9 @@
 #include "dialog_computeRadianceDistance.h"
 
 #include "Utils/sphericalHarmonics.h"
+#include "Utils/bivariatePolynomials.h"
 #include "Utils/Shaders/shaderRadiancePerVertex.h"
+#include "Utils/Shaders/shaderRadiancePerVertex_P.h"
 #include "Utils/drawer.h"
 
 #include "Algo/Decimation/decimation.h"
@@ -21,7 +23,11 @@ struct MapParameters
 {
 	MapParameters() :
 		positionVBO(NULL),
+		tangentVBO(NULL),
 		normalVBO(NULL),
+		binormalVBO(NULL),
+		radiancePerVertexShader(NULL),
+		radiancePerVertexPShader(NULL),
 		radianceTexture(NULL),
 		paramVBO(NULL),
 		positionApproximator(NULL),
@@ -33,11 +39,16 @@ struct MapParameters
 	unsigned int nbVertices;
 
 	Utils::VBO* positionVBO;
+	Utils::VBO* tangentVBO;
 	Utils::VBO* normalVBO;
+	Utils::VBO* binormalVBO;
 
 	CGoGN::Utils::ShaderRadiancePerVertex* radiancePerVertexShader;
+	CGoGN::Utils::ShaderRadiancePerVertex_P* radiancePerVertexPShader;
 
 	VertexAttribute<Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>, PFP2::MAP> radiance;
+	VertexAttribute<Utils::BivariatePolynomials<PFP2::REAL, PFP2::VEC3>, PFP2::MAP> radiance_P;
+
 	Utils::Texture<2, Geom::Vec3f>* radianceTexture;
 	VertexAttribute<Geom::Vec2i, PFP2::MAP> param;
 	Utils::VBO* paramVBO;
@@ -97,7 +108,8 @@ private slots:
 	void vboRemoved(Utils::VBO* vbo);
 	void attributeModified(unsigned int orbit, QString nameAttr);
 
-	void importFromFileDialog();
+	void importFromFileDialog_SH();
+	void importFromFileDialog_P();
 
 	void openComputeRadianceDistanceDialog();
 	void computeRadianceDistanceFromDialog();
@@ -106,7 +118,8 @@ public slots:
 	// slots for Python calls
 	void changePositionVBO(const QString& map, const QString& vbo);
 	void changeNormalVBO(const QString& map, const QString& vbo);
-	MapHandlerGen* importFromFile(const QString& fileName);
+	MapHandlerGen* importFromFile_SH(const QString& fileName);
+	MapHandlerGen* importFromFile_P(const QString& fileName);
 	void decimate(
 		const QString& mapName,
 		const QString& positionAttributeName,
@@ -148,7 +161,8 @@ protected:
 	std::vector<unsigned int> exportNbVert;
 	unsigned int nextExportIndex;
 
-	QAction* m_importAction;
+	QAction* m_importSHAction;
+	QAction* m_importPAction;
 
 	static bool isInHemisphere(double x, double y, double z, void* u)
 	{ // true iff [x,y,z] and u have the same direction

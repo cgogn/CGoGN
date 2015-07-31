@@ -32,6 +32,8 @@ private:
 private slots:
 	void positionVBOChanged(int index);
 	void normalVBOChanged(int index);
+	void tangentVBOChanged(int index);
+	void binormalVBOChanged(int index);
 	void fragmentInterpolationChanged(int state);
 	void decimateClicked();
 
@@ -40,6 +42,10 @@ private:
 	void removePositionVBO(QString name);
 	void addNormalVBO(QString name);
 	void removeNormalVBO(QString name);
+	void addTangentVBO(QString name);
+	void removeTangentVBO(QString name);
+	void addBiNormalVBO(QString name);
+	void removeBiNormalVBO(QString name);
 
 	void updateMapParameters();
 };

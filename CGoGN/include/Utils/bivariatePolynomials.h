@@ -12,6 +12,8 @@
 #include <cmath>
 #include <iostream>
 
+#include <Geometry/vector_gen.h>
+
 //#include <Eigen/Core>
 //#include <Eigen/Dense>
 //#include <Eigen/Cholesky>
@@ -26,9 +28,9 @@ template <typename Tscalar, typename Tcoef>
 class BivariatePolynomials
 {
 private :
-	const int degree ;			// (bi-)degree of the polynomial (=4)
-	const int nb_coefs ;              // number of coefs (=15)
-	Tcoef* coefs;               // table of coefficients
+	int degree ;	// (bi-)degree of the polynomial (=4)
+	int nb_coefs ;	// number of coefs (=15)
+	Tcoef* coefs;	// table of coefficients
 
 public :
 	// construction, destruction and initialization
@@ -36,19 +38,19 @@ public :
 	BivariatePolynomials(BivariatePolynomials const &);
 	~BivariatePolynomials();
 
-	int get_degree () { return degree; }
-	int get_nb_coefs () { return nb_coefs; }
+	int get_degree () const { return degree; }
+	int get_nb_coefs () const { return nb_coefs; }
 
 	// evaluation
 
 	Tcoef evaluate_at (Tscalar u, Tscalar v) const;
-	Tcoef evaluate_at (const Geom::Vec3<Tscalar>& tu, const Geom::Vec3<Tscalar>& tv, const Geom::Vec3<Tscalar>& n, const Geom::Vec3<Tscalar>& eval_dir) const;
+	Tcoef evaluate_at (const Geom::Vector<3,Tscalar>& tu, const Geom::Vector<3,Tscalar>& tv, const Geom::Vector<3,Tscalar>& n, const Geom::Vector<3,Tscalar>& eval_dir) const;
 
 	// I/O
-	const Tcoef& get_coef (int du, int dv) const {assert ((du>=0 && dv <=degree && dv>=0 && dv <=degree) || !" bi-degree is incorrect"); return get_coef(index(l,m));}
-	Tcoef& get_coef (int du, int dv) {assert ((du>=0 && dv <=degree && dv>=0 && dv <=degree) || !" bi-degree is incorrect"); return get_coef(index(l,m));}
+	const Tcoef& get_coef (int du, int dv) const {assert ((du>=0 && dv <=degree && dv>=0 && dv <=degree) || !" bi-degree is incorrect"); return get_coef(index(du,dv));}
+	Tcoef& get_coef (int du, int dv) {assert ((du>=0 && dv <=degree && dv>=0 && dv <=degree) || !" bi-degree is incorrect"); return get_coef(index(du,dv));}
 
-	Tcoef* get_coef_tab () {return coefs;}
+	Tcoef* get_coef_tab () const {return coefs;}
 
 	template <typename TS,typename TC> friend std::ostream & operator<< (std::ostream & os, const BivariatePolynomials<TS,TC> & sh);
 
