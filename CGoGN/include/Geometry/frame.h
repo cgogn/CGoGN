@@ -146,12 +146,12 @@ public: // methods
 	 */
 	Frame(const VEC3& compressedFrame) ;
 
-	~Frame() {} ;
+	~Frame() {}
 
 	/**
 	 * Returns a compressed version of the current local frame
 	 */
-	const VEC3& getCompressed() const { return m_EulerAngles ; } ;
+	const VEC3& getCompressed() const { return m_EulerAngles ; }
 
 	/**
 	 * Returns a decompressed frame (set of 3 VEC3)
@@ -190,7 +190,7 @@ public: // methods
 		lf.getFrame(X,Y,Z) ;
 		out << std::endl << "Decompressed : " << std::endl << X << std::endl << Y << std::endl << Z ;
 		return out ;
-	} ;
+	}
 
 private : // private constants
 	// The reference frame (X,Y,Z) can be any orthonormal

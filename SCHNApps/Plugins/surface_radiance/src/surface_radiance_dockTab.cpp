@@ -19,6 +19,8 @@ Surface_Radiance_DockTab::Surface_Radiance_DockTab(SCHNApps* s, Surface_Radiance
 
 	connect(combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(positionVBOChanged(int)));
 	connect(combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(normalVBOChanged(int)));
+	connect(combo_tangentVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(tangentVBOChanged(int)));
+	connect(combo_binormalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(binormalVBOChanged(int)));
 	connect(checkbox_fragInterp, SIGNAL(stateChanged(int)), this, SLOT(fragmentInterpolationChanged(int)));
 	connect(button_decimate, SIGNAL(clicked()), this, SLOT(decimateClicked()));
 }
@@ -53,6 +55,36 @@ void Surface_Radiance_DockTab::normalVBOChanged(int index)
 			foreach (View* v, map->getLinkedViews())
 				v->updateGL();
 			m_plugin->pythonRecording("changeNormalVBO", "", map->getName(), combo_normalVBO->currentText());
+		}
+	}
+}
+
+void Surface_Radiance_DockTab::tangentVBOChanged(int index)
+{
+	if(!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(map)
+		{
+			m_plugin->h_mapParameterSet[map].tangentVBO = map->getVBO(combo_tangentVBO->currentText());
+			foreach (View* v, map->getLinkedViews())
+				v->updateGL();
+			m_plugin->pythonRecording("changeTangentVBO", "", map->getName(), combo_tangentVBO->currentText());
+		}
+	}
+}
+
+void Surface_Radiance_DockTab::binormalVBOChanged(int index)
+{
+	if(!b_updatingUI)
+	{
+		MapHandlerGen* map = m_schnapps->getSelectedMap();
+		if(map)
+		{
+			m_plugin->h_mapParameterSet[map].binormalVBO = map->getVBO(combo_binormalVBO->currentText());
+			foreach (View* v, map->getLinkedViews())
+				v->updateGL();
+			m_plugin->pythonRecording("changeBiNormalVBO", "", map->getName(), combo_binormalVBO->currentText());
 		}
 	}
 }
@@ -129,6 +161,42 @@ void Surface_Radiance_DockTab::removeNormalVBO(QString name)
 	b_updatingUI = false;
 }
 
+void Surface_Radiance_DockTab::addTangentVBO(QString name)
+{
+	b_updatingUI = true;
+	combo_tangentVBO->addItem(name);
+	b_updatingUI = false;
+}
+
+void Surface_Radiance_DockTab::removeTangentVBO(QString name)
+{
+	b_updatingUI = true;
+	int curIndex = combo_tangentVBO->currentIndex();
+	int index = combo_tangentVBO->findText(name, Qt::MatchExactly);
+	if(curIndex == index)
+		combo_tangentVBO->setCurrentIndex(0);
+	combo_tangentVBO->removeItem(index);
+	b_updatingUI = false;
+}
+
+void Surface_Radiance_DockTab::addBiNormalVBO(QString name)
+{
+	b_updatingUI = true;
+	combo_binormalVBO->addItem(name);
+	b_updatingUI = false;
+}
+
+void Surface_Radiance_DockTab::removeBiNormalVBO(QString name)
+{
+	b_updatingUI = true;
+	int curIndex = combo_binormalVBO->currentIndex();
+	int index = combo_binormalVBO->findText(name, Qt::MatchExactly);
+	if(curIndex == index)
+		combo_binormalVBO->setCurrentIndex(0);
+	combo_binormalVBO->removeItem(index);
+	b_updatingUI = false;
+}
+
 void Surface_Radiance_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
@@ -137,6 +205,10 @@ void Surface_Radiance_DockTab::updateMapParameters()
 	combo_positionVBO->addItem("- select VBO -");
 	combo_normalVBO->clear();
 	combo_normalVBO->addItem("- select VBO -");
+	combo_tangentVBO->clear();
+	combo_tangentVBO->addItem("- select VBO -");
+	combo_binormalVBO->clear();
+	combo_binormalVBO->addItem("- select VBO -");
 
 	MapHandlerGen* map = m_schnapps->getSelectedMap();
 	if(map)
@@ -155,11 +227,18 @@ void Surface_Radiance_DockTab::updateMapParameters()
 				combo_normalVBO->addItem(QString::fromStdString(vbo->name()));
 				if(vbo == p.normalVBO)
 					combo_normalVBO->setCurrentIndex(i);
+				combo_tangentVBO->addItem(QString::fromStdString(vbo->name()));
+				if(vbo == p.tangentVBO)
+					combo_tangentVBO->setCurrentIndex(i);
+				combo_binormalVBO->addItem(QString::fromStdString(vbo->name()));
+				if(vbo == p.binormalVBO)
+					combo_binormalVBO->setCurrentIndex(i);
 				++i;
 			}
 		}
 
-		checkbox_fragInterp->setChecked(p.radiancePerVertexShader->getFragInterp());
+		if (p.radiancePerVertexShader)
+			checkbox_fragInterp->setChecked(p.radiancePerVertexShader->getFragInterp());
 	}
 
 	b_updatingUI = false;

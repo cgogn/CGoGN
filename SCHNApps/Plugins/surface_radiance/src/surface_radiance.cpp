@@ -1,6 +1,8 @@
 #include "surface_radiance.h"
 
 #include "meshTableSurfaceRadiance.h"
+#include "meshTableSurfaceRadiance_P.h"
+
 #include "halfEdgeSelectorRadiance.h"
 #include "edgeSelectorRadiance.h"
 
@@ -29,9 +31,13 @@ bool Surface_Radiance_Plugin::enable()
 	m_dockTab = new Surface_Radiance_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Radiance");
 
-	m_importAction = new QAction("import", this);
-	m_schnapps->addMenuAction(this, "Radiance;Import", m_importAction);
-	connect(m_importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
+	m_importSHAction = new QAction("importSH", this);
+	m_schnapps->addMenuAction(this, "Radiance;Import (SH)", m_importSHAction);
+	connect(m_importSHAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog_SH()));
+
+	m_importPAction = new QAction("importP", this);
+	m_schnapps->addMenuAction(this, "Radiance;Import (P)", m_importPAction);
+	connect(m_importPAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog_P()));
 
 	m_computeRadianceDistanceDialog = new Dialog_ComputeRadianceDistance(m_schnapps);
 
@@ -72,7 +78,7 @@ void Surface_Radiance_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	const MapParameters& p = h_mapParameterSet[map];
 
-	if(p.positionVBO && p.normalVBO)
+	if(p.radiancePerVertexShader && p.positionVBO && p.normalVBO)
 	{
 		p.radiancePerVertexShader->setAttributePosition(p.positionVBO);
 		p.radiancePerVertexShader->setAttributeNormal(p.normalVBO);
@@ -86,6 +92,25 @@ void Surface_Radiance_Plugin::drawMap(View* view, MapHandlerGen* map)
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0f, 1.0f);
 		map->draw(p.radiancePerVertexShader, Algo::Render::GL2::TRIANGLES);
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
+
+	if(p.radiancePerVertexPShader && p.positionVBO && p.normalVBO && p.tangentVBO && p.binormalVBO)
+	{
+		p.radiancePerVertexPShader->setAttributePosition(p.positionVBO);
+		p.radiancePerVertexPShader->setAttributeTangent(p.tangentVBO);
+		p.radiancePerVertexPShader->setAttributeNormal(p.normalVBO);
+		p.radiancePerVertexPShader->setAttributeBiNormal(p.binormalVBO);
+		p.radiancePerVertexPShader->setAttributeRadiance(p.paramVBO, p.radianceTexture, GL_TEXTURE1);
+
+		qglviewer::Vec c = view->getCurrentCamera()->position();
+		PFP2::VEC3 camera(c.x, c.y, c.z);
+		p.radiancePerVertexPShader->setCamera(Geom::Vec3f(camera[0], camera[1], camera[2])); // convert to Vec3f because PFP2 can hold Vec3d !
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0f, 1.0f);
+		map->draw(p.radiancePerVertexPShader, Algo::Render::GL2::TRIANGLES);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 }
@@ -141,6 +166,8 @@ void Surface_Radiance_Plugin::vboAdded(Utils::VBO *vbo)
 		{
 			m_dockTab->addPositionVBO(QString::fromStdString(vbo->name()));
 			m_dockTab->addNormalVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->addTangentVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->addBiNormalVBO(QString::fromStdString(vbo->name()));
 		}
 	}
 }
@@ -155,6 +182,8 @@ void Surface_Radiance_Plugin::vboRemoved(Utils::VBO *vbo)
 		{
 			m_dockTab->removePositionVBO(QString::fromStdString(vbo->name()));
 			m_dockTab->removeNormalVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->removeTangentVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->removeBiNormalVBO(QString::fromStdString(vbo->name()));
 		}
 	}
 
@@ -167,6 +196,14 @@ void Surface_Radiance_Plugin::vboRemoved(Utils::VBO *vbo)
 	{
 		mapParam.normalVBO = NULL;
 	}
+	if(mapParam.tangentVBO == vbo)
+	{
+		mapParam.tangentVBO = NULL;
+	}
+	if(mapParam.binormalVBO == vbo)
+	{
+		mapParam.binormalVBO = NULL;
+	}
 }
 
 void Surface_Radiance_Plugin::attributeModified(unsigned int orbit, QString nameAttr)
@@ -177,12 +214,22 @@ void Surface_Radiance_Plugin::attributeModified(unsigned int orbit, QString name
 	}
 }
 
-void Surface_Radiance_Plugin::importFromFileDialog()
+void Surface_Radiance_Plugin::importFromFileDialog_SH()
 {
-	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import surface with radiance", m_schnapps->getAppPath(), "Surface with radiance Files (*.ply)");
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import surface with radiance (SH)", m_schnapps->getAppPath(), "Surface with radiance Files (*.ply)");
 	QStringList::Iterator it = fileNames.begin();
 	while(it != fileNames.end()) {
-		importFromFile(*it);
+		importFromFile_SH(*it);
+		++it;
+	}
+}
+
+void Surface_Radiance_Plugin::importFromFileDialog_P()
+{
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import surface with radiance (P)", m_schnapps->getAppPath(), "Surface with radiance Files (*.ply)");
+	QStringList::Iterator it = fileNames.begin();
+	while(it != fileNames.end()) {
+		importFromFile_P(*it);
 		++it;
 	}
 }
@@ -264,7 +311,7 @@ void Surface_Radiance_Plugin::changeNormalVBO(const QString& map, const QString&
 	}
 }
 
-MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
+MapHandlerGen* Surface_Radiance_Plugin::importFromFile_SH(const QString& fileName)
 {
 	QFileInfo fi(fileName);
 	if(fi.exists())
@@ -338,6 +385,90 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 
 			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_resolution());
 			registerShader(mapParams.radiancePerVertexShader);
+		}
+
+		this->pythonRecording("importFile", mhg->getName(), fi.baseName());
+
+		return mhg;
+	}
+	else
+		return NULL;
+}
+
+MapHandlerGen* Surface_Radiance_Plugin::importFromFile_P(const QString& fileName)
+{
+	QFileInfo fi(fileName);
+	if(fi.exists())
+	{
+		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
+		if(mhg)
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
+			PFP2::MAP* map = mh->getMap();
+
+			MeshTablesSurface_Radiance_P importer(*map);
+			if (!importer.importPLY<Utils::BivariatePolynomials<PFP2::REAL, PFP2::VEC3> >(fileName.toStdString()))
+			{
+				std::cout << "could not import " << fileName.toStdString() << std::endl;
+				return NULL;
+			}
+			CGoGN::Algo::Surface::Import::importMesh<PFP2>(*map, importer);
+
+			// get vertex position attribute
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> position = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("position") ;
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> tangent = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("tangent");
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> normal = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("normal");
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> binormal = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("binormal");
+			mh->registerAttribute(position);
+			mh->registerAttribute(tangent);
+			mh->registerAttribute(normal);
+			mh->registerAttribute(binormal);
+
+			MapParameters& mapParams = h_mapParameterSet[mhg];
+
+			mapParams.nbVertices = Algo::Topo::getNbOrbits<VERTEX>(*map);
+
+			mapParams.radiance_P = map->getAttribute<Utils::BivariatePolynomials<PFP2::REAL, PFP2::VEC3>, VERTEX, PFP2::MAP>("radiance") ;
+			mapParams.radianceTexture = new Utils::Texture<2, Geom::Vec3f>(GL_FLOAT);
+			mapParams.param = map->checkAttribute<Geom::Vec2i, VERTEX, PFP2::MAP>("param");
+
+			unsigned int nbCoefs = mapParams.radiance_P[map->begin()].get_nb_coefs();
+
+			// create texture
+			unsigned int nbv_nbc = Algo::Topo::getNbOrbits<VERTEX>(*map) * nbCoefs;
+			unsigned int size = 1;
+			while (size * size < nbv_nbc)
+				size <<= 1;
+
+			mapParams.radianceTexture->create(Geom::Vec2i(size, size));
+
+			// fill texture
+			unsigned int count = 0;
+			foreach_cell<VERTEX>(*map, [&] (Vertex v)
+			{
+				PFP2::VEC3* coefs = mapParams.radiance_P[v].get_coef_tab();
+				unsigned int i = count / size;
+				unsigned int j = count % size;
+				mapParams.param[v] = Geom::Vec2i(i, j) ; // first index for current vertex
+				for (unsigned int l = 0 ; l <= nbCoefs ; ++l)
+				{
+					i = count / size;
+					j = count % size;
+					(*(mapParams.radianceTexture))(i,j) = coefs[l];
+					++count;
+				}
+			}) ;
+			// resulting texture : PB0_v0, PB1_v0, ..., PB14_v0, PB0_v1, ...
+			// resulting param : param[vx] points to PB0_vx
+			// the size of the texture is needed to know where to do the divisions and modulos.
+
+			mapParams.radianceTexture->update();
+
+			mapParams.paramVBO = new Utils::VBO();
+			mapParams.paramVBO->updateData(mapParams.param);
+
+			mapParams.radiancePerVertexPShader = new Utils::ShaderRadiancePerVertex_P();
+			registerShader(mapParams.radiancePerVertexPShader);
 		}
 
 		this->pythonRecording("importFile", mhg->getName(), fi.baseName());

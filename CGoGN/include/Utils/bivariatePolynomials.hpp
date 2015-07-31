@@ -75,7 +75,7 @@ Tcoef BivariatePolynomials<Tscalar,Tcoef>::evaluate_at (Tscalar u, Tscalar v) co
 }
 
 template <typename Tscalar,typename Tcoef>
-Tcoef BivariatePolynomials<Tscalar,Tcoef>::evaluate_at (const Geom::Vec3<Tscalar>& tu, const Geom::Vec3<Tscalar>& tv, const Geom::Vec3<Tscalar>& n, const Geom::Vec3<Tscalar>& eval_dir) const;
+Tcoef BivariatePolynomials<Tscalar,Tcoef>::evaluate_at (const Geom::Vector<3,Tscalar>& tu, const Geom::Vector<3,Tscalar>& tv, const Geom::Vector<3,Tscalar>& n, const Geom::Vector<3,Tscalar>& eval_dir) const
 {
 	Tscalar u = tu*eval_dir;
 	Tscalar v = tv*eval_dir;
@@ -95,7 +95,7 @@ I/O
 template <typename Tscalar,typename Tcoef>
 std::ostream & operator << (std::ostream & os, const BivariatePolynomials<Tscalar,Tcoef> & p)
 {
-	for (int d = 0; d <= sh.degree; d++)
+	for (int d = 0; d <= p.degree; d++)
 	{
 		for (int du = d; du >=0 ; du--)
 			os << p.get_coef(du,d-du) << "\t";
