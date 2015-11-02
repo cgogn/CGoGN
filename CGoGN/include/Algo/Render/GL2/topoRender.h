@@ -383,6 +383,14 @@ public:
 
 	template<typename MAP>
 	void drawColoredDarts(MAP& map);
+
+	/**
+	 * Get back middle position of drawn darts
+	 * @param map the map
+	 * @param posExpl the output positions
+	 */
+	template<typename PFP>
+	void computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute< typename PFP::VEC3, typename PFP::MAP>& posExpl);
 };
 
 

@@ -641,6 +641,23 @@ Dart TopoRender::raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec
 	return dFinal;
 }
 
+template <typename PFP>
+void TopoRender::computeDartMiddlePositions( typename PFP::MAP& map, DartAttribute< typename PFP::VEC3, typename PFP::MAP>& posExpl)
+{
+	DartAttribute<unsigned int, typename PFP::MAP> attIndex = map.template getAttribute<unsigned int, DART, typename PFP::MAP>(m_nameIndex);
+	if (!attIndex.isValid())
+		attIndex  = map.template addAttribute<unsigned int, DART, typename PFP::MAP>(m_nameIndex);
+
+
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
+		const Geom::Vec3f& Q = m_bufferDartPosition[attIndex[d]+1];
+		posExpl[d] = (P + Q)*0.5f;
+	}
+}
+
+
 } // namespace GL2
 
 } // namespace Algo
