@@ -86,7 +86,7 @@ void TextureSticker::fullScreenTexture(CGoGNGLuint texId)
 
 	// Draw quad
 	sm_textureMappingShader->enableVertexAttribs();
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	sm_textureMappingShader->disableVertexAttribs();
 
 	// Unbind texture mapping shader
@@ -134,7 +134,7 @@ void TextureSticker::fullScreenTextureDepth(CGoGNGLuint texId, CGoGNGLuint dtexI
 
 	// Draw quad
 	sm_depthtextureMappingShader->enableVertexAttribs();
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	sm_depthtextureMappingShader->disableVertexAttribs();
 
 	// Unbind texture mapping shader
@@ -175,7 +175,7 @@ void TextureSticker::fullScreenShader(Utils::GLSLShader* shader)
 
 	// Draw quad
 	shader->enableVertexAttribs();
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	shader->disableVertexAttribs();
 	
 	// Unbind shader
