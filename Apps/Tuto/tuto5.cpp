@@ -130,9 +130,9 @@ void MyQT::cb_initGL()
 	m_sprite->setAttributePosition(m_positionVBO);
 	m_sprite->setColor(Geom::Vec4f(1.0f, 0.0f , 0.0f, 1.0f));
 
-    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
-    storeVerticesInfo();
-    m_strings->sendToVBO();
+	m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
+	storeVerticesInfo();
+	m_strings->sendToVBO();
 
     // copy de contenu de VBO a la creation
 	m_dataVBO = new Utils::VBO(*m_positionVBO);

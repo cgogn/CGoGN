@@ -353,7 +353,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 
 	QImage* ptr = new QImage(filename.c_str());
 
-	if (ptr == NULL)
+	if (ptr->isNull())
 	{
 		CGoGNout << "Impossible to load "<< filename << CGoGNendl;
 		return false;

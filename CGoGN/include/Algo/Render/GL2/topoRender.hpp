@@ -622,24 +622,42 @@ Dart TopoRender::raySelection(MAP& map, const Geom::Vec3f& rayA, const Geom::Vec
 	double dist2 = std::numeric_limits<double>::max();
 
 	for(Dart d = map.begin(); d!=map.end(); map.next(d))
-	{
-		// get back position of segment PQ
-		const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
-		const Geom::Vec3f& Q =m_bufferDartPosition[attIndex[d]+1];
-		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
-		if (ld2<dm2)
+		if (!map.isBoundaryMarkedCurrent(d))
 		{
-			Geom::Vec3f V = (P+Q)/2.0f - rayA;
-			double d2 = double(V*V);
-			if (d2<dist2)
+			// get back position of segment PQ
+			const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
+			const Geom::Vec3f& Q =m_bufferDartPosition[attIndex[d]+1];
+			float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+			if (ld2<dm2)
 			{
-				dist2 = d2;
-				dFinal = d;
+				Geom::Vec3f V = (P+Q)/2.0f - rayA;
+				double d2 = double(V*V);
+				if (d2<dist2)
+				{
+					dist2 = d2;
+					dFinal = d;
+				}
 			}
 		}
-	}
 	return dFinal;
 }
+
+template <typename PFP>
+void TopoRender::computeDartMiddlePositions( typename PFP::MAP& map, DartAttribute< typename PFP::VEC3, typename PFP::MAP>& posExpl)
+{
+	DartAttribute<unsigned int, typename PFP::MAP> attIndex = map.template getAttribute<unsigned int, DART, typename PFP::MAP>(m_nameIndex);
+	if (!attIndex.isValid())
+		attIndex  = map.template addAttribute<unsigned int, DART, typename PFP::MAP>(m_nameIndex);
+
+
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
+		const Geom::Vec3f& Q = m_bufferDartPosition[attIndex[d]+1];
+		posExpl[d] = (P + Q)*0.5f;
+	}
+}
+
 
 } // namespace GL2
 
