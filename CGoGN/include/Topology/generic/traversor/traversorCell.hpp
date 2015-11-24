@@ -660,7 +660,8 @@ protected:
 	bool& m_finished;
 	unsigned int m_id;
 	FUNC m_lambda;
-	std::thread::id& m_threadId;	// ref on thread::id in table of threads in genericMap for init at operator()
+	std::thread::id& m_threadId; // ref on thread::id in table of threads in genericMap for init at operator()
+
 public:
 	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id, std::thread::id& threadId) :
 		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func), m_threadId(threadId)
@@ -669,6 +670,8 @@ public:
 
 	ThreadFunction(const ThreadFunction<ORBIT, FUNC>& tf):
 		m_cells(tf.m_cells), m_sync1(tf.m_sync1), m_sync2(tf.m_sync2), m_finished(tf.m_finished), m_id(tf.m_id), m_lambda(tf.m_lambda){}
+
+	std::thread::id& getThreadId() { return m_threadId; }
 
 	void operator()()
 	{
@@ -714,10 +717,12 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
 
 	// add place for nbth new threads in the table of threadId in genericmap
-	unsigned int firstThread = map.addEmptyThreadIds(nbth);
+//	unsigned int firstThread = map.addEmptyThreadIds(nbth);
+
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
-		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i],sync1,sync2, finished,1+i,map.getThreadId(firstThread+i));
+		std::thread::id& threadId = map.addEmptyThreadId();
+		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i], sync1, sync2, finished, 1+i, threadId);
 		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
 	}
 
@@ -744,20 +749,18 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 		sync2.wait();// everybody refilled then go
 	}
 
-	sync1.wait();// wait for all thread to finish its vector
-	finished = true;// say finsih to everyone
+	sync1.wait(); // wait for all thread to finish its vector
+	finished = true; // say finsih to everyone
 	sync2.wait(); // just wait for last barrier wait !
 
-
-	//wait for all theads to be finished
+	// wait for all theads to be finished
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		threads[i]->join();
 		delete threads[i];
+		map.removeThreadId(tfs[i]->getThreadId());
 		delete tfs[i];
 	}
-
-	map.popThreadIds(nbth);
 
 	delete[] tfs;
 	delete[] threads;

@@ -268,7 +268,7 @@ template <typename PFP>
 Dart Topo3PrimalRender<PFP>::pickColor(unsigned int x, unsigned int y)
 {
 	//more easy picking for
-	unsigned int dw = m_topo_dart_width;
+	float dw = m_topo_dart_width;
 	m_topo_dart_width+=2;
 
 	// save clear color and set to zero

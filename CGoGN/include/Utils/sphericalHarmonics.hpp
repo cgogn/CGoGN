@@ -16,7 +16,7 @@ template <typename Tscalar,typename Tcoef> int SphericalHarmonics<Tscalar,Tcoef>
 template <typename Tscalar,typename Tcoef> unsigned long SphericalHarmonics<Tscalar,Tcoef>::cpt_instances = 0;
 
 template <typename Tscalar,typename Tcoef> Tscalar SphericalHarmonics<Tscalar,Tcoef>::K_tab[(max_resolution+1)*(max_resolution+1)];
-template <typename Tscalar,typename Tcoef> Tscalar SphericalHarmonics<Tscalar,Tcoef>::F_tab[(max_resolution+1)*(max_resolution+1)];
+template <typename Tscalar,typename Tcoef> Tscalar SphericalHarmonics<Tscalar,Tcoef>::F_tab[32][(max_resolution+1)*(max_resolution+1)];
 
 
 /*************************************************************************
@@ -53,18 +53,21 @@ SphericalHarmonics<Tscalar,Tcoef>::~SphericalHarmonics()
 template <typename Tscalar,typename Tcoef>
 void SphericalHarmonics<Tscalar,Tcoef>::set_level(int res_level)
 {
-	assert(res_level >= 0 && res_level < max_resolution);
-	assert(cpt_instances == 0);
-	resolution = res_level;
-	nb_coefs = (resolution + 1) * (resolution + 1);
-	init_K_tab();
+	if (res_level != resolution)
+	{
+		assert(res_level >= 0 && res_level < max_resolution);
+		assert(cpt_instances == 0);
+		resolution = res_level;
+		nb_coefs = (resolution + 1) * (resolution + 1);
+		init_K_tab();
+	}
 }
 
 template <typename Tscalar,typename Tcoef>
 void SphericalHarmonics<Tscalar,Tcoef>::set_nb_coefs(int nbc)
 {
 	assert(nbc > 0);
-	int sq = ceil(sqrt(nbc)) ;
+	int sq = int(std::ceil(std::sqrt(nbc))) ;
 	assert(sq*sq == nbc || !"Number of coefs does not fill the last level") ;
 	set_level(sq-1) ;
 }
@@ -74,47 +77,52 @@ evaluation
 **************************************************************************/
 
 template <typename Tscalar,typename Tcoef>
-void SphericalHarmonics<Tscalar,Tcoef>::set_eval_direction (Tscalar theta, Tscalar phi)
+void SphericalHarmonics<Tscalar,Tcoef>::set_eval_direction (Tscalar theta, Tscalar phi, unsigned int threadId)
 {
-	compute_P_tab(cos(theta));
-	compute_y_tab(phi);
+	assert(threadId < 32);
+	compute_P_tab(std::cos(theta), threadId);
+	compute_y_tab(phi, threadId);
 }
 
 template <typename Tscalar,typename Tcoef>
-void SphericalHarmonics<Tscalar,Tcoef>::set_eval_direction (Tscalar x, Tscalar y, Tscalar z)
+void SphericalHarmonics<Tscalar,Tcoef>::set_eval_direction (Tscalar x, Tscalar y, Tscalar z, unsigned int threadId)
 {
-	compute_P_tab(z);
+	assert(threadId < 32);
+	compute_P_tab(z, threadId);
 
 	Tscalar phi (0);
 	if ((x*x + y*y) > 0.0)
 		phi = atan2(y, x);
 
-	compute_y_tab(phi);
+	compute_y_tab(phi, threadId);
 }
 
 template <typename Tscalar,typename Tcoef>
-Tcoef SphericalHarmonics<Tscalar,Tcoef>::evaluate () const
+Tcoef SphericalHarmonics<Tscalar,Tcoef>::evaluate (unsigned int threadId) const
 {
+	assert(threadId < 32);
 	Tcoef r (0); // (0.0,0.0,0.0); //  TODO : use Tcoef (0)
 	for (int i = 0; i < nb_coefs; i++)
 	{
-		r += coefs[i] * F_tab[i];
+		r += coefs[i] * F_tab[threadId][i];
 	}
 	return r;
 }
 
 template <typename Tscalar,typename Tcoef>
-Tcoef SphericalHarmonics<Tscalar,Tcoef>::evaluate_at (Tscalar theta, Tscalar phi) const
+Tcoef SphericalHarmonics<Tscalar,Tcoef>::evaluate_at (Tscalar theta, Tscalar phi, unsigned int threadId) const
 {
-	set_eval_direction(theta, phi);
-	return evaluate();
+	assert(threadId < 32);
+	set_eval_direction(theta, phi, threadId);
+	return evaluate(threadId);
 }
 
 template <typename Tscalar,typename Tcoef>
-Tcoef SphericalHarmonics<Tscalar,Tcoef>::evaluate_at (Tscalar x, Tscalar y, Tscalar z) const
+Tcoef SphericalHarmonics<Tscalar,Tcoef>::evaluate_at (Tscalar x, Tscalar y, Tscalar z, unsigned int threadId) const
 {
-	set_eval_direction(x, y, z);
-	return evaluate();
+	assert(threadId < 32);
+	set_eval_direction(x, y, z, threadId);
+	return evaluate(threadId);
 }
 
 template <typename Tscalar,typename Tcoef>
@@ -123,7 +131,7 @@ void SphericalHarmonics<Tscalar,Tcoef>::init_K_tab ()
 	for(int l = 0; l <= resolution; l++)
 	{
 		// recursive computation of the squares
-		K_tab[index(l,0)] = (2*l+1) / (4*M_PI);
+		K_tab[index(l,0)] = Tscalar((2*l+1) / (4*M_PI));
 		for (int m = 1; m <= l; m++)
 			K_tab[index(l,m)] = K_tab[index(l,m-1)] / (l-m+1) / (l+m);
 		// square root + symmetry
@@ -147,41 +155,41 @@ void SphericalHarmonics<Tscalar,Tcoef>::copy_K_tab (Tscalar tab[])
 */
 
 template <typename Tscalar,typename Tcoef>
-void SphericalHarmonics<Tscalar,Tcoef>::compute_P_tab (Tscalar t)
+void SphericalHarmonics<Tscalar,Tcoef>::compute_P_tab (Tscalar t, unsigned int threadId)
 {
 //	if (t<0) {t=-t*t;} else {t=t*t;} // for plotting only : expand the param near equator
 
-	F_tab[index(0,0)] = 1;
+	F_tab[threadId][index(0,0)] = 1;
 	for (int l = 1; l <= resolution; l++)
 	{
-		F_tab[index(l,l)] = (1-2*l) * sqrt(1-t*t) * F_tab[index(l-1,l-1)];  // first diago
-		F_tab[index(l,l-1)] = t * (2*l-1) * F_tab[index(l-1,l-1)];// second diago
+		F_tab[threadId][index(l,l)] = (1-2*l) * sqrt(1-t*t) * F_tab[threadId][index(l-1,l-1)];  // first diago
+		F_tab[threadId][index(l,l-1)] = t * (2*l-1) * F_tab[threadId][index(l-1,l-1)];// second diago
 		for (int m = 0; m <= l-2; m++)
 		{// remaining of the line under the 2 diago
-			F_tab[index(l,m)] = t * (2*l-1) / (float) (l-m) * F_tab[index(l-1,m)] - (l+m-1) / (float) (l-m) * F_tab[index(l-2,m)];
+			F_tab[threadId][index(l,m)] = t * (2*l-1) / (float) (l-m) * F_tab[threadId][index(l-1,m)] - (l+m-1) / (float) (l-m) * F_tab[threadId][index(l-2,m)];
 		}
 	}
 }
 
 template <typename Tscalar,typename Tcoef>
-void SphericalHarmonics<Tscalar,Tcoef>::compute_y_tab (Tscalar phi)
+void SphericalHarmonics<Tscalar,Tcoef>::compute_y_tab (Tscalar phi, unsigned int threadId)
 {
 	for (int l = 0; l <= resolution; l++)
 	{
-		F_tab[index(l,0)] *= K_tab[index(l,0)]; // remove for plotting
+		F_tab[threadId][index(l,0)] *= K_tab[index(l,0)]; // remove for plotting
 	}
 
 	for (int m = 1; m <= resolution; m++)
 	{
-		Tscalar cos_m_phi = cos ( m * phi );
-		Tscalar sin_m_phi = sin ( m * phi );
+		Tscalar cos_m_phi = std::cos ( m * phi );
+		Tscalar sin_m_phi = std::sin ( m * phi );
 
 		for (int l = m; l <= resolution; l++)
 		{
-			F_tab[index(l,m)] *= sqrt(2.0); // remove for plotting
-			F_tab[index(l,m)] *= K_tab[index(l,m)]; // remove for plotting
-			F_tab[index(l,-m)] = F_tab[index(l,m)] * sin_m_phi ; // store the values for -m<0 in the upper triangle
-			F_tab[index(l,m)] *= cos_m_phi;
+			F_tab[threadId][index(l,m)] *= M_SQRT2; // std::sqrt(2.0); // remove for plotting
+			F_tab[threadId][index(l,m)] *= K_tab[index(l,m)]; // remove for plotting
+			F_tab[threadId][index(l,-m)] = F_tab[threadId][index(l,m)] * sin_m_phi ; // store the values for -m<0 in the upper triangle
+			F_tab[threadId][index(l,m)] *= cos_m_phi;
 		}
 	}
 
@@ -284,16 +292,17 @@ void SphericalHarmonics<Tscalar,Tcoef>::fit_to_data(
 	int n,
 	Tdirection* t_theta, Tdirection* t_phi,
 	Tchannel* t_R, Tchannel* t_G, Tchannel* t_B,
-	double lambda)
+	double lambda,
+	unsigned int threadId)
 {
 	Eigen::MatrixXd mM (nb_coefs,n); // matrix with basis function values, evaluated for all directions
 	// compute mM
 	for (int p = 0; p < n; ++p)
 	{
-		set_eval_direction(t_theta[p], t_phi[p]);
+		set_eval_direction(t_theta[p], t_phi[p], threadId);
 		for (int i = 0; i < nb_coefs; ++i)
 		{
-			mM(i,p) = F_tab[i];
+			mM(i,p) = F_tab[threadId][i];
 		}
 	}
 	fit_to_data(n, mM, t_R, t_G, t_B, lambda);
@@ -305,16 +314,17 @@ void SphericalHarmonics<Tscalar,Tcoef>::fit_to_data(
 	int n,
 	Tdirection* t_x, Tdirection* t_y, Tdirection* t_z,
 	Tchannel* t_R, Tchannel* t_G, Tchannel* t_B,
-	double lambda)
+	double lambda,
+	unsigned int threadId)
 {
 	Eigen::MatrixXd mM (nb_coefs,n); // matrix with basis function values, evaluated for all directions
 	// compute mM
 	for (int p=0; p<n; ++p)
 	{
-		set_eval_direction(t_x[p],t_y[p],t_z[p]);
+		set_eval_direction(t_x[p],t_y[p],t_z[p], threadId);
 		for (int i=0; i<nb_coefs; ++i)
 		{
-			mM(i,p) = F_tab[i];
+			mM(i,p) = F_tab[threadId][i];
 		}
 	}
 	fit_to_data(n, mM, t_R, t_G, t_B, lambda);

@@ -25,9 +25,7 @@
 #ifndef TENSOR_H_
 #define TENSOR_H_
 
-/*!
- * \file tensor.h
- */
+#include <vector>
 
 #define CONST_VAL -5212368.54127 // random value
 

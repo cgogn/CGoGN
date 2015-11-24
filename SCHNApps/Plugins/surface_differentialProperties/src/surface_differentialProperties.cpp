@@ -281,7 +281,7 @@ void Surface_DifferentialProperties_Plugin::computeCurvature(
 	Algo::Surface::Geometry::computeAnglesBetweenNormalsOnEdges<PFP2>(*map, position, edgeAngle);
 	Algo::Surface::Geometry::computeAreaEdges<PFP2>(*map, position, edgeArea);
 
-	PFP2::REAL meanEdgeLength = Algo::Surface::Geometry::meanEdgeLength<PFP2>(*map, position);
+	PFP2::REAL meanEdgeLength = Algo::Geometry::meanEdgeLength<PFP2>(*map, position);
 
 	float radius = 2.0f * meanEdgeLength;
 	Algo::Surface::Geometry::computeCurvatureVertices_NormalCycles_Projected<PFP2>(*map, radius, position, normal, edgeAngle, edgeArea, kmax, kmin, Kmax, Kmin, Knormal);

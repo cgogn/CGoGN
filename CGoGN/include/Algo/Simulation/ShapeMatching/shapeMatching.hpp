@@ -39,7 +39,7 @@ namespace ShapeMatching
 
 
 template <typename PFP>
-ShapeMatching<PFP>::ShapeMatching(MAP& map, VertexAttribute<VEC3>& position, VertexAttribute<REAL>& mass):
+ShapeMatching<PFP>::ShapeMatching(MAP& map, VertexAttribute<VEC3, MAP>& position, VertexAttribute<REAL, MAP>& mass) :
     m_map(map),
     m_position(position),
     m_mass(mass)
@@ -48,17 +48,17 @@ ShapeMatching<PFP>::ShapeMatching(MAP& map, VertexAttribute<VEC3>& position, Ver
 
     m_q.reserve(nbE);
 
-    m_goal = this->m_map.template getAttribute<VEC3, VERTEX>("goal");
+	m_goal = this->m_map.template getAttribute<VEC3, VERTEX, MAP>("goal");
 
     if(!m_goal.isValid())
-        m_goal = this->m_map.template addAttribute<VEC3, VERTEX>("goal");
+		m_goal = this->m_map.template addAttribute<VEC3, VERTEX, MAP>("goal");
 }
 
 template <typename PFP>
 ShapeMatching<PFP>::~ShapeMatching()
 {
     if(m_goal.isValid())
-      m_map.template removeAttribute<VEC3, VERTEX>(m_goal);
+		m_map.template removeAttribute<VEC3, VERTEX, MAP>(m_goal);
 }
 
 template <typename PFP>
@@ -184,7 +184,7 @@ void ShapeMatching<PFP>::shapeMatch()
 
 // \alpha : stiffness | v_i : velocity | f_ext : force exterieure
 template <typename PFP>
-void ShapeMatching<PFP>::computeVelocities(VertexAttribute<VEC3>& velocity, VertexAttribute<VEC3>& fext, REAL h, REAL alpha)
+void ShapeMatching<PFP>::computeVelocities(VertexAttribute<VEC3, MAP>& velocity, VertexAttribute<VEC3, MAP>& fext, REAL h, REAL alpha)
 {
     for(unsigned int i = velocity.begin() ; i < velocity.end() ; velocity.next(i))
     {
@@ -193,7 +193,7 @@ void ShapeMatching<PFP>::computeVelocities(VertexAttribute<VEC3>& velocity, Vert
 }
 
 template <typename PFP>
-void ShapeMatching<PFP>::applyVelocities(VertexAttribute<VEC3>& velocity, REAL h)
+void ShapeMatching<PFP>::applyVelocities(VertexAttribute<VEC3, MAP>& velocity, REAL h)
 {
     for(unsigned int i = m_position.begin() ; i < m_position.end() ; m_position.next(i))
     {

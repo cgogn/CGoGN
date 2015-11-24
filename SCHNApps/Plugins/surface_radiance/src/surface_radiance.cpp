@@ -1,11 +1,18 @@
 #include "surface_radiance.h"
 
 #include "meshTableSurfaceRadiance.h"
+#include "meshTableSurfaceRadiance_P.h"
+
 #include "halfEdgeSelectorRadiance.h"
 #include "edgeSelectorRadiance.h"
 
 #include "mapHandler.h"
 #include "camera.h"
+
+#include "Algo/Geometry/distances.h"
+#include "Algo/Geometry/plane.h"
+
+#include "SphericalFunctionIntegratorCartesian.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -24,6 +31,23 @@ bool Surface_Radiance_Plugin::enable()
 	m_dockTab = new Surface_Radiance_DockTab(m_schnapps, this);
 	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Radiance");
 
+	m_importSHAction = new QAction("importSH", this);
+	m_schnapps->addMenuAction(this, "Radiance;Import (SH)", m_importSHAction);
+	connect(m_importSHAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog_SH()));
+
+	m_importPAction = new QAction("importP", this);
+	m_schnapps->addMenuAction(this, "Radiance;Import (P)", m_importPAction);
+	connect(m_importPAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog_P()));
+
+	m_computeRadianceDistanceDialog = new Dialog_ComputeRadianceDistance(m_schnapps);
+
+	m_computeRadianceDistanceAction = new QAction("Compute Radiance Distance", this);
+	m_schnapps->addMenuAction(this, "Radiance;Compute Distance", m_computeRadianceDistanceAction);
+	connect(m_computeRadianceDistanceAction, SIGNAL(triggered()), this, SLOT(openComputeRadianceDistanceDialog()));
+
+	connect(m_computeRadianceDistanceDialog, SIGNAL(accepted()), this, SLOT(computeRadianceDistanceFromDialog()));
+	connect(m_computeRadianceDistanceDialog->button_apply, SIGNAL(clicked()), this, SLOT(computeRadianceDistanceFromDialog()));
+
 	connect(m_schnapps, SIGNAL(selectedViewChanged(View*, View*)), this, SLOT(selectedViewChanged(View*, View*)));
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
@@ -34,9 +58,7 @@ bool Surface_Radiance_Plugin::enable()
 
 	m_dockTab->updateMapParameters();
 
-	m_importAction = new QAction("import", this);
-	m_schnapps->addMenuAction(this, "Radiance;Import", m_importAction);
-	connect(m_importAction, SIGNAL(triggered()), this, SLOT(importFromFileDialog()));
+	connect(m_schnapps, SIGNAL(schnappsClosing()), this, SLOT(schnappsClosing()));
 
 	return true;
 }
@@ -56,7 +78,7 @@ void Surface_Radiance_Plugin::drawMap(View* view, MapHandlerGen* map)
 {
 	const MapParameters& p = h_mapParameterSet[map];
 
-	if(p.positionVBO && p.normalVBO)
+	if(p.radiancePerVertexShader && p.positionVBO && p.normalVBO)
 	{
 		p.radiancePerVertexShader->setAttributePosition(p.positionVBO);
 		p.radiancePerVertexShader->setAttributeNormal(p.normalVBO);
@@ -70,6 +92,25 @@ void Surface_Radiance_Plugin::drawMap(View* view, MapHandlerGen* map)
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0f, 1.0f);
 		map->draw(p.radiancePerVertexShader, Algo::Render::GL2::TRIANGLES);
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
+
+	if(p.radiancePerVertexPShader && p.positionVBO && p.normalVBO && p.tangentVBO && p.binormalVBO)
+	{
+		p.radiancePerVertexPShader->setAttributePosition(p.positionVBO);
+		p.radiancePerVertexPShader->setAttributeTangent(p.tangentVBO);
+		p.radiancePerVertexPShader->setAttributeNormal(p.normalVBO);
+		p.radiancePerVertexPShader->setAttributeBiNormal(p.binormalVBO);
+		p.radiancePerVertexPShader->setAttributeRadiance(p.paramVBO, p.radianceTexture, GL_TEXTURE1);
+
+		qglviewer::Vec c = view->getCurrentCamera()->position();
+		PFP2::VEC3 camera(c.x, c.y, c.z);
+		p.radiancePerVertexPShader->setCamera(Geom::Vec3f(camera[0], camera[1], camera[2])); // convert to Vec3f because PFP2 can hold Vec3d !
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0f, 1.0f);
+		map->draw(p.radiancePerVertexPShader, Algo::Render::GL2::TRIANGLES);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 }
@@ -106,6 +147,11 @@ void Surface_Radiance_Plugin::mapRemoved(MapHandlerGen* map)
 	disconnect(map, SIGNAL(attributeModified(unsigned int, QString)), this, SLOT(attributeModified(unsigned int, QString)));
 }
 
+void Surface_Radiance_Plugin::schnappsClosing()
+{
+//	m_computeRadianceDistanceDialog->close();
+}
+
 
 
 
@@ -120,6 +166,8 @@ void Surface_Radiance_Plugin::vboAdded(Utils::VBO *vbo)
 		{
 			m_dockTab->addPositionVBO(QString::fromStdString(vbo->name()));
 			m_dockTab->addNormalVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->addTangentVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->addBiNormalVBO(QString::fromStdString(vbo->name()));
 		}
 	}
 }
@@ -134,6 +182,8 @@ void Surface_Radiance_Plugin::vboRemoved(Utils::VBO *vbo)
 		{
 			m_dockTab->removePositionVBO(QString::fromStdString(vbo->name()));
 			m_dockTab->removeNormalVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->removeTangentVBO(QString::fromStdString(vbo->name()));
+			m_dockTab->removeBiNormalVBO(QString::fromStdString(vbo->name()));
 		}
 	}
 
@@ -146,6 +196,14 @@ void Surface_Radiance_Plugin::vboRemoved(Utils::VBO *vbo)
 	{
 		mapParam.normalVBO = NULL;
 	}
+	if(mapParam.tangentVBO == vbo)
+	{
+		mapParam.tangentVBO = NULL;
+	}
+	if(mapParam.binormalVBO == vbo)
+	{
+		mapParam.binormalVBO = NULL;
+	}
 }
 
 void Surface_Radiance_Plugin::attributeModified(unsigned int orbit, QString nameAttr)
@@ -156,13 +214,72 @@ void Surface_Radiance_Plugin::attributeModified(unsigned int orbit, QString name
 	}
 }
 
-void Surface_Radiance_Plugin::importFromFileDialog()
+void Surface_Radiance_Plugin::importFromFileDialog_SH()
 {
-	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import surface with radiance", m_schnapps->getAppPath(), "Surface with radiance Files (*.ply)");
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import surface with radiance (SH)", m_schnapps->getAppPath(), "Surface with radiance Files (*.ply)");
 	QStringList::Iterator it = fileNames.begin();
 	while(it != fileNames.end()) {
-		importFromFile(*it);
+		importFromFile_SH(*it);
 		++it;
+	}
+}
+
+void Surface_Radiance_Plugin::importFromFileDialog_P()
+{
+	QStringList fileNames = QFileDialog::getOpenFileNames(m_schnapps, "Import surface with radiance (P)", m_schnapps->getAppPath(), "Surface with radiance Files (*.ply)");
+	QStringList::Iterator it = fileNames.begin();
+	while(it != fileNames.end()) {
+		importFromFile_P(*it);
+		++it;
+	}
+}
+
+void Surface_Radiance_Plugin::openComputeRadianceDistanceDialog()
+{
+	m_computeRadianceDistanceDialog->show();
+}
+
+void Surface_Radiance_Plugin::computeRadianceDistanceFromDialog()
+{
+	QList<QListWidgetItem*> currentItems1 = m_computeRadianceDistanceDialog->list_maps_1->selectedItems();
+	QList<QListWidgetItem*> currentItems2 = m_computeRadianceDistanceDialog->list_maps_2->selectedItems();
+
+	if(!currentItems1.empty() && !currentItems2.empty())
+	{
+		const QString& mapName1 = currentItems1[0]->text();
+		const QString& mapName2 = currentItems2[0]->text();
+
+		QString positionName1 = m_computeRadianceDistanceDialog->combo_positionAttribute_1->currentText();
+		QString positionName2 = m_computeRadianceDistanceDialog->combo_positionAttribute_2->currentText();
+
+		QString normalName1 = m_computeRadianceDistanceDialog->combo_normalAttribute_1->currentText();
+		QString normalName2 = m_computeRadianceDistanceDialog->combo_normalAttribute_2->currentText();
+
+		QString distanceName1;
+		if(m_computeRadianceDistanceDialog->distanceAttributeName_1->text().isEmpty())
+			distanceName1 = m_computeRadianceDistanceDialog->combo_distanceAttribute_1->currentText();
+		else
+			distanceName1 = m_computeRadianceDistanceDialog->distanceAttributeName_1->text();
+
+		QString distanceName2;
+		if(m_computeRadianceDistanceDialog->distanceAttributeName_2->text().isEmpty())
+			distanceName2 = m_computeRadianceDistanceDialog->combo_distanceAttribute_2->currentText();
+		else
+			distanceName2 = m_computeRadianceDistanceDialog->distanceAttributeName_2->text();
+
+		// create VBO if asked
+		if (m_computeRadianceDistanceDialog->enableVBO->isChecked())
+		{
+			MapHandlerGen* mhg1 = getSCHNApps()->getMap(mapName1);
+			if (mhg1)
+				mhg1->createVBO(distanceName1);
+
+			MapHandlerGen* mhg2 = getSCHNApps()->getMap(mapName2);
+			if (mhg2)
+				mhg2->createVBO(distanceName2);
+		}
+
+		computeRadianceDistance(mapName1, positionName1, normalName1, distanceName1, mapName2, positionName2, normalName2, distanceName2);
 	}
 }
 
@@ -194,7 +311,7 @@ void Surface_Radiance_Plugin::changeNormalVBO(const QString& map, const QString&
 	}
 }
 
-MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
+MapHandlerGen* Surface_Radiance_Plugin::importFromFile_SH(const QString& fileName)
 {
 	QFileInfo fi(fileName);
 	if(fi.exists())
@@ -268,6 +385,90 @@ MapHandlerGen* Surface_Radiance_Plugin::importFromFile(const QString& fileName)
 
 			mapParams.radiancePerVertexShader = new Utils::ShaderRadiancePerVertex(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>::get_resolution());
 			registerShader(mapParams.radiancePerVertexShader);
+		}
+
+		this->pythonRecording("importFile", mhg->getName(), fi.baseName());
+
+		return mhg;
+	}
+	else
+		return NULL;
+}
+
+MapHandlerGen* Surface_Radiance_Plugin::importFromFile_P(const QString& fileName)
+{
+	QFileInfo fi(fileName);
+	if(fi.exists())
+	{
+		MapHandlerGen* mhg = m_schnapps->addMap(fi.baseName(), 2);
+		if(mhg)
+		{
+			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
+			PFP2::MAP* map = mh->getMap();
+
+			MeshTablesSurface_Radiance_P importer(*map);
+			if (!importer.importPLY<Utils::BivariatePolynomials<PFP2::REAL, PFP2::VEC3> >(fileName.toStdString()))
+			{
+				std::cout << "could not import " << fileName.toStdString() << std::endl;
+				return NULL;
+			}
+			CGoGN::Algo::Surface::Import::importMesh<PFP2>(*map, importer);
+
+			// get vertex position attribute
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> position = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("position") ;
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> tangent = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("tangent");
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> normal = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("normal");
+			VertexAttribute<PFP2::VEC3, PFP2::MAP> binormal = map->getAttribute<PFP2::VEC3, VERTEX, PFP2::MAP>("binormal");
+			mh->registerAttribute(position);
+			mh->registerAttribute(tangent);
+			mh->registerAttribute(normal);
+			mh->registerAttribute(binormal);
+
+			MapParameters& mapParams = h_mapParameterSet[mhg];
+
+			mapParams.nbVertices = Algo::Topo::getNbOrbits<VERTEX>(*map);
+
+			mapParams.radiance_P = map->getAttribute<Utils::BivariatePolynomials<PFP2::REAL, PFP2::VEC3>, VERTEX, PFP2::MAP>("radiance") ;
+			mapParams.radianceTexture = new Utils::Texture<2, Geom::Vec3f>(GL_FLOAT);
+			mapParams.param = map->checkAttribute<Geom::Vec2i, VERTEX, PFP2::MAP>("param");
+
+			unsigned int nbCoefs = mapParams.radiance_P[map->begin()].get_nb_coefs();
+
+			// create texture
+			unsigned int nbv_nbc = Algo::Topo::getNbOrbits<VERTEX>(*map) * nbCoefs;
+			unsigned int size = 1;
+			while (size * size < nbv_nbc)
+				size <<= 1;
+
+			mapParams.radianceTexture->create(Geom::Vec2i(size, size));
+
+			// fill texture
+			unsigned int count = 0;
+			foreach_cell<VERTEX>(*map, [&] (Vertex v)
+			{
+				PFP2::VEC3* coefs = mapParams.radiance_P[v].get_coef_tab();
+				unsigned int i = count / size;
+				unsigned int j = count % size;
+				mapParams.param[v] = Geom::Vec2i(i, j) ; // first index for current vertex
+				for (unsigned int l = 0 ; l <= nbCoefs ; ++l)
+				{
+					i = count / size;
+					j = count % size;
+					(*(mapParams.radianceTexture))(i,j) = coefs[l];
+					++count;
+				}
+			}) ;
+			// resulting texture : PB0_v0, PB1_v0, ..., PB14_v0, PB0_v1, ...
+			// resulting param : param[vx] points to PB0_vx
+			// the size of the texture is needed to know where to do the divisions and modulos.
+
+			mapParams.radianceTexture->update();
+
+			mapParams.paramVBO = new Utils::VBO();
+			mapParams.paramVBO->updateData(mapParams.param);
+
+			mapParams.radiancePerVertexPShader = new Utils::ShaderRadiancePerVertex_P();
+			registerShader(mapParams.radiancePerVertexPShader);
 		}
 
 		this->pythonRecording("importFile", mhg->getName(), fi.baseName());
@@ -411,6 +612,149 @@ void Surface_Radiance_Plugin::decimate(const QString& mapName, const QString& po
 
 	mh->notifyConnectivityModification();
 	mh->notifyAttributeModification(position);
+}
+
+void Surface_Radiance_Plugin::computeRadianceDistance(
+	const QString& mapName1,
+	const QString& positionAttributeName1,
+	const QString& normalAttributeName1,
+	const QString& distanceAttributeName1,
+	const QString& mapName2,
+	const QString& positionAttributeName2,
+	const QString& normalAttributeName2,
+	const QString& distanceAttributeName2)
+{
+	MapHandler<PFP2>* mh1 = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName1));
+	if(mh1 == NULL)
+		return;
+
+	MapHandler<PFP2>* mh2 = static_cast<MapHandler<PFP2>*>(m_schnapps->getMap(mapName2));
+	if(mh2 == NULL)
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position1 = mh1->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName1);
+	if(!position1.isValid())
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normal1 = mh1->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName1);
+	if(!normal1.isValid())
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> position2 = mh2->getAttribute<PFP2::VEC3, VERTEX>(positionAttributeName2);
+	if(!position2.isValid())
+		return;
+
+	VertexAttribute<PFP2::VEC3, PFP2::MAP> normal2 = mh2->getAttribute<PFP2::VEC3, VERTEX>(normalAttributeName2);
+	if(!normal2.isValid())
+		return;
+
+	VertexAttribute<PFP2::REAL, PFP2::MAP> distance1 = mh1->getAttribute<PFP2::REAL, VERTEX>(distanceAttributeName1);
+	if(!distance1.isValid())
+		distance1 = mh1->addAttribute<PFP2::REAL, VERTEX>(distanceAttributeName1);
+
+	VertexAttribute<PFP2::REAL, PFP2::MAP> distance2 = mh2->getAttribute<PFP2::REAL, VERTEX>(distanceAttributeName2);
+	if(!distance2.isValid())
+		distance2 = mh2->addAttribute<PFP2::REAL, VERTEX>(distanceAttributeName2);
+
+	MapParameters& mapParams1 = h_mapParameterSet[mh1];
+	MapParameters& mapParams2 = h_mapParameterSet[mh2];
+
+	SphericalFunctionIntegratorCartesian integrator;
+	integrator.Init(29);
+
+	PFP2::MAP* map1 = mh1->getMap();
+	PFP2::MAP* map2 = mh2->getMap();
+
+	// compute distance between map1 and map2 here
+	//   distance from map1 to map2 is stored in map1 vertex attribute distance1
+	//   distance from map2 to map1 is stored in map2 vertex attribute distance2
+
+	// for each vertex of map1
+
+	std::vector<PFP2::REAL> errors;
+	errors.reserve(100000);
+
+	map2->setExternalThreadsAuthorization(true);
+
+	Parallel::foreach_cell<VERTEX>(*map1, [&] (Vertex v, unsigned int threadIndex)
+	{
+		const PFP2::VEC3& P = position1[v];
+		PFP2::VEC3& N = normal1[v];
+
+		// find closest point on map2
+
+		PFP2::REAL minDist2 = std::numeric_limits<PFP2::REAL>::max();
+		Face closestFace;
+
+		for (Face f : allFacesOf(*map2))
+		{
+			PFP2::REAL dist = Algo::Geometry::squaredDistancePoint2Face<PFP2>(*map2, f, position2, P);
+			if (dist < minDist2)
+			{
+				minDist2 = dist;
+				closestFace = f;
+			}
+		}
+
+//		PFP2::REAL minDist = sqrt(minDist2);
+
+		double l1, l2, l3;
+		Algo::Geometry::closestPointInTriangle<PFP2>(*map2, closestFace, position2, P, l1, l2, l3);
+
+		// compute radiance error
+
+		const PFP2::VEC3& P1 = position2[closestFace.dart];
+		const PFP2::VEC3& P2 = position2[map2->phi1(closestFace.dart)];
+		const PFP2::VEC3& P3 = position2[map2->phi_1(closestFace.dart)];
+		PFP2::VEC3 CP = l1*P1 + l2*P2 + l3*P3;
+
+		const PFP2::VEC3& N1 = normal2[closestFace.dart];
+		const PFP2::VEC3& N2 = normal2[map2->phi1(closestFace.dart)];
+		const PFP2::VEC3& N3 = normal2[map2->phi_1(closestFace.dart)];
+		PFP2::VEC3 CPN = l1*N1 + l2*N2 + l3*N3;
+
+		const Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& R1 = mapParams2.radiance[closestFace.dart];
+		const Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& R2 = mapParams2.radiance[map2->phi1(closestFace.dart)];
+		const Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& R3 = mapParams2.radiance[map2->phi_1(closestFace.dart)];
+		Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> CPR = R1*l1 + R2*l2 + R3*l3;
+
+		Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3> diffRad(mapParams1.radiance[v]);
+		diffRad -= CPR;
+
+		double integral;
+		double area;
+		integrator.Compute(&integral, &area, SHEvalCartesian_Error, &diffRad, isInHemisphere, N.data());
+
+		PFP2::REAL radError = integral / area;
+
+		distance1[v] = radError;
+
+		errors.push_back(radError);
+	}
+	);
+
+	map2->setExternalThreadsAuthorization(false);
+
+	std::sort(errors.begin(), errors.end());
+	PFP2::REAL Q1 = errors[int(errors.size() / 4)];
+//	PFP2::REAL Q2 = errors[int(errors.size() / 2)];
+	PFP2::REAL Q3 = errors[int(errors.size() * 3 / 4)];
+	PFP2::REAL IQrange = Q3 - Q1;
+	PFP2::REAL lowerBound = Q1 - 1.5*IQrange;
+	PFP2::REAL upperBound = Q3 + 1.5*IQrange;
+	for (PFP2::REAL& dist : distance1.iterable())
+	{
+		if (dist < lowerBound) { dist = lowerBound; }
+		if (dist > upperBound) { dist = upperBound; }
+	}
+
+	integrator.Release();
+
+	this->pythonRecording("computeRadianceDistance", "", mapName1, positionAttributeName1, distanceAttributeName1,
+							mapName2, positionAttributeName2, distanceAttributeName2);
+
+	mh1->notifyAttributeModification(distance1);
+	mh2->notifyAttributeModification(distance2);
 }
 
 void Surface_Radiance_Plugin::checkNbVerticesAndExport(Surface_Radiance_Plugin* p, const unsigned int* nbVertices)

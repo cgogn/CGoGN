@@ -42,20 +42,16 @@ namespace Parallel
 CGoGN_TOPO_API int NumberOfThreads = getSystemNumberOfCores();
 }
 
-
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
-
-std::vector< std::vector<Dart>* >* GenericMap::s_vdartsBuffers = NULL;
-
-std::vector< std::vector<unsigned int>* >* GenericMap::s_vintsBuffers = NULL;
 
 //std::mutex* GenericMap::s_DartBufferMutex = NULL;
 //std::mutex* GenericMap::s_IntBufferMutex = NULL;
 
-std::vector<GenericMap*>*  GenericMap::s_instances=NULL;
+std::vector<GenericMap*>*  GenericMap::s_instances = NULL;
 
 GenericMap::GenericMap():
 	m_nextMarkerId(0),
+	m_authorizeExternalThreads(false),
 	m_manipulator(NULL)
 {
 	if(m_attributes_registry_map == NULL)
@@ -63,13 +59,22 @@ GenericMap::GenericMap():
 
 	s_instances->push_back(this);
 
-	m_thread_ids.reserve(NB_THREAD+1);
-	m_thread_ids.push_back( std::this_thread::get_id() );
+	m_thread_ids.reserve(NB_THREADS + 1);
+	m_thread_ids.push_back(std::this_thread::get_id());
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
+	}
+
+	for(unsigned int i = 0; i < NB_THREADS; ++i)
+	{
+		s_vdartsBuffers[i].reserve(8);
+		s_vintsBuffers[i].reserve(8);
+
+//		for(unsigned int j = 0; j < NB_ORBITS; ++j)
+//			m_markVectors_free[i][j].reserve(8);
 	}
 
 	init();
@@ -79,8 +84,6 @@ void GenericMap::copyAllStatics(const StaticPointers& sp)
 {
 	m_attributes_registry_map = sp.att_registry;
 	s_instances = sp.instances;
-	s_vdartsBuffers = sp.vdartsBuffers;
-	s_vintsBuffers = sp.vintsBuffers;
 }
 
 void GenericMap::initAllStatics(StaticPointers* sp)
@@ -123,33 +126,18 @@ void GenericMap::initAllStatics(StaticPointers* sp)
 		registerAttribute<MarkerBool>("MarkerBool");
 	}
 
-	if (s_instances==NULL)
-		s_instances= new std::vector<GenericMap*>;
+	if (s_instances == NULL)
+		s_instances = new std::vector<GenericMap*>;
 
-	if (s_vdartsBuffers == NULL)
-	{
-		s_vdartsBuffers = new std::vector< std::vector<Dart>* >[NB_THREAD];
-		s_vintsBuffers = new std::vector< std::vector<unsigned int>* >[NB_THREAD];
-
-		for(unsigned int i = 0; i < NB_THREAD; ++i)
-		{
-			s_vdartsBuffers[i].reserve(8);
-			s_vintsBuffers[i].reserve(8);
-				// prealloc ?
-		}
-	}
 	if (sp != NULL)
 	{
 		sp->att_registry = m_attributes_registry_map;
 		sp->instances = s_instances;
-		sp->vdartsBuffers = s_vdartsBuffers;
-		sp->vintsBuffers = s_vintsBuffers;
 	}
 }
 
 GenericMap::~GenericMap()
 {
-
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		if(isOrbitEmbedded(i))
@@ -175,7 +163,7 @@ GenericMap::~GenericMap()
 //		delete m_attributes_registry_map;
 //		m_attributes_registry_map = NULL;
 
-//		for(unsigned int i = 0; i < NB_THREAD; ++i)
+//		for(unsigned int i = 0; i < NB_THREADS; ++i)
 //		{
 //			for (auto it =s_vdartsBuffers[i].begin(); it != s_vdartsBuffers[i].end(); ++it)
 //				delete *it;
@@ -214,7 +202,6 @@ bool GenericMap::releaseManipulate(MapManipulator* ptr)
 	return true;
 }
 
-
 void GenericMap::init(bool addBoundaryMarkers)
 {
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
@@ -229,10 +216,9 @@ void GenericMap::init(bool addBoundaryMarkers)
 			m_quickLocalAdjacentTraversal[i][j] = NULL ;
 		}
 
-		for(unsigned int j = 0; j < NB_THREAD; ++j)
+		for(unsigned int j = 0; j < NB_THREADS; ++j)
 			m_markVectors_free[i][j].clear();
 	}
-
 
 	if (addBoundaryMarkers)
 	{
@@ -240,8 +226,7 @@ void GenericMap::init(bool addBoundaryMarkers)
 		m_boundaryMarkers[1] = m_attribs[DART].addMarkerAttribute("BoundaryMark1") ;
 	}
 
-
-	 for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
+	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 }
@@ -282,7 +267,7 @@ void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit
 
 	// NE MARCHE PLUS PAS POSSIBLE DE CHANGER LES CONTAINER
 
-//	for (unsigned int i = 0; i < NB_THREAD; ++i)
+//	for (unsigned int i = 0; i < NB_THREADS; ++i)
 //	{
 //		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
 //		{
@@ -460,7 +445,7 @@ void GenericMap::dumpAttributesAndMarkers()
 //	CGoGNout << "RESERVED MARKERS "<< CGoGNendl;
 //	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 //	{
-//		for (unsigned int j = 0; j < NB_THREAD; ++j)
+//		for (unsigned int j = 0; j < NB_THREADS; ++j)
 //		{
 //			MarkSet ms = m_marksets[i][j];
 //			if (!ms.isClear())
@@ -565,7 +550,7 @@ void GenericMap::moveData(GenericMap &mapf)
 {
 	GenericMap::init(false);
 
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		this->m_attribs[i].swap(mapf.m_attribs[i]);
 		this->m_embeddings[i] = mapf.m_embeddings[i];
@@ -573,7 +558,7 @@ void GenericMap::moveData(GenericMap &mapf)
 		mapf.m_embeddings[i] = NULL ;
 		mapf.m_quickTraversal[i] = NULL;
 
-		for (unsigned int j=0; j<NB_ORBITS; ++j)
+		for (unsigned int j = 0; j < NB_ORBITS; ++j)
 		{
 			this->m_quickLocalIncidentTraversal[i][j] = mapf.m_quickLocalIncidentTraversal[i][j];
 			this->m_quickLocalAdjacentTraversal[i][j] = mapf.m_quickLocalAdjacentTraversal[i][j];
@@ -581,8 +566,14 @@ void GenericMap::moveData(GenericMap &mapf)
 			mapf.m_quickLocalAdjacentTraversal[i][j] = NULL ;
 		}
 
-		for (unsigned int j=0; j<NB_THREAD; ++j)
+		for (unsigned int j = 0; j < NB_THREADS; ++j)
 			this->m_markVectors_free[i][j].swap(mapf.m_markVectors_free[i][j]);
+	}
+
+	for (unsigned int i = 0; i < NB_THREADS; ++i)
+	{
+		this->s_vdartsBuffers[i].swap(mapf.s_vdartsBuffers[i]);
+		this->s_vintsBuffers[i].swap(mapf.s_vintsBuffers[i]);
 	}
 
 	this->m_boundaryMarkers[0] = mapf.m_boundaryMarkers[0];
@@ -593,9 +584,7 @@ void GenericMap::moveData(GenericMap &mapf)
 	for(auto it = mapf.attributeHandlers.begin(); it != mapf.attributeHandlers.end(); ++it)
 	   (*it).second->setInvalid() ;
 	mapf.attributeHandlers.clear() ;
-
 }
-
 
 void GenericMap::garbageMarkVectors()
 {
@@ -627,11 +616,11 @@ void GenericMap::garbageMarkVectors()
 
 void GenericMap::removeMarkVectors()
 {
-	for (unsigned int orbit=0; orbit<NB_ORBITS;++orbit)
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		std::vector<std::string> attNames;
 		m_attribs[orbit].getAttributesNames(attNames);
-		for (auto sit=attNames.begin(); sit!=attNames.end();++sit)
+		for (auto sit = attNames.begin(); sit != attNames.end(); ++sit)
 		{
 			if (sit->substr(0,7) == "marker_")
 			{
@@ -641,7 +630,5 @@ void GenericMap::removeMarkVectors()
 	}
 	m_nextMarkerId = 0;
 }
-
-
 
 } // namespace CGoGN

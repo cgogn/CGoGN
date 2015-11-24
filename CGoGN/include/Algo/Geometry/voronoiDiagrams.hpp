@@ -50,7 +50,7 @@ template <typename PFP>
 void VoronoiDiagram<PFP>::setSeeds_random (unsigned int nseeds)
 {
 	seeds.clear();
-	srand ( time(NULL) );
+	srand ( (unsigned int)(time(NULL)) );
 	const unsigned int nbv = map.getNbCells(VERTEX);
 
 	std::set<unsigned int> myVertices ;
@@ -94,18 +94,18 @@ void VoronoiDiagram<PFP>::initFrontWithSeeds ()
 	{
 		Dart d = seeds[i];
 		vmReached.mark(d);
-		vertexInfo[d].it = front.insert(std::pair<float,Dart>(0.0, d));
+		vertexInfo[d].it = front.insert(std::pair<REAL,Dart>(0.0, d));
 		vertexInfo[d].valid = true;
 		regions[d] = i;
 		vertexInfo[d].pathOrigin = d;
 	}
 }
 
-template <typename PFP>
-void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL,typename PFP::MAP>& c)
-{
-	edgeCost = c;
-}
+//template <typename PFP>
+//void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL,typename PFP::MAP>& c)
+//{
+//	edgeCost = c;
+//}
 
 template <typename PFP>
 void VoronoiDiagram<PFP>::collectVertexFromFront(Dart e)
@@ -116,24 +116,24 @@ void VoronoiDiagram<PFP>::collectVertexFromFront(Dart e)
 }
 
 template <typename PFP>
-void VoronoiDiagram<PFP>::addVertexToFront(Dart f, float d)
+void VoronoiDiagram<PFP>::addVertexToFront(Dart f, REAL d)
 {
 	VertexInfo& vi (vertexInfo[f]);
-	vi.it = front.insert(std::pair<float,Dart>(d + edgeCost[f], f));
+	vi.it = front.insert(std::pair<REAL,Dart>(d + edgeCost[f], f));
 	vi.valid = true;
 	vi.pathOrigin = map.phi2(f);
 	vmReached.mark(f);
 }
 
 template <typename PFP>
-void VoronoiDiagram<PFP>::updateVertexInFront(Dart f, float d)
+void VoronoiDiagram<PFP>::updateVertexInFront(Dart f, REAL d)
 {
 	VertexInfo& vi (vertexInfo[f]);
-	float dist = d + edgeCost[f];
+	REAL dist = d + edgeCost[f];
 	if (dist < vi.it->first)
 	{
 		front.erase(vi.it);
-		vi.it = front.insert(std::pair<float,Dart>(dist, f));
+		vi.it = front.insert(std::pair<REAL,Dart>(dist, f));
 		vi.pathOrigin = map.phi2(f);
 	}
 }
@@ -147,7 +147,7 @@ Dart VoronoiDiagram<PFP>::computeDiagram ()
 	while ( !front.empty() )
 	{
 		e = front.begin()->second;
-		float d = front.begin()->first;
+		REAL d = front.begin()->first;
 
 		collectVertexFromFront(e);
 
@@ -179,7 +179,7 @@ void VoronoiDiagram<PFP>::computeDiagram_incremental (unsigned int nseeds)
 	seeds.clear();
 
 	// first seed
-	srand ( time(NULL) );
+	srand ((unsigned int)(time(NULL)) );
 	unsigned int s = rand() % map.getNbCells(VERTEX);
 	unsigned int n = 0;
 	TraversorV<MAP> tv (map);
@@ -209,7 +209,7 @@ void VoronoiDiagram<PFP>::computeDistancesWithinRegion (Dart seed)
 	vmReached.unmarkAll();
 
 	vmReached.mark(seed);
-	vertexInfo[seed].it = front.insert(std::pair<float,Dart>(0.0, seed));
+	vertexInfo[seed].it = front.insert(std::pair<REAL,Dart>(0.0, seed));
 	vertexInfo[seed].valid = true;
 	vertexInfo[seed].pathOrigin = seed;
 
@@ -217,7 +217,7 @@ void VoronoiDiagram<PFP>::computeDistancesWithinRegion (Dart seed)
 	while ( !front.empty() )
 	{
 		Dart e = front.begin()->second;
-		float d = front.begin()->first;
+		REAL d = front.begin()->first;
 
 		collectVertexFromFront(e);
 
@@ -416,13 +416,14 @@ typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateEnergyFromRoot(Dart e)
 template <typename PFP>
 void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned int numSeed)
 {
+	typedef typename PFP::REAL REAL;
 	// precondition : energyGrad.size() > numSeed
 	Dart e = this->seeds[numSeed];
 
 	std::vector<Dart> v;
 	v.reserve(8);
 
-	std::vector<float> da;
+	std::vector<REAL> da;
 	da.reserve(8);
 
 	distances[e] = 0.0;
@@ -432,7 +433,7 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned i
 	{
 		if ( pathOrigins[f] == this->map.phi2(f))
 		{
-			float distArea = cumulateEnergyFromRoot(f);
+			REAL distArea = cumulateEnergyFromRoot(f);
 			da.push_back(distArea);
 			distances[e] += distances[f];
 			v.push_back(f);
@@ -458,12 +459,13 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned i
 template <typename PFP>
 Dart CentroidalVoronoiDiagram<PFP>::selectBestNeighborFromSeed(unsigned int numSeed)
 {
+	typedef typename PFP::REAL REAL;
 	Dart e = this->seeds[numSeed];
 	Dart newSeed = e;
 	const VertexAttribute<VEC3, MAP>& pos = this->map.template getAttribute<VEC3,VERTEX,typename PFP::MAP>("position");
 
 	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
-	float maxProj = 0.0;
+	REAL maxProj = 0;
 	Traversor2VVaE<MAP> tv (this->map, e);
 	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
 	{
@@ -471,7 +473,7 @@ Dart CentroidalVoronoiDiagram<PFP>::selectBestNeighborFromSeed(unsigned int numS
 		{
 			VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
 	//		edgeV.normalize();
-			float proj = edgeV * energyGrad[numSeed];
+			REAL proj = edgeV * energyGrad[numSeed];
 			if (proj > maxProj)
 			{
 				maxProj = proj;
@@ -514,7 +516,7 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 	std::vector<Dart> v;
 	v.reserve(8);
 
-	std::vector<float> da;
+	std::vector<REAL> da;
 	da.reserve(8);
 
 	distances[e] = 0.0;
@@ -524,7 +526,7 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 	{
 		if ( pathOrigins[f] == this->map.phi2(f))
 		{
-			float distArea = cumulateEnergyFromRoot(f);
+			REAL distArea = cumulateEnergyFromRoot(f);
 			da.push_back(distArea);
 			distances[e] += distances[f];
 			v.push_back(f);
@@ -545,14 +547,14 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 	}
 	grad /= 2.0;
 
-	float maxProj = 0.0;
-//	float memoForTest = 0.0;
+	REAL maxProj = 0.0;
+//	REAL memoForTest = 0.0;
 	for (unsigned int j = 0; j<v.size(); ++j)
 	{
 		Dart f = v[j];
 		VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
 //		edgeV.normalize();
-		float proj = edgeV * grad;
+		REAL proj = edgeV * grad;
 //		proj -= areaElts[e] * this->edgeCost[f] * this->edgeCost[f];
 		if (proj > maxProj)
 		{

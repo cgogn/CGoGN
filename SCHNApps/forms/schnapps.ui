@@ -34,6 +34,7 @@
     <addaction name="action_LoadPythonScript"/>
     <addaction name="action_Python_Recording"/>
     <addaction name="action_Append_Python_Recording"/>
+    <addaction name="action_Clean_All"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -95,6 +96,11 @@
   <action name="action_Append_Python_Recording">
    <property name="text">
     <string>Append Python Recording</string>
+   </property>
+  </action>
+  <action name="action_Clean_All">
+   <property name="text">
+    <string>Clean All</string>
    </property>
   </action>
  </widget>

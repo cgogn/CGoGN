@@ -83,8 +83,8 @@ void EarTriangulation<PFP>::recompute2Ears( Dart d, const typename PFP::VEC3& no
 
 //	float dotpr1 = 1.0f - (v1*v2);
 //	float dotpr2 = 1.0f + (v1*v3);
-	float dotpr1 = acos(v1*v2) / (M_PI/2.0f);
-	float dotpr2 = acos(-(v1*v3)) / (M_PI/2.0f);
+	REAL dotpr1 = std::acos(v1*v2) / REAL(M_PI / 2.0f);
+	REAL dotpr2 = std::acos(-(v1*v3)) / REAL(M_PI/2.0f);
 
 	if (!convex)	// if convex no need to test if vertex is an ear (yes)
 	{
@@ -114,7 +114,7 @@ void EarTriangulation<PFP>::recompute2Ears( Dart d, const typename PFP::VEC3& no
 		}
 	}
 
-	float length = (Tb-Tc).norm2();
+	REAL length = (Tb - Tc).norm2();
 	m_dartEars[d2] = m_ears.insert(VertexPoly(d2,dotpr1,length));
 
 	length = (Td-Ta).norm2();
@@ -122,7 +122,7 @@ void EarTriangulation<PFP>::recompute2Ears( Dart d, const typename PFP::VEC3& no
 }
 
 template<typename PFP>
-float EarTriangulation<PFP>::computeEarInit(Dart d, const typename PFP::VEC3& normalPoly, float& val)
+typename PFP::REAL EarTriangulation<PFP>::computeEarInit(Dart d, const typename PFP::VEC3& normalPoly, REAL& val)
 {
 	Dart e =  m_map.phi1(d);
 	Dart f =  m_map.phi1(e);
@@ -137,7 +137,7 @@ float EarTriangulation<PFP>::computeEarInit(Dart d, const typename PFP::VEC3& no
 	v2.normalize();
 
 //	val = 1.0f - (v1*v2);
-	val = acos(v1*v2) / (M_PI/2.0f);
+	val = std::acos(v1*v2) / REAL(M_PI / 2.0f);
 
 	typename PFP::VEC3 vn = v1^v2;
 	if (vn*normalPoly > 0.0f)
@@ -181,8 +181,8 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 
 	do
 	{
-		float val;
-		float length = computeEarInit(a,normalPoly,val);
+		REAL val;
+		REAL length = computeEarInit(a, normalPoly, val);
 		a = m_map.phi1(a);	// phi here because ears is next of a
 		m_dartEars[a] = m_ears.insert(VertexPoly(a,val,length));
 		if (length!=0)

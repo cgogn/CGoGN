@@ -28,8 +28,13 @@ public:
 	virtual ~Plugin();
 
 public slots:
+	/// [PYTHON] get object name
 	QString getName();
+
+	/// [PYTHON] get file path to the shared library of plugin
 	QString getFilePath();
+
+	/// get schnapps object
 	SCHNApps* getSCHNApps();
 
 private:
@@ -84,9 +89,21 @@ inline T pyR_stringify(T v)
 template <>
 inline QString pyR_stringify(QString v)
 {
-	return "\"" + v + "\"";
-}
+	// test if v containe non ascii char
+	bool needDecode = false;
+	int i = 0;
+	while (!needDecode && (i < v.size()))
+	{
+		if (v[i].unicode()>127)
+			needDecode = true;
+		++i;
+	}
 
+	if (needDecode)
+		return "\"" + v + "\".decode('latin-1')";
+	else
+		return "\"" + v + "\"";
+}
 
 
 template <typename T1>

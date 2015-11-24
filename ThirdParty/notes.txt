@@ -1,0 +1,13 @@
+PythonQt 
+--------
+In src/PythonQt.h:
+	put #include <iostream> in first place
+In CMakeLists.txt:
+	remove line 14 include(CTestUseLaunchers OPTIONAL)
+	findPackage(PythonLibs 2.7 REQUIRED)
+	
+libQGLViewer
+------------
+- Keep only QGLViewer directory
+- Add the CMakeLists.txt
+- patch 2.6.1  quaternion.cpp: Quaternion::setFromRotationMatrix 155/158 float <- qreal

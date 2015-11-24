@@ -46,127 +46,260 @@ inline typename VEC3::DATA_TYPE distancePoint2TrianglePlane(const VEC3& P, const
 	return plane.distance(P) ;
 }
 
+// implemented following :
+// Distance Between Point and Triangle in 3D
+// http://www.geometrictools.com/Documentation/DistancePoint3Triangle3.pdf
 template <typename VEC3>
 typename VEC3::DATA_TYPE squaredDistancePoint2Triangle(const VEC3& P, const VEC3& A, const VEC3& B, const VEC3& C)
 {
-    VEC3 vPA = A - P ;
-    VEC3 vAB = B - A ;
-    VEC3 vAC = C - A ;
-    double fA00 = vAB.norm2() ;
-    double fA01 = vAB * vAC ;
-    double fA11 = vAC.norm2() ;
-    double fB0 = vPA * vAB ;
-    double fB1 = vPA * vAC ;
-    double fC = vPA.norm2() ;
-    double fDet = fabs(fA00*fA11-fA01*fA01);
-    double fS = fA01*fB1-fA11*fB0;
-    double fT = fA01*fB0-fA00*fB1;
-    double fSqrDistance;
+	VEC3 D = A - P ;
+	VEC3 E0 = B - A ;
+	VEC3 E1 = C - A ;
 
-    if (fS + fT <= fDet)
-    {
-        if (fS < 0.0f)
-        {
-            if (fT < 0.0f)  // region 4
-            {
-                if (fB0 < 0.0f)
-                {
-                    fT = 0.0f;
-                    if (-fB0 >= fA00) { fS = 1.0f; fSqrDistance = fA00+(2.0f)*fB0+fC; }
-                    else { fS = -fB0/fA00; fSqrDistance = fB0*fS+fC; }
-                }
-                else
-                {
-                    fS = 0.0f;
-                    if (fB1 >= 0.0f) { fT = 0.0f; fSqrDistance = fC; }
-                    else if (-fB1 >= fA11) { fT = 1.0f; fSqrDistance = fA11+(2.0f)*fB1+fC; }
-                    else { fT = -fB1/fA11; fSqrDistance = fB1*fT+fC; }
-                }
-            }
-            else  // region 3
-            {
-                fS = 0.0f;
-                if (fB1 >= 0.0f) { fT = 0.0f; fSqrDistance = fC; }
-                else if (-fB1 >= fA11) { fT = 1.0f; fSqrDistance = fA11+(2.0f)*fB1+fC; }
-                else { fT = -fB1/fA11; fSqrDistance = fB1*fT+fC; }
-            }
-        }
-        else if (fT < 0.0f)  // region 5
-        {
-            fT = 0.0f;
-            if (fB0 >= 0.0f) { fS = 0.0f; fSqrDistance = fC; }
-            else if (-fB0 >= fA00) { fS = 1.0f; fSqrDistance = fA00+(2.0f)*fB0+fC; }
-            else { fS = -fB0/fA00; fSqrDistance = fB0*fS+fC; }
-        }
-        else  // region 0
-        {
-            // minimum at interior point
-            double fInvDet = (1.0f)/fDet;
-            fS *= fInvDet;
-            fT *= fInvDet;
-            fSqrDistance = fS*(fA00*fS+fA01*fT+(2.0f)*fB0) + fT*(fA01*fS+fA11*fT+(2.0f)*fB1)+fC;
-        }
-    }
-    else
-    {
-        double fTmp0, fTmp1, fNumer, fDenom;
+	double a = E0.norm2() ;
+	double b = E0 * E1 ;
+	double c = E1.norm2() ;
+	double d = E0 * D ;
+	double e = E1 * D ;
+	double f = D.norm2() ;
 
-        if (fS < 0.0f)  // region 2
-        {
-            fTmp0 = fA01 + fB0;
-            fTmp1 = fA11 + fB1;
-            if (fTmp1 > fTmp0)
-            {
-                fNumer = fTmp1 - fTmp0;
-                fDenom = fA00-2.0f*fA01+fA11;
-                if (fNumer >= fDenom) { fS = 1.0f; fT = 0.0f; fSqrDistance = fA00+(2.0f)*fB0+fC; }
-                else { fS = fNumer/fDenom; fT = 1.0f - fS; fSqrDistance = fS*(fA00*fS+fA01*fT+2.0f*fB0) + fT*(fA01*fS+fA11*fT+(2.0f)*fB1)+fC; }
-            }
-            else
-            {
-                fS = 0.0f;
-                if (fTmp1 <= 0.0f) { fT = 1.0f; fSqrDistance = fA11+(2.0f)*fB1+fC; }
-                else if (fB1 >= 0.0f) { fT = 0.0f; fSqrDistance = fC; }
-                else { fT = -fB1/fA11; fSqrDistance = fB1*fT+fC; }
-            }
-        }
-        else if (fT < 0.0f)  // region 6
-        {
-            fTmp0 = fA01 + fB1;
-            fTmp1 = fA00 + fB0;
-            if (fTmp1 > fTmp0)
-            {
-                fNumer = fTmp1 - fTmp0;
-                fDenom = fA00-(2.0f)*fA01+fA11;
-                if (fNumer >= fDenom) { fT = 1.0f; fS = 0.0f; fSqrDistance = fA11+(2.0f)*fB1+fC; }
-                else { fT = fNumer/fDenom; fS = 1.0f - fT; fSqrDistance = fS*(fA00*fS+fA01*fT+(2.0f)*fB0) + fT*(fA01*fS+fA11*fT+(2.0f)*fB1)+fC; }
-            }
-            else
-            {
-                fT = 0.0f;
-                if (fTmp1 <= 0.0f) { fS = 1.0f; fSqrDistance = fA00+(2.0f)*fB0+fC; }
-                else if (fB0 >= 0.0f) { fS = 0.0f; fSqrDistance = fC; }
-                else { fS = -fB0/fA00; fSqrDistance = fB0*fS+fC; }
-            }
-        }
-        else  // region 1
-        {
-            fNumer = fA11 + fB1 - fA01 - fB0;
-            if (fNumer <= 0.0f) { fS = 0.0f; fT = 1.0f; fSqrDistance = fA11+(2.0f)*fB1+fC; }
-            else
-            {
-                fDenom = fA00-2.0f*fA01+fA11;
-                if (fNumer >= fDenom) { fS = 1.0f; fT = 0.0f; fSqrDistance = fA00+(2.0f)*fB0+fC; }
-                else { fS = fNumer/fDenom; fT = 1.0f - fS; fSqrDistance = fS*(fA00*fS+fA01*fT+(2.0f)*fB0) + fT*(fA01*fS+fA11*fT+(2.0f)*fB1)+fC; }
-            }
-        }
-    }
+	double det = fabs(a*c - b*b);
+	double s = b*e - c*d;
+	double t = b*d - a*e;
 
-    // account for numerical round-off error
-    if (fSqrDistance < 0.0f)
-        fSqrDistance = 0.0f;
+	double sqrDistance;
 
-    return fSqrDistance;
+	if (s + t <= det)
+	{
+		if (s < 0.0f)
+		{
+			if (t < 0.0f)  // region 4
+			{
+				if (d < 0.0)
+				{
+					t = 0.0;
+					if (-d >= a) { s = 1.0; sqrDistance = a + 2.0*d + f; }
+					else { s = -d/a; sqrDistance = d*s + f; }
+				}
+				else
+				{
+					s = 0.0;
+					if (e >= 0.0) { t = 0.0; sqrDistance = f; }
+					else if (-e >= c) { t = 1.0; sqrDistance = c + 2.0*e + f; }
+					else { t = -e/c; sqrDistance = e*t + f; }
+				}
+			}
+			else  // region 3
+			{
+				s = 0.0;
+				if (e >= 0.0) { t = 0.0; sqrDistance = f; }
+				else if (-e >= c) { t = 1.0; sqrDistance = c + 2.0*e + f; }
+				else { t = -e/c; sqrDistance = e*t + f; }
+			}
+		}
+		else if (t < 0.0)  // region 5
+		{
+			t = 0.0;
+			if (d >= 0.0) { s = 0.0; sqrDistance = f; }
+			else if (-d >= a) { s = 1.0; sqrDistance = a + 2.0*d + f; }
+			else { s = -d/a; sqrDistance = d*s + f; }
+		}
+		else  // region 0
+		{
+			// minimum at interior point
+			double invDet = 1.0 / det;
+			s *= invDet;
+			t *= invDet;
+			sqrDistance = s * (a*s + b*t + 2.0*d) + t * (b*s + c*t + 2.0*e) + f;
+		}
+	}
+	else
+	{
+		double tmp0, tmp1, numer, denom;
+
+		if (s < 0.0f)  // region 2
+		{
+			tmp0 = b + d;
+			tmp1 = c + e;
+			if (tmp1 > tmp0)
+			{
+				numer = tmp1 - tmp0;
+				denom = a - 2.0*b + c;
+				if (numer >= denom) { s = 1.0; t = 0.0; sqrDistance = a + 2.0*d + f; }
+				else { s = numer/denom; t = 1.0 - s; sqrDistance = s * (a*s + b*t + 2.0*d) + t * (b*s + c*t + 2.0*e) + f; }
+			}
+			else
+			{
+				s = 0.0;
+				if (tmp1 <= 0.0) { t = 1.0; sqrDistance = c + 2.0*e + f; }
+				else if (e >= 0.0) { t = 0.0; sqrDistance = f; }
+				else { t = -e/c; sqrDistance = e*t + f; }
+			}
+		}
+		else if (t < 0.0f)  // region 6
+		{
+			tmp0 = b + e;
+			tmp1 = a + d;
+			if (tmp1 > tmp0)
+			{
+				numer = tmp1 - tmp0;
+				denom = a - 2.0*b + c;
+				if (numer >= denom) { t = 1.0; s = 0.0; sqrDistance = c + 2.0*e + f; }
+				else { t = numer/denom; s = 1.0 - t; sqrDistance = s * (a*s + b*t + 2.0*d) + t * (b*s + c*t + 2.0*e) + f; }
+			}
+			else
+			{
+				t = 0.0;
+				if (tmp1 <= 0.0) { s = 1.0; sqrDistance = a + 2.0*d + f; }
+				else if (d >= 0.0) { s = 0.0; sqrDistance = f; }
+				else { s = -d/a; sqrDistance = d*s + f; }
+			}
+		}
+		else  // region 1
+		{
+			numer = c + e - b - d;
+			if (numer <= 0.0) { s = 0.0; t = 1.0; sqrDistance = c + 2.0*e + f; }
+			else
+			{
+				denom = a - 2.0*b + c;
+				if (numer >= denom) { s = 1.0; t = 0.0; sqrDistance = a + 2.0*d + f; }
+				else { s = numer/denom; t = 1.0 - s; sqrDistance = s * (a*s + b*t + 2.0*d) + t * (b*s + c*t + 2.0*e) + f; }
+			}
+		}
+	}
+
+//	sqrDistance = s * (a*s + b*t + 2.0*d) + t * (b*s + c*t + 2.0*e) + f;
+
+	// account for numerical round-off error
+	if (sqrDistance < 0.0)
+		sqrDistance = 0.0;
+
+	return sqrDistance;
+}
+
+template <typename VEC3>
+void closestPointInTriangle(const VEC3& P, const VEC3& A, const VEC3& B, const VEC3& C, double& u, double& v, double& w)
+{
+	VEC3 D = A - P ;
+	VEC3 E0 = B - A ;
+	VEC3 E1 = C - A ;
+
+	double a = E0.norm2() ;
+	double b = E0 * E1 ;
+	double c = E1.norm2() ;
+	double d = E0 * D ;
+	double e = E1 * D ;
+	double f = D.norm2() ;
+
+	double det = fabs(a*c - b*b);
+	double s = b*e - c*d;
+	double t = b*d - a*e;
+
+	if (s + t <= det)
+	{
+		if (s < 0.0f)
+		{
+			if (t < 0.0f)  // region 4
+			{
+				if (d < 0.0)
+				{
+					t = 0.0;
+					if (-d >= a) { s = 1.0; }
+					else { s = -d/a; }
+				}
+				else
+				{
+					s = 0.0;
+					if (e >= 0.0) { t = 0.0; }
+					else if (-e >= c) { t = 1.0; }
+					else { t = -e/c; }
+				}
+			}
+			else  // region 3
+			{
+				s = 0.0;
+				if (e >= 0.0) { t = 0.0; }
+				else if (-e >= c) { t = 1.0; }
+				else { t = -e/c; }
+			}
+		}
+		else if (t < 0.0)  // region 5
+		{
+			t = 0.0;
+			if (d >= 0.0) { s = 0.0; }
+			else if (-d >= a) { s = 1.0; }
+			else { s = -d/a; }
+		}
+		else  // region 0
+		{
+			// minimum at interior point
+			double invDet = 1.0 / det;
+			s *= invDet;
+			t *= invDet;
+		}
+	}
+	else
+	{
+		double tmp0, tmp1, numer, denom;
+
+		if (s < 0.0f)  // region 2
+		{
+			tmp0 = b + d;
+			tmp1 = c + e;
+			if (tmp1 > tmp0)
+			{
+				numer = tmp1 - tmp0;
+				denom = a - 2.0*b + c;
+				if (numer >= denom) { s = 1.0; t = 0.0; }
+				else { s = numer/denom; t = 1.0 - s; }
+			}
+			else
+			{
+				s = 0.0;
+				if (tmp1 <= 0.0) { t = 1.0; }
+				else if (e >= 0.0) { t = 0.0; }
+				else { t = -e/c; }
+			}
+		}
+		else if (t < 0.0f)  // region 6
+		{
+			tmp0 = b + e;
+			tmp1 = a + d;
+			if (tmp1 > tmp0)
+			{
+				numer = tmp1 - tmp0;
+				denom = a - 2.0*b + c;
+				if (numer >= denom) { t = 1.0; s = 0.0; }
+				else { t = numer/denom; s = 1.0 - t; }
+			}
+			else
+			{
+				t = 0.0;
+				if (tmp1 <= 0.0) { s = 1.0; }
+				else if (d >= 0.0) { s = 0.0; }
+				else { s = -d/a; }
+			}
+		}
+		else  // region 1
+		{
+			numer = c + e - b - d;
+			if (numer <= 0.0) { s = 0.0; t = 1.0; }
+			else
+			{
+				denom = a - 2.0*b + c;
+				if (numer >= denom) { s = 1.0; t = 0.0; }
+				else { s = numer/denom; t = 1.0 - s; }
+			}
+		}
+	}
+
+//	u = s;
+//	v = t;
+//	w = 1.0 - s - t;
+
+	u = 1.0 - s - t;
+	v = s;
+	w = t;
 }
 
 template <typename VEC3>
@@ -268,30 +401,30 @@ typename VEC3::DATA_TYPE squaredDistanceSeg2Point(const VEC3& A, const VEC3& AB,
 template <typename VEC3>
 bool lineLineClosestPoints(const VEC3& P1, const VEC3& V1, const VEC3& P2, const VEC3& V2, VEC3& Q1, VEC3& Q2)
 {
-	   Geom::Vec3f P12 = P1 - P2;
+	typedef typename VEC3::DATA_TYPE SCAL;
+	VEC3 P12 = P1 - P2;
 
-	   float d1343 = P12 * V2;
-	   float d4321 = V2*V1;
-	   float d1321 = P12*V1;
-	   float d4343 = V2*V2;
-	   float d2121 = V1*V1;
+	SCAL d1343 = P12 * V2;
+	SCAL d4321 = V2*V1;
+	SCAL d1321 = P12*V1;
+	SCAL d4343 = V2*V2;
+	SCAL d2121 = V1*V1;
 
-	   float denom = d2121 * d4343 - d4321 * d4321;
+	SCAL denom = d2121 * d4343 - d4321 * d4321;
 
-	   if (fabs(denom) < 0.0000001)
-	      return false;
+	if (fabs(denom) < 0.0000001)
+		return false;
 
-	   float numer = d1343 * d4321 - d1321 * d4343;
+	SCAL numer = d1343 * d4321 - d1321 * d4343;
 
-	   float mua = numer / denom;
-	   float mub = (d1343 + d4321 * mua) / d4343;
+	SCAL mua = numer / denom;
+	SCAL mub = (d1343 + d4321 * mua) / d4343;
 
-	   Q1 = P1 + mua*V1;
-	   Q2 = P2 + mub*V2;
-	   return true;
+	Q1 = P1 + mua*V1;
+	Q2 = P2 + mub*V2;
+	return true;
 }
 
+} // namespace Geom
 
-}
-
-}
+} // namespace CGoGN

@@ -32,6 +32,7 @@ private:
 	QColor m_diffuseColor;
 	QColor m_simpleColor;
 	QColor m_vertexColor;
+	QColor m_backColor;
 	int m_currentColorDial;
 
 	bool b_updatingUI;
@@ -42,15 +43,19 @@ private slots:
 	void colorVBOChanged(int index);
 	void renderVerticesChanged(bool b);
 	void verticesScaleFactorChanged(int i);
+	void verticesScaleFactorPressed();
 	void renderEdgesChanged(bool b);
 	void renderFacesChanged(bool b);
 	void faceStyleChanged(QAbstractButton* b);
 	void renderBoundaryChanged(bool b);
+	void renderBackfaceChanged(bool b);
 
 	void diffuseColorClicked();
 	void simpleColorClicked();
 	void vertexColorClicked();
-	void colorSelected(const QColor& col);
+	void backColorClicked();
+	void bothColorClicked();
+	void colorSelected();
 
 private:
 	void addPositionVBO(QString name);

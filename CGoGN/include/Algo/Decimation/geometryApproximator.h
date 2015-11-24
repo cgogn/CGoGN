@@ -26,6 +26,7 @@
 #define __GEOMETRY_APPROXIMATOR_H__
 
 #include "Algo/Decimation/approximator.h"
+#include "Utils/qem.h"
 #include "Utils/convertType.h"
 #include <Eigen/Dense>
 

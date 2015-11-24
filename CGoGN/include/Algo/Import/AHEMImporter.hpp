@@ -28,6 +28,8 @@
 
 #include "Algo/Import/AHEMImporterDefAttr.h"
 
+#include <algorithm>
+
 
 namespace CGoGN
 {
@@ -230,10 +232,10 @@ void AHEMImporter<PFP>::LoadTopology()
 
 	// Ensure vertices are created by querying the position attribute
 
-	VertexAttribute<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map->template getAttribute<typename PFP::VEC3, VERTEX, typename PFP::MAP>("position");
 
 	if (!position.isValid())
-		position = map->template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
+		position = map->template addAttribute<typename PFP::VEC3, VERTEX, typename PFP::MAP>("position");
 
 	// Read faces stream and create faces [only intra-face links]
 	
@@ -304,10 +306,10 @@ void AHEMImporter<PFP>::LoadTopology()
 template <typename PFP>
 void AHEMImporter<PFP>::LoadPosition(AHEMAttributeDescriptor* posDescr)
 {
-	VertexAttribute<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
+	VertexAttribute<typename PFP::VEC3, typename PFP::MAP> position = map->template getAttribute<typename PFP::VEC3, VERTEX, typename PFP::MAP>("position");
 
 	if (!position.isValid())
-		position = map->template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
+		position = map->template addAttribute<typename PFP::VEC3, VERTEX, typename PFP::MAP>("position");
 
 	f.seekg(posDescr->fileStartOffset, std::ios_base::beg);
 	f.read(buffer, posDescr->attributeChunkSize);

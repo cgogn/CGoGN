@@ -62,9 +62,12 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 		
 		glGenTextures(1, &(*m_idTexture));
 		glBindTexture(GL_TEXTURE_2D, *m_idTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)(buff));
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_RED,  GL_UNSIGNED_BYTE, (GLvoid*)(buff));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		delete[] buff;
 	}
 	else
@@ -88,8 +91,7 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 	else
 	{
 		std::stringstream ss;
-		ss << "vec4 backColor = vec4(" <<bgc[0] << "," << bgc[1] << "," << bgc[2] << ",color[3]);\n";
-//		ss << "vec4 backColor = vec4(0.2,0.1,0.4);\n";
+		ss << "    vec4 backColor = vec4(" <<bgc[0] << "," << bgc[1] << "," << bgc[2] << ",color[3]);\n";
 		glxfrag.append(ss.str());
 		glxfrag.append(fragmentShaderText3);
 	}
@@ -178,6 +180,7 @@ unsigned int Strings3D::sendOneStringToVBO(const std::string& str, float **buffe
 		float u2 = u + float(REALWIDTHFONT) / float(WIDTHTEXTURE);
 		float v2 = v + float(WIDTHFONT - 1) / float(HEIGHTTEXTURE);
 
+		// 0
 		*buffer++ = x;
 		*buffer++ = 0;
 		*buffer++ = u;
@@ -185,16 +188,31 @@ unsigned int Strings3D::sendOneStringToVBO(const std::string& str, float **buffe
 
 		float xf = x + float(REALWIDTHFONT) / 25.f;
 
+		// 1
 		*buffer++ = xf;
 		*buffer++ = 0;
 		*buffer++ = u2;
 		*buffer++ = v2;
 
+		// 2
 		*buffer++ = xf;
 		*buffer++ = float(WIDTHFONT) / 25.f;
 		*buffer++ = u2;
 		*buffer++ = v;
 
+		// 0
+		*buffer++ = x;
+		*buffer++ = 0;
+		*buffer++ = u;
+		*buffer++ = v2;
+
+		// 2
+		*buffer++ = xf;
+		*buffer++ = float(WIDTHFONT) / 25.f;
+		*buffer++ = u2;
+		*buffer++ = v;
+
+		// 3
 		*buffer++ = x;
 		*buffer++ = float(WIDTHFONT) / 25.f;
 		*buffer++ = u;
@@ -205,7 +223,7 @@ unsigned int Strings3D::sendOneStringToVBO(const std::string& str, float **buffe
 
 	*buffervbo = buffer;
 
-	return 4 * nbc;
+	return 6 * nbc;
 }
 
 void Strings3D::sendToVBO()
@@ -214,7 +232,7 @@ void Strings3D::sendToVBO()
 
 	// alloc buffer
 	m_vbo1->bind();
-	glBufferData(GL_ARRAY_BUFFER, m_nbChars * 16 * sizeof(float), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_nbChars * 24 * sizeof(float), 0, GL_STREAM_DRAW);
 	float* buffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 
 	// fill buffer
@@ -269,7 +287,7 @@ void Strings3D::postdraw()
 void Strings3D::draw(unsigned int idSt, const Geom::Vec3f& pos)
 {
 	glUniform3fv(*m_uniform_position, 1, pos.data());
-	glDrawArrays(GL_QUADS, m_strpos[idSt].first , m_strpos[idSt].second );
+	glDrawArrays(GL_TRIANGLES, m_strpos[idSt].first , m_strpos[idSt].second );
 }
 
 void Strings3D::drawAll(const Geom::Vec4f& color)
@@ -290,7 +308,7 @@ void Strings3D::drawAll(const Geom::Vec4f& color)
 	for (unsigned int idSt=0; idSt<nb; ++idSt)
 	{
 		glUniform3fv(*m_uniform_position, 1, m_strTranslate[idSt].data());
-		glDrawArrays(GL_QUADS, m_strpos[idSt].first , m_strpos[idSt].second );
+		glDrawArrays(GL_TRIANGLES, m_strpos[idSt].first , m_strpos[idSt].second );
 	}
 	postdraw();
 }
@@ -316,23 +334,38 @@ void Strings3D::updateString(unsigned int idSt, const std::string& str)
 		float u2 = u + float(REALWIDTHFONT) / float(WIDTHTEXTURE);
 		float v2 = v + float(WIDTHFONT - 1) / float(HEIGHTTEXTURE);
 
+		// 0
 		*buffer++ = x;
 		*buffer++ = 0;
 		*buffer++ = u;
 		*buffer++ = v2;
 
 		float xf = x + float(REALWIDTHFONT) / 25.f;
-
+		// 1
 		*buffer++ = xf;
 		*buffer++ = 0;
 		*buffer++ = u2;
 		*buffer++ = v2;
 
+		// 2
 		*buffer++ = xf;
 		*buffer++ = float(WIDTHFONT) / 25.f;
 		*buffer++ = u2;
 		*buffer++ = v;
 
+		// 0
+		*buffer++ = x;
+		*buffer++ = 0;
+		*buffer++ = u;
+		*buffer++ = v2;
+
+		// 2
+		*buffer++ = xf;
+		*buffer++ = float(WIDTHFONT) / 25.f;
+		*buffer++ = u2;
+		*buffer++ = v;
+
+		// 3
 		*buffer++ = x;
 		*buffer++ = float(WIDTHFONT) / 25.f;
 		*buffer++ = u;

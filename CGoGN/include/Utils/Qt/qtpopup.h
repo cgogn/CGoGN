@@ -59,7 +59,7 @@ class CGoGN_UTILS_API QtPopUp : public QDialog
 {
 	Q_OBJECT
 
-	Utils::QT::SimpleQT * m_cbs;
+	//Utils::QT::SimpleQT * m_cbs;
 
 	QGridLayout* m_layout;
 
@@ -69,7 +69,7 @@ public:
 	* create an empty popup
 	* @param withButtons  add OK/CANCEL to the popup (exec launch blocking popup & return 1/0)
 	*/
-	QtPopUp(Utils::QT::SimpleQT* sqt=NULL, bool withButtons=false);
+	QtPopUp(/*Utils::QT::SimpleQT* sqt=NULL,*/ bool withButtons=false);
 
 	/**
 	 *

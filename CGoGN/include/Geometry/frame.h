@@ -26,6 +26,7 @@
 #define _FRAME_H_
 
 #include <cmath>
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -68,8 +69,11 @@ Geom::Vector<3,REAL> cartToSpherical (const Geom::Vector<3,REAL>& cart) ;
  * @param epsilon tolerated error
  * @return true if the frame is direct, normalized and orthogonal
  */
-template<typename PFP>
-bool isDirectOrthoNormalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-5) ;
+//template<typename PFP>
+//bool isDirectOrthoNormalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-5) ;
+template<typename VEC3>
+bool isDirectOrthoNormalFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon = 1e-5) ;
+
 
 /**
  * Tests if the frame is direct
@@ -79,8 +83,8 @@ bool isDirectOrthoNormalFrame(const typename PFP::VEC3& X, const typename PFP::V
  * @param epsilon tolerated error
  * @return true if the frame is direct
  */
-template<typename PFP>
-bool isDirectFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-7) ;
+template<typename VEC3>
+bool isDirectFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon = 1e-7) ;
 
 /**
  * Tests if the frame is orthogonal
@@ -90,8 +94,8 @@ bool isDirectFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, con
  * @param epsilon tolerated error
  * @return true if the frame is orthogonal
  */
-template<typename PFP>
-bool isOrthogonalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-5) ;
+template<typename VEC3>
+bool isOrthogonalFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon = 1e-5);
 
 /**
  * Tests if the frame is normalized
@@ -101,8 +105,8 @@ bool isOrthogonalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y,
  * @param epsilon tolerated error
  * @return true if the frame is normalized
  */
-template<typename PFP>
-bool isNormalizedFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-5) ;
+template<typename VEC3>
+bool isNormalizedFrame(const VEC3& X, const VEC3& Y, const VEC3& Z, typename VEC3::DATA_TYPE epsilon = 1e-5);
 
 /**
  * Class for representing a direct right-handed local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
@@ -114,10 +118,9 @@ bool isNormalizedFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y,
  *   VEC3 compressed = lf.getCompressed() ;	// Extract compressed frame
  *  Frame<PFP> newLf(compressed) ;			// Constructor from implicit (compressed) expression.
  */
-template <typename PFP>
+template <typename REAL>
 class Frame
 {
-	typedef typename PFP::REAL REAL ;
 	typedef typename Geom::Vector<2,REAL> VEC2 ;
 	typedef typename Geom::Vector<3,REAL> VEC3 ;
 
@@ -143,12 +146,12 @@ public: // methods
 	 */
 	Frame(const VEC3& compressedFrame) ;
 
-	~Frame() {} ;
+	~Frame() {}
 
 	/**
 	 * Returns a compressed version of the current local frame
 	 */
-	const VEC3& getCompressed() const { return m_EulerAngles ; } ;
+	const VEC3& getCompressed() const { return m_EulerAngles ; }
 
 	/**
 	 * Returns a decompressed frame (set of 3 VEC3)
@@ -164,21 +167,21 @@ public: // methods
 	 * @param epsilon the authorized deviation
 	 * @return true if frames are identical (or deviate less than epsilon)
 	 */
-	bool equals(const Frame<PFP>& lf, REAL epsilon = 1e-6) const ;
+	bool equals(const Frame<REAL>& lf, REAL epsilon = 1e-6) const ;
 
 	/**
 	 * Equality of frames
 	 * Identical to calling equals with default epsilon
 	 * @return true if frames are identical
 	 */
-	bool operator==(const Frame<PFP>& lf) const ;
+	bool operator==(const Frame<REAL>& lf) const;
 
 	/**
 	 * Inequality of frames
 	 * Identical to calling !equals with default epsilon
 	 * @return false if frames are identical
 	 */
-	bool operator!=(const Frame<PFP>& lf) const ;
+	bool operator!=(const Frame<REAL>& lf) const;
 
 	friend std::ostream& operator<< (std::ostream &out, const Frame& lf) {
 		out << "Compressed : " << std::endl << lf.getCompressed() ;
@@ -187,7 +190,7 @@ public: // methods
 		lf.getFrame(X,Y,Z) ;
 		out << std::endl << "Decompressed : " << std::endl << X << std::endl << Y << std::endl << Z ;
 		return out ;
-	} ;
+	}
 
 private : // private constants
 	// The reference frame (X,Y,Z) can be any orthonormal
@@ -203,16 +206,28 @@ private : // private constants
 //	static const REAL Zx = 0.464255 ;
 //	static const REAL Zy = 0.657695 ;
 //	static const REAL Zz = -0.593215 ;
-	static const REAL Xx = 0.0766965 ;
-	static const REAL Xy = 0.383483 ;
-	static const REAL Xz = 0.920358 ;
-	static const REAL Yx = -0.760734 ;
-	static const REAL Yy = 0.619202 ;
-	static const REAL Yz = -0.194606 ;
-	static const REAL Zx = -0.644516 ;
-	static const REAL Zy = -0.685222 ;
-	static const REAL Zz = 0.339219 ;
 
+
+	//static const REAL Xx = 0.0766965 ;
+	//static const REAL Xy = 0.383483 ;
+	//static const REAL Xz = 0.920358 ;
+	//static const REAL Yx = -0.760734 ;
+	//static const REAL Yy = 0.619202 ;
+	//static const REAL Yz = -0.194606 ;
+	//static const REAL Zx = -0.644516 ;
+	//static const REAL Zy = -0.685222 ;
+	//static const REAL Zz = 0.339219 ;
+
+	// only integral static const can be init inline in standard C++ (float init is gcc extension)
+	static const REAL Xx;
+	static const REAL Xy;
+	static const REAL Xz;
+	static const REAL Yx;
+	static const REAL Yy;
+	static const REAL Yz;
+	static const REAL Zx;
+	static const REAL Zy;
+	static const REAL Zz;
 } ;
 
 } // namespace Geom

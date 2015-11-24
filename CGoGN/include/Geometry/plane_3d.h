@@ -54,7 +54,7 @@ class Plane3D
 		/*                CONSTRUCTORS                */
 		/**********************************************/
 
-		Plane3D(int d = 0);
+		Plane3D(T d = 0);
 
 		Plane3D(const Plane3D<T>& p);
 
@@ -82,6 +82,9 @@ class Plane3D
 		/**********************************************/
 		/*             UTILITY FUNCTIONS              */
 		/**********************************************/
+
+		// compute a point on the plane (-d*N)
+		Vector<3, T> point() const;
 
 		// compute the distance between the plane and point p
 		T distance(const Vector<3,T>& p) const;

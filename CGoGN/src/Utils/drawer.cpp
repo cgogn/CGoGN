@@ -41,9 +41,11 @@ namespace Utils
 	m_currentSize(1.0f),
 	m_shader(NULL),
 	m_shaderL(NULL),
+	m_shaderSF(NULL),
 	//m_shaderCL(NULL),
 	//m_shader3DCL(NULL),
-	m_lineMode(lineMode)
+	m_lineMode(lineMode),
+	m_withShading(false)
 {
 	m_vboPos = new Utils::VBO();
 	m_vboPos->setDataSize(3);
@@ -69,8 +71,13 @@ namespace Utils
 	}
 
 
+	m_shaderSF = new Utils::ShaderSimpleFlat();
+	m_shaderSF->setAttributePosition(m_vboPos);
+	m_shaderSF->setAttributeColor(m_vboCol);
+
 	Utils::GLSLShader::registerShader(NULL, m_shader);
 	Utils::GLSLShader::registerShader(NULL, m_shaderL);
+	Utils::GLSLShader::registerShader(NULL, m_shaderSF);
 
 	m_dataPos.reserve(128);
 	m_dataCol.reserve(128);
@@ -82,12 +89,14 @@ Drawer::~Drawer()
 {
 	Utils::GLSLShader::unregisterShader(NULL, m_shader);
 	Utils::GLSLShader::unregisterShader(NULL, m_shaderL);
+	Utils::GLSLShader::unregisterShader(NULL, m_shaderSF);
 	delete m_vboPos;
 	delete m_vboCol;
 
 	if (m_shaderL != m_shader)
 		delete m_shaderL;
 	delete m_shader;
+	delete m_shaderSF;
 }
 
 //Utils::ShaderColorPerVertex* Drawer::getShader()
@@ -102,6 +111,8 @@ std::vector<Utils::GLSLShader*> Drawer::getShaders()
 	if (m_shaderL != m_shader)
 		shaders.push_back(m_shaderL);
 
+	shaders.push_back(m_shaderSF);
+
 	return shaders;
 }
 
@@ -110,6 +121,8 @@ void Drawer::updateMatrices(const glm::mat4& projection, const glm::mat4& modelv
 	m_shader->updateMatrices(projection,modelview);
 	if (m_shaderL != m_shader)
 		m_shaderL->updateMatrices(projection,modelview);
+
+	m_shaderSF->updateMatrices(projection, modelview);
 }
 
 
@@ -198,6 +211,25 @@ void Drawer::endList()
 	std::vector<Geom::Vec3f> tempo2;
 	tempo2.swap(m_dataCol);
 
+	for (auto it = m_begins.begin(); it != m_begins.end(); ++it)
+	{
+		switch (it->mode)
+		{
+		case GL_POINTS:
+			m_begins_point.push_back(*it);
+			break;
+		case GL_LINES:
+		case GL_LINE_STRIP:
+		case GL_LINE_LOOP:
+			m_begins_line.push_back(*it);
+			break;
+		default:
+			m_begins_face.push_back(*it);
+			break;
+		}
+	}
+
+
 	if (m_compile != GL_COMPILE)
 		callList();
 }
@@ -218,59 +250,114 @@ void Drawer::updatePositions(unsigned int first, unsigned int nb, const float* P
 
 void Drawer::callList(float opacity)
 {
+	//if (m_begins.empty())
+	//	return;
+
+	//m_shader->setOpacity(opacity);
+	//m_shader->enableVertexAttribs();
+	//for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+	//{
+	//	if (pp->mode == GL_POINTS)
+	//	{
+	//		glPointSize(pp->width);
+	//		glDrawArrays(GL_POINTS, pp->begin, pp->nb);
+	//	}
+	//}
+	//m_shader->disableVertexAttribs();
+
+	//m_shaderL->setOpacity(opacity);
+	//m_shaderL->enableVertexAttribs();
+	//for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+	//{
+	//	if (pp->mode != GL_POINTS)
+	//	{
+	//		m_shaderL->setLineWidth(pp->width);
+	//		m_shaderL->bind();
+	//		glDrawArrays(pp->mode, pp->begin, pp->nb);
+	//	}
+	//}
+	//m_shaderL->disableVertexAttribs();
+
 	if (m_begins.empty())
 		return;
 
-	m_shader->setOpacity(opacity);
-	m_shader->enableVertexAttribs();
-	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
-	{
-		if (pp->mode == GL_POINTS)
-		{
-			glPointSize(pp->width);
-			glDrawArrays(GL_POINTS, pp->begin, pp->nb);
-		}
-	}
-	m_shader->disableVertexAttribs();
-
+	// rendering lines
 	m_shaderL->setOpacity(opacity);
 	m_shaderL->enableVertexAttribs();
-	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+	for (std::vector<PrimParam>::iterator pp = m_begins_line.begin(); pp != m_begins_line.end(); ++pp)
 	{
-		if (pp->mode != GL_POINTS)
-		{
-			m_shaderL->setLineWidth(pp->width);
-			m_shaderL->bind();
-			glDrawArrays(pp->mode, pp->begin, pp->nb);
-		}
+		m_shaderL->setLineWidth(pp->width);
+		m_shaderL->bind();
+		glDrawArrays(pp->mode, pp->begin, pp->nb);
 	}
 	m_shaderL->disableVertexAttribs();
-}
 
-
-void Drawer::callSubList(int index, float opacity)
-{
-	if (index >= int(m_begins.size()))
-		return;
-	PrimParam* pp = & (m_begins[index]);
-
-	if (pp->mode == GL_POINTS)
+	
+	if (m_withShading)
 	{
+		// rendering faces
+		m_shaderSF->enableVertexAttribs();
+		for (std::vector<PrimParam>::iterator pp = m_begins_face.begin(); pp != m_begins_face.end(); ++pp)
+		{
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
+		m_shaderSF->disableVertexAttribs();
+
+		// rendering points
 		m_shader->setOpacity(opacity);
 		m_shader->enableVertexAttribs();
-		glPointSize(pp->width);
-		glDrawArrays(pp->mode, pp->begin, pp->nb);
+		for (std::vector<PrimParam>::iterator pp = m_begins_point.begin(); pp != m_begins_point.end(); ++pp)
+		{
+			glPointSize(pp->width);
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
 		m_shader->disableVertexAttribs();
 	}
 	else
 	{
-		m_shaderL->setOpacity(opacity);
-		m_shaderL->setLineWidth(pp->width);
-		m_shaderL->enableVertexAttribs();
-		glDrawArrays(pp->mode, pp->begin, pp->nb);
-		m_shaderL->disableVertexAttribs();
+		// rendering faces & points
+		m_shader->setOpacity(opacity);
+		m_shader->enableVertexAttribs();
+		for (std::vector<PrimParam>::iterator pp = m_begins_face.begin(); pp != m_begins_face.end(); ++pp)
+		{
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
+		for (std::vector<PrimParam>::iterator pp = m_begins_point.begin(); pp != m_begins_point.end(); ++pp)
+		{
+			glPointSize(pp->width);
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
+
+		m_shader->disableVertexAttribs();
 	}
 }
+
+
+
+//
+//void Drawer::callSubList(int index, float opacity)
+//{
+//	if (index >= int(m_begins.size()))
+//		return;
+//	PrimParam* pp = & (m_begins[index]);
+//
+//	if (pp->mode == GL_POINTS)
+//	{
+//		m_shader->setOpacity(opacity);
+//		m_shader->enableVertexAttribs();
+//		glPointSize(pp->width);
+//		glDrawArrays(pp->mode, pp->begin, pp->nb);
+//		m_shader->disableVertexAttribs();
+//	}
+//	else
+//	{
+//		m_shaderL->setOpacity(opacity);
+//		m_shaderL->setLineWidth(pp->width);
+//		m_shaderL->enableVertexAttribs();
+//		glDrawArrays(pp->mode, pp->begin, pp->nb);
+//		m_shaderL->disableVertexAttribs();
+//	}
+//}
 
 //void Drawer::callSubLists(int first, int nb, float opacity)
 //{

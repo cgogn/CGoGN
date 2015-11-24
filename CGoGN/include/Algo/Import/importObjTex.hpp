@@ -25,6 +25,7 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/autoAttributeHandler.h"
 #include "Container/fakeAttribute.h"
+
 #include <fstream>
 #include <algorithm>
 
@@ -84,13 +85,13 @@ inline Geom::Vec2f OBJModel<PFP>::getTexCoord(Dart d)
 }
 
 template <typename PFP>
-void OBJModel<PFP>::setPositionAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP> position)
+void OBJModel<PFP>::setPositionAttribute(VertexAttribute<VEC3, MAP> position)
 {
 	m_positions = position;
 }
 
 template <typename PFP>
-void OBJModel<PFP>::setNormalAttribute(VertexAttribute<Geom::Vec3f, typename PFP::MAP> normal)
+void OBJModel<PFP>::setNormalAttribute(VertexAttribute<VEC3, typename PFP::MAP> normal)
 {
 	m_normals = normal;
 }
@@ -259,7 +260,7 @@ void OBJModel<PFP>::readMaterials(const std::string& filename)
 template <typename PFP>
 unsigned int OBJModel<PFP>::getMaterialIndex(const std::string& name) const
 {
-	std::map<std::string, int>::iterator it = m_materialNames.find(name);
+	std::map<std::string, int>::const_iterator it = m_materialNames.find(name);
 	if (it != m_materialNames.end())
 		return it->second;
 	return 0xffffffff;
@@ -363,7 +364,7 @@ unsigned int OBJModel<PFP>::createSimpleVBO_P(Utils::VBO* positionVBO)
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate((unsigned int)(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
@@ -411,13 +412,13 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PT(Utils::VBO* positionVBO, Utils::V
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate((unsigned int)(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
 
 	texcoordVBO->setDataSize(2);
-	texcoordVBO->allocate(TCBuff.size());
+	texcoordVBO->allocate((unsigned int)(TCBuff.size()));
 	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
 	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
 	texcoordVBO->releasePtr();
@@ -430,7 +431,7 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::V
 {
 	TraversorF<typename PFP::MAP> traf(m_map);
 	std::vector<Geom::Vec3f> posBuff;
-	std::vector<Geom::Vec2f> normalBuff;
+	std::vector<Geom::Vec3f> normalBuff;
 	posBuff.reserve(16384);
 	normalBuff.reserve(16384);
 
@@ -477,13 +478,13 @@ unsigned int OBJModel<PFP>::createSimpleVBO_PN(Utils::VBO* positionVBO, Utils::V
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate((unsigned int)(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
 
 	normalVBO->setDataSize(3);
-	normalVBO->allocate(normalBuff.size());
+	normalVBO->allocate((unsigned int)(normalBuff.size()));
 	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
@@ -724,7 +725,7 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 			m_groupFirstSub[outGr] = inSg;
 		}
 	}
-	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+	m_groupNbSub[outGr + 1] = (unsigned int)(m_sgMat.size()) - m_groupNbSub[outGr];
 
 	// now create VBOs
 
@@ -733,7 +734,7 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 
 	unsigned int firstIndex = 0;
 
-	unsigned int sz = group_faces.size();
+	unsigned int sz = (unsigned int)(group_faces.size());
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
 	m_groupIdx.resize(sz);
@@ -774,7 +775,7 @@ bool OBJModel<PFP>::createGroupMatVBO_P( Utils::VBO* positionVBO)
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate((unsigned int)(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
@@ -974,7 +975,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 			m_groupFirstSub[outGr] = inSg;
 		}
 	}
-	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+	m_groupNbSub[outGr + 1] = (unsigned int)(m_sgMat.size()) - m_groupNbSub[outGr];
 
 	// now create VBOs
 
@@ -985,7 +986,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 
 	unsigned int firstIndex = 0;
 
-	unsigned int sz = group_faces.size();
+	unsigned int sz = (unsigned int)(group_faces.size());
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
 	m_groupIdx.resize(sz);
@@ -1044,13 +1045,13 @@ bool OBJModel<PFP>::createGroupMatVBO_PT( Utils::VBO* positionVBO,
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate((unsigned int)(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
 
 	texcoordVBO->setDataSize(2);
-	texcoordVBO->allocate(TCBuff.size());
+	texcoordVBO->allocate((unsigned int)(TCBuff.size()));
 	Geom::Vec2f* ptrTC = reinterpret_cast<Geom::Vec2f*>(texcoordVBO->lockPtr());
 	memcpy(ptrTC,&TCBuff[0],TCBuff.size()*sizeof(Geom::Vec2f));
 	texcoordVBO->releasePtr();
@@ -1180,7 +1181,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 			m_groupFirstSub[outGr] = inSg;
 		}
 	}
-	m_groupNbSub[outGr+1] = m_sgMat.size() - m_groupNbSub[outGr];
+	m_groupNbSub[outGr + 1] = (unsigned int)(m_sgMat.size()) - m_groupNbSub[outGr];
 
 	// now create VBOs
 
@@ -1192,7 +1193,7 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 
 	unsigned int firstIndex = 0;
 
-	unsigned int sz = group_faces.size();
+	unsigned int sz = (unsigned int)(group_faces.size());
 	m_beginIndices.resize(sz);
 	m_nbIndices.resize(sz);
 	m_groupIdx.resize(sz);
@@ -1251,13 +1252,13 @@ bool OBJModel<PFP>::createGroupMatVBO_PN( Utils::VBO* positionVBO,
 	}
 
 	positionVBO->setDataSize(3);
-	positionVBO->allocate(posBuff.size());
+	positionVBO->allocate((unsigned int)(posBuff.size()));
 	Geom::Vec3f* ptrPos = reinterpret_cast<Geom::Vec3f*>(positionVBO->lockPtr());
 	memcpy(ptrPos,&posBuff[0],posBuff.size()*sizeof(Geom::Vec3f));
 	positionVBO->releasePtr();
 
 	normalVBO->setDataSize(3);
-	normalVBO->allocate(normalBuff.size());
+	normalVBO->allocate((unsigned int)(normalBuff.size()));
 	Geom::Vec3f* ptrNormal = reinterpret_cast<Geom::Vec3f*>(normalVBO->lockPtr());
 	memcpy(ptrNormal, &normalBuff[0], normalBuff.size()*sizeof(Geom::Vec3f));
 	normalVBO->releasePtr();
@@ -1844,7 +1845,7 @@ bool OBJModel<PFP>::import( const std::string& filename, std::vector<std::string
 template <typename PFP>
 unsigned int OBJModel<PFP>::storeFacesOfGroup(unsigned int groupId, std::vector<Dart>& dartFaces)
 {
-	unsigned int nb=dartFaces.size();
+	unsigned int nb = (unsigned int)(dartFaces.size());
 
 	TraversorF<typename PFP::MAP> traf(m_map);
 	for (Dart d=traf.begin(); d!= traf.end(); d = traf.next())
@@ -1855,7 +1856,7 @@ unsigned int OBJModel<PFP>::storeFacesOfGroup(unsigned int groupId, std::vector<
 		}
 	}
 
-	return dartFaces.size()-nb;
+	return (unsigned int)(dartFaces.size() - nb);
 }
 
 } // namespace Import

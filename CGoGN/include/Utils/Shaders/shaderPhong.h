@@ -46,6 +46,7 @@ protected:
 	bool m_with_color;
 	// flag color per vertex or not
 	bool m_with_eyepos;	
+	//bool m_doubleSided;
 
 	// shader sources OGL3
 	static std::string vertexShaderText;
@@ -61,6 +62,7 @@ protected:
 	CGoGNGLuint m_unif_lightPos;
 	CGoGNGLuint m_unif_eyePos;
 	CGoGNGLuint m_unif_backColor;
+	CGoGNGLuint m_unif_doubleSided;
 
 	//values
 	Geom::Vec4f m_ambiant;
@@ -70,6 +72,7 @@ protected:
 	Geom::Vec3f m_lightPos;
 	Geom::Vec3f m_eyePos;
 	Geom::Vec4f m_backColor;
+	int m_doubleSided;
 
 	VBO* m_vboPos;
 	VBO* m_vboNormal;
@@ -86,7 +89,9 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderPhong(bool withClipping = false ,bool doubleSided = false, bool withEyePosition=false);
+	ShaderPhong(bool withClipping = false, bool withEyePosition=false);
+
+	void setDoubleSided(bool doubleSided);
 
 	// inviduals parameter setting functions
 	void setAmbiant(const Geom::Vec4f& ambiant);

@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Topology/generic/traversor/traversor2.h"
+
 namespace CGoGN
 {
 
@@ -1034,7 +1036,7 @@ void HalfEdgeSelector_ColorGradient<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeIn
 	const REAL t = 0.01f ;
 	const REAL& err =
 		t * quadGeom(newPos) + // geom
-		(1-t) * computeGradientColorError(v0,v1).norm()/sqrt(3.0) // color
+		(1.0f-t) * computeGradientColorError(v0,v1).norm()/REAL(sqrt(3.0)) // color
 	;
 
 	/*std::cout << quadGeom(newPos) << std::endl ;
@@ -1082,7 +1084,7 @@ HalfEdgeSelector_ColorGradient<PFP>::computeGradientColorError(const Dart& v0, c
 		//const VEC3 e0 = Pj - Pi ;
 
 		const REAL areaIJ0sq = (ei ^ ej).norm2() ;
-		const REAL areaIJ0 = sqrt(areaIJ0sq)/2. ;
+		const REAL areaIJ0 = REAL(sqrt(areaIJ0sq)/2.0f) ;
 		areaSum += areaIJ0 ;
 		// per-channel treatment
 		for (unsigned int c = 0 ; c < 3 ;  ++c)

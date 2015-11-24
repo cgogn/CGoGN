@@ -28,6 +28,8 @@
 #include <vector>
 #include <cmath>
 #include <typeinfo>
+#include <algorithm>
+#include "Utils/cgognStream.h"
 
 namespace CGoGN
 {
@@ -515,6 +517,11 @@ DataType* Image<DataType>::getVoxelPtr(int lX, int lY, int  lZ)
 	return m_Data + lX + m_WX*lY + m_WXY*lZ;
 }
 
+template< typename  DataType >
+DataType Image<DataType>::getVoxel(const Geom::Vec3i &V)
+{
+	return m_Data[V[0] + m_WX*V[1] + m_WXY*V[2]];
+}
 
 
 /*
@@ -678,7 +685,7 @@ Image<DataType>* Image<DataType>::Blur3()
 				}
 				val += 3.0 * (*ori);
 				val /= (27.0 + 3.0);
-				DataType res(val);
+				DataType res = DataType(val);
 				*dest= res;
 			}
 			*(newImg->getVoxelPtr(txm,y,z)) = *(getVoxelPtr(txm,y,z));
@@ -740,11 +747,11 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 	float ys = m_SY/smin;
 	float zs = m_SZ/smin;
 
-	int radX = ceil(float(_i32radius)/xs);
-	int radY = ceil(float(_i32radius)/ys);
-	int radZ = ceil(float(_i32radius)/zs);
+	int radX = int(ceil(float(_i32radius)/xs));
+	int radY = int(ceil(float(_i32radius)/ys));
+	int radZ = int(ceil(float(_i32radius)/zs));
 
-	float sRadius = sqrt( double(_i32radius)/xs*double(_i32radius)/xs +  double(_i32radius)/ys*double(_i32radius)/ys +  double(_i32radius)/zs*double(_i32radius)/zs);
+	double sRadius = sqrt( double(_i32radius)/xs*double(_i32radius)/xs +  double(_i32radius)/ys*double(_i32radius)/ys +  double(_i32radius)/zs*double(_i32radius)/zs);
 
 	// memory allocation
 	// difficult to know how many voxels before computing,
@@ -760,7 +767,7 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 			for (int x = -radX; x<radX; x++)
 			{
 				Geom::Vec3f v(float(x)*xs,float(y)*ys,float(z)*zs);
-				float fLength =  v.norm();
+				double fLength =  v.norm();
 				// if inside the sphere
 				if (fLength<=sRadius)
 				{
@@ -1040,7 +1047,7 @@ void Image<DataType>::createNormalSphere(std::vector<Geom::Vec3f>& table, int _i
 			for (int x = -_i32radius;  x<=_i32radius; x++)
 			{
 				Geom::Vec3f v((float)x,(float)y,(float)z);
-				float fLength =  v.normalize();
+				double fLength =  v.normalize();
 				// if inside the sphere
 				if (fLength<=_i32radius)
 					table.push_back(v);

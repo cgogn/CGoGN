@@ -102,8 +102,8 @@ typename V_ATT::DATA_TYPE vertexNormal(typename PFP::MAP& map, Vertex v, const V
 		VEC3 n = faceNormal<PFP>(map, f, position) ;
 		if(!n.hasNan())
 		{
-			VEC3 v1 = vectorOutOfDart<PFP>(map, f.dart, position) ;
-			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(f), position) ;
+			VEC3 v1 = Algo::Geometry::vectorOutOfDart<PFP>(map, f.dart, position) ;
+			VEC3 v2 = Algo::Geometry::vectorOutOfDart<PFP>(map, map.phi_1(f), position);
 			typename VEC3::DATA_TYPE l = (v1.norm2() * v2.norm2());
 			if (l > (typename VEC3::DATA_TYPE(0.0)) )
 			{
@@ -135,14 +135,15 @@ typename V_ATT::DATA_TYPE vertexBorderNormal(typename PFP::MAP& map, Vertex v, c
 
 	for(std::vector<Dart>::iterator it = faces.begin() ; it != faces.end() ; ++it)
 	{
-		if(!f.isMarked(*it) && map.isBoundaryIncidentFace(*it))
+//		if(!f.isMarked(*it) && map.isBoundaryIncidentFace(*it))
+		if (!f.isMarked(*it) && (map.template isBoundaryMarked<3>(map.phi3(*it))))
 		{
 			f.mark(*it);
 			VEC3 n = faceNormal<PFP>(map, *it, position);
 			if(!n.hasNan())
 			{
-				VEC3 v1 = vectorOutOfDart<PFP>(map, *it, position);
-				VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(*it), position);
+				VEC3 v1 = Algo::Geometry::vectorOutOfDart<PFP>(map, *it, position);
+				VEC3 v2 = Algo::Geometry::vectorOutOfDart<PFP>(map, map.phi_1(*it), position);
 				n *= convexFaceArea<PFP>(map, *it, position) / (v1.norm2() * v2.norm2());
 				N += n ;
 			}

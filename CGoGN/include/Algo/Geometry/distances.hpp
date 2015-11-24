@@ -72,6 +72,15 @@ typename PFP::REAL squaredDistancePoint2Face(typename PFP::MAP& map, Face f, con
 }
 
 template <typename PFP>
+void closestPointInTriangle(typename PFP::MAP& map, Face f, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P, double& u, double& v, double& w)
+{
+	Dart d = map.phi1(f.dart);
+	Dart e = map.phi1(d);
+
+	Geom::closestPointInTriangle(P, position[f.dart], position[d], position[e], u, v, w);
+}
+
+template <typename PFP>
 typename PFP::REAL squaredDistancePoint2Edge(typename PFP::MAP& map, Edge e, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>& position, const typename PFP::VEC3& P)
 {
 	const typename PFP::VEC3& A = position[e.dart];

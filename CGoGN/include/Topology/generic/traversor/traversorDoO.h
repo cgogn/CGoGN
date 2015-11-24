@@ -39,7 +39,7 @@ private:
 	std::vector<Dart>* m_vd ;
 	const GenericMap* m_map;
 
-	TraversorDartsOfOrbit( const TraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
+	TraversorDartsOfOrbit(const TraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
 
 public:
 	TraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c) ;
@@ -66,7 +66,7 @@ private:
 	std::vector<Dart>* m_vd ;
 	const GenericMap* m_map;
 
-	VTraversorDartsOfOrbit( const VTraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
+	VTraversorDartsOfOrbit(const VTraversorDartsOfOrbit<MAP,ORBIT>& /*tr*/){}
 
 public:
 	VTraversorDartsOfOrbit(const MAP& map, Cell<ORBIT> c) ;

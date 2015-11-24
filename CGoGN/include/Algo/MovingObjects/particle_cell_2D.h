@@ -36,18 +36,19 @@ class ParticleCell2D : public Algo::MovingObjects::ParticleBase<PFP>
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 	typedef VertexAttribute<VEC3, MAP> TAB_POS ;
 
 	MAP& m ;
 
-	const TAB_POS& positionAttribut ;
+	/*const*/ TAB_POS& positionAttribut ;
 
 	Dart d ;
 	Dart lastCrossed ;
 
 	unsigned int crossCell ;
 
-	ParticleCell2D(MAP& map, Dart belonging_cell, const VEC3& pos, const TAB_POS& tabPos) :
+	ParticleCell2D(MAP& map, Dart belonging_cell, const VEC3& pos, /*const*/ TAB_POS& tabPos) :
 		Algo::MovingObjects::ParticleBase<PFP>(pos),
 		m(map),
 		positionAttribut(tabPos),

@@ -91,17 +91,21 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 					}
 					else
 					{
+						m_flatShader->setBackColor(p.backColor);
 						m_flatShader->setAttributePosition(p.positionVBO);
 						m_flatShader->setDiffuse(p.diffuseColor);
+						m_flatShader->setDoubleSided(p.renderBackfaces);
 						map->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
 					}
                     break;
                 case MapParameters::PHONG :
                     if(p.normalVBO != NULL)
                     {
+						m_phongShader->setBackColor(p.backColor);
                         m_phongShader->setAttributePosition(p.positionVBO);
                         m_phongShader->setAttributeNormal(p.normalVBO);
                         m_phongShader->setDiffuse(p.diffuseColor);
+						m_phongShader->setDoubleSided(p.renderBackfaces);
                         map->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
                     }
                     break;
@@ -111,7 +115,7 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 		if(p.renderVertices)
 		{
-			m_pointSprite->setSize(map->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
+			m_pointSprite->setSize(p.basePSradius * p.verticesScaleFactor); 
 			m_pointSprite->setAttributePosition(p.positionVBO);
 			m_pointSprite->setColor(p.vertexColor);
 			map->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
@@ -157,6 +161,7 @@ void Surface_Render_Plugin::mapAdded(MapHandlerGen *map)
 	DEBUG_SLOT();
 	connect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	connect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
+	connect(map, SIGNAL(boundingBoxModified()), this, SLOT(boundingBoxModified()));
 }
 
 void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
@@ -164,6 +169,10 @@ void Surface_Render_Plugin::mapRemoved(MapHandlerGen *map)
 	DEBUG_SLOT();
 	disconnect(map, SIGNAL(vboAdded(Utils::VBO*)), this, SLOT(vboAdded(Utils::VBO*)));
 	disconnect(map, SIGNAL(vboRemoved(Utils::VBO*)), this, SLOT(vboRemoved(Utils::VBO*)));
+	disconnect(map, SIGNAL(boundingBoxModified()), this, SLOT(boundingBoxModified()));
+
+	if(map == m_schnapps->getSelectedMap())
+		m_dockTab->updateMapParameters();
 }
 
 
@@ -230,9 +239,18 @@ void Surface_Render_Plugin::vboRemoved(Utils::VBO *vbo)
 		v->updateGL();
 }
 
+void Surface_Render_Plugin::boundingBoxModified()
+{
+	DEBUG_SLOT();
+	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
-
-
+	QList<View*> views = map->getLinkedViews();
+	foreach(View* v, views)
+	{
+		if (h_viewParameterSet.contains(v))
+			h_viewParameterSet[v][map].basePSradius = map->getBBdiagSize() / (2 * std::sqrt(map->getNbOrbits(EDGE)));
+	}
+}
 
 void Surface_Render_Plugin::changePositionVBO(const QString& view, const QString& map, const QString& vbo)
 {
@@ -293,6 +311,8 @@ void Surface_Render_Plugin::changeRenderVertices(const QString& view, const QStr
 	if(v && m)
 	{
 		h_viewParameterSet[v][m].renderVertices = b;
+		if (b)
+			h_viewParameterSet[v][m].basePSradius = m->getBBdiagSize() / (2 * std::sqrt(m->getNbOrbits(EDGE)));
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
@@ -325,6 +345,8 @@ void Surface_Render_Plugin::changeRenderEdges(const QString& view, const QString
 	if(v && m)
 	{
 		h_viewParameterSet[v][m].renderEdges = b;
+		if (b)
+			h_viewParameterSet[v][m].basePSradius = m->getBBdiagSize() / (16 * std::sqrt(m->getNbOrbits(EDGE)));
 		if(v->isSelectedView())
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
@@ -426,6 +448,39 @@ void Surface_Render_Plugin::changeVertexColor(const QString& view, const QString
 		{
 			if(v->isLinkedToMap(m))	v->updateGL();
 			if(m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+
+void Surface_Render_Plugin::changeBackColor(const QString& view, const QString& map, float r, float g, float b)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (v && m)
+	{
+		h_viewParameterSet[v][m].backColor = Geom::Vec4f(r, g, b, 0);
+		if (v->isSelectedView())
+		{
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
+		}
+	}
+}
+
+void Surface_Render_Plugin::changeRenderBackfaces(const QString& view, const QString& map, bool b)
+{
+	DEBUG_SLOT();
+	View* v = m_schnapps->getView(view);
+	MapHandlerGen* m = m_schnapps->getMap(map);
+	if (v && m)
+	{
+		h_viewParameterSet[v][m].renderBackfaces = b;
+		if (v->isSelectedView())
+		{
+			if (v->isLinkedToMap(m))	v->updateGL();
+			if (m->isSelectedMap()) m_dockTab->updateMapParameters();
 		}
 	}
 }

@@ -14,7 +14,7 @@ IF (WIN32)
 		link_directories( ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE})
 		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/${CMAKE_BUILD_TYPE}) # Release/Debug added automatically by visual
 	ELSE()
-		link_directories( ${CGoGN_ROOT_DIR}/bin/${ConfigurationName})
+		link_directories( ${CGoGN_ROOT_DIR}/bin/$(ConfigurationName))
 		SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin/) # Release/Debug added automatically by visual
 	ENDIF()
 ELSE()

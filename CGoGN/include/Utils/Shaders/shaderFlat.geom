@@ -5,6 +5,7 @@ uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 NormalMatrix;
 uniform mat4 ModelViewMatrix;
 uniform vec3 lightPosition;
+
 VARYING_OUT float lambertTerm;
 
 void main(void)
@@ -18,7 +19,7 @@ void main(void)
 	center /= 3.0;
 	vec4 newPos =  ModelViewMatrix * vec4(center,1.0);
 	vec3 L =  normalize (lightPosition - newPos.xyz);
-	lambertTerm = clamp(dot(N,L),0.0,1.0);
+	lambertTerm = dot(N,L);
 
 	int i;
 	for(i=0; i< NBVERTS_IN; i++)

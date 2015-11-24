@@ -38,7 +38,8 @@
 #include "Utils/vbo.h"
 
 #include "Algo/Histogram/histogram.h"
-#include "Utils/Qt/qthistodraw.h"
+#include "Algo/Histogram/qthistodraw.h"
+#include "Utils/Qt/qtpopup.h"
 
 using namespace CGoGN ;
 
@@ -120,7 +121,7 @@ protected:
 	ColMap*  l_cm;
 	Algo::Histogram::Histogram* l_histo;
 	Utils::QT::QtPopUp* l_popup;
-	Utils::QT::RenderHistogram* l_histodraw;
+	Algo::Histogram::RenderHistogram* l_histodraw;
 
 	unsigned int l_nbc;
 	unsigned int l_nbq;

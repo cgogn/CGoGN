@@ -122,7 +122,7 @@ typedef Cell<VOLUME> Vol;  // not Volume because of the namespace Volume
 
 namespace Parallel
 {
-const unsigned int SIZE_BUFFER_THREAD = 8192;
+const unsigned int SIZE_BUFFER_THREAD = 1024;
 }
 
 }
