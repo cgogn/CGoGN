@@ -79,9 +79,9 @@ Dependencies
 * install (or compile) Qt (choose 32/64 bits)
 * install python 2.7 (choose 32/64 bits) (Needed for SCHNApps)
 * Other Windows dependencies are furnished at:
-- http://cgogn.unistra.fr/Dependencies/dependencies.txt
-- http://cgogn.unistra.fr/Dependencies/windows_dependencies32.zip
-- http://cgogn.unistra.fr/Dependencies/windows_dependencies64.zip
+  * http://cgogn.unistra.fr/Dependencies/dependencies.txt
+  * http://cgogn.unistra.fr/Dependencies/windows_dependencies32.zip
+  * http://cgogn.unistra.fr/Dependencies/windows_dependencies64.zip
 
 **Supported compilers: Visual C++ 2013 (12.0) or greater**
 
