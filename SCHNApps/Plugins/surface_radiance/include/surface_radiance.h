@@ -173,7 +173,7 @@ protected:
 	static double SHEvalCartesian_Error(double x, double y, double z, void* u)
 	{
 		Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>& e = *(Utils::SphericalHarmonics<PFP2::REAL, PFP2::VEC3>*)(u);
-		PFP2::VEC3 c = e.evaluate_at(x, y, z);
+		PFP2::VEC3 c = e.evaluate_at(x, y, z, 0);
 		return c.norm2();
 	}
 };
