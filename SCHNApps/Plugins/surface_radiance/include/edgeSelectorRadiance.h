@@ -66,7 +66,7 @@ private:
 	static double SHEvalCartesian_Error(double x, double y, double z, void* u)
 	{
 		SH& e = *(SH*)(u);
-		VEC3 c = e.evaluate_at(x, y, z);
+		VEC3 c = e.evaluate_at(x, y, z, 0);
 		return c.norm2();
 	}
 
