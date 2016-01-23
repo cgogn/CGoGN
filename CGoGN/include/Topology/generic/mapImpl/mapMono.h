@@ -152,7 +152,107 @@ public:
 	bool copyFrom(const GenericMap& map);
 
 	void restore_topo_shortcuts();
+
+	friend class MapMonoProtected;
 } ;
+
+	class MapMonoProtected
+	{
+		protected:
+		MapMono& mMapMono;
+		public:
+		MapMonoProtected( MapMono& mm ) : mMapMono( mm ) {}
+
+		inline Dart newDart()
+		{
+			return mMapMono.newDart();
+		}
+
+		inline void deleteDart(Dart d)
+		{
+			mMapMono.deleteDart( d );
+		}
+
+		inline void addInvolution()
+		{
+			mMapMono.addInvolution();
+		}
+		inline void addPermutation()
+		{
+			mMapMono.addPermutation();
+		}
+		inline void removeLastInvolutionPtr() // for moveFrom
+		{
+			mMapMono.removeLastInvolutionPtr();
+		}
+
+		inline AttributeMultiVector<Dart>* getInvolutionAttribute(unsigned int i)
+		{
+			return mMapMono.getInvolutionAttribute( i );
+		}
+		inline AttributeMultiVector<Dart>* getPermutationAttribute(unsigned int i)
+		{
+			return mMapMono.getPermutationAttribute( i );
+		}
+		inline AttributeMultiVector<Dart>* getPermutationInvAttribute(unsigned int i)
+		{
+			return mMapMono.getPermutationInvAttribute( i );
+		}
+
+		unsigned int getNbInvolutions() const
+		{
+			return mMapMono.getNbInvolutions();
+		}
+		unsigned int getNbPermutations() const
+		{
+			return mMapMono.getNbPermutations();
+		}
+
+		template <int I>
+		inline Dart getInvolution(Dart d) const
+		{
+			return mMapMono.getInvolution<I>( d );
+		}
+
+		template <int I>
+		inline Dart getPermutation(Dart d) const
+		{
+			return mMapMono.getPermutation<I>( d );
+		}
+
+		template <int I>
+		inline Dart getPermutationInv(Dart d) const
+		{
+			return mMapMono.getPermutationInv<I>( d );
+		}
+
+		template <int I>
+		inline void involutionSew(Dart d, Dart e)
+		{
+			mMapMono.involutionSew<I>( d, e );
+		}
+
+		template <int I>
+		inline void involutionUnsew(Dart d)
+		{
+			mMapMono.involutionUnsew<I>( d );
+		}
+
+		template <int I>
+		inline void permutationSew(Dart d, Dart e)
+		{
+			mMapMono.permutationSew<I>( d, e );
+		}
+
+		template <int I>
+		inline void permutationUnsew(Dart d)
+		{
+			mMapMono.permutationUnsew<I>( d );
+		}
+
+		virtual void compactTopo() { mMapMono.compactTopo(); }
+
+	};
 
 } //namespace CGoGN
 

@@ -78,6 +78,13 @@ public:
 	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding) !!! WARNING !!!
 	 */
 	template <unsigned int ORBIT>
+	void forceDartEmbedding(Dart d, unsigned int emb) ;
+
+	/**
+	 * Set the cell index of the given dimension associated to dart d
+	 * !!! WARNING !!! use only on freshly inserted darts (no unref is done on old embedding) !!! WARNING !!!
+	 */
+	template <unsigned int ORBIT>
 	void initDartEmbedding(Dart d, unsigned int emb) ;
 
 	/**

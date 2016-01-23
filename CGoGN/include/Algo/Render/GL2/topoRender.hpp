@@ -649,12 +649,14 @@ void TopoRender::computeDartMiddlePositions( typename PFP::MAP& map, DartAttribu
 	if (!attIndex.isValid())
 		attIndex  = map.template addAttribute<unsigned int, DART, typename PFP::MAP>(m_nameIndex);
 
-
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
-		const Geom::Vec3f& Q = m_bufferDartPosition[attIndex[d]+1];
-		posExpl[d] = (P + Q)*0.5f;
+		if( attIndex[ d ] < 2 * this->m_nbDarts )
+		{
+			const Geom::Vec3f& P = m_bufferDartPosition[attIndex[d]];
+			const Geom::Vec3f& Q = m_bufferDartPosition[attIndex[d]+1];
+			posExpl[d] = (P + Q)*0.5f;
+		}
 	}
 }
 
