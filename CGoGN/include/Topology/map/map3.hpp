@@ -167,7 +167,7 @@ void Map3<MAP_IMPL>::deleteVolume(Dart d, bool withBoundary)
 			Dart e = visitedFaces[i] ;
 
 			if(!isBoundaryFace(e))
-				unsewVolumes(e) ;
+				unsewVolumes( phi3( e ) );
 
 			do	// add all face neighbours to the table
 			{
