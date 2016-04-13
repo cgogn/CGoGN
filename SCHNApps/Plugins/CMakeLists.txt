@@ -24,11 +24,12 @@ ADD_SUBDIRECTORY(surface_subdivision)
 ADD_SUBDIRECTORY(surface_selection)
 ADD_SUBDIRECTORY(surface_deformation)
 ADD_SUBDIRECTORY(surface_modelisation)
-
+ADD_SUBDIRECTORY(surface_radiance)
 ADD_SUBDIRECTORY(surface_distance)
+
 ADD_SUBDIRECTORY(volume_import)
+
 #ADD_SUBDIRECTORY(surface_tilings)
-#ADD_SUBDIRECTORY(surface_radiance)
 #ADD_SUBDIRECTORY(cage2D_deformation)
 #ADD_SUBDIRECTORY(cage3D_deformation)
 

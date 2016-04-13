@@ -142,8 +142,10 @@ public:
 	/**
 	 * update data from given data vector
 	 * @warning use only with include vbo.h (not vbo_base.h)
+	 * @tparam VEC_DIM dim of vec (1,2,3 or 4)
+	 * @param data a vector of float/VecXf or double/VecXd
 	 */
-	template <typename T>
+	template <unsigned int VEC_DIM, typename T>
 	void updateData(std::vector<T>& data);
 
 	void* lockPtr();

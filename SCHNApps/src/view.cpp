@@ -329,7 +329,7 @@ void View::init()
 
 	std::cout << "using " << glGetString(GL_VERSION) << std::endl;
 
-	qglviewer::Camera* c = this->camera();
+//	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
 //	delete c;
 

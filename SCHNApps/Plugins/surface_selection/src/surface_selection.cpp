@@ -110,7 +110,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 			CellSelectorGen* selector = m_schnapps->getSelectedSelector(orbit);
 			if(selector)
 			{
-				unsigned int nbCells = map->getGenericMap()->getNbCells(orbit);
+//				unsigned int nbCells = map->getGenericMap()->getNbCells(orbit);
 				switch(orbit)
 				{
 					case VERTEX : {
@@ -132,7 +132,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 						{
 							std::vector<PFP2::VEC3> selectionPoint;
 							selectionPoint.push_back(p.positionAttribute[m_selectingVertex]);
-							m_selectionSphereVBO->updateData(selectionPoint);
+							m_selectionSphereVBO->updateData<3>(selectionPoint);
 							m_pointSprite->setAttributePosition(m_selectionSphereVBO);
 							m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
 							m_pointSprite->setLightPosition(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
@@ -184,7 +184,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 //									PFP2::MAP* m = static_cast<MapHandler<PFP2>*>(map)->getMap();
 									std::vector<PFP2::VEC3> selectionPoint;
 									selectionPoint.push_back(p.positionAttribute[m_selectingEdge.dart]);
-									m_selectionSphereVBO->updateData(selectionPoint);
+									m_selectionSphereVBO->updateData<3>(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
 									m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
@@ -237,7 +237,7 @@ void Surface_Selection_Plugin::drawMap(View* view, MapHandlerGen* map)
 
 									std::vector<PFP2::VEC3> selectionPoint;
 									selectionPoint.push_back(p.positionAttribute[m_selectingFace.dart]);
-									m_selectionSphereVBO->updateData(selectionPoint);
+									m_selectionSphereVBO->updateData<3>(selectionPoint);
 
 									m_pointSprite->setAttributePosition(m_selectionSphereVBO);
 									m_pointSprite->setColor(CGoGN::Geom::Vec4f(0.0f, 0.0f, 1.0f, 0.5f));
@@ -561,7 +561,7 @@ void Surface_Selection_Plugin::updateSelectedCellsRendering()
 					std::vector<PFP2::VEC3> selectedPoints;
 					for(std::vector<Vertex>::const_iterator v = selectedCells.begin(); v != selectedCells.end(); ++v)
 						selectedPoints.push_back(p.positionAttribute[*v]);
-					m_selectedVerticesVBO->updateData(selectedPoints);
+					m_selectedVerticesVBO->updateData<3>(selectedPoints);
 					m_selectedVertices_dirty = false;
 					break;
 				}
