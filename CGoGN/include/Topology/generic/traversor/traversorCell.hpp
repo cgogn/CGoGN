@@ -648,28 +648,155 @@ inline void foreach_cell_until(const MAP& map, FUNC f, TraversalOptim opt)
 namespace Parallel
 {
 
+///// internal functor for boost call
+//template <unsigned int ORBIT, typename FUNC>
+//class ThreadFunction
+//{
+//protected:
+//	typedef Cell<ORBIT> CELL;
+//	std::vector<CELL>& m_cells;
+//	Utils::Barrier& m_sync1;
+//	Utils::Barrier& m_sync2;
+//	bool& m_finished;
+//	unsigned int m_id;
+//	FUNC m_lambda;
+//	std::thread::id& m_threadId; // ref on thread::id in table of threads in genericMap for init at operator()
+
+//public:
+//	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id, std::thread::id& threadId) :
+//		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func), m_threadId(threadId)
+//	{
+//	}
+
+//	ThreadFunction(const ThreadFunction<ORBIT, FUNC>& tf):
+//		m_cells(tf.m_cells), m_sync1(tf.m_sync1), m_sync2(tf.m_sync2), m_finished(tf.m_finished), m_id(tf.m_id), m_lambda(tf.m_lambda){}
+
+//	std::thread::id& getThreadId() { return m_threadId; }
+
+//	void operator()()
+//	{
+//		// first thing to do set the thread id in genericMap
+//		m_threadId = std::this_thread::get_id();
+
+//		while (!m_finished)
+//		{
+//			for (typename std::vector<CELL>::const_iterator it = m_cells.begin(); it != m_cells.end(); ++it)
+//				m_lambda(*it, m_id);
+//			m_cells.clear();
+//			m_sync1.wait(); // wait every body has finished
+//			m_sync2.wait(); // wait vectors has been refilled
+//		}
+//	}
+//};
+
+
+//template <TraversalOptim OPT, unsigned int ORBIT, typename MAP, typename FUNC>
+//void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
+//{
+//	// buffer for cell traversing
+//	std::vector< Cell<ORBIT> >* vd = new std::vector< Cell<ORBIT> >[nbth];
+//	for (unsigned int i = 0; i < nbth; ++i)
+//		vd[i].reserve(SIZE_BUFFER_THREAD);
+
+//	unsigned int nb = 0;
+//	TraversorCell<MAP, ORBIT, OPT> trav(map);
+//	Cell<ORBIT> cell = trav.begin();
+//	Cell<ORBIT> c_end = trav.end();
+//	while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
+//	{
+//		vd[nb%nbth].push_back(cell);
+//		nb++;
+//		cell = trav.next();
+//	}
+//	Utils::Barrier sync1(nbth+1);
+//	Utils::Barrier sync2(nbth+1);
+//	bool finished=false;
+
+//	// launch threads
+//	std::thread** threads = new std::thread*[nbth];
+//	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
+
+//	// add place for nbth new threads in the table of threadId in genericmap
+////	unsigned int firstThread = map.addEmptyThreadIds(nbth);
+
+//	for (unsigned int i = 0; i < nbth; ++i)
+//	{
+//		std::thread::id& threadId = map.addEmptyThreadId();
+//		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i], sync1, sync2, finished, 1+i, threadId);
+//		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
+//	}
+
+//	// and continue to traverse the map
+//	std::vector< Cell<ORBIT> >* tempo = new std::vector< Cell<ORBIT> >[nbth];
+//	for (unsigned int i = 0; i < nbth; ++i)
+//		tempo[i].reserve(SIZE_BUFFER_THREAD);
+
+//	while (cell.dart != c_end.dart)
+//	{
+//		for (unsigned int i = 0; i < nbth; ++i)
+//			tempo[i].clear();
+//		unsigned int nb = 0;
+
+//		while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
+//		{
+//			tempo[nb%nbth].push_back(cell);
+//			nb++;
+//			cell = trav.next();
+//		}
+//		sync1.wait();// wait for all thread to finish its vector
+//		for (unsigned int i = 0; i < nbth; ++i)
+//			vd[i].swap(tempo[i]);
+//		sync2.wait();// everybody refilled then go
+//	}
+
+//	sync1.wait(); // wait for all thread to finish its vector
+//	finished = true; // say finsih to everyone
+//	sync2.wait(); // just wait for last barrier wait !
+
+//	// wait for all theads to be finished
+//	for (unsigned int i = 0; i < nbth; ++i)
+//	{
+//		threads[i]->join();
+//		delete threads[i];
+//		map.removeThreadId(tfs[i]->getThreadId());
+//		delete tfs[i];
+//	}
+
+//	delete[] tfs;
+//	delete[] threads;
+//	delete[] vd;
+//	delete[] tempo;
+//}
+
+
 /// internal functor for boost call
-template <unsigned int ORBIT, typename FUNC>
+template <TraversalOptim OPT, unsigned int ORBIT, typename MAP, typename FUNC>
 class ThreadFunction
 {
 protected:
 	typedef Cell<ORBIT> CELL;
-	std::vector<CELL>& m_cells;
-	Utils::Barrier& m_sync1;
-	Utils::Barrier& m_sync2;
-	bool& m_finished;
+
+	std::vector<CELL> m_cells;
+
 	unsigned int m_id;
 	FUNC m_lambda;
 	std::thread::id& m_threadId; // ref on thread::id in table of threads in genericMap for init at operator()
+	std::mutex& m_mutex_map;
+	TraversorCell<MAP, ORBIT, OPT>& m_trav;
+	Cell<ORBIT>& m_current_cell;
+
 
 public:
-	ThreadFunction(FUNC func, std::vector<CELL>& vd, Utils::Barrier& s1, Utils::Barrier& s2, bool& finished, unsigned int id, std::thread::id& threadId) :
-		m_cells(vd), m_sync1(s1), m_sync2(s2), m_finished(finished), m_id(id), m_lambda(func), m_threadId(threadId)
+	ThreadFunction(FUNC func,unsigned int id, std::thread::id& threadId, std::mutex& mutmap, TraversorCell<MAP, ORBIT, OPT>& trav, Cell<ORBIT>& current_cell) :
+		m_id(id), m_lambda(func), m_threadId(threadId),
+		m_mutex_map(mutmap), m_trav(trav), m_current_cell(current_cell)
 	{
 	}
 
-	ThreadFunction(const ThreadFunction<ORBIT, FUNC>& tf):
-		m_cells(tf.m_cells), m_sync1(tf.m_sync1), m_sync2(tf.m_sync2), m_finished(tf.m_finished), m_id(tf.m_id), m_lambda(tf.m_lambda){}
+	ThreadFunction(const ThreadFunction<OPT,ORBIT,MAP,FUNC>& tf):
+		 m_id(tf.m_id), m_lambda(tf.m_lambda),
+		 m_mutex_map(tf.mutmap), m_trav(tf.trav), m_current_cell(tf.current_cell)
+	{}
 
 	std::thread::id& getThreadId() { return m_threadId; }
 
@@ -678,80 +805,54 @@ public:
 		// first thing to do set the thread id in genericMap
 		m_threadId = std::this_thread::get_id();
 
-		while (!m_finished)
+		m_cells.reserve(SIZE_BUFFER_THREAD);
+
+		bool finished = false;
+
+		while (!finished)
 		{
-			for (typename std::vector<CELL>::const_iterator it = m_cells.begin(); it != m_cells.end(); ++it)
-				m_lambda(*it, m_id);
-			m_cells.clear();
-			m_sync1.wait(); // wait every body has finished
-			m_sync2.wait(); // wait vectors has been refilled
+			// get data
+			m_mutex_map.lock();
+			Cell<ORBIT> c_end = m_trav.end();
+			while ((m_current_cell.dart != c_end.dart) && (m_cells.size() <SIZE_BUFFER_THREAD) )
+			{
+				m_cells.push_back(m_current_cell);
+				m_current_cell = m_trav.next();
+			}
+			m_mutex_map.unlock();
+
+			// and traverse
+			if (m_cells.empty())
+				finished = true;
+			else
+			{
+				for (typename std::vector<CELL>::const_iterator it = m_cells.begin(); it != m_cells.end(); ++it)
+					m_lambda(*it, m_id);
+				m_cells.clear();
+			}
 		}
 	}
 };
 
-
 template <TraversalOptim OPT, unsigned int ORBIT, typename MAP, typename FUNC>
 void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 {
-	// buffer for cell traversing
-	std::vector< Cell<ORBIT> >* vd = new std::vector< Cell<ORBIT> >[nbth];
-	for (unsigned int i = 0; i < nbth; ++i)
-		vd[i].reserve(SIZE_BUFFER_THREAD);
 
-	unsigned int nb = 0;
 	TraversorCell<MAP, ORBIT, OPT> trav(map);
 	Cell<ORBIT> cell = trav.begin();
-	Cell<ORBIT> c_end = trav.end();
-	while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
-	{
-		vd[nb%nbth].push_back(cell);
-		nb++;
-		cell = trav.next();
-	}
-	Utils::Barrier sync1(nbth+1);
-	Utils::Barrier sync2(nbth+1);
-	bool finished=false;
+
+	std::mutex mutex_map;
 
 	// launch threads
 	std::thread** threads = new std::thread*[nbth];
-	ThreadFunction<ORBIT,FUNC>** tfs = new ThreadFunction<ORBIT,FUNC>*[nbth];
-
-	// add place for nbth new threads in the table of threadId in genericmap
-//	unsigned int firstThread = map.addEmptyThreadIds(nbth);
+	ThreadFunction<OPT,ORBIT,MAP,FUNC>** tfs = new ThreadFunction<OPT,ORBIT,MAP,FUNC>*[nbth];
 
 	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		std::thread::id& threadId = map.addEmptyThreadId();
-		tfs[i] = new ThreadFunction<ORBIT,FUNC>(func, vd[i], sync1, sync2, finished, 1+i, threadId);
+		tfs[i] = new ThreadFunction<OPT,ORBIT,MAP,FUNC>(func, 1+i,threadId,mutex_map,trav,cell);
 		threads[i] = new std::thread( std::ref( *(tfs[i]) ) );
 	}
-
-	// and continue to traverse the map
-	std::vector< Cell<ORBIT> >* tempo = new std::vector< Cell<ORBIT> >[nbth];
-	for (unsigned int i = 0; i < nbth; ++i)
-		tempo[i].reserve(SIZE_BUFFER_THREAD);
-
-	while (cell.dart != c_end.dart)
-	{
-		for (unsigned int i = 0; i < nbth; ++i)
-			tempo[i].clear();
-		unsigned int nb = 0;
-
-		while ((cell.dart != c_end.dart) && (nb < nbth*SIZE_BUFFER_THREAD) )
-		{
-			tempo[nb%nbth].push_back(cell);
-			nb++;
-			cell = trav.next();
-		}
-		sync1.wait();// wait for all thread to finish its vector
-		for (unsigned int i = 0; i < nbth; ++i)
-			vd[i].swap(tempo[i]);
-		sync2.wait();// everybody refilled then go
-	}
-
-	sync1.wait(); // wait for all thread to finish its vector
-	finished = true; // say finsih to everyone
-	sync2.wait(); // just wait for last barrier wait !
 
 	// wait for all theads to be finished
 	for (unsigned int i = 0; i < nbth; ++i)
@@ -764,9 +865,8 @@ void foreach_cell_tmpl(MAP& map, FUNC func, unsigned int nbth)
 
 	delete[] tfs;
 	delete[] threads;
-	delete[] vd;
-	delete[] tempo;
 }
+
 
 template <unsigned int ORBIT, typename MAP, typename FUNC>
 void foreach_cell(MAP& map, FUNC func, TraversalOptim opt, unsigned int nbth)
