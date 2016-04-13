@@ -14,9 +14,9 @@ Linux
 =====
 Dependencies
 ------------
-* install for following package cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev zlib1g-dev uuid-dev libgsl0-dev libsuitesparse-dev python27
+* install for following package cmake cmake-curses-gui cmake-qt-gui libXi-dev libXmu-dev libglew-dev zlib1g-dev uuid-dev libgsl0-dev libsuitesparse-dev python2.7-dev
 * for Qt4: libqt4-dev qt4-dev-tools qtcreator
-* for Qt5: qt5-default qtbase5-dev-tools qtcreator
+* for Qt5: qt5-default qtbase5-dev-tools qtcreator libqt5svg5-dev libqt5opengl5-dev
 
 **Supported compilers: g++ 4.8 or greater**
 
