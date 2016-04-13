@@ -178,11 +178,11 @@ void Surface_Selection_DockTab::clearPressed()
 	{
 		MapHandlerGen* map = m_schnapps->getSelectedMap();
 		unsigned int orbit = m_schnapps->getCurrentOrbit();
-
-		if (map)
+		CellSelectorGen* sel = m_schnapps->getSelectedSelector(orbit);
+		if (map && sel)
 		{
-			m_plugin->clearSelection(map->getName(), orbit, m_schnapps->getSelectedSelector(orbit)->getName());
-			m_plugin->pythonRecording("clearSelection", "", map->getName(), orbit, m_schnapps->getSelectedSelector(orbit)->getName());
+			m_plugin->clearSelection(map->getName(), orbit, sel->getName());
+			m_plugin->pythonRecording("clearSelection", "", map->getName(), orbit, sel->getName());
 		}
 	}
 }

@@ -190,6 +190,9 @@ void Drawer::newList(GLenum comp)
 	m_dataPos.clear();
 	m_dataCol.clear();
 	m_begins.clear();
+	m_begins_point.clear();
+	m_begins_line.clear();
+	m_begins_face.clear();
 }
 
 void Drawer::endList()

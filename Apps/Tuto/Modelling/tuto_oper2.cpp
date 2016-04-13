@@ -132,7 +132,7 @@ void MyQT::operation(int x)
 		break;
 	case 7:
 		CGoGNout <<"split face"<<CGoGNendl;
-		if (m_selected != NIL)
+		if ((m_selected != NIL) && (m_selected2 != NIL) && myMap.sameFace(m_selected,m_selected2))
 		{
 			myMap.splitFace(m_selected,m_selected2);
 			updateMap();
@@ -310,6 +310,26 @@ void MyQT::cb_keyPress(int keycode)
 		updateMap();
 		updateGL();
 		break;
+	case '1':
+		if (m_selected!=NIL)
+			m_selected = myMap.phi1(m_selected);
+		updateMap();
+		updateGL();
+		break;
+	case '2':
+		if (m_selected!=NIL)
+			m_selected = myMap.phi2(m_selected);
+		updateMap();
+		updateGL();
+		break;
+
+	case ' ':
+		m_selected=NIL;
+		m_selected2=NIL;
+		updateMap();
+		updateGL();
+		break;
+
 	}
 	updateGL();
 }
