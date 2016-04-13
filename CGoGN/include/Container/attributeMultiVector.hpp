@@ -191,7 +191,7 @@ bool AttributeMultiVector<T>::copy(const AttributeMultiVectorGen* atmvg)
 	}
 
 	for (unsigned int i = 0; i < atmv->m_tableData.size(); ++i)
-		std::memcpy(m_tableData[i], atmv->m_tableData[i], _BLOCKSIZE_ * sizeof(T));
+		std::memcpy( (void*) m_tableData[i], (void*) atmv->m_tableData[i], _BLOCKSIZE_ * sizeof(T));
 
 	return true;
 }
