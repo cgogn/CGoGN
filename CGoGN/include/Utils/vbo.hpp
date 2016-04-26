@@ -28,23 +28,42 @@ namespace CGoGN
 namespace Utils
 {
 
-template <typename T>
+template <unsigned int VEC_DIM, typename T>
 void VBO::updateData(std::vector<T>& data)
 {
 	if (m_lock)
 	{
-		CGoGNerr << "Error locked VBO" << CGoGNendl;
+		CGoGNerr << "VBO::updateData : Error locked VBO" << CGoGNendl;
 		return;
 	}
 
 	if (data.empty())
 		return;
 
-	m_data_size = sizeof(T) / sizeof(float);
+	m_data_size = VEC_DIM;
 	m_nbElts = uint32(data.size());
-
 	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
-	glBufferData(GL_ARRAY_BUFFER, m_nbElts * sizeof(T), &(data[0]), GL_STREAM_DRAW);
+
+	if (sizeof(T) / sizeof(double) == VEC_DIM)
+	{
+		unsigned int nbf = m_nbElts * m_data_size;
+		float* buffer = new float[nbf];
+		float* ptr_out = buffer;
+		double* ptr_in = reinterpret_cast<double*>(&(data[0]));
+		for (unsigned int i=0; i<nbf; ++i)
+			*ptr_out++ = float(*ptr_in++);
+		glBufferData(GL_ARRAY_BUFFER, nbf * sizeof(float), buffer, GL_STREAM_DRAW);
+		delete[] buffer;
+		return;
+	}
+	if (sizeof(T) / sizeof(float) == VEC_DIM)
+	{
+		glBufferData(GL_ARRAY_BUFFER, m_nbElts * VEC_DIM * sizeof(float), &(data[0]), GL_STREAM_DRAW);
+		return;
+	}
+
+	// we should normally never reach this code
+	CGoGNerr << "VBO::updateData : Error only float, double, VecXf, VecXd" << CGoGNendl;
 }
 
 } // namespace Utils

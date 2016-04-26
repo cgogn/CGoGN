@@ -415,7 +415,7 @@ int main(int argc, char **argv)
 	{
 		position = myMap.addAttribute<VEC3, VERTEX, MAP>("position");
 
-		int nb = 16;
+		int nb = 3;
 		Algo::Volume::Tilings::Cubic::Grid<PFP> cubic(myMap, nb, nb, nb);
 		cubic.embedIntoGrid(position, 1.0f, 1.0f, 1.0f);
 
