@@ -129,6 +129,8 @@ class Matrix
 {
   public:
 
+	static std::string CGoGNnameOfType() { return ""; }
+
     /** \brief Base class typedef.
       * \sa PlainObjectBase
       */
