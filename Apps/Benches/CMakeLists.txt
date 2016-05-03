@@ -10,3 +10,6 @@ target_link_libraries( bench_remesh ${CGoGN_LIBS} ${CGoGN_EXT_LIBS} )
 
 add_executable(bench_compact bench_compact.cpp )
 target_link_libraries( bench_compact ${CGoGN_LIBS} ${CGoGN_EXT_LIBS} )
+
+add_executable(bench_import_trav bench_import_trav.cpp )
+target_link_libraries( bench_import_trav ${CGoGN_LIBS} ${CGoGN_EXT_LIBS} )

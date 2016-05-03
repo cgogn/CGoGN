@@ -1,6 +1,7 @@
 #ifndef _SURFACE_RENDERVECTOR_PLUGIN_H_
 #define _SURFACE_RENDERVECTOR_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
 #include "surface_renderVector_dockTab.h"
 
@@ -30,7 +31,7 @@ struct MapParameters
 * The length and color of each vector can be changed.
 * All parameters are per view / per map.
 */
-class Surface_RenderVector_Plugin : public PluginInteraction
+class SURFACE_RENDER_VECTOR_API Surface_RenderVector_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

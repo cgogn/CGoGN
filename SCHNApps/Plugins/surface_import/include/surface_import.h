@@ -1,6 +1,7 @@
 #ifndef _SURFACE_IMPORT_PLUGIN_H_
 #define _SURFACE_IMPORT_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_processing.h"
 
 namespace CGoGN
@@ -13,7 +14,7 @@ namespace SCHNApps
 * The import image function allow the creation of a mesh with a face by pixel.
 * Image format support is given by Qt.
 */
-class Surface_Import_Plugin : public PluginProcessing
+class SURFACE_IMPORT_API Surface_Import_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

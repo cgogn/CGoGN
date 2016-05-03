@@ -1,0 +1,9 @@
+#ifdef WIN32
+#if defined SURFACE_DIFFERENTIAL_PROPERTIES_DLL_EXPORT
+#define SURFACE_DIFFERENTIAL_PROPERTIES_API __declspec(dllexport)
+#else
+#define SURFACE_DIFFERENTIAL_PROPERTIES_API __declspec(dllimport)
+#endif
+#else
+#define SURFACE_DIFFERENTIAL_PROPERTIES_API
+#endif

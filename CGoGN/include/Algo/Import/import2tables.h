@@ -62,7 +62,7 @@ class MeshTablesSurface
 public:
 	typedef typename PFP::MAP MAP ;
     typedef typename PFP::VEC3 VEC3 ;
-    typedef typename VEC3::DATA_TYPE DATA_TYPE ;
+	typedef typename VEC3::DATA_TYPE DATA_TYPE ;
 	typedef typename PFP::REAL REAL ;
 
 protected:

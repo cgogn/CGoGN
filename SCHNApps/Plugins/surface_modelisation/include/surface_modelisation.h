@@ -1,6 +1,7 @@
 #ifndef _SURFACE_MODELISATION_PLUGIN_H_
 #define _SURFACE_MODELISATION_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
 #include "surface_modelisation_dockTab.h"
 
@@ -32,7 +33,7 @@ struct MapParameters
 	CellSelector<PFP2::MAP, FACE>* faceSelector;
 };
 
-class Surface_Modelisation_Plugin : public PluginInteraction
+class SURFACE_MODELISATION_API Surface_Modelisation_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
