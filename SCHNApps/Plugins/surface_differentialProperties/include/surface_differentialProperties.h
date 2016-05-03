@@ -1,6 +1,7 @@
 #ifndef _SURFACE_DIFFERENTIALPROPERTIES_PLUGIN_H_
 #define _SURFACE_DIFFERENTIALPROPERTIES_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_processing.h"
 
 #include "dialog_computeNormal.h"
@@ -16,7 +17,7 @@ namespace SCHNApps
  * - Normals
  * - Curvatures
  */
-class Surface_DifferentialProperties_Plugin : public PluginProcessing
+class SURFACE_DIFFERENTIAL_PROPERTIES_API Surface_DifferentialProperties_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

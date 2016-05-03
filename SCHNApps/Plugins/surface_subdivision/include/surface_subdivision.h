@@ -1,6 +1,7 @@
 #ifndef _SURFACE_SUBDIVISION_PLUGIN_H_
 #define _SURFACE_SUBDIVISION_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_processing.h"
 
 #include "dialog_surface_subdivision.h"
@@ -20,7 +21,7 @@ namespace SCHNApps
  * - linear triangulation
  * - linear quadrangulation
  */
-class Surface_Subdivision_Plugin : public Plugin
+class SURFACE_SUBDIVISION_API Surface_Subdivision_Plugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

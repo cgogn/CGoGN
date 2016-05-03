@@ -1,6 +1,7 @@
 #ifndef _SURFACE_RENDERSCALAR_PLUGIN_H_
 #define _SURFACE_RENDERSCALAR_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
 #include "surface_renderScalar_dockTab.h"
 
@@ -44,7 +45,7 @@ struct MapParameters
 * A position VBO must be provided for surface rendering.
 * All parameters are per view / per map.
 */
-class Surface_RenderScalar_Plugin : public PluginInteraction
+class SURFACE_RENDER_SCALAR_API Surface_RenderScalar_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

@@ -3,7 +3,7 @@
 
 #include "dll.h"
 #include "plugin_interaction.h"
-#include "surface_deformation_dockTab.h"
+#include "surface_lsm_dockTab.h"
 
 #include "mapHandler.h"
 
@@ -36,18 +36,13 @@ struct MapParameters
 
 	bool initialized;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionInit;
-	VertexAttribute<PFP2::VEC3, PFP2::MAP> diffCoord;
-	VertexAttribute<Eigen_Matrix3f, PFP2::MAP> vertexRotationMatrix;
-	VertexAttribute<PFP2::VEC3, PFP2::MAP> rotatedDiffCoord;
-
 	VertexAttribute<unsigned int, PFP2::MAP> vIndex;
 	unsigned int nb_vertices;
 
 	NLContext nlContext;
 };
 
-class SURFACE_DEFORMATION_API Surface_Deformation_Plugin : public PluginInteraction
+class SURFACE_LSM_API Surface_LSM_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
@@ -55,15 +50,15 @@ class SURFACE_DEFORMATION_API Surface_Deformation_Plugin : public PluginInteract
 	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
 #endif
 
-	friend class Surface_Deformation_DockTab;
+	friend class Surface_LSM_DockTab;
 
 public:
-	Surface_Deformation_Plugin() :
+	Surface_LSM_Plugin() :
 		m_draginit(false),
 		m_dragging(false)
 	{}
 
-	~Surface_Deformation_Plugin()
+	~Surface_LSM_Plugin()
 	{}
 
 	virtual bool enable();
@@ -102,11 +97,10 @@ public slots:
 
 protected:
 	void toggleMapDeformation(MapHandlerGen* map);
-	void matchDiffCoord(MapHandlerGen* map);
-	void asRigidAsPossible(MapHandlerGen* map);
+	void lsm(MapHandlerGen* map);
 
 protected:
-	Surface_Deformation_DockTab* m_dockTab;
+	Surface_LSM_DockTab* m_dockTab;
 	QHash<MapHandlerGen*, MapParameters> h_parameterSet;
 
 	bool m_draginit;
