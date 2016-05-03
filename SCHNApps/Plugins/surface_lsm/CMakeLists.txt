@@ -4,6 +4,8 @@ SET( PLUGIN_NAME Surface_LSM )
 
 SET( PLUGIN_ROOT_DIR ${SCHNApps_ROOT_DIR}/Plugins/surface_lsm )
 
+ADD_DEFINITIONS(-DSURFACE_LSM_DLL_EXPORT)
+
 INCLUDE_DIRECTORIES(
 	${PLUGIN_ROOT_DIR}/include
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -25,8 +27,8 @@ file(
 
 SET(
 	PLUGIN_QOBJECT_FILES
-	${PLUGIN_ROOT_DIR}/include/surface_deformation.h
-	${PLUGIN_ROOT_DIR}/include/surface_deformation_dockTab.h
+	${PLUGIN_ROOT_DIR}/include/surface_lsm.h
+	${PLUGIN_ROOT_DIR}/include/surface_lsm_dockTab.h
 )
 
 include( ${SCHNApps_ROOT_DIR}/Plugins/plugins_cmake.txt )

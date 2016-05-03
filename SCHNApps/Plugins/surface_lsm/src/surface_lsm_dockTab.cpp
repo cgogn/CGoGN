@@ -1,6 +1,6 @@
-#include "surface_deformation_dockTab.h"
+#include "surface_lsm_dockTab.h"
 
-#include "surface_deformation.h"
+#include "surface_lsm.h"
 #include "schnapps.h"
 #include "mapHandler.h"
 
@@ -10,7 +10,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-Surface_Deformation_DockTab::Surface_Deformation_DockTab(SCHNApps* s, Surface_Deformation_Plugin* p) :
+Surface_LSM_DockTab::Surface_LSM_DockTab(SCHNApps* s, Surface_LSM_Plugin* p) :
 	m_schnapps(s),
 	m_plugin(p),
 	b_updatingUI(false)
@@ -27,7 +27,7 @@ Surface_Deformation_DockTab::Surface_Deformation_DockTab(SCHNApps* s, Surface_De
 
 
 
-void Surface_Deformation_DockTab::positionAttributeChanged(int index)
+void Surface_LSM_DockTab::positionAttributeChanged(int index)
 {
 	if(!b_updatingUI)
 	{
@@ -46,7 +46,7 @@ void Surface_Deformation_DockTab::positionAttributeChanged(int index)
 	}
 }
 
-void Surface_Deformation_DockTab::handleSelectorChanged(int index)
+void Surface_LSM_DockTab::handleSelectorChanged(int index)
 {
 	if(!b_updatingUI)
 	{
@@ -61,7 +61,7 @@ void Surface_Deformation_DockTab::handleSelectorChanged(int index)
 	}
 }
 
-void Surface_Deformation_DockTab::freeSelectorChanged(int index)
+void Surface_LSM_DockTab::freeSelectorChanged(int index)
 {
 	if(!b_updatingUI)
 	{
@@ -75,7 +75,7 @@ void Surface_Deformation_DockTab::freeSelectorChanged(int index)
 	}
 }
 
-void Surface_Deformation_DockTab::startStopButtonClicked()
+void Surface_LSM_DockTab::startStopButtonClicked()
 {
 	if(!b_updatingUI)
 	{
@@ -89,7 +89,7 @@ void Surface_Deformation_DockTab::startStopButtonClicked()
 
 
 
-void Surface_Deformation_DockTab::addVertexAttribute(const QString& name)
+void Surface_LSM_DockTab::addVertexAttribute(const QString& name)
 {
 	b_updatingUI = true;
 	QString vec3TypeName = QString::fromStdString(nameOfType(PFP2::VEC3()));
@@ -99,7 +99,7 @@ void Surface_Deformation_DockTab::addVertexAttribute(const QString& name)
 	b_updatingUI = false;
 }
 
-void Surface_Deformation_DockTab::addVertexSelector(const QString& name)
+void Surface_LSM_DockTab::addVertexSelector(const QString& name)
 {
 	b_updatingUI = true;
 	combo_handleSelector->addItem(name);
@@ -107,7 +107,7 @@ void Surface_Deformation_DockTab::addVertexSelector(const QString& name)
 	b_updatingUI = false;
 }
 
-void Surface_Deformation_DockTab::removeVertexSelector(const QString& name)
+void Surface_LSM_DockTab::removeVertexSelector(const QString& name)
 {
 	b_updatingUI = true;
 	int curIndex = combo_handleSelector->currentIndex();
@@ -124,7 +124,7 @@ void Surface_Deformation_DockTab::removeVertexSelector(const QString& name)
 	b_updatingUI = false;
 }
 
-void Surface_Deformation_DockTab::mapParametersInitialized(bool b)
+void Surface_LSM_DockTab::mapParametersInitialized(bool b)
 {
 	b_updatingUI = true;
 	combo_positionAttribute->setEnabled(!b);
@@ -135,7 +135,7 @@ void Surface_Deformation_DockTab::mapParametersInitialized(bool b)
 	b_updatingUI = false;
 }
 
-void Surface_Deformation_DockTab::updateMapParameters()
+void Surface_LSM_DockTab::updateMapParameters()
 {
 	b_updatingUI = true;
 

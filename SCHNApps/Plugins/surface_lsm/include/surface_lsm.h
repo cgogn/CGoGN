@@ -1,8 +1,9 @@
 #ifndef _SURFACE_DEFORMATION_PLUGIN_H_
 #define _SURFACE_DEFORMATION_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
-#include "surface_deformation_dockTab.h"
+#include "surface_lsm_dockTab.h"
 
 #include "mapHandler.h"
 
@@ -35,15 +36,13 @@ struct MapParameters
 
 	bool initialized;
 
-	VertexAttribute<PFP2::VEC3, PFP2::MAP> positionInit;
-
 	VertexAttribute<unsigned int, PFP2::MAP> vIndex;
 	unsigned int nb_vertices;
 
 	NLContext nlContext;
 };
 
-class Surface_Deformation_Plugin : public PluginInteraction
+class SURFACE_LSM_API Surface_LSM_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
@@ -51,15 +50,15 @@ class Surface_Deformation_Plugin : public PluginInteraction
 	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
 #endif
 
-	friend class Surface_Deformation_DockTab;
+	friend class Surface_LSM_DockTab;
 
 public:
-	Surface_Deformation_Plugin() :
+	Surface_LSM_Plugin() :
 		m_draginit(false),
 		m_dragging(false)
 	{}
 
-	~Surface_Deformation_Plugin()
+	~Surface_LSM_Plugin()
 	{}
 
 	virtual bool enable();
@@ -101,7 +100,7 @@ protected:
 	void lsm(MapHandlerGen* map);
 
 protected:
-	Surface_Deformation_DockTab* m_dockTab;
+	Surface_LSM_DockTab* m_dockTab;
 	QHash<MapHandlerGen*, MapParameters> h_parameterSet;
 
 	bool m_draginit;

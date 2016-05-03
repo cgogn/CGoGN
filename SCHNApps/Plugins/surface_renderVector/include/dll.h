@@ -1,0 +1,9 @@
+#ifdef WIN32
+#if defined SURFACE_RENDER_VECTOR_DLL_EXPORT
+#define SURFACE_RENDER_VECTOR_API __declspec(dllexport)
+#else
+#define SURFACE_RENDER_VECTOR_API __declspec(dllimport)
+#endif
+#else
+#define SURFACE_RENDER_VECTOR_API
+#endif

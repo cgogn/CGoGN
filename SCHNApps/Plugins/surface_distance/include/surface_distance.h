@@ -1,6 +1,7 @@
 #ifndef _SURFACE_DISTANCE_PLUGIN_H_
 #define _SURFACE_DISTANCE_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_processing.h"
 
 #include "dialog_computeDistance.h"
@@ -11,7 +12,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Surface_Distance_Plugin : public PluginProcessing
+class SURFACE_DISTANCE_API Surface_Distance_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

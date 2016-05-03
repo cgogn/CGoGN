@@ -1,6 +1,7 @@
 #ifndef _SURFACE_DEFORMATION_PLUGIN_H_
 #define _SURFACE_DEFORMATION_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
 #include "surface_deformation_dockTab.h"
 
@@ -46,7 +47,7 @@ struct MapParameters
 	NLContext nlContext;
 };
 
-class Surface_Deformation_Plugin : public PluginInteraction
+class SURFACE_DEFORMATION_API Surface_Deformation_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

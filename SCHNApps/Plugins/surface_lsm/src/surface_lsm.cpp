@@ -1,4 +1,4 @@
-#include "surface_deformation.h"
+#include "surface_lsm.h"
 
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/laplacian.h"
@@ -38,17 +38,11 @@ void MapParameters::start(MapHandlerGen* mhg)
 		{
 			MapHandler<PFP2>* mh = static_cast<MapHandler<PFP2>*>(mhg);
 
-			positionInit = mh->getAttribute<PFP2::VEC3, VERTEX>("positionInit");
-			if(!positionInit.isValid())
-				positionInit = mh->addAttribute<PFP2::VEC3, VERTEX>("positionInit");
-
 			vIndex = mh->getAttribute<unsigned int, VERTEX>("vIndex");
 			if(!vIndex.isValid())
 				vIndex = mh->addAttribute<unsigned int, VERTEX>("vIndex");
 
 			PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
-
-			map->copyAttribute(positionInit, positionAttribute);
 
 			nb_vertices = Algo::Topo::computeIndexCells<VERTEX>(*map, vIndex);
 
@@ -68,9 +62,6 @@ void MapParameters::stop(MapHandlerGen* mh)
 {
 	if(initialized)
 	{
-//		if(positionInit.isValid())
-//			mh->removeAttribute(positionInit);
-
 //		if(vIndex.isValid())
 //			mh->removeAttribute(vIndex);
 
@@ -85,13 +76,13 @@ void MapParameters::stop(MapHandlerGen* mh)
 
 
 
-bool Surface_Deformation_Plugin::enable()
+bool Surface_LSM_Plugin::enable()
 {
 	//	magic line that init static variables of GenericMap in the plugins
 	GenericMap::copyAllStatics(m_schnapps->getStaticPointers());
 
-	m_dockTab = new Surface_Deformation_DockTab(m_schnapps, this);
-	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_Deformation");
+	m_dockTab = new Surface_LSM_DockTab(m_schnapps, this);
+	m_schnapps->addPluginDockTab(this, m_dockTab, "Surface_LSM");
 
 	connect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
@@ -105,16 +96,16 @@ bool Surface_Deformation_Plugin::enable()
 	return true;
 }
 
-void Surface_Deformation_Plugin::disable()
+void Surface_LSM_Plugin::disable()
 {
 	disconnect(m_schnapps, SIGNAL(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)), this, SLOT(selectedMapChanged(MapHandlerGen*, MapHandlerGen*)));
 }
 
-void Surface_Deformation_Plugin::draw(View *view)
+void Surface_LSM_Plugin::draw(View *view)
 {
 }
 
-void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
+void Surface_LSM_Plugin::keyPress(View* view, QKeyEvent* event)
 {
 	switch(event->key())
 	{
@@ -161,7 +152,7 @@ void Surface_Deformation_Plugin::keyPress(View* view, QKeyEvent* event)
 	}
 }
 
-void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
+void Surface_LSM_Plugin::mouseMove(View* view, QMouseEvent* event)
 {
 	if (m_dragging)
 	{
@@ -213,7 +204,7 @@ void Surface_Deformation_Plugin::mouseMove(View* view, QMouseEvent* event)
 
 
 
-void Surface_Deformation_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
+void Surface_LSM_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHandlerGen *cur)
 {
 	m_dockTab->updateMapParameters();
 	if (cur==NULL)
@@ -222,7 +213,7 @@ void Surface_Deformation_Plugin::selectedMapChanged(MapHandlerGen *prev, MapHand
 		m_dockTab->setDisabled(false);
 }
 
-void Surface_Deformation_Plugin::mapAdded(MapHandlerGen* map)
+void Surface_LSM_Plugin::mapAdded(MapHandlerGen* map)
 {
 	connect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
 	connect(map, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(cellSelectorAdded(unsigned int, const QString&)));
@@ -230,7 +221,7 @@ void Surface_Deformation_Plugin::mapAdded(MapHandlerGen* map)
 	connect(map, SIGNAL(selectedCellsChanged(CellSelectorGen*)), this, SLOT(selectedCellsChanged(CellSelectorGen*)));
 }
 
-void Surface_Deformation_Plugin::mapRemoved(MapHandlerGen* map)
+void Surface_LSM_Plugin::mapRemoved(MapHandlerGen* map)
 {
 	disconnect(map, SIGNAL(attributeAdded(unsigned int, const QString&)), this, SLOT(attributeAdded(unsigned int, const QString&)));
 	disconnect(map, SIGNAL(cellSelectorAdded(unsigned int, const QString&)), this, SLOT(cellSelectorAdded(unsigned int, const QString&)));
@@ -242,7 +233,7 @@ void Surface_Deformation_Plugin::mapRemoved(MapHandlerGen* map)
 
 
 
-void Surface_Deformation_Plugin::attributeAdded(unsigned int orbit, const QString& name)
+void Surface_LSM_Plugin::attributeAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
@@ -250,7 +241,7 @@ void Surface_Deformation_Plugin::attributeAdded(unsigned int orbit, const QStrin
 		m_dockTab->addVertexAttribute(name);
 }
 
-void Surface_Deformation_Plugin::cellSelectorAdded(unsigned int orbit, const QString& name)
+void Surface_LSM_Plugin::cellSelectorAdded(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
@@ -258,7 +249,7 @@ void Surface_Deformation_Plugin::cellSelectorAdded(unsigned int orbit, const QSt
 		m_dockTab->addVertexSelector(name);
 }
 
-void Surface_Deformation_Plugin::cellSelectorRemoved(unsigned int orbit, const QString& name)
+void Surface_LSM_Plugin::cellSelectorRemoved(unsigned int orbit, const QString& name)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 
@@ -282,7 +273,7 @@ void Surface_Deformation_Plugin::cellSelectorRemoved(unsigned int orbit, const Q
 	}
 }
 
-void Surface_Deformation_Plugin::selectedCellsChanged(CellSelectorGen* cs)
+void Surface_LSM_Plugin::selectedCellsChanged(CellSelectorGen* cs)
 {
 	MapHandlerGen* map = static_cast<MapHandlerGen*>(QObject::sender());
 	MapParameters& p = h_parameterSet[map];
@@ -297,7 +288,7 @@ void Surface_Deformation_Plugin::selectedCellsChanged(CellSelectorGen* cs)
 
 
 
-void Surface_Deformation_Plugin::changePositionAttribute(const QString& map, const QString& name)
+void Surface_LSM_Plugin::changePositionAttribute(const QString& map, const QString& name)
 {
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(m)
@@ -313,7 +304,7 @@ void Surface_Deformation_Plugin::changePositionAttribute(const QString& map, con
 	}
 }
 
-void Surface_Deformation_Plugin::changeHandleSelector(const QString& map, const QString& name)
+void Surface_LSM_Plugin::changeHandleSelector(const QString& map, const QString& name)
 {
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(m)
@@ -329,7 +320,7 @@ void Surface_Deformation_Plugin::changeHandleSelector(const QString& map, const 
 	}
 }
 
-void Surface_Deformation_Plugin::changeFreeSelector(const QString& map, const QString& name)
+void Surface_LSM_Plugin::changeFreeSelector(const QString& map, const QString& name)
 {
 	MapHandlerGen* m = m_schnapps->getMap(map);
 	if(m)
@@ -349,7 +340,7 @@ void Surface_Deformation_Plugin::changeFreeSelector(const QString& map, const QS
 
 
 
-void Surface_Deformation_Plugin::toggleMapDeformation(MapHandlerGen* map)
+void Surface_LSM_Plugin::toggleMapDeformation(MapHandlerGen* map)
 {
 	if(map)
 	{
@@ -369,7 +360,7 @@ void Surface_Deformation_Plugin::toggleMapDeformation(MapHandlerGen* map)
 	}
 }
 
-void Surface_Deformation_Plugin::lsm(MapHandlerGen* mh)
+void Surface_LSM_Plugin::lsm(MapHandlerGen* mh)
 {
 	PFP2::MAP* map = static_cast<MapHandler<PFP2>*>(mh)->getMap();
 	MapParameters& p = h_parameterSet[mh];
@@ -393,7 +384,7 @@ void Surface_Deformation_Plugin::lsm(MapHandlerGen* mh)
 #if CGOGN_QT_DESIRED_VERSION == 5
 	Q_PLUGIN_METADATA(IID "CGoGN.SCHNapps.Plugin")
 #else
-	Q_EXPORT_PLUGIN2(Surface_Deformation_Plugin, Surface_Deformation_Plugin)
+	Q_EXPORT_PLUGIN2(Surface_LSM_Plugin, Surface_LSM_Plugin)
 #endif
 
 } // namespace SCHNApps
