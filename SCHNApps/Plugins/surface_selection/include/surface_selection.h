@@ -1,6 +1,7 @@
 #ifndef _SURFACE_SELECTION_PLUGIN_H_
 #define _SURFACE_SELECTION_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
 #include "surface_selection_dockTab.h"
 
@@ -42,7 +43,7 @@ struct MapParameters
 * - in a sphere
 * - with a give variation of the normal.
 */
-class Surface_Selection_Plugin : public PluginInteraction
+class SURFACE_SELECTION_API Surface_Selection_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

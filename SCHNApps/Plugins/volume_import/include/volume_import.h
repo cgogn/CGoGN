@@ -1,6 +1,7 @@
 #ifndef _VOLUME_IMPORT_PLUGIN_H_
 #define _VOLUME_IMPORT_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_processing.h"
 
 namespace CGoGN
@@ -9,7 +10,7 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-class Volume_Import_Plugin : public PluginProcessing
+class VOLUME_IMPORT_API Volume_Import_Plugin : public PluginProcessing
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

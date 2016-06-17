@@ -1,6 +1,7 @@
 #ifndef _SURFACE_RADIANCE_PLUGIN_H_
 #define _SURFACE_RADIANCE_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
 #include "surface_radiance_dockTab.h"
 #include "dialog_computeRadianceDistance.h"
@@ -62,7 +63,7 @@ struct MapParameters
 	Algo::Surface::Decimation::Selector<PFP2>* selector;
 };
 
-class Surface_Radiance_Plugin : public PluginInteraction
+class SURFACE_RADIANCE_API Surface_Radiance_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)

@@ -1,4 +1,5 @@
 #include "surface_render.h"
+#include "surface_render_dockTab.h"
 
 #include "mapHandler.h"
 #include "slot_debug.h"
@@ -139,7 +140,6 @@ void Surface_Render_Plugin::drawMap(View* view, MapHandlerGen* map)
 		}
 	}
 }
-
 
 
 
