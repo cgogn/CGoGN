@@ -1,8 +1,8 @@
 #ifndef _SURFACE_RENDER_PLUGIN_H_
 #define _SURFACE_RENDER_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
-#include "surface_render_dockTab.h"
 
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderPhong.h"
@@ -60,6 +60,8 @@ struct MapParameters
 	Geom::Vec4f backColor;
 };
 
+class Surface_Render_DockTab;
+
 /**
 * @brief Plugin for 2-Maps topology rendering.
 * Some parameters are per view / per map:
@@ -69,7 +71,7 @@ struct MapParameters
 * - position attribute
 * - scale factors
 */
-class Surface_Render_Plugin : public PluginInteraction
+class SURFACE_RENDER_API Surface_Render_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 

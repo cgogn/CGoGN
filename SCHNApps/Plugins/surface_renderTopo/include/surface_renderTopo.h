@@ -1,6 +1,7 @@
 #ifndef _SURFACE_RENDERTOPO_PLUGIN_H_
 #define _SURFACE_RENDERTOPO_PLUGIN_H_
 
+#include "dll.h"
 #include "plugin_interaction.h"
 #include "surface_renderTopo_dockTab.h"
 
@@ -23,7 +24,7 @@ namespace SCHNApps
 * - position attribute
 * - scale factors
 */
-class Surface_RenderTopo_Plugin : public PluginInteraction
+class SURFACE_RENDER_TOPO_API Surface_RenderTopo_Plugin : public PluginInteraction
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
