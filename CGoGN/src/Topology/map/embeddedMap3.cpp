@@ -77,10 +77,10 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 {
 	Dart nd = Map3::cutEdge(d);
 
-//	if(isOrbitEmbedded<VERTEX>())
-//	{
-//		initOrbitEmbeddingNewCell<VERTEX>(nd) ;
-//	}
+	if(isOrbitEmbedded<VERTEX>())
+	{
+		Algo::Topo::initOrbitEmbeddingOnNewCell<VERTEX>(*this, nd) ;
+	}
 
 	if(isOrbitEmbedded<EDGE>())
 	{
