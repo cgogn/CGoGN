@@ -36,7 +36,7 @@ namespace CGoGN
 
 inline bool XMLisError(tinyxml2::XMLError err, const std::string& msg)
 {
-	if (err != tinyxml2::SUCCESS)
+	if (err != tinyxml2::XML_SUCCESS)
 	{
 		CGoGNerr << msg << CGoGNendl;
 		return true;
