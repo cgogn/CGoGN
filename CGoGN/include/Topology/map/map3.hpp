@@ -1404,7 +1404,7 @@ Dart Map3<MAP_IMPL>::newBoundaryCycle(unsigned int nbE)
 }
 
 template <typename MAP_IMPL>
-unsigned int Map3<MAP_IMPL>::closeHole(Dart d)
+unsigned int Map3<MAP_IMPL>::closeHole(Dart d, bool forboundary )
 {
 	assert(phi3(d) == d);		// Nothing to close
 	DartMarkerStore< Map3<MAP_IMPL> > m(*this) ;

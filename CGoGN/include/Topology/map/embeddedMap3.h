@@ -142,12 +142,12 @@ public:
 	//!
 	/*! No attribute is attached to the new volume
 	 */
-	virtual unsigned int closeHole(Dart d);
+	virtual unsigned int closeHole(Dart d, bool forboundary = true );
 
 	//!
 	/*!
 	 */
-	virtual bool check();
+	virtual bool check() const;
 } ;
 
 } // namespace CGoGN

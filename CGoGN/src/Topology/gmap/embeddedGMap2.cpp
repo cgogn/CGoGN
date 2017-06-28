@@ -545,7 +545,7 @@ unsigned int EmbeddedGMap2::closeHole(Dart d, bool forboundary)
 	return nbE ;
 }
 
-bool EmbeddedGMap2::check()
+bool EmbeddedGMap2::check() const
 {
 	bool topo = GMap2::check() ;
 	if (!topo)

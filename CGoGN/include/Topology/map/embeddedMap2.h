@@ -170,7 +170,7 @@ public:
 	/**
 	 *
 	 */
-	bool check() ;
+	bool check() const ;
 } ;
 
 } // namespace CGoGN

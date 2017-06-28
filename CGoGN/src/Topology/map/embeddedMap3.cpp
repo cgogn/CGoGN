@@ -619,7 +619,7 @@ Dart EmbeddedMap3::collapseVolume(Dart d, bool delDegenerateVolumes)
 	return resV;
 }
 
-unsigned int EmbeddedMap3::closeHole(Dart d)
+unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary ) 
 {
 	unsigned int nbF = Map3::closeHole(d) ;
 
@@ -664,7 +664,7 @@ unsigned int EmbeddedMap3::closeHole(Dart d)
 	return nbF ;
 }
 
-bool EmbeddedMap3::check()
+bool EmbeddedMap3::check() const
 {
 	std::cout << "nb vertex orbits : " << Algo::Topo::getNbOrbits<VERTEX>(*this) << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;

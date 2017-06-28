@@ -122,7 +122,6 @@ void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typena
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
 
 	std::string name_index(this->m_nameIndex);
 	if (onlyBoundary)

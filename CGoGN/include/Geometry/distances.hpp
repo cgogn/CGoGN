@@ -189,7 +189,7 @@ void closestPointInTriangle(const VEC3& P, const VEC3& A, const VEC3& B, const V
 	double c = E1.norm2() ;
 	double d = E0 * D ;
 	double e = E1 * D ;
-	double f = D.norm2() ;
+	//double f = D.norm2() ;
 
 	double det = fabs(a*c - b*b);
 	double s = b*e - c*d;

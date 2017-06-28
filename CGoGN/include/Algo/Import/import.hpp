@@ -580,7 +580,6 @@ template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 {
     typedef typename PFP::MAP MAP;
-    typedef typename PFP::VEC3 VEC3;
 
     VertexAutoAttribute< NoTypeNameAttribute< std::vector<Dart> >, MAP> vecDartsPerVertex(map, "incidents");
 
