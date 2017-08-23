@@ -47,6 +47,8 @@ endif()
 
 if(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+else()
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs -std=c++11")
 endif() 
 
 #-----------------------------------------------------------------------------
