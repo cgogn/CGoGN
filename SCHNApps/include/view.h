@@ -156,6 +156,9 @@ public slots:
 	*/
 	bool isLinkedToMap(const QString& name) const;
 
+
+	void updateBoundingBox();
+
 private:
 	bool b_updatingUI;
 
@@ -203,8 +206,6 @@ private slots:
 	void cameraAdded(Camera* camera);
 	void cameraRemoved(Camera* camera);
 	void cameraCheckStateChanged(QListWidgetItem* item);
-
-	void updateBoundingBox();
 
 signals:
 	void currentCameraChanged(Camera*, Camera*);

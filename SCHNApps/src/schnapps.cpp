@@ -798,6 +798,25 @@ MapHandlerGen* SCHNApps::getMap(const QString& name) const
 		return NULL;
 }
 
+
+void  SCHNApps::setScaling(float sx, float sy, float sz)
+{
+	foreach(MapHandlerGen* m, m_maps)
+	{
+		m->setScaling(sx,sy,sz);
+	}
+
+	foreach(View* v, m_views)
+	{
+		v->updateBoundingBox();
+	}
+
+
+	m_controlMapTab->scaling_x->setValue(sx);
+	m_controlMapTab->scaling_y->setValue(sy);
+	m_controlMapTab->scaling_z->setValue(sz);
+}
+
 MapHandlerGen* SCHNApps::getSelectedMap() const
 {
 	return m_controlMapTab->getSelectedMap();

@@ -94,7 +94,7 @@ LIST(APPEND EXT_LIBS PythonQt ${PYTHON_LIBRARIES})
 
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs -std=c++11")
 endif()
 
 if(WIN32)

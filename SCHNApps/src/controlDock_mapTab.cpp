@@ -55,6 +55,10 @@ ControlDock_MapTab::ControlDock_MapTab(SCHNApps* s) :
 	connect(button_volumeAddSelector, SIGNAL(clicked()), this, SLOT(addSelector()));
 	connect(button_volumeRemoveSelector, SIGNAL(clicked()), this, SLOT(removeSelector()));
 
+	connect(scaling_x, SIGNAL(valueChanged(double)), this, SLOT(scaleRenderMap()));
+	connect(scaling_y, SIGNAL(valueChanged(double)), this, SLOT(scaleRenderMap()));
+	connect(scaling_z, SIGNAL(valueChanged(double)), this, SLOT(scaleRenderMap()));
+
 	connect(m_schnapps, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(mapAdded(MapHandlerGen*)));
 	connect(m_schnapps, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(mapRemoved(MapHandlerGen*)));
 }
@@ -318,6 +322,7 @@ void ControlDock_MapTab::mapAdded(MapHandlerGen* m)
 {
 	b_updatingUI = true;
 	list_maps->addItem(m->getName());
+	m->setScaling(scaling_x->value(),scaling_y->value(),scaling_z->value());
 	b_updatingUI = false;
 }
 
@@ -384,6 +389,15 @@ void ControlDock_MapTab::selectedMapCellSelectorRemoved(unsigned int orbit, cons
 }
 
 
+
+void ControlDock_MapTab::scaleRenderMap()
+{
+	QTextStream* rec = m_schnapps->pythonStreamRecorder();
+	if (rec)
+		*rec << "schnapps.setScaling(" << scaling_x->value()<< "," << scaling_y->value()<< "," << scaling_z->value() << ");" << endl;
+
+	m_schnapps->setScaling(scaling_x->value(),scaling_y->value(),scaling_z->value());
+}
 
 
 
