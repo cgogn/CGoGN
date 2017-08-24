@@ -63,6 +63,9 @@ private slots:
 	void selectedMapCellSelectorAdded(unsigned int orbit, const QString& name);
 	void selectedMapCellSelectorRemoved(unsigned int orbit, const QString& name);
 
+
+	void scaleRenderMap();
+
 private:
 	void updateSelectedMapInfo();
 

@@ -272,6 +272,8 @@ public slots:
 	/// internal use (for static declaration / shared library problem)
 	const StaticPointers& getStaticPointers() const { return m_sp; }
 
+	void setScaling(float sx, float sy, float sz);
+
 	/*********************************************************
 	 * MANAGE TEXTURES
 	 *********************************************************/
