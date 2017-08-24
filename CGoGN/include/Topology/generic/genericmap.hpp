@@ -178,7 +178,9 @@ inline Dart GenericMap::newDart()
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		if (m_embeddings[i])							// set all its embeddings
+		{
 			(*m_embeddings[i])[di] = EMBNULL ;			// to EMBNULL
+		}
 	}
 
 	return Dart::create(di) ;

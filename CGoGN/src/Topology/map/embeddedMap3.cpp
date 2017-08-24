@@ -79,7 +79,10 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 
 	if(isOrbitEmbedded<VERTEX>())
 	{
-		Algo::Topo::initOrbitEmbeddingOnNewCell<VERTEX>(*this, nd) ;
+		// embed the new darts created in the cut vertex
+		Algo::Topo::setOrbitEmbedding<VERTEX>(*this, d, getEmbedding<VERTEX>(d)) ;
+		// embed a new cell for the new vertex and copy the attributes' line (c) Lionel
+		Algo::Topo::setOrbitEmbeddingOnNewCell<VERTEX>(*this, nd) ;
 	}
 
 	if(isOrbitEmbedded<EDGE>())
@@ -616,7 +619,7 @@ Dart EmbeddedMap3::collapseVolume(Dart d, bool delDegenerateVolumes)
 	return resV;
 }
 
-unsigned int EmbeddedMap3::closeHole(Dart d)
+unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary ) 
 {
 	unsigned int nbF = Map3::closeHole(d) ;
 
@@ -661,7 +664,7 @@ unsigned int EmbeddedMap3::closeHole(Dart d)
 	return nbF ;
 }
 
-bool EmbeddedMap3::check()
+bool EmbeddedMap3::check() const
 {
 	std::cout << "nb vertex orbits : " << Algo::Topo::getNbOrbits<VERTEX>(*this) << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;

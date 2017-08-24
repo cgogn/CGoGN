@@ -150,7 +150,7 @@ public:
 	 */
 	unsigned int closeHole(Dart d, bool forboundary = true);
 
-	bool check() ;
+	bool check() const;
 } ;
 
 } // namespace CGoGN

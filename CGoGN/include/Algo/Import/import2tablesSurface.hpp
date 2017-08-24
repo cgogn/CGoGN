@@ -396,7 +396,6 @@ bool MeshTablesSurface<PFP>::import3DMap(typename PFP3::MAP& map, std::vector<st
 
 	attrNames.push_back(positions.name()) ;
 
-	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
 
 	// lecture des nombres de sommets / faces du bord
 	m_nbVertices = 0;
@@ -417,6 +416,7 @@ bool MeshTablesSurface<PFP>::import3DMap(typename PFP3::MAP& map, std::vector<st
 
 	std::cout << "m_nbFaces = " << m_nbFaces << std::endl;
 
+//	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
 //	std::vector<unsigned int> verticesID;
 //	verticesID.reserve(m_nbVertices);
 

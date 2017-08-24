@@ -139,7 +139,6 @@ inline void LoopSubdivisionAttribNameTyped(typename PFP::MAP& map, const std::st
 template <typename PFP>
 void LoopSubdivisionAttribName(typename PFP::MAP& map, const std::string& nameAttrib)
 {
-	typedef typename PFP::MAP MAP;
 
 	switch(map.template getAttributeTypeCode<VERTEX>(nameAttrib))
 	{

@@ -181,7 +181,6 @@ template<typename PFP>
 inline void MapRender::addEarTri(typename PFP::MAP& map, Face f, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3, typename PFP::MAP>* pos)
 {
 	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
 
 	bool(*fn_pt1)(VertexPoly*,VertexPoly*) = &(MapRender::cmpVP);
 	VPMS ears(fn_pt1);

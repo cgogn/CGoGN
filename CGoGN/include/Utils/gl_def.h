@@ -89,14 +89,14 @@ inline void glCheckErrors()
 {
 	GLenum glError = glGetError();
 	if (glError != GL_NO_ERROR)
-		CGoGNerr<<"GL error: " << gluErrorString(glError) << CGoGNendl;
+		CGoGNerr<<"GL error: " << glError << CGoGNendl;
 }
 
 inline void glCheckErrors(const std::string& message)
 {
 	GLenum glError = glGetError();
 	if (glError != GL_NO_ERROR)
-		CGoGNerr<< message <<" : " << gluErrorString(glError) << CGoGNendl;
+		CGoGNerr<< message <<" : " << glError << CGoGNendl;
 }
 #endif
 

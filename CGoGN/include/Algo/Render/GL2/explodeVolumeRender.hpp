@@ -105,9 +105,7 @@ void ExplodeVolumeRender::computeFace(typename PFP::MAP& map, Dart d, const EMBV
 									  const typename PFP::VEC3& centerFace, const typename PFP::VEC3& /*centerNormalFace*/,
                                       std::vector<typename PFP::VEC3>& vertices, std::vector<typename PFP::VEC3>& normals)
 {
-    //typedef typename PFP::VEC3 VEC3;
 	typedef typename EMBV::DATA_TYPE VEC3;
-	typedef typename PFP::REAL REAL;
 
 	normals.clear();
 	vertices.clear();
@@ -148,9 +146,7 @@ template<typename PFP, typename V_ATT, typename W_ATT>
 void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const V_ATT& positions, const W_ATT& colorPerXXX)
 {
 	typedef typename V_ATT::DATA_TYPE VEC3;
-	typedef typename W_ATT::DATA_TYPE COL3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
@@ -284,7 +280,6 @@ void ExplodeVolumeRender::updateSmooth(typename PFP::MAP& map, const EMBV& posit
 {
 	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::REAL REAL;
 	typedef typename Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
@@ -431,7 +426,6 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const V_ATT& positi
     //typedef typename PFP::VEC3 VEC3;
 	typedef typename V_ATT::DATA_TYPE VEC3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
@@ -541,7 +535,6 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const EMBV& positio
 
 	typedef typename EMBV::DATA_TYPE VEC3;
 	typedef typename PFP::MAP MAP;
-	typedef typename PFP::REAL REAL;
 	typedef Geom::Vec3f VEC3F;
 
 	VolumeAutoAttribute<VEC3, MAP> centerVolumes(map, "centerVolumes");
