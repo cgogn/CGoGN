@@ -6,12 +6,12 @@ find_package(Qt5Widgets REQUIRED)
 
 # aliases (module Widgets included by default)
 macro(qt_use_modules)
-  qt5_use_modules(${ARGN} Widgets)
+  #qt5_use_modules(${ARGN} Widgets)
 endmacro()
 
 # macro that include module need by cgogn
 macro(qt_use_cgogn_modules)
-  qt5_use_modules(${ARGN} Gui OpenGL Xml Svg Widgets)
+  #qt5_use_modules(${ARGN} Gui OpenGL Xml Svg Widgets)
 endmacro()
 
 macro(qt_wrap_cpp)

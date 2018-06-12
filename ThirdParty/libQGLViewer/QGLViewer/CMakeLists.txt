@@ -86,7 +86,13 @@ set(MOC_FILES_GROUP "Generated")
 set(MOC_UI_FILES_GROUP "Generated")
 set(FORM_FILES_GROUP "Generated")
 
-include_directories("..")
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Widgets)
+find_package(Qt5Opengl)
+find_package(Qt5Xml)
+find_package(Qt5Svg)
+include_directories(".." ${Qt5OpenGL_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS})
 
 
 if(WIN32)
@@ -97,7 +103,7 @@ endif()
 
 
 add_library(QGLViewer SHARED ${HEADER_FILES} ${MOC_FILES} ${MOC_UI_FILES} ${FORM_FILES} ${SOURCE_FILES})
-target_link_libraries(QGLViewer  ${OPENGL_LIBRARY})
+target_link_libraries(QGLViewer  ${Qt5OpenGL_LIBRARIES} ${Qt5Xml_LIBRARIES} ${Qt5Svg_LIBRARIES} ${OPENGL_LIBRARY}  )
 qt_use_modules(QGLViewer Core OpenGL Xml Svg Gui)
 IF(${CGoGN_DESIRED_QT_VERSION} STREQUAL "5")
 	qt_use_modules(QGLViewer Widgets)
