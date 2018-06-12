@@ -226,7 +226,7 @@ bool MapMulti::saveMapBin(const std::string& filename) const
 	unsigned int *buffi = reinterpret_cast<unsigned int*>(buff + 64);
 	*buffi = NB_ORBITS;
 	fs.write(reinterpret_cast<const char*>(buff), 256);
-	delete buff;
+	delete[] buff;
 
 	// save all attribs
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
