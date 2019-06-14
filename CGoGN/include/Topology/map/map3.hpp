@@ -1427,7 +1427,15 @@ unsigned int Map3<MAP_IMPL>::closeHole(Dart d, bool forboundary )
 		Dart f = it ;
 
 		unsigned int degree = this->faceDegree(f) ;
-		Dart b = newBoundaryCycle(degree) ;
+		Dart b;
+		if( forboundary )
+		{
+			b = newBoundaryCycle(degree);
+		}
+		else
+		{
+			b = Map1<MAP_IMPL>::newCycle( degree );
+		}
 		++count ;
 
 		Dart bit = b ;
